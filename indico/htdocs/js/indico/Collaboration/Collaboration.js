@@ -19,7 +19,7 @@ var highlightColor = "#FFFF88";
  * @param {Array of String} errors An Array of strings with the errors to display.
  */
 var CSErrorPopup = function (title, errors, afterMessage) {
-    var popup = new ErrorPopup(Html.span("errorTitle", title), errors, Html.span("messageAfterErrors", afterMessage));
+    var popup = new ErrorPopup(title, errors, Html.span("messageAfterErrors", afterMessage));
     popup.open();
 };
 
@@ -802,49 +802,40 @@ var rejectBooking = function(booking, conferenceId) {
     var title = "Reason for rejection";
 
 
-    var popup = new ExclusivePopup(title, function(){return true;});
+    var popup = new ConfirmPopup(title, null, function(confirmed) {
+        if(!confirmed) {
+            return;
+        }
+        var killProgress = IndicoUI.Dialogs.Util.progress("Rejecting booking...");
+        var reason = this.textarea.get();
 
-    popup.draw = function(){
+        indicoRequest(
+            'collaboration.rejectCSBooking',
+            {
+                conference: conferenceId,
+                reason: reason,
+                bookingId: booking.id
+            },
+            function(result,error) {
+                if (!error) {
+                    refreshBooking(result);
+                    killProgress();
+                } else {
+                    killProgress();
+                    IndicoUtil.errorReport(error);
+                }
+            }
+        );
+    }, 'OK', 'Cancel Rejection');
+
+    popup.draw = function() {
         var self = this;
         var span1 = Html.span('', "Please write the reason of your rejection (short):");
-        var textarea = Html.textarea({style:{marginTop: '5px', marginBottom: '5px'}, id: "rejectionTextarea", rows: 3, cols: 30});
+        this.textarea = Html.textarea({style:{marginTop: '5px', marginBottom: '5px'}, id: "rejectionTextarea", rows: 3, cols: 30});
         var span2 = Html.span('', "The reason will be displayed to the user.");
 
-        // We construct the "ok" button and what happens when it's pressed
-        var okButton = Html.input('button', '', "OK");
-        okButton.observeClick(function() {
-            var killProgress = IndicoUI.Dialogs.Util.progress("Rejecting booking...");
-            var reason = textarea.get();
-
-            indicoRequest(
-                'collaboration.rejectCSBooking',
-                {
-                    conference: conferenceId,
-                    reason: reason,
-                    bookingId: booking.id
-                },
-                function(result,error) {
-                    if (!error) {
-                        refreshBooking(result);
-                        killProgress();
-                    } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-            );
-            self.close();
-        });
-
-        // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, "Cancel Rejection");
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-
-        var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, okButton, cancelButton)
-
-        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, Html.br(), textarea, Html.br(), span2, Html.br(), buttonDiv]));
+        this.content = Widget.block([span1, Html.br(), this.textarea, Html.br(), span2]);
+        return this.ConfirmPopup.prototype.draw.call(this);
     };
 
     popup.open();
@@ -1049,15 +1040,6 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             }
         },
 
-        /**
-         * Opens the popup, but does NOT call postdraw()
-         * Necessary so that we can call plugin's onCreate() or onEdit() between draw() and postdraw()
-         */
-        open: function() {
-            $E(document.body).append(this.draw());
-            this.isopen = true;
-        },
-
         draw: function() {
             var self = this;
 
@@ -1074,20 +1056,6 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             // We initialize the parameter manager in order to make checks on the fields
             this.__buildParameterManager();
 
-            // We construct the "save" button and what happens when it's pressed
-            var saveButton = Html.input('button', null, $T("Save"));
-            saveButton.observeClick(function(){
-                self.__save();
-            });
-
-            // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, $T("Cancel"));
-            cancelButton.observeClick(function(){
-                self.close();
-            });
-
-            var buttonDiv = Html.div({}, saveButton, cancelButton);
-
             var width = 600;
             if (pluginHasFunction(self.bookingType, "getPopupWidth")) {
                 var width = codes[self.bookingType].getPopupWidth();
@@ -1096,11 +1064,23 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
 
             this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, null);
 
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw(), buttonDiv,
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw(), null,
                     {backgroundColor: "#FFFFFF"});
         },
 
-        postDraw: function() {
+        _getButtons: function() {
+            var self = this;
+            return [
+                [$T('Save'), function() {
+                    self.__save();
+                }],
+                [$T('Cancel'), function() {
+                    self.close();
+                }]
+            ];
+        },
+
+        afterDraw: function() {
 
             // If we are modifying a booking, we put the booking's values the dialog's input fields
             if (this.popupType === 'edit') {
@@ -1125,7 +1105,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             }
 
             this.tabControl.heightToTallestTab();
-            this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
+            this.postDraw();
 
             // We put calendar widgets on the date fields
             this.__drawCalendarWidgets();
@@ -1287,7 +1267,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             var title = this.bookingType + ' booking modification';
         }
         this.conferenceId = conferenceId;
-        this.ExclusivePopupWithButtons(title, positive);
+        this.ExclusivePopupWithButtons(title);
 
         // We initialize the dictionary where the values sent to the server
         // will be sent on save
@@ -1321,7 +1301,7 @@ var createBooking = function(pluginName, conferenceId) {
     if (pluginHasFunction(pluginName, "onCreate")) {
         codes[pluginName].onCreate(popup);
     }
-    popup.postDraw();
+    popup.afterDraw();
 
     return true;
 }
@@ -1339,7 +1319,7 @@ var editBooking = function(booking, conferenceId) {
     if (pluginHasFunction(booking.type, "onEdit")) {
         codes[booking.type].onEdit(booking, popup);
     }
-    popup.postDraw();
+    popup.afterDraw();
 }
 
 /**
@@ -1593,63 +1573,45 @@ var withdrawRequest = function(pluginName, conferenceId) {
         var self = this;
         var title = $T("Withdraw request");
 
-        var popup = new ExclusivePopup(title, function(){return true;});
-        popup.draw = function(){
-            var self = this;
-            var span = Html.span("", $T("Are you sure you want to withdraw the request?"));
+        var popup = new ConfirmPopup(title, $T('Are you sure you want to withdraw the request?'), function(confirmed) {
+            if(!confirmed) {
+                return;
+            }
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Withdrawing your request..."));
 
-            // We construct the "ok" button and what happens when it's pressed
-            var okButton = Html.input('button', null, "Withdraw");
-            okButton.observeClick(function() {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T("Withdrawing your request..."));
-
-                indicoRequest(
-                    'collaboration.removeCSBooking',
-                    {
-                        conference: conferenceId,
-                        bookingId: singleBookings[pluginName].id
-                    },
-                    function(result,error) {
-                        if (!error) {
-                            if (result.error) {
-                                killProgress();
-                                if (result._type === 'CSSanitizationError') {
-                                    sanitizationError(result.invalidFields);
-                                } else {
-                                    codes[pluginName].errorHandler('remove', result, singleBookings[pluginName]);
-                                }
+            indicoRequest(
+                'collaboration.removeCSBooking',
+                {
+                    conference: conferenceId,
+                    bookingId: singleBookings[pluginName].id
+                },
+                function(result,error) {
+                    killProgress();
+                    if (!error) {
+                        if (result.error) {
+                            if (result._type === 'CSSanitizationError') {
+                                sanitizationError(result.invalidFields);
                             } else {
-                                // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
-                                removeIFrame(singleBookings[pluginName]);
-                                singleBookings[pluginName] = null;
-                                refreshPlugin(pluginName);
-                                if (pluginHasFunction(pluginName, 'clearForm')) {
-                                    codes[pluginName]['clearForm']()
-                                }
-                                killProgress();
-                                if (pluginHasFunction(pluginName, 'postDelete')) {
-                                    codes[pluginName].postDelete(result);
-                                }
+                                codes[pluginName].errorHandler('remove', result, singleBookings[pluginName]);
                             }
                         } else {
-                            killProgress();
-                            IndicoUtil.errorReport(error);
+                            // If the server found no problems, we remove the booking from the watchlist and remove the corresponding iframe.
+                            removeIFrame(singleBookings[pluginName]);
+                            singleBookings[pluginName] = null;
+                            refreshPlugin(pluginName);
+                            if (pluginHasFunction(pluginName, 'clearForm')) {
+                                codes[pluginName]['clearForm']()
+                            }
+                            if (pluginHasFunction(pluginName, 'postDelete')) {
+                                codes[pluginName].postDelete(result);
+                            }
                         }
+                    } else {
+                        IndicoUtil.errorReport(error);
                     }
-                );
-                self.close();
-            });
-
-            // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, $T("Cancel"));
-            cancelButton.observeClick(function(){
-                self.close();
-            });
-
-            var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, okButton, cancelButton)
-
-            return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span, Html.br(), buttonDiv]));
-        }
+                }
+            );
+        }, 'Withdraw', 'Cancel');
         popup.open();
     }
 };
