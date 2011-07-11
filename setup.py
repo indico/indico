@@ -124,7 +124,7 @@ def _getInstallRequires():
 
     base =  ['ZODB3>=3.8', 'pytz', 'zope.index', 'zope.interface', 'simplejson',
              'suds', 'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil<2.0',
-             'pypdf', 'mako>=0.4.1']
+             'pypdf', 'mako>=0.4.1', 'babel']
 
     #for Python older than 2.7
     if sys.version_info[0] <= 2 and sys.version_info[1] < 7:

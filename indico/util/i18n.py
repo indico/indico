@@ -27,6 +27,8 @@ from distutils.cmd import Command
 import ast
 
 # external lib imports
+import pkg_resources
+
 try:
     from babel.support import Translations
     from translations import *
@@ -39,14 +41,15 @@ except:
     pass
 
 
-import pkg_resources
+try:
+    INDICO_DIST = pkg_resources.get_distribution('indico')
+except pkg_resources.DistributionNotFound:
+    INDICO_DIST = None
 
-# indico imports
+if INDICO_DIST:
+    LOCALE_DIR = INDICO_DIST.get_resource_filename('indico', 'indico/locale')
 
-
-LOCALE_DIR = pkg_resources.get_distribution('indico').get_resource_filename('indico', 'indico/locale')
 LOCALE_DOMAIN = 'messages'
-
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
 
 
@@ -69,7 +72,10 @@ def getAllLocales():
     """
     List all available locales/translations
     """
-    return [loc for loc in pkg_resources.get_distribution('indico').resource_listdir('indico/locale') if '.' not in loc]
+    if INDICO_DIST:
+        return [loc for loc in INDICO_DIST.resource_listdir('indico/locale') if '.' not in loc]
+    else:
+        return []
 
 
 availableLocales = getAllLocales()
