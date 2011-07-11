@@ -571,7 +571,7 @@ type("SaveConfirmPopup", ["ExclusivePopupWithButtons"],
 
         this.content = content;
         this.handler = handler;
-        this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
+        this.ExclusivePopupWithButtons(title, function(){
             self.handler(0);
             return true;
         });
