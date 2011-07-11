@@ -13,13 +13,13 @@
 # General Public License for more details.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"Project-Id-Version: 0.98-dev\n"
+"Report-Msgid-Bugs-To: indico-team@cern.ch\n"
 "POT-Creation-Date: 2011-07-04 14:06+0200\n"
-"PO-Revision-Date: 2011-07-08 11:07+0100\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2011-07-11 10:15+0200\n"
+"Last-Translator: Anamaria Costache\n"
 "Language-Team: French\n"
-"Language: \n"
+"Language: French\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1626,7 +1626,7 @@ msgstr ""
 "        Cher/Chère %s %s, \n"
 "\n"
 "        %s %s, le responsable de l'évènement '%s' voudrait vous inviter à y prendre part.         Il se déroule le %s à %s, %s. Des informations supplémentaires sont \n"
-"accessibles à %s \n"
+"        accessibles à %s \n"
 "        Vous êtes cordialement invités à accepter ou décliner l'offre en \n"
 "        cliquant sur le lien suivant : \n"
 "        %s \n"
@@ -1634,6 +1634,8 @@ msgstr ""
 "        Dans l'espoir de vous rencontrer à %s \n"
 "        Votre Indico \n"
 "        au nom de %s %s\n"
+"\n"
+"        "
 
 #: MaKaC/participant.py:402
 #: indico/MaKaC/participant.py:402
@@ -2276,6 +2278,7 @@ msgstr ""
 "             Il y a un nouvel inscrit dans '%s'. Voir information ci-dessous: \n"
 "\n"
 "             %s\n"
+"                      "
 
 #: MaKaC/registration.py:939
 #: indico/MaKaC/registration.py:939
@@ -2479,20 +2482,20 @@ msgstr "Vous ne pouvez pas choisir 2 fois la même session"
 #: indico/MaKaC/registration.py:3626
 #, python-format
 msgid "We are sorry but there are not enough places for the social event \"%s\".                          "
-msgstr "Nous sommes désolés mais il n'y a pas assez de places pour l'événement social\"%s\"."
+msgstr "Nous sommes désolés mais il n'y a pas assez de places pour l'événement social\"%s\".                          "
 
 #: MaKaC/registration.py:3633
 #: indico/MaKaC/registration.py:3633
 #, python-format
 msgid "Impossible to decrease %s places for \"%s\" because the current number of                         places would be less than zero"
-msgstr "Impossible de diminuer le nombre de places pour \"%s\" car il serait alors inférieur à zéro."
+msgstr "Impossible de diminuer de %s le nombre de                         places pour \"%s\" car il serait alors inférieur à zéro"
 
 #: MaKaC/registration.py:3754
 #: MaKaC/webinterface/tpls/RegFormSocialEventModifFrame.tpl:21
 #: indico/MaKaC/registration.py:3754
 #: indico/MaKaC/webinterface/tpls/RegFormSocialEventModifFrame.tpl:21
 msgid "Social Events"
-msgstr "Évènements sociaux"
+msgstr "Événements sociaux"
 
 #: MaKaC/registration.py:3773
 #: MaKaC/webinterface/pages/conferences.py:7096
@@ -4586,7 +4589,9 @@ msgstr "Une erreur inconnue s'est produite lors de la mise à jour de l'informat
 msgid ""
 "Unknown error occured when updating MICALA START task information in micala database: %s\n"
 "."
-msgstr "Une erreur inconnue s'est produite lors de la mise à jour de l'information de la tâche MICALA START dans la base de donnés micala: %s\n"
+msgstr ""
+"Une erreur inconnue s'est produite lors de la mise à jour de l'information de la tâche MICALA START dans la base de donnés micala: %s\n"
+"."
 
 #: MaKaC/plugins/Collaboration/RecordingManager/common.py:738
 #: indico/MaKaC/plugins/Collaboration/RecordingManager/common.py:738
@@ -12110,7 +12115,9 @@ msgstr ""
 msgid ""
 "xml parse error: unknown question type \"%s\"\n"
 "                                            "
-msgstr "xml parse error: type de question inconnue \"%s\"\n"
+msgstr ""
+"xml parse error: type de question inconnue \"%s\"\n"
+"                                            "
 
 #: MaKaC/webinterface/rh/groups.py:99
 #: indico/MaKaC/webinterface/rh/groups.py:99
@@ -18388,7 +18395,7 @@ msgstr "Vous pouvez utiliser les balises suivantes pour personnaliser vos répon
 #: MaKaC/webinterface/tpls/ConfModifEPaymentWorldPayDataModif.tpl:31
 #: indico/MaKaC/webinterface/tpls/ConfModifEPaymentWorldPayDataModif.tpl:31
 msgid "the % character is reserved. Use %% to use it."
-msgstr "Le caractère % est réservé. Pour écrire ce caractère, utilisez %%."
+msgstr "le caractère % est réservé. Utilisez %% pour l'écrire."
 
 #: MaKaC/webinterface/tpls/ConfModifEPaymentYellowPay.tpl:13
 #: MaKaC/webinterface/tpls/ConfModifEPaymentYellowPayDataModif.tpl:12
@@ -21502,7 +21509,7 @@ msgstr "ATTENTION!!"
 #: indico/MaKaC/webinterface/tpls/ContribSubmitMaterialConfirmation.tpl:29
 #, python-format
 msgid "You have selected to submit as %s material the file"
-msgstr "Vous avez choisi d'envoyer le fichier en tant que document %"
+msgstr "Vous avez choisi d'envoyer le fichier en tant que document %s"
 
 #: MaKaC/webinterface/tpls/ContribSubmitMaterialConfirmation.tpl:33
 #: indico/MaKaC/webinterface/tpls/ContribSubmitMaterialConfirmation.tpl:33
@@ -21901,7 +21908,7 @@ msgstr "Avertissement: tous vos critiques du contenu n'ont pas encore soumis leu
 #: MaKaC/webinterface/tpls/ContributionReviewingJudgements.tpl:83
 #: indico/MaKaC/webinterface/tpls/ContributionReviewingJudgements.tpl:83
 msgid "Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this."
-msgstr "Ici est affiché le jugement donné par le répondant.<br/> Si vous êtes le répondant de cette contribution, vous pouvez le changer. "
+msgstr "Ici est affiché le jugement donné par le répondant.<br/> Si vous êtes le répondant de cette contribution, vous pouvez le changer."
 
 #: MaKaC/webinterface/tpls/ContributionReviewingJudgements.tpl:91
 #: indico/MaKaC/webinterface/tpls/ContributionReviewingJudgements.tpl:91
@@ -21959,13 +21966,13 @@ msgid ""
 msgstr ""
 "Demande de création de site web autonome bien reçue.\n"
 "            Vous recevrez bientôt un courriel vous annonçant la complétion de l'action.\n"
-"            Veuillez attendre et merci de ne pas réitérer cette demande de multiples fois. \n"
-"            En cas de doute ou de délai excessif, vous pouvez contacter <a href=\"mailto:%(supportAddr)s\">le support Indico</a>."
+"            Veuillez attendre et merci de ne pas réitérer cette demande             de multiples fois. \n"
+"            En cas de doute ou de délai excessif, vous pouvez contacter <a href=\"mailto:%s\" enctype=\"text/plain\">le support Indico</a>."
 
 #: MaKaC/webinterface/tpls/DomainControlFrame.tpl:3
 #: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:3
 msgid "Domain control"
-msgstr "Controle d´accès par domaine IP"
+msgstr "Controle d'accès par domaine IP"
 
 #: MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
 #: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
@@ -24790,8 +24797,8 @@ msgid ""
 "                In example for capacity = 20, rooms having capacity 16 - 24\n"
 "                will be included in searching results."
 msgstr ""
-"Chercher seulement les salles avec une capacité de + ou - 20%%. \n"
-"                Par exemple pour une capacité = 20, toutes les salles dont la capacité est comprise entre 16 et 24\n"
+"Chercher seulement les salles avec une capacité dans une fourchette de 20%. \n"
+"                Par exemple pour une capacité = 20, toutes les salles dont la capacité est de 16-24\n"
 "                seront retournées."
 
 #: MaKaC/webinterface/tpls/RoomBookingSearch4Rooms.tpl:164
@@ -24800,7 +24807,7 @@ msgid ""
 "If there are no rooms of capacity within 20% range,\n"
 "                system will search for greater capacity."
 msgstr ""
-"Si aucune salle n´a une capacité à + ou - 20%%, \n"
+"Si aucune salle n'a une capacité dans une fourchette de 20%, \n"
 "                le système cherchera des salles plus grandes."
 
 #: MaKaC/webinterface/tpls/RoomBookingSearch4Rooms.tpl:168
