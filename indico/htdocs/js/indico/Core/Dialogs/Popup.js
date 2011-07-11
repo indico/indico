@@ -59,7 +59,7 @@ type("ExclusivePopup", ["Printable"], {
         this.canvas.dialog('open');
     },
 
-    draw: function(content, customStyle) {
+    draw: function(content, customStyle, popupStyle) {
         customStyle = customStyle || {};
         if(!content) {
             content = '';
@@ -68,7 +68,10 @@ type("ExclusivePopup", ["Printable"], {
             content = content.dom;
         }
 
-        var container = $('<div class="exclusivePopup"/>').css(customStyle).append(content);
+        if(popupStyle === undefined) {
+            popupStyle = customStyle;
+        }
+        var container = $('<div class="exclusivePopup"/>').css(popupStyle).append(content);
 
         this.showCloseButton = !!this.title;
         this._makeCanvas();
