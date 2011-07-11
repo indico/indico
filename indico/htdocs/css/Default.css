@@ -5199,7 +5199,7 @@ div.balloonPopupCloseButton {
 
 .loadingPopup {
     background: transparent url('../images/load_lightblue.gif') scroll no-repeat center center;
-    min-width: 130px;
+    min-width: 180px;
     height: 70px;
 }
 .loadingPopup .text {

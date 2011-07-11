@@ -188,7 +188,7 @@ type("ProgressDialog",["ExclusivePopup"],
                  this,
                  Html.div('loadingPopup',
                           Html.div('text', this.text)),
-                 {background: '#424242', border: 'none', padding: '20px', overflow:'auto'});
+                 {background: '#424242', border: 'none', padding: '20px 5px', overflow:'auto'});
          }
      },
      function(text) {
