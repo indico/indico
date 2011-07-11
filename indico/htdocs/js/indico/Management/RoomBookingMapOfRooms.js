@@ -45,20 +45,29 @@ type("MapAspectDataPopup", ["ExclusivePopupWithButtons"],
                 [$T('Default on start-up'), $B(Html.checkbox({}), aspectData.accessor('defaultOnStartup'))]
             ]);
 
-            var buttons = Html.div({},
-                    Widget.link(command(curry(this.action, aspectData, function() {self.close();}), Html.input("button", {}, $T("Save")))),
-                    Widget.link(command(function() {self.close();}, Html.input("button", {}, $T("Cancel")))));
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
+        },
 
-             return this.ExclusivePopupWithButtons.prototype.draw.call(this, form, buttons);
-         }
-
-     },
-     function(title, aspectData, action) {
-         this.aspectData = aspectData;
-         this.action = action;
-         this.ExclusivePopup(title,  function(){return true;});
-     }
-    );
+        _getButtons: function() {
+            var self = this;
+            return [
+                [$T('Save'), function() {
+                    self.action(self.aspectData, function() {
+                        self.close();
+                    });
+                }],
+                [$T('Cancel'), function() {
+                    self.close();
+                }]
+            ];
+        }
+    },
+    function(title, aspectData, action) {
+        this.aspectData = aspectData;
+        this.action = action;
+        this.ExclusivePopup(title);
+    }
+);
 
 /**
  * Creates a list of aspects. Each aspect can be edited or removed.
