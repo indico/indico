@@ -153,6 +153,7 @@
 <script type="text/javascript">
 
 var newAspectsHandler = function(newAspect, setResult) {
+    var killProgress = IndicoUI.Dialogs.Util.progress();
     indicoRequest(
         'roomBooking.mapaspects.create',
         {
@@ -160,6 +161,7 @@ var newAspectsHandler = function(newAspect, setResult) {
             aspect: newAspect
         },
         function(result,error) {
+            killProgress();
             if (!error) {
                 setResult(true);
             } else {
@@ -171,6 +173,7 @@ var newAspectsHandler = function(newAspect, setResult) {
 }
 
 var editAspectHandler = function(oldAspect, setResult, newAspect) {
+    var killProgress = IndicoUI.Dialogs.Util.progress();
     indicoRequest(
         'roomBooking.mapaspects.update',
         {
@@ -178,6 +181,7 @@ var editAspectHandler = function(oldAspect, setResult, newAspect) {
             aspect: newAspect
         },
         function(result,error) {
+            killProgress();
             if (!error) {
                 setResult(true);
             } else {
@@ -189,6 +193,7 @@ var editAspectHandler = function(oldAspect, setResult, newAspect) {
 }
 
 var removeAspectHandler = function(aspect, setResult) {
+    var killProgress = IndicoUI.Dialogs.Util.progress();
     indicoRequest(
         'roomBooking.mapaspects.remove',
         {
@@ -196,6 +201,7 @@ var removeAspectHandler = function(aspect, setResult) {
             aspectId: aspect.get('id')
         },
         function(result,error) {
+            killProgress();
             if (!error) {
                 setResult(true);
             } else {
