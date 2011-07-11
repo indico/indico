@@ -254,11 +254,11 @@ type("ImportDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                  * Enables insert button whether some elements are selected at both importer and timetable list
                  */
                 var _observeInsertButton =  function(){
-                    if(self.importerList.getSelectedList().getLength() > 0 &&
-                           self.timetableList.getSelection() )
-                        self.insertButton.enable();
+                    if(self.importerList.getSelectedList().getLength() > 0 && self.timetableList.getSelection() )
+                        self.insertButton.disabledButtonWithTooltip('enable');
                     else
-                        self.insertButton.disable();
+                        self.insertButton.disabledButtonWithTooltip('disable');
+
                 };
                 this.importerList = new ImporterList([],
                         {"height" : this.height - 80, "width" : this.width / 2 - 20, "cssFloat" : "left"},
@@ -270,47 +270,36 @@ type("ImportDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                         Html.div({className:'importDialogHeader', style:{width:pixels(this.width * 0.9)}}, query, searchButton, $T(" in "), importFrom),
                         this.emptySearchDiv.draw(), this.importerList.draw(), this.timetableList.draw());
             },
-            /**
-             * Draws buttons at the bottom of the dialog.
-             */
-            drawButtons: function(){
+            _getButtons: function() {
                 var self = this;
-                this.insertButton = new DisabledButton(Html.input('button',{disabled:true}, $T('Proceed...')));
-                var insertButtonTooltip;
-                this.insertButton.observeEvent('mouseover', function(event){
-                    if (!self.insertButton.isEnabled()) {
-                       insertButtonTooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("Please select contributions to be added and their destination."), "tooltipError");
-                    }
-                });
-                this.insertButton.observeEvent('mouseout', function(event){
-                    Dom.List.remove(document.body, insertButtonTooltip);
-                });
-                this.insertButton.observeClick(function() {
+                return [
+                    [$T('Proceed...'), function() {
                         var destination = self.timetableList.getSelection();
                         var entries = self.importerList.getSelectedList();
                         var importer = self.importerList.getLastImporter();
-                        new ImporterDurationDialog(entries, destination,  self.confId, self.timetable, importer, function(redirect){
-                            if( !redirect ) {
+                        new ImporterDurationDialog(entries, destination,  self.confId, self.timetable, importer, function(redirect) {
+                            if(!redirect) {
                                 self._hideLists();
                                 self.timetableList.clearSelection();
                                 self.importerList.clearSelection();
                                 self.emptySearchDiv.showAfterSearch();
-                            } else
+                            } else {
                                 self.close();
+                            }
                         });
-                 });
-                return Html.div({}, this.insertButton.draw());
-            },
-            /**
-             * Overloaded method. Sets height and width of the dialog.
-             */
-            _adjustContentWrapper: function() {
-                this.ExclusivePopupWithButtons.prototype._adjustContentWrapper.call(this);
-                this.contentWrapper.setStyle("height", this.height);
-                this.contentWrapper.setStyle("width", this.width);
+                    }],
+                    [$T('Close'), function() {
+                        self.close();
+                    }]
+                ];
             },
             draw: function(){
-                return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.drawContent(), this.drawButtons());
+                this.insertButton = this.buttons.eq(0);
+                this.insertButton.disabledButtonWithTooltip({
+                    tooltip: $T('Please select contributions to be added and their destination.'),
+                    disabled: true
+                });
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.drawContent());
             }
         },
         /**
@@ -324,7 +313,7 @@ type("ImportDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
          */
         function(timetable){
             var self = this;
-            this.ExclusivePopupWithButtons(Html.div({style:{textAlign:"center"}},$T("Import Entries")));
+            this.ExclusivePopupWithButtons($T("Import Entries"));
             this.timetable = timetable?timetable:window.timetable;
             this.timetable = this.timetable.parentTimetable?this.timetable.parentTimetable:this.timetable
             this.confId = this.timetable.contextInfo.id;
@@ -462,20 +451,20 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
                 }
             },
 
-            drawButtons: function(){
+            _getButtons: function() {
                 var self = this;
-                var insertButton = Html.input("button",{},$T("Insert"));
-                var entriesLength = self.entries.getLength();
-
-                insertButton.observeClick(function(){
-                    if( self.parameterManager.check() ) {
+                return [
+                    [$T('Insert'), function() {
+                        if(!self.parameterManager.check()) {
+                            return;
+                        }
                         //Converts string containing contribution's start date(HH:MM) into a number of minutes.
                         //Using parseFloat because parseInt('08') = 0.
                         var time = parseFloat(self.info.get('startTime').split(':')[0]) * 60 + parseFloat(self.info.get('startTime').split(':')[1]);
                         var duration = parseInt(self.info.get('duration'));
                         var method = self._extractMethod();
                         //If last contribution finishes before 24:00
-                        if( time + duration * entriesLength <= 1440) {
+                        if( time + duration * self.entries.getLength() <= 1440) {
                             var killProgress = IndicoUI.Dialogs.Util.progress();
                             var date = self.destination.startDate.date.replace(/-/g,'/');
                             var args = [];
@@ -508,21 +497,25 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
                             var finalCallback = function(){
                                 if(self.successFunction)
                                     self.successFunction(self.info.get('redirect'));
-                                if( self.info.get('redirect') )
+                                if(self.info.get('redirect'))
                                     window.location = self._extractRedirectUrl();
                                 self.close();
                                 killProgress();
                             };
                             ImporterUtils.multipleIndicoRequest(args, successCallback , null, finalCallback);
                         }
-                        else
+                        else {
                             new WarningPopup("Warning", "Some contributions will end after 24:00. Please modify start time and duration.").open();
-                    }
-                });
-                return Html.div({}, insertButton);
+                        }
+                    }],
+                    [$T('Cancel'), function() {
+                        self.close();
+                    }]
+                ];
+
             },
             draw: function(){
-                return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.drawContent(), this.drawButtons());
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.drawContent());
             }
         },
         /**
@@ -536,7 +529,7 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
          */
         function(entries, destination, confId, timetable, importer, successFunction){
             var self = this;
-            this.ExclusivePopupWithButtons(Html.div({style:{textAlign:"center"}},$T("Adjust entries")));
+            this.ExclusivePopupWithButtons($T('Adjust entries'));
             this.confId = confId;
             this.entries = entries;
             this.destination = destination;
