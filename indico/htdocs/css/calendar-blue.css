@@ -30,7 +30,7 @@
 
 div.calendar {
     position: relative;
-    z-index: 4;
+    z-index: 20000;
     border: 1px solid #888888;
     padding: 1px;
     width: 182px;
