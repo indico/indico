@@ -32,12 +32,13 @@ import sys
 from distutils.sysconfig import get_python_lib, get_python_version
 from distutils.cmd import Command
 from distutils.command import bdist
+from indico.util import i18n
+
 
 import pkg_resources
 from setuptools.command import develop, install, sdist, bdist_egg, easy_install
 from setuptools import setup, find_packages, findall
 
-from indico.util import i18n
 
 try:
     from babel.messages import frontend as babel
@@ -207,8 +208,9 @@ class fetchdeps:
 
         wset = pkg_resources.working_set
 
-        wset.resolve(map(pkg_resources.Requirement.parse, _getInstallRequires()),
-                           installer = self._installMissing)
+        wset.resolve(map(pkg_resources.Requirement.parse,
+                         filter(lambda x: x != None, _getInstallRequires())),
+                     installer=self._installMissing)
 
         print "Done!"
 
@@ -218,7 +220,11 @@ class fetchdeps:
         print dist, EXTRA_RESOURCES_URL
         easy_install.main(["-f", EXTRA_RESOURCES_URL, "-U", str(dist)])
         env.scan()
-        return env[str(dist)][0]
+
+        if env[str(dist)]:
+            return env[str(dist)][0]
+        else:
+            return None
 
 
 class fetchdeps_indico(fetchdeps, Command):

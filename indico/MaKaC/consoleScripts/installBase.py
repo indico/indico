@@ -174,10 +174,9 @@ def compileAllLanguages(cmd):
         pkg_resources.require('babel')
     except pkg_resources.DistributionNotFound:
         print """
-Babel not found! JSTools is needed for internationalization, if you're building Indico from source. Please install it.
+Babel not found! Babel is needed for internationalization if you're building Indico from source. Please install it and re-run this program.
 i.e. try 'easy_install babel'"""
         sys.exit(-1)
-
 
     # call commands directly
     cc = cmd.distribution.get_command_obj('compile_catalog')

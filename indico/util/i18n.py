@@ -20,84 +20,37 @@
 # system lib imports
 import os
 import re
+import sys
 
 # stdlib imports
 from distutils.cmd import Command
-from gettext import NullTranslations
 import ast
 
 # external lib imports
-from babel.support import Translations, LazyProxy
-from babel.core import Locale
+try:
+    from babel.support import Translations
+    from translations import *
+
+    _ = ugettext = gettext = lazyTranslations.ugettext
+    ngettext = ungettext = lazyTranslations.ungettext
+
+except:
+    # no Babel
+    pass
+
+
 import pkg_resources
 
 # indico imports
-import indico.locale
-
-# legacy indico imports
-from MaKaC.common.contextManager import ContextManager
 
 
-LOCALE_DIR = os.path.dirname(indico.locale.__file__)
+LOCALE_DIR = pkg_resources.get_distribution('indico').get_resource_filename('indico', 'indico/locale')
 LOCALE_DOMAIN = 'messages'
 
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
 
-# Store the locale in a thread-local object
-nullTranslations = NullTranslations()
-
-
-def _tr_eval(func, *args, **kwargs):
-    # ok, eval time... is there a translation?
-    if 'translation' in ContextManager.get():
-        # yes? good, let's do it
-        tr = ContextManager.get('translation')
-    else:
-        # no? too bad, just don't transate anything
-        tr = nullTranslations
-    return getattr(tr, func)(*args, **kwargs).encode('utf-8')
-
-
-class LazyTranslations(Translations):
-    """
-    Defers translation in case there is still no translation available
-    It will be then done when the value is finally used
-    """
-    def _wrapper(self, func, *args, **kwargs):
-        # if there is a locale already defined
-        if 'translation' in ContextManager.get():
-            # straight translation
-            translation = ContextManager.get('translation')
-            return getattr(translation, func)(*args, **kwargs).encode('utf-8')
-        else:
-            # otherwise, defer translation to eval time
-            return LazyProxy(_tr_eval, func, *args, **kwargs)
-
-    def ugettext(self, text):
-        return self._wrapper('ugettext', text)
-
-    def ngettext(self, text):
-        return self._wrapper('ngettext', text)
-
-
-lazyTranslations = LazyTranslations()
-lazyTranslations.install(unicode=True)
-
-_ = ugettext = gettext = lazyTranslations.ugettext
-ngettext = ungettext = lazyTranslations.ungettext
 
 defaultLocale = 'en_US'
-
-
-class IndicoLocale(Locale):
-    """
-    Extends the Babel Locale class with some utility methods
-    """
-    def weekday(self, daynum, short=True):
-        """
-        Returns the week day given the index
-        """
-        return self.days['format']['abbreviated' if short else 'wide'][daynum].encode('utf-8')
 
 
 def setLocale(locale):
@@ -116,7 +69,7 @@ def getAllLocales():
     """
     List all available locales/translations
     """
-    return [loc for loc in pkg_resources.resource_listdir('indico.locale', '') if '.' not in loc]
+    return [loc for loc in pkg_resources.get_distribution('indico').resource_listdir('indico/locale') if '.' not in loc]
 
 
 availableLocales = getAllLocales()
@@ -135,9 +88,8 @@ def getLocaleDisplayNames(using=None):
 
 def parseLocale(locale):
     """
-    Just a shortcut to babel
     """
-    return Locale.parse(locale)
+    return IndicoLocale.parse(locale)
 
 
 def i18nformat(text):
@@ -172,7 +124,7 @@ class generate_messages_js(Command):
             pkg_resources.require('pojson')
         except pkg_resources.DistributionNotFound:
             print """
-            pojson not found! JSTools is needed for JS i18n file generation, if you're building Indico from source. Please install it.
+            pojson not found! pojson is needed for JS i18n file generation, if you're building Indico from source. Please install it.
             i.e. try 'easy_install pojson'"""
             sys.exit(-1)
 

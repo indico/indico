@@ -1,0 +1,120 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+Defines the ContextManager, which provides a global access namespace for
+storing runtime information
+"""
+
+import threading
+
+
+class DummyDict(object):
+    """
+    A context that doesn't react, much like a Null Object
+    """
+
+    def __init__(self):
+        pass
+
+    def _dummyMethod(*args, **__):
+        """
+        this method just does nothing, accepting
+        whatever arguments are passed to it
+        """
+        return None
+
+    def __getattr__(self, name):
+        return self._dummyMethod
+
+    def __setattr__(self, name, value):
+        return None
+
+    def __str__(self):
+        return "<DummyDict>"
+
+
+class Context(threading.local):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+    def __contains__(self, elem):
+        return elem in self.__dict__
+
+    def __getitem__(self, elem):
+        return self.get(elem)
+
+    def get(self, elem, default=DummyDict()):
+        if elem in self.__dict__:
+            return self.__dict__[elem]
+        else:
+            return default
+
+    def __setitem__(self, elem, value):
+        self.__dict__[elem] = value
+
+    def clear(self):
+        self.__dict__.clear()
+
+    def setdefault(self, name, default):
+        return self.__dict__.setdefault(name, default)
+
+
+class ContextManager(object):
+    """
+    A context manager provides a global access namespace (singleton) for storing
+    run-time information.
+    """
+
+    _context = Context()
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def destroy(cls):
+        """
+        destroy the context
+        """
+        cls._context.clear()
+
+    @classmethod
+    def get(cls, elem=None, default=DummyDict()):
+        """
+        If no set has been done over the variable before,
+        a dummy context will be returned.
+        """
+        if elem == None:
+            return cls._context
+        else:
+            return cls._context.get(elem, default)
+
+    @classmethod
+    def set(cls, elem, value):
+        cls._context[elem] = value
+        return cls.get(elem)
+
+    @classmethod
+    def setdefault(cls, name, default):
+        """
+        If no set has been done over the variable before,
+        a default value is *set* and *returned*
+        """
+        return cls._context.setdefault(name, default)
