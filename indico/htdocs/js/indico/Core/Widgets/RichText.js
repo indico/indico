@@ -427,7 +427,7 @@ function cleanText(text, target){
                 each(parsingResult[2], function(value){
                     ul.append(Html.li('', value));
                 });
-                var popupErrorList = new AlertPopup(Html.span('warningTitle', "List of forbidden elements"), ul);
+                var popupErrorList = new AlertPopup('List of forbidden elements', ul.dom);
                 popupErrorList.open();
             });
 
@@ -435,26 +435,7 @@ function cleanText(text, target){
             var popup = new ConfirmPopup($T("Warning!"), Html.div({style: {width:pixels(300), textAlign:'justify'}},
                                          $T("Your data contains some potentially harmful " + security +
                                          ", which cannot be stored in the database. Use the automatic Indico cleaner or clean the text manually (see the list of forbidden elements that you are using "), showErrorList, ")."),
-                                         cleaningFunction);
-            popup.draw = function(){
-                var self = this;
-
-                var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('Clean automatically'));
-                okButton.observeClick(function(){
-                    self.close();
-                    self.handler(true);
-                });
-
-                var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Clean manually'));
-                cancelButton.observeClick(function(){
-                    self.close();
-                    self.handler(false);
-                });
-
-                return this.ExclusivePopupWithButtons.prototype.draw.call(this,
-                        this.content,
-                        Html.div({}, okButton, cancelButton));
-            }
+                                         cleaningFunction, 'Clean automatically', 'Clean manually');
             popup.open();
             return false;
         }
