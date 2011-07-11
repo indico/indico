@@ -53,15 +53,6 @@ def addDomains( req, **params ):
 def removeDomains( req, **params ):
     return conferenceModif.RHConfRemoveDomains( req ).process( params )
 
-def selectRegistrars( req, **params ):
-    return conferenceModif.RHConfSelectRegistrars( req ).process( params )
-
-def addRegistrars( req, **params ):
-    return conferenceModif.RHConfAddRegistrars( req ).process( params )
-
-def removeRegistrars( req, **params):
-    return conferenceModif.RHConfRemoveRegistrars( req ).process( params )
-
 def modifySessionCoordRights( req, **params ):
     return conferenceModif.RHModifSessionCoordRights( req ).process( params )
 

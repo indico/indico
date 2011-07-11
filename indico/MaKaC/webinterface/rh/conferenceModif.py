@@ -1705,40 +1705,6 @@ class RHConfRemoveDomains( RHConferenceModifBase ):
         self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
 
 
-class RHConfSelectRegistrars( RHConferenceModifBase ):
-    _uh = urlHandlers.Derive(urlHandlers.UHConfModifAC, "selectRegistrars")
-
-    def _process( self ):
-        p = conferences.WPConfSelectRegistrars( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-class RHConfAddRegistrars( RHConferenceModifBase ):
-    _uh = urlHandlers.Derive(urlHandlers.UHConfModifAC, "addRegistrars")
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                p = ph.getById( id )
-                if p:
-                    self._target.addToRegistrars( p )
-        self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
-
-class RHConfRemoveRegistrars( RHConferenceModifBase ):
-    _uh = urlHandlers.Derive(urlHandlers.UHConfModifAC, "removeRegistrars")
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                av = ph.getById(id)
-                if av:
-                    self._target.removeFromRegistrars(av)
-        self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
-
 class RHConfGrantSubmissionToAllSpeakers( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfGrantSubmissionToAllSpeakers
 

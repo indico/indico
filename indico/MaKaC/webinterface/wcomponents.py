@@ -2152,17 +2152,14 @@ class WConfModificationControlFrame(WTemplated):
 
 class WConfRegistrarsControlFrame(WTemplated):
 
-    def getHTML(self, target, addRegistrarURL, removeRegistrarURL):
+    def getHTML(self, target):
         self.__target = target
-        params = {
-            "addRegistrarURL": addRegistrarURL,
-            "removeRegistrarURL": removeRegistrarURL
-        }
+        params = {}
         return WTemplated.getHTML( self, params )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["principalTable"] = WPrincipalTable().getHTML( self.__target.getRegistrarList(), self.__target, vars["addRegistrarURL"], vars["removeRegistrarURL"], selectable=False)
+        vars["confId"] = self.__target.getId()
         return vars
 
 

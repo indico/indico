@@ -3167,9 +3167,7 @@ class WConfModifAC:
                                                   params["setModifKeyURL"] ) + "<br>"
 
         if self._eventType == "conference":
-            rc = wcomponents.WConfRegistrarsControlFrame().getHTML( self.__conf,
-                                                  params["addRegistrarsURL"],
-                                                  params["removeRegistrarsURL"]) + "<br>"
+            rc = wcomponents.WConfRegistrarsControlFrame().getHTML( self.__conf) + "<br>"
         else:
             rc = ""
 
@@ -3205,9 +3203,7 @@ class WPConfModifAC( WPConferenceModifBase ):
             "addAllowedURL": urlHandlers.UHConfSelectAllowed.getURL(),
             "removeAllowedURL": urlHandlers.UHConfRemoveAllowed.getURL(),
             "addDomainURL": urlHandlers.UHConfAddDomain.getURL(),
-            "removeDomainURL": urlHandlers.UHConfRemoveDomain.getURL(),
-            "addRegistrarsURL": conferenceModif.RHConfSelectRegistrars._uh.getURL(),
-            "removeRegistrarsURL": conferenceModif.RHConfRemoveRegistrars._uh.getURL()
+            "removeDomainURL": urlHandlers.UHConfRemoveDomain.getURL()
         }
         return wc.getHTML( p )
 
@@ -3227,24 +3223,6 @@ class WPConfSelectAllowed( WPConfModifAC ):
             searchLocal = True
         wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectAllowed.getURL(),forceWithoutExtAuth=searchLocal )
         params["addURL"] = urlHandlers.UHConfAddAllowed.getURL()
-        return wc.getHTML( params )
-
-
-class WPConfSelectRegistrars( WPConfModifAC ):
-
-    def _getPageContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-
-        from MaKaC.webinterface.rh.conferenceModif import RHConfAddRegistrars
-        from MaKaC.webinterface.rh.conferenceModif import RHConfSelectRegistrars
-
-        wc = wcomponents.WPrincipalSelection(RHConfSelectRegistrars._uh.getURL(), forceWithoutExtAuth=searchLocal)
-
-        params["addURL"] = RHConfAddRegistrars._uh.getURL()
         return wc.getHTML( params )
 
 

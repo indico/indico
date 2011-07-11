@@ -1154,6 +1154,42 @@ class ConferenceProtectionRemoveManager(ConferenceManagerListBase):
         return self._getManagersList()
 
 
+class ConferenceProtectionGetRegistrarList(ConferenceModifBase):
+
+    def _getAnswer(self):
+        return fossilize(self._conf.getRegistrarList())
+
+
+class ConferenceProtectionAddExistingRegistrar(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        for user in self._userList:
+            self._conf.addToRegistrars(ph.getById(user["id"]))
+        return fossilize(self._conf.getRegistrarList())
+
+
+class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
+
+    def _checkParams(self):
+        ConferenceManagerListBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._registrarId = pm.extract("userId", pType=str, allowEmpty=False)
+        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        self._conf.removeFromRegistrars(ph.getById(self._registrarId))
+        return fossilize(self._conf.getRegistrarList())
+
+
+
+
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupportEmail": ConferenceSupportEmailModification,
@@ -1198,6 +1234,9 @@ methodMap = {
     "protection.addExistingManager": ConferenceProtectionAddExistingManager,
     "protection.removeManager": ConferenceProtectionRemoveManager,
     "protection.getManagerList": ConferenceProtectionGetManagerList,
+    "protection.addExistingRegistrar": ConferenceProtectionAddExistingRegistrar,
+    "protection.removeRegistrar": ConferenceProtectionRemoveRegistrar,
+    "protection.getRegistrarList": ConferenceProtectionGetRegistrarList,
     "participant.addExistingParticipant": ConferenceParticipantAddExisting,
     "participant.addNewParticipant": ConferenceParticipantAddNew
     }
