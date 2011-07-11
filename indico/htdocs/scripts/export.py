@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import sys,re
+import sys,re, socket
 import datetime,sets
 
 from MaKaC.common.general import *
@@ -46,6 +46,13 @@ def index(req, **params):
   global ids
   db.DBMgr.getInstance().startRequest()
   minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+  hostIP = req.get_remote_host()
+  if minfo.useProxy():
+      # if we're behind a proxy, use X-Forwarded-For
+      xff = req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
+      hostIP = socket.gethostbyname(xff)
+
   if minfo.getRoomBookingModuleActive():
         DALManagerCERN.connect()
   try:
@@ -78,7 +85,7 @@ def index(req, **params):
   [year, month, day] = re.split('-',date)
   startdate = tz.localize(datetime.datetime(int(year),int(month),int(day),0,0,0))
   enddate   = startdate + datetime.timedelta(days=days,hours=23,minutes=59,seconds=59)
-  res = getConfList(startdate, enddate, ids, req.get_remote_ip())
+  res = getConfList(startdate, enddate, ids, hostIP)
   # filter with event type
   if event_types != ['']:
     finalres = []

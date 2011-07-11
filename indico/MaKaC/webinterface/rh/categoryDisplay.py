@@ -562,7 +562,7 @@ class RHCategoryToiCal(RHCategoryOpenService):
     def _processData( self ):
         filename = "%s - Event.ics"%self._target.getName().replace("/","")
         data = ""
-        data += CategoryToiCal(self._target, self._req).getBody()
+        data += CategoryToiCal(self._target, self).getBody()
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
@@ -574,7 +574,7 @@ class RHCategoryToiCal(RHCategoryOpenService):
 class RHCategoryToRSS(RHCategoryOpenService):
 
     def _getRSS( self, tz ):
-        return CategoryToRSS(self._target, self._req, tz=tz).getBody()
+        return CategoryToRSS(self._target, self, tz=tz).getBody()
 
     def _processData( self ):
         data = ""
@@ -588,7 +588,7 @@ class RHCategoryToRSS(RHCategoryOpenService):
 class RHTodayCategoryToRSS(RHCategoryToRSS):
 
     def _getRSS( self, tz ):
-        return CategoryToRSS(self._target, self._req, date=nowutc().astimezone(timezone(tz)), tz=tz).getBody()
+        return CategoryToRSS(self._target, self, date=nowutc().astimezone(timezone(tz)), tz=tz).getBody()
 
 
 def sortByStartDate(conf1,conf2):

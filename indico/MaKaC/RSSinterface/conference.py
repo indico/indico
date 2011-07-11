@@ -65,7 +65,7 @@ class CategoryToRSS:
 
         sconfs = set()
 
-        sconfs = set(ACLfiltered(confs, self._req.get_remote_ip()))
+        sconfs = set(ACLfiltered(confs, self._req.getHostIP()))
         res = list(sconfs)
         res.sort(sortByStartDate)
         rss = xmlGen.XMLGen()
