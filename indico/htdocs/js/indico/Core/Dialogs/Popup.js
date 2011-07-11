@@ -96,7 +96,7 @@ type("ExclusivePopup", ["Printable"], {
                 draggable: true,
                 modal: true,
                 resizable: false,
-                closeOnEscape: false,
+                closeOnEscape: true,
                 title: this.title,
                 minWidth: '250px',
                 minHeight: 0,
@@ -115,6 +115,17 @@ type("ExclusivePopup", ["Printable"], {
     _onBeforeClose: function(e) {
         // Close button clicked
         if(e.originalEvent && $(e.originalEvent.currentTarget).hasClass('ui-dialog-titlebar-close')) {
+            if(isFunction(this.closeHandler) && !this.closeHandler()) {
+                return false;
+            }
+        }
+        // Escape key
+        else if(e.keyCode && e.keyCode === $.ui.keyCode.ESCAPE) {
+            e.stopPropagation(); // otherwise this triggers twice for some reason
+            if(this.closeHandler === null || !this.showCloseButton) {
+                // Ignore escape if we don't have a close button
+                return false;
+            }
             if(isFunction(this.closeHandler) && !this.closeHandler()) {
                 return false;
             }
