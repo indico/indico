@@ -59,28 +59,8 @@ type("PersonDataPopup", ["WithProtocolLinePopup"],
         draw: function() {
             var self = this;
             var personData = self.personData;
-            var closePopup = function(){self.close();};
 
             var protocolLine = this._getProtocolLine(personData);
-
-            var saveButton = Html.button({style:{marginLeft:pixels(5)}}, "Save");
-            saveButton.observeClick(function(){
-                if (self.parameterManager.check()) {
-                    personData.set('participantType', 'by_address');
-                    self.action(personData, closePopup);
-                }
-            });
-
-            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
-            cancelButton.observeClick(function(){
-                if (self.cancelAction) {
-                    self.cancelAction(closePopup);
-                } else {
-                    closePopup();
-                }
-            });
-
-            var buttonDiv = Html.div({}, saveButton, cancelButton)
 
             var content = IndicoUtil.createFormFromMap([
                 ['Title', $B(Html.select({}, Html.option({}, ""), Html.option({}, "Mr."), Html.option({}, "Mrs."), Html.option({}, "Ms."), Html.option({}, "Dr."), Html.option({}, "Prof.")), personData.accessor('title'))],
@@ -91,8 +71,28 @@ type("PersonDataPopup", ["WithProtocolLinePopup"],
                 protocolLine
             ]);
 
-            return this.WithProtocolLinePopup.prototype.draw.call(this, content, buttonDiv);
-        } // end of draw
+            return this.WithProtocolLinePopup.prototype.draw.call(this, content);
+        },
+
+        _getButtons: function() {
+            var self = this;
+            var closePopup = $.proxy(self.close, self);
+            return [
+                [$T('Save'), function() {
+                    if (self.parameterManager.check()) {
+                        self.personData.set('participantType', 'by_address');
+                        self.action(self.personData, closePopup);
+                    }
+                }],
+                [$T('Cancel'), function() {
+                    if (self.cancelAction) {
+                        self.cancelAction(closePopup);
+                    } else {
+                        closePopup();
+                    }
+                }]
+            ];
+        }
     },
 
     function(title, personData, action, cancelAction) {
@@ -119,24 +119,8 @@ type("RoomDataPopup", ["WithProtocolLinePopup"],
         draw: function() {
             var self = this;
             var roomData = self.roomData;
-            var closePopup = function(){self.close();};
 
             var protocolLine = this._getProtocolLine(roomData);
-
-            var saveButton = Html.button({style:{marginLeft:pixels(5)}}, "Save");
-            saveButton.observeClick(function(){
-                if (self.parameterManager.check()) {
-                    roomData.set('participantType', 'by_address');
-                    self.action(roomData, closePopup);
-                }
-            });
-
-            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, "Cancel");
-            cancelButton.observeClick(function(){
-                closePopup();
-            });
-
-            var buttonDiv = Html.div({}, saveButton, cancelButton)
 
             var content = IndicoUtil.createFormFromMap([
                 ['Room Name', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), roomData.accessor('name'))],
@@ -145,8 +129,24 @@ type("RoomDataPopup", ["WithProtocolLinePopup"],
                 protocolLine
             ]);
 
-            return this.WithProtocolLinePopup.prototype.draw.call(this, content, buttonDiv);
-        } // end of draw
+            return this.WithProtocolLinePopup.prototype.draw.call(this, content);
+        },
+
+        _getButtons: function() {
+            var self = this;
+            var closePopup = $.proxy(self.close, self);
+            return [
+                [$T('Save'), function() {
+                    if (self.parameterManager.check()) {
+                        self.roomData.set('participantType', 'by_address');
+                        self.action(self.roomData, closePopup);
+                    }
+                }],
+                [$T('Cancel'), function() {
+                    closePopup();
+                }]
+            ];
+        }
     },
 
     function(title, roomData, action) {
@@ -180,43 +180,21 @@ type("H323RoomPopup", ["ExclusivePopupWithButtons"],
             var roomData = self.roomData;
             var closePopup = function(){self.close();};
 
-            var saveButton = new DisabledButton(Html.input("button", {disabled:true}, $T("Save") ));
-            saveButton.observeClick(function(){
-                var selectedList = roomList.getSelectedList();
-                each(selectedList, function(room){
-                    room.set('participantType', 'by_address');
-                });
-                self.action(selectedList, closePopup);
-            });
-            saveButton.disable();
-
-            var tooltip;
-
-            saveButton.observeEvent('mouseover', function(event){
-                if (!saveButton.isEnabled()) {
-                    tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
-                            $T("You must select at least one item from the list"), "tooltipError");
-                }
-            });
-
-            saveButton.observeEvent('mouseout', function(event){
-                Dom.List.remove(document.body, tooltip);
-            });
-
-            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
-            cancelButton.observeClick(function(){
-                closePopup();
+            self.saveButton = self.buttons.eq(0);
+            self.saveButton.disabledButtonWithTooltip({
+                tooltip: $T('You must select at least one item from the list'),
+                disabled: true
             });
 
             var selectedObserver = function(selectedList) {
                 if (selectedList.isEmpty()) {
-                    saveButton.disable();
+                    self.saveButton.disabledButtonWithTooltip('disable');
                 } else {
-                    saveButton.enable();
+                    self.saveButton.disabledButtonWithTooltip('enable');
                 }
             };
 
-            var roomList = new H323RoomList(selectedObserver);
+            self.roomList = new H323RoomList(selectedObserver);
             var addedParticipants = self.participantListField.getParticipants();
             each(self.rooms, function(room){
                 var alreadyAdded = false;
@@ -233,16 +211,29 @@ type("H323RoomPopup", ["ExclusivePopupWithButtons"],
                 if (alreadyAdded) {
                     roomWO.set('unselectable', true);
                 }
-                roomList.set(room.name, roomWO);
-
+                self.roomList.set(room.name, roomWO);
             });
 
-            var buttonDiv = Html.div({}, saveButton.draw(), cancelButton)
-
             return this.ExclusivePopupWithButtons.prototype.draw.call(this,
-                Html.div("CERNMCU_H323RoomList_Div", roomList.draw()),
-                buttonDiv);
-        } // end of draw
+                Html.div("CERNMCU_H323RoomList_Div", self.roomList.draw()));
+        },
+
+        _getButtons: function() {
+            var self = this;
+            var closePopup = $.proxy(self.close, self);
+            return [
+                [$T('Save'), function() {
+                    var selectedList = self.roomList.getSelectedList();
+                    each(selectedList, function(room){
+                        room.set('participantType', 'by_address');
+                    });
+                    self.action(selectedList, closePopup);
+                }],
+                [$T('Cancel'), function() {
+                    closePopup();
+                }]
+            ];
+        }
     },
     function(title, rooms, participantListField, action) {
         this.rooms = rooms;
