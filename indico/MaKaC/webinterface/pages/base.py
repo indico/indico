@@ -21,6 +21,7 @@
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.Configuration import Config
+from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
