@@ -30,45 +30,18 @@ def modify( req, **params ):
 def modifyDates( req, **params ):
     return sessionModif.RHSessionDatesModification( req ).process( params )
 
-def convenerSearch( req, **params ):
-    return sessionModif.RHSessionDataModificationConvenerSearch( req ).process( params )
-    
-def convenerNew( req, **params ):
-    return sessionModif.RHSessionDataModificationConvenerNew( req ).process( params )
-    
-def personAdd( req, **params ):
-    return sessionModif.RHSessionDataModificationPersonAdd( req ).process( params )
-
-def newConvenerSearch( req, **params ):
-    return sessionModif.RHSessionDataModificationNewConvenerSearch( req ).process( params )    
-
-def newConvenerCreate( req, **params ):    
-    return sessionModif.RHSessionDataModificationNewConvenerCreate( req ).process( params )    
-
-def convenerAdd( req, **params ):
-    return sessionModif.RHSessionDataModificationConvenerAdd( req ).process( params )
-
 def close( req, **params ):
     return sessionModif.RHSessionClose( req ).process( params )
 
 def open( req, **params ):
     return sessionModif.RHSessionOpen( req ).process( params )
 
-def newConvener(req,**params):
-    return sessionModif.RHConvenerNew( req ).process( params)
-
-def remConveners(req, **args):
-    return sessionModif.RHConvenersRem( req ).process( args )
-
-def editConvener(req,**params):
-    return sessionModif.RHConvenerEdit( req ).process( params)
-
 def addMaterial( req, **params ):
     return sessionModif.RHSessionAddMaterial( req ).process( params )
-    
+
 def performAddMaterial( req, **params ):
     return sessionModif.RHSessionPerformAddMaterial( req ).process( params )
-    
+
 def removeMaterials( req, **params ):
     return sessionModif.RHSessionRemoveMaterials( req ).process( params )
 

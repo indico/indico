@@ -1137,32 +1137,6 @@ class UHConfAddSession( URLHandler ):
 class UHConfPerformAddSession( URLHandler ):
     _relativeURL = "confModifSchedule.py/performAddSession"
 
-class UHConfNewSessionConvenerSearch(URLHandler):
-    _relativeURL = "sessionCreation.py/convenerSearch"
-
-class UHConfNewSessionConvenerNew(URLHandler):
-    _relativeURL = "sessionCreation.py/convenerNew"
-
-class UHConfNewSessionPersonAdd(URLHandler):
-    _relativeURL = "sessionCreation.py/personAdd"
-
-class UHSessionDataModificationConvenerSearch(URLHandler):
-    _relativeURL = "sessionModification.py/convenerSearch"
-
-class UHSessionDataModificationConvenerNew(URLHandler):
-    _relativeURL = "sessionModification.py/convenerNew"
-
-class UHSessionDataModificationPersonAdd(URLHandler):
-    _relativeURL = "sessionModification.py/personAdd"
-
-class UHSessionDataModificationNewConvenerSearch(URLHandler):
-    _relativeURL = "sessionModification.py/newConvenerSearch"
-
-class UHSessionDataModificationNewConvenerCreate(URLHandler):
-    _relativeURL = "sessionModification.py/newConvenerCreate"
-
-class UHSessionDataModificationConvenerAdd(URLHandler):
-    _relativeURL = "sessionModification.py/convenerAdd"
 
 class UHConfAddContribution( URLHandler ):
     _relativeURL = "confModifContribList.py/addContribution"
@@ -2445,18 +2419,6 @@ class UHSessionDataModification( URLHandler ):
 
 class UHSessionDatesModification( URLHandler ):
     _relativeURL = "sessionModification.py/modifyDates"
-
-class UHSessionModConvenerNew( URLHandler ):
-    _relativeURL = "sessionModification.py/newConvener"
-
-
-class UHSessionModConvenersRem( URLHandler ):
-    _relativeURL = "sessionModification.py/remConveners"
-
-
-class UHSessionModConvenerEdit( URLHandler ):
-    _relativeURL = "sessionModification.py/editConvener"
-
 
 class UHSessionModSlotConvenerNew( URLHandler ):
     _relativeURL = "sessionModification.py/newSlotConvener"

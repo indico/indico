@@ -1282,11 +1282,12 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             var self = this;
             self.parameterManager = new IndicoUtil.parameterManager();
 
-            var grant = [];
+            var grantSubmission = [];
             var grantManagement = [];
+            var grantCoordination = [];
             var warning = [];
             if (this.grantSubmission) {
-                grant = [$T('Grant submission rights'), $B(Html.checkbox({}), userData.accessor('submission'))];
+                grantSubmission = [$T('Grant submission rights'), $B(Html.checkbox({}), userData.accessor('submission'))];
                 warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
                         $T('he or she will be sent an email asking to register as a user.'), Html.br(),
                         $T(' After the registration the user will automatically be given'), Html.br(),
@@ -1300,6 +1301,20 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                            $T(' given management rights.'))];
             }
 
+            if (this.grantCoordination) {
+                grantCoordination = [$T('Give coordination rights.'), $B(Html.checkbox({}), userData.accessor('coordinator'))];
+                warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
+                           $T('he or she will be sent an email asking to create an account.'), Html.br(),
+                           $T(' After the account creation the user will automatically be'), Html.br(),
+                           $T(' given coordination rights.'))];
+            }
+            if (this.grantManagement && this.grantCoordination) {
+                warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
+                        $T('he or she will be sent an email asking to create an account.'), Html.br(),
+                        $T(' After the account creation the user will automatically be'), Html.br(),
+                        $T(' given the rights.'))];
+            }
+
             var form = IndicoUtil.createFormFromMap([
                [$T('Title'), $B(Html.select({}, Html.option({}, ""), Html.option({value:'Mr.'}, $T("Mr.")), Html.option({value:'Mrs.'}, $T("Mrs.")), Html.option({value:'Ms.'}, $T("Ms.")), Html.option({value:'Dr.'}, $T("Dr.")), Html.option({value:'Prof.'}, $T("Prof."))), userData.accessor('title'))],
                [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
@@ -1309,7 +1324,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Address'), $B(Html.textarea(), userData.accessor('address'))],
                [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))],
                [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('fax'))],
-               grant, grantManagement, warning]);
+               grantSubmission, grantManagement, grantCoordination, warning]);
 
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
          },
@@ -1329,11 +1344,12 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
          }
 
      },
-     function(title, userData, action, grantSubmission, grantManagement, allowEmptyEmail) {
+     function(title, userData, action, grantSubmission, grantManagement, grantCoordination, allowEmptyEmail) {
          this.userData = userData;
          this.action = action;
          this.grantSubmission = exists(grantSubmission)?grantSubmission:false;
          this.grantManagement = exists(grantManagement)?grantManagement:false;
+         this.grantCoordination = exists(grantCoordination)?grantCoordination:false;
          this.allowEmptyEmail = exists(allowEmptyEmail)?allowEmptyEmail:true;
          this.ExclusivePopup(title,  function(){return true;});
      }

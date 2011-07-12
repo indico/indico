@@ -4533,39 +4533,6 @@ class WSchEditContrib(WTemplated):
         return vars
 
 
-class WConfModParticipEdit(WTemplated):
-
-    def __init__(self,title="",part=None):
-        self._part=part
-        self._ctitle=title
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(vars["postURL"]))
-        vars["caption"]=self.htmlText(self._ctitle)
-        title,firstName,familyName="","",""
-        affiliation,email,address,phone,fax="","","","",""
-        if self._part is not None:
-            title=self._part.getTitle()
-            firstName=self._part.getFirstName()
-            familyName=self._part.getFamilyName()
-            affiliation=self._part.getAffiliation()
-            email=self._part.getEmail()
-            address=self._part.getAddress()
-            phone=self._part.getPhone()
-            fax=self._part.getFax()
-        vars["titles"]=TitlesRegistry().getSelectItemsHTML(title)
-        vars["surName"]=quoteattr(familyName)
-        vars["name"]=quoteattr(firstName)
-        vars["affiliation"]=quoteattr(affiliation)
-        vars["email"]=quoteattr(email)
-        vars["address"]=address
-        vars["phone"]=quoteattr(phone)
-        vars["fax"]=quoteattr(fax)
-        if not vars.has_key("addToManagersList"):
-            vars["addToManagersList"]=""
-        return vars
-
 class WSessionModEditDataCode(WTemplated):
 
     def __init__(self):

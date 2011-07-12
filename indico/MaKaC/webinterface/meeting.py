@@ -206,10 +206,6 @@ class WebFactory(WebFactory):
         return WPMModSlotRemConfirmation(self,slot)
     getModSlotRemConfirmation = staticmethod(getModSlotRemConfirmation)
 
-    def getModConvenerNew(self,session):
-        return WPMModConvenerNew(self,session)
-    getModConvenerNew = staticmethod(getModConvenerNew)
-
     def getSessionAddMaterial(self,session,mf):
         return WPMSessionAddMaterial(self,session,mf)
     getSessionAddMaterial = staticmethod(getSessionAddMaterial)
@@ -237,10 +233,6 @@ class WebFactory(WebFactory):
     def getSessionModifSchedule(rh,session):
         return WPMSessionModifSchedule(rh,session)
     getSessionModifSchedule = staticmethod(getSessionModifSchedule)
-
-    def getModConvenerEdit(rh, session):
-        return WPMModConvenerEdit(rh, session)
-    getModConvenerEdit = staticmethod (getModConvenerEdit)
 
 #################### Participants #####################################
 
@@ -820,17 +812,6 @@ class WMContributionCreation(conferences.WContributionCreation):
 class WPMSessionAddMaterial(sessions.WPSessionAddMaterial):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
-
-
-class WPMModConvenerEdit(sessions.WPModConvenerEdit):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-
-class WPMModConvenerNew(sessions.WPModConvenerNew):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
 
 class WPMModSlotRemConfirmation(sessions.WPModSlotRemConfirmation):
     def _setupTabCtrl(self):

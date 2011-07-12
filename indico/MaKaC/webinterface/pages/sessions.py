@@ -688,27 +688,11 @@ class WSessionModifMain(wcomponents.WTemplated):
         self._session = session
         self._mfr = mfRegistry
 
-    def _getConvenersHTML(self):
-        res=[]
-        for conv in self._session.getConvenerList():
-            url=urlHandlers.UHSessionModConvenerEdit.getURL(conv)
-            res.append("""
-                <input type="checkbox" name="selConv" value=%s> <a href=%s>%s</a>
-                """%(quoteattr(str(conv.getId())),\
-                    quoteattr(str(url)), \
-                    self.htmlText(conv.getFullName())))
-        return "<br>".join(res)
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["addMaterialURL"]=urlHandlers.UHSessionAddMaterial.getURL(self._session)
         vars["removeMaterialsURL"]=urlHandlers.UHSessionRemoveMaterials.getURL()
 
-        newConvenerURL = urlHandlers.UHSessionDataModificationNewConvenerCreate.getURL(self._session)
-        vars["newConvenerURL"] = newConvenerURL
-        searchConvenerURL = urlHandlers.UHSessionDataModificationNewConvenerSearch.getURL(self._session)
-        vars["searchConvenerURL"] = searchConvenerURL
-        vars["remConvenersURL"]=quoteattr(str(urlHandlers.UHSessionModConvenersRem.getURL(self._session)))
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHSessionDataModification.getURL(self._session)))
         vars["code"]=self.htmlText(self._session.getCode())
         vars["title"]=self._session.getTitle()
@@ -730,7 +714,6 @@ class WSessionModifMain(wcomponents.WTemplated):
             tz = self._session.getTimezone()
             vars["startDate"]=self.htmlText(self._session.getAdjustedStartDate().strftime("%A %d %B %Y %H:%M"))
             vars["endDate"]=self.htmlText(self._session.getAdjustedEndDate().strftime("%A %d %B %Y %H:%M"))
-        vars["conveners"]=self._getConvenersHTML()
         vars["bgcolor"] = self._session.getColor()
         vars["textcolor"] = self._session.getTextColor()
         vars["entryDuration"]=self.htmlText((datetime(1900,1,1)+self._session.getContribDuration()).strftime("%Hh%M'"))
@@ -746,6 +729,8 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["Colors"]=""
             vars["Code"]=""
             vars["Rowspan"]=4
+        vars["confId"] = self._session.getConference().getId()
+        vars["sessionId"] = self._session.getId()
         return vars
 
 
@@ -815,77 +800,6 @@ class WPSessionDataModification(WPSessionModification):
 
 #---------------------------------------------------------------------------
 
-class WPSessionDataModificationConvenerSelect( WPSessionModifBase):
-
-    #def _setActiveTab( self ):
-    #    self._tabContribList.setActive()
-
-    def _getTabContent( self, params ):
-        searchAction = str(self._rh.getCurrentURL())
-        newButtonAction = params["newButtonAction"]
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        p = wcomponents.WComplexSelection(self._conf,searchAction, addTo = 5, forceWithoutExtAuth=searchLocal)
-        return p.getHTML(params)
-
-#---------------------------------------------------------------------------
-
-class WPSessionDataModificationConvenerNew(WPSessionModifBase):
-
-    #def _setActiveTab( self ):
-    #    self._tabContribList.setActive()
-
-    def _getTabContent( self, params ):
-        p = wcomponents.WNewPerson()
-
-        if params.get("formTitle",None) is None :
-            params["formTitle"] =_("Define new convener")
-        if params.get("titleValue",None) is None :
-            params["titleValue"] = ""
-        if params.get("surNameValue",None) is None :
-            params["surNameValue"] = ""
-        if params.get("nameValue",None) is None :
-            params["nameValue"] = ""
-        if params.get("emailValue",None) is None :
-            params["emailValue"] = ""
-        if params.get("addressValue",None) is None :
-            params["addressValue"] = ""
-        if params.get("affiliationValue",None) is None :
-            params["affiliationValue"] = ""
-        if params.get("phoneValue",None) is None :
-            params["phoneValue"] = ""
-        if params.get("faxValue",None) is None :
-            params["faxValue"] = ""
-
-
-        params["disabledRole"] = False
-        params["roleDescription"] = i18nformat(""" _("Coordinator")<br> _("Manager")""")
-        if params.has_key("submissionControlValue") :
-            params["roleValue"] = i18nformat(""" <input type="checkbox" name="coordinatorControl" checked> _("Give coordinator rights to the convener").<br>
-                                      <input type="checkbox" name="managerControl" checked> _("Give management rights to the convener").""")
-        else:
-            params["roleValue"] = i18nformat(""" <input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").<br>
-                                      <input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
-        params["disabledNotice"] = True
-        params["noticeValue"] = i18nformat("""<i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have
-         an Indico account, he or she will be sent an email asking to create an account. After the account creation the
-         user will automatically be given coordinator rights").</i>""")
-
-
-        if params.get("formAction",None) is None :
-            formAction = urlHandlers.UHSessionDataModificationPersonAdd.getURL(self._conf)
-            formAction.addParam("sessionId",self._session.getId())
-            formAction.addParam("orgin","new")
-            formAction.addParam("typeName","convener")
-            params["formAction"] = formAction
-
-        return p.getHTML(params)
-
-#---------------------------------------------------------------------------
-
 class WPModEditDataConfirmation(WPSessionModification):
 
     def _getTabContent(self,params):
@@ -893,84 +807,6 @@ class WPModEditDataConfirmation(WPSessionModification):
         msg= _("""You have selected to CHANGE THIS SESSION SCHEDULE TYPE from %s to %s, if you continue any contribution scheduled within any slot of the current session will be unscheduled, are you sure you want to continue?""")%(self._session.getScheduleType(),params["tt_type"])
         url=urlHandlers.UHSessionDataModification.getURL(self._session)
         return wc.getHTML(msg,url,params)
-
-
-class WPModConvenerNew(WPSessionModification):
-
-    def _getTabContent(self,params):
-        caption= _("Adding a new convener")
-        wc=wcomponents.WConfModParticipEdit(title=caption)
-        params["postURL"]=urlHandlers.UHSessionModConvenerNew.getURL(self._session)
-        params["addToManagersList"]= i18nformat("""
-                                    <tr>
-                                        <td nowrap class="titleCellTD">
-                                            <span class="titleCellFormat"> _("Specific rights")</span>
-                                        </td>
-                                        <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-                                            <input type="radio" name="specialRights" value="none" checked> _("Do not give specific rights").<br>
-                                            <input type="radio" name="specialRights" value="manager"> _("Give session manager rights to the convener").<br>
-                                            <input type="radio" name="specialRights" value="coordinator"> _("Give session coordinator rights to the convener").<br><br><i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have an Indico account, he or she will be sent an email asking to create an account. After the account creation the user will automatically be given the specific rights").</i>
-                                        </td>
-                                    </tr>
-                                    """)
-        return wc.getHTML( params )
-
-
-
-class WPModConvenerEdit(WPSessionModification):
-
-##    def _getTabContent(self,params):
-##        caption="Edit convener data"
-##        conv=params["convener"]
-##        wc=wcomponents.WConfModParticipEdit(part=conv,title=caption)
-##        params["postURL"]=urlHandlers.UHSessionModConvenerEdit.getURL(conv)
-##        params["addToManagersList"]=""
-##        return wc.getHTML(params)
-
-    def _getTabContent(self,params):
-        p = wcomponents.WNewPerson()
-        conv = params["convener"]
-        params["formTitle"] =  _("Define new convener")
-        params["titleValue"] = conv.getTitle()
-        params["surNameValue"] = conv.getFamilyName()
-        params["nameValue"] = conv.getFirstName()
-        params["emailValue"] = conv.getEmail()
-        params["addressValue"] = conv.getAddress()
-        params["affiliationValue"] = conv.getAffiliation()
-        params["phoneValue"] = conv.getPhone()
-        params["faxValue"] = conv.getFax()
-
-        params["disabledRole"] = False
-        params["roleDescription"] =  i18nformat(""" _("Coordinator")<br> _("Manager")""")
-        session = conv.getSession()
-        av = user.AvatarHolder().match({"email":conv.getEmail()})
-        params["disabledNotice"] = True
-        coordValue =  i18nformat("""<input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").""")
-        if (av and av[0] in session.getCoordinatorList()) or conv.getEmail() in session.getCoordinatorEmailList():
-            coordValue = _("""The convener is already a coordinator""")
-        else:
-            params["disabledNotice"] = False
-
-        managerValue =  i18nformat("""<input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
-        if (av and av[0] in session.getManagerList() ) or conv.getEmail() in session.getAccessController().getModificationEmail():
-            managerValue = _("""The convener is already a manager""")
-        else:
-            params["disabledNotice"] = False
-
-        params["roleValue"] = """ %s<br>
-                                  %s"""%(coordValue, managerValue)
-
-        params["noticeValue"] =  i18nformat("""<i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have
-         an Indico account, he or she will be sent an email asking to create an account. After the account creation the
-         user will automatically be given coordinator/manager rights").</i>""")
-
-        formAction = urlHandlers.UHSessionModConvenerEdit.getURL(conv)
-        formAction.addParam("orgin","new")
-        formAction.addParam("typeName","convener")
-        params["formAction"] = formAction
-
-        return p.getHTML(params)
-
 
 
 class WPSessionAddMaterial( WPSessionModification ):

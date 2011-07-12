@@ -37,13 +37,3 @@ def create(req, **args):
     p = pages.WPSessionCreation( req )
     p.createSession( args )
     return "done"
-
-def convenerSearch( req, **params ):
-    return conferenceModif.RHNewSessionConvenerSearch( req ).process( params )
-    
-def convenerNew( req, **params ):
-    return conferenceModif.RHNewSessionConvenerNew( req ).process( params )
-    
-def personAdd( req, **params ):
-    return conferenceModif.RHNewSessionPersonAdd( req ).process( params )
-    

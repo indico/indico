@@ -47,7 +47,7 @@ type("MeetingParticipantsListManager", [], {
                         );
                         newUserPopup.close();
                     }
-                }, false, false, false);
+                }, false, false, false, false);
         newUserPopup.open();
     },
 

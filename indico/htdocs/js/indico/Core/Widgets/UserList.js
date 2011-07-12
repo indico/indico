@@ -17,6 +17,7 @@
  * @param: showGrantManagementCB -> Bool, show the checkbox to grant management rights in the AddNew/Edit popup
  * @param: showGrantSubmissionCB -> Bool, show the checkbox to grant submission rights in the AddNew/Edit popup
  * @param: showAffiliation -> Bool, show the affiliation of the user
+ * @param: showGrantCoordinationCB -> Bool, show the checkbox to grant coordination rights in the AddNew/Edit popup
  */
 type("ListOfUsersManager", [], {
 
@@ -236,7 +237,7 @@ type("ListOfUsersManager", [], {
                         self._manageUserList(self.methods["addNew"], self._getAddNewParams(newData));
                         newUserPopup.close();
                     }
-                }, self.showGrantSubmissionCB, self.showGrantManagementCB);
+                }, self.showGrantSubmissionCB, self.showGrantManagementCB, self.showGrantCoordinationCB);
         newUserPopup.open();
     },
 
@@ -259,7 +260,7 @@ type("ListOfUsersManager", [], {
 },
 
     function(confId, methods, userListParams, inPlaceListElem, showRemoveIcon, showEditIcon, showFavouritesIcon, showOrderArrows,
-             kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation) {
+             kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation, showGrantCoordinationCB) {
         this.conferenceId = confId;
         this.methods = methods;
         this.userListParams = userListParams;
@@ -274,6 +275,7 @@ type("ListOfUsersManager", [], {
         this.showGrantSubmissionCB = showGrantSubmissionCB;
         this.showGrantManagementCB = showGrantManagementCB;
         this.showAffiliation = showAffiliation;
+        this.showGrantCoordinationCB = showGrantCoordinationCB;
         var self = this;
         if (userListParams) {
             indicoRequest(

@@ -42,36 +42,27 @@ ${ Colors }
 </tr>
 <tr>
   <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Default conveners")}</span></td>
-  <form action=${ remConvenersURL } method="POST">
   <td colspan="2">
-  <table width="100%"><tr>
-  <td bgcolor="white" valign="top" class="blacktext">
-    ${ conveners }
-  </td>
-  <td align="right" valign="bottom">
-    <table>
-    <tr>
-      <td>
-        <input type="submit" class="btn" value="${ _("remove")}">
-      </td>
-      </form>
-      <form action=${ newConvenerURL } method="POST">
-      <td>
-        <input type="submit" class="btn" value="${ _("new")}">
-      </td>
-      </form>
-      <form action=${ searchConvenerURL } method="POST">
-      <td>
-        <input type="submit" class="btn" value="${ _("search")}">
-      </td>
-      </form>
-    </tr>
-    </table>
-  </td>
-  </tr></table>
-  </td>
+      <table width="100%">
+          <tr>
+              <td style="width: 80%"><ul id="inPlaceConveners" class="UIPeopleList"></ul></td>
+              <td nowrap valign="top" style="width: 20%; text-align:right;">
+                  <span id="inPlaceConvenersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                      <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="convenerManager.addManagementMenu();">${ _("Add convener")}</a>
+                  </span>
+              </td>
+          </tr>
+       </table>
+   </td>
 </tr>
 <tr>
   <td colspan="3" class="horizontalLine">&nbsp;</td>
 </tr>
 </table>
+
+<script>
+
+var convenerManager = new SessionConvenerManager('${ confId }', '${ sessionId }', $E('inPlaceConveners'), $E('inPlaceConvenersMenu'),
+        "convener");
+
+</script>
