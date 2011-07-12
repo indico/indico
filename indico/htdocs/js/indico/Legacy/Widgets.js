@@ -260,9 +260,23 @@ IndicoUI.Widgets = {
         @namespace Generic, resusable, components
         */
     Generic: {
+    /**
+         * Creates a (NEWER) tooltip above the given element.
+         * Example of usage:
+         *
+         * var myElement = Html.div({}, "bla bla");
+         * IndicoUI.Widgets.Generic.createTooltip(myElement.dom, "Tooltip info here");"
+         *
+     */
+    createTooltip: function(this_element, content) {
+        $(this_element).qtip({content: content,
+          style: {}
+          });
+        return;
+      },
 
         /**
-         * Creates a tooltip above the given element.
+         * Creates a (OLDER) tooltip above the given element.
          * Example of usage:
          *
          * var homeButtonPopup = function(event) {
@@ -274,7 +288,7 @@ IndicoUI.Widgets = {
          * @param {Object} event (view example)
          * @param {String} content Whatever content is desired.
          */
-        tooltip: function(in_this, event, content) {
+      tooltip: function(in_this, event, content) {
             domTT_activate(in_this, event,
                            'content',
                            content,
@@ -301,7 +315,6 @@ IndicoUI.Widgets = {
                 domTT_tooltips.set(in_this.id, null)
             };
         },
-
 
         /**
          * Creates an error tooltip at the specified position, by adding it to the document body with position: fixed

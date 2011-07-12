@@ -315,6 +315,7 @@ IndicoUI.Effect = {
          * have to put the Javascript code measuring the height later in the DOM tree.
          *
          */
+
         var elem = $E(elemId);
         elem.dom.style.overflow = 'hidden';
         var elemDivHeight = elemHeight;

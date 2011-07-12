@@ -896,38 +896,32 @@ var showAllInfoRows = function(showAll) {
  * Mouseover help popup for the 'Keep booking synchronized with event' advanced option
  */
 
-var dateChangeHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 200px;"">' +
+var dateChangeHelpPopup = '<div style="padding:3px; width: 200px;"">' +
         $T('This option ensures that ' +
                 'if a manager changes the event\'s dates, ' +
                 'this booking\'s dates change accordingly. ') +
-        '<\/div>');
+        '<\/div>';
 };
 
 /**
  * Mouseover help popup for the 'Keep booking synchronized with event' advanced option, in case it is disabled.
  */
 
-var dateChangeDisabledHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;"">' +
+var dateChangeDisabledHelpPopup = '<div style="padding:3px; width: 300px;"">' +
             $T('This option ensures that ' +
             'if a manager changes the event\'s dates, ' +
             'this booking\'s dates change accordingly. ' +
             'The event already took place, ' +
             'so you cannot activate this option.') +
-        '<\/div>');
+        '<\/div>';
 };
 
 /**
  * Mouseover help popup for the 'Keep booking hidden' advanced option
  */
-var hiddenHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 150px;"">' +
+var hiddenHelpPopup = '<div style="padding:3px; width: 150px;"">' +
             $T('This option hides the booking in the event page.') +
-        '<\/div>');
+        '<\/div>';
 };
 
 var sanitizationError = function(invalidFields) {
@@ -1024,7 +1018,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             }
 
             if (exists($E('dateSyncHelpImg'))){
-                $E('dateSyncHelpImg').dom.onmouseover = dateChangeHelpPopup;
+                IndicoUI.Widgets.Generic.createTooltip($E('dateSyncHelpImg').dom, dateChangeHelpPopup);
             }
 
             if (this.popupType === 'edit' && !this.booking.canBeNotifiedOfEventDateChanges) {
@@ -1033,11 +1027,11 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                     $E('dateSyncCheckBox').dom.className = 'disabled';
                 }
                 if (exists($E('dateSyncHelpImg'))){
-                    $E('dateSyncHelpImg').dom.onmouseover = dateChangeDisabledHelpPopup;
+                  IndicoUI.Widgets.Generic.createTooltip($E('dateSyncHelpImg').dom, dateChangeDisabledHelpPopup);
                 }
             }
             if(exists($E('hiddenHelpImg'))) {
-                $E('hiddenHelpImg').dom.onmouseover = hiddenHelpPopup;
+              IndicoUI.Widgets.Generic.createTooltip($E('hiddenHelpImg').dom, hiddenHelpPopup);
             }
 
             this.tabControl.heightToTallestTab();

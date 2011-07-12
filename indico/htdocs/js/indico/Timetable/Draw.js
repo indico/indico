@@ -247,10 +247,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                        if (self.popupActive) {
                            return;
                        }
-
-                       IndicoUI.Widgets.Generic.tooltip(pileDiv.dom, event, "<div style='padding:3px'>" +
-                           $T('This poster session has ') + numContribs + $T(' contribution(s).') + "<br / >" +
-                           $T('Please click for more information.') + "</div>");
+                       IndicoUI.Widgets.Generic.createTooltip(pileDiv.dom, "<div style='padding:3px'>" +
+                         $T('This poster session has ') + numContribs + $T(' contribution(s).') + "<br / >" +
+                         $T('Please click for more information.') + "</div>");
                    };
                }
 
@@ -679,7 +678,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
     },
 
     _getTimeLocationInfo: function() {
-        return Html.div({}, this._getTime(), this._getRoomLocationInfo())
+      return Html.div({}, this._getTime(), this._getRoomLocationInfo());
     },
 
     _getGeneralInfo: function() {
@@ -1510,10 +1509,13 @@ type("TimetableDrawer", ["IWidget"],
 
              // Only do if not all days are drawn
              this.canvas.set([wholeDayBlocks, Html.div({style: {position: 'relative'}}, grid, blocks)]);
+             var totalHeight = height + wholeDayBlocks.dom.offsetHeight;
+
+             this.canvas.dom.style.height = pixels(totalHeight);
 
              this.postDraw();
 
-             return height + wholeDayBlocks.dom.offsetHeight;
+             return totalHeight;
          },
 
          setPrintableVersion: function(printableVersion) {

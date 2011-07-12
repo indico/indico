@@ -1140,24 +1140,6 @@ var revStateHelpPopup = function(event) {
                                      '<\/ul>');
 };*/
 
-/**
- * Mouseover popup to inform that material is not modificable when user
- * hovers mouse above disabled add, remove or edit buttons.
- */
-var modifyDisabledHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-                                     $T('Modifying this material is currently not possible because it has been already submitted.'));
-};
-
-var setMainResourceHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-                                     $T('Mark as main resource.'));
-};
-
-var mainResourceHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-                                     $T('Unmark main resource.'));
-};
 
 type("ResourceListWidget", ["ListWidget"], {
 
@@ -1256,6 +1238,14 @@ type("ResourceListWidget", ["ListWidget"], {
         var setMain;
         var flag;
 
+      /**
+ * Mouseover popup to inform that material is not modificable when user
+ * hovers mouse above disabled add, remove or edit buttons.
+ */
+var modifyDisabledHelpPopup = $T('Modifying this material is currently not possible because it has been already submitted.');
+var setMainResourceHelpPopup = $T('Mark as main resource.');
+var mainResourceHelpPopup =  $T('Unmark main resource.');
+
         if (resource.get('reviewingState') < 3) {
             if(resource.get('reviewingState') == 2){
                 flag = true;
@@ -1267,28 +1257,28 @@ type("ResourceListWidget", ["ListWidget"], {
                     self.set(resource.get('id'), resource);
                 }, flag);
             },
-                                             IndicoUI.Buttons.editButton())
-                                    );
+              IndicoUI.Buttons.editButton())
+                                   );
             if(resourceId != resParams.mainResourceId) {
                 setMain = Widget.link(command(setMainResource,IndicoUI.Buttons.starButton(true)));
-                setMain.dom.onmouseover = setMainResourceHelpPopup;
+                IndicoUI.Widgets.Generic.createTooltip(setMain.dom, setMainResourceHelpPopup);
             }
             else {
                 setMain = Widget.link(command(removeMainResource,IndicoUI.Buttons.starButton(false)));
-                setMain.dom.onmouseover = mainResourceHelpPopup;
+                IndicoUI.Widgets.Generic.createTooltip(setMain.dom, mainResourceHelpPopup);
             }
         } else {
             removeButton = IndicoUI.Buttons.removeButton(true);
             removeButton.dom.title = '';
-            removeButton.dom.onmouseover = modifyDisabledHelpPopup;
+            IndicoUI.Widgets.Generic.createTooltip(removeButton.dom, modifyDisabledHelpPopup);
 
             editButton = IndicoUI.Buttons.editButton(true);
             editButton.dom.title = '';
-            editButton.dom.onmouseover = modifyDisabledHelpPopup;
+            IndicoUI.Widgets.Generic.createTooltip(editButton.dom, modifyDisabledHelpPopup);
 
-            setMain = IndicoUI.Buttons.starButton(true)
+            setMain = IndicoUI.Buttons.starButton(true);
             setMain.dom.title = '';
-            setMain.dom.onmouseover = modifyDisabledHelpPopup;
+            IndicoUI.Widgets.Generic.createTooltip(setMain.dom, modifyDisabledHelpPopup);
         }
 
         var information = [

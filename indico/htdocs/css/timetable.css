@@ -1,43 +1,43 @@
 .day{
-	color:gray; 
-	font-weight:bold; 
+	color:gray;
+	font-weight:bold;
     left:0px;
-    position:absolute; 
+    position:absolute;
 }
 
 .time{
-	color:gray; 
-	background-color:white; 
-	font-size:-1; 
-	padding-right:5px; 
+	color:gray;
+	background-color:white;
+	font-size:-1;
+	padding-right:5px;
 	font-weight:normal;
     left:65px;
-    height:12px;
+    height: 12px;
     margin-left:35px;
     position:absolute;
 }
 
 .blockSession{
-    margin-left:0px; 
-    margin-top:0px;  
-    margin-bottom: 0px; 
+    margin-left:0px;
+    margin-top:0px;
+    margin-bottom: 0px;
     margin-right:0px;
     position: absolute;
     border-top: 2px solid  white;
     border-left: 1px solid  white;
-    border-right: 1px solid  white;   
+    border-right: 1px solid  white;
 }
 
 .contentTitleBlock{
-    font-size:12;  
-    position:absolute; 
+    font-size:12;
+    position:absolute;
     color:gray;
-    text-align: left; 
+    text-align: left;
 
-} 
+}
 
 .filterBlock{
-    position:absolute; 
+    position:absolute;
     font-weight:900;
     background: #DDDDDD;
     opacity: 0.8;
@@ -50,6 +50,231 @@
     overflow: auto;
 }
 
-.filterElement{    
+.filterElement{
     font-weight:normal;
+}
+
+
+/* * TimeTable Legend * */
+
+div.wholeLegend {
+    left: 50px;
+    top: 50px;
+/*    margin: 13px 0px 0px 0px;*/
+    margin: 0px;
+}
+
+div.legendMainToggleContainer {
+    margin-left: 523px;
+}
+div.legendMainToggleActive {
+    width: 92px;
+    padding: 3px;
+    border: 1px solid #999999;
+    color: white;
+    background: #9F883B;
+    border-radius: 0px 0px 4px 4px;
+    -moz-border-radius: 0px 0px 4px 4px;
+    cursor: pointer;
+    cursor: hand;
+    visibility: visible;
+    text-align: center;
+}
+
+div.legendMainToggle {
+    width: 92px;
+    padding: 3px;
+    border: 1px solid #999999;
+    color: white;
+    background: #666;
+    border-radius: 0px 0px 4px 4px;
+    -moz-border-radius: 0px 0px 4px 4px;
+    visibility: visible;
+    text-align: center;
+}
+
+div.legendMainToggle:hover {
+    border: 1px solid #AAAAAA;
+    color: white;
+    background: #555555;
+    cursor: pointer;
+    cursor: hand;
+}
+
+/*
+div.legendMainToggle {
+    float: right;
+}
+*/
+
+div.legendCloseButton {
+    cursor: pointer;
+    background-image: url('../images/popup_close_button.png');
+    width: 15px;
+    height: 15px;
+    margin-top: 1px;
+    margin-right: 2px;
+    margin-left: 2px;
+}
+
+div.legendPosToggle {
+    margin: 1px 0px 1px 0px;
+    width: 18px;
+    height: 15px;
+/*    border: 1px dotted #AAAAAA;*/
+    background: transparent url('../images/fix_timetable.png') top no-repeat;
+    float: right;
+    border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+}
+
+div.legendPosToggle:hover {
+    border: 1px solid #AAAAAA;
+    cursor: pointer;
+}
+
+div.legendPosToggleFixed {
+    margin: 1px 0px 1px 0px;
+    width: 18px;
+    height: 15px;
+    background: #9F883B url('../images/fix_timetable_fixed.png') top no-repeat;
+    float: right;
+    border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+}
+
+div.legendPosToggleFixed:hover {
+    border: 1px solid #AAAAAA;
+    cursor: pointer;
+}
+
+div.showMoreLink {
+/*    border: 1px solid #AAAAAA;
+    background: #888888;*/
+    margin: 0px 0px 1px 1px;
+    font-size: 11px;
+    color: #555555;
+    width: 30px;
+    height: 14px;
+/*    font-weight: bold;*/
+    visibility: visible;
+    float: right;
+    border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
+    text-decoration: underline;
+    margin-right: 9px;
+}
+
+div.showMoreLink:hover {
+    color: #AAAAAA;
+    cursor: pointer;
+}
+
+div.legendTitle {
+/*    font-weight: bold;*/
+    color: #555555;
+    font-size: 11px;
+    float: right;
+    margin-right: 3px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+}
+
+div.timeTableLegend {
+    background: #FFFFFF;
+    border: 1px solid #ECECEC;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    vertical-align: middle;
+    margin-top: 12px;
+    overflow: hidden;
+    box-shadow: #ccc 0px 2px 13px;
+    -moz-box-shadow: #ccc 0px 2px 13px;
+}
+
+div.timeTableLegendFixed {
+    position: fixed;
+    bottom: 0px;
+    background: #FFFFFF;
+    border: 1px solid #ECECEC;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    vertical-align: middle;
+    margin-top: 35px;
+    overflow: hidden;
+    box-shadow: #ccc 0px -3px 10px;
+    -moz-box-shadow: #ccc 0px -3px 10px;
+}
+
+div.legendItem {
+    color: #4E4C46;
+    font-size: 11px;
+/*    font-weight: bold;*/
+    height: 15px;
+    padding: 5px;
+    margin: 2px;
+    float: left;
+    overflow: hidden;
+
+/* WARNING: Needed for
+   Timetable/Base, in
+   _getLegendPostProcessing,
+   for session title concatenation
+   (min-width and max-width)
+*/
+    min-width: 111px;
+    max-width: 200px;
+}
+
+div.legendItem span {
+    margin-top: 3px;
+    background: #F5EEDB;
+    position: absolute;
+    padding: 5px;
+    margin: 12px 3px 3px;
+    display: none;
+    z-index: 100;
+}
+
+div.legendItem:hover span {
+   border: 1px solid black;
+   display: block;
+}
+
+div.truncedTitleDots {
+    border: 1px solid black;
+    background: #F5EEDB;
+}
+
+div.timeTableItemColour {
+    width: 15px;
+    height: 15px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    float: left;
+    margin-right: 3px;
+}
+
+
+div.toggleEnabled {
+    color: white;
+    background: #9F883B;
+    cursor: pointer;
+    cursor: hand;
+}
+
+div.toggleDisabled {
+    color: #EDEDED;
+    background: #CECECE;
+    cursor: default;
+}
+
+div.flatRightBorderRadius {
+    border-radius: 3px 0px 0px 3px;
+    -moz-border-radius: 3px 0px 0px 3px;
+}
+
+div.flatLeftBorderRadius {
+    border-radius: 0px 3px 3px 0px;
+    -moz-border-radius: 0px 3px 3px 0px;
 }

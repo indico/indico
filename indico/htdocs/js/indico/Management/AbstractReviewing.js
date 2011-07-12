@@ -276,7 +276,7 @@ type("RadioButtonSimpleField", ["ErrorAware"],
                 for (var i=0; i<this.radioButtons.length; i++) {
                     $E(this.radioButtons[i].dom.id).dom.onmouseover = function(event) {
                         var value = self.rbValues[this.defaultValue];
-                        IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>"+value+"</span>");
+                        IndicoUI.Widgets.Generic.createTooltip(this, "<span style='padding:3px'>"+value+"</span>");
                     };
                 }
             }
