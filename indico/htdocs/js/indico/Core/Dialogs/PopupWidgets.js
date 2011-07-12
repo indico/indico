@@ -3,14 +3,16 @@
  * specify a date range.
  */
 type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
-    _drawButtons: function() {
+    _getButtons: function() {
         var self = this;
-
-        var buttonDiv = Html.div({}, Widget.button(command(function() {
-            self._submit();
-        }, $T("Choose"))));
-
-        return buttonDiv;
+        return [
+            [$T('Choose'), function() {
+                self._submit()
+            }],
+            [$T('Cancel'), function() {
+                self.close()
+            }]
+        ];
     },
 
     _submit: function() {
@@ -43,25 +45,27 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
 
     _drawWidget: function() {
         var self = this;
-        var structure = Html.div({style:{height: pixels(245)}});
-        _.defer(function() {
-            self.dateRangeWidget = $(structure.dom).daterange({
-                allowPast: true,
-                useFields: false,
-                startDate: self.startDate,
-                endDate: self.endDate,
-                pickerOptions: {
-                    yearRange: 'c-2:c+2'
-                }
-            });
-        });
+        self.dateRangeWidget = $('<div/>');
+        return self.dateRangeWidget;
+    },
 
-        return structure;
+    postDraw: function() {
+        this.dateRangeWidget.daterange({
+            allowPast: true,
+            useFields: false,
+            startDate: this.startDate,
+            endDate: this.endDate,
+            pickerOptions: {
+                yearRange: 'c-2:c+2'
+            }
+        });
+        return true; // refresh position
     },
 
     draw: function() {
-        var self = this;
-        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget(), this._drawButtons());
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget(), null, {
+            overflow: 'visible'
+        });
     }
 }, function(startDate, endDate, callback, title, allowEqual) {
     var self = this;

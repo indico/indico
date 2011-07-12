@@ -141,7 +141,11 @@ type("ExclusivePopup", ["Printable"], {
             }
         }
 
-        this.postDraw();
+        if(this.postDraw() === true) {
+            // refresh position
+            var pos = this.canvas.dialog('option', 'position');
+            this.canvas.dialog('option', 'position', pos);
+        }
     },
 
     postDraw: function() {

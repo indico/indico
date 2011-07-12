@@ -8,6 +8,10 @@
     width: 37em;
 }
 
+.ui-dialog-content .ui-daterange {
+    width: 100%;
+}
+
 .ui-dialog {
     width: auto !important;
 }
