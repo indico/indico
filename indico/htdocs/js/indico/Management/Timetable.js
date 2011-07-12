@@ -100,9 +100,9 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 
          existingSelectionObserver: function(selectedList) {
              if(selectedList.isEmpty()){
-                 this.button.disable();
+                 this.saveButton.disabledButtonWithTooltip('disable');
              } else {
-                 this.button.enable();
+                 this.saveButton.disabledButtonWithTooltip('enable');
              }
          },
 
@@ -128,10 +128,25 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                            });
          },
 
+         _getButtons: function() {
+             var self = this;
+             return [
+                 [$T('Add selected'), function() {
+                     var ids = translate(self.unscheduledList.getList(), function(contrib) {
+                         return contrib.get('id');
+                     });
+                     self.addExisting(ids, self.selectedDay);
+                 }],
+                 [$T('Close'), function() {
+                     self.close();
+                 }]
+             ];
+         },
+
          draw: function() {
              var self = this;
 
-             var unscheduledList = new UnscheduledContributionList(self.existing, function(selectedList) {
+             self.unscheduledList = new UnscheduledContributionList(self.existing, function(selectedList) {
                  self.existingSelectionObserver(selectedList);
              });
 
@@ -147,26 +162,15 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                          Html.li({},
                              $T("Choose one (or more) unscheduled"),
                              Html.div("UnscheduledContribListDiv",
-                             unscheduledList.draw()))));
+                             self.unscheduledList.draw()))));
 
-             this.button = new DisabledButton(Html.input("button", {disabled:true}, $T("Add selected")));
-             var tooltip;
-             this.button.observeEvent('mouseover', function(event){
-                 if (!self.button.isEnabled()) {
-                     tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("To add an unscheduled contribution, please select at least one"), "tooltipError");
-                 }
-             });
-             this.button.observeEvent('mouseout', function(event){
-                 Dom.List.remove(document.body, tooltip);
+             this.saveButton = this.buttons.eq(0);
+             this.saveButton.disabledButtonWithTooltip({
+                 tooltip: $T('To add an unscheduled contribution, please select at least one'),
+                 disabled: true
              });
 
-             this.button.observeClick(function(){
-                     var ids = translate(unscheduledList.getList(),
-                                         function(contrib) { return contrib.get('id'); });
-                     self.addExisting(ids, self.selectedDay);
-             });
-
-             return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, this.button.draw());
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
          }
      },
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
@@ -262,10 +266,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
     },
 
     draw: function() {
-        var newForm = this._drawNewForm();
-        var contentDiv = newForm[0];
-        var buttons = newForm[1];
-        return this.ServiceDialogWithButtons.prototype.draw.call(this, contentDiv, buttons,
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, this._drawNewForm(), null,
                 {backgroundColor: 'white'}); // because of variable content
     },
 
@@ -468,43 +469,50 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             ]);
     },
 
+    _getButtons: function() {
+        var self = this;
+        return [
+            [$T('Add'), function() {
+                // check if the day changed
+                if(self.timetable && !self.timetable.isPoster && Util.formatDateTime(self.conferenceDays.get(), IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) != self.previousDate.substr(0,10)){
+                    self.dayChanged = true;
+                    // if we are inside a session and the new contribution is set for a different day, we suppose that the contribution is not part of the session
+                    self.method = self.timetable.managementActions.methods.Contribution.add;
+                }
+
+                each(self.args, function(value, key) {
+                    self.info.set(key, value);
+                });
+
+                if (self.parameterManager.check()) {
+                    var killProgress = IndicoUI.Dialogs.Util.progress();
+                    indicoRequest(self.method, self.info, function(result, error){
+                        killProgress();
+                        if (error) {
+                            IndicoUtil.errorReport(error);
+                        }
+                        else {
+                            self.close();
+                            // Only one element is returned but put it in an array
+                            // since the successFunc expects arrays
+                            self.successFunc([result]);
+                        }
+                    });
+                }
+            }],
+            [$T('Cancel'), function() {
+                self.close();
+            }]
+        ];
+    },
+
     _drawNewForm: function() {
         var self = this;
-
-        var submitInfo = function(){
-            each(self.args, function(value, key) {
-                self.info.set(key, value);
-            });
-
-            if (self.parameterManager.check()) {
-                var killProgress = IndicoUI.Dialogs.Util.progress();
-                indicoRequest(self.method, self.info, function(result, error){
-                    killProgress();
-                    if (error) {
-                        IndicoUtil.errorReport(error);
-                    }
-                    else {
-                        self.close();
-                        // Only one element is returned but put it in an array
-                        // since the successFunc expects arrays
-                        self.successFunc([result]);
-                    }
-                });
-            }
-        };
-
-        var addButton = Html.input('button',{},$T("Add"));
-        var cancelButton = Html.input('button',{}, $T("Cancel"));
-
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-
         var tabs = null;
 
         if (self.timetable) {
             //Create the list of the days in which the conference is being held
-            var conferenceDays = bind.element(
+            this.conferenceDays = bind.element(
                 Html.select({name: 'type'}),
                 self.days,
                 function(elem) {
@@ -513,27 +521,10 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 }
             );
 
-            tabs = [[$T("Basic"), self._drawMainTab(self.info, conferenceDays)]];
+            tabs = [[$T("Basic"), self._drawMainTab(self.info, this.conferenceDays)]];
         } else {
             tabs = [[$T("Basic"), self._drawMainTab(self.info)]];
         }
-
-        addButton.observeClick(function(){
-            //check if the day changed
-            if(self.timetable && !self.timetable.isPoster &&
-               Util.formatDateTime(conferenceDays.get(), IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) !=
-               self.previousDate.substr(0,10)){
-                self.dayChanged = true;
-
-                //if we are inside a session and the new contribution is set for a different day, we suppose that the contribution is not part of the session
-                self.method = self.timetable.managementActions.methods.Contribution.add;
-            }
-
-            submitInfo();
-        });
-
-
-        cancelButton.dom.style.marginLeft = pixels(10);
 
         if (this.isConference) {
             tabs.push([$T("Authors"), self._drawAuthorsTab(self.info)]);
@@ -542,8 +533,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         tabs.push([$T("Advanced"), self._drawAdvancedTab(self.info)]);
         var tabWidget = new TabWidget(tabs, 600, 400);
 
-        return [tabWidget.draw(), [addButton, cancelButton]];
-
+        return tabWidget.draw();
     }
 },
 
@@ -702,11 +692,7 @@ type("ChangeEditDialog", // silly name!
                  self.open();
              });
 
-         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args,
-                            title,
-                            function() {
-                                this.close();
-                            });
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args, title);
      });
 
 
@@ -720,13 +706,40 @@ type("AddBreakDialog", ["ChangeEditDialog"],
 
          },
 
+         _getButtons: function() {
+             var self = this;
+             return [
+                 [this.isEdit ? $T('Save') : $T('Add'), function() {
+                     // check if the day changed
+                     if(Util.formatDateTime(self.conferenceDays.get(),
+                                            IndicoDateTimeFormats.ServerHourless,
+                                            IndicoDateTimeFormats.Ordinal) !=
+                         self.previousDate.substr(0,10)){
+                         self.dayChanged = true;
+                     }
+                     if (self.isEdit) {
+                         self._saveInfo();
+                     } else {
+                         //in case we're inside a session and the break is added to a different day, we suppose it's not inside the session anymore
+                         if(self.dayChanged){
+                             self.method = self.managementActions.methods.Break.add;
+                         }
+                         else{
+                             if(exists(self.managementActions.timetable.parentTimetable)) {
+                                 self.method = self.managementActions.methods.SessionBreak.add;
+                             }
+                         }
+                         self._submitInfo();
+                     }
+                 }],
+                 [$T('Cancel'), function() {
+                     self.close();
+                 }]
+             ];
+         },
 
          draw: function(){
              var self = this;
-
-             var addButton = Html.input('button', {}, this.isEdit?$T("Save"):$T("Add"));
-             var cancelButton = Html.input('button', {}, $T("Cancel"));
-             cancelButton.dom.style.marginLeft = pixels(10);
 
              this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations,
                                                      this.info.get('roomInfo'),
@@ -739,37 +752,9 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                                      this.info,
                                                      this.isEdit?this.info.get("id"):null);
 
-             cancelButton.observeClick(function(){
-                 self.close();
-             });
-
-
-             addButton.observeClick(function(){
-                 //check if the day changed
-                 if(Util.formatDateTime(conferenceDays.get(),
-                                        IndicoDateTimeFormats.ServerHourless,
-                                        IndicoDateTimeFormats.Ordinal) !=
-                     self.previousDate.substr(0,10)){
-                     self.dayChanged = true;
-                 }
-                 if (self.isEdit) {
-                     self._saveInfo();
-                 } else {
-                     //in case we're inside a session and the break is added to a different day, we suppose it's not inside the session anymore
-                     if(self.dayChanged){
-                         self.method = self.managementActions.methods.Break.add;
-                     }
-                     else{
-                         if(exists(self.managementActions.timetable.parentTimetable)) {
-                             self.method = self.managementActions.methods.SessionBreak.add;
-                         }
-                     }
-                     self._submitInfo();
-                 }
-             });
 
              //Create the list of the days in which the conference is being held
-             var conferenceDays = bind.element(
+             this.conferenceDays = bind.element(
                      Html.select({name: 'type'}),
                      self.days,
                      function(elem) {
@@ -779,11 +764,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  );
 
 
-             conferenceDays.set(Util.formatDateTime(self.info.get('startDate'), IndicoDateTimeFormats.Ordinal, IndicoDateTimeFormats.Server/*Hourless*/));
+             this.conferenceDays.set(Util.formatDateTime(self.info.get('startDate'), IndicoDateTimeFormats.Ordinal, IndicoDateTimeFormats.Server/*Hourless*/));
 
              //We need to update the value of Time and endDateTime every time that is changed by the user
              //value is the new date
-             conferenceDays.observe(function(value) {
+             this.conferenceDays.observe(function(value) {
                  //it is neccesary to update the date in dateArgs with the new date to make the request
                  self.dateArgs.set("selectedDay", Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal));
                  //but we need to check if are inside a session and if the day changed, in order
@@ -827,7 +812,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              //template for the binding
              var timeTranslation = {
                      toTarget: function (value) {
-                         var aux = conferenceDays.get();
+                         var aux = self.conferenceDays.get();
                          return Util.formatDateTime(aux, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) + ' ' + value;
                      },
                      toSource: function(value) {
@@ -875,15 +860,13 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  [$T('Title'), $B(self.parameterManager.add(Html.edit({ id: 'breakTitle'})), this.info.accessor('title'))],
                  [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), this.info.accessor('description'))],
                  [$T('Place'), this.roomEditor.draw()],
-                 [$T('Date'), conferenceDays],
+                 [$T('Date'), this.conferenceDays],
                  [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}},
                          this.startTimeField, $T(' Duration '), this.timeField, $T('min'))],
                  colorPickerComponent
              ]);
 
-             var buttonDiv = Html.div({}, addButton, cancelButton);
-
-             return this.ServiceDialogWithButtons.prototype.draw.call(this, contentDiv, buttonDiv);
+             return this.ServiceDialogWithButtons.prototype.draw.call(this, contentDiv);
          },
 
          _saveInfo: function() {
@@ -1095,6 +1078,42 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                 return moveEntryTable;
             },
 
+            _getButtons: function() {
+                var self = this;
+                return [
+                    [$T('Move Entry'), function() {
+                        var value = self.getChosenValue();
+
+                        // if nothing has been selected yet
+                        if (!value) {
+                            return;
+                        }
+
+                        var killProgress = IndicoUI.Dialogs.Util.progress($T('Moving the entry...'));
+
+                        indicoRequest(self.managementActions.methods[self.inSession?'SessionEntry':'Event'].moveEntry, {
+                            value : value,
+                            conference : self.confId,
+                            scheduleEntryId : self.scheduleEntryId,
+                            sessionId : self.sessionId,
+                            sessionSlotId : self.slotId
+                        }, function(result, error) {
+                            if (error) {
+                                killProgress();
+                                IndicoUtil.errorReport(error);
+                            } else {
+                                // change json and repaint timetable
+                                self.managementActions.timetable._updateMovedEntry(result, result.old.id);
+                                killProgress();
+                                self.close();
+                            }
+                        });
+                    }],
+                    [$T('Cancel'), function() {
+                        self.close();
+                    }]
+                ];
+            },
 
             draw: function() {
                 var self = this;
@@ -1144,51 +1163,8 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                 },
                     $T("Please select the place where you want to move it to."));
 
-                // We construct the "ok" button and what happens when it's pressed
-                var okButton = Html.input('button', '', $T("Move Entry"));
-                okButton.observeClick(function() {
-                    var value = self.getChosenValue();
-
-                    // if nothing has been selected yet
-                    if (!value) {
-                        return false;
-                    }
-
-                    var killProgress = IndicoUI.Dialogs.Util.progress("Moving the entry...");
-
-                    indicoRequest(self.managementActions.methods[self.inSession?'SessionEntry':'Event'].moveEntry, {
-                        value : value,
-                        conference : self.confId,
-                        scheduleEntryId : self.scheduleEntryId,
-                        sessionId : self.sessionId,
-                        sessionSlotId : self.slotId
-                    }, function(result, error) {
-                        if (error) {
-                            killProgress();
-                            IndicoUtil.errorReport(error);
-                        } else {
-                            // change json and repaint timetable
-                            self.managementActions.timetable._updateMovedEntry(result, result.old.id);
-                            killProgress();
-                            self.close();
-                        }
-                    });
-                });
-
-                // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-                var cancelButton = Html.input('button',  {
-                    style : {
-                        marginLeft : pixels(5)
-                    }
-                }, "Cancel");
-                cancelButton.observeClick(function() {
-                    self.close();
-                });
-
-                var content = Widget.block( [Html.div({}, span1, span2), this.tabWidget.draw(), Html.br()] );
-                var buttons = Html.div({}, okButton, cancelButton);
-
-                return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, buttons);
+                var content = Widget.block([Html.div({}, span1, span2), this.tabWidget.draw(), Html.br()]);
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
             },
 
             /*
@@ -1310,14 +1286,14 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         startTimeRescheduleRB.observeClick(function(){
             if(self.rescheduleAction == "startingTime") {
                 if (self.fitInnerAction == "noFit") {
-                    self.rescheduleButton.disable();
+                    self.rescheduleButton.disabledButtonWithTooltip('disable');
                 }
                 self.rescheduleAction = "noAction";
                 startTimeRescheduleTr.dom.className = "";
                 startTimeRescheduleRB.dom.checked = false;
             }
             else {
-                self.rescheduleButton.enable();
+                self.rescheduleButton.disabledButtonWithTooltip('enable');
                 self.rescheduleAction = "startingTime";
                 startTimeRescheduleTr.dom.className = "selectedAction";
                 durationRescheduleTr.dom.className = "";
@@ -1326,14 +1302,14 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         durationRescheduleRB.observeClick(function(){
             if(self.rescheduleAction == "duration" ) {
                 if (self.fitInnerAction == "noFit") {
-                    self.rescheduleButton.disable();
+                    self.rescheduleButton.disabledButtonWithTooltip('disable');
                 }
                 self.rescheduleAction = "noAction";
                 durationRescheduleTr.dom.className = "";
                 durationRescheduleRB.dom.checked = false;
             }
             else{
-                self.rescheduleButton.enable();
+                self.rescheduleButton.disabledButtonWithTooltip('enable');
                 self.rescheduleAction = "duration";
                 durationRescheduleTr.dom.className = "selectedAction";
                 startTimeRescheduleTr.dom.className = "";
@@ -1443,43 +1419,28 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         var checked = this.fitInnerCheckBox.get();
 
         if ( checked ) {
-            this.rescheduleButton.enable();
+            this.rescheduleButton.disabledButtonWithTooltip('enable');
             this.fitInnerAction = "doFit";
         }
         else {
             if (this.rescheduleAction == "noAction") {
-                this.rescheduleButton.disable();
+                this.rescheduleButton.disabledButtonWithTooltip('disable');
             }
             this.fitInnerAction = "noFit";
         }
     },
 
 
-    /**
-     * Draws the reschedule and cancel buttons
-     */
-    __drawButtons: function() {
+    _getButtons: function() {
         var self = this;
-        // Reschedule and cancel buttons
-        this.rescheduleButton = new DisabledButton(Html.input("button", {disabled:true, style:{marginRight:pixels(3)}}, $T("Reschedule")));
-        var rescheduleButtonTooltip;
-        this.rescheduleButton.observeEvent('mouseover', function(event){
-            if (!self.rescheduleButton.isEnabled()) {
-                rescheduleButtonTooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("Please select type of rescheduling"), "tooltipError");
-            }
-        });
-        this.rescheduleButton.observeEvent('mouseout', function(event){
-            Dom.List.remove(document.body, rescheduleButtonTooltip);
-        });
-
-        this.rescheduleButton.observeClick(function() {
-            self.__reschedule();
-        });
-
-        var cancelButton = Html.input("button", {style:{marginLeft:pixels(3)}}, $T("Cancel"));
-        cancelButton.observeClick(function(){self.close();});
-
-        return Html.div({}, this.rescheduleButton.draw(), cancelButton);
+        return [
+            [$T('Reschedule'), function() {
+                self.__reschedule();
+            }],
+            [$T('Cancel'), function() {
+                self.close();
+            }]
+        ];
     },
 
 
@@ -1577,6 +1538,11 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
     draw: function(){
         var self = this;
 
+        this.rescheduleButton = this.buttons.eq(0);
+        this.rescheduleButton.disabledButtonWithTooltip({
+            tooltip: $T('Please select the rescheduling type'),
+            disabled: true
+        });
         var actionChooseDiv = this.__drawChooseAction();
         var intervalDiv = this.__drawChooseInterval();
         var actionFitDiv = "";
@@ -1585,7 +1551,6 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         }
 
         this.mainContent = Html.div({style:{width:pixels(450)}}, actionChooseDiv, intervalDiv, actionFitDiv);
-        var buttonContent = this.__drawButtons();
 
         this.__intervalObserver();
         if (this.isTopLevelTimetable) {
@@ -1593,7 +1558,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         }
         this.__buildParameterManager();
 
-        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.mainContent, buttonContent);
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.mainContent);
 
     }
 },
@@ -1601,7 +1566,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
      * Constructor
      */
     function(parentTimetable){
-        this.ExclusivePopupWithButtons(Html.div({style:{textAlign:"center"}},$T("Reschedule Entries")), positive);
+        this.ExclusivePopupWithButtons($T('Reschedule Entries'));
         this.tt = parentTimetable;
 
         this.isTopLevelTimetable = exists(this.tt.TopLevelManagementTimeTable);
