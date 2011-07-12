@@ -1297,11 +1297,21 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('fax'))],
                grant]);
 
-            var buttons = Html.div({},
-                    Widget.link(command(curry(this.action, userData, function() {self.close();}), Html.input("button", {}, $T("Save")))),
-                    Widget.link(command(function() {self.close();}, Html.input("button", {}, $T("Cancel")))));
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
+         },
 
-             return this.ExclusivePopupWithButtons.prototype.draw.call(this, form, buttons);
+         _getButtons: function() {
+             var self = this;
+             return [
+                 [$T('Save'), function() {
+                     self.action(self.userData, function() {
+                         self.close();
+                     });
+                 }],
+                 [$T('Cancel'), function() {
+                     self.close();
+                 }]
+             ];
          }
 
      },
