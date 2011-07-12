@@ -1,4 +1,4 @@
-<% from MaKaC.i18n import _,langList %>
+<% from indico.util.i18n import getLocaleDisplayNames %>
 <form action="${ postURL }" method="POST">
 <table width="95%" align="center" border="0">
 <tr>
@@ -45,7 +45,7 @@
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Language")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
          <select name="lang">
-           % for l in langList():
+           % for l in getLocaleDisplayNames():
            <option ${"selected" if l[0] == language else ""} value="${ l[0] }">${ l[1] }</option>
            % endfor
          </select>

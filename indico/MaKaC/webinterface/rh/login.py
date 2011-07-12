@@ -108,7 +108,7 @@ class RHSignOut( base.RH ):
         else:
             # if not all the site is HTTPS, try moving user to plain HTTP
             if not Config.getInstance().getBaseURL().startswith('https'):
-                self._redirect(self._returnURL.replace('https', 'http'))
+                self._redirect(str(self._returnURL).replace('https', 'http'))
             else:
                 self._redirect(self._returnURL)
 
