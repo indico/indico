@@ -4968,7 +4968,7 @@ class WConvenerSentMail  (wcomponents.WTemplated):
         vars["BackURL"]=quoteattr(str(urlHandlers.UHConfAllSessionsConveners.getURL(self._conf)))
         return vars
 
-class WPSentEmail( WPConfModifListings ):
+class WPConvenerSentEmail( WPConfModifListings ):
     def _getTabContent(self,params):
         wc = WConvenerSentMail(self._conf)
         return wc.getHTML()
@@ -8618,11 +8618,10 @@ class WConfAuthorIndex(wcomponents.WTemplated):
             itemFormatFunc=self._getContribFullView
 
         self._urlGen=urlHandlers.UHContributionDisplay.getURL
-        contribList=[itemFormatFunc(auth.getContribution()) for auth in pl]
         if authCaption.strip()=="":
             return ""
-        authId = key
-        authorURL = urlHandlers.UHContribAuthorDisplay.getURL(self._conf)
+        authId = auth.getId()
+        authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution())
         authorURL.addParam( "authorId", authId )
         contribList=[]
         for auth in pl:

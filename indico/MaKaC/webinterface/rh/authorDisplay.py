@@ -21,20 +21,21 @@
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.pages import authors
 from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.rh.contribDisplay import RHContributionDisplayBase
 
-class RHAuthorDisplayBase( RHConferenceBaseDisplay ):
+class RHAuthorDisplayBase( RHContributionDisplayBase ):
 
     def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
+        RHContributionDisplayBase._checkParams( self, params )
         self._authorId = params.get( "authorId", "" ).strip()
 
 
 class RHAuthorDisplay( RHAuthorDisplayBase ):
     _uh = urlHandlers.UHContribAuthorDisplay
-    
+
     def _process( self ):
-        p = authors.WPAuthorDisplay( self, self._conf, self._authorId )
+        p = authors.WPAuthorDisplay( self, self._contrib, self._authorId )
         return p.display()
 
 
-        
+

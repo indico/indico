@@ -28,8 +28,9 @@ from MaKaC.i18n import _
 
 class WAuthorDisplay(wcomponents.WTemplated):
 
-    def __init__(self,conf, authId):
-        self._conf = conf
+    def __init__(self,contrib, authId):
+        self._conf = contrib.getConference()
+        self._contrib = contrib
         self._authorId = authId
 
     def _getMaterialHTML(self, contrib):
@@ -63,7 +64,7 @@ class WAuthorDisplay(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        authorList=self._conf.getAuthorIndex().getById(self._authorId)
+        authorList=self._conf.getAuthorIndex().getByAuthorObj(self._contrib.getAuthorById(self._authorId))
         author = None
         if authorList is not None:
             author=authorList[0]
@@ -92,12 +93,13 @@ class WAuthorDisplay(wcomponents.WTemplated):
 class WPAuthorDisplay(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEAuthorDisplay
 
-    def __init__(self, rh, conf, authId):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
+    def __init__(self, rh, contrib, authId):
+        WPConferenceDefaultDisplayBase.__init__(self, rh, contrib.getConference())
         self._authorId = authId
+        self._contrib = contrib
 
     def _getBody(self,params):
-        wc=WAuthorDisplay(self._conf, self._authorId)
+        wc=WAuthorDisplay(self._contrib, self._authorId)
         return wc.getHTML()
 
     def _defineSectionMenu( self ):

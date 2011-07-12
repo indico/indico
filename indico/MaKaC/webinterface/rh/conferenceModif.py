@@ -2772,7 +2772,7 @@ class RHConvenerSendEmail( RHConferenceModifBase  ):
         if self._send:
             self._params['to'] = self._toEmails
             registrantNotificator.EmailNotificator().notifyAll(self._params)
-            p = conferences.WPSentEmail(self, self._target)
+            p = conferences.WPConvenerSentEmail(self, self._target)
             return p.display()
         else:
             self._redirect(urlHandlers.UHConfAllSessionsConveners.getURL(self._conf))

@@ -7462,6 +7462,9 @@ class AuthorIndex(Persistent):
     def getById(self, id):
         return self._idx.get(id,None)
 
+    def getByAuthorObj(self, auth):
+        return self.getById(self._getKey(auth))
+
     def getParticipationKeys(self):
         return self._idx.keys()
 

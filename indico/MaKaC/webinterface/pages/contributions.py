@@ -234,8 +234,8 @@ class WContributionDisplayBase(wcomponents.WTemplated):
 
         pal = []
         for pa in self._contrib.getPrimaryAuthorList():
-            authURL=urlHandlers.UHContribAuthorDisplay.getURL(self._contrib.getConference())
-            authURL.addParam("authorId", authIndex._getKey(pa))
+            authURL=urlHandlers.UHContribAuthorDisplay.getURL(self._contrib)
+            authURL.addParam("authorId", pa.getId())
             authCaption="<a href=%s>%s</a>"%(quoteattr(str(authURL)), self.htmlText(pa.getFullName()))
             if pa.getAffiliation()!="":
                 authCaption="%s (%s)"%(authCaption,self.htmlText(pa.getAffiliation()))
