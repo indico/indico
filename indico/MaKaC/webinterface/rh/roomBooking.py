@@ -722,39 +722,6 @@ class RHRoomBookingSearch4Bookings( RHRoomBookingBase ):
         p = roomBooking_wp.WPRoomBookingSearch4Bookings( self )
         return p.display()
 
-class RHRoomBookingSearch4Users( RHRoomBookingBase ):
-
-    def _checkParams( self, params ):
-
-        roomID = params.get( "roomID" )
-        roomLocation = params.get( "roomLocation" )
-        candRoom = None
-        if roomID:
-            self._formMode = FormMode.MODIF
-            roomID = int( roomID )
-            candRoom = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
-        else:
-            self._formMode = FormMode.NEW
-            candRoom = Factory.newRoom()  # Is it OK? Potential bug.
-
-        self._loadRoomCandidateFromParams( candRoom, params )
-        self._saveRoomCandidateToSession( candRoom )
-
-        # Set session
-        self._websession.setVar( "showErrors", False )
-        self._websession.setVar( "candDataInSession", True )
-
-        if params.has_key( 'largePhotoPath' ): del params['largePhotoPath']
-        if params.has_key( 'smallPhotoPath' ): del params['smallPhotoPath']
-
-        self._forceWithoutExtAuth = True
-        if params.has_key( 'searchExt' )  and  params['searchExt'] == 'Nice':
-            self._forceWithoutExtAuth = False
-
-    def _process( self ):
-        p = roomBooking_wp.WPRoomBookingSearch4Users( self )
-        return p.display( **self._getRequestParams() )
-
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
     def _checkParams(self, params):

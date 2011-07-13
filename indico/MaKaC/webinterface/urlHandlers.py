@@ -330,8 +330,6 @@ class UHRoomBookingSearch4Rooms( URLHandler ):
 
 class UHRoomBookingSearch4Bookings( URLHandler ):
     _relativeURL = "roomBooking.py/search4Bookings"
-class UHRoomBookingSearch4Users( URLHandler ):
-    _relativeURL = "roomBooking.py/search4Users"
 
 class UHRoomBookingRoomList( URLHandler ):
     _relativeURL = "roomBooking.py/roomList"
@@ -1984,15 +1982,6 @@ class UHAdminSwitchNewsActive( URLHandler ):
 
 class UHAdminSwitchHighlightActive( URLHandler ):
     _relativeURL = "adminList.py/switchHighlightActive"
-
-class UHAdminsSelectUsers( URLHandler ):
-    _relativeURL = "adminList.py/selectAdmins"
-
-class UHAdminsAddUsers( URLHandler ):
-    _relativeURL = "adminList.py/addAdmins"
-
-class UHAdminsRemoveUsers( URLHandler ):
-    _relativeURL = "adminList.py/removeAdmins"
 
 class UHAdminsStyles( URLHandler ):
     _relativeURL = "adminLayout.py/styles"

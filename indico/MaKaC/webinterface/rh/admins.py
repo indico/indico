@@ -98,42 +98,6 @@ class RHConfigUpcoming( RHAdminBase ):
         return p.display()
 
 
-class RHAdminSelectUsers( RHAdminBase ):
-    _uh = urlHandlers.UHAdminsSelectUsers
-
-    def _process( self ):
-        p = admins.WPAdminSelectUsers( self )
-        return p.display( **self._getRequestParams() )
-
-
-class RHAdminAddUsers( RHAdminBase ):
-    _uh = urlHandlers.UHAdminsAddUsers
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            al = self._minfo.getAdminList()
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if ph.getById( id ) != None:
-                    al.grant( ph.getById( id ) )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
-
-
-class RHAdminRemoveUsers( RHAdminBase ):
-    _uh = urlHandlers.UHAdminsRemoveUsers
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            al = self._minfo.getAdminList()
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if ph.getById( id ) != None:
-                    al.revoke( ph.getById( id ) )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
-
-
 class RHGeneralInfoModification( RHAdminBase ):
     _uh = urlHandlers.UHGeneralInfoModification
 

@@ -67,8 +67,30 @@
 <div class="groupTitle" style="margin-top: 30px;">${ _("Administrator list")}</div>
 <table width="100%">
     <tr>
-        <td bgcolor="white" width="100%" valign="top" class="blacktext">
-            ${adminList}
+        <td bgcolor="white" width="60%">
+            <table width="100%">
+                <tr>
+                    <td><ul id="inPlaceAdministrators" class="UIPeopleList"></ul></td>
+                </tr>
+                <tr>
+                    <td nowrap style="width:60%; padding-top:5px;">
+                        <input type="button" onclick="adminListManager.addExistingUser();" value='${ _("Add administrator") }'></input>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
         </td>
     </tr>
 </table>
+
+<script>
+
+var methods = {'addExisting': 'admin.general.addExistingAdmin',
+                    'remove': 'admin.general.removeAdmin',
+               'getUserList': 'admin.general.getAdminList'};
+
+var params = {};
+
+var adminListManager = new ModificationControlManager(null, methods, params, $E('inPlaceAdministrators'), "administrator");
+
+</script>

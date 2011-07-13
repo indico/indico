@@ -23,6 +23,8 @@ from MaKaC.user import PrincipalHolder, AvatarHolder
 import MaKaC.webcast as webcast
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.services.interface.rpc.common import ServiceError
+import MaKaC.common.info as info
+from MaKaC.common.fossilize import fossilize
 
 
 ### Webcast Administrators classes ###
@@ -80,9 +82,60 @@ class AdminLoginAs(AdminService):
         return True
 
 
+class GetAdministratorList(AdminService):
+
+    def _getAnswer(self):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        return fossilize(minfo.getAdminList())
+
+
+class AddExistingAdministrator(AdminService):
+
+    def _checkParams(self):
+        AdminService._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        adminList = minfo.getAdminList()
+        ph = PrincipalHolder()
+        for user in self._userList:
+            avatar = ph.getById(user["id"])
+            if avatar != None:
+                adminList.grant(avatar)
+            else:
+                raise ServiceError("ER-U0", _("Cannot found user with id %s") % user["id"])
+        return fossilize(minfo.getAdminList())
+
+
+class RemoveAdministrator(AdminService):
+
+    def _checkParams(self):
+        AdminService._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userId = pm.extract("userId", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        adminList = minfo.getAdminList()
+        ph = PrincipalHolder()
+        user = ph.getById(self._userId)
+        if user != None:
+            adminList.revoke(user)
+        else:
+            raise ServiceError("ER-U0", _("Cannot found user with id %s") % self._userId)
+        return fossilize(minfo.getAdminList())
+
+
+
 methodMap = {
     "services.addWebcastAdministrators": AddWebcastAdministrators,
     "services.removeWebcastAdministrator": RemoveWebcastAdministrator,
+
+    "general.addExistingAdmin": AddExistingAdministrator,
+    "general.removeAdmin": RemoveAdministrator,
+    "general.getAdminList": GetAdministratorList,
 
     "header.loginAs": AdminLoginAs
 }

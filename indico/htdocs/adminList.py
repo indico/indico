@@ -35,14 +35,3 @@ def switchNewsActive( req, **params ):
 
 def switchHighlightActive( req, **params ):
     return admins.RHAdminSwitchHighlightActive( req ).process( params )
-
-def selectAdmins( req, **params ):
-    return admins.RHAdminSelectUsers( req ).process( params )
-
-def addAdmins( req, **params ):
-    return admins.RHAdminAddUsers( req ).process( params )
-    
-def removeAdmins( req, **params ):
-    return admins.RHAdminRemoveUsers( req ).process( params )
-    
-

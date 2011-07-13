@@ -233,18 +233,6 @@ class WPRoomBookingSearch4Bookings( WPRoomBookingBase ):
         wc = wcomponents.WRoomBookingSearch4Bookings( self._rh )
         return wc.getHTML( params )
 
-class WPRoomBookingSearch4Users( WPRoomBookingBase ):
-    def __init__( self, rh ):
-        self._rh = rh
-        WPRoomBookingBase.__init__( self, rh )
-
-    def _getBody( self, params ):
-        wc = wcomponents.WUserSelection( \
-             urlHandlers.UHRoomBookingSearch4Users.getURL(),
-             forceWithoutExtAuth = self._rh._forceWithoutExtAuth,
-             multi = False )
-        params["addURL"] = urlHandlers.UHRoomBookingRoomForm.getURL()
-        return wc.getHTML( params )
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):
 

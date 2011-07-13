@@ -177,7 +177,6 @@ class WAdmins(wcomponents.WTemplated):
             vars["timezone"] = minfo.getTimezone()
         except:
             vars["timezone"] = 'UTC'
-        vars["adminList"] = wcomponents.WPrincipalTable().getHTML( minfo.getAdminList().getList(),  None, vars["addAdminsURL"], vars["removeAdminsURL"], selectable=False )
         vars["systemIconAdmins"] = Config.getInstance().getSystemIconURL( "admin" )
         iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
         iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
@@ -233,27 +232,9 @@ class WPAdmins( WPAdminsBase ):
 
     def _getPageContent( self, params ):
         wc = WAdmins()
-        pars = { "GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL(), \
-                "addAdminsURL": urlHandlers.UHAdminsSelectUsers.getURL(), \
-                "removeAdminsURL": urlHandlers.UHAdminsRemoveUsers.getURL() }
+        pars = { "GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL() }
         return wc.getHTML( pars )
 
-class WPAdminSelectUsers( WPAdmins ):
-
-    def _getPageContent( self, params ):
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHAdminsSelectUsers.getURL(), forceWithoutExtAuth=False )
-        wc.setTitle( _("Select administrator"))
-        params["addURL"] =  urlHandlers.UHAdminsAddUsers.getURL()
-        html = i18nformat("""<table align="center" width="95%%">
-    <tr>
-       <td class="formTitle"> _("General admin data")</td>
-    </tr>
-    <tr>
-        <td>
-            <br>
-        """)
-        html = "%s%s"%(html,wc.getHTML( params ))
-        return "%s%s"%(html,"""</td></tr></table>""")
 
 class WGeneralInfoModification(wcomponents.WTemplated):
 
