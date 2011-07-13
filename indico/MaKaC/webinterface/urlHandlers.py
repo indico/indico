@@ -1899,18 +1899,6 @@ class UHGroupPerformModification( URLHandler ):
     _relativeURL = "groupModification.py/update"
 
 
-class UHGroupSelectMembers( URLHandler ):
-    _relativeURL = "groupDetails.py/selectMembers"
-
-
-class UHGroupAddMembers( URLHandler ):
-    _relativeURL = "groupDetails.py/addMembers"
-
-
-class UHGroupRemoveMembers( URLHandler ):
-    _relativeURL = "groupDetails.py/removeMembers"
-
-
 class UHPrincipalDetails:
 
     def getURL( cls, member ):

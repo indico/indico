@@ -28,13 +28,3 @@ if DEVELOPMENT:
 
 def index(req, **params):
     return groups.RHGroupDetails( req ).process( params )
-
-def selectMembers(req, **params):
-    return groups.RHGroupSelectMembers( req ).process( params )
-
-def addMembers( req, **params ):
-    return groups.RHGroupAddMembers( req ).process( params )
-
-def removeMembers( req, **params ):
-    return groups.RHGroupRemoveMembers( req ).process( params )
-

@@ -19,7 +19,7 @@
 
 from MaKaC.services.implementation.base import AdminService
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.user import PrincipalHolder, AvatarHolder
+from MaKaC.user import PrincipalHolder, AvatarHolder, GroupHolder
 import MaKaC.webcast as webcast
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.services.interface.rpc.common import ServiceError
@@ -101,9 +101,9 @@ class AddExistingAdministrator(AdminService):
         adminList = minfo.getAdminList()
         ph = PrincipalHolder()
         for user in self._userList:
-            avatar = ph.getById(user["id"])
-            if avatar != None:
-                adminList.grant(avatar)
+            principal = ph.getById(user["id"])
+            if principal != None:
+                adminList.grant(principal)
             else:
                 raise ServiceError("ER-U0", _("Cannot found user with id %s") % user["id"])
         return fossilize(minfo.getAdminList())
@@ -128,6 +128,56 @@ class RemoveAdministrator(AdminService):
         return fossilize(minfo.getAdminList())
 
 
+class GroupMemberBase(AdminService):
+
+    def _checkParams(self):
+        AdminService._checkParams(self)
+        self._pm = ParameterManager(self._params)
+        gh = GroupHolder()
+        groupId = self._pm.extract("groupId", pType=str, allowEmpty=False)
+        self._group = gh.getById(groupId)
+        if self._group == None:
+            raise ServiceError("ER-G0", _("Cannot found group with id %s") % groupId)
+
+
+class GroupGetMemberList(GroupMemberBase):
+
+    def _getAnswer(self):
+        return fossilize(self._group.getMemberList())
+
+
+class GroupAddExistingMember(GroupMemberBase):
+
+    def _checkParams(self):
+        GroupMemberBase._checkParams(self)
+        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        for user in self._userList:
+            principal = ph.getById(user["id"])
+            if principal != None:
+                self._group.addMember(principal)
+            else:
+                raise ServiceError("ER-U0", _("Cannot found user with id %s") % user["id"])
+        return fossilize(self._group.getMemberList())
+
+
+class GroupRemoveMember(GroupMemberBase):
+
+    def _checkParams(self):
+        GroupMemberBase._checkParams(self)
+        self._userId = self._pm.extract("userId", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        user = ph.getById(self._userId)
+        if user != None:
+            self._group.removeMember(user)
+        else:
+            raise ServiceError("ER-U0", _("Cannot found user with id %s") % self._userId)
+        return fossilize(self._group.getMemberList())
+
 
 methodMap = {
     "services.addWebcastAdministrators": AddWebcastAdministrators,
@@ -137,5 +187,9 @@ methodMap = {
     "general.removeAdmin": RemoveAdministrator,
     "general.getAdminList": GetAdministratorList,
 
-    "header.loginAs": AdminLoginAs
+    "header.loginAs": AdminLoginAs,
+
+    "groups.addExistingMember": GroupAddExistingMember,
+    "groups.removeMember": GroupRemoveMember,
+    "groups.getMemberList": GroupGetMemberList
 }

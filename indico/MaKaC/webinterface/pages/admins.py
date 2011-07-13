@@ -1870,9 +1870,9 @@ class WGroupDetails(wcomponents.WTemplated):
         vars["name"] = self._group.getName()
         vars["description"] = self._group.getDescription()
         vars["email"] = self._group.getEmail()
-        vars["membersList"] = wcomponents.WPrincipalTable().getHTML( self._group.getMemberList(),  None, vars["addMembersURL"], vars["removeMembersURL"], selectable=False )
         vars["locator"] = self._group.getLocator().getWebForm()
         vars["obsolete"] = self._group.isObsolete()
+        vars["groupId"] = self._group.getId()
         return vars
 
 
@@ -1883,8 +1883,6 @@ class WPGroupDetails( WPGroupBase ):
         pars = { \
     "modifyURL": urlHandlers.UHGroupModification.getURL( self._group ),\
     "detailsURLGen": urlHandlers.UHPrincipalDetails.getURL, \
-    "addMembersURL": urlHandlers.UHGroupSelectMembers.getURL(self._group),\
-    "removeMembersURL": urlHandlers.UHGroupRemoveMembers.getURL(self._group), \
     "backURL": urlHandlers.UHGroups.getURL() }
         return c.getHTML( pars )
 
@@ -1925,20 +1923,6 @@ class WPGroupModification( WPGroupModificationBase ):
         comp = WGroupModification( self._group )
         params["postURL"] = urlHandlers.UHGroupPerformModification.getURL()
         params["backURL"] = urlHandlers.UHGroupDetails.getURL( self._group )
-        return comp.getHTML( params )
-
-
-class WPGroupSelectMembers( WPGroupModificationBase ):
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        comp = wcomponents.WPrincipalSelection( urlHandlers.UHGroupSelectMembers.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHGroupAddMembers.getURL()
         return comp.getHTML( params )
 
 
