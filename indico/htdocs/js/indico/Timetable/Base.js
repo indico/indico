@@ -291,7 +291,7 @@ type("DisplayTimeTable", ["TimeTable"], {
         var legend = this._getLegend();
         this.legend.replaceWith(legend);
         this.legend = legend;
-        this._getLegendPostProcessing(true);
+        this._getLegendPostProcessing();
     },
 
     _functionButtons: function() {
@@ -837,27 +837,10 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
            //Initially show N and have the rest hidden (buried under "...more")
            self._maxLegendItemsShownInitially = 4;
 
-           var moreText = $T("more...");
-           var lessText = $T("less...");
-           var showMoreLink = Html.div({id: 'showMoreLink', className: 'showMoreLink'}, moreText);
-
-           var showMoreIncrease = 4;
-           showMoreLink.observeClick(
-             function() {
-               var currentText = showMoreLink.dom.innerHTML;
-               showMoreLink.dom.innerHTML = (currentText == moreText) ? lessText : moreText ;
-
-               if(currentText == moreText) {
-                 self._fadeShowAllLegendItems();
-               } else if(currentText == lessText) {
-                 self._fadeHideLegendItems();
-               }
-               //(below), false = we did not click the Detailed View toggle button
-               self._getLegendPostProcessing(false);
-             });
-
+           /*
            var legendInfo = self._generateLegendDivItems(this.legendSessionInfo);
 	       var legendDiv = Html.div({id: 'legendDiv', style:{visibility: 'visible', overflow: 'auto'}}, legendInfo);
+             */
 
            var toggleLegendPosButton = Html.div('legendPosToggle');
            var toggleLegendButton = Html.div({className: 'legendMainToggleActive'}, $T("Session legend"));
@@ -868,39 +851,46 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
            $E(toggleLegendButtonContainer).dom.style.height = '0';
            $E(toggleLegendButtonContainer).dom.style.opacity = "0";
 
-           var closeButton = Html.div({className: 'legendCloseButton',
-                               style: {cssFloat: 'right', position: 'static'}});
-
            var divTitle = Html.div('legendTitle', $T("Session Legend"));
+
+           var legendItems = self._legendItemsContainer(toggleLegendPosButton);
+           /*
            var legendItems = Html.div({id: 'timeTableLegend', className: 'timeTableLegend',
                                        style: {visibility: 'visible',
                                        width: $E("timetable").dom.childNodes[0].offsetWidth-15}},
-                                      closeButton, toggleLegendPosButton,/* divTitle, */legendDiv, showMoreLink);
+                                      closeButton, toggleLegendPosButton, legendDiv, showMoreLink);
+           */
+           var newLegendItems = null;
 
            self._toggleFollowButtonEnabled = function () {
              var legendVisible = (legendItems.dom.style.visibility == "visible");
            };
-
-           closeButton.observeClick(function() {
-             self._toggleLegend();
-           });
 
            toggleLegendPosButton.observeClick(function() {
 
              var legendItemsContainer = null;
 			 if(toggleLegendPosButton.dom._clicked) {
                jQuery(legendItems.dom).remove(legendItemsContainer); //JQUERY!
+               jQuery(newLegendItems.dom).remove(legendItemsContainer); //JQUERY!
                toggleLegendPosButton.dom._clicked = false;
+               newLegendItems = self._legendItemsContainer(toggleLegendPosButton);
 
-               legendItems.dom.className = "timeTableLegend";
+               newLegendItems.dom.className = "timeTableLegend";
                toggleLegendPosButton.dom.className = "legendPosToggle";
-               self._toggleButtonPlusAll.append(legendItems);
+               self._toggleButtonPlusAll.append(newLegendItems);
+
 			 } else {
                jQuery(legendItems.dom).remove(); //JQUERY!
+               if(newLegendItems != null) {
+                 jQuery(newLegendItems.dom).remove(); //JQUERY!
+                 jQuery(newLegendItems.dom).remove(legendItemsContainer); //JQUERY!
+               }
                toggleLegendPosButton.dom._clicked = true;
-               legendItems.dom.className = "timeTableLegendFixed";
+               newLegendItems = self._legendItemsContainer(toggleLegendPosButton);
+               newLegendItems.dom.className = "timeTableLegendFixed";
+
                // MarginLeft to make it centered at the bottom of the screen (when fixed)
-               legendItemsContainer = Html.div({id: 'legendBottomContainer', style: {marginLeft: '31%'}}, legendItems);
+               legendItemsContainer = Html.div({id: 'legendBottomContainer', style: {marginLeft: '31%'}}, newLegendItems);
                legendItemsContainer.dom.style.opacity = "0";
                legendItemsContainer.dom.style.height = '0';
 
@@ -909,6 +899,7 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
 
                IndicoUI.Effect.slide(legendItemsContainer, 45);
 			 }
+             self._getLegendPostProcessing();
 		   });
 
            toggleLegendButton.observeClick(function() {
@@ -933,6 +924,52 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
 
            return Html.div({});
          }
+       },
+
+       _legendItemsContainer: function(toggleLegendPosButton) {
+         var self = this;
+         var moreText = $T("more...");
+         var lessText = $T("less...");
+         var showMoreLink = Html.div({id: 'showMoreLink', className: 'showMoreLink'}, moreText);
+
+         var showMoreIncrease = 4;
+           showMoreLink.observeClick(
+             function() {
+               var currentText = showMoreLink.dom.innerHTML;
+               showMoreLink.dom.innerHTML = (currentText == moreText) ? lessText : moreText ;
+
+               if(currentText == moreText) {
+                 self._fadeShowAllLegendItems();
+               } else if(currentText == lessText) {
+                 self._fadeHideLegendItems();
+               }
+               //(below), false = we did not click the Detailed View toggle button
+               self._getLegendPostProcessing();
+             });
+
+         var closeButton = Html.div({className: 'legendCloseButton',
+                             style: {cssFloat: 'right', position: 'static'}});
+
+         closeButton.observeClick(function() {
+           self._toggleLegend();
+         });
+
+         if(showMoreLink.dom.innerHTML == moreText) {
+           self._fadeShowAllLegendItems();
+         } else if(showMoreLink.dom.innerHTML == lessText) {
+           self._fadeHideLegendItems();
+         }
+
+         //Returns a div with each color+session name element
+         var legendElements = self._generateLegendDivItems(self.legendSessionInfo);
+
+	     var legendDiv = Html.div({id: 'legendDiv', style:{visibility: 'visible',
+                              overflow: 'auto'}}, legendElements);
+         var legendItems = Html.div({id: 'timeTableLegend', className: 'timeTableLegend',
+                                   style: {visibility: 'visible',
+                                   width: $E("timetable").dom.childNodes[0].offsetWidth-15}},
+                                   closeButton, toggleLegendPosButton, legendDiv, showMoreLink);
+         return legendItems;
        },
 
        //Generates the "legend items"
@@ -1012,7 +1049,7 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
            "legendMainToggleActive" : "legendMainToggle";
        },
 
-       _getLegendPostProcessing: function(toggleDetailedView) {
+       _getLegendPostProcessing: function() {
          var self = this;
          //loop for truncation of too long session titles, the text next a coloured box in the "session legend".
          var legendItemElements =
@@ -1062,6 +1099,9 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
        i = 0;
        for(date_value in data) {
        for(session_value in data[date_value]) {
+         if(session_value.charAt(0) != "s") {
+           continue;
+         }
            var session = (data[date_value])[session_value];
            if(legendSessionInfo[session["id"]] == null) {
              legendSessionInfo[i] = [session["id"], session["title"], session["color"], session["textColor"]];
