@@ -644,7 +644,7 @@ class OSSpecific(object):
         """
         Locks file f with lock type lockType
         """
-        fcntl.fcntl(f, lockType)
+        fcntl.flock(f, lockType)
 
     @classmethod
     def _lockFileOthers(cls, f, lockType):
