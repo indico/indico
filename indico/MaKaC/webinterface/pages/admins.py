@@ -1468,6 +1468,7 @@ class WUserDetails(wcomponents.WTemplated):
         vars["locator"] = self.htmlText(self._avatar.getLocator().getWebForm())
         vars["identities"] = ""
         vars["status"] = self._avatar.getStatus()
+        vars["unlockedFields"] = self._avatar.getNotSyncedFields()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         al = minfo.getAdminList()
         if self._currentUser == self._avatar or \

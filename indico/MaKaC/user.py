@@ -1432,6 +1432,11 @@ class Avatar(Persistent, Fossilizable):
             self.unlockedFields.append(field)
             self._p_changed = 1
 
+    def getNotSyncedFields(self):
+        if not hasattr(self, 'unlockedFields'):
+            self.unlockedFields = []
+        return self.unlockedFields
+
     def getLang(self):
         try:
             return self._lang

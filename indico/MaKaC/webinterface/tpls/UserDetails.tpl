@@ -112,30 +112,75 @@
 
 <script>
 
+var unlockedFields = ${jsonEncode(unlockedFields)};
+
+var unlockField = function(field) {
+    if(!_.contains(unlockedFields, field)) {
+        unlockedFields.push(field);
+    }
+    var lockLink = $('<a href="#"/>').css('margin-left', '3px').text($T('(synchronize)')).click(function(e) {
+        e.preventDefault();
+        var killProgress = IndicoUI.Dialogs.Util.progress();
+        var $this = $(this);
+        indicoRequest('user.syncPersonalData', {
+            userId: '${ userId }',
+            dataType: field
+        }, function(result, error) {
+            killProgress();
+            if(error) {
+                IndicoUtil.errorReport(error);
+                return;
+            }
+            lockField(field);
+            alert($T('Synchronization has been re-enabled for this field. To update the data with the central database, you need to log out and then login again.'));
+            $this.remove();
+        });
+    });
+    $(this.wcanvas.dom).find('a').after(lockLink);
+};
+
+var lockField = function(field) {
+    unlockedFields = _.without(unlockedFields, field);
+};
+
 var requestFirstName = function() {
     $E('firstNameHeader').set(this.value);
+    unlockField.call(this, 'firstName');
 };
 
 var requestSurName = function() {
     $E('surNameHeader').set(this.value.toUpperCase()+',');
+    unlockField.call(this, 'surName');
 };
 
 var requestTitle = function() {
     $E('titleHeader').set(this.value);
 };
 
+var beforeEdit = function(field) {
+    if(!_.contains(unlockedFields, field) && !confirm($T('This field is currently synchronized with the central database. If you change it, central updates will be disabled.'))) {
+        return false;
+    }
+}
+
 
 $E('inPlaceEditTitle').set(new SelectEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'title'}, ${ titleList }, '${ title }', requestTitle).draw());
 
-$E('inPlaceEditSurName').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'surName'}, '${ surName }', false, requestSurName).draw());
+var editSurName =  new InputEditWidget('user.setPersonalData',
+        {'userId':'${ userId }', 'dataType':'surName'}, '${ surName }', false, requestSurName, null, null, null,
+        curry(beforeEdit, 'surName'));
+$E('inPlaceEditSurName').set(editSurName.draw());
 
-$E('inPlaceEditName').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'name'}, '${ name }', false, requestFirstName).draw());
+var editFirstName = new InputEditWidget('user.setPersonalData',
+        {'userId':'${ userId }', 'dataType':'name'}, '${ name }', false, requestFirstName, null, null, null,
+        curry(beforeEdit, 'firstName'));
+$E('inPlaceEditName').set(editFirstName.draw());
 
-$E('inPlaceEditOrganisation').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'organisation'}, '${ organisation }', false).draw());
+var editOrganisation = new InputEditWidget('user.setPersonalData',
+        {'userId':'${ userId }', 'dataType':'organisation'}, '${ organisation }', false, curry(unlockField, 'affiliation'), null, null, null,
+        curry(beforeEdit, 'affiliation'));
+$E('inPlaceEditOrganisation').set(editOrganisation.draw());
 
 $E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'email'}, '${ onlyEmail }', false, null, Util.Validation.isEmailAddress,
@@ -144,14 +189,30 @@ $E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
 $E('inPlaceEditAddress').set(new TextAreaEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'address'}, $E('inPlaceEditAddress').dom.innerHTML, true).draw());
 
-$E('inPlaceEditTelephone').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'telephone'}, '${ telephon }', true).draw());
+var editTelephone = new InputEditWidget('user.setPersonalData',
+        {'userId':'${ userId }', 'dataType':'telephone'}, '${ telephon }', true, curry(unlockField, 'phone'), null, null, null,
+        curry(beforeEdit, 'phone'));
+$E('inPlaceEditTelephone').set(editTelephone.draw());
 
-$E('inPlaceEditFax').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'fax'},'${ fax }', true).draw());
+var editFax = new InputEditWidget('user.setPersonalData',
+        {'userId':'${ userId }', 'dataType':'fax'},'${ fax }', true, curry(unlockField, 'fax'), null, null, null,
+        curry(beforeEdit, 'fax'));
+$E('inPlaceEditFax').set(editFax.draw());
 
 $E('inPlaceEditSecondaryEmails').set(new InputEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'secondaryEmails'}, '${ secEmails }', true, null, Util.Validation.isEmailList,
         $T("List contains invalid e-mail address or invalid separator"),
         $T("You can specify more than one email address separated by commas, semicolons or whitespaces.")).draw());
+
+$.each({
+    surName: editSurName,
+    firstName: editFirstName,
+    affiliation: editOrganisation,
+    phone: editTelephone,
+    fax: editFax
+}, function(field, editor) {
+    if(_.contains(unlockedFields, field)) {
+        unlockField.call(editor, field);
+    }
+});
 </script>

@@ -42,7 +42,7 @@ type("InlineRemoteWidget", ["InlineWidget"],
 
              // if the widget is set to load on startup,
              // the content will be a 'loading' message
-             var wcanvas = Html.div({}, this.loadOnStartup?
+             this.wcanvas = Html.div({}, this.loadOnStartup?
                                    this._handleLoading():
                                    content);
 
@@ -51,20 +51,20 @@ type("InlineRemoteWidget", ["InlineWidget"],
              this.source.state.observe(function(state) {
                  if (state == SourceState.Error) {
                      self._handleError(self.source.error.get());
-                     wcanvas.set(content);
+                     self.wcanvas.set(content);
                      self.setMode('edit');
                      self._handleBackToEditMode();
                  } else if (state == SourceState.Loaded) {
                      self._handleLoaded(self.source.get());
-                     wcanvas.set(content);
+                     self.wcanvas.set(content);
                      self.setMode('display');
                      self._handleSuccess();
                  } else {
-                     wcanvas.set(self._handleLoading());
+                     self.wcanvas.set(self._handleLoading());
                  }
              });
 
-             return wcanvas;
+             return self.wcanvas;
          }
 
      },
@@ -1246,6 +1246,11 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
      {
 
          setMode: function(mode) {
+             if(mode == 'edit' && isFunction(this.beforeEdit)) {
+                 if(this.beforeEdit() === false) {
+                     return;
+                 }
+             }
              this.modeChooser.set(mode);
          },
 
@@ -1343,9 +1348,10 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
          }
 
      },
-     function(method, attributes, initValue) {
+     function(method, attributes, initValue, beforeEdit) {
          this.frameAttrs = {'display': 'inline', 'marginLeft': '5px'};
          this.value = initValue;
+         this.beforeEdit = beforeEdit;
          this.InlineRemoteWidget(method, attributes, false);
      });
 
@@ -1658,14 +1664,14 @@ type("InputEditWidget", ["InlineEditWidget", "ErrorAware"],
                 }
             }
         },
-        function(method, attributes, initValue, allowEmpty, successHandler, validation, errorMsg, helpMsg) {
+        function(method, attributes, initValue, allowEmpty, successHandler, validation, errorMsg, helpMsg, beforeEdit) {
             this.attributes = attributes;
             this.allowEmpty = allowEmpty;
             this.successHandler = successHandler;
             this.validation = validation;
             this.errorMsg = errorMsg;
             this.helpMsg = helpMsg;
-            this.InlineEditWidget(method, attributes, initValue);
+            this.InlineEditWidget(method, attributes, initValue, beforeEdit);
         });
 
 

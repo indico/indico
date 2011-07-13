@@ -387,16 +387,19 @@ class UserSetPersonalData(UserPersonalDataBase):
                 else:
                     raise ServiceError("ERR-U8", _("Invalid title value"))
             elif self._dataType == "surName":
+                self._user.setFieldSynced('surName', False)
                 surName = idxs.getById("surName")
                 surName.unindexUser(self._avatar)
                 self._user.setSurName(self._value)
                 surName.indexUser(self._avatar)
             elif self._dataType == "name":
+                self._user.setFieldSynced('firstName', False)
                 name = idxs.getById("name")
                 name.unindexUser(self._avatar)
                 self._user.setName(self._value)
                 name.indexUser(self._avatar)
             elif self._dataType == "organisation":
+                self._user.setFieldSynced('affiliation', False)
                 org = idxs.getById("organisation")
                 org.unindexUser(self._avatar)
                 self._user.setOrganisation(self._value)
@@ -424,6 +427,12 @@ class UserSetPersonalData(UserPersonalDataBase):
                             secondaryEmails.append(email)
                 self._user.setSecondaryEmails(secondaryEmails)
                 return ", ".join(self._user.getSecondaryEmails())
+            elif self._dataType == "telephone":
+                self._user.setFieldSynced('phone', False)
+                self._user.setTelephone(self._value)
+            elif self._dataType == "fax":
+                self._user.setFieldSynced('fax', False)
+                self._user.setFax(self._value)
             else:
                 getattr(self._user, funcSet)(self._value)
 
@@ -431,6 +440,15 @@ class UserSetPersonalData(UserPersonalDataBase):
         else:
             raise ServiceError("ERR-U5", _("User id not specified"))
 
+
+class UserSyncPersonalData(UserPersonalDataBase):
+    _dataTypes = ["surName", "firstName", "affiliation", "phone", "fax"]
+
+    def _getAnswer(self):
+        if self._dataType == 'name':
+            self._dataType = 'firstName'
+        self._user.setFieldSynced(self._dataType, True)
+        return True
 
 
 methodMap = {
@@ -451,6 +469,7 @@ methodMap = {
     "setTimezone": UserSetTimezone,
     "getDisplayTimezones": UserGetDisplayTimezones,
     "setDisplayTimezone": UserSetDisplayTimezone,
-    "setPersonalData": UserSetPersonalData
+    "setPersonalData": UserSetPersonalData,
+    "syncPersonalData": UserSyncPersonalData
 
 }
