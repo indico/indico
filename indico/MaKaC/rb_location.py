@@ -31,7 +31,7 @@ global ids of objects, and cross-location queries.
 from persistent import Persistent
 from MaKaC.common.Locators import Locator
 import MaKaC
-from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.plugins import PluginLoader
 
 
