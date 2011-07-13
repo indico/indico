@@ -27,14 +27,5 @@ def index(req, **params):
 def setCreateConferenceControl( req, **params ):
     return categoryMod.RHCategorySetConfControl( req ).process( params )
 
-def selectAllowedToCreateConf( req, **params ):
-    return categoryMod.RHCategorySelectConfCreators( req ).process( params )
-
-def addAllowedToCreateConferences( req, **params ):
-    return categoryMod.RHCategoryAddConfCreators( req ).process( params )
-
-def removeAllowedToCreateConferences( req, **params ):
-    return categoryMod.RHCategoryRemoveConfCreators( req ).process( params )
-
 def setNotifyCreation( req, **params ):
     return categoryMod.RHCategorySetNotifyCreation( req ).process( params )

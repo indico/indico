@@ -14,7 +14,19 @@
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Users allowed to create conferences")}</span></td>
-        <td class="blacktext"><div style="width:50%;">${ principalTable }</div></td>
+        <td bgcolor="white" width="80%">
+            <table width="100%">
+                <tr>
+                    <td><ul id="inPlaceConfCreators" class="UIPeopleList"></ul></td>
+                </tr>
+                <tr>
+                    <td nowrap style="width:80%">
+                        <input type="button" onclick="modificationControlManagerCC.addExistingUser();" value='${ _("Add user") }'></input>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Notify event creation by email to")}:</span></td>
@@ -26,3 +38,15 @@
         </form>
     </tr>
 </table>
+
+<script>
+
+var methodsCC = {'addExisting': 'category.protection.addExistingConfCreator',
+                    'remove': 'category.protection.removeConfCreator',
+               'getUserList': 'category.protection.getConfCreatorList'};
+
+var paramsCC = {categoryId: '${ categoryId }', kindOfList: 'confCreation'};
+
+var modificationControlManagerCC = new ModificationControlManager(null, methodsCC, paramsCC, $E('inPlaceConfCreators'), "user");
+
+</script>

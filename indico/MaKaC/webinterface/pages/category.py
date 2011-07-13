@@ -1907,9 +1907,7 @@ class WCategModifAC(wcomponents.WTemplated):
         vars["categoryId"] = self._categ.getId()
         if not self._categ.getSubCategoryList():
             frame = wcomponents.WConfCreationControlFrame( self._categ )
-            p = { "setStatusURL": vars["setConferenceCreationControlURL"], \
-                  "addCreatorsURL": vars["addConferenceCreatorsURL"], \
-                  "removeCreatorsURL": vars["removeConfenceCreatorsURL"] }
+            p = { "setStatusURL": vars["setConferenceCreationControlURL"] }
             vars["confCreationControlFrame"] = frame.getHTML(p)
         return vars
 
@@ -1926,9 +1924,7 @@ class WPCategModifAC( WPCategoryModifBase ):
 "removeAllowedURL": urlHandlers.UHCategoryRemoveAllowed.getURL(), \
 "addDomainURL": urlHandlers.UHCategoryAddDomain.getURL(), \
 "removeDomainURL": urlHandlers.UHCategoryRemoveDomain.getURL(),\
-"setConferenceCreationControlURL": urlHandlers.UHCategorySetConfCreationControl.getURL() , \
-"addConferenceCreatorsURL": urlHandlers.UHCategorySelectConfCreators.getURL(),\
-"removeConfenceCreatorsURL": urlHandlers.UHCategoryRemoveConfCreators.getURL() }
+"setConferenceCreationControlURL": urlHandlers.UHCategorySetConfCreationControl.getURL() }
         return wc.getHTML( pars )
 
 
@@ -1943,19 +1939,6 @@ class WPCategorySelectAllowed( WPCategModifAC ):
             searchLocal = True
         wc = wcomponents.WPrincipalSelection( urlHandlers.UHCategorySelectAllowed.getURL(),forceWithoutExtAuth=searchLocal )
         params["addURL"] = urlHandlers.UHCategoryAddAllowed.getURL()
-        return wc.getHTML( params )
-
-
-class WPCategorySelectConfCreators( WPCategModifAC ):
-
-    def _getPageContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHCategorySelectConfCreators.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHCategoryAddConfCreators.getURL()
         return wc.getHTML( params )
 
 #---------------------------------------------------------------------------------

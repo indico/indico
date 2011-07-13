@@ -2199,17 +2199,6 @@ class UHCategorySetConfCreationControl( URLHandler ):
 class UHCategorySetNotifyCreation( URLHandler ):
     _relativeURL = "categoryConfCreationControl.py/setNotifyCreation"
 
-class UHCategorySelectConfCreators( URLHandler ):
-    _relativeURL = "categoryConfCreationControl.py/selectAllowedToCreateConf"
-
-
-class UHCategoryAddConfCreators( URLHandler ):
-    _relativeURL = "categoryConfCreationControl.py/addAllowedToCreateConferences"
-
-
-class UHCategoryRemoveConfCreators( URLHandler ):
-    _relativeURL = "categoryConfCreationControl.py/removeAllowedToCreateConferences"
-
 
 class UHCategModifTools( URLHandler ):
     _relativeURL = "categoryTools.py"

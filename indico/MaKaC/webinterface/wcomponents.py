@@ -3346,9 +3346,9 @@ class WConfCreationControlFrame(WTemplated):
         if self._categ.isConferenceCreationRestricted():
             vars["status"] =  _("RESTRICTED")
             vars["changeStatus"] = i18nformat("""( <input type="submit" class="btn" name="OPEN" value="_("OPEN it")"> )""")
-        vars["principalTable"] = WPrincipalTable().getHTML( self._categ.getConferenceCreatorList(), self._categ , vars["addCreatorsURL"], vars["removeCreatorsURL"], selectable=False )
         vars["notifyCreationList"] = quoteattr(self._categ.getNotifyCreationList())
         vars["setNotifyCreationURL"] = urlHandlers.UHCategorySetNotifyCreation.getURL(self._categ)
+        vars["categoryId"] = self._categ.getId()
         return vars
 
 class WMinutesDisplay(WTemplated):

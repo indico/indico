@@ -658,41 +658,6 @@ class RHCategorySetConfControl( RHCategModifBase ):
         self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
 
 
-class RHCategorySelectConfCreators( RHCategModifBase ):
-    _uh = urlHandlers.UHCategorySelectConfCreators
-
-    def _process( self ):
-        p = category.WPCategorySelectConfCreators( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHCategoryAddConfCreators( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryAddConfCreators
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                entity = ph.getById( id )
-                assert(isinstance(entity, user.Avatar) or
-                       isinstance(entity, user.Group))
-                self._target.grantConferenceCreation( entity )
-        self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
-
-
-class RHCategoryRemoveConfCreators( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryRemoveConfCreators
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                self._target.revokeConferenceCreation( ph.getById( id ) )
-        self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
-
 class RHCategorySetNotifyCreation( RHCategModifBase ):
     _uh = urlHandlers.UHCategorySetNotifyCreation
 

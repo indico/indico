@@ -254,50 +254,65 @@ class CategoryContactInfoModification( CategoryTextModificationBase ):
         return self._categ.getAccessController().getContactInfo()
 
 
-class CategoryManagerListBase(CategoryModifBase):
 
-    def _getManagersList(self):
-        result = fossilize(self._categ.getManagerList())
-        # get pending users
-        for email in self._categ.getAccessController().getModificationEmail():
-            pendingUser = {}
-            pendingUser["email"] = email
-            pendingUser["pending"] = True
-            result.append(pendingUser)
-        return result
-
-
-class CategoryGetManagerList(CategoryManagerListBase):
-
-    def _getAnswer(self):
-        return self._getManagersList()
-
-
-class CategoryAddExistingManager(CategoryManagerListBase):
+class CategoryControlUserListBase(CategoryModifBase):
 
     def _checkParams(self):
-        CategoryManagerListBase._checkParams(self)
+        CategoryModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._kindOfList = pm.extract("kindOfList", pType=str, allowEmpty=False)
+
+    def _getControlUserList(self):
+        if self._kindOfList == "modification":
+            result = fossilize(self._categ.getManagerList())
+            # get pending users
+            for email in self._categ.getAccessController().getModificationEmail():
+                pendingUser = {}
+                pendingUser["email"] = email
+                pendingUser["pending"] = True
+                result.append(pendingUser)
+            return result
+        elif self._kindOfList == "confCreation":
+            return fossilize(self._categ.getConferenceCreatorList())
+
+
+class CategoryGetControlUserList(CategoryControlUserListBase):
+
+    def _getAnswer(self):
+        return self._getControlUserList()
+
+
+class CategoryAddExistingControlUser(CategoryControlUserListBase):
+
+    def _checkParams(self):
+        CategoryControlUserListBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._userList = pm.extract("userList", pType=list, allowEmpty=False)
 
     def _getAnswer(self):
         ph = PrincipalHolder()
         for user in self._userList:
-            self._categ.grantModification(ph.getById(user["id"]))
-        return self._getManagersList()
+            if self._kindOfList == "modification":
+                self._categ.grantModification(ph.getById(user["id"]))
+            elif self._kindOfList == "confCreation":
+                self._categ.grantConferenceCreation(ph.getById(user["id"]))
+        return self._getControlUserList()
 
 
-class CategoryRemoveManager(CategoryManagerListBase):
+class CategoryRemoveControlUser(CategoryControlUserListBase):
 
     def _checkParams(self):
-        CategoryManagerListBase._checkParams(self)
+        CategoryControlUserListBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._managerId = pm.extract("userId", pType=str, allowEmpty=False)
+        self._userId = pm.extract("userId", pType=str, allowEmpty=False)
 
     def _getAnswer(self):
         ph = PrincipalHolder()
-        self._categ.revokeModification(ph.getById(self._managerId))
-        return self._getManagersList()
+        if self._kindOfList == "modification":
+            self._categ.revokeModification(ph.getById(self._userId))
+        elif self._kindOfList == "confCreation":
+            self._categ.revokeConferenceCreation(ph.getById(self._userId))
+        return self._getControlUserList()
 
 
 methodMap = {
@@ -311,5 +326,11 @@ methodMap = {
     "protection.changeContactInfo": CategoryContactInfoModification,
     "protection.addExistingManager": CategoryAddExistingManager,
     "protection.removeManager": CategoryRemoveManager,
-    "protection.getManagerList": CategoryGetManagerList
+    "protection.getManagerList": CategoryGetManagerList,
+    "protection.addExistingManager": CategoryAddExistingControlUser,
+    "protection.removeManager": CategoryRemoveControlUser,
+    "protection.getManagerList": CategoryGetControlUserList,
+    "protection.addExistingConfCreator": CategoryAddExistingControlUser,
+    "protection.removeConfCreator": CategoryRemoveControlUser,
+    "protection.getConfCreatorList": CategoryGetControlUserList
     }

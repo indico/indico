@@ -9,12 +9,12 @@ ${ confCreationControlFrame }
 
 <script>
 
-var methods = {'addExisting': 'category.protection.addExistingManager',
+var methodsMod = {'addExisting': 'category.protection.addExistingManager',
                     'remove': 'category.protection.removeManager',
                'getUserList': 'category.protection.getManagerList'};
 
-var params = {categoryId: '${ categoryId }'};
+var paramsMod = {categoryId: '${ categoryId }', kindOfList: 'modification'};
 
-var modificationControlManager = new ModificationControlManager(null, methods, params, $E('inPlaceManagers'), "manager");
+var modificationControlManager = new ModificationControlManager(null, methodsMod, paramsMod, $E('inPlaceManagers'), "manager");
 
 </script>
