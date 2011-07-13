@@ -22,10 +22,9 @@ from BTrees.Length import Length
 from zope.index.field import FieldIndex
 
 from BTrees.IOBTree import IOBTree, IOTreeSet
-from BTrees.OOBTree import OOBTree, OOTreeSet, union
+from BTrees.OOBTree import OOBTree, OOTreeSet, OOSet, union
 from persistent import Persistent
 
-import logging
 import zope.interface
 
 
@@ -60,22 +59,19 @@ class ElementAlreadyInIndexException(Exception):
     """
 
 
-class IOIndex(Persistent):
-    """
-    Maps integer values to objects
-    int -> set(obj, ...)
+class Index(Persistent):
+    pass
 
-    int is obtained by means of an adapter
 
-    objects need to implement IUniqueIdProvider as well, as an id is needed for
-    the backward-index (OOBTrees don't accept persisten objects as keys)
-    """
+class SIndex(Index):
+
+    _fwd_class = None
+    _fwd_set_class = None
 
     def __init__(self, adapter):
-        self._fwd_index = IOBTree()
-        self._rev_index = OOBTree()
-        self._num_objs = Length(0)
         self._adapter = adapter
+        self._fwd_index = self._fwd_class()
+        self._num_objs = Length(0)
 
     def _gc_entry(self, v):
         """
@@ -83,6 +79,93 @@ class IOIndex(Persistent):
         """
         if len(self._fwd_index[v]) == 0:
             del self._fwd_index[v]
+
+    def index_obj(self, obj):
+
+        value = self._adapter(obj)
+        vset = self._fwd_index.get(value, self._fwd_set_class())
+
+        if obj in vset:
+            raise InconsistentIndexException("%s already in fwd[%s]", (obj, value))
+        else:
+            vset.add(obj)
+            self._num_objs.change(1)
+
+        self._fwd_index[value] = vset
+
+    def _unindex_obj_from_key(self, key, obj):
+        if key in self._fwd_index:
+            vset = self._fwd_index[key]
+            if obj in vset:
+                vset.remove(obj)
+                self._fwd_index[key] = vset
+                self._gc_entry(key)
+            else:
+                raise InconsistentIndexException("'%s' not in fwd[%s]",
+                                                 (obj, key))
+        else:
+            raise InconsistentIndexException("'%s' not in fwd index" % key)
+
+    def unindex_obj(self, obj):
+        """
+        Slightly dumber than the one in DIndex, takes the indexation value (key)
+        instead of looking it up in the reverse index
+        """
+        key = self._adapter(obj)
+        self._unindex_obj_from_key(key, obj)
+        self._num_objs.change(-1)
+
+
+    def values(self, *args):
+        res = self._fwd_set_class()
+        for s in self._fwd_index.itervalues(*args):
+            res = union(res, s)
+        return res
+
+    def itervalues(self, *args):
+        for s in self._fwd_index.itervalues(*args):
+            for t in s:
+                yield t
+
+    def iteritems(self, *args):
+        for ts, s in self._fwd_index.iteritems(*args):
+            for t in s:
+                yield ts, t
+
+    def minKey(self):
+        return self._fwd_index.minKey()
+
+    def maxKey(self):
+        return self._fwd_index.maxKey()
+
+    def __iter__(self):
+        return iter(self._fwd_index)
+
+    def __len__(self):
+        return self._num_objs()
+
+    def __getitem__(self, item):
+        return self._fwd_index[item]
+
+    def get(self, item, default=None):
+        return self._fwd_index.get(item, default)
+
+
+
+class DIndex(SIndex):
+    """
+    Bidirectional Index Class
+
+    objects need to implement IUniqueIdProvider as well, as an id is needed for
+    the backward-index (OOBTrees don't accept persisten objects as keys)
+    """
+
+    _rev_class = None
+    _rev_set_class = None
+
+    def __init__(self, adapter):
+        super(DIndex, self).__init__(adapter)
+        self._rev_index = self._rev_class()
 
     def index_obj(self, obj):
 
@@ -96,25 +179,16 @@ class IOIndex(Persistent):
         uid = obj.getUniqueId()
         value = self._adapter(obj)
 
-        if uid not in self._rev_index:
-            ts = IOTreeSet()
-            self._rev_index[uid]  = ts
+        ts = self._rev_index.get(uid, self._rev_set_class())
 
-        if value in self._rev_index[uid]:
+        if value in ts:
             raise ElementAlreadyInIndexException()
         else:
-            self._rev_index[uid].add(value)
+            ts.add(value)
 
-        vset = self._fwd_index.get(value)
-        if vset is None:
-            vset = OOTreeSet()
-            self._fwd_index[value] = vset
+        self._rev_index[uid] = ts
 
-        if obj in vset:
-            raise InconsistentIndexException("%s already in fwd[%s]", (obj, value))
-        else:
-            vset.insert(obj)
-            self._num_objs.change(1)
+        super(DIndex, self).index_obj(obj)
 
         return (uid, value)
 
@@ -123,55 +197,49 @@ class IOIndex(Persistent):
         uid = obj.getUniqueId()
 
         if uid in self._rev_index:
-            values = self._rev_index[uid]
+            keys = self._rev_index[uid]
             del self._rev_index[uid]
 
-            for v in values:
-                if v in self._fwd_index:
-                    vset = self._fwd_index[v]
-                    if obj in vset:
-                        vset.remove(obj)
-                        self._gc_entry(v)
-                    else:
-                        raise InconsistentIndexException("%s not in fwd[%s]",
-                                                         (obj, v))
-                else:
-                    raise InconsistentIndexException("%s not in fwd index" % v)
+            for key in keys:
+                self._unindex_obj_from_key(key, obj)
         else:
             raise ElementNotFoundException(uid)
 
         self._num_objs.change(-1)
 
-    def values(self, *args):
-        res = OOTreeSet()
-        for s in self._fwd_index.itervalues(*args):
-            res = union(res, s)
-        return res
 
-    def itervalues(self, *args):
-        for s in self._fwd_index.itervalues(*args):
-            for t in s:
-                yield t
+class SIOIndex(DIndex):
+    """
+    Maps integer keys to objects
+    int -> set(obj)
+    """
+    _fwd_class = IOBTree
+    _fwd_set_class = OOTreeSet
 
-    def iteritems(self):
-        for ts, s in self._fwd_index.iteritems():
-            for t in s:
-                yield ts, t
 
-    def minKey(self):
-        return self._fwd_index.minKey()
+class IOIndex(DIndex):
+    """
+    Maps integer keys to objects
+    int -> set(obj)
+    uid(obj) -> set(int)
+    """
+    _fwd_class = IOBTree
+    _rev_class = OOBTree
+    _fwd_set_class = OOTreeSet
+    _rev_set_class = IOTreeSet
 
-    def maxKey(self):
-        return self._fwd_index.maxKey()
 
-    def __len__(self):
-        return self._num_objs()
+class OOIndex(DIndex):
+    """
+    Maps object keys to objects
+    obj -> set(obj)
+    uid(obj) -> set(obj)
+    """
+    _fwd_class = OOBTree
+    _rev_class = OOBTree
+    _fwd_set_class = OOSet
+    _rev_set_class = OOSet
 
-    def __getitem__(self, item):
-        return self._fwd_index[item]
-
-    def get(self, item):
-        return self._fwd_index[item]
 
 class IIIndex(FieldIndex):
 

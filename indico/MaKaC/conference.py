@@ -55,7 +55,7 @@ from pytz import timezone
 from pytz import all_timezones
 
 from persistent import Persistent
-from BTrees.OOBTree import OOBTree, OOTreeSet
+from BTrees.OOBTree import OOBTree, OOTreeSet, OOSet
 from BTrees.OIBTree import OIBTree,OISet,union
 import MaKaC
 import MaKaC.common.indexes as indexes
@@ -96,14 +96,20 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from sets import Set
+import zope.interface
 
 from indico.modules.scheduler import Client, tasks
+from indico.util.date_time import utc_timestamp
+from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 
 
 class CoreObject(Persistent):
     """
     CoreObjects are Persistent objects that are employed by Indico's core
     """
+
+    zope.interface.implements(IUniqueIdProvider,
+                              IIndexableByStartDateTime)
 
     def setModificationDate(self, date = None):
         """
@@ -112,6 +118,13 @@ class CoreObject(Persistent):
         if not date:
             date = nowutc()
         self._modificationDS = date
+
+    def __conform__(self, proto):
+
+        if proto == IIndexableByStartDateTime:
+            return utc_timestamp(self.getStartDate())
+        else:
+            return None
 
 
 class Locatable:
@@ -1101,7 +1114,7 @@ class Category(CommonObjectBase):
         return conf
 
     def removeConference( self, conf, notify=True, delete = False ):
-        if not (conf in self.getConferenceList()):
+        if not (conf in self.conferences):
             return
 
         self.unindexConf( conf )
@@ -1125,6 +1138,12 @@ class Category(CommonObjectBase):
             res.append(self.subcategories[id])
         return res
 
+    def iteritems(self, *args):
+        return self.conferences.iteritems(*args)
+
+    def itervalues(self, *args):
+        return self.conferences.itervalues(*args)
+
     def getConferenceList( self, sortType=1 ):
         """returns the list of conferences included in the current category.
            Thanks to the used structure the list is sorted by date.
@@ -1134,7 +1153,9 @@ class Category(CommonObjectBase):
             sortType=2--> Alphabetically
             sortType=3--> Alphabetically - Reversed
         """
+
         res = sorted(self.conferences, cmp=Conference._cmpByDate)
+
         if sortType==2:
             res.sort(Conference._cmpTitle)
         elif sortType==3:
@@ -1157,39 +1178,22 @@ class Category(CommonObjectBase):
                 res.extend(subcateg.getAllConferenceList())
         return res
 
-    def getPreviousEvent(self, conf):
-        cl=self.getConferenceList()
-        v=None
-        try:
-            i=cl.index(conf)
-            if i>0:
-                v=cl[i-1]
-        except ValueError, e:
-            pass
-        return v
+    def getNeighborEvents(self, conf):
 
-    def getNextEvent(self, conf):
-        cl=self.getConferenceList()
-        v=None
-        try:
-            i=cl.index(conf)
-            if i<(len(cl)-1):
-                v=cl[i+1]
-        except ValueError, e:
-            pass
-        return v
+        index = Catalog.getIdx('categ_conf_sd').getCategory(conf.getOwner().getId())
+        first, last = list(index[index.minKey()])[0], list(index[index.maxKey()])[-1]
 
-    def getFirstEvent(self, conf=None):
-        cl=self.getConferenceList()
-        if len(cl)>0 and cl[0]!=conf:
-            return cl[0]
-        return None
+        categIter = index.itervalues()
 
-    def getLastEvent(self, conf=None):
-        cl=self.getConferenceList()
-        if len(cl)>0 and cl[-1]!=conf:
-            return cl[-1]
-        return None
+        prev = None
+        for c in categIter:
+            if c == conf:
+                break
+            prev = c
+
+        nextEvt = next(categIter, None)
+
+        return prev, nextEvt, first, last
 
     def _setNumConferences(self):
         self._numConferences=0
@@ -1197,7 +1201,7 @@ class Category(CommonObjectBase):
             for sc in self.getSubCategoryList():
                 self._incNumConfs(sc.getNumConferences())
         else:
-            self._incNumConfs(len(self.getConferenceList()))
+            self._incNumConfs(len(self.conferences))
 
     def getNumConferences( self ):
         """returns the total number of conferences contained in the current
@@ -2074,8 +2078,6 @@ class Conference(CommonObjectBase, Locatable):
 
     @staticmethod
     def _cmpByDate(self, toCmp):
-        if not isinstance(toCmp, Conference):
-            return cmp(hash(self), hash(toCmp))
         res = cmp(self.getStartDate(), toCmp.getStartDate())
         if res != 0:
             return res
@@ -2083,9 +2085,10 @@ class Conference(CommonObjectBase, Locatable):
             return cmp(self, toCmp)
 
     def __cmp__(self, toCmp):
-        if not isinstance(toCmp, Conference):
+        if isinstance(toCmp, Conference):
+            return cmp(self.getId(), toCmp.getId())
+        else:
             return cmp(hash(self), hash(toCmp))
-        return cmp(self.getId(), toCmp.getId())
 
     def __eq__(self, toCmp):
         return self is toCmp
@@ -2431,11 +2434,15 @@ class Conference(CommonObjectBase, Locatable):
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateIdx.indexConf(self)
 
+        Catalog.getIdx('categ_conf_sd').index_obj(self)
+
     def unindexConf( self ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.unindexConf(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateIdx.unindexConf(self)
+
+        Catalog.getIdx('categ_conf_sd').unindex_obj(self)
 
     def __generateNewContribTypeId( self ):
         """Returns a new unique identifier for the current conference sessions

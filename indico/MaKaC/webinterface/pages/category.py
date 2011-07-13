@@ -37,11 +37,15 @@ from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.common.cache import CategoryCache
 from MaKaC.i18n import _
+
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
 from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
+
+from indico.util.i18n import i18nformat
+from indico.core.index import Catalog
 
 
 class WPCategoryBase ( main.WPMainBase ):
@@ -134,13 +138,14 @@ class WCategoryDisplay(wcomponents.WTemplated):
         vars["description"] = self._target.getDescription()
         vars["img"] = self._target.getIconURL()
         vars["categ"] = self._target;
-        subcats = self._target.getSubCategoryList()
-        confs = self._target.getConferenceList()
-        if len(subcats) > 0:
+        subcats = self._target.subcategories
+
+        confs = self._target.conferences
+        if subcats:
             cl=wcomponents.WCategoryList( self._target )
             params = {"categoryDisplayURLGen": vars["categDisplayURLGen"], "material": self._getMaterialHTML()}
             vars["contents"] = cl.getHTML( self._aw, params )
-        elif len(confs) > 0:
+        elif confs:
             pastEvents = self._aw.getSession().getVar("fetchPastEventsFrom")
             showPastEvents = pastEvents and self._target.getId() in pastEvents or self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()
             cl = wcomponents.WConferenceList( self._target, self._wfReg, showPastEvents)
@@ -1488,6 +1493,7 @@ class WCategModifMain(wcomponents.WTemplated):
 
     def getVars( self ):
 
+        index = Catalog.getIdx('categ_conf_sd').getCategory(self._categ.getId())
         vars = wcomponents.WTemplated.getVars( self )
         vars["locator"] = self._categ.getLocator().getWebForm()
         vars["name"] = self._categ.getName()
@@ -1505,7 +1511,7 @@ class WCategModifMain(wcomponents.WTemplated):
         if not self._categ.getSubCategoryList():
             vars['containsEvents'] = True
             vars["removeItemsURL"] = vars["actionConferencesURL"]
-            vars["items"] = self.__getConferenceItems( reversed(self._categ.getConferenceList()), vars["confModifyURLGen"],  vars["confModifyURLOpen"])
+            vars["items"] = self.__getConferenceItems(index.itervalues(), vars["confModifyURLGen"],  vars["confModifyURLOpen"])
         else:
             vars['containsEvents'] = False
             vars["items"] = self.__getSubCategoryItems( self._categ.getSubCategoryList(), vars["categModifyURLGen"] )
@@ -2022,7 +2028,7 @@ class WCategModifTools(wcomponents.WTemplated):
         vars["clearCache"] = ""
         if info.HelperMaKaCInfo.getMaKaCInfoInstance().isCacheActive():
             vars["clearCache"] = _("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear category cache")"></form>""") % urlHandlers.UHCategoryClearCache.getURL(self._categ)
-            if len(self._categ.getConferenceList()):
+            if self._categ.conferences:
                 vars["clearCache"] += _("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear conference caches")"></form>""") % urlHandlers.UHCategoryClearConferenceCaches.getURL(self._categ)
         return vars
 

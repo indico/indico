@@ -1,10 +1,7 @@
 <%!
 owner = conf.getOwnerList()[0]
 
-prev = owner.getPreviousEvent(conf)
-next = owner.getNextEvent(conf)
-first = owner.getFirstEvent(conf)
-last = owner.getLastEvent(conf)
+prev, next, first, last = owner.getNeighborEvents(conf)
 
 # If printURL is set then show the print button
 try:
