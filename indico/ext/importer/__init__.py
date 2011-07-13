@@ -22,6 +22,6 @@ from indico.util.i18n import _
 
 __metadata__ = {
     'name': "Importers",
-    'description': _("Imports data from external sources.")
+    'description': "Imports data from external sources."
     }
 

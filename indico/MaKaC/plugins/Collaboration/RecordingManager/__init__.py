@@ -23,6 +23,6 @@ from MaKaC.i18n import _
 __metadata__ = {
     'type': "Collaboration",
     'name': "RecordingManager",
-    'description': _("Recording Manager")
+    'description': "Recording Manager"
     }
 

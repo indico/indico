@@ -23,6 +23,6 @@ from MaKaC.i18n import _
 
 __metadata__ = {
     'name': "Instant Messaging",
-    'description': _("Instant Messaging Plugins"),
+    'description': "Instant Messaging Plugins",
     'requires': ['sleekxmpp']
     }

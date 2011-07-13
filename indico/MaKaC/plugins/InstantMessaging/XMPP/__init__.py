@@ -22,5 +22,5 @@ from MaKaC.i18n import _
 __metadata__ = {
     'type': "InstantMessaging",
     'name': "XMPP",
-    'description': _("XMPP-based messaging system")
+    'description': "XMPP-based messaging system"
     }

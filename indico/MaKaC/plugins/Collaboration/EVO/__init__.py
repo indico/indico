@@ -23,5 +23,5 @@ from MaKaC.i18n import _
 __metadata__ = {
     'type': "Collaboration",
     'name': "EVO",
-    'description': _("EVO, the Collaboration network")
+    'description': "EVO, the Collaboration network"
     }

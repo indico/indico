@@ -22,5 +22,5 @@ from MaKaC.i18n import _
 
 __metadata__ = {
     'name': "RoomBooking",
-    'description': _("Room Booking Plugins")
+    'description': "Room Booking Plugins"
     }

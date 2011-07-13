@@ -23,7 +23,7 @@ from indico.util.i18n import _
 __metadata__ = {
     'type': "RoomBooking",
     'name': "default",
-    'description': _("This is the default Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment")
+    'description': "This is the default Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment"
     }
 
 modules = {}

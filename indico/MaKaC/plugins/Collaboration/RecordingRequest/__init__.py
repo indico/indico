@@ -23,5 +23,5 @@ from MaKaC.i18n import _
 __metadata__ = {
     'type': "Collaboration",
     'name': "RecordingRequest",
-    'description': _("Recording Request")
+    'description': "Recording Request"
     }

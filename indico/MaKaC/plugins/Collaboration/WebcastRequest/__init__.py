@@ -21,5 +21,5 @@
 __metadata__ = {
     'type': "Collaboration",
     'name': "WebcastRequest",
-    'description': _("Webcast Request")
+    'description': "Webcast Request"
     }
