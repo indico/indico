@@ -448,7 +448,11 @@ class UserSyncPersonalData(UserPersonalDataBase):
         if self._dataType == 'name':
             self._dataType = 'firstName'
         self._user.setFieldSynced(self._dataType, True)
-        return True
+        val = self._user.getAuthenticatorPersonalData(self._dataType)
+        if val:
+            setter = "set%s%s" % (self._dataType[0].upper(), self._dataType[1:])
+            getattr(self._user, setter)(val)
+        return dict(val=val)
 
 
 methodMap = {

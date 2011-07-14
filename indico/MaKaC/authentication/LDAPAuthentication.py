@@ -106,19 +106,23 @@ class LDAPIdentity(PIdentity):
                 # modify Avatar with the up-to-date info from LDAP
                 av = self.user
 
+                av.clearAuthenticatorPersonalData()
+
                 if 'postalAddress' in data:
                     postalAddress = fromLDAPmultiline(data['postalAddress'])
                     if av.getAddress() != postalAddress:
                         av.setAddress(postalAddress)
 
-                if 'sn' in data and av.isFieldSynced('surName'):
+                if 'sn' in data:
                     surname = data['sn']
-                    if av.getSurName() != surname:
+                    av.setAuthenticatorPersonalData('surName', surname)
+                    if surname and av.getSurName() != surname and av.isFieldSynced('surName'):
                         av.setSurName(surname, reindex=True)
 
-                if 'givenName' in data and av.isFieldSynced('firstName'):
+                if 'givenName' in data:
                     firstName = data['givenName']
-                    if av.getName() != firstName:
+                    av.setAuthenticatorPersonalData('firstName', firstName)
+                    if firstName and av.getName() != firstName and av.isFieldSynced('firstName'):
                         av.setName(firstName, reindex=True)
 
                 if 'o' in data:
@@ -126,6 +130,7 @@ class LDAPIdentity(PIdentity):
                 else:
                     org = data.get('company', '')
 
+                av.setAuthenticatorPersonalData('affiliation', org)
                 if org.strip() != '' and org != av.getOrganisation() and av.isFieldSynced('affiliation'):
                     av.setOrganisation(org, reindex=True)
 

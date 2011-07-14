@@ -254,6 +254,8 @@ class Config:
                  "PostFinance + card": "postFinanceCard.gif",
                  "PostFinance e-finance": "postFinanceEFinance.gif",
                  "VISA": "VISA.gif",
+                 "syncOff": "sync_off.png",
+                 "syncOn": "sync_on.png",
     }
 
 

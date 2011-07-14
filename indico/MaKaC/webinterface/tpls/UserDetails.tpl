@@ -113,15 +113,34 @@
 <script>
 
 var unlockedFields = ${jsonEncode(unlockedFields)};
+var canSynchronize = !_.isEmpty(Indico.Settings.ExtAuthenticators);
+var authenticatorName = canSynchronize && Indico.Settings.ExtAuthenticators[0][1];
+var syncOffIcon = $('<img/>', {src: '${Config.getInstance().getSystemIconURL("syncOff")}'});
+var syncOnIcon = $('<img/>', {src: '${Config.getInstance().getSystemIconURL("syncOn")}'});
+var syncOnMsg = 'This field is currently synchronized with the ' + authenticatorName + ' database.';
+var syncOffMsg = 'You changed this field manually. To synchronize it with the ' + authenticatorName + ' database, click this button.';
+
+var makeSyncInfo = function(on) {
+    var icon = on ? syncOnIcon : syncOffIcon;
+    var msg = on ? syncOnMsg : syncOffMsg;
+    var syncInfo = $('<span/>').css('margin-left', '3px').append(icon.clone());
+    syncInfo.mousemove(function(e) {
+        IndicoUI.Widgets.Generic.tooltip(this, e, msg);
+    });
+    return syncInfo;
+}
 
 var unlockField = function(field) {
+    var self = this;
+    if(!canSynchronize) {
+        return;
+    }
     if(!_.contains(unlockedFields, field)) {
         unlockedFields.push(field);
     }
-    var lockLink = $('<a href="#"/>').css('margin-left', '3px').text($T('(synchronize)')).click(function(e) {
+    var lockLink = $('<a href="#"/>').css('margin-left', '3px').append(makeSyncInfo(false)).click(function(e) {
         e.preventDefault();
         var killProgress = IndicoUI.Dialogs.Util.progress();
-        var $this = $(this);
         indicoRequest('user.syncPersonalData', {
             userId: '${ userId }',
             dataType: field
@@ -132,16 +151,35 @@ var unlockField = function(field) {
                 return;
             }
             lockField(field);
-            alert($T('Synchronization has been re-enabled for this field. To update the data with the central database, you need to log out and then login again.'));
-            $this.remove();
+            if(!result.val) {
+                alert($T('Synchronization has been re-enabled for this field. To update the data with the central database, you need to log out and then login again.'));
+            }
+            else {
+               self.value = result.val;
+               self.modeChooser.set('display');
+               if(field == 'firstName' || field == 'surName') {
+                   $E(field + 'Header').set(result.val);
+               }
+            }
+            $(self.wcanvas.dom).find('a').after(makeSyncInfo(true));
         });
     });
     $(this.wcanvas.dom).find('a').after(lockLink);
 };
 
 var lockField = function(field) {
+    if(!canSynchronize) {
+        return;
+    }
     unlockedFields = _.without(unlockedFields, field);
 };
+
+var showAsSynchronized = function(field) {
+    if(!canSynchronize) {
+        return;
+    }
+    $(this.wcanvas.dom).find('a').after(makeSyncInfo(true));
+}
 
 var requestFirstName = function() {
     $E('firstNameHeader').set(this.value);
@@ -158,6 +196,9 @@ var requestTitle = function() {
 };
 
 var beforeEdit = function(field) {
+    if(!canSynchronize) {
+        return;
+    }
     if(!_.contains(unlockedFields, field) && !confirm($T('This field is currently synchronized with the central database. If you change it, central updates will be disabled.'))) {
         return false;
     }
@@ -213,6 +254,9 @@ $.each({
 }, function(field, editor) {
     if(_.contains(unlockedFields, field)) {
         unlockField.call(editor, field);
+    }
+    else {
+        showAsSynchronized.call(editor, field);
     }
 });
 </script>

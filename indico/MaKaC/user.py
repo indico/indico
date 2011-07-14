@@ -577,6 +577,7 @@ class Avatar(Persistent, Fossilizable):
 
         self.personalInfo = PersonalInfo()
         self.unlockedFields = [] # fields that are not synchronized with auth backends
+        self.authenticatorPersonalData = {} # personal data from authenticator
 
         if userData != None:
             if userData.has_key( "name" ):
@@ -987,8 +988,8 @@ class Avatar(Persistent, Fossilizable):
     def getName(self):
         return self.name
 
-    def getFirstName(self):
-        return self.name
+    getFirstName = getName
+    setFirstName = setName
 
     def setSurName(self, name, reindex=False):
         if reindex:
@@ -1162,6 +1163,7 @@ class Avatar(Persistent, Fossilizable):
     def setTelephone(self, tel, item=0 ):
         self.telephone[item] = tel
         self._p_changed = 1
+    setPhone = setTelephone
 
     def getTelephones(self):
         return self.telephone
@@ -1436,6 +1438,20 @@ class Avatar(Persistent, Fossilizable):
         if not hasattr(self, 'unlockedFields'):
             self.unlockedFields = []
         return self.unlockedFields
+
+    def setAuthenticatorPersonalData(self, field, value):
+        if not hasattr(self, 'authenticatorPersonalData'):
+            self.authenticatorPersonalData = {}
+        self.authenticatorPersonalData[field] = value
+        self._p_changed = 1
+
+    def getAuthenticatorPersonalData(self, field):
+        if not hasattr(self, 'authenticatorPersonalData'):
+            self.authenticatorPersonalData = {}
+        return self.authenticatorPersonalData.get(field)
+
+    def clearAuthenticatorPersonalData(self):
+        self.authenticatorPersonalData = {}
 
     def getLang(self):
         try:
