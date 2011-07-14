@@ -117,8 +117,8 @@ var canSynchronize = !_.isEmpty(Indico.Settings.ExtAuthenticators);
 var authenticatorName = canSynchronize && Indico.Settings.ExtAuthenticators[0][1];
 var syncOffIcon = $('<img/>', {src: '${Config.getInstance().getSystemIconURL("syncOff")}'});
 var syncOnIcon = $('<img/>', {src: '${Config.getInstance().getSystemIconURL("syncOn")}'});
-var syncOnMsg = 'This field is currently synchronized with the ' + authenticatorName + ' database.';
-var syncOffMsg = 'You changed this field manually. To synchronize it with the ' + authenticatorName + ' database, click this button.';
+var syncOnMsg = $T('This field is currently synchronized with the {0} database.').format(authenticatorName);
+var syncOffMsg = $T('You changed this field manually. To synchronize it with the {0} database, click this icon.').format(authenticatorName);
 
 var makeSyncInfo = function(on) {
     var icon = on ? syncOnIcon : syncOffIcon;
@@ -152,7 +152,7 @@ var unlockField = function(field) {
             }
             lockField(field);
             if(!result.val) {
-                alert($T('Synchronization has been re-enabled for this field. To update the data with the central database, you need to log out and then login again.'));
+                alert($T('Synchronization has been re-enabled for this field. To update the data with the {0} database, you need to log out and then login again.').format(authenticatorName));
             }
             else {
                self.value = result.val;
@@ -199,7 +199,7 @@ var beforeEdit = function(field) {
     if(!canSynchronize) {
         return;
     }
-    if(!_.contains(unlockedFields, field) && !confirm($T('This field is currently synchronized with the central database. If you change it, central updates will be disabled.'))) {
+    if(!_.contains(unlockedFields, field) && !confirm($T('This field is currently synchronized with the {0} database. If you change it, synchronization will be disabled.').format(authenticatorName))) {
         return false;
     }
 }
