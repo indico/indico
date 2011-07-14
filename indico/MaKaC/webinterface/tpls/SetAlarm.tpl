@@ -99,7 +99,7 @@ function setEmailsState()
 	</tr>
 		<%= toAllParticipants %>
 	<tr>
-		<td>&nbsp;<input type="checkbox" name="defineReceprtiens" onClick="setEmailsState()" <%= definedRecipients %>></td>
+		<td>&nbsp;<input type="checkbox" name="defineRecipients" onClick="setEmailsState()" <%= definedRecipients %>></td>
 		<td> <%= _("Define recipients (comma-separated list of email addresses)")%> :</td>
 	</tr>
 	<tr>
