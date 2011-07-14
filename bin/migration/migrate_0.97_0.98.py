@@ -22,10 +22,11 @@ Migration script: v0.97 -> v0.98
 """
 
 import sys, traceback, argparse
-from BTrees.OOBTree import OOTreeSet
+from BTrees.OOBTree import OOTreeSet, OOBTree
+from BTrees.IOBTree import IOBTree
 from dateutil import rrule
 
-from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex
+from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayIndex
 from MaKaC.common import DBMgr
 from MaKaC.common.Counter import Counter
 from MaKaC.conference import ConferenceHolder, CategoryManager, Conference
@@ -240,15 +241,28 @@ def runCategoryConfDictToTreeSet(dbi, withRBDB):
         if len(categ.conferences) != len(categ.conferencesBackup):
             print "Problem migrating conf dict to tree set: %s" % categ.getId()
 
+def runRoomBlockingInit(dbi, withRBDB):
+    """
+    Initializing room blocking indexes.
+    """
+    root = DALManager().getRoot()
+    if not root.has_key( 'RoomBlocking' ):
+        root['RoomBlocking'] = OOBTree()
+        root['RoomBlocking']['Blockings'] = IOBTree()
+        root['RoomBlocking']['Indexes'] = OOBTree()
+        root['RoomBlocking']['Indexes']['OwnerBlockings'] = OOBTree()
+        root['RoomBlocking']['Indexes']['DayBlockings'] = CalendarDayIndex()
+        root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
 
 def runMigration(withRBDB=False):
 
-    tasks = [runPluginMigration,
-             runCategoryACMigration,
-             runConferenceMigration,
-             runTaskMigration,
-             runCategoryConfDictToTreeSet,
-             runCategoryDateIndexMigration]
+    tasks = [#runPluginMigration,
+#             runCategoryACMigration,
+#             runConferenceMigration,
+#             runTaskMigration,
+#             runCategoryConfDictToTreeSet,
+#             runCategoryDateIndexMigration,
+             runRoomBlockingInit]
 
     print "\nExecuting migration...\n"
 

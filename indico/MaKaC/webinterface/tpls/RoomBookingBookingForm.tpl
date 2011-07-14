@@ -48,18 +48,18 @@
     }
 
     function searchForUsers() {
-        var popup = new ChooseUsersPopup($T('Select a user'),
-                                     true,
-                                     null, false,
-                                     true, null,
-                                     true, true,
-                                     function(users) {
-                                         $E('bookedForName').set(users[0].name);
-                                         $E('bookedForId').set(users[0].id);
-                                         $E('contactEmail').set(users[0].email);
-                                     });
+            var popup = new ChooseUsersPopup($T('Select a user'),
+                                         true,
+                                         null, false,
+                                         true, null,
+                                         true, true,
+                                         function(users) {
+                                             $E('bookedForName').set(users[0].name);
+                                             $E('bookedForId').set(users[0].id);
+                                             $E('contactEmail').set(users[0].email);
+                                         });
 
-        popup.execute();
+            popup.execute();
     }
 
 
@@ -187,7 +187,7 @@
                                                     ${ inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) }
                                                 </td>
                                             </tr>
-                                        % elif:
+                                        % else:
                                             <tr>
                                                 <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Name")}&nbsp;&nbsp;</small></td>
                                                 <td align="left" class="blacktext">

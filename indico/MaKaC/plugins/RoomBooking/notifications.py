@@ -17,8 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from indico.core.api.reservation import IReservationListener, IReservationStartStopListener
-from indico.core.api.base import Component
+from indico.core.extpoint.reservation import IReservationListener, IReservationStartStopListener
+from indico.core.extpoint.base import Component
 from zope.interface import implements
 from datetime import datetime, timedelta
 from persistent import Persistent
