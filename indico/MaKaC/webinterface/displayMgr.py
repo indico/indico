@@ -302,6 +302,7 @@ class Menu(Persistent):
                 if not link.wasChanged() or link.getCaption() == '':
                     link.setCaption(data["caption"], silent=True)
                 link.setURL(data["URL"])
+                link.setDisplayTarget(data.get("displayTarget",""))
             else:
                 #we must create the link
                 self._createSystemLink(name, linksData)
@@ -574,7 +575,7 @@ class Link(Persistent):
         self._id = ""
         self._caption = ""
         self._v_visible=True
-        self._displayTarget = "_blank"
+        self._displayTarget = ""
 
     def getId(self):
         return self._id
@@ -903,7 +904,8 @@ class SystemLinkData(Observable):
             "abstractsBook": { \
                 "caption": _("Book of abstracts"), \
                 "URL": str(urlHandlers.UHConfAbstractBook.getURL(conf)), \
-                "parent": ""}, \
+                "parent": "", \
+                "displayTarget": "_blank"}, \
             "registrationForm": { \
                 "caption": _("Registration"), \
                 "URL": str(urlHandlers.UHConfRegistrationForm.getURL(conf)), \

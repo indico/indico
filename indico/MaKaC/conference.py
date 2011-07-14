@@ -12027,11 +12027,17 @@ class ContributionType(Persistent):
 class BOAConfig(Persistent):
     """Contains the configuration of the Book of Abstracts of a conference
     """
+    sortByTypes = {"number": "ID",
+                   "name": "Title",
+                   "sessionTitle": "Session title",
+                   "speaker": "Presenter",
+                   "schedule": "Schedule"}
 
     def __init__(self,conf):
         self._conf=conf
         self._text=""
-        self._showIds=False
+        self._showIds= False
+        self._sortBy = "number"
 
     def getText(self):
         return self._text
@@ -12046,3 +12052,15 @@ class BOAConfig(Persistent):
 
     def setShowIds(self,showIds):
         self._showIds=showIds
+
+    def getSortBy(self):
+        if not hasattr(self, "_sortBy"):
+            self._sortBy="number"
+        return self._sortBy
+
+    def setSortBy(self,sortBy):
+        self._sortBy=sortBy
+
+    @staticmethod
+    def getSortByTypes():
+        return BOAConfig.sortByTypes

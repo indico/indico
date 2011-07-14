@@ -26,7 +26,7 @@ try :
     from PIL import Image
 except ImportError, e:
     from MaKaC.PDFinterface.base import Image
-from MaKaC.PDFinterface.base import escape
+from MaKaC.PDFinterface.base import escape, Int2Romans
 from datetime import timedelta,datetime
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch, cm
@@ -1938,25 +1938,21 @@ class SimplifiedTimeTablePlain(PDFBase):
                 story.append(entry)
             currentDay+=timedelta(days=1)
 
-class AbstractBook(PDFBase):
+class AbstractBook(PDFWithTOC):
 
-    def __init__(self,conf,aw,sortBy,tz=None):
+    def __init__(self,conf,aw,tz=None):
         self._conf=conf
         if not tz:
             self._tz = self._conf.getTimezone()
         else:
             self._tz = tz
         self._aw=aw
-        self._sortBy=sortBy
-        if sortBy.strip()=="" or\
-                sortBy not in ["number", "name", "sessionTitle", "speaker", "schedule"]:
+        self._sortBy=self._conf.getBOAConfig().getSortBy()
+        if self._sortBy.strip()=="" or\
+                self._sortBy not in ["number", "name", "sessionTitle", "speaker", "schedule"]:
             self._sortBy="number"
-        PDFBase.__init__(self)
         self._title= _("Book of abstracts")
-        self._doc.leftMargin=1*cm
-        self._doc.rightMargin=1*cm
-        self._doc.topMargin=1.5*cm
-        self._doc.bottomMargin=1*cm
+        PDFWithTOC.__init__(self)
 
     def firstPage(self,c,doc):
         c.saveState()
@@ -1986,72 +1982,114 @@ class AbstractBook(PDFBase):
         c.setFillColorRGB(0.5,0.5,0.5)
         c.drawString(1*cm,self._PAGE_HEIGHT-1*cm,
             "%s / %s"%(escape(self._conf.getTitle()),self._title))
-        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"Page %d "%doc.page)
+        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"%d "%doc.page)
         c.restoreState()
 
     def _defineStyles(self):
         self._styles={}
         titleStyle=getSampleStyleSheet()["Heading1"]
-        titleStyle.fontSize=13.0
+        titleStyle.fontName="LinuxLibertine-Bold"
+        titleStyle.fontSize=14.0
         titleStyle.spaceBefore=0
-        titleStyle.spaceAfter=4
+        titleStyle.spaceAfter=10
         titleStyle.leading=14
         self._styles["title"]=titleStyle
-        spkStyle=getSampleStyleSheet()["Heading2"]
-        spkStyle.fontSize=10.0
-        spkStyle.spaceBefore=0
-        spkStyle.spaceAfter=0
-        spkStyle.leading=14
-        self._styles["speakers"]=spkStyle
+        subtitleStyle=getSampleStyleSheet()["Heading1"]
+        subtitleStyle.fontName="LinuxLibertine-Bold"
+        subtitleStyle.fontSize=11.0
+        subtitleStyle.spaceBefore=0
+        subtitleStyle.spaceAfter=4
+        subtitleStyle.leading=14
+        self._styles["subtitle"]=subtitleStyle
+        authStyle=getSampleStyleSheet()["Heading3"]
+        authStyle.fontName="LinuxLibertine"
+        authStyle.fontSize=8.0
+        authStyle.spaceBefore=0
+        authStyle.spaceAfter=0
+        authStyle.leading=14
+        self._styles["authors"]=authStyle
         abstractStyle=getSampleStyleSheet()["Normal"]
+        abstractStyle.fontName="LinuxLibertine"
         abstractStyle.fontSize=10.0
         abstractStyle.spaceBefore=0
         abstractStyle.spaceAfter=0
-        abstractStyle.alignment=TA_LEFT
+        abstractStyle.alignment=TA_JUSTIFY
         self._styles["abstract"]=abstractStyle
         ttInfoStyle=getSampleStyleSheet()["Normal"]
+        ttInfoStyle.fontName="LinuxLibertine"
         ttInfoStyle.fontSize=10.0
         ttInfoStyle.spaceBefore=0
         ttInfoStyle.spaceAfter=0
+        ttInfoStyle.alignment=TA_JUSTIFY
         self._styles["tt_info"]=ttInfoStyle
         normalStyle=getSampleStyleSheet()["Normal"]
+        normalStyle.fontName="LinuxLibertine"
         normalStyle.fontSize=10.0
         normalStyle.spaceBefore=5
         normalStyle.spaceAfter=5
-        normalStyle.alignment=TA_LEFT
+        normalStyle.alignment=TA_JUSTIFY
         self._styles["normal"]=normalStyle
 
     def _addContribution(self, contrib, story):
         if not contrib.canAccess(self._aw):
             return
-        caption="%s - %s"%(contrib.getId(),contrib.getTitle())
-        p1=Paragraph(escape(caption),self._styles["title"])
-        lspk=[]
-        for spk in contrib.getSpeakerList():
-            fullName=spk.getFullName()
-            instit=spk.getAffiliation().strip()
-            if instit!="":
-                fullName="%s (%s)"%(fullName, instit)
-            lspk.append("%s"%escape(fullName))
-        speakers= i18nformat("""<b>_("Presenter"): %s</b>""")%"; ".join(lspk)
-        p2=Paragraph(speakers,self._styles["speakers"])
-        abstract=contrib.getDescription()
-        p3=Paragraph(escape(abstract),self._styles["abstract"])
+        paragraphs=[]
         ses=""
         if contrib.getSession() is not None:
             ses=contrib.getSession().getTitle()
         if contrib.getBoardNumber():
             if ses != "":
                 ses = "%s - "%ses
-            ses="%sBoard: %s"%(ses, contrib.getBoardNumber())
-        if contrib.isScheduled():
-            if ses != "":
-                ses = "%s - "%ses
-            text="%s%s"%(ses,contrib.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y %H:%M"))
-        else:
-            text = ses
-        p4=Paragraph(escape(text),self._styles["tt_info"])
-        abs=KeepTogether([p1,p4,p2,p3])
+                ses="%sBoard %s"%(ses, contrib.getBoardNumber())
+        if ses!="":
+            ses = "%s / "%ses
+
+        caption = "%s%s"%(ses,contrib.getId())
+        paragraphs.append(Paragraph(escape(caption),self._styles["subtitle"]))
+        caption="%s"%(contrib.getTitle())
+        p = Paragraph(escape(caption),self._styles["title"])
+        paragraphs.append(p)
+        flowableText = escape(contrib.getTitle())
+        if self._conf.getBOAConfig().getShowIds():
+            flowableText += """ (%s)"""%contrib.getId()
+        self._indexedFlowable[p] = {"text":escape(flowableText), "level":1}
+
+        lauth=[]
+        institutions=[]
+        for auth in contrib.getAuthorList():
+            fullName=auth.getFullName()
+            instit=auth.getAffiliation().strip()
+            if instit!="":
+                try:
+                    indexInsti = institutions.index(instit) + 1
+                except:
+                    institutions.append(instit)
+                    indexInsti = len(institutions)
+                fullName="%s <sup>%s</sup>"%(fullName,indexInsti)
+            lauth.append("%s"%escape(fullName))
+        authors= "; ".join(lauth)
+        paragraphs.append(Paragraph(authors,self._styles["authors"]))
+        if institutions:
+            linst=[]
+            for instit in institutions:
+                linst.append("<sup>%s</sup> <i>%s</i>"%(institutions.index(instit)+1, instit))
+            institutionsText="<br/>".join(linst)
+            paragraphs.append(Paragraph(institutionsText,self._styles["authors"]))
+
+        submitterEmail=""
+        if isinstance(contrib, conference.AcceptedContribution):
+            submitterEmail=contrib.getAbstract().getSubmitter().getEmail()
+        elif contrib.getSubmitterList():
+            submitterEmail=contrib.getSubmitterList()[0].getEmail()
+
+        if submitterEmail!="":
+            submitter = i18nformat("""<b>_("Corresponding Author"):</b> %s""")%submitterEmail
+            paragraphs.append(Paragraph(escape(submitter),self._styles["normal"]))
+
+        abstract=contrib.getDescription()
+        paragraphs.append(Paragraph(escape(abstract),self._styles["abstract"]))
+
+        abs=KeepTogether(paragraphs)
         story.append(abs)
         story.append(Spacer(1,0.4*inch))
 
@@ -2059,7 +2097,6 @@ class AbstractBook(PDFBase):
         self._defineStyles()
         if not story:
             story=self._story
-        story.append(PageBreak())
         if self._conf.getBOAConfig().getText():
             text=self._conf.getBOAConfig().getText().replace("<BR>","<br>")
             text=text.replace("<Br>","<br>")
@@ -2286,27 +2323,6 @@ class ProceedingsChapterSeparator(PDFBase):
         self._story.append(PageBreak())
         self._story.append(PageBreak())
         return story
-
-class Int2Romans:
-
-    def int_to_roman(input):
-        """
-        Convert an integer to Roman numerals.
-        """
-        if type(input) != type(1):
-            raise TypeError, _("expected integer, got %s") % type(input)
-        if not 0 < input < 4000:
-            raise MaKaCError( _("Int to Roman Error: Argument must be between 1 and 3999"))
-        ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
-        nums = ('m',  'cm', 'd', 'cd','c', 'xc','l','xl','x','ix','v','iv','i')
-        result = ""
-        for i in range(len(ints)):
-            count = int(input / ints[i])
-            result += nums[i] * count
-            input -= ints[i] * count
-        return result
-    int_to_roman = staticmethod(int_to_roman)
-
 
 class RegistrantToPDF(PDFBase):
 

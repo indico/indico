@@ -45,9 +45,6 @@ def abstractBook(req, **params):
 def abstractBookLatex(req, **params):
     return conferenceDisplay.RHConferenceLatexPackage(req).process(params)
 
-def abstractBookPerform(req,**params):
-    return conferenceDisplay.RHAbstractBookPerform(req).process(params)
-
 def accessKey(req, **params):
     return conferenceDisplay.RHConferenceAccessKey(req).process(params)
 

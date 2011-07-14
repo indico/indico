@@ -6594,6 +6594,7 @@ class RHAbstractBookEdit( RHConfModifCFABase ):
         if params.has_key("EDIT"):
             self._action="EDIT"
             self._text=params.get("text","")
+            self._sortBy=params.get("sortBy","")
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
 
@@ -6604,6 +6605,7 @@ class RHAbstractBookEdit( RHConfModifCFABase ):
             return
         elif self._action=="EDIT":
             self._target.getBOAConfig().setText(self._text)
+            self._target.getBOAConfig().setSortBy(self._sortBy)
             self._redirect(url)
             return
         p=conferences.WPModAbstractBookEdit(self,self._target)

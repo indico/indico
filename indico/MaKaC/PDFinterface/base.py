@@ -170,6 +170,26 @@ def setTTFonts():
         #pdfmetrics.registerFont(TTFont('Uming-CN', os.path.join(dir, 'uming.ttc')))
         alreadyRegistered = True
 
+class Int2Romans:
+
+    def int_to_roman(input):
+        """
+        Convert an integer to Roman numerals.
+        """
+        if type(input) != type(1):
+            raise TypeError, _("expected integer, got %s") % type(input)
+        if not 0 < input < 4000:
+            raise MaKaCError( _("Int to Roman Error: Argument must be between 1 and 3999"))
+        ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
+        nums = ('m',  'cm', 'd', 'cd','c', 'xc','l','xl','x','ix','v','iv','i')
+        result = ""
+        for i in range(len(ints)):
+            count = int(input / ints[i])
+            result += nums[i] * count
+            input -= ints[i] * count
+        return result
+    int_to_roman = staticmethod(int_to_roman)
+
 class Paragraph(platypus.Paragraph):
     """
     add a part attribute for drawing the name of the current part on the laterPages function
@@ -511,7 +531,6 @@ class DocTemplateWithTOC(SimpleDocTemplate):
                 text: the text which will br print in the table
                 level: the level of the entry( modifying the indentation and the police
         """
-
         self._toc = []
         self._tocStory = []
         self._indexedFlowable = indexedFlowable
@@ -520,6 +539,8 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self._firstPageNumber = firstPageNumber
         SimpleDocTemplate.__init__(self, filename, **kw)
         setTTFonts()
+        self._PAGE_HEIGHT = self.pagesize[1]
+        self._PAGE_WIDTH = self.pagesize[0]
 
     def afterFlowable(self, flowable):
         if flowable in self._indexedFlowable:
@@ -536,11 +557,12 @@ class DocTemplateWithTOC(SimpleDocTemplate):
 
     def _prepareTOC(self):
         headerStyle = ParagraphStyle({})
-        headerStyle.fontName = "Times-Bold"
+        headerStyle.fontName = "LinuxLibertine-Bold"
         headerStyle.fontSize = modifiedFontSize(18, 18)
         headerStyle.leading = modifiedFontSize(22, 22)
         headerStyle.alignment = TA_CENTER
         entryStyle = ParagraphStyle({})
+        entryStyle.fontName = "LinuxLibertine"
         entryStyle.spaceBefore = 8
         self._tocStory.append(PageBreak())
         self._tocStory.append(Spacer(inch, 1*cm))
@@ -549,7 +571,14 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         for entry in self._toc:
             self._tocStory.append(TableOfContentsEntry("<para leftIndent=%s" % ((entry[0] - 1) * 50) + ">" + entry[1] + "</para>", str(entry[2]),entryStyle))
             #self._tocStory.append(SimpleParagraph(entry[1]))
-        self._tocStory.append(PageBreak())
+        #self._tocStory.append(PageBreak())
+
+    def laterPages(self,c,doc):
+        c.saveState()
+        c.setFont('Times-Roman',9)
+        c.setFillColorRGB(0.5,0.5,0.5)
+        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"%s "%Int2Romans.int_to_roman(doc.page-1))
+        c.restoreState()
 
     def multiBuild(self, story, filename=None, canvasMaker=Canvas, maxPasses=10, onFirstPage=_doNothing, onLaterPages=_doNothing):
         self._calc()    #in case we changed margins sizes etc
@@ -565,6 +594,9 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self.addPageTemplates([PageTemplate(id='First',frames=frameT, onPage=onFirstPage,pagesize=self.pagesize)])
         if onFirstPage is _doNothing and hasattr(self,'onFirstPage'):
             self.pageTemplates[0].beforeDrawPage = self.onFirstPage
+        self.addPageTemplates([PageTemplate(id='Later',frames=frameT, onPageEnd=self.laterPages,pagesize=self.pagesize)])
+        if onLaterPages is _doNothing and hasattr(self,'onLaterPages'):
+            self.pageTemplates[1].beforeDrawPage = self.onLaterPages
         SimpleDocTemplate.multiBuild(self, self._tocStory, maxPasses, canvasmaker=canvasMaker)
         self.mergePDFs(self.filename, contentFile)
 

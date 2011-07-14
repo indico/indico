@@ -561,7 +561,7 @@ class ConfDisplayMenu:
             for sublink in link.getEnabledLinkList():
                 if sublink.isVisible():
                     sublinkList.append(sublink)
-            if isinstance(link,displayMgr.ExternLink):
+            if (link.getDisplayTarget()):
                 target=""" target="%s" """%link.getDisplayTarget()
             #Commented because 'menuicon' variable is not used
             #if sublinkList:
@@ -9293,12 +9293,20 @@ class WConfModAbstractBook(wcomponents.WTemplated):
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         boaConfig=self._conf.getBOAConfig()
+        sortBy=boaConfig.getSortBy()
+        sortByList=boaConfig.getSortByTypes()
+        vars["sortByList"] = sortByList
         vars["modURL"]=quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
+        vars["previewURL"]=quoteattr(str(urlHandlers.UHConfAbstractBook.getURL(self._conf)))
         vars["text"]=boaConfig.getText()
+        vars["sortBy"]=sortBy
         vars["showIds"]=boaConfig.getShowIds()
         vars["urlToogleShowIds"]=str(urlHandlers.UHConfModAbstractBookToogleShowIds.getURL(self._conf))
-        return vars
+        vars["conf"]=self._conf
+        vars["bookOfAbstractsActive"] = self._conf.getAbstractMgr().getCFAStatus()
+        vars["bookOfAbstractsMenuActive"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu().getLinkByName('abstractsBook').isEnabled()
 
+        return vars
 
 class WPModAbstractBook(WPConferenceModifAbstractBase):
 
@@ -9307,29 +9315,6 @@ class WPModAbstractBook(WPConferenceModifAbstractBase):
 
     def _getTabContent( self, params ):
         wc=WConfModAbstractBook(self._conf)
-        return wc.getHTML()
-
-
-class WConfModAbstractBookEdit(wcomponents.WTemplated):
-
-    def __init__(self,conf):
-        self._conf=conf
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        boaConfig=self._conf.getBOAConfig()
-        vars["postURL"]=quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
-        vars["text"]=self.htmlText(boaConfig.getText())
-        return vars
-
-
-class WPModAbstractBookEdit(WPConferenceModifAbstractBase):
-
-    def _setActiveTab( self ):
-        self._tabBOA.setActive()
-
-    def _getTabContent( self, params ):
-        wc=WConfModAbstractBookEdit(self._conf)
         return wc.getHTML()
 
 class WPFullMaterialPackage( WPConfModifToolsBase ):

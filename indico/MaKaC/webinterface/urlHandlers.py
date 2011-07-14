@@ -3333,9 +3333,6 @@ class UHConfAbstractBook( URLHandler ):
 class UHConfAbstractBookLatex( URLHandler ):
     _relativeURL = "conferenceDisplay.py/abstractBookLatex"
 
-class UHConfAbstractBookPerform( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/abstractBookPerform"
-
 class UHConferenceToiCal( URLHandler ):
     _relativeURL = "conferenceDisplay.py/ical"
 

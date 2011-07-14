@@ -976,21 +976,9 @@ class RHAbstractBook(RHConferenceBaseDisplay):
             raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
 
     def _process( self ):
-        p=conferences.WPAbstractBookCustomise(self,self._target)
-        return p.display()
-
-class RHAbstractBookPerform(RHConferenceBaseDisplay):
-    _uh=urlHandlers.UHConfAbstractBook
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        self._sortBy = params.get("sortBy","")
-
-    def _process( self ):
         tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
         filename = "%s - Book of abstracts.pdf"%cleanHTMLHeaderFilename(self._target.getTitle())
-        from MaKaC.PDFinterface.conference import AbstractBook
-        pdf = AbstractBook(self._target,self.getAW(), self._sortBy, tz=tz)
+        pdf = AbstractBook(self._target,self.getAW(), tz=tz)
         data = pdf.getPDFBin()
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
