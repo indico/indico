@@ -61,5 +61,5 @@ class Catalog(OOBTree):
         for indexName, clazz in cls._indexMap.iteritems():
             if not cls.getIdx(indexName, db=db):
                 newIdx = clazz()
-                newIdx.initialize(dbi=dbi)
                 root['catalog'][indexName] = newIdx
+                newIdx.initialize(dbi=dbi)

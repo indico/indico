@@ -35,6 +35,13 @@ from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
 from zope.index.text import textindex
 
+
+# BTrees are 32 bit by default
+# TODO: make this configurable
+# 0111 111 .... max signed int
+BTREE_MAX_INT = 0x7FFFFFFF
+
+
 class Index(Persistent):
     _name = ""
 
@@ -329,7 +336,7 @@ class CalendarIndex(Persistent):
         sdate = date2utctimestamp(conf.getStartDate())
         edate = date2utctimestamp(conf.getEndDate())
         #checking if 2038 problem occurs
-        if type(sdate) == type(1L) or type(edate) == type(1L):
+        if sdate > BTREE_MAX_INT or edate > BTREE_MAX_INT:
             return
         if self._idxSdate.has_key( sdate ):
             res = self._idxSdate[sdate]
@@ -366,7 +373,7 @@ class CalendarIndex(Persistent):
         sdate = date2utctimestamp(conf.getStartDate())
         edate = date2utctimestamp(conf.getEndDate())
         #checking if 2038 problem occurs
-        if type(sdate) == type(1L) or type(edate) == type(1L):
+        if sdate > BTREE_MAX_INT or edate > BTREE_MAX_INT:
             return
         if not self._idxSdate.has_key( sdate ):
             for key in self._idxSdate.keys():
@@ -587,7 +594,7 @@ class CalendarDayIndex(Persistent):
         for day in range(days + 1):
             key = int(datetimeToUnixTime(startDate + timedelta(day)))
             #checking if 2038 problem occurs
-            if type(key) == type(1L):
+            if key > BTREE_MAX_INT:
                 continue
             if self._idxDay.has_key(key):
                 self._idxDay[key].add(conf)
@@ -602,7 +609,7 @@ class CalendarDayIndex(Persistent):
         for dayNumber in range(days + 1):
             day = int(datetimeToUnixTime(startDate + timedelta(dayNumber)))
             #checking if 2038 problem occurs
-            if type(day) == type(1L):
+            if day > BTREE_MAX_INT:
                 continue
             if self._idxDay.has_key( day ):
                 if conf in self._idxDay[day]:
