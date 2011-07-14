@@ -126,7 +126,7 @@ class LDAPIdentity(PIdentity):
                 else:
                     org = data.get('company', '')
 
-                if org.strip() != '' and org != av.getOrganisation():
+                if org.strip() != '' and org != av.getOrganisation() and av.isFieldSynced('affiliation'):
                     av.setOrganisation(org, reindex=True)
 
                 mail = data.get('mail', '')
