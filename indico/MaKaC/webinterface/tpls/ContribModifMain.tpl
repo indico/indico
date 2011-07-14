@@ -110,7 +110,7 @@
                         <table width="100%">
                             <tr>
                                 <td style="width: 79%"><ul id="inPlacePrimaryAuthors" class="UIPeopleList"></ul></td>
-                                <td nowrap valign="top" style="width: 21%; text-align:right;">
+                                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                     <span id="inPlacePrimaryAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                                         <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="primaryAuthorManager.addManagementMenu();">${ _("Add primary author")}</a>
                                     </span>
@@ -128,7 +128,7 @@
                         <table width="100%">
                             <tr>
                                 <td style="width: 79%"><ul id="inPlaceCoAuthors" class="UIPeopleList"></ul></td>
-                                <td nowrap valign="top" style="width: 21%; text-align:right;">
+                                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                     <span id="inPlaceCoAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                                         <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="coAuthorManager.addManagementMenu();">${ _("Add co-author")}</a>
                                     </span>
@@ -147,7 +147,7 @@
                         <table width="100%">
                             <tr>
                                 <td style="width: 79%"><ul id="inPlaceSpeakers" class="UIPeopleList"></ul></td>
-                                <td nowrap valign="top" style="width: 21%; text-align:right;">
+                                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                     <span id="inPlaceSpeakersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                                         <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="speakerManager.addManagementMenu();">${ _("Add presenter") if eventType == "conference" else  _("Add speakers")}</a>
                                     </span>

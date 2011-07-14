@@ -91,6 +91,6 @@ var methods = {'addExisting': 'admin.general.addExistingAdmin',
 
 var params = {};
 
-var adminListManager = new ModificationControlManager(null, methods, params, $E('inPlaceAdministrators'), "administrator");
+var adminListManager = new SimpleListControlManager(null, methods, params, $E('inPlaceAdministrators'), "administrator");
 
 </script>

@@ -33,9 +33,10 @@ type("ListOfUsersManager", [], {
         chooseUsersPopup.execute();
     },
 
-    _manageUserList: function(method, params, progress) {
+    _manageUserList: function(method, params, progress, highlight) {
         var self = this;
         var progress = any(progress, true);
+        var highlight = any(highlight, false);
         if (progress)
             var killProgress = IndicoUI.Dialogs.Util.progress();
         indicoRequest(
@@ -45,6 +46,8 @@ type("ListOfUsersManager", [], {
                         self._updateUserList(result);
                         if (progress)
                             killProgress();
+                        if (highlight)
+                            IndicoUI.Effect.highLight('fullName_'+params['userId'], 'orange', 3000);
                     } else {
                         if (progress)
                             killProgress();
@@ -628,7 +631,7 @@ type("ListOfUsersManagerForForm", [], {
  * @param: inPlaceListElem -> Element of the webpage where the list will be.
  * @param: userCaption -> String to show in the texts
  */
-type("ModificationControlManager", ["ListOfUsersManager"], {
+type("SimpleListControlManager", ["ListOfUsersManager"], {
 
     _getAddExistingParams: function(userList) {
         var params = this.params;

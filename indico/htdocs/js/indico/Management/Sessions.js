@@ -1,7 +1,7 @@
 /*
  * Manager for the modification control list of users/groups in session management
  */
-type("SessionControlManager", ["ModificationControlManager"], {
+type("SessionControlManager", ["SimpleListControlManager"], {
 
     _manageBothUserList: function(method, params) {
         var self = this;
@@ -150,7 +150,7 @@ type("SessionControlManager", ["ModificationControlManager"], {
 },
 
     function(confId, methods, params, inPlaceListElem, userCaption) {
-        this.ModificationControlManager(confId, methods, params, inPlaceListElem, userCaption);
+        this.SimpleListControlManager(confId, methods, params, inPlaceListElem, userCaption);
     }
 );
 

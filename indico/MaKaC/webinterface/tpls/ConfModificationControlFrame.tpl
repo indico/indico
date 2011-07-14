@@ -68,6 +68,6 @@ var methods = {'addExisting': 'event.protection.addExistingManager',
 
 var params = {confId: '${ confId }'};
 
-var modificationControlManager = new ModificationControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+var modificationControlManager = new SimpleListControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
 
 </script>

@@ -39,6 +39,6 @@ var methods = {'addExisting': 'contribution.protection.addExistingManager',
 
 var params = {confId: '${ confId }', contribId: '${ contribId }'};
 
-var modificationControlManager = new ModificationControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+var modificationControlManager = new SimpleListControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
 
 </script>

@@ -157,68 +157,18 @@ class RHUserMerge(RHAdminBase):
         self._params = params
         RHAdminBase._checkParams( self, params )
 
-
-        self.prin = None
-        if self._params.get("prinId", None) and self._params["prinId"] != "":
-            self.prin = ah.getById(self._params["prinId"])
-
-        self.toMerge = None
-        if self._params.get("toMergeId", None) and self._params["toMergeId"] != "":
-            self.toMerge = ah.getById(self._params["toMergeId"])
-
-        self.selectPrin = False
-        if self._params.get("selectPrin", None):
-            self.selectPrin = True
-
-        self.selectToMerge = False
-        if self._params.get("selectToMerge", None):
-            self.selectToMerge = True
+        self.prin = ah.getById(self._params.get("prinId", None))
+        self.toMerge = ah.getById(self._params.get("toMergeId", None))
 
         self.merge = False
         if self._params.get("merge", None):
             self.merge = True
             if self.prin is not None and self.toMerge is not None and self.prin == self.toMerge:
                 raise FormValuesError(_("One cannot merge a user with him/herself"))
-        self.cancel = False
-        self.setPrin = False
-        self.newPrin = None
-        if self._params.get("setPrin", None):
-            if self._params.get("selectedPrincipals", None):
-                self.setPrin = True
-                self.newPrin = ah.getById(self._params.get("selectedPrincipals", ""))
-            else:
-                self.cancel = True
-
-        self.setToMerge = False
-        self.newToMerge = None
-        if self._params.get("setToMerge", None):
-            if self._params.get("selectedPrincipals", None):
-                self.setToMerge = True
-                self.newToMerge = ah.getById(self._params.get("selectedPrincipals", ""))
-            else:
-                self.cancel = True
 
 
     def _process( self ):
-
-        if self.setPrin:
-            self.prin = self.newPrin
-
-        elif self.setToMerge:
-            self.toMerge = self.newToMerge
-
-        elif self.cancel:
-            pass
-
-        elif self.selectPrin:
-            p = admins.WPUserMergeSelectPrin( self, self.prin, self.toMerge )
-            return p.display(**self._getRequestParams())
-
-        elif self.selectToMerge:
-            p = admins.WPUserMergeSelectToMerge( self, self.prin, self.toMerge )
-            return p.display(**self._getRequestParams())
-
-        elif self.merge:
+        if self.merge:
             if self.prin and self.toMerge:
                 ah = user.AvatarHolder()
                 ah.mergeAvatar(self.prin, self.toMerge)

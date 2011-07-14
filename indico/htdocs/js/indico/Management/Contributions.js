@@ -3,9 +3,12 @@
  */
 type("ParticipantsListManager", ["ListOfUsersManager"], {
 
-	_manageUserList: function(method, params, methodKey) {
+	_manageUserList: function(method, params, methodKey, progress, highlightUser) {
         var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress();
+        var progress = any(progress, true);
+        var highlightUser = any(highlightUser, false);
+        if (progress)
+            var killProgress = IndicoUI.Dialogs.Util.progress();
         indicoRequest(
             method, params,
             function(result, error) {
@@ -32,9 +35,13 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                     } else {
                         self._updateUserList(result);
                     }
-                    killProgress();
+                    if (highlightUser)
+                        IndicoUI.Effect.highLight('fullName_'+params['userId'], 'orange', 3000);
+                    if (progress)
+                        killProgress();
                 } else {
-                    killProgress();
+                    if (progress)
+                        killProgress();
                     IndicoUtil.errorReport(error);
                 }
             }
@@ -114,9 +121,9 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
 
             if (!result[i]['showGrantSubmissionRights']) {
                 // Show submitter
-                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['fullName'], Html.small({style:{paddingLeft:'5px'}}, $T('(Submitter)')));
+                var userText = Html.span({className:'nameLink', cssFloat:'left', id:'fullName_'+result[i]['id']}, result[i]['fullName'], Html.small({style:{paddingLeft:'5px'}}, $T('(Submitter)')));
             } else {
-                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['fullName']);
+                var userText = Html.span({className:'nameLink', cssFloat:'left', id:'fullName_'+result[i]['id']}, result[i]['fullName']);
             }
             userRowElements.push(userText);
 
@@ -125,10 +132,50 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                                         onmouseout:"this.className = ''", style:{cssFloat:'right'}});
 
             var optionsMenuLink = Html.a({id:'userMenu_' + result[i]['id'], className:'dropDownMenu fakeLink',
-                                         style:{marginLeft:'15px', marginRight:'15px'}}, $T('Options'));
+                                         style:{marginLeft:'15px', marginRight:'15px'}}, $T('More'));
             this._addParticipantMenu(optionsMenuLink, result[i]['id'], result[i]['showGrantSubmissionRights']);
             optionsMenuSpan.append(optionsMenuLink);
             userRowElements.push(optionsMenuSpan);
+
+            // edit icon
+            var imageEdit = Html.img({
+                src: imageSrc("edit"),
+                alt: $T('Edit ') + this.userCaption,
+                title: $T('Edit this ') + this.userCaption,
+                className: 'UIRowButton2',
+                id: 'edit_'+result[i]['id'],
+                style:{cssFloat:'right', cursor:'pointer'}
+            });
+
+            imageEdit.observeClick(function(event) {
+                if (event.target) { // Firefox
+                    var userId = event.target.id.split('_')[1];
+                } else { // IE
+                    var userId = event.srcElement.id.split('_')[1];
+                }
+                self._getUserData(self.methods["getUserData"], self._getGetUserParams(userId));
+            });
+            userRowElements.push(imageEdit);
+
+            // remove icon
+            var imageRemove = Html.img({
+                src: imageSrc("remove"),
+                alt: $T('Remove ') + this.userCaption,
+                title: $T('Remove this ') + this.userCaption + $T(' from the list'),
+                className: 'UIRowButton2',
+                id: 'remove_'+result[i]['id'],
+                style:{marginRight:'15px', cssFloat:'right', cursor:'pointer'}
+            });
+
+            imageRemove.observeClick(function(event) {
+                if (event.target) { // Firefox
+                    var userId = event.target.id.split('_')[1];
+                } else { // IE
+                    var userId = event.srcElement.id.split('_')[1];
+                }
+                self._manageUserList(self.methods["remove"], self._getRemoveParams(userId), "remove");
+            });
+            userRowElements.push(imageRemove);
 
             if (this.kindOfUser != "speaker") {
                 // arrow icons
@@ -147,7 +194,7 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                     } else { // IE
                         var userId = event.srcElement.id.split('_')[1];
                     }
-                    self._manageUserList(self.methods["downUser"], self._getDownUserParams(userId));
+                    self._manageUserList(self.methods["downUser"], self._getDownUserParams(userId), "downUser", false, true);
                 });
                 userRowElements.push(downArrow);
 
@@ -166,7 +213,7 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                     } else { // IE
                         var userId = event.srcElement.id.split('_')[1];
                     }
-                    self._manageUserList(self.methods["upUser"], self._getUpUserParams(userId));
+                    self._manageUserList(self.methods["upUser"], self._getUpUserParams(userId), "upUser", false, true);
                 });
                 userRowElements.push(upArrow);
             }
@@ -191,8 +238,6 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
             else
                 var opposite = 'primary author';
 
-            menuItems[$T('Edit ') + self.userCaption] = function() {
-                self._getUserData(self.methods["getUserData"], self._getGetUserParams(userId)); };
             if (self.kindOfUser != 'speaker') {
                 menuItems[$T('Move to ') + opposite] = function() {
                     self._changeToOtherList(userId);
@@ -218,10 +263,6 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                     menu.close();
                 };
             }
-            menuItems[$T('Remove ') + self.userCaption] = function(){
-                self._manageUserList(self.methods["remove"], self._getRemoveParams(userId), "remove");
-                menu.close();
-            };
 
             var menu = new PopupMenu(menuItems, [element], "popupList");
             var pos = element.getAbsolutePosition();
@@ -252,16 +293,14 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
 
     _changeToOtherList: function(userId) {
         var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress();
         indicoRequest(
                 self.methods["changeToList"], self._getParamsWithUserId(userId),
                 function(result, error) {
                     if (!error) {
                         self._updateUserList(result[0]);
                         self.complementaryList1.updateUserList(result[1]);
-                        killProgress();
+                        IndicoUI.Effect.highLight('fullName_'+userId, 'orange', 3000);
                     } else {
-                        killProgress();
                         IndicoUtil.errorReport(error);
                     }
                 }
@@ -289,7 +328,6 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
 
     _changeSubmissionRights: function(userId, action) {
         var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress();
         indicoRequest(this.methods["changeSubmission"], this._getChangeSubmissionRightsParams(userId, action),
                 function(result, error) {
                     if (!error) {
@@ -298,6 +336,7 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                                 // Update current list and speakers/presenters list
                                 self._updateUserList(result[0]);
                                 self.complementaryList2.updateUserList(result[1]);
+                                IndicoUI.Effect.highLight('fullName_'+userId, 'orange', 3000);
                             } else {
                                 // Update all the lists
                                 self._updateUserList(result[0]);
@@ -306,10 +345,9 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                            }
                         } else {
                             self._updateUserList(result);
+                            IndicoUI.Effect.highLight('fullName_'+userId, 'orange', 3000);
                         }
-                        killProgress();
                     } else {
-                        killProgress();
                         IndicoUtil.errorReport(error);
                     }
                 }
@@ -646,7 +684,7 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
                 var kindOfUser = "pending";
                 var userIdentifier = result[i]['name'];
             } else {
-                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['name'], this._getRolesText(result[i]));
+                var userText = Html.span({className:'nameLink', cssFloat:'left', id:'fullName_'+result[i]['id']}, result[i]['name'], this._getRolesText(result[i]));
                 var kindOfUser = "principal";
                 var userIdentifier = result[i]['id'];
             }
@@ -719,24 +757,24 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
             if (self.eventType == "conference") {
                 if (!user['isPrAuthor']) {
                     menuItems[$T('Add as primary author')] = function() {
-                        self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "prAuthor"), false);
+                        self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "prAuthor"), false, true);
                         menu.close();
                     };
                 } else {
                     menuItems[$T('Remove as primary author')] = function() {
-                        self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "prAuthor"), false);
+                        self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "prAuthor"), false, true);
                         menu.close();
                     };
                 }
 
                 if (!user['isCoAuthor']) {
                     menuItems[$T('Add as co-author')] = function() {
-                        self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "coAuthor"), false);
+                        self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "coAuthor"), false, true);
                         menu.close();
                     };
                 } else {
                     menuItems[$T('Remove as co-author')] = function() {
-                        self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "coAuthor"), false);
+                        self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "coAuthor"), false, true);
                         menu.close();
                     };
                 }
@@ -744,12 +782,12 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
 
             if (!user['isSpeaker']) {
                 menuItems[$T('Add as ') + self.speakerCaption] = function() {
-                    self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "speaker"), false);
+                    self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "speaker"), false, true);
                     menu.close();
                 };
             } else {
                 menuItems[$T('Remove as ') + self.speakerCaption] = function() {
-                    self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "speaker"), false);
+                    self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "speaker"), false, true);
                     menu.close();
                 };
             }

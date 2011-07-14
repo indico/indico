@@ -15,6 +15,6 @@ var methodsMod = {'addExisting': 'category.protection.addExistingManager',
 
 var paramsMod = {categoryId: '${ categoryId }', kindOfList: 'modification'};
 
-var modificationControlManager = new ModificationControlManager(null, methodsMod, paramsMod, $E('inPlaceManagers'), "manager");
+var modificationControlManager = new SimpleListControlManager(null, methodsMod, paramsMod, $E('inPlaceManagers'), "manager");
 
 </script>

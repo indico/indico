@@ -28,6 +28,6 @@ var methods = {'addExisting': 'event.protection.addExistingRegistrar',
 
 var params = {confId: '${ confId }'};
 
-var registrationControlManager = new ModificationControlManager('${ confId }', methods, params, $E('inPlaceRegistrars'), "manager");
+var registrationControlManager = new SimpleListControlManager('${ confId }', methods, params, $E('inPlaceRegistrars'), "manager");
 
 </script>

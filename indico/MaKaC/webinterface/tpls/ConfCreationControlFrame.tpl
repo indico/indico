@@ -47,6 +47,6 @@ var methodsCC = {'addExisting': 'category.protection.addExistingConfCreator',
 
 var paramsCC = {categoryId: '${ categoryId }', kindOfList: 'confCreation'};
 
-var modificationControlManagerCC = new ModificationControlManager(null, methodsCC, paramsCC, $E('inPlaceConfCreators'), "user");
+var modificationControlManagerCC = new SimpleListControlManager(null, methodsCC, paramsCC, $E('inPlaceConfCreators'), "user");
 
 </script>

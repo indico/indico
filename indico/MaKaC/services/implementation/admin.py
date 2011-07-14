@@ -25,6 +25,7 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.services.interface.rpc.common import ServiceError
 import MaKaC.common.info as info
 from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.user import IAvatarAllDetailsFossil
 
 
 ### Webcast Administrators classes ###
@@ -179,6 +180,29 @@ class GroupRemoveMember(GroupMemberBase):
         return fossilize(self._group.getMemberList())
 
 
+class MergeGetCompleteUserInfo(AdminService):
+
+    def _checkParams(self):
+        AdminService._checkParams(self)
+        pm = ParameterManager(self._params)
+        av = AvatarHolder()
+        userId = pm.extract("userId", pType=str, allowEmpty=False)
+        self._user = av.getById(userId)
+        if self._user == None:
+            raise ServiceError("ER-U0", _("Cannot found user with id %s") % userId)
+
+    def _getAnswer(self):
+        userFossil = fossilize(self._user, IAvatarAllDetailsFossil)
+        identityList = []
+        for identity in self._user.getIdentityList():
+            identityDict = {}
+            identityDict["login"] = identity.getLogin()
+            identityDict["authTag"] = identity.getAuthenticatorTag()
+            identityList.append(identityDict)
+        userFossil["identityList"] = identityList
+        return userFossil
+
+
 methodMap = {
     "services.addWebcastAdministrators": AddWebcastAdministrators,
     "services.removeWebcastAdministrator": RemoveWebcastAdministrator,
@@ -191,5 +215,7 @@ methodMap = {
 
     "groups.addExistingMember": GroupAddExistingMember,
     "groups.removeMember": GroupRemoveMember,
-    "groups.getMemberList": GroupGetMemberList
+    "groups.getMemberList": GroupGetMemberList,
+
+    "merge.getCompleteUserInfo": MergeGetCompleteUserInfo
 }

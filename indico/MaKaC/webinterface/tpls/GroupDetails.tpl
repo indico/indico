@@ -72,6 +72,6 @@ var methods = {'addExisting': 'admin.groups.addExistingMember',
 
 var params = {groupId: '${ groupId }'};
 
-var groupMemberManager = new ModificationControlManager(null, methods, params, $E('inPlaceMembers'), "member");
+var groupMemberManager = new SimpleListControlManager(null, methods, params, $E('inPlaceMembers'), "member");
 
 </script>
