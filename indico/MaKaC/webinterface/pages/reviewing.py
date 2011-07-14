@@ -272,6 +272,9 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
         vars["stateTable"] = ht
         vars["questionTable"] = qs
         vars["criteriaTable"] = cs
+        vars["reviewingModesDict"] = {}
+        for i in self.__target.getConfPaperReview().reviewingModes:
+            vars["reviewingModesDict"][i] = i
         return vars
 
 

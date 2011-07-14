@@ -1595,6 +1595,10 @@ type("SelectEditWidget", ["InlineEditWidget"],
                 if (this.successHandler) {
                     return this.successHandler();
                 }
+            },
+
+            getCurrentValue: function() {
+                return this.currentValue;
             }
         },
         function(method, attributes, options, initValue, successHandler) {

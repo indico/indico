@@ -391,8 +391,9 @@
 
 <script type="text/javascript">
 
-var observer = function(value) {
+var observer = function() {
 
+    var value = reviewingModeSelect.getCurrentValue();
     if (value == "No reviewing") {
         $E('steptitle').dom.style.display = 'none';
         $E('title').dom.style.display = 'none';
@@ -537,12 +538,10 @@ var observer = function(value) {
     }
 }
 
-new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditReviewingMode'),
-                    'reviewing.conference.changeReviewingMode',
-                    {conference: '${ ConfReview.getConference().getId() }'},
-                    ${ ConferencePaperReview.reviewingModes[1:] },
-                    "${ ConfReview.getReviewingMode() }",
-                    observer);
+var reviewingModeSelect = new SelectEditWidget('reviewing.conference.changeReviewingMode',
+        {conference: '${ ConfReview.getConference().getId() }'}, ${ reviewingModesDict }
+        , "${ ConfReview.getReviewingMode() }", observer);
+$E('inPlaceEditReviewingMode').set(reviewingModeSelect.draw());
 
 var showReviewingStates = function() {
     $E('inPlaceEditStates').set(new ManageListOfElements({'get':'reviewing.paperReviewing.getStatuses',

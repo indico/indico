@@ -1019,11 +1019,11 @@ class Template(Persistent):
         A conference can have many of these templates.
     """
 
-    formats = [_("Word"),
-               _("OpenOffice Writer"),
-               _("PowerPoint"),
-               _("OpenOffice Impress"),
-               _("LaTeX")]
+    formats = ["Word",
+               "OpenOffice Writer",
+               "PowerPoint",
+               "OpenOffice Impress",
+               "LaTeX"]
 
     def __init__(self, id, conference, name, description, format, file):
         self.__id = id
