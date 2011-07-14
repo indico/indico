@@ -408,6 +408,8 @@ class _ActionSubCategDeletion:
 
     def perform( self ):
         for categ in self._categs:
+            for manager in categ.getManagerList():
+                categ.revokeModification(manager)
             categ.delete()
 
 class _ActionSortCategories:
@@ -509,8 +511,9 @@ class _ActionConferenceDeletion:
 
     def perform( self,confs ):
         for event in confs:
+            for manager in event.getManagerList():
+                event.revokeModification(manager)
             event.delete()
-
 
     def askConfirmation( self, params ):
         p = category.WPConferenceDeletion( self._rh, self._target )

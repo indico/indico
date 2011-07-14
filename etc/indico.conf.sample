@@ -253,6 +253,13 @@ CssStylesheetName    = "Default"
 
 
 #------------------------------------------------------------------------------
+# DATA EXPORT PARAMETERS
+#------------------------------------------------------------------------------
+
+# Categories that you want to limit to certain IPs (RSS, iCal, export.py)
+ExportACL = {}
+
+#------------------------------------------------------------------------------
 # OAI PARAMETERS
 #------------------------------------------------------------------------------
 # The Open Archives Initiative develops and promotes interoperability standards

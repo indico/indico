@@ -101,6 +101,9 @@ type("PopupMenu", ["ChainedPopupWidget"],
 
             if(typeof value == "string" ) {
                 link.setAttribute('href', value);
+                if (self.linkToExternalWindow) {
+                    link.setAttribute('target', '_blank');
+                }
                 if (self.closeOnClick) {
                     link.observeClick(function() {
                         self.close();
@@ -174,7 +177,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
             return this.PopupWidget.prototype.draw.call(this, content, x, y);
         }
     },
-    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler, currentItem) {
+    function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler, currentItem, linkToExternalWindow) {
         this.ChainedPopupWidget(chainElements, alignRight);
         this.items = items;
         this.currentItem = currentItem;
@@ -182,6 +185,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
         this.cssClass = "popupList " + any(cssClass,"");
         this.closeOnClick = any(closeOnClick, false);
         this.closeHandler = any(closeHandler, function() {return true;});
+        this.linkToExternalWindow = any(linkToExternalWindow, false);
     }
 );
 

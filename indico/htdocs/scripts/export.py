@@ -18,17 +18,18 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import sys,re
+import sys,re, socket
 import datetime,sets
 
 from MaKaC.common.general import *
-from MaKaC.common import db
+from MaKaC.common import db, Config
 from MaKaC.conference import ConferenceHolder,CategoryManager
 from MaKaC.common import indexes
 from MaKaC.common import xmlGen
 from MaKaC.webinterface.urlHandlers import UHMaterialDisplay
 from MaKaC.ICALinterface.conference import ConferenceToiCal
 from MaKaC.ICALinterface.base import ICALBase
+from MaKaC.RSSinterface.conference import ACLfiltered
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface import urlHandlers
@@ -45,6 +46,13 @@ def index(req, **params):
   global ids
   db.DBMgr.getInstance().startRequest()
   minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+  hostIP = req.get_remote_host()
+  if minfo.useProxy():
+      # if we're behind a proxy, use X-Forwarded-For
+      xff = req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
+      hostIP = socket.gethostbyname(xff)
+
   if minfo.getRoomBookingModuleActive():
         DALManagerCERN.connect()
   try:
@@ -77,7 +85,7 @@ def index(req, **params):
   [year, month, day] = re.split('-',date)
   startdate = tz.localize(datetime.datetime(int(year),int(month),int(day),0,0,0))
   enddate   = startdate + datetime.timedelta(days=days,hours=23,minutes=59,seconds=59)
-  res = getConfList(startdate,enddate,ids)
+  res = getConfList(startdate, enddate, ids, hostIP)
   # filter with event type
   if event_types != ['']:
     finalres = []
@@ -310,15 +318,18 @@ def displayRSSConf(conf,rss,tz):
 def sortByStartDate(conf1,conf2):
   return cmp(conf1.getStartDate(),conf2.getStartDate())
 
-def getConfList(startdate,enddate,ids):
+def getConfList(startdate,enddate,ids, requestIP):
   #create result set
   res = sets.Set()
   #instanciate indexes
   im = indexes.IndexesHolder()
   calIdx = im.getIndex('categoryDate')
   for cid in ids:
-      confs = calIdx.getObjectsInDays(cid, startdate, enddate)
-      res.union_update(confs)
+      confs = ACLfiltered(calIdx.iterateObjectsIn(cid, startdate, enddate), requestIP)
+      for conf in confs:
+          res.add(conf)
   res = list(res)
   res.sort(sortByStartDate)
   return res
+
+

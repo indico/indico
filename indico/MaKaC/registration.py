@@ -3240,7 +3240,7 @@ class ReasonParticipationForm(BaseForm):
     def __init__(self, data=None):
         BaseForm.__init__(self)
         self._title = _("Reason for participation")
-        self._description = _("Please, let us know why you are interested on participate in our event:")
+        self._description = _("Please, let us know why you are interested to participate in our event:")
         if data is not None:
             self._title = data.get("title", self._title)
             self._description = data.get("description",self._description)
@@ -4372,7 +4372,8 @@ class Registrant(Persistent):
             res = "%s %s"%( self.getFirstName(), self.getFamilyName())
             res = res.strip()
         else:
-            res = self.getFamilyName().upper()
+            # accented letter capitalization requires all these encodes/decodes
+            res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
             if self.getFirstName() != "":
                 res = "%s, %s"%( res, self.getFirstName() )
         if title and self.getTitle() != "":

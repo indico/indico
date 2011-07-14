@@ -23,6 +23,10 @@ The ``scheduler`` module provides Indico with a scheduling API that allows speci
 (tasks to be run at given times, with a certain repeatibility, if needed).
 """
 
+class TaskDelayed(Exception):
+    def __init__(self, seconds):
+        self.delaySeconds = seconds
+
 from indico.modules.scheduler.module import SchedulerModule
 from indico.modules.scheduler.server import Scheduler
 from indico.modules.scheduler.client import Client

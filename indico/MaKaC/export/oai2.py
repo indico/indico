@@ -591,7 +591,7 @@ class DataInt:
             return self.contToXMLDC(obj, out=out)
         elif isinstance(obj, conference.SubContribution):
             return self.subContToXMLDC(obj, out=out)
-        raise "Unknown object type: %s id=%s"%(obj, obj.getId())
+        raise Exception("Unknown object type: %s id=%s"%(obj, obj.getId()))
 
     def subContToXMLDC(self, subCont, out=None):
         if not out:

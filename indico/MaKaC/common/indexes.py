@@ -715,6 +715,49 @@ class CalendarDayIndex(Persistent):
         res.difference_update(set([event for event in self._idxDay[int(datetimeToUnixTime(stDay))] if event.getStartDate() < date]))
         return res
 
+    def iterateObjectsIn(self, sDate, eDate):
+        sDay = datetime(sDate.year, sDate.month, sDate.day) if sDate else None
+        eDay = datetime(eDate.year, eDate.month, eDate.day) if eDate else None
+
+        if sDay and sDay == eDay:
+            if int(datetimeToUnixTime(sDay)) in self._idxDay:
+                for event in self._idxDay[int(datetimeToUnixTime(sDay))]:
+                    if event.getStartDate() <= eDate and event.getEndDate() >= sDate:
+                        yield event
+            return
+
+        # keep track of the records that have been already sent
+
+        if sDay and int(datetimeToUnixTime(sDay)) in self._idxDay:
+            for event in self._idxDay[int(datetimeToUnixTime(sDay))]:
+                if event.getEndDate() >= sDate:
+                    yield event
+
+        if sDay and eDay:
+            fromTS, toTS = sDay + timedelta(1), eDay - timedelta(1)
+        elif sDay:
+            fromTS, toTS = sDay + timedelta(), None
+        elif eDay:
+            fromTS, toTS = None, eDay - timedelta(1)
+        else:
+            fromTS, toTS = None, None
+
+        for evt in self.iterateObjectsInDays(fromTS, toTS):
+            yield evt
+
+        if eDay and int(datetimeToUnixTime(eDay)) in self._idxDay:
+            for event in self._idxDay[int(datetimeToUnixTime(eDay))]:
+                if event.getStartDate() <= eDate:
+                    yield event
+
+    def iterateObjectsInDays(self, sDate=None, eDate=None):
+
+        sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day))) if sDate else None
+        eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day))) if eDate else None
+        for day in self._idxDay.itervalues(sDay, eDay):
+            for event in day:
+                yield event
+
 
 class CategoryDateIndex(Persistent):
 
@@ -860,6 +903,13 @@ class CategoryDayIndex(CategoryDateIndex):
             return self._idxCategItem[categid].getObjectsInDays(sDate, eDate)
         else:
             return []
+
+    def iterateObjectsIn(self, categid, sDate, eDate):
+        if categid in self._idxCategItem:
+            return self._idxCategItem[categid].iterateObjectsIn(sDate, eDate)
+        else:
+            return []
+
 
 class PendingQueuesUsersIndex( Index ):
     _name = ""

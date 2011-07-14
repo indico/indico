@@ -32,6 +32,8 @@ from persistent import Persistent
 from MaKaC.common.Locators import Locator
 import MaKaC
 from indico.util.i18n import i18nformat
+from MaKaC.errors import MaKaCError
+from MaKaC.i18n import _
 from MaKaC.plugins import PluginLoader
 
 
@@ -189,7 +191,7 @@ class Location( Persistent, object ):
     def insertLocation( location ):
         _ensureZODBBranch()
         if not isinstance( location, Location ):
-            raise 'location attribute must be of Location class'
+            raise MaKaCError('location attribute must be of Location class')
         if Location.parse(location.friendlyName):
             # location with same name already exists
             return False
@@ -204,7 +206,7 @@ class Location( Persistent, object ):
     def removeLocation( locationName ):
         _ensureZODBBranch()
         if not isinstance( locationName, str ):
-            raise 'locationName attribute must be string'
+            raise MaKaCError('locationName attribute must be string')
         root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
         locations = root[_ROOM_BOOKING_LOCATION_LIST]
         locations = [ loc for loc in locations if loc.friendlyName != locationName ]
@@ -345,7 +347,7 @@ class ReservationGUID( Persistent, object ):
         Initializes new instance with location:Location and id:int.
         """
         if not isinstance( location, Location ):
-            raise 'location attribute must be of Location class'
+            raise MaKaCError('location attribute must be of Location class')
         self.location = location
         self.id = id
 
@@ -362,15 +364,15 @@ class ReservationGUID( Persistent, object ):
         """
         Parses guidString into ReservationGUID object.
         """
-        # TODO: check if this code is used. self is not defined, so it will fail
         try:
             loc, id = guidString.split( "|" )
             loc = loc.strip(); id = int( id.strip() )
-            self.location = Location.parse( loc )
-            if not self.location: raise ''
-            self.id = id
+            location = Location.parse( loc )
+            if not location:
+                raise MaKaCError('invalid location')
+            return ReservationGUID(location, id)
         except:
-            raise guidString + ' - invalid ReservationGUID string'
+            raise MaKaCError(guidString + ' - invalid ReservationGUID string')
 
     def getReservation( self ):
         """
@@ -395,7 +397,7 @@ class RoomGUID( Persistent, object ):
         Initializes new instance with location:Location and id:str.
         """
         if not isinstance( location, Location ):
-            raise 'location attribute must be of Location class'
+            raise MaKaCError('location attribute must be of Location class')
         self.location = location
         self.id = id
 
@@ -417,10 +419,11 @@ class RoomGUID( Persistent, object ):
             loc = loc.strip();
             id = int( id.strip() )
             location = Location.parse( loc )
-            if not location: raise 'Cannot parse location'
+            if not location:
+                raise MaKaCError('Cannot parse location')
             return RoomGUID( location, id )
         except:
-            raise guidString + ' - invalid RoomGUID string'
+            raise MaKaCError(guidString + ' - invalid RoomGUID string')
 
     def getRoom( self ):
         """

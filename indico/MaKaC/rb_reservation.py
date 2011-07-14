@@ -28,6 +28,7 @@ from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodsOverlap, overlap, Pe
     datespan
 from MaKaC.rb_location import ReservationGUID, Location, CrossLocationQueries
 from MaKaC.accessControl import AccessWrapper
+from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder, Avatar
 from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
@@ -626,7 +627,7 @@ class ReservationBase( Fossilizable ):
         # 4) Remember and return collisions.
 
         if ( rooms == None and self.room == None ) or self.startDT == None or self.endDT == None:
-            raise 'room, startDT, endDT fields must not be None'
+            raise MaKaCError('room, startDT, endDT fields must not be None')
 
         if rooms == None:
             rooms = [ self.room ]
@@ -728,6 +729,8 @@ class ReservationBase( Fossilizable ):
             retStartDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.startDT.hour, self.startDT.minute )
             retEndDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.endDT.hour, self.endDT.minute )
 
+            if retStartDT > self.endDT:
+                return None
             if self.dayIsExcluded( retStartDT.date() ):
                 return self.getNextRepeating( retStartDT )  # Recurrently ask for next
             return Period( retStartDT, retEndDT )
@@ -748,11 +751,13 @@ class ReservationBase( Fossilizable ):
             retStartDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.startDT.hour, self.startDT.minute )
             retEndDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.endDT.hour, self.endDT.minute )
 
+            if retStartDT > self.endDT:
+                return None
             if self.dayIsExcluded( retStartDT.date() ):
                 return self.getNextRepeating( retStartDT )  # Recurrently ask for next
             return Period( retStartDT, retEndDT )
 
-        raise 'Unknown repeatability type.'
+        raise MaKaCError('Unknown repeatability type.')
 
     def overlapsOn( self, startDT, endDT ):
         """
@@ -827,7 +832,7 @@ class ReservationBase( Fossilizable ):
                     return True
             return False
 
-        raise "Unknown repeatability type"
+        raise MaKaCError("Unknown repeatability type")
 
     # Excluded days management ----------------------------------------------
 
@@ -860,7 +865,7 @@ class ReservationBase( Fossilizable ):
             return 'Not applicable to non-repeating reservations.'
         for d in excludedDays:
             if not isinstance( d, date ):
-                raise 'excludedDays must contain only objects of date type (NOT datetime)'
+                raise MaKaCError('excludedDays must contain only objects of date type (NOT datetime)')
 
     def excludeDay( self, dayD ):
         """
@@ -870,7 +875,7 @@ class ReservationBase( Fossilizable ):
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
-            raise 'dayD must be of date type (NOT datetime)'
+            raise MaKaCError('dayD must be of date type (NOT datetime)')
 
     def includeDay( self, dayD ):
         """
@@ -880,7 +885,7 @@ class ReservationBase( Fossilizable ):
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
-            raise 'dayD must be of date type (NOT datetime)'
+            raise MaKaCError('dayD must be of date type (NOT datetime)')
 
     def dayIsExcluded( self, dayD ):
         """
@@ -889,7 +894,7 @@ class ReservationBase( Fossilizable ):
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
-            raise 'dayD must be of date type (NOT datetime)'
+            raise MaKaCError('dayD must be of date type (NOT datetime)')
 
 
     # Statistical ------------------------------------------------------------
@@ -1185,10 +1190,10 @@ class ReservationBase( Fossilizable ):
         elif isinstance( accessWrapper, Avatar ):
             user = accessWrapper
         else:
-            raise 'canModify requires either AccessWrapper or Avatar object'
+            raise MaKaCError('canModify requires either AccessWrapper or Avatar object')
         if not user:
             return False
-        can = user.isAdmin() or \
+        can = user.isRBAdmin() or \
             self.isOwnedBy( user ) or \
             self.room.isOwnedBy( user )
         return can
@@ -1197,19 +1202,19 @@ class ReservationBase( Fossilizable ):
         """ Owner can cancel """
         if user == None:
             return False
-        return self.isOwnedBy( user ) or user.isAdmin()
+        return self.isOwnedBy( user ) or user.isRBAdmin()
 
     def canReject( self, user ):
         """ Responsible can reject """
         if user == None:
             return False
-        return self.room.isOwnedBy( user ) or user.isAdmin()
+        return self.room.isOwnedBy( user ) or user.isRBAdmin()
 
     def canDelete( self, user ):
         """ Only admin can delete """
         if user == None:
             return False
-        return user.isAdmin()
+        return user.isRBAdmin()
 
     def isOwnedBy( self, avatar ):
         """
@@ -1376,6 +1381,14 @@ class ReservationBase( Fossilizable ):
 
         return addrs
 
+    def _getBookedForUser(self):
+        if not self.bookedForId:
+            return None
+        return AvatarHolder().getById(self.bookedForId)
+
+    def _setBookedForUser(self, avatar):
+        self.bookedForId = avatar and avatar.getId()
+
     def _eval_str( self, s ):
         ixPrv = 0
         ret = ""
@@ -1518,6 +1531,8 @@ class ReservationBase( Fossilizable ):
     weekNumber = property( _getWeekNumber )
 
     # Who and why
+    bookedForId = None    # str - for whom it is booked; avatar id (if enabled in options)
+    bookedForUser = property(_getBookedForUser, _setBookedForUser)
     bookedForName = None  # str - for whom it is booked; free text
     contactEmail = None   # str - contact; typically the person for whom the booking is done
     contactPhone = None   # str - contact; typically the person for whom the booking is done

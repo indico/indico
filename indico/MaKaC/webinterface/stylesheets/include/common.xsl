@@ -289,7 +289,7 @@
             <xsl:variable name="typeName" select="./name"/>
 
             <xsl:if test="count(./../../files/file[type=$typeName]) = 1">
-                <a href="{./../../files/file[type=$typeName][1]/url}" class="material"><img src="{./imgURL}" border="0" alt="{./imgAlt}"/></a>
+                <a href="{./../../files/file[type=$typeName][1]/url}" class="material" target="_blank"><img src="{./imgURL}" border="0" alt="{./imgAlt}"/></a>
             </xsl:if>
 
             <xsl:if test="count(./../../files/file[type=$typeName]) &gt; 1">

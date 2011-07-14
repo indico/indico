@@ -64,14 +64,14 @@ class GenericMailer:
         msg="""Content-Type: %s; charset=\"utf-8\"\r\nFrom: %s\r\nTo: %s\r\n%sSubject: %s\r\n\r\n%s"""%(ct, fromAddr,\
                 to,cc,subject,body)
         try:
-            Logger.get('mail').debug("Mailing %s  CC: %s" % (notification.getToList(), notification.getCCList()))
+            Logger.get('mail').info("Mailing %s  CC: %s" % (notification.getToList(), notification.getCCList()))
             server.sendmail(fromAddr,notification.getToList()+notification.getCCList(),msg)
         except smtplib.SMTPRecipientsRefused,e:
             server.quit()
             raise MaKaCError( _("Email address is not valid: ")+str(e.recipients))
         server.quit()
 
-        Logger.get('mail').debug('Mail sent to %s' % to)
+        Logger.get('mail').info('Mail sent to %s' % to)
 
     def sendAndLog(notification, conference, module="", user = None):
         GenericMailer.send(notification)

@@ -154,7 +154,7 @@ def doesPeriodsOverlap( *args, **kwargs ):
         return __doesPeriodsOverlap( args[0], args[1], args[2], args[3] )
     if len( args ) == 2:
         return __doesPeriodsOverlap( args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT )
-    raise '2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )'
+    raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
 def __doesPeriodsOverlap( startDT1, endDT1, startDT2, endDT2 ):
     # Dates must overlap
@@ -178,7 +178,7 @@ def overlap( *args, **kwargs ):
         return __overlap( args[0], args[1], args[2], args[3] )
     if len( args ) == 2:
         return __overlap( args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT )
-    raise '2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )'
+    raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
 
 def __overlap( startDT1, endDT1, startDT2, endDT2):
@@ -230,8 +230,8 @@ def iterdays(first, last):
     for day in iterdays( datetime.now(), datetime.now() + timedelta( 21 ) ):
         pass
     """
-    if not isinstance( first, datetime ): raise 'pass datetime' #first = datetime( first.year, first.month, first.day )
-    if not isinstance( last, datetime ): raise 'pass datetime'  #last = datetime(  last.year, last.month, last.day )
+    if not isinstance( first, datetime ): raise TypeError('pass datetime') #first = datetime( first.year, first.month, first.day )
+    if not isinstance( last, datetime ): raise TypeError('pass datetime')  #last = datetime(  last.year, last.month, last.day )
     for day in range((last - first).days + 1):
         yield first + timedelta(day)
 
@@ -280,7 +280,7 @@ def toUTC( localNaiveDT ):
     if localNaiveDT == None:
         return None
     if localNaiveDT.tzinfo != None:
-        raise 'This methods converts only _naive_ datetimes, assuming they are in local/DTS time. Naive datetimes does not contain information about timezone.'
+        raise ValueError('This methods converts only _naive_ datetimes, assuming they are in local/DTS time. Naive datetimes does not contain information about timezone.')
     return localNaiveDT + timedelta( 0, time.altzone )
 
 
@@ -289,7 +289,7 @@ def fromUTC( utcNaiveDT ):
     #    return None
     try:
         if utcNaiveDT.tzinfo != None:
-            raise 'This methods converts only _naive_ datetimes, assuming they are in UTC time. Naive datetimes does not contain information about timezone.'
+            raise ValueError('This methods converts only _naive_ datetimes, assuming they are in UTC time. Naive datetimes does not contain information about timezone.')
         return utcNaiveDT - timedelta( 0, time.altzone )
     except AttributeError:
         return None

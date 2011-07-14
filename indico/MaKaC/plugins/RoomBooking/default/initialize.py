@@ -48,7 +48,7 @@ def deleteRoomBookingBranches( force = False ):
     from both main and room booking databases.
     """
     if not force:
-        raise 'nothing done'
+        raise Exception('nothing done')
 
     indicoRoot = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
     root = DALManagerCERN().getRoot()

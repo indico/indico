@@ -54,6 +54,9 @@ from MaKaC.plugins import PluginLoader, PluginsHolder
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
 from indico.modules import ModuleHolder
+from MaKaC.errors import MaKaCError
+from MaKaC.conference import ConferenceHolder
+from MaKaC.webinterface.locators import CategoryWebLocator
 
 class WPAdminsBase( WPMainBase ):
 
@@ -132,7 +135,10 @@ class WPAdminsBase( WPMainBase ):
         self._createTabCtrl()
         self._setActiveTab()
 
-        frame = WAdminFrame()
+        if self._rh._getUser().isAdmin():
+            frame = WAdminFrame()
+        else:
+            frame = WRBAdminFrame()
         p = { "body": self._getPageContent( params ),
               "sideMenu": self._sideMenu.getHTML() }
 
@@ -227,6 +233,9 @@ class WAdminFrame(wcomponents.WTemplated):
 
     def getTitleTabPixels( self ):
         return 260
+
+class WRBAdminFrame(WAdminFrame):
+    pass
 
 class WPAdmins( WPAdminsBase ):
 
@@ -1468,11 +1477,22 @@ class WUserDetails(wcomponents.WTemplated):
         vars["categoryManager"] = ""
         categs = u.getLinkTo("category","manager")
         for categ in categs:
-            vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
+            target = CategoryWebLocator({"categId": categ.getId()}).getObject()
+            if target == None:
+                u.unlinkTo(categ,"manager")
+            else:
+                vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
+
         vars["eventManager"] = ""
+        ch = ConferenceHolder()
         events = u.getLinkTo("conference","manager")
         for event in events:
-            vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
+            try:
+                ch.getById(event.getId())
+                vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
+            except MaKaCError, e:
+                u.unlinkTo(event,"manager")
+
         return vars
 
     def getEmailsHTML(self, u):
@@ -2100,14 +2120,23 @@ class WPRoomsBase( WPAdminsBase ):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
-                urlHandlers.UHRoomBookingPluginAdmin.getURL() )
-        self._subTabMain = self._subTabRoomBooking.newSubTab( "main", _("Main"), \
-                urlHandlers.UHRoomBookingPluginAdmin.getURL() )
+        if self._rh._getUser().isAdmin():
+            self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
+                    urlHandlers.UHRoomBookingPluginAdmin.getURL() )
+            self._subTabMain = self._subTabRoomBooking.newSubTab( "main", _("Main"), \
+                    urlHandlers.UHRoomBookingPluginAdmin.getURL() )
+        else:
+            self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
+                    urlHandlers.UHRoomBookingAdmin.getURL() )
         self._subTabConfig = self._subTabRoomBooking.newSubTab( "configuration", _("Configuration"), \
                 urlHandlers.UHRoomBookingAdmin.getURL() )
         self._subTabRoomMappers = self._tabCtrl.newTab( "mappers", _("Room Mappers"), \
                 urlHandlers.UHRoomMappers.getURL() )
+
+    def _getNavigationDrawer(self):
+        if self._rh._getUser().isAdmin():
+            return wcomponents.WSimpleNavigationDrawer(_("Room Booking Admin"), urlHandlers.UHRoomBookingPluginAdmin.getURL, bgColor="white")
+        return wcomponents.WSimpleNavigationDrawer(_("Room Booking Admin"), urlHandlers.UHRoomBookingAdmin.getURL, bgColor="white")
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
@@ -2440,6 +2469,9 @@ class WPRoomBookingPluginAdminBase( WPRoomsBase ):
 
     def _setActiveTab( self ):
         self._subTabRoomBooking.setActive()
+
+    def _getSiteArea(self):
+        return 'Room Booking Administration'
 
 class WPRoomBookingPluginAdmin( WPRoomBookingPluginAdminBase ):
 

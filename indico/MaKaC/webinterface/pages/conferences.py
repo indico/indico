@@ -8606,13 +8606,7 @@ class WConfAuthorIndex(wcomponents.WTemplated):
         if len(pl)<=0:
             return ""
         auth=pl[0]
-        authCaption="%s"%auth.getFamilyName().upper()
-        #if authCaption.strip()=="":
-        #    return ""
-        #if self._selLetter!='[all]' and authCaption[0].lower()!=self._selLetter:
-        #    return ""
-        if auth.getFirstName()!="":
-            authCaption="%s, %s"%(authCaption,auth.getFirstName())
+        authCaption = auth.getFullNameNoTitle()
         itemFormatFunc=self._getContribMinView
         if self._view=="full":
             itemFormatFunc=self._getContribFullView
@@ -9056,6 +9050,8 @@ class WConfModAbstractBook(wcomponents.WTemplated):
         boaConfig=self._conf.getBOAConfig()
         vars["modURL"]=quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
         vars["text"]=boaConfig.getText()
+        vars["showIds"]=boaConfig.getShowIds()
+        vars["urlToogleShowIds"]=str(urlHandlers.UHConfModAbstractBookToogleShowIds.getURL(self._conf))
         return vars
 
 

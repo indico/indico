@@ -23,7 +23,7 @@ It sends emails to all the primary authors and speakers
 NOTE: Please, comment the "return" below this line in order
 to run the code. It was put just like a security reason.
 """
-raise "delete this line to run the code"
+raise Exception("delete this line to run the code")
 
 import sys
 sys.path.append('/soft/python/lib/python2.3/site-packages')

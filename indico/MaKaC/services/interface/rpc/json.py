@@ -103,7 +103,7 @@ def process(req):
         # read request
         requestText = req.read()
 
-        Logger.get('rpc').debug('json rpc request. request text= ' + str(requestText))
+        Logger.get('rpc').info('json rpc request. request text= ' + str(requestText))
 
         if requestText == "":
             raise RequestError("ERR-R2", "Empty request.")

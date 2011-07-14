@@ -7383,18 +7383,13 @@ class ContributionParticipation(Persistent, Fossilizable):
         return res
 
     def getFullName( self ):
-        res = self.getFamilyName().upper()
-        if self.getFirstName() != "":
-            if res.strip() != "":
-                res = "%s, %s"%( res, self.getFirstName() )
-            else:
-                res = self.getFirstName()
+        res = self.getFullNameNoTitle()
         if self.getTitle() != "":
             res = "%s %s"%( self.getTitle(), res )
         return res
 
     def getFullNameNoTitle( self ):
-        res = self.getFamilyName().upper()
+        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
         if self.getFirstName() != "":
             if res.strip() != "":
                 res = "%s, %s"%( res, self.getFirstName() )
@@ -12009,9 +12004,18 @@ class BOAConfig(Persistent):
     def __init__(self,conf):
         self._conf=conf
         self._text=""
+        self._showIds=False
 
     def getText(self):
         return self._text
 
     def setText(self,newText):
         self._text=newText.strip()
+
+    def getShowIds(self):
+        if not hasattr(self, "_showIds"):
+            self._showIds=False
+        return self._showIds
+
+    def setShowIds(self,showIds):
+        self._showIds=showIds

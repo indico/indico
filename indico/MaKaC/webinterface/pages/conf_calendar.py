@@ -35,6 +35,7 @@ from copy import copy
 from MaKaC.common.Counter import Counter
 from MaKaC.common.utils import HolidaysHolder
 import MaKaC.common.timezoneUtils as timezoneUtils
+from MaKaC.errors import MaKaCError
 
 
 class WPCalendarBase( WPMainBase ):
@@ -507,7 +508,7 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
                         if date(year,month,day) == date(int(y),int(m),int(d)):
                             bgcolor="#ffcccc"
                     except Exception,e:
-                        raise "%s-%s-%s------%s-%s-%s\nself._date:%s\ndate2:%s"%(year,month,day,y,m,d, self._date,date2)
+                        raise MaKaCError("%s-%s-%s------%s-%s-%s\nself._date:%s\ndate2:%s"%(year,month,day,y,m,d, self._date,date2))
 
                     url.addParam("day", day)
                     url.addParam("month",month)

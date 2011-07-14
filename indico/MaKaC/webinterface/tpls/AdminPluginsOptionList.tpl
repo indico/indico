@@ -348,7 +348,7 @@
                             <% checked = 'checked' %>
                         % endif
                     <input name="${ name }" type="checkbox" size="50" ${checked}>
-                    % elif option.getType() == 'list_multiline':
+                    % elif option.getType() in ('list_multiline', 'textarea'):
                     <textarea name="${ name }" cols="38">${ value }</textarea>
                     % else:
                     <input name="${ name }" type="text" size="50" value="${ value }">
@@ -363,7 +363,7 @@
                     % endif
                 % endif
             </td>
-            % if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict:
+            % if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict or option.getNote():
             <td style="width: 40%">
                 % if option.getType() == int:
                 <span style="color: orange; font-size: smaller;">${ _("Please input an integer")}</span>
@@ -376,6 +376,8 @@
                 <% warningText = _("Please input keys and values in Python syntax. No unicode objects allowed. Example: {\"john\":\"tall\", \"pete\":\"short\"}") %>
                 ${ warningText }
                 </span>
+                % elif option.getNote():
+                <span style="color: orange; font-size: smaller;">${ option.getNote() }</span>
                 % endif
             </td>
             % else:

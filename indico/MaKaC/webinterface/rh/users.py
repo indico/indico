@@ -26,7 +26,6 @@ import MaKaC.common.info as info
 import MaKaC.errors as errors
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.mail as mail
-import MaKaC.common.indexes as indexes
 from MaKaC.common.general import *
 from MaKaC.errors import MaKaCError, ModificationError
 from MaKaC.accessControl import AdminList
@@ -262,15 +261,15 @@ class RHUserExistWithIdentity( RH ):
 
 class _UserUtils:
 
-    def setUserData( self, a, userData):
-        a.setName( userData["name"] )
-        a.setSurName( userData["surName"] )
+    def setUserData(self, a, userData, reindex=False):
+        a.setName( userData["name"], reindex=reindex )
+        a.setSurName( userData["surName"], reindex=reindex )
         a.setTitle( userData["title"] )
-        a.setOrganisation( userData["organisation"] )
+        a.setOrganisation( userData["organisation"], reindex=reindex )
         if userData.has_key("lang"):
             a.setLang( userData["lang"] )
         a.setAddress( userData["address"] )
-        a.setEmail( userData["email"] )
+        a.setEmail( userData["email"], reindex )
         a.setSecondaryEmails( userData.get("secEmails", [] ))
         a.setTelephone( userData["telephone"] )
         a.setFax( userData["fax"] )

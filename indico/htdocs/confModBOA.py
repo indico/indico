@@ -27,5 +27,6 @@ def index(req, **params):
 def edit(req, **params):
     return conferenceModif.RHAbstractBookEdit( req ).process( params )
 
-
+def toogleShowIds(req, **params):
+    return conferenceModif.RHAbstractBookToogleShowIds( req ).process( params )
 

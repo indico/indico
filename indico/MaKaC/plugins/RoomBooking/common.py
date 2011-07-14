@@ -17,18 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.plugins.base import PluginsHolder
 
-import sys
-sys.path.append("c:/development/indico/code/code")
-from MaKaC.common import DBMgr
-
-DBMgr.getInstance().startRequest()
-from MaKaC.conference import ConferenceHolder,AcceptedContribution
-for conf in ConferenceHolder().getList():
-    for contrib in conf.getContributionList():
-        if isinstance(contrib,AcceptedContribution):
-            try:
-                assert (len(contrib.getSubmitterList())>=1)
-            except AssertionError:
-                raise Exception("conf %s - contrib %s"%(conf.getId(),contrib.getId()))
-DBMgr.getInstance().endRequest()
+def getRoomBookingOption(opt):
+    return PluginsHolder().getPluginType('RoomBooking').getOption(opt).getValue()

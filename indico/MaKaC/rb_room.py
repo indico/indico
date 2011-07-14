@@ -27,6 +27,7 @@ from MaKaC.rb_tools import Impersistant, checkPresence, iterdays
 from MaKaC.rb_location import Location, RoomGUID, CrossLocationQueries
 from MaKaC.user import Avatar, AvatarHolder
 from MaKaC.accessControl import AccessWrapper
+from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
 
 
@@ -355,7 +356,7 @@ class RoomBase( object ):
         elif isinstance( eq, str ):
             self._equipment = eq
             return
-        raise 'Invalid equipment list'
+        raise MaKaCError('Invalid equipment list')
 
     def getEquipment( self ):
         """
@@ -380,11 +381,11 @@ class RoomBase( object ):
 
     def isCloseToBuilding( self, buildingNr ):
         """ Returns true if room is close to the specified building """
-        raise 'Not implemented'
+        raise NotImplementedError('Not implemented')
 
     def belongsTo( self, user ):
         """ Returns true if current CrbsUser is responsible for this room """
-        raise 'Not implemented'
+        raise NotImplementedError('Not implemented')
 
     # "System" ---------------------------------------------------------------
 
@@ -522,7 +523,7 @@ class RoomBase( object ):
             return False
 
         if (self.isOwnedBy( user ) and self.isActive) \
-               or user.isAdmin():
+               or user.isRBAdmin():
             return True
         return False
 
@@ -542,7 +543,7 @@ class RoomBase( object ):
         if user == None:
             return False
         if (self.isOwnedBy( user ) and self.isActive) \
-               or user.isAdmin():
+               or user.isRBAdmin():
             return True
         return False
 
@@ -555,13 +556,13 @@ class RoomBase( object ):
             return False
         if isinstance( accessWrapper, AccessWrapper ):
             if accessWrapper.getUser():
-                return accessWrapper.getUser().isAdmin()
+                return accessWrapper.getUser().isRBAdmin()
             else:
                 return False
         elif isinstance( accessWrapper, Avatar ):
-            return accessWrapper.isAdmin()
+            return accessWrapper.isRBAdmin()
 
-        raise 'canModify requires either AccessWrapper or Avatar object'
+        raise MaKaCError('canModify requires either AccessWrapper or Avatar object')
 
     def canDelete( self, user ):
         return self.canModify( user )
@@ -596,7 +597,7 @@ class RoomBase( object ):
 
     def setLocationName( self, locationName ):
         if self.__class__.__name__ == 'RoomBase':
-            raise 'This method is purely virtual. Call it only on derived objects.'
+            raise MaKaCError('This method is purely virtual. Call it only on derived objects.')
         return self.setLocationName( locationName ) # Subclass
 
     def getAccessKey( self ): return ""
@@ -711,6 +712,8 @@ class RoomBase( object ):
            roomNr: #{self.roomNr}
      isReservable: #{self.isReservable}
 rNeedConfirmation: #{self.resvsNeedConfirmation}
+startNotification: #{self.resvStartNotification}
+  endNotification: #{self.resvEndNotification}
 
              site: #{self.site}
          capacity: #{self.capacity}
@@ -776,6 +779,9 @@ rNeedConfirmation: #{self.resvsNeedConfirmation}
     isReservable = None   # bool - whether the room is reservable
     photoId = property( _getPhotoId, _setPhotoId )        # str - room picture id
     externalId = None     # str - custom external room id, i.e. for locating on the map
+
+    resvStartNotification = False # bool - whether to send notifications on booking start
+    resvEndNotification = False # bool - whether to send notifications on booking end
 
     telephone = None      # str
     surfaceArea = None    # int, positive - in meters^2

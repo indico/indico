@@ -18,17 +18,24 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import sys
-sys.path.append("c:/development/indico/code/code")
-from MaKaC.common import DBMgr
+from indico.core.api import IListener
 
-DBMgr.getInstance().startRequest()
-from MaKaC.conference import ConferenceHolder,AcceptedContribution
-for conf in ConferenceHolder().getList():
-    for contrib in conf.getContributionList():
-        if isinstance(contrib,AcceptedContribution):
-            try:
-                assert (len(contrib.getSubmitterList())>=1)
-            except AssertionError:
-                raise Exception("conf %s - contrib %s"%(conf.getId(),contrib.getId()))
-DBMgr.getInstance().endRequest()
+
+class IReservationListener(IListener):
+    """Used for handling events related to room reservations"""
+
+    def reservationCreated(self):
+        """Sent when a reservation is created"""
+
+    def reservationUpdated(self):
+        """Sent when a reservation is modified"""
+
+    def reservationDeleted(self):
+        """Sent when a reservation is deleted"""
+
+class IReservationStartStopListener(IListener):
+    def reservationStarted(self, resv):
+        """Sent when a reservation has started (executed by task daemon) """
+
+    def reservationFinished(self, resv):
+        """Sent when a reservation has started (executed by task daemon) """

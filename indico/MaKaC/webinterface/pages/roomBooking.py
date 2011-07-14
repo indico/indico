@@ -160,6 +160,11 @@ class WPRoomBookingBase( WPMainBase ):
                                         enabled=self._showResponsible)
 
 
+        if self._rh._getUser().isRBAdmin():
+            self._adminSect = wcomponents.SideMenuSection(_("Administration"), \
+                                            urlHandlers.UHRoomBookingAdmin.getURL() )
+            self._adminOpt = wcomponents.SideMenuItem(_("Administration"), \
+                                            urlHandlers.UHRoomBookingAdmin.getURL() )
 
         self._leftMenu.addSection( self._roomsOpt )
         self._roomsOpt.addItem( self._roomSearchOpt )
@@ -178,6 +183,9 @@ class WPRoomBookingBase( WPMainBase ):
         self._blockingsOpt.addItem( self._blockRooms )
         self._blockingsOpt.addItem( self._myBlockingListOpt )
         self._blockingsOpt.addItem( self._usersBlockings )
+        if self._rh._getUser().isRBAdmin():
+            self._leftMenu.addSection( self._adminSect )
+            self._adminSect.addItem( self._adminOpt )
         return self._leftMenu
 
     def _isRoomBooking(self):
@@ -406,6 +414,10 @@ class WPRoomBookingBookingDetails( WPRoomBookingBase ):
 # 4. New booking
 
 class WPRoomBookingBookingForm( WPRoomBookingBase ):
+
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+               self._includeJSPackage('Management')
 
     def __init__( self, rh ):
         self._rh = rh

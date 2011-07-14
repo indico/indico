@@ -25,7 +25,7 @@ from datetime import datetime
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 #from MaKaC.registration import AccommodationType, SocialEventItem, RegistrationSession, GeneralSectionForm, GeneralField, FieldInputs, RadioItem, Status, StatusValue
-from MaKaC.errors import FormValuesError
+from MaKaC.errors import FormValuesError, MaKaCError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages import registrationForm
@@ -233,7 +233,7 @@ class RHModifModule:
             try:
                 rhmod = module.webinterface.rh
             except:
-                raise "%s"%module
+                raise MaKaCError("%s"%module)
             requestTag = params.get("requestTag", "No requestTag")
             rh = rhmod.getRHByTag(rhmod, requestTag)
             if rh:

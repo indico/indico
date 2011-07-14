@@ -273,7 +273,7 @@ class AbstractParticipation(Persistent):
         return self._title
 
     def getFullName( self ):
-        res = self.getSurName().upper()
+        res = self.getSurName().decode('utf-8').upper().encode('utf-8')
         tmp=[]
         for name in self.getFirstName().lower().split(" "):
             if name.strip() == "":

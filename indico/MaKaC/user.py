@@ -53,6 +53,7 @@ import urllib
 import base64
 from xml.dom.minidom import parseString
 from copy import deepcopy
+from MaKaC.plugins.base import PluginsHolder
 
 """Contains the classes that implement the user management subsystem
 """
@@ -538,6 +539,7 @@ class Avatar(Persistent, Fossilizable):
                                 email*, telephone*, fax*
         """
         self.id = ""
+        self.personId = None
         self.name = ""
         self.surName = ""
         self.title = ""
@@ -964,8 +966,20 @@ class Avatar(Persistent, Fossilizable):
     def getId(self):
         return self.id
 
-    def setName(self, name):
-        self.name = name
+    def setPersonId(self, personId):
+        self.personId = personId
+
+    def getPersonId(self):
+        return getattr(self, 'personId', None)
+
+    def setName(self, name, reindex=False):
+        if reindex:
+            idx = indexes.IndexesHolder().getById('name')
+            idx.unindexUser(self)
+            self.name = name
+            idx.indexUser(self)
+        else:
+            self.name = name
         self._p_changed = 1
 
     def getName(self):
@@ -974,8 +988,14 @@ class Avatar(Persistent, Fossilizable):
     def getFirstName(self):
         return self.name
 
-    def setSurName(self, name):
-        self.surName = name
+    def setSurName(self, name, reindex=False):
+        if reindex:
+            idx = indexes.IndexesHolder().getById('surName')
+            idx.unindexUser(self)
+            self.surName = name
+            idx.indexUser(self)
+        else:
+            self.surName = name
 
     def getSurName(self):
         return self.surName
@@ -986,7 +1006,8 @@ class Avatar(Persistent, Fossilizable):
     def getFullName(self):
         surName = ""
         if self.getSurName() != "":
-            surName = "%s, "%self.getSurName().upper()
+            # accented letter capitalization requires all these encodes/decodes
+            surName = "%s, " % self.getSurName().decode('utf-8').upper().encode('utf-8')
         return "%s%s"%(surName, self.getName())
 
     def getStraightFullName(self):
@@ -1003,12 +1024,24 @@ class Avatar(Persistent, Fossilizable):
             res = "%s%s."%(res, self.getName()[0].upper())
         return res
 
-    def addOrganisation(self, newOrg):
-        self.organisation.append(newOrg.strip())
+    def addOrganisation(self, newOrg, reindex=False):
+        if reindex:
+            idx = indexes.IndexesHolder().getById('organisation')
+            idx.unindexUser(self)
+            self.organisation.append(newOrg.strip())
+            idx.indexUser(self)
+        else:
+            self.organisation.append(newOrg.strip())
         self._p_changed = 1
 
-    def setOrganisation(self, org, item=0):
-        self.organisation[item] = org.strip()
+    def setOrganisation(self, org, item=0, reindex=False):
+        if reindex:
+            idx = indexes.IndexesHolder().getById('organisation')
+            idx.unindexUser(self)
+            self.organisation[item] = org.strip()
+            idx.indexUser(self)
+        else:
+            self.organisation[item] = org.strip()
         self._p_changed = 1
 
     setAffiliation = setOrganisation
@@ -1072,8 +1105,14 @@ class Avatar(Persistent, Fossilizable):
         self.address[item] = address
         self._p_changed = 1
 
-    def setEmail(self, email, item=0 ):
-        self.email = email.strip().lower()
+    def setEmail(self, email, reindex=False):
+        if reindex:
+            idx = indexes.IndexesHolder().getById('email')
+            idx.unindexUser(self)
+            self.email = email.strip().lower()
+            idx.indexUser(self)
+        else:
+            self.email = email.strip().lower()
 
     def getEmails( self ):
         return [self.email] + self.getSecondaryEmails()
@@ -1297,6 +1336,19 @@ class Avatar(Persistent, Fossilizable):
         al = AdminList.getInstance()
         if al.isAdmin( self ):
             return True
+        return False
+
+    def isRBAdmin(self):
+        """
+        Convenience method for checking whether this user is an admin for the RB module.
+        Returns bool.
+        """
+        if self.isAdmin():
+            return True
+        for entity in PluginsHolder().getPluginType('RoomBooking').getOption('Managers').getValue():
+            if (isinstance(entity, Group) and entity.containsUser(self)) or \
+                (isinstance(entity, Avatar) and entity == self):
+                return True
         return False
 
     def getRooms( self ):
