@@ -3298,25 +3298,26 @@ class WConferenceList(WTemplated):
         today = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0)
         thisMonth = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0, day=1)
         thisMonthTS = utc_timestamp(thisMonth)
+        nextMonthTS = utc_timestamp(thisMonth.replace(month = (thisMonth.month % 12) + 1))
         todayTS = utc_timestamp(thisMonth)
-        tomorrowTS = utc_timestamp(today + timedelta(days=1))
-        oneMonthTS = utc_timestamp(today - timedelta(days=30))
+        oneMonthTS = utc_timestamp((today - timedelta(days=30)).replace(day=1))
         future = []
         present = []
 
         for ts, conf in index.iteritems(thisMonthTS):
-            if ts < tomorrowTS or len(present) < OPTIMAL_PRESENT_EVENTS:
+            if ts < nextMonthTS or len(present) < OPTIMAL_PRESENT_EVENTS:
                 present.append(conf)
             else:
                 future.append(conf)
 
         if len(present) < MIN_PRESENT_EVENTS:
-            extraEvents = list(index.itervalues(oneMonthTS, todayTS))
+            extraEvents = index.values(oneMonthTS, todayTS)
             present += extraEvents
 
         if not present:
-            present = [elem for elem in index[index.maxKey()]]
-
+            maxDT = timezone('UTC').localize(datetime.utcfromtimestamp(index.maxKey())).astimezone(timezone(tz))
+            prevMonthTS = utc_timestamp(maxDT.replace(day=1))
+            present = index.values(prevMonthTS)
         numPast = self._categ.getNumConferences() - len(present) - len(future)
         return present, future, len(future), numPast
 

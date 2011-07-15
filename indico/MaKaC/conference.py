@@ -1196,12 +1196,13 @@ class Category(CommonObjectBase):
         return prev, nextEvt, first, last
 
     def _setNumConferences(self):
-        self._numConferences=0
-        if len(self.getSubCategoryList())>0:
+        self._numConferences = 0
+        if self.conferences:
+            self._incNumConfs(len(self.conferences))
+        else:
             for sc in self.getSubCategoryList():
                 self._incNumConfs(sc.getNumConferences())
-        else:
-            self._incNumConfs(len(self.conferences))
+
 
     def getNumConferences( self ):
         """returns the total number of conferences contained in the current
