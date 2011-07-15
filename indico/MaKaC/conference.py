@@ -1104,6 +1104,8 @@ class Category(CommonObjectBase):
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateIdx.unindexConf(conf)
 
+        Catalog.getIdx('categ_conf_sd').unindex_obj(conf)
+
     def newConference( self, creator, id="", creationDate=None, modificationDate=None ):
         conf = Conference( creator, id, creationDate, modificationDate )
         ConferenceHolder().add( conf )
