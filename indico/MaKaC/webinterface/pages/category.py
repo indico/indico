@@ -44,7 +44,6 @@ from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
-from indico.util.i18n import i18nformat
 from indico.core.index import Catalog
 
 
