@@ -36,7 +36,7 @@ print "set up list of keys to be deleted"
 for key in keys:
   value = sm[key]
   try:
-    if value.get_access_age() > websessionDelay:
+    if value.get_creation_age() > websessionDelay:
       todelete.append(key)
       deleted+=1
   except:
