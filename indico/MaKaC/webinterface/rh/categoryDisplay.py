@@ -244,7 +244,9 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
 
     def _createEvent(self, params):
         c = self._target.newConference( self._getUser() )
-        UtilsConference.setValues( c, self._params )
+
+        UtilsConference.setValues( c, self._params, creating=True )
+
         if self._wf:
             self._wfReg.registerFactory( c, self._wf )
 
@@ -410,7 +412,7 @@ class UtilPersons:
 
 class UtilsConference:
 
-    def setValues(c, confData, notify=False):
+    def setValues(c, confData, notify=False, creating=False):
         from MaKaC.webinterface.common.tools import escape_tags_short_url
         c.setTitle( confData["title"] )
         c.setDescription( confData["description"] )
@@ -456,7 +458,8 @@ class UtilsConference:
                 raise FormValuesError("The end date you have entered is not correct: %s"%e)
         moveEntries = int(confData.get("move",0))
         c.setDates( sDate.astimezone(timezone('UTC')), \
-                    eDate.astimezone(timezone('UTC')), moveEntries = moveEntries )
+                    eDate.astimezone(timezone('UTC')), moveEntries=moveEntries,
+                    creating=creating)
 
         #################################
         # Fermi timezone awareness(end) #

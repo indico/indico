@@ -167,6 +167,9 @@ class DIndex(SIndex):
         super(DIndex, self).__init__(adapter)
         self._rev_index = self._rev_class()
 
+    def has_obj(self, obj):
+        return obj.getUniqueId() in self._rev_index
+
     def index_obj(self, obj):
 
         if not IUniqueIdProvider.providedBy(obj):
@@ -182,7 +185,7 @@ class DIndex(SIndex):
         ts = self._rev_index.get(uid, self._rev_set_class())
 
         if value in ts:
-            raise ElementAlreadyInIndexException()
+            raise ElementAlreadyInIndexException((value, obj))
         else:
             ts.add(value)
 

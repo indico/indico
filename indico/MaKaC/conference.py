@@ -2437,6 +2437,7 @@ class Conference(CommonObjectBase, Locatable):
 
         Catalog.getIdx('categ_conf_sd').index_obj(self)
 
+
     def unindexConf( self ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.unindexConf(self)
@@ -2730,7 +2731,7 @@ class Conference(CommonObjectBase, Locatable):
             self._observers = []
         return self._observers
 
-    def setDates( self, sDate, eDate=None, check=1, moveEntries=0 ):
+    def setDates( self, sDate, eDate=None, check=1, moveEntries=0, creating=False):
         """
         Set the start/end date for a conference
         """
@@ -2771,8 +2772,10 @@ class Conference(CommonObjectBase, Locatable):
                     _("You should try using a larger timespan."))
 
         # so, we really need to try changing something
-        # let's get to work and remove the conference from the date indexes
-        self.unindexConf()
+
+        if not creating:
+            # let's get to work and remove the conference from the date indexes
+            self.unindexConf()
 
         # set the dates
         self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
