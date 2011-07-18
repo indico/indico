@@ -1091,22 +1091,16 @@ class Category(CommonObjectBase):
         return ""
 
     def indexConf( self, conf ):
-        calIdx = indexes.IndexesHolder().getIndex('calendar')
-        calIdx.indexConf(conf)
+        # Specific for category changes, calls Conference.indexConf()
+        # (date-related indexes)
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.indexConf(conf)
-        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
-        catDateIdx.indexConf(conf)
+        conf.indexConf()
 
     def unindexConf( self, conf ):
-        calIdx = indexes.IndexesHolder().getIndex('calendar')
-        calIdx.unindexConf(conf)
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.unindexConf(conf)
-        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
-        catDateIdx.unindexConf(conf)
-
-        Catalog.getIdx('categ_conf_sd').unindex_obj(conf)
+        conf.unindexConf()
 
     def newConference( self, creator, id="", creationDate=None, modificationDate=None ):
         conf = Conference( creator, id, creationDate, modificationDate )
@@ -2055,7 +2049,6 @@ class Conference(CommonObjectBase, Locatable):
         self._closed = False
         self._visibility = 999
         self._pendingQueuesMgr=pendingQueues.ConfPendingQueuesMgr(self)
-#        self.indexConf()
         self._sections = []
         self._participation = Participation(self)
         self._logHandler = LogHandler()
@@ -2434,6 +2427,9 @@ class Conference(CommonObjectBase, Locatable):
         self._closed = closed
 
     def indexConf( self ):
+        # called when event dates change
+        # see also Category.indexConf()
+
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.indexConf(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
@@ -2735,7 +2731,7 @@ class Conference(CommonObjectBase, Locatable):
             self._observers = []
         return self._observers
 
-    def setDates( self, sDate, eDate=None, check=1, moveEntries=0, creating=False):
+    def setDates( self, sDate, eDate=None, check=1, moveEntries=0):
         """
         Set the start/end date for a conference
         """
@@ -2777,9 +2773,7 @@ class Conference(CommonObjectBase, Locatable):
 
         # so, we really need to try changing something
 
-        if not creating:
-            # let's get to work and remove the conference from the date indexes
-            self.unindexConf()
+        self.unindexConf()
 
         # set the dates
         self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
