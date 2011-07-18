@@ -61,7 +61,7 @@ class CategoryToiCal(ICALBase):
 
         text = self._printHeader()
         # get all visible events in category
-        confs = set(ACLfiltered(calIdx.iterateObjectsIn(self._categ.getId(), None, None), self._req.getHostIP()))
+        confs = set(ACLfiltered(calIdx.iterateObjectsIn(self._categ.getId(), None, None), self._req.getHostIP(), self._req.getAW()))
 
         for conf in confs:
             text += ConferenceToiCal(conf).getCore()

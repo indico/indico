@@ -29,7 +29,7 @@ from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.common.info as info
 
 
-def ACLfiltered(iter, requestIP):
+def ACLfiltered(iter, requestIP, aw=None):
 
     acl = Config.getInstance().getExportACL().iteritems()
     blIds = list(categ for (categ, iplist) in acl if (requestIP not in iplist))
@@ -38,7 +38,10 @@ def ACLfiltered(iter, requestIP):
         owners = list(categ.getId() for categ in conf.getOwnerPath()) + ['0']
         for blId in blIds:
             if blId in owners:
-                break
+                if aw and aw.getUser() and conf.canAccess(aw):
+                    yield conf
+                else:
+                    break
         else:
             yield conf
 
@@ -65,7 +68,7 @@ class CategoryToRSS:
 
         sconfs = set()
 
-        sconfs = set(ACLfiltered(confs, self._req.getHostIP()))
+        sconfs = set(ACLfiltered(confs, self._req.getHostIP(), self._req.getAW()))
         res = list(sconfs)
         res.sort(sortByStartDate)
         rss = xmlGen.XMLGen()
@@ -89,7 +92,7 @@ class CategoryToRSS:
         return rss.getXml()
 
 class ConferenceToRSS:
-    
+
     def __init__(self, conf, tz=None):
         self._conf = conf
         self._protected = conf.hasAnyProtection()
@@ -115,7 +118,7 @@ class ConferenceToRSS:
         else:
             desc = ""
 
-        rss.writeTag("description", desc )        
+        rss.writeTag("description", desc )
         rss.writeTag("pubDate", self._conf.getAdjustedModificationDate(self._tz).strftime("%a, %d %b %Y %H:%M:%S %Z"))
         rss.writeTag("guid",url)
         rss.closeTag("item")
