@@ -34,6 +34,7 @@ from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 
+from indico.core.index import Catalog
 from indico.ext import livesync
 from indico.util import console
 from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
@@ -158,7 +159,7 @@ def runConferenceMigration(dbi, withRBDB):
 
         # Convert RegistrationSessions to RegistrantSessions
         if isinstance(obj, Conference):
-            for reg in obj.getRegistrants().values():
+            for reg in obj.getRegistrants().itervalues():
                 if reg._sessions and \
                        isinstance(reg._sessions[0], RegistrationSession):
                     reg._sessions = [RegistrantSession(ses, reg) \
@@ -230,13 +231,20 @@ If you still want to regenerate it, please, do it manually using """ \
         """bin/migration/CategoryDate.py"""
 
 
+def runCatalogMigration(dbi, withRBDB):
+    """
+    Initializing the new index catalog
+    """
+    Catalog.updateDB(dbi=dbi)
+
+
 def runCategoryConfDictToTreeSet(dbi, withRBDB):
     """
     Replacing the conference dictionary in the Category objects by a OOTreeSet.
     """
-    for categ in CategoryManager()._getIdx().values():
+    for categ in CategoryManager()._getIdx().itervalues():
         categ.conferencesBackup = categ.conferences.values()
-        categ.conferences = OOTreeSet(categ.conferences.values())
+        categ.conferences = OOTreeSet(categ.conferences.itervalues())
         if len(categ.conferences) != len(categ.conferencesBackup):
             print "Problem migrating conf dict to tree set: %s" % categ.getId()
 
@@ -248,7 +256,8 @@ def runMigration(withRBDB=False):
              runConferenceMigration,
              runTaskMigration,
              runCategoryConfDictToTreeSet,
-             runCategoryDateIndexMigration]
+             runCategoryDateIndexMigration,
+             runCatalogMigration]
 
     print "\nExecuting migration...\n"
 
