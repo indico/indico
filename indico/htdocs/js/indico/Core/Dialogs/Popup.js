@@ -65,6 +65,7 @@ type("ExclusivePopup", ["Printable"], {
             content = '';
         }
         else if(content.dom) {
+            // support indico XElement objects
             content = content.dom;
         }
 
