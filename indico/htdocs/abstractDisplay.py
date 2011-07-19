@@ -30,5 +30,4 @@ def pdf(req, **params):
 
 
 def abstractsPdf(req, **params):
-    import pydevd;pydevd.settrace()
     return CFADisplay.RHAbstractsDisplayPDF( req ).process( params )
