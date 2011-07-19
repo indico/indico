@@ -2437,7 +2437,6 @@ class Conference(CommonObjectBase, Locatable):
 
         Catalog.getIdx('categ_conf_sd').index_obj(self)
 
-
     def unindexConf( self ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.unindexConf(self)

@@ -36,7 +36,9 @@ class CategoryEventStartDateIndex(Index):
         self._container[key] = value
 
     def getCategory(self, categId):
-        return self._container.get(categId, IOIndex(IIndexableByStartDateTime))
+        if categId not in self._container:
+            self._container[categId] =  IOIndex(IIndexableByStartDateTime)
+        return self._container[categId]
 
     def index_obj(self, obj):
         self.getCategory(obj.getOwner().getId()).index_obj(obj)
