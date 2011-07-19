@@ -151,7 +151,6 @@ class SIndex(Index):
         return self._fwd_index.get(item, default)
 
 
-
 class DIndex(SIndex):
     """
     Bidirectional Index Class
@@ -209,6 +208,40 @@ class DIndex(SIndex):
             raise ElementNotFoundException(uid)
 
         self._num_objs.change(-1)
+
+    def _check(self, dbi=None):
+        """
+        Simple sanity check
+        """
+        i = 0
+        # check that the elements in fwd index are also in rev index
+        cls = self.__class__.__name__
+        for ts, eset in self._fwd_index.iteritems():
+            if not eset:
+                yield "[%s] Element set at '%s' is empty" % ts
+            for elem in eset:
+                uid = elem.getUniqueId()
+                key = self._adapter(elem)
+                if uid not in self._rev_index:
+                    yield "[%s] An entry for '%s'(%s) should exist in _rev_index" \
+                          % (cls, uid, ts)
+                elif key not in self._rev_index[uid]:
+                    yield "[%s] Element '%s'(%s) should be in _rev_index['%s']" \
+                          % (cls, uid, ts, key)
+            if dbi and i % 1000 == 999:
+                dbi.abort()
+            i += 1
+
+        # now the opposite
+        for uid, kset in self._rev_index.iteritems():
+            for key in kset:
+                if key not in self._fwd_index:
+                    yield "[%s] Key '%s' not found in _fwd_index" % (cls, key)
+                elif uid not in map(lambda x:x.getUniqueId(), self._fwd_index[key]):
+                    yield "[%s] Object '%s' not in _fwd_index[%s]" % (cls, uid, key)
+            if dbi and i % 1000 == 999:
+                dbi.abort()
+            i += 1
 
 
 class SIOIndex(DIndex):
