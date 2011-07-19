@@ -107,6 +107,9 @@
             'Edit entry': '<xsl:value-of select="$item/modifyLink"/>',
             </xsl:when>
         </xsl:choose>
+        <xsl:if test="$item/sessionTimetableLink != ''">
+            'Edit session timetable': '<xsl:value-of select="$item/sessionTimetableLink"/>',
+        </xsl:if>
         <xsl:if test="$item/cloneLink != ''">
             'Clone event': '<xsl:value-of select="$item/cloneLink"/>',
         </xsl:if>
