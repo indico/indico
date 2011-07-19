@@ -59,3 +59,30 @@ class CategoryEventStartDateIndex(Index):
             self[cid] = self._initializeSubIndex(categ.conferences)
             if dbi:
                 dbi.commit()
+
+    def _check(self, dbi=None):
+        from MaKaC.conference import CategoryManager, ConferenceHolder
+        confIdx = ConferenceHolder()._getIdx()
+        categIdx = CategoryManager()._getIdx()
+
+        i = 0
+
+        for cid, index in self._container.iteritems():
+            # simple data structure check
+            for problem in index._check():
+                yield problem
+
+            # consistency with CategoryManager
+            if cid not in categIdx:
+                yield "Category '%s' not in CategoryManager" % cid
+
+            # consistency with ConferenceHolder
+            for ts, conf in index.iteritems():
+                if conf.getId() not in confIdx:
+                    yield "[%s] Conference '%s'(%s) not in ConferenceHolder" \
+                          % (cid, conf.getId(), ts)
+
+                if dbi and i % 100 == 99:
+                    dbi.abort()
+
+                i += 1

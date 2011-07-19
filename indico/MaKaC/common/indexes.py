@@ -34,7 +34,8 @@ from pytz import timezone
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
 from zope.index.text import textindex
-
+import pytz
+import itertools
 
 # BTrees are 32 bit by default
 # TODO: make this configurable
@@ -296,6 +297,27 @@ class CategoryIndex(Persistent):
             return self._idxCategItem[categid]
         else:
             return []
+
+    def _check(self, dbi=None):
+        """
+        Performs some sanity checks
+        """
+        i = 0
+        from MaKaC.conference import ConferenceHolder
+        confIdx = ConferenceHolder()._getIdx()
+
+        for cid, confs in self._idxCategItem.iteritems():
+            for confId in confs:
+                # it has to be in the conference holder
+                if confId not in confIdx:
+                    yield "[%s] '%s' not in ConferenceHolder" % (cid, confId)
+                # the category has to be one of the owners
+                elif cid not in (map(lambda x:x.id, ConferenceHolder().getById(confId).getOwnerPath()) + ['0']):
+                    yield "[%s] Conference '%s' is not owned" % (cid, confId)
+            if dbi and i % 100 == 99:
+                dbi.sync()
+            i += 1
+
 
 class CalendarIndex(Persistent):
     """Implements a persistent calendar-like index. Objects (need to implement
@@ -563,20 +585,41 @@ class CalendarIndex(Persistent):
     def getObjectsStartingAfter( self, date ):
         return self._getObjectsStartingAfter( date )
 
-    #def getObjectsStartingInYear( self, year ):
-    #    lastDay = datetime( year, 12, 31 )
-    #    s1 = sets.Set()
-    #    # Objects starting before last day of year (included):
-    #    s1 = self._getObjectsStartingBefore(lastDay + timedelta(days=1))
-    #    if not s1:
-    #        return s1
-    #    firstDay = datetime( year, 1, 1 )
-    #    s2 = sets.Set()
-    #    # Objects starting before first day of year (excluded):
-    #    s2 = self._getObjectsStartingBefore(firstDay)
-    #    # Difference:
-    #    s1.difference_update( s2 )
-    #    return s1
+    def _check(self, dbi=None):
+        """
+        Performs some sanity checks
+        """
+
+        from MaKaC.conference import ConferenceHolder
+        confIdx = ConferenceHolder()._getIdx()
+
+        def _check_index(desc, index, func):
+            i = 0
+            for ts, confs in index.iteritems():
+                for confId in confs:
+                    # it has to be in the conference holder
+                    if confId not in confIdx:
+                        yield "[%s][%s] '%s' not in ConferenceHolder" % (desc, ts, confId)
+                    else:
+
+                        conf = ConferenceHolder().getById(confId)
+                        try:
+                            expectedDate = date2utctimestamp(func(conf))
+                        except OverflowError:
+                            expectedDate = 'overflow'
+
+                        # ts must be ok
+                        if ts != expectedDate:
+                            yield "[%s][%s] Conference '%s' has bogus date (should be '%s')" % (desc, ts, confId, expectedDate)
+                    if dbi and i % 100 == 99:
+                        dbi.sync()
+                    i += 1
+
+        return itertools.chain(
+            _check_index('sdate', self._idxSdate, lambda x: x.getStartDate()),
+            _check_index('edate', self._idxEdate, lambda x: x.getEndDate()))
+
+
 class CalendarDayIndex(Persistent):
     def __init__( self ):
         self._idxDay = IOBTree()
@@ -763,6 +806,36 @@ class CalendarDayIndex(Persistent):
             for event in day:
                 yield event
 
+        i = 0
+        confIdx = ConferenceHolder()._getIdx()
+
+    def _check(self, dbi=None, categId=''):
+        """
+        Performs some sanity checks
+        """
+        i = 0
+        from MaKaC.conference import ConferenceHolder
+        confIdx = ConferenceHolder()._getIdx()
+
+        for ts, confs in self._idxDay.iteritems():
+            dt = pytz.timezone('UTC').localize(datetime.utcfromtimestamp(ts))
+
+            for confId in confs:
+                # it has to be in the conference holder
+                if confId not in confIdx:
+                    yield "[%s][%s] '%s' not in ConferenceHolder" % (ts, categId, confId)
+                else:
+                    conf = ConferenceHolder().getById(confId)
+                # date must be ok
+                    if date > conf.getEndDate() or date < conf.getStartDate():
+                        yield "[%s] '%s' has date out of bounds '%s'(%s)" % (categId, confId, ts, dt)
+                    elif categId not in (map(lambda x:x.id, ConferenceHolder().getById(confId).getOwnerPath()) + ['0']):
+                        yield "[%s] Conference '%s' is not owned" % (categId, confId)
+
+                if dbi and i % 100 == 99:
+                    dbi.sync()
+                i += 1
+
 
 class CategoryDateIndex(Persistent):
 
@@ -914,6 +987,14 @@ class CategoryDayIndex(CategoryDateIndex):
             return self._idxCategItem[categid].iterateObjectsIn(sDate, eDate)
         else:
             return []
+
+    def _check(self, dbi=None):
+        """
+        Performs some sanity checks
+        """
+        for categId, calDayIdx in self._idxCategItem.iteritems():
+            for problem in calDayIdx._check(dbi=dbi, categId=categId):
+                yield problem
 
 
 class PendingQueuesUsersIndex( Index ):
