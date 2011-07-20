@@ -1360,7 +1360,7 @@ class Avatar(Persistent, Fossilizable):
         from MaKaC.rb_room import RoomBase
 
         myRooms = CrossLocationQueries.getRooms( reallyAllFast = True )
-        myRooms = [ room for room in myRooms if room.isOwnedBy( self ) ]
+        myRooms = [ room for room in myRooms if room.isOwnedBy( self ) and room.isActive ]
         return myRooms
 
     def getReservations(self):

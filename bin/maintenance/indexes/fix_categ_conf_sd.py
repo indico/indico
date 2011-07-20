@@ -18,31 +18,47 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.common.db import DBMgr
+"""
+Checks consistency (fixing errors) of 'categ_conf_sd'
+"""
+
+
+from indico.core.index import Catalog
+
+from MaKaC.common import DBMgr
 from MaKaC.conference import CategoryManager
-from ZODB.POSException import ConflictError
-
-
-def _visit(dbi, cat, deep=0):
-    global i
-
-    for retries in xrange(0,10):
-        try:
-            if not cat.getConferenceList():
-                for scat in cat.getSubCategoryList():
-                    _visit(dbi, scat, deep + 1)
-                cat._setNumConferences()
-                print "%sset %s: %s" % (" " * deep, cat.getTitle(), cat.getNumConferences())
-            dbi.commit()
-            break
-        except ConflictError:
-            dbi.sync()
 
 if __name__ == '__main__':
     dbi = DBMgr.getInstance()
-    dbi.startRequest()
-    home = CategoryManager().getById(0)
 
-    with dbi.transaction() as conn:
-        i = 0
-        _visit(dbi, home)
+    dbi.startRequest()
+
+    index = Catalog.getIdx('categ_conf_sd')
+
+    i = 0
+
+    for cid, categ in CategoryManager()._getIdx().iteritems():
+        catIdx = index.getCategory(cid)
+        for conf in categ.conferences:
+            if not catIdx.has_obj(conf):
+                print "'%s' not indexed " % conf,
+                catIdx.index_obj(conf)
+                print "[FIXED]"
+                dbi.commit()
+
+        todelete = []
+        for cid, conf in catIdx.iteritems():
+            if conf not in categ.conferences:
+                print "'%s' indexed " % conf,
+                todelete.append(conf)
+                print "[FIXED]"
+
+        for conf in todelete:
+            catIdx.unindex_obj(conf)
+            dbi.commit()
+
+        if i % 10 == 9:
+            dbi.abort()
+        i += 1
+
+    dbi.endRequest()

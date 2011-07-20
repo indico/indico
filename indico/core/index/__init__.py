@@ -20,3 +20,4 @@
 
 from indico.core.index.base import *
 from indico.core.index.adapter import *
+from indico.core.index.catalog import Catalog

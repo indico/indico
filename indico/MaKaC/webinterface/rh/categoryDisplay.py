@@ -239,7 +239,9 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
 
     def _createEvent(self, params):
         c = self._target.newConference( self._getUser() )
-        UtilsConference.setValues( c, self._params )
+
+        UtilsConference.setValues(c, self._params)
+
         if self._wf:
             self._wfReg.registerFactory( c, self._wf )
 
@@ -451,7 +453,7 @@ class UtilsConference:
                 raise FormValuesError("The end date you have entered is not correct: %s"%e)
         moveEntries = int(confData.get("move",0))
         c.setDates( sDate.astimezone(timezone('UTC')), \
-                    eDate.astimezone(timezone('UTC')), moveEntries = moveEntries )
+                    eDate.astimezone(timezone('UTC')), moveEntries=moveEntries)
 
         #################################
         # Fermi timezone awareness(end) #

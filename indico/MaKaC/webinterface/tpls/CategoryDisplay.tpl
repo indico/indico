@@ -10,7 +10,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
         % if not isRootCategory:
             <li><a href="${ urlHandlers.UHCategoryDisplay.getURL(categ.owner) }">${ _("Go to parent category") }</a>|</li>
         % endif
-            % if categ.getConferenceList() != []:
+            % if categ.conferences:
                 <li><a href="${ urlHandlers.UHCategoryToiCal.getURL(categ) }">${ _("iCal export")}</a>|</li>
             % endif
         <li><a id="moreLink" class="dropDownMenu" href="#">${ _("View") }</a></li>

@@ -120,8 +120,8 @@ class CategoryStatistics(Statistics):
                         stats["contributions"][year] = scat._statistics["contributions"][year]
                 stats["resources"] += scat._statistics["resources"]
 
-        elif len(cat.getConferenceList()) > 0:
-            for event in cat.getConferenceList():
+        elif cat.conferences:
+            for event in cat.conferences:
                 cls._processEvent(dbi, event, stats)
 
         stats["updated"] = nowutc()

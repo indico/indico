@@ -21,6 +21,7 @@
 from MaKaC.plugins import PluginsHolder, OldObservable
 
 import os,types,string
+import itertools
 from xml.sax.saxutils import escape, quoteattr
 from copy import copy
 from datetime import timedelta,datetime,date,time
@@ -65,7 +66,14 @@ from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 
+from indico.util.date_time import utc_timestamp
+from indico.core.index import Catalog
+
 import re
+
+MIN_PRESENT_EVENTS = 6
+OPTIMAL_PRESENT_EVENTS = 10
+
 
 class WTemplated(OldObservable):
     """This class provides a basic implementation of a web component (an
@@ -3254,116 +3262,46 @@ class WConferenceList(WTemplated):
 
     def __init__( self, category, wfRegm, showPastEvents ):
         self._categ = category
-        self._list = category.getConferenceList()
         self._showPastEvents = showPastEvents
 
     def getHTML( self, aw, params ):
         self._aw = aw
         return WTemplated.getHTML( self, params )
 
-    def _findFirstEventFromCurrentMonth(self):
-        currentDate = nowutc()
-        return self._findEventIdx(datetime(currentDate.year, currentDate.month, 1, tzinfo=timezone('utc')))
+    def getEventTimeline(self, tz):
+        index = Catalog.getIdx('categ_conf_sd').getCategory(self._categ.getId())
+        today = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0)
+        thisMonth = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0, day=1)
+        thisMonthTS = utc_timestamp(thisMonth)
+        nextMonthTS = utc_timestamp(thisMonth.replace(month = (thisMonth.month % 12) + 1))
+        todayTS = utc_timestamp(thisMonth)
+        oneMonthTS = utc_timestamp((today - timedelta(days=30)).replace(day=1))
+        future = []
+        present = []
 
-    def _findPresentEvent(self):
-        currentDate = nowutc()
-        return self._findEventIdx(datetime(currentDate.year, currentDate.month, currentDate.day, tzinfo=timezone('utc')))
-
-    def _findEventIdx(self, day):
-        st = 0
-        end = len(self._list) - 1
-
-        def find(st, end):
-            current = int((st + end) / 2)
-            if end - st > 1:
-                if self._list[current].getStartDate() > day:
-                    return find(st, current)
-                elif self._list[current].getStartDate() < day:
-                    return find(current, end)
-                else:
-                    return current
+        for ts, conf in index.iteritems(thisMonthTS):
+            if ts < nextMonthTS or len(present) < OPTIMAL_PRESENT_EVENTS:
+                present.append(conf)
             else:
-                if self._list[current].getStartDate() > day:
-                    if current > 0:
-                        return current - 1
-                    else:
-                        return 0
-                elif self._list[current].getStartDate() < day:
-                    if current + 1< len(self._list):
-                        return current + 1
-                    else:
-                        return current
-                else:
-                    return current
+                future.append(conf)
 
-        return find(st, end)
+        if len(present) < MIN_PRESENT_EVENTS:
+            present = list(index.values(oneMonthTS, thisMonthTS)) + present
 
-    def getPrevMonth(self,d):
-        year = d.year
-        prevMonth = (d.month - 1)%12
-        if prevMonth == 0:
-            prevMonth = 12
-            year -= 1
-        return datetime(year, prevMonth, 1, tzinfo = timezone('utc'))
-
-    def getNextMonth(self,d):
-        year = d.year
-        nextMonth = (d.month + 1)%12
-        if d.month + 1 == 12:
-            nextMonth = 12
-        elif d.month + 1 > 12:
-            year += 1
-        return datetime(year, nextMonth, 1, tzinfo = timezone('utc'))
-
-    def _getEventsFromPreviousMonth(self, stIndex, previousMonthStart):
-        newIndex = stIndex
-        while newIndex >= 0 and self._list[newIndex].getStartDate() >= previousMonthStart:
-            newIndex -= 1
-        return newIndex if newIndex + 1 == len(self._list) else newIndex + 1
-
-    def _getEventsFromCurrentMonth(self, stIndex, currentMonthStart):
-        nextMonthStart = self.getNextMonth(currentMonthStart)
-        newIndex = stIndex
-        while newIndex < len(self._list) and self._list[newIndex].getStartDate() < nextMonthStart:
-            newIndex += 1
-        return newIndex
-
-    def _getFutureEvents(self, stIndex):
-        nextMonthStart = self.getNextMonth(self._list[stIndex + 1].getStartDate())
-        newIndex = stIndex
-        while newIndex < len(self._list) and self._list[newIndex].getStartDate() < nextMonthStart:
-            newIndex += 1
-        return newIndex
-
-    def getPresentPastFutureEvents(self):
-        currentMonth = nowutc()
-        previousMonth = currentMonth
-
-        firstEventIdx = self._findFirstEventFromCurrentMonth()
-        presentEventIdx = self._findPresentEvent()
-        lastEventIdx = firstEventIdx
-
-        maxEventsShown = min([10, len(self._list)])
-        minFutureEventsShown = min([5, len(self._list) - presentEventIdx])
-
-        lastEventIdx = self._getEventsFromCurrentMonth(lastEventIdx,currentMonth)
-
-        while lastEventIdx - firstEventIdx < maxEventsShown:
-            currentMonth = self.getNextMonth(currentMonth)
-            lastEventIdx = self._getEventsFromCurrentMonth(lastEventIdx,currentMonth)
-            previousMonth = self.getPrevMonth(previousMonth)
-            firstEventIdx = self._getEventsFromPreviousMonth(firstEventIdx,previousMonth)
-
-        while len(self._list) > lastEventIdx + 1 and lastEventIdx - presentEventIdx < minFutureEventsShown:
-            lastEventIdx = self._getFutureEvents(lastEventIdx)
-
-        return list(self._list[firstEventIdx:lastEventIdx]), list(self._list[lastEventIdx:]),len(self._list) - lastEventIdx, firstEventIdx
+        if not present:
+            maxDT = timezone('UTC').localize(datetime.utcfromtimestamp(index.maxKey())).astimezone(timezone(tz))
+            prevMonthTS = utc_timestamp(maxDT.replace(day=1))
+            present = index.values(prevMonthTS)
+        numPast = self._categ.getNumConferences() - len(present) - len(future)
+        return present, future, len(future), numPast
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["presentItems"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"] =  self.getPresentPastFutureEvents()
+        displayTZ = DisplayTZ(self._aw, self._categ, useServerTZ=1).getDisplayTZ()
+        vars["ActiveTimezone"] = displayTZ
+        vars["presentItems"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"] =  self.getEventTimeline(displayTZ)
         vars["categ"] = self._categ
-        vars["ActiveTimezone"] = DisplayTZ(self._aw,self._categ,useServerTZ=1).getDisplayTZ()
+
         vars["showPastEvents"] = self._showPastEvents
 
         return vars

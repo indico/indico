@@ -373,7 +373,7 @@ class SessionManager:
             session = self._create_session(request)
 
 
-        session._set_access_time(self.ACCESS_TIME_RESOLUTION)
+        #session._set_access_time(self.ACCESS_TIME_RESOLUTION)
         return session
 
     # get_session ()
@@ -590,10 +590,10 @@ class Session:
         # with get_access_age()
         return (_now or time()) - self.__creation_time
 
-    def get_access_age (self, _now=None):
-        """Return the number of seconds since session was last accessed."""
-        # _now arg is for SessionManager's use
-        return (_now or time()) - self.__access_time
+#    def get_access_age (self, _now=None):
+#        """Return the number of seconds since session was last accessed."""
+#        # _now arg is for SessionManager's use
+#        return (_now or time()) - self.__access_time
 
 
     # -- Methods for SessionManager only -------------------------------

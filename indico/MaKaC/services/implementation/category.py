@@ -23,6 +23,7 @@ Asynchronous request handlers for category-related services.
 """
 
 import datetime
+from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
 import MaKaC.conference as conference
@@ -32,6 +33,8 @@ import MaKaC.webinterface.locators as locators
 from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvents
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import PrincipalHolder, Avatar, Group
+
+from indico.core.index import Catalog
 
 class CategoryBase(object):
     """
@@ -146,7 +149,8 @@ class GetPastEventsList(CategoryDisplayBase):
         self._lastIdx = int(self._params.get("lastIdx"))
 
     def _getAnswer( self ):
-        pastEvents = list(self._target.getConferenceList())[0:self._lastIdx]
+        index = Catalog.getIdx('categ_conf_sd').getCategory(self._categ.getId())
+        pastEvents = list(islice(index.itervalues(), self._lastIdx))
         return WConferenceListEvents(pastEvents, self._aw).getHTML()
 
 class SetShowPastEventsForCateg(CategoryDisplayBase):

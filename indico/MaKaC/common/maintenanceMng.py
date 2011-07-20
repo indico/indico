@@ -28,7 +28,7 @@ class MaintenanceMng:
     fileMatch = "((^Indico.*)|(.*\.tmp$))"
     tmpDelay = 3*3600
     websessionDelay = float(24 * 3600)
-    
+
     def humanReadableSize(bytes, units="b"):
             if units == 'k':
                 return '%-8ldKB' % (bytes / 1024)
@@ -69,11 +69,11 @@ class MaintenanceMng:
                         cls.fileMatch != "" and cls._match(cls.fileMatch, filename):
                     os.remove(file)
     cleanupTmp = classmethod(cleanupTmp)
-    
+
     def getWebsessionNum():
         return len(getSessionManager().keys())
     getWebsessionNum = staticmethod(getWebsessionNum)
-    
+
     def cleanupWebsession( cls ):
         sm = getSessionManager()
         aux = {}
@@ -81,7 +81,7 @@ class MaintenanceMng:
             aux[key] = sm[key]
         for key in aux.keys():
             value = sm[key]
-            if value.get_access_age() > cls.websessionDelay:
+            if value.get_creation_age() > cls.websessionDelay:
                 sm.delete_session(key)
     cleanupWebsession = classmethod(cleanupWebsession)
-        
+

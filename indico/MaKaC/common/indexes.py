@@ -34,6 +34,14 @@ from pytz import timezone
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
 from zope.index.text import textindex
+import pytz
+import itertools
+
+# BTrees are 32 bit by default
+# TODO: make this configurable
+# 0111 111 .... max signed int
+BTREE_MAX_INT = 0x7FFFFFFF
+
 
 class Index(Persistent):
     _name = ""
@@ -290,6 +298,27 @@ class CategoryIndex(Persistent):
         else:
             return []
 
+    def _check(self, dbi=None):
+        """
+        Performs some sanity checks
+        """
+        i = 0
+        from MaKaC.conference import ConferenceHolder
+        confIdx = ConferenceHolder()._getIdx()
+
+        for cid, confs in self._idxCategItem.iteritems():
+            for confId in confs:
+                # it has to be in the conference holder
+                if confId not in confIdx:
+                    yield "[%s] '%s' not in ConferenceHolder" % (cid, confId)
+                # the category has to be one of the owners
+                elif cid not in (map(lambda x:x.id, ConferenceHolder().getById(confId).getOwnerPath()) + ['0']):
+                    yield "[%s] Conference '%s' is not owned" % (cid, confId)
+            if dbi and i % 100 == 99:
+                dbi.sync()
+            i += 1
+
+
 class CalendarIndex(Persistent):
     """Implements a persistent calendar-like index. Objects (need to implement
         the __hash__ method) with a starting and ending dates can be added to
@@ -329,7 +358,7 @@ class CalendarIndex(Persistent):
         sdate = date2utctimestamp(conf.getStartDate())
         edate = date2utctimestamp(conf.getEndDate())
         #checking if 2038 problem occurs
-        if type(sdate) == type(1L) or type(edate) == type(1L):
+        if sdate > BTREE_MAX_INT or edate > BTREE_MAX_INT:
             return
         if self._idxSdate.has_key( sdate ):
             res = self._idxSdate[sdate]
@@ -366,7 +395,7 @@ class CalendarIndex(Persistent):
         sdate = date2utctimestamp(conf.getStartDate())
         edate = date2utctimestamp(conf.getEndDate())
         #checking if 2038 problem occurs
-        if type(sdate) == type(1L) or type(edate) == type(1L):
+        if sdate > BTREE_MAX_INT or edate > BTREE_MAX_INT:
             return
         if not self._idxSdate.has_key( sdate ):
             for key in self._idxSdate.keys():
@@ -556,20 +585,41 @@ class CalendarIndex(Persistent):
     def getObjectsStartingAfter( self, date ):
         return self._getObjectsStartingAfter( date )
 
-    #def getObjectsStartingInYear( self, year ):
-    #    lastDay = datetime( year, 12, 31 )
-    #    s1 = sets.Set()
-    #    # Objects starting before last day of year (included):
-    #    s1 = self._getObjectsStartingBefore(lastDay + timedelta(days=1))
-    #    if not s1:
-    #        return s1
-    #    firstDay = datetime( year, 1, 1 )
-    #    s2 = sets.Set()
-    #    # Objects starting before first day of year (excluded):
-    #    s2 = self._getObjectsStartingBefore(firstDay)
-    #    # Difference:
-    #    s1.difference_update( s2 )
-    #    return s1
+    def _check(self, dbi=None):
+        """
+        Performs some sanity checks
+        """
+
+        from MaKaC.conference import ConferenceHolder
+        confIdx = ConferenceHolder()._getIdx()
+
+        def _check_index(desc, index, func):
+            i = 0
+            for ts, confs in index.iteritems():
+                for confId in confs:
+                    # it has to be in the conference holder
+                    if confId not in confIdx:
+                        yield "[%s][%s] '%s' not in ConferenceHolder" % (desc, ts, confId)
+                    else:
+
+                        conf = ConferenceHolder().getById(confId)
+                        try:
+                            expectedDate = date2utctimestamp(func(conf))
+                        except OverflowError:
+                            expectedDate = 'overflow'
+
+                        # ts must be ok
+                        if ts != expectedDate:
+                            yield "[%s][%s] Conference '%s' has bogus date (should be '%s')" % (desc, ts, confId, expectedDate)
+                    if dbi and i % 100 == 99:
+                        dbi.sync()
+                    i += 1
+
+        return itertools.chain(
+            _check_index('sdate', self._idxSdate, lambda x: x.getStartDate()),
+            _check_index('edate', self._idxEdate, lambda x: x.getEndDate()))
+
+
 class CalendarDayIndex(Persistent):
     def __init__( self ):
         self._idxDay = IOBTree()
@@ -588,7 +638,7 @@ class CalendarDayIndex(Persistent):
         for day in range(days + 1):
             key = int(datetimeToUnixTime(startDate + timedelta(day)))
             #checking if 2038 problem occurs
-            if type(key) == type(1L):
+            if key > BTREE_MAX_INT:
                 continue
             if self._idxDay.has_key(key):
                 self._idxDay[key].add(conf)
@@ -604,7 +654,7 @@ class CalendarDayIndex(Persistent):
         for dayNumber in range(days + 1):
             day = int(datetimeToUnixTime(startDate + timedelta(dayNumber)))
             #checking if 2038 problem occurs
-            if type(day) == type(1L):
+            if day > BTREE_MAX_INT:
                 continue
             if self._idxDay.has_key( day ):
                 if conf in self._idxDay[day]:
@@ -758,6 +808,36 @@ class CalendarDayIndex(Persistent):
             for event in day:
                 yield event
 
+        i = 0
+        confIdx = ConferenceHolder()._getIdx()
+
+    def _check(self, dbi=None, categId=''):
+        """
+        Performs some sanity checks
+        """
+        i = 0
+        from MaKaC.conference import ConferenceHolder
+        confIdx = ConferenceHolder()._getIdx()
+
+        for ts, confs in self._idxDay.iteritems():
+            dt = pytz.timezone('UTC').localize(datetime.utcfromtimestamp(ts))
+
+            for confId in confs:
+                # it has to be in the conference holder
+                if confId not in confIdx:
+                    yield "[%s][%s] '%s' not in ConferenceHolder" % (ts, categId, confId)
+                else:
+                    conf = ConferenceHolder().getById(confId)
+                # date must be ok
+                    if date > conf.getEndDate() or date < conf.getStartDate():
+                        yield "[%s] '%s' has date out of bounds '%s'(%s)" % (categId, confId, ts, dt)
+                    elif categId not in (map(lambda x:x.id, ConferenceHolder().getById(confId).getOwnerPath()) + ['0']):
+                        yield "[%s] Conference '%s' is not owned" % (categId, confId)
+
+                if dbi and i % 100 == 99:
+                    dbi.sync()
+                i += 1
+
 
 class CategoryDateIndex(Persistent):
 
@@ -910,6 +990,14 @@ class CategoryDayIndex(CategoryDateIndex):
         else:
             return []
 
+    def _check(self, dbi=None):
+        """
+        Performs some sanity checks
+        """
+        for categId, calDayIdx in self._idxCategItem.iteritems():
+            for problem in calDayIdx._check(dbi=dbi, categId=categId):
+                yield problem
+
 
 class PendingQueuesUsersIndex( Index ):
     _name = ""
@@ -981,404 +1069,10 @@ class PendingCoordinatorsTasksIndex( PendinQueuesTasksIndex ):
     _name = "pendingCoordinatorsTasks"
     pass
 
-class DoubleIndex(Index):
-
-    def __init__( self, name='' ):
-        if name != '':
-            self._name = name
-        self._words = OOBTree()
-        self._ids = OOBTree()
-
-    def _addItem( self, value, item ):
-        if value != "":
-            words = self._words
-            if words.has_key(value):
-                if item not in words[value]:
-                    l = words[value]
-                    l.append(item)
-                    words[value] = l
-            else:
-                words[value] = [ item ]
-            self.setIndex(words)
-            id = self._itemToId(item)
-            if self._ids.has_key(value):
-                if id not in self._ids[value]:
-                    l = self._ids[value]
-                    l.append(id)
-                    self._ids[value] = l
-            else:
-                self._ids[value] = [id]
-            self._p_changed = 1
-
-    def _withdrawItem( self, value, item ):
-        if self._words.has_key(value):
-            if item in self._words[value]:
-                words = self._words
-                l = words[value]
-                l.remove(item)
-                words[value] = l
-                self.setIndex(words)
-        id = self._itemToId(item)
-        if self._ids.has_key(value):
-            if id in self._ids[value]:
-                l = self._ids[value]
-                l.remove(id)
-                self._ids[value] = l
-        self._p_changed = 1
-
-    def _itemToId(self, item):
-        #to be overloaded
-        return ""
-
-    def initIndex(self):
-        self._words = OOBTree()
-        self._ids = OOBTree()
-        self._p_changed = 1
-
-    def getLowerIndex(self):
-        if self._words.keys():
-            return min(self._words.keys())
-        return None
-
-class OAIDoubleIndex(DoubleIndex):
-
-    def __init__(self, name='' ):
-        DoubleIndex.__init__(self, name)
-        self.firstDate = nowutc().replace( hour=0, minute=0, second=0, microsecond=0 )
-
-    def initIndex( self ):
-        DoubleIndex.initIndex(self)
-        self.firstDate = nowutc().replace( hour=0, minute=0, second=0, microsecond=0 )
-
-    def getElements(self, from_date, until_date):
-        if not (from_date or until_date):
-            return self.getAllElements()
-
-        if from_date:
-            fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
-        else:
-            fd = self.firstDate
-
-        if until_date:
-            ud = datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]), tzinfo=timezone('UTC'))
-        else:
-            ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
-
-        res = []
-        if fd > ud:
-            return res
-        delta = timedelta(1)
-        while fd <= ud:
-            d = fd.strftime("%Y-%m-%d")
-            if d in self._words:
-                res.extend(self._words[d])
-            fd += delta
-        return res
-
-
-    def getElementIds(self, from_date, until_date):
-        if not (from_date or until_date):
-            return self.getAllElementIds()
-
-        if from_date:
-            fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
-        else:
-            fd = self.firstDate
-
-        if until_date:
-            ud = datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]), tzinfo=timezone('UTC'))
-        else:
-            ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
-
-        res = []
-        if fd > ud:
-            return res
-
-        delta = timedelta(1)
-        while fd <= ud:
-            d = fd.strftime("%Y-%m-%d")
-            if d in self._ids:
-                res.extend(self._ids[d])
-            fd += delta
-        return res
-
-    def getAllElements(self):
-        res = []
-        for date in self._words.keys():
-            res.extend(self._words[date])
-        return res
-
-    def getAllElementIds(self):
-        res = []
-        for date in self._ids.keys():
-            res.extend(self._ids[date])
-        return res
-
-    def unindexElement( self, cont ):
-        date = cont.getOAIModificationDate().strftime("%Y-%m-%d")
-        self._withdrawItem( date, cont )
-
-
-class OAIContributionIndex( OAIDoubleIndex ):
-    def __init__(self, name='' ):
-        OAIDoubleIndex.__init__(self, name)
-        self.firstDate = nowutc().replace( hour=0, minute=0, second=0, microsecond=0 )
-
-    def initIndex( self ):
-        OAIDoubleIndex.initIndex(self)
-        self.firstDate = nowutc().replace( hour=0, minute=0, second=0, microsecond=0 )
-
-    def _itemToId(self, item):
-        from MaKaC.conference import Contribution, SubContribution
-        if isinstance(item, Contribution):
-            return "%s:%s"%(item.getConference().getId(), item.getId())
-        elif isinstance(item, SubContribution):
-            return "%s:%s:%s"%(item.getConference().getId(), item.getContribution().getId(), item.getId())
-        return ""
-
-    def getContributions(self, from_date, until_date):
-        return OAIDoubleIndex.getElements(self, from_date, until_date)
-
-    def getContributionsIds(self, from_date, until_date):
-        return OAIDoubleIndex.getElementIds(self, from_date, until_date)
-
-    def getAllContributions(self):
-        return OAIDoubleIndex.getAllElements(self)
-
-    def getAllContributionsIds(self):
-        return OAIDoubleIndex.getAllElementIds(self)
-
-    def unindexContribution( self, cont ):
-        return OAIDoubleIndex.unindexElement(self, cont)
-
-    def indexContribution( self, cont ):
-#        Logger.get('oai/indexes').debug("\tINDEXING %s from conf %s" % (cont.getId(), cont.getConference().getId()))
-        if not self.isIndexable(cont):
-#            Logger.get('oai/indexes').debug("\t\tUNINDEXED - contribution is not indexable")
-            self.unindexContribution(cont)
-            return
-        from MaKaC.conference import ContribStatusWithdrawn
-        if not isinstance(cont.getContribution().getCurrentStatus(), ContribStatusWithdrawn):
-            date = cont.getOAIModificationDate()
-            strDate = date.strftime("%Y-%m-%d")
-            if date < self.firstDate:
-                self.firstDate = date
-            self._addItem( strDate, cont )
-
-class OAIContributionModificationDateIndex( OAIContributionIndex ):
-    _name = "OAIContributionModificationDate"
-
-    def isIndexable(self, conf):
-        # only public conferences shoud be indexed
-        return not conf.hasAnyProtection()
-
-
-class OAIPrivateContributionModificationDateIndex( OAIContributionIndex ):
-    _name = "OAIPrivateContributionModificationDate"
-
-    def __init__( self, name='' ):
-        OAIContributionIndex.__init__(self, name)
-
-    def indexContribution( self, cont ):
-        if not cont.hasAnyProtection():
-            self.unindexContribution(cont)
-            return
-        from MaKaC.conference import ContribStatusWithdrawn
-        if not isinstance(cont.getContribution().getCurrentStatus(), ContribStatusWithdrawn):
-            date = cont.getOAIModificationDate()
-            strDate = date.strftime("%Y-%m-%d")
-            if date < self.firstDate:
-                self.firstDate = date
-            self._addItem( strDate, cont )
-
-class OAIDeletedContributionModificationDateIndex( OAIContributionModificationDateIndex ):
-    _name = "OAIDeletedContributionModificationDate"
-
-    def indexContribution( self, cont ):
-        date = cont.getOAIModificationDate()
-        strDate = date.strftime("%Y-%m-%d")
-        if date < self.firstDate:
-            self.firstDate = date
-        self._addItem( strDate, cont )
-
-class OAIDeletedPrivateContributionModificationDateIndex(OAIDeletedContributionModificationDateIndex):
-    _name = "OAIDeletedPrivateContributionModificationDate"
-
-
-class OAIDeletedContributionCategoryIndex( OAIContributionIndex ):
-    _name = "OAIDeletedContributionCategory"
-
-    def __init__( self, name='' ):
-        OAIContributionIndex.__init__(self, name)
-
-    def _itemToId(self, item):
-        return item.getId()
-
-    def indexContribution( self, cont ):
-        for catId in cont.getCategoryPath():
-            self._addItem( catId, cont )
-
-    def unindexContribution( self, cont ):
-        for catId in cont.getCategoryPath():
-            self._withdrawItem( catId, cont )
-
-    def getContributions(self, catId):
-        if not catId in self._ids:
-            return []
-        return self._words[catId]
-
-    def getContributionsIds(self, catId):
-        if not catId in self._ids:
-            return []
-        return self._ids[catId]
-
-    def getAllConferences(self):
-        return self.getAllElements()
-
-    def getAllConferencesIds(self):
-        return self.getAllElementIds()
-
-class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategoryIndex ):
-    _name = "OAIDeletedPrivateContributionCategory"
-
-
-class OAIConferenceIndex( OAIDoubleIndex ):
-
-    def __init__( self, name='' ):
-        OAIDoubleIndex.__init__(self, name)
-        self.firstDate = nowutc().replace( hour=0, minute=0, second=0, microsecond=0 )
-
-    def initIndex( self ):
-        OAIDoubleIndex.initIndex(self)
-        self.firstDate = nowutc().replace( hour=0, minute=0, second=0, microsecond=0 )
-
-    def _itemToId(self, item):
-        return item.getId()
-
-    def unindexElement( self, conf ):
-        date = conf.getOAIModificationDate().strftime("%Y-%m-%d")
-        self._withdrawItem( date, conf )
-
-    def unindexConference( self, conf ):
-        self.unindexElement(conf)
-
-    def getConferences(self, from_date, until_date):
-        return OAIDoubleIndex.getElements(self, from_date, until_date)
-
-    def getConferencesIds(self, from_date, until_date):
-        if not (from_date or until_date):
-            return self.getAllConferencesIds()
-
-        if from_date:
-            fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
-        else:
-            fd = self.firstDate
-
-        if until_date:
-            ud = datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]), tzinfo=timezone('UTC'))
-        else:
-            ud = nowutc().replace( hour=23, minute=59, second=29, microsecond=0 )
-
-        res = []
-        if fd > ud:
-            return res
-
-        delta = timedelta(1)
-        while fd <= ud:
-            d = fd.strftime("%Y-%m-%d")
-            if d in self._ids:
-                res.extend(self._ids[d])
-            fd += delta
-
-        return res
-
-    def getAllConferences(self):
-        return OAIDoubleIndex.getAllElements(self)
-
-    def getAllConferencesIds(self):
-        return OAIDoubleIndex.getAllElementIds(self)
-
-
-class OAIConferenceModificationDateIndex( OAIConferenceIndex ):
-    _name = "OAIConferenceModificationDate"
-
-    def __init__( self, name='' ):
-        OAIConferenceIndex.__init__(self, name)
-
-    def indexConference( self, conf ):
-
-        if conf.hasAnyProtection():
-            self.unindexConference(conf)
-            return
-        date = conf.getOAIModificationDate()
-        strDate = date.strftime("%Y-%m-%d")
-        if date < self.firstDate:
-            self.firstDate = date
-        self._addItem( strDate, conf )
-
-    def isIndexable(self, conf):
-        # only public conferences shoud be indexed
-        return not conf.hasAnyProtection()
-
-
-class OAIPrivateConferenceModificationDateIndex( OAIConferenceModificationDateIndex ):
-    _name = "OAIPrivateConferenceModificationDate"
-
-    def __init__( self, name='' ):
-        OAIConferenceIndex.__init__(self, name)
-
-    def indexConference( self, conf ):
-        if not conf.hasAnyProtection():
-            self.unindexConference(conf)
-            return
-        date = conf.getOAIModificationDate()
-        strDate = date.strftime("%Y-%m-%d")
-        if date < self.firstDate:
-            self.firstDate = date
-        self._addItem( strDate, conf )
-
-class OAIDeletedConferenceModificationDateIndex( OAIConferenceModificationDateIndex ):
-    _name = "OAIDeletedConferenceModificationDate"
-
-    def isIndexable(self, conf):
-        # only public conferences shoud be indexed
-        return not conf.hasAnyProtection()
-
-class OAIDeletedPrivateConferenceModificationDateIndex( OAIPrivateConferenceModificationDateIndex ):
-    _name = "OAIDeletedPrivateConferenceModificationDate"
-
-
-class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
-    _name = "OAIDeletedConferenceCategory"
-
-    def __init__( self, name='' ):
-        OAIConferenceIndex.__init__(self, name)
-
-    def indexConference( self, conf ):
-        for catId in conf.getCategoryPath():
-            self._addItem( catId, conf )
-
-    def unindexConference( self, conf ):
-        for catId in conf.getCategoryPath():
-            self._withdrawItem( catId, conf )
-
-    def getConferences(self, catId):
-        if not catId in self._ids:
-            return []
-        return self._words[catId]
-
-    def getConferencesIds(self, catId):
-        if not catId in self._ids:
-            return []
-        return self._ids[catId]
-
-
-class OAIDeletedPrivateConferenceCategoryIndex( OAIDeletedConferenceCategoryIndex ):
-    _name = "OAIDeletedPrivateConferenceCategory"
-
 
 class IndexException(Exception):
     pass
+
 
 class IntStringMappedIndex(Persistent):
     def __init__(self):
@@ -1470,6 +1164,7 @@ class TextIndex(IntStringMappedIndex):
         records = self._textIdx.apply(text.decode('utf8')).items()
         return [(self.getString(record[0]), record[1]) for record in records]
 
+
 class IndexesHolder( ObjectHolder ):
 
     idxName = "indexes"
@@ -1480,19 +1175,7 @@ class IndexesHolder( ObjectHolder ):
                     "pendingSubmitters",
                     "pendingSubmittersTasks", "pendingManagers",
                     "pendingManagersTasks", "pendingCoordinators",
-                    "pendingCoordinatorsTasks", "webcasts", "collaboration",
-                    "OAIConferenceModificationDate",
-                    "OAIContributionModificationDate",
-                    "OAIPrivateConferenceModificationDate",
-                    "OAIPrivateContributionModificationDate",
-                    "OAIDeletedConferenceModificationDate",
-                    "OAIDeletedContributionModificationDate",
-                    "OAIDeletedConferenceCategory",
-                    "OAIDeletedContributionCategory",
-                    "OAIDeletedPrivateConferenceModificationDate",
-                    "OAIDeletedPrivateContributionModificationDate",
-                    "OAIDeletedPrivateConferenceCategory",
-                    "OAIDeletedPrivateContributionCategory"]
+                    "pendingCoordinatorsTasks", "webcasts", "collaboration"]
 
     def getIndex( self, name ):
         return self.getById(name)
@@ -1546,37 +1229,6 @@ class IndexesHolder( ObjectHolder ):
                     Idx[str(id)] = CollaborationIndex()
                 else:
                     raise MaKaCError(_("Tried to retrieve collaboration index, but Collaboration plugins are not present"))
-
-            # OAI date indices
-            elif id=="OAIConferenceModificationDate":
-                Idx[str(id)] = OAIConferenceModificationDateIndex()
-            elif id=="OAIContributionModificationDate":
-                Idx[str(id)] = OAIContributionModificationDateIndex()
-            elif id=="OAIPrivateConferenceModificationDate":
-                Idx[str(id)] = OAIPrivateConferenceModificationDateIndex()
-            elif id=="OAIPrivateContributionModificationDate":
-                Idx[str(id)] = OAIPrivateContributionModificationDateIndex()
-            elif id=="OAIDeletedConferenceModificationDate":
-                Idx[str(id)] = OAIDeletedConferenceModificationDateIndex()
-            elif id=="OAIDeletedContributionModificationDate":
-                Idx[str(id)] = OAIDeletedContributionModificationDateIndex()
-            elif id=="OAIDeletedPrivateConferenceModificationDate":
-                Idx[str(id)] = OAIDeletedPrivateConferenceModificationDateIndex()
-            elif id=="OAIDeletedPrivateContributionModificationDate":
-                Idx[str(id)] = OAIDeletedPrivateContributionModificationDateIndex()
-
-
-            # category indices
-            elif id=="OAIDeletedConferenceCategory":
-                Idx[str(id)] = OAIDeletedConferenceCategoryIndex()
-            elif id=="OAIDeletedContributionCategory":
-                Idx[str(id)] = OAIDeletedContributionCategoryIndex()
-            elif id=="OAIDeletedPrivateConferenceCategory":
-                Idx[str(id)] = OAIDeletedPrivateConferenceCategoryIndex()
-            elif id=="OAIDeletedPrivateContributionCategory":
-                Idx[str(id)] = OAIDeletedPrivateContributionCategoryIndex()
-            else:
-                Idx[str(id)] = Index()
 
             return Idx[str(id)]
 
