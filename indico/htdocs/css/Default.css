@@ -2,7 +2,7 @@
   font-family: 'Special Elite';
   font-style: normal;
   font-weight: normal;
-  src: local('Special Elite'), local('SpecialElite-Regular'), url('css/SpecialElite.ttf');
+  src: local('Special Elite'), local('SpecialElite-Regular'), url('SpecialElite.ttf');
 }
 
 /*
@@ -3056,15 +3056,23 @@ div.filterDiv
 }
 
 .sideBar ul {
-    margin: 10px 10px 20px 10px;
+    margin: 15px 10px 0px 0px;
     padding: 0;
     list-style-type: none;
 }
 
 .sideBar li {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     list-style-type: none;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
 }
+
+.sideBar li:last-child {
+    border-bottom: 0px none;
+    padding-bottom: 0px;
+}
+
 
 .sideMenu li {
     margin-bottom: 10px;
