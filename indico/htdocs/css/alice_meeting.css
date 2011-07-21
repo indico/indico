@@ -60,9 +60,13 @@ div.meetingEventHeader a:hover {
 
 div.meetingEventHeader h1 {
 	color: #333333;
+        text-shadow: none;
 }
 
 div.meetingEventHeader h2 {
     color: #333333;
 }
 
+div.meetingEventHeader > div.details {
+    text-shadow: none;
+}
