@@ -2963,6 +2963,10 @@ div.filterDiv
     behavior: url('css/border-radius.htc');
 }
 
+.smallSideBox h1 {
+    font-family: 'Special Elite', arial, serif;
+}
+
 .sideMenu {
     float: left;
     width: 200px;
@@ -3051,8 +3055,6 @@ div.filterDiv
     color: #777;
     font-size: 15px;
     text-shadow: 1px 1px 0px #FEFEFE;
-    font-family: 'Special Elite', arial, serif;
-
 }
 
 .sideBar ul {
@@ -3061,14 +3063,14 @@ div.filterDiv
     list-style-type: none;
 }
 
-.sideBar li {
+.sideBar ul.items li {
     margin-bottom: 5px;
     list-style-type: none;
     padding-bottom: 5px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e4e4e4;
 }
 
-.sideBar li:last-child {
+.sideBar ul.items li:last-child {
     border-bottom: 0px none;
     padding-bottom: 0px;
 }

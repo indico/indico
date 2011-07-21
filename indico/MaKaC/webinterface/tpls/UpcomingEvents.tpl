@@ -1,4 +1,4 @@
-<ul>
+<ul class="items">
 % for (status, dateTime, eventTitle, eventId) in upcomingEvents:
 <li>
 
