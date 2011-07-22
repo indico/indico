@@ -806,10 +806,6 @@ class CalendarDayIndex(Persistent):
             for event in day:
                 yield event
 
-        i = 0
-        from MaKaC.conference import ConferenceHolder
-        confIdx = ConferenceHolder()._getIdx()
-
     def _check(self, dbi=None, categId=''):
         """
         Performs some sanity checks
