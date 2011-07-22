@@ -103,7 +103,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
              return Html.div({},
                              this.plain.draw(),
                              this.richDiv,
-                             Widget.link(this.switchLink));
+                             this.hideSwitchLink?null:Widget.link(this.switchLink));
          },
 
          observe: function(callback) {
@@ -166,7 +166,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
              this.rich.destroy();
          }
      },
-     function(width, height, initialText, mode, toolbarSet) {
+     function(width, height, initialText, mode, toolbarSet, hideSwitchLink) {
 
          var textAreaParams = { style: {} };
          textAreaParams.style.width = pixels(width);
@@ -201,7 +201,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
                  self.synchronizeRich();
              }
          };
-
+         this.hideSwitchLink=any(hideSwitchLink,false);
          var self = this;
          this.switchLink = new Chooser(
              {
@@ -240,8 +240,8 @@ type("ParsedRichTextWidget",['RichTextWidget'],
                     return cleanText(this.plain.get(),this.plain);
             }
         },
-        function(width, height, initialText, mode, toolbarSet) {
-            this.RichTextWidget(width, height, initialText, mode, toolbarSet);
+        function(width, height, initialText, mode, toolbarSet, hideSwitchLink) {
+            this.RichTextWidget(width, height, initialText, mode, toolbarSet, hideSwitchLink);
             this.rich = new ParsedRichTextEditor(width, height, toolbarSet);
 
             var self = this;

@@ -599,8 +599,16 @@ extend(IndicoUI.Dialogs,
                var compileMinutes = exists(compile)?compile:false;
                var killProgress = null;
                var saveAndClose = false;
+               var rtWidget = null;
+               var useragent = navigator.userAgent;
+               useragent = useragent.toLowerCase();
 
-               var rtWidget = new ParsedRichTextEditor(700, 400, 'IndicoFull');
+               if (useragent.indexOf('iphone') != -1 || useragent.indexOf('symbianos') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('android') != -1 || useragent.indexOf('blackberry') != -1 || useragent.indexOf('samsung') != -1 || useragent.indexOf('nokia') != -1 || useragent.indexOf('windows ce') != -1 || useragent.indexOf('sonyericsson') != -1 || useragent.indexOf('webos') != -1 || useragent.indexOf('wap') != -1 || useragent.indexOf('motor') != -1 || useragent.indexOf('symbian') != -1 ) {
+                   rtWidget = new ParsedRichTextWidget(700, 400,'','plain','IndicoMinimal',true);
+               }
+               else {
+                   rtWidget = new ParsedRichTextEditor(700, 400,'IndicoFull');
+               }
 
                var saveButton;
                var intToStr = function(id) {
