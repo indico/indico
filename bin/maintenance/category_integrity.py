@@ -28,7 +28,7 @@ It can be added as a periodic cronjob.
 import sys
 
 from MaKaC.common import DBMgr
-from MaKaC.conference import CategoryManager
+from MaKaC.conference import CategoryManager, ConferenceHolder
 
 
 
@@ -54,8 +54,7 @@ def check_event_number_consistency(root):
             dbi.commit()
 
 
-def check_event_number_leaves(categ, dbi):
-    expected = len(categ.conferences)
+def check_event_number_leaves(categ, expected, dbi):
     obtained = categ._numConferences
 
     if expected != obtained:
@@ -72,6 +71,7 @@ if __name__ == '__main__':
     dbi = DBMgr.getInstance()
     dbi.startRequest()
 
+    confIndex = ConferenceHolder()._getIdx()
     index = CategoryManager()._getIdx()
 
     for cid, categ in index.iteritems():
@@ -81,8 +81,14 @@ if __name__ == '__main__':
             # since we're here check consistency of TreeSet
             categ.conferences._check()
 
+            lenConfs = 0
+            for conf in categ.conferences:
+                lenConfs += 1
+                if conf.getId() not in confIndex:
+                    sys.stderr.write("[%s] '%s' not in ConferenceHolder!\n" % (cid, conf.getId()))
+
             # check event numbers
-            check_event_number_leaves(categ, dbi)
+            check_event_number_leaves(categ, lenConfs, dbi)
 
             # check that there are no subcategories
             if categ.subcategories:
