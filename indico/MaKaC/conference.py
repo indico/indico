@@ -95,7 +95,6 @@ from MaKaC.webinterface import urlHandlers
 
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
-from sets import Set
 import zope.interface
 
 from indico.modules.scheduler import Client, tasks
@@ -3246,22 +3245,11 @@ class Conference(CommonObjectBase, Locatable):
         for session in self.getSessionList() :
             for convener in session.getConvenerList() :
                 key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
-                if dictionary.has_key(key) :
-                    dictionary[key].add(convener)
-                else :
-                    set = Set()
-                    set.add(convener)
-                    dictionary[key] = set
+                dictionary.setdefault(key, set()).add(convener)
             for slot in session.getSlotList():
                 for convener in slot.getConvenerList() :
                     key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
-                    if dictionary.has_key(key) :
-                        dictionary[key].add(convener)
-                    else :
-                        set = Set()
-                        set.add(convener)
-                        dictionary[key] = set
-
+                dictionary.setdefault(key, set()).add(convener)
 
         return dictionary
 
