@@ -1190,6 +1190,13 @@ class Category(CommonObjectBase):
 
         nextEvt = next(categIter, None)
 
+        # if the event is already the first or the last, don't confuse
+        # users by showing the respective arrow
+        if first == conf:
+            first = None
+        if last == conf:
+            last = None
+
         return prev, nextEvt, first, last
 
     def _setNumConferences(self):
