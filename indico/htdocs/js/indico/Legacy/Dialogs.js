@@ -78,6 +78,7 @@ extend(IndicoUI.Dialogs,
                        popup.postDraw = function() {
                            roomEditor.postDraw();
                            this.ExclusivePopup.prototype.postDraw.call(this);
+                           $E('sessionTitle').dom.focus();
                        };
 
                        popup.draw = function(){
@@ -196,10 +197,9 @@ extend(IndicoUI.Dialogs,
                            });
                            colorPicker.setFixedPosition();
                            var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
-
                            var contentDiv = Html.div({},
                                IndicoUtil.createFormFromMap([
-                                   [$T('Title'), $B(parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), info.accessor('title'))],
+                                   [$T('Title'), $B(parameterManager.add(Html.edit({ id: 'sessionTitle'}), 'text', false), info.accessor('title'))],
                                    [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
                                    [$T('Date'), conferenceDays],
                                    startEndTimeComponent,

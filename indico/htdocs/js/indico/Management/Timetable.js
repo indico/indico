@@ -716,6 +716,8 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          postDraw: function() {
              this.roomEditor.postDraw();
              this.ChangeEditDialog.prototype.postDraw.call(this);
+             $E('breakTitle').dom.focus();
+
          },
 
 
@@ -870,7 +872,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
 
              var contentDiv = IndicoUtil.createFormFromMap([
-                 [$T('Title'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}})), this.info.accessor('title'))],
+                 [$T('Title'), $B(self.parameterManager.add(Html.edit({ id: 'breakTitle'})), this.info.accessor('title'))],
                  [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), this.info.accessor('description'))],
                  [$T('Place'), this.roomEditor.draw()],
                  [$T('Date'), conferenceDays],
