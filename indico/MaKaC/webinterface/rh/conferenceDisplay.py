@@ -540,7 +540,10 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
             contrib = self._conf.getContributionById(params.get("contribId",""))
         if self._chair:
             chairid=params.get("chairId","")
-            self._emailto =self._conf.getChairById(chairid).getEmail()
+            chair = self._conf.getChairById(chairid)
+            if chair == None:
+                raise NotFoundError(_("The chair you try to email does not exist."))
+            self._emailto = chair.getEmail()
         if self._auth:
             authid=params.get("authId","")
             author = contrib.getAuthorById(authid)
