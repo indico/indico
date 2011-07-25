@@ -516,6 +516,10 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
     def _loadResvCandidateFromDefaults( self, params ):
         ws = self._websession
         # After room details
+        if not params.has_key('roomID'):
+            raise MaKaCError( _("""The parameter roomID is missing."""))
+        if not params.has_key('roomLocation'):
+            raise MaKaCError( _("""The parameter roomLocation is missing"""))
         roomID = int( params['roomID'] )
         roomLocation = params['roomLocation']
         candResv = Location.parse( roomLocation ).factory.newReservation() # Create in the same location as room
