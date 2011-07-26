@@ -268,10 +268,11 @@ class develop_indico(Command):
         print """\nIndico needs to store some information in the filesystem (database, cache, temporary files, logs...)
 Please specify the directory where you'd like it to be placed.
 (Note that putting it outside of your sourcecode tree is recommended)"""
-        prefixDir = raw_input('[%s]: ' % os.getcwd()).strip()
+        prefixDirDefault = os.path.dirname(os.getcwd())
+        prefixDir = raw_input('[%s]: ' % prefixDirDefault).strip()
 
         if prefixDir == '':
-            prefixDir = os.getcwd()
+            prefixDir = prefixDirDefault
 
         directories = dict((d, os.path.join(prefixDir, d)) for d in
                            ['db', 'log', 'tmp', 'cache', 'archive'])
