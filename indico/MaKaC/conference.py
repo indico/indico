@@ -3510,6 +3510,9 @@ class Conference(CommonObjectBase, Locatable):
         """
         return self.contributions.values()
 
+    def iterContributions(self):
+        return self.contributions.itervalues()
+
     def getContributionListSortedById(self):
         """Returns a list of the conference contribution objects, sorted by their id
         """
@@ -8873,6 +8876,9 @@ class Contribution(CommonObjectBase, Locatable):
 
     def getSubContributionList(self):
         return self._subConts
+
+    def iterSubContributions(self):
+        return iter(self._subConts)
 
     def upSubContribution(self, subcont):
         if subcont in self._subConts:
