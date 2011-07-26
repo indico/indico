@@ -1165,6 +1165,16 @@ class Category(CommonObjectBase):
         """
         return self.conferences
 
+    def iterAllConferences( self):
+        """returns the iterator for conferences in all subcategories.
+        """
+        for conf in self.conferences:
+            yield conf
+
+        for subcateg in self.subcategories.itervalues():
+            for conf in subcateg.iterAllConferences():
+                yield conf
+
     def getAllConferenceList( self ):
         """returns the list of all conferences included in the current category
         and in all its subcategories"""
