@@ -39,9 +39,9 @@ def ACLfiltered(iter, requestIP, aw=None):
             if '/' in rule:
                 # it's a netmask (CIDR), check if ip belongs to it
                 # ipv4-specific, non-endian-safe check!
-                ipaddr = struct.unpack('L', socket.inet_aton(ip))[0]
+                ipaddr = struct.unpack('=L', socket.inet_aton(ip))[0]
                 netaddr, bits = rule.split('/')
-                netmask = struct.unpack('L', socket.inet_aton(netaddr))[0] & ((2L << int(bits) - 1) - 1)
+                netmask = struct.unpack('=L', socket.inet_aton(netaddr))[0] & ((2L << int(bits) - 1) - 1)
                 if ipaddr & netmask == netmask:
                     return True
             else:
