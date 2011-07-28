@@ -33,8 +33,7 @@ import MaKaC.user as user
 import MaKaC.domain as domain
 from MaKaC.common.general import *
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.errors import MaKaCError
-from MaKaC.errors import FormValuesError
+from MaKaC.errors import MaKaCError,NoReportError,FormValuesError
 #import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.conference as conference
 import stat
@@ -56,6 +55,8 @@ class RHCategModifBase( RHModificationBaseProtected ):
     def _checkParams( self, params ):
         l = locators.CategoryWebLocator( params )
         self._target = l.getObject()
+        if self._target == None:
+            raise NoReportError(_("The specified category with id \"%s\" does not exist or has been deleted")%params["categId"])
         self._getSession().setVar("currentCategoryId", self._target.getId())
 
 
