@@ -20,8 +20,8 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Duration")%></span></td>
             <td bgcolor="white" width="100%">
-                <input type="text" size="2" name="durationHours" value="<%= durationHours %>">:
-                <input type="text" size="2" name="durationMinutes" value="<%= durationMinutes %>">
+                <input type="text" size="2" name="durationHours" id="durationHours" value="<%= durationHours %>">:
+                <input type="text" size="2" name="durationMinutes" id="durationMinutes" value="<%= durationMinutes %>">
             </td>
         </tr>
         <!--<tr>
@@ -34,7 +34,7 @@
             <td colspan="2" align="left">
                 <table align="left">
                     <tr>
-                        <td align="left"><input type="submit" class="btn" value="<%= _("ok")%>">
+                        <td align="left"><input type="submit" id="okBtn" class="btn" value="<%= _("ok")%>">
                         <input type="submit" class="btn" value="cancel" name=" <%= _("cancel")%>"></td>
                     </tr>
                 </table>
@@ -42,3 +42,20 @@
         </tr>
     </table>
 </form>
+<script  type="text/javascript">
+
+        IndicoUI.executeOnLoad(function()
+    {
+        var parameterManager = new IndicoUtil.parameterManager();
+        var submitButton = $E('okBtn');
+
+        submitButton.observeClick(function(){
+            if (!parameterManager.check()) {
+                return false;
+            }
+        });
+
+        parameterManager.add($E('durationHours'), 'int', false);
+        parameterManager.add($E('durationMinutes'), 'int', false);
+    });
+</script>

@@ -3266,7 +3266,7 @@ class Conference(CommonObjectBase, Locatable):
             for slot in session.getSlotList():
                 for convener in slot.getConvenerList() :
                     key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
-                dictionary.setdefault(key, set()).add(convener)
+                    dictionary.setdefault(key, set()).add(convener)
 
         return dictionary
 

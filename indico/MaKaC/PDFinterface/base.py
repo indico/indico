@@ -96,7 +96,10 @@ class PDFHTMLParser(HTMLParser):
             self.text.append( "<%s%s>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
 
     def handle_startendtag(self, tag, attrs):
-        self.text.append( "<%s%s/>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
+        if tag =="a":
+            self.text.append( "</a>" )
+        else:
+            self.text.append( "<%s%s/>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
 
     def handle_endtag(self, tag):
         if tag in self._removedTags:

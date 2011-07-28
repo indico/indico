@@ -375,8 +375,16 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
             sc.setTitle( params.get("title", "") )
             sc.setDescription( params.get("description", "") )
             sc.setKeywords( params.get("keywords", "") )
-            sc.setDuration( params.get("durationHours", ""), \
-                             params.get("durationMinutes", "") )
+            try:
+                durationHours = int(params.get("durationHours",""))
+            except ValueError:
+                raise FormValuesError(_("Please specify a valid hour format (0-23)."))
+            try:
+                durationMinutes = int(params.get("durationMinutes",""))
+            except ValueError:
+                raise FormValuesError(_("Please specify a valid minutes format (0-59)."))
+
+            sc.setDuration( durationHours, durationMinutes )
             sc.setSpeakerText( params.get("speakers", "") )
             sc.setParent(self._target)
             for presenter in self._getDefinedList("presenter") :

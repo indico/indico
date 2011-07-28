@@ -461,27 +461,21 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         self._createTabCtrl()
         #TODO: check if it comes from the timetable or the contribution list
         # temp solution: isScheduled.
-        if self._target.isScheduled():
-            banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
+        banner = ""
+        if self._canModify or self._isPRM:
+            banner = wcomponents.WContribListBannerModif(self._target).getHTML()
         else:
-            if self._canModify or self._isPRM:
-                banner = wcomponents.WContribListBannerModif(self._target).getHTML()
-            else:
-                if self._conf.getConfPaperReview().isRefereeContribution(self._rh._getUser(), self._contrib):
-                    banner = wcomponents.WListOfPapersToReview(self._target, "referee").getHTML()
-                if self._conf.getConfPaperReview().isReviewerContribution(self._rh._getUser(), self._contrib):
-                    banner = wcomponents.WListOfPapersToReview(self._target, "reviewer").getHTML()
-                if self._conf.getConfPaperReview().isEditorContribution(self._rh._getUser(), self._contrib):
-                    banner = wcomponents.WListOfPapersToReview(self._target, "editor").getHTML()
+            if self._conf.getConfPaperReview().isRefereeContribution(self._rh._getUser(), self._contrib):
+                banner = wcomponents.WListOfPapersToReview(self._target, "referee").getHTML()
+            if self._conf.getConfPaperReview().isReviewerContribution(self._rh._getUser(), self._contrib):
+                banner = wcomponents.WListOfPapersToReview(self._target, "reviewer").getHTML()
+            if self._conf.getConfPaperReview().isEditorContribution(self._rh._getUser(), self._contrib):
+                banner = wcomponents.WListOfPapersToReview(self._target, "editor").getHTML()
+        if banner == "":
+            banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
 
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
-
-        if not self._canModify or self._isPRM:
-            return body
-        else:
-            return banner + body
-
 
 class WPContribModifMain( WPContributionModifBase ):
 
