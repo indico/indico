@@ -71,10 +71,9 @@ class LazyTranslations(Translations):
     def ugettext(self, text):
         return self._wrapper('ugettext', text)
 
-    def ngettext(self, text):
-        return self._wrapper('ngettext', text)
+    def ungettext(self, singular, plural, n):
+        return self._wrapper('ungettext', singular, plural, n)
 
 
 lazyTranslations = LazyTranslations()
 lazyTranslations.install(unicode=True)
-
