@@ -5004,6 +5004,61 @@ div.timetableContribution  {
     background-color: #f8f2e8;
 }
 
+/* Timetable drag n drop,
+   droppable styles starts here. */
+
+/* For when the  Shift is held down */
+div.shiftIndicator {
+    display: none;
+    color: #118822;
+    font-weight: bold;
+    text-align: center;
+    margin-left: -96px;
+    padding: 10px;
+    background: #FFF;
+    border-top: 1px solid #202020;
+    border-left: 1px solid #202020;
+    border-right: 1px solid #202020;
+    position: fixed;
+    bottom: 0px;
+    left: 50%;
+    border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    -webkit-border-radius: 10px 10px 0px 0px;
+}
+
+div.ui-state-hightlight {
+}
+
+div.ui-draggable {
+   /* border: 3px solid #9F883B;*/
+}
+
+div.ui-draggable:hover {
+    cursor: move;
+}
+
+div.ui-draggable-dragging {
+    border: 3px solid gold;
+    /*background-color: gold;*/
+    /*To make the current dragged element
+      on top of everything*/
+    z-index: 9000;
+}
+
+div.dragTip {
+    /* Just over 9000! (To be "above" the draggable, which has z-index 9000) */
+    z-index: 9001;
+    position: absolute;
+    width: 100%;
+    top: 350;
+    border-top: 1px dotted red;
+    font-weight: bold;
+}
+
+/* Timetable drag n drop,
+   droppable styles ends here. */
+
 div.timetableSession div.timetableBlock{
 }
 
@@ -5729,7 +5784,29 @@ div.timetableManagementInfoArea ul li{
     background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
 }
 
+div.blockMoveProgressText {
+/*
+    position: fixed;
+    bottom: 0px;*/
+    padding: 3px 8px 3px;
+    text-align: center;
+    color: #DDD;
+}
 
+div.blockMoveProgressImage {
+    background: transparent url("../images/load_lightblue.gif") no-repeat center center;
+    padding-bottom: 49px;
+}
+
+div.blockMoveProgress {
+    width: 100px;
+    background-color: #424242;
+    position: fixed;
+    bottom: 1px;
+    left: 91.8%;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
 
 /* MODIF DISPLAY*/
 

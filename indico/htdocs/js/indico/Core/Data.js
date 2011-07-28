@@ -168,7 +168,7 @@ var Util = {
         m2 = obj.time.match(/(\d+):(\d+):(\d+)/);
 
 
-        var date = new Date(m1[1],m1[2],m1[3]);
+        var date = new Date(m1[1],m1[2] - 1,m1[3]);
         setTime(date, [m2[1],m2[2],m2[3]]);
 
         return date;

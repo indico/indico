@@ -988,7 +988,6 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
 
             getChosenValue: function() {
                 var radios = document.getElementsByName("rbID");
-
                 for ( var i = 0; i < radios.length; i++) {
                     if (radios[i].checked) {
                         return radios[i].value;
@@ -1107,6 +1106,9 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                             return;
                         }
 
+                        var value = self.getChosenValue();
+                        self.handleBlockMove(self, value);
+
                         var killProgress = IndicoUI.Dialogs.Util.progress($T('Moving the entry...'));
 
                         indicoRequest(self.managementActions.methods[self.inSession?'SessionEntry':'Event'].moveEntry, {
@@ -1199,13 +1201,49 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
 
                 return Indico.Data.WeekDays[nDate.getDay()].substring(0,3) + ' ' + nDate.getDate() + '/' + (nDate.getMonth() + 1);
             },
+
             postDraw: function(){
                 this.tabWidget.postDraw();
                 this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
-            }
-        },
+            },
 
-        function(managementActions, timetable, entryType, sessionId, slotId, currentDay, scheduleEntryId, confId, startDate){
+          /* Takes care of moving a contribution/timeblock to another session/timetable.
+           * This goes for both "drag and drop" as well as the regular "MoveEntry Dialog clicking"*/
+          handleBlockMove: function(eventData, value) {
+            var self = this;
+
+            // if nothing has been selected yet
+            if (!value) {
+              return false;
+            }
+
+            //Displays a "loading ..." div at the righthand bottom side
+            var killProgress = IndicoUI.Dialogs.Util.blockMoveProgress("Moving the entry...");
+
+            self.inSession = true;
+            if (eventData.sessionId == null && eventData.sessionSlotId == null) {
+              self.inSession = false;
+            }
+
+            indicoRequest(self.managementActions.methods[self.inSession?'SessionEntry':'Event'].moveEntry, {
+                            value : value,
+                            conference : self.confId,
+                            scheduleEntryId : eventData.scheduleEntryId,
+                            sessionId : eventData.sessionId,
+                            sessionSlotId : self.slotId
+                          }, function(result, error) {
+                            if (error) {
+                              killProgress();
+                              IndicoUtil.errorReport(error);
+                            } else {
+                              // change json and repaint timetable
+                              self.managementActions.timetable._updateMovedEntry(result, result.old.id);
+                              killProgress();
+                              self.close();
+                            }});
+          }
+        },
+        function(managementActions, timetable, entryType, sessionId, slotId, currentDay, scheduleEntryId, confId, startDate) {
             this.managementActions = managementActions;
             this.timetableData = timetable.getData();
             this.topLevelTimetableData = timetable.parentTimetable?timetable.parentTimetable.getData():this.timetableData;
@@ -1221,9 +1259,9 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
             var self = this;
 
             this.ExclusivePopupWithButtons($T("Move Timetable Entry"),
-                                function() {
-                                    self.close();
-                                });
+            function() {
+              self.close();
+            });
         });
 
 

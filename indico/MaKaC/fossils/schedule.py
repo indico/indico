@@ -197,6 +197,9 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
         """ Inherited Room """
     getInheritRoom.produce = lambda x: x.getOwner().getOwnRoom() is None
 
+    def getDuration(self):
+        """ Entry End Date """
+    getDuration.convert = Conversion.duration
 
 
 class ILinkedTimeSchEntryFossil(ISchEntryFossil):

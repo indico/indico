@@ -12,6 +12,7 @@ type("TimetableLayoutManager", [],
                  checkpoints[time].push([key, type, sessionId]);
              };
 
+
              // Enforce key ordering
              // In case we are dealing with structures that are inside a session,
              // and have a non-null sessionCode, use it for ordering
@@ -34,7 +35,7 @@ type("TimetableLayoutManager", [],
 
              each(orderedKeys, function(key){
                  var value = data[key];
-                 sTime =value.startDate.time.replace(/:/g,'');
+                 sTime = value.startDate.time.replace(/:/g,'');
                  eTime = value.endDate.time.replace(/:/g,'');
 
                  // If a poster session with a duration of > 7h then don't place
@@ -55,7 +56,7 @@ type("TimetableLayoutManager", [],
                      }
                  }
              });
-
+             this.checkpoints = checkpoints;
              return checkpoints;
          },
 
@@ -471,7 +472,6 @@ type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
              each(points, function(point) {
                  if (point[1] == 'start') {
                      block = self.getBlock(algData.blocks, point[0]);
-
                      block.start = algData.topPx;
                      algData.active++;
                      self.assign(algData.assigned, block);

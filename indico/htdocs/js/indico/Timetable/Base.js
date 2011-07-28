@@ -10,7 +10,7 @@ var TimetableDefaults = {
     minContribHeight: 20,      // Minimum height for a contrib displayed inside a session TODO: remove?
     layouts: {'compact': {name: "Compact",
                           values : {
-                              pxPerHour: 60,
+                              pxPerHour: 150,
                               pxPerSpace: 2,
                               minPxPerBlock: 50
                           },
@@ -18,7 +18,7 @@ var TimetableDefaults = {
 
               'proportional': {name: 'Proportional',
                                values : {
-                                   pxPerHour: 50,
+                                   pxPerHour: 120, //50 when not proportional
                                    minPxPerBlock: 25
                                },
                                manager: new ProportionalLayoutManager()
@@ -129,12 +129,39 @@ type("TimeTable", ["HistoryListener"], {
         return [];
     },
 
+    //To be overloaded
     redrawLegend: function() {
         return;
+    },
+
+    _shiftKeyListener: function() {
+      var indicatorDiv = $('.shiftIndicator');
+
+      //If its not already drawn/appended
+      if(!(indicatorDiv.length > 0)) {
+        indicatorDiv = (Html.div('shiftIndicator', $T("Shifting later entries ENABLED"))).dom;
+        $('body').append(indicatorDiv);
+      }
+
+      //< Keyboard Key "Shift" held down > listener for shifting while dragging blocks
+      $(window).keydown(function(e) {
+        //if Shift is pushed down
+        if(e.keyCode == '16') {
+          $(window).data('shiftIsPressed', true);
+          $(indicatorDiv).fadeIn("fast");
+        }}).keyup(function(e){
+          if(e.keyCode == '16') {
+            $(window).data('shiftIsPressed', false);
+            $(indicatorDiv).fadeOut("fast");
+          }
+        });
+
+      $(window).data('shiftIsPressed', false); //default value is false
     }
 },
      function(data, width, wrappingElement, detailLevel, managementMode) {
          var self = this;
+         this._shiftKeyListener();
 
          this.data = data;
 
@@ -146,7 +173,6 @@ type("TimeTable", ["HistoryListener"], {
          this.loadingIndicator = this._createLoadingIndicator();
          this.header = this._getHeader();
          this.legend = $('<div/>');
-         this.showNumSessions = 4; //Number of sessions shown in the legend by default, used by getLegend(..)
      }
     );
 
@@ -1227,7 +1253,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
          this.ManagementTimeTable(data, eventInfo, eventInfo, width, wrappingElement, detailLevel, customLinks);
          var managementActions = new TopLevelTimeTableManagementActions(this, eventInfo, eventInfo, isSessionTimetable);
-         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions, historyBroker);
+       this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, managementActions, historyBroker, 'proportional');
 
          this.postDraw = TopLevelTimeTableMixin.prototype.postDraw;
 

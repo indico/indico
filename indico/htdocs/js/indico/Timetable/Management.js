@@ -149,13 +149,15 @@ type("TimetableManagementActions", [], {
 
         info.set('scheduleEntry', eventData.scheduleEntryId);
         info.set('conference', eventData.conferenceId);
-
         info.set('startDate', startDate);
         info.set('endDate', endDate);
         info.set('reschedule', reschedule);
         info.set('sessionTimetable', this.isSessionTimetable);
 
         var type = eventData.entryType;
+        if(type == undefined) {
+          type = "Contribution";
+        }
 
         if (exists(eventData.sessionId)) {
             info.set('session', eventData.sessionId);
@@ -168,7 +170,9 @@ type("TimetableManagementActions", [], {
             }
         }
 
-        var killProgress = IndicoUI.Dialogs.Util.progress();
+      //Displays a "loading ..." div at the righthand bottom side
+      var killProgress = IndicoUI.Dialogs.Util.blockMoveProgress();
+
         indicoRequest(this.methods[type].modifyStartEndDate, info, function(result, error){
             killProgress();
             if (error) {
@@ -578,7 +582,7 @@ type("TimetableManagementActions", [], {
     },
 
 
-    moveEntry: function(eventData){
+    moveEntry: function(eventData) {
         var moveEntryDiag = new MoveEntryDialog(
             this,
             this.timetable,
@@ -648,7 +652,6 @@ type("TimetableManagementActions", [], {
     * Iterates through entries and adds all of them
     */
     _addEntries: function(entries) {
-
         var self = this;
 
         each(entries, function(entry) {

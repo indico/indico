@@ -29,7 +29,6 @@ from MaKaC.common.Configuration import Config
 from MaKaC.common.timezoneUtils import nowutc, date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
-from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
