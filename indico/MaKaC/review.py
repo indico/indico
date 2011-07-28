@@ -3325,7 +3325,7 @@ class NotificationTemplate(Persistent):
             self.addCCAddr(addr)
 
     def setCAasCCAddr(self, CAasCCAddr):
-        self._CAasCCAddr = CAasCCAddr.
+        self._CAasCCAddr = CAasCCAddr
 
     def getCAasCCAddr(self):
         try:
