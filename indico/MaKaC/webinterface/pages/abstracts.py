@@ -33,6 +33,8 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
 from MaKaC.common import Configuration
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
 
 class WConfCFADeactivated(wcomponents.WTemplated):
@@ -124,52 +126,17 @@ class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
         self._sectionMenu.setCurrentItem(self._cfaOpt)
 
 
-class WNewAbstractSubmission( wcomponents.WTemplated ):
-
-    def __init__( self, aw, conf ):
-        self._aw = aw
-        self._conf = conf
-
-    def _getErrorHTML( self, msgList ):
-        if not msgList:
-            return ""
-        return """
-            <table align="center" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-                """%"<br>".join( msgList )
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["postURL"] = urlHandlers.UHAbstractSubmission.getURL( self._conf )
-        vars["dataModificationForm"] = WAbstractDataModification( self._conf ).getHTML( vars )
-        vars["error"] = self._getErrorHTML( vars.get( "errors", [] ) )
-        return vars
-
-
-
-
 class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAbstractSubmission
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
+           self._includeJSPackage('Management')
 
     def _getBody( self, params ):
-        wc = WNewAbstractSubmission( self._getAW(), self._conf )
+        params["postURL"] = urlHandlers.UHAbstractSubmission.getURL( self._conf )
+        params["origin"] = "display"
+        wc = WAbstractDataModification( self._conf )
         return wc.getHTML( params )
 
     def _defineSectionMenu( self ):
@@ -438,6 +405,7 @@ class WAbstractDisplay( wcomponents.WTemplated ):
             vars["status"] = "UNDER REVIEW"
         vars["comments"] = self.htmlText( self._abstract.getComments() )
         vars["abstractId"] = self._abstract.getId()
+        vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
         return vars
 
 
@@ -455,69 +423,6 @@ class WPAbstractDisplay( WPAbstractDisplayBase ):
         self._toolBar.addItem(pdf)
 
 
-class WAbstractDataModificationAuthorItem( wcomponents.WTemplated ):
-
-    def __init__( self, authorData ):
-        self._authorData = authorData
-
-    #def _getTitleItems( self ):
-    #    items = []
-    #    for i in ["", "Mr.", "Mrs.", "Miss.", "Dr.", "Prof."]:
-    #        selected = ""
-    #        if self._authorData["auth_title"] == i:
-    #            selected = "selected"
-    #        items.append("""<option value="%s" %s>%s</option>
-    #                        """%(i, selected, i) )
-    #    return "\n".join( items )
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["anchor"] = ""
-        if self._authorData["auth_focus"]:
-            vars["anchor"] = """<a name="interest"></a>"""
-        vars["auth_id"] = str( self._authorData["auth_id"] )
-        vars["titleItems"] = TitlesRegistry().getSelectItemsHTML(self._authorData["auth_title"])
-        vars["auth_surName"] = quoteattr( str( self._authorData["auth_surName"] ) )
-        vars["auth_firstName"] = quoteattr( str( self._authorData["auth_firstName"] ) )
-        vars["auth_affiliation"] = quoteattr( str( self._authorData["auth_affiliation"] ) )
-        vars["auth_email"] = quoteattr( str( self._authorData["auth_email"] ) )
-        vars["auth_phone"] = quoteattr( str( self._authorData["auth_phone"] ) )
-        vars["auth_address"] = self._authorData["auth_address"]
-        vars["auth_speaker"] = ""
-        if self._authorData["auth_speaker"]:
-            vars["auth_speaker"] = "checked"
-        return vars
-
-
-class WAbstractDataModificationPrimaryAuthorItem( WAbstractDataModificationAuthorItem ):
-    pass
-
-class WAbstractDataModificationSecondaryAuthorItem( WAbstractDataModificationAuthorItem ):
-    pass
-
-
-class WAbstractDataModificationTrackItem( wcomponents.WTemplated ):
-
-    def __init__( self, track, checked=0, multipleTracks=True ):
-        self._track = track
-        self._checked = checked
-        self._multipleTracks = multipleTracks
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["checked"] = ""
-        if self._checked:
-            vars["checked"] = "checked"
-        vars["id"] = quoteattr( self._track.getId() )
-        if self._multipleTracks:
-            vars["type"] = "checkbox"
-        else:
-            vars["type"] = "radio"
-        vars["title"] = self.htmlText( self._track.getTitle() )
-        vars["description"] = self._track.getDescription()
-        return vars
-
-
 class WAbstractDataModification( wcomponents.WTemplated ):
 
     def __init__( self, conf ):
@@ -525,153 +430,58 @@ class WAbstractDataModification( wcomponents.WTemplated ):
         self._limitedFieldList = []
         self._mandatoryFieldList = [] # all mandatory fields ids, except which are also limited
 
-    def _getAdditionalFieldsHTML(self, vars):
-        html = ""
+    def _setMandatoryAndLimitedFields(self):
         abfm = self._conf.getAbstractMgr().getAbstractFieldsMgr()
         for f in abfm.getFields():
             id = f.getId()
-            value = vars.get(id,"")
-            if not f.isActive():
-                html += """<input type="hidden" name="%s" value=%s>""" % ("f_%s"%id,quoteattr(value))
-            else:
-                caption = f.getCaption()
+            if f.isActive():
                 maxLength = int(f.getMaxLength())
-                type = f.getType()
                 isMandatory = f.isMandatory()
-                if isMandatory:
-                    mandatoryText = """<span class="mandatoryField">*</span>"""
-                else:
-                    mandatoryText = ""
-                nbRows = 10
                 if maxLength > 0: # it means there is a limit for the field in words or in characters
                     self._limitedFieldList.append(["f_"+id, maxLength, "maxLimitionCounter_"+id.replace(" ", "_"), f.getLimitation(), str(isMandatory)]) # append the textarea/input id
-                    if f.getLimitation() == "words":
-                        nbRows = int((int(maxLength)*4.5)/85) + 1 # ~5 (4.5 + 1 space) is the average size of one word in english
-                        maxLengthJS = i18nformat("""<small><input name="maxwords%s" id="maxLimitionCounter_%s" size="4" value="%s" disabled> _("words left")</small>""") % (id.replace(" ", "_"), id.replace(" ", "_"), maxLength)
-                    else:
-                        nbRows = int(int(maxLength)/85) + 1
-                        maxLengthJS = i18nformat("""<small><input name="maxchars%s" id="maxLimitionCounter_%s" size="4" value="%s" disabled> _("chars left")</small>""") % (id.replace(" ", "_"), id.replace(" ", "_"), maxLength)
-                    if (nbRows > 30):
-                        nbRows = 30 # maximum size of the field.
                 else:
-                    maxLengthJS =  ""
-                    # check if the field is mandatory (it is not limited)
                     if isMandatory:
                         self._mandatoryFieldList.append("f_"+id)
-                if type == "textarea":
-                    field = """<textarea id="%s" name="%s" width="100%%" rows="%s" style="width:100%%">%s</textarea>""" % ( "f_%s"%id, "f_%s"%id, nbRows, value )
-                elif type == "input":
-                    field = """<input id="%s" name="%s" value="%s" style="width:100%%">""" % ("f_%s"%id, "f_%s"%id, value)
 
-                html+="""
-                    <tr>
-                        <td>&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td align="right" valign="top"  style="white-space:nowrap">
-                            <span class="dataCaptionFormat">%s</span>&nbsp;%s<br><br>
-                            %s
-                        </td>
-                        <td width="100%%">%s</td>
-                    </tr>
-                """ % ( caption, mandatoryText, maxLengthJS, field )
-        return html
-
+    def _getMaxTrackId(self):
+        result = 0
+        for track in self._conf.getTrackList():
+            trackId = int(track.getId())
+            if trackId > result:
+                result = trackId
+        return result
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["postURL"] = quoteattr( str( vars["postURL"] ) )
-        vars["title"] = quoteattr( str( vars.get("title", "") ) )
-        authors = vars["authors"]
-        authItems = []
-        for auth in authors.getPrimaryList():
-            item = WAbstractDataModificationPrimaryAuthorItem( auth ).getHTML()
-            authItems.append( item )
-        vars["primary_authors"] = "".join( authItems )
-        authItems = []
-        for auth in authors.getSecondaryList():
-            item = WAbstractDataModificationSecondaryAuthorItem( auth ).getHTML()
-            authItems.append( item )
-        vars["secondary_authors"] = "".join( authItems )
+        vars["postURL"] = quoteattr(str( vars["postURL"]))
+        vars["origin"] = vars.get("origin", "display")
+        vars["title"] = quoteattr(str(vars.get("title", "")))
+        vars["prAuthors"] = fossilize(vars.get("prAuthors", []))
+        vars["coAuthors"] = fossilize(vars.get("coAuthors", []))
         cfaMgr = self._conf.getAbstractMgr()
-        vars["tracksMandatory"] = ""
-        if cfaMgr.areTracksMandatory():
-            vars["tracksMandatory"] = """<span class="mandatoryField">*</span>"""
-        tracks = []
-        multipleTracks = cfaMgr.getMultipleTracks()
-        for track in self._conf.getTrackList():
-            selected = (track.getId() in vars["tracks"])
-            tracks.append( WAbstractDataModificationTrackItem( track, selected, multipleTracks ).getHTML() )
-        vars["tracks"] = "".join( tracks )
-        types = []
-        for contribType in self._conf.getContribTypeList():
-            selected = ""
-            if contribType == vars.get( "type", None ) and contribType != None:
-                selected = " selected"
-            types.append( """<option value=%s%s>%s</option>
-                            """%(quoteattr( str( contribType.getId() ) ), \
-                                    selected, \
-                                    self.htmlText( contribType.getName() ) ) )
-        vars["types"] = ""
-        if len(types)>0:
-            selected = ""
-            if vars.get( "type", "" ) == "":
-                selected = "selected"
-            types.insert( 0 , i18nformat("""<option value=""%s>--_("not specified")--</option>""")%selected )
-            vars["types"] = i18nformat("""
-                            <tr><td>&nbsp;</td></tr>
-                            <tr>
-                                <td align="right" valign="top" style="white-space:nowrap;">
-                                    <span class="dataCaptionFormat">_("Presentation type")</span>&nbsp;
-                                </td>
-                                <td>
-                                    <select name="type">
-                                        %s
-                                    </select>
-                                </td>
-                            </tr>
-                            """)%("\n".join( types ))
-
-        vars["comments"] = str( vars.get("comments", "") )
-        vars["additionalFields"] = self._getAdditionalFieldsHTML(vars)
+        vars["tracksMandatory"] = cfaMgr.areTracksMandatory()
+        vars["tracks"] = self._conf.getTrackList()
+        if cfaMgr.getMultipleTracks():
+            vars["trackListType"] = "checkbox"
+        else:
+            vars["trackListType"] = "radio"
+        vars["tracksSelected"] = vars.get("tracksSelectedList", []) # list of track ids that had been selected
+        vars["types"] = self._conf.getContribTypeList()
+        vars["typeSelected"] = vars.get("type", None)
+        vars["maxTrackId"] = self._getMaxTrackId()
+        vars["comments"] = str(vars.get("comments", ""))
+        fieldDict = {}
+        for field in cfaMgr.getAbstractFieldsMgr().getFields():
+            f_id = "f_" + field.getId()
+            fieldDict[f_id] = vars.get(f_id, "")
+        vars["fieldsDict"] = fieldDict
+        vars["additionalFields"] = cfaMgr.getAbstractFieldsMgr().getFields()
+        self._setMandatoryAndLimitedFields()
         vars["limitedFieldList"] = self._limitedFieldList
         vars["mandatoryFieldList"] = self._mandatoryFieldList
-        return vars
-
-
-class WAbstractModification( wcomponents.WTemplated ):
-
-    def __init__( self, aw, abstract ):
-        self._aw = aw
-        self._abstract = abstract
-
-    def _getErrorHTML( self, msgList ):
-        if not msgList:
-            return ""
-        return """
-            <table align="center" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-                """%"<br>".join( msgList )
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["postURL"] = urlHandlers.UHAbstractModify.getURL( self._abstract )
-        conf = self._abstract.getConference()
-        vars["dataModificationForm"] = WAbstractDataModification( conf ).getHTML( vars )
-        vars["error"] = self._getErrorHTML( vars.get("errors", []) )
+        vars["attachedFilesAllowed"] = cfaMgr.getAttachFiles()
+        vars["errorList"] = vars.get("errors", [])
+        vars["attachments"] = fossilize(vars.get("attachments", []), ILocalFileAbstractMaterialFossil)
         return vars
 
 
@@ -683,7 +493,8 @@ class WPAbstractModify( WPAbstractDisplayBase ):
                self._includeJSPackage('Management')
 
     def _getBody( self, params ):
-        wc = WAbstractModification( self._getAW(), self._abstract )
+        params["postURL"] = urlHandlers.UHAbstractModify.getURL( self._abstract )
+        wc = WAbstractDataModification( self._abstract.getConference() )
         return wc.getHTML( params )
 
 
@@ -1004,6 +815,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
             vars["rating"] = "%.2f" % rating
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
+        vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
 
         return vars
 
@@ -1037,22 +849,13 @@ class WPAbstractSelectSubmitter(WPAbstractManagementBase):
 class WPModEditData(WPAbstractManagment):
 
     def __init__(self, rh, abstract, abstractData):
-        WPAbstractManagment.__init__(self,rh,abstract)
-        self._abstractData=abstractData
+        WPAbstractManagment.__init__(self, rh, abstract)
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfModAbstractEditData(self._target.getConference(),self._abstractData)
-        p={"postURL": urlHandlers.UHAbstractModEditData.getURL(self._abstract)}
-        return i18nformat("""
-            <table width="95%%" cellpadding="0" cellspacing="0" align="center" border="0">
-            <tr>
-            <td class="groupTitle">
-                        _("Editing an abstract")
-                    </td>
-                </tr>
-                %s
-            </table>
-                """)%wc.getHTML(p)
+        params["postURL"] = urlHandlers.UHAbstractModEditData.getURL(self._abstract)
+        params["origin"] = "management"
+        wc = WAbstractDataModification(self._conf)
+        return wc.getHTML(params)
 
 
 class WAbstractManagmentAccept( wcomponents.WTemplated ):

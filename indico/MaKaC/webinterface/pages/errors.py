@@ -208,21 +208,28 @@ class WPAccessError( WPDecorated ):
         WPDecorated. __init__( self, rh )
 
     def _getBody( self, params ):
-        tgt = self._rh._target
-        if tgt and tgt.isProtected() and (tgt.getAccessKey() != "" or \
-                                          ( (not type(tgt) is Category) and tgt.getConference().getAccessKey() != "")):
-            msg = ""
-            sess = self._rh._getSession()
-            keys = sess.getVar("accessKeys")
-            id = tgt.getUniqueId()
-            if keys != None and keys.has_key(id):
-                msg = i18nformat("""<font color=red> _("Bad access key")!</font>""")
-            else:
-                msg = ""
-            wc = WAccessKeyError( self._rh, msg )
-        else:
-            wc = WAccessError( self._rh )
+        wc = WAccessError( self._rh )
         return wc.getHTML()
+
+
+class WPKeyAccessError( WPDecorated ):
+
+    def __init__( self, rh ):
+        WPDecorated. __init__( self, rh )
+
+    def _getBody( self, params ):
+        tgt = self._rh._target
+        msg = ""
+        sess = self._rh._getSession()
+        keys = sess.getVar("accessKeys")
+        id = tgt.getUniqueId()
+        if keys != None and keys.has_key(id):
+            msg = i18nformat("""<font color=red> _("Bad access key")!</font>""")
+        else:
+            msg = ""
+        wc = WAccessKeyError( self._rh, msg )
+        return wc.getHTML()
+
 
 class WHostnameError( WGenericError ):
 

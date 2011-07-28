@@ -35,7 +35,7 @@ def getSubjectIndicoTitle():
     return systitle
 
 class personMail:
-    
+
     def send(addto, addcc, addfrom, subject, body):
         addto = addto.replace("\r\n","")
         tolist = addto.split(",")
@@ -46,7 +46,7 @@ class personMail:
 
 
 class GenericNotification :
-    
+
     def __init__(self, data=None):
         if data is None :
             self._fromAddr = ""
@@ -62,52 +62,52 @@ class GenericNotification :
             self._subject = data.get("subject","")
             self._body = data.get("body","")
             self._contenttype = data.get("content-type","text/plain")
-            
+
     def getContentType(self):
         return self._contenttype
-    
+
     def setContentType(self, contentType):
         self._contenttype = contentType
-    
+
     def getFromAddr(self):
         return self._fromAddr
-    
+
     def setFromAddr(self, fromAddr):
         if fromAddr is None :
             return False
         self._fromAddr = fromAddr
         return True
-        
+
     def getToList(self):
         return self._toList
-    
+
     def setToList(self, toList):
         if toList is None :
             return False
         self._toList = toList
         return True
-        
+
     def getCCList(self):
         return self._ccList
-        
+
     def setCCList(self, ccList):
         if ccList is None :
             return False
         self._ccList = ccList
         return True
-        
+
     def getSubject(self):
         return self._subject
-        
+
     def setSubject(self, subject):
         if subject is None :
             return False
         self._subject = subject
         return True
-    
+
     def getBody(self):
         return self._body
-        
+
     def setBody(self, body):
         if body is None :
             return False
@@ -125,8 +125,8 @@ class Mailer:
             fromAddr = notification.getFromAddr()
         toAddr = str(notification.getDestination().getEmail())
         text = """%s
--- 
-Indico project <http://cern.ch/indico>
+--
+Indico project <http://indico-software.org/>
                 """%(notification.getMsg())
         maildata = { "fromAddr": fromAddr, "toList": [toAddr], "subject": "[Indico] %s"%notification.getSubject(), "body": text }
         GenericMailer.send(GenericNotification(maildata))
@@ -134,7 +134,7 @@ Indico project <http://cern.ch/indico>
 
 
 class sendConfirmationRequest:
-    
+
     def __init__( self, user ):
         self._user = user
 
@@ -203,12 +203,12 @@ Thank you for using Indico.
                 """)%(self._user.getIdentityList()[0].getLogin())
         maildata = { "fromAddr": "Indico Mailer<%s>"%minfo.getNoReplyEmail(returnSupport=True), "toList": [self._user.getEmail()], "subject": _("[%s] Registration accepted")%getSubjectIndicoTitle(), "body": text }
         GenericMailer.send(GenericNotification(maildata))
-    
+
 class sendLoginInfo:
-    
+
     def __init__( self, user ):
         self._user = user
-    
+
     def send (self ):
         idList = self._user.getIdentityList()
         logins = []

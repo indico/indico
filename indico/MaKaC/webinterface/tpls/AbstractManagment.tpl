@@ -45,6 +45,15 @@
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Contribution type")}</span></td>
                     <td bgcolor="white" valign="top">${ type }</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Attached files")}</span></td>
+                    <td bgcolor="white" valign="top">
+                        % for file in attachments:
+                            <div style="padding-bottom:3px;"><a href=${ file["url"] }>${ file["file"]["fileName"] }</a></div>
+                        % endfor
+                    </td>
                     <form action=${ modDataURL } method="POST">
                     <td align="right" valign="bottom">
                         <input type="submit" class="btn" name="modify" value="${ _("modify") }">

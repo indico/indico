@@ -47,7 +47,7 @@ from MaKaC.common.general import *
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError
+from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from xml.sax.saxutils import escape
 
@@ -849,7 +849,7 @@ class RHDisplayBaseProtected( RHProtected ):
                 target = self._target
             if not isinstance(self._target, Category):
                 if target.getAccessKey() != "" or target.getConference() and target.getConference().getAccessKey() != "":
-                    raise AccessError()
+                    raise KeyAccessError()
             if self._getUser() == None:
                 self._checkSessionUser()
             else:

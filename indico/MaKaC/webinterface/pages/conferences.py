@@ -5654,18 +5654,21 @@ class WConfModifCFA( wcomponents.WTemplated ):
         abMgr = self._conf.getAbstractMgr()
         iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
         iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
-        url = urlHandlers.UHConfCFASwitchMultipleTracks.getURL(self._conf)
+        vars["multipleUrl"] = urlHandlers.UHConfCFASwitchMultipleTracks.getURL(self._conf)
         if abMgr.getMultipleTracks():
-            icon = iconEnabled
+            vars["multipleIcon"] = iconEnabled
         else:
-            icon = iconDisabled
-        vars["miscOptions"] = i18nformat("""<a href="%s"><img src="%s" border="0"> _("Allow multiple tracks selection")</a>""") % (str(url), icon)
-        url = urlHandlers.UHConfCFAMakeTracksMandatory.getURL(self._conf)
+            vars["multipleIcon"] = iconDisabled
+        vars["mandatoryUrl"] = urlHandlers.UHConfCFAMakeTracksMandatory.getURL(self._conf)
         if abMgr.areTracksMandatory():
-            icon = iconEnabled
+            vars["mandatoryIcon"] = iconEnabled
         else:
-            icon = iconDisabled
-        vars["miscOptions"] += """<br/><a href="%s"><img src="%s" border="0"> Make track selection mandatory</a>""" % (str(url), icon)
+            vars["mandatoryIcon"] = iconDisabled
+        if abMgr.getAttachFiles():
+            vars["attachIcon"] = iconEnabled
+        else:
+            vars["attachIcon"] = iconDisabled
+        vars["attachUrl"] = urlHandlers.UHConfCFAAllowAttachFiles.getURL(self._conf)
         vars["setStatusURL"]=urlHandlers.UHConfCFAChangeStatus.getURL(self._conf)
         vars["dataModificationURL"]=urlHandlers.UHCFADataModification.getURL(self._conf)
         vars["addTypeURL"]=urlHandlers.UHCFAManagementAddType.getURL(self._conf)
@@ -5761,10 +5764,11 @@ class WPConfModifCFAPreview( WPConferenceModifAbstractBase ):
         import MaKaC.webinterface.pages.abstracts as abstracts
         wc = abstracts.WAbstractDataModification( self._conf )
         # Simulate fake abstract
-        from MaKaC.webinterface.rh.CFADisplay import AbstractData
+        from MaKaC.webinterface.common.abstractDataWrapper import AbstractData
         ad = AbstractData(self._conf.getAbstractMgr(), {})
         params = ad.toDict()
         params["postURL"] = ""
+        params["origin"] = "management"
         return wc.getHTML(params)
 
 class WPConfModifCFA( WPConferenceModifAbstractBase ):
@@ -6350,24 +6354,15 @@ class WPConfAbstractList( WPConferenceModifAbstractBase ):
 
 class WPModNewAbstract(WPConfAbstractList):
 
-    def __init__(self,rh,conf,abstractData):
-        WPConfAbstractList.__init__(self, rh, conf,"")
-        self._abstractData=abstractData
+    def __init__(self, rh, conf, abstractData):
+        WPConfAbstractList.__init__(self, rh, conf, "")
 
-    def _getTabContent( self, params ):
-        wc=wcomponents.WConfModAbstractEditData(self._conf,self._abstractData)
-        p={"postURL": urlHandlers.UHConfModNewAbstract.getURL(self._conf)}
-        return i18nformat("""
-            <table width="95%%" cellpadding="0" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777">
-            <tr>
-            <td class="groupTitle">
-                        _("Submitting a new abstract")
-                    </td>
-                </tr>
-                %s
-            </table>
-                """)%wc.getHTML(p)
-        return wc.getHTML()
+    def _getTabContent(self, params):
+        from MaKaC.webinterface.pages.abstracts import WAbstractDataModification
+        params["postURL"] = urlHandlers.UHConfModNewAbstract.getURL(self._conf)
+        params["origin"] = "management"
+        wc = WAbstractDataModification(self._conf)
+        return wc.getHTML(params)
 
 
 class WConfModAbstractsMerge(wcomponents.WTemplated):

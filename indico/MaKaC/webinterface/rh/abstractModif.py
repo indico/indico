@@ -29,7 +29,7 @@ from MaKaC.common.xmlGen import XMLGen
 from MaKaC.errors import MaKaCError,ModificationError, FormValuesError
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 from MaKaC.common import Config
-import MaKaC.webinterface.common.abstractDataWrapper as abstractDataWrapper
+from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
 from MaKaC.abstractReviewing import ConferenceAbstractReview
@@ -110,6 +110,7 @@ class RHAbstractSetSubmitter(RHAbstractModifBase):
             id  = params["selectedPrincipals"]
             self._target.setSubmitter( ph.getById( id ) )
         self._redirect( urlHandlers.UHAbstractManagment.getURL( self._target ) )
+
 
 class RHAbstractDirectAccess(RHAbstractModifBase, RHConferenceBase):
 
@@ -553,75 +554,53 @@ class RHAC(RHAbstractModifBase):
         return p.display()
 
 
-class RHEditData(RHAbstractModifBase):
+class RHEditData(RHAbstractModifBase, AbstractParam):
 
-    def _getDirectionKey(self, params):
-        for key in params.keys():
-            if key.startswith("upPA"):
-                return key.split("_")
-            elif key.startswith("downPA"):
-                return key.split("_")
-            elif key.startswith("upCA"):
-                return key.split("_")
-            elif key.startswith("downCA"):
-                return key.split("_")
-        return None
-
-    def _checkParams(self,params):
+    def _checkParams(self, params):
         RHAbstractModifBase._checkParams(self,params)
-        toNorm=["auth_prim_id","auth_prim_title", "auth_prim_first_name",
-            "auth_prim_family_name","auth_prim_affiliation",
-            "auth_prim_email", "auth_prim_phone", "auth_prim_speaker",
-            "auth_co_id","auth_co_title", "auth_co_first_name",
-            "auth_co_family_name","auth_co_affiliation",
-            "auth_co_email", "auth_co_phone", "auth_co_speaker"]
-        for k in toNorm:
-            params[k]=self._normaliseListParam(params.get(k,[]))
-        self._abstractData=abstractDataWrapper.Abstract(self._conf.getAbstractMgr().getAbstractFieldsMgr(), **params)
-        self._doNotSanitizeFields = self._abstractData.getFieldNames()
-        self._doNotSanitizeFields.append('title')
-        self._action=""
-        if params.has_key("OK"):
-            self._action="UPDATE"
-        elif params.has_key("CANCEL"):
-            self._action="CANCEL"
-        elif params.has_key("addPrimAuthor"):
-            self._abstractData.newPrimaryAuthor()
-        elif params.has_key("addCoAuthor"):
-            self._abstractData.newCoAuthor()
-        elif params.has_key("remPrimAuthors"):
-            idList=self._normaliseListParam(params.get("sel_prim_author",[]))
-            self._abstractData.removePrimaryAuthors(idList)
-        elif params.has_key("remCoAuthors"):
-            idList=self._normaliseListParam(params.get("sel_co_author",[]))
-            self._abstractData.removeCoAuthors(idList)
-        else:
-            arrowKey = self._getDirectionKey(params)
-            if arrowKey != None:
-                id = arrowKey[1]
-                if arrowKey[0] == "upPA":
-                    self._abstractData.upPrimaryAuthors(id)
-                elif arrowKey[0] == "downPA":
-                    self._abstractData.downPrimaryAuthors(id)
-                elif arrowKey[0] == "upCA":
-                    self._abstractData.upCoAuthors(id)
-                elif arrowKey[0] == "downCA":
-                    self._abstractData.downCoAuthors(id)
-            else:
-                self._abstractData=abstractDataWrapper.Abstract(self._conf.getAbstractMgr().getAbstractFieldsMgr())
-                self._abstractData.mapAbstract(self._target)
+        if self._getUser() == None:
+            return
+        headerSize = self._req.headers_in["content-length"]
+        AbstractParam._checkParams(self, params, self._conf, headerSize)
+        if self._action == "":
+            #First call
+            afm = self._conf.getAbstractMgr().getAbstractFieldsMgr()
+            self._abstractData.title = self._abstract.getTitle()
+            for f in afm.getFields():
+                id = f.getId()
+                self._abstractData.setFieldValue(id, self._abstract.getField(id))
+            self._abstractData.type = self._abstract.getContribType()
+            trackIds = []
+            for track in self._abstract.getTrackListSorted():
+                trackIds.append(track.getId())
+            self._abstractData.tracks = trackIds
+            self._abstractData.comments = self._abstract.getComments()
+
+    def _doValidate( self ):
+        #First, one must validate that the information is fine
+        errors = self._abstractData.check()
+        if errors:
+            p = abstracts.WPModEditData(self, self._target, self._abstractData)
+            pars = self._abstractData.toDict()
+            pars["errors"] = errors
+            pars["action"] = self._action
+            # restart the current value of the param attachments to show the existing files
+            pars["attachments"] = self._abstract.getAttachments().values()
+            return p.display( **pars )
+        self._abstract.clearAuthors()
+        #self._setAbstractData(self._abstract)
+        self._abstractData.setAbstractData(self._abstract)
+        self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
 
     def _process( self ):
-        if self._action=="UPDATE":
-            if not self._abstractData.hasErrors():
-                self._abstractData.updateAbstract(self._target)
-                self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
-                return
-        elif self._action=="CANCEL":
+        if self._action == "CANCEL":
             self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
-            return
-        p = abstracts.WPModEditData(self,self._target,self._abstractData)
-        return p.display()
+        elif self._action == "VALIDATE":
+            return self._doValidate()
+        else:
+            p = abstracts.WPModEditData(self, self._target, self._abstractData)
+            pars = self._abstractData.toDict()
+            return p.display(**pars)
 
 
 class RHIntComments(RHAbstractModifBase):

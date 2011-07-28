@@ -720,6 +720,9 @@ class UHConfCFASwitchMultipleTracks( URLHandler ):
 class UHConfCFAMakeTracksMandatory( URLHandler ):
     _relativeURL = "confModifCFA.py/makeTracksMandatory"
 
+class UHConfCFAAllowAttachFiles( URLHandler ):
+    _relativeURL = "confModifCFA.py/switchAttachFiles"
+
 class UHCFAManagementAddType( URLHandler ):
     _relativeURL = "confModifCFA.py/addType"
 
@@ -3116,6 +3119,8 @@ class UHConfModifCFARemoveSubmitter( URLHandler ):
 class UHAbstractChangeSubmitter( URLHandler ):
     _relativeURL = "abstractManagment.py/changeSubmitter"
 
+class UHAbstractAttachmentFileAccess(URLHandler):
+    _relativeURL = "abstractDisplay.py/getAttachedFile"
 
 class UHAbstractSetSubmitter( URLHandler ):
     _relativeURL = "abstractManagment.py/setSubmitter"

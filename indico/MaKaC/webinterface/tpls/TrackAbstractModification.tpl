@@ -42,6 +42,14 @@
                     <td bgcolor="white" valign="top">${ tracks }</td>
                 </tr>
                 <tr>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Attached files")}</span></td>
+                    <td bgcolor="white" valign="top">
+                        % for file in attachments:
+                            <div style="padding-bottom:3px;"><a href=${ file["url"] }>${ file["file"]["fileName"] }</a></div>
+                        % endfor
+                    </td>
+                </tr>
+                <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
                 <tr>

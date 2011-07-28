@@ -30,7 +30,7 @@ import MaKaC.webinterface.common.timezones as convertTime
 import MaKaC.common.timezoneUtils as timezoneUtils
 from BTrees.OOBTree import OOBTree
 from sets import Set
-import MaKaC.webinterface.common.abstractDataWrapper as abstractDataWrapper
+from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.materialFactories as materialFactories
@@ -3617,6 +3617,14 @@ class RHConfModifCFAMakeTracksMandatory( RHConfModifCFABase ):
         self._conf.getAbstractMgr().setTracksMandatory(not self._conf.getAbstractMgr().areTracksMandatory())
         self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
 
+
+class RHConfModifCFASwitchAttachFiles( RHConfModifCFABase ):
+
+    def _process( self ):
+        self._conf.getAbstractMgr().setAllowAttachFiles(not self._conf.getAbstractMgr().getAttachFiles())
+        self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
+
+
 class RHCFAAddType( RHConfModifCFABase ):
 
     def _checkParams( self, params ):
@@ -6217,73 +6225,46 @@ class RHAbstractsParticipantList(RHConfModifCFABase):
         return p.display()
 
 
-class RHNewAbstract(RHConfModifCFABase):
+class RHNewAbstract(RHConfModifCFABase, AbstractParam):
 
-    def _getDirectionKey(self, params):
-        for key in params.keys():
-            if key.startswith("upPA"):
-                return key.split("_")
-            elif key.startswith("downPA"):
-                return key.split("_")
-            elif key.startswith("upCA"):
-                return key.split("_")
-            elif key.startswith("downCA"):
-                return key.split("_")
-        return None
+    def _checkParams(self, params):
+        RHConfModifCFABase._checkParams(self, params)
+        #if the user is not logged in we return inmediately as this form needs
+        #   the user to be logged in and therefore all the checking below is not
+        #   necessary
+        if self._getUser() == None:
+            return
+        headerSize = self._req.headers_in["content-length"]
+        AbstractParam._checkParams(self, params, self._conf, headerSize)
 
-    def _checkParams(self,params):
-        RHConfModifCFABase._checkParams(self,params)
-        toNorm=["auth_prim_id","auth_prim_title", "auth_prim_first_name",
-            "auth_prim_family_name","auth_prim_affiliation",
-            "auth_prim_email", "auth_prim_phone", "auth_prim_speaker",
-            "auth_co_id","auth_co_title", "auth_co_first_name",
-            "auth_co_family_name","auth_co_affiliation",
-            "auth_co_email", "auth_co_phone", "auth_co_speaker"]
-        for k in toNorm:
-            params[k]=self._normaliseListParam(params.get(k,[]))
-        self._abstractData=abstractDataWrapper.Abstract(self._conf.getAbstractMgr().getAbstractFieldsMgr(), **params)
-        self._action=""
-        if params.has_key("OK"):
-            self._action="CREATE"
-        elif params.has_key("CANCEL"):
-            self._action="CANCEL"
-        elif params.has_key("addPrimAuthor"):
-            self._abstractData.newPrimaryAuthor()
-        elif params.has_key("addCoAuthor"):
-            self._abstractData.newCoAuthor()
-        elif params.has_key("remPrimAuthors"):
-            idList=self._normaliseListParam(params.get("sel_prim_author",[]))
-            self._abstractData.removePrimaryAuthors(idList)
-        elif params.has_key("remCoAuthors"):
-            idList=self._normaliseListParam(params.get("sel_co_author",[]))
-            self._abstractData.removeCoAuthors(idList)
-        else:
-            arrowKey = self._getDirectionKey(params)
-            if arrowKey != None:
-                id = arrowKey[1]
-                if arrowKey[0] == "upPA":
-                    self._abstractData.upPrimaryAuthors(id)
-                elif arrowKey[0] == "downPA":
-                    self._abstractData.downPrimaryAuthors(id)
-                elif arrowKey[0] == "upCA":
-                    self._abstractData.upCoAuthors(id)
-                elif arrowKey[0] == "downCA":
-                    self._abstractData.downCoAuthors(id)
-            else:
-                self._abstractData=abstractDataWrapper.Abstract(self._conf.getAbstractMgr().getAbstractFieldsMgr())
+
+    def _doValidate( self ):
+        #First, one must validate that the information is fine
+        errors = self._abstractData.check()
+        if errors:
+            p = conferences.WPModNewAbstract(self, self._target, self._abstractData)
+            pars = self._abstractData.toDict()
+            pars["errors"] = errors
+            pars["action"] = self._action
+            return p.display( **pars )
+        #Then, we create the abstract object and set its data to the one
+        #   received
+        cfaMgr = self._target.getAbstractMgr()
+        abstract = cfaMgr.newAbstract( self._getUser() )
+        #self._setAbstractData(abstract)
+        self._abstractData.setAbstractData(abstract)
+        #Finally, we display the abstract management page
+        self._redirect(urlHandlers.UHAbstractManagment.getURL(abstract))
 
     def _process( self ):
-        if self._action=="CREATE":
-            if not self._abstractData.hasErrors():
-                abs=self._target.getAbstractMgr().newAbstract(self._getUser())
-                self._abstractData.updateAbstract(abs)
-                self._redirect(urlHandlers.UHAbstractManagment.getURL(abs))
-                return
-        elif self._action=="CANCEL":
+        if self._action == "CANCEL":
             self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._target))
-            return
-        p = conferences.WPModNewAbstract(self,self._target,self._abstractData)
-        return p.display()
+        elif self._action == "VALIDATE":
+            return self._doValidate()
+        else:
+            p = conferences.WPModNewAbstract(self, self._target, self._abstractData)
+            pars = self._abstractData.toDict()
+            return p.display(**pars)
 
 
 class RHContribsActions:

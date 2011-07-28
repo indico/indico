@@ -1297,7 +1297,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],
                [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', true), userData.accessor('email'))],
                [$T('Address'), $B(Html.textarea(), userData.accessor('address'))],
-               [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('telephone'))],
+               [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))],
                [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('fax'))],
                grant]);
 
@@ -1313,6 +1313,46 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
          this.userData = userData;
          this.action = action;
          this.grantSubmission = exists(grantSubmission)?grantSubmission:false;
+         this.ExclusivePopup(title,  function(){return true;});
+     }
+    );
+
+/**
+ * Creates a data creation / edit pop-up dialog.
+ * @param {String} title The title of the popup.
+ * @param {Object} userData A WatchObject that has to have the following keys/attributes:
+ *                          id, title, familyName, firstName, affiliation, email, telephone.
+ *                          Its information will be displayed as initial values in the dialog.
+ * @param {Function} action A callback function that will be called if the user presses ok. The function will be passed
+ *                          a WatchObject with the new values.
+ */
+type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
+    {
+        draw: function() {
+            var userData = this.userData;
+            var self = this;
+            self.parameterManager = new IndicoUtil.parameterManager();
+
+            var form = IndicoUtil.createFormFromMap([
+               [$T('Title'), $B(Html.select({}, Html.option({}, ""), Html.option({value:'Mr.'}, $T("Mr.")), Html.option({value:'Mrs.'}, $T("Mrs.")), Html.option({value:'Ms.'}, $T("Ms.")), Html.option({value:'Dr.'}, $T("Dr.")), Html.option({value:'Prof.'}, $T("Prof."))), userData.accessor('title'))],
+               [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
+               [$T('First Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('firstName'))],
+               [$T('Affiliation'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('affiliation'))],
+               [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', false), userData.accessor('email'))],
+               [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))]
+               ]);
+
+            var buttons = Html.div({},
+                    Widget.link(command(curry(this.action, userData, function() {self.close();}), Html.input("button", {}, $T("Save")))),
+                    Widget.link(command(function() {self.close();}, Html.input("button", {}, $T("Cancel")))));
+
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this, form, buttons);
+         }
+
+     },
+     function(title, userData, action) {
+         this.userData = userData;
+         this.action = action;
          this.ExclusivePopup(title,  function(){return true;});
      }
     );

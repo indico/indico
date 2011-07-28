@@ -82,3 +82,6 @@ def switchMultipleTracks(req, **params):
 
 def makeTracksMandatory(req, **params):
     return conferenceModif.RHConfModifCFAMakeTracksMandatory(req).process(params)
+
+def switchAttachFiles(req, **params):
+    return conferenceModif.RHConfModifCFASwitchAttachFiles(req).process(params)

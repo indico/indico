@@ -68,7 +68,9 @@
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Misc. Options")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
-            ${ miscOptions }
+            <a href="${ multipleUrl }"><img src="${ multipleIcon }" border="0"> ${ _("Allow multiple tracks selection") }</a>
+            <br/><a href="${ mandatoryUrl }"><img src="${ mandatoryIcon }" border="0"> ${ _("Make track selection mandatory") }</a>
+            <br/><a href="${ attachUrl }"><img src="${ attachIcon }" border="0"> ${ _("Allow to attach files") }</a>
         </td>
     </tr>
     </tr>

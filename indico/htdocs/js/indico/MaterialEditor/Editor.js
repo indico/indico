@@ -1609,6 +1609,42 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
      }
     );
 
+/*
+type("AbstractSubmissionMaterialListWidget", ["MaterialListWidget"], {
+
+    drawContent: function() {
+
+        var self = this;
+
+        $O(self.source).each(function(value, key){
+            var obj = watchize(value);
+            self.set(key, obj);
+        });
+
+
+        var link = Widget.link(command(function(){
+                    IndicoUI.Dialogs.Material.add(null,
+                                                  self,
+                                                  null,
+                                                  null,
+                                                  self.makeMaterialLoadFunction(),
+                                                  true);
+                }, $T("Upload file")));
+        return Html.div(
+            {},
+            Html.div({style:{textAlign: 'left'}}, link),
+            Html.div({style:{overflow: 'auto'}},
+                     this.ListWidget.prototype.draw.call(this))
+        );
+    }
+},
+     function(args) {
+         this.MaterialListWidget({});
+     }
+    );
+*/
+
+
 
 type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
 

@@ -34,7 +34,8 @@ from MaKaC.accessControl import AdminList
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
-#from MaKaC.abstractReviewing import AbstractReview
+from MaKaC.common import Config
+import tempfile
 
 
 class AbstractSorter:
@@ -330,6 +331,9 @@ class Author( AbstractParticipation ):
     def clone(self, abstract):
         auth = Author(abstract, self.getData())
         return auth
+
+    def isSpeaker(self):
+        return self._abstract.isSpeaker(self)
 
 class Submitter( AbstractParticipation ):
 
@@ -674,6 +678,7 @@ class AbstractMgr(Persistent):
         self._submissionNotification=SubmissionNotification()
         self._multipleTracks = True
         self._tracksMandatory = False
+        self._attachFiles = False
 
     def getMultipleTracks( self ):
         try:
@@ -692,8 +697,18 @@ class AbstractMgr(Persistent):
             self.setTracksMandatory( False )
             return self._tracksMandatory
 
+    def getAttachFiles(self):
+        try:
+            return self._attachFiles
+        except:
+            self.setAllowAttachFiles(False)
+            return self._attachFiles
+
     def setTracksMandatory( self, tracksMandatory = False ):
         self._tracksMandatory = tracksMandatory
+
+    def setAllowAttachFiles(self, attachFiles = False):
+        self._attachFiles = attachFiles
 
     def getAbstractFieldsMgr(self):
         try:
@@ -967,7 +982,7 @@ class AbstractMgr(Persistent):
         ''' Check if the user is submitter, primary author or co-author of the abstract
         '''
         # Check if the user is a submitter or (co-author)
-        if abstract.isSubmitter(user) or self.getAbstractListForAuthorEmail(user.getEmail()):
+        if abstract.isSubmitter(user) or (abstract in self.getAbstractListForAuthorEmail(user.getEmail())):
             return True
 
         return False
@@ -1301,6 +1316,8 @@ class Abstract(Persistent):
         self._submitter=None
         self._setSubmitter( submitter )
         self._rating = None # It needs to be none to avoid the case of having the same value as the lowest value in the judgement
+        self._attachments = {}
+        self._attachmentsCounter = Counter()
 
     def clone(self, conference, abstractId):
 
@@ -1375,6 +1392,21 @@ class Abstract(Persistent):
                     abs._addTrackReallocation(newtrl)
                     abs._addTrackJudgementToHistorical(newtrl)
 
+        # Cloning materials
+        from MaKaC.conference import LocalFile
+        for f in self.getAttachments().values():
+            # name for the new file
+            name = "abs_mat_" + conference.getId() + "_" + abs.getId() + "_" + str(len(abs.getAttachments().keys()) + 1)
+            # set the new file
+            newFile = LocalFile()
+            newFile = f.clone(conference)
+            newFile.setName(name)
+            newFile.setOwner(abs)
+            newFile.setId(name)
+            newFile.archive(self.getConference()._getRepository())
+            abs.getAttachments()[name] = newFile
+            abs._notifyModification()
+
         return abs
 
     def getUniqueId( self ):
@@ -1419,6 +1451,43 @@ class Abstract(Persistent):
     def setComments(self, comments):
         self._comments = comments
 
+    def saveFiles(self, files):
+        cfg = Config.getInstance()
+        from MaKaC.conference import LocalFile
+        for fileUploaded in files:
+            # create a temp file
+            tempPath = cfg.getUploadedFilesTempDir()
+            tempFileName = tempfile.mkstemp(suffix="IndicoAbstract.tmp", dir=tempPath)[1]
+            f = open(tempFileName, "wb")
+            f.write(fileUploaded.file.read() )
+            f.close()
+            # name for the new file
+            name = "abs_mat_" + self.getConference().getId() + "_" + self.getId() + "_" + self._getAttachmentsCounter()
+            # set the file
+            file = LocalFile()
+            file.setName(name)
+            file.setFileName(fileUploaded.filename)
+            file.setFilePath(tempFileName)
+            file.setOwner(self)
+            file.setId(name)
+            file.archive(self.getConference()._getRepository())
+            self.getAttachments()[name] = file
+            self._notifyModification()
+
+    def checkExistingFiles(self, keys):
+        existingKeys = self.getAttachments().keys()
+        for key in existingKeys:
+            if not key in keys:
+                self._deleteFile(key)
+
+    def _deleteFile(self, key):
+        file = self.getAttachments()[key]
+        file.delete()
+        del self.getAttachments()[key]
+
+    def removeResource(self, res):
+        pass
+
     def _setOwner( self, owner ):
         self._owner = owner
 
@@ -1442,6 +1511,14 @@ class Abstract(Persistent):
 
     def getModificationDate( self ):
         return self._modificationDate
+
+    def setModificationDate(self, date = None):
+        """
+        Method called to notify the current object has been modified.
+        """
+        if not date:
+            date = nowutc()
+        self._modificationDate = date
 
     def _setSubmitter( self, av ):
         if not av:
@@ -1812,6 +1889,9 @@ class Abstract(Persistent):
         if self.isAllowedToCoordinate(av):
             return True
         return self.canUserModify(av)
+
+    def getAccessController(self):
+        return self.getConference().getAccessController()
 
     def canAccess(self,aw):
         #if the conference is protected, then only allowed AW can access
@@ -2447,6 +2527,35 @@ class Abstract(Persistent):
         for jud in self.getJudgementHistoryByTrack(track):
             if (jud.getResponsible() == user):
                 return jud.getJudValue()
+
+    def getAttachmentsSize(self, keys):
+        """
+            Get the total size of the files that are in the list of keys
+        """
+        size = 0
+        for key in keys:
+            if key in self.getAttachments().keys():
+                size += self.getAttachments()[key].getSize()
+        return size
+
+    def _getAttachmentsCounter(self):
+        try:
+            if self._attachmentsCounter:
+                pass
+        except AttributeError:
+            self._attachmentsCounter = Counter()
+        return self._attachmentsCounter.newCount()
+
+    def setAttachments(self, attachments):
+        self._attachments = attachments
+
+    def getAttachments(self):
+        try:
+            if self._attachments:
+                pass
+        except AttributeError:
+            self._attachments = {}
+        return self._attachments
 
 
 class AbstractJudgement( Persistent ):

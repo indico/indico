@@ -247,7 +247,7 @@ class _PendingSubmitterNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://cern.ch/indico>
+    Indico project <http://indico-software.org/>
                 """)%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):
@@ -355,7 +355,7 @@ class _PendingManagerNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://cern.ch/indico>
+    Indico project <http://indico-software.org/>
                 """)%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):
@@ -453,7 +453,7 @@ class _PendingConfManagerNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://cern.ch/indico>
+    Indico project <http://indico-software.org/>
                 """)%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):
@@ -547,7 +547,7 @@ class _PendingCoordinatorNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://cern.ch/indico>
+    Indico project <http://indico-software.org/>
                 """)%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):

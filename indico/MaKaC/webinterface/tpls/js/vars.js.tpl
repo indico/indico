@@ -156,5 +156,10 @@ var Indico = {
     Settings: {
         ExtAuthenticators: ${ jsonEncode(extAuths) },
         RoomBookingModuleActive: ${ jsBoolean(rbActive) }
+    },
+
+    FileRestrictions: {
+        MaxUploadFilesTotalSize: ${ config.getMaxUploadFilesTotalSize() },
+        MaxUploadFileSize: ${ config.getMaxUploadFileSize() }
     }
 };

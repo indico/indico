@@ -41,7 +41,7 @@ from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHSubmitMaterialBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
-from MaKaC.errors import MaKaCError, ModificationError, NoReportError, AccessError, NotFoundError
+from MaKaC.errors import MaKaCError, ModificationError, NoReportError, AccessError, KeyAccessError, NotFoundError
 from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF,TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, ProgrammeToPDF, TimetablePDFFormat
 from xml.sax.saxutils import escape
 from MaKaC.participant import Participant
@@ -1302,7 +1302,7 @@ class RHInternalPageDisplay(RHConferenceBaseDisplay):
             from MaKaC.conference import Link,LocalFile
 
             if self._conf.getAccessKey() != "":
-                raise AccessError()
+                raise KeyAccessError()
             if self._getUser() == None:
                 self._checkSessionUser()
             else:

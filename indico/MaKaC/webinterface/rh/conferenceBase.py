@@ -254,7 +254,7 @@ class RHSubmitMaterialBase:
         self._password = params.get("password","")
 
         self._userList = json.loads(params.get("userList", "[]"))
-        maxUploadFileSize = self._cfg.getMaxUploadFileSize()
+        maxUploadFilesTotalSize = self._cfg.getMaxUploadFilesTotalSize()
 
         if self._uploadType == "file":
             if isinstance(params["file"], list):
@@ -271,7 +271,7 @@ class RHSubmitMaterialBase:
                     fDict["fileName"] = fileUpload.filename
                     estimSize = int(self._req.headers_in["content-length"])
 
-                    if maxUploadFileSize and estimSize > (maxUploadFileSize * BYTES_1MB):
+                    if maxUploadFilesTotalSize and estimSize > (maxUploadFilesTotalSize * BYTES_1MB):
                         # if file is too big, do not save it in disk
                         fDict["filePath"] = ''
                         fDict["size"] = estimSize
@@ -303,7 +303,7 @@ class RHSubmitMaterialBase:
     def _setErrorList(self, fileEntry):
         res=[]
 
-        maxUploadFileSize = self._cfg.getMaxUploadFileSize()
+        maxUploadFilesTotalSize = self._cfg.MaxUploadFilesTotalSize()
 
         if self._uploadType == "file":
             if "filePath" in fileEntry and not fileEntry["filePath"].strip():
@@ -311,8 +311,8 @@ class RHSubmitMaterialBase:
             if "size" in fileEntry:
                 if fileEntry["size"] < 10:
                     self._errorList.append(_("""The file %s seems to be empty """) % fileEntry["fileName"])
-                elif maxUploadFileSize and fileEntry["size"] > (maxUploadFileSize*1024*1024):
-                    self._errorList.append(_("The file size of %s exceeds the upload limit (%s Mb)") % (fileEntry["fileName"], maxUploadFileSize))
+                elif maxUploadFilesTotalSize and fileEntry["size"] > (maxUploadFilesTotalSize*1024*1024):
+                    self._errorList.append(_("The file size of %s exceeds the upload limit (%s Mb)") % (fileEntry["fileName"], maxUploadFilesTotalSize))
         elif self._uploadType == "link":
             if not self._links[0]["url"].strip():
                 self._errorList.append(_("""A valid URL must be specified."""))

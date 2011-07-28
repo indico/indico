@@ -331,6 +331,8 @@ class AccessController( Persistent, Observable ):
         return 0
 
     def getAnyContactInfo(self):
+        if self.getOwner() == None: # we are in the highest level
+            return None
         if not self.getContactInfo() and self.getOwner().getOwner():
             return self.getOwner().getOwner().getAccessController().getAnyContactInfo()
         else:

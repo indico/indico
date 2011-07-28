@@ -158,7 +158,13 @@ ApacheGroup = "nogroup"
 #------------------------------------------------------------------------------
 # FILE UPLOAD
 #------------------------------------------------------------------------------
-# Here you can limit the maximum size of uploaded files (in MB)
+# Here you can limit the maximum size of all the uploaded files (in MB) in a
+# request
+# default: 0 (unlimited)
+
+MaxUploadFilesTotalSize = 0
+
+# Here you can limit the maximum size of an uploaded file (in MB)
 # default: 0 (unlimited)
 
 MaxUploadFileSize = 0

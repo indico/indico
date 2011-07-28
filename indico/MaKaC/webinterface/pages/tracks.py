@@ -33,6 +33,8 @@ from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 import MaKaC.user as user
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
 class WPTrackBase(WPConferenceBase):
 
@@ -956,6 +958,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
             vars["rating"] = "%.2f" % rating
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
+        vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
 
         return vars
 

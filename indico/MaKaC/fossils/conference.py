@@ -177,6 +177,15 @@ class ILocalFileExtendedFossil(ILocalFileFossil):
         """ Local File File Size """
     getSize.name = "file.fileSize"
 
+class ILocalFileAbstractMaterialFossil(ILocalFileExtendedFossil):
+
+    def getURL(self):
+        """ URL of the Local File """
+    getURL.produce = lambda s: str(urlHandlers.UHAbstractAttachmentFileAccess.getURL(s))
+    getURL.name = "url"
+
+
+
 class IMaterialMinimalFossil(IFossil):
 
     def getId(self):

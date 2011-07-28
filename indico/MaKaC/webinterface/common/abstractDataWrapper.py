@@ -18,30 +18,39 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from MaKaC.common.fossilize import fossilizes, Fossilizable
+from MaKaC.fossils.abstracts import IAuthorFossil
+import util.text as textUtils
+from MaKaC.webinterface.general import normaliseListParam
+from MaKaC.common import Config
 
-class Author:
+BYTES_1MB = 1024 * 1024
 
-    def __init__(self,id,**data):
-        self._id=id
+class Author(Fossilizable):
+
+    fossilizes(IAuthorFossil)
+
+    def __init__(self, id, **data):
+        self._id = id
         self.setValues(**data)
 
     def setValues(self, **data):
-        self._title=data.get("title","")
-        self._firstName=data.get("first_name","")
-        self._familyName=data.get("family_name","")
-        self._affiliation=data.get("affiliation","")
-        self._email=data.get("email","")
-        self._phone=data.get("phone","")
-        self._speaker=data.get("isSpeaker",False)
+        self._title = data.get("title", "")
+        self._firstName = data.get("first_name", "")
+        self._familyName = data.get("family_name", "")
+        self._affiliation = data.get("affiliation", "")
+        self._email = data.get("email", "")
+        self._phone = data.get("phone", "")
+        self._speaker = data.get("isSpeaker", False)
 
-    def mapAuthor(self,author):
-        self._title=author.getTitle()
-        self._firstName=author.getFirstName()
-        self._familyName=author.getSurName()
-        self._affiliation=author.getAffiliation()
-        self._email=author.getEmail()
-        self._phone=author.getTelephone()
-        self._speaker=author.getAbstract().isSpeaker(author)
+    def mapAuthor(self, author):
+        self._title = author.getTitle()
+        self._firstName = author.getFirstName()
+        self._familyName = author.getSurName()
+        self._affiliation = author.getAffiliation()
+        self._email = author.getEmail()
+        self._phone = author.getTelephone()
+        self._speaker = author.getAbstract().isSpeaker(author)
 
     def getTitle(self):
         return self._title
@@ -74,200 +83,251 @@ class Author:
         return "id:%s - nombre:%s"%(self._id, self._familyName)
 
 
-class Abstract:
+class AbstractData:
 
-    def __init__(self, afm, **data):
-        self._afm = afm
-        self.setValues(**data)
+    def __init__( self, absMgr, params, headerSize, displayValues=False ):
+        self._absMgr = absMgr
+        self._afm = absMgr.getAbstractFieldsMgr()
+        if (headerSize):
+            self._headerSize = float(headerSize)  / BYTES_1MB
+        self._displayValues = displayValues
+        cparams = params.copy()
+        self._mapFromParams( cparams )
 
-    def setValues(self, **data):
-        self._title=data.get("title", "")
+    def _mapFromParams( self, params ):
+        self.title = params.get("title",  "").strip()
         self._otherFields = {}
         for f in self._afm.getFields():
             id = f.getId()
-            self._otherFields[id] = data.get("f_"+id,"").strip()
-        self._contribTypeId=data.get("contribType", "")
-        self._primAuthors=[]
-        for i in range(len(data.get("auth_prim_id",[]))):
-            id=data["auth_prim_id"][i]
-            val={   "title":data["auth_prim_title"][i],
-                    "first_name":data["auth_prim_first_name"][i],
-                    "family_name":data["auth_prim_family_name"][i],
-                    "affiliation":data["auth_prim_affiliation"][i],
-                    "email":data["auth_prim_email"][i],
-                    "phone":data["auth_prim_phone"][i],
-                    "isSpeaker":id in data["auth_prim_speaker"] }
-            id=len(self._primAuthors)
-            self._primAuthors.append(Author(id,**val))
-        self._coAuthors=[]
-        for i in range(len(data.get("auth_co_id",[]))):
-            id=data["auth_co_id"][i]
-            val={ "title":data["auth_co_title"][i],
-                    "first_name":data["auth_co_first_name"][i],
-                    "family_name":data["auth_co_family_name"][i],
-                    "affiliation":data["auth_co_affiliation"][i],
-                    "email":data["auth_co_email"][i],
-                    "phone":data["auth_co_phone"][i],
-                    "isSpeaker":id in data["auth_co_speaker"] }
-            id=len(self._coAuthors)
-            self._coAuthors.append(Author(id,**val))
+            self._otherFields[id] = params.get("f_%s"%id,"").strip()
+        self.type = params.get("type", None)
+        self.tracks = normaliseListParam( params.get("tracks", []) )
+
+        if self._displayValues:
+            # the call comes from modifying an existing abstract, we want to display the current content in the abstract form
+            self._prAuthorsListParam = params.get("prAuthors", [])
+            self._coAuthorsListParam = params.get("coAuthors", [])
+            self._setExistingAuthors()
+        else:
+            # the call comes from submitting a new abstract or modifying an existing abstract
+            from MaKaC.services.interface.rpc import json
+            self._prAuthorsListParam = json.decode(params.get("prAuthors", "[]"))
+            self._coAuthorsListParam = json.decode(params.get("coAuthors", "[]"))
+            self._setNewAuthors()
+        self.comments = params.get("comments", "")
+        self.origin = params.get("origin", "display")
+        self.files = params.get("file", [])
+        if not isinstance(self.files, list): # just one file attached
+            self.files = [self.files]
+        self.existingFiles = params.get("existingFile", [])
+        if not isinstance(self.existingFiles, list): # just one file attached
+            self.existingFiles = [self.existingFiles]
+
+
+    def setAbstractData(self, abstract):
+        conf = abstract.getConference()
+        cfaMgr = conf.getAbstractMgr()
+        afm = cfaMgr.getAbstractFieldsMgr()
+        abstract.setTitle( self.title )
+        for f in afm.getFields():
+            fieldId = f.getId()
+            abstract.setField(fieldId, self.getFieldValue(fieldId))
+        # add primary authors
+        for authData in self.getPrimaryAuthorList():
+            auth = abstract.newPrimaryAuthor(title = authData.getTitle(), \
+                                firstName = authData.getFirstName(), \
+                                surName = authData.getFamilyName(), \
+                                email = authData.getEmail(), \
+                                affiliation = authData.getAffiliation(), \
+                                address = "", \
+                                telephone = authData.getPhone())
+            if authData.isSpeaker():
+                abstract.addSpeaker(auth)
+        # add co-authors
+        for authData in self.getCoAuthorList():
+            auth = abstract.newCoAuthor(title = authData.getTitle(), \
+                                firstName = authData.getFirstName(), \
+                                surName = authData.getFamilyName(), \
+                                email = authData.getEmail(), \
+                                affiliation = authData.getAffiliation(), \
+                                address = "", \
+                                telephone = authData.getPhone())
+            if authData.isSpeaker():
+                abstract.addSpeaker(auth)
+        abstract.setContribType(self.type)
+        tracks = []
+        for trackId in self.tracks:
+            tracks.append(conf.getTrackById(trackId))
+        abstract.setTracks(tracks)
+        abstract.setComments(self.comments)
+        abstract.checkExistingFiles(self.existingFiles)
+        abstract.saveFiles(self.files)
+
+
+    def _setNewAuthors(self):
+        self._prAuthors = []
+        for author in self._prAuthorsListParam:
+            try:
+                isSpeaker = author["isSpeaker"]
+            except KeyError:
+                isSpeaker = False
+            values = {"title": author["title"],
+                      "first_name": author["firstName"],
+                      "family_name": author["familyName"],
+                      "affiliation": author["affiliation"],
+                      "email": author["email"],
+                      "phone": author["phone"],
+                      "isSpeaker": isSpeaker
+                      }
+
+            authId = len(self._prAuthors)
+            self._prAuthors.append(Author(authId, **values))
+
+        self._coAuthors = []
+        for author in self._coAuthorsListParam:
+            try:
+                isSpeaker = author["isSpeaker"]
+            except KeyError:
+                isSpeaker = False
+            values = {"title": author["title"],
+                      "first_name": author["firstName"],
+                      "family_name": author["familyName"],
+                      "affiliation": author["affiliation"],
+                      "email": author["email"],
+                      "phone": author["phone"],
+                      "isSpeaker": isSpeaker
+                      }
+
+            authId = len(self._prAuthors) + len(self._coAuthors)
+            self._coAuthors.append(Author(authId, **values))
+
+    def _setExistingAuthors(self):
+        self._prAuthors = []
+        for author in self._prAuthorsListParam:
+            values = {"title": author.getTitle(),
+                      "first_name": author.getFirstName(),
+                      "family_name": author.getFamilyName(),
+                      "affiliation": author.getAffiliation(),
+                      "email": author.getEmail(),
+                      "phone": author.getTelephone(),
+                      "isSpeaker": author.isSpeaker()
+                      }
+
+            authId = len(self._prAuthors)
+            self._prAuthors.append(Author(authId, **values))
+
+        self._coAuthors = []
+        for author in self._coAuthorsListParam:
+            values = {"title": author.getTitle(),
+                      "first_name": author.getFirstName(),
+                      "family_name": author.getFamilyName(),
+                      "affiliation": author.getAffiliation(),
+                      "email": author.getEmail(),
+                      "phone": author.getTelephone(),
+                      "isSpeaker": author.isSpeaker()
+                      }
+            authId = len(self._prAuthors) + len(self._coAuthors)
+            self._coAuthors.append(Author(authId, **values))
 
     def getFieldNames( self ):
-        return self._otherFields.keys()
+        return ['f_%s' % id for id in self._otherFields.keys()]
 
-    def getOtherFieldValue( self, id ):
+    def getFieldValue( self, id ):
         return self._otherFields.get(id, "")
 
-    def setOtherFieldValue( self, id, value ):
+    def setFieldValue( self, id, value ):
         self._otherFields[id] = value
 
-    def mapAbstract(self, abstract):
-        self._title=abstract.getTitle()
-        self._otherFields = {}
-        for key in abstract.getFields().keys():
-            self._otherFields[key] = abstract.getField(key)
-        self._contribTypeId=""
-        if abstract.getContribType():
-            self._contribTypeId=abstract.getContribType().getId()
-        self._primAuthors=[]
-        self._coAuthors=[]
-        for author in abstract.getPrimaryAuthorList():
-            a=Author(len(self._primAuthors))
-            a.mapAuthor(author)
-            self._primAuthors.append(a)
-        for author in abstract.getCoAuthorList():
-            a=Author(len(self._coAuthors))
-            a.mapAuthor(author)
-            self._coAuthors.append(a)
-
-    def getTitle(self):
-        return self._title
-
-    def getContribTypeId(self):
-        return self._contribTypeId
-
     def getPrimaryAuthorList(self):
-        return self._primAuthors
+        return self._prAuthors
 
     def getCoAuthorList(self):
         return self._coAuthors
 
-    def hasErrors(self):
+    def check( self ):
+        errors = []
+        if self.title.strip() == "":
+            errors.append( _("Abstract TITLE cannot be empty") )
+        for f in self._afm.getFields():
+            id = f.getId()
+            caption = f.getCaption()
+            ml = f.getMaxLength()
+            limitation = f.getLimitation()
+            if f.isMandatory() and self._otherFields.get(id,"") == "":
+                errors.append(_("The field <b>%s</b> is mandatory") % caption)
+            if ml != 0:
+                if limitation == "words" and textUtils.wordsCounter(self._otherFields.get(id,"")) > ml:
+                    errors.append(_("The field <b>%s</b> cannot be more than %s words") % (caption,ml))
+                elif limitation == "chars" and len(self._otherFields.get(id,"")) > ml:
+                    errors.append(_("The field <b>%s</b> cannot be more than %s characters") % (caption,ml))
+        if not self.origin == "management":
+            if not self._prAuthorsListParam:
+                errors.append( _("No PRIMARY AUTHOR has been specified. You must define at least one primary author") )
+            if not self._checkSpeaker():
+                errors.append( _("At least ONE PRESENTER must be specified") )
+        if not self.tracks and self._absMgr.areTracksMandatory():
+            # check if there are tracks, otherwise the user cannot select at least one
+            if len(self._absMgr.getConference().getTrackList()) != 0:
+                errors.append( _("At least ONE TRACK must be seleted") )
+        if not self._checkTotalSize():
+            errors.append(_("The maximum size allowed for the attachments (%sMB) has been exceeded.") % Config.getInstance().getMaxUploadFilesTotalSize())
+        return errors
+
+    def _checkSpeaker(self):
+        for author in self._prAuthors:
+            if author.isSpeaker():
+                return True
+        for author in self._coAuthors:
+            if author.isSpeaker():
+                return True
         return False
 
-    def getErrors(self):
-        return []
+    def _checkTotalSize(self):
+        return not self._headerSize > float(Config.getInstance().getMaxUploadFilesTotalSize())
 
-    def updateAbstract(self,abstract):
-        abstract.setTitle(self.getTitle())
-        for key in self._otherFields.keys():
-            abstract.setField(key,self._otherFields[key])
-        abstract.setContribType(abstract.getConference().getContribTypeById(self._contribTypeId))
-        abstract.clearAuthors()
-        for auth in self.getPrimaryAuthorList():
-            abs_auth=abstract.newPrimaryAuthor()
-            abs_auth.setTitle(auth.getTitle())
-            abs_auth.setFirstName(auth.getFirstName())
-            abs_auth.setSurName(auth.getFamilyName())
-            abs_auth.setAffiliation(auth.getAffiliation())
-            abs_auth.setEmail(auth.getEmail())
-            abs_auth.setTelephone(auth.getPhone())
-            if auth.isSpeaker():
-                abstract.addSpeaker(abs_auth)
-        for auth in self.getCoAuthorList():
-            abs_auth=abstract.newCoAuthor()
-            abs_auth.setTitle(auth.getTitle())
-            abs_auth.setFirstName(auth.getFirstName())
-            abs_auth.setSurName(auth.getFamilyName())
-            abs_auth.setAffiliation(auth.getAffiliation())
-            abs_auth.setEmail(auth.getEmail())
-            abs_auth.setTelephone(auth.getPhone())
-            if auth.isSpeaker():
-                abstract.addSpeaker(abs_auth)
-
-    def newPrimaryAuthor(self):
-        self._primAuthors.append(Author(len(self._primAuthors)))
-
-    def newCoAuthor(self):
-        self._coAuthors.append(Author(len(self._coAuthors)))
-
-    def _resetIds(self, l):
-        i = 0
-        for auth in l:
-            auth.setId(i)
-            i += 1
-
-    def upPrimaryAuthors(self,id):
-        i = 0
-        pauth = None
-        for auth in self._primAuthors:
-            if str(auth.getId()) == str(id):
-                pauth = auth
-                break
-            i += 1
-        i -= 1
-        if i>=0:
-            self._primAuthors.remove(pauth)
-            self._primAuthors.insert(i, pauth)
-            self._resetIds(self._primAuthors)
-
-    def downPrimaryAuthors(self,id):
-        i = 0
-        pauth = None
-        for auth in self._primAuthors:
-            if str(auth.getId()) == id:
-                pauth = auth
-                break
-            i += 1
-        i += 1
-        if i<len(self._primAuthors):
-            self._primAuthors.remove(pauth)
-            self._primAuthors.insert(i, pauth)
-            self._resetIds(self._primAuthors)
-
-    def upCoAuthors(self,id):
-        i = 0
-        cauth = None
-        for auth in self._coAuthors:
-            if str(auth.getId()) == str(id):
-                cauth = auth
-                break
-            i += 1
-        i -= 1
-        if i>=0:
-            self._coAuthors.remove(cauth)
-            self._coAuthors.insert(i, cauth)
-            self._resetIds(self._coAuthors)
-
-    def downCoAuthors(self,id):
-        i = 0
-        cauth = None
-        for auth in self._coAuthors:
-            if str(auth.getId()) == id:
-                cauth = auth
-                break
-            i += 1
-        i += 1
-        if i<len(self._coAuthors):
-            self._coAuthors.remove(cauth)
-            self._coAuthors.insert(i, cauth)
-            self._resetIds(self._coAuthors)
-
-    def removePrimaryAuthors(self,idList):
-        toRem=[]
-        for auth in self._primAuthors:
-            if str(auth.getId()) in idList:
-                toRem.append(auth)
-        for auth in toRem:
-            self._primAuthors.remove(auth)
-
-    def removeCoAuthors(self,idList):
-        toRem=[]
-        for auth in self._coAuthors:
-            if str(auth.getId()) in idList:
-                toRem.append(auth)
-        for auth in toRem:
-            self._coAuthors.remove(auth)
+    def toDict( self ):
+        d = { "title": self.title, \
+              "type": self.type, \
+              "tracksSelectedList": self.tracks, \
+              "prAuthors": self._prAuthors, \
+              "coAuthors": self._coAuthors, \
+              "comments": self.comments, \
+              "attachments": self.files }
+        for f in self._afm.getFields():
+            id = f.getId()
+            d["f_"+id] = self._otherFields.get(id,"")
+        return d
 
 
+class AbstractParam:
 
+    def _checkParams(self, params, conf, headerSize):
+        if params.has_key("abstractId"): # we are in modify
+            self._abstract = self._target =  conf.getAbstractMgr().getAbstractById(params["abstractId"])
+        self._action = ""
+        if "cancel" in params:
+            self._action = "CANCEL"
+            return
+        typeId = params.get("type", "")
+        params["type"] = conf.getContribTypeById(typeId)
+        if not params.has_key("prAuthors") or not params.has_key("coAuthors"): # loading form (with or without values)
+            try: # if the the abstract exists, get the current values to show them
+                params["prAuthors"] = self._abstract.getPrimaryAuthorList()
+                params["coAuthors"] = self._abstract.getCoAuthorList()
+                params["file"] = self._abstract.getAttachments().values()
+                self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=True)
+            except AttributeError: # first call to submit a new abstract
+                self._abstractData = AbstractData(self._conf.getAbstractMgr(), params, headerSize, displayValues=False)
+        else: # performance the action
+            if params.has_key("existingFile"): # we are modifiying an abstract with existing files
+                # we need to calculate the current size of the existing files to do the checks
+                existingSize = self._abstract.getAttachmentsSize(params["existingFile"])
+                existingSize += int(headerSize)
+                self._abstractData = AbstractData(conf.getAbstractMgr(), params, existingSize, displayValues=False)
+            else:
+                # we are submitting a new abstract
+                self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=False)
+        self._doNotSanitizeFields = self._abstractData.getFieldNames()
+        self._doNotSanitizeFields.append('title')
+        if "validate" in params:
+            self._action = "VALIDATE"

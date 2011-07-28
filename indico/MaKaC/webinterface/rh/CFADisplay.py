@@ -41,7 +41,7 @@ import MaKaC.conference as conference
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
-import util.text as textUtils
+from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 
 
 class RHBaseCFA( RHConferenceBaseDisplay ):
@@ -99,203 +99,6 @@ class RHAbstractSubmissionBase( RHBaseCFA ):
             return p.display()
         else:
             return self._processIfOpened()
-
-
-class _AbstractAuthorList:
-
-    def __init__( self, params ):
-        self._mapFromParams( params )
-
-    def _getAuthorFromParams( self, idx, params ):
-        author = {  "auth_id": int( params["auth_id"][idx].strip() ), \
-                "auth_title": params["auth_title"][idx].strip(), \
-                "auth_firstName": params["auth_firstName"][idx].strip(), \
-                "auth_surName": params["auth_surName"][idx].strip(), \
-                "auth_affiliation": params["auth_affiliation"][idx].strip(), \
-                "auth_email": params["auth_email"][idx].strip(), \
-                "auth_phone": params["auth_phone"][idx].strip(), \
-                "auth_address": params["auth_address"][idx].strip(), \
-                "auth_primary": params["auth_primary"][idx], \
-                "auth_speaker": params["auth_speaker"][idx], \
-                "auth_focus": False }
-        return author
-
-    def _normaliseAuthorParams( self, params ):
-        params["auth_id"]  = normaliseListParam( params.get("auth_id", []) )
-        params["auth_title"]  = normaliseListParam( params.get("auth_title", []) )
-        params["auth_firstName"]  = normaliseListParam( params.get("auth_firstName", []) )
-        params["auth_surName"]  = normaliseListParam( params.get("auth_surName", []) )
-        params["auth_affiliation"]       = normaliseListParam( params.get("auth_affiliation", []) )
-        params["auth_email"]  = normaliseListParam( params.get("auth_email", []) )
-        params["auth_phone"]  = normaliseListParam( params.get("auth_phone", []) )
-        params["auth_address"]  = normaliseListParam( params.get("auth_address", []) )
-        primaries  = normaliseListParam( params.get("auth_primary", []) )
-        #params["auth_primary"] = normaliseListParam( params.get("auth_primary", []) )
-        speakers = normaliseListParam( params.get("auth_speaker", []) )
-        params["auth_primary"] = []
-        params["auth_speaker"] = []
-        for id in params["auth_id"]:
-            params["auth_primary"].append( str(id) in primaries )
-            params["auth_speaker"].append( str(id) in speakers)
-
-    def _mapFromParams( self, params ):
-        self._normaliseAuthorParams( params )
-        self._primaryAuthors = IOBTree()
-        self._secondaryAuthors = IOBTree()
-        maxId = -1
-        for idx in range( len( params["auth_id"] ) ):
-            id = int( params["auth_id"][idx] )
-            if id>maxId:
-                maxId = id
-            author = self._getAuthorFromParams( idx, params )
-            if author["auth_primary"]:
-                self._primaryAuthors[ id ] = author
-            else:
-                self._secondaryAuthors[ id ] = author
-        self._nextId = maxId+1
-
-    def getList( self ):
-        res = []
-        for a in self._primaryAuthors.values():
-            res.append( a )
-        for a in self._secondaryAuthors.values():
-            res.append( a )
-        return res
-
-    def getPrimaryList( self ):
-        return self._primaryAuthors.values()
-
-    def getSecondaryList( self ):
-        return self._secondaryAuthors.values()
-
-    def _getNewAuthor( self, **data ):
-        author = { "auth_id": int( self._nextId ), \
-                "auth_title": data.get("title", ""), \
-                "auth_firstName": data.get("firstName", ""), \
-                "auth_surName": data.get("surName", ""), \
-                "auth_affiliation": data.get("affiliation", ""), \
-                "auth_email": data.get("email", ""), \
-                "auth_phone": data.get("phone", ""), \
-                "auth_address": data.get("address", ""), \
-                "auth_primary": data.get("primary", False), \
-                "auth_speaker": data.get("speaker", False), \
-                "auth_focus": data.get("focus", False) }
-        #self._authors[ self._nextId ] = author
-        self._nextId += 1
-        return author
-
-    def addPrimaryAuthor( self, **data ):
-        data["primary"] = True
-        author = self._getNewAuthor( **data )
-        self._primaryAuthors[ author["auth_id"] ] = author
-
-    def addSecondaryAuthor( self, **data ):
-        data["primary"] = False
-        author = self._getNewAuthor( **data )
-        self._secondaryAuthors[ author["auth_id"] ] = author
-
-    def removePrimaryAuthor( self, id ):
-        try:
-            del self._primaryAuthors[ int(id) ]
-        except KeyError:
-            pass
-
-    def removeSecondaryAuthor( self, id ):
-        try:
-            del self._secondaryAuthors[ int(id) ]
-        except KeyError:
-            pass
-
-
-class AbstractData:
-
-    def __init__( self, absMgr, params ):
-        self._absMgr = absMgr
-        self._afm = absMgr.getAbstractFieldsMgr()
-        cparams = params.copy()
-        self._mapFromParams( cparams )
-
-    def _mapFromParams( self, params ):
-        self.title = params.get("title",  "").strip()
-        self._otherFields = {}
-        for f in self._afm.getFields():
-            id = f.getId()
-            self._otherFields[id] = params.get("f_%s"%id,"").strip()
-        self.type = params.get("type", None)
-        self.tracks = normaliseListParam( params.get("tracks", []) )
-        self.authors = _AbstractAuthorList( params )
-        self.comments = params.get("comments","")
-
-    def getFieldNames( self ):
-        return ['f_%s' % id for id in self._otherFields.keys()]
-
-    def getFieldValue( self, id ):
-        return self._otherFields.get(id, "")
-
-    def setFieldValue( self, id, value ):
-        self._otherFields[id] = value
-
-    def check( self ):
-        errors = []
-        if self.title.strip() == "":
-            errors.append( _("Abstract TITLE cannot be empty") )
-        for f in self._afm.getFields():
-            id = f.getId()
-            caption = f.getCaption()
-            ml = f.getMaxLength()
-            limitation = f.getLimitation()
-            if f.isMandatory() and self._otherFields.get(id,"") == "":
-                errors.append(_("The field <b>%s</b> is mandatory") % caption)
-            if ml != 0:
-                if limitation == "words" and textUtils.wordsCounter(self._otherFields.get(id,"")) > ml:
-                    errors.append(_("The field <b>%s</b> cannot be more than %s words") % (caption,ml))
-                elif limitation == "chars" and len(self._otherFields.get(id,"")) > ml:
-                    errors.append(_("The field <b>%s</b> cannot be more than %s characters") % (caption,ml))
-        if len( self.authors.getPrimaryList() ) == 0:
-            errors.append( _("No PRIMARY AUTHOR has been specified. You must define at least one primary author") )
-        speakerCount = 0
-        idx = 1
-        for author in self.authors.getPrimaryList():
-            if author["auth_firstName"].strip() == "":
-                errors.append( _("FIRST NAME has not been specified for PRIMARY AUTHOR #%s")%idx )
-            if author["auth_surName"].strip() == "":
-                errors.append( _("SURNAME has not been specified for PRIMARY AUTHOR #%s")%idx )
-            if author["auth_affiliation"].strip() == "":
-                errors.append( _("AFFILIATION has not been specified for PRIMARY AUTHOR #%s")%idx )
-            if author["auth_email"].strip() == "":
-                errors.append( _("EMAIL has not been specified for PRIMARY AUTHOR #%s")%idx )
-            if author["auth_speaker"]:
-                speakerCount += 1
-            idx += 1
-        idx = 1
-        for author in self.authors.getSecondaryList():
-            if author["auth_firstName"].strip() == "":
-                errors.append( _("FIRST NAME has not been specified for CO-AUTHOR #%s")%idx )
-            if author["auth_surName"].strip() == "":
-                errors.append( _("SURNAME has not been specified for CO-AUTHOR #%s")%idx )
-            if author["auth_affiliation"].strip() == "":
-                errors.append( _("AFFILIATION has not been specified for CO-AUTHOR #%s")%idx )
-            if author["auth_speaker"]:
-                speakerCount += 1
-            idx += 1
-        if speakerCount == 0:
-            errors.append( _("At least ONE PRESENTER must be specified") )
-        if not self.tracks and self._absMgr.areTracksMandatory():
-            # check if there are tracks, otherwise the user cannot select at least one
-            if len(self._absMgr.getConference().getTrackList()) != 0:
-                errors.append( _("At least ONE TRACK must be seleted") )
-        return errors
-
-    def toDict( self ):
-        d = { "title": self.title, \
-              "type": self.type, \
-              "tracks": self.tracks, \
-              "authors": self.authors, \
-              "comments": self.comments }
-        for f in self._afm.getFields():
-            id = f.getId()
-            d[id] = self._otherFields.get(id,"")
-        return d
 
 
 class _AbstractSubmissionNotification:
@@ -396,54 +199,21 @@ _("The following email has been sent to %s"):
 %s""")%(self.getDestination().getFullName(), msg)
 
 
-class RHAbstractSubmission( RHAbstractSubmissionBase ):
-    _uh = urlHandlers.UHAbstractSubmission
+class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):
 
     def _checkParams( self, params ):
-        RHAbstractSubmissionBase._checkParams( self, params )
+        RHAbstractSubmissionBase._checkParams(self, params)
         #if the user is not logged in we return inmediately as this form needs
         #   the user to be logged in and therefore all the checking below is not
         #   necessary
-
         if self._getUser() == None:
             return
-        self._action = ""
-        if "cancel" in params:
-            self._action = "CANCEL"
-            return
-        id = params.get("type", "")
-        params["type"] = self._conf.getContribTypeById(id)
-        self._abstractData = AbstractData( self._target.getAbstractMgr(), params )
-        self._doNotSanitizeFields = self._abstractData.getFieldNames()
-        self._doNotSanitizeFields.append('title')
-        if "add_primary_author" in params:
-            #self._action = "NEW_AUTHOR"
-            self._abstractData.authors.addPrimaryAuthor( focus=True )
-        elif "add_secondary_author" in params:
-            #self._action = "NEW_AUTHOR"
-            self._abstractData.authors.addSecondaryAuthor( focus=True )
-        elif "remove_primary_authors" in params:
-            tmp = self._normaliseListParam( params.get("selected_primary_authors", []) )
-            for id in tmp:
-                self._abstractData.authors.removePrimaryAuthor( id )
-        elif "remove_secondary_authors" in params:
-            tmp = self._normaliseListParam( params.get("selected_secondary_authors", []) )
-            for id in tmp:
-                self._abstractData.authors.removeSecondaryAuthor( id )
-        elif "validate" in params:
-            self._action = "VALIDATE"
-        else:
-            #First call
-            av = self._getUser()
-            self._abstractData.authors.addPrimaryAuthor( \
-                                        title = av.getTitle(), \
-                                        firstName = av.getName(), \
-                                        surName = av.getSurName(), \
-                                        affiliation = av.getOrganisation(), \
-                                        email = av.getEmail(), \
-                                        phone = av.getTelephone(), \
-                                        address = av.getAddress(), \
-                                        speaker = True )
+        headerSize = self._req.headers_in["content-length"]
+        AbstractParam._checkParams(self, params, self._conf, headerSize)
+
+
+class RHAbstractSubmission( RHAbstractModificationAction ):
+    _uh = urlHandlers.UHAbstractSubmission
 
     def _doValidate( self ):
         #First, one must validate that the information is fine
@@ -457,51 +227,21 @@ class RHAbstractSubmission( RHAbstractSubmissionBase ):
         #Then, we create the abstract object and set its data to the one
         #   received
         cfaMgr = self._target.getAbstractMgr()
-        afm = cfaMgr.getAbstractFieldsMgr()
-        a = cfaMgr.newAbstract( self._getUser() )
-        a.setTitle( self._abstractData.title )
-        for f in afm.getFields():
-            id = f.getId()
-            a.setField(id, self._abstractData.getFieldValue(id))
-        for authData in self._abstractData.authors.getPrimaryList():
-            auth=a.newPrimaryAuthor(title = authData["auth_title"], \
-                                firstName = authData["auth_firstName"], \
-                                surName = authData["auth_surName"], \
-                                email = authData["auth_email"], \
-                                affiliation = authData["auth_affiliation"], \
-                                address = authData["auth_address"], \
-                                telephone = authData["auth_phone"] )
-            if authData["auth_speaker"]:
-                a.addSpeaker( auth )
-        for authData in self._abstractData.authors.getSecondaryList():
-            auth=a.newCoAuthor(title = authData["auth_title"], \
-                                firstName = authData["auth_firstName"], \
-                                surName = authData["auth_surName"], \
-                                email = authData["auth_email"], \
-                                affiliation = authData["auth_affiliation"], \
-                                address = authData["auth_address"], \
-                                telephone = authData["auth_phone"] )
-            if authData["auth_speaker"]:
-                a.addSpeaker( auth )
-        a.setContribType( self._abstractData.type )
-        for trackId in self._abstractData.tracks:
-            track = self._conf.getTrackById( trackId )
-            a.addTrack( track )
-        a.setComments(self._abstractData.comments)
-
-
+        abstract = cfaMgr.newAbstract( self._getUser() )
+        #self._setAbstractData(abstract)
+        self._abstractData.setAbstractData(abstract)
         #The commit must be forced before sending the confirmation
         DBMgr.getInstance().commit()
         #Email confirmation about the submission
-        mail.Mailer.send( _AbstractSubmissionNotification( a ), self._conf.getSupportEmail(returnNoReply=True) )
+        mail.Mailer.send( _AbstractSubmissionNotification( abstract ), self._conf.getSupportEmail(returnNoReply=True) )
         #Email confirmation about the submission to coordinators
         if cfaMgr.getSubmissionNotification().hasDestination():
-            asn=_AbstractSubmissionNotification( a )
+            asn=_AbstractSubmissionNotification( abstract )
             asn.setSubject(_("[Indico] New abstract submission: %s")%asn.getDestination().getFullName())
             mail.GenericMailer.send( asn )
         #We must perform some actions: email warning to the authors
         #Finally, we display a confirmation form
-        self._redirect( urlHandlers.UHAbstractSubmissionConfirmation.getURL( a ) )
+        self._redirect( urlHandlers.UHAbstractSubmissionConfirmation.getURL( abstract ) )
 
     def _processIfOpened( self ):
         if self._action == "CANCEL":
@@ -513,6 +253,89 @@ class RHAbstractSubmission( RHAbstractSubmissionBase ):
             pars = self._abstractData.toDict()
             return p.display( **pars )
 
+
+
+class RHAbstractModify(RHAbstractModificationAction, RHModificationBaseProtected):
+    _uh = urlHandlers.UHAbstractModify
+
+    def _checkProtection( self ):
+        RHModificationBaseProtected._checkProtection( self )
+
+
+    def _checkParams( self, params ):
+        RHAbstractModificationAction._checkParams(self, params)
+        if self._getUser() == None:
+            return
+        if self._action == "":
+            #First call
+            afm = self._conf.getAbstractMgr().getAbstractFieldsMgr()
+            self._abstractData.title = self._abstract.getTitle()
+            for f in afm.getFields():
+                id = f.getId()
+                self._abstractData.setFieldValue(id, self._abstract.getField(id))
+            self._abstractData.type = self._abstract.getContribType()
+            trackIds = []
+            for track in self._abstract.getTrackListSorted():
+                trackIds.append(track.getId())
+            self._abstractData.tracks = trackIds
+            self._abstractData.comments = self._abstract.getComments()
+
+
+    def _processIfActive( self ):
+        #We overload this method to allow modification after the CFA is closed if the modification deadline is after the submission deadline
+        cfaMgr = self._conf.getAbstractMgr()
+        modifDeadLine = cfaMgr.getModificationDeadline()
+        if not modifDeadLine:
+            modifDeadLine = cfaMgr.getEndSubmissionDate()
+        #if the user is in the autorized list, don't check period
+        if self._getUser() in cfaMgr.getAuthorizedSubmitterList():
+            return self._processIfOpened()
+        #if the submission period is not yet opened we show up a form informing
+        #   about that.
+        if timezoneUtils.nowutc() < cfaMgr.getStartSubmissionDate():
+        #if the submission period is already closed we show up a form informing
+        #   about that.
+            p = abstracts.WPCFANotYetOpened( self, self._conf )
+            return p.display()
+        #elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() :
+        elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() and timezoneUtils.nowutc() > modifDeadLine:
+            p = abstracts.WPCFAClosed( self, self._conf )
+            return p.display()
+        else:
+            return self._processIfOpened()
+
+    def _doValidate( self ):
+        #First, one must validate that the information is fine
+        errors = self._abstractData.check()
+        if errors:
+            p = abstracts.WPAbstractModify( self, self._target )
+            pars = self._abstractData.toDict()
+            pars["errors"] = errors
+            pars["action"] = self._action
+            # restart the current value of the param attachments to show the existing files
+            pars["attachments"] = self._abstract.getAttachments().values()
+            return p.display( **pars )
+        self._abstract.clearAuthors()
+        self._abstractData.setAbstractData(self._abstract)
+        self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
+
+    def _processIfOpened( self ):
+        #check if the modification period is not over or if the abstract
+        #   is in a different status than Submitted
+        if not self._conf.getAbstractMgr().inModificationPeriod() or \
+                not isinstance( self._abstract.getCurrentStatus(), \
+                                                AbstractStatusSubmitted ):
+            wp = abstracts.WPAbstractCannotBeModified( self, self._abstract )
+            return wp.display()
+        if self._action == "CANCEL":
+            self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
+        elif self._action == "VALIDATE":
+            return self._doValidate()
+        else:
+            p = abstracts.WPAbstractModify( self, self._target )
+            pars = self._abstractData.toDict()
+            pars["action"] = self._action
+            return p.display( **pars )
 
 
 class RHUserAbstracts( RHAbstractSubmissionBase ):
@@ -556,6 +379,27 @@ class RHAbstractDisplay( RHAbstractDisplayBase ):
     def _processIfActive( self ):
         p = abstracts.WPAbstractDisplay( self, self._target )
         return p.display()
+
+
+class RHGetAttachedFile(RHAbstractDisplay):
+
+    def _checkParams(self, params):
+        RHAbstractDisplay._checkParams(self, params)
+        self._fileId = params.get("resId", None)
+        if (self._fileId == None):
+            raise MaKaCError( _("Invalid resource Id."))
+
+    def _process(self):
+        try:
+            file = self._abstract.getAttachments()[self._fileId]
+        except AttributeError:
+            raise MaKaCError( _("The file does not exist."))
+        self._req.headers_out["Content-Length"] = "%s" % file.getSize()
+        cfg = Config.getInstance()
+        mimetype = cfg.getFileTypeMimeType(file.getFileType())
+        self._req.content_type = """%s""" % (mimetype)
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\"""" % file.getFileName()
+        return file.readBin()
 
 
 class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
@@ -633,154 +477,6 @@ class RHAbstractModificationBase( RHAbstractDisplayBase, RHModificationBaseProte
             return p.display()
         else:
             return self._processIfOpened()
-
-
-class RHAbstractModify( RHAbstractModificationBase ):
-    _uh = urlHandlers.UHAbstractModify
-
-    def _checkParams( self, params ):
-        RHAbstractModificationBase._checkParams( self, params )
-        #if the user is not logged in we return inmediately as this form needs
-        #   the user to be logged in and therefore all the checking below is not
-        #   necessary
-        if self._getUser() == None:
-            return
-        self._action = ""
-        if "cancel" in params:
-            self._action = "CANCEL"
-            return
-
-        params["type"]=self._conf.getContribTypeById(params.get("type", ""))
-        self._abstractData = AbstractData( self._conf.getAbstractMgr(), params )
-        self._doNotSanitizeFields = self._abstractData.getFieldNames()
-        self._doNotSanitizeFields.append('title')
-        if "add_primary_author" in params:
-            self._abstractData.authors.addPrimaryAuthor( focus=True )
-        elif "add_secondary_author" in params:
-            self._abstractData.authors.addSecondaryAuthor( focus=True )
-        elif "remove_primary_authors" in params:
-            tmp = self._normaliseListParam( params.get("selected_primary_authors", []) )
-            for id in tmp:
-                self._abstractData.authors.removePrimaryAuthor( id )
-        elif "remove_secondary_authors" in params:
-            tmp = self._normaliseListParam( params.get("selected_secondary_authors", []) )
-            for id in tmp:
-                self._abstractData.authors.removeSecondaryAuthor( id )
-        elif "validate" in params:
-            self._action = "VALIDATE"
-        else:
-            #First call
-            afm = self._conf.getAbstractMgr().getAbstractFieldsMgr()
-            self._abstractData.title = self._abstract.getTitle()
-            for f in afm.getFields():
-                id = f.getId()
-                self._abstractData.setFieldValue(id, self._abstract.getField(id))
-            for author in self._abstract.getPrimaryAuthorList():
-                data = { "title": author.getTitle(), \
-                        "firstName": author.getFirstName(), \
-                        "surName": author.getSurName(), \
-                        "affiliation": author.getAffiliation(), \
-                        "email": author.getEmail(), \
-                        "phone": author.getTelephone(), \
-                        "address": author.getAddress(), \
-                        "primary": self._abstract.isPrimaryAuthor( author ), \
-                        "speaker": self._abstract.isSpeaker( author ) }
-                self._abstractData.authors.addPrimaryAuthor( **data )
-            for author in self._abstract.getCoAuthorList():
-                data = { "title": author.getTitle(), \
-                        "firstName": author.getFirstName(), \
-                        "surName": author.getSurName(), \
-                        "affiliation": author.getAffiliation(), \
-                        "email": author.getEmail(), \
-                        "phone": author.getTelephone(), \
-                        "address": author.getAddress(), \
-                        "primary": self._abstract.isPrimaryAuthor( author ), \
-                        "speaker": self._abstract.isSpeaker( author ) }
-                self._abstractData.authors.addSecondaryAuthor( **data )
-            self._abstractData.type=self._abstract.getContribType()
-            trackIds = []
-            for track in self._abstract.getTrackListSorted():
-                trackIds.append( track.getId() )
-            self._abstractData.tracks = trackIds
-            self._abstractData.comments = self._abstract.getComments()
-
-    def _doValidate( self ):
-        #First, one must validate that the information is fine
-        errors = self._abstractData.check()
-        if errors:
-            p = abstracts.WPAbstractModify( self, self._target )
-            pars = self._abstractData.toDict()
-            pars["errors"] = errors
-            pars["action"] = self._action
-            return p.display( **pars )
-        #Then, we create the abstract object and set its data to the one
-        #   received
-        self._abstract.setTitle( self._abstractData.title )
-        afm = self._conf.getAbstractMgr().getAbstractFieldsMgr()
-        for f in afm.getFields():
-            id = f.getId()
-            self._abstract.setField( id, self._abstractData.getFieldValue(id))
-        self._abstract.clearAuthors()
-        #for authData in self._abstractData.authors.getList():
-        #    auth = self._abstract.newAuthor( title = authData["auth_title"], \
-        #                        firstName = authData["auth_firstName"], \
-        #                        surName = authData["auth_surName"], \
-        #                        email = authData["auth_email"], \
-        #                        affiliation = authData["auth_affiliation"], \
-        #                        address = authData["auth_address"], \
-        #                        telephone = authData["auth_phone"] )
-        #    if authData["auth_speaker"]:
-        #        self._abstract.addSpeaker( auth )
-        #    if authData["auth_primary"]:
-        #        self._abstract.addPrimaryAuthor( auth )
-        for authData in self._abstractData.authors.getPrimaryList():
-            auth=self._abstract.newPrimaryAuthor(title=authData["auth_title"], \
-                                firstName = authData["auth_firstName"], \
-                                surName = authData["auth_surName"], \
-                                email = authData["auth_email"], \
-                                affiliation = authData["auth_affiliation"], \
-                                address = authData["auth_address"], \
-                                telephone = authData["auth_phone"] )
-            if authData["auth_speaker"]:
-                self._abstract.addSpeaker( auth )
-        for authData in self._abstractData.authors.getSecondaryList():
-            auth=self._abstract.newCoAuthor(title=authData["auth_title"], \
-                                firstName = authData["auth_firstName"], \
-                                surName = authData["auth_surName"], \
-                                email = authData["auth_email"], \
-                                affiliation = authData["auth_affiliation"], \
-                                address = authData["auth_address"], \
-                                telephone = authData["auth_phone"] )
-            if authData["auth_speaker"]:
-                self._abstract.addSpeaker( auth )
-        self._abstract.setContribType( self._abstractData.type )
-        #self._abstract.clearTracks()
-        tracks = []
-        for trackId in self._abstractData.tracks:
-            tracks.append( self._conf.getTrackById( trackId ) )
-        self._abstract.setTracks( tracks )
-        self._abstract.setComments(self._abstractData.comments)
-        #We must perform some actions: email warning to the authors
-        #Finally, we display a confirmation form
-        self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
-
-    def _processIfOpened( self ):
-        #check if the modification period is not over or if the abstract
-        #   is in a different status than Submitted
-        if not self._conf.getAbstractMgr().inModificationPeriod() or \
-                not isinstance( self._abstract.getCurrentStatus(), \
-                                                AbstractStatusSubmitted ):
-            wp = abstracts.WPAbstractCannotBeModified( self, self._abstract )
-            return wp.display()
-        if self._action == "CANCEL":
-            self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
-        elif self._action == "VALIDATE":
-            return self._doValidate()
-        else:
-            p = abstracts.WPAbstractModify( self, self._target )
-            pars = self._abstractData.toDict()
-            pars["action"] = self._action
-            return p.display( **pars )
 
 
 class RHAbstractWithdraw( RHAbstractModificationBase ):

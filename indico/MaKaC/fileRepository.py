@@ -35,6 +35,7 @@ from BTrees import OOBTree
 from MaKaC.common.Counter import Counter
 
 from MaKaC.common.logger import Logger
+from MaKaC.review import Abstract
 
 class Repository:
     """Generic class for file repositories. A file repository knows where to
@@ -133,9 +134,18 @@ class MaterialLocalRepository(Persistent):
 
             conf = newFile.getConference()
 
-            session = newFile.getSession()
-            cont = newFile.getContribution()
-            subcont = newFile.getSubContribution()
+            abstract = None
+            session = None
+            cont = None
+            subcont = None
+
+            if (isinstance(newFile.getOwner(), Abstract)):
+                abstract = newFile.getOwner()
+            else:
+                session = newFile.getSession()
+                cont = newFile.getContribution()
+                subcont = newFile.getSubContribution()
+
             try:
                 year = str(conf.getCreationDate().year)
             except:
@@ -152,6 +162,9 @@ class MaterialLocalRepository(Persistent):
             elif session:
                 #the file is attach to a session, but not to a contribution. Then create a directory for the session
                 interPath = os.path.join( interPath, "s%s"%session.getId())
+            elif abstract:
+                #the file is attach to an abstract. Then create a directory for the abstract
+                interPath = os.path.join( interPath, "abs%s"%abstract.getId())
             else:
                 #the file is attach directly to the conference, then don't add directory
                 pass

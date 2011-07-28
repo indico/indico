@@ -10,15 +10,17 @@
    Used to place the footer correctly at the bottom
 */
 div.wrapper {
-    height: auto !important;
     min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -100px; /* the bottom margin is the negative value of the footer's height */
 }
 /*
     Used to create empty space in end of wrapper
     which is used but the footer
 */
 div.wrapper .emptyFooter {
-    height: 50px; /* The height of the footer */
+    height: 100px; /* The height of the footer */
 }
 
 .smallLabel {
@@ -3339,8 +3341,8 @@ ul.listCompact {
 .footer {
     text-align: center;
     color: #444444;
-    height: 40px;
-    margin-top: -80px;
+    height: 80px;
+    /*margin-top: -80px;*/
     margin-bottom: 5px;
     padding-top: 10px;
     bottom: 0;
@@ -3348,7 +3350,7 @@ ul.listCompact {
 }
 
 .longFooter {
-    margin-top: -80px;
+    /*margin-top: -80px;*/
 }
 
 
@@ -5143,7 +5145,7 @@ div.exclusivePopup {
     border: 1px solid black;
     -moz-border-radius: 10px;
     -webkit-border-radius:10px;
-    behavior: url(css/border-radius.htc);
+    /*behavior: url(css/border-radius.htc);*/
     min-width: 250px;
 }
 
@@ -6962,4 +6964,89 @@ table.infoQuestionsTable td.dataBold {
 
 .abstract.selected:hover {
     background: #CDEB8B;
+}
+
+.authorTable {
+    -moz-border-radius: 5px 5px 5px 5px;
+    border-radius: 5px 5px 5px 5px;
+    border: 1px solid gray;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    background-color: white;
+    cursor: move;
+    z-index: 1;
+}
+
+.divNotSelected {
+    background: #ECECEC;
+    -moz-border-radius: 5px 5px 5px 5px;
+    padding: 3px 0px 6px 2px;
+    width: 70%;
+}
+
+.divSelected {
+    background: #CDEB8B;
+    -moz-border-radius: 5px 5px 5px 5px;
+    padding: 3px 0px 6px 2px;
+    width: 70%;
+}
+
+.authorError {
+    font-weight: bold;
+    color: #881122;
+    text-align: left;
+    padding-top: 6px;
+}
+
+.addAuthorTD {
+    width: 20%;
+    text-align:left;
+    padding-top:6px;
+    padding-left: 6px;
+}
+
+.authorText {
+    width: 90%;
+    padding-left: 5px;
+}
+
+.placeholder {
+    background: none repeat scroll 0 0 #FFCC66;
+    height: 1.5em;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+.drop-target {
+    background: none repeat scroll 0 0 #FFF7CF;
+    border: 1px dashed #FFAA00 !important;
+    width: 85%;
+}
+
+.sortblock {
+    width:85%;
+}
+
+.sortblock ul {
+    margin-top: 2px;
+    margin-bottom: 10px;
+    padding: 4px;
+    list-style-type: none;
+    width: 100%;
+}
+
+.absMaterialInput {
+    margin: 5px 5px 0px 5px;
+}
+
+.existingAttachment {
+    padding-left: 6px;
+    padding-bottom: 8px;
+}
+
+.subGroupTitleAbstract{
+   font-size: 13px;
+   font-family: Verdana, Arial;
+   color: #523D04;
+   padding: 3px 0px 8px 3px;
+   font-weight: bold;
 }

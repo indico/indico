@@ -81,6 +81,12 @@ class AccessError(AccessControlError):
     pass
 
 
+class KeyAccessError(AccessControlError):
+    """
+    """
+    pass
+
+
 class HostnameResolveError(MaKaCError):
     """
     Hostname resolution failed

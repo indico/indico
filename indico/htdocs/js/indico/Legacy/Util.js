@@ -548,56 +548,56 @@ var IndicoUtil = {
                 }
 
                 //--- Check if there are errors ---
-                if (dataType == "checkBoxList") {
+                if (dataType == "checkBoxList" && !exists(extraCheckFunction)) {
                     if (!allowEmpty && !self.checkCheckBoxes(component)) { // component must be the parent element of all the checkboxes
-                        error = Html.span({}, "At least one must be selected");
+                        error = Html.span({}, $T("At least one must be selected"));
                     }
                 }
-                else if (dataType == "radio") {
+                else if (dataType == "radio" && !exists(extraCheckFunction)) {
                     if (!allowEmpty && !self.checkRadioButton(component)) {
-                        error = Html.span({}, "Please choose an option");
+                        error = Html.span({}, $T("Please choose an option"));
                     }
                 }
                 else if (dataType == 'int' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
-                    error = Html.span({}, "Field must be a number");
+                    error = Html.span({}, $T("Field must be a number"));
                 }
                 // TODO: to be replaced by just 'int'
                 else if (dataType == 'int_pos_or_neg' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
                     if (!(component.get()[0] == '-' && IndicoUtil.isInteger(component.get().slice(1)))) {
-                        error = Html.span({}, "Field must be a number");
+                        error = Html.span({}, $T("Field must be a number"));
                     }
                 }
                 else if (dataType == 'unsigned_int' && !(allowEmpty && trim(component.get()) === '') && (!IndicoUtil.isInteger(component.get()) || component.get()<=0)) {
                     error = Html.span({}, "Field must be a positive number");
                 }
                 else if (dataType == 'non_negative_int' && !(allowEmpty && trim(component.get()) === '') && (!IndicoUtil.isInteger(component.get()) || component.get()<0)) {
-                    error = Html.span({}, "Field must be a positive number");
+                    error = Html.span({}, $T("Field must be a positive number"));
                 }
                 else if (dataType == 'datetime' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.parseDateTime(component.get())) {
-                    error = Html.span({}, "Date format is not valid. It should be dd/mm/yyyy hh:mm");
+                    error = Html.span({}, $T("Date format is not valid. It should be dd/mm/yyyy hh:mm"));
                 }
                 else if (dataType == 'email' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailAddress(component.get())) {
-                    error = Html.span({}, "Invalid e-mail address");
+                    error = Html.span({}, $T("Invalid e-mail address"));
                 }
                 else if (dataType == 'emaillist' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailList(component.get())){
-                    error = Html.span({}, "List contains invalid e-mail address or invalid separator");
+                    error = Html.span({}, $T("List contains invalid e-mail address or invalid separator"));
                 }
                 else if (dataType == 'url' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isURL(component.get())) {
-                    error = Html.span({}, "Invalid URL");
+                    error = Html.span({}, $T("Invalid URL"));
                 }
                 else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
-                    error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");
+                    error = Html.span({}, $T("That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38"));
                 }
                 else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
-                    error = Html.span({}, "Time format is not valid. It should be hh:mm");
+                    error = Html.span({}, $T("Time format is not valid. It should be hh:mm"));
                 }
                 else if (dataType == 'shortURL' && !IndicoUtil.parseShortURL(component.get())) {
-                    error = Html.span({}, "The short URL contains invalid characters. The allowed characters are alphanumeric, _, - and .");
+                    error = Html.span({}, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, _, - and ."));
                 }
                 else if (exists(extraCheckFunction)) {
                     error = extraCheckFunction(component.get());
                 } else if (!allowEmpty && trim(component.get()) === '') {
-                    error = Html.span({}, "Field is mandatory");
+                    error = Html.span({}, $T("Field is mandatory"));
                 }
                 //--------------------------------
 
@@ -611,7 +611,7 @@ var IndicoUtil = {
                     if (component.ErrorAware) {
                         oList = component.setError(error);
 
-                    } else if (dataType == 'checkBoxList') {
+                    } else if (dataType == 'checkBoxList' || dataType == 'radio') {
                         var result = IndicoUtil.markInvalidField(component, error, true);
                         oList = result[1];
                     } else if (component.dom.type != 'radio') {

@@ -53,6 +53,10 @@ class IAvatarFossil(IAvatarMinimalFossil):
     def getTitle( self ):
         """ Avatar name title (Mr, Mrs..) """
 
+    def getTelephone( self ):
+        """ Avatar telephone """
+    getTelephone.name = "phone"
+
     def getOrganisation( self ):
         """ Avatar organisation / affiliation """
     getOrganisation.name = "affiliation"

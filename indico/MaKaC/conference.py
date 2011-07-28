@@ -35,11 +35,12 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
     IResourceMinimalFossil, ILinkMinimalFossil, ILocalFileMinimalFossil,\
     IResourceFossil, ILinkFossil, ILocalFileFossil,\
     ILocalFileExtendedFossil, IConferenceParticipationMinimalFossil,\
-    ICategoryFossil
+    ICategoryFossil, ILocalFileAbstractMaterialFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from indico.util.i18n import L_
+from MaKaC.review import Abstract
 
 
 import re, os
@@ -10391,7 +10392,7 @@ class SubContribution(CommonObjectBase, Locatable):
 
 class Material(CommonObjectBase):
     """This class represents a set of electronic documents (resources) which can
-        be attached to a conference, a session or a contribution.
+        be attached to a conference, a session, a contribution or an abstract.
         A material can be of several types (achieved by specialising this class)
         and is like a container of files which have some relation among them.
         It contains the minimal set of attributes to store basic meta data and
@@ -10541,6 +10542,11 @@ class Material(CommonObjectBase):
 
     def getSubContribution( self ):
         if isinstance(self.getOwner(), SubContribution):
+            return self.getOwner()
+        return None
+
+    def getAbstract( self ):
+        if isinstance(self.getOwner(), Abstract):
             return self.getOwner()
         return None
 
@@ -11350,7 +11356,7 @@ class LocalFile(Resource):
             inside the repository where it is archived.
     """
 
-    fossilizes(ILocalFileMinimalFossil, ILocalFileFossil, ILocalFileExtendedFossil)
+    fossilizes(ILocalFileMinimalFossil, ILocalFileFossil, ILocalFileExtendedFossil, ILocalFileAbstractMaterialFossil)
 
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )

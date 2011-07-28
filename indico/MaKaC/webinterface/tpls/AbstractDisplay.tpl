@@ -52,6 +52,24 @@
                                             <td>
                                                 <table width="100%" cellspacing="0">
                                                     <tr>
+                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Attached files")} :</b></td>
+                                                        <td width="100%">
+                                                        % if len(attachments) == 0:
+                                                            <span>--none--</span>
+                                                        % else:
+                                                            % for file in attachments:
+                                                                <div style="padding-bottom:3px;"><a href=${ file["url"] }>${ file["file"]["fileName"] }</a></div>
+                                                            % endfor
+                                                        % endif
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <table width="100%" cellspacing="0">
+                                                    <tr>
                                                         <td nowrap class="displayField" valign="top"><b> ${ _("Primary authors")} :</b></td>
                                                         <td width="100%">${ primary_authors }</td>
                                                     </tr>
