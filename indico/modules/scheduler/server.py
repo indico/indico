@@ -378,7 +378,7 @@ class Scheduler(object):
                 self._taskCycle(timestamp, curTask)
 
         except base.SchedulerQuitException, e:
-            self._logger.info('Scheduler was shut down: %s' % e)
+            self._logger.warning('Scheduler was shut down: %s' % e)
             return 0
         except:
             self._logger.exception('Unexpected error')

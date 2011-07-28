@@ -94,7 +94,6 @@ from MaKaC.webinterface import urlHandlers
 
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
-from sets import Set
 import zope.interface
 
 from indico.modules.scheduler import Client, tasks
@@ -1165,6 +1164,16 @@ class Category(CommonObjectBase):
         """
         return self.conferences
 
+    def iterAllConferences( self):
+        """returns the iterator for conferences in all subcategories.
+        """
+        for conf in self.conferences:
+            yield conf
+
+        for subcateg in self.subcategories.itervalues():
+            for conf in subcateg.iterAllConferences():
+                yield conf
+
     def getAllConferenceList( self ):
         """returns the list of all conferences included in the current category
         and in all its subcategories"""
@@ -1189,6 +1198,13 @@ class Category(CommonObjectBase):
             prev = c
 
         nextEvt = next(categIter, None)
+
+        # if the event is already the first or the last, don't confuse
+        # users by showing the respective arrow
+        if first == conf:
+            first = None
+        if last == conf:
+            last = None
 
         return prev, nextEvt, first, last
 
@@ -3250,22 +3266,11 @@ class Conference(CommonObjectBase, Locatable):
         for session in self.getSessionList() :
             for convener in session.getConvenerList() :
                 key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
-                if dictionary.has_key(key) :
-                    dictionary[key].add(convener)
-                else :
-                    set = Set()
-                    set.add(convener)
-                    dictionary[key] = set
+                dictionary.setdefault(key, set()).add(convener)
             for slot in session.getSlotList():
                 for convener in slot.getConvenerList() :
                     key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
-                    if dictionary.has_key(key) :
-                        dictionary[key].add(convener)
-                    else :
-                        set = Set()
-                        set.add(convener)
-                        dictionary[key] = set
-
+                    dictionary.setdefault(key, set()).add(convener)
 
         return dictionary
 
@@ -3518,6 +3523,9 @@ class Conference(CommonObjectBase, Locatable):
         """Returns a list of the conference contribution objects
         """
         return self.contributions.values()
+
+    def iterContributions(self):
+        return self.contributions.itervalues()
 
     def getContributionListSortedById(self):
         """Returns a list of the conference contribution objects, sorted by their id
@@ -8908,6 +8916,9 @@ class Contribution(CommonObjectBase, Locatable):
 
     def getSubContributionList(self):
         return self._subConts
+
+    def iterSubContributions(self):
+        return iter(self._subConts)
 
     def upSubContribution(self, subcont):
         if subcont in self._subConts:

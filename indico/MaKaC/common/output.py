@@ -737,13 +737,17 @@ class outputGenerator(Observable):
         out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(session)))
 
 
-        slotCode = session.getSortedSlotList().index(slot) + 1
+        slotId = session.getSortedSlotList().index(slot)
+        slotCode = slotId + 1
         if session.getCode() not in ["no code", ""]:
             out.writeTag("code","%s-%s" % (session.getCode(),slotCode))
         else:
             out.writeTag("code","sess%s-%s" % (session.getId(),slotCode))
         if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
-            out.writeTag("slotId", session.getSortedSlotList().index(slot))
+            out.writeTag("slotId", slotId)
+            url = urlHandlers.UHSessionModifSchedule.getURL(session)
+            ttLink = "%s#%s.s%sl%s" % (url, session.getStartDate().strftime('%Y%m%d'), session.getId(), slotId)
+            out.writeTag("sessionTimetableLink",ttLink)
         if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
             out.writeTag("minutesLink",True)
             out.writeTag("materialLink", True)

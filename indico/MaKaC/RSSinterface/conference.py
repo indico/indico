@@ -27,12 +27,30 @@ import sets
 from pytz import timezone
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.common.info as info
+import struct, socket
 
 
+# TOREMOVE
 def ACLfiltered(iter, requestIP, aw=None):
 
+    def _inIPList(iplist, ip):
+
+        for rule in iplist:
+            if '/' in rule:
+                # it's a netmask (CIDR), check if ip belongs to it
+                # ipv4-specific, non-endian-safe check!
+                ipaddr = struct.unpack('=L', socket.inet_aton(ip))[0]
+                netaddr, bits = rule.split('/')
+                netmask = struct.unpack('=L', socket.inet_aton(netaddr))[0] & ((2L << int(bits) - 1) - 1)
+                if ipaddr & netmask == netmask:
+                    return True
+            else:
+                if ip in iplist:
+                    return True
+        return False
+
     acl = Config.getInstance().getExportACL().iteritems()
-    blIds = list(categ for (categ, iplist) in acl if (requestIP not in iplist))
+    blIds = list(categ for (categ, iplist) in acl if (not _inIPList(iplist, requestIP)))
 
     for conf in iter:
         owners = list(categ.getId() for categ in conf.getOwnerPath()) + ['0']

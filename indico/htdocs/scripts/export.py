@@ -47,11 +47,10 @@ def index(req, **params):
   db.DBMgr.getInstance().startRequest()
   minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
-  hostIP = req.get_remote_host()
+  hostIP = req.get_remote_ip()
   if minfo.useProxy():
       # if we're behind a proxy, use X-Forwarded-For
-      xff = req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
-      hostIP = socket.gethostbyname(xff)
+      hostIP = req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
 
   if minfo.getRoomBookingModuleActive():
         DALManagerCERN.connect()

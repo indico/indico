@@ -25,6 +25,7 @@ process.
 """
 
 import time, sys, os, argparse, logging, cmd, multiprocessing
+from logging.handlers import SMTPHandler
 
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
 
@@ -39,8 +40,19 @@ class SchedulerApp(object):
     def __init__(self, args):
         super(SchedulerApp, self).__init__()
         self.args = args
+        config = Config.getInstance()
+        worker = config.getWorkerName();
+        self.mailer = SMTPHandler(config.getSmtpServer(),
+                                  'scheduler@%s' % worker,
+                                  config.getSupportEmail(),
+                                  "[indico_scheduler] Problem at %s" % worker)
+
+        self.mailer.setLevel(logging.WARNING)
 
     def run(self):
+        root_logger = logging.getLogger('')
+        root_logger.addHandler(self.mailer)
+
         logger = logging.getLogger('daemon')
         try:
             Scheduler(multitask_mode = self.args.mode).run()

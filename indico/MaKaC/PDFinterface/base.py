@@ -96,7 +96,10 @@ class PDFHTMLParser(HTMLParser):
             self.text.append( "<%s%s>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
 
     def handle_startendtag(self, tag, attrs):
-        self.text.append( "<%s%s/>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
+        if tag =="a":
+            self.text.append( "</a>" )
+        else:
+            self.text.append( "<%s%s/>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
 
     def handle_endtag(self, tag):
         if tag in self._removedTags:
@@ -474,18 +477,22 @@ class PDFBase:
             if logo:
                 imagePath = logo.getFilePath()
             if imagePath:
-                img = PILImage.open(imagePath)
-                width, height = img.size
-                if width > self._PAGE_WIDTH:
-                    ratio =  float(height)/width
-                    width = self._PAGE_WIDTH
-                    height = self._PAGE_WIDTH * ratio
-                    img = img.resize((width, height))
-                startHeight = self._PAGE_HEIGHT
-                if drawTitle:
-                    startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
-                    height = 0
-                c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, startHeight - 1.5 * inch - height)
+                try:
+                    img = PILImage.open(imagePath)
+                    width, height = img.size
+                    if width > self._PAGE_WIDTH:
+                        ratio =  float(height)/width
+                        width = self._PAGE_WIDTH
+                        height = self._PAGE_WIDTH * ratio
+                        img = img.resize((int(width), int(height)))
+                    startHeight = self._PAGE_HEIGHT
+                    if drawTitle:
+                        startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+                        height = 0
+                    c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, startHeight - 1.5 * inch - height)
+                except IOError:
+                    if drawTitle:
+                        self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
                 return True
         return False
 

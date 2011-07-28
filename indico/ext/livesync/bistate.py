@@ -59,7 +59,7 @@ class BistateRecordProcessor(object):
 
         # categories are never converted to records
 
-        for conf in categ.getAllConferenceList():
+        for conf in categ.iterAllConferences():
             cls._breakDownConference(conf, chgSet, state)
             cls._cacheControl(dbi, chgSet)
 
@@ -68,7 +68,7 @@ class BistateRecordProcessor(object):
 
         cls._setStatus(chgSet, conf, state)
 
-        for contrib in conf.getContributionList():
+        for contrib in conf.iterContributions():
             cls._breakDownContribution(contrib, chgSet, state)
 
     @classmethod
@@ -76,7 +76,7 @@ class BistateRecordProcessor(object):
 
         cls._setStatus(chgSet, contrib, state)
 
-        for scontrib in contrib.getSubContributionList():
+        for scontrib in contrib.iterSubContributions():
             cls._setStatus(chgSet, scontrib, state)
 
     @classmethod

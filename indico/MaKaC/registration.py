@@ -18,7 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import md5, random, time
+import random, time
+from hashlib import md5
 from datetime import datetime,timedelta
 from pytz import timezone
 from pytz import all_timezones
@@ -4292,7 +4293,7 @@ class Registrant(Persistent):
 
     def _generateRandomId(self):
         n=datetime.now()
-        return md5.new(str(random.random()+time.mktime(n.timetuple()))).hexdigest()
+        return md5(str(random.random()+time.mktime(n.timetuple()))).hexdigest()
 
     def getRandomId(self):
         try:

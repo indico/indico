@@ -808,9 +808,6 @@ class CalendarDayIndex(Persistent):
             for event in day:
                 yield event
 
-        i = 0
-        confIdx = ConferenceHolder()._getIdx()
-
     def _check(self, dbi=None, categId=''):
         """
         Performs some sanity checks
@@ -822,17 +819,17 @@ class CalendarDayIndex(Persistent):
         for ts, confs in self._idxDay.iteritems():
             dt = pytz.timezone('UTC').localize(datetime.utcfromtimestamp(ts))
 
-            for confId in confs:
+            for conf in confs:
                 # it has to be in the conference holder
-                if confId not in confIdx:
-                    yield "[%s][%s] '%s' not in ConferenceHolder" % (ts, categId, confId)
+                if conf.getId() not in confIdx:
+                    yield "[%s][%s] '%s' not in ConferenceHolder" % (ts, categId, conf.getId())
                 else:
-                    conf = ConferenceHolder().getById(confId)
-                # date must be ok
-                    if date > conf.getEndDate() or date < conf.getStartDate():
-                        yield "[%s] '%s' has date out of bounds '%s'(%s)" % (categId, confId, ts, dt)
-                    elif categId not in (map(lambda x:x.id, ConferenceHolder().getById(confId).getOwnerPath()) + ['0']):
-                        yield "[%s] Conference '%s' is not owned" % (categId, confId)
+                    # date must be ok
+                    if dt > conf.getEndDate().replace(hour=23, minute=59, second=59) \
+                           or dt < conf.getStartDate().replace(hour=0, minute=0, second=0):
+                        yield "[%s] '%s' has date out of bounds '%s'(%s)" % (categId, conf.getId(), ts, dt)
+                    elif categId not in (map(lambda x:x.id, conf.getOwnerPath()) + ['0']):
+                        yield "[%s] Conference '%s' is not owned" % (categId, conf.getId())
 
                 if dbi and i % 100 == 99:
                     dbi.sync()

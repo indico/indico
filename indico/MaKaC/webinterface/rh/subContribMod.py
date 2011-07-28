@@ -102,9 +102,16 @@ class RHSubContributionModifData( RHSubContribModifBase ):
         self._target.setTitle( params.get("title","") )
         self._target.setDescription( params.get("description","") )
         self._target.setKeywords( params.get("keywords","") )
+        try:
+            durationHours = int(params.get("durationHours",""))
+        except ValueError:
+            raise FormValuesError(_("Please specify a valid hour format (0-23)."))
+        try:
+            durationMinutes = int(params.get("durationMinutes",""))
+        except ValueError:
+            raise FormValuesError(_("Please specify a valid minutes format (0-59)."))
 
-        self._target.setDuration( params.get("durationHours",""), \
-                             params.get("durationMinutes","") )
+        self._target.setDuration( durationHours, durationMinutes )
         self._target.setSpeakerText( params.get("speakers","") )
         self._redirect(urlHandlers.UHSubContributionModification.getURL( self._target ) )
 

@@ -45,6 +45,10 @@ class Catalog(OOBTree):
     def getIdx(cls, indexName, db=None):
         if not db:
             db = DBMgr.getInstance().getDBConnection()
+
+        if 'catalog' not in db.root():
+            cls.initialize(db=db)
+
         return db.root()['catalog'].get(indexName)
 
     @classmethod

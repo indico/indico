@@ -3149,6 +3149,10 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
             raise FormValuesError( _("""Please choose a "FROM" address for this alarm"""))
         self._fromAddr=params.get("fromAddr")
 
+        if not params.has_key("toAllParticipants") and (not params.has_key("defineRecipients")
+                                                        or (params.has_key("defineRecipients") and params.get("Emails","")=="")):
+            raise FormValuesError( _("""Please select the checkbox 'Send to all participants' or 'Define recipients' with a list of emails."""))
+
         params = self._getRequestParams()
 
         self._dateType = params["dateType"]
