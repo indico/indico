@@ -258,23 +258,3 @@ CssStylesheetName    = "Default"
 
 # Categories that you want to limit to certain IPs (RSS, iCal, export.py)
 ExportACL = {}
-
-#------------------------------------------------------------------------------
-# OAI PARAMETERS
-#------------------------------------------------------------------------------
-# The Open Archives Initiative develops and promotes interoperability standards
-# that aim to facilitate the efficient dissemination of content.
-# The following parameters allow you to personalize Indico's OAI behavior.
-# For additional information about OAI you can check its homepage:
-#
-#    http://www.openarchives.org/
-
-OAILogFile           = "/opt/indico/log/oai.log"
-NbRecordsInResume    = 100
-NbIdentifiersInResume = 100
-OAIRtExpire          = 90000
-OAINamespace         = ""
-IconfNamespace       = "http://localhost/"
-IconfXSD             = "http://localhost/iconf.xsd"
-RepositoryName       = ""
-RepositoryIdentifier = ""
