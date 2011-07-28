@@ -51,7 +51,7 @@ var listOfAddHandlers = {};
                 {
                     conference: '<%= conf.getId() %>',
                     track: '<%= i %>',
-                    userList: useList
+                    userList: userList
                 },
                 function(result,error) {
                     if (!error) {
