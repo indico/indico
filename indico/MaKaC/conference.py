@@ -70,7 +70,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController, AdminList
-from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError
+from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NoReportError
 from MaKaC import registration,epayment
 from MaKaC.evaluation import Evaluation
 from MaKaC.trashCan import TrashCanManager
@@ -4917,7 +4917,7 @@ class ConferenceHolder( ObjectHolder ):
         if self._getIdx().has_key(str(id)):
             return self._getIdx()[str(id)]
         else:
-            raise MaKaCError( _("Event id %s does not exist") % str(id) )
+            raise NoReportError( _("The specified event with id \"%s\" does not exist.") % str(id) )
 
 class ConfSectionsMgr:
 

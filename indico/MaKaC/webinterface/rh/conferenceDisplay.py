@@ -1453,5 +1453,5 @@ class RHShortURLRedirect(RH):
             conf = sum.getById(self._tag)
             self._redirect(urlHandlers.UHConferenceDisplay.getURL(conf))
         else:
-            raise MaKaCError("Bad event tag or Id : \"%s\""%self._tag)
+            raise NoReportError(_("The specified event with id or tag \"%s\" does not exist or has been deleted")%self._tag)
 
