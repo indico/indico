@@ -159,12 +159,13 @@ class AbstractReviewingAddReviewer(AbstractReviewingBase):
         AbstractReviewingBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._trackId = pm.extract("track", pType=str, allowEmpty=False)
-        self._reviewerId = pm.extract("user", pType=str, allowEmpty=False)
+        self._reviewerList = pm.extract("userList", pType=list, allowEmpty=False)
 
     def _getAnswer(self):
-        ah = user.AvatarHolder()
-        av = ah.getById(self._reviewerId)
-        self._conf.getTrackById(self._trackId).addCoordinator(av)
+        for reviewer in self._reviewerList:
+            ah = user.AvatarHolder()
+            av = ah.getById(reviewer["id"])
+            self._conf.getTrackById(self._trackId).addCoordinator(av)
         return True
 
 
