@@ -87,8 +87,6 @@ class outputGenerator(Observable):
         else:
             self._XMLGen = XMLGen()
         self._config = Config.getInstance()
-        self.iconfNamespace = self._config.getIconfNamespace()
-        self.iconfXSD = self._config.getIconfXSD()
         self.text = ""
         self.dataInt = dataInt
         self.time_XML = 0
