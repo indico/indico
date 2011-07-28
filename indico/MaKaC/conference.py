@@ -4890,7 +4890,7 @@ class ConferenceHolder( ObjectHolder ):
         if self._getIdx().has_key(str(id)):
             return self._getIdx()[str(id)]
         else:
-            raise NoReportError( _("The specified event with id \"%s\" does not exist.") % str(id) )
+            raise NoReportError( _("The specified event with id \"%s\" does not exist or has been deleted.") % str(id) )
 
 class ConfSectionsMgr:
 
