@@ -10,13 +10,12 @@
             <span class="dataCaptionFormat">Options</span>
         </td>
         <td bgcolor="white" width="100%" class="blacktext">
-            <% if showIds: %>
+            % if showIds:
                 <% icon = str(Config.getInstance().getSystemIconURL( "enabledSection" )) %>
-            <% end %>
-            <% else: %>
+            % else:
                 <% icon = str(Config.getInstance().getSystemIconURL( "disabledSection" )) %>
-            <% end %>
-            <a href="<%= urlToogleShowIds %>"><img src="<%= icon %>"> <%= _("Show Abstract IDs") %></a> <%= _("(Table of Contents)") %>
+            % endif
+            <a href="${ urlToogleShowIds }"><img src="${ icon }"> ${ _("Show Abstract IDs") }</a> ${ _("(Table of Contents)") }
         </td>
     </tr>
     <tr>

@@ -31,10 +31,10 @@
              ${ _("Whether bookings must be accepted by person responsible.")}
         </div>
         <div id="resvStartNotificationCH" class="tip">
-             <%= _("Whether to trigger notifications when a booking for the room begins.")%>
+             ${ _("Whether to trigger notifications when a booking for the room begins.") }
         </div>
         <div id="resvEndNotificationCH" class="tip">
-             <%= _("Whether to trigger notifications when a booking for the room ends.")%>
+             ${ _("Whether to trigger notifications when a booking for the room ends.") }
         </div>
         <div id="whereIsKeyCH" class="tip">
              ${ _("How to obtain a key. Typically a phone number.")}
@@ -158,12 +158,12 @@
                                             <td align="left" class="blacktext"><input type="checkbox" ${' checked="checked" ' if room.resvsNeedConfirmation else ""} id="resvsNeedConfirmation" name="resvsNeedConfirmation" /> ${contextHelp('resvsNeedConfirmationCH' )}</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> <%= _("Notification on booking start")%>&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" <% if room.resvStartNotification: %> checked="checked" <% end %> id="resvStartNotification" name="resvStartNotification" /> <% contextHelp( 'resvStartNotificationCH' ) %></td>
+                                            <td align="right" valign="top"><small> ${ _("Notification on booking start")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvStartNotification else ''} id="resvStartNotification" name="resvStartNotification" /> ${ contextHelp( 'resvStartNotificationCH' ) }</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> <%= _("Notification on booking end")%>&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" <% if room.resvEndNotification: %> checked="checked" <% end %> id="resvEndNotification" name="resvEndNotification" /> <% contextHelp( 'resvEndNotificationCH' ) %></td>
+                                            <td align="right" valign="top"><small> ${ _("Notification on booking end")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvEndNotification else ''} id="resvEndNotification" name="resvEndNotification" /> ${ contextHelp( 'resvEndNotificationCH' ) }</td>
                                         </tr>
                                     </table>
                                 </td>
