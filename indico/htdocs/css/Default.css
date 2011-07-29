@@ -3333,7 +3333,7 @@ ul.listCompact {
     text-align: center;
     color: #444444;
     height: 40px;
-    margin-top: -60px;
+    margin-top: -80px;
     margin-bottom: 5px;
     padding-top: 10px;
     bottom: 0;
@@ -3341,7 +3341,7 @@ ul.listCompact {
 }
 
 .longFooter {
-    margin-top: -60px;
+    margin-top: -80px;
 }
 
 
