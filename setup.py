@@ -610,7 +610,7 @@ if __name__ == '__main__':
     if BABEL_PRESENT:
         for cmdname in ['init_catalog', 'extract_messages', 'compile_catalog', 'update_catalog']:
             cmdclass['%s_js' % cmdname] = getattr(babel, cmdname)
-        cmdclass['generate_messages_js'] = i18n.generate_messages_js
+        cmdclass['compile_catalog_js'] = i18n.generate_messages_js
 
     setup(name = "indico",
           cmdclass = cmdclass,
