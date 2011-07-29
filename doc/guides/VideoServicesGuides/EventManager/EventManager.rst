@@ -1322,7 +1322,7 @@ The details given are:
 
 - *Room name* :this is the name of the room
 
-- *Extension* : this is the numeric extension of the room, that gives another possibility of joining it. If one is logged in the Vidyo portal, one can join a room by entering the extension in the field "Select from list or Enter name to call" 
+- *Extension* : this is the numeric extension of the room, that gives another possibility of joining it. If one is logged in the Vidyo portal, one can join a room by entering the extension in the field "Select from list or Enter name to call"
 
 - *Room owner* : this is the owner of the room, which has moderator rights.
 
@@ -1869,6 +1869,7 @@ The Electronic Agreement system
 -------------------------------
 
 .. _here:
+
 The Electronic Agreement system can be found under the *Electronic Agreement* tab.
 The content of this page is only showed when either a Recording or a Webcast Request has been accepted.
 
@@ -1887,7 +1888,7 @@ In this section we will look in more details to the list of speakers and detail 
 
 The list of speaker contains the following fields:
 
-- The **Speaker** column, as you can expect, give you the name of the speaker. 
+- The **Speaker** column, as you can expect, give you the name of the speaker.
 - The **Email** column shows you the email address of the speaker, however, if in case the email would be wrong, the manager can click on the edit button in order to change his email.
 - The **Status** column shows the current status of the agreement. A help icon is there to remind you their meaning.
 	- *No Email*: The speaker does not have an email address.
@@ -1912,10 +1913,10 @@ To send an email to the speaker, the manager need first to select at least one e
 |figure77|
 
 The window above is a simple form that allow you to choose with which one of your email address you want to send the emails.
-Then, you will have a text field showing a default text that can be sent. This text can be personalized by the manager as he wants. 
+Then, you will have a text field showing a default text that can be sent. This text can be personalized by the manager as he wants.
 
-However, there is one and unique condition to respect: **keep the [url] tag**. 
-In the legend you can see some tags that can be inserted, none of them are mandatory except the **[url]** one. 
+However, there is one and unique condition to respect: **keep the [url] tag**.
+In the legend you can see some tags that can be inserted, none of them are mandatory except the **[url]** one.
 
 Indeed, the [url] tag will be replaced by the link to the agreement form. If this one is not present, the system will refuse to send the email until you input this tag. Once the email is sent, the status of the speaker will change to *Pending...*.
 

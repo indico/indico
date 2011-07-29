@@ -1,5 +1,7 @@
+.. _chat_guide:
+
 =================
-Chat room service 
+Chat room service
 =================
 
 --------------------
@@ -26,7 +28,7 @@ However, there are many other options, so feel free to check some other clients 
 See more in the chapter about `XMPP Clients <XMPPClients.html>`_.
 
 =====================================
-How to create a chat room from Indico 
+How to create a chat room from Indico
 =====================================
 
 In the management area for your event, you will find a new option, on the left menu, with the name **Chat rooms**. Click on it to access the chat room list.
@@ -58,7 +60,7 @@ After the creation, the room will be listed and you can perform different action
 |image2|
 
 ===================================
-How to join a chat room from Indico 
+How to join a chat room from Indico
 ===================================
 
 The home page of your event will display a hyperlink to the chat rooms that you have previously created.

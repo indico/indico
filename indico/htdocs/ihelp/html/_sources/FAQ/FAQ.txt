@@ -20,10 +20,25 @@ General Event
 How do I create the proceedings for my conference?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-From the Management area within your conference, go to the
+Step 1: Go to the *Contributions* option in the left menu in the Management Area.
+
+You can mark a file as a main resource through the Management Area of the
+contribution it belongs to (which you can access by clicking on the contribution's name).
+From there, you need to go to the tab *Material* and then click on |image7|
+to mark as main resource. Only one document can be marked as main resource.
+In the example below, IndicoFAQ.pdf is the main resource (yellow star as
+oppposed to gray star).
+
+|image8|
+
+The files marked as main resource will be used to build the proceedings.
+
+Step 2: From the Management area within your conference, go to the
 Contributions area and above the list of contributions there is a
 button for proceedings. If there are resources along with the
 contribution the main resource will be shown in the proceedings
+
+|image4|
 
 --------------
 
@@ -64,8 +79,29 @@ look like this :
 
 |image3|
 
+Fore more on protection in Indico, see :ref:`protection_guide`.
+
+------------------
+
+How do I export something into Microsoft Excel?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* With Windows:
+
+  - Excel 2007: Click on the icon |image5|, then on *Open with* Microsolf Excel 2007
+  - Excel 2010: Same as above
+
+|image6|
+
+* With Mac: Click on |image5|, an Excel document will automatically be opened
+
 --------------
 
 .. |image1| image:: FAQPics/pen.png
 .. |image2| image:: FAQPics/newpen.png
 .. |image3| image:: FAQPics/access_control.png
+.. |image4| image:: FAQPics/proceedings.png
+.. |image5| image:: FAQPics/excel.png
+.. |image6| image:: FAQPics/export.png
+.. |image7| image:: FAQPics/fav.png
+.. |image8| image:: FAQPics/material.png

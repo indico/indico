@@ -26,26 +26,24 @@ contributions for which you can submit material.
 Submitting
 ----------
 
-Once in the My contributions area you can click on the
-contribution name to view the contribution details and start
-submitting material.
+Once in the My contributions area (previous screenshot) you can click on
+*View* in order to display the contribution details and start submitting
+material.
 
 |image3|
 
---------------
 
-Submitting Material
-~~~~~~~~~~~~~~~~~~~
-
-Once you have clicked on 'Add Material' you are presented with
-a screen to let you submit.
+To submit material, click on *Add Material*. A popup will appear, from
+which you can choose the material type (slides, video etc.) and upload it.
+You also need to set the protection level, (see :ref:`access_control`), and
+you can add a description and display name. If you set the material to be private,
+a *Protection* tab will appear, where you can add users or groups that
+are allowed to access your material, set the visibility (hidden, visible)
+and if you wish, set an access key.
 
 |image4|
 
-You can choose of which material type you want to submit,
-upload a file, and enter a description or comment.
-
-When the material has been submitted it will appear in the
+Once the material has been submitted it will appear in the
 contribution details
 
 

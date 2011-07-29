@@ -14,6 +14,8 @@ your Conference Manager.
 You can access your session by selecting *My session* from the
 conference menu.
 
+|image8|
+
 --------------
 
 ------------------
@@ -55,7 +57,7 @@ Session Timetable Tab
 ~~~~~~~~~~~~~~~~~~~~~
 
 The Session Timetable tab lets you arrange the scheduling for your
-session, you can add/edit/delete session intervals, organise when your
+session, you can add/edit/delete session blocks, organise when your
 contributions are going to take place, and include breaks within
 your session.
 
@@ -88,8 +90,7 @@ co-ordinator cannot change details of the session itself.
 Tools Tab
 ~~~~~~~~~
 
-The Tools tab allows you to delete the session and to write
-minutes for the session.
+The Tools tab allows you to delete and to write minutes for the session.
 
 --------------
 
@@ -102,9 +103,21 @@ comments.
 
 |image7|
 
+--------------
+
+Files Tab
+~~~~~~~~~
+
+Click on *Add material* in this tab to attach material to the session.
+You can also edit (data and protection) and remove all the material
+(slides, videos etc.) attached to the session.
+
+--------------
+
 
 .. |image3| image:: QSPics/sessmain.png
 .. |image4| image:: QSPics/sesscontrib.png
 .. |image5| image:: QSPics/sesstt.png
 .. |image6| image:: QSPics/sessac.png
 .. |image7| image:: QSPics/sesscom.png
+.. |image8| image:: QSPics/mysess.png

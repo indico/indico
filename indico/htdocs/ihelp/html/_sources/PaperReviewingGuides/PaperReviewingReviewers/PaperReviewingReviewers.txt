@@ -1,3 +1,5 @@
+.. _content_reviewer:
+
 ==================================================
 Paper reviewing module - content reviewers's guide
 ==================================================

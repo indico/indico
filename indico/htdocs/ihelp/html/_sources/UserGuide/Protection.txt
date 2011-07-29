@@ -1,3 +1,5 @@
+.. _protection_guide:
+
 =================
 Protection System
 =================
@@ -13,8 +15,8 @@ Indico to grant or restrict access to users.
 Basic Concepts
 --------------
 
-Inheritance Schema
-~~~~~~~~~~~~~~~~~~
+Inheritance Graphic
+~~~~~~~~~~~~~~~~~~~
 
 You can set up a protection policy for almost all the objects that
 you can create within Indico. This protection policy is based on an
@@ -47,16 +49,16 @@ For each object (category, conference, contribution, session,
 etc) in Indico, one can set up three kinds of protection:
 modification control list, access control setup, and domain control.
 
-- 
+-
    The modification control list contains all the users or groups that can
    edit and modify an object. Therefore, people in this list will be
    the managers for the object and they can access all the pages
    related to it and the objects under it.
-- 
-   Access control setup: by default, an object is public but we can
-   make it private and add restrictions as shown in the section
+-
+   Access control setup: by default, an object is inheriting but we can
+   make it public or private and add restrictions as shown in the section
    `Access Control Policy <#id1>`_.
-- 
+-
    Domain control: one can protect an Indico object to be accessed
    only by users who are connected from some given IPs (see
    `Domain Control Policy <#id3>`_).
@@ -64,44 +66,62 @@ modification control list, access control setup, and domain control.
 
 --------------
 
+
+.. _access_control:
+
 Access Control Policy
 ---------------------
 
-By default, all the objects (category, event, session,
-contribution, material, file and link) in Indico are **PUBLIC**.
 
-We can set an object as PRIVATE and this means that all the
-objects under it will be PRIVATE as well.
+In Indico, an object can be a category, an event, a session, a contribution,
+material, files and links. You need to assign a level of protection to
+all of these events. There are three different kinds of events in Indico:
 
-If an object is **PRIVATE**, nobody can access it but the
-managers, the users/groups in the access list named "Users allowed
-to access" and those who know the "access key" if set.
 
-If an object is **PRIVATE by inheritance**:
+**Public**: Making an object public will make it accessible and visible
+to anyone. For example, suppose conference A belongs to category A. If
+the category A is private, but the conference A is public, then only
+allowed users will be able to access the category A, but everyone can
+access conference A.
 
-- 
-   Nobody can access it but the managers and the users/groups in the
-   access list "Users allowed to access" **of its father** (as
-   example, see section `"Inheritance Schema" <#prot_inhe>`_).
+|image210|
 
-- 
-   We can set the PRIVATE object as **PRIVATE by itself**, which means
-   that Indico checks only its protection policy and not the father's
-   protection policy.
+In this graph, only restricted users have access to Category A, but
+everyone can access Conference A, as it is public.
 
-   |image210|
 
-   In the graphic, "User 1" and "User 2" can access "Category A" but
-   they cannot access "Conference 1". Only "User 3" can access
-   "Conference 1".
-- 
-   We can set the PRIVATE object as **ABSOLUTELY PUBLIC**, which means
-   that Indico skips the protection that was established by inheritance.
+**Private**: Making an object private will make it invisible to all
+users. You will then need to set the users which will have access to it.
+For example, suppose category B is public and conference B is private,
+and you allow users 1 and 2 to access the conference. Then everyone will
+have access to category B, but only users 1 and 2 will be able to see
+conference B.
+
+|image212|
+
+In this graph, everyone can access Category B, but only restricted users
+can access Conference B, as it has been made private.
+
+
+**Inheriting**: Making an object inheriting makes it inherit the access
+protection of its parent. Changing the protection of the parent will
+change the protection of the object. For example, suppose conference C
+belongs to category C. If you make category C private, then conference C
+will be private; if category C is public, then conference C will be public.
+Making a category which belongs to the category *Home* inheriting
+will make the category public by default.
+
+Here is a graph that illustrates the inheriting example.
+
 
    |image211|
 
-   In the graphic, only "User 1" and "User 2" can access "Category A",
-   but everybody can access "Conference 1".
+In this graph, we see how Category C transmets its access protection to
+Conference C (which is included in it), i.e. how Conference C inherits
+its access protection from its parent category, Category C.
+
+By default, all objects in Indico are INHERITING.
+
 
 --------------
 
@@ -116,11 +136,12 @@ users accessing Indico from some given IPs (these IPs could be like
 If the Indico object is PRIVATE, this checking will not be
 applied.
 
-If you wish to add special access to some users, meaning that the
-domain control will not be applied for those users, you can add
-them in the "Users allowed to access" list.
+If it is INHERITING, it will have the same access protection as its
+parent. Its access protection status will therefore change whenever
+the parent's access protection changes.
 
 .. |image208| image:: UserGuidePics/tree.png
 .. |image209| image:: UserGuidePics/privByInh.png
-.. |image210| image:: UserGuidePics/privByItself.png
-.. |image211| image:: UserGuidePics/absoPub.png
+.. |image210| image:: UserGuidePics/privatePublic.png
+.. |image211| image:: UserGuidePics/inheriting.png
+.. |image212| image:: UserGuidePics/publicPrivate.png

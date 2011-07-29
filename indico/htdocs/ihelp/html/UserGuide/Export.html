@@ -57,14 +57,23 @@
 <div class="section" id="to-personal-scheduler-tools-outlook-ical-korganizer">
 <h2>6.1. To Personal Scheduler Tools (Outlook, iCal, korganizer...)<a class="headerlink" href="#to-personal-scheduler-tools-outlook-ical-korganizer" title="Permalink to this headline">¶</a></h2>
 <p>You can export an event or a set of events to your personal
-scheduler tool by using the Indico iCal export. When you see
-this icon <img alt="image162" src="../_images/ical_small.png" />, the link <em>iCal export</em>, or the menu <em>More</em>
-&gt; <em>Export to Ical</em>, you can click on it to export the content of
-the page you are on to your scheduler tool.</p>
-<p>On an event page, the event will be exported, on a category page,
-all events in the category will be exported. Some scheduler tools
+scheduler tool by using the Indico iCal export. There are different ways
+you can export data into iCal:</p>
+<ul class="simple">
+<li>With the icon <img alt="image162" src="../_images/ical_small.png" /> which you can find when looking at a category’s events. This will export the whole event into iCal:</li>
+</ul>
+<p><img alt="image165" src="../_images/ical1.png" /></p>
+<ul class="simple">
+<li>From the event page, from the menu <em>More</em> -&gt; <em>Export to iCal</em>. You have the choice to export the event or the timetable. Clicking on <em>Export event</em> will export the event into iCal and clicking on <em>Export timetable</em> will export the timetable, with all the contributions etc. within it.</li>
+</ul>
+<p><img alt="image166" src="../_images/ical2.png" /></p>
+<ul class="simple">
+<li>From the category’s overview page, by clicking on the link <em>iCal export</em>, on the top right. This will export all the events in the given category</li>
+</ul>
+<p><img alt="image167" src="../_images/ical3.png" /></p>
+<p>On a category page, all events in the category will be exported. Some scheduler tools
 recognize multiple events (iCal, korganizer, Outlook 2007),
-others do not (Outlook 2003), in this case only the first event in
+others do not (Outlook 2003); in this case, only the first event in
 the list is recognized.</p>
 <p>You can also ask your personal scheduler tool to subscribe to one
 of these export URLs (this is particularly interesting for the
@@ -87,7 +96,7 @@ subscribe to it using an RSS aggregator.</p>
 <p>If you maintain a Sharepoint web site, it is very easy to create
 inside it a web part exposing the forthcoming events from an Indico
 category. First add an XML web part, then in the &#8220;XML link&#8221; part,
-add the <a class="reference external" href="#using-the-export.py-script">XML export</a> URL from indico (eg.
+add the <a class="reference external" href="#using-the-export.py-script">XML export</a> URL from indico (e.g.
 <a class="reference external" href="http://indico.cern.ch/tools/export.py?fid=2l12&amp;date=today&amp;days=1000&amp;of=xml">http://indico.cern.ch/tools/export.py?fid=2l12&amp;date=today&amp;days=1000&amp;of=xml</a>)
 and in the &#8220;XSL link&#8221; part, add this URL:
 <a class="reference external" href="http://indico.cern.ch/export.xsl">http://indico.cern.ch/export.xsl</a>.</p>

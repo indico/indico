@@ -1296,6 +1296,9 @@ you don&#8217;t want to reload the page, use the <img alt="image0" src="../../_i
 reload / update the status.</p>
 <p>Even after a request is accepted or rejected, you can still modify
 it, which will trigger another mail being sent to the responsible.</p>
+<p><em>Note: Once the request is accepted, the manager will need to send to every speaker that
+will be recorded an email asking to accept some conditions. This will be done through the
+Electronic Agreement tab. More details are available in the</em> <a class="reference external" href="#the-electronic-agreement-system">Electronic Agreement system</a> section.</p>
 </div>
 </div>
 <div class="section" id="the-webcast-request-system">
@@ -1480,6 +1483,89 @@ you don not want to reload the page, use the <img alt="image1" src="../../_image
 reload (update) the status.</p>
 <p>Even after a request is accepted or rejected, you can still modify
 it, which will trigger another mail being sent to the responsible.</p>
+<p><em>Note: Once the request is accepted, the manager will need to send to every speaker that
+will be webcasted an email asking to accept some conditions. This will be done through the
+Electronic Agreement tab. More details are available in the</em> <a class="reference external" href="#the-electronic-agreement-system">Electronic Agreement system</a> section.</p>
+</div>
+</div>
+<div class="section" id="the-electronic-agreement-system">
+<h2>3.4.6. The Electronic Agreement system<a class="headerlink" href="#the-electronic-agreement-system" title="Permalink to this headline">¶</a></h2>
+<p id="here">The Electronic Agreement system can be found under the <em>Electronic Agreement</em> tab.
+The content of this page is only showed when either a Recording or a Webcast Request has been accepted.</p>
+<p>This page will list the speakers of every contribution that had been asked to be recorded or webcasted.
+The Electronic Agreement is a form that give the image rights to publish the contribution online.
+From this page, the manager will be able to send emails to the speakers asking them to accept the conditions.
+However, if the email of a speaker is not available for a reason or another, the manager can still download a Paper Agreement available through that same page. Once downloaded it, he can ask to the speaker to sign it, once this done, the manager can scan the document and upload it.</p>
+<div class="section" id="list-of-speakers">
+<h3>3.4.6.1. List of speakers<a class="headerlink" href="#list-of-speakers" title="Permalink to this headline">¶</a></h3>
+<p>In this section we will look in more details to the list of speakers and detail every field.</p>
+<p><img alt="figure76" src="../../_images/fig76.png" /></p>
+<p>The list of speaker contains the following fields:</p>
+<ul>
+<li><p class="first">The <strong>Speaker</strong> column, as you can expect, give you the name of the speaker.</p>
+</li>
+<li><p class="first">The <strong>Email</strong> column shows you the email address of the speaker, however, if in case the email would be wrong, the manager can click on the edit button in order to change his email.</p>
+</li>
+<li><dl class="first docutils">
+<dt>The <strong>Status</strong> column shows the current status of the agreement. A help icon is there to remind you their meaning.</dt>
+<dd><ul class="first last simple">
+<li><em>No Email</em>: The speaker does not have an email address.</li>
+<li><em>Not Signed</em>: The speaker has not signed the agreement and no email has been sent to him.</li>
+<li><em>Pending...</em>: The email has been sent to the speaker.</li>
+<li><em>Signed</em>: The agreement has been signed electronically.</li>
+<li><em>Uploaded</em>: The agreement has been signed through the paper form.</li>
+<li><em>Refused</em>: The speaker did not agree with the conditions and refused the agreement. In addition to this status, a help button will appear which will show you the rejection reason.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>The <strong>Request Type</strong> column shows you for which request (recording or webcast) the speaker is involved to. A help icon is there to remind you their meaning.</dt>
+<dd><ul class="first last simple">
+<li><em>REC</em>: Only the recording request has been requested.</li>
+<li><em>WEB</em>: Only the webcast request has been requested.</li>
+<li><em>REC/WEB</em>: Both requests have been requested.</li>
+<li><em>NA</em>: The information is not available.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">The <strong>Contribution</strong> column shows you the name of the contribution that the speaker will attend.</p>
+</li>
+<li><p class="first">The <strong>Upload Agreement</strong> column give you the link to upload the Paper Agreement, once uploaded, a pdf icon will appear with a link to the file.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="send-email-to-speakers">
+<h3>3.4.6.2. Send Email to Speakers<a class="headerlink" href="#send-email-to-speakers" title="Permalink to this headline">¶</a></h3>
+<p>To send an email to the speaker, the manager need first to select at least one entry. Once done, clicking the <em>Send Email</em> button will popup a window with the default text that will be sent, as you can see here.</p>
+<p><img alt="figure77" src="../../_images/fig77.png" /></p>
+<p>The window above is a simple form that allow you to choose with which one of your email address you want to send the emails.
+Then, you will have a text field showing a default text that can be sent. This text can be personalized by the manager as he wants.</p>
+<p>However, there is one and unique condition to respect: <strong>keep the [url] tag</strong>.
+In the legend you can see some tags that can be inserted, none of them are mandatory except the <strong>[url]</strong> one.</p>
+<p>Indeed, the [url] tag will be replaced by the link to the agreement form. If this one is not present, the system will refuse to send the email until you input this tag. Once the email is sent, the status of the speaker will change to <em>Pending...</em>.</p>
+</div>
+<div class="section" id="upload-the-paper-agreement">
+<h3>3.4.6.3. Upload the Paper Agreement<a class="headerlink" href="#upload-the-paper-agreement" title="Permalink to this headline">¶</a></h3>
+<p>When the email of the speaker is not available, you can still provide a <em>Paper Agreement</em>. To do so you will need to perform the following steps:</p>
+<ol class="arabic">
+<li><p class="first">Upload the form needed, the link can be found in the introduction text on this same page.</p>
+<blockquote>
+<p><img alt="figure78" src="../../_images/fig78.png" /></p>
+</blockquote>
+</li>
+<li><p class="first">Contact the speaker and ask him to sign the paper.</p>
+</li>
+<li><p class="first">Scan the paper agreement.</p>
+</li>
+<li><p class="first">Upload the pdf scan through this page, by clicking to the <em>Upload</em> link. A popup will appear asking you to provide the file.</p>
+<blockquote>
+<p><img alt="figure79" src="../../_images/fig79.png" /></p>
+</blockquote>
+</li>
+</ol>
+<p>Once the file submited, the page will refresh and a pdf icon will appear. Clicking on this icon will show you the pdf that you have just uploaded.</p>
 </div>
 </div>
 </div>
@@ -1555,6 +1641,12 @@ it, which will trigger another mail being sent to the responsible.</p>
 <li><a class="reference external" href="#modifying-a-webcast-request">3.4.5.3. Modifying a Webcast Request</a></li>
 <li><a class="reference external" href="#withdrawing-a-webcast-request">3.4.5.4. Withdrawing a Webcast Request</a></li>
 <li><a class="reference external" href="#id5">3.4.5.5. Result of the request</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#the-electronic-agreement-system">3.4.6. The Electronic Agreement system</a><ul>
+<li><a class="reference external" href="#list-of-speakers">3.4.6.1. List of speakers</a></li>
+<li><a class="reference external" href="#send-email-to-speakers">3.4.6.2. Send Email to Speakers</a></li>
+<li><a class="reference external" href="#upload-the-paper-agreement">3.4.6.3. Upload the Paper Agreement</a></li>
 </ul>
 </li>
 </ul>

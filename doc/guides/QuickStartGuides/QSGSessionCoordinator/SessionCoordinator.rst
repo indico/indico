@@ -14,7 +14,7 @@ before you can add them to your session.
 You are given this co-ordinator access by either the Session
 Manager or the Conference Manager. The Conference Manager sets the
 level of modification rights for all of the Session Co-ordinators.
-You can access your session by selecting *My session* from the 
+You can access your session by selecting *My session* from the
 conference menu.
 
 |image1|
@@ -34,6 +34,9 @@ session you will be presented with this page:
 
 |image2|
 
+If you are not allowed access and you think you should, please contact a
+conference manager immediately.
+
 --------------
 
 Basic Rights
@@ -41,10 +44,10 @@ Basic Rights
 
 All Session Co-ordinators can:
 
-- 
+-
    Manage the timetable with restrictions: it is allowed to add contributions,
-   create breaks, reschedule contributions and breaks; but, for instance, it 
-   is not allowed to create new sessions, new intervals, etc.
+   create breaks, reschedule contributions and breaks; but, for instance, it
+   is not allowed to create new sessions, new blocks, etc.
 -  View contribution list (cannot modify contributions)
 -  View the sessions' main information (cannot modify)
 -  View comments from the Conference Manager (cannot modify)
@@ -63,7 +66,7 @@ If the Conference Manager has allowed contribution modification
 rights you can:
 
 -  Modify the main data of the contribution.
-- 
+-
    Set the access controls for the contribution, i.e., give
    submission rights to presenters or allow others to manage the
    contribution.
@@ -85,14 +88,14 @@ Unrestricted Timetable Management
 If the Conference Manager has allowed you unrestricted timetable
 management rights you can:
 
-- 
+-
    Add contributions and breaks, reschedule contributions and breaks
    as before
--  Add, Edit and Delete session intervals 
+-  Add, Edit and Delete session blocks
 
 
 The timetable management area will be the same as with the
-basic rights with the options to manage the intervals:
+basic rights with the options to manage the blocks:
 
 |image5|
 

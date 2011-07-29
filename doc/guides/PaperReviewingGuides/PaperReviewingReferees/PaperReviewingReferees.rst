@@ -1,3 +1,5 @@
+.. _referee_guide:
+
 ========================================
 Paper reviewing module - referee's guide
 ========================================

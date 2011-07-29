@@ -1,3 +1,6 @@
+.. _track_coordinators_guide:
+
+
 ==========================
 Track Co-ordinator's Guide
 ==========================
@@ -26,11 +29,30 @@ track.
 Track Co-ordinating
 -------------------
 
-Once in the My tracks area you can click on the small red pen
-to the left of the track name to access the co-ordination
+Once in the My tracks area you can click on *Edit*
+to the right of the track name to access the co-ordination
 area of that track.
 
 --------------
+
+Main Tab
+~~~~~~~~
+
+From here, you can change the code, title and description of the track.
+
+|image7|
+
+-------------
+
+Coordination Control Tab
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is where you add/remove users allowed to coordinate the track. **Note**:
+this tab is only available to you if you are a manager!
+
+|image8|
+
+
 
 Abstracts Tab
 ~~~~~~~~~~~~~
@@ -45,12 +67,23 @@ Abstract's Management area. From here you can view the abstract's
 details and propose whether you want to accept, reject, mark as
 duplicated, or suggest the abstract for another track.
 
+------------
+
+Main Tab
+^^^^^^^^
+
+This is where you can modify the main details of the abstract, and also
+see some information as for instance submitter, status, etc.
+It is also from here where a track coordinator can propose the abstract to
+be accepted, rejected, for another track and mark as duplicated (see next
+image).
+
 |image5|
 
 --------------
 
 Internal Comments Tab
-~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^
 
 The Internal comments tab allows you to view and add any comments
 attached to the abstract.
@@ -63,3 +96,5 @@ attached to the abstract.
 .. |image4| image:: QSPics/trackabs.png
 .. |image5| image:: QSPics/trackab.png
 .. |image6| image:: QSPics/trackcomm.png
+.. |image7| image:: QSPics/maintab.png
+.. |image8| image:: QSPics/controltab.png

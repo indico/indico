@@ -1,3 +1,5 @@
+.. _layout_reviewer:
+
 =================================================
 Paper reviewing module - layout reviewer's guide
 =================================================

@@ -8,14 +8,14 @@ After installation the first screen presented to you will be:
 
 |image1|
 
-First you must to create an user account by clicking on login.
-You will be presented with a Log In screen and with an option to 
-create an account. A form will need to be filled in with your 
-user details. Once this is complete an email will be sent to you 
-with a link to activate your account, once activated you will 
+First you must create an user account by clicking on login.
+You will be presented with a Log In screen and with an option to
+create an account. A form will needs to be filled in with your
+user details. Once this is complete an email will be sent to you
+with a link to activate your account. Once activated, you will
 then be able to login.
-Now, it is the moment to add yourself as an Administrator. 
-In order to do so, click on *Server admin*, in the top blue bar, and you 
+Now, it is the moment to add yourself as an Administrator.
+In order to do so, click on *Server admin*, in the top blue bar, and you
 will access the `Administration Area <#administration-area>`_.
 
 |image2|
@@ -26,9 +26,9 @@ and use the user search to find and select your account. You will
 then be an Administrator and can start using all the features of
 Indico. If there is no Administrator account anybody can access and
 change all parts of Indico leaving it exposed with no access
-control. Once, someone adds himself as Administrator, nobody else will be able
+control. Once someone adds himself as Administrator, nobody else will be able
 to do it in the same way, but existing Administrators can add new Administrators.
-Administrators will have access and modification rights to all categories and events. 
+Administrators will have access and modification rights to all categories and events.
 
 Users can create their own accounts to use Indico, and they
 can modify, delete and add extra logins manually. Administrators are also able
@@ -51,9 +51,9 @@ an email will be sent to the user.
 Activating a User Created Account
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A user activates the account by using the link that
-is sent in an email after applying for a new account. If
-the account is not activated the user cannot log in.
+A user activates his account by using the link that is sent in the
+email he receives once he applied for a new account. The account must
+be activated, otherwise he won't be able to log in.
 
 --------------
 
@@ -61,7 +61,7 @@ Retrieving a Forgotten Password
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If a user needs to retrieve his password, he can use the
-login screen and his forgotten password option; the user will be
+login screen and its forgotten password option; the user will be
 sent their password by email to the address registered with that
 account.
 
@@ -81,14 +81,14 @@ maintenance.
 
 --------------
 
-General settings 
+General settings
 ----------------
 
 From the *General settings* in the Administration Area, you are able to
-modify the system title, the organisation, the support email and
-address. You can also add or remove users from the administration
-list; this means they have full administration access throughout
-Indico.
+modify the system title, the organisation, the support email, the no
+reply email and address. You can also add or remove users from the
+administration list; this means they have full administration access
+throughout Indico.
 
 |image3|
 
@@ -103,8 +103,8 @@ this support email.
 Users
 -----
 
-From the *Users and Groups* option you can control and modify
-any of the user accounts and groups.
+The *Users and Groups* option allows you to control and modify any of
+the users accounds and groups.
 
 --------------
 
@@ -114,7 +114,7 @@ Manually Creating a User
 To manually create a new account use the *New User* button in the
 *Users and Groups* menu, *Manage Users* tab. You will be presented
 with the same form as a user creating his own account;
-fill in and submit this form to create the account. You will still
+fill it in and submit it in order to create the account. You will still
 need to activate the account.
 
 --------------
@@ -124,9 +124,9 @@ Searching for Users
 
 You can search for a user by surname, first name, email
 address or organisation. If you are not sure of the full details you
-can enter the first few letters and you will be shown all the users that
-match your search. The Search filter is found by clicking on
-*Users and Groups* > *Manage Users*.
+can enter only one of the options or the first few letters and you will
+be shown all the users that match your search. The Search filter is
+found by clicking on *Users and Groups* > *Manage Users*.
 
 --------------
 
@@ -134,16 +134,17 @@ Manually Activating an Account
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To activate an account from within the administration area, go to
-the *Users and Groups* option, *Manage Users* tab, and search for the user's
-account using the filter, then select the account you wish to
+the *Users and Groups* option, *Manage Users* tab and search for the user's
+account using the filter. Then select the account you wish to
 activate, this will take you to the user's details:
 
 |image5|
 
 If an account has not been activated its status will be *not
-confirmed*. Click the button next to the status in order to activate
-the account. The account status will then be changed to *activated* and
-the user for that account will now be able to log in.
+confirmed*. Click the button *activate the account* next to the status
+in order to activate the account. The account status will then be
+changed to *activated* and the user for that account will now be able
+to log in.
 
 --------------
 
@@ -161,16 +162,16 @@ Creating Additional Logins for a User
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A user may have more than one login (username and password) on
-their account, this can be useful if a user has certain access
+their account, this can be useful if the user has certain access
 rights with one login but not with another, they can then choose
 which login to use when using Indico.
 
 |image6|
 
-To create a new login account for a user, use the *create a new
-account* option. This will take you to a screen where you can enter
+To create a new login account for a user, click on the *create a new
+account* button. This will take you to a screen where you can enter
 a new username and password. Once the new account is added it will
-show in the User Details screen as above
+show in the User Details screen as above.
 
 --------------
 
@@ -179,8 +180,8 @@ Deleting Additional Logins
 
 To delete any additional account login select those accounts for
 that user that you wish to delete and use the *delete selected
-accounts* option from the User Details screen above. A user must
-have one login account however.
+accounts* option from the User Details screen above. However, a user
+must have at least one login account.
 
 --------------
 
@@ -191,7 +192,7 @@ You can use the Groups section to categorise users if you wish.
 You may want to use this feature to help with Access Control.
 If, for example, you have more than one user that you would like to
 manage an event, you could make a group of Managers for each event
-and then assign each set to an event as apposed to adding each
+and then assign each set to an event, as apposed to adding each
 individual user.
 
 To create a new group use the *New Group* feature in the *Users
@@ -204,9 +205,9 @@ You can then start to add or remove users from the group.
 
 |image8|
 
-You can assign a group of users to Access Control in the same was
-as you can add individual users. Once your group(s) are created
-you can use the *Groups* option to find a particular group, to
+You can assign a group of users to Access Control in the same way
+as you can add individual users. Once your group(s) is/are created
+you can use the *Search Groups* option to find a particular group, to
 continue adding and removing users, or to modify the group details.
 
 --------------
@@ -223,35 +224,36 @@ which to use in this domain:
 
 |image9|
 
-Any domains you create can be shown from the  *IP Domains* 
-menu, you can search for the domain name you want to look at
-and you will be shown the details of that Domain.
+Any domains you create can be viewed from the  *IP Domains*
+menu, you can search for the domain name you want to look at it
+and you will be shown its details.
 
 |image10|
 
-From here you can also modify the domain.
+You can also modify the Domain by clicking on it, and then on the
+button *modify*.
 
 --------------
 
 Maintenance
 -----------
 
-The maintenance area is accessible from the *System* menu, *Maintenance* tab. 
+The maintenance area is accessible from the *System* menu, *Maintenance* tab.
 From here you are able to:
 
-- 
+-
    View the amount of Temporary files being used by Indico. Indico
    creates temporary files internally for example when a user submits
    a file or when creating a DVD, etc. These temporary files are
    stored until you delete them from here.
 
-- 
+-
    Pack the Database. Indico periodically backs up your database and
    stores the older versions; you can choose to remove older versions
    to save memory by using the *pack* option, this will keep the
    current version of the database.
 
-- 
+-
    Delete Websessions. The database stores temporary information for
    the period in which an end user is navigating Indico, for example,
    websessions. Websessions are stored in the database until you choose
@@ -261,7 +263,7 @@ From here you are able to:
 |image11|
 
 You will be asked to confirm the deletion of temporary files and
-websessions as well as when packing the database.
+websessions as well as packing of the database.
 
 
 .. |image0| image:: AdminGuidePics/logo.png

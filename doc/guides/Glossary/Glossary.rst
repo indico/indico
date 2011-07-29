@@ -1,3 +1,5 @@
+.. _indico_glossary:
+
 Indico's Glossary
 =================
 
@@ -122,8 +124,8 @@ Indico's Glossary
      A subdivision of a contribution.
 
    Track
-     Often topics or areas in which to start organising your conference.
-     Can contain abstracts and contributions.
+     Tracks define the main divisions/topics of your conference. You can
+     attach contributions and abstracts to tracks.
 
    Visibility
      In the context of Indico, Visibility usually refers to the extent

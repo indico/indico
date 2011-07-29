@@ -6,16 +6,22 @@ Meeting
 -------
 
 A Meeting is not as in depth as a Conference and is made
-for smaller events. Within a Meeting you can find two main
-modules:
+for smaller events. Within a Meeting you can find the modules:
 
-* Participants: you can add all the participants for the Meeting
-  or you can open the participation so users can apply for it.
-* Timetable: in which you can directly add Sessions, Contributions, and
-  Breaks.
-
-As well, as for conferences, you can set the Access Control for the meeting
-and you have Tools in which you can remove, clone, and set alarms.
+* General settings: Where you  can manage the general settings of the
+  meeting (e.g. title, location etc.)
+* Timetable: In which you can directly add Sessions, Contributions, and Breaks.
+* Material: Where you can upload material that will be attached to the
+  meeting. The material can be slides, videos, minutes etc.
+* Participants: you can add all the participants for the Meeting or you
+  can open the participation so users can apply for it.
+* Evaluation: You can submit an evaluation form to be completed by the
+  participants. You can set the questions, edit the form and the results
+  and preview it in the different tabs available
+* Lists: Relevant lists of users, such as list of all sessions’ conveners etc
+* Protection: Set the access control for the meeting
+* Tools: Where you can set alarms, clone the conference etc.
+* Logs: List of all the actions performed on the whole of the meeting
 
 
 --------------
@@ -23,14 +29,13 @@ and you have Tools in which you can remove, clone, and set alarms.
 Creating a Meeting
 ------------------
 
-If you have the correct access rights within a Category you can
-create a new meeting using the blue top bar *Create event* option.
-You will be presented with a form similar to that for
-a Conference; you are able to choose the default style in
-which the Meeting will be displayed
-`(see Meeting Display Area) <#meeting-display-area>`_. When you submit this form the
-Meeting will be created and you will be redirected to its Management
-Area.
+To create a meeting, click on *Create* -> *Meeting* in the top blue menu
+bar. You will be presented with a form you need to complete. First, you
+need to choose the category in which your meeting will be created. Then,
+enter the basic information (title, start/end date etc.); you can choose
+the default style in which the Meeting will be displayed `(see Meeting Display Area)
+<#meeting-display-area>`_. Finally, set the access protection. Click on *Create meeting*.
+You will be redirected to the meeting's Management Area.
 
 --------------
 
@@ -38,30 +43,27 @@ Meeting Management Area
 -----------------------
 
 The Management Area allows you to control the different parts of
-your meeting. The following sections will show each area of the
-Meeting Management.
+your meeting. The following sections will show each option of the
+Meeting Management Area.
 
-Clicking on the link *View event page* will take you to the
-management display area for the meeting.
+Clicking on the link *Switch to event page* will take you to the
+event page of the meeting.
 
 --------------
 
 General Settings Management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-From the Main tab, you are able to modify the details of the
-meeting including title, description, location, default style of
-the display, support emails and caption. You can also add/remove any chairpersons.
+In General Settings, you can edit the title, description, place, start/end
+date, timezone, default style, event type. You can add a support e-mail
+and modify its caption; it will be displayed in the event page. It is also
+possible to create a short display URL, used as a shortcut to the event page.
+You have the possibility of changing the default style, `(see Meeting Display Area)
+<#meeting-display-area>`_  . To edit the visibility, see visibility in :ref:`general_settings`
+for conferences. Finally, you can add or remove any chairpersons.
 
 |image100|
 
---------------
-
-Meeting Visibility
-^^^^^^^^^^^^^^^^^^
-
-This option allows you to choose up to which level your meeting
-will be visible in the overview pages.
 
 --------------
 
@@ -74,13 +76,12 @@ and breaks.
 
 The management of the timetable is the same as for conferences. The
 only difference is while adding contributions. In conferences, you can
-add unscheduled contributions to the timetable. On the other hand, in
-meetings, unscheduled contributions don't exist, you need always to
-create the contribution.
+add unscheduled contributions to the timetable. In meetings, unscheduled
+contributions don't exist, therefore you will always need to create the contribution.
 
 Here, we will just explain how to create contributions. For more details and
-further explanations about the Timetable Management `(see Timetable Management
-for Conferences) <Conferences.html#timetable-management>`_.
+further explanations about the Timetable Management `see Timetable Management
+for Conferences <Conferences.html#timetable-management>`_.
 
 --------------
 
@@ -94,7 +95,7 @@ a pop-up with a form to create a new contribution.
 |image103|
 
 Within this form, you can define the name, description, location,
-presenters, and the starting time and duration of this contribution.
+presenters, the starting time and duration of this contribution.
 
 |image104|
 
@@ -116,10 +117,139 @@ See `Contribution Management for Conferences <Conferences.html#contribution-mana
 
 --------------
 
+Material
+~~~~~~~~
+
+Here, you can upload any material you wish to attach to the meeting.
+The material can be video, slides, minutes etc. You can modify the material
+by clicking on |image144| or to delete it by clicking on |image145|.
+
+|image143|
+
+--------------
+
+Chat rooms
+~~~~~~~~~~
+
+Similar to lectures; see :ref:`chat_room` for lectures.
+
+--------------
+
+Video Services
+~~~~~~~~~~~~~~
+
+Similar to lectures; see :ref:`video_services` for lectures
+
+--------------
+
+Participants
+~~~~~~~~~~~~
+
+You can view here a list of all the participants. You can add or remove
+participants (as a manager), mark as present/absent, ask for excuse, send
+email etc. You can also export the list of participants to Excel by clicking
+on Export to Excel on the right. You can also choose whether to display or
+not the list of participants in the event page.
+
+|image153|
+
+You can also choose whether to send email notification to a participant
+when you add him, if you allow users to apply to this event and if the
+participation requests must be approved by the event manager (you) or not.
+
+**N.B.**: If you cannot modify these options, it means that your meeting is in the past.
+
+The list of participants can be built in the three following ways:
+
+------------------
+
+Manager adds participants
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In this case, you must select the option
+: Users **may not apply** to participate in this event, as seen below.
+To add someone, click on *Search database* if the participant is in your
+Indico database; if not, click on *Define new*.
+
+|image154|
+
+-----------------
+
+Manager invites participants
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To do so, click on *Invite participant*
+to the right of *Define new*. The participant(s) invited will receive an
+email informing them they have been invited to an event. This email will
+contain a link they will have to use to accept/reject the invitation.
+
+|image155|
+
+When they will open the link, the following window will appear:
+
+|image159|
+
+They will then need to click on *Accept* or *Reject*.
+
+------------------
+
+Users apply for participation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can choose to accept  all participation requests or you can choose
+to approve each request individually. In the picture below you can see
+where how to let users apply for participation and where to choose whether
+participation requests are auto-confirmed or not.
+
+|image156|
+
+Users will be able to apply from the event page, by clicking on *Apply here*.
+
+|image157|
+
+A window will appear:
+
+|image158|
+
+To apply, you will need to click on *Submit*
+
+If the manager chooses to approve the requests for participation, he will
+see a message appear when users apply:
+
+|image160|
+
+To accept or reject a request, he will need to click on *See pending participants*
+and the following window will appear, where he can manage the requests.
+
+|image161|
+
+--------------
+
+Evaluation
+~~~~~~~~~~
+
+Same as for lectures; see :ref:`evaluation` .
+
+-------------
+
+Lists
+~~~~~
+
+See :ref:`lists_management` for Conferences.
+
+-------------
+
+Logs
+~~~~
+
+See :ref:`logs_management` for Conferences
+
+-------------
+
 Protection Management
 ~~~~~~~~~~~~~~~~~~~~~
 
-Protection in a meeting is the same as that in a Conference.
+Protection in a meeting is the same as in a Conference.
 There is Modification Control, Domain Control, and Access Control.
 When adding to the Access and Modification lists, you can also add
 Groups of users if any have been defined by Administration.
@@ -135,7 +265,10 @@ key can modify the meeting without logging in.
 *Access Control* When the meeting is public, anyone can view the
 meeting including the details, timetable, material, etc. When the
 meeting is private, only those in the access list, meeting
-managers, and administrators can view the meeting.
+managers, and administrators can view the meeting. When it is inheriting,
+its access protection will be the same as its parent category. Changing
+the access protection of the parent category will change the access protection
+of the meeting (see :ref:`access_control`)
 
 |image120|
 
@@ -143,8 +276,9 @@ When private you can also add an Access Key which means anyone
 with this key can access the meeting without logging in.
 
 *Domain Control* This is available for public meetings. It allows you
-to specify which domain can access the meeting. For instance, people
-from inside the CERN domain can access.
+to specify which domain can access the meeting. For instance, choosing
+CERN will mean the meeting is only accessible for people inside the
+CERN domain.
 
 *Material Visibility* By default a material will always be
 visible in the timetable, even if it is private (the user will
@@ -161,7 +295,6 @@ Tools Tab
 The meeting Tools allow you to make certain actions on the whole
 of the meeting. See following sub-sections.
 
-|image121|
 
 --------------
 
@@ -175,12 +308,14 @@ be asked to confirm deletion beforehand.
 
 --------------
 
+.. _clone_meeting:
+
 Cloning a Meeting
 ^^^^^^^^^^^^^^^^^
 
 Clone the meeting if you would like to make another meeting exactly the
 same. You have the option to clone it once, at fixed intervals,
-or on certain dates.
+or on certain dates. For more on cloning, see :ref:`clone_event` for conferences.
 
 |image123|
 
@@ -216,6 +351,26 @@ the date that you have selected.
 
 |image126|
 
+Posters
+^^^^^^^
+
+You have the possibility of creating posters for your meetings. You can
+create your own, or create one from a template.
+
+|image146|
+
+-------------
+
+Lock
+^^^^
+
+It is possible to lock the meeting. If you lock the event, you won’t be
+able to change its details anymore. Only the creator of the meetings or
+an administrator of the system/category can unlock an event. You will be
+asked to confirm.
+
+|image121|
+
 --------------
 
 Meeting Display Area
@@ -223,7 +378,7 @@ Meeting Display Area
 
 The Meeting Display is the view that users of the meeting will
 see. If the meeting is public they will not need to log in to view
-the meeting. It is also the area in which you can access the
+it. It is also the area in which you can access the
 modification areas if you have access rights. There are various
 views/styles in which the meeting can be displayed; the following sections
 show the different views and displays.
@@ -254,14 +409,30 @@ their date or the session they are included in.
 * Change the style of the display. The following sections give you some examples
   of available styles.
 
---------------
+The other icons are:
 
-IT Style
-~~~~~~~~
+* |image147|: Gets you back to the Indico homepage
 
-The IT style:
+* |image148|: Brings you to the oldest event in the category your event belongs to
 
-|image135|
+* |image149|: Brings you to the previous event in the category your event belongs to
+
+* |image150|: Brings you to the category event overview your event belongs to
+
+* |image151|: Brings you to the next event in the category your event belongs to
+
+* |image152|: Brings you to the newest event in the category your event belongs to
+
+* |image162|: From *Manage* , you can:
+
+  * Edit event: this will lead you to the management area of the meeting, same as for PENCIL
+
+  * Clone event: Leads you to the tab *Clone  Event* in the *Tools* option;  see :ref:`clone_meeting`
+
+  * Edit minutes: add and edit your minutes. When you add minutes, the following appears in the event page: |image163| Clicking on *Minutes* on the left will open the minutes in the same page; clicking on the icon on the right will open the minutes in a new tab
+
+  * Manage material: opens a window where you can add, edit or delete existing material
+
 
 --------------
 
@@ -355,7 +526,6 @@ The Parellel style:
 .. |image132| image:: UserGuidePics/conf2.png
 .. |image133| image:: UserGuidePics/conf2.png
 .. |image134| image:: UserGuidePics/meetd1.png
-.. |image135| image:: UserGuidePics/meetd2.png
 .. |image136| image:: UserGuidePics/meetd3.png
 .. |image137| image:: UserGuidePics/meetd4.png
 .. |image138| image:: UserGuidePics/meetd5.png
@@ -363,3 +533,24 @@ The Parellel style:
 .. |image140| image:: UserGuidePics/confd21.png
 .. |image141| image:: UserGuidePics/meetd7.png
 .. |image142| image:: UserGuidePics/meetd8.png
+.. |image143| image:: UserGuidePics/meetingMaterial.png
+.. |image144| image:: UserGuidePics/edit.png
+.. |image145| image:: UserGuidePics/delete.png
+.. |image146| image:: UserGuidePics/meetPosters.png
+.. |image147| image:: UserGuidePics/home.png
+.. |image148| image:: UserGuidePics/a1.png
+.. |image149| image:: UserGuidePics/a2.png
+.. |image150| image:: UserGuidePics/a3.png
+.. |image151| image:: UserGuidePics/a4.png
+.. |image152| image:: UserGuidePics/a5.png
+.. |image153| image:: UserGuidePics/particip.png
+.. |image154| image:: UserGuidePics/particip2.png
+.. |image155| image:: UserGuidePics/particip3.png
+.. |image156| image:: UserGuidePics/particip4.png
+.. |image157| image:: UserGuidePics/particip5.png
+.. |image158| image:: UserGuidePics/particip6.png
+.. |image159| image:: UserGuidePics/particip7.png
+.. |image160| image:: UserGuidePics/particip8.png
+.. |image161| image:: UserGuidePics/particip9.png
+.. |image162| image:: UserGuidePics/manage.png
+.. |image163| image:: UserGuidePics/minutes.png

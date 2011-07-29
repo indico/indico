@@ -56,52 +56,116 @@
 <h1>4. Lectures<a class="headerlink" href="#lectures" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="lecture">
 <h2>4.1. Lecture<a class="headerlink" href="#lecture" title="Permalink to this headline">¶</a></h2>
-<p>A Lecture is the simplest form of event within Indico. A
-Lecture allows you to add material, give details about the lecture,
-and set the access control. You also have Tools in which you can
-remove, clone, and set alarms.</p>
+<p>A Lecture is the simplest form of event within Indico. The following modules can be found in a lecture:</p>
+<ul class="simple">
+<li>General settings: Set the general settings of the conference</li>
+<li>Material: Attach material to the lecture (slides, videos etc.)</li>
+<li>Participants: You can add all the participants for the Meeting or you can
+open the participation so users can apply for it</li>
+<li>Evaluation: You can set an evaluation form to be completed by the participants</li>
+<li>Protection: Set the access protection of the lecture</li>
+<li>Tools: Where you can set alarms, lock/delete/clone the lecture, etc.</li>
+<li>Logs: List of all the actions performed on the whole of the lecture</li>
+</ul>
 </div>
 <hr class="docutils" />
 <div class="section" id="creating-a-lecture">
 <h2>4.2. Creating a Lecture<a class="headerlink" href="#creating-a-lecture" title="Permalink to this headline">¶</a></h2>
-<p>If you have the correct access rights within a Category you can
-create a new lecture using the <em>Create event</em> &gt; <em>Lecture</em> from the
-blue top bar.
-You will be presented with a form similar to that for a Meeting;
-you are able to choose the default style in which the
+<p>If you have the correct access rights within a category, you can create
+a new lecture by clicking on <em>Create event</em> then <em>Lecture</em> from the blue
+top bar. You will be presented with a form similar to that for a Meeting.
+You will need to choose a category in which to create your lectures, then
+the basic information; you can choose the default style in which the
 Lecture will be displayed <a class="reference external" href="#lecture-display-area">(See Lecture Display Area)</a>.
-After you submit this form the Lecture will be created and you will
-be redirected to its Management Area.</p>
+Set the access protection and click on <em>Create lecture</em>; you are done.
+You will be redirected to the Lecture Management Area.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="lecture-management-area">
 <h2>4.3. Lecture Management Area<a class="headerlink" href="#lecture-management-area" title="Permalink to this headline">¶</a></h2>
 <p>The Management Area allows you to control the different parts of
-your lecture. The following sections will show each area of the
-Lecture Management.</p>
+your lecture. The following sections will show all the options in the
+Lecture Management Area.</p>
 <hr class="docutils" />
 <div class="section" id="general-settings-management">
 <h3>4.3.1. General Settings Management<a class="headerlink" href="#general-settings-management" title="Permalink to this headline">¶</a></h3>
-<p>From the <em>General settings</em> menu, you are able to modify the details of the
-lecture including title, description, location, dates, speakers, and default
-style of the display.</p>
+<p>In <em>General settings</em>, you can: edit the title, place, start/end date,
+timezone, default style (see <a class="reference internal" href="#lecture-display-area"><em>Lecture Display Area</em></a> ), visibility (see <a class="reference external" href="Conferences.html#general-settings"><em>General Settings</em></a> for conferences), event type, keywords.
+You can add a description to your lecture, a support email and its caption
+(which will appear on the event page), organizers and a short display URL
+(used as a shortcut to the lecture’s event page). You can also add or remove speakers.</p>
 <p><img alt="image141" src="../_images/lect2.png" /></p>
-<p>Clicking on the link <em>View event page</em> will take you to the
+<p>Clicking on the button <em>Switch to event page</em> will take you to the
 home page of your event.</p>
+</div>
 <hr class="docutils" />
 <div class="section" id="material">
-<h4>4.3.1.1. Material<a class="headerlink" href="#material" title="Permalink to this headline">¶</a></h4>
+<h3>4.3.2. Material<a class="headerlink" href="#material" title="Permalink to this headline">¶</a></h3>
 <p>You can add material to the lecture, by using the <em>Material</em> menu, and
 the link <em>Add Material</em>.
 You can then enter the name and description of the material.</p>
 <p><img alt="image144" src="../_images/lect10.png" /></p>
 <p>The material can be files or links. You also protect the material
-to control who has access to view the material.</p>
+to control who has access to view it.</p>
+<hr class="docutils" />
 </div>
+<div class="section" id="chat-room">
+<span id="id1"></span><h3>4.3.3. Chat room<a class="headerlink" href="#chat-room" title="Permalink to this headline">¶</a></h3>
+<p>If the Indico administrators have enabled the chat room module, you can create
+chat rooms for your lecture.</p>
+<p>For more information, see <a class="reference external" href="../Chat/ChatUserGuide.html#chat-guide"><em>Chat room service</em></a>.</p>
+<p><img alt="image166" src="../_images/chatroom2.png" /></p>
+<hr class="docutils" />
+</div>
+<div class="section" id="video-services">
+<span id="id2"></span><h3>4.3.4. Video Services<a class="headerlink" href="#video-services" title="Permalink to this headline">¶</a></h3>
+<p>If the Indico administrators have enabled the Video Services functionality, you can have access to the <em>Video Services</em>
+option. The tabs in Video Services are:</p>
+<ul class="simple">
+<li>Videoconferencing: Set up a videoconference</li>
+<li>Recording request: Once you&#8217;ve set up the location of the lecture, you
+can do a recording request. You will be presented to a form to complete
+and you will need to ensure that all speakers
+have given their permission to have their talks recorded.</li>
+<li>Webcast request: You can do a webcast request. You need to complete a
+form, select a room capable of webcasting and ensure that all speakers
+give their permission to have their talks webcasted</li>
+<li>Managers: Here you add video services managers and managers for individual
+systems</li>
+</ul>
+<p>For more information, see <a class="reference external" href="../VideoServicesGuides/UserGuide/VideoServicesUserGuide.html#video-guide"><em>Introduction</em></a>.</p>
 </div>
 <hr class="docutils" />
+<div class="section" id="participants">
+<h3>4.3.5. Participants<a class="headerlink" href="#participants" title="Permalink to this headline">¶</a></h3>
+<p>You can view here a list of all the participants. You can add or remove
+participants (as a manager), mark as present/absent, ask for excuse, send
+email etc. You can also export the list of participants to Excel by clicking
+on <em>Export to Excel</em> on the right. You can also choose whether to display
+or not the list of participants in the event page.</p>
+<p>For more info see <a class="reference external" href="Meetings.html#participants">Meeting participants</a>.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="evaluation">
+<span id="id3"></span><h3>4.3.6. Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this headline">¶</a></h3>
+<p>You can set an evaluation form to be completed by the participants. There
+are four tabs in this option:</p>
+<p><img alt="image162" src="../_images/lectureEvaluation.png" /></p>
+<ul class="simple">
+<li>Setup: Where you set the basic details, such as evaluation start/end date,
+max. number of submissions etc. You enable and disable the form by clicking
+on <em>Show</em>/<em>Hide</em>. You also have special actions, such as export or import
+the evaluation etc.</li>
+<li>Edit: This is where you create the evaluation form. You can add a textbox,
+textarea, password, select, radio or checkbox question.</li>
+<li>Preview: This shows you a preview of your evaluation form. Feel free to
+try it, any form submitted from here will not be taken into account.</li>
+<li>Results: Results of the evaluation</li>
+</ul>
+<p>For more on the evaluation process, go to <a class="reference external" href="Evaluation.html#event-evaluation"><em>Event Evaluation</em></a></p>
+</div>
 <div class="section" id="protection-management">
-<h3>4.3.2. Protection Management<a class="headerlink" href="#protection-management" title="Permalink to this headline">¶</a></h3>
+<h3>4.3.7. Protection Management<a class="headerlink" href="#protection-management" title="Permalink to this headline">¶</a></h3>
 <p>Protection Management in a lecture is the same as that in a Meeting.
 There is Modification Control, Domain Control and Access Control.
 When adding to the Access and Modification lists, you can also add
@@ -114,56 +178,77 @@ key can modify the lecture without logging in.</p>
 <p><img alt="image145" src="../_images/lect3.png" /></p>
 <p><em>Access Control</em> When the lecture is public, anyone can view the
 lecture . When the lecture is private, only those in the access
-list, lecture managers, and administrators can view the lecture.</p>
-<p><img alt="image146" src="../_images/confm30.png" /></p>
+list, lecture managers, and administrators can view the lecture.
+When it is inheriting, it has the same access protection as its parent
+category. Changing the access protection of its parent category will
+change the access protection of the lecture.</p>
 <p>When private you can also add an Access Key which means anyone
 with this key can access the lecture without logging in.</p>
+<p><img alt="image146" src="../_images/confm30.png" /></p>
 <p><em>Domain Control</em> This is available when the lecture is
 public. You can specify which domain can access the lecture. For
-instance, users accessing from a computer in the CERN domain will
-be able to access.</p>
+instance, choosing CERN as a domain means only users accessing
+from a computer in the CERN domain will be able to access.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="tools-management">
-<h3>4.3.3. Tools Management<a class="headerlink" href="#tools-management" title="Permalink to this headline">¶</a></h3>
+<h3>4.3.8. Tools Management<a class="headerlink" href="#tools-management" title="Permalink to this headline">¶</a></h3>
 <p>The lecture Tools allow you to carry out certain actions on the whole
 of the lecture.</p>
-<p><img alt="image147" src="../_images/lect4.png" /></p>
 <hr class="docutils" />
-<div class="section" id="deleting-a-lecture">
-<h4>4.3.3.1. Deleting a Lecture<a class="headerlink" href="#deleting-a-lecture" title="Permalink to this headline">¶</a></h4>
-<p>The Delete this lecture option will delete the whole lecture. You will
-be asked to confirm deletion beforehand.</p>
-<p><img alt="image148" src="../_images/lect5.png" /></p>
+<div class="section" id="alarm-control">
+<h4>4.3.8.1. Alarm Control<a class="headerlink" href="#alarm-control" title="Permalink to this headline">¶</a></h4>
+<p>You can set an alarm/reminder to alert people about the
+lecture; the alert will be in the form of an email. To do so, click on
+the button <em>add new alarm</em> in the <em>Alarms</em> tab.</p>
+<p><img alt="image152" src="../_images/lect9.png" /></p>
 </div>
 <hr class="docutils" />
 <div class="section" id="cloning-a-lecture">
-<h4>4.3.3.2. Cloning a Lecture<a class="headerlink" href="#cloning-a-lecture" title="Permalink to this headline">¶</a></h4>
+<h4>4.3.8.2. Cloning a Lecture<a class="headerlink" href="#cloning-a-lecture" title="Permalink to this headline">¶</a></h4>
 <p>Clone the lecture if you would like to make another lecture exactly the
 same. You have the option to clone it once, at fixed intervals,
 or on certain dates.</p>
 <p><img alt="image149" src="../_images/lect6.png" /></p>
+<p>For more explanation on the cloning process, see <a class="reference external" href="Conferences.html#clone-event"><em>Clone event</em></a> for
+conferences.</p>
 </div>
 <hr class="docutils" />
-<div class="section" id="packaging-material">
-<h4>4.3.3.3. Packaging Material<a class="headerlink" href="#packaging-material" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="posters">
+<h4>4.3.8.3. Posters<a class="headerlink" href="#posters" title="Permalink to this headline">¶</a></h4>
+<p>As for meetings, you can create posters for your lecture. You can either
+create your own, or use a local template.</p>
+<p><img alt="image163" src="../_images/lecturePoster.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="lock">
+<h4>4.3.8.4. Lock<a class="headerlink" href="#lock" title="Permalink to this headline">¶</a></h4>
+<p>It is possible to lock the lecture. If you lock the event, you won’t be
+able to change its details anymore. Only the creator of the lecture or
+an administrator of the system/category can unlock an event. You will be
+asked to confirm.</p>
+<p><img alt="image164" src="../_images/lectureLock.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="deleting-a-lecture">
+<h4>4.3.8.5. Deleting a Lecture<a class="headerlink" href="#deleting-a-lecture" title="Permalink to this headline">¶</a></h4>
+<p>The Delete option will delete the whole lecture. There is no undo tool
+so far, but you will be asked to confirm deletion beforehand.</p>
+<p><img alt="image148" src="../_images/lect5.png" /></p>
+</div>
+<hr class="docutils" />
+<div class="section" id="material-package">
+<h4>4.3.8.6. Material Package<a class="headerlink" href="#material-package" title="Permalink to this headline">¶</a></h4>
 <p>Using the <em>Material Package</em> option you can create a package
 of all the materials that have been used in the lecture.</p>
 <p><img alt="image150" src="../_images/lect7.png" /></p>
 <hr class="docutils" />
-</div>
 <hr class="docutils" />
-<div class="section" id="alarm-control">
-<h4>4.3.3.4. Alarm Control<a class="headerlink" href="#alarm-control" title="Permalink to this headline">¶</a></h4>
-<p>You can set an alarm/reminder to alert people about the
-lecture; the alert will be in the form of an email.</p>
-<p><img alt="image152" src="../_images/lect9.png" /></p>
 </div>
 </div>
 </div>
-<hr class="docutils" />
 <div class="section" id="lecture-display-area">
-<h2>4.4. Lecture Display Area<a class="headerlink" href="#lecture-display-area" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>4.4. Lecture Display Area<a class="headerlink" href="#lecture-display-area" title="Permalink to this headline">¶</a></h2>
 <p>The Lecture Display is the view that users of the lecture will
 see. If the lecture is public they will not need to log in to view
 the lecture. It is also the area in which you can access the
@@ -229,16 +314,20 @@ of the title.</p>
 <li><a class="reference external" href="#lecture">4.1. Lecture</a></li>
 <li><a class="reference external" href="#creating-a-lecture">4.2. Creating a Lecture</a></li>
 <li><a class="reference external" href="#lecture-management-area">4.3. Lecture Management Area</a><ul>
-<li><a class="reference external" href="#general-settings-management">4.3.1. General Settings Management</a><ul>
-<li><a class="reference external" href="#material">4.3.1.1. Material</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#protection-management">4.3.2. Protection Management</a></li>
-<li><a class="reference external" href="#tools-management">4.3.3. Tools Management</a><ul>
-<li><a class="reference external" href="#deleting-a-lecture">4.3.3.1. Deleting a Lecture</a></li>
-<li><a class="reference external" href="#cloning-a-lecture">4.3.3.2. Cloning a Lecture</a></li>
-<li><a class="reference external" href="#packaging-material">4.3.3.3. Packaging Material</a></li>
-<li><a class="reference external" href="#alarm-control">4.3.3.4. Alarm Control</a></li>
+<li><a class="reference external" href="#general-settings-management">4.3.1. General Settings Management</a></li>
+<li><a class="reference external" href="#material">4.3.2. Material</a></li>
+<li><a class="reference external" href="#chat-room">4.3.3. Chat room</a></li>
+<li><a class="reference external" href="#video-services">4.3.4. Video Services</a></li>
+<li><a class="reference external" href="#participants">4.3.5. Participants</a></li>
+<li><a class="reference external" href="#evaluation">4.3.6. Evaluation</a></li>
+<li><a class="reference external" href="#protection-management">4.3.7. Protection Management</a></li>
+<li><a class="reference external" href="#tools-management">4.3.8. Tools Management</a><ul>
+<li><a class="reference external" href="#alarm-control">4.3.8.1. Alarm Control</a></li>
+<li><a class="reference external" href="#cloning-a-lecture">4.3.8.2. Cloning a Lecture</a></li>
+<li><a class="reference external" href="#posters">4.3.8.3. Posters</a></li>
+<li><a class="reference external" href="#lock">4.3.8.4. Lock</a></li>
+<li><a class="reference external" href="#deleting-a-lecture">4.3.8.5. Deleting a Lecture</a></li>
+<li><a class="reference external" href="#material-package">4.3.8.6. Material Package</a></li>
 </ul>
 </li>
 </ul>

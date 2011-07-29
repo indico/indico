@@ -35,7 +35,7 @@ them:
 
 If you want to hide them to save visual space, click on *Hide additional
 bookings*. In meetings and lectures, we only show two bookings in order to save
-space for the timetable below. 
+space for the timetable below.
 
 In the previous list, each videoconference is
 represented by a line of text. The contents of this line are:
@@ -59,9 +59,9 @@ This detailed information will usually include:
 
 - *Protection*: The videoconference is protected by a password / PIN.
 - *Description*: The description given by the event managers.
-- *Instructions* on *how to join*, in case you cannot join from your PC because you 
-  need another physical device to do so. For example, for a CERN MCU videoconference, 
-  you need to be in a CERN room equipped with an adequate videoconferencing camera 
+- *Instructions* on *how to join*, in case you cannot join from your PC because you
+  need another physical device to do so. For example, for a CERN MCU videoconference,
+  you need to be in a CERN room equipped with an adequate videoconferencing camera
   and screen.
 
 -----------------------------------------------

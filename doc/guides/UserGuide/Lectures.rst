@@ -5,24 +5,31 @@ Lectures
 Lecture
 -------
 
-A Lecture is the simplest form of event within Indico. A
-Lecture allows you to add material, give details about the lecture,
-and set the access control. You also have Tools in which you can
-remove, clone, and set alarms.
+A Lecture is the simplest form of event within Indico. The following modules can be found in a lecture:
+
+* General settings: Set the general settings of the conference
+* Material: Attach material to the lecture (slides, videos etc.)
+* Participants: You can add all the participants for the Meeting or you can
+  open the participation so users can apply for it
+* Evaluation: You can set an evaluation form to be completed by the participants
+* Protection: Set the access protection of the lecture
+* Tools: Where you can set alarms, lock/delete/clone the lecture, etc.
+* Logs: List of all the actions performed on the whole of the lecture
+
 
 --------------
 
 Creating a Lecture
 ------------------
 
-If you have the correct access rights within a Category you can
-create a new lecture using the *Create event* > *Lecture* from the
-blue top bar.
-You will be presented with a form similar to that for a Meeting;
-you are able to choose the default style in which the
+If you have the correct access rights within a category, you can create
+a new lecture by clicking on *Create event* then *Lecture* from the blue
+top bar. You will be presented with a form similar to that for a Meeting.
+You will need to choose a category in which to create your lectures, then
+the basic information; you can choose the default style in which the
 Lecture will be displayed `(See Lecture Display Area) <#lecture-display-area>`_.
-After you submit this form the Lecture will be created and you will
-be redirected to its Management Area.
+Set the access protection and click on *Create lecture*; you are done.
+You will be redirected to the Lecture Management Area.
 
 --------------
 
@@ -30,27 +37,29 @@ Lecture Management Area
 -----------------------
 
 The Management Area allows you to control the different parts of
-your lecture. The following sections will show each area of the
-Lecture Management.
+your lecture. The following sections will show all the options in the
+Lecture Management Area.
 
 --------------
 
 General Settings Management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-From the *General settings* menu, you are able to modify the details of the
-lecture including title, description, location, dates, speakers, and default
-style of the display.
+In *General settings*, you can: edit the title, place, start/end date,
+timezone, default style (see :ref:`lecture_display_area` ), visibility (see :ref:`general_settings` for conferences), event type, keywords.
+You can add a description to your lecture, a support email and its caption
+(which will appear on the event page), organizers and a short display URL
+(used as a shortcut to the lecture’s event page). You can also add or remove speakers.
 
 |image141|
 
-Clicking on the link *View event page* will take you to the
+Clicking on the button *Switch to event page* will take you to the
 home page of your event.
 
 --------------
 
 Material
-^^^^^^^^
+~~~~~~~~
 
 You can add material to the lecture, by using the *Material* menu, and
 the link *Add Material*.
@@ -59,9 +68,83 @@ You can then enter the name and description of the material.
 |image144|
 
 The material can be files or links. You also protect the material
-to control who has access to view the material.
+to control who has access to view it.
 
 --------------
+
+.. _chat_room:
+
+Chat room
+~~~~~~~~~
+
+If the Indico administrators have enabled the chat room module, you can create
+chat rooms for your lecture.
+
+For more information, see :ref:`chat_guide`.
+
+|image166|
+
+
+
+-------------
+
+.. _video_services:
+
+Video Services
+~~~~~~~~~~~~~~
+If the Indico administrators have enabled the Video Services functionality, you can have access to the *Video Services*
+option. The tabs in Video Services are:
+
+* Videoconferencing: Set up a videoconference
+* Recording request: Once you've set up the location of the lecture, you
+  can do a recording request. You will be presented to a form to complete
+  and you will need to ensure that all speakers
+  have given their permission to have their talks recorded.
+* Webcast request: You can do a webcast request. You need to complete a
+  form, select a room capable of webcasting and ensure that all speakers
+  give their permission to have their talks webcasted
+* Managers: Here you add video services managers and managers for individual
+  systems
+
+For more information, see :ref:`video_guide`.
+
+------------
+
+Participants
+~~~~~~~~~~~~
+
+You can view here a list of all the participants. You can add or remove
+participants (as a manager), mark as present/absent, ask for excuse, send
+email etc. You can also export the list of participants to Excel by clicking
+on *Export to Excel* on the right. You can also choose whether to display
+or not the list of participants in the event page.
+
+For more info see `Meeting participants <Meetings.html#participants>`_.
+
+-----------
+
+.. _evaluation:
+
+Evaluation
+~~~~~~~~~~
+
+You can set an evaluation form to be completed by the participants. There
+are four tabs in this option:
+
+|image162|
+
+* Setup: Where you set the basic details, such as evaluation start/end date,
+  max. number of submissions etc. You enable and disable the form by clicking
+  on *Show*/*Hide*. You also have special actions, such as export or import
+  the evaluation etc.
+* Edit: This is where you create the evaluation form. You can add a textbox,
+  textarea, password, select, radio or checkbox question.
+* Preview: This shows you a preview of your evaluation form. Feel free to
+  try it, any form submitted from here will not be taken into account.
+* Results: Results of the evaluation
+
+For more on the evaluation process, go to :ref:`event_evaluation`
+
 
 Protection Management
 ~~~~~~~~~~~~~~~~~~~~~
@@ -82,16 +165,20 @@ key can modify the lecture without logging in.
 *Access Control* When the lecture is public, anyone can view the
 lecture . When the lecture is private, only those in the access
 list, lecture managers, and administrators can view the lecture.
-
-|image146|
+When it is inheriting, it has the same access protection as its parent
+category. Changing the access protection of its parent category will
+change the access protection of the lecture.
 
 When private you can also add an Access Key which means anyone
 with this key can access the lecture without logging in.
 
+|image146|
+
 *Domain Control* This is available when the lecture is
 public. You can specify which domain can access the lecture. For
-instance, users accessing from a computer in the CERN domain will
-be able to access.
+instance, choosing CERN as a domain means only users accessing
+from a computer in the CERN domain will be able to access.
+
 
 --------------
 
@@ -101,17 +188,17 @@ Tools Management
 The lecture Tools allow you to carry out certain actions on the whole
 of the lecture.
 
-|image147|
-
 --------------
 
-Deleting a Lecture
-^^^^^^^^^^^^^^^^^^
 
-The Delete this lecture option will delete the whole lecture. You will
-be asked to confirm deletion beforehand.
+Alarm Control
+^^^^^^^^^^^^^
 
-|image148|
+You can set an alarm/reminder to alert people about the
+lecture; the alert will be in the form of an email. To do so, click on
+the button *add new alarm* in the *Alarms* tab.
+
+|image152|
 
 --------------
 
@@ -124,10 +211,45 @@ or on certain dates.
 
 |image149|
 
+For more explanation on the cloning process, see :ref:`clone_event` for
+conferences.
+
+----------------
+
+Posters
+^^^^^^^
+
+As for meetings, you can create posters for your lecture. You can either
+create your own, or use a local template.
+
+|image163|
+
+-------------
+
+Lock
+^^^^
+
+It is possible to lock the lecture. If you lock the event, you won’t be
+able to change its details anymore. Only the creator of the lecture or
+an administrator of the system/category can unlock an event. You will be
+asked to confirm.
+
+|image164|
+
 --------------
 
-Packaging Material
+Deleting a Lecture
 ^^^^^^^^^^^^^^^^^^
+
+The Delete option will delete the whole lecture. There is no undo tool
+so far, but you will be asked to confirm deletion beforehand.
+
+|image148|
+
+--------------
+
+Material Package
+^^^^^^^^^^^^^^^^
 
 Using the *Material Package* option you can create a package
 of all the materials that have been used in the lecture.
@@ -147,15 +269,8 @@ of all the materials that have been used in the lecture.
 
 --------------
 
-Alarm Control
-^^^^^^^^^^^^^^^^^^^^^^
 
-You can set an alarm/reminder to alert people about the
-lecture; the alert will be in the form of an email.
-
-|image152|
-
---------------
+.. _lecture_display_area:
 
 Lecture Display Area
 --------------------
@@ -166,7 +281,7 @@ the lecture. It is also the area in which you can access the
 modification areas if you have access rights. There are various
 views in which the lecture can be displayed; the following sections
 show the different views and displays of the different parts of a
-lecture. 
+lecture.
 
 --------------
 
@@ -175,7 +290,7 @@ Lecture Style
 
 This is the default view for lectures in Indico. If you have
 modification rights to any parts in the lecture, you will be able
-to access the Management Area by clicking the modification icon |image155|. 
+to access the Management Area by clicking the modification icon |image155|.
 
 You can also do some management actions from the tab *Manage* on the right
 of the title.
@@ -251,3 +366,8 @@ The Event style:
 .. |image159| image:: UserGuidePics/lect14.png
 .. |image160| image:: UserGuidePics/lect15.png
 .. |image161| image:: UserGuidePics/lect16.png
+.. |image162| image:: UserGuidePics/lectureEvaluation.png
+.. |image163| image:: UserGuidePics/lecturePoster.png
+.. |image164| image:: UserGuidePics/lectureLock.png
+.. |image165| image:: UserGuidePics/chatroom1.png
+.. |image166| image:: UserGuidePics/chatroom2.png
