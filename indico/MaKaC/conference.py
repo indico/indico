@@ -290,6 +290,7 @@ class CategoryManager( ObjectHolder ):
         # remove category from the name index
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
         nameIdx.unindex(category.getId())
+        Catalog.getIdx('categ_conf_sd').remove_category(category.getId())
 
     def _newId( self ):
         """
