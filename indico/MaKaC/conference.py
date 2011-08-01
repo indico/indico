@@ -2957,9 +2957,9 @@ class Conference(CommonObjectBase, Locatable):
 
     def verifyEndDate(self, edate):
         if edate<self.getStartDate():
-            raise MaKaCError( _("End date cannot be before the start date"), _("Event"))
+            raise TimingError( _("End date cannot be before the start date"), _("Event"))
         if self.getSchedule().hasEntriesAfter(edate):
-            raise MaKaCError(_("Cannot change end date to %s: some entries in the timetable would be outside this date (%s)") % (edate,self.getSchedule().getEntries()[-1].getStartDate()), _("Event"))
+            raise TimingError(_("Cannot change end date to %s: some entries in the timetable would be outside this date (%s)") % (edate,self.getSchedule().getEntries()[-1].getStartDate()), _("Event"))
 
     def setEndDate(self, eDate, check = 1, index = True, notifyObservers = True):
         """ Changes the current conference end date/time to the one specified by the parameters.
