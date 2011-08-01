@@ -36,7 +36,9 @@ try:
     _ = ugettext = gettext = lazyTranslations.ugettext
     ngettext = ungettext = lazyTranslations.ungettext
 
-except:
+    gettext_lazy = forceLazyTranslations.ugettext
+
+except ImportError:
     # no Babel
     pass
 

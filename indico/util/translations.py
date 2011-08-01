@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from babel.support import Translations, LazyProxy
+from babel.support import Translations, LazyProxy as _LazyProxy
 from babel.core import Locale
 from gettext import NullTranslations
 
@@ -29,6 +29,15 @@ from indico.util.contextManager import ContextManager
 # Store the locale in a thread-local object
 nullTranslations = NullTranslations()
 
+
+class LazyProxy(_LazyProxy):
+    """
+    Stateless version of Babel's LazyProxy
+    """
+    def value(self):
+        # just return
+        return  self._func(*self._args, **self._kwargs)
+    value = property(value)
 
 
 class IndicoLocale(Locale):
@@ -44,13 +53,15 @@ class IndicoLocale(Locale):
 
 def _tr_eval(func, *args, **kwargs):
     # ok, eval time... is there a translation?
+
     if 'translation' in ContextManager.get():
         # yes? good, let's do it
         tr = ContextManager.get('translation')
     else:
-        # no? too bad, just don't transate anything
+        # no? too bad, just don't translate anything
         tr = nullTranslations
-    return getattr(tr, func)(*args, **kwargs).encode('utf-8')
+    res = getattr(tr, func)(*args, **kwargs).encode('utf-8')
+    return res
 
 
 class LazyTranslations(Translations):
@@ -58,9 +69,15 @@ class LazyTranslations(Translations):
     Defers translation in case there is still no translation available
     It will be then done when the value is finally used
     """
+
+    def __init__(self, forceLazy=False):
+        self.force = forceLazy
+        super(LazyTranslations, self).__init__()
+
     def _wrapper(self, func, *args, **kwargs):
-        # if there is a locale already defined
-        if 'translation' in ContextManager.get():
+        # if there is a locale already defined, use it
+        # (unless we have forced "lazy mode")
+        if 'translation' in ContextManager.get() and not self.force:
             # straight translation
             translation = ContextManager.get('translation')
             return getattr(translation, func)(*args, **kwargs).encode('utf-8')
@@ -76,4 +93,5 @@ class LazyTranslations(Translations):
 
 
 lazyTranslations = LazyTranslations()
+forceLazyTranslations = LazyTranslations(forceLazy=True)
 lazyTranslations.install(unicode=True)
