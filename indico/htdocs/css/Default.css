@@ -96,7 +96,11 @@ a.note:hover {
     margin: 30px auto;
     margin-top: 18px;
     border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    -webkit-border-radius: 10px 10px 0px 0px;
     box-shadow: 0px 0px 10px #000;
+    -moz-box-shadow: 0px 0px 10px #000;
+    -webkit-box-shadow: 0px 0px 10px #000;
 }
 
 
@@ -2859,6 +2863,8 @@ div.eventHeaderButtonBar {
 	min-height: 24px;
 	min-width: 200px;
         box-shadow: 0px 2px 2px #222;
+        -moz-box-shadow: 0px 2px 2px #222;
+        -webkit-box-shadow: 0px 2px 2px #222;
 }
 
 div.eventHeaderButtonBar a {
@@ -2958,9 +2964,13 @@ div.filterDiv
 
 .smallSideBox {
     border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
     padding: 15px 15px 10px 15px;
     background: #efefef;
     box-shadow: 0px 0px 6px #aaa;
+    -moz-box-shadow: 0px 0px 6px #aaa;
+    -webkit-box-shadow: 0px 0px 6px #aaa;
     behavior: url('css/border-radius.htc');
 }
 
@@ -3908,6 +3918,7 @@ div.tabBorderGradient {
     float: right;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
+    border-radius: 3px;
     margin: 10px 10px 0 0;
 }
 
@@ -5011,6 +5022,7 @@ td.collaborationDisplayInfoLeftCol span {
 
 .timetableBlock {
     border: 1px solid #aaaaaa;
+    border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius:3px;
     behavior: url(css/border-radius.htc);
@@ -5694,9 +5706,12 @@ div.timetableManagementInfoArea {
     width: 50%;
     background:#FFFFDD;
     border: 1px solid #aaaaaa;
+    border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius:3px;
     -moz-box-shadow:2px 2px 2px #888888;
+    -webkit-box-shadow:2px 2px 2px #888888;
+    box-shadow:2px 2px 2px #888888;
     margin-left: auto;
     margin-right: auto;
     behavior: url(css/border-radius.htc);
