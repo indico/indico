@@ -1076,7 +1076,7 @@ class Category(CommonObjectBase):
             raise MaKaCError( _("Cannot add event: the current category already contains some sub-categories"), _("Category"))
         if newConf.getId() == "":
             raise MaKaCError( _("Cannot add to a category an event which is not registered"), _("Category"))
-        self.conferences.add(newConf)
+        self.conferences.insert(newConf)
         newConf.addOwner(self)
         self._incNumConfs(1)
         self.indexConf(newConf)
