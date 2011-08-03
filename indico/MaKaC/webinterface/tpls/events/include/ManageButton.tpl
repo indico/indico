@@ -39,6 +39,10 @@
             % endif
         % endif
 
+        % if 'sessionTimetableLink' in info:
+            'Edit session timetable': '${info["sessionTimetableLink"]}',
+        % endif
+
         % if 'cloneLink' in info:
             'Clone event': '${info["cloneLink"]}',
         % endif
@@ -50,7 +54,8 @@
                 return false;},
         % endif
 
-        % if extractMinutes(item.getAllMaterialList()):
+        <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>
+        % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText():
             'Delete minutes': function(m) {
                 IndicoUI.Dialogs.deleteMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
                 m.close();

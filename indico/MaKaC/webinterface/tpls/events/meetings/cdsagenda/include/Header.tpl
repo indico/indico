@@ -140,7 +140,7 @@
                                         <span style="font-size:x-small;color:white;">
                                             % if getDate(session.getAdjustedStartDate(timezone)) == getDate(session.getAdjustedEndDate(timezone)):
                                                 ${prettyDate(session.getAdjustedStartDate(timezone))}&nbsp;${getTime(session.getAdjustedStartDate(timezone))}
-                                                % if getTime(session.getAdjustedEndDate(timezone)) != '00:00':
+                                                % if not isTime0H0M(session.getAdjustedEndDate(timezone)):
                                                     ->${getTime(session.getAdjustedEndDate(timezone))}
                                                 % endif
                                             % else:

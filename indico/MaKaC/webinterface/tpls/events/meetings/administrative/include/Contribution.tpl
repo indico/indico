@@ -17,9 +17,10 @@
         ${item.getTitle()}
         <br/>
         % if minutes:
-            % for minutesText in extractMinutes(item.getAllMaterialList()):
+            <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+            % if minutesText:
                 ${common.renderDescription(minutesText)}
-            % endfor
+            % endif
         % endif
         % if item.getDescription():
            <br/>

@@ -28002,6 +28002,9 @@ msgstr "Modifier les données de la présentation"
 msgid "inherit"
 msgstr "hériter"
 
+#~ msgid "en_GB"
+#~ msgstr "Anglais"
+
 #: MaKaC/webinterface/tpls/SessionModEditData.tpl:49
 #: MaKaC/webinterface/tpls/SessionModifMain.tpl:35
 #: indico/MaKaC/webinterface/tpls/SessionModEditData.tpl:49

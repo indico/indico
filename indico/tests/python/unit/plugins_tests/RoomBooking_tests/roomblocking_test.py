@@ -64,7 +64,7 @@ class RoomBooking_Feature(IndicoTestFeature):
                 avatar.setName("fake-%d" % i)
                 avatar.setSurName("fake")
                 avatar.setOrganisation("fake")
-                avatar.setLang("en_US")
+                avatar.setLang("en_GB")
                 avatar.setEmail("fake%d@fake.fake" % i)
                 avatar.setId("rb-fake-%d" % i)
                 ah.add(avatar)

@@ -56,12 +56,13 @@
     </table>
 
     % if minutes:
-        % for minutesText in extractMinutes(session.getAllMaterialList()):
+        <% minutesText = item.getSession().getMinutes().getText() if item.getSession().getMinutes() else None %>
+        % if minutesText:
             <div class="minutesTable">
-                <h2>Minutes</h2>
+                <h2>${_("Minutes")}</h2>
                 <span>${common.renderDescription(minutesText)}</span>
             </div>
-        % endfor
+        % endif
     % endif
 
     % if len(item.getSchedule().getEntries()) > 0:
@@ -70,6 +71,8 @@
             <%
                 if subitem.__class__.__name__ != 'BreakTimeSchEntry':
                     subitem = subitem.getOwner()
+                    if not subitem.canView(accessWrapper):
+                        continue
             %>
             <%include file="${getItemType(subitem)}.tpl"
                 args="item=subitem, parent=item, minutes=minutes, hideEndTime='true',

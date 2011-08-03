@@ -25,14 +25,14 @@ import zope.interface
 
 # Required by specific tasks
 from MaKaC.user import Avatar
-from MaKaC.common import Config
+from MaKaC.common import Config, info
 # end required
 
 from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.date_time import int_timestamp
+from indico.util.date_time import int_timestamp, format_date, format_time
 from indico.util.i18n import _, i18nformat
 from indico.modules.scheduler.fossils import ITaskFossil, ITaskOccurrenceFossil
 from indico.modules.scheduler import base, TaskDelayed
@@ -40,6 +40,10 @@ from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 from MaKaC.common.utils import getEmailList
 from MaKaC.plugins.base import Observable
 from MaKaC.rb_location import ReservationGUID
+from MaKaC.accessControl import AccessWrapper
+from MaKaC import schedule
+from MaKaC.common.utils import getLocationInfo
+from MaKaC.common.TemplateExec import render
 
 """
 Defines base classes for tasks, and some specific tasks as well
@@ -565,33 +569,38 @@ class AlarmTask(SendMailTask):
     def canModify(self, aw):
         return self.conf.canModify(aw)
 
+    def __getVarsTextTpl(self, conf):
+        tvars = {}
+        tvars['entries'] = []
+        confSchedule = conf.getSchedule()
+        entrylist = confSchedule.getEntries()
+        for entry in entrylist:
+            if type(entry) is schedule.BreakTimeSchEntry:
+                newItem = entry
+            else:
+                newItem = entry.getOwner()
+            tvars['entries'].append(newItem)
+        tvars["conf"] = conf
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        tvars['INCLUDE'] = os.path.join(styleMgr.getBaseTPLPath(), 'include')
+        tvars['getTime'] = lambda date : format_time(date.time())
+        tvars['isTime0H0M'] = lambda date : (date.hour, date.minute) == (0,0)
+        tvars['getDate'] = lambda date : format_date(date, format='yyyy-MM-dd')
+        tvars['prettyDate'] = lambda date : format_date(date, format='full')
+        tvars['getLocationInfo'] = lambda item: getLocationInfo(item, False)
+        from MaKaC.conference import SessionSlot
+        tvars['getItemType'] = lambda item: "Break" if isinstance(item, schedule.BreakTimeSchEntry) \
+                                            else ("Session" if isinstance(item, SessionSlot) else item.__class__.__name__)
+        return tvars
+
     def _setMailText(self):
         text = self.text
         if self.note:
             text = text + "Note: %s" % self.note
         if self.confSumary:
-            #try:
-                from MaKaC.common.output import outputGenerator
-                from MaKaC.accessControl import AdminList, AccessWrapper
-                import MaKaC.webinterface.urlHandlers as urlHandlers
-                admin = AdminList().getInstance().getList()[0]
-                aw = AccessWrapper()
-                aw.setUser(admin)
-                path = Config.getInstance().getStylesheetsDir()
-                if os.path.exists("%s/text.xsl" % path):
-                    stylepath = "%s/text.xsl" % path
-                outGen = outputGenerator(aw)
-                vars = { \
-                        "modifyURL": urlHandlers.UHConferenceModification.getURL( self.conf ), \
-                        "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL, \
-                        "contribModifyURLGen": urlHandlers.UHContributionModification.getURL, \
-                        "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL, \
-                        "materialURLGen": urlHandlers.UHMaterialDisplay.getURL, \
-                        "resourceURLGen": urlHandlers.UHFileAccess.getURL }
-                confText = outGen.getOutput(self.conf,stylepath,vars)
-                text += "\n\n\n" + confText
-            #except:
-            #    text += "\n\n\nSorry could not embed text version of the agenda..."
+            tplDir = Config.getInstance().getTPLDir()
+            text += render(os.path.join(tplDir, "events", "Text.tpl"), self.__getVarsTextTpl(self.conf))
+
         super(AlarmTask, self).setText(text)
 
     def setNote(self, note):

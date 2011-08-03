@@ -4,7 +4,7 @@ var json_locale_data = {
             "Content-Transfer-Encoding": "8bit",
             "Content-Type": "text/plain; charset=utf-8",
             "Generated-By": "Babel 0.9.6",
-            "Language-Team": "en_US <LL@li.org>",
+            "Language-Team": "en_GB <LL@li.org>",
             "Last-Translator": "FULL NAME <EMAIL@ADDRESS>",
             "MIME-Version": "1.0",
             "PO-Revision-Date": "2011-07-05 11:27+0200",

@@ -24,7 +24,7 @@
 </%def>
 
 <%def name="printContributionInfo(item)">
-   % if getTime(item.getAdjustedStartDate(timezone)) != '00:00':
+   % if not isTime0H0M(item.getAdjustedStartDate(timezone)):
         ${getTime(item.getAdjustedStartDate(timezone))}&nbsp;
    % endif
     ${item.getTitle()}&nbsp;
@@ -58,7 +58,7 @@
 
 
 <%def name="printBreakInfo(item)">
-   % if getTime(item.getAdjustedStartDate(timezone)) != '00:00':
+   % if not isTime0H0M(item.getAdjustedStartDate(timezone)):
         ${getTime(item.getAdjustedStartDate(timezone))}&nbsp;
    % endif
     ${item.getTitle()}
@@ -68,14 +68,13 @@
 
 <% location, room, url = getLocationInfo(conf) %>
 
-${conf.getTitle()}  (${prettyDate(startDate) + (" to " + prettyDate(endDate) if getDate(startDate) != getDate(endDate) else "")}) (${location} (${room}))<br/><br/>
-
+${conf.getTitle()}  (${prettyDate(conf.getAdjustedStartDate()) + (" to " + prettyDate(conf.getAdjustedEndDate()) if conf.getAdjustedStartDate().date() != conf.getAdjustedEndDate().date() else "")})<br/><br/>
 % if conf.getDescription():
     Description: ${conf.getDescription()}<br/>
 %endif
 
-% if participants:
-    Participants: ${participants}<br/>
+% if conf.getParticipation().displayParticipantList():
+    Participants: ${ conf.getParticipation().getPresentParticipantListText() }<br/>
 % endif
 
 % for index, item in enumerate(entries):

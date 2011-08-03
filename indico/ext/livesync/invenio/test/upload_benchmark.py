@@ -70,7 +70,7 @@ def runTests(host='localhost', port=FAKE_SERVICE_PORT,
     avatar.setName( "fake" )
     avatar.setSurName( "fake" )
     avatar.setOrganisation( "fake" )
-    avatar.setLang( "en_US" )
+    avatar.setLang( "en_GB" )
     avatar.setEmail( "fake@fake.fake" )
 
     #registering user

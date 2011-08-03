@@ -462,7 +462,6 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
      {
          _drawItem: function(item) {
              var option = Widget.option(item);// Html.option({value: item.key}, item.get());
-             this.options.set(item.key, option);
 
              if (this.selected.get()) {
                  if (this.selected.get() == item.key) {
@@ -476,17 +475,12 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
          _handleContent: function() {
              var self = this;
 
-             this.selected.observe(function(value) {
-                 var elem = self.options.get(value);
-
-                 if (elem) {
-                     elem.accessor('selected').set(true);
-                 }
-             });
-
              return bind.element(this.select,
                                  this.source,
                                  function(item) {
+                                     if ($.isArray(item)) {
+                                         item = new WatchPair(item[0], item[1]);
+                                     }
                                      return self._drawItem(item);
                                  });
          },
@@ -515,7 +509,6 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
 
      },
      function(method, args, callback) {
-         this.options = new WatchObject();
          this.select = Html.select({});
          this.selected = new WatchValue();
          // Load data source on startup

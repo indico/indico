@@ -23,8 +23,8 @@
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Template type")}</span></td>
       <td align="left">
-          <input type="radio" value="tpl" name="templatetype" onclick="enableTypeTemplate('xsl')">TPL
-          <input type="radio" value="xsl" name="templatetype" onclick="enableTypeTemplate('tpl')">XSL
+          <input type="radio" value="tpl" name="templatetype" onclick="enableTypeTemplate('tpl');">TPL
+          <input type="radio" value="xsl" name="templatetype" onclick="enableTypeTemplate('xsl');">XSL
       </td>
     </tr>
     <tr>
@@ -78,18 +78,18 @@
 
     function enableTypeTemplate (type) {
         if (type == 'xsl') {
-            $('stylesheetfile').disabled=true;
-            $('tplfile').disabled=false;
+            $('#stylesheetfile').removeAttr('disabled');
+            $('#tplfile').attr('disabled', 'disabled');
         }
         else {
-            $('stylesheetfile').disabled=false;
-            $('tplfile').disabled=true;
+            $('#stylesheetfile').attr('disabled', 'disabled');
+            $('#tplfile').removeAttr('disabled');
         }
-        $('new').disabled=false;
+        $('#new').removeAttr('disabled');
     }
 
-    var cssFileList = $('cssFileList');
-    $('cssCheckbox').onclick = function(event) {
+    var cssFileList = $('#cssFileList');
+    $('#cssCheckbox').onclick = function(event) {
         if (this.checked) cssFileList.enable();
         else cssFileList.disable();
     };

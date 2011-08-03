@@ -60,6 +60,8 @@
         <%
             if subitem.__class__.__name__ != 'BreakTimeSchEntry':
                 subitem = subitem.getOwner()
+                if not subitem.canView(accessWrapper):
+                    continue
         %>
         <%include file="${getItemType(subitem)}.tpl" args="item=subitem, parent=item, hideTime=hideTime, order=order"/>
         % if getItemType(subitem) == "Contribution":

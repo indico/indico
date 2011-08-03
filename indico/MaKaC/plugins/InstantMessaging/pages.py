@@ -113,6 +113,19 @@ class IMEventDisplayComponent(Component):
     def injectCSSFiles(self, obj):
         return ['InstantMessaging/im.css']
 
+    def eventDetailBanner(self, obj, conf):
+        if DBHelpers.roomsToShow(conf):
+            vars = {}
+            vars['chatrooms'] = DBHelpers.getShowableRooms(conf)
+            vars['linksList'] = PluginsHolder().getPluginType('InstantMessaging').getOption('customLinks').getValue()
+            vars['how2connect'] = PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor')
+            return WEventDetailBanner.forModule(InstantMessaging).getHTML(vars)
+        else:
+            return ""
+
+
+class WEventDetailBanner(wcomponents.WTemplated):
+    pass
 
 class WConfModifChat(wcomponents.WTemplated):
 

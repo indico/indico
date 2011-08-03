@@ -8,8 +8,8 @@
     </td>
     <td colspan="2">
         ${item.getTitle()}
-        % if formatDuration(item.getDuration()) != '00:00':
-             <span class="itemDuration"> (${prettyDuration(formatDuration(item.getDuration()))}) </span>
+        % if item.getDuration():
+             <span class="itemDuration"> (${prettyDuration(item.getDuration())}) </span>
         % endif
     </td>
 </tr>

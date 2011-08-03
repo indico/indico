@@ -42,7 +42,7 @@ class MaKaCInfo(Persistent):
         self._noReplyEmail = ""
         self._city = ""
         self._country = ""
-        self._lang = "en_US"
+        self._lang = "en_GB"
         self._tz = ""
 
         # Account-related features
@@ -378,7 +378,7 @@ class MaKaCInfo(Persistent):
         try:
             return self._lang
         except:
-            self._lang = "en_US"
+            self._lang = "en_GB"
             #Logger.get('i18n').warning('No language set in MaKaCInfo... using %s by default' % self._lang)
             return self._lang
 
@@ -475,7 +475,7 @@ class StyleManager(Persistent):
         if type == "":
             # style globally removed
             styles = self.getStyles()
-            if styleId in styles.keys():
+            if styles.has_key(styleId):
                 del styles[styleId]
                 self.setStyles(styles)
                 self.removeStyleFromAllTypes(styleId)
@@ -582,6 +582,16 @@ class StyleManager(Persistent):
                 return True
         return False
 
+    def getXSLPath(self, styleId):
+        if styleId.strip() != "":
+            xslFile = self.getTemplateFilename(styleId)
+            if not xslFile:
+                return False
+            path = os.path.join(self.getBaseXSLPath(), xslFile)
+            if os.path.exists(path):
+                return path
+        return None
+
     def getTemplateFilename(self, styleId):
         styles = self.getStyles()
         if styleId in styles:
@@ -611,7 +621,7 @@ class StyleManager(Persistent):
 
     def getXSLStyles(self):
         xslStyles = []
-        for style in self._styles.keys():
+        for style in self._styles:
             if self._styles[style][1]!= None and self._styles[style][1].endswith(".xsl"):
                 xslStyles.append(style)
         return xslStyles

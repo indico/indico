@@ -6478,7 +6478,7 @@ msgid "Move this contribution to the"
 msgstr "Déplacer cette contribution à"
 
 #: C:\depot\indico\code\code\MaKaC\po\language_list.py:8
-msgid "en_US"
+msgid "en_GB"
 msgstr "Anglais"
 
 #: C:\depot\indico\code\code\tpls\RoomBookingRoomList.tpl:47

@@ -55,7 +55,7 @@ LOCALE_DOMAIN = 'messages'
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
 
 
-defaultLocale = 'en_US'
+defaultLocale = 'en_GB'
 
 
 def setLocale(locale):
@@ -91,7 +91,7 @@ def getLocaleDisplayNames(using=None):
     locales = [IndicoLocale.parse(loc) for loc in availableLocales if loc != using]
     if using:
         locales.insert(0, IndicoLocale.parse(using))
-    return list((loc, loc.languages[loc.language].encode('utf-8')) for loc in locales)
+    return list((str(loc), loc.languages[loc.language].encode('utf-8')) for loc in locales)
 
 
 def parseLocale(locale):

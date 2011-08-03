@@ -6,8 +6,8 @@
     <%include file="ManageButton.tpl" args="item=item, alignRight=True"/>
     <span class="subLevelTitle confModifPadding">${item.getTitle()}</span>
 
-    % if formatDuration(item.getDuration()) != '00:00':
-        <em>${prettyDuration(formatDuration(item.getDuration()))}</em>
+    % if item.getDuration():
+        <em>${prettyDuration(item.getDuration())}</em>
     % endif
 
     % if item.getDescription():
@@ -44,11 +44,12 @@
     </table>
 
     % if minutes:
-        % for minutesText in extractMinutes(item.getAllMaterialList()):
+        <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+        % if minutesText:
             <div class="minutesTable">
-                <h2>Minutes</h2>
+                <h2>${_("Minutes")}</h2>
                 <span>${common.renderDescription(minutesText)}</span>
             </div>
-        % endfor
+        % endif
     % endif
 </li>

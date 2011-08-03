@@ -13,8 +13,8 @@
 
     <span class="confModifPadding">
         <span class="${titleClass}" style="color: #69856e">${item.getTitle()}</span>
-        % if hideEndTime and formatDuration(item.getDuration()) != '00:00':
-            <em> ${prettyDuration(formatDuration(item.getDuration()))}</em>
+        % if hideEndTime and item.getDuration():
+            <em> ${prettyDuration(item.getDuration())}</em>
         % endif
     </span>
 

@@ -206,3 +206,9 @@ class IEventDisplayContributor(IContributor):
         Observers should contribute with CSS files they wish to add to the
         <head></head> block
         """
+
+    def eventDetailBanner(self, obj, conf):
+        """
+        Returns the info that the plugins want to add after the header (where description is)
+        """
+

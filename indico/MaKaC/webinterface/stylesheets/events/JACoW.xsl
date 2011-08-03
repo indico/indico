@@ -1,4 +1,4 @@
-<?xml version='1.0'?>
+<?xml version='1.0' encoding="UTF-8"?>
 <!--
 
      This file is part of CDS Indico.
@@ -114,7 +114,7 @@
 <xsl:template match="name" xml:space="preserve">
         <lname><xsl:value-of select="./@last" disable-output-escaping="yes"/></lname>
         <fname><xsl:value-of select="./@first" disable-output-escaping="yes"/></fname>
-        <mname><xsl:value-of select="./@middle" disable-output-escaping="yes"/></mname></xsl:template>	
+        <mname><xsl:value-of select="./@middle" disable-output-escaping="yes"/></mname></xsl:template>
 
 <xsl:template match="organization" xml:space="preserve">
         <institute>

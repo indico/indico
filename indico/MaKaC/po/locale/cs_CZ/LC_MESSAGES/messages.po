@@ -5682,7 +5682,7 @@ msgid "Move this contribution to the"
 msgstr ""
 
 #: po\language_list.py:9
-msgid "en_US"
+msgid "en_GB"
 msgstr "English"
 
 #: webinterface\tpls\RoomBookingRoomList.tpl:47

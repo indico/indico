@@ -132,7 +132,7 @@ class DummyUser_Feature(IndicoTestFeature):
             avatar.setName("fake")
             avatar.setSurName("fake")
             avatar.setOrganisation("fake")
-            avatar.setLang("en_US")
+            avatar.setLang("en_GB")
             avatar.setEmail("fake@fake.fake")
 
             #registering user

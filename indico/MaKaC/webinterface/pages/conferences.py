@@ -41,7 +41,7 @@ import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.common.filters as filters
-from MaKaC.common.utils import isStringHTML, formatDateTime
+from MaKaC.common.utils import isStringHTML, formatDateTime, formatDate
 import MaKaC.common.utils
 import MaKaC.review as review
 from MaKaC.webinterface.pages.base import WPDecorated
@@ -67,6 +67,7 @@ import MaKaC.common.info as info
 from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.date_time import format_time, format_date, format_datetime
 import MaKaC.webcast as webcast
 
 from MaKaC.common.fossilize import fossilize
@@ -924,6 +925,8 @@ class WPEMail ( WPConferenceDefaultDisplayBase ):
 
 class WPXSLConferenceDisplay( WPConferenceBase ):
 
+    """ Use this class just to transform to XML"""
+
     def __init__( self, rh, conference, view, type, params ):
         WPConferenceBase.__init__( self, rh, conference )
         self._params = params
@@ -933,115 +936,26 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         self._firstDay = params.get("firstDay")
         self._lastDay = params.get("lastDay")
         self._daysPerRow = params.get("daysPerRow")
-        self._parentCateg = None
-        categId = rh._getSession().getVar("currentCategoryId")
-        if categId != None:
-            self._parentCateg = self._conf.getOwnerById(categId)
         self._webcastadd = False
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         if wm.isManager(self._getAW().getUser()):
             self._webcastadd = True
 
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPConferenceBase.getCSSFiles(self) + \
-               sum(self._notify('injectCSSFiles'), [])
-
-    def getJSFiles(self):
-        modules = WPConferenceBase.getJSFiles(self)
-
-        # if the user has management powers, include
-        # these modules
-        #if self._conf.canModify(self._rh.getAW()):
-
-        # TODO: find way to check if the user is able to manage
-        # anything inside the conference (sessions, ...)
-
-        modules += self._includeJSPackage('Management')
-        modules += self._includeJSPackage('MaterialEditor')
-        modules += self._includeJSPackage('Display')
-        return modules
-
     def _getFooter( self ):
         """
         """
-        wc = wcomponents.WFooter()
-        p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),"subArea": self._getSiteArea(),"dark":True}
-        if Config.getInstance().getShortEventURL():
-            id=self._conf.getUrlTag().strip()
-            if not id:
-                id = self._conf.getId()
-            p["shortURL"] =  Config.getInstance().getShortEventURL() + id
-        return wc.getHTML(p)
-
-    def _getHeadContent( self ):
-        htdocs = Config.getInstance().getHtdocsDir()
-        # First include the default Indico stylesheet
-        styleText = """<link rel="stylesheet" href="%s/css/%s">\n""" % \
-            (self._getBaseURL(), Config.getInstance().getCssStylesheetName())
-        # Then the common event display stylesheet
-        if os.path.exists("%s/css/common.css" % htdocs):
-            styleText += """        <link rel="stylesheet" href="%s/css/common.css">\n""" % self._getBaseURL()
-        if self._type == "simple_event":
-            styleText += """        <link rel="stylesheet" href="%s/css/lecture.css">\n""" % self._getBaseURL()
-        # And finally the specific display stylesheet
-        if os.path.exists("%s/css/%s.css" % (htdocs,self._view)):
-            styleText += """        <link rel="stylesheet" href="%s/css/%s.css">\n""" % (self._getBaseURL(), self._view)
-        return styleText
+        return ""
 
     def _getHTMLHeader( self ):
-
-        if self._view in ["xml","text","jacow"] and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
-            return ""
-
-        tpl = wcomponents.WHTMLHeader();
-
-        return tpl.getHTML({"area": "",
-                            "baseurl": self._getBaseURL(),
-                            "conf": Config.getInstance(),
-                            "page": self,
-                            "extraCSS": self.getCSSFiles(),
-                            "extraJSFiles": self.getJSFiles(),
-                            "extraJS": self._extraJS,
-                            "language": self._getAW().getSession().getLang()
-                            })
-
-    def _getHeader( self ):
-        """
-        """
-        if self._type == "simple_event":
-            wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._conf )
-        elif self._type == "meeting":
-            wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._conf )
-        else:
-            wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._conf )
-        return wc.getHTML( { "loginURL": self.getLoginURL(),\
-                             "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.getId(),\
-                             "currentView": self._view,\
-                             "type": self._type,\
-                             "selectedDate": self._params.get("showDate",""),\
-                             "selectedSession": self._params.get("showSession",""),\
-                             "detailLevel": self._params.get("detailLevel",""),\
-                             "filterActive": self._params.get("filterActive",""),\
-                             "loginAsURL": self.getLoginAsURL(),
-                            "dark": True } )
+        return ""
 
     def _applyDecoration( self, body ):
         """
         """
-        if self._params.get("frame","")=="no" or self._params.get("fr","")=="no":
-            if self._view in ["xml","text","jacow"]:
-                return body
-            else:
-                return WPrintPageFrame().getHTML({"content":body})
-        return WPConferenceBase._applyDecoration(self, body)
+        return body
 
     def _getHTMLFooter( self ):
-        if (self._view in ["xml","text","jacow"]) and (self._params.get("frame","")=="no" or self._params.get("fr","")=="no"):
-            return ""
-        return WPConferenceBase._getHTMLFooter(self)
+        return ""
 
     def _getBodyVariables(self):
         pars = { \
@@ -1056,8 +970,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         "subContribMinutesURLGen": urlHandlers.UHSubContributionDisplayWriteMinutes.getURL, \
         "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL, \
         "materialURLGen": urlHandlers.UHMaterialDisplay.getURL, \
-        "resourceURLGen": urlHandlers.UHFileAccess.getURL, \
-        "frame": self._params.get("frame","") or self._params.get("fr","") }
+        "resourceURLGen": urlHandlers.UHFileAccess.getURL }
 
         pars.update({ 'firstDay' : self._firstDay, 'lastDay' : self._lastDay, 'daysPerRow' : self._daysPerRow })
 
@@ -1069,14 +982,13 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
 
     def _getBody( self, params ):
         vars = self._getBodyVariables()
-        frame = self._params.get("frame","") != "no" and self._params.get("fr","") != "no"
         view = self._view
         outGen = outputGenerator(self._getAW())
-        path = Config.getInstance().getStylesheetsDir()
-        if os.path.exists("%s.xsl" % (os.path.join(path,view))):
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        if styleMgr.existsXSLFile(self._view):
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             tz = DisplayTZ(self._getAW(),self._conf).getDisplayTZ()
-            useCache = minfo.isCacheActive() and frame and self._params.get("detailLevel", "") in [ "", "contribution" ] and self._view == self._conf.getDefaultStyle() and self._params.get("showSession","all") == "all" and self._params.get("showDate","all") == "all" and tz == self._conf.getTimezone()
+            useCache = minfo.isCacheActive() and self._params.get("detailLevel", "") in [ "", "contribution" ] and self._view == self._conf.getDefaultStyle() and self._params.get("showSession","all") == "all" and self._params.get("showDate","all") == "all" and tz == self._conf.getTimezone()
             useNormalCache = useCache and self._conf.isFullyPublic() and not self._conf.canModify(self._getAW()) and self._getAW().getUser() == None
             useManagerCache = useCache and self._conf.canModify( self._getAW())
             body = ""
@@ -1087,25 +999,14 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                 cache = EventCache({"id": self._conf.getId(), "type": "normal"})
                 body = cache.getCachePage()
             if body == "":
-                stylepath = "%s.xsl" % (os.path.join(path,view))
                 if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
                     includeContribution = 1
                 else:
                     includeContribution = 0
-                body = outGen.getFormattedOutput(self._rh, self._conf, stylepath, vars, 1, includeContribution, 1, 1, self._params.get("showSession",""), self._params.get("showDate",""))
+                body = outGen.getFormattedOutput(self._rh, self._conf, styleMgr.getXSLPath(self._view), vars, 1, includeContribution, 1, 1, self._params.get("showSession",""), self._params.get("showDate",""))
             if useManagerCache or useNormalCache:
                 cache.saveCachePage( body )
-            if not frame:
-                html = body
-            else:
-                html = """
-                %s
-                %s
-                %s
-            """%(wcomponents.WErrorMessage().getHTML(params), \
-                wcomponents.WInfoMessage().getHTML(params), \
-                body)
-            return html
+            return body
         else:
             return _("Cannot find the %s stylesheet") % view
 
@@ -1133,6 +1034,13 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         "other" :{"mapsTo" : "other", "imgURL" : os.path.join(_ImagesBaseURL, "file_small.png"), "imgAlt" : "unknown type file"},
         "link"  :{"mapsTo" : "link",  "imgURL" : os.path.join(_ImagesBaseURL, "link.png"),       "imgAlt" : "link"}
     }
+
+    def __init__( self, rh, conference, view, type, params ):
+        WPXSLConferenceDisplay.__init__( self, rh, conference, view, type, params )
+        self._parentCateg = None
+        categId = rh._getSession().getVar("currentCategoryId")
+        if categId != None:
+            self._parentCateg = self._conf.getOwnerById(categId)
 
     def _getVariables(self, conf):
         vars = {}
@@ -1202,26 +1110,13 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                     newItem = entry.getOwner()
                 vars['entries'].append(newItem)
 
-        if PluginsHolder().hasPluginType("InstantMessaging") and DBHelpers.roomsToShow(conf):
-            vars['chatrooms'] = DBHelpers.getShowableRooms(conf)
-            vars['linksList'] = PluginsHolder().getPluginType('InstantMessaging').getOption('customLinks').getValue()
-            vars['how2connect'] = PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor')
-
-        if PluginsHolder().hasPluginType("Collaboration"):
-            from MaKaC.plugins.Collaboration.output import OutputGenerator
-            vars.update(OutputGenerator.getCollaborationParams(conf))
+        vars["pluginDetails"] = "".join(self._notify('eventDetailBanner', self._conf))
 
         vars["daysPerRow"] = self._daysPerRow
         vars["firstDay"] = self._firstDay
         vars["lastDay"] = self._lastDay
 
         return vars
-
-    def _getBookingKind(self, booking):
-        if booking.canBeStarted():
-            return "ongoing"
-        elif booking.hasStartDate() and booking.getAdjustedStartDate('UTC') > nowutc():
-            return "scheduled"
 
     def _getMaterialFiles(self, material):
         processedFiles = []
@@ -1242,13 +1137,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                 filename, fileType, fileURL = str(res.getURL()), "link", str(res.getURL())
             files.append({'name' : filename, 'type' : fileType, 'url' : fileURL})
         return files
-
-    def _extractMinutes(self, materials):
-        result = []
-        for material in materials:
-            if material.canView(self._rh._aw) and isinstance(material, Minutes):
-                result.append(material.getText())
-        return result
 
     def _getItemType(self, item):
         itemClass = item.__class__.__name__
@@ -1302,6 +1190,9 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             if session.canModify(self._rh._aw) or session.canCoordinate(self._rh._aw):
                 info["minutesLink"] = True
                 info["materialLink"] = True
+                url = urlHandlers.UHSessionModifSchedule.getURL(session)
+                ttLink = "%s#%s.s%sl%s" % (url, session.getStartDate().strftime('%Y%m%d'), session.getId(), info['slotId'])
+                info["sessionTimetableLink"] = ttLink
 
         elif itemType == 'Contribution':
             info['parentProtection'] = item.getAccessController().isProtected()
@@ -1330,6 +1221,19 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
         return info
 
+    def _getHTMLHeader( self ):
+        tpl = wcomponents.WHTMLHeader();
+
+        return tpl.getHTML({"area": "",
+                            "baseurl": self._getBaseURL(),
+                            "conf": Config.getInstance(),
+                            "page": self,
+                            "extraCSS": self.getCSSFiles(),
+                            "extraJSFiles": self.getJSFiles(),
+                            "extraJS": self._extraJS,
+                            "language": self._getAW().getSession().getLang()
+                            })
+
     def _getHeadContent( self ):
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         htdocs = Config.getInstance().getHtdocsDir()
@@ -1337,7 +1241,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         styleText = """<link rel="stylesheet" href="%s/css/%s">\n""" % \
             (self._getBaseURL(), Config.getInstance().getCssStylesheetName())
         # Then the common event display stylesheet
-        if os.path.exists("%s/css/common.css" % htdocs):
+        if os.path.exists("%s/css/events/common.css" % htdocs):
             styleText += """        <link rel="stylesheet" href="%s/css/events/common.css">\n""" % self._getBaseURL()
         if self._type == "simple_event":
             lectureStyle = styleMgr.getDefaultStyleForEventType("simple_event")
@@ -1349,23 +1253,85 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
         return styleText
 
+    def _getFooter( self ):
+        """
+        """
+        wc = wcomponents.WFooter()
+        p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),"subArea": self._getSiteArea(),"dark":True}
+        if Config.getInstance().getShortEventURL():
+            id=self._conf.getUrlTag().strip()
+            if not id:
+                id = self._conf.getId()
+            p["shortURL"] =  Config.getInstance().getShortEventURL() + id
+        return wc.getHTML(p)
+
+    def _getHeader( self ):
+        """
+        """
+        if self._type == "simple_event":
+            wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._conf )
+        elif self._type == "meeting":
+            wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._conf )
+        else:
+            wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._conf )
+        return wc.getHTML( { "loginURL": self.getLoginURL(),\
+                             "logoutURL": self.getLogoutURL(),\
+                             "confId": self._conf.getId(),\
+                             "currentView": self._view,\
+                             "type": self._type,\
+                             "selectedDate": self._params.get("showDate",""),\
+                             "selectedSession": self._params.get("showSession",""),\
+                             "detailLevel": self._params.get("detailLevel",""),\
+                             "filterActive": self._params.get("filterActive",""),\
+                             "loginAsURL": self.getLoginAsURL(),
+                            "dark": True } )
+
+    def getCSSFiles(self):
+        # flatten returned list
+
+        return WPConferenceBase.getCSSFiles(self) + \
+               sum(self._notify('injectCSSFiles'), [])
+
+    def getJSFiles(self):
+        modules = WPConferenceBase.getJSFiles(self)
+
+        # if the user has management powers, include
+        # these modules
+        #if self._conf.canModify(self._rh.getAW()):
+
+        # TODO: find way to check if the user is able to manage
+        # anything inside the conference (sessions, ...)
+
+        modules += self._includeJSPackage('Management')
+        modules += self._includeJSPackage('MaterialEditor')
+        modules += self._includeJSPackage('Display')
+        return modules
+
+    def _applyDecoration( self, body ):
+        """
+        """
+        if self._params.get("frame","")=="no" or self._params.get("fr","")=="no":
+                return WPrintPageFrame().getHTML({"content":body})
+        return WPConferenceBase._applyDecoration(self, body)
+
+    def _getHTMLFooter( self ):
+        if self._params.get("frame","")=="no" or self._params.get("fr","")=="no":
+            return ""
+        return WPConferenceBase._getHTMLFooter(self)
+
     def _getBody(self, params):
         """Return main information about the event."""
 
         if self._view != 'xml':
             vars = self._getVariables(self._conf)
-            vars['getTime'] = lambda date : formatDateTime(date, format='%H:%M')
-            vars['getDate'] = lambda date : formatDateTime(date, format='%Y-%m-%d')
-            vars['formatDuration'] = lambda duration : formatDateTime(datetime(1900,1,1) + duration, format='%H:%M')
-            vars['prettyDate'] = lambda date : formatDateTime(date, format='%A %d %B %Y')
-            vars['extractMinutes'] = lambda materials : self._extractMinutes(materials)
+            vars['getTime'] = lambda date : format_time(date.time())
+            vars['isTime0H0M'] = lambda date : (date.hour, date.minute) == (0,0)
+            vars['getDate'] = lambda date : format_date(date, format='yyyy-MM-dd')
+            vars['prettyDate'] = lambda date : format_date(date, format='full')
             vars['prettyDuration'] = MaKaC.common.utils.prettyDuration
             vars['parseDate'] = MaKaC.common.utils.parseDate
-            vars['formatDate'] = MaKaC.common.utils.formatDate
             vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
-            vars['formatTwoDates'] = MaKaC.common.utils.formatTwoDates
             vars['getMaterialFiles'] = lambda material : self._getMaterialFiles(material)
-            vars['getBookingKind'] = lambda b : self._getBookingKind(b)
             vars['extractInfoForButton'] = lambda item : self._extractInfoForButton(item)
             vars['getItemType'] = lambda item : self._getItemType(item)
             vars['getLocationInfo'] = MaKaC.common.utils.getLocationInfo
@@ -1392,8 +1358,13 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             html = "%s\n%s\n%s" % (errorMessage, infoMessage, body)
         return html
 
-class WPrintPageFrame ( wcomponents.WTemplated ):
+class WPrintPageFrame (wcomponents.WTemplated):
     pass
+
+class WText(wcomponents.WTemplated):
+
+    def __init__(self):
+        wcomponents.WTemplated("events/Text")
 
 class WConfProgramTrack(wcomponents.WTemplated):
 
@@ -10230,7 +10201,7 @@ class WPStaticMeetingBase(WPConferenceStaticDefaultDisplayBase):
         path = Config.getInstance().getStylesheetsDir()
         # if a css file is associated with the XSL stylesheet, then we include it in the header
         styleText = """<link rel="stylesheet" href="%s/css/%s">
-                       <link rel="stylesheet" href="%s/css/common.css">""" % \
+                       <link rel="stylesheet" href="%s/css/events/common.css">""" % \
                     (self.getRootDir(self._target), Config.getInstance().getCssStylesheetName(), self.getRootDir(self._target))
         try:
             if os.path.exists("%s.css" % (os.path.join(path,self._view))):
@@ -10305,8 +10276,8 @@ class WPXSLMeetingStaticDisplay( WPStaticMeetingBase ):
         from MaKaC.accessControl import AccessWrapper
         outGen = outputGenerator(AccessWrapper())
         path = Config.getInstance().getStylesheetsDir()
-        if os.path.exists("%s.xsl" % (os.path.join(path,view))):
-            stylepath = "%s.xsl" % (os.path.join(path,view))
+        stylepath = "%s.xsl" % (os.path.join(path, view))
+        if os.path.exists(stylepath):
             if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
                 includeContribution = 1
             else:

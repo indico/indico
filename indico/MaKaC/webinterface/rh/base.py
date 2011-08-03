@@ -138,7 +138,7 @@ class RequestHandlerBase(OldObservable):
         lang=self._websession.getLang()
         Logger.get('i18n').debug("lang:%s"%lang)
         if lang is None:
-            lang = "en_US"
+            lang = "en_GB"
         from indico.util.i18n import setLocale
         setLocale(lang)
 

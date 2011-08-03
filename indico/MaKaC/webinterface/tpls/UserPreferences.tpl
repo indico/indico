@@ -47,7 +47,7 @@
             req.state.observe(checkState("langStatus"));
         });
     };
-    var languageSelector = new SelectRemoteWidget("user.getLanguages",{},langCallback)
+    var languageSelector = new SelectRemoteWidget("user.getLanguages",{},langCallback);
 
     var tzCallback = function(){
         $E("myTimezone").set(myTimezoneSelector.draw());

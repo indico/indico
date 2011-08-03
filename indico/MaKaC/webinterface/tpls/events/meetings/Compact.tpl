@@ -11,13 +11,13 @@
         _lastDay = getDate(endDate)
     for entry in entries:
         entryDate = getDate(entry.getAdjustedStartDate(timezone))
-        entryTime = getTime(entry.getAdjustedStartDate(timezone))
+        eSD = entry.getAdjustedStartDate(timezone)
         if entryDate >= _firstDay and entryDate <= _lastDay:
             if not daysDict.has_key(entryDate):
                 daysDict[entryDate] = {}
                 daysDict[entryDate]['AM'] = []
                 daysDict[entryDate]['PM'] = []
-            dayDate = 'AM' if entryTime <'13:00' else 'PM'
+            dayDate = 'AM' if eSD.hour < 13 else 'PM'
             daysDict[entryDate][dayDate].append(entry)
     if not daysPerRow:
         numRows = 1
@@ -48,7 +48,7 @@
            ${common.renderUsers(session.getConvenerList(), unformatted=session.getConvenerText(), title=False, italicAffilation=False, separator=' ')}
      </span>
     % endif
-    % if getTime(session.getAdjustedStartDate(timezone)) != '00:00':
+    % if not isTime0H0M(session.getAdjustedStartDate(timezone)):
         (until ${getTime(item.getAdjustedEndDate(timezone))})
     % endif
     % if getLocationInfo(item) != getLocationInfo(item.getOwner()):
@@ -64,25 +64,29 @@
     </td>
     </tr>
     % if len(item.getSchedule().getEntries()) > 0:
+        <% countContribs = 0 %>
         % for subitem in item.getSchedule().getEntries():
                 <%
                     if subitem.__class__.__name__ != 'BreakTimeSchEntry':
                         subitem = subitem.getOwner()
+                    if not subitem.canView(accessWrapper):
+                        continue
                 %>
             % if getItemType(subitem) == "Break":
                 ${printBreak(subitem)}
             % elif getItemType(subitem) == "Contribution":
-                ${printContribution(subitem)}
+                ${printContribution(subitem, countContribs)}
+                <% countContribs += 1 %>
             % endif
         % endfor
     % endif
 </%def>
 
 
-<%def name="printContribution(item)" >
+<%def name="printContribution(item, contribIndex)" >
 
-    <tr bgcolor=${"silver" if item.getConference().getContribOrderSchedule(item) % 2 != 0 else "#D2D2D2"}>
-        <td bgcolor=${"#D0D0D0" if item.getConference().getContribOrderSchedule(item) % 2 != 0 else "#E2E2E2"}  valign="top" width="5%">
+    <tr bgcolor=${"silver" if contribIndex % 2 != 0 else "#D2D2D2"}>
+        <td bgcolor=${"#D0D0D0" if contribIndex % 2 != 0 else "#E2E2E2"}  valign="top" width="5%">
             ${getTime(item.getAdjustedStartDate(timezone))}
         </td>
         <td valign="top">
@@ -187,15 +191,16 @@
                 </tr>
             </table>
         </td>
+        <% countContribs = 0 %>
         % for day in sorted(daysDict.keys()):
             <td valign="top" bgcolor="gray">
                 <table width="100%" cellspacing="1" cellpadding="3" border="0">
-
                     % for item in daysDict[day]['AM']:
                                  % if getItemType(item) == "Session":
                                      ${printSession(item)}
                                  % elif getItemType(item) == "Contribution":
-                                     ${printContribution(item)}
+                                     ${printContribution(item, countContribs)}
+                                     <% countContribs += 1 %>
                                  % elif getItemType(item) == "Break":
                                      ${printBreak(item)}
                                  % endif
@@ -229,7 +234,8 @@
                                  % if getItemType(item) == "Session":
                                      ${printSession(item)}
                                  % elif getItemType(item) == "Contribution":
-                                     ${printContribution(item)}
+                                     ${printContribution(item, countContribs)}
+                                     <% countContribs += 1 %>
                                  % elif getItemType(item) == "Break":
                                      ${printBreak(item)}
                                  % endif

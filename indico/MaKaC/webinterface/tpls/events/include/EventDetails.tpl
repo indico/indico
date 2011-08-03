@@ -47,14 +47,15 @@
         % endfor
         </div>
         % if minutes:
-            % for text in extractMinutes(materials):
+            <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+            % if minutesText:
             <center>
                 <div class="minutesTable">
-                    <h2>Minutes</h2>
-                    <span>${common.renderDescription(text)}</span>
+                    <h2>${_("Minutes")}</h2>
+                    <span>${common.renderDescription(minutesText)}</span>
                 </div>
             </center>
-            % endfor
+            % endif
         % endif
     </td>
 </tr>
@@ -99,9 +100,7 @@
 </tr>
 % endif
 
-<%include file="VideoServices.tpl"/>
-
-<%include file="Chatrooms.tpl"/>
+${pluginDetails}
 
 % if conf.getSupportEmail():
 <tr>

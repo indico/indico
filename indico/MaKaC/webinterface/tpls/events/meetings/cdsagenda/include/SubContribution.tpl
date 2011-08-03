@@ -7,8 +7,8 @@
     <ul>
     <li>
     <span class="headline" style="font-size:x-small;">${item.getTitle()}</span>
-    % if formatDuration(item.getDuration()) != '00:00':
-         <span class="itemDuration">(${prettyDuration(formatDuration(item.getDuration()))})</span>
+    % if item.getDuration():
+         <span class="itemDuration">(${prettyDuration(item.getDuration())})</span>
     % endif
     % if len(item.getReportNumberHolder().listReportNumbers()) != 0:
         (
@@ -29,17 +29,18 @@
         <br/><span class="headerInfo">${common.renderDescription(item.getDescription())}</span>
     % endif
     % if minutes:
-        % for minutesText in extractMinutes(item.getAllMaterialList()):
+        <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+        % if minutesText:
         <br/>
           <table border="1" bgcolor="white" cellpadding="2" align="center">
             <tr>
-              <td align="center"><b>Minutes</b></td>
+              <td align="center" style:"font-weight:bold;">${_("Minutes")}</td>
             </tr>
             <tr>
                 <td><span class="minutes">${minutesText}</span></td>
             </tr>
           </table>
-        % endfor
+        % endif
     % endif
     </li>
     </ul>

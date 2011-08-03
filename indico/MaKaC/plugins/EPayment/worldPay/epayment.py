@@ -104,7 +104,7 @@ class WorldPayMod( BaseEPayMod ):
         self.setTextCallBackSuccess(data.get("APResponse", "epayment"))
         self.setTextCallBackCancelled(data.get("CPResponse", "epayment"))
 
-    def getFormHTML(self,prix,Currency,conf,registrant,lang = "en_US", secure=False):
+    def getFormHTML(self,prix,Currency,conf,registrant,lang = "en_GB", secure=False):
         """build the registration form to be send to worldPay"""
         url_confirm=localUrlHandlers.UHPayConfirmWorldPay.getURL()
         url_cancel_return=localUrlHandlers.UHPayCancelWorldPay.getURL(registrant)

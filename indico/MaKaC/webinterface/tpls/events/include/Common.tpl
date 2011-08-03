@@ -15,7 +15,7 @@
          % endif
     % endif
     % if room:
-        ${'<a href="%s">' % url if url else ''}
+        ${'<a href="%s">' % url or ''}
             <span class="${span}">${room}</span>
         ${'</a>' if url else ''}
         % if location and not parent or getLocationInfo(parent)[0] != location:
@@ -78,10 +78,10 @@
     <% timeFormat = "<strong>%s</strong>" if strong else "%s" %>
     % if getDate(startDate) == getDate(endDate):
         ${prettyDate(startDate)}
-        % if getTime(startDate) != '00:00':
+        % if not isTime0H0M(startDate):
             from ${timeFormat % getTime(startDate)}
         % endif
-        % if getTime(endDate) != '00:00':
+        % if not isTime0H0M(endDate):
             to ${timeFormat % getTime(endDate)}
         % endif
     % else:
@@ -94,8 +94,8 @@
 <%def name="renderEventTime2(startDate, endDate, timezone='')">
     % if getDate(startDate) == getDate(endDate):
         ${prettyDate(startDate)}
-        % if getTime(startDate) != '00:00':
-            - <u>${timeFormat % getTime(startDate)}</u>
+        % if not isTime0H0M(startDate):
+            - <u>${ getTime(startDate)}</u>
         % endif
     % else:
         from ${prettyDate(startDate)} (${getTime(startDate)})
@@ -119,8 +119,8 @@
 <%def name="renderEventTimeCompact(startDate, endDate)">
     % if getDate(startDate) == getDate(endDate):
         ${prettyDate(startDate)}
-        % if getTime(startDate) != '00:00':
-            - <u>${timeFormat % getTime(startDate)}</u>
+        % if not isTime0H0M(startDate):
+            - <u>${ getTime(startDate)}</u>
         % endif
     % else:
         from <b>${prettyDate(startDate)} (${getTime(startDate)})</b>

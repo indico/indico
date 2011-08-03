@@ -445,9 +445,10 @@ def parseDate(dateStr, format='%d/%m/%Y'):
 
 def prettyDuration(duration):
     """Return duration 01:05 in a pretty format 1h05'"""
-    hours, minutes = duration.split(':')
-    if hours != '00':
-        return "%sh%s'" % (hours.replace('0', ''), minutes)
+    hours = duration.seconds/60/60
+    minutes = duration.seconds/60%60
+    if hours:
+        return "%sh%s'" % (hours, minutes)
     else:
         return "%s'" % minutes
 
@@ -686,17 +687,16 @@ class OSSpecific(object):
             'LOCK_SH': None
             }
 
-def getLocationInfo(item):
+def getLocationInfo(item, roomLink=True):
     """Return a tuple (location, room, url) containing
     information about the location of the item."""
-    location = item.getLocation().getName()
-    room = item.getRoom()
-    if room == None:
-        roomName = ''
-    else:
-        roomName = room.getName()
+    location = item.getLocation().getName() if item.getLocation() else ""
+    roomName = item.getRoom().getName() if item.getRoom() else ""
     # TODO check if the following if is required
     if roomName in ['', '0--', 'Select:']:
         roomName = ''
-    url = RoomLinker().getURL(item.getRoom(), item.getLocation())
+    if roomLink:
+        url = RoomLinker().getURL(item.getRoom(), item.getLocation())
+    else:
+        url = ""
     return (location, roomName, url)

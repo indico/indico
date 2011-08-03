@@ -18930,7 +18930,7 @@ msgstr "Changer la thématique"
 #~ "le lieu par défaut dans le module d'administration (Menu principal / "
 #~ "Réservation de salles / Administration)."
 
-#~ msgid "en_US"
+#~ msgid "en_GB"
 #~ msgstr "Anglais"
 
 #~ msgid "Select 'Other room' to type in arbitrary name"

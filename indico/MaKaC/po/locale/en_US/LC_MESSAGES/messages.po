@@ -5521,7 +5521,7 @@ msgid "View category"
 msgstr ""
 
 #: language_list.py:8
-msgid "en_US"
+msgid "en_GB"
 msgstr "English"
 
 #: /home/pferreir/projects/indico/indico-development/code/code/tpls/ConfModifRegForm.tpl:65

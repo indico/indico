@@ -55,9 +55,10 @@
 
         <br/><br/>
         % if self.attr.minutes:
-            % for minutesText in extractMinutes(conf.getAllMaterialList()):
+            <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+            % if minutesText:
                 ${common.renderDescription(minutesText)}
-            % endfor
+            % endif
         % endif
 
         <%block name="printSchedule">

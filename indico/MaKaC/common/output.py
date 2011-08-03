@@ -122,9 +122,7 @@ class outputGenerator(Observable):
 
     def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         # get xml conference
-        start_time_XML = time.time()
         xml = self._getBasicXML(conf, vars, includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate,showContribution)
-        end_time_XML = start_time_HTML = time.time()
         if not os.path.exists(stylesheet):
             self.text = _("Cannot find stylesheet")
         if os.path.basename(stylesheet) == "xml.xsl":
@@ -133,10 +131,6 @@ class outputGenerator(Observable):
             # instanciate the XSL tool
             parser = XSLTransformer(stylesheet)
             self.text = parser.process(xml)
-
-        end_time_HTML = time.time()
-        self.time_XML = end_time_XML - start_time_XML
-        self.time_HTML = end_time_HTML - start_time_HTML
         return self.text
 
 
@@ -156,14 +150,7 @@ class outputGenerator(Observable):
             html = html.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
             html = html.replace(baseURL, baseSecureURL)
             html = html.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
-        if DEVELOPMENT:
-            stat_text = i18nformat("""<br><br><font size="-2">_("XML creation"): %s<br>_("HTML creation"): %s</font>""") % (self.time_XML,self.time_HTML)
-        else:
-            stat_text = ""
-        if (re.search("xml.xsl$",stylesheet) or re.search("text.xsl$",stylesheet) or re.search("jacow.xsl$",stylesheet)) and vars.get("frame","") != "no":
-            return "<pre>%s</pre>" % html.replace("<","&lt;") + stat_text
-        else:
-            return html + stat_text
+        return html
 
     def _getBasicXML(self, conf, vars,includeSession,includeContribution,includeSubContribution,includeMaterial,showSession="all",showDate="all",showContribution="all", showSubContribution="all", out=None):
         if not out:

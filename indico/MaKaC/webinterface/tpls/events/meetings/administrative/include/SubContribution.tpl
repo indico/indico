@@ -13,9 +13,10 @@
                 <td class="itemTopAlign">
                     <span class="subItemText">${item.getTitle()}</span>
                     % if minutes:
-                        % for minutesText in extractMinutes(item.getAllMaterialList()):
+                        <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+                        % if minutesText:
                             ${common.renderDescription(minutesText)}
-                        % endfor
+                        % endif
                     % endif
                 </td>
             </tr>

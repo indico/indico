@@ -81,7 +81,7 @@ class YellowPayMod(BaseEPayMod):
         self._hashSeed  =  hashSeed
 
 
-    def getFormHTML(self,prix,Currency,conf,registrant,lang = "en_US", secure=False):
+    def getFormHTML(self,prix,Currency,conf,registrant,lang = "en_GB", secure=False):
         l=[]
         l.append("%s=%s"%("confId",conf.getId()))
         l.append("%s=%s"%("registrantId",registrant.getId()))

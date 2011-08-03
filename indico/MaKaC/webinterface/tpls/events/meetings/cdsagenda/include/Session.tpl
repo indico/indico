@@ -17,7 +17,7 @@
     </span>
     <span class="headerInfo">
     (${getTime(item.getAdjustedStartDate(timezone))}
-    % if (checkEndTime and getTime(item.getAdjustedEndDate(timezone))!='00:00') or not checkEndTime:
+    % if (checkEndTime and not isTime0H0M(item.getAdjustedEndDate(timezone))) or not checkEndTime:
     ->${getTime(item.getAdjustedEndDate(timezone))}
     % endif
     )
@@ -96,6 +96,8 @@
         <%
            if subitem.__class__.__name__ != 'BreakTimeSchEntry':
                subitem = subitem.getOwner()
+               if not subitem.canView(accessWrapper):
+                    continue
         %>
         <%include file="${getItemType(subitem)}.tpl"
             args="item=subitem, parent=item, minutes=minutes, olist=olist, order=order"/>

@@ -22,8 +22,8 @@
     <tr>
       <td valign="top" align="left">
         <span class="headline">${item.getTitle()}</span>
-        % if formatDuration(item.getDuration()) != '00:00':
-             <span class="itemDuration"> (${prettyDuration(formatDuration(item.getDuration()))}) </span>
+        % if item.getDuration():
+             <span class="itemDuration"> (${prettyDuration(item.getDuration())}) </span>
         % endif
         % if len(item.getReportNumberHolder().listReportNumbers()) != 0:
             (
@@ -60,12 +60,13 @@
     </tr>
     % endif
     % if minutes:
-        % for minutesText in extractMinutes(item.getAllMaterialList()):
+        <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+        % if minutesText:
         <tr>
         <td align="center" style="padding-top:10px;padding-bottom:10px" colspan="2">
           <table border="1" bgcolor="white" cellpadding="2" align="center" width="100%">
             <tr>
-              <td align="center" style:"font-weight:bold;">Minutes</td>
+              <td align="center" style:"font-weight:bold;">${_("Minutes")}</td>
             </tr>
             <tr>
                 <td>${common.renderDescription(minutesText)}</td>
@@ -73,7 +74,7 @@
           </table>
         </td>
         </tr>
-        % endfor
+        % endif
     % endif
     % if item.getSubContributionList():
         % for subcont in item.getSubContributionList():

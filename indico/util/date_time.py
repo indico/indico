@@ -23,6 +23,8 @@ import time, pytz, calendar
 from MaKaC.common.timezoneUtils import nowutc
 from indico.util.i18n import currentLocale
 from babel.dates import format_datetime as _format_datetime
+from babel.dates import format_time as _format_time
+from babel.dates import format_date as _format_date
 
 
 def utc_timestamp(datetimeVal):
@@ -38,6 +40,23 @@ def format_datetime(dt, format='medium', locale=None, timezone=None):
 
     return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
+def format_date(d, format='medium', locale=None):
+    """
+    Basically a wrapper around Babel's own format_date
+    """
+    if not locale:
+        locale = currentLocale()
+
+    return _format_date(d, format=format, locale=locale).encode('utf-8')
+
+def format_time(t, format='short', locale=None, timezone=None):
+    """
+    Basically a wrapper around Babel's own format_time
+    """
+    if not locale:
+        locale = currentLocale()
+
+    return _format_time(t, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
 now_utc = nowutc
 

@@ -425,12 +425,13 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
                 else:
                     p = conferences.WPInternalPageDisplay(self,self._target, self._page)
         elif view in styleMgr.getXSLStyles():
+            if not isLibxml:
+                warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"
+            self._req.content_type = "text/xml"
             p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
-        elif view != "static" and isLibxml:
+        elif view != "static":
             p = conferences.WPTPLConferenceDisplay( self, self._target, view, type, self._reqParams )
         else:
-            if view != "static":
-                warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"
             if wf != None:
                 p = wf.getConferenceDisplayPage( self, self._target, self._reqParams )
             else:
@@ -471,9 +472,9 @@ class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
                 view =styleMgr.getDefaultStyleForEventType( type )
                 displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
         # create the html factory
-        if view in styleMgr.getXSLStyles():
+        if view in styleMgr.getXSLStyles() and isLibxml:
             p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
-        elif view != "static" and isLibxml:
+        elif view != "static":
             p = conferences.WPTPLConferenceDisplay( self, self._target, view, type, self._reqParams )
         else:
             p = conferences.WPMeetingTimeTable( self, self._target,"parallel","meeting",self._reqParams )
@@ -1159,7 +1160,7 @@ class RHConferenceToiCal(RHConferenceBaseDisplay):
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
-class RHConferenceToXML(RHConferenceBaseDisplay):
+class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
@@ -1168,24 +1169,14 @@ class RHConferenceToXML(RHConferenceBaseDisplay):
     def _process( self ):
         filename = "%s - Event.xml"%cleanHTMLHeaderFilename(self._target.getTitle())
         from MaKaC.common.xmlGen import XMLGen
-        from MaKaC.common.output import outputGenerator, XSLTransformer
+        from MaKaC.common.output import outputGenerator
         xmlgen = XMLGen()
         xmlgen.initXml()
         outgen = outputGenerator(self.getAW(), xmlgen)
         xmlgen.openTag("event")
         outgen.confToXML(self._target.getConference(),0,0,1)
         xmlgen.closeTag("event")
-        basexml = xmlgen.getXml()
-        path = Config.getInstance().getStylesheetsDir()
-        stylepath = "%s.xsl" % (os.path.join(path,self._xmltype))
-        if self._xmltype != "standard" and os.path.exists(stylepath):
-            try:
-                parser = XSLTransformer(stylepath)
-                data = parser.process(basexml)
-            except:
-                data = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
-        else:
-            data = basexml
+        data = xmlgen.getXml()
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )

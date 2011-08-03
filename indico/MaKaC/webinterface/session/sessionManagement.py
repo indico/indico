@@ -94,7 +94,7 @@ class PSession( base.Session, Persistent ):
             try:
                 lang=self.user.getLang()
             except:
-                lang="en_US"
+                lang="en_GB"
                 Logger.get('i18n').debug('No user language defined. Using %s as default.' % lang)
             self._lang = lang
 

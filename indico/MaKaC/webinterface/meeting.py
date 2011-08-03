@@ -474,7 +474,7 @@ class WPMContributionDisplay(contributions.WPContributionDisplay):
                     <table border="0" cellpadding="0" cellspacing="0"
                                 align="center" valign="top" width="95%%">
                         <tr>
-                            <td class="formTitle" width="100%%"> _("Contribution View") - %s</td>
+                            <td class="formTitle" width="100%%">%s</td>
                         </tr>
                         <tr>
                             <td align="left" valign="middle" width="100%%">

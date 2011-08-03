@@ -9,16 +9,16 @@
         <div id="collShowBookingsDiv">
             <span class="collShowHideBookingsText">
                 <%
-                moreOngoing = sum(1 for b in bookings[pos + 1:] if getBookingKind(b) == 'ongoing')
-                moreScheduled = sum(1 for b in bookings[pos + 1:] if getBookingKind(b) == 'scheduled')
+                moreOngoing = sum(1 for b in bookings[pos + 1:] if getBookingType(b) == 'ongoing')
+                moreScheduled = sum(1 for b in bookings[pos + 1:] if getBookingType(b) == 'scheduled')
                 %>
                 There are
-                % if getBookingKind(booking) == 'ongoing':
+                % if getBookingType(booking) == 'ongoing':
                     ${ 1 + moreOngoing } more ongoing bookings
                     % if moreScheduled > 0:
                         and ${moreScheduled} more scheduled bookings.
                     % endif
-                % elif getBookingKind(booking) == 'scheduled':
+                % elif getBookingType(booking) == 'scheduled':
                     ${ 1 + moreScheduled } more scheduled bookings.
                 % endif
             </span>
@@ -36,7 +36,7 @@
     <div class="collaborationDisplayBookingLine">
     <span class="collaborationDisplayBookingType">${data.getDisplayName()}</span>\
     % if booking.hasStartDate():
-        ${getBookingKind(booking)}
+        ${getBookingType(booking)}
         ${formatTwoDates(booking.getAdjustedStartDate(timezone),
                          booking.getAdjustedEndDate(timezone),
                          useToday=True, useTomorrow=True, dayFormat='%a %d/%m', capitalize=False)}\

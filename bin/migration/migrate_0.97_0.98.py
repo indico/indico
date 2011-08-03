@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.user import AvatarHolder
 
 """
 Migration script: v0.97 -> v0.98
@@ -262,6 +263,13 @@ def runRoomBlockingInit(dbi, withRBDB):
         root['RoomBlocking']['Indexes']['DayBlockings'] = CalendarDayIndex()
         root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
 
+def runLangToGB(dbi, withRBDB):
+    avatars = AvatarHolder().getList()
+    for av in avatars:
+        if av.getLang() == "en_US":
+            av.setLang("en_GB")
+    dbi.commit()
+
 def runMigration(withRBDB=False):
 
 
@@ -272,7 +280,8 @@ def runMigration(withRBDB=False):
               runCategoryConfDictToTreeSet,
               runCategoryDateIndexMigration,
               runCatalogMigration,
-              runRoomBlockingInit]
+              runRoomBlockingInit,
+              runLangToGB]
 
     print "\nExecuting migration...\n"
 

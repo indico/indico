@@ -10,8 +10,10 @@
 var ttdata = ${ str(ttdata) };
 var eventInfo = ${ eventInfo };
 
+var minWidth = 900;
+var widthOffset = 300;
 var historyBroker = new BrowserHistoryBroker();
-var timetable = new SessionManagementTimeTable(ttdata, eventInfo, 900,$E('timetableDiv'),historyBroker);
+var timetable = new SessionManagementTimeTable(ttdata, eventInfo, document.body.clientWidth - widthOffset < minWidth ? minWidth : document.body.clientWidth - widthOffset,$E('timetableDiv'),historyBroker);
 
 IndicoUI.executeOnLoad(function(){
 
