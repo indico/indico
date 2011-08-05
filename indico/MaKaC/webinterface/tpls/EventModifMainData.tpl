@@ -244,9 +244,13 @@ $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', $
     ${ macros.genericField(macros.FIELD_TEXT, 'inPlaceEditOrganiserText', 'event.main.changeOrganiserText', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh) }
 % endif
 
-<%  from MaKaC.common import info %>
+<%
+from MaKaC.common import info
+styleOptions = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStyleDictForEventType(confObj.getType())
+styleOptions = dict(map(lambda k: (k, styleOptions[k][0]), styleOptions))
+%>
 
-${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStyleDictForEventType(confObj.getType()), orderOptionsBy = "value") }
+${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=styleOptions, orderOptionsBy = "value") }
 
 ${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditVisibility', 'event.main.changeVisibility', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=visibilityList, orderOptionsBy = "key") }
 
