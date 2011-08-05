@@ -47,7 +47,7 @@ class SchedulerApp(object):
                                   config.getSupportEmail(),
                                   "[indico_scheduler] Problem at %s" % worker)
 
-        self.mailer.setLevel(logging.WARNING)
+        self.mailer.setLevel(logging.ERROR)
 
     def run(self):
         root_logger = logging.getLogger('')

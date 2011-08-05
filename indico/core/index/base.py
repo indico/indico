@@ -88,7 +88,7 @@ class SIndex(Index):
         if obj in vset:
             raise InconsistentIndexException("%s already in fwd[%s]", (obj, value))
         else:
-            vset.add(obj)
+            vset.insert(obj)
             self._num_objs.change(1)
 
         self._fwd_index[value] = vset
@@ -186,7 +186,7 @@ class DIndex(SIndex):
         if value in ts:
             raise ElementAlreadyInIndexException((value, obj))
         else:
-            ts.add(value)
+            ts.insert(value)
 
         self._rev_index[uid] = ts
 

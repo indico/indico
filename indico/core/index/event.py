@@ -30,21 +30,27 @@ class CategoryEventStartDateIndex(Index):
         self._container = OOBTree()
 
     def __getitem__(self, key):
-        return self.getCategory[key]
+        return self._container[key]
 
     def __setitem__(self, key, value):
         self._container[key] = value
 
-    def getCategory(self, categId):
+    def getCategory(self, categId, create=False):
         if categId not in self._container:
-            self._container[categId] =  IOIndex(IIndexableByStartDateTime)
+            if create:
+                self._container[categId] =  IOIndex(IIndexableByStartDateTime)
+            else:
+                raise KeyError(categId)
         return self._container[categId]
 
     def index_obj(self, obj):
-        self.getCategory(obj.getOwner().getId()).index_obj(obj)
+        self.getCategory(obj.getOwner().getId(), create=True).index_obj(obj)
 
     def unindex_obj(self, obj):
         self.getCategory(obj.getOwner().getId()).unindex_obj(obj)
+
+    def remove_category(self, categId):
+        del self._container[categId]
 
     def _initializeSubIndex(self, cset):
         tsIndex = IOIndex(IIndexableByStartDateTime)

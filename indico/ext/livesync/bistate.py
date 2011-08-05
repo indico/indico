@@ -182,7 +182,7 @@ class BistateBatchUploaderAgent(PushSyncAgent):
             deleted = operation & STATUS_DELETED
             try:
                 if record.getOwner() or recId:
-                    # caching is disabled because ACL changes do not triggered
+                    # caching is disabled because ACL changes do not trigger
                     # notifyModification, and consequently can be classified as a hit
                     # even if they were changed
                     # TODO: change overrideCache to False when this problem is solved

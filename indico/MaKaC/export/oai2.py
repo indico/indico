@@ -61,14 +61,6 @@ class DataInt:
         #self._info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._outGen = outputGenerator(self.OAIuser, self._XMLGen, dataInt=self)
 
-        self.namespace               = self._config.getOAINamespace()
-        self.iconfNamespace          = self._config.getIconfNamespace()
-        self.iconfXSD                = self._config.getIconfXSD()
-        self.oai_marcXSD             = self._config.getBaseURL() + "/oai_marc.xsd"
-        self.repositoryName          = self._config.getRepositoryName()
-        #self.supportemail            = self._info.getSupportEmail()
-        self.repositoryIdentifier    = self._config.getRepositoryIdentifier()
-
     def setPermissionsOf(self, avatar):
         """
         Defines that this interface will have access to contents that

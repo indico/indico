@@ -205,6 +205,29 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
 
     },
 
+    _parentText: function(args) {
+        var text = null;
+
+        if (args.subContId) {
+            text = $T("Inherit from parent Subcontribution");
+        } else if (args.contribId) {
+            text = $T("Inherit from parent Contribution");
+        } else if (args.sessionId) {
+            text = $T("Inherit from parent Session");
+        } else if (args.confId) {
+            text = $T("Inherit from parent Conference");
+        } else if (args.categId) {
+            text = $T("Inherit from parent Category");
+        }
+
+        text = Html.span({}, text, " ",
+                         Html.unescaped.span({className: args.parentProtected ? 'strongProtPrivate' : 'strongProtPublic', style: {fontStyle: 'italic'}}," ",
+                                   Protection.ParentRestrictionMessages[args.parentProtected?1:-1]));
+
+        return text;
+    },
+
+
     _findTypeName: function(id) {
         for (var i in this.types) {
             if (this.types[i][0] == id) {
@@ -243,7 +266,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
 
 
             selector = new RadioFieldWidget([
-                ['inherit', Html.span({className: protection == -1 ? 'strongProtPublic' : 'strongProtPrivate'}, $T("Same as for the parent material type ")+"\""+entry.get('title')+"\" ", inheritanceText)],
+                ['inherit', Html.span({className: protection == -1 ? 'strongProtPublic' : 'strongProtPrivate'}, $T("Inherit from parent material type ")+"\""+entry.get('title')+"\" ", inheritanceText)],
                 ['private', Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
                 ['public', Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
