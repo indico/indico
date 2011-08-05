@@ -30,6 +30,7 @@ from MaKaC.webinterface.rh.admins import RCAdmin, RHAdminBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 
+
 class RCCollaborationAdmin(object):
     @staticmethod
     def hasRights(request = None, user = None):

@@ -86,14 +86,6 @@ class SendElectronicAgreement(ConferenceModifBase):
 
         return self.content.format(url=url, name= speakerWrapper.getObject().getDirectFullName())
 
-        #cont = self._conf.getContributionById(speakerWrapper.getContId())
-        #=======================================================================
-        # newContent.replace("[contTitle]","%s"%cont.getTitle())
-        # newContent.replace("[contDate]", "%s"%formatTwoDates(cont.getStartDate(), cont.getEndDate(), tz = cont.getTimezone(), showWeek = True))
-        # newContent.replace("[contRoom]", "%s"%cont.getRoom())
-        #=======================================================================
-        #return newContent
-
     def _getAnswer(self):
         report = ""
         i = 0

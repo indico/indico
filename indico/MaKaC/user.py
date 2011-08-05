@@ -2022,6 +2022,3 @@ class PersonalBasket(Persistent):
 
     def getUsers(self):
         return self._users
-
-
-

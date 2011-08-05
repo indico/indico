@@ -2,7 +2,7 @@
 <div style="margin-bottom: 1em;">
     <span class="RRNoteTitle">${_("Warning:")}</span>
     <span class="RRNoteText">
-        ${ _("We will need to know the location and room before we can record the event.") }<br />
+        ${ "We will need to know the location and room before we can record the event." | _}<br />
         ${ _("Please go to the") } <a href="${ urlHandlers.UHConferenceModification.getURL(Conference)}"> ${ _("General Settings") }</a> ${ _("and enter the location and room for this Indico event.")}
     </span>
 </div>
@@ -63,9 +63,8 @@
 % endif
     <div class="RRFormSubsection">
         <span class="RRQuestion">
-            ${ _('Once your request accepted, all speakers will need to sign an electronic agreement.')}<br/>
-            ${ _('For more details about how to do so, please go ') }
-           <a href="${ linkToEA }">${ _('here')}</a>.
+            ${ 'Once your request has been accepted, all speakers will need to sign an electronic agreement.' | _}<br/>
+            ${ _('For more details about how to do so, please go <a href="%s">here</a>') % linkToEA}
         </span>
         <br/>
     </div>
@@ -75,11 +74,12 @@
 <div class="RRFormSection">
     <!-- SLIDES? CHALKBOARD? -->
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('Will slides and/or chalkboards be used?') }</span>
+        <span class="RRQuestion">${ 'Will slides and/or chalkboards be used?' | _ }</span>
         <br />
         <select name="lectureOptions" id="lectureOptions">
-            <option value="chooseOne">-- ${ _('Choose one') } --</option>
+            <option value="chooseOne">-- ${ 'Choose one' | _ } --</option>
             % for value, text in LectureOptions:
+            <% from indico.util.contextManager import ContextManager %>
             <option value="${value}">${text}</option>
             % endfor
         </select>
@@ -87,10 +87,10 @@
 
     <!-- WHAT TYPE OF TALK IS IT -->
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('What type of event is it?') }</span>
+        <span class="RRQuestion">${ 'What type of event is it?' | _ }</span>
         <br />
         <select name="lectureStyle" id="lectureStyle">
-            <option value="chooseOne">-- ${ _('Choose one') } --</option>
+            <option value="chooseOne">-- ${ 'Choose one' | _ } --</option>
             % for value, text in TypesOfEvents:
             <option value="${value}">${text}</option>
             % endfor
@@ -99,7 +99,7 @@
 
     <!-- HOW URGENTLY IS POSTING NEEDED -->
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('How urgently do you need to have the recordings posted online?') }</span>
+        <span class="RRQuestion">${ 'How urgently do you need to have the recordings posted online?' | _ }</span>
         <br />
         <select name="postingUrgency" id="postingUrgency">
             % for value, text in PostingUrgency:
@@ -108,21 +108,21 @@
             % else:
                 <% selectedText = "" %>
             % endif
-            <option value="${value}" ${selectedText }>${text}</option>
+            <option value="${value}" ${selectedText}>${text}</option>
             % endfor
         </select>
     </div>
 
     <!-- HOW MANY REMOTE VIEWERS -->
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('How many people do you expect to view the online recordings afterward?') }</span>
+        <span class="RRQuestion">${ 'How many people do you expect to view the online recordings afterward?' | _ }</span>
         <br />
         <input type="text" size="20" name="numRemoteViewers" value="" />
     </div>
 
     <!-- HOW MANY ATTENDEES -->
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('How many people do you expect to attend the event in person?') }</span>
+        <span class="RRQuestion">${ 'How many people do you expect to attend the event in person?' | _ }</span>
         <br />
         <input type="text" size="20" name="numAttendees" value="" />
     </div>
@@ -133,7 +133,7 @@
 <div class="RRFormSection">
     <!-- PURPOSE OF RECORDING -->
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('Why do you need this event recorded? (check all that apply)') }</span>
+        <span class="RRQuestion">${ 'Why do you need this event recorded? (check all that apply)' | _ }</span>
         <ul class="RROptionList">
             % for value, text in RecordingPurpose:
             <li>
@@ -145,7 +145,7 @@
     </div>
     <!-- EXPECTED AUDIENCE -->
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('Who is the intended audience? (check all that apply)') }</span>
+        <span class="RRQuestion">${ 'Who is the intended audience? (check all that apply)' | _ }</span>
         <ul class="RROptionList">
             % for value, text in IntendedAudience:
             <li>
@@ -157,7 +157,7 @@
     </div>
     <!-- SUBJECT MATTER -->
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('What is the subject matter? (check all that apply)') }</span>
+        <span class="RRQuestion">${ 'What is the subject matter? (check all that apply)' | _ }</span>
         <ul class="RROptionList">
             % for value, text in SubjectMatter:
             <li>
@@ -172,7 +172,7 @@
 <!-- SECTION 4: Extra comments -->
 <div class="RRFormSection">
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('Please write here any other comments or instructions you may have:') }</span>
+        <span class="RRQuestion">${ 'Please write here any other comments or instructions you may have:' | _ }</span>
         <textarea rows="10" cols="60" name="otherComments" style="display:block;"></textarea>
     </div>
 </div>
@@ -180,11 +180,11 @@
 % if IsSingleBooking:
 <div style="margin-top: 1em;">
     <div id="sendRecordingRequestBottom" style="display:none;">
-        <button onclick="send('RecordingRequest')">${ _('Send request') }</button>
+        <button onclick="send('RecordingRequest')">${ 'Send request' | _ }</button>
         ${inlineContextHelp(_('Send the Request to the Recording administrators.'))}
     </div>
     <div id="modifyRecordingRequestBottom" style="display:none;">
-        <button onclick="send('RecordingRequest')">${ _('Modify request') }</button>
+        <button onclick="send('RecordingRequest')">${ 'Modify request' | _ }</button>
         ${inlineContextHelp(_('Modify the Recording Request.'))}
     </div>
     <div id="withdrawRecordingRequestBottom" style="display:none;">

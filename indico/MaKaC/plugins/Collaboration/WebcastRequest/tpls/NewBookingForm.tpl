@@ -183,9 +183,8 @@
     <div class="WRFormSection">
         <div class="WRFormSubsection">
         <span class="WRQuestion">
-            ${ _('Once your request accepted, all speakers will need to sign an electronic agreement.')}<br/>
-            ${ _('For more details about how to do so, please go ') }
-            <a href="${ linkToEA }">${ _('here')}</a>.
+            ${ 'Once your request has been accepted, all speakers will need to sign an electronic agreement.' | _}<br/>
+            ${ _('For more details about how to do so, please go <a href="%s">here</a>') % linkToEA}
         </span>
         <br/>
         </div>

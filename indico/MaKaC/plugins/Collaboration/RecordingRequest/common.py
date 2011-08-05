@@ -25,56 +25,58 @@ from MaKaC.conference import Contribution
 from MaKaC.common.fossilize import fossilizes
 from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IRecordingRequestErrorFossil
 
+from indico.util.i18n import L_
+
 lectureOptions = [
-    ("none", "None"),
-    ("slides", "Slides"),
-    ("chalkboard", "Chalkboard"),
-    ("slidesAndChalkboard" , "Slides and Chalkboard")
+    ("none", L_("None")),
+    ("slides", L_("Slides")),
+    ("chalkboard", L_("Chalkboard")),
+    ("slidesAndChalkboard" , L_("Slides and Chalkboard"))
 ]
 
 typeOfEvents = [
-    ("lecturePresentation" , "Lecture / Presentation"),
-    ("courseTutorial", "Course / Tutorial"),
-    ("panelDiscussion" , "Panel discussion"),
-    ("noAudience", "Remote teaching or candidate interview")
+    ("lecturePresentation" , L_("Lecture / Presentation")),
+    ("courseTutorial", L_("Course / Tutorial")),
+    ("panelDiscussion" , L_("Panel discussion")),
+    ("noAudience", L_("Remote teaching or candidate interview"))
 ]
 
 postingUrgency = [
-    ("withinHours" , "Within hours"),
-    ("withinDay" , "Within a day"),
-    ("withinWeek" , "Within a week")
+    ("withinHours" , L_("Within hours")),
+    ("withinDay" , L_("Within a day")),
+    ("withinWeek" , L_("Within a week"))
 ]
 
 recordingPurpose = [
-    ("historicPreservation" , "Preservation of a historically valuable talk"),
-    ("remoteParticipants" , "Dissemination to participants unable to attend in person"),
-    ("trainingCourse" , "Training course"),
-    ("candidateInterview" , "Candidate interview"),
-    ("remoteTeaching" , "Remote teaching"),
-    ("savingTravel" , "Saving money on travel"),
-    ("publicOutreach" , "Public outreach")
+    ("historicPreservation" , L_("Preservation of a historically valuable talk")),
+    ("remoteParticipants" , L_("Dissemination to participants unable to attend in person")),
+    ("trainingCourse" , L_("Training course")),
+    ("candidateInterview" , L_("Candidate interview")),
+    ("remoteTeaching" , L_("Remote teaching")),
+    ("savingTravel" , L_("Saving money on travel")),
+    ("publicOutreach" , L_("Public outreach"))
 ]
 
 intendedAudience = [
-    ("collaborationMembers" , "Members of a particular collaboration or experiment"),
-    ("groupMembers" , "Members of a particular section or group"),
-    ("studentsGrad" , "Graduate students"),
-    ("studentsUndergrad" , "Undergraduate students"),
-    ("studentsHighSchool" , "High school students"),
-    ("studentsElementary" , "Elementary school students"),
-    ("CERNUsers" , "CERN users"),
-    ("CERNStaff" , "CERN staff"),
-    ("technicalPersonnel" , "Technical personnel"),
-    ("teachersHighSchool" , "High school teachers"),
-    ("generalPublic" , "General public")
+    ("collaborationMembers" , L_("Members of a particular collaboration or experiment")),
+    ("groupMembers" , L_("Members of a particular section or group")),
+    ("studentsGrad" , L_("Graduate students")),
+    ("studentsUndergrad" , L_("Undergraduate students")),
+    ("studentsHighSchool" , L_("High school students")),
+    ("studentsElementary" , L_("Elementary school students")),
+    ("CERNUsers" , L_("CERN users")),
+    ("CERNStaff" , L_("CERN staff")),
+    ("technicalPersonnel" , L_("Technical personnel")),
+    ("teachersHighSchool" , L_("High school teachers")),
+    ("generalPublic" , L_("General public"))
 ]
 
 subjectMatter = [
-    ("physics" , "Physics"),
-    ("computerScience" , "Computer Science"),
-    ("engineering" , "Engineering"),
-    ("safety" , "Safety"),
-    ("techTraining" , "Technical Training")
+    ("physics" , L_("Physics")),
+    ("computerScience" , L_("Computer Science")),
+    ("engineering" , L_("Engineering")),
+    ("safety" , L_("Safety")),
+    ("techTraining" , L_("Technical Training"))
 ]
 
 def getTalks(conference, oneIsEnough = False, sort = False):

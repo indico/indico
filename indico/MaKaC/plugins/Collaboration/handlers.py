@@ -38,9 +38,8 @@ from MaKaC.errors import MaKaCError
 from MaKaC.conference import LocalFile
 import MaKaC.webinterface.displayMgr as displayMgr
 
-AGREEMENTPATH = "/home/gcerto/Desktop/EAForms"
 
-class RHCollaborationElectronicAgreement(RHConfModifCSBookings):
+class RHElectronicAgreement(RHConfModifCSBookings):
     _url = r'^/Collaboration/elecAgree/?$'
 
     def _checkParams(self, params):
@@ -108,10 +107,10 @@ class RHCollaborationElectronicAgreement(RHConfModifCSBookings):
         if self._cannotViewTab:
             raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
         else:
-            p = WPCollaborationElectronicAgreement(self, self._conf)
+            p = WPElectronicAgreement(self, self._conf)
             return p.display(sortCriteria = self.sortCriteria, order = self.order)
 
-class RHCollaborationElectronicAgreementGetFile(RHConferenceBaseDisplay):
+class RHElectronicAgreementGetFile(RHConferenceBaseDisplay):
     _url = r'^/Collaboration/getPaperAgree/?$'
 
     def _checkParams(self, params):
@@ -145,7 +144,7 @@ class RHCollaborationElectronicAgreementGetFile(RHConferenceBaseDisplay):
         else:
             raise MaKaCError("The speaker wrapper id does not match any existing speaker.")
 
-class RHCollaborationElectronicAgreementForm(RHConferenceBaseDisplay):
+class RHElectronicAgreementForm(RHConferenceBaseDisplay):
     _url = r'^/Collaboration/elecAgreeForm/?$'
 
     def _checkParams(self, params):
@@ -158,16 +157,17 @@ class RHCollaborationElectronicAgreementForm(RHConferenceBaseDisplay):
     def wpEvaluation(self):
         wf = self.getWebFactory()
         if wf !=None: # Event: Meeting/Lecture
-            return WPCollaborationElectronicAgreementForm(self, self._conf, self.authKey).display()
+            return WPElectronicAgreementForm(self, self._conf, self.authKey).display()
         else:# Event: Conference
-            return WPCollaborationElectronicAgreementFormConference(self, self._conf, self.authKey).display()
+            return WPElectronicAgreementFormConference(self, self._conf, self.authKey).display()
+
 
 class RHCollaborationHtdocs(RHHtdocs):
     """
     Static file handler for Collaboration plugin
     """
 
-    _url = r"^/Collaboration/?(?P<plugin>.*?)/(?P<filepath>.*)$"
+    _url = r"^/Collaboration/(?:(?P<plugin>[^\s/]+)/)?(?P<filepath>[^\s/]+)$"
 
     @classmethod
     def calculatePath(cls, plugin, filepath):

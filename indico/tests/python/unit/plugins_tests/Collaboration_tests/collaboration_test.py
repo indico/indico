@@ -34,7 +34,7 @@ from MaKaC.common import Config
 from util import TestZEOServer
 
 import math
-#import profile
+import profile
 import time
 import logging
 import traceback
@@ -76,7 +76,7 @@ import os, signal
 config = Config.getInstance()
 
 #system and DB paths / configuration
-testingDbfile = '/home/gcerto/indico/tmp/data.fs'
+testingDbfile = '/tmp/data.fs'
 collaborationDbFile = os.path.join(config.getUploadedFilesTempDir(), 'CollaborationTests-Data.fs')
 zeoPort = 9685
 
@@ -296,7 +296,7 @@ class TestResponsiveness(unittest.TestCase):
             self.average, self.deviation, self.caverage, self.cdeviation = processResults(times)
 
         if doProfile:
-            pass#profile.runctx("executeAddBookingTest()", {}, {'executeAddBookingTest' : executeAddBookingTest}, 'addBooking.prof')
+            profile.runctx("executeAddBookingTest()", {}, {'executeAddBookingTest' : executeAddBookingTest}, 'addBooking.prof')
         else:
             exec "executeAddBookingTest()" in {}, {'executeAddBookingTest' : executeAddBookingTest}
 
@@ -341,7 +341,7 @@ class TestResponsiveness(unittest.TestCase):
             self.average, self.deviation, self.caverage, self.cdeviation = processResults(times)
 
         if doProfile:
-            pass#profile.runctx("executeRemoveBookingTest()", {}, {'executeRemoveBookingTest' : executeRemoveBookingTest}, 'removeBooking.prof')
+            profile.runctx("executeRemoveBookingTest()", {}, {'executeRemoveBookingTest' : executeRemoveBookingTest}, 'removeBooking.prof')
         else:
             exec "executeRemoveBookingTest()" in {}, {'executeRemoveBookingTest' : executeRemoveBookingTest}
 
@@ -408,7 +408,7 @@ class TestResponsiveness(unittest.TestCase):
             self.average, self.deviation, self.caverage, self.cdeviation = processResults(times)
 
         if doProfile:
-            pass#profile.runctx("executeRemoveConfTest()", {}, {'executeRemoveConfTest' : executeRemoveConfTest}, 'removeConference.prof')
+            profile.runctx("executeRemoveConfTest()", {}, {'executeRemoveConfTest' : executeRemoveConfTest}, 'removeConference.prof')
         else:
             exec "executeRemoveConfTest()" in {}, {'executeRemoveConfTest' : executeRemoveConfTest}
 
@@ -435,7 +435,7 @@ class TestResponsiveness(unittest.TestCase):
             self.average, self.deviation, self.caverage, self.cdeviation = processResults(times)
 
         if doProfile:
-            pass#profile.runctx("executeIndexQueryTest()", {}, {'executeIndexQueryTest' : executeIndexQueryTest}, 'indexQuery.prof')
+            profile.runctx("executeIndexQueryTest()", {}, {'executeIndexQueryTest' : executeIndexQueryTest}, 'indexQuery.prof')
         else:
             exec "executeIndexQueryTest()" in {}, {'executeIndexQueryTest' : executeIndexQueryTest}
 

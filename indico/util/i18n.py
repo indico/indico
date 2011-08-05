@@ -36,7 +36,7 @@ try:
     _ = ugettext = gettext = lazyTranslations.ugettext
     ngettext = ungettext = lazyTranslations.ungettext
 
-    gettext_lazy = forceLazyTranslations.ugettext
+    L_ = gettext_lazy = forceLazyTranslations.ugettext
 
 except ImportError:
     # no Babel

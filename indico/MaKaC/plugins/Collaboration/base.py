@@ -40,13 +40,15 @@ from MaKaC.plugins.Collaboration import mail
 from MaKaC.common.mail import GenericMailer
 import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
-from MaKaC.i18n import _
+from indico.util.i18n import gettext_lazy
+from indico.util.date_time import now_utc
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil, ICSSanitizationErrorFossil,\
     ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil,\
     ISpeakerWrapperBaseFossil
+
 
 class CSBookingManager(Persistent, Observer):
     """ Class for managing the bookins of a meeting.
@@ -282,7 +284,7 @@ class CSBookingManager(Persistent, Observer):
                 CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
                 return modifyResult
             else:
-                modificationDate = nowutc()
+                modificationDate = now_utc()
                 booking.setModificationDate(modificationDate)
 
                 if booking.isHidden():
@@ -699,78 +701,65 @@ class CSBookingManager(Persistent, Observer):
                                 if an element is present in 'both', it will be deleted from
                                 'recording and 'webcast'
 
-            returns dict = { 'recording': {}, 'webcast' : {}, 'both': {} }
+            returns d = { 'recording': {}, 'webcast' : {}, 'both': {} }
         '''
+
+        d = {}
 
         recordingBooking = self.getSingleBooking("RecordingRequest")
         webcastBooking = self.getSingleBooking("WebcastRequest")
 
-        dict = {}
-        if recordingBooking:
-            dict["recording"] = recordingBooking.getContributionSpeakerSingleBooking()
-        else:
-            dict["recording"] = {}
-
-        if webcastBooking:
-            dict["webcast"] = webcastBooking.getContributionSpeakerSingleBooking()
-        else:
-            dict["webcast"] = {}
+        d["recording"] = recordingBooking.getContributionSpeakerSingleBooking() if recordingBooking else {}
+        d["webcast"] = webcastBooking.getContributionSpeakerSingleBooking() if webcastBooking else {}
 
         contributions = {}
         ''' Look for speaker intersections between 'recording' and 'webcast' dicts
             and put them in 'both' dict. Additionally, if any intersection has been found,
             we exclude them from the original dictionary.
         '''
-        for cont in dict["recording"].copy():
-            if cont in dict["webcast"].copy():
+        for cont in d["recording"].copy():
+            if cont in d["webcast"].copy():
                 # Check if same contribution/speaker in 'recording' and 'webcast'
-                intersection = list(set(dict['recording'][cont]) & set(dict['webcast'][cont]))
+                intersection = set(d['recording'][cont]) & set(d['webcast'][cont])
                 if intersection:
-                    contributions[cont] = intersection
+                    contributions[cont] = list(intersection)
 
-                    #if exclusive is True, amd as we found same contribution/speaker,
-                    #we delete them from 'recording' and 'webcast' dicts
+                    # if exclusive is True, and as we found same contribution/speaker,
+                    # we delete them from 'recording' and 'webcast' dicts
                     if exclusive:
-                        exclusion = list(set(dict['recording'][cont]) ^ set(contributions[cont]))
+                        exclusion = set(d['recording'][cont]) ^ set(contributions[cont])
                         if not exclusion:
-                            del dict["recording"][cont]
+                            del d["recording"][cont]
                         else:
-                            dict["recording"][cont] = exclusion
+                            d["recording"][cont] = list(exclusion)
 
-                        exclusion = list(set(dict['webcast'][cont]) ^ set(contributions[cont]))
+                        exclusion = set(d['webcast'][cont]) ^ set(contributions[cont])
                         if not exclusion:
-                            del dict["webcast"][cont]
+                            del d["webcast"][cont]
                         else:
-                            dict["webcast"][cont] = exclusion
+                            d["webcast"][cont] = list(exclusion)
 
-        dict["both"] = contributions
+        d["both"] = contributions
 
-        return dict
+        return d
 
     def getContributionSpeakerByType(self, requestType):
         ''' Return a plain dict of contribution/speaker according to the requestType
             if the request type is 'both', we need to merge the lists
         '''
-        dict = self.getSortedContributionSpeaker(False) # We want non exclusive dict
+        d = self.getSortedContributionSpeaker(False) # We want non exclusive dict
 
         if requestType == "recording":
-            return dict['recording']
+            return d['recording']
         elif requestType == "webcast":
-            return dict['webcast']
+            return d['webcast']
         elif requestType == "both":
-            #We merge the 3 dict 'recording', 'webcast' and 'both'
-            result = dict['webcast'].copy()
-            for elem in dict['recording']:
-                temp = dict['recording'][elem]
-                temp.extend(x for x in result.get(elem, []) if x not in temp)
-                result[elem] = temp
+            # We merge 'recording' and 'webcast'
+            m = dict(((cont, list(set(spks) | \
+                set(d['webcast'].get(cont, [])))) for cont, spks in d['recording'].iteritems()))
+            m.update(dict((cont, spks) for cont, spks in d['webcast'].iteritems() if cont not in m))
 
-            for elem in dict['both']:
-                temp = dict['both'][elem]
-                temp.extend(x for x in result.get(elem,[]) if x not in temp)
-                result[elem] = temp
-
-            return result
+            return m
         else:
             return {}
 
@@ -793,9 +782,9 @@ class CSBookingManager(Persistent, Observer):
 
                     if sw:
                         if not sw.getObject().getEmail():
-                            if sw.getStatus() != SpeakerStatusEnum.SIGNED and \
-                                sw.getStatus() != SpeakerStatusEnum.FROMFILE and \
-                                 sw.getStatus() != SpeakerStatusEnum.REFUSED:
+                            if sw.getStatus() not in [SpeakerStatusEnum.SIGNED,
+                                                      SpeakerStatusEnum.FROMFILE,
+                                                      SpeakerStatusEnum.REFUSED]:
                                 sw.setStatus(SpeakerStatusEnum.NOEMAIL)
                         elif sw.getStatus() == SpeakerStatusEnum.NOEMAIL:
                             sw.setStatus(SpeakerStatusEnum.NOTSIGNED)
@@ -864,10 +853,9 @@ class CSBookingManager(Persistent, Observer):
         list = []
         for spkWrap in self._speakerWrapperList:
             if spkWrap.getUniqueId() == id and \
-                spkWrap.hasEmail() and \
-                    spkWrap.getStatus() != SpeakerStatusEnum.SIGNED and \
-                        spkWrap.getStatus() != SpeakerStatusEnum.FROMFILE and \
-                            spkWrap.getRequestType() in requestTypeAccepted:
+                   spkWrap.hasEmail() and spkWrap.getStatus() not in \
+                   [SpeakerStatusEnum.SIGNED, SpeakerStatusEnum.FROMFILE] and \
+                   spkWrap.getRequestType() in requestTypeAccepted:
 
                 list.append(spkWrap.getObject().getEmail())
 
@@ -1946,16 +1934,9 @@ class SpeakerWrapper(Persistent, Fossilizable):
         self.localFile = None
         self.dateAgreement = 0
         self.ipSignature = None
-        self.modificationDate = time.time()
+        self.modificationDate = nowutc()
         self.uniqueIdHash = md5("%s.%s"%(time.time(), self.getUniqueId())).hexdigest()
-        self.statusString = {
-                            SpeakerStatusEnum.NOEMAIL:_("No Email"),
-                            SpeakerStatusEnum.NOTSIGNED:_("Not Signed"),
-                            SpeakerStatusEnum.SIGNED: _("Signed"),
-                            SpeakerStatusEnum.FROMFILE: _("Uploaded"),
-                            SpeakerStatusEnum.PENDING: _("Pending..."),
-                            SpeakerStatusEnum.REFUSED: _("Refused")
-                            }
+
     def getUniqueId(self):
         return "%s.%s"%(self.contId, self.speaker.getId())
 
@@ -1969,14 +1950,11 @@ class SpeakerWrapper(Persistent, Fossilizable):
     def getStatus(self):
         return self.status
 
-    def getStatusString(self):
-        return self.statusString[self.status]
-
     def setStatus(self, newStatus, ip=None):
         try:
             self.status = newStatus;
             if newStatus == SpeakerStatusEnum.SIGNED or newStatus == SpeakerStatusEnum.FROMFILE:
-                self.dateAgreement = time.time()
+                self.dateAgreement = now_utc()
                 if newStatus == SpeakerStatusEnum.SIGNED:
                     self.ipSignature = ip
         except Exception, e:
@@ -2061,13 +2039,13 @@ class SpeakerWrapper(Persistent, Fossilizable):
         return None
 
     def getModificationDate(self):
-        if hasattr(self, "modificationDate"):#TODO: remove when safe
+        if hasattr(self, "modificationDate"):  # TODO: remove when safe
             return self.modificationDate
         return None
 
     def setModificationDate(self):
-        if hasattr(self, "modificationDate"):#TODO: remove when safe
-            self.modificationDate = time.time()
+        if hasattr(self, "modificationDate"):  # TODO: remove when safe
+            self.modificationDate = now_utc()
 
     def getLocator(self):
         return self.getContribution().getLocator()

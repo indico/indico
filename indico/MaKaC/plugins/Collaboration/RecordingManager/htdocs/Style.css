@@ -70,7 +70,6 @@ div.RMtalkDisplay {
     border: 1px;
     border-color: #FFFFFF;
     border-style: solid;
-    /*height: 34px;*/
     font-family: serif;
     font-size: smaller;
     margin: 0px;
@@ -83,10 +82,8 @@ div.RMtalkHover {
     background-color: #FFF6DF;
     border-width: 1px;
     border-style: dashed;
-    /*height: 34px;*/
     font-family: serif;
     font-size: small;
-/*   line-height: 1; */
     margin: 0px;
     padding: 2px;
     background-position: right;
@@ -97,7 +94,6 @@ div.RMtalkSelected {
     background-color: #CDEB8B;
     border-width: 1px;
     border-style: solid;
-    /*height: 34px;*/
     font-family: serif;
     font-size: small;
     font-weight: normal;
