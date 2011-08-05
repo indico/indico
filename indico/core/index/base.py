@@ -186,7 +186,7 @@ class DIndex(SIndex):
         if value in ts:
             raise ElementAlreadyInIndexException((value, obj))
         else:
-            ts.index(value)
+            ts.insert(value)
 
         self._rev_index[uid] = ts
 
