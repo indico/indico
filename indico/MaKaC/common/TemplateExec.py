@@ -188,7 +188,7 @@ def deepstr(obj):
     #stringfy objects inside a dictionary
     if isinstance(obj, dict):
         for k, v in obj.items():
-            del obj[k] #wAvatare delete the old key
+            del obj[k] #we delete the old key
             obj[deepstr(k)] = deepstr(v)
 
     return str(obj)
