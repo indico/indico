@@ -8164,6 +8164,7 @@ class WPModMoveContribsToSessionConfirmation(WPModifContribList):
         p={"postURL":urlHandlers.UHConfModMoveContribsToSession.getURL(self._conf),}
         return wc.getHTML(p)
 
+
 class WPConfEditContribType(WPConferenceModifBase):
 
     def __init__(self, rh, ct):
