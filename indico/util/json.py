@@ -43,11 +43,11 @@ def dumps(obj, **kwargs):
     return _json.dumps(obj, cls=I18nJSONEncoder, **kwargs)
 
 
-def decode(string):
+def loads(string):
     """
     Simple wrapper around json.decode()
     """
-    return _json.decode(string)
+    return _json.loads(string)
 
 
 def json_filter(obj):
