@@ -3792,15 +3792,14 @@ class Conference(CommonObjectBase, Locatable):
         # protected pages
         if self.__ac.isHarvesterIP(aw.getIP()):
             return True
-        #####################################################
-        if self.getAccessKey()!= "":
-            if self.canKeyAccess( aw ) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
-                return False
-        elif not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
-            return False
-        if not self.isProtected():
-            return True
-        return self.isAllowedToAccess( aw.getUser() )
+
+        if self.isProtected():
+            if self.canUserModify(aw.getUser()) or self.isAllowedToAccess( aw.getUser() ):
+                return True
+            else:
+                return self.canKeyAccess(aw)
+        else:
+            return self.canIPAccess(aw.getIP())
 
     def canKeyAccess( self, aw, key=None ):
         sess = aw.getSession()

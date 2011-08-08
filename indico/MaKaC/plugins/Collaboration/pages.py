@@ -68,6 +68,7 @@ class WEventDetailBanner(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         vars['getBookingType'] = WEventDetailBanner.getBookingType
         vars['formatTwoDates'] = formatTwoDates
+        return vars
 
 
 # Extra WP and W classes for the Electronic Agreement page

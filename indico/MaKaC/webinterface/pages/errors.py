@@ -207,11 +207,13 @@ class WPAccessError( WPDecorated ):
         WPDecorated. __init__( self, rh )
 
     def _getBody( self, params ):
-        if self._rh._target and (self._rh._target.getAccessKey() != "" or ( (not type(self._rh._target) is Category) and self._rh._target.getConference().getAccessKey() != "")):
+        tgt = self._rh._target
+        if tgt and tgt.isProtected() and (tgt.getAccessKey() != "" or \
+                                          ( (not type(tgt) is Category) and tgt.getConference().getAccessKey() != "")):
             msg = ""
             sess = self._rh._getSession()
             keys = sess.getVar("accessKeys")
-            id = self._rh._target.getUniqueId()
+            id = tgt.getUniqueId()
             if keys != None and keys.has_key(id):
                 msg = i18nformat("""<font color=red> _("Bad access key")!</font>""")
             else:
