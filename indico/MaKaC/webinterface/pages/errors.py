@@ -171,7 +171,7 @@ class WAccessError( WTemplated ):
         vars = WTemplated.getVars( self )
         vars["area"]= i18nformat(""" _("Authorisation") - """)
         vars["msg"] = _("The access to this page has been restricted by its owner and you are not authorised to view it")
-        vars["contactEmail"] = self._rh._target.getContactEmail()
+        vars["contactInfo"] = self._rh._target.getAccessController().getAnyContactInfo()
         return vars
 
 class WAccessKeyError( WTemplated ):

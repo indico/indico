@@ -60,7 +60,7 @@ class AccessController( Persistent, Observable ):
         self.requiredDomains = []
         self.accessKey = ""
         self.owner = owner
-        self.contactEmail = ""
+        self.contactInfo = ""
 
     def getOwner(self):
         return self.owner
@@ -330,17 +330,24 @@ class AccessController( Persistent, Observable ):
             return 1
         return 0
 
-    def getContactEmail(self):
-        try:
-            if self.contactEmail:
-                pass
-        except AttributeError, e:
-            self.contactEmail = ""
-        return self.contactEmail
+    def getAnyContactInfo(self):
+        if not self.getContactInfo() and self.getOwner().getOwner():
+            return self.getOwner().getOwner().getAccessController().getAnyContactInfo()
+        else:
+            return self.getContactInfo()
 
-    def setContactEmail(self, contactEmail):
-        self.contactEmail = contactEmail
-        self._p_changed = 1
+    def getContactInfo(self):
+        """Defines who to contact in case of access control error.
+        One can use this info to display it along with the exception message"""
+        try:
+            if self.contactInfo:
+                pass
+        except AttributeError:
+            self.contactInfo = ""
+        return self.contactInfo
+
+    def setContactInfo(self, info):
+        self.contactInfo = info
 
 class CategoryAC(AccessController):
 

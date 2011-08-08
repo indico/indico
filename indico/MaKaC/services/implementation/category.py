@@ -219,14 +219,14 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._categ.revokeAccess(userToRemove)
 
-class CategoryContactEmailModification( CategoryTextModificationBase ):
+class CategoryContactInfoModification( CategoryTextModificationBase ):
     """
     Category contact email modification
     """
     def _handleSet(self):
-        self._categ.setContactEmail(self._value)
+        self._categ.getAccessController().setContactInfo(self._value)
     def _handleGet(self):
-        return self._categ.getContactEmail()
+        return self._categ.getAccessController().getContactInfo()
 
 methodMap = {
     "getCategoryList": GetCategoryList,
@@ -236,5 +236,5 @@ methodMap = {
     "protection.getAllowedUsersList": CategoryProtectionUserList,
     "protection.addAllowedUsers": CategoryProtectionAddUsers,
     "protection.removeAllowedUser": CategoryProtectionRemoveUser,
-    "protection.changeContactEmail": CategoryContactEmailModification
+    "protection.changeContactInfo": CategoryContactInfoModification
     }

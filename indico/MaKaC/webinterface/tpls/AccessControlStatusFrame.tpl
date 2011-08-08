@@ -126,13 +126,12 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
 </tr>
 % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
 <tr>
-    <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Contact in case no access")}</span></td>
+    <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Contact in case of no access")}</span></td>
     <td bgcolor="white" width="100%" valign="top" class="blacktext">
-    <span id="inPlaceEditContact">${contactEmail}</span></td>
+    <span id="inPlaceEditContact"></span></td>
 </tr>
 <script type="text/javascript">
-${ macros.genericField(macros.FIELD_TEXT, 'inPlaceEditContact', termsDict[type]['name'] + '.protection.changeContactEmail', dict([(termsDict[type]['paramsKey'], target.getId())]), preCache=True, rh=self_._rh) }
-
+new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[type]['name'] + '.protection.changeContactInfo'}', ${dict([(termsDict[type]['paramsKey'], target.getId())])}, '${contactInfo or _("no contact info defined")}');
 </script>
 
 % endif

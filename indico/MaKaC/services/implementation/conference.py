@@ -745,14 +745,14 @@ class ConferenceProtectionSetModifKey(ConferenceModifBase):
     def _getAnswer(self):
         self._conf.setModifKey(self._modifKey)
 
-class ConferenceContactEmailModification( ConferenceTextModificationBase ):
+class ConferenceContactInfoModification( ConferenceTextModificationBase ):
     """
     Conference contact email modification
     """
     def _handleSet(self):
-        self._target.setContactEmail(self._value)
+        self._target.getAccessController().setContactInfo(self._value)
     def _handleGet(self):
-        return self._target.getContactEmail()
+        return self._target.getAccessController().getContactInfo()
 
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
@@ -780,5 +780,5 @@ methodMap = {
     "protection.removeAllowedUser": ConferenceProtectionRemoveUser,
     "protection.setAccessKey": ConferenceProtectionSetAccessKey,
     "protection.setModifKey": ConferenceProtectionSetModifKey,
-    "protection.changeContactEmail": ConferenceContactEmailModification
+    "protection.changeContactInfo": ConferenceContactInfoModification
     }
