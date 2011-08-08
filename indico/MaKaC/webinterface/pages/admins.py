@@ -365,7 +365,7 @@ class WPUpdateNews( WPHomepageCommon ):
         wc = WUpdateNews()
         newsModule = ModuleHolder().getById("news")
 
-        newslist = fossilize(newsModule.getNewsItemsList(),INewsItemFossil, tz=tz)
+        newslist = fossilize(newsModule.getNewsItemsList(), INewsItemFossil, tz=tz)
         newsTypesList = newsModule.getNewsTypesAsDict()
         recentDays = newsModule.getRecentDays()
 

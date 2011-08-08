@@ -36,10 +36,13 @@ TEMPLATE_DIR = Config.getInstance().getTPLDir()
 # Directory for storing compiled Mako templates
 COMPILED_MODULES = os.path.join(Config.getInstance().getTempDir(), "mako_modules")
 
+FILTER_IMPORTS = ['from indico.util.json import dumps as j']
+
 mako = TemplateLookup(directories=["/"],
                       module_directory=COMPILED_MODULES,
                       disable_unicode=True,
-                      filesystem_checks=True)
+                      filesystem_checks=True,
+                      imports=FILTER_IMPORTS)
 
 
 def render(tplPath, params):

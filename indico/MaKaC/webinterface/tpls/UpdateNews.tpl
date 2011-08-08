@@ -20,7 +20,7 @@
 <div id="newsContainer" class="newsContainer"></div>
 
 <script type="text/javascript">
-    var newsList = new NewsList(${ jsonEncode(newslist) }, 'newsContainer', ${ jsonEncode(newsTypesList) });
+    var newsList = new NewsList(${ newslist | j,n }, 'newsContainer', ${ newsTypesList | j,n });
 
     var addButton = Widget.link(command(function(){
                                             newsList.addItem();

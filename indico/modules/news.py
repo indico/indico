@@ -23,7 +23,7 @@ from persistent import Persistent
 from MaKaC.common.Counter import Counter
 from indico.modules import ModuleHolder, Module
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.i18n import _
+from indico.util.i18n import L_
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, \
      isTimezoneAware, setAdjustedDate
 from MaKaC.common.fossilize import Fossilizable, fossilizes
@@ -40,8 +40,8 @@ class NewsModule(Module):
     """
 
     id = "news"
-    _newsTypes = [ ("general", _("General News") ), ("future", _("Coming soon") ),
-                   ("new", _("New features") ), ("bug", _("Bug fixes") ) ]
+    _newsTypes = [ ("general", L_("General News") ), ("future", L_("Coming soon") ),
+                   ("new", L_("New features") ), ("bug", L_("Bug fixes") ) ]
 
     def __init__(self):
         self._newsItems = []

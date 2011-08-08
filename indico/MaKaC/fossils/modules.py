@@ -22,6 +22,7 @@ from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.conference import ICategoryFossil, IConferenceMinimalFossil
 
+
 class INewsItemFossil(IFossil):
 
     def getId(self):
@@ -44,6 +45,7 @@ class INewsItemFossil(IFossil):
 
     def getHumanReadableType(self):
         pass
+
 
 class IObservedObjectFossil(IFossil):
 
