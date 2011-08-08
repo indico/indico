@@ -23,5 +23,6 @@ from MaKaC.i18n import _
 
 __metadata__ = {
     'name': "Collaboration",
-    'description': "Collaboration Tools Plugins"
+    'description': "Collaboration Tools Plugins",
+    'requires': ['suds']
     }
