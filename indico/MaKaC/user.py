@@ -23,6 +23,7 @@ from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
                             IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from random import random
+from indico.util.i18n import i18nformat
 
 import ZODB
 from persistent import Persistent

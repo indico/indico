@@ -168,7 +168,7 @@ class WPRoomBookingBase( WPMainBase ):
 
         self._leftMenu.addSection( self._roomsOpt )
         self._roomsOpt.addItem( self._roomSearchOpt )
-        if Location.getDefaultLocation().isMapAvailable():
+        if Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable():
             self._roomsOpt.addItem( self._roomMapOpt )
         self._roomsOpt.addItem( self._myRoomListOpt )
         self._leftMenu.addSection( self._bookingsOpt )

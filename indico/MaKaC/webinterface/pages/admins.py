@@ -135,10 +135,7 @@ class WPAdminsBase( WPMainBase ):
         self._createTabCtrl()
         self._setActiveTab()
 
-        if self._rh._getUser().isAdmin():
-            frame = WAdminFrame()
-        else:
-            frame = WRBAdminFrame()
+        frame = WAdminFrame()
         p = { "body": self._getPageContent( params ),
               "sideMenu": self._sideMenu.getHTML() }
 
@@ -163,9 +160,6 @@ class WPAdminsBase( WPMainBase ):
         return "nothing"
 
 class WAdmins(wcomponents.WTemplated):
-
-    def __init__(self):
-        pass
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )

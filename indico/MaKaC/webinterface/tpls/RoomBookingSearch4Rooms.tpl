@@ -251,9 +251,11 @@
                                                         <td class="subFieldWidth" align="right" ><small> ${ _("Location")}&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
                                                             <select name="roomLocation" id="roomLocation">
+                                                                % if Location.getDefaultLocation():
                                                                 <option value="">${ Location.getDefaultLocation().friendlyName }</option>
+                                                                % endif
                                                                 % for loc in Location.allLocations:
-                                                                    % if loc.friendlyName != Location.getDefaultLocation().friendlyName:
+                                                                    % if Location.getDefaultLocation() and loc.friendlyName != Location.getDefaultLocation().friendlyName:
                                                                         <option value="${loc.friendlyName}" >${ loc.friendlyName }</option>
                                                                     % endif
                                                                 % endfor

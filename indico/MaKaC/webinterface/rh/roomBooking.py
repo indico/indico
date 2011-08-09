@@ -650,11 +650,15 @@ class RHRoomBookingWelcome( RHRoomBookingBase ):
     _uh = urlHandlers.UHRoomBookingWelcome
 
     def _process( self ):
+        if Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable():
+            self._redirect( urlHandlers.UHRoomBookingMapOfRooms.getURL())
+        else:
+            self._redirect( urlHandlers.UHRoomBookingSearch4Rooms.getURL( forNewBooking = True ))
         #if self._getUser().isResponsibleForRooms():
         #    self._redirect( urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, autoCriteria = True ) )
         #    return
         #self._redirect( urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True, autoCriteria = True ) )
-        self._redirect( urlHandlers.UHRoomBookingMapOfRooms.getURL())
+
 
 # 1. Searching
 
@@ -947,7 +951,7 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
 
         self._rooms = rooms
 
-        self._mapAvailable = Location.getDefaultLocation().isMapAvailable()
+        self._mapAvailable = Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable()
 
     def _process( self ):
         self._businessLogic()
