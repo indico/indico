@@ -415,20 +415,23 @@ var bookingTemplateM = function(booking) {
 
     if (booking.hasAcceptReject && userIsAdmin) {
         var cellAccept = Html.td({className : "collaborationCellNarrow"});
-        var acceptButton = Widget.link(command(
-            function() {accept(booking);} ,
-            Html.img({
-                alt: "Accept Booking",
-                title: "Accept Booking",
-                src: imageSrc("accept"),
-                style: {
-                    'verticalAlign': 'middle'
-                }
-            })
-        ));
-        cellAccept.set(acceptButton);
-        row.append(cellAccept);
-
+        
+        if (booking.acceptRejectStatus !== true) { // Hides the accept button if already accepted.
+            var acceptButton = Widget.link(command(
+                function() {accept(booking);} ,
+                Html.img({
+                    alt: "Accept Booking",
+                    title: "Accept Booking",
+                    src: imageSrc("accept"),
+                    style: {
+                        'verticalAlign': 'middle'
+                    }
+                })
+            ));
+            cellAccept.set(acceptButton);
+            row.append(cellAccept);
+        }
+        
         var cellReject = Html.td({className : "collaborationCellNarrow"});
         var rejectButton = Widget.link(command(
             function() {reject(booking);} ,
@@ -504,18 +507,21 @@ var bookingTemplateS = function(booking) {
 
 
         if (booking.hasAcceptReject && userIsAdmin) {
-            var acceptButton = Widget.link(command(
-                function() {accept(booking);} ,
-                Html.img({
-                    alt: "Accept Booking",
-                    title: "Accept Booking",
-                    src: imageSrc("accept"),
-                    style: {
-                        'verticalAlign': 'middle'
-                    }
-                })
-            ));
-            liActions.append(Html.div("actionButton", acceptButton));
+            
+            if (booking.acceptRejectStatus !== true) { // Hides the accept button if already accepted.
+                var acceptButton = Widget.link(command(
+                    function() {accept(booking);} ,
+                    Html.img({
+                        alt: "Accept Booking",
+                        title: "Accept Booking",
+                        src: imageSrc("accept"),
+                        style: {
+                            'verticalAlign': 'middle'
+                        }
+                    })
+                ));
+                liActions.append(Html.div("actionButton", acceptButton));
+            }
 
             var rejectButton = Widget.link(command(
                 function() {reject(booking);} ,
