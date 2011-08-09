@@ -823,18 +823,16 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
                         Html.div({style: {marginTop: '10px'}}, self.protectionSelector.draw()));
 
     },
-    _drawButtons: function(){
+    _getButtons: function() {
         var self = this;
-
-        var saveButton = Html.input('button', {style: {marginRight: pixels(3)}}, $T('Save'));
-        var cancelButton = Html.input('button', {style: {marginLeft: pixels(3)}}, $T('Cancel'));
-        saveButton.observeClick(function(){
+        return [
+            [$T('Save'), function() {
             self._save();
-        });
-        cancelButton.observeClick(function(){
+            }],
+            [$T('Cancel'), function() {
             self.close();
-        });
-       return Html.div({}, saveButton, cancelButton);
+            }]
+        ];
     },
 
     _drawWidget: function(){
@@ -854,7 +852,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
 
     draw: function() {
         this.tabWidget =  this._drawWidget();
-        return this.ServiceDialogWithButtons.prototype.draw.call(this, this.tabWidget.draw(), this._drawButtons());
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, this.tabWidget.draw());
     },
 
     postDraw: function(){
@@ -1636,16 +1634,14 @@ type("AbstractSubmissionMaterialListWidget", ["MaterialListWidget"], {
 
 type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
 
-    _drawButtons: function() {
-
+    _getButtons: function() {
         var self = this;
-        var buttonDiv = Html.div({},
-            Widget.button(command(function() {
+        return [
+            [$T("Close"), function() {
                 self.close();
                 window.location.reload(true);
-            }, $T("Close"))));
-
-        return buttonDiv;
+            }]
+        ];
     },
 
     draw: function() {
@@ -1675,8 +1671,7 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
             this,
             Html.div({style: {width: pixels(this.width),
                               height: pixels(this.height+10)}},
-                     mlist.draw()),
-            this._drawButtons()
+                     mlist.draw())
         );
     }
 },
