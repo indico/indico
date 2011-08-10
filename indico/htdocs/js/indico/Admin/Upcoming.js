@@ -92,7 +92,7 @@ type("CategoryEventAddDialog", ["ExclusivePopupWithButtons"],
                  ["Weight (float)", $B(Html.edit(), this.info.accessor('weight'))],
                  ["Advertisement time (days)", $B(Html.edit(), this.info.accessor('delta'))]]);
 
-             return this.ExclusivePopup.prototype.draw.call(this, Html.div({}, form));
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({}, form));
          },
 
          _getButtons: function() {
@@ -121,7 +121,7 @@ type("CategoryEventAddDialog", ["ExclusivePopupWithButtons"],
      function(targetList) {
          var self = this;
          this.targetList = targetList;
-         this.ExclusivePopup("Add Category/Event", function() {
+         this.ExclusivePopupWithButtons("Add Category/Event", function() {
              return true;
          });
      });

@@ -1319,7 +1319,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
          this.userData = userData;
          this.action = action;
          this.grantSubmission = exists(grantSubmission)?grantSubmission:false;
-         this.ExclusivePopup(title,  function(){return true;});
+         this.ExclusivePopupWithButtons(title);
      }
     );
 

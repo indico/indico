@@ -65,7 +65,7 @@ type("MapAspectDataPopup", ["ExclusivePopupWithButtons"],
     function(title, aspectData, action) {
         this.aspectData = aspectData;
         this.action = action;
-        this.ExclusivePopup(title);
+        this.ExclusivePopupWithButtons(title);
     }
 );
 

@@ -414,7 +414,7 @@ type("AlertPopup", ["ExclusivePopupWithButtons"],
     function(title, content, callback) {
         this.content = content;
         this.callback = callback || positive;
-        this.ExclusivePopup(title, this.callback);
+        this.ExclusivePopupWithButtons(title, this.callback);
     }
 );
 
