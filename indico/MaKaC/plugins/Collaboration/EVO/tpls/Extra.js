@@ -11,9 +11,9 @@ var EVOLaunchClientHelpPopup = function(event) {
         '<\/div>');
 };
 
-type("EVOLaunchClientPopup", ["ExclusivePopup"],
+type("EVOLaunchClientPopup", ["AlertPopup"],
     {
-        draw: function() {
+        __getContent: function() {
             var self = this;
 
             var linkClicked = function(){
@@ -21,26 +21,26 @@ type("EVOLaunchClientPopup", ["ExclusivePopup"],
                 return true;
             };
 
-            var clientLink = Html.a({href: this.bookingUrl, onclick : linkClicked, style:{display: 'block'}},
-                    $T("Click here to launch the EVO client"));
+            var clientLink = $('<a/>', {href: this.bookingUrl})
+                .click(linkClicked)
+                .css('display', 'block')
+                .text($T("Click here to launch the EVO client"));
 
-            var infoLink = Html.span({className: 'fakeLink', style: {display: 'block', fontSize: 'smaller', paddingTop: pixels(10)}},
-                $T('(Why am I getting this popup?)'));
-            infoLink.dom.onmouseover = EVOLaunchClientHelpPopup;
+            var infoLink = $('<span/>', {'class': 'fakeLink'})
+                .mouseover(EVOLaunchClientHelpPopup)
+                .css({
+                    display: 'block',
+                    fontSize: 'smaller',
+                    paddingTop: '10px'
+                })
+                .text($T('(Why am I getting this popup?)'));
 
-            var cancelButton = Html.button({style: {marginTop: pixels(10)}}, $T("Cancel"));
-            cancelButton.observeClick(function(){
-                self.close();
-            });
-
-            return this.ExclusivePopup.prototype.draw.call(this,
-                    Html.div({style:{textAlign: 'center'}}, clientLink, infoLink, cancelButton)
-                    );
+            return $('<div/>').append(clientLink).append(infoLink);
         }
     },
     function(bookingUrl) {
         this.bookingUrl = bookingUrl;
-        this.ExclusivePopup($T('Launch EVO client'), positive);
+        this.AlertPopup($T('Launch EVO client'), this.__getContent());
     }
 );
 
