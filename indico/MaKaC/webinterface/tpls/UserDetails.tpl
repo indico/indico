@@ -156,11 +156,11 @@ var unlockField = function(field) {
             }
             else {
                self.value = result.val;
-               self.modeChooser.set('display');
                if(field == 'firstName' || field == 'surName') {
                    $E(field + 'Header').set(result.val);
                }
             }
+            self.modeChooser.set('display');
             $(self.wcanvas.dom).find('a').after(makeSyncInfo(true));
         });
     });
