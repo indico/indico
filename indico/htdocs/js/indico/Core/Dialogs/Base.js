@@ -157,12 +157,10 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
 type("NoReportErrorDialog", ["AlertPopup"], {
 
     __getTitle: function() {
-        var title = this.error.title;
-        return Html.span('warningTitle', title ? title : $T("Warning"));
+        return this.error.title || $T("Warning");
     },
 
     __getContent: function() {
-
         var content = Html.div({style: {textAlign: 'left'}});
         content.append(Html.div({}, this.error.message));
         content.append(Html.unescaped.div("warningExplanation", this.error.explanation));
@@ -172,7 +170,7 @@ type("NoReportErrorDialog", ["AlertPopup"], {
                     Html.a({href: Indico.Urls.Login+'?returnURL='+document.URL}, $T("Go to login page"))));
         }
 
-        return content;
+        return content.dom;
     }
 },
     function(error){
