@@ -2,11 +2,14 @@
  * Mouseover help popup for EVOLaunchClientPopup
  */
 
-var EVOLaunchClientHelpPopup = '<div style="padding:3px;width:300px;">' +
+var EVOLaunchClientHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px;width:300px;">' +
             $T('If you are using Internet Explorer, Indico cannot load the EVO client directly; '  +
             'you need to click on the link. ' +
             'You can avoid this by using another browser. Sorry for the inconvenience.') +
-        '<\/div>';
+        '<\/div>');
+};
 
 type("EVOLaunchClientPopup", ["ExclusivePopup"],
     {
@@ -23,7 +26,7 @@ type("EVOLaunchClientPopup", ["ExclusivePopup"],
 
             var infoLink = Html.span({className: 'fakeLink', style: {display: 'block', fontSize: 'smaller', paddingTop: pixels(10)}},
                 $T('(Why am I getting this popup?)'));
-            IndicoUI.Widgets.Generic.createTooltip(infoLink.dom, EVOLaunchClientHelpPopup);
+            infoLink.dom.onmouseover = EVOLaunchClientHelpPopup;
 
             var cancelButton = Html.button({style: {marginTop: pixels(10)}}, $T("Cancel"));
             cancelButton.observeClick(function(){
@@ -44,11 +47,14 @@ type("EVOLaunchClientPopup", ["ExclusivePopup"],
 /**
  * Mouseover help popup for the 'Start date' field
  */
-var EVOStartDateHelpPopup = '<div style="padding:3px; width: 300px;"">' +
+var EVOStartDateHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+        '<div style="padding:3px; width: 300px;"">' +
             $T('Please create your booking between <strong>${ MinStartDate }</strong> and <strong>${ MaxEndDate }</strong> ' +
             "(Allowed dates \/ times based on your event's start date and end date). " +
             'Also, please remember the start date cannot be more than ${ AllowedStartMinutes } minutes in the past.') +
-        '<\/div>';
+        '<\/div>');
+};
 
 /**
  * Mouseover help popup for the 'End date' field

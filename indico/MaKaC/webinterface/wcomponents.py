@@ -184,6 +184,7 @@ class WTemplated(OldObservable):
             Params:
                 params -- additional paramters received from the caller
         """
+
         self._rh = ContextManager.get('currentRH', None)
         if self.tplId == None:
             self.tplId = self.__class__.__name__[1:]
@@ -203,6 +204,7 @@ class WTemplated(OldObservable):
                 pass
 
         vars = self.getVars()
+
         vars['__rh__'] = self._rh
         vars['self_'] = self
 

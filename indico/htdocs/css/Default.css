@@ -3912,11 +3912,16 @@ div.tabBorderGradient {
 
 .tabExtraButtons {
     background-color: #888;
-    float: right;
+    position: absolute;
+    right: 0;
+    top: 30px;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
     margin: 10px 10px 0 0;
+    box-shadow:1px 1px 1px #000;
+    -moz-box-shadow:1px 1px 1px #000;
+    z-index: 1;
 }
 
 .tabExtraButtons .buttonContainer {

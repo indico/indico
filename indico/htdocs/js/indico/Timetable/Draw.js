@@ -247,9 +247,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                        if (self.popupActive) {
                            return;
                        }
-                       IndicoUI.Widgets.Generic.createTooltip(pileDiv.dom, "<div style='padding:3px'>" +
-                         $T('This poster session has ') + numContribs + $T(' contribution(s).') + "<br / >" +
-                         $T('Please click for more information.') + "</div>");
+                       IndicoUI.Widgets.Generic.tooltip(pileDiv.dom, event, "<div style='padding:3px'>" +
+                           $T('This poster session has ') + numContribs + $T(' contribution(s).') + "<br / >" +
+                           $T('Please click for more information.') + "</div>");
                    };
                }
 
@@ -1486,6 +1486,8 @@ type("TimetableDrawer", ["IWidget"],
              if (this.preventRedraw) {
                  return;
              }
+
+             this.timetable.redrawLegend();
 
              day = any(day, this.day);
              if (day == 'all') {

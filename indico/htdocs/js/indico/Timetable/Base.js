@@ -48,12 +48,12 @@ type("TimeTable", ["HistoryListener"], {
 
 
     _draw: function(timetableDiv) {
-      return Html.div({style:{width: this.width, overflow: 'auto'}},
-                      Html.div({style:{display:'block'}}, this.legend),
-                      this.header,
-                      timetableDiv,
-                      this.loadingIndicator
-                     );
+        return $('<div/>').css({width: this.width}).append(
+            $('<div/>').css('display', 'block'),
+            this.legend,
+            this.header.dom,
+            timetableDiv.dom,
+            this.loadingIndicator.dom).get();
     },
 
     _getMenu: function() {
@@ -127,6 +127,10 @@ type("TimeTable", ["HistoryListener"], {
       */
     _functionButtons: function() {
         return [];
+    },
+
+    redrawLegend: function() {
+        return;
     }
 },
      function(data, width, wrappingElement, detailLevel, managementMode) {
@@ -141,7 +145,7 @@ type("TimeTable", ["HistoryListener"], {
          this.width = width;
          this.loadingIndicator = this._createLoadingIndicator();
          this.header = this._getHeader();
-         this.legend = this._getLegend();
+         this.legend = $('<div/>');
          this.showNumSessions = 4; //Number of sessions shown in the legend by default, used by getLegend(..)
      }
     );
@@ -182,8 +186,6 @@ type("DisplayTimeTable", ["TimeTable"], {
     print: function() {
         var self = this;
 
-        //self.timetableDrawer.setPrintableVersion(true);
-
         var bodyPadding = $E(document.body).dom.style.padding;
         var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
         var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
@@ -201,10 +203,9 @@ type("DisplayTimeTable", ["TimeTable"], {
             Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
 
         goBackLink.observeClick(function(e) {
-            self.timetableDrawer.setPrintableVersion(false);
             $E(document.body).setStyle('padding', bodyPadding);
             $E(document.body).set(elements);
-
+            self.timetableDrawer.setPrintableVersion(false);
         });
         printLink.observeClick(function(e) {
             window.print();
@@ -277,6 +278,7 @@ type("DisplayTimeTable", ["TimeTable"], {
     },
 
     toggleDetailedView: function() {
+        var self = this
         var detailLevel = this.timetableDrawer.detail.get();
         var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
         this.timetableDrawer.detail.set(newDetailLevel);
@@ -286,12 +288,29 @@ type("DisplayTimeTable", ["TimeTable"], {
         this.detailsButton.btn.getParent().dom.style.background = state ? "#9F883B" : "";
         this._addToHistory(this.currentDay + (state?'.detailed':''));
 
-        /* Draw legend or "undraw" legend (getLegend() returns an empty div)
-         when toggling for detailed view. */
-        var legend = this._getLegend();
-        this.legend.replaceWith(legend);
+        var legend;
+
+        //If the "Detailed view" button is clicked and "activated".
+        if(this.inDetailedMode) {
+            /* Draw legend or "undraw" legend (getLegend() returns an empty div)
+               when toggling for detailed view. */
+            legend = this._getLegend();
+            this.legend.replaceWith(legend)
+
+            if (this._legendActive) {
+                self._toggleLegend(true);
+            } else {
+                self._legendPostDraw();
+            }
+        } else {
+            if (this._legendActive) {
+                self._toggleLegend(false);
+            }
+            legend = $('<div/>');
+            this.legend.replaceWith(legend)
+
+        }
         this.legend = legend;
-        this._getLegendPostProcessing();
     },
 
     _functionButtons: function() {
@@ -318,18 +337,12 @@ type("DisplayTimeTable", ["TimeTable"], {
         // TODO: Needs to be implemented
         this.linkButton = Html.div('linkButtonWhite', $T('Link'));
 
-        this.detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
+        this.detailsButton = {'btn': Html.div({className: 'buttonWhite', id: 'detailsButton'},
+                                               Html.span({}, $T('Detailed view'))),
             'onclick': function() {self.toggleDetailedView();}};
 
         this.filterButton = {'btn': Html.div('buttonWhite', $T('Filter')),
             'onclick': function(btnContainer) {
-              var legend = $E("timeTableLegend").dom;
-              if(legend) {
-                var legendVisible = legend.style.visibility == "visible";
-                if(legendVisible) {
-                  self._toggleLegend();
-                }
-              }
               // Save the container so that the filter button background
               // color can be restored when filter is closed
               self.filterButtonContainer = btnContainer;
@@ -823,322 +836,206 @@ type("ManagementTimeTable",["TimeTable"], {
 
 type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"], {
 
-       _retrieveHistoryState: function(hash) {
-         var currentDay = this._parseDayInterval(hash)[0];
-         this.setSelectedTab(currentDay);
-       },
+    _retrieveHistoryState: function(hash) {
+        var currentDay = this._parseDayInterval(hash)[0];
+        this.setSelectedTab(currentDay);
+    },
 
-       _getLegend: function() {
-         var self = this;
+    _getLegend: function() {
+        var self = this;
+        //Initially show N and have the rest hidden (buried under "...more")
+        self._maxLegendItemsShownInitially = 4;
 
-         //If the "Detailed view" button is clicked and "activated".
-         if(this.inDetailedMode) {
+        var toggleLegendButton = $('<div id="legendMainToggle">' +
+                                   $T("Session legend") + '</div>');
 
-           //Initially show N and have the rest hidden (buried under "...more")
-           self._maxLegendItemsShownInitially = 4;
+        if (this._legendActive) {
+            toggleLegendButton.addClass('active');
+        }
 
-           /*
-           var legendInfo = self._generateLegendDivItems(this.legendSessionInfo);
-	       var legendDiv = Html.div({id: 'legendDiv', style:{visibility: 'visible', overflow: 'auto'}}, legendInfo);
-             */
+        toggleLegendButton.click(function() {
+            self._legendActive = !self._legendActive;
+            self._toggleLegend(self._legendActive);
+        });
 
-           var toggleLegendPosButton = Html.div('legendPosToggle');
-           var toggleLegendButton = Html.div({className: 'legendMainToggleActive'}, $T("Session legend"));
+        self._toggleLegendButton = toggleLegendButton;
 
-           self._toggleLegendButton = toggleLegendButton;
-           var toggleLegendButtonContainer = Html.div({id: 'legendMainToggleContainer',
-                                               className: 'legendMainToggleContainer'}, toggleLegendButton);
-           $E(toggleLegendButtonContainer).dom.style.height = '0';
-           $E(toggleLegendButtonContainer).dom.style.opacity = "0";
+        this.legendItems = self._legendItemsContainer();
+        // hide it so that we can execute the nice scroll down animation
+        this.legendItems.hide();
 
-           var divTitle = Html.div('legendTitle', $T("Session Legend"));
+        // create 'update' event that will be called when the day changes (redraw)
+        this.legendItems.bind('update', function(){
+            $(this).html(self._legendItemsContainer().children());
+            if (self._legendActive && self.legendSessionInfo[self.currentDay].length){
+                $(this).slideDown();
+            } else {
+                $(this).slideUp();
+            }
+            self._legendPostDraw();
+        });
 
-           var legendItems = self._legendItemsContainer(toggleLegendPosButton);
-           /*
-           var legendItems = Html.div({id: 'timeTableLegend', className: 'timeTableLegend',
-                                       style: {visibility: 'visible',
-                                       width: $E("timetable").dom.childNodes[0].offsetWidth-15}},
-                                      closeButton, toggleLegendPosButton, legendDiv, showMoreLink);
-           */
-           var newLegendItems = null;
+        return $('<div id="wholeLegend"/>').append(toggleLegendButton).append(this.legendItems);
+    },
 
-           self._toggleFollowButtonEnabled = function () {
-             var legendVisible = (legendItems.dom.style.visibility == "visible");
-           };
-
-           toggleLegendPosButton.observeClick(function() {
-
-             var legendItemsContainer = null;
-			 if(toggleLegendPosButton.dom._clicked) {
-               jQuery(legendItems.dom).remove(legendItemsContainer); //JQUERY!
-               jQuery(newLegendItems.dom).remove(legendItemsContainer); //JQUERY!
-               toggleLegendPosButton.dom._clicked = false;
-               newLegendItems = self._legendItemsContainer(toggleLegendPosButton);
-
-               newLegendItems.dom.className = "timeTableLegend";
-               toggleLegendPosButton.dom.className = "legendPosToggle";
-               self._toggleButtonPlusAll.append(newLegendItems);
-
-			 } else {
-               jQuery(legendItems.dom).remove(); //JQUERY!
-               if(newLegendItems != null) {
-                 jQuery(newLegendItems.dom).remove(); //JQUERY!
-                 jQuery(newLegendItems.dom).remove(legendItemsContainer); //JQUERY!
-               }
-               toggleLegendPosButton.dom._clicked = true;
-               newLegendItems = self._legendItemsContainer(toggleLegendPosButton);
-               newLegendItems.dom.className = "timeTableLegendFixed";
-
-               // MarginLeft to make it centered at the bottom of the screen (when fixed)
-               legendItemsContainer = Html.div({id: 'legendBottomContainer', style: {marginLeft: '31%'}}, newLegendItems);
-               legendItemsContainer.dom.style.opacity = "0";
-               legendItemsContainer.dom.style.height = '0';
-
-               toggleLegendPosButton.dom.className = "legendPosToggleFixed";
-               $E(document.body).append(legendItemsContainer);
-
-               IndicoUI.Effect.slide(legendItemsContainer, 45);
-			 }
-             self._getLegendPostProcessing();
-		   });
-
-           toggleLegendButton.observeClick(function() {
-             self._toggleLegend();
-		   });
-
-           // toggleButtonPlusAll contains everything in the legend - except when the legend is fixed
-           // because then its being manually drawn/appended directly on the <body>
-           this._toggleButtonPlusAll = Html.div('wholeLegend ', toggleLegendButtonContainer, legendItems);
-
-           return this._toggleButtonPlusAll;
-         } else { //If NOT (this.inDetailedMode)
-
-           if($E("legendBottomContainer")) {
-             jQuery("#legendBottomContainer").remove(); //JQUERY!
-           }
-
-           var ele = $E("legendMainToggleContainer");
-           if(ele){
-             IndicoUI.Effect.slide(ele, 25);
-           }
-
-           return Html.div({});
-         }
-       },
-
-       _legendItemsContainer: function(toggleLegendPosButton) {
-         var self = this;
-         var moreText = $T("more...");
-         var lessText = $T("less...");
-         var showMoreLink = Html.div({id: 'showMoreLink', className: 'showMoreLink'}, moreText);
-
-         var showMoreIncrease = 4;
-           showMoreLink.observeClick(
-             function() {
-               var currentText = showMoreLink.dom.innerHTML;
-               showMoreLink.dom.innerHTML = (currentText == moreText) ? lessText : moreText ;
-
-               if(currentText == moreText) {
-                 self._fadeShowAllLegendItems();
-               } else if(currentText == lessText) {
-                 self._fadeHideLegendItems();
-               }
-               //(below), false = we did not click the Detailed View toggle button
-               self._getLegendPostProcessing();
-             });
-
-         var closeButton = Html.div({className: 'legendCloseButton',
-                             style: {cssFloat: 'right', position: 'static'}});
-
-         closeButton.observeClick(function() {
-           self._toggleLegend();
-         });
-
-         if(showMoreLink.dom.innerHTML == moreText) {
-           self._fadeShowAllLegendItems();
-         } else if(showMoreLink.dom.innerHTML == lessText) {
-           self._fadeHideLegendItems();
-         }
-
-         //Returns a div with each color+session name element
-         var legendElements = self._generateLegendDivItems(self.legendSessionInfo);
-
-	     var legendDiv = Html.div({id: 'legendDiv', style:{visibility: 'visible',
-                              overflow: 'auto'}}, legendElements);
-         var legendItems = Html.div({id: 'timeTableLegend', className: 'timeTableLegend',
-                                   style: {visibility: 'visible',
-                                   width: $E("timetable").dom.childNodes[0].offsetWidth-15}},
-                                   closeButton, toggleLegendPosButton, legendDiv, showMoreLink);
-         return legendItems;
-       },
-
-       //Generates the "legend items"
-       // (a small colored rounded square with the sessions title on its right hand side)
-       // Returns a Div with those legend element items.
-       _generateLegendDivItems: function(legendSessionInfo) {
-         var self = this;
-         var showNumSessionsCounter = 0;
-         var legendItems = $B(Html.div(), legendSessionInfo,
-            function(sessionArgumentList) {
-              var sessionId = sessionArgumentList[0];
-              var sessionTitle = sessionArgumentList[1];
-              var sessionColour = sessionArgumentList[2];
-              var sessionTextColor = sessionArgumentList[3];
-
-              //If the number of legend items shown by default has been reached we'll hide the rest.
-              var displaySetting =
-                (showNumSessionsCounter <= self._maxLegendItemsShownInitially) ? '' : 'none';
-              var opacitySetting =
-                (showNumSessionsCounter <= self._maxLegendItemsShownInitially) ? '1' : '0';
-
-              var legendItem =
-                Html.div({className: 'legendItem legendItemHover',
-                style: {opacity: opacitySetting, display: displaySetting}},
-                Html.div({className: 'legendItemHoverOverlay', style: {visibility: 'hidden', display: 'none'}},
-                Html.span({}, Html.div({}, sessionTitle))),
-                Html.div({className: 'timeTableItemColour', style: {background: sessionColour}}),
-                Html.div({id: "legendItem "+(showNumSessionsCounter)}, sessionTitle));
-
-              showNumSessionsCounter++;
-              return legendItem;
+    _legendItemsContainer: function() {
+        var self = this;
+        var state = false;
+        var moreText = $T("see more...");
+        var showMoreLink = $('<a id="showMoreLink" class="showMoreLink">' + moreText + '</a>').click(
+            function() {
+                if(!state) {
+                    self._fadeShowAllLegendItems();
+                    showMoreLink.text($T('less...'));
+                } else{
+                    self._fadeHideLegendItems();
+                    showMoreLink.text(moreText);
+                }
+                self._legendPostDraw();
+                state = !state;
             });
-         return legendItems;
-       },
 
-       //Used by the "...more"-button when you want to show more elements
-       _fadeShowAllLegendItems: function() {
-         var legendItemElements = $E(document).getElementsByClassName("legendItem");
-         for(var x = this._maxLegendItemsShownInitially; x < legendItemElements.length; x++) {
-           if(legendItemElements[x].dom.style.opacity != "") {
-             legendItemElements[x].dom.style.display = "";
-             IndicoUI.Effect.fade(legendItemElements[x]);
-           }
-         }
-       },
+        var closeButton = $('<div class="legendCloseButton"/>').click(function() {
+            self._toggleLegend(false);
+            self._legendActive = false;
+        });
 
-         //Used by the "...less"-button when you want to hide more elementsmaxLegendItemsShownInitially
-         //Note, it does NOT HIDE ALL: depending on "maxLegendItemsShownInitially".
-       _fadeHideLegendItems: function() {
-         var legendItemElements = $E(document).getElementsByClassName("legendItem");
-         for(var x=0; x < legendItemElements.length; x++) {
+        var sessions = self.legendSessionInfo[this.currentDay];
+        var container = $('<div id="timeTableLegend" class="timeTableLegend follow-scroll">').append(closeButton)
 
-         if(x >= this._maxLegendItemsShownInitially) {
-           legendItemElements[x].dom.style.display = "none";
-           IndicoUI.Effect.fade(legendItemElements[x]);
-           }
-         }
-       },
+        if (sessions.length) {
+            // Returns a div with each color + session name element
+            var legendElements = self._generateLegendDivItems(sessions);
+            container.append($('<div id="legendItemContainer"/>').append(legendElements))
+            if (sessions.length > self._maxLegendItemsShownInitially) {
+                container.append(showMoreLink);
+            }
+        }
+        return container;
+    },
 
-       /* This function is also called in "this.filterButton" in order
-        to hide it (the Session Legend) when the Filter is brought up */
-       _toggleLegend: function() {
-         var self = this;
+    // Generates the "legend items"
+    // (a small colored rounded square with the sessions title on its right hand side)
+    // Returns a Div with those legend element items.
+    _generateLegendDivItems: function(sessions) {
+        var self = this;
+        var showNumSessionsCounter = 0;
+        var container = $('<div>');
 
-		 if(self._filterActive) {
-		   //"Warning": this is NOT triggering the Filter-onClick effect which it "should"
-		   //Instead it does the same thing manually - what's done in onClick for filterButton
-		   self.filterButtonContainer.dom.style.background = "";
-		   self.filter.toggle();
-           self._filterActive = false;
-		 }
-         self._toggleFollowButtonEnabled();
+        $.each(sessions, function(idx, l){
+            var div =  $('<div class="legendItem" />').
+                append($('<div class="timeTableItemColour" />').css('background', l[2]),
+                       $('<span/>').text(l[1]));
 
-		 IndicoUI.Effect.slide('timeTableLegend', 25);
-         self._toggleLegendButton.dom.className =
-           (self._toggleLegendButton.dom.className == "legendMainToggle") ?
-           "legendMainToggleActive" : "legendMainToggle";
-       },
+            container.append(div)
 
-       _getLegendPostProcessing: function() {
-         var self = this;
-         //loop for truncation of too long session titles, the text next a coloured box in the "session legend".
-         var legendItemElements =
-             $E(document).getElementsByClassName("truncedSessionTitle");
-         var legendItemToolTip =
-             $E(document).getElementsByClassName("legendItemHoverOverlay");
+            if (idx >= self._maxLegendItemsShownInitially){
+                div.hide();
+            }
+        });
+        return container;
+    },
 
-         var initialTruncing = null;
-         var truncSessionTitle = null;
-         var titleIsTruncated = false;
-         var i = 0;
+    redrawLegend: function() {
+        if (this.legendItems) {
+            this.legendItems.trigger('update');
+        }
+    },
 
-         //Loop through each legend item
-         while($E('legendItem '+i) != null) {
-           var title = $E('legendItem '+i);
-           var fullTitle = title.dom.innerHTML;
-           initialTruncing = title.dom.innerHTML.length;
-           truncSessionTitle = "";
-           //Keep truncating the title until its short enough to be written in one line and still less wide than the
-           // "maximum legend item width".
-           while(title.dom.offsetHeight > 15) {
-             titleIsTruncated = true;
-             truncSessionTitle =
-                 TimetableBlockBase.prototype.truncateTitle(--initialTruncing, title.dom.innerHTML);
-             title.dom.innerHTML = truncSessionTitle;
-           }
+    // Used by the "...more"-button when you want to show more elements
+    _fadeShowAllLegendItems: function() {
+        $('.legendItem').fadeIn();
+    },
 
-           if(titleIsTruncated) {
-             IndicoUI.Widgets.Generic.createTooltip(title.dom, fullTitle);
-             titleIsTruncated = false;
-           }
-         i++;
-         }
+    // Used by the "...less"-button when you want to hide more elementsmaxLegendItemsShownInitially
+    // Note, it does NOT HIDE ALL: depending on "maxLegendItemsShownInitially".
+    _fadeHideLegendItems: function() {
+        $('.legendItem').slice(this._maxLegendItemsShownInitially).fadeOut();
+    },
 
-         var ele = $E("legendMainToggleContainer");
+    /* This function is also called in "this.filterButton" in order
+       to hide it (the Session Legend) when the Filter is brought up */
+    _toggleLegend: function(state) {
+        var self = this;
 
-         if(ele != null) {
-           if(ele.offsetHeight == 0) {
-             IndicoUI.Effect.slide(ele, 25);
-           }
-         }
-       },
+        if (state) {
+            $('#legendMainToggle').addClass('active');
+            if (this.legendSessionInfo[this.currentDay].length) {
+                $('#timeTableLegend').slideDown();
+            }
+        } else {
+            $('#timeTableLegend').slideUp();
+            $('#legendMainToggle').removeClass('active');
+        }
+        this._legendPostDraw();
+    },
 
-     _extractSessionInfo: function(data) {
-       /*Extract colors from each session */
-       var legendSessionInfo = new Array();
-       i = 0;
-       for(date_value in data) {
-       for(session_value in data[date_value]) {
-         if(session_value.charAt(0) != "s") {
-           continue;
-         }
-           var session = (data[date_value])[session_value];
-           if(legendSessionInfo[session["id"]] == null) {
-             legendSessionInfo[i] = [session["id"], session["title"], session["color"], session["textColor"]];
-           }
-           i += 1;
-         }
-       }
+    _legendPostDraw: function() {
+        var self = this;
+        // loop for truncation of too long session titles,
+        // the text next a coloured box in the "session legend".
+        var initialTruncing = null;
+        var i = 0;
 
-       legendSessionInfo.sort(function(a, b){
-         var a = a[0].toLowerCase();
-         var b = b[0].toLowerCase();
-         if (a < b) {
-           return -1;
-         }
-         if (a > b) {
-           return 1;
-         }
+        // Loop through each legend item
+        $('.legendItem').each(function(){
+            var titleIsTruncated = false;
+            var fullTitle = $(this).text();
+            initialTruncing = fullTitle.length;
+            // Keep truncating the title until its short enough to be written in
+            // one line and still less wide than the
+            // "maximum legend item width".
 
-         return 0;  //default return value (no sorting)
-       });
-       return legendSessionInfo;
-     }
-     },
+            var span = $(this).children('span');
+
+            while(span.get(0).offsetHeight > 25 || span.get(0).offsetWidth > 130) {
+                titleIsTruncated = true;
+                var truncSessionTitle = TimetableBlockBase.prototype.truncateTitle(--initialTruncing, fullTitle);
+                span.html(truncSessionTitle);
+            }
+
+            if(titleIsTruncated) {
+                $(this).qtip({content: fullTitle, position: {my: 'top middle', at: 'bottom middle'}});
+            }
+        });
+
+        if ($('#detailsButton').length) {
+            $('#legendMainToggle').position({my: 'left top',
+                                             at: 'left bottom',
+                                             of: $('#detailsButton').parent('.buttonContainer')});
+            $('#timeTableLegend:visible').width($('#timeTableLegend').get(0).clientWidth-10);
+        }
+
+    },
+
+    _extractSessionInfo: function(data) {
+        // get an a dictionary where the keys are days and the values are lists
+        // of [id, title, color] tuples (sessions only)
+        var days = {};
+        _(data).each(function(entries, day){
+            days[day] = _(entries).chain().
+                select(function(e){ return e.entryType == 'Session' }).
+                map(function(s){ return [s.id, s.title, s.color] }).
+                sortBy(function(l){return l[0]}).value();
+        });
+        // for "all days", put it all together
+        days['all'] = _(days).chain().map(function(entries, day){ return entries }).
+            reduce(function(l, elem){ return l.concat(elem); }, []).uniq().value();
+        return days;
+    }
+},
      function(data, contextInfo, width, wrappingElement, detailLevel, historyBroker, timetableLayoutId) {
+         this.postDraw = TopLevelTimeTableMixin.prototype.postDraw;
+         this.legendSessionInfo = this._extractSessionInfo(data);
+         this._legendActive = true;
 
-       this.legendSessionInfo = this._extractSessionInfo(data);
+         this.DisplayTimeTable(data, width, wrappingElement, detailLevel);
+         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, null, historyBroker, timetableLayoutId);
 
-       this.DisplayTimeTable(data, width, wrappingElement, detailLevel);
-       this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, null, historyBroker, timetableLayoutId);
-
-       this.eventInfo = contextInfo;
-
-       this._filterSetup();
-
-       this.postDraw = TopLevelTimeTableMixin.prototype.postDraw;
-
+         this.eventInfo = contextInfo;
+         this._filterSetup();
      });
+
 
 type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMixin"], {
 
@@ -1324,7 +1221,6 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             this.setSelectedTab(dayInterval[0]);
         }
     }
-
 },
      function(data, eventInfo, width, wrappingElement, detailLevel, historyBroker, isSessionTimetable, customLinks) {
 
@@ -1511,4 +1407,3 @@ type("SessionDisplayTimeTable", ["TopLevelDisplayTimeTable"], {
         this.TopLevelDisplayTimeTable(data, eventInfo, width, wrappingElement, 'contribution', historyBroker, null);
 
     });
-

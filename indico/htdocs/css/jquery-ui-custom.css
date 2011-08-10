@@ -9,6 +9,7 @@
 }
 
 /* Indico styled tooltips USED WITH qTip2 */
+
 .ui-tooltip-default {
     border: solid 1px #888;
     color: #222;
@@ -19,30 +20,9 @@
 
 .ui-tooltip-default .ui-tooltip-titlebar,
 .ui-tooltip-default .ui-tooltip-content {
-/*    border: solid 1px #888;*/
     border: none;
     color: #222;
     background-color: #F0F0F0;
     font-size: 11px;
     padding: 2px;
-}
-
-.tooltip {
-    border: solid 1px #888;
-    color: #222;
-    background-color: #F0F0F0;
-    font-size: 11px;
-    padding: 2px;
- }
-
-.tooltip88 {
-    height: auto;
-    display: none;
-    position: absolute;
-    background: #FF0000;
-    border: 2px solid #000;
-    -moz-border-radius: 7px;
-    border-radius: 7px;
-    padding: 7px 10px;
-    z-index: 100;
 }
