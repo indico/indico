@@ -597,11 +597,27 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
 });
 
-type("UploadTemplateDialog", ["ExclusivePopup"], {
+type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
+
+    _getButtons: function() {
+        var self = this;
+        return [
+            [$T('Upload'), function() {
+                if (self.pm.check()) {
+                    self.killProgress = IndicoUI.Dialogs.Util.progress($T('Uploading...'));
+                    self.uploading = true;
+                    $(self.form.dom).submit();
+                }
+            }],
+            [$T('Cancel'), function() {
+                self.close();
+            }]
+        ];
+    },
 
      _fileUpload: function() {
         var self = this
-        var pm = new IndicoUtil.parameterManager();
+        var pm = self.pm = new IndicoUtil.parameterManager();
         var uploadType = Html.input('hidden', {name: 'uploadType'});
         var selector = this._showFormatChooser(pm);
         var file = Html.input('file', {name: 'file'});
@@ -648,17 +664,7 @@ type("UploadTemplateDialog", ["ExclusivePopup"], {
             }
         });
 
-        return Html.div({},
-                        this.form,
-                        Html.div({style: {'textAlign': 'center', width: self.width, height: self.height}},
-                                 Widget.button(command(
-                                     function() {
-                                         if (pm.check()) {
-                                             self.killProgress = IndicoUI.Dialogs.Util.progress($T('Uploading...'));
-                                             self.uploading = true;
-                                             $(self.form.dom).submit();
-                                         }
-                                     }, $T("Upload")))));
+        return Html.div({}, this.form);
 },
 
     _showFormatChooser: function(pm) {
@@ -702,7 +708,7 @@ type("UploadTemplateDialog", ["ExclusivePopup"], {
     },
 
     draw: function() {
-        return this.ExclusivePopup.prototype.draw.call(this,this._fileUpload());
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._fileUpload());
     }
 }, function(title, args, width, height, types, uploadAction, onUpload) {
     var self = this;
@@ -715,12 +721,7 @@ type("UploadTemplateDialog", ["ExclusivePopup"], {
     this.onUpload = onUpload;
 
     this.args = clone(args);
-
-
-    this.ExclusivePopup($T(title),
-                        function() {
-                            self.close();
-                        });
+    this.ExclusivePopupWithButtons($T(title));
 });
 
 type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithButtons", "PreLoadHandler"], {
