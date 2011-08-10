@@ -40,6 +40,16 @@ from indico.util.i18n import  L_
 from indico.util.date_time import format_datetime
 
 
+STATUS_STRING = {
+    SpeakerStatusEnum.NOEMAIL: L_("No Email"),
+    SpeakerStatusEnum.NOTSIGNED: L_("Not Signed"),
+    SpeakerStatusEnum.SIGNED: L_("Signed"),
+    SpeakerStatusEnum.FROMFILE: L_("Uploaded"),
+    SpeakerStatusEnum.PENDING: L_("Pending..."),
+    SpeakerStatusEnum.REFUSED: L_("Refused")
+        }
+
+
 class IMEventDisplayComponent(Component):
 
     zope.interface.implements(IEventDisplayContributor)
@@ -72,17 +82,6 @@ class WEventDetailBanner(wcomponents.WTemplated):
 
 
 # Extra WP and W classes for the Electronic Agreement page
-
-STATUS_STRING = {
-    SpeakerStatusEnum.NOEMAIL: L_("No Email"),
-    SpeakerStatusEnum.NOTSIGNED: L_("Not Signed"),
-    SpeakerStatusEnum.SIGNED: L_("Signed"),
-    SpeakerStatusEnum.FROMFILE: L_("Uploaded"),
-    SpeakerStatusEnum.PENDING: L_("Pending..."),
-    SpeakerStatusEnum.REFUSED: L_("Refused")
-        }
-
-
 # Here the form page
 class WPElectronicAgreementForm(WPSimpleEventDisplay):
     def __init__(self, rh, conf, authKey):
