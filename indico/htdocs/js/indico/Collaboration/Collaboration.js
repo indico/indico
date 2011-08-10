@@ -1640,24 +1640,24 @@ var loadBookings = function() {
  * to edit the email of the speaker who needs to sign the Electronical Agreement
  */
 type("EditSpeakerEmail", ["ExclusivePopupWithButtons"],{
-        _drawButtons: function(){
+        _getButtons: function() {
             var self = this;
+            return [
+                [$T('Save'), function() {
+                    var method;
+                    if (self.confType == 'simple_event') {
+                        method = 'collaboration.setEmailChair';
+                    }
+                    else {
+                        method = 'collaboration.setEmailSpeaker';
+                    }
 
-            method = "";
-            if (self.confType == "simple_event")
-                method = 'collaboration.setEmailChair';
-            else
-                method = 'collaboration.setEmailSpeaker';
-
-            var saveButton = Widget.button(command(function(){
-                //var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving new Email..."));
-                var newEmail = document.getElementById('emailField').value;
-
-                if (Util.Validation.isEmailAddress(newEmail) || newEmail==""){
-                    indicoRequest(
+                    var newEmail = $('#emailField').val();
+                    if (Util.Validation.isEmailAddress(newEmail) || newEmail == '') {
+                        indicoRequest(
                             method,
                             {
-                                conference : self.confId,
+                                conference: self.confId,
                                 contribution: self.contId,
                                 spkId: self.spkId,
                                 value: newEmail
@@ -1667,25 +1667,21 @@ type("EditSpeakerEmail", ["ExclusivePopupWithButtons"],{
                                 if (error) {
                                     IndicoUtil.errorReport(error);
                                 } else {
-                                    window.location.reload(true);
+                                    window.location.reload();
                                 }
                             }
-                    );
+                        );
+                        self.close();
+                    }
+                    else {
+                        //Popup saying that email format is unvalid
+                        IndicoUI.Dialogs.Util.alert($T("Input Error"), $T("Invalid Email Address Format"));
+                    }
+                }],
+                [$T('Cancel'), function() {
                     self.close();
-                }else{
-                    //Popup saying that email format is unvalid
-                    IndicoUI.Dialogs.Util.alert($T("Input Error"), $T("Unvalid Email Address Format"));
-                }
-            }, $T("Save")));
-
-            // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Widget.button(command(function() {
-                self.close();
-            }, $T("Cancel")));
-
-            var buttonDiv = Html.div({style:{textAlign:"center"}}, saveButton, cancelButton)
-
-            return buttonDiv;
+                }]
+            ];
         },
 
         _drawWidget: function(){
@@ -1698,11 +1694,7 @@ type("EditSpeakerEmail", ["ExclusivePopupWithButtons"],{
         },
 
         draw: function(){
-            var self = this;
-            return this.ExclusivePopupWithButtons.prototype.draw.call(
-                    this,
-                    this._drawWidget(),
-                    this._drawButtons());
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
         }
     },
     function(confType, fullName, spkId, email, confId, contId){
@@ -1721,49 +1713,20 @@ type("EditSpeakerEmail", ["ExclusivePopupWithButtons"],{
 
 type("UploadElectronicAgreementPopup", ["ExclusivePopupWithButtons"],{
 
-        _setupIframe: function(iframe) {
+        _getButtons: function(){
             var self = this;
 
-            var loadFunc = function() {
-                if (self.uploading) {
-                    self.killProgress();
-                    self.uploading = false;
-                    setTimeout(
-                        function() {
-                            self.close();
-                            window.location.reload();
-                        }, 100
-                    );
-                }
-            };
-
-            if (Browser.IE) {
-                // cof! cof!
-                iframe.dom.onreadystatechange = loadFunc;
-            } else {
-                // for normal browsers
-                iframe.observeEvent("load", loadFunc);
-            }
-        },
-
-        _drawButtons: function(){
-            var self = this;
-
-            var uploadButton = Widget.button(command(function() {
-                if (self.pm.check()){
-                    self.killProgress = IndicoUI.Dialogs.Util.progress($T('Uploading...'));
-                    self.uploading = true;
-                    self.form.dom.submit();
-                }
-            }, $T("Upload")));
-
-            var cancelButton = Widget.button(command(function() {
-                self.close();
-            }, $T("Cancel")));
-
-            var buttonDiv = Html.div({style:{textAlign:"center"}}, uploadButton, cancelButton)
-
-            return buttonDiv;
+            return [
+                [$T('Upload'), function() {
+                    if (self.pm.check()){
+                        self.killProgress = IndicoUI.Dialogs.Util.progress($T('Uploading...'));
+                        $(self.form.dom).submit();
+                    }
+                }],
+                [$T('Cancel'), function() {
+                    self.close();
+                }]
+            ];
         },
 
         _drawWidget: function(){
@@ -1776,31 +1739,40 @@ type("UploadElectronicAgreementPopup", ["ExclusivePopupWithButtons"],{
             self.pm.add(this.file, 'text', false);
 
             this.frameId = Html.generateId();
-            var iframe = Html.iframe({id: this.frameId, name: this.frameId, style: {display: 'none'}});
-
-            this._setupIframe(iframe);
-
             this.form = Html.form(
                     {
-                        target: this.frameId,
                         method: 'post',
                         id: "uploadForm",
-                        action: self.uploadAction,
-                        enctype: 'multipart/form-data',
-                        encoding: 'multipart/form-data'
+                        action: self.uploadAction
                     },
                     info,
                     this.file,
                     Html.input('hidden', {name:'spkUniqueId'}, self.spkUniqueId));
 
-            return Html.div({}, iframe, this.form);
+            $(this.form.dom).ajaxForm({
+                dataType: 'json',
+                iframe: true,
+                /*
+                complete: function() {
+                    self.killProgress();
+                },
+                */
+                success: function(resp) {
+                    if (resp.status == 'ERROR') {
+                        self.killProgress();
+                        IndicoUtil.errorReport(resp.info);
+                    }
+                    else {
+                        location.reload();
+                    }
+                }
+            });
+
+            return Html.div({}, this.form);
         },
 
         draw: function(){
-            return this.ExclusivePopupWithButtons.prototype.draw.call(
-                    this,
-                    this._drawWidget(),
-                    this._drawButtons());
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
         },
 
     },
@@ -1810,58 +1782,51 @@ type("UploadElectronicAgreementPopup", ["ExclusivePopupWithButtons"],{
        self.spkUniqueId = spkUniqueId;
        self.uploadAction = uploadAction;
        self.pm = new IndicoUtil.parameterManager();
-       self.uploading = false;
        this.ExclusivePopupWithButtons($T("Upload the Paper Agreement"));
     }
 );
 
 type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
 
-        _drawButtons: function(){
+        _getButtons: function() {
             var self = this;
-
-            var sendButton = Widget.button(command(function(){
-
-                var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending..."));
-                indicoRequest(
-                    "collaboration.sendElectronicAgreement",
-                    {
-                        conference : self.confId,
-                        uniqueIdList: self.uniqueIdList,
-                        from: $E("fromEmailAddress"),
-                        content: self.rtWidget.get(),
-                    },
-                    function(result, error){
-                        killProgress();
-                        if (error) {
-                            IndicoUtil.errorReport(error);
-                            self.close();
-                        } else {
-                            if(result == "url_error"){
-                                IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {url} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
-                            }else if(result == "talkTitle_error"){
-                                IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {talkTitle} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
-                            }else{
+            return [
+                [$T('Send'), function() {
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending..."));
+                    indicoRequest(
+                        "collaboration.sendElectronicAgreement",
+                        {
+                            conference: self.confId,
+                            uniqueIdList: self.uniqueIdList,
+                            from: $E("fromEmailAddress"),
+                            content: self.rtWidget.get(),
+                        },
+                        function(result, error){
+                            killProgress();
+                            if (error) {
+                                IndicoUtil.errorReport(error);
                                 self.close();
-                                span1 = Html.div({}, $T("Email sent successfully!"));
-                                span2 = Html.div({}, $T("The email has been sent to:"));
-                                span3 = Html.div({}, result);
-
-                                informationPopup(Html.div({}, span1, span2, span3));
+                            } else {
+                                if(result == "url_error"){
+                                    IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {url} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
+                                }else if(result == "talkTitle_error"){
+                                    IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {talkTitle} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
+                                }else{
+                                    self.close();
+                                    var divs = $('<div/>');
+                                    $('<div/>').html($T("Email sent successfully!")).appendTo(divs);
+                                    $('<div/>').html($T("The email has been sent to:")).appendTo(divs);
+                                    $('<div/>').text(result).appendTo(divs);
+                                    informationPopup(divs);
+                                }
                             }
                         }
-                    }
-                );
-                //self.close();
-            }, $T("Send")));
-
-            var cancelButton = Widget.button(command(function() {
-                self.close();
-            }, $T("Cancel")));
-
-            var buttonDiv = Html.div({style:{textAlign:"center"}}, sendButton, cancelButton)
-
-            return buttonDiv;
+                    );
+                }],
+                [$T('Cancel'), function() {
+                    self.close();
+                }]
+            ];
         },
 
         _drawWidget: function(){
@@ -1909,13 +1874,7 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
         },
 
         draw: function(){
-            var self = this;
-
-            return this.ExclusivePopupWithButtons.prototype.draw.call(
-                    this,
-                    this._drawWidget(),
-                    this._drawButtons()
-                    );
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
         }
     },
     function(confTitle, confId, uniqueIdList, fromList, userId){
@@ -1931,13 +1890,9 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
 );
 
 //Information popup, will print an information and redirect to the redirectionLink when click on OK
-var informationPopup = function(information, redirectionLink){
-
+var informationPopup = function(information, redirectionLink) {
     (new AlertPopup($T("Confirmation"), information, function() {
-        if (redirectionLink)
-            window.location = redirectionLink;
-        else
-            window.location = window.location.href;
+        window.location = redirectionLink || window.location.href;
     })).open();
 };
 

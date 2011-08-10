@@ -98,6 +98,8 @@ class RHElectronicAgreement(RHConfModifCSBookings):
     def _process(self):
         if self.spkUniqueId and self.file:
             self.uploadProcess()
+            from MaKaC.services.interface.rpc import json
+            return json.encode_iframe({'status': 'OK'})
 
         if self._cannotViewTab:
             raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))

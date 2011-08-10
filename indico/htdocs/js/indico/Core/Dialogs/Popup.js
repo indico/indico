@@ -397,7 +397,7 @@ type("AlertPopup", ["ExclusivePopupWithButtons"],
                 padding: '10px',
                 textAlign: 'center'
             }).append($('<div/>').css('textAlign', 'left').html(this.content));
-            return this.ExclusivePopup.prototype.draw.call(this, content);
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
         },
 
         _getButtons: function() {
