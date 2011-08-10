@@ -69,7 +69,7 @@
     {
         // Get the selected option in the SELECT
         var selectedURL = $F('roomName');
-        var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-]*)(?:&|$)/;
+        var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-\+]*)(?:&|$)/;
         var roomIDPattern = /roomID=([a-zA-Z0-9\-]*)(?:&|$)/;
 
         // Get the room location and id from the url

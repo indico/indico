@@ -220,7 +220,7 @@ class UserCanBook(LoggedOnlyService):
         LoggedOnlyService._checkParams(self)
         self._user = self.getAW().getUser()
         self._roomID = int(self._params.get("roomID", ""))
-        self._roomLocation = self._params.get("roomLocation", "")
+        self._roomLocation = self._params.get("roomLocation", "").replace("+"," ")
         self._room = CrossLocationQueries.getRooms(roomID = self._roomID, location = self._roomLocation)
 
     def _getAnswer( self):
