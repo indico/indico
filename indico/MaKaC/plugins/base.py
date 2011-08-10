@@ -151,10 +151,6 @@ class ComponentsManager(Persistent):
                 Logger.get('ext.notification').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
                 raise
 
-        if subscribers == []:
-            Logger.get('ext.notification').warning('Event %s not present in %s' %
-                                                   (event, obj))
-
         return results
 
     def getAllSubscribers(self, method):
