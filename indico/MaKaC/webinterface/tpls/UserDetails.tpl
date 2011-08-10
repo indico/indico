@@ -112,7 +112,7 @@
 
 <script>
 
-var unlockedFields = ${jsonEncode(unlockedFields)};
+var unlockedFields = ${unlockedFields | n,j};
 var canSynchronize = !_.isEmpty(Indico.Settings.ExtAuthenticators);
 var authenticatorName = canSynchronize && Indico.Settings.ExtAuthenticators[0][1];
 var syncOffIcon = $('<img/>', {src: '${Config.getInstance().getSystemIconURL("syncOff")}'});
@@ -123,11 +123,8 @@ var syncOffMsg = $T('You changed this field manually. To synchronize it with the
 var makeSyncInfo = function(on) {
     var icon = on ? syncOnIcon : syncOffIcon;
     var msg = on ? syncOnMsg : syncOffMsg;
-    var syncInfo = $('<span/>').css('margin-left', '3px').append(icon.clone());
-    syncInfo.mousemove(function(e) {
-        IndicoUI.Widgets.Generic.tooltip(this, e, msg);
-    });
-    return syncInfo;
+    return $('<span/>').css('margin-left', '3px').
+           append(icon.clone()).qtip({content: msg});
 }
 
 var unlockField = function(field) {
