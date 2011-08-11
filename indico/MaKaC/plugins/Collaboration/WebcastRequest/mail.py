@@ -121,7 +121,7 @@ Request details:<br />
             if self._bp["talks"] == "all":
                 talkInfo = getCommonTalkInformation(self._conference)
                 text = ["""The user chose "All webcast-able Talks". List of webcast-able talks:"""]
-                webcastableTalks = talkInfo[2]
+                webcastableTalks = talkInfo[3]
                 if webcastableTalks:
                     text.extend(MailTools.talkListText(self._conference, webcastableTalks))
                     text.append("<strong>Important note:</strong> room is only shown if different from event.")

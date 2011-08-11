@@ -49,7 +49,7 @@ def getCommonTalkInformation(conference):
         if location and room and (location.getName() + ":" + room.getName() in wcRoomNames):
             webcastAbleTalks.append(t)
 
-    return (talks, wcRoomFullNames, webcastAbleTalks)
+    return (talks, wcRoomFullNames, wcRoomNames, webcastAbleTalks)
 
 class WebcastRequestError(CSErrorBase): #already fossilizable
     fossilizes(IWebcastRequestErrorFossil)

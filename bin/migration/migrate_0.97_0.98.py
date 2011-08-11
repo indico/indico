@@ -17,6 +17,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.user import AvatarHolder
+from MaKaC.rb_location import CrossLocationQueries
 
 """
 Migration script: v0.97 -> v0.98

@@ -47,7 +47,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["DisplayTalks"] = initialDisplay
         vars["InitialChoose"] = initialChoose
 
-        talks, wcRoomNames, webcastAbleTalks = getCommonTalkInformation(self._conf)
+        talks, wcRoomFullNames, wcRoomNames, webcastAbleTalks = getCommonTalkInformation(self._conf)
         nTalks = len(talks)
         nWebcastCapable = len(webcastAbleTalks)
 
@@ -55,7 +55,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["NTalks"] = nTalks
 
         #list of "locationName:roomName" strings
-        vars["WebcastCapableRooms"] = wcRoomNames
+        vars["WebcastCapableRooms"] = wcRoomFullNames
 
         vars["NWebcastCapableContributions"] = nWebcastCapable
 

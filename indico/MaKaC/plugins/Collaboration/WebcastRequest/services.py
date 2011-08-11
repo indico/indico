@@ -28,7 +28,7 @@ class WebcastAbleTalksService(CollaborationPluginServiceBase):
     
     def _getAnswer(self):
         talkInfo = getCommonTalkInformation(self._conf)
-        webcastAbleTalks = talkInfo[2]
+        webcastAbleTalks = talkInfo[3]
         webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
         
         return fossilize(webcastAbleTalks, IContributionWithSpeakersFossil,
