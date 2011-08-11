@@ -41,4 +41,3 @@ class Plugins_Feature(IndicoTestFeature):
             obj._ph.reloadAllPlugins()
             obj._do = DummyObservable()
 
-

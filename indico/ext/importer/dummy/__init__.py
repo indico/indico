@@ -21,5 +21,5 @@
 __metadata__ = {
     'name': 'Dummy importer',
     'type': 'importer',
-    'description': _('Importer used for testing')
+    'description': 'Importer used for testing'
     }

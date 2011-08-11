@@ -36,23 +36,6 @@ from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
 terminated = None
 
 
-class TestTimeSource(base.TimeSource):
-    def __init__(self, factor):
-        self._startTime = nowutc()
-        self._factor = factor
-
-    def getCurrentTime(self):
-        realDiff = nowutc() - self._startTime
-        seconds = (realDiff.seconds + realDiff.microseconds / 1E6)
-
-        fakeDiff = timedelta(seconds = seconds*self._factor)
-
-        return self._startTime + fakeDiff
-
-    def sleep(self, amount):
-        time.sleep(amount/float(self._factor))
-
-
 class TestTask(OneShotTask):
 
     def __init__(self, myid, date_time):
@@ -129,14 +112,13 @@ class _TestScheduler(IndicoTestCase):
     _requires = ['db.DummyUser']
 
     def tearDown(self):
+        self._shutdown()
         with self._context('database'):
             self._smodule.destroyDBInstance()
         super(_TestScheduler, self).tearDown()
 
     def setUp(self):
         super(_TestScheduler, self).setUp()
-
-        base.TimeSource.set(TestTimeSource(2))
 
         with self._context('database'):
             self._smodule = SchedulerModule.getDBInstance()
@@ -152,14 +134,14 @@ class _TestScheduler(IndicoTestCase):
 
         for w in self._workers:
             while terminated[w] != value:
-                # timeout at 10 sec
                 if timewaited < timeout:
                     base.TimeSource.get().sleep(1)
                     timewaited += 1
                 else:
-                    ## print "bad news... timeout @ %s, value=%s" % \
-                    ##        (w, terminated[w])
                     return False
+
+        # "courtesy seconds" to allow pending info to be processed by scheduler
+        base.TimeSource.get().sleep(2)
         return True
 
     def _startSomeWorkers(self, type_tasks, time_tasks, **kwargs):
@@ -201,9 +183,7 @@ class _TestScheduler(IndicoTestCase):
         self.assertEqual(self._checkWorkersFinished(10),
                          True)
 
-        self._shutdown()
-
-        self._assertStatus({'state': False,
+        self._assertStatus({'state': True,
                             'waiting': 0,
                             'running': 0,
                             'spooled': 0,
@@ -221,9 +201,7 @@ class _TestScheduler(IndicoTestCase):
         self.assertEqual(self._checkWorkersFinished(10),
                          True)
 
-        self._shutdown()
-
-        self._assertStatus({'state': False,
+        self._assertStatus({'state': True,
                             'waiting': 0,
                             'running': 0,
                             'spooled': 0,
@@ -258,9 +236,7 @@ class _TestScheduler(IndicoTestCase):
         self.assertEqual(self._checkWorkersFinished(5),
                          True)
 
-        self._shutdown()
-
-        self._assertStatus({'state': False,
+        self._assertStatus({'state': True,
                             'waiting': 0,
                             'running': 0,
                             'spooled': 0,
@@ -300,11 +276,7 @@ class _TestScheduler(IndicoTestCase):
         self.assertEqual(self._checkWorkersFinished(10),
                          True)
 
-        self._shutdown()
-
-        self._sched.join()
-
-        self._assertStatus({'state': False,
+        self._assertStatus({'state': True,
                             'waiting': 0,
                             'running': 0,
                             'spooled': 0,
@@ -330,9 +302,7 @@ class _TestScheduler(IndicoTestCase):
         self.assertEqual(self._checkWorkersFinished(10),
                          True)
 
-        self._shutdown()
-
-        self._assertStatus({'state': False,
+        self._assertStatus({'state': True,
                             'waiting': 0,
                             'running': 0,
                             'spooled': 0,
@@ -355,9 +325,7 @@ class _TestScheduler(IndicoTestCase):
         self.assertEqual(self._checkWorkersFinished(30),
                          False)
 
-        self._shutdown()
-
-        self._assertStatus({'state': False,
+        self._assertStatus({'state': True,
                             'waiting': 2,
                             'running': 0,
                             'spooled': 0,
@@ -381,16 +349,14 @@ class _TestScheduler(IndicoTestCase):
             seconds.append((s % 6) * 10)
 
         self._startSomeWorkers([TestPeriodicTask] * 5,
-                               [rrule.MINUTELY] * 5,
+                               [rrule.SECONDLY] * 5,
                                bysecond=tuple(seconds))
 
         # Not all workers will have finished
         self.assertEqual(self._checkWorkersFinished(100, value=3),
                          True)
 
-        self._shutdown()
-
-        self._assertStatus({'state': False,
+        self._assertStatus({'state': True,
                             'waiting': 5,
                             'running': 0,
                             'spooled': 0,
@@ -402,28 +368,16 @@ class _TestScheduler(IndicoTestCase):
         Creating 1 periodic task that fails every second time
         """
 
-        now = base.TimeSource.get().getCurrentTime()
-
-        s = ((now.second / 10) + 1) % 6
-
-        seconds = [s * 10]
-
-        # get intervals of 10 seconds
-        for i in range(0, 3):
-            s = s + 1
-            seconds.append((s % 6) * 10)
-
         self._startSomeWorkers([TestPeriodicFailTask],
-                               [rrule.MINUTELY],
-                               bysecond=tuple(seconds))
+                               [rrule.SECONDLY],
+                               dtstart=base.TimeSource.get().getCurrentTime(),
+                               interval=10)
 
         # All workers will have finished
-        self.assertEqual(self._checkWorkersFinished(60, value=4),
+        self.assertEqual(self._checkWorkersFinished(55, value=4),
                          True)
 
-        self._shutdown()
-
-        self._assertStatus({'state': False,
+        self._assertStatus({'state': True,
                             'waiting': 1,
                             'running': 0,
                             'spooled': 0,

@@ -32,6 +32,7 @@ import StringIO
 import pkg_resources
 from smtpd import SMTPServer
 import asyncore
+import logging
 
 # Indico
 from indico.util.console import colored
@@ -305,7 +306,7 @@ class BaseTestRunner(IOMixin):
 
 class FakeMailServer(SMTPServer):
     def process_message(self, peer, mailfrom, rcpttos, data):
-        print "mail from %s" % mailfrom
+         logging.getLogger('indico.test.fake_smtp').info("mail from %s" % mailfrom)
 
 
 class FakeMailThread(Thread):

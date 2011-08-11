@@ -148,7 +148,8 @@ class TestManager(object):
             'LogDir': os.path.join(temp, 'log'),
             'XMLCacheDir': os.path.join(temp, 'cache'),
             'ArchiveDir': os.path.join(temp, 'archive'),
-            'UploadedFilesTempDir': os.path.join(temp, 'tmp')
+            'UploadedFilesTempDir': os.path.join(temp, 'tmp'),
+            'TempDir': os.path.join(temp, 'tmp')
             })
 
         Config.setInstance(config)

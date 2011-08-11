@@ -18,10 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.i18n import _
-
 __metadata__ = {
     'type': "Collaboration",
     'name': "CERNMCU",
-    'description': _("Create conferences in CERN's MCU")
+    'description': "Create conferences in CERN's MCU"
     }

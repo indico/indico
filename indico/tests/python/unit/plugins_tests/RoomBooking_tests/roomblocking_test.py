@@ -22,7 +22,7 @@
 # pylint: disable-all
 
 from indico.tests.env import *
-from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
+from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase, with_context
 from MaKaC.user import AvatarHolder, Avatar, Group, GroupHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common import Configuration
@@ -131,6 +131,7 @@ class RoomBookingTestCase(IndicoTestCase):
 class TestRoomBookingDBSetup(IndicoTestCase):
     _requires = [RoomBooking_Feature]
 
+    @with_context('database')
     def testDummies(self):
         self.assertEqual(self._room1.getResponsible(), self._avatar1)
         self.assertEqual(self._room2.getResponsible(), self._avatar2)
@@ -177,6 +178,7 @@ class TestRoomBlocking(RoomBookingTestCase):
         self._resv8 = self._createResv(self._room6, self._avatar3, date(2010, 12, 30), date(2011, 1, 2))
         self._resv9 = self._createResv(self._room7, self._avatar3, date(2011, 1, 1), date(2011, 1, 1))
 
+    @with_context('database')
     def testGeneralData(self):
         block = self._createTestBlocking()
         self.assertEqual(block.createdByUser, self._avatar2)
@@ -185,6 +187,7 @@ class TestRoomBlocking(RoomBookingTestCase):
         self.assertEqual(block.getStartDate().time(), time())
         self.assertEqual(block.getEndDate().time(), time())
 
+    @with_context('database')
     def testIndexes(self):
         block = self._createTestBlocking()
         block2 = Factory.newRoomBlocking()()
@@ -243,6 +246,7 @@ class TestRoomBlocking(RoomBookingTestCase):
         block2.update()
         self.assertTrue(not RoomBlockingBase.getByRoom(self._room1))
 
+    @with_context('database')
     def testBlockingRejectionIfNotAllowed(self):
         self._createTestReservations()
         block = self._createTestBlocking()
@@ -278,6 +282,7 @@ class TestRoomBlocking(RoomBookingTestCase):
         br.approve(sendNotification=False)
         self.assertTrue(self._resv9.isRejected) # should be rejected: blocking has been approved
 
+    @with_context('database')
     def testReservationSpecificBlockingMethods(self):
         block = self._createTestBlocking()
         candResv = Location.getDefaultLocation().factory.newReservation()
@@ -311,6 +316,7 @@ class TestRoomBlocking(RoomBookingTestCase):
         self.assertTrue(candResv.getBlockingConflictState() is None) # No blocking
         self.assertEqual(candResv.getBlockedDates(), [])
 
+    @with_context('database')
     def testPrivileges(self):
         block = self._createTestBlocking() # owner: av2, acl: av4
         # canModify: admins and owner
@@ -357,6 +363,7 @@ class TestRoomBlocking(RoomBookingTestCase):
         self.assertTrue(block.isOwnedBy(self._avatar2)) # owner
         self.assertFalse(block.isOwnedBy(self._dummy)) # admin
 
+    @with_context('database')
     def testACL(self):
         block = self._createTestBlocking()
         grp = Group()

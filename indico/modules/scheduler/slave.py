@@ -114,18 +114,19 @@ class _Worker(object):
                 base.TimeSource.get().sleep(nextRunIn)
 
             except Exception, e:
-                nextRunIn = i * 10  # secs
                 self._logger.exception("%s failed with exception '%s'. " % \
                                        (self._task, e))
 
                 if  i < self._config.task_max_tries:
+                    nextRunIn = i * 10  # secs
+
                     self._logger.warning("Retrying for the %dth time in %d secs.." % \
                                          (i + 1, nextRunIn))
 
-                # if i is still low enough, we sleep progressively more
-                # so that if the error is caused by concurrency we don't make
-                # the problem worse by hammering the server.
-                base.TimeSource.get().sleep(nextRunIn)
+                    # if i is still low enough, we sleep progressively more
+                    # so that if the error is caused by concurrency we don't make
+                    # the problem worse by hammering the server.
+                    base.TimeSource.get().sleep(nextRunIn)
 
         self._logger.info('Ended on: %s' % self._task.endedOn)
 

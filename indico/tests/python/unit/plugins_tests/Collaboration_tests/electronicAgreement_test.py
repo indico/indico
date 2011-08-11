@@ -31,7 +31,7 @@ from MaKaC.plugins.Collaboration.services import SetSpeakerEmailAddress, SendEle
     RejectElectronicAgreement, AcceptElectronicAgreement
 from MaKaC import conference
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
-from tests.python.unit.util import IndicoTestFeature, IndicoTestCase
+from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase, with_context
 
 class FalseUser:
     _instance = None
@@ -45,7 +45,11 @@ class FalseUser:
     def getTimezone(self):
         return 'UTC'
 
+
 class FalseSession:
+    def is_https(self):
+        return False
+
     def getUser(self):
         return FalseUser.getInstance()
 
@@ -54,6 +58,7 @@ class FalseSession:
 
     def get_remote_ip(self):
         return '127.0.0.1'
+
 
 class Collaboration_Feature(IndicoTestFeature):
     _requires = ['plugins.Plugins']
@@ -66,7 +71,7 @@ class Collaboration_Feature(IndicoTestFeature):
     def destroy(self, obj):
         super(Collaboration_Feature, self).destroy(obj)
 
-ah = AvatarHolder()
+
 class TestElectronicAgreement(IndicoTestCase):
 
     _requires = [Collaboration_Feature]
@@ -79,6 +84,9 @@ class TestElectronicAgreement(IndicoTestCase):
         To contribution 1 - Add 1 speaker, person1
         '''
         super(TestElectronicAgreement, self).setUp()
+
+        self._startDBReq()
+
         self.falseSession = FalseSession()
         # Create few users
         self._creator = Avatar({"name":"God", "email":"test@epfl.ch"})
@@ -94,19 +102,20 @@ class TestElectronicAgreement(IndicoTestCase):
         self.person1.setId("spk3")
         self.person4 = Avatar({"name":"silvio", "email":"78@hispeed.ch"})
         self.person1.setId("spk4")
+
+        ah = AvatarHolder()
         ah.add(self.person1)
         ah.add(self.person2)
         ah.add(self.person3)
         ah.add(self.person4)
 
         # Create a conference
-        self._conf = Conference(self._creator)
-        category = conference.Category()
-        self._conf.addOwner(category)
+        category = conference.CategoryManager().getById('0')
+        self._conf = category.newConference(self._creator)
         self._conf.setTimezone('UTC')
         sd=datetime(2011, 06, 01, 10, 00, tzinfo=timezone("UTC"))
         ed=datetime(2011, 06, 05, 10, 00, tzinfo=timezone("UTC"))
-        self._conf.setDates(sd,ed)
+        self._conf.setDates(sd,ed,)
         ch = ConferenceHolder()
         ch.add(self._conf)
 
@@ -146,7 +155,9 @@ class TestElectronicAgreement(IndicoTestCase):
         slot1.getSchedule().addEntry(c2.getSchEntry())
 
         self.createAndAcceptBooking()
+        self._stopDBReq()
 
+    @with_context('database')
     def testRightsFiltering(self):
         '''
         Test if the managing rights are respected.
@@ -169,6 +180,7 @@ class TestElectronicAgreement(IndicoTestCase):
                 sw = manager.getSpeakerWrapperByUniqueId("%s.%s"%(cont, spk.getId()))
                 self.assert_(sw.getRequestType() == "webcast" or sw.getRequestType() == "both")
 
+    @with_context('database')
     def testNOEMAILStatus(self):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to NOEMAIL.\n
@@ -211,6 +223,7 @@ class TestElectronicAgreement(IndicoTestCase):
                 self.changeEmailService(cont, self.speaker1.getId(), "")
                 self.assert_(sw.getStatus() == SpeakerStatusEnum.REFUSED)
 
+    @with_context('database')
     def testPENDINGStatus(self):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to PENDING.\n
@@ -231,6 +244,7 @@ class TestElectronicAgreement(IndicoTestCase):
                 sw = manager.getSpeakerWrapperByUniqueId("%s.%s"%(cont, spk.getId()))
                 self.assert_(sw.getStatus() == SpeakerStatusEnum.PENDING)
 
+    @with_context('database')
     def testSIGNEDStatus(self):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to SIGNED.\n
@@ -244,6 +258,7 @@ class TestElectronicAgreement(IndicoTestCase):
                 self.submitAgreementService(sw, 'accept')
                 self.assert_(sw.getStatus() == SpeakerStatusEnum.SIGNED)
 
+    @with_context('database')
     def testREFUSEDStatus(self):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to REFUSED.\n

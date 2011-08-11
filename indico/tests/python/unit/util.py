@@ -26,9 +26,12 @@ Some utils for unit tests
 import unittest, sys, new, contextlib
 
 # indico imports
+from indico.util.contextManager import ContextManager
+from indico.util.i18n import setLocale
+
+# indico legacy imports
 from MaKaC.common import Config
 from MaKaC.common.logger import Logger
-from MaKaC.common.contextManager import ContextManager
 
 loadedFeatures = []
 
@@ -83,41 +86,6 @@ class FeatureLoadingObject(object):
         del self._activeFeatures[:]
 
 
-class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
-
-    """
-    IndicoTestCase is a normal TestCase on steroids. It allows you to load
-    "features" that will empower your test classes
-    """
-
-    _requires = []
-
-    def __init__(self, *args, **kwargs):
-        unittest.TestCase.__init__(self, *args, **kwargs)
-        FeatureLoadingObject.__init__(self)
-
-    def setUp(self):
-        Logger.removeHandler('smtp')
-        self._configFeatures(self)
-
-    def tearDown(self):
-        self._unconfigFeatures(self)
-
-    @contextlib.contextmanager
-    def _context(self, *contexts, **kwargs):
-        ctxs = []
-        res = []
-        for ctxname in contexts:
-            ctx = getattr(self, '_context_%s' % ctxname)(**kwargs)
-            res.append(ctx.next())
-            ctxs.append(ctx)
-
-        yield res if len(res) > 1 else res[0]
-
-        for ctx in ctxs[::-1]:
-            ctx.next()
-
-
 class IndicoTestFeature(FeatureLoadingObject):
 
     _requires = []
@@ -127,6 +95,18 @@ class IndicoTestFeature(FeatureLoadingObject):
 
     def destroy(self, obj):
         self._unconfigFeatures(obj)
+
+
+def with_context(context):
+    """
+    Decorator
+    """
+    def wrapper(method):
+        def testWrapped(self, *args, **kwargs):
+            with self._context(context):
+                return method(self, *args, **kwargs)
+        return testWrapped
+    return wrapper
 
 
 class ContextManager_Feature(IndicoTestFeature):
@@ -161,5 +141,42 @@ class RequestEnvironment_Feature(IndicoTestFeature):
 
     def _context_request(self):
         self._startRequest()
+        setLocale('en_GB')
         yield
         self._endRequest()
+
+
+class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
+
+    """
+    IndicoTestCase is a normal TestCase on steroids. It allows you to load
+    "features" that will empower your test classes
+    """
+
+    _requires = []
+
+    def __init__(self, *args, **kwargs):
+        unittest.TestCase.__init__(self, *args, **kwargs)
+        FeatureLoadingObject.__init__(self)
+
+    def setUp(self):
+        setLocale('en_GB')
+        Logger.removeHandler('smtp')
+        self._configFeatures(self)
+
+    def tearDown(self):
+        self._unconfigFeatures(self)
+
+    @contextlib.contextmanager
+    def _context(self, *contexts, **kwargs):
+        ctxs = []
+        res = []
+        for ctxname in contexts:
+            ctx = getattr(self, '_context_%s' % ctxname)(**kwargs)
+            res.append(ctx.next())
+            ctxs.append(ctx)
+
+        yield res if len(res) > 1 else res[0]
+
+        for ctx in ctxs[::-1]:
+            ctx.next()

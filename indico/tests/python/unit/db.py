@@ -99,6 +99,7 @@ class Database_Feature(IndicoTestFeature):
     def _action_stopDBReq(obj):
         transaction.commit()
         obj._conn.close()
+        obj._conn = None
 
     def _context_database(self, sync=False):
         conn = self._startDBReq()

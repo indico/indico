@@ -29,14 +29,17 @@ of files.
 import unittest
 import os
 from indico.tests.env import *
+from indico.tests.python.unit.util import IndicoTestCase
 
-class TestMaterialRepository(unittest.TestCase):
+
+class TestMaterialRepository(IndicoTestCase):
     """
     Tests the basic functionalities of the MaterialLocalRepository file
     repository.
     """
 
     def setUp( self ):
+        super(TestMaterialRepository, self).setUp()
         self._archivePath = os.path.join( os.getcwd(), "tmpArchive" )
         #create a directory where the archive will be set up
         try:

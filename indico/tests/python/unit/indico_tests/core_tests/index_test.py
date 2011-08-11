@@ -109,7 +109,7 @@ class TestIIIndex(unittest.TestCase):
 class IDummyAdapter(zope.interface.Interface):
     pass
 
-class DummyObject(Persistent):
+class DummyObject(object):
 
     zope.interface.implements(IUniqueIdProvider,
                               IDummyAdapter)
@@ -156,7 +156,7 @@ class TestIOIndex(unittest.TestCase):
         self.assertEqual(len(self._idx), 0)
 
         for i in range(0,20):
-            self.assertRaises(KeyError, self._idx.get, i)
+            self.assertEqual(self._idx.get(i), None)
 
     def testUnindexingNonExisting(self):
         self.assertRaises(ElementNotFoundException,
@@ -169,4 +169,3 @@ class TestIOIndex(unittest.TestCase):
         self.assertRaises(ElementAlreadyInIndexException,
                           self._idx.index_obj,
                           obj)
-

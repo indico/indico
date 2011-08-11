@@ -93,8 +93,6 @@ class PluginLoader(object):
 
         ptypes = dict((ep.name, ep.module_name) for ep in pkg_resources.iter_entry_points('indico.ext_types'))
 
-        print ptypes
-
         cls.loadPluginType(ptypeId, ptypes[ptypeId])
         cls._ptypesLoaded.add(ptypeId)
 
@@ -232,8 +230,6 @@ class PluginLoader(object):
                 if not epoint.name.startswith("%s." % ptypeId):
                     continue
                 else:
-                    print epoint, ptypeId
-
                     pid = epoint.name[len(ptypeId) + 1:]
                     # load plugin files
                     cls._loadPluginFromDir(mname, ptypeId, ptypeModule, pid)

@@ -24,6 +24,8 @@ System tests for indico.ext.livesync
 Here, the notification parts of the plugin are tested in a global way.
 """
 
+from indico.util.i18n import currentLocale
+
 # plugin imports
 from indico.ext.livesync.test.unit.base import _TestSynchronization
 
@@ -122,7 +124,7 @@ class TestBasicOperations(_TestSynchronization):
 
         self.checkActions(ts, set([(categ3, 'moved set_public')]))
 
-    def testEventeCreateDeleteInside(self):
+    def testEventCreateDeleteInside(self):
         """
         Create an event (and things inside) and delete it
         """
