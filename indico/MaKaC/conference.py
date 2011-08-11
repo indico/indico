@@ -1047,6 +1047,7 @@ class Category(CommonObjectBase):
         # set the protection
         sc.setProtection(protection)
 
+        Catalog.getIdx('categ_conf_sd').add_category(sc.getId())
         sc._notify('created', self)
 
         self._addSubCategory( sc )
