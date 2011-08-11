@@ -28,6 +28,8 @@ class CategoryEventStartDateIndex(Index):
 
     def __init__(self):
         self._container = OOBTree()
+        # add home category by default
+        self.add_category('0')
 
     def __getitem__(self, key):
         return self._container[key]
@@ -38,13 +40,16 @@ class CategoryEventStartDateIndex(Index):
     def getCategory(self, categId, create=False):
         if categId not in self._container:
             if create:
-                self._container[categId] =  IOIndex(IIndexableByStartDateTime)
+                self.add_category(categId)
             else:
                 raise KeyError(categId)
         return self._container[categId]
 
+    def add_category(self, categId):
+        self._container[categId] =  IOIndex(IIndexableByStartDateTime)
+
     def index_obj(self, obj):
-        self.getCategory(obj.getOwner().getId(), create=True).index_obj(obj)
+        self.getCategory(obj.getOwner().getId()).index_obj(obj)
 
     def unindex_obj(self, obj):
         self.getCategory(obj.getOwner().getId()).unindex_obj(obj)

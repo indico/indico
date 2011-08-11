@@ -39,6 +39,10 @@ class Catalog(OOBTree):
 
         catalog = cls()
 
+        for indexName, clazz in cls._indexMap.iteritems():
+            newIdx = clazz()
+            catalog[indexName] = newIdx
+
         db.root()['catalog'] = catalog
 
     @classmethod
@@ -63,7 +67,6 @@ class Catalog(OOBTree):
             cls.initialize(db=db)
 
         for indexName, clazz in cls._indexMap.iteritems():
-            if not cls.getIdx(indexName, db=db):
-                newIdx = clazz()
-                root['catalog'][indexName] = newIdx
-                newIdx.initialize(dbi=dbi)
+            newIdx = clazz()
+            root['catalog'][idxName] = newIdx
+            newIdx.initialize(dbi=dbi)
