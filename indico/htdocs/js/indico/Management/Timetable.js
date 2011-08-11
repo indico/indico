@@ -891,29 +891,31 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              /* timetable may need a full refresh,
                 if the time changes */
 
+             if (self.parameterManager.check()){
              /** save in server **/
              var args = clone(self.info);
 
              var killProgress = IndicoUI.Dialogs.Util.progress();
-             indicoRequest(self.managementActions.methods[self.info.get('type')].edit,
-                      args,
-                      function(result, error){
-                      killProgress();
-                      if (error) {
-                           IndicoUtil.errorReport(error);
-                      }
-                      else {
-                          //if we are moving the result to the top timetable we don't need the session slot
-                          if(self.dayChanged && exists(result.slotEntry)) {
-                              result.slotEntry = null;
-                              self.managementActions.timetable._updateMovedEntry(result, result.oldId);
-                          }else {
-                              self.managementActions.timetable._updateEntry(result, result.id);
+                 indicoRequest(self.managementActions.methods[self.info.get('type')].edit,
+                          args,
+                          function(result, error){
+                          killProgress();
+                          if (error) {
+                               IndicoUtil.errorReport(error);
                           }
+                          else {
+                              //if we are moving the result to the top timetable we don't need the session slot
+                              if(self.dayChanged && exists(result.slotEntry)) {
+                                  result.slotEntry = null;
+                                  self.managementActions.timetable._updateMovedEntry(result, result.oldId);
+                              }else {
+                                  self.managementActions.timetable._updateEntry(result, result.id);
+                              }
 
-                          self.close();
-                      }
-             });
+                              self.close();
+                          }
+                 });
+             }
          }
      },
 
