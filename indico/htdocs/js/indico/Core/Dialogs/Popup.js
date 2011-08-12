@@ -409,6 +409,10 @@ type("AlertPopup", ["ExclusivePopupWithButtons"],
     },
 
     function(title, content, callback) {
+        if(content.dom) {
+            // Indico XElement object
+            content = content.dom;
+        }
         this.content = content;
         this.callback = callback || positive;
         this.ExclusivePopupWithButtons(title, this.callback);
