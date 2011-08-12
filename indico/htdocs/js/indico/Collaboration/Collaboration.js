@@ -1064,8 +1064,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
 
             this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, null);
 
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw(), null,
-                    {backgroundColor: "#FFFFFF"});
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw());
         },
 
         _getButtons: function() {

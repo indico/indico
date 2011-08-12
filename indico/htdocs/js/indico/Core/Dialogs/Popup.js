@@ -227,9 +227,6 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
         if(this.defaultButton !== null) {
             this.buttons[this.defaultButton].focus();
         }
-    },
-    draw: function(mainContent, buttonContent, popupCustomStyle, mainContentStyle, buttonBarStyle) {
-        this.ExclusivePopup.prototype.draw.call(this, mainContent, popupCustomStyle);
     }
 }, function(title, closeButtonHandler, printable, showPrintButton, noCanvas){
     this.ExclusivePopup(title, closeButtonHandler, printable, showPrintButton, noCanvas);

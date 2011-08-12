@@ -352,7 +352,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             var height = 200
 
             this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, height);
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw(), {backgroundColor: "#FFFFFF"});
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw());
         },
 
         _getButtons: function() {

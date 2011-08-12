@@ -562,7 +562,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                                         [$T('Advanced'), this._drawAdvanced()]],
                                        400, 300);
 
-        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget(), null, {backgroundColor: 'white'});
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
     }
 
 
@@ -615,7 +615,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
         ];
     },
 
-     _fileUpload: function() {
+    _fileUpload: function() {
         var self = this
         var pm = self.pm = new IndicoUtil.parameterManager();
         var uploadType = Html.input('hidden', {name: 'uploadType'});

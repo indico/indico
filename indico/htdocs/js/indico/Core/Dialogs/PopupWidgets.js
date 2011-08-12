@@ -63,7 +63,7 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     },
 
     draw: function() {
-        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget(), null, {
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget(), {
             overflow: 'visible'
         });
     }
