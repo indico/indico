@@ -5332,16 +5332,18 @@ class WSetAlarm(wcomponents.WTemplated):
 class WConfDisplayAlarm( wcomponents.WTemplated ):
 
     def __init__(self, conference, aw):
-            self.__conf = conference
+            self.__conf = self.__target = conference
             self._aw=aw
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["alarmFrame"] = wcomponents.WAlarmFrame().getHTML(\
-                                            self.__conf,\
-                                            vars["addAlarmURL"], \
-                                            vars["deleteAlarmURL"],\
-                                            vars["modifyAlarmURL"] )
+        vars["locator"] = self.__target.getLocator().getWebForm()
+        vars["dtFormat"]= "%Y-%m-%d %H:%M"
+        vars["confTZ"]= timezone(self.__target.getTimezone())
+        vars["alarmList"] = self.__target.getAlarmList()
+        vars["timezone"] = self.__target.getTimezone()
+        vars["notScheduledMsg"] = _("The alarm is being scheduled, please wait some seconds and refresh the page.")
+        vars["alarmSentMsg"] = _("The alarm can no longer be edited as it has already been sent.")
         return vars
 
 class WPConfDisplayAlarm( WPConfModifToolsBase ):
