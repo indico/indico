@@ -687,17 +687,10 @@ class RH(RequestHandlerBase):
                 os.remove(file)
 
     def getRequestURL( self ):
-        proc = "http://"
-        try:
-            if self._req.is_https():
-                proc = "https://"
-        except:
-            pass
-
-        port = ""
-        if self._req.parsed_uri[apache.URI_PORT]:
-            port = ":" + str( self._req.parsed_uri[apache.URI_PORT] )
-        return "%s%s%s%s"%(proc, self._req.hostname, port, self._req.unparsed_uri)
+        """
+        Reconstructs the request URL
+        """
+        return self._req.construct_url(self._req.unparsed_uri)
 
     def _startRequestSpecific2RH( self ):
         """
@@ -795,11 +788,7 @@ class RoomBookingDBMixin:     # It's _not_ RH
 class RHProtected( RH ):
 
     def _getLoginURL( self ):
-        #url = self.getCurrentURL()
-        url = self.getRequestURL()
-        if url == "":
-            url = urlHandlers.UHWelcome.getURL()
-        return urlHandlers.UHSignIn.getURL( url )
+        return urlHandlers.UHSignIn.getURL(self.getRequestURL())
 
     def _checkSessionUser( self ):
         """
