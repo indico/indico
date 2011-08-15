@@ -487,23 +487,23 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         if abstract.getComments():
             comments = i18nformat(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
         html = """
-        <tr id="abstracts%s" style="background-color: transparent;" onmouseout="onMouseOut('abstracts%s')" onmouseover="onMouseOver('abstracts%s')">
-            <td align="right" width="3%%" valign="top"><input type="checkbox" onchange="isSelected('abstracts%s')" name="abstracts" value=%s%s></td>
+        <tr id="abstracts%s" class="abstract">
+            <td align="right" width="3%%" valign="top"><input type="checkbox" name="abstracts" value="%s"%s></td>
             <td nowrap class="CRLabstractDataCell">%s%s</td>
             <td width="100%%" align="left" valign="top" class="CRLabstractDataCell">
-                <a href=%s>%s</a></td>
+                <a href="%s">%s</a></td>
             <td valign="top" class="CRLabstractDataCell">%s</td>
             <td nowrap valign="top" class="CRLabstractDataCell">%s %s</td>
             <td valign="top" class="CRLabstractDataCell">%s</td>
             <td nowrap valign="top" class="CRLabstractDataCell">%s</td>
         </tr>
-                """%(abstract.getId(), abstract.getId(), abstract.getId(), abstract.getId(), \
-                     quoteattr(str(abstract.getId())),self._checked, \
-                     self.htmlText(abstract.getId()),comments,\
-                    quoteattr(str(url)),self.htmlText(abstract.getTitle()),\
-                    self.htmlText(contribTypeName),icon, \
-                    label,self.htmlText(accType),\
-                    abstract.getSubmissionDate().strftime("%d %B %Y"))
+                """ % (abstract.getId(), \
+                abstract.getId(),self._checked, \
+                self.htmlText(abstract.getId()),comments,\
+                str(url),self.htmlText(abstract.getTitle()),\
+                self.htmlText(contribTypeName),icon, \
+                label,self.htmlText(accType),\
+                abstract.getSubmissionDate().strftime("%d %B %Y"))
         return html
 
     def _getURL( self ):
@@ -611,58 +611,21 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         sortingField = self._sortingCrit.getField()
         vars["currentSorting"] = ""
 
+        for crit in ["type", "status", "number", "date"]:
+            url = self._getURL()
 
-        url = self._getURL()
-        url.addParam("sortBy", "type")
-        vars["typeImg"] = ""
-        if sortingField and sortingField.getId() == "type":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="type">"""
-            if self._order == "down":
-                vars["typeImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["typeImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["typeSortingURL"] = quoteattr( str( url ) )
+            vars["%sImg" % crit] = ""
+            url.addParam("sortBy", crit)
 
-        vars["statusImg"] = ""
-        url = self._getURL()
-        url.addParam("sortBy", "status")
-        if sortingField and sortingField.getId() == "status":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="status">"""
-            if self._order == "down":
-                vars["statusImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["statusImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["statusSortingURL"] = quoteattr( str( url ) )
-
-        vars["numberImg"] = ""
-        url = self._getURL()
-        url.addParam("sortBy", "number")
-        if sortingField and sortingField.getId() == "number":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="number">"""
-            if self._order == "down":
-                vars["numberImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["numberImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["numberSortingURL"] = quoteattr(str(url))
-
-        url = self._getURL()
-        url.addParam("sortBy", "date")
-        vars["dateImg"] = ""
-        if sortingField and sortingField.getId() == "date":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="date">"""
-            if self._order == "down":
-                vars["dateImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["dateImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["dateSortingURL"] = quoteattr( str( url ) )
+            if sortingField.getId() == crit:
+                vars["currentSorting"] = '<input type="hidden" name="sortBy" value="%s">' % crit
+                if self._order == "down":
+                    vars["%sImg" % crit] = """<img src="%s" alt="">"""%(Config.getInstance().getSystemIconURL("downArrow"))
+                    url.addParam("order","up")
+                elif self._order == "up":
+                    vars["%sImg" % crit] = """<img src="%s" alt="">"""%(Config.getInstance().getSystemIconURL("upArrow"))
+                    url.addParam("order","down")
+            vars["%sSortingURL" % crit] = str(url)
 
         url = urlHandlers.UHTrackModifAbstracts.getURL( self._track )
         url.addParam("order", self._order)

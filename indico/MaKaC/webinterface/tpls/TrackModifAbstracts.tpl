@@ -82,6 +82,10 @@
             <table width="100%" cellspacing="0" border="0" style="padding-left:2px">
                 <tr>
                     <td colspan="7" style="border-bottom: 2px solid #777777; padding-bottom: 3px;" valign="bottom" align="left">
+                      % if canModify:
+                          <a href="${ allAbstractsURL }" style="float:right; margin-top: 15px;">${ _("Go to all abstracts")}</a>
+                      % endif
+
                         <table>
                             <tr>
                                 <form action=${ actionURL } method="post" name="abstractsForm" target="_blank" onSubmit="return atLeastOneSelected();">
@@ -90,9 +94,6 @@
                                 <td valign="bottom" align="left" nowrap>
                                     <input type="image" name="PDF" src=${ pdfIconURL} border="0" value="${ _("PDF of selected")}">
                                 </td>
-                                % if canModify:
-                                    <td nowrap width="100%" align="right"><span class="fakeLink" onclick="window.location = '${ allAbstractsURL }';">${ _("Go to all abstracts")}</span></td>
-                                % endif
                             </tr>
                         </table>
                     </td>
@@ -105,16 +106,16 @@
                     <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts with the filters criteria selected")}</span></td>
                 % else:
                 <tr>
-                    <td colspan="7" style="padding: 5px 0px 10px;" nowrap>${ _("Select: ") }<a style="color: #0B63A5;" onclick="selectAll();">${ _("All") }</a>, <a style="color: #0B63A5;" onclick="deselectAll()">${ _("None") }</a></td>
+                    <td colspan="7" style="padding: 5px 0px 10px;" nowrap>${ _("Select: ") }<a style="color: #0B63A5;" id="selectAll">${ _("All") }</a>, <a style="color: #0B63A5;" id="deselectAll">${ _("None") }</a></td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href=${ numberSortingURL }> ${_("ID")}</a> ${ numberImg }</td>
+                    <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href="${ numberSortingURL }"> ${_("ID")}</a> ${ numberImg }</td>
                     <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF">${ _("Title")}</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${ typeSortingURL }>${ _("Type")}</a> ${ typeImg }</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${ statusSortingURL }>${ _("Status")}</a><b> ${ statusImg }</td>
+                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${ typeSortingURL }">${ _("Type")}</a> ${ typeImg }</td>
+                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${ statusSortingURL }">${ _("Status")}</a><b> ${ statusImg }</td>
                     <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${ _("Acc. Type")}</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${ dateSortingURL }> ${ _("Submission date")}</a> ${ dateImg }</td>
+                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${ dateSortingURL }"> ${ _("Submission date")}</a> ${ dateImg }</td>
                 </tr>
                  % endif
                 <form action=${ actionURL } method="post" name="abstractsForm" target="_blank" onSubmit="return atLeastOneSelected()">
@@ -132,13 +133,14 @@
                                 <td nowrap valign="bottom" align="left">
                                     <input type="image" name="PDF" src=${ pdfIconURL} border="0" value="${ _("PDF of selected")}">
                                 </td>
-                                % if canModify:
-                                    <td nowrap width="100%" align="right"><span class="fakeLink" onclick="window.location = '${ allAbstractsURL }';">${ _("Go to all abstracts")}</span></td>
-                                % endif
+
                                 </form>
                                 </form>
                             </tr>
                         </table>
+                        % if canModify:
+                          <a href="${ allAbstractsURL }" style="float:right;">${ _("Go to all abstracts")}</a>
+                        % endif
                     </td>
                 </tr>
             </table>
@@ -165,75 +167,35 @@ function showFilters() {
 }
 
 
-function selectAll() {
-    if (!document.abstractsForm.abstracts.length) {
-        document.abstractsForm.abstracts.checked = true;
-    } else {
-        for (i = 0; i < document.abstractsForm.abstracts.length; i++) {
-            document.abstractsForm.abstracts[i].checked = true;
+$(function() {
+    $('.abstract input').change(function() {
+        if (this.checked) {
+            $(this).parents('.abstract').addClass('selected');
+        } else {
+            $(this).parents('.abstract').removeClass('selected');
         }
-    }
-    isSelected("abstractsItems")
-}
+    });
 
-function deselectAll() {
-    if (!document.abstractsForm.abstracts.length) {
-        document.abstractsForm.abstracts.checked = false;
-    } else {
-        for (i = 0; i < document.abstractsForm.abstracts.length; i++) {
-            document.abstractsForm.abstracts[i].checked = false;
-        }
-    }
-    isSelected("abstractsItems")
-}
+    $('#selectAll').click(function() {
+        $('.abstract input:not(:disabled)').prop('checked', true)
+        $('.abstract input').trigger('change');
+    });
 
-function isSelected(element) {
-    var inputNodes = IndicoUtil.findFormFields($E(element))
-    for (i = 0; i < inputNodes.length; i++) {
-        var node = inputNodes[i];
-        if (node.type == "checkbox") {
-            if(node.checked == true) {
-                $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
-            } else {
-                $E(node.name+node.value).dom.style.backgroundColor='transparent';
-            }
-        }
-    }
-}
+    $('#deselectAll').click(function() {
+        $('.abstract input:not(:disabled)').prop('checked', false)
+        $('.abstract input').trigger('change');
+    });
 
-function onMouseOver(element) {
-    if ($E(element).dom.style.backgroundColor ==='transparent') {
-       $E(element).dom.style.backgroundColor='rgb(255, 246, 223)';
-    }
-}
-
-function onMouseOut(element) {
-    var inputNodes = IndicoUtil.findFormFields($E(element))
-    for (i = 0; i < inputNodes.length; i++) {
-        var node = inputNodes[i];
-        if (node.type == "checkbox") {
-            if(node.checked !== true) {
-                $E(node.name+node.value).dom.style.backgroundColor='transparent';
-            } else {
-                $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
-            }
-        }
-    }
-}
+});
 
 function atLeastOneSelected() {
-    var inputNodes = IndicoUtil.findFormFields($E("abstractsItems"))
-    for (i = 0; i < inputNodes.length; i++) {
-        var node = inputNodes[i];
-        if (node.type == "checkbox") {
-            if(node.checked == true) {
-                return true;
-            }
-        }
+    if($('.abstract input:not(:disabled):checked').length) {
+        return true;
+    } else {
+        var dialog = new WarningPopup($T("Warning"), $T("No abstract selected! Please select at least one."));
+        dialog.open();
+        return false;
     }
-    var dialog = new WarningPopup($T("Warning"), $T("No abstract selected! Please select at least one."));
-    dialog.open();
-    return false;
 }
 
 </script>
