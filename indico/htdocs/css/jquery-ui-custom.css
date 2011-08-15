@@ -10,17 +10,8 @@
 
 /* Indico styled tooltips USED WITH qTip2 */
 
-.ui-tooltip-default {
-    border: solid 1px #888;
-    color: #222;
-    background-color: #F0F0F0;
-    font-size: 11px;
-    padding: 2px;
-}
-
-.ui-tooltip-default .ui-tooltip-titlebar,
 .ui-tooltip-default .ui-tooltip-content {
-    border: none;
+    border: solid 1px #888;
     color: #222;
     background-color: #F0F0F0;
     font-size: 11px;

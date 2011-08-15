@@ -6,3 +6,8 @@
         labels: [$T('Choose the start date'), $T('Choose the end date')]
     });
 })(jQuery);
+
+$.fn.qtip.defaults = $.extend(true, {}, $.fn.qtip.defaults, {
+    position: { my: 'top left', at: 'bottom right'},
+    style: {tip: {corner: true}}
+});
