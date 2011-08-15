@@ -55,10 +55,13 @@ class RHContributionDisplay( RoomBookingDBMixin, RHContributionDisplayBase ):
 
     def _process( self ):
         p = contributions.WPContributionDisplay( self, self._contrib, self._hideFull )
-        wf=self.getWebFactory()
-        if wf is not None:
-                p = wf.getContributionDisplay( self, self._contrib, self._hideFull)
-        return p.display()
+        if self._conf.getType()=="simple_event":
+            self._redirect(urlHandlers.UHConferenceDisplay.getURL(self._conf))
+        else:
+            wf=self.getWebFactory()
+            if wf is not None:
+                    p = wf.getContributionDisplay( self, self._contrib, self._hideFull)
+            return p.display()
 
 
 class RHContributionToXML(RHContributionDisplay):
