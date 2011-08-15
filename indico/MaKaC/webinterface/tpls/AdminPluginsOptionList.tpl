@@ -235,6 +235,7 @@
                                          optionName: "${ name }",
                                          room: roomToAdd
                                          },function(result,error) {
+                                             if (!error) {
                                                  setResult(true);
                                              } else {
                                                  IndicoUtil.errorReport(error);
