@@ -29,12 +29,14 @@ from dateutil import rrule
 
 from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayIndex
 from MaKaC.common import DBMgr
+from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
 from MaKaC.conference import ConferenceHolder, CategoryManager, Conference
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
+from MaKaC.webinterface import displayMgr
 
 from indico.core.index import Catalog
 from indico.ext import livesync
@@ -253,6 +255,7 @@ def runCategoryConfDictToTreeSet(dbi, withRBDB):
         if len(categ.conferences) != len(categ.conferencesBackup):
             print "Problem migrating conf dict to tree set: %s" % categ.getId()
 
+
 def runRoomBlockingInit(dbi, withRBDB):
     """
     Initializing room blocking indexes.
@@ -266,11 +269,34 @@ def runRoomBlockingInit(dbi, withRBDB):
         root['RoomBlocking']['Indexes']['DayBlockings'] = CalendarDayIndex()
         root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
 
+
 def runLangToGB(dbi, withRBDB):
     avatars = AvatarHolder().getList()
     for av in avatars:
         if av.getLang() == "en_US":
             av.setLang("en_GB")
+
+
+def runMakoMigration(dbi, withRBDB):
+    cdmr = displayMgr.ConfDisplayMgrRegistery()
+    info = HelperMaKaCInfo().getMaKaCInfoInstance()
+    sm = info.getStyleManager()
+    for lid in ['meeting', 'simple_event', 'conference']:
+        l = sm._eventStylesheets[lid]
+        if 'it' in l:
+            l.remove('it')
+        if 'administrative3' in l:
+            l.remove('administrative3')
+        sm._eventStylesheets[lid] = l
+        sm._p_changed = 1
+    ch = ConferenceHolder()
+    for conf in ch.getList():
+        confDM = cdmr.getDisplayMgr(conf)
+        if confDM.getDefaultStyle() == 'administrative3':
+            confDM.setDefaultStyle('administrative')
+        if confDM.getDefaultStyle() == 'it':
+            confDM.setDefaultStyle('standard')
+
 
 def runPluginOptionsRoomGUIDs(dbi, withRBDB):
     ph = PluginsHolder()
@@ -285,7 +311,6 @@ def runPluginOptionsRoomGUIDs(dbi, withRBDB):
 
 def runMigration(withRBDB=False):
 
-
     tasks = [ runPluginMigration,
               runCategoryACMigration,
               runConferenceMigration,
@@ -294,7 +319,8 @@ def runMigration(withRBDB=False):
               runCategoryDateIndexMigration,
               runCatalogMigration,
               runRoomBlockingInit,
-              runLangToGB]
+              runLangToGB,
+              runMakoMigration]
 
     print "\nExecuting migration...\n"
 
