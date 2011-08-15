@@ -293,6 +293,71 @@ type("SelectableListWidget", ["ListWidget"],
     }
 );
 
+
+type("JTabWidget", ["IWidget"], {
+    _addTab: function(label, content) {
+        var id = _.uniqueId('x-tab-');
+        var container = $('<div/>', { id: id }).html(content);
+        this.canvas.append(container).tabs('add', '#' + id, label);
+    },
+    draw: function() {
+        return this.canvas[0];
+    },
+    enable: function() {
+        this.canvas.tabs('enable');
+    },
+    disable: function() {
+        this.canvas.tabs('disable');
+    },
+    enableTab: function(index) {
+        this.canvas.tabs('enable', index);
+    },
+    disableTab: function(index) {
+        this.canvas.tabs('disable', index);
+    },
+    getLabel: function(index) {
+        return this.canvas.find('.ui-tabs-nav > li').eq(index);
+    },
+    showNotification: function(index, text) {
+        var label = this.getLabel(index);
+        label.qtip({
+            content: text,
+            position: {
+                my: 'bottom middle',
+                at: 'top middle',
+                viewport: $(window)
+            },
+            show: {
+                event: false
+            },
+            hide: {
+                event: 'unfocus'
+            }
+        }).qtip('show');
+    },
+    hideNotification: function(index) {
+        var label = this.getLabel(index);
+        label.qtip('destroy');
+    }
+}, function(tabs, width, height) {
+    var self = this;
+    // create canvas element
+    self.canvas = $('<div><ul/></div>');
+    if(width) {
+        self.canvas.width(width);
+    }
+    if(height) {
+        self.canvas.css('minHeight', height);
+    }
+    self.canvas.tabs();
+    // add initial tabs
+    $.each(tabs, function(i, tab) {
+        var content = tab[1].dom ? tab[1].dom : tab[1];
+        self._addTab(tab[0], content);
+    });
+});
+
+
 type("TabWidget", ["IWidget"],{
     _titleTemplate: function(text) {
         return text;

@@ -24,6 +24,14 @@
     color: #e25300;
 }
 
+.ui-tabs a {
+    outline: none;
+}
+
+.ui-tabs-nav .ui-state-disabled {
+    display: none;
+}
+
 /* Indico styled tooltips USED WITH qTip2 */
 
 .ui-tooltip-default .ui-tooltip-content {

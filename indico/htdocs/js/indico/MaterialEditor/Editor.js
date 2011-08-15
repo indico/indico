@@ -306,15 +306,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
                 // draw a little notification saying that
                 // the added tab can be used
-                self.notification  = new NotificationBalloonPopup(
-                    selector.radioDict[state],
-                    Html.div({style:{width: '120px'}}, $T("You can specify users using this tab")));
-
-                var pos = self.tabWidget.tabs[1].getAbsolutePosition();
-
-                // open it, pointing to tab
-                self.notification.open(pos.x + self.tabWidget.tabs[1].dom.offsetWidth/2, pos.y);
-
+                self.tabWidget.showNotification(1, $T('You can specify users using this tab'));
             } else {
                 self.tabWidget.disableTab(1);
             }
@@ -557,10 +549,10 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
         var protectionDiv = this._drawProtectionDiv();
 
-        this.tabWidget = new TabWidget([[$T('Basic'), this._drawUpload()],
+        this.tabWidget = new JTabWidget([[$T('Basic'), this._drawUpload()],
                                         [$T("Protection"), protectionDiv],
                                         [$T('Advanced'), this._drawAdvanced()]],
-                                       400, 300);
+                                       400);
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
     }
@@ -805,15 +797,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
                 self.tabWidget.enableTab(1);
                 // draw a little notification saying that
                 // the added tab can be used
-                self.notification  = new NotificationBalloonPopup(
-                    self.protectionSelector.radioDict[value],
-                    Html.div({style:{width: '120px'}}, $T("You can specify users using this tab")));
-
-                var pos = self.tabWidget.tabs[1].getAbsolutePosition();
-
-                // open it, pointing to tab
-                self.notification.open(pos.x + self.tabWidget.tabs[1].dom.offsetWidth/2, pos.y);
-
+                self.tabWidget.showNotification(1, $T('You can specify users using this tab'));
             } else {
                 self.tabWidget.disableTab(1);
             }
@@ -848,7 +832,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         if(!this.forReviewing) {
             widget.push([$T("Protection") , protectionDiv]);
         }
-        return new TabWidget(widget, 400,350);
+        return new JTabWidget(widget, 400);
     },
 
     draw: function() {
