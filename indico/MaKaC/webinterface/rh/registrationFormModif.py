@@ -48,7 +48,6 @@ class RHRegistrationFormModif( RHRegistrationFormModifBase ):
     _uh = urlHandlers.UHConfModifRegForm
 
     def _process( self ):
-        self._conf.getRegistrationForm()._convertPersonalData()
         p = registrationForm.WPConfModifRegForm( self, self._conf )
         return p.display()
 

@@ -139,6 +139,9 @@ def runConferenceMigration(dbi, withRBDB):
         # only for conferences
         if level == 'event':
 
+            # convert registration form's "Personal Data" section to new format
+            obj.getRegistrationForm()._convertPersonalData()
+
             # handle sessions, that our iterator ignores
             for session in obj.getSessionList():
                 _fixAccessController(session)

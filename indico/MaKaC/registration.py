@@ -66,7 +66,7 @@ class RegistrationForm(Persistent):
             self.setStartRegistrationDate(nowutc())
             self.setEndRegistrationDate(nowutc())
             self.setModificationEndDate(None)
-            self.setCurrency( _("not selected"))
+            self.setCurrency("not selected")
         else:
             self.activated = groupData.get("activated", False)
             self.title = groupData.get("name", "")
@@ -172,7 +172,7 @@ class RegistrationForm(Persistent):
         try:
             return self._currency
         except:
-            self.setCurrency( _("not selected"))
+            self.setCurrency("not selected")
         return self._currency
 
     def setCurrency(self, currency):
@@ -427,8 +427,16 @@ class RegistrationForm(Persistent):
             registrant.addMiscellaneousGroup(mg)
             for f in pd.getSortedFields():
                 val = getattr(registrant, '_' + f.getPDField())
+                # radiobuttons are numerically indexed
+                if f.getCaption() == "Title":
+                    try:
+                        val = str(TitlesRegistry._items.index(val))
+                    except ValueError:
+                        # can happen for older events with obsolete titles
+                        val = "0"
+
                 fakeParams = {f.getInput().getHTMLName(): val}
-                f.getInput().setResponseValue(mg.getResponseItemById(f.getId()), fakeParams, registrant, mg)
+                f.getInput().setResponseValue(mg.getResponseItemById(f.getId()), fakeParams, registrant, mg, override=True)
         self.personalData = pd
 
     def getPersonalData(self):
@@ -1082,7 +1090,7 @@ class FieldInputType(Persistent):
         """
         return ""
 
-    def setResponseValue(self, item, params, registrant, mg=None):
+    def setResponseValue(self, item, params, registrant, mg=None, override=False):
         """
         This method shouldn't be called from the classes inheriting from this one (FieldInputType).
         This method fills the attribute "item" (MiscellaneousInfoSimpleItem) with the value the user wrote
@@ -1095,7 +1103,7 @@ class FieldInputType(Persistent):
         else:
             self._beforeValueChange(item, False)
 
-        self._setResponseValue(item, params, registrant)
+        self._setResponseValue(item, params, registrant, override=override)
         self._afterValueChange(item)
 
     def _beforeValueChange(self, item, newItem):
@@ -1108,7 +1116,7 @@ class FieldInputType(Persistent):
         if item.getQuantity():
             self.getParent().increaseNoPlaces()
 
-    def _setResponseValue(self, item, registrant, params):
+    def _setResponseValue(self, item, registrant, params, override=False):
         """
         Method that should be overwritten by the classes inheriting from this one in order to get the value written in the form.
         """
@@ -1189,14 +1197,14 @@ class TextInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed() ):
             #if ( item is not None and item.isBillable()):
             #######################
             # if the registrant has already payed, Indico blocks all the modifications about new/removed items
             return
         v=params.get(self.getHTMLName(),"")
-        if self.getParent().isMandatory() and v.strip()=="":
+        if not override and self.getParent().isMandatory() and v.strip()=="":
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())
 
         item.setQuantity(0)
@@ -1284,10 +1292,10 @@ class TelephoneInput(FieldInputType):
             tmp = """%s</tr><tr><td>%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         v = params.get(self.getHTMLName(), "")
 
-        if self.getParent().isMandatory() and v.strip() == "":
+        if not override and self.getParent().isMandatory() and v.strip() == "":
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
 
         if v.strip() != '' and not TelephoneInput._PATTERN.match(v):
@@ -1385,14 +1393,14 @@ class TextareaInput(FieldInputType):
 
         return tmp
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed() ):
             #if ( item is not None and item.isBillable()):
             #######################
             # if the registrant has already payed, Indico blocks all the modifications about new/removed items
             return
         v=params.get(self.getHTMLName(),"")
-        if self.getParent().isMandatory() and v.strip()=="":
+        if not override and self.getParent().isMandatory() and v.strip()=="":
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())
         item.setQuantity(0)
         item.setValue(v)
@@ -1513,7 +1521,7 @@ class NumberInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         v=params.get(self.getHTMLName(),"")
         quantity = 0
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed()):
@@ -1521,9 +1529,9 @@ class NumberInput(FieldInputType):
             #######################
             # if the registrant has already payed, Indico blocks all the modifications about new/removed items
             return
-        if self.getParent().isMandatory() and v.strip()=="":
+        if not override and self.getParent().isMandatory() and v.strip()=="":
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())
-        if self.getParent().isMandatory() and (not v.isalnum() or int(v)<0):
+        if not override and self.getParent().isMandatory() and (not v.isalnum() or int(v)<0):
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it with a number.")%self.getParent().getCaption())
         if ( not v.isalnum() or int(v)<1):
             quantity = 0
@@ -1643,7 +1651,7 @@ class LabelInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed()):
             #if ( item is not None and item.isBillable()):
             #######################
@@ -1707,7 +1715,7 @@ class CheckboxInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         if (registrant is not None and self._parent.isBillable() and registrant.getPayed()):
             #if ( item is not None and item.isBillable()):
             #######################
@@ -1789,7 +1797,7 @@ class YesNoInput(FieldInputType):
 
 
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         if (registrant is not None and self._parent.isBillable() and registrant.getPayed()):
             #if ( item is not None and item.isBillable()):
             #    return
@@ -1798,7 +1806,7 @@ class YesNoInput(FieldInputType):
             return
         v=params.get(self.getHTMLName())
 
-        if self.getParent().isMandatory() and v.strip() == "":
+        if not override and self.getParent().isMandatory() and v.strip() == "":
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
 
         if v=="yes":
@@ -1999,7 +2007,7 @@ class RadioGroupInput(FieldInputType):
                 ri.setBillable(c.get("billable", False))
                 ri.setPrice(c.get("price", ""))
                 ri.setEnabled(c.get("isEnabled", True))
-                ri.setPlacesLimit(c.get("placesLimit"))
+                ri.setPlacesLimit(c.get("placesLimit", 0))
                 self.addItem(ri)
         if data.has_key("defaultItem"):
             self.setDefaultItem(data.get("defaultItem",None))
@@ -2239,7 +2247,7 @@ class RadioGroupInput(FieldInputType):
         else:
             return self._getDropDownModifHTML(item, registrant, default)
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         v=params.get(self.getHTMLName(),"")
         billable=False
         for val in self._items.values():
@@ -2250,7 +2258,7 @@ class RadioGroupInput(FieldInputType):
             #######################
             # if the registrant has already payed, Indico blocks all the modifications about new/removed items
             return
-        if self.getParent().isMandatory() and v.strip()=="":
+        if not override and self.getParent().isMandatory() and v.strip()=="":
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())
         price=0
         quantity=0
@@ -2262,6 +2270,7 @@ class RadioGroupInput(FieldInputType):
             billable=radioitem.isBillable()
             price=radioitem.getPrice()
             quantity=1
+
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
         item.setMandatory(self.getParent().isMandatory())
         item.setValue(caption)
@@ -2394,9 +2403,9 @@ class CountryInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         v = params.get(self.getHTMLName(), "")
-        if self.getParent().isMandatory() and v.strip() == "":
+        if not override and self.getParent().isMandatory() and v.strip() == "":
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
 
         item.setQuantity(0)
@@ -2451,7 +2460,7 @@ class DateInput(FieldInputType):
             htmlName = self.getHTMLName()
 
         from MaKaC.webinterface.wcomponents import WDateField
-        inputHTML = WDateField("", htmlName, date, self.dateFormat, True, self._parent.isMandatory()).getHTML()
+        inputHTML = WDateField(htmlName, date, self.dateFormat, True, self._parent.isMandatory()).getHTML()
 
         dateFormat = self.dateFormat
         dateFormat = re.sub('%d', 'DD', dateFormat)
@@ -2468,7 +2477,7 @@ class DateInput(FieldInputType):
             tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant):
+    def _setResponseValue(self, item, params, registrant, override=False):
         day = params.get('%sDay' % self.getHTMLName(), 1) or 1
         month = params.get('%sMonth' % self.getHTMLName(), 1) or 1
         year = params.get('%sYear' % self.getHTMLName())
@@ -2481,7 +2490,7 @@ class DateInput(FieldInputType):
             item.setValue(date)
         elif not self._parent.isMandatory():
             item.setValue(None)
-        else:
+        elif not override:
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
 
         item.setMandatory(self.getParent().isMandatory())
@@ -2704,6 +2713,11 @@ class GeneralField(Persistent):
 
     def updateCurrentNoPlaces(self):
         self._currentNoPlaces = 0
+
+        if self._parent.getId() == '':
+            # parent is not yet in the form
+            return
+
         for reg in self._parent.getRegistrationForm().getConference().getRegistrantsList():
             item = reg.getMiscellaneousGroupById(self._parent.getId()).getResponseItemById(self.getId())
             if item is not None and item.getQuantity():
@@ -2946,7 +2960,7 @@ class PersonalDataForm(GeneralSectionForm):
               'inputValues': {
                   'inputType':'dropdown',
                   'emptyCaption': '',
-                  'radioitems': [{'caption':title} for title in TitlesRegistry.getList()[1:]]
+                  'radioitems': [{'caption':title} for title in TitlesRegistry.getList()]
               },
               'lock': ('input', 'delete')
             },
@@ -2994,15 +3008,8 @@ class PersonalDataForm(GeneralSectionForm):
         return dict((name, mg.getResponseItemById(field.getId()).getValue()) for name, field in self._pdMap.iteritems())
 
     def getValuesFromAvatar(self, av):
-        r = {}
-        r['title'] = ''
-        r['firstName'] = ''
-        r['surname'] = ''
-        r['institution'] = ''
-        r['email'] = ''
-        r['address'] = ''
-        r['phone'] = ''
-        r['fax'] = ''
+        r = dict((k, '') for k in ['title', 'firstName', 'surname', 'institution',
+                                   'email', 'address', 'phone', 'fax'])
         if av is not None:
             r['title'] = av.getTitle()
             r['firstName'] = av.getFirstName()
@@ -3013,7 +3020,7 @@ class PersonalDataForm(GeneralSectionForm):
             r['phone'] = av.getTelephone()
             faxes = av.getFaxes()
             fax = ''
-            if len(faxes)>0:
+            if len(faxes) > 0:
                 fax = faxes[0]
             r['fax'] = fax
         return r

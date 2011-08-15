@@ -165,7 +165,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
                         </tr>
                         """%(st.getId(), quoteattr(str(urlStatus)), st.getCaption().strip() or  i18nformat("""-- [%s]  _("status with no name") --""")%st.getId()) )
         if html == []:
-            html.append( i18nformat("""<tr><td style="padding-left:20px"><ul><li> _("No statuses defined yet").</li></ul><br>  _("You can use this option in order to create general statuses you will be able to use afterwards in the list of registrants. For instance, you can create a status "paid" in order to check if someone has paid or not").</td></tr>"""))
+            html.append("""<tr><td style="padding-left:20px"><ul><li>%s</li></ul><br>%s</td></tr>""" % (_("No statuses defined yet."), _("You can use this option in order to create general statuses you will be able to use afterwards in the list of registrants. For instance, you can create a status \"paid\" in order to check if someone has paid or not.")))
         html.insert(0, """<a href="" name="statuses"></a><table style="padding-top:20px">""")
         html.append("</table>")
         return "".join(html)
