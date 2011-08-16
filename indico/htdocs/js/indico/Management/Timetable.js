@@ -531,7 +531,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         }
 
         tabs.push([$T("Advanced"), self._drawAdvancedTab(self.info)]);
-        var tabWidget = new TabWidget(tabs, 600, 400);
+        var tabWidget = new JTabWidget(tabs, 600, 400);
 
         return tabWidget.draw();
     }
