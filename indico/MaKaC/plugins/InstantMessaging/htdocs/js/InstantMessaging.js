@@ -351,7 +351,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             var width = 600;
             var height = 200
 
-            this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, height);
+            this.tabControl = new JTabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, height);
             return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw());
         },
 
