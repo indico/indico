@@ -297,6 +297,7 @@ type("SelectableListWidget", ["ListWidget"],
 type("JTabWidget", ["IWidget"], {
     _addTab: function(label, content) {
         var id = _.uniqueId('x-tab-');
+        $(content).css('display', '').find('script').remove();
         var container = $('<div/>', { id: id }).html(content);
         this.canvas.append(container).tabs('add', '#' + id, label);
     },
@@ -316,7 +317,23 @@ type("JTabWidget", ["IWidget"], {
         this.canvas.tabs('disable', index);
     },
     getLabel: function(index) {
-        return this.canvas.find('.ui-tabs-nav > li').eq(index);
+        return $('.ui-tabs-nav > li', this.canvas).eq(index);
+    },
+    getTabIndex: function(label) {
+        return $('.ui-tabs-nav > li', this.canvas).filter(function() {
+            return $(this).text() == label;
+        }).eq(0).index();
+    },
+    getSelectedTab: function() {
+        return thus.getLabel(this.canvas.tabs('selected'));
+    },
+    setSelectedTab: function(labelOrIndex){
+        if(_.isNumber(labelOrIndex)) {
+            this.canvas.tabs('select', labelOrIndex);
+        }
+        else {
+            this.canvas.tabs('select', this.getTabIndex(labelOrIndex));
+        }
     },
     showNotification: function(index, text) {
         var label = this.getLabel(index);
@@ -339,7 +356,7 @@ type("JTabWidget", ["IWidget"], {
         var label = this.getLabel(index);
         label.qtip('destroy');
     }
-}, function(tabs, width, height) {
+}, function(tabs, width, height, initialSelection) {
     var self = this;
     // create canvas element
     self.canvas = $('<div><ul/></div>');
@@ -355,6 +372,14 @@ type("JTabWidget", ["IWidget"], {
         var content = tab[1].dom ? tab[1].dom : tab[1];
         self._addTab(tab[0], content);
     });
+    if(initialSelection) {
+        if(_.isNumber(initialSelection)) {
+            self.canvas.tabs('select', initialSelection);
+        }
+        else {
+            self.canvas.tabs('select', self.getTabIndex(initialSelection));
+        }
+    }
 });
 
 

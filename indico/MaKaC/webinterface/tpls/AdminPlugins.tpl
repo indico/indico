@@ -118,7 +118,7 @@
 var tabList = [
     ${ ",\n".join(['["' + plugin.getName() + '" , $E("' + plugin.getName() + 'OptionsDiv")]' for plugin in pluginList])}
 ]
-var tabControl = new TabWidget(tabList, null, null, tabList[${ InitialPlugin }][0]);
-$E('pluginTabs').set(tabControl.draw());
+var tabControl = new JTabWidget(tabList, null, null, ${ InitialPlugin });
+$('#pluginTabs').html(tabControl.draw());
 
 </script>
