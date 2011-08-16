@@ -1,4 +1,4 @@
-<div id="schedulerPanel">
+<div id="schedulerPanel" style="display: table;">
 </div>
 
 <script type="text/javascript">

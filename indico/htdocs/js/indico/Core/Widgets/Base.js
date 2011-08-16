@@ -293,7 +293,6 @@ type("SelectableListWidget", ["ListWidget"],
     }
 );
 
-
 type("JTabWidget", ["IWidget"], {
     _addTab: function(label, content) {
         var id = _.uniqueId('x-tab-');
@@ -328,7 +327,7 @@ type("JTabWidget", ["IWidget"], {
         }).eq(0).index();
     },
     getSelectedTab: function() {
-        return this.getLabel(this.canvas.tabs('selected'));
+        return this.getLabel(this.canvas.tabs('option', 'selected'));
     },
     setSelectedTab: function(labelOrIndex){
         if(_.isNumber(labelOrIndex)) {
@@ -337,6 +336,10 @@ type("JTabWidget", ["IWidget"], {
         else {
             this.canvas.tabs('select', this.getTabIndex(labelOrIndex));
         }
+    },
+    getSelectedPanel: function() {
+        var index = this.canvas.tabs('option', 'selected');
+        return $('> div', this.canvas).eq(index);
     },
     heightToTallestTab: function() {
         var maxHeight = 0;
@@ -364,7 +367,8 @@ type("JTabWidget", ["IWidget"], {
     hideNotification: function(index) {
         var label = this.getLabel(index);
         label.qtip('destroy');
-    }
+    },
+    _notifyTabChange: function() { }
 }, function(tabs, width, height, initialSelection, canvas) {
     var self = this;
     // create canvas element
@@ -381,7 +385,11 @@ type("JTabWidget", ["IWidget"], {
     if(height) {
         self.canvas.css('minHeight', height);
     }
-    self.canvas.tabs();
+    self.canvas.tabs({
+        select: function(e, ui) {
+            self._notifyTabChange();
+        }
+    });
     // add initial tabs
     $.each(tabs, function(i, tab) {
         var content = tab[1].dom ? tab[1].dom : tab[1];
@@ -398,17 +406,22 @@ type("JLookupTabWidget", ["JTabWidget"], {
         var content = $('<div/>').data('generator', generator);
         this.JTabWidget.prototype._addTab.call(this, label, content);
     },
-}, function(tabs, width, height, initialSelection, canvas) {
-    this.JTabWidget(tabs, width, height, initialSelection, canvas);
-    this.canvas.bind('tabsshow', function(e, ui) {
-        var container = $('> div', ui.panel);
+    _generateContent: function(panel) {
+        var container = $('> div', panel);
         var generator = container.data('generator');
         var content = generator();
         if(content.dom) {
             content = content.dom;
         }
         container.html(content);
+    }
+}, function(tabs, width, height, initialSelection, canvas) {
+    var self = this;
+    self.JTabWidget(tabs, width, height, initialSelection, canvas);
+    self.canvas.bind('tabsshow', function(e, ui) {
+        self._generateContent(ui.panel);
     });
+    self._generateContent(self.getSelectedPanel());
 });
 
 

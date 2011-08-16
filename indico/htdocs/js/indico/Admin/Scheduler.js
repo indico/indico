@@ -297,12 +297,14 @@ type('WaitingTaskTable', ['TaskTable'],
          this.TaskTable(method, {}, 10);
      });
 
-type('SchedulerPanel', ['LookupTabWidget'],
+type('SchedulerPanel', ['JLookupTabWidget'],
      {
-         _notifyTabChange: function(from, to) {
+         _notifyTabChange: function() {
              // each time a tab changes, cancel the timeout events
              // (otherwise we'd have a circus of AJAX requests)
-             clearTimeout(this._currentWidget._timeout);
+             if(this._currentWidget) {
+                 clearTimeout(this._currentWidget._timeout);
+             }
          },
 
          _summary: function() {
@@ -336,7 +338,7 @@ type('SchedulerPanel', ['LookupTabWidget'],
          }
 
      }, function() {
-         this.LookupTabWidget([
+         this.JLookupTabWidget([
              [$T('Summary'), this._keepStatusWrapper(this._summary)],
              [$T('Running Tasks'), this._keepStatusWrapper(this._running)],
              [$T('Waiting queue'), this._keepStatusWrapper(this._waiting)],
