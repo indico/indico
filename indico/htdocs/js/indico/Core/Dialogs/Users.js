@@ -450,7 +450,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
     draw: function() {
         var self = this;
 
-        this.tabWidget = new TabWidget([[$T("Users"), this.userPanel.draw()], [$T("Groups"), this.groupPanel.draw()]], null, null);
+        this.tabWidget = new JTabWidget([[$T("Users"), this.userPanel.draw()], [$T("Groups"), this.groupPanel.draw()]]);
 
         return this.IWidget.prototype.draw.call(this, this.tabWidget.draw());
     }
@@ -743,8 +743,8 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
     postDraw: function() {
         // We have to do this first and not after the super call or it won't work in IE7
         if (this.allowSearch && this.enableGroups) {
-            var tabContainer = this.searchPanel.tabWidget.container;
-            tabContainer.setStyle('height', pixels(tabContainer.dom.offsetHeight));
+            var tabContainer = this.searchPanel.tabWidget.canvas;
+            tabContainer.height(tabContainer.height());
         }
         if (this.includeFavourites || exists(this.suggestedUsers)) {
             this.suggestedUsersPanel.suggestedUserListDiv.setStyle('height', pixels(this.cellSuggested.dom.offsetHeight - this.suggestedUsersPanel.titleDiv.dom.offsetHeight - 10));

@@ -2145,7 +2145,6 @@ td.searchUsersGroupsPanel, td.suggestedUsersPanel {
 td.searchUsersGroupsPanel {
     width: 450px;
     padding-left: 10px;
-    background-color: white;
     padding-top: 10px;
     padding-right:10px;
 }
