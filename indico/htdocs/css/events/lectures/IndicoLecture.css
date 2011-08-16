@@ -40,10 +40,12 @@ div.lectureEventHeader {
     margin: 0px;
     padding: 20px 30px;
     position: relative;
+    border-radius: 10px 10px 0px 0px;
 }
 
 div.lectureEventHeader > h1 {
     margin-top:10px;
+    text-shadow: 1px 1px 5px #000;
 }
 
 div.lectureEventHeader > h2 {
@@ -53,6 +55,7 @@ div.lectureEventHeader > h2 {
 
 div.lectureEventHeader > div.details, div.lectureEventHeader a {
     color: #BBB;
+    text-shadow: 1px 1px 1px #555;
 }
 
 div.lectureEventHeader a:hover {
