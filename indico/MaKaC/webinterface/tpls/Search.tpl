@@ -194,7 +194,7 @@ IndicoUI.executeOnLoad(function(){
 % if len(contribResults) > 0:
     tabList.push(['Contributions', $E('contribs')]);
 % endif
-    var tabCtrl = new TabWidget(tabList, $E('container').dom.clientWidth?$E('container').dom.clientWidth:null);
+    var tabCtrl = new JTabWidget(tabList);
     $E('container').set(tabCtrl.draw());
 
 % endif
