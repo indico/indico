@@ -380,7 +380,6 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
 
     def _process( self ):
         params = self._getRequestParams()
-
         #set default variables
         if not self._reqParams.has_key("showDate"):
             self._reqParams["showDate"] = "all"

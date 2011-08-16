@@ -92,9 +92,6 @@ def removeMaterials( req, **params ):
 def sessionSlots( req, **params ):
     return conferenceModif.RHConfSessionSlots( req ).process( params )
 
-def autoSolveConflict( req, **params ):
-    return conferenceModif.RHConfAutoSolveConflict( req ).process( params )
-
 def addContribType( req, **params ):
     return conferenceModif.RHConfAddContribType( req ).process( params )
 

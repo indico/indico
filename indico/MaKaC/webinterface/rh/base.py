@@ -76,6 +76,20 @@ class RequestHandlerBase(OldObservable):
         """
         pass
 
+    def _getAuth(self):
+        """
+        Returns True if current user is a user or has either a modification
+        or access key in their session.
+        auth_keys is the set of permissible session keys which do not require user login.
+        """
+        auth_keys = ["modifKeys", "accessKeys"]
+
+        for key in auth_keys:
+            if self._websession.getVar(key):
+                return True
+
+        return self._getUser()
+
     def getAW( self ):
         """
         Returns the access wrapper related to this session/user
@@ -365,6 +379,14 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').info('Request %s finished with AccessError: "%s"' % (id(self._req), e))
 
         self._req.status = apache.HTTP_FORBIDDEN
+        # Supposing that the config file says that Indico should enforce HTTPS,
+        # we must force HTTPS here because Indico gets inside this method only in 2 situations:
+        # 1. A user is logged in and he has no access (the request is already https)
+        # 2. Indico will ask for access key (it must be https)
+        if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
+            self._tohttps = True
+            if self._checkHttpsRedirect():
+                return
         p=errors.WPAccessError(self)
         return p.display()
 
@@ -504,9 +526,9 @@ class RH(RequestHandlerBase):
                         #raise(str(dir(self._websession)))
                         self._setSessionUser()
                         self._setLang(params)
-
-                        if self._getUser():
-                            Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))
+                        if self._getAuth():
+                            if self._getUser():
+                                Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))
                             if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
                                 self._tohttps = True
                                 if self._checkHttpsRedirect():

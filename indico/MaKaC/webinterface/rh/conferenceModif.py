@@ -201,20 +201,15 @@ class RHConferenceModifKey( RHConferenceModifBase ):
         RHConferenceModifBase._checkProtection(self)
 
     def _process( self ):
-
         if self._redirectURL != "":
             url = self._redirectURL
-
-#        elif self._conf.getType() == "conference":
-#            url = urlHandlers.UHConferenceOtherViews.getURL( self._conf )
-#        else:
-#            url = urlHandlers.UHConferenceModification.getURL( self._conf )
         else:
             url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
         self._redirect( url )
 
 class RHConferenceModifManagementAccess( RHConferenceModifKey ):
     _uh = urlHandlers.UHConfManagementAccess
+    _tohttps = True
 
     def _checkParams(self, params):
         RHConferenceModifKey._checkParams(self, params)
@@ -235,7 +230,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
             RHConferenceModifKey._checkProtection(self)
 
     def _process( self ):
-
         if self._redirectURL != "":
             url = self._redirectURL
 
