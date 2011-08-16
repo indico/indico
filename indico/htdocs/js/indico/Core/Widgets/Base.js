@@ -335,6 +335,12 @@ type("JTabWidget", ["IWidget"], {
             this.canvas.tabs('select', this.getTabIndex(labelOrIndex));
         }
     },
+    heightToTallestTab: function() {
+        var maxHeight = 0;
+        $('> div', this.canvas).each(function() {
+            maxHeight = Math.max(maxHeight, $(this).height());
+        }).height(maxHeight);
+    },
     showNotification: function(index, text) {
         var label = this.getLabel(index);
         label.qtip({

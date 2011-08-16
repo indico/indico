@@ -28,8 +28,14 @@
     outline: none;
 }
 
-.ui-tabs-nav .ui-state-disabled {
+.ui-tabs .ui-tabs-nav .ui-state-disabled {
     display: none;
+}
+
+.ui-tabs .ui-tabs-hide {
+    position: absolute;
+    top: -10000px;
+    left: -10000px;
 }
 
 /* Indico styled tooltips USED WITH qTip2 */
