@@ -1062,7 +1062,7 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                 width = width > 400 ? width : 400;
             }
 
-            this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, null);
+            this.tabControl = new JTabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width);
 
             return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw());
         },
