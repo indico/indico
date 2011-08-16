@@ -299,7 +299,10 @@ type("JTabWidget", ["IWidget"], {
         var id = _.uniqueId('x-tab-');
         $(content).css('display', '').find('script').remove();
         var container = $('<div/>', { id: id }).html(content);
-        this.canvas.append(container).tabs('add', '#' + id, label);
+        this.canvas.append(container).tabs('add', '#' + id, this._titleTemplate(label));
+    },
+    _titleTemplate: function(text) {
+        return text;
     },
     draw: function() {
         return this.canvas[0];
@@ -325,7 +328,7 @@ type("JTabWidget", ["IWidget"], {
         }).eq(0).index();
     },
     getSelectedTab: function() {
-        return thus.getLabel(this.canvas.tabs('selected'));
+        return this.getLabel(this.canvas.tabs('selected'));
     },
     setSelectedTab: function(labelOrIndex){
         if(_.isNumber(labelOrIndex)) {
@@ -362,10 +365,16 @@ type("JTabWidget", ["IWidget"], {
         var label = this.getLabel(index);
         label.qtip('destroy');
     }
-}, function(tabs, width, height, initialSelection) {
+}, function(tabs, width, height, initialSelection, canvas) {
     var self = this;
     // create canvas element
-    self.canvas = $('<div><ul/></div>');
+    if(canvas) {
+        canvas = canvas.dom || canvas;
+        self.canvas = $(canvas).append('<ul/>');
+    }
+    else {
+        self.canvas = $('<div><ul/></div>');
+    }
     if(width) {
         self.canvas.width(width);
     }
@@ -379,13 +388,27 @@ type("JTabWidget", ["IWidget"], {
         self._addTab(tab[0], content);
     });
     if(initialSelection) {
-        if(_.isNumber(initialSelection)) {
-            self.canvas.tabs('select', initialSelection);
-        }
-        else {
-            self.canvas.tabs('select', self.getTabIndex(initialSelection));
-        }
+        self.setSelectedTab(initialSelection);
     }
+
+});
+
+type("JLookupTabWidget", ["JTabWidget"], {
+    _addTab: function(label, generator) {
+        var content = $('<div/>').data('generator', generator);
+        this.JTabWidget.prototype._addTab.call(this, label, content);
+    },
+}, function(tabs, width, height, initialSelection, canvas) {
+    this.JTabWidget(tabs, width, height, initialSelection, canvas);
+    this.canvas.bind('tabsshow', function(e, ui) {
+        var container = $('> div', ui.panel);
+        var generator = container.data('generator');
+        var content = generator();
+        if(content.dom) {
+            content = content.dom;
+        }
+        container.html(content);
+    });
 });
 
 
