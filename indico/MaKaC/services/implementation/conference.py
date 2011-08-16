@@ -993,7 +993,8 @@ class ConferenceEditChairPerson(ConferenceModifBase):
         chair.setFax(self._userData.get("fax", ""))
         #If the chairperson needs to be given management rights
         if self._userData.get("manager", None):
-            avl = AvatarHolder().match({"email": self._userData.get("email", "")})
+            avl = AvatarHolder().match({"email": self._userData.get("email", "")},
+                                       forceWithoutExtAuth=True, exact=True)
             if avl:
                 av = avl[0]
                 self._conf.grantModification(av)
@@ -1016,13 +1017,11 @@ class ConferenceGetChairPersonData(ConferenceModifBase):
 
     def _getAnswer(self):
         chair = self._conf.getChairById(self._chairId)
-        # var to control if we have to show the checkbox to allow add to modification control list
-        canModify = True
-        av = AvatarHolder().match({"email": chair.getEmail()})
-        if (not av or not av[0] in self._conf.getManagerList()) and not chair.getEmail() in self._conf.getAccessController().getModificationEmail():
-            canModify = False
         result = fossilize(chair)
-        result["canModify"] = canModify
+
+        av = AvatarHolder().match({"email": chair.getEmail()},
+                                  forceWithoutExtAuth=True, exact=True)
+        result['canModify'] = self._conf.getAccessController().canModify(av[0]) if av else False
         return result
 
 

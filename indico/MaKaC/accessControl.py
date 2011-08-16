@@ -284,6 +284,7 @@ class AccessController( Persistent, Observable ):
         """tells whether the specified user has modification privileges"""
         if AdminList.getInstance().isAdmin( user ):
             return True
+
         for principal in self.managers:
             if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( user ):
                 return True

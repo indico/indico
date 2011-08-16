@@ -26,7 +26,7 @@
     </form>
     <tr>
       <td>
-        <input type="button" value="${ _("Log me as ...")}" onclick="loginAsManager.drawUsersPopup();">
+        <input type="button" value="${ _("Log me as ...")}" onclick="loginAs();">
       </td>
     </tr>
     </table>
@@ -87,9 +87,3 @@
 </form>
 
 </table>
-
-<script>
-
-var loginAsManager = new LoginAsManager();
-
-</script>
