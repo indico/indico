@@ -2512,7 +2512,6 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["id"] = self._registrant.getId()
-        vars["pdfields"] = self._getPDInfoHTML()
         vars["registrationDate"] = i18nformat("""--_("date unknown")--""")
 
         if self._registrant.getRegistrationDate() is not None:
@@ -2548,7 +2547,7 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["modPayDetails"] = self.modPay.getPaymentDetails()
-        vars["payMods"] = self.modPay.getSortedModPay()
+        vars["payMods"] = self.modPay.getSortedEnabledModPay()
         vars["registrant"] = self._registrant
         vars["conf"] = self._conf
         vars["lang"] = self._rh._getSession().getLang()

@@ -31,35 +31,28 @@
                         <td>
                           <table width="100%" align="left" border="0" style="border-top:2px solid black">
                            <tr>&nbsp;</tr>
-                           <tr><td align="left">
-                           % if payMods:
-                           <select id="selectPaymentSystem" onChange="payModOnChangefunction()" name="${_("PaymentMethod")}">
-                           <option value="" selected>${_("Select the payment system")}</option>
-                               % for m in payMods:
-                                   % if m.isEnabled():
-                                        <option value="${m.getId()}">${m.getTitle()}</option>
+                           <tr>
+                               <td align="left" nowrap>
+                                   % if len(payMods) > 1:
+                                       <select id="selectPaymentSystem" onChange="payModOnChangefunction()" name="${_("PaymentMethod")}">
+                                       <option value="" selected>${_("Select payment system")}</option>
+                                           % for m in payMods:
+                                                    <option value="${m.getId()}">${m.getTitle()}</option>
+                                           % endfor
+                                       </select>
+                                   % else:
+                                       ${payMods[0].getTitle()}
                                    % endif
-                               % endfor
-                           </select>
-                           % endif
-
-                           </td>
-                           <td colspan="3" align="right"><span id="inPlaceSelectPaymentMethod" style="display:none"></span>
-                           <input type="submit" id="paySubmit" value="Pay Now" onclick="$('#'+$('#selectPaymentSystem').attr('value')).submit();" disabled>
-                           </td>
+                               </td>
+                               <td><span id="inPlaceSelectPaymentMethod" style="display:none"></span></td>
+                               <td colspan="2" align="right" width="100%" nowrap>
+                               <input type="submit" id="paySubmit" value="Pay Now" onclick="submitPayment();" disabled><span id="progressInd"></span>
+                               </td>
                            </tr>
-                           <td colspan="3" style="color:black"><b>Total Amount:</b></td>
-                           <td align="right"><span style=""><span id="totalAmount" style="">${registrant.getTotal()}</span> ${conf.getRegistrationForm().getCurrency()}</span></td>
+                               <td colspan="3" style="color:black" nowrap><b>Total Amount:</b></td>
+                               <td align="right"><span style=""><span id="totalAmount" style="">${registrant.getTotal()}</span> ${conf.getRegistrationForm().getCurrency()}</span></td>
                            </tr>
                            <tr><td  colspan="4" style="border-top:2px solid black">&nbsp;</td></tr>
-                           <tr>
-                           <tr>
-                           % for m in payMods:
-                               % if m.isEnabled():
-                               ${m.getFormHTML(registrant.getTotal(),conf.getRegistrationForm().getCurrency(),conf,registrant, lang = lang, secure=secure)}
-                               % endif
-                           % endfor
-                           </tr>
                           </table>
                         </td>
                       </tr>
@@ -75,16 +68,21 @@
   </table>
 </center>
 
+% for m in payMods:
+   ${m.getFormHTML(registrant.getTotal(),conf.getRegistrationForm().getCurrency(),conf,registrant, lang = lang, secure=secure)}
+% endfor
+
 <script type="text/javascript">
 var selectFunctions = {};
 
 IndicoUI.executeOnLoad(function() {
     $("#selectPaymentMethod").appendTo("#inPlaceSelectPaymentMethod");
     % for m in payMods:
-        % if m.isEnabled():
             selectFunctions['${m.getId()}'] = ${m.getOnSelectedHTML()};
-        % endif
     % endfor
+    % if len(payMods) == 1:
+        selectFunctions['${payMods[0].getId()}']('${registrant.getTotal()}');
+    % endif
 });
 
 function payModOnChangefunction() {
@@ -96,6 +94,16 @@ function payModOnChangefunction() {
         $('#paySubmit').attr('disabled', true);
         $('#totalAmount').text('${registrant.getTotal()}');
     }
+}
+
+function submitPayment() {
+    var idSel = "";
+    % if len(payMods) == 1:
+        idSel = '${payMods[0].getId()}';
+    % else:
+        idSel = $('#selectPaymentSystem').attr('value');
+    % endif
+    $('#'+idSel).submit();
 }
 
 </script>

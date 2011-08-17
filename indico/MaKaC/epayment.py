@@ -247,6 +247,14 @@ class EPayment(Persistent):
         self.updatePlugins()
         return self._sortedModPay
 
+    def getSortedEnabledModPay(self):
+        smp = self.getSortedModPay()
+        l = []
+        for m in smp:
+            if m.isEnabled():
+                l.append(m)
+        return l
+
     def addToSortedModPay(self, form, i=None):
         if i is None:
             i=len(self.getSortedModPay())
@@ -348,12 +356,11 @@ class BaseEPayMod(Persistent):
         raise Exception("This method must be overloaded")
 
     def getOnSelectedHTML(self):
-        return "function (amount) {"\
-            "if($('#selectPaymentSystem').val()) {" \
-             "$('#paySubmit').removeAttr('disabled');"\
-             "$('#totalAmount').text(amount);"\
-             "$('#inPlaceSelectPaymentMethod').hide();"\
-             "}}"
+        return """function (amount) {
+                     $('#paySubmit').removeAttr('disabled');
+                     $('#totalAmount').text(amount);
+                     $('#inPlaceSelectPaymentMethod').hide();
+                }"""
 
     def getConfModifEPaymentURL(self, conf):
         """
