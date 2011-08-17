@@ -460,7 +460,7 @@ class Scheduler(object):
 
         self._logger.debug('Checking AWOL tasks...')
 
-        for task in self._schedModule.getRunningList():
+        for task in self._schedModule.getRunningList()[:]:
             if not task.getOnRunningListSince():
                 self._logger.warning("Task %s is in the runningList but has no "
                                "onRunningListSince value! Removing from runningList "
