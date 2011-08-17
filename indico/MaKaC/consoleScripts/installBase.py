@@ -181,7 +181,7 @@ i.e. try 'easy_install babel'"""
     # call commands directly
     cc = cmd.distribution.get_command_obj('compile_catalog')
     cc.run()
-    gjs = cmd.distribution.get_command_obj('generate_messages_js')
+    gjs = cmd.distribution.get_command_obj('compile_catalog_js')
     gjs.run()
 
 
