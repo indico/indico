@@ -229,7 +229,7 @@ class ContributionParticipantsBase(ContributionModifBase):
             partFossil = fossilize(part)
             # var to control if we have to show the entry in the author menu to allow add submission rights
             showGrantSubmissionRights = True
-            av = AvatarHolder().match({"email": part.getEmail()})
+            av = AvatarHolder().match({"email": part.getEmail()}, forceWithoutExtAuth=True, exact=True)
             if not av:
                 if part.getEmail() in self._contribution.getSubmitterEmailList():
                     showGrantSubmissionRights = False

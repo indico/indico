@@ -2077,11 +2077,11 @@ ul.UIPeopleList li, ul.UISuggestedPeopleList li {
 }
 
 ul.PeopleList li:hover {
-    background-color: #ECECEC;
+    background: #ECECEC;
 }
 
 ul.UIPeopleList li:hover, ul.UISuggestedPeopleList li:hover {
-    background-color: #FFF6DF;
+    background-color: #FFF6DF !important;
 }
 
 ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
@@ -2092,12 +2092,8 @@ ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
     line-height: normal;
 }
 
-ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
-    background-color: transparent;
-}
-
 ul.UIPeopleList li .nameLink {
-    padding: 4px 30px;
+    padding: 0px 0px 4px 30px;
 }
 
 ul.UIPeopleList li .foundUserEmail, ul.UISuggestedPeopleList li .foundUserEmail {
@@ -2208,12 +2204,12 @@ div#UILoadDiv h1{
 
 ul.UIPeopleList li.UIPerson
 {
-    background: url("../images/user.png") left top no-repeat;
+    background: transparent url("../images/user.png") left top no-repeat;
 }
 
 ul.UIPeopleList li.UIGroup
 {
-    background: url("../images/group.png") left top no-repeat;
+    background: transparent url("../images/group.png") left top no-repeat;
 
 }
 

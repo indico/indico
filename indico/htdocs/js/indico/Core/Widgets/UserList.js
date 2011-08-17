@@ -57,6 +57,91 @@ type("ListOfUsersManager", [], {
         );
     },
 
+    _personName: function(user, showAffiliation) {
+        var fullName = user.familyName.toUpperCase() + (user.firstName?(', ' + user.firstName):'');
+        if (user.title) {
+            fullName = user.title + ' ' + fullName;
+        }
+        if (showAffiliation && user.affiliation) {
+            fullName += " (" + user.affiliation + ")";
+        }
+        return fullName
+    },
+
+    _component_order: ['favorite',  'remove', 'edit', 'arrows'],
+
+    _components: {
+
+        favorite: function(user) {
+            return $('<span/>').css({padding:'3px', 'float':'right'}).
+                html(new ToggleFavouriteButton(this, {}, IndicoGlobalVars['userData']['favorite-user-ids'][user.id]).draw().dom);
+
+        },
+
+        remove: function(user) {
+            var self = this;
+            // remove icon
+            return $('<img/>').attr({
+                src: imageSrc("remove"), alt: $T('Remove ') + self.userCaption,
+                title: $T('Remove this ') + self.userCaption + $T(' from the list'),
+                'class': 'UIRowButton2',
+                style: "margin-right:10px; float:right; cursor:pointer;"
+            }).click(function(event) {
+                self.options.onRemove.call(self, user);
+            })
+        },
+
+
+        edit: function(user, callback) {
+            var self = this;
+            return $('<img />').attr({
+                src: imageSrc("edit"),
+                alt: $T('Edit ') + this.userCaption,
+                title: $T('Edit this ') + this.userCaption,
+                'class': 'UIRowButton2',
+                style:'float: right; cursor: pointer;'
+            }).click(function(event) {
+                self.options.onEdit.call(self, user);
+            });
+        },
+
+        arrows: function(user, callback_up, callback_down){
+            var self = this;
+            var arrow = function(direction, title) {
+                return $('<img/>').attr({
+                    src: imageSrc("arrow_" + direction),
+                    'alt': title,
+                    'title': title,
+                    style: 'padding-top: 6px; float: left; cursor: pointer'
+                });
+            };
+
+            return $('<div/>').append(
+                arrow('up', $T('Move up')).click(function(event) {
+                    self.options.onArrowUp.call(self, user);
+                }),
+                arrow('down', $T('Move down')).click(function(event) {
+                    self.options.onArrowDown.call(self, user);
+                }));
+        }
+    },
+
+    onEdit: function(user) {
+        this._getUserData(this.methods["getUserData"], this._getGetUserParams(user.id));
+    },
+
+    onRemove: function(user) {
+        this._manageUserList(this.methods["remove"], this._getRemoveParams(user.id));
+    },
+
+    onArrowUp: function(user) {
+        self._manageUserList(this.methods["upUser"], this._getUpUserParams(user.id));
+    },
+
+    onArrowDown: function(user){
+        self._manageUserList(this.methods["downUser"], this._getDownUserParams(user.id));
+    },
+
     _getUserData: function(method, params) {
         var self = this;
         var killProgress = IndicoUI.Dialogs.Util.progress();
@@ -105,128 +190,47 @@ type("ListOfUsersManager", [], {
     _updateUserList: function(result) {
         var self = this;
         // update the user list
-        this.inPlaceListElem.set('');
-        for (var i=0; i<result.length; i++) {
-            var userRowElements = [];
 
-            if (this.showAffiliation && result[i]['affiliation'] != '') {
-                // Show submitter
-                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['fullName'] + ' ('+ result[i]['affiliation'] + ')');
-            } else {
-                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['fullName']);
-            }
-            userRowElements.push(userText);
+        var container = $(this.inPlaceListElem.dom).html('');
 
-            // favourites star
-            if (this.showFavouritesIcon && IndicoGlobalVars.isUserAuthenticated &&
-                    exists(IndicoGlobalVars['userData']['favorite-user-ids']) && result[i]['_type'] === "Avatar") {
-                spanStar = Html.span({style:{padding:'3px', cssFloat:'right'}});
-                spanStar.set(new ToggleFavouriteButton(result[i], {}, IndicoGlobalVars['userData']['favorite-user-ids'][result[i]['id']]).draw());
-                userRowElements.push(spanStar);
-            }
-
-            if (this.showEditIcon) {
-                // edit icon
-                var imageEdit = Html.img({
-                    src: imageSrc("edit"),
-                    alt: $T('Edit ') + this.userCaption,
-                    title: $T('Edit this ') + this.userCaption,
-                    className: 'UIRowButton2',
-                    id: 'edit_'+result[i]['id'],
-                    style:{cssFloat:'right', cursor:'pointer'}
-                });
-
-                imageEdit.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._getUserData(self.methods["getUserData"], self._getGetUserParams(userId));
-                });
-                userRowElements.push(imageEdit);
-            }
-
-            if (this.showRemoveIcon) {
-                // remove icon
-                var imageRemove = Html.img({
-                    src: imageSrc("remove"),
-                    alt: $T('Remove ') + this.userCaption,
-                    title: $T('Remove this ') + this.userCaption + $T(' from the list'),
-                    className: 'UIRowButton2',
-                    id: 'remove_'+result[i]['id'],
-                    style:{marginRight:'15px', cssFloat:'right', cursor:'pointer'}
-                });
-
-                imageRemove.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._manageUserList(self.methods["remove"], self._getRemoveParams(userId));
-                });
-                userRowElements.push(imageRemove);
-            }
-
-            if (this.showOrderArrows) {
-                // arrow icons
-                // up arrow
-                var upArrow = Html.img({
-                    src: imageSrc("arrow_up"),
-                    alt: $T('Up ') + this.userCaption,
-                    title: $T('Up this ') + this.userCaption,
-                    id: 'up_'+result[i]['id'],
-                    style:{paddingTop: '6px', cssFloat:'left', cursor:'pointer'}
-                });
-
-                upArrow.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._manageUserList(self.methods["upUser"], self._getUpUserParams(userId));
-                });
-                userRowElements.push(upArrow);
-                // Down arrow
-                var downArrow = Html.img({
-                    src: imageSrc("arrow_down"),
-                    alt: $T('Down ') + this.userCaption,
-                    title: $T('Down this ') + this.userCaption,
-                    id: 'down_'+result[i]['id'],
-                    style:{paddingTop: '6px', cssFloat:'left', cursor:'pointer'}
-                });
-
-                downArrow.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._manageUserList(self.methods["downUser"], self._getDownUserParams(userId));
-                });
-                userRowElements.push(downArrow);
-
-            }
-
-            var elemStyle = this.elementClass;
-            if (result[i]['_type'] == 'Group')
+        $.each(result, function(idx) {
+            var user = this;
+            var elemStyle = self.elementClass;
+            if (this._type == 'Group')
                 elemStyle = "UIGroup";
 
-            var row = Html.li({className: elemStyle, onmouseover: "this.style.backgroundColor = '#ECECEC';",
-                                onmouseout : "this.style.backgroundColor='#ffffff';", style:{cursor:'auto'}});
+            var row = $('<li/>').attr('class', elemStyle).
+                append($('<span class="nameLink" />').append(
+                    self._personName(this, self.showAffiliation)));
 
-            for (var j=userRowElements.length-1; j>=0; j--) { // Done the 'for' like this because of IE7
-                row.append(userRowElements[j]);
-            }
-
-            this.inPlaceListElem.append(row);
-        }
+            _(self._component_order).each(function(opt, idx){
+                if (self.options[opt]) {
+                    var comp = self._components[opt].call(self, user, self.options[opt]);
+                    row.append(comp);
+                }
+            });
+            container.append(row);
+        });
     },
 
     addManagementMenu: function(){
         // To overwrite
+    },
+
+    _showEditUserPopup: function(userData) {
+        var self = this;
+        // get the user data
+        var user = $O(userData);
+        var editUserPopup = new UserDataPopup(
+                $T('Edit ') + self.userCaption + $T(' data'),
+                user,
+                function(newData) {
+                    if (editUserPopup.parameterManager.check()) {
+                        self._manageUserList(self.methods["edit"], self._getEditParams(newData));
+                        editUserPopup.close();
+                    }
+                }, self.showGrantManagementCB, self.showGrantSubmissionCB);
+        editUserPopup.open();
     },
 
     _addNonExistingUser: function() {
@@ -242,36 +246,16 @@ type("ListOfUsersManager", [], {
                     }
                 }, self.showGrantSubmissionCB, self.showGrantManagementCB, self.showGrantCoordinationCB);
         newUserPopup.open();
-    },
-
-    _showEditUserPopup: function(userData) {
-        var self = this;
-        // get the user data
-        var user = $O(userData);
-        var editUserPopup = new UserDataPopup(
-                $T('Edit ') + self.userCaption + $T(' data'),
-                user,
-                function(newData) {
-                    if (editUserPopup.parameterManager.check()) {
-                        self._manageUserList(self.methods["edit"], self._getEditParams(newData));
-                        editUserPopup.close();
-                    }
-                }, false, !userData['canModify']);
-        editUserPopup.open();
     }
-
 },
 
-    function(confId, methods, userListParams, inPlaceListElem, showRemoveIcon, showEditIcon, showFavouritesIcon, showOrderArrows,
-             kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation, showGrantCoordinationCB) {
+    function(confId, methods, userListParams, inPlaceListElem,
+             kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation, showGrantCoordinationCB, options) {
+        var self = this;
         this.conferenceId = confId;
         this.methods = methods;
         this.userListParams = userListParams;
         this.inPlaceListElem = inPlaceListElem;
-        this.showRemoveIcon = showRemoveIcon;
-        this.showEditIcon = showEditIcon;
-        this.showFavouritesIcon = showFavouritesIcon;
-        this.showOrderArrows = showOrderArrows;
         this.kindOfUser = kindOfUser;
         this.userCaption = userCaption;
         this.elementClass = elementClass;
@@ -279,7 +263,24 @@ type("ListOfUsersManager", [], {
         this.showGrantManagementCB = showGrantManagementCB;
         this.showAffiliation = showAffiliation;
         this.showGrantCoordinationCB = showGrantCoordinationCB;
+
         var self = this;
+
+        this.options = {
+            remove: true,
+            edit: true,
+            favorite: true,
+            arrows: true,
+        };
+
+        _(['onRemove', 'onEdit', 'onArrowUp', 'onArrowDown']).
+            each(function(val){
+                self.options[val] = self[val];
+            });
+        _(this.options).extend(options)
+
+        this.inPlaceListElem.set(progressIndicator(true, true));
+
         if (userListParams) {
             indicoRequest(
                     self.methods["getUserList"], self.userListParams,
@@ -315,32 +316,32 @@ type("ListOfUsersManager", [], {
  * @param: showGrantSubmissionCB -> Bool, show the checkbox to grant submission rights in the AddNew/Edit popup
  * @param: showAffiliation -> Bool, show the affiliation of the user
  */
-type("ListOfUsersManagerForForm", [], {
+type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
 
-	_addExistingUser: function(title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
-                               showToggleFavouriteButtons) {
-        // Create the popup to add new users
+	_addExistingUser: function(title, allowSearch, conferenceId, enableGroups,
+                                   includeFavourites, suggestedUsers, onlyOne,
+                                   showToggleFavouriteButtons) {
         var self = this;
-        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
-        //          showToggleFavouriteButtons, chooseProcess)
-        var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers,
-                               onlyOne, showToggleFavouriteButtons,
-                               function(userList) {
-                                   for (var i=0; i<userList.length; i++) {
-                                       if (!self._isAlreadyInList(userList[i]['email'])) {
-                                           userList[i]['existing'] = true;
-                                           self.usersList.append(userList[i]);
-                                       } else {
-                                           var popup = new AlertPopup($T('Add ')+self.userCaption,
-                                                           $T('The email address (') + userList[i]['email'] +
-                                                           $T(') of a user you are trying to add is already used by another participant or the user is already added to the list.'));
-                                           popup.open();
-                                       }
-                                   }
-                                   self._updateUserList();
-                               });
-        chooseUsersPopup.execute();
-    },
+        // Create the popup to add new users
+        var chooseUsersPopup = new ChooseUsersPopup(
+            title, allowSearch, conferenceId, enableGroups, includeFavourites,
+            suggestedUsers, onlyOne, showToggleFavouriteButtons,
+            function(userList) {
+                for (var i=0; i<userList.length; i++) {
+                    if (!self._isAlreadyInList(userList[i]['email'])) {
+                        userList[i]['existing'] = true;
+                        self.usersList.append(userList[i]);
+                    } else {
+                        var popup = new AlertPopup($T('Add ')+self.userCaption,
+                                                   $T('The email address (') + userList[i]['email'] +
+                                                   $T(') of a user you are trying to add is already used by another participant or the user is already added to the list.'));
+                        popup.open();
+                    }
+                }
+                self._updateUserList();
+            });
+            chooseUsersPopup.execute();
+        },
 
     _addNonExistingUser: function() {
         var self = this;
@@ -379,130 +380,39 @@ type("ListOfUsersManagerForForm", [], {
         var self = this;
         this.inPlaceListElem.set('');
 
-        for (var i=0; i<this.usersList.length.get(); i++) {
-            var userRowElements = [];
+        $.each(result, function(idx) {
+            var user = this;
+            var row = $('<li class="UIPerson"/>');
 
-            if (!this.usersList.item(i)['title'] && !this.usersList.item(i)['firstName']) {
-                var fullName = this.usersList.item(i)['familyName'].toUpperCase();
-            } else if (!this.usersList.item(i)['title'] && this.usersList.item(i)['firstName']) {
-                var fullName = this.usersList.item(i)['familyName'].toUpperCase() + ', ' + this.usersList.item(i)['firstName'];
-            } else if (this.usersList.item(i)['title'] && !this.usersList.item(i)['firstName']) {
-                var fullName = this.usersList.item(i)['title'] + ' ' + this.usersList.item(i)['familyName'].toUpperCase();
-            } else {
-                var fullName = this.usersList.item(i)['title'] + ' ' + this.usersList.item(i)['familyName'].toUpperCase() + ', ' + this.usersList.item(i)['firstName'];
-            }
-
-
-            if (this.showAffiliation && this.usersList.item(i)['affiliation']) {
-                // Show affiliation
-                var userText = Html.span({className:'nameLink', cssFloat:'left'}, fullName + ' ('+ this.usersList.item(i)['affiliation'] + ')');
-            } else {
-                var userText = Html.span({className:'nameLink', cssFloat:'left'}, fullName);
-            }
-            userRowElements.push(userText);
-
-            // favourites star
-            if (this.showFavouritesIcon && IndicoGlobalVars.isUserAuthenticated &&
-                    exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.usersList.item(i)['_type'] === "Avatar") {
-                spanStar = Html.span({style:{padding:'3px', cssFloat:'right'}});
-                spanStar.set(new ToggleFavouriteButton(this.usersList.item(i), {}, IndicoGlobalVars['userData']['favorite-user-ids'][this.usersList.item(i)['id']]).draw());
-                userRowElements.push(spanStar);
-            }
+            var userText = $('<span class="nameLink" />').append(
+                self._personName(this, self.showAffiliation));
+            var star = self._favoriteStar(this);
 
             if (this.showEditIcon) {
-                // edit icon
-                var imageEdit = Html.img({
-                    src: imageSrc("edit"),
-                    alt: $T('Edit ') + this.userCaption,
-                    title: $T('Edit this ') + this.userCaption,
-                    className: 'UIRowButton2',
-                    id: 'edit_'+i,
-                    style:{cssFloat:'right', cursor:'pointer'}
+                var edit = self._editIcon(this, function(user) {
+                    self._editUser(user);
                 });
-
-                imageEdit.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._editUser(userId);
-                });
-                userRowElements.push(imageEdit);
             }
-
-            if (this.showRemoveIcon) {
-                // remove icon
-                var imageRemove = Html.img({
-                    src: imageSrc("remove"),
-                    alt: $T('Remove ') + this.userCaption,
-                    title: $T('Remove this ') + this.userCaption + $T(' from the list'),
-                    className: 'UIRowButton2',
-                    id: 'remove_'+i,
-                    style:{marginRight:'15px', cssFloat:'right', cursor:'pointer'}
+            var removeImage = self._removeIcon(
+                this,
+                function(){
+                    self._removeUser(user);
                 });
-
-                imageRemove.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._removeUser(userId);
-                });
-                userRowElements.push(imageRemove);
-            }
 
             if (this.showOrderArrows) {
-                // arrow icons
-                // up arrow
-                var upArrow = Html.img({
-                    src: imageSrc("arrow_up"),
-                    alt: $T('Up ') + this.userCaption,
-                    title: $T('Up this ') + this.userCaption,
-                    id: 'up_'+i,
-                    style:{paddingTop: '6px', cssFloat:'left', cursor:'pointer'}
-                });
-
-                upArrow.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._upUser(userId);
-                });
-                userRowElements.push(upArrow);
-                // Down arrow
-                var downArrow = Html.img({
-                    src: imageSrc("arrow_down"),
-                    alt: $T('Down ') + this.userCaption,
-                    title: $T('Down this ') + this.userCaption,
-                    id: 'down_'+i,
-                    style:{paddingTop: '6px', cssFloat:'left', cursor:'pointer'}
-                });
-
-                downArrow.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._downUser(userId);
-                });
-                userRowElements.push(downArrow);
-
+                var arrows = self._arrowIcons(
+                    this,
+                    function(user){
+                        self._upUser(user.id);
+                    },
+                    function(user){
+                        self._downUser(user.id);
+                    });
             }
 
-            var row = Html.li({className: this.elementClass, onmouseover: "this.style.backgroundColor = '#ECECEC';",
-                                onmouseout : "this.style.backgroundColor='#ffffff';", style:{cursor:'auto'}});
+            row.append(userText, star, edit, removeImage, arrows);
+        });
 
-            for (var j=userRowElements.length-1; j>=0; j--) { // Done the 'for' like this because of IE7
-                row.append(userRowElements[j]);
-            }
-
-            this.inPlaceListElem.append(row);
-        }
         this._checkEmptyList();
     },
 
@@ -510,10 +420,10 @@ type("ListOfUsersManagerForForm", [], {
         // To overwrite
     },
 
-    _removeUser: function(userId) {
+    _removeUser: function(user) {
         var killProgress = IndicoUI.Dialogs.Util.progress();
-        if (this.usersList.item(userId)) {
-            this.usersList.remove(this.usersList.item(userId));
+        if (user) {
+            this.usersList.remove(user);
             this._updateUserList();
             killProgress();
             return;
@@ -524,17 +434,17 @@ type("ListOfUsersManagerForForm", [], {
         }
     },
 
-    _editUser: function(userId) {
+    _editUser: function(user) {
         var self = this;
-        if (this.usersList.item(userId)) {
+        if (user) {
             var killProgress = IndicoUI.Dialogs.Util.progress();
-            var user = $O(this.usersList.item(userId));
+            var user = $O(user);
             var editUserPopup = new UserDataPopup(
                 $T('Edit ') + self.userCaption + $T(' data'),
                 user,
                 function(newData) {
                     if (editUserPopup.parameterManager.check()) {
-                        self._userModifyData(userId, newData);
+                        self._userModifyData(newData);
                         self._updateUserList();
                         editUserPopup.close();
                     }
@@ -548,18 +458,18 @@ type("ListOfUsersManagerForForm", [], {
         }
     },
 
-    _userModifyData: function(userId, newData) {
-        this.usersList.item(userId)['title'] = any(newData.get('title'), '');
-        this.usersList.item(userId)['familyName'] = any(newData.get('familyName'), '');
-        this.usersList.item(userId)['firstName'] = any(newData.get('firstName'), '');
-        this.usersList.item(userId)['affiliation'] = any(newData.get('affiliation'), '');
-        this.usersList.item(userId)['email'] = any(newData.get('email'), '');
-        this.usersList.item(userId)['address'] = any(newData.get('address'), '');
-        this.usersList.item(userId)['phone'] = any(newData.get('phone'), '');
-        this.usersList.item(userId)['fax'] = any(newData.get('fax'), '');
+    _userModifyData: function(user) {
+        this.usersList.item(user.id)['title'] = any(user.get('title'), '');
+        this.usersList.item(user.id)['familyName'] = any(user.get('familyName'), '');
+        this.usersList.item(user.id)['firstName'] = any(user.get('firstName'), '');
+        this.usersList.item(user.id)['affiliation'] = any(user.get('affiliation'), '');
+        this.usersList.item(user.id)['email'] = any(user.get('email'), '');
+        this.usersList.item(user.id)['address'] = any(user.get('address'), '');
+        this.usersList.item(user.id)['phone'] = any(user.get('phone'), '');
+        this.usersList.item(user.id)['fax'] = any(user.get('fax'), '');
     },
 
-	addManagementMenu: function() {
+    addManagementMenu: function() {
         // To overwrite
     },
 
@@ -570,23 +480,6 @@ type("ListOfUsersManagerForForm", [], {
     _downUser: function(userId) {
         // To overwrite
     },
-
-    _showEditUserPopup: function(userData) {
-        var self = this;
-        // get the user data
-        var user = $O(userData);
-        var editUserPopup = new UserDataPopup(
-                $T('Edit ') + self.userCaption + $T(' data'),
-                user,
-                function(newData) {
-                    if (editUserPopup.parameterManager.check()) {
-                        self._manageUserList(self.methods["edit"], self._getEditParams(newData));
-                        editUserPopup.close();
-                    }
-                }, self.showGrantManagementCB, self.showGrantSubmissionCB);
-        editUserPopup.open();
-    },
-
     getUsersList: function() {
         return this.usersList;
     },
@@ -653,80 +546,55 @@ type("SimpleListControlManager", ["ListOfUsersManager"], {
     _updateUserList: function(result) {
         var self = this;
         // update the user list
-        this.inPlaceListElem.set('');
-        for (var i=0; i<result.length; i++) {
-            var userRowElements = [];
 
+        var container = $(this.inPlaceListElem.dom).html('');
+        $.each(result, function(idx) {
             var kindOfUser = "principal";
-            var userIdentifier = result[i]['id'];
-            if (result[i]['_type'] == "Avatar") {
-                if (!result[i]['firstName']) {
-                    var fullName = result[i]['familyName'].toUpperCase();
-                } else {
-                    var fullName = result[i]['familyName'].toUpperCase() + ', ' + result[i]['firstName'];
-                }
+            var userIdentifier = this.id;
+
+            if (this._type == "Avatar") {
+                var fullName = self._personName(this);
                 var elementStyle = "UIPerson";
-            } else if (result[i]['_type'] == "Group") {
-                var fullName = result[i]['name'];
+            } else if (this._type == "Group") {
+                var fullName = this.name;
                 var elementStyle = "UIGroup";
-            } else if (result[i]['pending']) {
+            } else if (this.pending) {
                 kindOfUser = "pending";
-                userIdentifier = result[i]['email'];
-                var fullName = $T('Non-registered-user');
+                userIdentifier = this.email;
+                var fullName = $T('Non-registered user');
                 var elementStyle = "UIPerson";
             }
-            var userText = Html.span({className:'nameLink', cssFloat:'left'}, fullName, Html.small({},' ('+ result[i]['email'] + ')'));
-            userRowElements.push(userText);
+
+            var row = $('<li/>').attr({'class': elementStyle});
+
+            var userText = $('<span class="nameLink" />').
+                append(fullName, $('<small/>').append(' (' + this.email + ')'));
+
+            row.append(self._removeIcon(
+                this,
+                function(){
+                    self._manageUserList(self.methods.remove, self._getRemoveParams(userIdentifier, kindOfUser), false);
+                }));
 
             // favourites star
-            if (this.showFavouritesIcon && IndicoGlobalVars.isUserAuthenticated &&
-                    exists(IndicoGlobalVars['userData']['favorite-user-ids']) && result[i]['_type'] === "Avatar") {
-                spanStar = Html.span({style:{padding:'3px', cssFloat:'right'}});
-                spanStar.set(new ToggleFavouriteButton(result[i], {}, IndicoGlobalVars['userData']['favorite-user-ids'][result[i]['id']]).draw());
-                userRowElements.push(spanStar);
+            if (self.showFavouritesIcon && IndicoGlobalVars.isUserAuthenticated &&
+                exists(IndicoGlobalVars.userData['favorite-user-ids']) && this._type == "Avatar") {
+                row.append(self._favoriteStar(this))
             }
 
-            // remove icon
-            var imageRemove = Html.img({
-                src: imageSrc("remove"),
-                alt: $T('Remove ') + this.userCaption,
-                title: $T('Remove this ') + this.userCaption + $T(' from the list'),
-                className: 'UIRowButton2',
-                id: 'r_' + kindOfUser + '_' + userIdentifier,
-                style:{marginRight:'10px', cssFloat:'right', cursor:'pointer'}
-            });
-
-            imageRemove.observeClick(function(event) {
-                if (event.target) { // Firefox
-                    var kindOfUser = event.target.id.split('_')[1];
-                    var userId = event.target.id.split('r_'+kindOfUser+'_')[1];
-                } else { // IE
-                    var kindOfUser = event.srcElement.id.split('_')[1];
-                    var userId = event.srcElement.id.split('r_'+kindOfUser+'_')[1];
-                }
-                self._manageUserList(self.methods["remove"], self._getRemoveParams(userId, kindOfUser), false);
-            });
-            userRowElements.push(imageRemove);
-
-            var row = Html.li({className: elementStyle, onmouseover: "this.style.backgroundColor = '#ECECEC';",
-                                onmouseout : "this.style.backgroundColor='#ffffff';", style:{cursor:'auto'}});
-
-            for (var j=userRowElements.length-1; j>=0; j--) { // Done the 'for' like this because of IE7
-                row.append(userRowElements[j]);
-            }
-            this.inPlaceListElem.append(row);
-        }
+            row.append(userText);
+            container.append(row);
+        });
     }
 
 },
-
-    function(confId, methods, params, inPlaceListElem, userCaption) {
-        this.confId = confId;
-        this.methods = methods;
-        this.params = params;
-        // params: confId, methods, userListParams, inPlaceListElem, showRemoveIcon, showEditIcon, showFavouritesIcon, showOrderArrows,
-        // kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation
-        this.ListOfUsersManager(this.confId, this.methods, params, inPlaceListElem, true,
-                                false, true, false, userCaption, userCaption, null, false, false, false);
-    }
+     function(confId, methods, params, inPlaceListElem, userCaption) {
+         this.confId = confId;
+         this.methods = methods;
+         this.params = params;
+         // params: confId, methods, userListParams, inPlaceListElem, showRemoveIcon, showEditIcon, showFavouritesIcon, showOrderArrows,
+         // kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation
+         this.ListOfUsersManager(this.confId, this.methods, params, inPlaceListElem, true,
+                                 false, true, false, userCaption, userCaption, null, false, false, false);
+     }
 );

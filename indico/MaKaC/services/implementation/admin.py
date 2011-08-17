@@ -54,7 +54,7 @@ class RemoveWebcastAdministrator(AdminService):
         self._userId = pm.extract("user", pType=str, allowEmpty=False)
         self._pr = PrincipalHolder().getById(self._userId)
         if self._pr == None:
-            raise ServiceError("ER-U0", _("Cannot found user with id %s") % self._userId)
+            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
 
     def _getAnswer( self):
         ph = PrincipalHolder()
@@ -73,7 +73,7 @@ class AdminLoginAs(AdminService):
         self._userId = pm.extract("userId", pType=str, allowEmpty=False)
         self._av = AvatarHolder().getById(self._userId)
         if self._av == None:
-            raise ServiceError("ER-U0", _("Cannot found user with id %s") % self._userId)
+            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
 
     def _getAnswer(self):
         tzUtil = timezoneUtils.SessionTZ(self._av)
@@ -90,7 +90,7 @@ class GetAdministratorList(AdminService):
         return fossilize(minfo.getAdminList())
 
 
-class AddExistingAdministrator(AdminService):
+class AddAdministrator(AdminService):
 
     def _checkParams(self):
         AdminService._checkParams(self)
@@ -106,7 +106,7 @@ class AddExistingAdministrator(AdminService):
             if principal != None:
                 adminList.grant(principal)
             else:
-                raise ServiceError("ER-U0", _("Cannot found user with id %s") % user["id"])
+                raise ServiceError("ER-U0", _("Cannot find user with id %s") % user["id"])
         return fossilize(minfo.getAdminList())
 
 
@@ -125,7 +125,7 @@ class RemoveAdministrator(AdminService):
         if user != None:
             adminList.revoke(user)
         else:
-            raise ServiceError("ER-U0", _("Cannot found user with id %s") % self._userId)
+            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
         return fossilize(minfo.getAdminList())
 
 
@@ -138,7 +138,7 @@ class GroupMemberBase(AdminService):
         groupId = self._pm.extract("groupId", pType=str, allowEmpty=False)
         self._group = gh.getById(groupId)
         if self._group == None:
-            raise ServiceError("ER-G0", _("Cannot found group with id %s") % groupId)
+            raise ServiceError("ER-G0", _("Cannot find group with id %s") % groupId)
 
 
 class GroupGetMemberList(GroupMemberBase):
@@ -160,7 +160,7 @@ class GroupAddExistingMember(GroupMemberBase):
             if principal != None:
                 self._group.addMember(principal)
             else:
-                raise ServiceError("ER-U0", _("Cannot found user with id %s") % user["id"])
+                raise ServiceError("ER-U0", _("Cannot find user with id %s") % user["id"])
         return fossilize(self._group.getMemberList())
 
 
@@ -176,7 +176,7 @@ class GroupRemoveMember(GroupMemberBase):
         if user != None:
             self._group.removeMember(user)
         else:
-            raise ServiceError("ER-U0", _("Cannot found user with id %s") % self._userId)
+            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
         return fossilize(self._group.getMemberList())
 
 
@@ -189,7 +189,7 @@ class MergeGetCompleteUserInfo(AdminService):
         userId = pm.extract("userId", pType=str, allowEmpty=False)
         self._user = av.getById(userId)
         if self._user == None:
-            raise ServiceError("ER-U0", _("Cannot found user with id %s") % userId)
+            raise ServiceError("ER-U0", _("Cannot find user with id %s") % userId)
 
     def _getAnswer(self):
         userFossil = fossilize(self._user, IAvatarAllDetailsFossil)
@@ -207,7 +207,7 @@ methodMap = {
     "services.addWebcastAdministrators": AddWebcastAdministrators,
     "services.removeWebcastAdministrator": RemoveWebcastAdministrator,
 
-    "general.addExistingAdmin": AddExistingAdministrator,
+    "general.addExistingAdmin": AddAdministrator,
     "general.removeAdmin": RemoveAdministrator,
     "general.getAdminList": GetAdministratorList,
 

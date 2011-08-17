@@ -409,8 +409,7 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
 
         this.ListOfUsersManager(this.confId, this.methods,
                                 {confId: this.confId, contribId: this.contribId, kindOfList: kindOfUser},
-                                inPlaceListElem, false, false,
-                                false, true, kindOfUser, userCaption, elementClass, true, false, false);
+                                inPlaceListElem, kindOfUser, userCaption, elementClass, true, false, false, {remove: false, edit: true, favorite: false, arrows: true});
     }
 );
 
@@ -464,22 +463,6 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
         });
     },
 
-    _showEditUserPopup: function(userData) {
-        var self = this;
-        // get the user data
-        var user = $O(userData);
-        var editUserPopup = new UserDataPopup(
-                $T('Edit ') + self.userCaption + $T(' data'),
-                user,
-                function(newData) {
-                    if (editUserPopup.parameterManager.check()) {
-                        self._manageUserList(self.methods["edit"], self._getEditParams(newData));
-                        editUserPopup.close();
-                    }
-                }, false, false);
-        editUserPopup.open();
-    },
-
     _addFromAuthorsList: function() {
         var self = this;
         var killProgress = IndicoUI.Dialogs.Util.progress();
@@ -524,7 +507,7 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
 
 
         this.ListOfUsersManager(confId, this.methods, {confId: confId, contribId: this.contribId, subContribId: this.subContribId},
-                                inPlaceListElem, true, true, false, false, null, userCaption, "UIPerson", false, false, true);
+                                inPlaceListElem, null, userCaption, "UIPerson", false, false, true, false, {remove: true, edit: true, favorite: false, arrows: false});
     }
 );
 

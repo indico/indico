@@ -25,32 +25,31 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.user import AvatarHolder
 from MaKaC.services.interface.rpc.common import ServiceError
 
+
 class ChangeAbstractSubmitter(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._submitterId = pm.extract("submitterId", pType=str, allowEmpty=False)
-        self._abstractId = pm.extract("abstractId", pType=str, allowEmpty=False)
-
+        submitterId = pm.extract("submitterId", pType=str, allowEmpty=False)
+        abstractId = pm.extract("abstractId", pType=str, allowEmpty=False)
+        self._abstract = self._conf.getAbstractMgr().getAbstractById(abstractId)
+        self._submitter = user.AvatarHolder().getById(submitterId)
 
     def _getAnswer(self):
-        ah = user.AvatarHolder()
-        av = ah.getById(self._submitterId)
-        self._conf.getAbstractMgr().getAbstractById(self._abstractId).setSubmitter(av)
-        newSubmitter = self._conf.getAbstractMgr().getAbstractById(self._abstractId).getSubmitter()
-        return {"name": newSubmitter.getFullName(),
-                "affiliation": newSubmitter.getAffiliation(),
-                "email": newSubmitter.getEmail()}
+        self._abstract.setSubmitter(self._submitter)
+        return {"name": self._submitter.getFullName(),
+                "affiliation": self._submitter.getAffiliation(),
+                "email": self._submitter.getEmail()}
 
 
-class GetLateSumissionAuthUserList(ConferenceModifBase):
+class GetLateSubmissionAuthUserList(ConferenceModifBase):
 
     def _getAnswer(self):
         return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
 
 
-class AddLateSumissionAuthUser(ConferenceModifBase):
+class AddLateSubmissionAuthUser(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
@@ -67,27 +66,25 @@ class AddLateSumissionAuthUser(ConferenceModifBase):
         return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
 
 
-class RemoveLateSumissionAuthUser(ConferenceModifBase):
+class RemoveLateSubmissionAuthUser(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
         ah = AvatarHolder()
-        self._user = ah.getById(pm.extract("userId", pType=str, allowEmpty=False))
+        userId = pm.extract("userId", pType=str, allowEmpty=False)
+        self._user = ah.getById(userId)
         if self._user == None:
-            raise ServiceError("ERR-U0", _("User does not exist."))
+            raise ServiceError("ERR-U0", _("User '%s' does not exist.") % userId)
 
     def _getAnswer(self):
         self._conf.getAbstractMgr().removeAuthorizedSubmitter(self._user)
         return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
 
 
-
-
-
 methodMap = {
     "changeSubmitter": ChangeAbstractSubmitter,
-    "lateSubmission.addExistingLateAuthUser": AddLateSumissionAuthUser,
-    "lateSubmission.removeLateAuthUser": RemoveLateSumissionAuthUser,
-    "lateSubmission.getLateAuthUser": GetLateSumissionAuthUserList
+    "lateSubmission.addExistingLateAuthUser": AddLateSubmissionAuthUser,
+    "lateSubmission.removeLateAuthUser": RemoveLateSubmissionAuthUser,
+    "lateSubmission.getLateAuthUser": GetLateSubmissionAuthUserList
     }
