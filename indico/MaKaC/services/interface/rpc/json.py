@@ -33,7 +33,7 @@ from MaKaC.services.interface.rpc.common import NoReportError
 from MaKaC.services.interface.rpc.process import ServiceRunner
 
 from MaKaC.common.logger import Logger
-from indico.util.json import dumps
+from indico.util.json import dumps, loads
 
 class Json:
     def __init__(self, content):
@@ -47,7 +47,7 @@ def encode_iframe(obj):
     return "<html><head></head><body><textarea>%s</textarea></body></html>" % s
 
 def decode(str):
-    return unicodeToUtf8(simplejson.loads(str))
+    return unicodeToUtf8(loads(str))
 
 def unicodeToUtf8(obj):
     """ obj must be a unicode object, a list or a dictionary
