@@ -18,18 +18,14 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import sys
 
 from MaKaC.common import DBMgr
 from MaKaC import user
-from MaKaC.common.indexes import IndexesHolder, NameIndex
+from MaKaC.common.indexes import IndexesHolder
 
 
 """
-It has been added a new attribute which is "mark as main resource" for
-the material of a contribution. This script will mark [only for CHEP]
-every resource with the name "main" or those we are the single pdfs in
-the "paper" material.
+Generates a file with all the avatars that are not well indexed by name.
 """
 
 DBMgr.getInstance().startRequest()

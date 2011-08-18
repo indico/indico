@@ -39,6 +39,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
+from indico.util.i18n import L_
 
 
 import re, os
@@ -12027,11 +12028,11 @@ class ContributionType(Persistent):
 class BOAConfig(Persistent):
     """Contains the configuration of the Book of Abstracts of a conference
     """
-    sortByTypes = {"number": "ID",
-                   "name": "Title",
-                   "sessionTitle": "Session title",
-                   "speaker": "Presenter",
-                   "schedule": "Schedule"}
+    sortByTypes = {"number": L_("ID"),
+                   "name": L_("Title"),
+                   "sessionTitle": L_("Session title"),
+                   "speaker": L_("Presenter"),
+                   "schedule": L_("Schedule")}
 
     def __init__(self,conf):
         self._conf=conf

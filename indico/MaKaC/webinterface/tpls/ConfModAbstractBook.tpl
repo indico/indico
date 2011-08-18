@@ -6,12 +6,12 @@
 <br /><br />
 % if bookOfAbstractsActive:
     % if bookOfAbstractsMenuActive:
-        Note that your customizations will be saved and users will be able to download this book of abstract from the <a href="${ urlHandlers.UHConferenceDisplay.getURL( conf ) }">event home page</a>.
+        ${ _("Note that your customizations will be saved and users will be able to download this book of abstract from the <a href='%s'>event home page</a>")% urlHandlers.UHConferenceDisplay.getURL( conf ) }.
     % else:
-        Note that you need to enable the book of abstracts link in <a href="${ urlHandlers.UHConfModifDisplayMenu.getURL( conf ) }">Layout->Menu</a>.
+        ${ _("Note that you need to enable the book of abstracts link in <a href='%s'>Layout->Menu</a>")% urlHandlers.UHConfModifDisplayMenu.getURL( conf ) }.
     % endif
 % else:
-    Note that you need to enable call for abstracts if you wish to provide a link in the <a href="${ urlHandlers.UHConferenceDisplay.getURL( conf ) }">event home page</a> menu, so users can download your book of abstracts.
+    ${ _("Note that you need to enable call for abstracts if you wish to provide a link in the <a href='%s'>event home page</a> menu, so users can download your book of abstracts")% urlHandlers.UHConferenceDisplay.getURL( conf ) }.
 % endif
 </div>
 
@@ -52,7 +52,7 @@
 
 <%  from MaKaC.common import info %>
 $E('inPlaceEditAdditionalText').set(new RichTextInlineEditWidget('abstract.abstractsbook.changeAdditionalText', ${ jsonEncode(dict(conference="%s"%conf.getId())) }, ${ jsonEncode(text) }, 300, 45).draw());
-new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList}, '${sortBy}');
+new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList|n,j}, '${sortBy}');
 </script>
 
 
