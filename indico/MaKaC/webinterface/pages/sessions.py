@@ -386,12 +386,12 @@ class WSessionDisplayBase(wcomponents.WTemplated):
 
     def _getTimeTableHTML(self):
 
-        ttdata = json.encode(schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz,
+        ttdata = json.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz,
                                                                            None, days = None, mgmtMode = False))
 
         eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz=self._tz)
         eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz=self._tz)
-        eventInfo = json.encode(eventInfo)
+        eventInfo = json.dumps(eventInfo)
 
         return """
             <div id="timetableDiv" style="position: relative;">
@@ -1449,13 +1449,13 @@ class WSessionModifSchedule(wcomponents.WTemplated):
         tz = self._session.getTimezone()
         vars["timezone"]= tz
 
-        vars['ttdata'] = json.encode(schedule.ScheduleToJson.process(self._session.getSchedule(), tz,
+        vars['ttdata'] = json.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), tz,
                                                                            None, days = None, mgmtMode = True))
 
         eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz=tz)
         eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz=tz)
         eventInfo['isCFAEnabled'] = self._session.getConference().getAbstractMgr().isActive()
-        vars['eventInfo'] = json.encode(eventInfo)
+        vars['eventInfo'] = json.dumps(eventInfo)
 
         return vars
 

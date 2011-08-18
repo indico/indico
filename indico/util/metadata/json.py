@@ -37,7 +37,7 @@ class JSONSerializer(Serializer):
     _mime = 'application/json'
 
     def __call__(self, fossil):
-        return json.encode(fossil, pretty=self.pretty)
+        return json.dumps(fossil, pretty=self.pretty)
 
 
 Serializer.register('json', JSONSerializer)
