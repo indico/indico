@@ -26,20 +26,21 @@ to the outside world.
 """
 
 # System modules
-import os, sys, shutil, signal, commands, tempfile
+import os, sys, shutil, signal, commands, tempfile, pkg_resources
 
 # Database
 import transaction
 from MaKaC.common.db import DBMgr
 
 # Indico
-from MaKaC.common.Configuration import Config
-
+import indico
 from indico.util.console import colored
 from indico.tests.config import TestConfig
 from indico.tests.base import TestOptionException, FakeMailThread
-
 from indico.tests.runners import *
+
+# Indico legacy
+from MaKaC.common.Configuration import Config
 
 TEST_RUNNERS = {'unit': UnitTestRunner,
                 'functional': FunctionalTestRunner,
@@ -103,11 +104,9 @@ class TestManager(object):
         """
         result = False
 
-        print
         TestManager._title("Starting test framework\n")
 
         self._setFakeConfig()
-
         self._startSMTPServer()
         self._startManageDB()
 
@@ -133,38 +132,54 @@ class TestManager(object):
             return -1
 
     def _setFakeConfig(self):
+        """
+        Sets a fake configuration for the current process, using a temporary directory
+        """
         config = Config.getInstance()
-        config.updateValues(Config.default_values)
-        config.updateValues({
-            'SmtpServer': ('localhost', 8025),
-            'SmtpUseTLS': 'no',
-            'DBConnectionParams': ('localhost', 59675)
-            })
 
         temp = tempfile.mkdtemp(prefix="indico_")
         self._info('Using %s as temporary dir' % temp)
 
-        config.updateValues({
+        os.mkdir(os.path.join(temp, 'log'))
+        os.mkdir(os.path.join(temp, 'archive'))
+
+        indicoDist = pkg_resources.get_distribution('indico')
+        htdocsDir = indicoDist.get_resource_filename('indico', 'indico/htdocs')
+        etcDir = indicoDist.get_resource_filename('indico', 'etc')
+
+        # set defaults
+        config.reset({
+            'BaseURL': 'http://localhost:8000',
+            'BaseSecureURL': 'http://localhost:8000',
+            'UseXSendFile': False,
+            'AuthenticatorList': ['Local'],
+            'SmtpServer': ('localhost', 8025),
+            'SmtpUseTLS': 'no',
+            'DBConnectionParams': ('localhost', TestConfig.getInstance().getFakeDBPort()),
             'LogDir': os.path.join(temp, 'log'),
             'XMLCacheDir': os.path.join(temp, 'cache'),
+            'HtdocsDir': htdocsDir,
             'ArchiveDir': os.path.join(temp, 'archive'),
             'UploadedFilesTempDir': os.path.join(temp, 'tmp'),
-            'TempDir': os.path.join(temp, 'tmp')
+            'ConfigurationDir': etcDir
             })
 
         Config.setInstance(config)
         self._cfg = config
 
+        # re-configure logging and template generator, so that paths are updated
+        from MaKaC.common import TemplateExec
+        from MaKaC.common.logger import Logger
+        TemplateExec.mako = TemplateExec._define_lookup()
+        Logger.reset()
+
+
 ################## Start of DB Managing functions ##################
     def _startManageDB(self):
-
-        params = Config.getInstance().getDBConnectionParams()
         port = TestConfig.getInstance().getFakeDBPort()
 
         self._info("Starting fake DB in port %s" % port)
         self._startFakeDB('localhost', port)
-        TestManager._createDummyUser()
-        TestManager._setDebugMode()
 
     def _stopManageDB(self):
         """
@@ -183,8 +198,6 @@ class TestManager(object):
         self.zeoServer = TestManager._createDBServer(
             os.path.join(self.dbFolder, "Data.fs"),
             zeoHost, zeoPort)
-
-        DBMgr.setInstance(DBMgr(hostname=zeoHost, port=zeoPort))
 
     def _stopFakeDB(self):
         """
@@ -243,107 +256,8 @@ class TestManager(object):
         # run a DB in a child process
         from indico.tests.util import TestZEOServer
         server = TestZEOServer(port, dbFile, hostname = host)
+        server.daemon = True
         server.start()
         return server
 
 ################## End of DB Managing functions ##################
-
-    @staticmethod
-    def _createDummyUser():
-        """
-        Creates a test user in the DB
-        """
-        from MaKaC import user
-        from MaKaC.authentication import AuthenticatorMgr
-        from MaKaC.common import HelperMaKaCInfo
-
-        TestManager._info("Adding a dummy user")
-
-        DBMgr.getInstance().startRequest()
-
-        #filling info to new user
-        avatar = user.Avatar()
-        avatar.setName( "fake" )
-        avatar.setSurName( "fake" )
-        avatar.setOrganisation( "fake" )
-        avatar.setLang( "en_GB" )
-        avatar.setEmail( "fake@fake.fake" )
-
-        #registering user
-        ah = user.AvatarHolder()
-        ah.add(avatar)
-
-        #setting up the login info
-        li = user.LoginInfo( "dummyuser", "dummyuser" )
-        ih = AuthenticatorMgr()
-        userid = ih.createIdentity( li, avatar, "Local" )
-        ih.add( userid )
-
-        #activate the account
-        avatar.activateAccount()
-
-        #since the DB is empty, we have to add dummy user as admin
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        al = minfo.getAdminList()
-        al.grant( avatar )
-
-        DBMgr.getInstance().endRequest()
-
-    @staticmethod
-    def _deleteDummyUser():
-        """
-        Deletes the test user from the DB
-        """
-
-        from MaKaC import user
-        from MaKaC.authentication import AuthenticatorMgr
-        from MaKaC.common import HelperMaKaCInfo
-        from MaKaC.common import indexes
-
-        TestManager._info("Deleting dummy user", "cyan")
-
-        DBMgr.getInstance().startRequest()
-
-        #removing user from admin list
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        al = minfo.getAdminList()
-        ah = user.AvatarHolder()
-        avatar = ah.match({'email':'fake@fake.fake'})[0]
-        al.revoke( avatar )
-
-        #remove the login info
-        userid = avatar.getIdentityList()[0]
-        ih = AuthenticatorMgr()
-        ih.removeIdentity(userid)
-
-        #unregistering the user info
-        index = indexes.IndexesHolder().getById("email")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("name")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("surName")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("organisation")
-        index.unindexUser(avatar)
-        index = indexes.IndexesHolder().getById("status")
-        index.unindexUser(avatar)
-
-        DBMgr.getInstance().endRequest()
-
-
-    @staticmethod
-    def _setDebugMode():
-        """
-        Sets the Debug Mode for the DB
-        """
-        from MaKaC.common import HelperMaKaCInfo
-
-        TestManager._info("Starting up debug mode")
-
-        DBMgr.getInstance().startRequest()
-
-        #debug mode
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        minfo.setDebugActive()
-
-        DBMgr.getInstance().endRequest()

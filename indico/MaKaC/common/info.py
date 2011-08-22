@@ -572,6 +572,7 @@ class StyleManager(Persistent):
     def isCorrectStyle(self, styleId):
         if styleId not in self._styles:
             return False
+
         correctCSS = self.existsCSSFile(styleId) or not self.getCSSFilename(styleId)
         return styleId == 'static' or (self.existsTPLFile(styleId) and correctCSS) or (self.existsXSLFile(styleId) and correctCSS)
 

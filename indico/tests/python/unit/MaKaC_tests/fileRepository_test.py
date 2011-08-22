@@ -38,6 +38,8 @@ class TestMaterialRepository(IndicoTestCase):
     repository.
     """
 
+    _requires = ["db.DummyUser"]
+
     def setUp( self ):
         super(TestMaterialRepository, self).setUp()
         self._archivePath = os.path.join( os.getcwd(), "tmpArchive" )
@@ -55,6 +57,7 @@ class TestMaterialRepository(IndicoTestCase):
         cfg._archivePath = self._archivePath
 
     def tearDown( self ):
+        super(TestMaterialRepository, self).tearDown()
         #delete the temporary archive space and all the files below
         #os.removedirs( self._archivePath )
         for root, dirs, files in os.walk(self._archivePath, topdown=False):
@@ -80,24 +83,26 @@ class TestMaterialRepository(IndicoTestCase):
         """Makes sure a file wich is attached to a conference gets stored in
             the right path: basePath/year/C0/0/test.txt
         """
-        #first we create a dummy user which will be the conf creator
-        from MaKaC.user import Avatar
-        av = Avatar()
-        #Now we create a dummy conference and set its id to 0
-        from MaKaC.conference import Conference
-        c = Conference( av )
-        c.setId( "0" )
-        #Now we create the material (id=0) and attach it to the conference
-        from MaKaC.conference import Material
-        m = Material()
-        c.addMaterial( m )
-        #Now we create a dummy file and attach it to the material
-        filePath = os.path.join( os.getcwd(), "test.txt" )
-        fh = open(filePath, "w")
-        fh.write("hola")
-        fh.close()
-        from MaKaC.conference import LocalFile
-        f = LocalFile()
-        f.setFilePath( filePath )
-        f.setFileName( "test.txt" )
-        m.addResource( f )
+
+        with self._context('database'):
+            #first we create a dummy user which will be the conf creator
+            from MaKaC.user import Avatar
+            av = Avatar()
+            #Now we create a dummy conference and set its id to 0
+            from MaKaC.conference import Conference
+            c = Conference( av )
+            c.setId( "0" )
+            #Now we create the material (id=0) and attach it to the conference
+            from MaKaC.conference import Material
+            m = Material()
+            c.addMaterial( m )
+            #Now we create a dummy file and attach it to the material
+            filePath = os.path.join( os.getcwd(), "test.txt" )
+            fh = open(filePath, "w")
+            fh.write("hola")
+            fh.close()
+            from MaKaC.conference import LocalFile
+            f = LocalFile()
+            f.setFilePath( filePath )
+            f.setFileName( "test.txt" )
+            m.addResource( f )

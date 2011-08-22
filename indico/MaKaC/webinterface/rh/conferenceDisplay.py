@@ -409,6 +409,7 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
             import lxml
         except:
             isLibxml = False
+
         # create the html factory
         if type == "conference":
             if params.get("ovw", False):

@@ -471,8 +471,6 @@ i.e. try 'easy_install %s'""" % (package, package)
                                                               'python',
                                                               'functional'),
                                     'url':       TestConfig.getInstance().getSeleniumURL(),
-                                    'inZipPath': TestConfig.getInstance().getSeleniumInZipPath(),
-                                    'zipname':   TestConfig.getInstance().getSeleniumZipname(),
                                     'filename':  TestConfig.getInstance().getSeleniumFilename()}
         except KeyError, key:
             print "[ERR] Please specify a value for %s in tests.conf" % key
@@ -487,14 +485,6 @@ i.e. try 'easy_install %s'""" % (package, package)
                 print "Downloading %s to %s..." % (jar['url'], jar['path'])
                 try:
                     self.download(jar['url'], jar['path'])
-
-                    #if a zipname is specified, we will unzip the target file pointed by inZipPath variable
-                    try:
-                        if jar['zipname'] != None:
-                            self.unzip(os.path.join(jar['path'], jar['zipname']), jar['inZipPath'], os.path.join(jar['path'], jar['filename']))
-                    except KeyError:
-                        pass
-
                 except IOError, e:
                     validJars = validJars and False
                     print 'Could not download %s from %s (%s)' % (jar['filename'], jar['url'], e)

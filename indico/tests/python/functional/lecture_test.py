@@ -1,0 +1,211 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+from seleniumTestCase import LoggedInSeleniumTestCase, setUpModule
+import unittest, time, re
+
+
+class LectureBase(object):
+
+    def setUp(self, event='lecture'):
+        super(LectureBase, self).setUp()
+        self.go("/index.py")
+        self.click(css="span.dropDownMenu")
+        self.click(ltext="Create %s" % event)
+        self.type(name="title", text="%s test" % event)
+        self.click(id="advancedOptionsText")
+        self.click(name="ok")
+
+        self.click(css="#inPlaceEditStartEndDate > div > div > span > div > a")
+        sd = self.elem(xpath="//span[@id='inPlaceEditStartEndDate']/div/div/span/div/table/tbody/tr[1]/td[2]/div/input")
+        sd.clear()
+        sd.send_keys("11/07/2011 18:00")
+        ed = self.elem(xpath="//span[@id='inPlaceEditStartEndDate']/div/div/span/div/table/tbody/tr[2]/td[2]/div/input")
+        ed.clear()
+        ed.send_keys("12/07/2011 18:00")
+        self.click(css="button")
+
+    def test_tools(self):
+        self.go("/confModifTools.py?confId=0")
+        self.click(xpath="//ul[@id='tabList']/li[4]/a")
+        self.click(name="confirm")
+        self.click(ltext="Unlock")
+        self.click(ltext="Tools")
+        self.click(ltext="Clone Event")
+        self.click(css="input[name=cloneOnce]")
+        self.click(name="confirm")
+        self.go("/confModifTools.py?confId=0")
+        self.click(ltext="Clone Event")
+        self.type(css="#cloneIntervalPlace_until > div.dateField > input[type=text]", text="18/07/2011")
+        self.click(name="cloneWithInterval")
+        self.click(name="confirm")
+        self.go("/confModifTools.py?confId=0")
+        self.click(ltext="Clone Event")
+        self.click(name="cloneGivenDays")
+        alert = self.get_alert()
+        self.assertEqual("The specified end date is not valid.", alert.text)
+        alert.accept()
+        self.type(css="#cloneDaysPlace_until > div.dateField > input[type=text]", text="12/08/2011")
+        box = self.elem(css="#cloneDaysPlace_start > div.dateField > input[type=text]")
+        box.clear()
+        box.send_keys("06/08/2011")
+        self.click(name="cloneGivenDays")
+        self.click(name="confirm")
+        self.click(css="span.listName > a > span")
+        self.click(id="manageEventButton")
+        self.click(ltext="Tools")
+        self.click(ltext="Delete")
+        self.click(name="confirm")
+
+    def test_general_settings(self, lecture=True):
+        self.go("/conferenceModification.py?confId=0")
+        self.click(ltext="(edit)")
+        title = self.elem(css="input[type=text]")
+        title.clear()
+        title.send_keys("Test Event 1")
+        self.click(css="button")
+        self.click(css="#inPlaceEditDescription > div > div > span > div > a")
+        self.type(css="textarea", text="whatever")
+        self.click(css="button")
+        self.click(xpath="//td[@id='inPlaceEditLocation']/span[2]/a")
+        self.type(css="input[type=text]", text="Some Place")
+        self.type(name="_roomName", text="Room 1")
+        self.type(css="textarea", text="some address")
+        self.click(css="button")
+        self.click(css="#inPlaceEditStartEndDate > div > div > span > div > a")
+        sdate = self.elem(css="input[type=text]")
+        sdate.clear()
+        sdate.send_keys("14/07/2011 08:00")
+
+        edate = self.elem(xpath="//span[@id='inPlaceEditStartEndDate']/div/div/span/div/table/tbody/tr[2]/td[2]/div/input")
+        edate.clear()
+        edate.send_keys("14/07/2011 09:00")
+
+        self.click(css="button")
+        self.click(css="#inPlaceEditSupport > div > div > span > div > a")
+        supp = self.elem(xpath="//td[2]/input")
+        supp.clear()
+        supp.send_keys("Support 111")
+        self.click(css="button")
+        if lecture:
+            self.click(css="#inPlaceEditOrganiserText > div > div > span > div > a")
+            self.type(css="input[type=text]", text="Dummy")
+            self.click(css="button")
+        self.click(css="#inPlaceEditDefaultStyle > div > div > span > div > a")
+        self.click(css="button")
+        self.click(css="#inPlaceEditVisibility > div > div > span > div > a")
+        self.select(css="select", label="Nowhere")
+        self.click(css="button")
+        self.click(css="#inPlaceEditType > div > div > span > div > a")
+        self.click(css="button")
+        self.click(xpath="//input[@value='new']")
+        self.select(name="title", label="Mr.")
+        self.type(name="surName", text="dummy")
+        self.type(name="name", text="Dummy")
+        self.type(name="email", text="new@dummz.org")
+        self.click(name="ok")
+
+    def test_participants(self):
+        self.go("/confModifParticipants.py?confId=0")
+        self.select(css="select", label="not be sent")
+        self.select(css="div > select", label="displayed")
+        self.select(css="div.body form select", label="may not apply")
+        self.click(css="input.btn")
+        self.type(name="surname", text="Fake")
+        self.click(name="action")
+        #self.click(name="selectedPrincipals")
+        self.click(xpath="//input[@value='select']")
+        self.click(xpath="//input[@value='Define new']")
+        self.select(name="title", label="Ms.")
+        self.type(name="surName", text="New")
+        self.type(name="name", text="Dummy")
+        self.type(name="email", text="new@dummz.org")
+        self.click(name="ok")
+        self.click(css="div.uniformButtonVBar > div > input.btn")
+        self.click(ltext="Participants list")
+        self.click(xpath="//input[@name='participantsAction' and @value='Remove participant']")
+
+    def test_evaluation(self):
+        self.go("/confModifEvaluation.py/setup?confId=0")
+        self.click(ltext="Edit")
+        self.click(xpath="//img[@alt='Insert a question of type TextBox']")
+        self.type(name="questionValue", text="What is your name?")
+        self.type(name="keyword", text="name")
+        self.click(name="save")
+        self.click(xpath="//img[@alt='Insert a question of type TextArea']")
+        self.type(name="questionValue", text="What is your quest?")
+        self.type(name="keyword", text="quest")
+        self.click(name="save")
+        self.click(xpath="//img[@alt='Insert a question of type PasswordBox']")
+        self.type(name="questionValue", text="What is your password?")
+        self.type(name="keyword", text="password")
+        self.click(name="save")
+        self.click(xpath="//img[@alt='Insert a question of type Select']")
+        self.type(name="questionValue", text="What is your favorite color?")
+        self.type(name="keyword", text="color")
+        self.type(name="choiceItem_1", text="blue")
+        self.type(name="choiceItem_2", text="yellow")
+        self.click(name="save")
+        self.click(xpath="//img[@alt='Insert a question of type RadioButton']")
+        self.type(name="questionValue", text="I shall count to...")
+        self.type(name="keyword", text="123")
+        self.type(name="choiceItem_1", text="3")
+        self.type(name="choiceItem_2", text="5")
+        self.click(name="save")
+        self.click(xpath="//img[@alt='Insert a question of type CheckBox']")
+        self.type(name="questionValue", text="It is a...")
+        self.type(name="keyword", text="a")
+        self.type(name="choiceItem_1", text="witch")
+        self.type(name="choiceItem_2", text="duck")
+        self.click(name="save")
+        self.click(ltext="Preview")
+        self.click(name="submit")
+        self.click(xpath="//li")
+        self.click(css="li.tabUnselected")
+        self.click(name="reinit")
+        self.click(css="div > input.btn")
+        edate = self.elem(css="#eDatePlace > div.dateField > input[type=text]")
+        edate.clear()
+        edate.send_keys("21/7/2011")
+        self.click(name="modify")
+
+    def test_protection(self):
+        self.go("/confModifAC.py?confId=0")
+        self.click(css="input.btn")
+        self.type(name="surname", text="fake")
+        self.click(name="action")
+        self.click(xpath="//input[@value='select']")
+        self.type(name="modifKey", text="123")
+        self.click(css="#setModifKey > input.btn")
+        alert = self.get_alert()
+        self.assertEqual("Please note that it is more secure to make the event private instead of using a modification key.", alert.text)
+        alert.accept()
+        self.click(name="changeToPrivate")
+        self.type(id="accessKey", text="123")
+        self.click(css="#setAccessKey > input.btn")
+        alert = self.get_alert()
+        self.assertEqual("Please note that it is more secure to make the event private instead of using an access key.", alert.text)
+        alert.accept()
+        self.click(name="changeToPublic")
+        self.click(name="changeToPrivate")
+
+
+class LectureTests(LectureBase, LoggedInSeleniumTestCase):
+    pass

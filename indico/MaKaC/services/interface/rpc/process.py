@@ -40,7 +40,6 @@ def lookupHandler(method):
                 raise RequestError("ERR-R0", "Unknown endpoint: %s" % endpointName)
         else:
             raise RequestError("ERR-R1", "Unsupported method")
-
     return handler
 
 

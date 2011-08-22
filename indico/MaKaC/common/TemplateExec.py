@@ -32,17 +32,18 @@ import xml.sax.saxutils
 
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
-
-# Directory for storing compiled Mako templates
-COMPILED_MODULES = os.path.join(Config.getInstance().getTempDir(), "mako_modules")
-
 FILTER_IMPORTS = ['from indico.util.json import dumps as j']
 
-mako = TemplateLookup(directories=["/"],
-                      module_directory=COMPILED_MODULES,
-                      disable_unicode=True,
-                      filesystem_checks=True,
-                      imports=FILTER_IMPORTS)
+
+def _define_lookup():
+    return TemplateLookup(directories=["/"],
+                          module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
+                          disable_unicode=True,
+                          filesystem_checks=True,
+                          imports=FILTER_IMPORTS)
+
+
+mako = _define_lookup()
 
 
 def render(tplPath, params):

@@ -451,6 +451,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
             """ % path
         confCSS = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager().getCSS()
+
         if confCSS:
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
         return printCSS

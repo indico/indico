@@ -1,4 +1,4 @@
-import os, string
+import os, string, copy
 import logging.handlers, logging.config, logging
 import ConfigParser
 
@@ -186,36 +186,45 @@ class LoggerUtils:
             root.manager.loggerDict[log].disabled = 1
 
 
-
 class Logger:
     """
     Encapsulates the features provided by the standard logging module
     """
 
-    config = Config.getInstance()
+    @classmethod
+    def initialize(cls):
+        # Lists of filters for each handler
+        filters = {'indico' : [logging.Filter('indico')],
+                   'other'  : [ExtraIndicoFilter()],
+                   'smtp'   : [logging.Filter('indico')]}
 
-    configDir = config.getLogDir()
-    smtpServer = config.getSmtpServer()
-    serverName = config.getWorkerName()
-    if not serverName:
-        serverName = config.getHostNameURL()
+        config = Config.getInstance()
+        logConfFilepath = os.path.join(config.getConfigurationDir(), "logging.conf")
 
-    # Default arguments for the handlers, taken mostly for the configuration
-    defaultArgs = { 'indico' : "('%s', 'a')" %os.path.join(configDir, 'indico.log'),
-                    'other'  : "('%s', 'a')" %os.path.join(configDir, 'other.log'),
-                    'smtp'   : "(\"%s\", 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
-                                % (smtpServer, serverName, config.getSupportEmail(), serverName)
+        configDir = config.getLogDir()
+        smtpServer = config.getSmtpServer()
+        serverName = config.getWorkerName()
+        if not serverName:
+            serverName = config.getHostNameURL()
+
+        # Default arguments for the handlers, taken mostly for the configuration
+        defaultArgs = { 'indico' : "('%s', 'a')" % os.path.join(configDir, 'indico.log'),
+                        'other'  : "('%s', 'a')" % os.path.join(configDir, 'other.log'),
+                        'smtp'   : "(\"%s\", 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
+                        % (smtpServer[0], serverName, config.getSupportEmail(), serverName)
                     }
 
-    # Lists of filters for each handler
-    filters = {'indico' : [logging.Filter('indico')],
-               'other'  : [ExtraIndicoFilter()],
-               'smtp'   : [logging.Filter('indico')]}
+        cls.handlers = LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
+    @classmethod
+    def reset(cls):
+        """
+        Reset the config, using new paths, etc (useful for testing)
+        """
+        if cls.handlers:
+            for handler in copy.copy(cls.handlers):
+                cls.removeHandler(handler)
 
-    logConfFilepath = os.path.join(config.getConfigurationDir(), "logging.conf")
-
-    #logging.config.fileConfig(logConfFilepath)
-    handlers = LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
+        cls.initialize()
 
     @classmethod
     def removeHandler(cls, handlerName):
@@ -228,3 +237,6 @@ class Logger:
     @classmethod
     def get(cls, module=None):
         return logging.getLogger('indico' if module == None else 'indico.' + module)
+
+
+Logger.initialize()

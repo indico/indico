@@ -23,7 +23,8 @@
 
 from indico.tests.env import *
 from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase, with_context
-from MaKaC.user import AvatarHolder, Avatar, Group, GroupHolder
+from MaKaC.user import AvatarHolder, Avatar, Group, GroupHolder, LoginInfo
+from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common import Configuration
 from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
@@ -38,7 +39,7 @@ from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 
 
 class RoomBooking_Feature(IndicoTestFeature):
-    _requires = ['db.Database']
+    _requires = ['db.DummyUser']
 
     def start(self, obj):
         super(RoomBooking_Feature, self).start(obj)
@@ -67,6 +68,16 @@ class RoomBooking_Feature(IndicoTestFeature):
                 avatar.setLang("en_GB")
                 avatar.setEmail("fake%d@fake.fake" % i)
                 avatar.setId("rb-fake-%d" % i)
+
+                # setting up the login info
+                li = LoginInfo("fake-%d" % i, "fake-%d" % i)
+                ih = AuthenticatorMgr()
+                userid = ih.createIdentity(li, avatar, "Local")
+                ih.add(userid)
+
+                # activate the account
+                avatar.activateAccount()
+
                 ah.add(avatar)
                 obj._avatars.append(avatar)
                 setattr(obj, '_avatar%d' % i, avatar)

@@ -22,6 +22,7 @@
 import ZODB
 from ZODB import ConflictResolution, MappingStorage
 import transaction
+from ZODB.POSException import ConflictError
 
 # legacy imports
 from MaKaC.common.db import DBMgr
@@ -34,6 +35,7 @@ from MaKaC.common import HelperMaKaCInfo
 # indico imports
 from indico.tests.python.unit.util import IndicoTestFeature
 
+from MaKaC.common.spy import transaction
 
 class TestMemStorage(MappingStorage.MappingStorage,
                      ConflictResolution.ConflictResolvingStorage):
@@ -75,25 +77,34 @@ class Database_Feature(IndicoTestFeature):
         super(Database_Feature, self).start(obj)
 
         obj._dbmgr = DBMgr.getInstance()
-        obj._db = obj._dbmgr._db
 
-        # Reset everything
-        with obj._context('database') as conn:
-            r = conn.root._root
+        retries = 10
+        # quite prone to DB conflicts
+        while retries:
+            try:
+                with obj._context('database', sync=True) as conn:
+                    r = conn.root()
 
-            for e in r.keys():
-                del r[e]
+                    # Reset everything
+                    for e in r.keys():
+                        del r[e]
 
-            # initialize db root
-            cm = CategoryManager()
+                    # initialize db root
+                    cm = CategoryManager()
+                    cm.getRoot()
 
-            cm.getRoot()
+                    obj._home = cm.getById('0')
 
-            obj._home = cm.getById('0')
+                    # set debug mode on
+                    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+                    minfo.setDebugActive(True)
+                break
+            except ConflictError:
+                retries -= 1
 
     def _action_startDBReq(obj):
-        obj._conn = obj._db.open()
-        obj._dbmgr._setConnObject(obj._conn)
+        obj._dbmgr.startRequest()
+        obj._conn = obj._dbmgr.getDBConnection()
         return obj._conn
 
     def _action_stopDBReq(obj):

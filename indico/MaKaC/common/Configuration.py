@@ -22,6 +22,7 @@
 and transparent way the system configuration (this is mainly done through the
 Config class).
 """
+import copy
 import os
 import urlparse
 import socket
@@ -467,7 +468,7 @@ class Config:
         'ApacheGroup'               : 'nogroup',
         'Profile'                   : 'no',
         'UseXSendFile'              : 'no',
-        'AuthenticatedEnforceSecure': 'yes',
+        'AuthenticatedEnforceSecure': 'no',
         'ExportACL'           : {},
         'MaxUploadFileSize' : '1024',
         # Authentication
@@ -522,27 +523,16 @@ class Config:
             if k in new_vals:
                 self._configVars[k] = new_vals[k]
 
-    def __readConfigFile(self):
-        """initializes configuration parameters (Search order: indico.conf, default_values)
-
-        IF YOU WANT TO CREATE NEW USER CONFIGURABLE OPTIONS:
-        If you need to define a new configuration option you _need_ to specify it here with
-        its default value and then you can put it in indico.conf.
-
-                #### Indico will not see options that don't appear here ####
+    def reset(self, custom={}):
         """
+        Resets the config to the default values (ignoring indico.conf) and
+        sets custom options if provided
+        """
+        self._configVars = copy.deepcopy(self.default_values)
+        self._configVars.update(custom)
+        self._deriveOptions()
 
-        self._configVars = {}
-        declared_values = dir(MaKaCConfig)
-
-        # When populating configuration variables indico.conf's values have priority
-        for k in self.default_values:
-            if k in declared_values:
-                self._configVars[k] = MaKaCConfig.__getattribute__(k) # declared_values[k] doesn't work, don't ask me why
-            else: # key is not declared in indico.conf, using its default value
-                self._configVars[k] = self.default_values[k]
-
-
+    def _deriveOptions(self):
         # Variables whose value is derived automatically
         # THIS IS THE PLACE TO ADD NEW SHORTHAND OPTIONS, DONT CREATE A FUNCTION IF THE VALUE NEVER CHANGES,
         # Configuration.py will become fat again if you don't follow this advice.
@@ -568,13 +558,39 @@ class Config:
             'ShortCategURL'             : '%s/%s' % (self.getBaseURL(), self.getShortCategTag()),
             'ShortEventURL'             : '%s/%s' % (self.getBaseURL(), self.getShortEventTag()),
             'TPLDir'                    : os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'tpls'),
-            'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].split(':')[0],
+            'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
+            'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
             'FileConverterServerURL'    : self.getFileConverter().get("conversion_server", ""),
             'FileConverterResponseURL'  : self.getFileConverter().get("response_url", ""),
             'ImagesBaseURL'             : "%s/images" % self._configVars['BaseURL'],
             'ImagesBaseSecureURL'       : "%s/images" % self._configVars['BaseSecureURL'],
             'Version'                   : MaKaC.__version__,
                                  })
+
+
+    def __readConfigFile(self):
+        """initializes configuration parameters (Search order: indico.conf, default_values)
+
+        IF YOU WANT TO CREATE NEW USER CONFIGURABLE OPTIONS:
+        If you need to define a new configuration option you _need_ to specify it here with
+        its default value and then you can put it in indico.conf.
+
+                #### Indico will not see options that don't appear here ####
+        """
+
+        self._configVars = {}
+        declared_values = dir(MaKaCConfig)
+
+        # When populating configuration variables indico.conf's values have priority
+        for k in self.default_values:
+            if k in declared_values:
+                self._configVars[k] = MaKaCConfig.__getattribute__(k) # declared_values[k] doesn't work, don't ask me why
+            else: # key is not declared in indico.conf, using its default value
+                self._configVars[k] = self.default_values[k]
+
+        # options that are derived automatically
+        self._deriveOptions()
+
 
         self.__tplFiles = {}
 

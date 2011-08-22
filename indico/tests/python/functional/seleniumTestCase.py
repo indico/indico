@@ -23,12 +23,14 @@ This module defines a base structure for Selenum test cases
 """
 
 # Test libs
-from selenium import selenium
+from selenium import webdriver
+from selenium.webdriver.common.alert import Alert
 import unittest, time
 
 # Indico
 from indico.tests import BaseTestRunner
 from indico.tests.runners import GridEnvironmentRunner
+from indico.tests.python.unit.util import IndicoTestCase
 
 from MaKaC.common.db import DBMgr
 from MaKaC.common.Configuration import Config
@@ -36,88 +38,53 @@ from MaKaC.conference import ConferenceHolder
 from MaKaC.errors import MaKaCError
 
 
-class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
+def setUpModule():
+    global webd
+
+    gridData = GridEnvironmentRunner.getGridData()
+    webd = webdriver.Firefox();
+    webd.implicitly_wait(15)
+
+#    if gridData:
+#        webd = selenium(gridData.host,
+#                       gridData.port,
+#                       gridData.env,
+#                       self.getRootUrl())
+#    else:
+#        webd = selenium("localhost", 4444, "*firefox",
+#                        Config.getInstance().getBaseURL())
+
+
+def name_or_id_target(f):
+    def _wrapper(*args, **kwargs):
+        if 'id' in kwargs:
+            elem = webd.find_element_by_id(kwargs['id'])
+            del kwargs['id']
+        elif 'xpath' in kwargs:
+            elem = webd.find_element_by_xpath(kwargs['xpath'])
+            del kwargs['xpath']
+        elif 'name' in kwargs:
+            elem = webd.find_element_by_name(kwargs['name'])
+            del kwargs['name']
+        elif 'css' in kwargs:
+            elem = webd.find_element_by_css_selector(kwargs['css'])
+            del kwargs['css']
+        elif 'ltext' in kwargs:
+            elem = webd.find_element_by_link_text(kwargs['ltext'])
+            del kwargs['ltext']
+        return f(*(list(args) + [elem]), **kwargs)
+    return _wrapper
+
+
+class SeleniumTestCase(IndicoTestCase):
     """
     Base class for a selenium test case (grid or RC)
     """
 
-    def setUp(self):
-        self.verificationErrors = []
-        self.confId = None
-        sel = None
+    _requires = ['db.DummyUser']
 
-        gridData = GridEnvironmentRunner.getGridData()
-
-        if gridData:
-            sel = selenium(gridData.host,
-                           gridData.port,
-                           gridData.env,
-                           self.getRootUrl())
-        else:
-            sel = selenium("localhost", 4444, "*firefox",
-                           self.getRootUrl())
-
-        sel.start()
-        sel.window_maximize()
-
-        # convenient to set the browser in a known state
-        # from twill import commands as tc
-        # tc.clear_cookies()
-
-        # Handy functions from selenium and twill you might need
-        # set up the time between each selenium's commands (in milliseconds)
-        # self._selenium.set_speed(5000)
-
-        self._selenium = sel
-
-    def tearDown(self):
-        #if a confId is specified we'll try to delete the conf
-        # in case the test failed
-        if self.confId:
-            self.deleteConference(self.confId)
-
-        self._selenium.stop()
-
-        print "Errors array: %s" % self.verificationErrors
-        self.assertEqual([], self.verificationErrors)
-
-    def getRootUrl(self):
-        """
-        Return root URL of Indico instance
-        """
-        return Config.getInstance().getBaseURL()
-
-    def setConfID(self, url):
-        """
-        Parsing the url to retrieve the confId
-        if the confID is set up, we'll try to delete this conference in the teardown
-        in case the test fails
-        """
-
-        splitUrl = url.split('=')
-        self.confId = splitUrl[1]
-
-    def deleteConference(self, confId):
-        """
-        Deletes a conference from the Indico DB
-        """
-
-        DBMgr.getInstance().startRequest()
-
-        try:
-            if confId:
-                #we try to delete the conf
-                ch = ConferenceHolder()
-                conf = ch.getById(confId)
-                conf.delete()
-        except MaKaCError, e:
-            #test succeeded and conf has already been deleted
-            pass
-
-        DBMgr.getInstance().endRequest()
-
-
-    def waitForAjax(self, sel, timeout=5000):
+    @classmethod
+    def waitForAjax(cls, sel, timeout=5000):
         """
         Wait that all the AJAX calls finish
         """
@@ -125,20 +92,27 @@ class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
         sel.wait_for_condition("selenium.browserbot.getCurrentWindow()"
                                ".activeWebRequests == 0", timeout)
 
-    def waitForElement(self, sel, elem, timeout=5000):
+    @classmethod
+    def waitForElement(cls, sel, elem, timeout=5000):
         """
         Wait for a given element to show up
         """
         sel.wait_for_condition("selenium.isElementPresent(\"%s\")" % elem, timeout)
 
-    def waitPageLoad(self, sel, timeout=30000):
+    @classmethod
+    def waitPageLoad(cls, sel, timeout=30000):
         """
         Wait for a page to load (give it some time to load the JS too)
         """
         sel.wait_for_page_to_load(timeout)
         time.sleep(2)
 
-    def failUnless(self, func, *args):
+    @classmethod
+    def go(cls, rel_url):
+        webd.get("%s%s" % (Config.getInstance().getBaseURL(), rel_url))
+
+    @classmethod
+    def failUnless(cls, func, *args):
         """
         failUnless that supports retries
         (1 per second)
@@ -148,7 +122,7 @@ class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
 
         while (triesLeft):
             try:
-                unittest.TestCase.failUnless(self, func(*args))
+                unittest.TestCase.failUnless(cls, func(*args))
             except AssertionError, e:
                 print "left %d" % triesLeft
                 exception = e
@@ -156,24 +130,43 @@ class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
                 time.sleep(1)
                 continue
             return
-
         raise exception
+
+    @classmethod
+    def get_alert(cls):
+        alert = Alert(webd)
+        return alert
+
+    @classmethod
+    @name_or_id_target
+    def click(cls, elem):
+        elem.click()
+
+    @classmethod
+    @name_or_id_target
+    def type(cls, elem, text=''):
+        elem.send_keys(text)
+
+    @classmethod
+    @name_or_id_target
+    def elem(cls, elem):
+        return elem
+
+    @classmethod
+    @name_or_id_target
+    def select(cls, elem, label=''):
+        elem.click()
+        for el in elem.find_elements_by_tag_name('option'):
+            if str(el.text) == str(label):
+                el.click()
 
 class LoggedInSeleniumTestCase(SeleniumTestCase):
 
     def setUp(self):
-
         super(LoggedInSeleniumTestCase, self).setUp()
 
-        sel = self._selenium
-
-        if not sel.is_text_present("Logout"):
-            # Login
-            sel.open("/indico/signIn.py")
-            sel.type("login", "dummyuser")
-            sel.type("password", "dummyuser")
-            sel.click("loginButton")
-            sel.wait_for_page_to_load("30000")
-
-
-
+        # Login
+        self.go("/signIn.py")
+        self.type(name="login", text="dummyuser")
+        self.type(name="password", text="dummyuser")
+        self.click(id="loginButton")

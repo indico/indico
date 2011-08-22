@@ -45,6 +45,11 @@ import nose
 from indico.tests.config import TestConfig
 from indico.tests.base import BaseTestRunner, Option
 from indico.tests.util import openBrowser, relpathto
+from indico.util.shell import refServer
+
+# legacy indico modules
+from MaKaC.common import Config
+
 
 __all__ = [
     'UnitTestRunner',
@@ -223,16 +228,24 @@ class FunctionalTestRunner(NoseTestRunner):
         BaseTestRunner.__init__(self, **kwargs)
         self.child = None
 
+    def _runFakeWebServer(self):
+        """
+        Spawn a new refserver-based thread using the test db
+        """
+        config = Config.getInstance()
+        t = threading.Thread(target=refServer, args=(config.getHostNameURL(),
+                                                     int(config.getPortURL())))
+        t.setDaemon(True)
+        t.start()
+
     def _runSeleniumCycle(self):
         """
         Run selenium over the existing test suite (or a specific test)
         """
 
-        try:
-            if not self._startSeleniumServer():
-                return ('[ERR] Could not start functional tests because selenium'
-                        ' server cannot be started.\n')
+        self._runFakeWebServer()
 
+        try:
             args = self._buildArgs()
 
             # Execute the tests

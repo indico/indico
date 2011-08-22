@@ -1,8 +1,13 @@
-import sys, getopt, logging, argparse
+import sys, getopt, logging, argparse, urlparse, re
 from IPython.Shell import IPShellEmbed
+from wsgiref.simple_server import make_server
+from wsgiref.util import shift_path_info
+
+from indico.web.wsgi.indico_wsgi_handler import application
 
 ## indico legacy imports
 import MaKaC
+from MaKaC.common import Config
 from MaKaC.common.db import DBMgr
 from MaKaC.conference import Conference, Category, ConferenceHolder, CategoryManager
 from MaKaC.user import AvatarHolder, GroupHolder
@@ -22,6 +27,36 @@ def add(namespace, element, name=None, doc=None):
         print ": %s" % doc
     else:
         print
+
+
+def refServer(host='localhost', port=8000):
+    """
+    Run an Indico WSGI ref server instance
+    Very simple dispatching app
+    """
+
+    config = Config.getInstance()
+
+    baseURL = config.getBaseURL()
+    path = urlparse.urlparse(baseURL)[2].rstrip('/')
+
+    def fake_app(environ, start_response):
+        rpath = environ['PATH_INFO']
+        m = re.match(r'^%s(.*)$' % path, rpath)
+        if m:
+            environ['PATH_INFO'] = m.group(1)
+            environ['SCRIPT_NAME'] = path
+            for msg in application(environ, start_response):
+                yield msg
+        else:
+            start_response("404 NOT FOUND", [])
+            yield 'Not found'
+
+    print "Serving on port %d..." % port
+    httpd = make_server(host, port, fake_app)
+    # Serve until process is killed
+    httpd.serve_forever()
+
 
 def setupNamespace(dbi):
 
@@ -48,6 +83,9 @@ def main():
     parser.add_argument('--logging', action='store',
                         help='display logging messages for specified level')
 
+    parser.add_argument('--web-server', action='store_true',
+                        help='run a standalone WSGI web server with Indico')
+
     args, remainingArgs = parser.parse_known_args()
 
     if 'logging' in args and args.logging:
@@ -57,17 +95,21 @@ def main():
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-    dbi = DBMgr.getInstance()
-    dbi.startRequest()
+    if 'web_server' in args and args.web_server:
+        config = Config.getInstance()
+        refServer(config.getHostNameURL(), int(config.getPortURL()))
+    else:
+        dbi = DBMgr.getInstance()
+        dbi.startRequest()
 
-    namespace = setupNamespace(dbi)
+        namespace = setupNamespace(dbi)
 
-    ipshell = IPShellEmbed(remainingArgs,
-                           banner='Indico Shell',
-                           exit_msg='Good luck',
-                           user_ns=namespace)
+        ipshell = IPShellEmbed(remainingArgs,
+                               banner='Indico Shell',
+                               exit_msg='Good luck',
+                               user_ns=namespace)
 
-    ipshell()
+        ipshell()
 
-    dbi.abort()
-    dbi.endRequest()
+        dbi.abort()
+        dbi.endRequest()
