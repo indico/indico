@@ -3585,10 +3585,7 @@ class Tab:
 #        vars["refereeTable"] = "%s"%WPrincipalTable().getHTML( self.__conf.getAbstractMgr().getRefereeList(), self.__conf, vars["addRefereeURL"], vars["removeRefereeURL"] )
 #        return vars
 
-class WTabControl( WTemplated ):
-    _unSelTabCls="Unselected"
-    _selTabCls="Selected"
-
+class WTabControl(WTemplated):
     def __init__(self, ctrl, accessWrapper, **params):
         self._tabCtrl = ctrl
         self._aw = accessWrapper
