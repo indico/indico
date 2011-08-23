@@ -121,6 +121,10 @@
     text-decoration: none;
 }
 
+.static-tabs .ui-tabs-nav li.ui-tabs-selected a {
+    cursor: pointer !important;
+}
+
 .ui-widget-content {
     background: #FFFFFF !important;
     border: none !important;

@@ -3589,85 +3589,48 @@ class WTabControl( WTemplated ):
     _unSelTabCls="Unselected"
     _selTabCls="Selected"
 
-    def __init__( self, ctrl, accessWrapper, **params ):
+    def __init__(self, ctrl, accessWrapper, **params):
         self._tabCtrl = ctrl
         self._aw = accessWrapper
 
-    def _getTabsHTML(self, tabCtrl=None,maxtabs=1):
-        # TODO: Transport this to the template
-
-        if tabCtrl==None:
-            tabCtrl = self._tabCtrl
-
-        html = []
-
-        # Which css class prefix to use
-        tabClassPrefix = ""
-        isSubTab = False
-
-        if tabCtrl.getLevel() % 2 == 0:
-            tabClassPrefix = "tab"
-        else:
-            tabClassPrefix = "subTab"
-            isSubTab = True
-
-        activeTopLevelTab = None
-        for i in range(0, len(tabCtrl.getTabList())):
-            tab = tabCtrl.getTabList()[i]
-
+    def _getTabs(self):
+        tabs = []
+        for tab in self._tabCtrl.getTabList():
             if not tab.isEnabled() or tab.isHidden():
                 continue
-            cls=self.__class__._unSelTabCls
+            tabs.append((tab.getCaption(), tab.getURL(), tab.isActive()))
+        return tabs
 
-            # Don't add the right border if in sub level and if last elemnt
-            borderRight = ""
-            if i == len(tabCtrl.getTabList()) -1 and isSubTab:
-                borderRight = """ style="border-right: 0;" """
-
-            caption = """<a href="%s"%s>%s</a>"""%(tab.getURL(), borderRight, \
-                                                tab.getCaption().replace(" ","&nbsp;") )
-
+    def _getActiveTabId(self):
+        for i, tab in enumerate(self._tabCtrl.getTabList()):
             if tab.isActive():
-                self._activeTab = activeTopLevelTab = tab
-                cls=self.__class__._selTabCls
+                return i
+        return 0
 
-                if tab.getSubTabControl():
-                    self._getTabsHTML(tab.getSubTabControl(), maxtabs)
+    def _getActiveTab(self):
+        for tab in self._tabCtrl.getTabList():
+            if tab.isActive():
+                return tab
 
-            html.append("""<li class="%s%s" onclick="window.location = '%s'" onmouseout="this.style.backgroundPosition = '0 -30px';" onmouseover="this.style.backgroundPosition = '0 0';">%s</li>"""%(tabClassPrefix, cls, tab.getURL(), caption))
-        if html!=[]:
-            gradientDiv = ""
-            if not activeTopLevelTab.hasChildren():
-                gradientDiv = """<div class="tabGradient"><div class="tabBorderGradient" style="float: left;"></div><div class="tabBorderGradient" style="float: right;"></div></div>"""
+    def _getBody(self):
+        tab = self._getActiveTab()
+        if not tab:
+            return self._body
+        sub = tab.getSubTabControl()
+        if not sub:
+            return self._body
+        return WTabControl(sub, self._aw).getHTML(self._body)
 
-            cssClass = ""
-            if tabCtrl.getLevel() == 0:
-                cssClass = """ class="tabListContainer" """
-            html.insert(0, """<div %s><ul id="tabList" class="%sList">""" %(cssClass, tabClassPrefix))
-            html.append("""</ul>%s</div>""" % gradientDiv)
-
-            self._tabsBars.append("".join(html))
-
-            return True
-
-        return False
-
-    def _getTabs( self):
-        self._tabsBars=[]
-
-        self._getTabsHTML(tabCtrl=self._tabCtrl, maxtabs=len(self._tabCtrl.getTabList())+1)
-        self._tabsBars.reverse()
-        return "".join(self._tabsBars)
-
-    def getHTML( self, body ):
+    def getHTML(self, body):
         self._body = body
-        return WTemplated.getHTML( self )
+        return WTemplated.getHTML(self)
 
     def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["cs"] = len(self._tabCtrl.getTabList())+1
-        vars["body"] = self._body
-        vars["tabItems"] = self._getTabs()
+        vars = WTemplated.getVars(self)
+        vars['body'] = self._getBody()
+        vars['tabs'] = self._getTabs()
+        vars['activeTab'] = self._getActiveTabId()
+        vars['tabControlId'] = id(self)
 
         return vars
 
