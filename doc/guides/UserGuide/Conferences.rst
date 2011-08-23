@@ -771,7 +771,7 @@ submitted to the conference:
 
 * **Add New**:  Submit a new abstract. When you click on this, a window will open:
 
-|image109|
+|image150|
 
 You will need to fill in the form and click on *submit* .
 
@@ -1509,8 +1509,11 @@ logged in you can fill in the form to submit your abstract.
 
 |image80|
 
-You need to fill in the title, content, and author details. If you
-need to you can add any co-authors. You can also choose which track
+You need to fill in the title, content, and the mandatory fields specified 
+(if any). You have to add/select at least one primary author. If you
+need to you can add any co-authors. It is possible to move authors and co-authors 
+by doing drag and drop. Sometimes will be possible to attach files to the abstract, 
+if the option has been set by the manager. You can also choose which track
 you would like your abstract to be included in as well as any
 comments you would like to add. You will receive an email notification
 after submitting.
@@ -1861,7 +1864,6 @@ session. You may also make a PDF of the session.
 .. |image106| image:: UserGuidePics/trackContributions.png
 .. |image107| image:: UserGuidePics/pdf.png
 .. |image108| image:: UserGuidePics/contributionsMaterial.png
-.. |image109| image:: UserGuidePics/submitAbstract.png
 .. |image110| image:: UserGuidePics/acceptAbstract.png
 .. |image111| image:: UserGuidePics/rejectAbstract.png
 .. |image112| image:: UserGuidePics/mergeAbstract.png
@@ -1902,3 +1904,4 @@ session. You may also make a PDF of the session.
 .. |image147| image:: UserGuidePics/contrew3.png
 .. |image148| image:: UserGuidePics/contrew4.png
 .. |image149| image:: UserGuidePics/layrew1.png
+.. |image150| image:: UserGuidePics/absSubForm.PNG
