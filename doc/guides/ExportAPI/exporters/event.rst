@@ -24,7 +24,9 @@ Detail Levels
 events
 ~~~~~~
 Returns basic data about the event. In this example occurrences are
-included, too. ::
+included, too.
+
+Result for https://indico.server/export/event/137346.json?occ=yes&pretty=yes::
 
     {
         "count": 1,
@@ -92,7 +94,9 @@ included, too. ::
 
 contributions
 ~~~~~~~~~~~~~
-Includes the contributions of the event. ::
+Includes the contributions of the event.
+
+Output for https://indico.server/export/event/137346.json?detail=contributions&pretty=yes::
 
     {
         "count": 1,
@@ -233,7 +237,9 @@ sessions
 Includes details about the different sessions and groups contributions by
 sessions. The top-level *contributions* list only contains contributions
 which are not assigned to any session. Subcontributions are included in
-this details level, too. ::
+this details level, too.
+
+For example, https://indico.server/export/event/137346.json?detail=sessions&pretty=yes::
 
     {
         "count": 1,

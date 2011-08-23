@@ -22,7 +22,7 @@
                         <tr>
                             <td>${key.getUser().getFullName()}</td>
                             <td>${key.getUseCount()}</td>
-                            <td>${formatDateTime(key.getLastUsedDT()) if key.getLastUsedDT() else 'Never'}</td>
+                            <td>${formatDateTime(key.getLastUsedDT()) if key.getLastUsedDT() else _('Never')}</td>
                             <td>${_('Yes') if key.isBlocked() else _('No')}</td>
                             <td>${ key.getKey() }</td>
                             <td>

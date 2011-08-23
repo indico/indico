@@ -23,17 +23,17 @@ Utility functions
 """
 
 
-def get_query_parameter(qdata, keys, default=None, integer=False):
+def get_query_parameter(queryParams, keys, default=None, integer=False):
     if type(keys) != list:
         keys = list(keys)
     for k in keys:
-        paramlist = qdata.get(k)
+        paramlist = queryParams.get(k)
         if paramlist:
             if len(paramlist) == 1:
                 val = paramlist[0]
                 if integer:
                     val = int(val)
-                del qdata[k]
+                del queryParams[k]
                 return val
             else:
                 raise Exception("duplicate argument' %s'!" % k)

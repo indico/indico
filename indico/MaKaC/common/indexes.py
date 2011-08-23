@@ -739,6 +739,9 @@ class CalendarDayIndex(Persistent):
         return res
 
     def iterateObjectsIn(self, sDate, eDate):
+        """
+        Returns all the events between two dates taking into account the starting and ending times.
+        """
         sDay = datetime(sDate.year, sDate.month, sDate.day) if sDate else None
         eDay = datetime(eDate.year, eDate.month, eDate.day) if eDate else None
 
@@ -748,8 +751,6 @@ class CalendarDayIndex(Persistent):
                     if event.getStartDate() <= eDate and event.getEndDate() >= sDate:
                         yield event
             return
-
-        # keep track of the records that have been already sent
 
         if sDay and int(datetimeToUnixTime(sDay)) in self._idxDay:
             for event in self._idxDay[int(datetimeToUnixTime(sDay))]:
@@ -782,6 +783,9 @@ class CalendarDayIndex(Persistent):
         return res
 
     def iterateObjectsInDays(self, sDate=None, eDate=None):
+        """
+        Returns all the events between two dates WITHOUT taking into account the starting and ending times.
+        """
 
         sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day))) if sDate else None
         eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day))) if eDate else None

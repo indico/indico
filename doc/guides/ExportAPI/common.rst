@@ -7,6 +7,10 @@ is requested. If a parameter has a shorter form, it's given in parentheses.
 ==========  =====  =======================================================
 Param       Short  Description
 ==========  =====  =======================================================
+from/to     f/t    Accepted formats:
+                      * ISO 8601 subset - YYYY-MM-DD[THH:MM]
+                      * 'today', 'yesterday', 'tomorrow' and 'now'
+                      * days in the future/past: '[+/-]DdHHhMMm'
 nocache     nc     Do not return cached results (the results are written
                    to the cache though).
 pretty      p      Pretty-print the output. When exporting as JSON it will

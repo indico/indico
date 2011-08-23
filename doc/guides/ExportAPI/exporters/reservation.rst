@@ -34,7 +34,9 @@ reservations
 ~~~~~~~~~~~~
 
 Returns detailed data about the reservations and the most important
-information about the booked room::
+information about the booked room.
+
+For example, https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&bookedfor=*MONNICH*&pretty=yes::
 
     {
         "count": 1,

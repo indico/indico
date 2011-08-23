@@ -29,7 +29,7 @@ class GenericMailer:
 
     @staticmethod
     def send(notification):
-        server=smtplib.SMTP(*Config.getInstance().getSmtpServer())
+        server=smtplib.SMTP(Config.getInstance().getSmtpServer())
         if Config.getInstance().getSmtpUseTLS():
             server.ehlo()
             (code, errormsg) = server.starttls()

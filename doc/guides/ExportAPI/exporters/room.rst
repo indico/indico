@@ -30,7 +30,9 @@ Detail Levels
 rooms
 ~~~~~
 
-Returns basic data about the rooms::
+Returns basic data about the rooms.
+
+For example, https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes::
 
     {
         "count": 1,
@@ -61,7 +63,9 @@ Returns basic data about the rooms::
 reservations
 ~~~~~~~~~~~~
 
-Returns basic data about the rooms and their reservations in the given timeframe::
+Returns basic data about the rooms and their reservations in the given timeframe.
+
+Output for https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&pretty=yes::
 
     {
         "count": 1,

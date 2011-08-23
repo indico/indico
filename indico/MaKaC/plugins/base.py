@@ -487,7 +487,7 @@ class PluginBase(Persistent):
         """
         self.__options = {}
         self.__actions = {}
-        self.__exporters = []
+        self.__HTTPAPIHooks = []
 
         self.__usable = False
 
@@ -706,21 +706,21 @@ class PluginBase(Persistent):
         return len(self.getActionList(includeOnlyNonAssociated=includeOnlyNonAssociated)) > 0
     ############## end of actions related ###############
 
-    ############## exporters related ###############
-    def updateAllExporters(self, retrievedPluginExporters):
-        self.__exporters = []
-        if retrievedPluginExporters is not None:
-            self.__exporters = retrievedPluginExporters
+    ############## HTTPAPIHook related ###############
+    def updateAllHTTPAPIHooks(self, retrievedPluginHTTPAPIHooks):
+        self.__HTTPAPIHooks = []
+        if retrievedPluginHTTPAPIHooks is not None:
+            self.__HTTPAPIHooks = retrievedPluginHTTPAPIHooks
         self._notifyModification()
 
-    def getExporterList(self):
+    def getHTTPAPIHookList(self):
         try:
-            return self.__exporters
+            return self.__HTTPAPIHooks
         except:
-            self.__exporters = []
-            return self.__exporters
+            self.__HTTPAPIHooks = []
+            return self.__HTTPAPIHooks
 
-    ############## end of exporters related ###############
+    ############## end of HTTPAPIHooks related ###############
 
     def _notifyModification(self):
         self._p_changed = 1
@@ -803,8 +803,8 @@ class PluginType (PluginBase):
             p.updateAllActions(pluginModule.actions.pluginActions)
 
         if hasattr(pluginModule, "export") and \
-               hasattr(pluginModule.options, "globalExporters"):
-            p.updateAllExporters(pluginModule.export.globalExporters)
+               hasattr(pluginModule.options, "globalHTTPAPIHooks"):
+            p.updateAllHTTPAPIHooks(pluginModule.export.globalHTTPAPIHooks)
 
         self._updateComponentInfo(p, pluginModule)
         self._updateHandlerInfo(p, pluginModule)
@@ -843,13 +843,13 @@ class PluginType (PluginBase):
         self.__description = ptypeMetadata['description']
         self.__visible = ptypeMetadata['visible']
 
-        # components, handlers, options, actions and exporters
+        # components, handlers, options, actions and HTTPAPIHooks
         self._updateComponentInfo(self, ptypeModule)
         self._updateRHMapInfo(self, ptypeModule)
         self._updateHandlerInfo(self, ptypeModule)
         self.updateAllOptions(self._retrievePluginTypeOptions())
         self.updateAllActions(self._retrievePluginTypeActions())
-        self.updateAllExporters(self._retrievePluginTypeExporters())
+        self.updateAllHTTPAPIHooks(self._retrievePluginTypeHTTPAPIHooks())
 
 
     def _getAllSubmodules(self, module):
@@ -917,12 +917,12 @@ class PluginType (PluginBase):
         else:
             return None
 
-    def _retrievePluginTypeExporters(self):
+    def _retrievePluginTypeHTTPAPIHooks(self):
 
         hasExportModule = hasattr(self.getModule(), "export")
-        hasGlobalExportersVariable = hasExportModule and hasattr(self.getModule().export, "globalExporters")
-        if hasExportModule and hasGlobalExportersVariable:
-            return self.getModule().export.globalExporters
+        hasGlobalHTTPAPIHooksVariable = hasExportModule and hasattr(self.getModule().export, "globalHTTPAPIHooks")
+        if hasExportModule and hasGlobalHTTPAPIHooksVariable:
+            return self.getModule().export.globalHTTPAPIHooks
         else:
             return None
 

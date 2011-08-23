@@ -27,7 +27,9 @@ Detail Levels
 events
 ~~~~~~
 
-Returns basic data about the events in the category::
+Returns basic data about the events in the category.
+
+This is the result of the following the query https://my.indico/export/categ/2.json?from=today&to=today&pretty=yes::
 
     {
         "count": 2,

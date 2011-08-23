@@ -27,6 +27,7 @@ import fnmatch
 import itertools
 import pytz
 import re
+import urllib
 from zope.interface import Interface, implements
 from datetime import datetime, timedelta, date, time
 
@@ -73,41 +74,46 @@ class LimitExceededException(Exception):
     pass
 
 
-class Exporter(object):
-    EXPORTER_LIST = []
+class HTTPAPIHook(object):
+    """This class is the hook between the query (path+params) and the generator of the results (fossil).
+       It is also in charge of checking the parameters and the access rights.
+    """
+
+    HOOK_LIST = []
     TYPES = None # abstract
     RE = None # abstract
     DEFAULT_DETAIL = None # abstract
     MAX_RECORDS = None # abstract
-    SERIALIZER_TYPE_MAP = {}
+    SERIALIZER_TYPE_MAP = {} # maps fossil type names to friendly names (useful for plugins e.g. RoomCERN --> Room)
     VALID_FORMATS = None # None = all formats
-    GUEST_ALLOWED = True
+    GUEST_ALLOWED = True # When False, it forces authentication
 
     @classmethod
-    def parseRequest(cls, path, qdata):
-        """Parse a request path and return an exporter and the requested data type."""
-        exporters = itertools.chain(cls.EXPORTER_LIST, cls._getPluginExporters())
-        for expCls in exporters:
+    def parseRequest(cls, path, queryParams):
+        """Parse a request path and return a hook and the requested data type."""
+        path = urllib.unquote(path)
+        hooks = itertools.chain(cls.HOOK_LIST, cls._getPluginHooks())
+        for expCls in hooks:
             m = expCls._matchPath(path)
             if m:
                 gd = m.groupdict()
                 g = m.groups()
                 type = g[0]
                 format = g[-1]
-                if format not in ExportInterface.getAllowedFormats():
+                if format not in DataFetcher.getAllowedFormats():
                     return None, None
                 elif expCls.VALID_FORMATS and format not in expCls.VALID_FORMATS:
                     return None, None
-                return expCls(qdata, type, gd), format
+                return expCls(queryParams, type, gd), format
         return None, None
 
     @staticmethod
     def register(cls):
-        """Register an exporter that is not part of a plugin.
+        """Register a hook that is not part of a plugin.
 
-        To use it, simply decorate the exporter class with this method."""
+        To use it, simply decorate the hook class with this method."""
         assert cls.RE is not None
-        Exporter.EXPORTER_LIST.append(cls)
+        HTTPAPIHook.HOOK_LIST.append(cls)
         return cls
 
     @classmethod
@@ -118,22 +124,22 @@ class Exporter(object):
         return cls._RE.match(path)
 
     @classmethod
-    def _getPluginExporters(cls):
+    def _getPluginHooks(cls):
         for plugin in PluginsHolder().getPluginTypes():
-            for expClsName in plugin.getExporterList():
+            for expClsName in plugin.getHTTPAPIHookList():
                 yield getattr(plugin.getModule().export, expClsName)
 
-    def __init__(self, qdata, type, urlParams):
-        self._qdata = qdata
+    def __init__(self, queryParams, type, pathParams):
+        self._queryParams = queryParams
         self._type = type
-        self._urlParams = urlParams
+        self._pathParams = pathParams
 
     def _getParams(self):
-        self._offset = get_query_parameter(self._qdata, ['O', 'offset'], 0, integer=True)
-        self._orderBy = get_query_parameter(self._qdata, ['o', 'order'], 'start')
-        self._descending = get_query_parameter(self._qdata, ['c', 'descending'], False)
-        self._detail = get_query_parameter(self._qdata, ['d', 'detail'], self.DEFAULT_DETAIL)
-        tzName = get_query_parameter(self._qdata, ['tz'], None)
+        self._offset = get_query_parameter(self._queryParams, ['O', 'offset'], 0, integer=True)
+        self._orderBy = get_query_parameter(self._queryParams, ['o', 'order'], 'start')
+        self._descending = get_query_parameter(self._queryParams, ['c', 'descending'], False)
+        self._detail = get_query_parameter(self._queryParams, ['d', 'detail'], self.DEFAULT_DETAIL)
+        tzName = get_query_parameter(self._queryParams, ['tz'], None)
 
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._serverTZ = info.getTimezone()
@@ -145,11 +151,23 @@ class Exporter(object):
         except pytz.UnknownTimeZoneError, e:
             raise HTTPAPIError("Bad timezone: '%s'" % e.message, apache.HTTP_BAD_REQUEST)
         max = self.MAX_RECORDS.get(self._detail, 1000)
-        self._userLimit = get_query_parameter(self._qdata, ['n', 'limit'], 0, integer=True)
+        self._userLimit = get_query_parameter(self._queryParams, ['n', 'limit'], 0, integer=True)
         if self._userLimit > max:
             raise HTTPAPIError("You can only request up to %d records per request with the detail level '%s'" %
                 (max, self._detail), apache.HTTP_BAD_REQUEST)
         self._limit = self._userLimit if self._userLimit > 0 else max
+
+        fromDT = get_query_parameter(self._queryParams, ['f', 'from'])
+        toDT = get_query_parameter(self._queryParams, ['t', 'to'])
+        dayDT = get_query_parameter(self._queryParams, ['day'])
+
+        if (fromDT or toDT) and dayDT:
+            raise HTTPAPIError("'day' can only be used without 'from' and 'to'", apache.HTTP_BAD_REQUEST)
+        elif dayDT:
+            fromDT = toDT = dayDT
+
+        self._fromDT = DataFetcher._getDateTime('from', fromDT, self._tz) if fromDT else None
+        self._toDT = DataFetcher._getDateTime('to', toDT, self._tz, aux=self._fromDT) if toDT else None
 
     def _hasAccess(self, aw):
         return True
@@ -158,9 +176,9 @@ class Exporter(object):
         """Perform the actual exporting"""
         self._getParams()
         if not self.GUEST_ALLOWED and not aw.getUser():
-            raise HTTPAPIError('Guest access to this exporter is forbidden.', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('Guest access to this hook is forbidden.', apache.HTTP_FORBIDDEN)
         if not self._hasAccess(aw):
-            raise HTTPAPIError('Access to this exporter is restricted.', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('Access to this hook is restricted.', apache.HTTP_FORBIDDEN)
         resultList = []
         complete = True
 
@@ -177,7 +195,7 @@ class Exporter(object):
         return resultList, complete, self.SERIALIZER_TYPE_MAP
 
 
-class ExportInterface(object):
+class DataFetcher(object):
     DETAIL_INTERFACES = {}
 
     _deltas =  {'yesterday': timedelta(-1),
@@ -187,15 +205,17 @@ class ExportInterface(object):
                     'end': lambda x: x.getEndDate(),
                     'title': lambda x: x.getTitle()}
 
-    def __init__(self, aw, exporter):
+    def __init__(self, aw, hook):
         self._aw = aw
-        self._tz = exporter._tz
-        self._serverTZ = exporter._serverTZ
-        self._offset = exporter._offset
-        self._limit = exporter._limit
-        self._detail = exporter._detail
-        self._orderBy = exporter._orderBy
-        self._descending = exporter._descending
+        self._tz = hook._tz
+        self._serverTZ = hook._serverTZ
+        self._offset = hook._offset
+        self._limit = hook._limit
+        self._detail = hook._detail
+        self._orderBy = hook._orderBy
+        self._descending = hook._descending
+        self._fromDT = hook._fromDT
+        self._toDT = hook._toDT
 
     @classmethod
     def getAllowedFormats(cls):
@@ -264,19 +284,6 @@ class ExportInterface(object):
             return tz.localize(value.combine(value.date(), time(0, 0, 0)))
         else:
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
-
-    def _getQueryParams(self, qdata):
-        fromDT = get_query_parameter(qdata, ['f', 'from'])
-        toDT = get_query_parameter(qdata, ['t', 'to'])
-        dayDT = get_query_parameter(qdata, ['day'])
-
-        if (fromDT or toDT) and dayDT:
-            raise HTTPAPIError("'day' can only be used without 'from' and 'to'", apache.HTTP_BAD_REQUEST)
-        elif dayDT:
-            fromDT = toDT = dayDT
-
-        self._fromDT = ExportInterface._getDateTime('from', fromDT, self._tz) if fromDT else None
-        self._toDT = ExportInterface._getDateTime('to', toDT, self._tz, aux=self._fromDT) if toDT else None
 
     def _limitIterator(self, iterator, limit):
         counter = 0
@@ -348,8 +355,8 @@ class ExportInterface(object):
             yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ), iface)
 
 
-@Exporter.register
-class CategoryEventExporter(Exporter):
+@HTTPAPIHook.register
+class CategoryEventHook(HTTPAPIHook):
     TYPES = ('event', 'categ')
     RE = r'(?P<idlist>\w+(?:-\w+)*)'
     DEFAULT_DETAIL = 'events'
@@ -361,19 +368,22 @@ class CategoryEventExporter(Exporter):
     }
 
     def _getParams(self):
-        super(CategoryEventExporter, self)._getParams()
-        self._idList = self._urlParams['idlist'].split('-')
+        super(CategoryEventHook, self)._getParams()
+        self._idList = self._pathParams['idlist'].split('-')
+        self._occurrences = get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no') == 'yes'
+        self._location = get_query_parameter(self._queryParams, ['l', 'location'])
+        self._room = get_query_parameter(self._queryParams, ['r', 'room'])
 
     def export_categ(self, aw):
-        expInt = CategoryEventExportInterface(aw, self)
-        return expInt.category(self._idList, self._qdata)
+        expInt = CategoryEventFetcher(aw, self)
+        return expInt.category(self._idList)
 
     def export_event(self, aw):
-        expInt = CategoryEventExportInterface(aw, self)
-        return expInt.event(self._idList, self._qdata)
+        expInt = CategoryEventFetcher(aw, self)
+        return expInt.event(self._idList)
 
 
-class CategoryEventExportInterface(ExportInterface):
+class CategoryEventFetcher(DataFetcher):
     DETAIL_INTERFACES = {
         'events': IConferenceMetadataFossil,
         'contributions': IConferenceMetadataWithContribsFossil,
@@ -381,9 +391,11 @@ class CategoryEventExportInterface(ExportInterface):
         'sessions': IConferenceMetadataWithSessionsFossil
     }
 
-    def _getQueryParams(self, qdata):
-        super(CategoryEventExportInterface, self)._getQueryParams(qdata)
-        self._occurrences = get_query_parameter(qdata, ['occ', 'occurrences'], 'no') == 'yes'
+    def __init__(self, aw, hook):
+        super(CategoryEventFetcher, self).__init__(aw, hook)
+        self._occurrences = hook._occurrences
+        self._location = hook._location
+        self._room = hook._room
 
     def _postprocess(self, obj, fossil, iface):
         return self._addOccurrences(fossil, obj, self._fromDT, self._toDT)
@@ -411,23 +423,19 @@ class CategoryEventExportInterface(ExportInterface):
 
         return fossil
 
-    def category(self, idlist, qdata):
-        self._getQueryParams(qdata)
-        location = get_query_parameter(qdata, ['l', 'location'])
-        room = get_query_parameter(qdata, ['r', 'room'])
-
+    def category(self, idlist):
         idx = IndexesHolder().getById('categoryDate')
 
         filter = None
-        if room or location:
+        if self._room or self._location:
             def filter(obj):
-                if location:
+                if self._location:
                     name = obj.getLocation() and obj.getLocation().getName()
-                    if not name or not fnmatch.fnmatch(name.lower(), location.lower()):
+                    if not name or not fnmatch.fnmatch(name.lower(), self._location.lower()):
                         return False
-                if room:
+                if self._room:
                     name = obj.getRoom() and obj.getRoom().getName()
-                    if not name or not fnmatch.fnmatch(name.lower(), room.lower()):
+                    if not name or not fnmatch.fnmatch(name.lower(), self._room.lower()):
                         return False
                 return True
 
@@ -435,8 +443,7 @@ class CategoryEventExportInterface(ExportInterface):
             for obj in self._process(idx.iterateObjectsIn(catId, self._fromDT, self._toDT), filter, IConferenceMetadataFossil):
                 yield obj
 
-    def event(self, idlist, qdata):
-        self._getQueryParams(qdata)
+    def event(self, idlist):
         ch = ConferenceHolder()
 
         def _iterate_objs(objIds):

@@ -16,22 +16,22 @@
             <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("API mode")}</span></td>
             <td class="blacktext">
                 <select name="apiMode">
-                    <option value="0"${' selected="selected"' if apiMode == 0 else ''}>Public requests without API key, authenticated requests with API key</option>
-                    <option value="1"${' selected="selected"' if apiMode == 1 else ''}>All requests require an API key</option>
-                    <option value="2"${' selected="selected"' if apiMode == 2 else ''}>Public requests without API key, authenticated requests with API key and signature</option>
-                    <option value="3"${' selected="selected"' if apiMode == 3 else ''}>All requests require an API key, authenticated requests additionally need a signature</option>
-                    <option value="4"${' selected="selected"' if apiMode == 4 else ''}>All requests require an API key and a signature</option>
+                    <option value="0"${' selected="selected"' if apiMode == 0 else ''}>${ _("Public requests without API key, authenticated requests with API key") }</option>
+                    <option value="1"${' selected="selected"' if apiMode == 1 else ''}>${ _("All requests require an API key") }</option>
+                    <option value="2"${' selected="selected"' if apiMode == 2 else ''}>${ _("Public requests without API key, authenticated requests with API key and signature") }</option>
+                    <option value="3"${' selected="selected"' if apiMode == 3 else ''}>${ _("All requests require an API key, authenticated requests additionally need a signature") }</option>
+                    <option value="4"${' selected="selected"' if apiMode == 4 else ''}>${ _("All requests require an API key and a signature") }</option>
                 </select>
             </td>
         </tr>
         <tr>
-            <td class="dataCaptionTD"><span class="dataCaptionFormat">Cache TTL (seconds)</span></td>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Cache TTL (seconds)") }</span></td>
             <td class="blacktext">
                 <input type="text" name="apiCacheTTL" id="apiCacheTTL" value="${apiCacheTTL}" />
             </td>
         </tr>
         <tr>
-            <td class="dataCaptionTD"><span class="dataCaptionFormat">Signature TTL (seconds)</span></td>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Signature TTL (seconds)") }</span></td>
             <td class="blacktext">
                 <input type="text" name="apiSignatureTTL" id="apiSignatureTTL" value="${apiSignatureTTL}" />
             </td>

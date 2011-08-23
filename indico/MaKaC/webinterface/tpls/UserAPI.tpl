@@ -30,13 +30,13 @@
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Last used")}</span></td>
         <td class="blacktext">
-            ${apiKey.getLastUsedDT() and formatDateTime(apiKey.getLastUsedDT()) or 'Never' if apiKey else _('n/a')}
+            ${apiKey.getLastUsedDT() and formatDateTime(apiKey.getLastUsedDT()) or _('Never') if apiKey else _('n/a')}
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Last used by")}</span></td>
         <td class="blacktext">
-            ${apiKey.getLastUsedIP() or 'n/a' if apiKey else _('n/a')}
+            ${apiKey.getLastUsedIP() or _('n/a') if apiKey else _('n/a')}
         </td>
     </tr>
     <tr>
@@ -92,7 +92,7 @@
                 </td>
             </tr>
             <tr>
-                 <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">Old keys</span></td>
+                 <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Old keys") }</span></td>
                  <td class="blacktext">
                     % if apiKey.getOldKeys():
                         <ul>

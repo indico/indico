@@ -23,7 +23,7 @@ import fnmatch
 import itertools
 from dateutil import rrule
 from datetime import datetime, timedelta
-from indico.web.http_api import ExportInterface, Exporter
+from indico.web.http_api import DataFetcher, HTTPAPIHook
 from indico.web.http_api.util import get_query_parameter
 from indico.util.fossilize import fossilize, IFossil
 from indico.util.fossilize.conversion import Conversion
@@ -37,7 +37,7 @@ from MaKaC.user import Group, Avatar
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 
 
-globalExporters = ['RoomExporter', 'ReservationExporter']
+globalHTTPAPIHooks = ['RoomHook', 'ReservationHook']
 MAX_DATETIME = datetime(2099, 12, 31, 23, 59, 00)
 MIN_DATETIME = datetime(2000, 1, 1, 00, 00, 00)
 
@@ -46,8 +46,16 @@ def utcdate(datet):
     d = datet.astimezone(timezone('UTC'))
     return utc2server(d)
 
-class RoomBookingExporter(Exporter):
+class RoomBookingHook(HTTPAPIHook):
     GUEST_ALLOWED = False
+
+    def _getParams(self):
+        super(RoomBookingHook, self)._getParams()
+
+        self._fromDT = utcdate(self._fromDT) if self._fromDT else None
+        self._toDT = utcdate(self._toDT) if self._toDT else None
+        self._occurrences = get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no') == 'yes'
+        self._resvFilter = getResvStateFilter(self._queryParams)
 
     def _hasAccess(self, aw):
         """Check if the impersonated user may access the RB module
@@ -67,12 +75,12 @@ class RoomBookingExporter(Exporter):
                 return True
         return False
 
-class RoomExporter(RoomBookingExporter):
+class RoomHook(RoomBookingHook):
     """
     Example: /room/CERN/23.xml
     """
     TYPES = ('room', )
-    RE = r'(?P<location>\w+)/(?P<idlist>\w+(?:-\w+)*)'
+    RE = r'(?P<location>[\w\s]+)/(?P<idlist>\w+(?:-[\w\s]+)*)'
     DEFAULT_DETAIL = 'rooms'
     MAX_RECORDS = {
         'rooms': 500,
@@ -85,18 +93,18 @@ class RoomExporter(RoomBookingExporter):
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
-        super(RoomExporter, self)._getParams()
-        self._location = self._urlParams['location']
-        self._idList = self._urlParams['idlist'].split('-')
+        super(RoomHook, self)._getParams()
+        self._location = self._pathParams['location']
+        self._idList = self._pathParams['idlist'].split('-')
 
     def export_room(self, aw):
-        expInt = RoomExportInterface(aw, self)
-        return expInt.room(self._location, self._idList, self._qdata)
+        expInt = RoomFetcher(aw, self)
+        return expInt.room(self._location, self._idList)
 
 
-class ReservationExporter(RoomBookingExporter):
+class ReservationHook(RoomBookingHook):
     TYPES = ('reservation', )
-    RE = r'(?P<loclist>\w+(?:-\w+)*)'
+    RE = r'(?P<loclist>[\w\s]+(?:-[\w\s]+)*)'
     DEFAULT_DETAIL = 'reservations'
     MAX_RECORDS = {
         'reservations': 100
@@ -108,12 +116,12 @@ class ReservationExporter(RoomBookingExporter):
     VALID_FORMATS = ('json', 'jsonp', 'xml', 'ics')
 
     def _getParams(self):
-        super(ReservationExporter, self)._getParams()
-        self._locList = self._urlParams['loclist'].split('-')
+        super(ReservationHook, self)._getParams()
+        self._locList = self._pathParams['loclist'].split('-')
 
     def export_reservation(self, aw):
-        expInt = ReservationExportInterface(aw, self)
-        return expInt.reservation(self._locList, self._qdata)
+        expInt = ReservationFetcher(aw, self)
+        return expInt.reservation(self._locList)
 
 
 class IRoomMetadataFossil(IFossil):
@@ -226,18 +234,15 @@ class IReservationMetadataFossil(IReservationMetadataFossilBase):
     room.result = IMinimalRoomMetadataFossil
 
 
-class RoomBookingExportInterface(ExportInterface):
+class RoomBookingFetcher(DataFetcher):
     """
     Base export interface for RB related stuff
     """
 
-    def _getQueryParams(self, qdata):
-        super(RoomBookingExportInterface, self)._getQueryParams(qdata)
-
-        self._fromDT = utcdate(self._fromDT) if self._fromDT else None
-        self._toDT = utcdate(self._toDT) if self._toDT else None
-        self._occurrences = get_query_parameter(qdata, ['occ', 'occurrences'], 'no') == 'yes'
-        self._resvFilter = getResvStateFilter(qdata)
+    def __init__(self, aw, hook):
+        super(RoomBookingFetcher, self).__init__(aw, hook)
+        self._occurrences = hook._occurrences
+        self._resvFilter = hook._resvFilter
 
     @staticmethod
     def _repeatingIterator(resv):
@@ -265,7 +270,7 @@ class RoomBookingExportInterface(ExportInterface):
         return fossil
 
 
-class RoomExportInterface(RoomBookingExportInterface):
+class RoomFetcher(RoomBookingFetcher):
     DETAIL_INTERFACES = {
         'rooms': IRoomMetadataFossil,
         'reservations': IRoomMetadataWithReservationsFossil
@@ -305,9 +310,7 @@ class RoomExportInterface(RoomBookingExportInterface):
 
         return fossil
 
-    def room(self, location, idlist, qdata):
-
-        self._getQueryParams(qdata)
+    def room(self, location, idlist):
 
         Factory.getDALManager().connect()
         rooms = CrossLocationQueries.getRooms(location=location)
@@ -322,7 +325,7 @@ class RoomExportInterface(RoomBookingExportInterface):
         Factory.getDALManager().disconnect()
 
 
-class ReservationExportInterface(RoomBookingExportInterface):
+class ReservationFetcher(RoomBookingFetcher):
     DETAIL_INTERFACES = {
         'reservations': IReservationMetadataFossil
     }
@@ -331,9 +334,7 @@ class ReservationExportInterface(RoomBookingExportInterface):
         return self._addOccurrences(fossil, obj, self._fromDT, self._toDT)
 
 
-    def reservation(self, locList, qdata):
-
-        self._getQueryParams(qdata)
+    def reservation(self, locList):
 
         Factory.getDALManager().connect()
 
@@ -357,15 +358,15 @@ class ReservationExportInterface(RoomBookingExportInterface):
         Factory.getDALManager().disconnect()
 
 
-def getResvStateFilter(qdata):
-    cancelled = get_query_parameter(qdata, ['cxl', 'cancelled'])
-    rejected = get_query_parameter(qdata, ['rej', 'rejected'])
-    confirmed = get_query_parameter(qdata, ['confirmed'], -1)
-    archival = get_query_parameter(qdata, ['arch', 'archival'])
-    repeating = get_query_parameter(qdata, ['rec', 'recurring', 'rep', 'repeating'])
-    avc = get_query_parameter(qdata, ['avc'])
-    avcSupport = get_query_parameter(qdata, ['avcs', 'avcsupport'])
-    bookedFor = get_query_parameter(qdata, ['bf', 'bookedfor'])
+def getResvStateFilter(queryParams):
+    cancelled = get_query_parameter(queryParams, ['cxl', 'cancelled'])
+    rejected = get_query_parameter(queryParams, ['rej', 'rejected'])
+    confirmed = get_query_parameter(queryParams, ['confirmed'], -1)
+    archival = get_query_parameter(queryParams, ['arch', 'archival'])
+    repeating = get_query_parameter(queryParams, ['rec', 'recurring', 'rep', 'repeating'])
+    avc = get_query_parameter(queryParams, ['avc'])
+    avcSupport = get_query_parameter(queryParams, ['avcs', 'avcsupport'])
+    bookedFor = get_query_parameter(queryParams, ['bf', 'bookedfor'])
     if not any((cancelled, rejected, confirmed != -1, archival, repeating, avc, avcSupport, bookedFor)):
         return None
     if cancelled is not None:

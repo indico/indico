@@ -32,7 +32,7 @@ from urlparse import parse_qs
 from ZODB.POSException import ConflictError
 
 # indico imports
-from indico.web.http_api import Exporter
+from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
@@ -59,11 +59,11 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     Returns a string consisting of path and sorted query string.
     Dynamic arguments like signature and timestamp are removed from the query string.
     """
-    qdata = remove_lists(parse_qs(query))
+    queryParams = remove_lists(parse_qs(query))
     if remove:
         for key in remove:
-            qdata.pop(key, None)
-    sortedQuery = sorted(qdata.items(), key=lambda x: x[0].lower())
+            queryParams.pop(key, None)
+    sortedQuery = sorted(queryParams.items(), key=lambda x: x[0].lower())
     if separate:
         return path, sortedQuery and urllib.urlencode(sortedQuery)
     elif sortedQuery:
@@ -121,22 +121,22 @@ def handler(req, **params):
     logger = Logger.get('httpapi')
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
     # Parse the actual query string
-    qdata = parse_qs(query)
+    queryParams = parse_qs(query)
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
 
     cache = RequestCache(HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL())
 
-    apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
-    signature = get_query_parameter(qdata, ['signature'])
-    timestamp = get_query_parameter(qdata, ['timestamp'], 0, integer=True)
-    no_cache = get_query_parameter(qdata, ['nc', 'nocache'], 'no') == 'yes'
-    pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
-    onlyPublic = get_query_parameter(qdata, ['op', 'onlypublic'], 'no') == 'yes'
+    apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
+    signature = get_query_parameter(queryParams, ['signature'])
+    timestamp = get_query_parameter(queryParams, ['timestamp'], 0, integer=True)
+    no_cache = get_query_parameter(queryParams, ['nc', 'nocache'], 'no') == 'yes'
+    pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
+    onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
 
     # Get our handler function and its argument and response type
-    func, dformat = Exporter.parseRequest(path, qdata)
+    func, dformat = HTTPAPIHook.parseRequest(path, queryParams)
     if func is None or dformat is None:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
@@ -197,7 +197,7 @@ def handler(req, **params):
             dbi.endRequest(False)
 
         serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
-                                       **remove_lists(qdata))
+                                       **remove_lists(queryParams))
 
         if error:
             resultFossil = fossilize(error)

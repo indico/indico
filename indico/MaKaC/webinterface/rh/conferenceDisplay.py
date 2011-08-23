@@ -1053,7 +1053,7 @@ class RHConfParticipantsAddPending(RHConferenceDisplay):
                 pending.setTelephone(params.get("phone",""))
                 pending.setFax(params.get("fax",""))
             participation = self._conf.getParticipation()
-            if participation.alreadyParticipating(pending) != 0:
+            if participation.alreadyParticipating(pending) != 0 or participation.alreadyPending(pending) != 0:
                 errorList.append("There is already a participant with the email address '%s' in this meeting."
                                  % pending.getEmail())
             else:
