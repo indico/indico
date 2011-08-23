@@ -57,9 +57,9 @@ type("ServiceDialog", ["ExclusivePopup"],
                         killProgress();
                         self._error(error);
                     } else {
-                        self._success(response);
                         killProgress();
                         self.close();
+                        self._success(response);
                     }
                 }
             );

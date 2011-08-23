@@ -1655,9 +1655,6 @@ class UHConfModifParticipantsPendingEdit( URLHandler ):
 class UHConfParticipantsNewPending( URLHandler ):
     _relativeURL = "confModifParticipants.py/newPending"
 
-class UHConfParticipantsAddPending( URLHandler ):
-    _relativeURL = "confModifParticipants.py/addPending"
-
 
 class UHConfParticipantsInvitation( URLHandler ):
     _relativeURL = "confModifParticipants.py/invitation"

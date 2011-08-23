@@ -73,9 +73,6 @@ def pendingEdit( req, **params ):
 def newPending( req, **params ):
     return conferenceDisplay.RHConfParticipantsNewPending( req ).process( params )
 
-def addPending( req, **params ):
-    return conferenceDisplay.RHConfParticipantsAddPending( req ).process( params )
-
 def invitation( req, **params ):
     return conferenceDisplay.RHConfParticipantsInvitation( req ).process( params )
 

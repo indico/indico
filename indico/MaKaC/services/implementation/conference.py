@@ -32,6 +32,7 @@ from MaKaC.common import filters
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common import indexes, info
+from MaKaC.common.fossilize import fossilize
 
 from MaKaC.conference import ConferenceHolder, ConferenceChair
 import MaKaC.conference as conference
@@ -45,6 +46,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.participant import Participant
 
 import datetime
 from pytz import timezone
@@ -58,8 +60,6 @@ from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 from MaKaC.fossils.contribution import IContributionFossil
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
-from MaKaC.participant import Participant
-from MaKaC.common.fossilize import fossilize
 
 
 class ConferenceBase:
@@ -726,52 +726,59 @@ class ConferenceGetFieldsAndContribTypes(ConferenceDisplayBase):
         cTypesDict =  dict([(ct.getId(), ct.getName()) for ct in cTypes])
         return [afmDict, cTypesDict]
 
+class ConferenceApplyParticipant(ConferenceDisplayBase):
 
-class ConferenceParticipationForm(ConferenceDisplayBase):
+    def _checkParams(self):
+        ConferenceDisplayBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._title = pm.extract("title", pType=str, allowEmpty=True)
+        self._familyName = pm.extract("surName", pType=str, allowEmpty=False)
+        self._firstName = pm.extract("name", pType=str, allowEmpty=False)
+        self._email = pm.extract("email", pType=str, allowEmpty=False)
+        self._affiliation = pm.extract("affiliation", pType=str, allowEmpty=True)
+        self._address = pm.extract("address", pType=str, allowEmpty=True)
+        self._telephone = pm.extract("phone", pType=str, allowEmpty=True)
+        self._fax = pm.extract("fax", pType=str, allowEmpty=True)
+
     def _getAnswer(self):
-
-        params = {}
-
         if self._conf.getStartDate() < timezoneUtils.nowutc() :
-            return """This event began on %s, you cannot apply for
-                      participation after the event began."""%self._conf.getStartDate()
+            raise NoReportError(_("""This event began on %s, you cannot apply for
+                                         participation after the event began."""%self._conf.getStartDate()), title=_("Event started"))
 
         if not self._conf.getParticipation().isAllowedForApplying() :
-            return """Participation in this event is restricted to persons invited.
-                      If you insist on taking part in this event, please contact the event manager."""
-
-        p = wcomponents.WNewPerson()
-
-        params["formAction"] = str(urlHandlers.UHConfParticipantsAddPending.getURL(self._conf))
-        params["formTitle"] = None
-        params["cancelButtonParams"] = """ type="button" id="cancelRegistrationButton" """
-
-        params["titleValue"] = ""
-        params["surNameValue"] = ""
-        params["nameValue"] = ""
-        params["emailValue"] = ""
-        params["addressValue"] = ""
-        params["affiliationValue"] = ""
-        params["phoneValue"] = ""
-        params["faxValue"] = ""
-
+            raise NoReportError( _("""Participation in this event is restricted to persons invited.
+                                           If you insist on taking part in this event, please contact the event manager."""), title=_("Application restricted"))
+        result = {}
         user = self._getUser()
-        if user is not None :
-            params["titleValue"] = user.getTitle()
-            params["surNameValue"] = user.getFamilyName()
-            params["nameValue"] = user.getName()
-            params["emailValue"] = user.getEmail()
-            params["addressValue"] = user.getAddress()
-            params["affiliationValue"] = user.getAffiliation()
-            params["phoneValue"] = user.getTelephone()
-            params["faxValue"] = user.getFax()
-
-            params["disabledTitle"] = params["disabledSurName"] = True
-            params["disabledName"] = params["disabledEmail"] = True
-            params["disabledAddress"] = params["disabledPhone"] = True
-            params["disabledFax"] = params["disabledAffiliation"] = True
-
-        return p.getHTML(params)
+        pending = Participant(self._conf, user)
+        if user is None :
+            pending.setTitle(self._title)
+            pending.setFamilyName(self._familyName)
+            pending.setFirstName(self._firstName)
+            pending.setEmail(self._email)
+            pending.setAffiliation(self._affiliation)
+            pending.setAddress(self._address)
+            pending.setTelephone(self._telephone)
+            pending.setFax(self._fax)
+        participation = self._conf.getParticipation()
+        if participation.alreadyParticipating(pending) != 0:
+            raise NoReportError(_("The participant can not be added to the meeting because there is already a participant with the email address '%s'."
+                                % pending.getEmail()),title=_('Already registered participant'))
+        elif participation.alreadyPending(pending)!=0:
+            raise NoReportError(_("The participant can not be added to the meeting because there is already a pending participant with the email address '%s'."
+                                % pending.getEmail()),title=_('Already pending participant'))
+        else:
+            if participation.addPendingParticipant(pending):
+                if participation.getAutoAccept():
+                    result["msg"] = _("The request for participation has been accepted")
+                    if participation.displayParticipantList() :
+                        result["listParticipants"] = participation.getPresentParticipantListText()
+                else:
+                    result["msg"] = _("The participant identified by email '%s' has been added to the list of pending participants"
+                                    % pending.getEmail())
+            else:
+                return NoReportError(_("The participant cannot be added."), title=_("Error"))
+        return result
 
 class ConferenceProtectionUserList(ConferenceModifBase):
 
@@ -842,7 +849,6 @@ class ConferenceContactInfoModification( ConferenceTextModificationBase ):
         self._target.getAccessController().setContactInfo(self._value)
     def _handleGet(self):
         return self._target.getAccessController().getContactInfo()
-
 
 class ConferenceAlarmSendTestNow(ConferenceModifBase):
 
@@ -1190,7 +1196,7 @@ methodMap = {
     "showConcurrentEvents": ShowConcurrentEvents,
 #    "getFields": ConferenceGetFields,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
-    "getParticipationForm": ConferenceParticipationForm,
+    "participation.applyParticipant": ConferenceApplyParticipant,
     "protection.getAllowedUsersList": ConferenceProtectionUserList,
     "protection.addAllowedUsers": ConferenceProtectionAddUsers,
     "protection.removeAllowedUser": ConferenceProtectionRemoveUser,

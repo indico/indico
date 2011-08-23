@@ -1049,47 +1049,6 @@ class RHConfParticipantsNewPending(RHConferenceDisplay):
         return p.display(**params)
 
 
-class RHConfParticipantsAddPending(RHConferenceDisplay):
-    _uh = urlHandlers.UHConfParticipantsAddPending
-
-    def _process( self ):
-        params = self._getRequestParams()
-        errorList = []
-        infoList = []
-        if params.has_key("ok") :
-            user = self._getUser()
-            pending = Participant(self._conf, user)
-            if user is None :
-                pending.setTitle(params.get("title",""))
-                pending.setFamilyName(params.get("surName",""))
-                pending.setFirstName(params.get("name",""))
-                pending.setEmail(params.get("email",""))
-                pending.setAffiliation(params.get("affiliation",""))
-                pending.setAddress(params.get("address",""))
-                pending.setTelephone(params.get("phone",""))
-                pending.setFax(params.get("fax",""))
-            participation = self._conf.getParticipation()
-            if participation.alreadyParticipating(pending) != 0 or participation.alreadyPending(pending) != 0:
-                errorList.append("There is already a participant with the email address '%s' in this meeting."
-                                 % pending.getEmail())
-            else:
-                if participation.addPendingParticipant(pending):
-                    if participation.getAutoAccept():
-                        infoList.append(_("The request for participation has been accepted"))
-                    else:
-                        infoList.append("The participant identified by email '%s' has been added to the list of pending participants"
-                                    % pending.getEmail())
-                else:
-                    errorList.append(_("The participant cannot be added."))
-
-        if infoList:
-            self._reqParams["infoMsg"] = infoList
-        if errorList:
-            self._reqParams["errorMsg"] = errorList
-
-        return RHConferenceDisplay._process(self)
-
-
 class RHConfParticipantsRefusal(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConfParticipantsRefusal
 

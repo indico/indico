@@ -1,19 +1,19 @@
 <%page args="minutes=False"/>
 <%namespace name="common" file="Common.tpl"/>
 
-<table class="eventDetails">
+<table class="eventDetails" id="eventDetails">
 <tbody>
 % if conf.getDescription():
-<tr>
+<tr id="eventDescription">
     <td class="leftCol">Description</td>
     <td>${common.renderDescription(conf.getDescription())}</td>
 </tr>
 % endif
 
 % if participants:
-<tr>
+<tr id="eventParticipants">
     <td class="leftCol">Participants</td>
-    <td>${participants}</td>
+    <td id="eventListParticipants">${participants}</td>
 </tr>
 % endif
 
@@ -79,9 +79,6 @@
     <td>
         Want to participate?
         <span class="fakeLink" id="applyLink">Apply here</span>
-        <script type="text/javascript">
-            $E('applyLink').observeClick(function(){new ApplyForParticipationPopup("${conf.getId()}")});
-        </script>
     </td>
 </tr>
 % endif
@@ -110,3 +107,41 @@ ${pluginDetails}
 % endif
 </tbody>
 </table>
+<script type="text/javascript">
+    IndicoUI.executeOnLoad(function(){
+        var onSuccess = function(result){
+            if(result.msg){
+                (new AlertPopup($T("Success"),result.msg)).open();
+            }
+            if (result.listParticipants){
+                if( $("#eventParticipants").length==0){
+                    var trParticipants=$(Html.tr({id:"eventParticipants"},
+                            Html.td({class:"leftCol"},$T("Participants")),
+                            Html.td({id:"eventListParticipants"},"")).dom);
+                    if ($("#eventDescription").length==0){
+                        $("#eventDetails").prepend(trParticipants);
+                    }else{
+                        $("#eventDescription").after(trParticipants);
+                    }
+                }
+                $("#eventListParticipants").text(result.listParticipants).effect("highlight",{},3000);
+            }
+        };
+        var userData = {};
+        var allowEdit = true;
+        % if currentUser:
+            allowEdit = false;
+            userData["id"] = '${currentUser.getId()}';
+            userData["title"] = '${currentUser.getTitle()}';
+            userData["surName"] = '${currentUser.getFamilyName()}';
+            userData["name"] = '${currentUser.getName()}';
+            userData["email"] = '${currentUser.getEmail()}';
+            userData["address"] = '${currentUser.getAddress()}';
+            userData["affiliation"] = '${currentUser.getAffiliation()}';
+            userData["phone"] = '${currentUser.getTelephone()}';
+            userData["fax"] = '${currentUser.getFax()}';
+        % endif
+            $('#applyLink').click(function(){new ApplyForParticipationPopup('${conf.getId()}','event.participation.applyParticipant',
+                    $T('Apply for participation'), userData, onSuccess, allowEdit);});
+    });
+</script>

@@ -1099,6 +1099,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         vars["daysPerRow"] = self._daysPerRow
         vars["firstDay"] = self._firstDay
         vars["lastDay"] = self._lastDay
+        vars["currentUser"] = self._rh._aw.getUser()
 
         return vars
 
