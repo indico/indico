@@ -282,7 +282,9 @@ class WebcastManager(Persistent):
         """ Returns the Webcast Service URL ( a string ).
             It will be used to display a link when an event is a forthcoming webcast.
         """
-        if not wc or not wc.getAudience():
+        if not wc:
+            return None
+        elif not wc.getAudience():
             return CollaborationTools.getOptionValue('WebcastRequest', "webcastPublicURL")
 
         for row in CollaborationTools.getOptionValue('WebcastRequest', "webcastAudiences"):
