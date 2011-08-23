@@ -33,40 +33,40 @@
     color: #555555 !important;
 }
 
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { 
-    color: #555555; 
-    text-decoration: none; 
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+    color: #555555;
+    text-decoration: none;
 }
 
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { 
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
     border: 1px solid #d3d3d3;
-    font-weight: normal; 
-    color: #555555; 
+    font-weight: normal;
+    color: #555555;
 }
 
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { 
-    border: 1px solid #999999; 
-    background: #dadada url(../images/jquery-ui/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x; 
-    font-weight: normal; 
-    color: #212121; 
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
+    border: 1px solid #999999;
+    background: #dadada url(../images/jquery-ui/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x;
+    font-weight: normal;
+    color: #212121;
 }
 
-.ui-state-hover a, .ui-state-hover a:hover { 
-    color: #212121; 
-    text-decoration: none; 
+.ui-state-hover a, .ui-state-hover a:hover {
+    color: #212121;
+    text-decoration: none;
 }
 
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { 
-    border: 1px solid #aaaaaa; 
-    background: #ffffff url(../images/jquery-ui/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x; 
-    font-weight: normal; 
-    color: #212121; 
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    border: 1px solid #aaaaaa;
+    background: #ffffff url(../images/jquery-ui/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x;
+    font-weight: normal;
+    color: #212121;
 }
 
-.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { 
-    color: #555555; 
-    text-decoration: none; 
-    font-weight: bold; 
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
+    color: #555555;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .ui-widget-header {
@@ -95,30 +95,30 @@
     background: #FFFFFF !important;
 }
 
-.ui-tabs .ui-corner-top, .ui-tabs .ui-corner-all { 
-    -moz-border-radius-topleft: 0px; 
-    -webkit-border-top-left-radius: 0px; 
-    border-top-left-radius: 0px; 
-    -moz-border-radius-topright: 0px; 
-    -webkit-border-top-right-radius: 0px; 
-    border-top-right-radius: 0px; 
+.ui-tabs .ui-corner-top, .ui-tabs .ui-corner-all {
+    -moz-border-radius-topleft: 0px;
+    -webkit-border-top-left-radius: 0px;
+    border-top-left-radius: 0px;
+    -moz-border-radius-topright: 0px;
+    -webkit-border-top-right-radius: 0px;
+    border-top-right-radius: 0px;
 }
 
-.ui-tabs { 
-    position: relative; 
-    padding: none; 
-    zoom: 1; 
+.ui-tabs {
+    position: relative;
+    padding: none;
+    zoom: 1;
 }
 
-.ui-tabs .ui-tabs-nav { 
-    margin: 0; 
-    padding: .2em 0 0 !important; 
+.ui-tabs .ui-tabs-nav {
+    margin: 0;
+    padding: .2em 0 0 !important;
 }
 
-.ui-tabs .ui-tabs-nav li a { 
-    float: left; 
-    padding: 6px 8px 3px 8px; 
-    text-decoration: none; 
+.ui-tabs .ui-tabs-nav li a {
+    float: left;
+    padding: 6px 8px 3px 8px;
+    text-decoration: none;
 }
 
 .ui-widget-content {
@@ -127,14 +127,14 @@
 }
 
 .ui-widget-header {
-    background: none !important;   
-    color: inherit !important; 
+    background: none !important;
+    color: inherit !important;
 }
 
-.ui-widget-overlay { 
-    background: #444444 url(../images/jquery-ui/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat; 
+.ui-widget-overlay {
+    background: #444444 url(../images/jquery-ui/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat;
     opacity: .50;
-    filter:Alpha(Opacity=50); 
+    filter:Alpha(Opacity=50);
 }
 
 /* Indico styled tooltips USED WITH qTip2 */
