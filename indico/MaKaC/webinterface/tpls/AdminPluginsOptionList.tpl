@@ -427,8 +427,10 @@
                         % if rbActive:
                             addNew = true;
                         % endif
-                        var rlf = new RoomListField('PeopleListDiv', 'PeopleList', ${ option.getValue() },
-                               addNew, addRoomHandler, removeRoomHandler);
+                        <%
+                        roomList = dict((str(r.guid), '%s: %s' % (r.locationName, r.getFullName())) for r in option.getRooms())
+                        %>
+                        var rlf = new RoomListField('PeopleListDiv', 'PeopleList', ${ fossilize(roomList) }, addNew, addRoomHandler, removeRoomHandler);
 
                         $E('roomList${name}').set(rlf.draw());
                     </script>

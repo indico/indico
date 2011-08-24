@@ -429,9 +429,9 @@ type("RoomListWidget", ["ListWidget"],
             var roomData = room.get();
 
             var removeButton = Widget.link(command(function() {
-                self.removeProcess(roomData, function(result) {
+                self.removeProcess(room.key, function(result) {
                     if (result) {
-                        self.set(room.key, null);
+                        self.set(room, null);
                     }
                 });
             }, IndicoUI.Buttons.removeButton()));
@@ -477,13 +477,14 @@ type("RoomListField", ["IWidget"], {
         }
 
         if(this.allowNew) {
-            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {}, callback);
+            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, callback);
             var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
             addRoomButton.observeClick(function(){
                 var selectedValue = roomChooser.select.get();
                 self.newProcess(selectedValue, function(result){
                     if (result) {
-                        self.roomList.set(selectedValue,selectedValue);
+                        var roomName = $('>option:selected', roomChooser.select.dom).text();
+                        self.roomList.set(selectedValue, roomName);
                     }
                 });
             });
@@ -503,12 +504,19 @@ type("RoomListField", ["IWidget"], {
     function(roomDivStyle, roomListStyle, initialRooms, allowNew, newProcess, removeProcess) {
 
         var self = this;
-        this.roomList = new RoomListWidget(roomListStyle,removeProcess);
+        this.roomList = new RoomListWidget(roomListStyle, function(roomToRemove, setResult) {
+            return removeProcess(roomToRemove, function(result) {
+                setResult(result);
+                if(result) {
+                    self.roomList.set(roomToRemove, null);
+                }
+            });
+        }, true);
         this.roomDivStyle = any(roomDivStyle, "UIPeopleListDiv");
 
         if (exists(initialRooms)) {
-            each (initialRooms,function(room){
-                self.roomList.set(room, room);
+            each (initialRooms,function(room, guid){
+                self.roomList.set(guid, room);
             });
         }
 
