@@ -41,7 +41,7 @@ AuthenticatedEnforceSecure = "yes"
 
 BaseURL              = "http://localhost/indico"
 
-# BaseSecureURL is the HTTPS location of Indico.
+# BaseSecureURL is the HTTPS location of Indico. Set empty string if you want to use http.
 
 BaseSecureURL        = "https://localhost/indico"
 

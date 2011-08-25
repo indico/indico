@@ -2563,8 +2563,8 @@ class WSignIn(WTemplated):
         vars["msg"] = self.htmlText( vars.get( "msg" ) )
         imgIcon=Configuration.Config.getInstance().getSystemIconURL("currentMenuItem")
         if Configuration.Config.getInstance().getAuthenticatedEnforceSecure():
-           imgIcon=imgIcon.replace("http://", "https://")
-           imgIcon = urlHandlers.setSSLPort( imgIcon )
+            imgIcon=imgIcon.replace("http://", "https://")
+            imgIcon = urlHandlers.setSSLPort( imgIcon )
         vars["itemIcon"] = imgIcon
         vars["createAccount"] = ""
         if minfo.getAuthorisedAccountCreation():

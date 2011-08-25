@@ -187,6 +187,7 @@ class RHConfModifCSBase(RHConferenceModifBase):
 
 class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
     _uh = urlHandlers.UHConfModifCollaboration
+    _tohttps = True
 
     def _checkParams(self, params):
         RHConfModifCSBase._checkParams(self, params)
@@ -218,12 +219,6 @@ class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p.display()
         else:
-            ph = PluginsHolder()
-            if ph.getPluginType('Collaboration').getOption("useHTTPS").getValue():
-                self._tohttps = True
-                if self._checkHttpsRedirect():
-                    return ""
-
             if self._cannotViewTab:
                 raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
             else:

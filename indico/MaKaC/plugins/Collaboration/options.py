@@ -34,9 +34,6 @@ globalOptions = [
                           "defaultValue": [],
                           "editable": True,
                           "visible": True} ),
-    ("useHTTPS", {"description": _("Use HTTPS in collaboration pages?"),
-                     "type" : bool,
-                     "defaultValue": False} ),
     ("tabOrder", {"description": _("Order in which the tabs will appear"),
                   "type": list,
                   "defaultValue": ["Videoconferencing", "Recording Request", "Webcast Request"]

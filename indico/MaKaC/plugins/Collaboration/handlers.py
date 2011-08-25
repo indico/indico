@@ -98,12 +98,6 @@ class RHElectronicAgreement(RHConfModifCSBookings):
         if self.spkUniqueId and self.file:
             self.uploadProcess()
 
-        ph = PluginsHolder()
-        if ph.getPluginType('Collaboration').getOption("useHTTPS").getValue():
-            self._tohttps = True
-            if self._checkHttpsRedirect():
-                return ""
-
         if self._cannotViewTab:
             raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
         else:

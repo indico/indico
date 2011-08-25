@@ -638,7 +638,7 @@ class Config:
         return self._yesOrNoVariable('UseXSendFile')
 
     def getAuthenticatedEnforceSecure(self):
-        return self._yesOrNoVariable('AuthenticatedEnforceSecure')
+        return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
 
     def getInstance(cls):
         """returns an instance of the Config class ensuring only a single

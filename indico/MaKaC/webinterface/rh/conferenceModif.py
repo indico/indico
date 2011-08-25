@@ -243,8 +243,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
         elif self._isVideoServicesManagerOrAdmin:
-            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-            url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS())
+            url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = self.use_https())
 
         else:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )

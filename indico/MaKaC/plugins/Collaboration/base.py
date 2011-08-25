@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from indico.util.contextManager import ContextManager
 import time
 from persistent import Persistent
 from hashlib import md5
@@ -34,7 +35,6 @@ from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools,\
     MailTools
 from MaKaC.conference import Observer
-from MaKaC.common.contextManager import ContextManager
 from MaKaC.webinterface.common.tools import hasTags
 from MaKaC.plugins.Collaboration import mail
 from MaKaC.common.mail import GenericMailer
@@ -596,7 +596,7 @@ class CSBookingManager(Persistent, Observer):
                 ContextManager.get('dateChangeNotificationProblems')['Collaboration'] = [
                     'Some Video Services bookings could not be moved:',
                     problems,
-                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner(), secure = CollaborationTools.isUsingHTTPS())) + ' the Video Services section]] to modify them yourself.'
+                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner(), secure = ContextManager.get('currentRH').use_https())) + ' the Video Services section]] to modify them yourself.'
                 ]
 
 
@@ -1636,7 +1636,7 @@ class CSBookingBase(Persistent, Fossilizable):
 
     def getModificationURL(self):
         return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),
-                                                           secure = CollaborationTools.isUsingHTTPS(),
+                                                           secure = ContextManager.get('currentRH').use_https(),
                                                            tab = CollaborationTools.getPluginTab(self.getPlugin()))
 
     def hasStartDate(self):

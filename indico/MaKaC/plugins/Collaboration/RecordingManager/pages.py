@@ -22,6 +22,7 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
     CollaborationTools
 from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrphans
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
+from indico.util.contextManager import ContextManager
 import re
 #from MaKaC.common.logger import Logger
 
@@ -41,7 +42,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["Talks"] = talks
         vars["Conference"] = self._conf
         previewURL = CollaborationTools.getOptionValue("RecordingManager", "micalaPreviewURL")
-        if CollaborationTools.isUsingHTTPS():
+        if self._rh.use_https():
             previewURL = previewURL.replace("http","https")
         vars["PreviewURL"] = previewURL
 
