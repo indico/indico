@@ -116,25 +116,14 @@ class RequestHandlerBase(OldObservable):
             return ""
         return self._uh.getURL( self._target )
 
-    def getRequestParams( self ):
-        return self._params
-
     def getRequestURL( self ):
         """
         Reconstructs the request URL
         """
-        proc = "http://"
-        try:
-            if self._req.is_https():
-                proc = "https://"
-        except:
-            pass
+        return self._req.construct_url(self._req.unparsed_uri)
 
-        port = ""
-        if self._req.parsed_uri[apache.URI_PORT]:
-            port = ":" + str( self._req.parsed_uri[apache.URI_PORT] )
-        return "%s%s%s%s"%(proc, self._req.hostname, port, self._req.unparsed_uri)
-    requestURL = property( getRequestURL )
+    def getRequestParams( self ):
+        return self._params
 
     def getRequestHTTPHeaders( self ):
         return self._req.headers_in
@@ -801,11 +790,7 @@ class RoomBookingDBMixin:     # It's _not_ RH
 class RHProtected( RH ):
 
     def _getLoginURL( self ):
-        #url = self.getCurrentURL()
-        url = self.getRequestURL()
-        if url == "":
-            url = urlHandlers.UHWelcome.getURL()
-        return urlHandlers.UHSignIn.getURL( url )
+        return urlHandlers.UHSignIn.getURL(self.getRequestURL())
 
     def _checkSessionUser( self ):
         """

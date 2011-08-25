@@ -73,7 +73,6 @@ class RHConferenceSite( RHCustomizable ):
         self._setMenuStatus(params)
 
     def _getLoginURL( self ):
-        #url = self.getCurrentURL()
         url = self.getRequestURL()
         if url == "":
             url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
