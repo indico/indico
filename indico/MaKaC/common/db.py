@@ -83,7 +83,8 @@ class DBMgr:
 
         self._storage=ClientStorage((hostname, port), username=cfg.getDBUserName(), password=cfg.getDBPassword(), realm=cfg.getDBRealm())
         self._db=MaKaCDB(self._storage)
-        self._conn={}
+        self._conn = threading.local()
+        self._conn.conn = None
 
     @classmethod
     def getInstance( cls, *args, **kwargs ):
@@ -96,31 +97,21 @@ class DBMgr:
     def setInstance( cls, dbInstance ):
         cls._instance = dbInstance
 
-    @staticmethod
-    def _getUniqueIdentifier():
-        return threading._get_ident()
-
     def _getConnObject(self):
-        tid = DBMgr._getUniqueIdentifier()
-        return self._conn[tid]
+        return self._conn.conn
 
     def _setConnObject(self, obj):
-        tid = DBMgr._getUniqueIdentifier()
-        self._conn[tid] = obj
+        self._conn.conn = obj
+
 
     def _delConnObject(self):
-        tid = DBMgr._getUniqueIdentifier()
-        del self._conn[tid]
+        self._conn.conn = None
+
 
     def startRequest( self ):
         """Initialise the DB and starts a new transaction.
         """
-
-        tid = DBMgr._getUniqueIdentifier()
-
-        self._conn[tid] = self._db.open()
-        Logger.get('dbmgr').debug('Allocated connection for %s - table size is %s' % \
-                                  (tid, len(self._conn)))
+        self._conn.conn = self._db.open()
 
     def endRequest( self, commit=True ):
         """Closes the DB and commits changes.
@@ -137,9 +128,7 @@ class DBMgr:
         return self._getConnObject()
 
     def isConnected( self ):
-        tid = DBMgr._getUniqueIdentifier()
-
-        return tid in self._conn
+        return self._conn.conn != None
 
     def getDBConnCache(self):
         conn = self._getConnObject()
