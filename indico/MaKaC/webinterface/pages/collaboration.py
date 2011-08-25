@@ -198,7 +198,6 @@ class WPConfModifCSBase (WPConferenceModifBase):
         self._tabCtrl = wcomponents.TabControl()
 
     def _createTabCtrl(self):
-        isUsingHTTPS = CollaborationTools.isUsingHTTPS()
 
         for tabName in self._tabNames:
             isPlugin = False
@@ -212,7 +211,7 @@ class WPConfModifCSBase (WPConferenceModifBase):
             elif tabName == 'Managers':
                 url = urlHandlers.UHConfModifCollaborationManagers.getURL(self._conf)
             else:
-                url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = isUsingHTTPS, tab = tabName)
+                url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = self.rh.use_https(), tab = tabName)
             self._tabs[tabName] = self._tabCtrl.newTab(tabName, tabName, url)
 
         self._setActiveTab()

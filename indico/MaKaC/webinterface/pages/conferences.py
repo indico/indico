@@ -2414,7 +2414,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed(self._rh.getAW().getUser()):
             from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
-                urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = CollaborationTools.isUsingHTTPS()))
+                urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = self._rh.use_https()))
             self._generalSection.addItem( self._videoServicesMenuItem)
         else:
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"), None)

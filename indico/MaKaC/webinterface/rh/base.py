@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from urlparse import urljoin
 
 """Base definitions for the request handlers (rh). A rh is a class which
 complies to a well defined interface and which from a mod_python request knows
@@ -82,7 +83,7 @@ class RequestHandlerBase(OldObservable):
         or access key in their session.
         auth_keys is the set of permissible session keys which do not require user login.
         """
-        auth_keys = ["modifKeys", "accessKeys"]
+        auth_keys = ["modifKeys"]#, "accessKeys"]  Cookie would stay forever and force https
 
         for key in auth_keys:
             if self._websession.getVar(key):
@@ -116,11 +117,20 @@ class RequestHandlerBase(OldObservable):
             return ""
         return self._uh.getURL( self._target )
 
-    def getRequestURL( self ):
+    def getRequestURL( self, secure=False ):
         """
         Reconstructs the request URL
         """
-        return self._req.construct_url(self._req.unparsed_uri)
+        if secure:
+            return  urljoin(Config.getInstance().getBaseSecureURL(), self._req.unparsed_uri)
+        else:
+            return self._req.construct_url(self._req.unparsed_uri)
+
+    def use_https(self):
+        """
+        If the RH must be HTTPS and there is a BaseSecurURL, then use it!
+        """
+        return self._tohttps and Config.getInstance().getBaseSecureURL()
 
     def getRequestParams( self ):
         return self._params
@@ -193,7 +203,7 @@ class RH(RequestHandlerBase):
                  python data types. The key is the parameter name while the
                  value should be the received paramter value (or values).
     """
-    _tohttps = False
+    _tohttps = False # set this value to True for the RH that must be HTTPS when there is a BaseSecureURL
     _doNotSanitizeFields = []
 
     def __init__( self, req ):
@@ -293,9 +303,11 @@ class RH(RequestHandlerBase):
             pass
 
     def _checkHttpsRedirect(self):
-        if self._tohttps and not self._req.is_https():
-            current_url = self._req.construct_url(self._req.unparsed_uri)
-            self._redirect(urlHandlers.setSSLPort(current_url.replace("http://", "https://")))
+        """
+        If HTTPS must be used but it is not, redirect!
+        """
+        if self.use_https() and not self._req.is_https():
+            self._redirect(self.getRequestURL(secure=True))
             return True
         else:
             return False
@@ -483,7 +495,7 @@ class RH(RequestHandlerBase):
 
         #redirect to https if necessary
         if self._checkHttpsRedirect():
-            return res
+            return
 
         DBMgr.getInstance().startRequest()
         self._startRequestSpecific2RH()     # I.e. implemented by Room Booking request handlers
@@ -521,7 +533,7 @@ class RH(RequestHandlerBase):
                             if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
                                 self._tohttps = True
                                 if self._checkHttpsRedirect():
-                                    return res
+                                    return
 
                         #if self._getUser() != None and self._getUser().getId() == "893":
                         #    profile = True

@@ -98,13 +98,6 @@ class CollaborationTools(object):
         return cls.getCollaborationPluginType().getOption(optionName).getValue()
 
     @classmethod
-    def isUsingHTTPS(cls):
-        """ Utility function that returns if we should use HTTPS in collaboration pages or not.
-        """
-        return cls.getCollaborationPluginType().hasOption('useHTTPS') and \
-               cls.getCollaborationPluginType().getOption('useHTTPS').getValue()
-
-    @classmethod
     def getModule(cls, pluginId):
         """ Utility function that returns a module object given a plugin name.
             pluginId: a string such as "evo", "DummyPlugin", etc.
