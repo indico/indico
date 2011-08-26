@@ -962,43 +962,10 @@ var showAllInfoRows = function(showAll) {
     });
 };
 
-/**
- * Mouseover help popup for the 'Keep booking synchronized with event' advanced option
- */
-
-var dateChangeHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 200px;"">' +
-        $T('This option ensures that ' +
-                'if a manager changes the event\'s dates, ' +
-                'this booking\'s dates change accordingly. ') +
-        '<\/div>');
-};
 
 /**
  * Mouseover help popup for the 'Keep booking synchronized with event' advanced option, in case it is disabled.
  */
-
-var dateChangeDisabledHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;"">' +
-            $T('This option ensures that ' +
-            'if a manager changes the event\'s dates, ' +
-            'this booking\'s dates change accordingly. ' +
-            'The event already took place, ' +
-            'so you cannot activate this option.') +
-        '<\/div>');
-};
-
-/**
- * Mouseover help popup for the 'Keep booking hidden' advanced option
- */
-var hiddenHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 150px;"">' +
-            $T('This option hides the booking in the event page.') +
-        '<\/div>');
-};
 
 var sanitizationError = function(invalidFields) {
     each(invalidFields, function(fieldName) {
@@ -1033,6 +1000,27 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             if (this.tabControl.getSelectedTab() === 'Advanced') {
                 this.tabControl.setSelectedTab('Basic');
             }
+        },
+
+        /**
+         * Opens the popup, but does NOT call postdraw()
+         * Necessary so that we can call plugin's onCreate() or onEdit() between draw() and postdraw()
+         */
+        open: function() {
+            $E(document.body).append(this.draw());
+            this.isopen = true;
+            $('#dateSyncHelpImg').qtip(
+            {
+            	content :  $T('This option ensures that ' +'if a manager changes the event\'s dates, ' +
+            			'this booking\'s dates change accordingly. ' +'The event already took place, ' +
+            			'so you cannot activate this option.')
+        				});
+            $('#dateSyncHelpImg').qtip(
+            {
+            	content :   $T('This option ensures that ' +
+            			'if a manager changes the event\'s dates, ' +
+            			'this booking\'s dates change accordingly. ')
+            });
         },
 
         draw: function() {
@@ -1081,23 +1069,12 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                 IndicoUtil.setFormValues(this.components, this.booking.bookingParams);
             }
 
-            if (exists($E('dateSyncHelpImg'))){
-                $E('dateSyncHelpImg').dom.onmouseover = dateChangeHelpPopup;
-            }
-
             if (this.popupType === 'edit' && !this.booking.canBeNotifiedOfEventDateChanges) {
                 if (exists($E('dateSyncCheckBox'))) {
                     $E('dateSyncCheckBox').dom.disabled = true;
                     $E('dateSyncCheckBox').dom.className = 'disabled';
                 }
-                if (exists($E('dateSyncHelpImg'))){
-                    $E('dateSyncHelpImg').dom.onmouseover = dateChangeDisabledHelpPopup;
-                }
             }
-            if(exists($E('hiddenHelpImg'))) {
-                $E('hiddenHelpImg').dom.onmouseover = hiddenHelpPopup;
-            }
-
             this.tabControl.heightToTallestTab();
             this.postDraw();
 

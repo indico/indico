@@ -204,4 +204,3 @@ IndicoUI.executeOnLoad(function(){
 });
 % endif
 </script>
-
