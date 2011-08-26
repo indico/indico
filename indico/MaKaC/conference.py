@@ -4892,16 +4892,6 @@ class ConferenceHolder( ObjectHolder ):
         id = ObjectHolder._newId( self )
         return "%s"%id
 
-    def getByStartDate( self, sday, eday = None ):
-        # XXX This function seems strange?
-        res=[]
-        sDayStart=datetime(sday.year,sday.month,sday.day,0,0)
-        sDayEnd=datetime(sday.year,sday.month,sday.day,23,59)
-        for conf in self.getList():
-            if sday>=sDayStart and eday<=sDayEnd:
-                res.append(conf)
-        return conf
-
     def getById( self, id, quiet=False ):
         """returns an object from the index which id corresponds to the one
             which is specified.
