@@ -342,19 +342,15 @@ var mandatoryFieldList = ${ mandatoryFieldList };
 mandatoryFieldList.push("abstractTitle"); // append the title id which is in this template
 var pmMandatoryFields = new IndicoUtil.parameterManager();
 
-// Extra function to check in the parameter manager for the
 var checkTrackOptions = function() {
-    // check if at least one of the checkboxes/radiobuttons is checked
-    var maxTrackId = ${ maxTrackId };
-    for(var i=0; i<maxTrackId+1; i++) {
-        var elem = $E('track_'+i);
-        if (elem) {
-            if (elem.dom.checked) {
-                return null;
-            }
-        }
+    /* Extra function to use in the parameter manager.
+       Checks if at least one of the checkboxes/radiobuttons is checked.
+    */
+    if ($('input:checked[id^=track_]').length > 0) {
+        return null;
+    }else {
+        return Html.span({}, $T("At least one must be selected"));
     }
-    return Html.span({}, $T("At least one must be selected"));
 };
 
 

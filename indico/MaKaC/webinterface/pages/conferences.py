@@ -5664,7 +5664,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
             vars["mandatoryIcon"] = iconEnabled
         else:
             vars["mandatoryIcon"] = iconDisabled
-        if abMgr.getAttachFiles():
+        if abMgr.canAttachFiles():
             vars["attachIcon"] = iconEnabled
         else:
             vars["attachIcon"] = iconDisabled
@@ -5765,7 +5765,7 @@ class WPConfModifCFAPreview( WPConferenceModifAbstractBase ):
         wc = abstracts.WAbstractDataModification( self._conf )
         # Simulate fake abstract
         from MaKaC.webinterface.common.abstractDataWrapper import AbstractData
-        ad = AbstractData(self._conf.getAbstractMgr(), {})
+        ad = AbstractData(self._conf.getAbstractMgr(), {}, 9999)
         params = ad.toDict()
         params["postURL"] = ""
         params["origin"] = "management"

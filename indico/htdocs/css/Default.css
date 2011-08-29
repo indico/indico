@@ -3342,7 +3342,6 @@ ul.listCompact {
     text-align: center;
     color: #444444;
     height: 80px;
-    /*margin-top: -80px;*/
     margin-bottom: 5px;
     padding-top: 10px;
     bottom: 0;
@@ -3389,63 +3388,6 @@ ul.listCompact {
     padding: 20px 30px;
     line-height: 30px;
 }
-
-/* TODO: Remove these?
-
-.banner_0
-{
-    background: #E0E0E0;
-    font-size: 16px;
-}
-
-.banner_1
-{
-    background: #F0F0F0;
-    font-size: 14px;
-    margin-right: 20px;
-}
-
-.banner_2
-{
-    background: #F8F8F8;
-    font-size: 13px;
-    margin-right: 40px;
-}
-
-.banner_3
-{
-    background: #FCFCFC;
-    font-size: 13px;
-    margin-right: 60px;
-}
-
-.banner_4
-{
-    background: #FCFCFC;
-    font-size: 13px;
-    margin-right: 60px;
-}
-
-.banner_5
-{
-    background: #FCFCFC;
-    font-size: 13px;
-    margin-right: 60px;
-}
-
-.banner_green
-{
-    background: #d5edd7;
-    font-size: 16px;
-}
-
-.banner_orange
-{
-    background: rgb(255,205,174);
-    font-size: 16px;
-}
-
-*/
 
 .selectedCategoryName{
     padding:20px;
@@ -5145,7 +5087,6 @@ div.exclusivePopup {
     border: 1px solid black;
     -moz-border-radius: 10px;
     -webkit-border-radius:10px;
-    /*behavior: url(css/border-radius.htc);*/
     min-width: 250px;
 }
 

@@ -3621,7 +3621,7 @@ class RHConfModifCFAMakeTracksMandatory( RHConfModifCFABase ):
 class RHConfModifCFASwitchAttachFiles( RHConfModifCFABase ):
 
     def _process( self ):
-        self._conf.getAbstractMgr().setAllowAttachFiles(not self._conf.getAbstractMgr().getAttachFiles())
+        self._conf.getAbstractMgr().setAllowAttachFiles(not self._conf.getAbstractMgr().canAttachFiles())
         self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
 
 
@@ -4547,7 +4547,6 @@ window.parent.OnUploadCompleted(%s,"%s","%s", "%s") ;
             materialName = "Internal Page Files"
             mats = self._target.getMaterialList()
             mat = None
-            existingFile = None
             for m in mats:
                 if m.getTitle() == materialName:
                     mat = m
@@ -6253,8 +6252,8 @@ class RHNewAbstract(RHConfModifCFABase, AbstractParam):
         abstract = cfaMgr.newAbstract( self._getUser() )
         #self._setAbstractData(abstract)
         self._abstractData.setAbstractData(abstract)
-        #Finally, we display the abstract management page
-        self._redirect(urlHandlers.UHAbstractManagment.getURL(abstract))
+        #Finally, we display the abstract list page
+        self._redirect(urlHandlers.UHConfAbstractList.getURL(self._conf))
 
     def _process( self ):
         if self._action == "CANCEL":

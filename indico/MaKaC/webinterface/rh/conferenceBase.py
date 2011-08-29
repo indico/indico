@@ -51,8 +51,8 @@ class RHCustomizable( RH ):
 
     def getWebFactory( self ):
         if self._wf == "":
-           wr = webFactoryRegistry.WebFactoryRegistry()
-           self._wf = wr.getFactory( self._conf )
+            wr = webFactoryRegistry.WebFactoryRegistry()
+            self._wf = wr.getFactory( self._conf )
         return self._wf
 
 
@@ -61,10 +61,6 @@ class RHConferenceSite( RHCustomizable ):
     def _setMenuStatus(self,params):
         if params.has_key("menuStatus"):
             self._getSession().setVar("menuStatus",params["menuStatus"])
- #       wr = webFactoryRegistry.WebFactoryRegistry()
- #       self._wf = wr.getFactory( self._conf )
- #       if self._wf is not None:
- #           self._getSession().setVar("menuStatus","close")
 
     def _checkParams( self, params ):
         l = locators.WebLocator()
@@ -235,8 +231,6 @@ class RHSubmitMaterialBase:
         return fileName
 
     def _checkParams(self,params):
-
-        filesToDelete = []
         self._action = ""
         self._overwrite = False
         #if request has already been handled (DB conflict), then we keep the existing files list
@@ -254,7 +248,7 @@ class RHSubmitMaterialBase:
         self._password = params.get("password","")
 
         self._userList = json.loads(params.get("userList", "[]"))
-        maxUploadFilesTotalSize = self._cfg.getMaxUploadFilesTotalSize()
+        maxUploadFilesTotalSize = float(self._cfg.getMaxUploadFilesTotalSize())
 
         if self._uploadType == "file":
             if isinstance(params["file"], list):
@@ -303,7 +297,7 @@ class RHSubmitMaterialBase:
     def _setErrorList(self, fileEntry):
         res=[]
 
-        maxUploadFilesTotalSize = self._cfg.MaxUploadFilesTotalSize()
+        maxUploadFilesTotalSize = float(self._cfg.MaxUploadFilesTotalSize())
 
         if self._uploadType == "file":
             if "filePath" in fileEntry and not fileEntry["filePath"].strip():

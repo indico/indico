@@ -562,8 +562,9 @@ class RHEditData(RHAbstractModifBase, AbstractParam):
             return
         headerSize = self._req.headers_in["content-length"]
         AbstractParam._checkParams(self, params, self._conf, headerSize)
-        if self._action == "":
-            #First call
+        if self._action == "":#First call
+            #TODO: remove this code, this should be handle by AbstractData (not method available
+            # because setAbstractData(abstract) is used when saving, so there are specific actions.
             afm = self._conf.getAbstractMgr().getAbstractFieldsMgr()
             self._abstractData.title = self._abstract.getTitle()
             for f in afm.getFields():

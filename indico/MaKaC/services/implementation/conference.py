@@ -28,10 +28,8 @@ from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceB
 
 import MaKaC.webinterface.displayMgr as displayMgr
 
-from MaKaC.common.Configuration import Config
 from MaKaC.common import filters
 from MaKaC.common.utils import validMail, setValidEmailSeparators
-from MaKaC.common.fossilize import fossilize
 from MaKaC.common import indexes, info
 from MaKaC.common.fossilize import fossilize
 
@@ -56,7 +54,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
 from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
-        ResultWithWarning, TimingNoReportError, ServiceAccessError
+        ResultWithWarning, TimingNoReportError
 from MaKaC.fossils.contribution import IContributionFossil
 
 

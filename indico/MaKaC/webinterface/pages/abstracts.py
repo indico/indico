@@ -443,14 +443,6 @@ class WAbstractDataModification( wcomponents.WTemplated ):
                     if isMandatory:
                         self._mandatoryFieldList.append("f_"+id)
 
-    def _getMaxTrackId(self):
-        result = 0
-        for track in self._conf.getTrackList():
-            trackId = int(track.getId())
-            if trackId > result:
-                result = trackId
-        return result
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["postURL"] = quoteattr(str( vars["postURL"]))
@@ -468,7 +460,6 @@ class WAbstractDataModification( wcomponents.WTemplated ):
         vars["tracksSelected"] = vars.get("tracksSelectedList", []) # list of track ids that had been selected
         vars["types"] = self._conf.getContribTypeList()
         vars["typeSelected"] = vars.get("type", None)
-        vars["maxTrackId"] = self._getMaxTrackId()
         vars["comments"] = str(vars.get("comments", ""))
         fieldDict = {}
         for field in cfaMgr.getAbstractFieldsMgr().getFields():
@@ -479,8 +470,9 @@ class WAbstractDataModification( wcomponents.WTemplated ):
         self._setMandatoryAndLimitedFields()
         vars["limitedFieldList"] = self._limitedFieldList
         vars["mandatoryFieldList"] = self._mandatoryFieldList
-        vars["attachedFilesAllowed"] = cfaMgr.getAttachFiles()
+        vars["attachedFilesAllowed"] = cfaMgr.canAttachFiles()
         vars["errorList"] = vars.get("errors", [])
+        #TODO: In case of error we will lose the attached files, we should keep them somehow
         vars["attachments"] = fossilize(vars.get("attachments", []), ILocalFileAbstractMaterialFossil)
         return vars
 

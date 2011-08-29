@@ -380,15 +380,22 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').info('Request %s finished with AccessError: "%s"' % (id(self._req), e))
 
         self._req.status = apache.HTTP_FORBIDDEN
-        # Supposing that the config file says that Indico should enforce HTTPS,
-        # we must force HTTPS here because Indico gets inside this method only in 2 situations:
-        # 1. A user is logged in and he has no access (the request is already https)
-        # 2. Indico will ask for access key (it must be https)
-        if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
-            self._tohttps = True
-            if self._checkHttpsRedirect():
-                return
         p=errors.WPAccessError(self)
+        return p.display()
+
+    def _processKeyAccessError(self,e):
+        """Treats access errors occured during the process of a RH.
+        """
+        Logger.get('requestHandler').info('Request %s finished with KeyAccessError: "%s"' % (id(self._req), e))
+
+        self._req.status = apache.HTTP_FORBIDDEN
+        # We are going to redirect to the page asking for access key
+        # and so it must be https if there is a BaseSecureURL. And that's
+        # why we set _tohttps to True.
+        self._tohttps = True
+        if self._checkHttpsRedirect():
+            return
+        p=errors.WPKeyAccessError(self)
         return p.display()
 
     def _processModificationError(self,e):
@@ -584,6 +591,11 @@ class RH(RequestHandlerBase):
                     retry -= 1
                     time.sleep(10-retry)
                     continue
+        except KeyAccessError, e:
+            #Key Access error treatment
+            res = self._processKeyAccessError( e )
+            self._endRequestSpecific2RH( False )
+            DBMgr.getInstance().endRequest(False)
         except AccessError, e:
             #Access error treatment
             res = self._processAccessError( e )

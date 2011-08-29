@@ -83,7 +83,7 @@ class Author(Fossilizable):
         return "id:%s - nombre:%s"%(self._id, self._familyName)
 
 
-class AbstractData:
+class AbstractData(object):
 
     def __init__( self, absMgr, params, headerSize, displayValues=False ):
         self._absMgr = absMgr
@@ -116,12 +116,8 @@ class AbstractData:
             self._setNewAuthors()
         self.comments = params.get("comments", "")
         self.origin = params.get("origin", "display")
-        self.files = params.get("file", [])
-        if not isinstance(self.files, list): # just one file attached
-            self.files = [self.files]
-        self.existingFiles = params.get("existingFile", [])
-        if not isinstance(self.existingFiles, list): # just one file attached
-            self.existingFiles = [self.existingFiles]
+        self.files = normaliseListParam(params.get("file", []))
+        self.existingFiles = normaliseListParam(params.get("existingFile", []))
 
 
     def setAbstractData(self, abstract):
@@ -160,17 +156,14 @@ class AbstractData:
             tracks.append(conf.getTrackById(trackId))
         abstract.setTracks(tracks)
         abstract.setComments(self.comments)
-        abstract.checkExistingFiles(self.existingFiles)
+        abstract.deleteFilesNotInList(self.existingFiles)
         abstract.saveFiles(self.files)
 
 
     def _setNewAuthors(self):
         self._prAuthors = []
         for author in self._prAuthorsListParam:
-            try:
-                isSpeaker = author["isSpeaker"]
-            except KeyError:
-                isSpeaker = False
+            isSpeaker = author.get("isSpeaker", False)
             values = {"title": author["title"],
                       "first_name": author["firstName"],
                       "family_name": author["familyName"],
@@ -185,10 +178,7 @@ class AbstractData:
 
         self._coAuthors = []
         for author in self._coAuthorsListParam:
-            try:
-                isSpeaker = author["isSpeaker"]
-            except KeyError:
-                isSpeaker = False
+            isSpeaker = author.get("isSpeaker", False)
             values = {"title": author["title"],
                       "first_name": author["firstName"],
                       "family_name": author["familyName"],
@@ -247,29 +237,29 @@ class AbstractData:
     def check( self ):
         errors = []
         if self.title.strip() == "":
-            errors.append( _("Abstract TITLE cannot be empty") )
+            errors.append( _("Abstract title cannot be empty") )
         for f in self._afm.getFields():
             id = f.getId()
             caption = f.getCaption()
             ml = f.getMaxLength()
             limitation = f.getLimitation()
             if f.isMandatory() and self._otherFields.get(id,"") == "":
-                errors.append(_("The field <b>%s</b> is mandatory") % caption)
+                errors.append(_("The field '%s' is mandatory") % caption)
             if ml != 0:
                 if limitation == "words" and textUtils.wordsCounter(self._otherFields.get(id,"")) > ml:
-                    errors.append(_("The field <b>%s</b> cannot be more than %s words") % (caption,ml))
+                    errors.append(_("The field '%s' cannot be more than %s words") % (caption,ml))
                 elif limitation == "chars" and len(self._otherFields.get(id,"")) > ml:
-                    errors.append(_("The field <b>%s</b> cannot be more than %s characters") % (caption,ml))
+                    errors.append(_("The field '%s' cannot be more than %s characters") % (caption,ml))
         if not self.origin == "management":
             if not self._prAuthorsListParam:
-                errors.append( _("No PRIMARY AUTHOR has been specified. You must define at least one primary author") )
+                errors.append( _("No primary author has been specified. You must define at least one primary author") )
             if not self._checkSpeaker():
-                errors.append( _("At least ONE PRESENTER must be specified") )
+                errors.append( _("At least one presenter must be specified") )
         if not self.tracks and self._absMgr.areTracksMandatory():
             # check if there are tracks, otherwise the user cannot select at least one
             if len(self._absMgr.getConference().getTrackList()) != 0:
-                errors.append( _("At least ONE TRACK must be seleted") )
-        if not self._checkTotalSize():
+                errors.append( _("At least one track must be seleted") )
+        if self._hasExceededTotalSize():
             errors.append(_("The maximum size allowed for the attachments (%sMB) has been exceeded.") % Config.getInstance().getMaxUploadFilesTotalSize())
         return errors
 
@@ -282,8 +272,9 @@ class AbstractData:
                 return True
         return False
 
-    def _checkTotalSize(self):
-        return not self._headerSize > float(Config.getInstance().getMaxUploadFilesTotalSize())
+    def _hasExceededTotalSize(self):
+        maxSize = float(Config.getInstance().getMaxUploadFilesTotalSize())
+        return maxSize > 0 and not self._headerSize > maxSize
 
     def toDict( self ):
         d = { "title": self.title, \
@@ -318,15 +309,9 @@ class AbstractParam:
                 self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=True)
             except AttributeError: # first call to submit a new abstract
                 self._abstractData = AbstractData(self._conf.getAbstractMgr(), params, headerSize, displayValues=False)
-        else: # performance the action
-            if params.has_key("existingFile"): # we are modifiying an abstract with existing files
-                # we need to calculate the current size of the existing files to do the checks
-                existingSize = self._abstract.getAttachmentsSize(params["existingFile"])
-                existingSize += int(headerSize)
-                self._abstractData = AbstractData(conf.getAbstractMgr(), params, existingSize, displayValues=False)
-            else:
-                # we are submitting a new abstract
-                self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=False)
+        else:
+            # we are submitting a new abstract or modifying
+            self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=False)
         self._doNotSanitizeFields = self._abstractData.getFieldNames()
         self._doNotSanitizeFields.append('title')
         if "validate" in params:

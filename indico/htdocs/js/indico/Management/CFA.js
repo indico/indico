@@ -627,7 +627,7 @@ type("AbstractFilesManager", [],
                         popup.open();
                         self._replaceInput(key.currentTarget);
                     } else if (!self.checkTotalFilesSize()) {
-                        var popup = new AlertPopup($T('Warning'), $T('The maximum size allowed in total (') + Indico.FileRestrictions.MaxUploadFilesTotalSize + 'MB) ' + $T('has been exceeded. Please remove any file before submitting the abstract.'));
+                        var popup = new AlertPopup($T('Warning'), $T('The maximum size allowed in total (') + Indico.FileRestrictions.MaxUploadFilesTotalSize + 'MB) ' + $T('has been exceeded. Please remove some file before submitting the abstract.'));
                         popup.open();
                     }
                 }
@@ -658,6 +658,10 @@ type("AbstractFilesManager", [],
     },
 
     _addFile: function(size, elemId) {
+        // if 0, unlimited
+        if (Indico.FileRestrictions.MaxUploadFileSize <= 0) {
+            return true;
+        }
         var sizeInMB = size / (1024 * 1024);
         if (this.fileSizeDict[elemId] != 0) {
             // The element is not new, it is going to be replaced
@@ -674,6 +678,10 @@ type("AbstractFilesManager", [],
     },
 
     checkTotalFilesSize: function() {
+        // if 0, unlimited
+        if (Indico.FileRestrictions.MaxUploadFilesTotalSize <= 0) {
+            return true;
+        }
         if (this.filesSize > Indico.FileRestrictions.MaxUploadFilesTotalSize) {
             this.uploadLink.dom.style.display = 'none';
             this.sizeError.dom.style.display = '';
@@ -689,8 +697,6 @@ type("AbstractFilesManager", [],
         for (var i=0; i<this.initialMaterial.length; i++) {
             var newElement = this._buildExistingElement(i);
             this.inPlaceExistingMaterial.append(newElement);
-            // update the size
-            this.filesSize += this.initialMaterial[i]['file']['fileSize'] / (1024*1024);
         }
         var divOthers = Html.div({className: 'subGroupTitleAbstract', style:{paddingBottom:'0px'}}, $T('Other files you want to attach'));
         this.inPlaceExistingMaterial.append(divOthers);
@@ -730,7 +736,6 @@ type("AbstractFilesManager", [],
 
     _removeExistingMaterial: function(elemId) {
         if (this.initialMaterial[elemId]) {
-            this.filesSize -= (this.initialMaterial[elemId]['file']['fileSize']) / (1024*1024);
             this.initialMaterialCounter -= 1;
             this.inPlaceExistingMaterial.remove($E('divExFile_' + elemId));
             if (this.initialMaterialCounter <= 0) {

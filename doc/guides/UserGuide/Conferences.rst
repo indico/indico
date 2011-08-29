@@ -1509,10 +1509,10 @@ logged in you can fill in the form to submit your abstract.
 
 |image80|
 
-You need to fill in the title, content, and the mandatory fields specified 
+You need to fill in the title, content, and the mandatory fields specified
 (if any). You have to add/select at least one primary author. If you
-need to you can add any co-authors. It is possible to move authors and co-authors 
-by doing drag and drop. Sometimes will be possible to attach files to the abstract, 
+need to you can add any co-authors. It is possible to move authors and co-authors
+by doing drag and drop. Sometimes will be possible to attach files to the abstract,
 if the option has been set by the manager. You can also choose which track
 you would like your abstract to be included in as well as any
 comments you would like to add. You will receive an email notification

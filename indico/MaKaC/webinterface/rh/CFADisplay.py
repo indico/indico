@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from indico.MaKaC.webinterface.rh.fileAccess import RHFileAccess
 
 import os
 from textwrap import TextWrapper
@@ -223,12 +224,12 @@ class RHAbstractSubmission( RHAbstractModificationAction ):
             pars = self._abstractData.toDict()
             pars["errors"] = errors
             pars["action"] = self._action
+            pars["attachments"] = []
             return p.display( **pars )
         #Then, we create the abstract object and set its data to the one
         #   received
         cfaMgr = self._target.getAbstractMgr()
         abstract = cfaMgr.newAbstract( self._getUser() )
-        #self._setAbstractData(abstract)
         self._abstractData.setAbstractData(abstract)
         #The commit must be forced before sending the confirmation
         DBMgr.getInstance().commit()
@@ -367,39 +368,9 @@ class RHAbstractSubmissionConfirmation( RHAbstractDisplayBase ):
 class RHAbstractDisplay( RHAbstractDisplayBase ):
     _uh = urlHandlers.UHAbstractDisplay
 
-    def _checkProtection(self):
-        if self._getUser() == None:
-            self._checkSessionUser()
-        else:
-            if self._abstract is None:
-                raise MaKaCError( _("The abstract you are trying to access does not exist"))
-            if not self._conf.getAbstractMgr().isInAuthorizedViewList(self._getUser(), self._abstract):
-                RHAbstractSubmissionBase._checkProtection(self)
-
     def _processIfActive( self ):
         p = abstracts.WPAbstractDisplay( self, self._target )
         return p.display()
-
-
-class RHGetAttachedFile(RHAbstractDisplay):
-
-    def _checkParams(self, params):
-        RHAbstractDisplay._checkParams(self, params)
-        self._fileId = params.get("resId", None)
-        if (self._fileId == None):
-            raise MaKaCError( _("Invalid resource Id."))
-
-    def _process(self):
-        try:
-            file = self._abstract.getAttachments()[self._fileId]
-        except AttributeError:
-            raise MaKaCError( _("The file does not exist."))
-        self._req.headers_out["Content-Length"] = "%s" % file.getSize()
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType(file.getFileType())
-        self._req.content_type = """%s""" % (mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\"""" % file.getFileName()
-        return file.readBin()
 
 
 class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
@@ -533,3 +504,12 @@ class RHAbstractRecovery( RHAbstractModificationBase ):
         else:
             wp = abstracts.WPAbstractRecovery( self, self._abstract )
             return wp.display()
+
+class RHGetAttachedFile(RHFileAccess):
+
+    def _checkProtection( self ):
+        # Same protection as the abstract
+        temptarget=self._target
+        self._target = self._target.getOwner()
+        RHFileAccess._checkProtection( self )
+        self._target = temptarget

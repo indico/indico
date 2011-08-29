@@ -3115,7 +3115,6 @@ class UHConfModifCFAAddSubmitter( URLHandler ):
 class UHConfModifCFARemoveSubmitter( URLHandler ):
     _relativeURL = "confModifCFA.py/removeSubmitter"
 
-
 class UHAbstractChangeSubmitter( URLHandler ):
     _relativeURL = "abstractManagment.py/changeSubmitter"
 

@@ -40,7 +40,6 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from indico.util.i18n import L_
-from MaKaC.review import Abstract
 
 
 import re, os
@@ -10392,7 +10391,7 @@ class SubContribution(CommonObjectBase, Locatable):
 
 class Material(CommonObjectBase):
     """This class represents a set of electronic documents (resources) which can
-        be attached to a conference, a session, a contribution or an abstract.
+        be attached to a conference, a session or a contribution.
         A material can be of several types (achieved by specialising this class)
         and is like a container of files which have some relation among them.
         It contains the minimal set of attributes to store basic meta data and
@@ -10544,12 +10543,6 @@ class Material(CommonObjectBase):
         if isinstance(self.getOwner(), SubContribution):
             return self.getOwner()
         return None
-
-    def getAbstract( self ):
-        if isinstance(self.getOwner(), Abstract):
-            return self.getOwner()
-        return None
-
 
     @Updates (['MaKaC.conference.Material',
                  'MaKaC.conference.Minutes',
@@ -11056,7 +11049,7 @@ class Resource(CommonObjectBase):
         self._owner = None
         self.__ac = AccessController(self)
 
-    def clone( self, conf ):
+    def clone( self, conf, protection=True ):
         res = self.__class__()
         res.setName(self.getName())
         res.setDescription(self.getDescription())
@@ -11064,7 +11057,8 @@ class Resource(CommonObjectBase):
         res.notifyModification()
         res.setId(self.getId())
 
-        res.setProtection(self.getAccessController()._getAccessProtection())
+        if protection:
+            res.setProtection(self.getAccessController()._getAccessProtection())
         #res.__ac = self.getAccessController()
 
         return res
@@ -11366,8 +11360,8 @@ class LocalFile(Resource):
         self.__repository = None
         self.__archivedId = ""
 
-    def clone( self, conf ):
-        localfile = Resource.clone(self, conf)
+    def clone( self, conf, protection=True ):
+        localfile = Resource.clone(self, conf, protection)
         localfile.setFilePath(self.getFilePath())
         localfile.setFileName(self.getFileName())
         return localfile

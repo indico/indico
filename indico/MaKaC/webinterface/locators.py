@@ -141,8 +141,7 @@ class WebLocator:
     def setContribType( self, params ):
         self.setConference(params)
         if not ("contribTypeId" in params.keys()) or params["contribTypeId"].strip=="":
-            if mustExist:
-                raise errors.MaKaCError( _("contribType id not set"))
+            raise errors.MaKaCError( _("contribType id not set"))
         else:
             self.__contribTypeId = params["contribTypeId"]
 
@@ -248,6 +247,9 @@ class WebLocator:
         if "confId" in params.keys() and params["confId"] != None:
             if "reviewId" in params.keys():
                 self.setReview(params, 0)
+            elif "abstractId" in params.keys():
+                self.setAbstract(params, mustExist)
+                return
             else:
                 self.setSubContribution( params, 0 )
 
@@ -329,7 +331,10 @@ class WebLocator:
             return obj
         if self.__abstractId:
             obj = obj.getAbstractMgr().getAbstractById( self.__abstractId )
-            return obj
+            if obj == None:
+                raise errors.NoReportError("The abstract you are trying to access does not exist or has been deleted")
+            if self.__resId:
+                return obj.getAttachmentById( self.__resId )
         if self.__sessionId:
             obj = obj.getSessionById( self.__sessionId )
             fr = materialFactories.SessionMFRegistry
