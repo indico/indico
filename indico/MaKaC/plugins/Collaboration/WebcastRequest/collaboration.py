@@ -126,6 +126,8 @@ class CSBooking(CSBookingBase):
     def _reject(self):
         self._statusMessage = "Request rejected by responsible"
         self._statusClass = "statusMessageError"
+        import MaKaC.webcast as webcast
+        webcast.HelperWebcastManager.getWebcastManagerInstance().delForthcomingWebcast(self._conf)
 
         try:
             notification = RequestRejectedNotification(self)
@@ -149,6 +151,9 @@ class CSBooking(CSBookingBase):
                 return WebcastRequestError('reject', e)
 
     def _delete(self):
+        import MaKaC.webcast as webcast
+        webcast.HelperWebcastManager.getWebcastManagerInstance().delForthcomingWebcast(self._conf)
+
         if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestDeletedNotification(self)

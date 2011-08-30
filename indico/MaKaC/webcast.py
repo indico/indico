@@ -112,6 +112,11 @@ class WebcastManager(Persistent):
         else:
             wc.setAudience(audience)
 
+    def delForthcomingWebcast(self, event):
+        wc = self.getForthcomingWebcast(event)
+        if wc and wc in self._forthcoming_webcasts:
+            self._forthcoming_webcasts.remove(wc)
+
     def getForthcomingWebcast(self, event):
         for wc in self._forthcoming_webcasts:
             if wc.getEvent() == event:
