@@ -116,6 +116,7 @@ class WebcastManager(Persistent):
         wc = self.getForthcomingWebcast(event)
         if wc and wc in self._forthcoming_webcasts:
             self._forthcoming_webcasts.remove(wc)
+            self._p_changed = 1
 
     def getForthcomingWebcast(self, event):
         for wc in self._forthcoming_webcasts:
