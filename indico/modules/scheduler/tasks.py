@@ -672,7 +672,7 @@ class AlarmTask(SendMailTask):
 
 Best Regards
 
-    """%(self.conf.getTitle(),\
+"""%(self.conf.getTitle(),\
                 self.conf.getAdjustedStartDate().strftime("%A %d %b %Y at %H:%M"),\
                 self.conf.getTimezone(),\
                 locationText,\

@@ -78,7 +78,8 @@
     </tr>
     <tr>
         <td>&nbsp;<input type="checkbox" name="toAllParticipants" ${"checked" if toAllParticipants else ""}></td>
-        <td> ${_("Send alarm to all participants of the event.")}</td>
+        <% toPartOrReg =  _("participants") if conference.getType() != "conference" else _("registrants") %>
+        <td> ${_("Send alarm to all %s of the event.")%toPartOrReg }</td>
     </tr>
     <tr>
         <td>&nbsp;<input type="checkbox" name="defineRecipients" onClick="setEmailsState()" ${ "checked" if Emails!="" else "" }></td>
@@ -137,7 +138,7 @@ var sendTestAlarm = function (form)
         confId: ${conference.getId()},
         fromAddr: $("#fromAddr").val(),
         note: $("#note").val(),
-        includeConf: $("#includeConf").val(),
+        includeConf: $("#includeConf:checked").val(),
     },
     function(result, error) {
         if(error) {
@@ -145,7 +146,7 @@ var sendTestAlarm = function (form)
             killProgress();
         } else{
             killProgress();
-            (new AlertPopup($T('Success'),$T("The test alarm has been succesfully sent."))).open();
+            (new AlertPopup($T('Email sent'),$T("The test alarm has been sent succesfully."))).open();
         }
     });
     return false;

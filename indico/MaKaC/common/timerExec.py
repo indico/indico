@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from indico.util.i18n import i18nformat
 
 import time, signal, copy, sys, traceback
 from threading import Thread
@@ -681,7 +682,7 @@ class Alarm(task):
         if not tz:
             tz = self.conf.getTimezone()
         if tz not in all_timezones:
-           tz = 'UTC'
+            tz = 'UTC'
         if self.timeBefore:
             return self.conf.getStartDate().astimezone(timezone(tz)) - self.timeBefore
         else:

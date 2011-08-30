@@ -3140,16 +3140,15 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
         self._defineRecipients = params.get("defineRecipients", False)
         self._emails = params.get("Emails","")
 
-        if not params.has_key("dateType") or params.get("dateType","")=="":
-            raise FormValuesError(_("Please choose when to send this alarm"))
-
-        self._dateType = params["dateType"]
+        self._dateType = params.get("dateType", "")
         self._year = int(params["year"])
         self._month = int(params["month"])
         self._day = int(params["day"])
         self._hour = int(params["hour"])
         self._minute = int(params["minute"])
-        self._timeBefore = params["timeBefore"]
+        self._timeBefore = int(params.get("timeBefore", 0))
+        if self._timeBefore <= 0:
+            raise FormValuesError(_("Time before the beginning of the event should be bigger than zero"))
         self._timeTypeBefore = params["timeTypeBefore"]
         self._note = params.get("note","")
         self._includeConf = params.get("includeConf",None)
@@ -3157,21 +3156,27 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
         self._testAlarm = False
 
     def _initializeAlarm(self, dryRun = False):
-        if self._dateType == "1":
-            dtStart = timezone(self._conf.getTimezone()).localize(
-                datetime(self._year,
-                         self._month,
-                         self._day,
-                         self._hour,
-                         self._minute)).astimezone(timezone('UTC'))
+        if dryRun: # sending now
+            dtStart = timezoneUtils.nowutc()
             relative = None
         else:
-            if self._timeTypeBefore=="days":
-                delta = timedelta(days=int(self._timeBefore))
-            elif self._timeTypeBefore=="hours":
-                delta = timedelta(0, int(self._timeBefore) * 3600)
-            dtStart = self._target.getStartDate() - delta
-            relative = delta
+            if self._dateType == "1": # given date
+                dtStart = timezone(self._conf.getTimezone()).localize(
+                    datetime(self._year,
+                             self._month,
+                             self._day,
+                             self._hour,
+                             self._minute)).astimezone(timezone('UTC'))
+                relative = None
+            elif self._dateType == "2": # N days/hours before the event
+                if self._timeTypeBefore=="days":
+                    delta = timedelta(days=self._timeBefore)
+                elif self._timeTypeBefore=="hours":
+                    delta = timedelta(0, self._timeBefore * 3600)
+                dtStart = self._target.getStartDate() - delta
+                relative = delta
+            else:
+                raise MaKaCError(_("Wrong value has been choosen for 'when to send the alarm'"))
 
         if self._alarmId:
             al = self._conf.getAlarmById(self._alarmId)
@@ -3191,55 +3196,15 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
                 al.addToAddr(addr.strip())
 
         al.setFromAddr(self._fromAddr)
-        al.setSubject("Event reminder: %s" % self._target.getTitle())
-
-        try:
-            locationText = self._target.getLocation().getName()
-            if self._target.getLocation().getAddress() != "":
-                locationText += ", %s" % self._target.getLocation().getAddress()
-            if self._target.getRoom().getName() != "":
-                locationText += " (%s)" % self._target.getRoom().getName()
-        except:
-            locationText = ""
-
-        if locationText != "":
-            locationText = i18nformat(""" _("Location"): %s""") % locationText
-        fullName="%s" % self._conf.getTitle()
-
-        if self._getUser() is not None:
-            fullName = ",\n%s" % self._getUser().getStraightFullName()
-        else:
-            fullName = ""
-
-        if Config.getInstance().getShortEventURL() != "":
-            url = "%s%s" % (Config.getInstance().getShortEventURL(),
-                            self._target.getId())
-        else:
-            url = urlHandlers.UHConferenceDisplay.getURL( self._target )
-
-        al.setNote(self._note)
-        al.setText( _("""Hello,
-
-    Please note that the event "%s" will begin on %s (%s).
-    %s
-
-    You can access the full event here:
-    %s
-
-Best Regards%s
-
-    """) % (self._target.getTitle(),
-            self._target.getAdjustedStartDate().strftime("%A %d %b %Y at %H:%M"),
-            self._target.getTimezone(),
-            locationText,
-            url,
-            fullName,
-            ))
 
         if self._includeConf and self._includeConf == "1":
             al.setConfSummary(True)
         else:
             al.setConfSummary(False)
+
+        al.setSubject("Event reminder: %s"%self._conf.getTitle())
+
+        al.setNote(self._note)
 
         al.setToAllParticipants(self._toAllParticipants)
         self._al = al
@@ -3248,17 +3213,6 @@ class RHConfSendAlarmNow( RHCreateAlarm ):
 
     def _checkParams( self, params ):
         RHCreateAlarm._checkParams( self, params )
-        emails = []
-        if self._emails != "" :
-            emails.append(self._emails)
-        if self._toAllParticipants:
-            if self._conf.getType()=="conference":
-                for r in self._conf.getRegistrantsList():
-                    emails.append(r.getEmail())
-            else:
-                for p in self._conf.getParticipation().getParticipantList() :
-                    emails.append(p.getEmail())
-            self._emails = ", ".join(emails)
 
         self._initializeAlarm(dryRun = True)
 
@@ -3274,6 +3228,10 @@ class RHConfSaveAlarm( RHCreateAlarm ):
 
     def _checkParams( self, params ):
         RHCreateAlarm._checkParams( self, params )
+
+        if not params.has_key("dateType") or params.get("dateType","")=="":
+            raise FormValuesError(_("Please choose when to send this alarm"))
+
         self._initializeAlarm()
 
     def _process(self):

@@ -73,7 +73,7 @@ ${conf.getTitle()}  (${prettyDate(conf.getAdjustedStartDate()) + (" to " + prett
     Description: ${conf.getDescription()}<br/>
 %endif
 
-% if conf.getParticipation().displayParticipantList():
+% if conf.getParticipation().displayParticipantList() and conf.getParticipation().getParticipantList():
     Participants: ${ conf.getParticipation().getPresentParticipantListText() }<br/>
 % endif
 
