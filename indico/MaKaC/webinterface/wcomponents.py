@@ -3599,9 +3599,12 @@ class WTabControl(WTemplated):
         return tabs
 
     def _getActiveTabId(self):
+        skipped = 0
         for i, tab in enumerate(self._tabCtrl.getTabList()):
+            if not tab.isEnabled() or tab.isHidden():
+                skipped += 1
             if tab.isActive():
-                return i
+                return i - skipped
         return 0
 
     def _getActiveTab(self):
