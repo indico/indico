@@ -298,7 +298,7 @@ def runMakoMigration(dbi, withRBDB):
         sm._p_changed = 1
     ch = ConferenceHolder()
     for conf in ch.getList():
-        confDM = cdmr.getDisplayMgr(conf)
+        confDM = cdmr.getDisplayMgr(conf, False)
         if confDM.getDefaultStyle() == 'administrative3':
             confDM.setDefaultStyle('administrative')
         if confDM.getDefaultStyle() == 'it':
