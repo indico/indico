@@ -20,7 +20,7 @@
 
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.abstracts import IAuthorFossil
-import util.text as textUtils
+import indico.util.text as textUtils
 from MaKaC.webinterface.general import normaliseListParam
 from MaKaC.common import Config
 

@@ -330,7 +330,8 @@ def runMigration(withRBDB=False):
               runCatalogMigration,
               runRoomBlockingInit,
               runLangToGB,
-              runMakoMigration]
+              runMakoMigration,
+              runPluginOptionsRoomGUIDs]
 
     print "\nExecuting migration...\n"
 
