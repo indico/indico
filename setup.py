@@ -47,7 +47,7 @@ except ImportError:
     BABEL_PRESENT = False
 
 
-EXTRA_RESOURCES_URL = "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation/IndicoExtras"
+EXTRA_RESOURCES_URL = "http://indico-software.org/wiki/Admin/Installation/IndicoExtras"
 
 if sys.platform == 'linux2':
     import pwd
@@ -609,8 +609,8 @@ if __name__ == '__main__':
           description = "Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool",
           author = "Indico Team",
           author_email = "indico-team@cern.ch",
-          url = "http://cdswaredev.cern.ch/indico",
-          download_url = "http://cdswaredev.cern.ch/indico/wiki/Releases/Indico0.97.0",
+          url = "http://indico-software.org",
+          download_url = "http://indico-software.org/wiki/Releases/Indico0.97.0",
           platforms = ["any"],
           long_description = "Indico allows you to schedule conferences, from single talks to complex meetings with sessions and contributions. It also includes an advanced user delegation mechanism, allows paper reviewing, archival of conference information and electronic proceedings",
           license = "http://www.gnu.org/licenses/gpl-2.0.txt",
