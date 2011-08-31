@@ -205,12 +205,6 @@ class SessionChairListBase(SessionModifBase):
         pm = ParameterManager(self._params)
         self._kindOfList = pm.extract("kindOfList", pType=str, allowEmpty=False)
 
-    def _isConvener(self, email):
-        for convener in self._session.getConvenerList():
-            if email == convener.getEmail():
-                return True
-        return False
-
     def _getSessionChairList(self):
         # get the lists we need to iterate
         if self._kindOfList == "manager":
@@ -224,7 +218,7 @@ class SessionChairListBase(SessionModifBase):
             sessionChairFossil = fossilize(sessionChair)
             if isinstance(sessionChair, Avatar):
                 isConvener = False
-                if self._isConvener(sessionChair.getEmail()):
+                if self._session.isConvenerByEmail(sessionChair.getEmail()):
                     isConvener = True
                 sessionChairFossil['isConvener'] = isConvener
             result.append(sessionChairFossil)
@@ -235,12 +229,6 @@ class SessionChairListBase(SessionModifBase):
             pendingUser["pending"] = True
             result.append(pendingUser)
         return result
-
-
-class SessionGetChairList(SessionChairListBase):
-
-    def _getAnswer(self):
-        return self._getSessionChairList()
 
 
 class SessionAddExistingChair(SessionChairListBase):
@@ -266,7 +254,7 @@ class SessionRemoveChair(SessionChairListBase):
         SessionChairListBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._chairId = pm.extract("userId", pType=str, allowEmpty=False)
-        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=False)
+        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=True, defaultValue=None)
 
     def _getAnswer(self):
         if self._kindOfUser == "pending":
@@ -280,7 +268,7 @@ class SessionRemoveChair(SessionChairListBase):
                 except KeyError:
                     # the user is not in the list of conveners (the table is not updated). Do nothing and update the list
                     pass
-        elif self._kindOfUser == "principal":
+        else:
             ph = PrincipalHolder()
             if self._kindOfList == "manager":
                 self._session.revokeModification(ph.getById(self._chairId))
@@ -336,26 +324,6 @@ class SessionConvenersBase(SessionModifBase):
                 return True
         return False
 
-    def _isSessionManager(self, convener):
-        # pendings managers
-        if convener.getEmail() in self._session.getAccessController().getModificationEmail():
-            return True
-        # managers list
-        for manager in self._session.getManagerList():
-            if convener.getEmail() == manager.getEmail():
-                return True
-        return False
-
-    def _isSessionCoordinator(self, convener):
-        # pendings coordinators
-        if convener.getEmail() in self._session.getConference().getPendingQueuesMgr().getPendingCoordinatorsKeys():
-            return True
-        # coordinator list
-        for coord in self._session.getCoordinatorList():
-            if convener.getEmail() == coord.getEmail():
-                return True
-        return False
-
     def _setConvenerData(self, conv):
         conv.setTitle(self._userData.get("title", ""))
         conv.setFirstName(self._userData.get("firstName", ""))
@@ -371,16 +339,10 @@ class SessionConvenersBase(SessionModifBase):
         result = []
         for convener in self._session.getConvenerList():
             convFossil = fossilize(convener)
-            convFossil["isManager"] = self._isSessionManager(convener)
-            convFossil["isCoordinator"] = self._isSessionCoordinator(convener)
+            convFossil["isManager"] = convener.isSessionManager()
+            convFossil["isCoordinator"] = convener.isSessionCoordinator()
             result.append(convFossil)
         return result
-
-
-class SessionGetConvenerList(SessionConvenersBase):
-
-    def _getAnswer(self):
-        return self._getConvenerList()
 
 
 class SessionAddExistingConvener(SessionConvenersBase):
@@ -439,15 +401,6 @@ class SessionConvenerActionBase(SessionConvenersBase):
             raise ServiceError("ERR-U0", _("User does not exist."))
 
 
-class SessionGetConvenerData(SessionConvenerActionBase):
-
-    def _getAnswer(self):
-        result = fossilize(self._convener)
-        result["isManager"] = self._isSessionManager(self._convener)
-        result["isCoordinator"] = self._isSessionCoordinator(self._convener)
-        return result
-
-
 class SessionEditConvenerData(SessionConvenerActionBase):
 
     def _checkParams(self):
@@ -469,8 +422,8 @@ class SessionEditConvenerData(SessionConvenerActionBase):
     def _getAnswer(self):
         prevEmail = self._convener.getEmail()
         newEmail = self._userData.get("email", "")
-        isSessionCoordinator = self._isSessionCoordinator(self._convener)
-        isSessionManager = self._isSessionManager(self._convener)
+        isSessionCoordinator = self._convener.isSessionCoordinator()
+        isSessionManager = self._convener.isSessionManager()
         self._setConvenerData(self._convener)
         if prevEmail != newEmail:
             if isSessionCoordinator:
@@ -548,19 +501,15 @@ methodMap = {
     "protection.removeAllowedUser": SessionProtectionRemoveUser,
     "protection.addExistingManager": SessionAddExistingChair,
     "protection.removeManager": SessionRemoveChair,
-    "protection.getManagerList": SessionGetChairList,
     "protection.addAsConvener": SessionAddAsConvener,
     "protection.removeAsConvener": SessionRemoveAsConvener,
     "protection.addExistingCoordinator": SessionAddExistingChair,
     "protection.removeCoordinator": SessionRemoveChair,
-    "protection.getCoordinatorList": SessionGetChairList,
 
     "conveners.addExistingConvener": SessionAddExistingConvener,
     "conveners.addNewConvener": SessionAddNewConvener,
-    "conveners.getConvenerData": SessionGetConvenerData,
     "conveners.editConvenerData": SessionEditConvenerData,
     "conveners.removeConvener": SessionRemoveConvener,
-    "conveners.getConvenerList": SessionGetConvenerList,
     "conveners.grantRights": SessionGrantRights,
     "conveners.revokeRights": SessionRevokeRights
 }

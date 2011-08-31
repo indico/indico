@@ -1044,7 +1044,7 @@ type("EditResourceDialog", ["EditMaterialResourceBase"], {
         $B(self.description, self.newResource.accessor('description'));
         $B(self.url, self.newResource.accessor('url'));
         $B(self.protectionSelector, self.newResource.accessor('protection'));
-    },
+    }
 },
 
      function(args, material, materialName, resource, domItem, appender, title, forReviewing) {

@@ -110,6 +110,9 @@
 
 <script>
 
-var lateSubmissionAuthUsers = new LateSubmissionUsersManager('${ confId }', $E('inPlaceUsers'), "user");
+var lateSubmissionAuthUsers = new ListOfUsersManager('${ confId }',
+    {'addExisting': 'abstracts.lateSubmission.addExistingLateAuthUser', 'remove': 'abstracts.lateSubmission.removeLateAuthUser'},
+    {'confId': '${ confId }'}, $E('inPlaceUsers'), "user", "UIPerson", false, {}, {title: false, affiliation: false, email:true},
+    {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ lateAuthUsers | n,j});
 
 </script>

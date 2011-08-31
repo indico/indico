@@ -43,12 +43,6 @@ class ChangeAbstractSubmitter(ConferenceModifBase):
                 "email": self._submitter.getEmail()}
 
 
-class GetLateSubmissionAuthUserList(ConferenceModifBase):
-
-    def _getAnswer(self):
-        return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
-
-
 class AddLateSubmissionAuthUser(ConferenceModifBase):
 
     def _checkParams(self):
@@ -85,6 +79,5 @@ class RemoveLateSubmissionAuthUser(ConferenceModifBase):
 methodMap = {
     "changeSubmitter": ChangeAbstractSubmitter,
     "lateSubmission.addExistingLateAuthUser": AddLateSubmissionAuthUser,
-    "lateSubmission.removeLateAuthUser": RemoveLateSubmissionAuthUser,
-    "lateSubmission.getLateAuthUser": GetLateSubmissionAuthUserList
+    "lateSubmission.removeLateAuthUser": RemoveLateSubmissionAuthUser
     }

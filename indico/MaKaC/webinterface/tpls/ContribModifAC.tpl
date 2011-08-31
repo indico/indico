@@ -13,7 +13,7 @@ ${ accessControlFrame }
         <td width="100%" style="padding-bottom:20px;">
             <table width="80%">
                 <tr>
-                    <td id="parentTDSubmitters" style="width:79%; display:none"><ul id="inPlaceSubmitters" class="UIPeopleList"></ul></td>
+                    <td id="parentTDSubmitters" style="width:79%;"><ul id="inPlaceSubmitters" class="UIPeopleList"></ul></td>
                 </tr>
                 <tr>
                     <td nowrap valign="top" style="width: 21%; text-align:left;">
@@ -30,15 +30,17 @@ ${ accessControlFrame }
 
 <script>
 
-var submitterManager = new SubmissionControlListManager('${ confId }', '${ contribId }', $E('inPlaceSubmitters'),
-        $E('parentTDSubmitters'),  "submitter", '${ eventType }');
+var submitterManager = new SubmissionControlListManager('${ confId }', {confId: '${ confId }', contribId: '${ contribId }'},
+        $E('inPlaceSubmitters'),  "submitter", '${ eventType }', ${ submitters | n,j});
 
-var methods = {'addExisting': 'contribution.protection.addExistingManager',
-                    'remove': 'contribution.protection.removeManager',
-               'getUserList': 'contribution.protection.getManagerList'};
+var methodsMgr = {'addExisting': 'contribution.protection.addExistingManager',
+                    'remove': 'contribution.protection.removeManager'};
 
 var params = {confId: '${ confId }', contribId: '${ contribId }'};
 
-var modificationControlManager = new SimpleListControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+
+var modificationControlManager = new ListOfUsersManager('${ confId }',
+        methodsMgr, params, $E('inPlaceManagers'), "manager", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ managers | n,j});
 
 </script>

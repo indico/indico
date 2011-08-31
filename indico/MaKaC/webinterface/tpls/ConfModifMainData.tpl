@@ -8,6 +8,7 @@
             <input type="submit" class="btn" value="${ _("modify")}">
         </form>
         </td>
+    </tr>
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>

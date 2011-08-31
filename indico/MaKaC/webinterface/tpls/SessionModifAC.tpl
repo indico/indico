@@ -32,23 +32,21 @@ ${ accessControlFrame }
 // Modificaton control
 var methods = {'addExisting': 'session.protection.addExistingManager',
                     'remove': 'session.protection.removeManager',
-               'getUserList': 'session.protection.getManagerList',
              'addAsConvener': 'session.protection.addAsConvener',
           'removeAsConvener': 'session.protection.removeAsConvener'};
 
 var params = {confId: '${ confId }', sessionId: '${ sessionId }', kindOfList: 'manager'};
 
-var modificationControlManager = new SessionControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+var modificationControlManager = new SessionControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager", ${ managers | n,j});
 
 // Coordination control
 var coordMethods = {'addExisting': 'session.protection.addExistingCoordinator',
                          'remove': 'session.protection.removeCoordinator',
-                    'getUserList': 'session.protection.getCoordinatorList',
                   'addAsConvener': 'session.protection.addAsConvener',
                'removeAsConvener': 'session.protection.removeAsConvener'};
 
 var coordParams = {confId: '${ confId }', sessionId: '${ sessionId }', kindOfList: 'coordinator'};
 
-var coordinationControlManager = new SessionControlManager('${ confId }', coordMethods, coordParams, $E('inPlaceCoordinators'), "coordinator");
+var coordinationControlManager = new SessionControlManager('${ confId }', coordMethods, coordParams, $E('inPlaceCoordinators'), "coordinator", ${ coordinators | n,j});
 
 </script>

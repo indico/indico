@@ -3,272 +3,141 @@
  */
 type("ParticipantsListManager", ["ListOfUsersManager"], {
 
-	_manageUserList: function(method, params, methodKey, progress, highlightUser) {
+    _manageAllConectedUserList: function(method, params) {
         var self = this;
-        var progress = any(progress, true);
-        var highlightUser = any(highlightUser, false);
-        if (progress)
-            var killProgress = IndicoUI.Dialogs.Util.progress();
         indicoRequest(
-            method, params,
-            function(result, error) {
-                if (!error) {
-                    if (self.eventType == "conference") {
-                        if (methodKey == 'remove' && self.kindOfUser != 'speaker') {
-                            // Update current list and speakers/presenters list
-                            self._updateUserList(result[0]);
-                            self.complementaryList2.updateUserList(result[1]);
-                        } else if (methodKey == 'edit') {
-                            if (self.kindOfUser == 'speaker') {
-                                // Update all the lists
-                                self._updateUserList(result[0]);
-                                self.complementaryList1.updateUserList(result[1]);
-                                self.complementaryList2.updateUserList(result[2]);
-                            } else {
-                                // Update current list and speakers/presenters list
-                               self._updateUserList(result[0]);
-                               self.complementaryList2.updateUserList(result[1]);
-                            }
+                method, params,
+                function(result, error) {
+                    if (!error) {
+                        if (self.eventType == "conference") {
+                            // Update all lists of the page
+                            primaryAuthorManager.drawUserList(result[0]);
+                            coAuthorManager.drawUserList(result[1]);
+                            speakerManager.drawUserList(result[2]);
                         } else {
-                            self._updateUserList(result);
+                            speakerManager.drawUserList(result);
                         }
                     } else {
-                        self._updateUserList(result);
+                        IndicoUtil.errorReport(error);
                     }
-                    if (highlightUser)
-                        IndicoUI.Effect.highLight('fullName_'+params['userId'], 'orange', 3000);
-                    if (progress)
-                        killProgress();
-                } else {
-                    if (progress)
-                        killProgress();
-                    IndicoUtil.errorReport(error);
                 }
-            }
-    );
-},
-
-    _getAddNewParams: function(userData) {
-        var params = {confId: this.confId, userData: userData, contribId: this.contribId, kindOfList: this.kindOfUser};
-        return params;
+        );
     },
 
-    _getAddExistingParams: function(userList) {
-        var params = {confId: this.confId, userList: userList, contribId: this.contribId, kindOfList: this.kindOfUser};
-        return params;
-    },
-
-    _getEditParams: function(userData) {
-        var params = {confId: this.confId, userId: userData.get("id"), userData: userData, contribId: this.contribId,
-                      kindOfList: this.kindOfUser, eventType: this.eventType};
-        return params;
-    },
-
-    _getRemoveParams: function(userId) {
-        return this._getParamsWithUserId(userId);
-    },
-
-    _getGetUserParams: function(userId) {
-        return this._getParamsWithUserId(userId);
-    },
-
-    _getDownUserParams: function(userId) {
-        return this._getParamsWithUserId(userId);
-    },
-
-    _getUpUserParams: function(userId) {
-        return this._getParamsWithUserId(userId);
-    },
-
-    _getChangeSubmissionRightsParams: function(userId, action) {
-        var params = {confId: this.confId, contribId: this.contribId, userId: userId, action: action,
-                      kindOfList: this.kindOfUser, eventType: this.eventType};
-        return params;
-    },
-
-    _getParamsWithUserId: function(userId) {
-        var params = {confId: this.confId, contribId: this.contribId, userId: userId, kindOfList: this.kindOfUser};
-        return params;
-    },
-
-    _showEditUserPopup: function(userData) {
-        var self = this;
-        // get the user data
-        var user = $O(userData);
-        var editUserPopup = new UserDataPopup(
-                $T('Edit ') + self.userCaption + $T(' data'),
-                user,
-                function(newData) {
-                    if (editUserPopup.parameterManager.check()) {
-                        self._manageUserList(self.methods["edit"], self._getEditParams(newData), "edit");
-                        editUserPopup.close();
-                    }
-                }, userData['showGrantSubmissionRights'], false);
-        editUserPopup.open();
-    },
-
-    updateUserList: function(result) {
-        // this method is implemented to give visibility from outside of the class, keeping the inheritance
-        this._updateUserList(result);
-    },
-
-    _updateUserList: function(result) {
-        var self = this;
-        // update the user list
-        this.inPlaceListElem.set('');
-        for (var i=0; i<result.length; i++) {
-            var userRowElements = [];
-
-            if (!result[i]['showGrantSubmissionRights']) {
-                // Show submitter
-                var userText = Html.span({className:'nameLink', cssFloat:'left', id:'fullName_'+result[i]['id']}, result[i]['fullName'], Html.small({style:{paddingLeft:'5px'}}, $T('(Submitter)')));
-            } else {
-                var userText = Html.span({className:'nameLink', cssFloat:'left', id:'fullName_'+result[i]['id']}, result[i]['fullName']);
-            }
-            userRowElements.push(userText);
-
-            // Options menu for each user
-            var optionsMenuSpan = Html.span({onmouseover:"this.className = 'mouseover'",
-                                        onmouseout:"this.className = ''", style:{cssFloat:'right'}});
-
-            var optionsMenuLink = Html.a({id:'userMenu_' + result[i]['id'], className:'dropDownMenu fakeLink',
-                                         style:{marginLeft:'15px', marginRight:'15px'}}, $T('More'));
-            this._addParticipantMenu(optionsMenuLink, result[i]['id'], result[i]['showGrantSubmissionRights']);
-            optionsMenuSpan.append(optionsMenuLink);
-            userRowElements.push(optionsMenuSpan);
-
-            // edit icon
-            var imageEdit = Html.img({
-                src: imageSrc("edit"),
-                alt: $T('Edit ') + this.userCaption,
-                title: $T('Edit this ') + this.userCaption,
-                className: 'UIRowButton2',
-                id: 'edit_'+result[i]['id'],
-                style:{cssFloat:'right', cursor:'pointer'}
-            });
-
-            imageEdit.observeClick(function(event) {
-                if (event.target) { // Firefox
-                    var userId = event.target.id.split('_')[1];
-                } else { // IE
-                    var userId = event.srcElement.id.split('_')[1];
-                }
-                self._getUserData(self.methods["getUserData"], self._getGetUserParams(userId));
-            });
-            userRowElements.push(imageEdit);
-
-            // remove icon
-            var imageRemove = Html.img({
-                src: imageSrc("remove"),
-                alt: $T('Remove ') + this.userCaption,
-                title: $T('Remove this ') + this.userCaption + $T(' from the list'),
-                className: 'UIRowButton2',
-                id: 'remove_'+result[i]['id'],
-                style:{marginRight:'15px', cssFloat:'right', cursor:'pointer'}
-            });
-
-            imageRemove.observeClick(function(event) {
-                if (event.target) { // Firefox
-                    var userId = event.target.id.split('_')[1];
-                } else { // IE
-                    var userId = event.srcElement.id.split('_')[1];
-                }
-                self._manageUserList(self.methods["remove"], self._getRemoveParams(userId), "remove");
-            });
-            userRowElements.push(imageRemove);
-
-            if (this.kindOfUser != "speaker") {
-                // arrow icons
-                // Down arrow
-                var downArrow = Html.img({
-                    src: imageSrc("arrow_down"),
-                    alt: $T('Down ') + this.userCaption,
-                    title: $T('Down this ') + this.userCaption,
-                    id: 'down_'+result[i]['id'],
-                    style:{paddingTop: '6px', cssFloat:'left', cursor:'pointer'}
-                });
-
-                downArrow.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._manageUserList(self.methods["downUser"], self._getDownUserParams(userId), "downUser", false, true);
-                });
-                userRowElements.push(downArrow);
-
-                // up arrow
-                var upArrow = Html.img({
-                    src: imageSrc("arrow_up"),
-                    alt: $T('Up ') + this.userCaption,
-                    title: $T('Up this ') + this.userCaption,
-                    id: 'up_'+result[i]['id'],
-                    style:{paddingTop: '6px', cssFloat:'left', cursor:'pointer'}
-                });
-
-                upArrow.observeClick(function(event) {
-                    if (event.target) { // Firefox
-                        var userId = event.target.id.split('_')[1];
-                    } else { // IE
-                        var userId = event.srcElement.id.split('_')[1];
-                    }
-                    self._manageUserList(self.methods["upUser"], self._getUpUserParams(userId), "upUser", false, true);
-                });
-                userRowElements.push(upArrow);
-            }
-            var row = Html.li({className: this.elementClass, onmouseover: "this.style.backgroundColor = '#ECECEC';",
-                onmouseout : "this.style.backgroundColor='#ffffff';", style:{cursor:'auto'}});
-
-            for (var j=userRowElements.length-1; j>=0; j--) { // Done the 'for' like this because of IE7
-                row.append(userRowElements[j]);
-            }
-
-            this.inPlaceListElem.append(row);
+    _personName: function(user) {
+        var content = this.ListOfUsersManager.prototype._personName.call(this, user);
+        if (!user.showSubmitterCB) {
+            content += '<small class="roleSmall"> Submitter </small>';
         }
+        return content;
     },
 
-    _addParticipantMenu : function(element, userId, showGrantSubmissionRights) {
+    _drawUserList: function() {
         var self = this;
 
-        element.observeClick(function(e) {
-            var menuItems = {};
-            if (self.kindOfUser == 'prAuthor')
-                var opposite = 'co-author';
-            else
-                var opposite = 'primary author';
+        var container = $(this.inPlaceListElem.dom).html('');
 
-            if (self.kindOfUser != 'speaker') {
-                menuItems[$T('Move to ') + opposite] = function() {
-                    self._changeToOtherList(userId);
-                    menu.close();
-                };
-            }
-
-            if (showGrantSubmissionRights) {
-                menuItems[$T('Grant submission rights')] = function() {
-                    self._changeSubmissionRights(userId, "grant");
-                    menu.close();
-                };
+        this.usersList.each(function(val, idx) {
+            var user = val;
+            var elemStyle = self.elementClass;
+            var row = $('<li/>').attr('class', elemStyle);
+            _(self._component_order).each(function(opt, idx){
+                if (self.userOptions[opt]) {
+                    var comp = self._components[opt].call(self, user, self.userOptions[opt]);
+                    row.append(comp);
+                }
+            });
+            if (self.kindOfUser == "prAuthor" || self.kindOfUser == "coAuthor") {
+                var spanClass = 'authorMove';
+                row.attr('id', 'author_' + user.id);
             } else {
-                menuItems[$T('Remove submission rights')] = function() {
-                    self._changeSubmissionRights(userId, "remove");
-                    menu.close();
-                };
+                var spanClass = 'nameLink';
             }
+            row.append($('<span class=' + spanClass + ' />').append(
+                self._personName(user)));
 
-            if (self.kindOfUser != 'speaker') {
-                menuItems[$T('Send an email')] = function() {
-                    self._sendEmail(userId);
-                    menu.close();
-                };
-            }
-
-            var menu = new PopupMenu(menuItems, [element], "popupList");
-            var pos = element.getAbsolutePosition();
-            menu.open(pos.x, pos.y + 20);
-            return false;
+            container.append(row);
         });
+        this._checkEmptyList();
+    },
+
+    canDropElement: function(elemId, list) {
+        var authorId = elemId.split('_')[1];
+        var author = this.getAuthorById(authorId);
+        if (author) {
+            for (var i=0; i<list.length.get(); i++) {
+                if (author.email == list.item(i).email) {
+            	    return false;
+                }
+            }
+        }
+        return true;
+    },
+
+    getAuthorById: function(authorId) {
+        for (var i=0; i<this.usersList.length.get(); i++) {
+            if (authorId == this.usersList.item(i).id) {
+                return this.usersList.item(i);
+            }
+        }
+        return null;
+    },
+
+    updateDraggableList: function(complementaryList) {
+        var newList = $L();
+        for(var i=0; i<this.inPlaceListElem.dom.children.length; i++) {
+            var elemId = this.inPlaceListElem.dom.children[i].id.split('_')[1];
+            var author = this.getAuthorById(elemId)
+            if (author) {
+                newList.append(author);
+            } else {
+            	// the author is in the other list
+                author = complementaryList.getAuthorById(elemId);
+                if (author) {
+                    newList.append(author);
+                }
+            }
+        }
+        return newList;
+    },
+
+    _getParamsChangeSubmissionRights: function(userId, action) {
+	    var params = this.userListParams;
+	    params['userId'] = userId;
+	    params['action'] = action;
+	    params['eventType'] = this.eventType;
+        return params;
+    },
+
+    _getParamsSendEmail: function(userId) {
+        // Same params as remove, so we use the same method
+    	return this._getRemoveParams(userId);
+    },
+
+    onMenu : function(element, user) {
+        var self = this;
+        var menuItems = {};
+
+        if (user.showSubmitterCB) {
+            menuItems[$T('Grant submission rights')] = function() {
+                self._manageAllConectedUserList(self.methods["changeSubmission"], self._getParamsChangeSubmissionRights(user.id, "grant"));
+                menu.close();
+            };
+        } else {
+            menuItems[$T('Remove submission rights')] = function() {
+            	self._manageAllConectedUserList(self.methods["changeSubmission"], self._getParamsChangeSubmissionRights(user.id, "remove"));
+                menu.close();
+            };
+        }
+
+        menuItems[$T('Send an email')] = function() {
+            self._sendEmail(user.id);
+            menu.close();
+        };
+
+        var menu = new PopupMenu(menuItems, [$E(element)], "popupList");
+        var pos = $(element).position();
+        menu.open(pos.left - 25, pos.top + 20);
     },
 
     addManagementMenu: function(){
@@ -277,39 +146,27 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
             var menuItems = {};
 
             if (self.kindOfUser == 'speaker' && self.eventType == "conference") {
-                menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+                menuItems[$T('Add from authors')] = function() {
+                    self._addFromAuthorsList();
+                };
             }
 
-            menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false,
-                                                                               true, true, false, true); };
-            menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
+            menuItems[$T('Add existing')] = function() {
+                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, true, false, true);
+            };
+            menuItems[$T('Add new')] = function() {
+                self._addNonExistingUser();
+            };
 
-            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList");
+            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
             var pos = self.inPlaceMenu.getAbsolutePosition();
             menu.open(pos.x + 40, pos.y + 20);
-            return false;
         });
-    },
-
-    _changeToOtherList: function(userId) {
-        var self = this;
-        indicoRequest(
-                self.methods["changeToList"], self._getParamsWithUserId(userId),
-                function(result, error) {
-                    if (!error) {
-                        self._updateUserList(result[0]);
-                        self.complementaryList1.updateUserList(result[1]);
-                        IndicoUI.Effect.highLight('fullName_'+userId, 'orange', 3000);
-                    } else {
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-        );
     },
 
     _sendEmail: function(userId) {
         // request necessary data
-        indicoRequest(this.methods["sendEmail"], this._getParamsWithUserId(userId),
+        indicoRequest(this.methods["sendEmail"], this._getParamsSendEmail(userId),
                function(result, error) {
                     if (!error) {
                         if (result["email"] == "") {
@@ -326,90 +183,41 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         );
     },
 
-    _changeSubmissionRights: function(userId, action) {
-        var self = this;
-        indicoRequest(this.methods["changeSubmission"], this._getChangeSubmissionRightsParams(userId, action),
-                function(result, error) {
-                    if (!error) {
-                        if (self.eventType == "conference") {
-                            if (self.kindOfUser != 'speaker') {
-                                // Update current list and speakers/presenters list
-                                self._updateUserList(result[0]);
-                                self.complementaryList2.updateUserList(result[1]);
-                                IndicoUI.Effect.highLight('fullName_'+userId, 'orange', 3000);
-                            } else {
-                                // Update all the lists
-                                self._updateUserList(result[0]);
-                                self.complementaryList1.updateUserList(result[1]);
-                                self.complementaryList2.updateUserList(result[2]);
-                           }
-                        } else {
-                            self._updateUserList(result);
-                            IndicoUI.Effect.highLight('fullName_'+userId, 'orange', 3000);
-                        }
-                    } else {
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-        );
-    },
-
     _addFromAuthorsList: function() {
         var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress();
-        // Get the suggestedUsers
-        indicoRequest(this.methods["getAllAuthors"], {confId: this.confId, contribId: this.contribId},
-                function(result, error) {
-                    if (!error) {
-                        killProgress();
-                        // Create the popup to add suggested users
-                        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
-                        //          showToggleFavouriteButtons, chooseProcess)
-                        var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
-                                result, false, false,
-                                function(userList) {self._manageUserList(self.methods["addAuthorAsPresenter"], self._getAddExistingParams(userList));}
-                        );
-                        chooseUsersPopup.execute();
-                    } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    }
-                }
+        // Create the popup to add suggested users
+        var initialList = this._getAuthorsList();
+        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
+        //          showToggleFavouriteButtons, chooseProcess)
+        var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
+                initialList, false, false,
+                function(userList) {self._manageUserList(self.methods["addAuthorAsPresenter"], self._getAddExistingParams(userList));}
         );
+        chooseUsersPopup.execute();
     },
 
-    setComplementariesList: function(complementaryList1, complementaryList2) {
-        this.complementaryList1 = complementaryList1;
-        this.complementaryList2 = complementaryList2;
+    _getAuthorsList: function() {
+        return primaryAuthorManager.getUsersList().allItems().concat(coAuthorManager.getUsersList().allItems());
     }
 
 },
 
-    function(confId, contribId, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass) {
-        var self = this;
-        this.confId = confId;
-        this.contribId = contribId;
-        this.eventType = eventType;
+    function(confId, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList) {
+        this.kindOfUser = kindOfUser;
+	    this.eventType = eventType;
 
         this.methods = {'addNew': 'contribution.participants.addNewParticipant',
                         'addExisting': 'contribution.participants.addExistingParticipant',
                         'remove': 'contribution.participants.removeParticipant',
                         'edit': 'contribution.participants.editParticipantData',
-                        'getUserData': 'contribution.participants.getParticipantData',
-                        'getUserList': 'contribution.participants.getParticipantsList',
-                        'upUser': 'contribution.participants.upParticipant',
-                        'downUser': 'contribution.participants.downParticipant',
-                        'changeToList': 'contribution.participants.changeAuthorToOtherList',
                         'sendEmail': 'contribution.participants.sendEmailData',
                         'changeSubmission': 'contribution.participants.changeSubmissionRights',
-                        'getAllAuthors': 'contribution.participants.getAllAuthors',
                         'addAuthorAsPresenter': 'contribution.participants.addAuthorAsPresenter'};
 
-        this.inPlaceMenu = inPlaceMenu;
-
-        this.ListOfUsersManager(this.confId, this.methods,
-                                {confId: this.confId, contribId: this.contribId, kindOfList: kindOfUser},
-                                inPlaceListElem, kindOfUser, userCaption, elementClass, true, false, false, {remove: false, edit: true, favorite: false, arrows: true});
+        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, elementClass, false,
+                {submission: true, management: false, coordination: false},
+                {title: false, affiliation: true, email:false},
+                {remove: true, edit: true, favorite: false, arrows: false, menu: true}, initialList, true, false, inPlaceMenu);
     }
 );
 
@@ -420,43 +228,20 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
  */
 type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
 
-    _getAddNewParams: function(userData) {
-        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userData: userData};
-        return params;
-    },
-
-    _getAddExistingParams: function(userList) {
-        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userList: userList};
-        return params;
-    },
-
-    _getEditParams: function(userData) {
-        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userData: userData};
-        return params;
-    },
-
-    _getRemoveParams: function(userId) {
-        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userId: userId};
-        return params;
-    },
-
-    _getGetUserParams: function(userId) {
-        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userId: userId};
-        return params;
-    },
-
     addManagementMenu: function(){
         var self = this;
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
 
-            menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+            if (self.eventType == "conference") {
+                menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+            }
 
             menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
                                                                                true, true, false, true); };
             menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
 
-            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList");
+            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
             var pos = self.inPlaceMenu.getAbsolutePosition();
             menu.open(pos.x, pos.y + 20);
             return false;
@@ -465,49 +250,34 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
 
     _addFromAuthorsList: function() {
         var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress();
-        // Get the suggestedUsers
-        indicoRequest(this.methods["getAllAuthors"], {confId: this.confId, contribId: this.contribId},
-                function(result, error) {
-                    if (!error) {
-                        killProgress();
-                        // Create the popup to add suggested users
-                        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
-                        //          showToggleFavouriteButtons, chooseProcess)
-                        var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
-                                result, false, false,
-                                function(userList) {self._manageUserList(self.methods["addAuthorAsPresenter"], self._getAddExistingParams(userList));}
-                        );
-                        chooseUsersPopup.execute();
-                    } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-        );
+        if (this.authorsList.length == 0) {
+            // Show warning popup
+            var popup = new AlertPopup($T('Warning'), $T('There are no authors available to add as presenters.'));
+            popup.open();
+        } else {
+            var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
+                    this.authorsList, false, false,
+                    function(userList) {self._manageUserList(self.methods["addAuthorAsPresenter"], self._getAddExistingParams(userList));}
+            );
+            chooseUsersPopup.execute();
+        }
     }
 
 },
 
-    function(confId, contribId, subContribId, inPlaceListElem, inPlaceMenu, userCaption) {
-        var self = this;
-        this.confId = confId;
-        this.contribId = contribId;
-        this.subContribId = subContribId;
+    function(confId, params, inPlaceListElem, inPlaceMenu, userCaption, initialList, authorsList, eventType) {
         this.methods = {'addNew': 'contribution.participants.subContribution.addNewParticipant',
                         'addExisting': 'contribution.participants.subContribution.addExistingParticipant',
                         'remove': 'contribution.participants.subContribution.removeParticipant',
                         'edit': 'contribution.participants.subContribution.editParticipantData',
-                        'getUserData': 'contribution.participants.subContribution.getParticipantData',
-                        'getUserList': 'contribution.participants.subContribution.getParticipantsList',
-                        'getAllAuthors': 'contribution.participants.subContribution.getAllAuthors',
                         'addAuthorAsPresenter': 'contribution.participants.subContribution.addAuthorAsPresenter'};
+        this.authorsList = authorsList;
+        this.eventType = eventType;
 
-        this.inPlaceMenu = inPlaceMenu;
-
-
-        this.ListOfUsersManager(confId, this.methods, {confId: confId, contribId: this.contribId, subContribId: this.subContribId},
-                                inPlaceListElem, null, userCaption, "UIPerson", false, false, true, false, {remove: true, edit: true, favorite: false, arrows: false});
+        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "UIPerson", false,
+            {submission: false, management: false, coordination: false},
+            {title: false, affiliation: true, email:false},
+            {remove: true, edit: true, favorite: false, arrows: false, menu: false}, initialList, true, false, inPlaceMenu);
     }
 );
 
@@ -525,13 +295,15 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
 
-            menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+            if (self.eventType == "conference") {
+                menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+            }
 
             menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
                                                                                true, true, false, true); };
             menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
 
-            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList");
+            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
             var pos = self.inPlaceMenu.getAbsolutePosition();
             menu.open(pos.x, pos.y + 20);
             return false;
@@ -540,38 +312,28 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
 
     _addFromAuthorsList: function() {
         var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress();
-        // Get the suggestedUsers
-        indicoRequest(this.methods["getAllAuthors"], {confId: this.confId, contribId: this.contribId},
-                function(result, error) {
-                    if (!error) {
-                        killProgress();
-                        // Create the popup to add suggested users
-                        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
-                        //          showToggleFavouriteButtons, chooseProcess)
-                        var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
-                                result, false, false,
-                                function(userList) {
-                                    for (var i=0; i<userList.length; i++) {
-                                        if (!self._isAlreadyInList(userList[i]['email'])) {
-                                            self.usersList.append(userList[i]);
-                                        } else {
-                                            var popup = new AlertPopup($T('Add ')+self.userCaption,
-                                                            $T('The email address (') + userList[i]['email'] +
-                                                            $T(') of a user you are trying to add is already used by another participant or the user is already added to the list.'));
-                                            popup.open();
-                                        }
-                                    }
-                                    self._updateUserList();
-                                }
-                        );
-                        chooseUsersPopup.execute();
-                    } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
+        if (this.authorsList.length == 0) {
+            // Show warning popup
+            var popup = new AlertPopup($T('Warning'), $T('There are no authors available to add as presenters.'));
+            popup.open();
+        } else {
+            var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
+                this.authorsList, false, false,
+                function(userList) {
+                    for (var i=0; i<userList.length; i++) {
+                        if (!self._isAlreadyInList(userList[i]['email'])) {
+                            self.usersList.append(userList[i]);
+                        } else {
+                            var popup = new AlertPopup($T('Add ')+self.userCaption,
+                                    $T('The email address (') + userList[i]['email'] +
+                                    $T(') of a user you are trying to add is already used by another participant or the user is already added to the list.'));
+                            popup.open();
+                        }
                     }
-                }
-        );
+                    self._drawUserList();
+                });
+            chooseUsersPopup.execute();
+        }
     },
 
     _checkEmptyList: function() {
@@ -586,16 +348,15 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
 
 },
 
-    function(confId, contribId, inPlaceListElem, inPlaceMenu, parentElement, userCaption) {
-        this.contribId = contribId;
-        this.inPlaceMenu = inPlaceMenu;
+    function(inPlaceListElem, inPlaceMenu, parentElement, userCaption, authorsList, eventType) {
         this.parentElement = parentElement;
-        this.userCaption = userCaption;
-        this.usersList = $L();
-        this.methods = {'getAllAuthors': 'contribution.participants.subContribution.getAllAuthors'};
+        this.authorsList = authorsList;
+        this.eventType = eventType;
 
-        this.ListOfUsersManagerForForm(confId, inPlaceListElem, true, true, false, false, userCaption, userCaption,
-                                       "UIPerson", false, false, true);
+        this.ListOfUsersManagerForForm(null, inPlaceListElem, userCaption, "UIPerson", false,
+                {submission: false, management: false, coordination: false},
+                {title: false, affiliation: true, email:false},
+                {remove: true, edit: true, favorite: false, arrows: false, menu: false}, [], true, false, inPlaceMenu);
     }
 );
 
@@ -609,193 +370,95 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
         this._addExistingUser($T('Add submitter'), true, this.confId, true, true, null, false, true);
     },
 
-    _getAddExistingParams: function(userList) {
-        var params = {confId: this.confId, userList: userList, contribId: this.contribId};
-        return params;
-    },
-
-    _getRemoveParams: function(userId, kindOfUser) {
-        var params = {confId: this.confId, contribId: this.contribId, userId: userId, kindOfUser: kindOfUser};
-        return params;
-    },
-
     _getModifyAsAuthorParams: function(userId, kindOfList) {
-        var params = {confId: this.confId, contribId: this.contribId, userId: userId, kindOfList: kindOfList};
+        var params = this.userListParams;
+        params['userId'] = userId;
+        params['kindOfList'] = kindOfList;
         return params;
     },
 
-    _getRolesText: function(user) {
-        if (user['_type'] == 'Avatar') {
-            var text = '(';
+    _personName: function(user) {
+        var content = this.ListOfUsersManager.prototype._personName.call(this, user);
+        if (user._type == 'Avatar') {
+            var roles = '';
             var counter = 0;
-            if (user['isPrAuthor']) {
-                text += $T('Primary author');
+            if (user.isPrAuthor) {
+                roles += $T('Primary author');
                 counter += 1;
             }
-            if (user['isCoAuthor']) {
+            if (user.isCoAuthor) {
                 if (counter > 0)
-                    text += $T(', Co-author');
+                    roles += $T(', Co-author');
                 else
-                    text += $T('Co-author');
+                    roles += $T('Co-author');
                 counter += 1;
             }
-            if (user['isSpeaker']) {
+            if (user.isSpeaker) {
                 if (counter > 0)
-                    text += $T(', ') + this.speakerCaptionCapital;
+                    roles += $T(', ') + this.speakerCaptionCapital;
                 else
-                    text += this.speakerCaptionCapital;
+                    roles += this.speakerCaptionCapital;
                 counter += 1;
             }
             if (counter == 0)
-                return null;
+                return content;
             else
-                return Html.small({style:{paddingLeft:'5px'}}, text + ')');
+                return content += '<small class="roleSmall">' + roles +  '</small>';
         } else {
-            return null;
+            return content;
         }
     },
 
-    _updateUserList: function(result) {
-        var self = this;
-        // update the user list
-        this.inPlaceListElem.set('');
-        for (var i=0; i<result.length; i++) {
-            var userRowElements = [];
-
-            if (result[i]["pending"]) {
-                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['name'], Html.small({style:{paddingLeft:'5px'}}, $T('(Pending)')), this._getRolesText(result[i]));
-                var kindOfUser = "pending";
-                var userIdentifier = result[i]['name'];
-            } else {
-                var userText = Html.span({className:'nameLink', cssFloat:'left', id:'fullName_'+result[i]['id']}, result[i]['name'], this._getRolesText(result[i]));
-                var kindOfUser = "principal";
-                var userIdentifier = result[i]['id'];
-            }
-            userRowElements.push(userText);
-
-            if (result[i]['_type'] == 'Avatar') {
-                // Options menu for each user
-                var optionsMenuSpan = Html.span({onmouseover:"this.className = 'mouseover'",
-                                            onmouseout:"this.className = ''", style:{cssFloat:'right'}});
-
-                var optionsMenuLink = Html.a({id:'userMenu_' + result[i]['id'], className:'dropDownMenu fakeLink',
-                                         style:{marginLeft:'15px', marginRight:'15px'}}, $T('More'));
-                this._addParticipantMenu(optionsMenuLink, result[i]);
-                optionsMenuSpan.append(optionsMenuLink);
-                userRowElements.push(optionsMenuSpan);
-            }
-
-            // favourites star
-            if (IndicoGlobalVars.isUserAuthenticated &&
-                    exists(IndicoGlobalVars['userData']['favorite-user-ids']) && result[i]['_type'] === "Avatar") {
-                spanStar = Html.span({style:{padding:'3px', cssFloat:'right'}});
-                spanStar.set(new ToggleFavouriteButton(result[i], {}, IndicoGlobalVars['userData']['favorite-user-ids'][result[i]['id']]).draw());
-                userRowElements.push(spanStar);
-            }
-
-            // remove icon
-            var imageRemove = Html.img({
-                src: imageSrc("remove"),
-                alt: $T('Remove ') + this.userCaption,
-                title: $T('Remove this ') + this.userCaption + $T(' from the list'),
-                className: 'UIRowButton2',
-                id: 'r_' + kindOfUser + '_' + userIdentifier,
-                style:{cssFloat:'right', cursor:'pointer', marginLeft:'4px', marginRight:'10px'}
-            });
-
-            imageRemove.observeClick(function(event) {
-                if (event.target) { // Firefox
-                    var kindOfUser = event.target.id.split('_')[1];
-                    var userId = event.target.id.split('r_'+kindOfUser+'_')[1];
-                } else { // IE
-                    var kindOfUser = event.srcElement.id.split('_')[1];
-                    var userId = event.srcElement.id.split('r_'+kindOfUser+'_')[1];
-                }
-                self._manageUserList(self.methods["remove"], self._getRemoveParams(userId, kindOfUser), false);
-            });
-            userRowElements.push(imageRemove);
-
-            var elemStyle = this.elementClass;
-            if (result[i]['_type'] == 'Group')
-                elemStyle = "UIGroup";
-
-            var row = Html.li({className: elemStyle, onmouseover: "this.style.backgroundColor = '#ECECEC';",
-                                onmouseout : "this.style.backgroundColor='#ffffff';", style:{cursor:'auto'}});
-
-            for (var j=userRowElements.length-1; j>=0; j--) { // Done the 'for' like this because of IE7
-                row.append(userRowElements[j]);
-            }
-
-            this.inPlaceListElem.append(row);
-        }
-        this._checkEmptyList(result);
-    },
-
-    _addParticipantMenu : function(element, user) {
+    onMenu : function(element, user) {
+        var menuItems = {};
         var self = this;
 
-        element.observeClick(function(e) {
-            var menuItems = {};
-
-            if (self.eventType == "conference") {
-                if (!user['isPrAuthor']) {
-                    menuItems[$T('Add as primary author')] = function() {
-                        self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "prAuthor"), false, true);
-                        menu.close();
-                    };
-                } else {
-                    menuItems[$T('Remove as primary author')] = function() {
-                        self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "prAuthor"), false, true);
-                        menu.close();
-                    };
-                }
-
-                if (!user['isCoAuthor']) {
-                    menuItems[$T('Add as co-author')] = function() {
-                        self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "coAuthor"), false, true);
-                        menu.close();
-                    };
-                } else {
-                    menuItems[$T('Remove as co-author')] = function() {
-                        self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "coAuthor"), false, true);
-                        menu.close();
-                    };
-                }
-            }
-
-            if (!user['isSpeaker']) {
-                menuItems[$T('Add as ') + self.speakerCaption] = function() {
-                    self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "speaker"), false, true);
+        if (this.eventType == "conference") {
+            if (!user.isPrAuthor) {
+                menuItems[$T('Add as primary author')] = function() {
+                    self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user.id, "prAuthor"), false);
                     menu.close();
                 };
             } else {
-                menuItems[$T('Remove as ') + self.speakerCaption] = function() {
-                    self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "speaker"), false, true);
+                menuItems[$T('Remove as primary author')] = function() {
+                    self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user.id, "prAuthor"), false);
                     menu.close();
                 };
             }
 
-            var menu = new PopupMenu(menuItems, [element], "popupList");
-            var pos = element.getAbsolutePosition();
-            menu.open(pos.x-25, pos.y + 20);
-            return false;
-        });
-    },
+            if (!user.isCoAuthor) {
+                menuItems[$T('Add as co-author')] = function() {
+                    self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user.id, "coAuthor"), false);
+                    menu.close();
+                };
+            } else {
+                menuItems[$T('Remove as co-author')] = function() {
+                    self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user.id, "coAuthor"), false);
+                    menu.close();
+                };
+            }
+        }
 
-    _checkEmptyList: function(result) {
-        if (result.length == 0)
-            this.parentElement.dom.style.display = 'none';
-        else
-            this.parentElement.dom.style.display = '';
+        if (!user.isSpeaker) {
+            menuItems[$T('Add as ') + self.speakerCaption] = function() {
+                self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user.id, "speaker"), false);
+                menu.close();
+            };
+        } else {
+            menuItems[$T('Remove as ') + self.speakerCaption] = function() {
+                self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user.id, "speaker"), false);
+                menu.close();
+            };
+        }
+
+        var menu = new PopupMenu(menuItems, [$E(element)], "popupList");
+        var pos = $(element).position();
+        menu.open(pos.left - 25, pos.top + 20);
     }
 
 },
 
-    function(confId, contribId, inPlaceListElem, parentElement, userCaption, eventType) {
-        this.confId = confId;
-	    this.contribId = contribId;
-        this.parentElement = parentElement;
-        this.userCaption = userCaption;
+    function(confId, params, inPlaceListElem, userCaption, eventType, initialList) {
         this.eventType = eventType;
         if (this.eventType == 'conference') {
             this.speakerCaption = $T('presenter');
@@ -808,11 +471,11 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
 
         this.methods = {'addExisting': 'contribution.protection.submissionControl.addExistingSubmitter',
                         'remove': 'contribution.protection.submissionControl.removeSubmitter',
-                        'getUserList': 'contribution.protection.submissionControl.getSubmittersList',
                         'addAsAuthor': 'contribution.protection.submissionControl.addAsAuthor',
                         'removeAsAuthor':'contribution.protection.submissionControl.removeAsAuthor'};
 
-        this.ListOfUsersManager(confId, this.methods, {confId: confId, contribId: this.contribId},
-                inPlaceListElem, true, true, false, false, null, userCaption, "UIPerson", false, false, true);
+        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "UIPerson", true, {},
+                {title: false, affiliation: false, email:false},
+                {remove: true, edit: false, favorite: true, arrows: false, menu: true}, initialList);
     }
 );

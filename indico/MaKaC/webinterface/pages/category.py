@@ -46,6 +46,7 @@ from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
 from indico.core.index import Catalog
+from MaKaC.common.fossilize import fossilize
 
 
 class WPCategoryBase ( main.WPMainBase ):
@@ -1885,6 +1886,16 @@ class WCategModifAC(wcomponents.WTemplated):
     def __init__( self, category ):
         self._categ = category
 
+    def _getControlUserList(self):
+        result = fossilize(self._categ.getManagerList())
+        # get pending users
+        for email in self._categ.getAccessController().getModificationEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
@@ -1909,6 +1920,7 @@ class WCategModifAC(wcomponents.WTemplated):
             frame = wcomponents.WConfCreationControlFrame( self._categ )
             p = { "setStatusURL": vars["setConferenceCreationControlURL"] }
             vars["confCreationControlFrame"] = frame.getHTML(p)
+        vars["managers"] = self._getControlUserList()
         return vars
 
 class WPCategModifAC( WPCategoryModifBase ):

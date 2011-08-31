@@ -63,11 +63,12 @@
 <script>
 
 var methods = {'addExisting': 'event.protection.addExistingManager',
-                    'remove': 'event.protection.removeManager',
-               'getUserList': 'event.protection.getManagerList'};
+                    'remove': 'event.protection.removeManager'};
 
 var params = {confId: '${ confId }'};
 
-var modificationControlManager = new SimpleListControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+var modificationControlManager = new ListOfUsersManager('${ confId }',
+        methods, params, $E('inPlaceManagers'), "manager", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ managers | n,j});
 
 </script>

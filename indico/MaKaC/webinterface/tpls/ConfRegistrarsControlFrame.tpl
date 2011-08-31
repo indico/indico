@@ -23,11 +23,12 @@
 <script>
 
 var methods = {'addExisting': 'event.protection.addExistingRegistrar',
-                    'remove': 'event.protection.removeRegistrar',
-               'getUserList': 'event.protection.getRegistrarList'};
+                    'remove': 'event.protection.removeRegistrar'};
 
 var params = {confId: '${ confId }'};
 
-var registrationControlManager = new SimpleListControlManager('${ confId }', methods, params, $E('inPlaceRegistrars'), "manager");
+var registrationControlManager = new ListOfUsersManager('${ confId }',
+        methods, params, $E('inPlaceRegistrars'), "manager", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ registrars | n,j});
 
 </script>

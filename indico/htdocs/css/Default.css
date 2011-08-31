@@ -2054,7 +2054,7 @@ div.UISuggestedPeopleListDiv {
     height: 300px;
 }
 
-ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList { /* UIPeopleList: for all lists of users, among them, found users */
+ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList, ul.UIAuthorList { /* UIPeopleList: for all lists of users, among them, found users */
     border: none;
     display: block;
     list-style-type: none;
@@ -2062,7 +2062,7 @@ ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList { /* UIPeopleList: for 
     margin: 0;
 }
 
-ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li {
+ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li, ul.UIAuthorList li {
     margin: 0;
     display: block;
     margin-bottom: 0px;
@@ -2071,7 +2071,7 @@ ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li {
     vertical-align: middle;
 }
 
-ul.UIPeopleList li, ul.UISuggestedPeopleList li {
+ul.UIPeopleList li, ul.UISuggestedPeopleList, ul.UIAuthorList li {
     border-bottom: 1px dotted #DDDDDD;
     cursor: pointer;
 }
@@ -2092,7 +2092,7 @@ ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
     line-height: normal;
 }
 
-ul.UIPeopleList li .nameLink {
+ul.UIPeopleList li .nameLink, ul.UIAuthorList li .nameLink {
     padding: 0px 0px 4px 30px;
 }
 
@@ -7285,4 +7285,21 @@ span.num_events {
 
 .regFormDoneCaption {
     color: black;
+}
+
+}
+
+.roleSmall {
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+ul.UIAuthorList li .authorMove {
+    padding: 0px 0px 4px 20px;
+    z-index: 1;
+    cursor: move;
+}
+
+ul.UIAuthorList li.UIAuthorMove {
+    background: white url("../images/drag.png") left top no-repeat;
 }

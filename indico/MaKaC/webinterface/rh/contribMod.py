@@ -337,15 +337,7 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
             sc.setParent(self._target)
 
             for presenter in presenters:
-                try:
-                    if presenter["existing"]:
-                        # the avatar should exists
-                        ah = AvatarHolder()
-                        spk = conference.SubContribParticipation()
-                        spk.setDataFromAvatar(ah.getById(presenter["id"]))
-                except KeyError:
-                    # create new speaker
-                    spk = self._newSpeaker(presenter)
+                spk = self._newSpeaker(presenter)
                 sc.newSpeaker(spk)
 
             logInfo = sc.getLogInfo()

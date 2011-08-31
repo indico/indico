@@ -2137,6 +2137,16 @@ class WModificationControlFrame(WTemplated):
 
 class WConfModificationControlFrame(WTemplated):
 
+    def _getManagersList(self):
+        result = fossilize(self.__target.getManagerList())
+        # get pending users
+        for email in self.__target.getAccessController().getModificationEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
     def getHTML( self, target, setModifKeyURL ):
         self.__target = target
         params = { "setModifKeyURL": setModifKeyURL,
@@ -2148,6 +2158,7 @@ class WConfModificationControlFrame(WTemplated):
         vars["locator"] = self.__target.getLocator().getWebForm()
         vars["confId"] = self.__target.getId()
         vars["modifKey"] = self.__target.getModifKey()
+        vars["managers"] = self._getManagersList()
         return vars
 
 class WConfRegistrarsControlFrame(WTemplated):
@@ -2160,6 +2171,7 @@ class WConfRegistrarsControlFrame(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["confId"] = self.__target.getId()
+        vars["registrars"] = fossilize(self.__target.getRegistrarList())
         return vars
 
 
@@ -3349,6 +3361,7 @@ class WConfCreationControlFrame(WTemplated):
         vars["notifyCreationList"] = quoteattr(self._categ.getNotifyCreationList())
         vars["setNotifyCreationURL"] = urlHandlers.UHCategorySetNotifyCreation.getURL(self._categ)
         vars["categoryId"] = self._categ.getId()
+        vars["confCreators"] = fossilize(self._categ.getConferenceCreatorList())
         return vars
 
 class WMinutesDisplay(WTemplated):

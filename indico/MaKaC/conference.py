@@ -5131,6 +5131,26 @@ class SessionChair(ConferenceParticipation):
         loc["convId"]=self.getId()
         return loc
 
+    def isSessionManager(self):
+        # pendings managers
+        if self.getEmail() in self._session.getAccessController().getModificationEmail():
+            return True
+        # managers list
+        for manager in self._session.getManagerList():
+            if self.getEmail() == manager.getEmail():
+                return True
+        return False
+
+    def isSessionCoordinator(self):
+        # pendings coordinators
+        if self.getEmail() in self._session.getConference().getPendingQueuesMgr().getPendingCoordinatorsKeys():
+            return True
+        # coordinator list
+        for coord in self._session.getCoordinatorList():
+            if self.getEmail() == coord.getEmail():
+                return True
+        return False
+
 
 class SlotChair(ConferenceParticipation):
 
@@ -6547,6 +6567,12 @@ class Session(CommonObjectBase, Locatable):
                     self.removeCoordinatorEmail(email)
                     ret = True
         return ret
+
+    def isConvenerByEmail(self, email):
+        for convener in self.getConvenerList():
+            if email == convener.getEmail():
+                return True
+        return False
 
 
     def getCoordinatorList( self ):
@@ -8432,6 +8458,32 @@ class Contribution(CommonObjectBase, Locatable):
             self._primaryAuthors = []
         return part in self._primaryAuthors
 
+    def isCoAuthor(self, part):
+        try:
+            if self._coAuthors:
+                pass
+        except AttributeError:
+            self._coAuthors = []
+        return part in self._coAuthors
+
+    def isPrimaryAuthorByEmail(self, email):
+        for prAuthor in self.getPrimaryAuthorList():
+            if prAuthor.getEmail() == email:
+                return True
+        return False
+
+    def isCoAuthorByEmail(self, email):
+        for coAuthor in self.getCoAuthorList():
+            if coAuthor.getEmail() == email:
+                return True
+        return False
+
+    def isSpeakerByEmail(self, email):
+        for speaker in self.getSpeakerList():
+            if speaker.getEmail() == email:
+                return True
+        return False
+
     def upPrimaryAuthor(self,part):
         """
         """
@@ -8467,6 +8519,59 @@ class Contribution(CommonObjectBase, Locatable):
         self._primaryAuthors.remove(part)
         self._primaryAuthors.insert(idx+1,part)
         self.notifyModification()
+
+    def newAuthorsList(self, prAuthors, coAuthors):
+        ''' calculate new lists of both kind of authors, because something has
+            been changed the position by drag and drop '''
+        newPrList = self.calculateNewAuthorList(prAuthors, "prAuthor")
+        newCoList = self.calculateNewAuthorList(coAuthors, "coAuthor")
+        self.setPrimaryAuthorList(newPrList)
+        self.setCoAuthorList(newCoList)
+
+    def calculateNewAuthorList(self, list, kind):
+        result = []
+        if kind == "prAuthor":
+            for auth in list:
+                author = self.getPrimaryAuthorById(auth['id'])
+                if author:
+                    result.append(author)
+                else:
+                    author = self.getCoAuthorById(auth['id'])
+                    if author:
+                        result.append(author)
+
+        elif kind == "coAuthor":
+            for auth in list:
+                author = self.getCoAuthorById(auth['id'])
+                if author:
+                    result.append(author)
+                else:
+                    author = self.getPrimaryAuthorById(auth['id'])
+                    if author:
+                        result.append(author)
+        return result
+
+
+    def getPrimaryAuthorById(self, authorId):
+        for author in self.getPrimaryAuthorList():
+            if authorId == author.getId():
+                return author
+        return None
+
+    def getCoAuthorById(self, authorId):
+        for author in self.getCoAuthorList():
+            if authorId == author.getId():
+                return author
+        return None
+
+    def setPrimaryAuthorList(self, list):
+        self._primaryAuthors = list
+        self.notifyModification()
+
+    def setCoAuthorList(self, list):
+        self._coAuthors = list
+        self.notifyModification()
+
 
     def upCoAuthor(self,part):
         """
@@ -8525,6 +8630,13 @@ class Contribution(CommonObjectBase, Locatable):
         except  AttributeError:
             self._authors = OOBTree()
         return self._authors.values()
+
+    def getAllAuthors(self):
+        """ This method returns a list composed by the primary authors
+            and co-authors. The different with getAuthorList() is the type
+            of the output.
+        """
+        return self.getPrimaryAuthorList() + self.getCoAuthorList()
 
     def addCoAuthor( self, part ):
         """

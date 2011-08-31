@@ -85,12 +85,9 @@
 
 <script>
 
-var methods = {'addExisting': 'admin.general.addExistingAdmin',
-                    'remove': 'admin.general.removeAdmin',
-               'getUserList': 'admin.general.getAdminList'};
-
-var params = {};
-
-var adminListManager = new SimpleListControlManager(null, methods, params, $E('inPlaceAdministrators'), "administrator");
+var adminListManager = new ListOfUsersManager(null,
+        {'addExisting': 'admin.general.addExistingAdmin', 'remove': 'admin.general.removeAdmin'},
+        {}, $E('inPlaceAdministrators'), "administrator", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j});
 
 </script>

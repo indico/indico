@@ -39,6 +39,8 @@ from indico.util.i18n import i18nformat
 from MaKaC import user
 from pytz import timezone
 import MaKaC.common.timezoneUtils as timezoneUtils
+from MaKaC.common.fossilize import fossilize
+from MaKaC.user import Avatar, AvatarHolder
 
 
 class WPContributionBase( WPMainBase, WPConferenceBase ):
@@ -661,6 +663,21 @@ class WContribModifMain(wcomponents.WTemplated):
                     </tr>"""%(caption, self.htmlText( self._contrib.getField(id) ))
         return html
 
+    def _getParticipantsList(self, participantList):
+        result = []
+        for part in participantList:
+            partFossil = fossilize(part)
+            # var to control if we have to show the entry in the author menu to allow add submission rights
+            isSubmitter = False
+            av = AvatarHolder().match({"email": part.getEmail()}, forceWithoutExtAuth=True, exact=True)
+            if not av:
+                if part.getEmail() in self._contrib.getSubmitterEmailList():
+                    isSubmitter = True
+            elif (av[0] in self._contrib.getSubmitterList() or self._contrib.getConference().getPendingQueuesMgr().isPendingSubmitter(part)):
+                isSubmitter = True
+            partFossil["showSubmitterCB"] = not isSubmitter
+            result.append(partFossil)
+        return result
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -719,6 +736,9 @@ class WContribModifMain(wcomponents.WTemplated):
             vars["sessionType"] = self._contrib.getSession().getScheduleType()
         else:
             vars["sessionType"] = 'none'
+        vars["primaryAuthors"] = self._getParticipantsList(self._contrib.getPrimaryAuthorList())
+        vars["coAuthors"] = self._getParticipantsList(self._contrib.getCoAuthorList())
+        vars["speakers"] = self._getParticipantsList(self._contrib.getSpeakerList())
         return vars
 
 
@@ -761,6 +781,43 @@ class WContribModifAC(wcomponents.WTemplated):
     def __init__( self, contrib ):
         self._contrib = contrib
 
+    def _getManagersList(self):
+        result = fossilize(self._contrib.getManagerList())
+        # get pending users
+        for email in self._contrib.getAccessController().getModificationEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
+    def _getSubmittersList(self):
+        result = []
+        for submitter in self._contrib.getSubmitterList():
+            submitterFossil = fossilize(submitter)
+            if isinstance(submitter, Avatar):
+                isSpeaker = False
+                if self._contrib.getConference().getType() == "conference":
+                    isPrAuthor = False
+                    isCoAuthor = False
+                    if self._contrib.isPrimaryAuthorByEmail(submitter.getEmail()):
+                        isPrAuthor = True
+                    if self._contrib.isCoAuthorByEmail(submitter.getEmail()):
+                        isCoAuthor = True
+                    submitterFossil["isPrAuthor"] = isPrAuthor
+                    submitterFossil["isCoAuthor"] = isCoAuthor
+                if self._contrib.isSpeakerByEmail(submitter.getEmail()):
+                    isSpeaker = True
+                submitterFossil["isSpeaker"] = isSpeaker
+            result.append(submitterFossil)
+        # get pending users
+        for email in self._contrib.getSubmitterEmailList():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars( self )
         mcf=wcomponents.WModificationControlFrame()
@@ -781,6 +838,8 @@ class WContribModifAC(wcomponents.WTemplated):
         vars["confId"] = self._contrib.getConference().getId()
         vars["contribId"] = self._contrib.getId()
         vars["eventType"] = self._contrib.getConference().getType()
+        vars["managers"] = self._getManagersList()
+        vars["submitters"] = self._getSubmittersList()
         return vars
 
 
@@ -827,9 +886,8 @@ class WSubContributionCreation(wcomponents.WTemplated):
         vars["durationMinutes"] = vars.get("durationMinutes","15")
         vars["keywords"] = vars.get("keywords","")
         vars["locator"] = self.__owner.getLocator().getWebForm()
-
-        vars["confId"] = self._contribution.getConference().getId()
-        vars["contribId"] = self._contribution.getId()
+        vars["authors"] = fossilize(self._contribution.getAllAuthors())
+        vars["eventType"] = self._contribution.getConference().getType()
         return vars
 
 

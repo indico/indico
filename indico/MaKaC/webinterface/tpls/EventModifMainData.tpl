@@ -292,6 +292,15 @@ $E('inPlaceEditLocation').set([
 
 // Search chairpersons/speakers
 
-var chairPersonsManager = new ChairPersonsManager(confFossile["id"], $E('chairPersonsList'), $E('addNewChairSpan'), userCaption);
+var chairPersonsManager = new ListOfUsersManager(confFossile["id"],
+        {'addNew': 'event.main.addNewChairPerson',
+         'addExisting': 'event.main.addExistingChairPerson',
+         'remove': 'event.main.removeChairPerson',
+         'edit': 'event.main.editChairPerson'}, {confId: confFossile["id"]}, $E('chairPersonsList'),
+        "chairperson", "UIPerson", false,
+        {submission: false, management: true, coordination: false},
+        {title: true, affiliation: false, email:false},
+        {remove: true, edit: true, favorite: false, arrows: false, menu: false}, ${chairpersons | n,j},
+        true, false, $E('addNewChairSpan'));
 
 </script>

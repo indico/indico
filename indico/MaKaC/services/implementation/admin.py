@@ -43,7 +43,7 @@ class AddWebcastAdministrators(AdminService):
             pr = ph.getById(user["id"])
             if pr != None:
                 self._wm.addManager(pr)
-        return True
+        return fossilize(self._wm.getManagers())
 
 class RemoveWebcastAdministrator(AdminService):
 
@@ -51,7 +51,7 @@ class RemoveWebcastAdministrator(AdminService):
         AdminService._checkParams(self)
         pm = ParameterManager(self._params)
         self._wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        self._userId = pm.extract("user", pType=str, allowEmpty=False)
+        self._userId = pm.extract("userId", pType=str, allowEmpty=False)
         self._pr = PrincipalHolder().getById(self._userId)
         if self._pr == None:
             raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
@@ -61,7 +61,7 @@ class RemoveWebcastAdministrator(AdminService):
         pr = ph.getById(self._userId)
         if pr != None:
             self._wm.removeManager(pr)
-        return True
+        return fossilize(self._wm.getManagers())
 
 
 ### Administrator Login as... class ###
@@ -81,13 +81,6 @@ class AdminLoginAs(AdminService):
         self._getSession().setVar("ActiveTimezone", tz)
         self._getSession().setUser(self._av)
         return True
-
-
-class GetAdministratorList(AdminService):
-
-    def _getAnswer(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        return fossilize(minfo.getAdminList())
 
 
 class AddAdministrator(AdminService):
@@ -139,12 +132,6 @@ class GroupMemberBase(AdminService):
         self._group = gh.getById(groupId)
         if self._group == None:
             raise ServiceError("ER-G0", _("Cannot find group with id %s") % groupId)
-
-
-class GroupGetMemberList(GroupMemberBase):
-
-    def _getAnswer(self):
-        return fossilize(self._group.getMemberList())
 
 
 class GroupAddExistingMember(GroupMemberBase):
@@ -209,13 +196,11 @@ methodMap = {
 
     "general.addExistingAdmin": AddAdministrator,
     "general.removeAdmin": RemoveAdministrator,
-    "general.getAdminList": GetAdministratorList,
 
     "header.loginAs": AdminLoginAs,
 
     "groups.addExistingMember": GroupAddExistingMember,
     "groups.removeMember": GroupRemoveMember,
-    "groups.getMemberList": GroupGetMemberList,
 
     "merge.getCompleteUserInfo": MergeGetCompleteUserInfo
 }

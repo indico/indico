@@ -53,12 +53,14 @@ from MaKaC.errors import TimingError
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
-from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, Warning, \
         ResultWithWarning, TimingNoReportError, NoReportError
 from MaKaC.fossils.contribution import IContributionFossil
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
 from MaKaC.participant import Participant
+from MaKaC.common.fossilize import fossilize
+
 
 class ConferenceBase:
     """
@@ -872,22 +874,34 @@ class ConferenceSocialBookmarksToggle(ConferenceModifBase):
         val = self._conf.getDisplayMgr().getShowSocialApps()
         self._conf.getDisplayMgr().setShowSocialApps(not val)
 
-class ConferenceAddExistingChairPerson(ConferenceModifBase):
+class ConferenceChairPersonBase(ConferenceModifBase):
 
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
-        # Check if there is already a user with the same email
-        for person in self._userList:
-            if self._isEmailAlreadyUsed(person["email"]):
-                raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another chairperson or the user is already added to the list. Chairperson(s) not added.") % person["email"])
+    def _getChairPersonsList(self):
+        result = fossilize(self._conf.getChairList())
+        for chair in result:
+            av = AvatarHolder().match({"email": chair['email']},
+                                  forceWithoutExtAuth=True, exact=True)
+            chair['showManagerCB'] = True
+            if (av and self._conf.getAccessController().canModify(av[0])) or chair['email'] in self._conf.getAccessController().getModificationEmail():
+                chair['showManagerCB'] = False
+        return result
 
     def _isEmailAlreadyUsed(self, email):
         for chair in self._conf.getChairList():
             if email == chair.getEmail():
                 return True
         return False
+
+class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
+
+    def _checkParams(self):
+        ConferenceChairPersonBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        # Check if there is already a user with the same email
+        for person in self._userList:
+            if self._isEmailAlreadyUsed(person["email"]):
+                raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another chairperson or the user is already added to the list. Chairperson(s) not added.") % person["email"])
 
     def _newChair(self, av):
         chair = ConferenceChair()
@@ -907,23 +921,17 @@ class ConferenceAddExistingChairPerson(ConferenceModifBase):
             av = ah.getById(person["id"])
             self._newChair(av)
 
-        return fossilize(self._conf.getChairList())
+        return self._getChairPersonsList()
 
 
-class ConferenceAddNewChairPerson(ConferenceModifBase):
+class ConferenceAddNewChairPerson(ConferenceChairPersonBase):
 
     def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
+        ConferenceChairPersonBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._userData = pm.extract("userData", pType=dict, allowEmpty=False)
-        if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed():
+        if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed(self._userData.get("email", "")):
             raise ServiceAccessError(_("The email address is already used by another chairperson. Chairperson not added."))
-
-    def _isEmailAlreadyUsed(self):
-        for chair in self._conf.getChairList():
-            if self._userData.get("email", "") == chair.getEmail():
-                return True
-        return False
 
     def _newChair(self):
         chair = ConferenceChair()
@@ -948,30 +956,29 @@ class ConferenceAddNewChairPerson(ConferenceModifBase):
 
     def _getAnswer(self):
         self._newChair()
-        return fossilize(self._conf.getChairList())
+        return self._getChairPersonsList()
 
 
-class ConferenceRemoveChairPerson(ConferenceModifBase):
+class ConferenceRemoveChairPerson(ConferenceChairPersonBase):
 
     def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
+        ConferenceChairPersonBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._chairId = pm.extract("chairId", pType=str, allowEmpty=False)
+        self._chairId = pm.extract("userId", pType=str, allowEmpty=False)
 
     def _getAnswer(self):
         chair = self._conf.getChairById(self._chairId)
         self._conf.removeChair(chair)
+        return self._getChairPersonsList()
 
-        return fossilize(self._conf.getChairList())
 
-
-class ConferenceEditChairPerson(ConferenceModifBase):
+class ConferenceEditChairPerson(ConferenceChairPersonBase):
 
     def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
+        ConferenceChairPersonBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._userData = pm.extract("userData", pType=dict, allowEmpty=False)
-        self._chairId = pm.extract("chairId", pType=str, allowEmpty=False)
+        self._chairId = pm.extract("userId", pType=str, allowEmpty=False)
         if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed():
             raise ServiceAccessError(_("The email address is already used by another chairperson. Chairperson not modified."))
 
@@ -1005,30 +1012,7 @@ class ConferenceEditChairPerson(ConferenceModifBase):
     def _getAnswer(self):
         chair = self._conf.getChairById(self._chairId)
         self._editChair(chair)
-        return fossilize(self._conf.getChairList())
-
-
-class ConferenceGetChairPersonData(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._chairId = pm.extract("chairId", pType=str, allowEmpty=False)
-
-    def _getAnswer(self):
-        chair = self._conf.getChairById(self._chairId)
-        result = fossilize(chair)
-
-        av = AvatarHolder().match({"email": chair.getEmail()},
-                                  forceWithoutExtAuth=True, exact=True)
-        result['canModify'] = self._conf.getAccessController().canModify(av[0]) if av else False
-        return result
-
-
-class ConferenceGetChairPersonList(ConferenceModifBase):
-
-    def _getAnswer(self):
-        return fossilize(self._conf.getChairList())
+        return self._getChairPersonsList()
 
 
 class ConferenceAddParticipantBase(ConferenceModifBase):
@@ -1115,12 +1099,6 @@ class ConferenceManagerListBase(ConferenceModifBase):
         return result
 
 
-class ConferenceProtectionGetManagerList(ConferenceManagerListBase):
-
-    def _getAnswer(self):
-        return self._getManagersList()
-
-
 class ConferenceProtectionAddExistingManager(ConferenceManagerListBase):
 
     def _checkParams(self):
@@ -1141,22 +1119,16 @@ class ConferenceProtectionRemoveManager(ConferenceManagerListBase):
         ConferenceManagerListBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._managerId = pm.extract("userId", pType=str, allowEmpty=False)
-        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=False)
+        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=True, defaultValue=None)
 
     def _getAnswer(self):
         if self._kindOfUser == "pending":
             # remove pending email, self._submitterId is an email address
             self._conf.getAccessController().revokeModificationEmail(self._managerId)
-        elif self._kindOfUser == "principal":
+        else:
             ph = PrincipalHolder()
             self._conf.revokeModification(ph.getById(self._managerId))
         return self._getManagersList()
-
-
-class ConferenceProtectionGetRegistrarList(ConferenceModifBase):
-
-    def _getAnswer(self):
-        return fossilize(self._conf.getRegistrarList())
 
 
 class ConferenceProtectionAddExistingRegistrar(ConferenceModifBase):
@@ -1179,13 +1151,11 @@ class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
         ConferenceManagerListBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._registrarId = pm.extract("userId", pType=str, allowEmpty=False)
-        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=False)
 
     def _getAnswer(self):
         ph = PrincipalHolder()
         self._conf.removeFromRegistrars(ph.getById(self._registrarId))
         return fossilize(self._conf.getRegistrarList())
-
 
 
 
@@ -1210,8 +1180,6 @@ methodMap = {
     "main.addNewChairPerson": ConferenceAddNewChairPerson,
     "main.removeChairPerson": ConferenceRemoveChairPerson,
     "main.editChairPerson": ConferenceEditChairPerson,
-    "main.getChairPersonData": ConferenceGetChairPersonData,
-    "main.getChairPersonList": ConferenceGetChairPersonList,
     "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributionsReview,
     "contributions.listAll" : ConferenceListContributions,
@@ -1232,10 +1200,8 @@ methodMap = {
     "alarm.sendTestNow": ConferenceAlarmSendTestNow,
     "protection.addExistingManager": ConferenceProtectionAddExistingManager,
     "protection.removeManager": ConferenceProtectionRemoveManager,
-    "protection.getManagerList": ConferenceProtectionGetManagerList,
     "protection.addExistingRegistrar": ConferenceProtectionAddExistingRegistrar,
     "protection.removeRegistrar": ConferenceProtectionRemoveRegistrar,
-    "protection.getRegistrarList": ConferenceProtectionGetRegistrarList,
     "participant.addExistingParticipant": ConferenceParticipantAddExisting,
     "participant.addNewParticipant": ConferenceParticipantAddNew
     }

@@ -36,6 +36,7 @@ import MaKaC.user as user
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
+
 class WPTrackBase(WPConferenceBase):
 
     def __init__( self, rh, track, subTrack=None):
@@ -1095,9 +1096,9 @@ class WTrackModifCoordination( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["users"] = self._track.getCoordinatorList()
         vars["trackId"] = self._track.getId()
         vars["confId"] = self._track.getConference().getId()
+        vars["coordinators"] = fossilize(self._track.getCoordinatorList())
         return vars
 
 

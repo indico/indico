@@ -276,12 +276,6 @@ class CategoryControlUserListBase(CategoryModifBase):
             return fossilize(self._categ.getConferenceCreatorList())
 
 
-class CategoryGetControlUserList(CategoryControlUserListBase):
-
-    def _getAnswer(self):
-        return self._getControlUserList()
-
-
 class CategoryAddExistingControlUser(CategoryControlUserListBase):
 
     def _checkParams(self):
@@ -325,8 +319,6 @@ methodMap = {
     "protection.removeAllowedUser": CategoryProtectionRemoveUser,
     "protection.changeContactInfo": CategoryContactInfoModification,
     "protection.removeManager": CategoryRemoveControlUser,
-    "protection.getManagerList": CategoryGetControlUserList,
     "protection.addExistingConfCreator": CategoryAddExistingControlUser,
-    "protection.removeConfCreator": CategoryRemoveControlUser,
-    "protection.getConfCreatorList": CategoryGetControlUserList
+    "protection.removeConfCreator": CategoryRemoveControlUser
     }

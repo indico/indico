@@ -67,11 +67,12 @@
 <script>
 
 var methods = {'addExisting': 'admin.groups.addExistingMember',
-                    'remove': 'admin.groups.removeMember',
-               'getUserList': 'admin.groups.getMemberList'};
+                    'remove': 'admin.groups.removeMember'};
 
 var params = {groupId: '${ groupId }'};
 
-var groupMemberManager = new SimpleListControlManager(null, methods, params, $E('inPlaceMembers'), "member");
+var groupMemberManager = new ListOfUsersManager(null,
+        methods, params, $E('inPlaceMembers'), "member", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ members | n,j});
 
 </script>

@@ -69,10 +69,23 @@
       <td class="groupTitle">${ _("Webcast Administrators list")}</td>
     </tr>
     <tr>
-    <td id="webcastAdminList" style="padding-top:5px;"></td>
-<!--       <td bgcolor="white" width="100%" valign="top" class="blacktext">
-
-      </td> -->
+        <table width="100%">
+            <tr>
+                <td bgcolor="white" width="60%">
+                    <table width="100%">
+                        <tr>
+                            <td><ul id="inPlaceWebcastAdmin" class="UIPeopleList"></ul></td>
+                        </tr>
+                        <tr>
+                            <td nowrap style="width:60%; padding-top:5px;">
+                                <input type="button" onclick="webcastAdminListManager.addExistingUser();" value='${ _("Add webcast administrator") }'></input>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+       </table>
     </tr>
     </table>
   </td>
@@ -82,52 +95,9 @@
 
 <script>
 
-// Create the handlers
-var addUserHandler = function(userList, setResult) {
-    indicoRequest(
-            'admin.services.addWebcastAdministrators',
-            {
-                userList: userList
-            },
-            function(result,error) {
-                if (!error) {
-                    setResult(true);
-                } else {
-                    IndicoUtil.errorReport(error);
-                    setResult(false);
-                }
-            }
-    );
-};
-
-var removeUserHandler = function(user, setResult) {
-    indicoRequest(
-            'admin.services.removeWebcastAdministrator',
-            {
-                user: user.get('id')
-            },
-            function(result,error) {
-                if (!error) {
-                    setResult(true);
-                } else {
-                    IndicoUtil.errorReport(error);
-                    setResult(false);
-                }
-            }
-    );
-};
-
-// Create the component for each track
-var uf = new UserListField('reviewersPRUserListDiv', 'userList',
-		${ jsonEncode(fossilize(adminList)) },
-        true,null,
-        true, false, null, null,
-        false, false, true,
-        addUserHandler, null, removeUserHandler);
-
-
-
-// Draw the component
-$E("webcastAdminList").set(uf.draw());
+var webcastAdminListManager = new ListOfUsersManager(null,
+        {'addExisting': 'admin.services.addWebcastAdministrators', 'remove': 'admin.services.removeWebcastAdministrator'},
+        {}, $E('inPlaceWebcastAdmin'), "webcast administrator", "UIPerson", false, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ webcastAdmins | n,j});
 
 </script>

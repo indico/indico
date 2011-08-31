@@ -68,8 +68,8 @@
         parameterManager.add($E('durationMinutes'), 'int', false);
     });
 
-var presenterManager = new AddSubContributionPresenterListManager('${ confId }', '${ contribId }', $E('inPlacePresenters'),
-        $E('inPlacePresentersMenu'), $E('parentTDPresenters'),  "presenter");
+var presenterManager = new AddSubContributionPresenterListManager($E('inPlacePresenters'),
+        $E('inPlacePresentersMenu'), $E('parentTDPresenters'),  "presenter", ${ authors | n,j }, '${ eventType }');
 
 function setPresentersParam(data) {
     var usersList = presenterManager.getUsersList();

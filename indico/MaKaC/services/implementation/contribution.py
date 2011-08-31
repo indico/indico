@@ -228,16 +228,17 @@ class ContributionParticipantsBase(ContributionModifBase):
         for part in participantList:
             partFossil = fossilize(part)
             # var to control if we have to show the entry in the author menu to allow add submission rights
-            showGrantSubmissionRights = True
+            isSubmitter = False
             av = AvatarHolder().match({"email": part.getEmail()}, forceWithoutExtAuth=True, exact=True)
             if not av:
                 if part.getEmail() in self._contribution.getSubmitterEmailList():
-                    showGrantSubmissionRights = False
+                    isSubmitter = True
             elif (av[0] in self._contribution.getSubmitterList() or self._conf.getPendingQueuesMgr().isPendingSubmitter(part)):
-                showGrantSubmissionRights = False
-            partFossil["showGrantSubmissionRights"] = showGrantSubmissionRights
+                isSubmitter = True
+            partFossil["showSubmitterCB"] = not isSubmitter
             result.append(partFossil)
         return result
+
 
 
 class ContributionParticipantsUserBase(ContributionParticipantsBase):
@@ -250,19 +251,6 @@ class ContributionParticipantsUserBase(ContributionParticipantsBase):
             self._participant = self._contribution.getAuthorById(self._pm.extract("userId", pType=str, allowEmpty=False))
         if self._participant == None:
             raise ServiceError("ERR-U0", _("User does not exist."))
-
-
-class ContributionGetParticipantsList(ContributionParticipantsBase):
-
-    def _getAnswer(self):
-        if self._kindOfList == "prAuthor":
-            return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
-        elif self._kindOfList == "coAuthor":
-            return self._getParticipantsList(self._contribution.getCoAuthorList())
-        elif self._kindOfList == "speaker":
-            return self._getParticipantsList(self._contribution.getSpeakerList())
-        else:
-            raise ServiceError("ERR-UK0", _("Invalid kind of list of users."))
 
 
 class ContributionAddExistingParticipant(ContributionParticipantsBase):
@@ -355,33 +343,17 @@ class ContributionRemoveParticipant(ContributionParticipantsUserBase):
     def _getAnswer(self):
         if self._kindOfList == "prAuthor":
             self._contribution.removePrimaryAuthor(self._participant)
-            return [self._getParticipantsList(self._contribution.getPrimaryAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
+            #return [self._getParticipantsList(self._contribution.getPrimaryAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
+            return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
         elif self._kindOfList == "coAuthor":
             self._contribution.removeCoAuthor(self._participant)
-            return [self._getParticipantsList(self._contribution.getCoAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
+            #return [self._getParticipantsList(self._contribution.getCoAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
+            return self._getParticipantsList(self._contribution.getCoAuthorList())
         elif self._kindOfList == "speaker":
             self._contribution.removeSpeaker(self._participant)
             return self._getParticipantsList(self._contribution.getSpeakerList())
         else:
             raise ServiceError("ERR-UK0", _("Invalid kind of list of users."))
-
-
-class ContributionGetParticipantData(ContributionParticipantsUserBase):
-
-    def _getAnswer(self):
-        # var to control if we have to show the checkbox to allow add submission rights
-        showGrantSubmissionRights = True
-        av = AvatarHolder().match({"email": self._participant.getEmail()})
-        if not av:
-            if self._participant.getEmail() in self._contribution.getSubmitterEmailList():
-            #if self._conf.getPendingQueuesMgr().isPendingSubmitter(self._participant):
-                showGrantSubmissionRights = False
-        elif (av[0] in self._contribution.getSubmitterList() or self._conf.getPendingQueuesMgr().isPendingSubmitter(self._participant)):
-            showGrantSubmissionRights = False
-        result = fossilize(self._participant)
-        result["showGrantSubmissionRights"] = showGrantSubmissionRights
-        return result
-
 
 
 class ContributionEditParticipantData(ContributionParticipantsBase):
@@ -398,7 +370,7 @@ class ContributionEditParticipantData(ContributionParticipantsBase):
             raise ServiceError("ERR-U0", _("User does not exist."))
         if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed():
             raise ServiceAccessError(_("The email address is already used by another participant. Participant not modified."))
-        self._eventType = self._pm.extract("eventType", pType=str, allowEmpty=False)
+        #self._eventType = self._pm.extract("eventType", pType=str, allowEmpty=False)
 
     def _isEmailAlreadyUsed(self):
         if self._kindOfList == "prAuthor":
@@ -435,7 +407,7 @@ class ContributionEditParticipantData(ContributionParticipantsBase):
         #If the author needs to be given submission rights because the checkbox is selected
         if self._userData.get("submission", False):
             if self._userData.get("email", "") == "":
-                raise ServiceAccessError(_("It is necessary to enter the email of the %s if you want to add him as submitter.") % self._kindOfList)
+                raise ServiceAccessError(_("It is necessary to enter the email of the user if you want to add him as submitter."))
             grantSubm = True
         if grantSubm:
             self._contribution.grantSubmission(self._participant)
@@ -443,74 +415,13 @@ class ContributionEditParticipantData(ContributionParticipantsBase):
     def _getAnswer(self):
         self._editParticipant()
         if self._kindOfList == "prAuthor":
-            return [self._getParticipantsList(self._contribution.getPrimaryAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
+            return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
         elif self._kindOfList == "coAuthor":
-            return [self._getParticipantsList(self._contribution.getCoAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
+            return self._getParticipantsList(self._contribution.getCoAuthorList())
         elif self._kindOfList == "speaker":
-            if self._eventType == "conference":
-                return [self._getParticipantsList(self._contribution.getSpeakerList()), self._getParticipantsList(self._contribution.getPrimaryAuthorList()),
-                        self._getParticipantsList(self._contribution.getCoAuthorList())]
-            else:
-                return self._getParticipantsList(self._contribution.getSpeakerList())
+            return self._getParticipantsList(self._contribution.getSpeakerList())
         else:
             raise ServiceError("ERR-UK0", _("Invalid kind of list of users."))
-
-
-class ContributionUpParticipant(ContributionParticipantsUserBase):
-
-    def _getAnswer(self):
-        if self._kindOfList == "prAuthor":
-            self._contribution.upPrimaryAuthor(self._participant)
-            return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
-        elif self._kindOfList == "coAuthor":
-            self._contribution.upCoAuthor(self._participant)
-            return self._getParticipantsList(self._contribution.getCoAuthorList())
-        else:
-            raise ServiceError("ERR-UK0", _("Invalid kind of list of users."))
-
-
-class ContributionDownParticipant(ContributionParticipantsUserBase):
-
-    def _getAnswer(self):
-        if self._kindOfList == "prAuthor":
-            self._contribution.downPrimaryAuthor(self._participant)
-            return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
-        elif self._kindOfList == "coAuthor":
-            self._contribution.downCoAuthor(self._participant)
-            return self._getParticipantsList(self._contribution.getCoAuthorList())
-        else:
-            raise ServiceError("ERR-UK0", _("Invalid kind of list of users."))
-
-
-class ContributionChangeAuthorToOtherList(ContributionParticipantsUserBase):
-
-    def _isAlreadyInList(self):
-        if self._kindOfList == "prAuthor":
-            authorList = self._contribution.getCoAuthorList()
-        elif self._kindOfList == "coAuthor":
-            authorList = self._contribution.getPrimaryAuthorList()
-
-        for auth in authorList:
-            if self._participant.getEmail() == auth.getEmail():
-                return True
-        return False
-
-    def _getAnswer(self):
-        if not self._isAlreadyInList() or self._participant.getEmail() == "":
-            if self._kindOfList == "prAuthor":
-                self._contribution.removePrimaryAuthor(self._participant)
-                self._contribution.addCoAuthor(self._participant)
-                return [self._getParticipantsList(self._contribution.getPrimaryAuthorList()), self._getParticipantsList(self._contribution.getCoAuthorList())]
-            elif self._kindOfList == "coAuthor":
-                self._contribution.removeCoAuthor(self._participant)
-                self._contribution.addPrimaryAuthor(self._participant)
-                return [self._getParticipantsList(self._contribution.getCoAuthorList()), self._getParticipantsList(self._contribution.getPrimaryAuthorList())]
-        else:
-            if self._kindOfList == "prAuthor":
-                list = "co-authors"
-            elif self._kindOfList == "coAuthor":
-                list = "primary authors"
-            raise ServiceAccessError(_("There is already an author with the same email address (%s) in the list of %s. Author not moved.") % (self._participant.getEmail(), list))
 
 
 class ContributionSendEmailData(ContributionParticipantsUserBase):
@@ -541,36 +452,12 @@ class ContributionChangeSubmissionRights(ContributionParticipantsUserBase):
                 self._contribution.revokeSubmissionEmail(self._participant.getEmail())
             else:
                 self._contribution.revokeSubmission(av[0])
-        if self._kindOfList == "prAuthor":
-            return [self._getParticipantsList(self._contribution.getPrimaryAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
-        elif self._kindOfList == "coAuthor":
-            return [self._getParticipantsList(self._contribution.getCoAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
-        elif self._kindOfList == "speaker":
-            if self._eventType == "conference":
-                return [self._getParticipantsList(self._contribution.getSpeakerList()), self._getParticipantsList(self._contribution.getPrimaryAuthorList()),
-                        self._getParticipantsList(self._contribution.getCoAuthorList())]
-            else:
-                return self._getParticipantsList(self._contribution.getSpeakerList())
+        if self._eventType == "conference":
+            return [self._getParticipantsList(self._contribution.getPrimaryAuthorList()),
+                    self._getParticipantsList(self._contribution.getCoAuthorList()),
+                    self._getParticipantsList(self._contribution.getSpeakerList())]
         else:
-            raise ServiceError("ERR-UK0", _("Invalid kind of list of users."))
-
-
-
-
-class ContributionGetAllAuthors(ContributionModifBase):
-
-    def _getAnswer(self):
-        result = []
-        for author in self._contribution.getPrimaryAuthorList():
-            if not author in self._contribution.getSpeakerList():
-                result.append(author)
-        for author in self._contribution.getCoAuthorList():
-            if not author in self._contribution.getSpeakerList():
-                result.append(author)
-
-        if result == []:
-            raise ServiceAccessError(_("There are no authors available to add as presenters."))
-        return fossilize(result)
+            return self._getParticipantsList(self._contribution.getSpeakerList())
 
 
 class ContributionAddAuthorAsPresenter(ContributionParticipantsBase):
@@ -583,6 +470,19 @@ class ContributionAddAuthorAsPresenter(ContributionParticipantsBase):
         for author in self._userList:
             self._contribution.addSpeaker(self._contribution.getAuthorById(author["id"]))
         return self._getParticipantsList(self._contribution.getSpeakerList())
+
+
+class ContributionUpdateAuthorList(ContributionModifBase):
+
+    def _checkParams(self):
+        ContributionModifBase._checkParams(self)
+        self._prList= self._pm.extract("prList", pType=list, allowEmpty=False)
+        self._coList= self._pm.extract("coList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        self._contribution.newAuthorsList(self._prList, self._coList)
+        return True
+
 
 
 class SubContributionParticipantsBase(ContributionModifBase):
@@ -603,12 +503,6 @@ class SubContributionParticipantsBase(ContributionModifBase):
             if email == part.getEmail():
                 return True
         return False
-
-
-class SubContributionGetParticipantsList(SubContributionParticipantsBase):
-
-    def _getAnswer(self):
-        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
 
 
 class SubContributionAddNewParticipant(SubContributionParticipantsBase):
@@ -657,19 +551,6 @@ class SubContributionAddExistingParticipant(SubContributionParticipantsBase):
         return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
 
 
-class SubContributionGetAllAuthors(ContributionModifBase):
-
-    def _getAnswer(self):
-        result = []
-        for author in self._contribution.getPrimaryAuthorList():
-            result.append(author)
-        for author in self._contribution.getCoAuthorList():
-            result.append(author)
-        if result == []:
-            raise ServiceAccessError(_("There are no authors available to add as presenters."))
-        return fossilize(result)
-
-
 class SubContributionRemoveParticipant(SubContributionParticipantsBase):
 
     def _checkParams(self):
@@ -701,18 +582,6 @@ class SubContributionAddAuthorAsPresenter(SubContributionAddExistingParticipant)
         for author in self._userList:
             self._newSpeaker(self._contribution.getAuthorById(author["id"]))
         return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
-
-
-class SubContributionGetParticipantData(SubContributionParticipantsBase):
-
-    def _checkParams(self):
-        SubContributionParticipantsBase._checkParams(self)
-        self._participant = self._subContrib.getSpeakerById(self._pm.extract("userId", pType=str, allowEmpty=False))
-        if self._participant == None:
-            raise ServiceError("ERR-U0", _("User does not exist."))
-
-    def _getAnswer(self):
-        return fossilize(self._participant, ISubContribParticipationFullFossil)
 
 
 class SubContributionEditParticipantData(SubContributionParticipantsBase):
@@ -755,24 +624,6 @@ class ContributionSubmittersBase(ContributionModifBase):
         ContributionModifBase._checkParams(self)
         self._pm = ParameterManager(self._params)
 
-    def _isPrimaryAuthor(self, email):
-        for prAuthor in self._contribution.getPrimaryAuthorList():
-            if prAuthor.getEmail() == email:
-                return True
-        return False
-
-    def _isCoAuthor(self, email):
-        for coAuthor in self._contribution.getCoAuthorList():
-            if coAuthor.getEmail() == email:
-                return True
-        return False
-
-    def _isSpeaker(self, email):
-        for speaker in self._contribution.getSpeakerList():
-            if speaker.getEmail() == email:
-                return True
-        return False
-
     def _getSubmittersList(self):
         result = []
         for submitter in self._contribution.getSubmitterList():
@@ -782,31 +633,23 @@ class ContributionSubmittersBase(ContributionModifBase):
                 if self._conf.getType() == "conference":
                     isPrAuthor = False
                     isCoAuthor = False
-                    if self._isPrimaryAuthor(submitter.getEmail()):
+                    if self._contribution.isPrimaryAuthorByEmail(submitter.getEmail()):
                         isPrAuthor = True
-                    if self._isCoAuthor(submitter.getEmail()):
+                    if self._contribution.isCoAuthorByEmail(submitter.getEmail()):
                         isCoAuthor = True
                     submitterFossil["isPrAuthor"] = isPrAuthor
                     submitterFossil["isCoAuthor"] = isCoAuthor
-                if self._isSpeaker(submitter.getEmail()):
+                if self._contribution.isSpeakerByEmail(submitter.getEmail()):
                     isSpeaker = True
                 submitterFossil["isSpeaker"] = isSpeaker
             result.append(submitterFossil)
         # get pending users
         for email in self._contribution.getSubmitterEmailList():
             pendingUser = {}
-            pendingUser["name"] = email
+            pendingUser["email"] = email
             pendingUser["pending"] = True
             result.append(pendingUser)
         return result
-
-
-
-
-class ContributionGetSubmittersList(ContributionSubmittersBase):
-
-    def _getAnswer(self):
-        return self._getSubmittersList()
 
 
 class ContributionAddExistingSubmitter(ContributionSubmittersBase):
@@ -828,13 +671,13 @@ class ContributionRemoveSubmitter(ContributionSubmittersBase):
     def _checkParams(self):
         ContributionSubmittersBase._checkParams(self)
         self._submitterId = self._pm.extract("userId", pType=str, allowEmpty=False)
-        self._kindOfUser = self._pm.extract("kindOfUser", pType=str, allowEmpty=False)
+        self._kindOfUser = self._pm.extract("kindOfUser", pType=str, allowEmpty=True, defaultValue=None)
 
     def _getAnswer(self):
         if self._kindOfUser == "pending":
             # remove pending email, self._submitterId is an email address
             self._contribution.revokeSubmissionEmail(self._submitterId)
-        elif self._kindOfUser == "principal":
+        else:
             ah = PrincipalHolder()
             av = ah.getById(self._submitterId)
             if av is not None:
@@ -927,12 +770,6 @@ class ContributionManagerListBase(ContributionModifBase):
         return result
 
 
-class ContributionGetManagerList(ContributionManagerListBase):
-
-    def _getAnswer(self):
-        return self._getManagersList()
-
-
 class ContributionAddExistingManager(ContributionManagerListBase):
 
     def _checkParams(self):
@@ -971,32 +808,22 @@ methodMap = {
     "participants.addExistingParticipant": ContributionAddExistingParticipant,
     "participants.editParticipantData": ContributionEditParticipantData,
     "participants.removeParticipant": ContributionRemoveParticipant,
-    "participants.getParticipantsList": ContributionGetParticipantsList,
-    "participants.getParticipantData": ContributionGetParticipantData,
-    "participants.upParticipant": ContributionUpParticipant,
-    "participants.downParticipant": ContributionDownParticipant,
-    "participants.changeAuthorToOtherList": ContributionChangeAuthorToOtherList,
     "participants.sendEmailData": ContributionSendEmailData,
     "participants.changeSubmissionRights": ContributionChangeSubmissionRights,
-    "participants.getAllAuthors": ContributionGetAllAuthors,
     "participants.addAuthorAsPresenter": ContributionAddAuthorAsPresenter,
+    "participants.updateAuthorList": ContributionUpdateAuthorList,
 
     "participants.subContribution.addNewParticipant": SubContributionAddNewParticipant,
     "participants.subContribution.addExistingParticipant": SubContributionAddExistingParticipant,
     "participants.subContribution.editParticipantData": SubContributionEditParticipantData,
     "participants.subContribution.removeParticipant": SubContributionRemoveParticipant,
-    "participants.subContribution.getParticipantsList": SubContributionGetParticipantsList,
-    "participants.subContribution.getParticipantData": SubContributionGetParticipantData,
-    "participants.subContribution.getAllAuthors": SubContributionGetAllAuthors,
     "participants.subContribution.addAuthorAsPresenter": SubContributionAddAuthorAsPresenter,
 
     "protection.submissionControl.addExistingSubmitter": ContributionAddExistingSubmitter,
     "protection.submissionControl.removeSubmitter": ContributionRemoveSubmitter,
-    "protection.submissionControl.getSubmittersList": ContributionGetSubmittersList,
     "protection.submissionControl.addAsAuthor": ContributionSumissionControlAddAsAuthor,
     "protection.submissionControl.removeAsAuthor": ContributionSumissionControlRemoveAsAuthor,
 
     "protection.addExistingManager": ContributionAddExistingManager,
-    "protection.removeManager": ContributionRemoveManager,
-    "protection.getManagerList": ContributionGetManagerList
+    "protection.removeManager": ContributionRemoveManager
 }

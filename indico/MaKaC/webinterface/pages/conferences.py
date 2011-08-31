@@ -83,7 +83,7 @@ from MaKaC.common.utils import formatDateTime
 from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.plugins.util import PluginFieldsWrapper
-
+from MaKaC.user import AvatarHolder
 
 
 def stringToDate( str ):
@@ -2169,6 +2169,16 @@ class WConfModifMainData(wcomponents.WTemplated):
         self._ct=ct
         self._rh = rh
 
+    def _getChairPersonsList(self):
+        result = fossilize(self._conf.getChairList())
+        for chair in result:
+            av = AvatarHolder().match({"email": chair['email']},
+                                  forceWithoutExtAuth=True, exact=True)
+            chair['showManagerCB'] = True
+            if (av and self._conf.getAccessController().canModify(av[0])) or chair['email'] in self._conf.getAccessController().getModificationEmail():
+                chair['showManagerCB'] = False
+        return result
+
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         type = vars["type"]
@@ -2243,6 +2253,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
         vars["screenDates"] = "%s -> %s" % (ssdate, sedate)
         vars["timezoneList"] = TimezoneRegistry.getList()
+        vars["chairpersons"] = self._getChairPersonsList()
         return vars
 ############# End of old collaboration related ##############################
 
@@ -4543,6 +4554,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
         vars["addNotifTplURL"]=urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
         vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
         vars["confId"] = self._conf.getId()
+        vars["lateAuthUsers"] = fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
         return vars
 
 

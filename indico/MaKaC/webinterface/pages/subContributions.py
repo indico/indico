@@ -33,6 +33,8 @@ from datetime import datetime
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 
 class WPSubContributionBase( WPMainBase, WPConferenceBase ):
 
@@ -381,6 +383,9 @@ class WSubContribModifMain(wcomponents.WTemplated):
         vars["confId"] = self._subContrib.getConference().getId()
         vars["contribId"] = self._subContrib.getContribution().getId()
         vars["subContribId"] = self._subContrib.getId()
+        vars["presenters"] = fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
+        vars["authors"] = fossilize(self._subContrib.getContribution().getAllAuthors())
+        vars["eventType"] = self._subContrib.getConference().getType()
         return vars
 
 class WPSubContributionReportNumberEdit(WPSubContributionModifBase):

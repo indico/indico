@@ -166,7 +166,7 @@ class AbstractReviewingAddReviewer(AbstractReviewingBase):
             ah = user.AvatarHolder()
             av = ah.getById(reviewer["id"])
             self._conf.getTrackById(self._trackId).addCoordinator(av)
-        return True
+        return fossilize(self._conf.getTrackById(self._trackId).getCoordinatorList())
 
 
 class AbstractReviewingRemoveReviewer(AbstractReviewingBase):
@@ -177,13 +177,15 @@ class AbstractReviewingRemoveReviewer(AbstractReviewingBase):
         AbstractReviewingBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._trackId = pm.extract("track", pType=str, allowEmpty=False)
-        self._reviewerId = pm.extract("user", pType=str, allowEmpty=False)
+        self._reviewerId = pm.extract("userId", pType=str, allowEmpty=True, defaultValue=None)
+        if (self._reviewerId == None):
+            self._reviewerId = pm.extract("user", pType=str, allowEmpty=False)
 
     def _getAnswer(self):
         ah = user.AvatarHolder()
         av = ah.getById(self._reviewerId)
         self._conf.getTrackById(self._trackId).removeCoordinator(av)
-        return True
+        return fossilize(self._conf.getTrackById(self._trackId).getCoordinatorList())
 
 methodMap = {
     "questions.changeNumberofAnswers": AbstractReviewingChangeNumAnswers,

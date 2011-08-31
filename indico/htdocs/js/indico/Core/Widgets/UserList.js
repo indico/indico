@@ -1,53 +1,53 @@
 
 /*
- * List of users: This component manage a listo of users, you can search and add users to the list, remove and edit them.
+ * List of users: This component manage a list of users, you can search and add users to the list, remove and edit them.
  * You can also add your own options
  * @param: confId -> Id of the conference (if needed)
  * @param: methods -> json object with the methods for the indicoRequests, the methods have to be:
- *    addExisting, addNew, edit, remove, getUserData, getUserList
- * @param: userListParams -> params of the indicoRequest for getUserList method
+ *    addExisting, addNew, edit, remove, upUser, downUser (for these functionalities, then you can add your own ones)
+ * @param: userListParams -> common params for all the indicoRequests for the component (ex. confId, contribId)
  * @param: inPlaceListElem -> element of the webpage where the list will be.
- * @param: showRemoveIcon -> Bool, true if we want to show the remove icon in each row
- * @param: showEditIcon -> Bool, true if we want to show the edit icon in each row
- * @param: showFavouritesIcon -> Bool, true if we want to show the favourites star
- * @param: showOrderArrows -> Bool, true if we want to have the order options
- * @param: kindOfUser -> String, kind of user identifier
  * @param: userCaption -> String to show in the texts
- * @param: elementClass -> String, css class of the elements in the list
- * @param: showGrantManagementCB -> Bool, show the checkbox to grant management rights in the AddNew/Edit popup
- * @param: showGrantSubmissionCB -> Bool, show the checkbox to grant submission rights in the AddNew/Edit popup
- * @param: showAffiliation -> Bool, show the affiliation of the user
- * @param: showGrantCoordinationCB -> Bool, show the checkbox to grant coordination rights in the AddNew/Edit popup
+ * @param: elementClass -> Class for the <li> elements in the list
+ * @param: allowGroups -> Bool, true if to have groups in the list is allowed
+ * @param: rightsToShow -> dictionary object, It shows the rights that the added users will be able to have. These values has to be:
+ *         {submission: bool, management: bool, coordination: bool}
+ * @param: nameOptions -> json object, Options for the user's name in the list. The options are:
+ *         {'affiliation': bool, 'email': bool, 'title': bool}
+ * @param: userOptions -> dictionary object: Options that can be performanced for each user. The allowed values are:
+ *         {remove: bool, edit: bool, favorite: bool, arrows: bool, menu: bool}
+ * @param: initialList -> List, It contains the initial users to add when the component is loaded the first time
+ * @param: allowEmptyEmail -> Bool, true if it is allowed to have an empty email when we add a non existing user
+ * @param: blockOnRemove -> Bool, true if it is necessary to block the page when an user is removed
+ * @param: inPlaceMenu -> element where the menu with the options to add users will be placed
  */
 type("ListOfUsersManager", [], {
 
-    _addExistingUser: function(title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
+    _addExistingUser: function(title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
                                 showToggleFavouriteButtons) {
         // Create the popup to add new users
         var self = this;
-        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
+        // params: (title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
         //          showToggleFavouriteButtons, chooseProcess)
-        var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers,
+        var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers,
                                                     onlyOne, showToggleFavouriteButtons,
                 function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList));});
         chooseUsersPopup.execute();
     },
 
-    _manageUserList: function(method, params, progress, highlight) {
+    _manageUserList: function(method, params, progress) {
         var self = this;
         var progress = any(progress, true);
-        var highlight = any(highlight, false);
         if (progress)
             var killProgress = IndicoUI.Dialogs.Util.progress();
         indicoRequest(
                 method, params,
                 function(result, error) {
                     if (!error) {
-                        self._updateUserList(result);
+                        self._updateUsersList(result);
+                        self._drawUserList();
                         if (progress)
                             killProgress();
-                        if (highlight)
-                            IndicoUI.Effect.highLight('fullName_'+params['userId'], 'orange', 3000);
                     } else {
                         if (progress)
                             killProgress();
@@ -57,25 +57,63 @@ type("ListOfUsersManager", [], {
         );
     },
 
-    _personName: function(user, showAffiliation) {
-        var fullName = user.familyName.toUpperCase() + (user.firstName?(', ' + user.firstName):'');
-        if (user.title) {
-            fullName = user.title + ' ' + fullName;
-        }
-        if (showAffiliation && user.affiliation) {
-            fullName += " (" + user.affiliation + ")";
-        }
-        return fullName
+    _manageAllConectedUserList: function() {
+        // To overwrite
+    	// You have to use this method if you have more than one ListOfUsersManager in the same page and
+    	// the elements of one list depend on the actions over the other list
     },
 
-    _component_order: ['favorite',  'remove', 'edit', 'arrows'],
+    _personName: function(user) {
+        if (user._type == "Group") {
+            var fullName = user.name;
+        } else {
+            if (user.pending) {
+                var fullName = $T('Non-registered user');
+            } else {
+                var fullName = user.familyName.toUpperCase() + (user.firstName?(', ' + user.firstName):'');
+            }
+        }
+        if (this.nameOptions['title'] && user.title) {
+            fullName = user.title + ' ' + fullName;
+        }
+        if (this.nameOptions['affiliation'] && user.affiliation) {
+            fullName += " (" + user.affiliation + ")";
+        }
+        if ((this.nameOptions['email'] || user.pending) && user.email) {
+            fullName += '<small> (' + user.email + ')</small>';
+        }
+        return fullName;
+    },
+
+    _component_order: ['remove', 'edit', 'favorite', 'menu', 'arrows'],
 
     _components: {
 
-        favorite: function(user) {
-            return $('<span/>').css({padding:'3px', 'float':'right'}).
-                html(new ToggleFavouriteButton(this, {}, IndicoGlobalVars['userData']['favorite-user-ids'][user.id]).draw().dom);
+        menu: function(user) {
+            var self = this;
+            if (!user.pending && user._type != "Group") {
+                var optionsMenuSpan = $('<span/>').css('float', 'right').hover(function() {
+                    $(this).addClass('mouseover');
+                }, function() {
+                    $(this).removeClass('mouseover');
+                });
+                var optionsMenuLink = $('<a/>').attr({
+                    id: user.id,
+                    'class': 'dropDownMenu fakeLink',
+                    style: 'margin-left:15px; margin-right:15px'
+                }).append($T('More')).click(function(event) {
+                    self.userOptions.onMenu.call(self, this, user);
+                });
+                optionsMenuSpan.append(optionsMenuLink);
+                return optionsMenuSpan;
+            }
+        },
 
+        favorite: function(user) {
+            if (user._type == "Avatar") {
+                return $('<span/>').css({padding:'3px', 'float':'right'}).
+                    html(new ToggleFavouriteButton(user, {}, IndicoGlobalVars['userData']['favorite-user-ids'][user.id]).draw().dom);
+            }
         },
 
         remove: function(user) {
@@ -87,8 +125,8 @@ type("ListOfUsersManager", [], {
                 'class': 'UIRowButton2',
                 style: "margin-right:10px; float:right; cursor:pointer;"
             }).click(function(event) {
-                self.options.onRemove.call(self, user);
-            })
+                self.userOptions.onRemove.call(self, user);
+            });
         },
 
 
@@ -101,7 +139,7 @@ type("ListOfUsersManager", [], {
                 'class': 'UIRowButton2',
                 style:'float: right; cursor: pointer;'
             }).click(function(event) {
-                self.options.onEdit.call(self, user);
+                self.userOptions.onEdit.call(self, user);
             });
         },
 
@@ -118,66 +156,83 @@ type("ListOfUsersManager", [], {
 
             return $('<div/>').append(
                 arrow('up', $T('Move up')).click(function(event) {
-                    self.options.onArrowUp.call(self, user);
+                    self.userOptions.onArrowUp.call(self, user);
                 }),
                 arrow('down', $T('Move down')).click(function(event) {
-                    self.options.onArrowDown.call(self, user);
+                    self.userOptions.onArrowDown.call(self, user);
                 }));
         }
     },
 
-    onEdit: function(user) {
-        this._getUserData(this.methods["getUserData"], this._getGetUserParams(user.id));
+    onEdit: function(userData, all) {
+        var self = this;
+        // get the user data
+        var user = $O(userData);
+        var editUserPopup = new UserDataPopup(
+                $T('Edit ') + self.userCaption + $T(' data'),
+                user,
+                function(newData) {
+                    if (editUserPopup.parameterManager.check()) {
+                    	if (!all)
+                            self._manageUserList(self.methods["edit"], self._getEditParams(newData));
+                    	else
+                    	    self._manageAllConectedUserList(self.methods["edit"], self._getEditParams(newData));
+                        editUserPopup.close();
+                    }
+                }, user.get('showSubmitterCB'), user.get('showManagerCB'), user.get('showCoordinatorCB'), self.allowEmptyEmail);
+        editUserPopup.open();
     },
 
     onRemove: function(user) {
-        this._manageUserList(this.methods["remove"], this._getRemoveParams(user.id));
+        if (user.pending) {
+            var kindOfUser = "pending";
+            this._manageUserList(this.methods["remove"], this._getRemoveParams(user.email, kindOfUser), this.blockOnRemove);
+        } else {
+            this._manageUserList(this.methods["remove"], this._getRemoveParams(user.id), this.blockOnRemove);
+        }
     },
 
     onArrowUp: function(user) {
-        self._manageUserList(this.methods["upUser"], this._getUpUserParams(user.id));
+        self._manageUserList(this.methods["upUser"], this._getUpUserParams(user.id), false);
     },
 
-    onArrowDown: function(user){
-        self._manageUserList(this.methods["downUser"], this._getDownUserParams(user.id));
+    onArrowDown: function(user) {
+        self._manageUserList(this.methods["downUser"], this._getDownUserParams(user.id), false);
     },
 
-    _getUserData: function(method, params) {
-        var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress();
-        indicoRequest(
-                method, params,
-                function(result,error) {
-                    if (!error) {
-                        self._showEditUserPopup(result);
-                        killProgress();
-                    } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-        );
+    onMenu: function(element, user) {
+        // to overwrite with the menu options for each case
     },
 
-    _getAddNewParams: function() {
-        // To overwrite
+    _getAddNewParams: function(userData) {
+        var params = this.userListParams;
+        params['userData'] = userData;
+        return params;
     },
 
-    _getAddExistingParams: function() {
-        // To overwrite
+    _getAddExistingParams: function(userList) {
+        var params = this.userListParams;
+        params['userList'] = userList;
+        return params;
     },
 
-    _getEditParams: function() {
-        // To overwrite
+    _getEditParams: function(userData) {
+        var params = this.userListParams;
+        params['userId'] = userData.get("id");
+        params['userData'] = userData;
+        return params;
     },
 
-    _getRemoveParams: function() {
-        // To overwrite
+    _getRemoveParams: function(userId, kindOfUser) {
+        var params = this.userListParams;
+        params['userId'] = userId;
+        if (kindOfUser)
+            params['kindOfUser'] = kindOfUser;
+        else
+            params['kindOfUser'] = null;
+        return params;
     },
 
-    _getGetUserParams: function() {
-        // To overwrite
-    },
 
     _getDownUserParams: function() {
         // To overwrite
@@ -187,50 +242,61 @@ type("ListOfUsersManager", [], {
         // To overwrite
     },
 
-    _updateUserList: function(result) {
+    addExistingUser: function(){
+        this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true);
+    },
+
+    drawUserList: function(result) {
+        if (result != undefined)
+            this._updateUsersList(result);
+        this._drawUserList();
+    },
+
+    _drawUserList: function() {
         var self = this;
-        // update the user list
 
         var container = $(this.inPlaceListElem.dom).html('');
 
-        $.each(result, function(idx) {
-            var user = this;
+        this.usersList.each(function(val, idx) {
+            var user = val;
             var elemStyle = self.elementClass;
-            if (this._type == 'Group')
+            if (user._type == 'Group')
                 elemStyle = "UIGroup";
 
-            var row = $('<li/>').attr('class', elemStyle).
-                append($('<span class="nameLink" />').append(
-                    self._personName(this, self.showAffiliation)));
+            var row = $('<li/>').attr('class', elemStyle)
 
-            _(self._component_order).each(function(opt, idx){
-                if (self.options[opt]) {
-                    var comp = self._components[opt].call(self, user, self.options[opt]);
+            _(self._component_order).each(function(opt, idx) {
+                if (self.userOptions[opt]) {
+                    var comp = self._components[opt].call(self, user, self.userOptions[opt]);
                     row.append(comp);
                 }
             });
+            row.append($('<span class="nameLink" />').append(
+                    self._personName(user)));
             container.append(row);
         });
+        this._checkEmptyList();
     },
 
-    addManagementMenu: function(){
-        // To overwrite
-    },
-
-    _showEditUserPopup: function(userData) {
+    addManagementMenu: function() {
         var self = this;
-        // get the user data
-        var user = $O(userData);
-        var editUserPopup = new UserDataPopup(
-                $T('Edit ') + self.userCaption + $T(' data'),
-                user,
-                function(newData) {
-                    if (editUserPopup.parameterManager.check()) {
-                        self._manageUserList(self.methods["edit"], self._getEditParams(newData));
-                        editUserPopup.close();
-                    }
-                }, self.showGrantManagementCB, self.showGrantSubmissionCB);
-        editUserPopup.open();
+        if (this.inPlaceMenu) {
+            this.inPlaceMenu.observeClick(function(e) {
+                var menuItems = {};
+
+                menuItems[$T('Add existing')] = function() {
+                    self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false, true, true, false, true);
+                };
+                menuItems[$T('Add new')] = function() {
+                    self._addNonExistingUser();
+                };
+
+                var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
+                var pos = self.inPlaceMenu.getAbsolutePosition();
+                menu.open(pos.x + 20, pos.y + 20);
+                //return false;
+            });
+        }
     },
 
     _addNonExistingUser: function() {
@@ -244,92 +310,132 @@ type("ListOfUsersManager", [], {
                         self._manageUserList(self.methods["addNew"], self._getAddNewParams(newData));
                         newUserPopup.close();
                     }
-                }, self.showGrantSubmissionCB, self.showGrantManagementCB, self.showGrantCoordinationCB);
+                }, self.rightsToShow.submission, self.rightsToShow.management, self.rightsToShow.coordination, self.allowEmptyEmail);
         newUserPopup.open();
+    },
+
+    getUsersList: function() {
+        return this.usersList;
+    },
+
+    setUsersList: function(list) {
+        this.usersList = list;
+    },
+
+    _checkEmptyList: function() {
+        // To overwrite
+    },
+
+    _isAlreadyInList: function(email) {
+        // It checks if there is any user with the same email
+        for (var i=0; i<this.usersList.length.get(); i++) {
+            if (email && email == this.usersList.item(i)['email']) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    _updateUsersList: function(list) {
+        var self = this;
+        this.usersList.clear();
+        $.each(list, function(idx, val) {
+            self.usersList.append(val);
+        });
     }
 },
 
-    function(confId, methods, userListParams, inPlaceListElem,
-             kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation, showGrantCoordinationCB, options) {
-        var self = this;
-        this.conferenceId = confId;
+    function(confId, methods, userListParams, inPlaceListElem, userCaption, elementClass, allowGroups,
+             rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu) {
+	    var self = this;
+        this.confId = confId;
         this.methods = methods;
         this.userListParams = userListParams;
         this.inPlaceListElem = inPlaceListElem;
-        this.kindOfUser = kindOfUser;
         this.userCaption = userCaption;
         this.elementClass = elementClass;
-        this.showGrantSubmissionCB = showGrantSubmissionCB;
-        this.showGrantManagementCB = showGrantManagementCB;
-        this.showAffiliation = showAffiliation;
-        this.showGrantCoordinationCB = showGrantCoordinationCB;
+        this.allowGroups = allowGroups;
+        this.rightsToShow = rightsToShow;
+        /*this.rightsToShow = {
+            submission: false,
+            management: false,
+            coordination: false
+        };*/
+        this.nameOptions = nameOptions;
+        /*this.nameOptions = {
+            'affiliation': false,
+            'email': false,
+            'title': false
+        };*/
+        this.userOptions = userOptions;
+        this.usersList = $L();
+        this._updateUsersList(initialList);
+        this.allowEmptyEmail = allowEmptyEmail;
+        this.blockOnRemove = any(blockOnRemove, false);
+        this.inPlaceMenu = inPlaceMenu;
 
-        var self = this;
-
-        this.options = {
+        /*this.userOptions = {
             remove: true,
             edit: true,
             favorite: true,
-            arrows: true,
-        };
-
-        _(['onRemove', 'onEdit', 'onArrowUp', 'onArrowDown']).
+            menu: true,
+            arrows: true
+        };*/
+        _(['onRemove', 'onEdit', 'onArrowUp', 'onArrowDown', 'onMenu']).
             each(function(val){
-                self.options[val] = self[val];
+                self.userOptions[val] = self[val];
             });
-        _(this.options).extend(options)
+        _(this.userOptions).extend(userOptions);
 
-        this.inPlaceListElem.set(progressIndicator(true, true));
-
-        if (userListParams) {
-            indicoRequest(
-                    self.methods["getUserList"], self.userListParams,
-                    function(result, error) {
-                        if (!error) {
-                            self._updateUserList(result);
-                        } else {
-                            IndicoUtil.errorReport(error);
-                        }
-                    }
-            );
+        if (this.usersList.length.get()) {
+            self._drawUserList();
         }
+
         this.addManagementMenu();
     }
 );
 
 
 /*
- * Manager of participant list for the cases we want to keep the information until the form submission.
+ * Manager of participant list for the cases that it is necessary to keep the information until the form submission and
+ * not send any request.
  * The difference between this class and ListOfUsersManager is that this object does not have
  * to send ajax request when a new participant is added/removed or edited.
  *
  * @param: confId -> Id of the conference (if needed)
- * @param: userListParams -> params of the indicoRequest for getUserList method
  * @param: inPlaceListElem -> element of the webpage where the list will be.
- * @param: showRemoveIcon -> Bool, true if we want to show the remove icon in each row
- * @param: showEditIcon -> Bool, true if we want to show the edit icon in each row
- * @param: showFavouritesIcon -> Bool, true if we want to show the favourites star
- * @param: showOrderArrows -> Bool, true if we want to have the order options
  * @param: userCaption -> String to show in the texts
- * @param: elementClass -> String, css class of the elements in the list
- * @param: showGrantManagementCB -> Bool, show the checkbox to grant management rights in the AddNew/Edit popup
- * @param: showGrantSubmissionCB -> Bool, show the checkbox to grant submission rights in the AddNew/Edit popup
- * @param: showAffiliation -> Bool, show the affiliation of the user
+ * @param: elementClass -> Class for the <li> elements in the list
+ * @param: allowGroups -> Bool, true if to have groups in the list is allowed
+ * @param: rightsToShow -> dictionary object, It shows the rights that the added users will be able to have. These values has to be:
+ *         {submission: bool, management: bool, coordination: bool}
+ * @param: nameOptions -> json object, Options for the user's name in the list. The options are:
+ *         {'affiliation': bool, 'email': bool, 'title': bool}
+ * @param: userOptions -> dictionary object: Options that can be performanced for each user. The allowed values are:
+ *         {remove: bool, edit: bool, favorite: bool, arrows: bool, menu: bool}
+ * @param: initialList -> List, It contains the initial users to add when the component is loaded the first time
+ * @param: allowEmptyEmail -> Bool, true if it is allowed to have an empty email when we add a non existing user
+ * @param: blockOnRemove -> Bool, true if it is necessary to block the page when an user is removed
+ * @param: inPlaceMenu -> element where the menu with the options to add users will be placed
  */
 type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
 
-	_addExistingUser: function(title, allowSearch, conferenceId, enableGroups,
+	_addExistingUser: function(title, allowSearch, confId, enableGroups,
                                    includeFavourites, suggestedUsers, onlyOne,
                                    showToggleFavouriteButtons) {
         var self = this;
         // Create the popup to add new users
         var chooseUsersPopup = new ChooseUsersPopup(
-            title, allowSearch, conferenceId, enableGroups, includeFavourites,
+            title, allowSearch, confId, enableGroups, includeFavourites,
             suggestedUsers, onlyOne, showToggleFavouriteButtons,
             function(userList) {
                 for (var i=0; i<userList.length; i++) {
                     if (!self._isAlreadyInList(userList[i]['email'])) {
                         userList[i]['existing'] = true;
+                        if (!userList[i]['address'])
+                            userList[i]['address'] = '';
+                        if (!userList[i]['fax'])
+                            userList[i]['fax'] = '';
                         self.usersList.append(userList[i]);
                     } else {
                         var popup = new AlertPopup($T('Add ')+self.userCaption,
@@ -338,7 +444,7 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
                         popup.open();
                     }
                 }
-                self._updateUserList();
+                self._drawUserList();
             });
             chooseUsersPopup.execute();
         },
@@ -363,7 +469,7 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
                         if (!self._isAlreadyInList(newUserData['email'])) {
                             newUserPopup.close();
                             self.usersList.append(newUserData);
-                            self._updateUserList();
+                            self._drawUserList();
                         } else {
                             var popup = new AlertPopup($T('Add ')+self.userCaption,
                                     $T('The email address (') + newUserData['email'] +
@@ -371,81 +477,22 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
                             popup.open();
                         }
                     }
-                }, self.showGrantSubmissionCB, self.showGrantManagementCB);
+                }, self.rightsToShow.submission, self.rightsToShow.management, self.rightsToShowCoordination, self.allowEmptyEmail);
         newUserPopup.open();
     },
 
-    _updateUserList: function() {
-        // Update the users in the interface
-        var self = this;
-        this.inPlaceListElem.set('');
-
-        $.each(result, function(idx) {
-            var user = this;
-            var row = $('<li class="UIPerson"/>');
-
-            var userText = $('<span class="nameLink" />').append(
-                self._personName(this, self.showAffiliation));
-            var star = self._favoriteStar(this);
-
-            if (this.showEditIcon) {
-                var edit = self._editIcon(this, function(user) {
-                    self._editUser(user);
-                });
-            }
-            var removeImage = self._removeIcon(
-                this,
-                function(){
-                    self._removeUser(user);
-                });
-
-            if (this.showOrderArrows) {
-                var arrows = self._arrowIcons(
-                    this,
-                    function(user){
-                        self._upUser(user.id);
-                    },
-                    function(user){
-                        self._downUser(user.id);
-                    });
-            }
-
-            row.append(userText, star, edit, removeImage, arrows);
-        });
-
-        this._checkEmptyList();
-    },
-
-    _checkEmptyList: function() {
-        // To overwrite
-    },
-
-    _removeUser: function(user) {
-        var killProgress = IndicoUI.Dialogs.Util.progress();
-        if (user) {
-            this.usersList.remove(user);
-            this._updateUserList();
-            killProgress();
-            return;
-        } else {
-            killProgress();
-            var popup = new AlertPopup($T('Remove ')+this.userCaption, $T('The user you are trying to remove does not exist.'));
-            popup.open();
-        }
-    },
-
-    _editUser: function(user) {
+    onEdit: function(user) {
         var self = this;
         if (user) {
             var killProgress = IndicoUI.Dialogs.Util.progress();
-            var user = $O(user);
+            var userData = $O(user);
             var editUserPopup = new UserDataPopup(
                 $T('Edit ') + self.userCaption + $T(' data'),
-                user,
+                userData,
                 function(newData) {
                     if (editUserPopup.parameterManager.check()) {
-                        self._userModifyData(newData);
-                        self._updateUserList();
+                        self._userModifyData(user, newData);
+                        self._drawUserList();
                         editUserPopup.close();
                     }
                 }, false, false);
@@ -458,143 +505,47 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
         }
     },
 
-    _userModifyData: function(user) {
-        this.usersList.item(user.id)['title'] = any(user.get('title'), '');
-        this.usersList.item(user.id)['familyName'] = any(user.get('familyName'), '');
-        this.usersList.item(user.id)['firstName'] = any(user.get('firstName'), '');
-        this.usersList.item(user.id)['affiliation'] = any(user.get('affiliation'), '');
-        this.usersList.item(user.id)['email'] = any(user.get('email'), '');
-        this.usersList.item(user.id)['address'] = any(user.get('address'), '');
-        this.usersList.item(user.id)['phone'] = any(user.get('phone'), '');
-        this.usersList.item(user.id)['fax'] = any(user.get('fax'), '');
-    },
-
-    addManagementMenu: function() {
-        // To overwrite
-    },
-
-    _upUser: function(userId) {
-        // To overwrite
-    },
-
-    _downUser: function(userId) {
-        // To overwrite
-    },
-    getUsersList: function() {
-        return this.usersList;
-    },
-
-    _isAlreadyInList: function(email) {
-        // It checks if there is any user with the same email
-        for (var i=0; i<this.usersList.length.get(); i++) {
-            if (email && email == this.usersList.item(i)['email']) {
-                return true;
-            }
+    onRemove: function(user) {
+        if (user) {
+            this.usersList.remove(user);
+            this._drawUserList();
+            return;
+        } else {
+            var popup = new AlertPopup($T('Remove ')+this.userCaption, $T('The user you are trying to remove does not exist.'));
+            popup.open();
         }
-        return false;
+    },
+
+    onArrowUp: function(user) {
+        // to overwrite
+    },
+
+    onArrowDown: function(user) {
+        // to overwrite
+    },
+
+    onMenu: function(element, user) {
+        // to overwrite with the menu options for each case
+    },
+
+
+    _userModifyData: function(user, newData) {
+        user.title = any(newData.get('title'), '');
+        user.familyName = any(newData.get('familyName'), '');
+        user.firstName = any(newData.get('firstName'), '');
+        user.affiliation = any(newData.get('affiliation'), '');
+        user.email = any(newData.get('email'), '');
+        user.address = any(newData.get('address'), '');
+        user.phone = any(newData.get('phone'), '');
+        user.fax = any(newData.get('fax'), '');
     }
 
 },
 
-    function(confId, inPlaceListElem, showRemoveIcon, showEditIcon, showFavouritesIcon, showOrderArrows,
-             userCaption, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation) {
+    function(confId, inPlaceListElem, userCaption, elementClass, allowGroups, rightsToShow, nameOptions, userOptions,
+             initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu) {
 
-        this.confId = confId;
-        this.inPlaceListElem = inPlaceListElem;
-        this.showRemoveIcon = showRemoveIcon;
-        this.showEditIcon = showEditIcon;
-        this.showFavouritesIcon = showFavouritesIcon;
-        this.showOrderArrows = showOrderArrows;
-        this.userCaption = userCaption;
-        this.elementClass = elementClass;
-        this.showGrantSubmissionCB = showGrantSubmissionCB;
-        this.showGrantManagementCB = showGrantManagementCB;
-        this.showAffiliation = showAffiliation;
-        this.usersList = $L();
+        this.ListOfUsersManager(confId, {}, {}, inPlaceListElem, userCaption, elementClass, allowGroups,
+                rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu);
     }
-);
-
-
-/*
- * Manager for the list of users/groups with modification rights
- *
- * @param: confId -> Id of the conference (if needed),
- * @param: methods -> Supported methods,
- * @param: params -> Common params for all the methods,
- * @param: inPlaceListElem -> Element of the webpage where the list will be.
- * @param: userCaption -> String to show in the texts
- */
-type("SimpleListControlManager", ["ListOfUsersManager"], {
-
-    _getAddExistingParams: function(userList) {
-        var params = this.params;
-        params['userList'] = userList;
-        return params;
-    },
-
-    _getRemoveParams: function(userId, kindOfUser) {
-        var params = this.params;
-        params['userId'] = userId;
-        params['kindOfUser'] = kindOfUser;
-        return params;
-    },
-
-    addExistingUser: function(){
-        this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, true, true, true, false, true);
-    },
-
-    _updateUserList: function(result) {
-        var self = this;
-        // update the user list
-
-        var container = $(this.inPlaceListElem.dom).html('');
-        $.each(result, function(idx) {
-            var kindOfUser = "principal";
-            var userIdentifier = this.id;
-
-            if (this._type == "Avatar") {
-                var fullName = self._personName(this);
-                var elementStyle = "UIPerson";
-            } else if (this._type == "Group") {
-                var fullName = this.name;
-                var elementStyle = "UIGroup";
-            } else if (this.pending) {
-                kindOfUser = "pending";
-                userIdentifier = this.email;
-                var fullName = $T('Non-registered user');
-                var elementStyle = "UIPerson";
-            }
-
-            var row = $('<li/>').attr({'class': elementStyle});
-
-            var userText = $('<span class="nameLink" />').
-                append(fullName, $('<small/>').append(' (' + this.email + ')'));
-
-            row.append(self._removeIcon(
-                this,
-                function(){
-                    self._manageUserList(self.methods.remove, self._getRemoveParams(userIdentifier, kindOfUser), false);
-                }));
-
-            // favourites star
-            if (self.showFavouritesIcon && IndicoGlobalVars.isUserAuthenticated &&
-                exists(IndicoGlobalVars.userData['favorite-user-ids']) && this._type == "Avatar") {
-                row.append(self._favoriteStar(this))
-            }
-
-            row.append(userText);
-            container.append(row);
-        });
-    }
-
-},
-     function(confId, methods, params, inPlaceListElem, userCaption) {
-         this.confId = confId;
-         this.methods = methods;
-         this.params = params;
-         // params: confId, methods, userListParams, inPlaceListElem, showRemoveIcon, showEditIcon, showFavouritesIcon, showOrderArrows,
-         // kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation
-         this.ListOfUsersManager(this.confId, this.methods, params, inPlaceListElem, true,
-                                 false, true, false, userCaption, userCaption, null, false, false, false);
-     }
 );

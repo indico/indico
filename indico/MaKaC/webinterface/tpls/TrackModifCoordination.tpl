@@ -4,63 +4,30 @@
         <td colspan="5" class="groupTitle"> ${ _("Users allowed to coordinate this track")}</td>
     </tr>
     <tr>
-        <td bgcolor="white">
-            <div id="trackCoordinatorsDiv"></div>
-        </td>
+        <table width="100%">
+            <tr>
+                <td bgcolor="white" width="60%">
+                    <table width="100%">
+                        <tr>
+                            <td><ul id="inPlaceTrackCoordinators" class="UIPeopleList"></ul></td>
+                        </tr>
+                        <tr>
+                            <td nowrap style="width:60%; padding-top:5px;">
+                                <input type="button" onclick="trackCoordinatorListManager.addExistingUser();" value='${ _("Add track coordinator") }'></input>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </tr>
 </table>
 <script>
 
-// Create the handlers
-var addUserHandler = function(userList, setResult) {
-    indicoRequest(
-            'abstractReviewing.team.addReviewer',
-            {
-                conference: '${ confId }',
-                track: '${ trackId }',
-                userList: userList
-            },
-            function(result,error) {
-                if (!error) {
-                    setResult(true);
-                } else {
-                    IndicoUtil.errorReport(error);
-                    setResult(false);
-                }
-            }
-    );
-};
-
-var removeUserHandler = function(user, setResult) {
-    indicoRequest(
-            'abstractReviewing.team.removeReviewer',
-            {
-                conference: '${ confId }',
-                track: '${ trackId }',
-                user: user.get('id')
-            },
-            function(result,error) {
-                if (!error) {
-                    setResult(true);
-                } else {
-                    IndicoUtil.errorReport(error);
-                    setResult(false);
-                }
-            }
-    );
-};
-
-// Create the component for each track
-var uf = new UserListField('UIPeopleListDiv', 'userList',
-        ${ jsonEncode(fossilize(users)) },
-        true,null,
-        true, false, null, null,
-        false, false, true,
-        addUserHandler, null, removeUserHandler);
-
-
-
-// Draw the component
-$E("trackCoordinatorsDiv").set(uf.draw());
+var trackCoordinatorListManager = new ListOfUsersManager('${ confId }',
+        {'addExisting': 'abstractReviewing.team.addReviewer', 'remove': 'abstractReviewing.team.removeReviewer'},
+        {confId: '${ confId }', track: '${ trackId }'}, $E('inPlaceTrackCoordinators'), "track coordinator", "UIPerson", false, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ coordinators | n,j});
 
 </script>

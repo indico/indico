@@ -201,6 +201,7 @@ class WAdmins(wcomponents.WTemplated):
         else:
             icon = iconDisabled
         vars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("Debug")</a></div>""") % (str(url), icon)
+        vars["administrators"] = fossilize(minfo.getAdminList())
         return vars
 
 
@@ -637,6 +638,7 @@ class WWebcastSetup( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars( self )
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         vars["adminList"] = wm.getManagers()
+        vars["webcastAdmins"] = fossilize(wm.getManagers())
         channels = wm.getChannels()
         iconremove = Config.getInstance().getSystemIconURL( "remove" )
         iconadd = Config.getInstance().getSystemIconURL( "add" )
@@ -1873,6 +1875,7 @@ class WGroupDetails(wcomponents.WTemplated):
         vars["locator"] = self._group.getLocator().getWebForm()
         vars["obsolete"] = self._group.isObsolete()
         vars["groupId"] = self._group.getId()
+        vars["members"] = fossilize(self._group.getMemberList())
         return vars
 
 

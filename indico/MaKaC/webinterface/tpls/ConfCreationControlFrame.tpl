@@ -42,11 +42,12 @@
 <script>
 
 var methodsCC = {'addExisting': 'category.protection.addExistingConfCreator',
-                    'remove': 'category.protection.removeConfCreator',
-               'getUserList': 'category.protection.getConfCreatorList'};
+                    'remove': 'category.protection.removeConfCreator'};
 
 var paramsCC = {categoryId: '${ categoryId }', kindOfList: 'confCreation'};
 
-var modificationControlManagerCC = new SimpleListControlManager(null, methodsCC, paramsCC, $E('inPlaceConfCreators'), "user");
+var modificationControlManagerCC = new ListOfUsersManager(null,
+		methodsCC, paramsCC, $E('inPlaceConfCreators'), "user", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ confCreators | n,j});
 
 </script>

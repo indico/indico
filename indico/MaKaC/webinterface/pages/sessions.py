@@ -51,6 +51,7 @@ import MaKaC.webinterface.common.timezones as convertTime
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
+from MaKaC.user import Avatar
 
 
 class WPSessionBase( WPConferenceBase ):
@@ -688,6 +689,15 @@ class WSessionModifMain(wcomponents.WTemplated):
         self._session = session
         self._mfr = mfRegistry
 
+    def _getConvenerList(self):
+        result = []
+        for convener in self._session.getConvenerList():
+            convFossil = fossilize(convener)
+            convFossil["isManager"] = convener.isSessionManager()
+            convFossil["isCoordinator"] = convener.isSessionCoordinator()
+            result.append(convFossil)
+        return result
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["addMaterialURL"]=urlHandlers.UHSessionAddMaterial.getURL(self._session)
@@ -731,6 +741,7 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["Rowspan"]=4
         vars["confId"] = self._session.getConference().getId()
         vars["sessionId"] = self._session.getId()
+        vars["conveners"] = self._getConvenerList()
         return vars
 
 
@@ -1844,6 +1855,31 @@ class WSessionModifAC(wcomponents.WTemplated):
     def __init__(self,session):
         self._session=session
 
+    def _getSessionChairList(self, rol):
+        # get the lists we need to iterate
+        if rol == "manager":
+            list = self._session.getManagerList()
+            pendingList = self._session.getAccessController().getModificationEmail()
+        elif rol == "coordinator":
+            list = self._session.getCoordinatorList()
+            pendingList = self._session.getConference().getPendingQueuesMgr().getPendingCoordinatorsKeys()
+        result = []
+        for sessionChair in list:
+            sessionChairFossil = fossilize(sessionChair)
+            if isinstance(sessionChair, Avatar):
+                isConvener = False
+                if self._session.isConvenerByEmail(sessionChair.getEmail()):
+                    isConvener = True
+                sessionChairFossil['isConvener'] = isConvener
+            result.append(sessionChairFossil)
+        # get pending users
+        for email in pendingList:
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         wc=wcomponents.WAccessControlFrame()
@@ -1860,6 +1896,8 @@ class WSessionModifAC(wcomponents.WTemplated):
 
         vars["confId"] = self._session.getConference().getId()
         vars["sessionId"] = self._session.getId()
+        vars["managers"] = self._getSessionChairList("manager")
+        vars["coordinators"] = self._getSessionChairList("coordinator")
         return vars
 
 

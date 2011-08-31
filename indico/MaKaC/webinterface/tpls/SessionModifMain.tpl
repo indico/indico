@@ -62,7 +62,7 @@ ${ Colors }
 
 <script>
 
-var convenerManager = new SessionConvenerManager('${ confId }', '${ sessionId }', $E('inPlaceConveners'), $E('inPlaceConvenersMenu'),
-        "convener");
+var convenerManager = new SessionConvenerManager('${ confId }', {confId: '${ confId }', sessionId: '${ sessionId }'}, $E('inPlaceConveners'), $E('inPlaceConvenersMenu'),
+        "convener", ${ conveners | n,j});
 
 </script>

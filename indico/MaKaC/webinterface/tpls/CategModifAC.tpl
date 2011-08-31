@@ -9,12 +9,13 @@ ${ confCreationControlFrame }
 
 <script>
 
-var methodsMod = {'addExisting': 'category.protection.addExistingManager',
-                    'remove': 'category.protection.removeManager',
-               'getUserList': 'category.protection.getManagerList'};
+var methodsMod = {'addExisting': 'category.protection.addExistingConfCreator',
+                    'remove': 'category.protection.removeManager'};
 
 var paramsMod = {categoryId: '${ categoryId }', kindOfList: 'modification'};
 
-var modificationControlManager = new SimpleListControlManager(null, methodsMod, paramsMod, $E('inPlaceManagers'), "manager");
+var modificationControlManager = new ListOfUsersManager(null,
+		methodsMod, paramsMod, $E('inPlaceManagers'), "manager", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ managers | n,j});
 
 </script>
