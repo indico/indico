@@ -187,7 +187,6 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
         else:
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
-
 class RHRegistrationFormCreationDone( RHRegistrationFormDisplayBase ):
 
     def _checkParams(self, params):
