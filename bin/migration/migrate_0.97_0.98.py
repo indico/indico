@@ -272,6 +272,9 @@ def runRoomBlockingInit(dbi, withRBDB):
 
 
 def runLangToGB(dbi, withRBDB):
+    """
+    Replacing en_US with en_GB.
+    """
     avatars = AvatarHolder().getList()
     for av in avatars:
         if av.getLang() == "en_US":
@@ -279,6 +282,9 @@ def runLangToGB(dbi, withRBDB):
 
 
 def runMakoMigration(dbi, withRBDB):
+    """
+    Installing new TPLs for meeting/lecture styles
+    """
     cdmr = displayMgr.ConfDisplayMgrRegistery()
     info = HelperMaKaCInfo().getMaKaCInfoInstance()
     sm = info.getStyleManager()
@@ -300,6 +306,9 @@ def runMakoMigration(dbi, withRBDB):
 
 
 def runPluginOptionsRoomGUIDs(dbi, withRBDB):
+    """
+    Modifying Room GUIDs
+    """
     ph = PluginsHolder()
     opt = ph.getPluginType('Collaboration').getPlugin('WebcastRequest').getOption('webcastCapableRooms')
     newValue = []
