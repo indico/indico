@@ -359,7 +359,7 @@ class Config:
                              os.path.join("meetings", "Compact.tpl"),
                              os.path.join("meetings", "Compact.css")),
 
-        "xml":              ("Simple xml", "XML.xsl", "XML.css"),
+        "xml":              ("Simple xml", "XML.xsl", None),
         "jacow":            ("JACoW XML", "JACoW.xsl", None),
         "text":             ("Simple text", "Text.tpl", None),
     }

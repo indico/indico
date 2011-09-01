@@ -130,11 +130,19 @@ def runCategoryACMigration(dbi, withRBDB):
         dbi.commit()
 
 
+def _fixDefaultStyle(conf, cdmr):
+    confDM = cdmr.getDisplayMgr(conf, False)
+    if confDM.getDefaultStyle() == 'administrative3':
+        confDM.setDefaultStyle('administrative')
+    if confDM.getDefaultStyle() == 'it':
+        confDM.setDefaultStyle('standard')
+
 def runConferenceMigration(dbi, withRBDB):
     """
     Adding missing attributes to conference objects and children
     """
 
+    cdmr = displayMgr.ConfDisplayMgrRegistery()
     ch = ConferenceHolder()
     i = 0
 
@@ -161,6 +169,9 @@ def runConferenceMigration(dbi, withRBDB):
             # For each conference, take the existing tasks and
             # convert them to the new object classes.
             _convertAlarms(obj)
+
+            # For each conference, fix the default style
+            _fixDefaultStyle(obj, cdmr)
 
         _fixAccessController(obj,
                              fixSelf=(level != 'subcontrib'))
@@ -285,9 +296,12 @@ def runMakoMigration(dbi, withRBDB):
     """
     Installing new TPLs for meeting/lecture styles
     """
-    cdmr = displayMgr.ConfDisplayMgrRegistery()
     info = HelperMaKaCInfo().getMaKaCInfoInstance()
     sm = info.getStyleManager()
+    try:
+        del sm._stylesheets
+    except:
+        pass
     for lid in ['meeting', 'simple_event', 'conference']:
         l = sm._eventStylesheets[lid]
         if 'it' in l:
@@ -295,15 +309,9 @@ def runMakoMigration(dbi, withRBDB):
         if 'administrative3' in l:
             l.remove('administrative3')
         sm._eventStylesheets[lid] = l
-        sm._p_changed = 1
-    ch = ConferenceHolder()
-    for conf in ch.getList():
-        confDM = cdmr.getDisplayMgr(conf, False)
-        if confDM.getDefaultStyle() == 'administrative3':
-            confDM.setDefaultStyle('administrative')
-        if confDM.getDefaultStyle() == 'it':
-            confDM.setDefaultStyle('standard')
-
+    styles = sm.getStyles()
+    styles['xml'] = ('xml','XML.xsl',None)
+    sm.setStyles(styles)
 
 def runPluginOptionsRoomGUIDs(dbi, withRBDB):
     """
