@@ -2590,6 +2590,8 @@ class GeneralField(Persistent):
         self.setCaption(caption)
         if firstTime or not self.isLocked('input'):
             self.setInput(FieldInputs.getAvailableInputKlassById(data.get("input","text"))(self))
+        else:
+            self.setInput(FieldInputs.getAvailableInputKlassById(self.getInput().getId())(self))
         if data.has_key("inputObj"):
             self._input.setValues(data["inputObj"].getValues())
         elif data.has_key('inputValues'):
@@ -2971,8 +2973,8 @@ class PersonalDataForm(GeneralSectionForm):
             { 'pd':'address', 'caption':'Address', 'lock':('input', 'delete') },
             { 'pd':'city', 'caption':'City', 'mandatory':True, 'lock':('input', 'delete') },
             { 'pd':'country', 'caption':'Country', 'input':'country', 'mandatory':True, 'lock':('input', 'delete') },
-            { 'pd':'phone', 'caption':'Phone', 'lock':('input', 'delete') },
-            { 'pd':'fax', 'caption':'Fax', 'lock':('input', 'delete') },
+            { 'pd':'phone', 'caption':'Phone', 'input':'telephone', 'lock':('input', 'delete') },
+            { 'pd':'fax', 'caption':'Fax', 'input':'telephone', 'lock':('input', 'delete') },
             { 'pd':'email', 'caption':'Email', 'mandatory':True, 'lock':('mandatory', 'input', 'delete', 'disable') },
             { 'pd':'personalHomepage', 'caption':'Personal homepage', 'lock':('input', 'delete') },
         )
