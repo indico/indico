@@ -2285,11 +2285,15 @@ class RadioGroupInput(FieldInputType):
         else:
             radioSelected = ''
             dropdownSelected = ' selected="selected"'
+        if self.getParent().isLocked('input'):
+            typeDisabled = ' disabled="disabled"'
+        else:
+            typeDisabled = ''
         html=[i18nformat("""
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Type of input")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
-              <select name="inputtype">
+              <select name="inputtype"%(typeDisabled)s>
                 <option value="radiogroup"%(radioSelected)s>Radio group</option>
                 <option value="dropdown"%(dropdownSelected)s>Drop-down menu</option>
               </select>
@@ -2298,7 +2302,7 @@ class RadioGroupInput(FieldInputType):
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">Items</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
-                <table>""") % dict(radioSelected=radioSelected, dropdownSelected=dropdownSelected)]
+                <table>""") % dict(radioSelected=radioSelected, dropdownSelected=dropdownSelected, typeDisabled=typeDisabled)]
         html.append( i18nformat("""<tr>
                             <td valign="top" align="left">
                             <table>
