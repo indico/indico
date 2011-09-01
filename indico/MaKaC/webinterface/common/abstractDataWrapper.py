@@ -274,7 +274,7 @@ class AbstractData(object):
 
     def _hasExceededTotalSize(self):
         maxSize = float(Config.getInstance().getMaxUploadFilesTotalSize())
-        return maxSize > 0 and not self._headerSize > maxSize
+        return maxSize > 0 and self._headerSize > maxSize
 
     def toDict( self ):
         d = { "title": self.title, \
