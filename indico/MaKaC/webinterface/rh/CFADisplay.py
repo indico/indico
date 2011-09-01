@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from indico.MaKaC.webinterface.rh.fileAccess import RHFileAccess
 
 import os
 from textwrap import TextWrapper
@@ -43,6 +42,8 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
+from MaKaC.webinterface.rh.fileAccess import RHFileAccess
+
 
 
 class RHBaseCFA( RHConferenceBaseDisplay ):
