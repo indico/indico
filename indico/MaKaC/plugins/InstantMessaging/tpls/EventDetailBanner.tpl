@@ -11,7 +11,7 @@
 <span class="CRDisplayMoreInfo" id="CRMoreInfo${cid}">More Info</span>\
         % if linksList:
 <span style="margin-left:8px;margin-right:8px;">|</span>\
-<span style="font-weight: bold;"><a id="joinLink${cid}" name="${cid}" class="dropDownMenu highlight" href="#">Join now!</a></span>
+<span style="font-weight: bold;"><a id="joinLink${cid}" name="${cid}" class="dropDownMenu highlight" href="#" target="_blank">Join now!</a></span>
         % endif
 
         <!-- Start of a chat room info line -->

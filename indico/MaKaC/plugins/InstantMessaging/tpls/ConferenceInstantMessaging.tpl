@@ -39,7 +39,7 @@
                     <td style="font-style:italic;"> - </td>
                 % endif
                 % if len(PluginFieldsWrapper('InstantMessaging').getOption('customLinks')) > 0:
-                    <td style="font-weight: bold;" nowrap><a id="joinLink${ cr.getId() }" name = "${ cr.getId() }" class="dropDownMenu highlight" href="#">${ _("Join now!")}</a></td>
+                    <td style="font-weight: bold;" nowrap><a id="joinLink${ cr.getId() }" name = "${ cr.getId() }" class="dropDownMenu highlight" href="#" target="_blank">${ _("Join now!")}</a></td>
                 % endif
                 </tr>
         % endfor
