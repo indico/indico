@@ -48,36 +48,6 @@ from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
 from indico.modules.scheduler import Client
 
 
-def runTaskMigration(dbi, withRBDB):
-    """
-    Migrating database tasks from the old format to the new one
-    """
-
-    c = Client()
-
-    for t in HelperTaskList().getTaskListInstance().getTasks():
-        for obj in t.getObjList():
-            print console.colored("   * %s" % obj.__class__.__name__, 'blue')
-            if obj.__class__.__name__ == 'FoundationSync':
-                c.enqueue(
-                    FoundationSyncTask(rrule.DAILY, byhour=0, byminute=0))
-            elif obj.__class__.__name__ == 'StatisticsUpdater':
-                c.enqueue(CategoryStatisticsUpdaterTask(
-                    CategoryManager().getById('0'),
-                    rrule.DAILY,
-                    byhour=0, byminute=0))
-            elif obj.__class__.__name__ == 'sendMail':
-                # they have to be somewhere in the conference
-                alarm = t.conf.alarmList[t.id]
-                c.enqueue(alarm)
-            else:
-                raise Exception("Unknown task type!")
-
-    if withRBDB:
-        DALManager.commit()
-    dbi.commit()
-
-
 def _fixAC(obj):
     ac = obj.getAccessController()
     ac.setOwner(obj)
@@ -120,16 +90,6 @@ def _convertAlarms(obj):
 
     obj.alarmList = alarms
 
-
-def runCategoryACMigration(dbi, withRBDB):
-    """
-    Fixing AccessController for categories
-    """
-    for categ in CategoryManager()._getIdx().itervalues():
-        _fixAccessController(categ)
-        dbi.commit()
-
-
 def _fixDefaultStyle(conf, cdmr):
     confDM = cdmr.getDisplayMgr(conf, False)
     if confDM.getDefaultStyle() == 'administrative3':
@@ -137,7 +97,44 @@ def _fixDefaultStyle(conf, cdmr):
     if confDM.getDefaultStyle() == 'it':
         confDM.setDefaultStyle('standard')
 
-def runConferenceMigration(dbi, withRBDB):
+def runTaskMigration(dbi, withRBDB, currentVersion):
+    """
+    Migrating database tasks from the old format to the new one
+    """
+
+    c = Client()
+
+    for t in HelperTaskList().getTaskListInstance().getTasks():
+        for obj in t.getObjList():
+            print console.colored("   * %s" % obj.__class__.__name__, 'blue')
+            if obj.__class__.__name__ == 'FoundationSync':
+                c.enqueue(
+                    FoundationSyncTask(rrule.DAILY, byhour=0, byminute=0))
+            elif obj.__class__.__name__ == 'StatisticsUpdater':
+                c.enqueue(CategoryStatisticsUpdaterTask(
+                    CategoryManager().getById('0'),
+                    rrule.DAILY,
+                    byhour=0, byminute=0))
+            elif obj.__class__.__name__ == 'sendMail':
+                # they have to be somewhere in the conference
+                alarm = t.conf.alarmList[t.id]
+                c.enqueue(alarm)
+            else:
+                raise Exception("Unknown task type!")
+
+    if withRBDB:
+        DALManager.commit()
+    dbi.commit()
+
+def runCategoryACMigration(dbi, withRBDB, currentVersion):
+    """
+    Fixing AccessController for categories
+    """
+    for categ in CategoryManager()._getIdx().itervalues():
+        _fixAccessController(categ)
+        dbi.commit()
+
+def runConferenceMigration(dbi, withRBDB, currentVersion):
     """
     Adding missing attributes to conference objects and children
     """
@@ -150,39 +147,41 @@ def runConferenceMigration(dbi, withRBDB):
         # only for conferences
         if level == 'event':
 
+            if currentVersion !="v0.98b1":
+                # handle sessions, that our iterator ignores
+                for session in obj.getSessionList():
+                    _fixAccessController(session)
+
+                if hasattr(obj, '_Conference__alarmCounter'):
+                    raise Exception("Conference Object %s (%s) seems to have been "
+                                    "already converted" % (obj, obj.id))
+
+                existingKeys = obj.alarmList.keys()
+                existingKeys.sort()
+                nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
+                obj._Conference__alarmCounter = Counter(nstart)
+
+                # For each conference, take the existing tasks and
+                # convert them to the new object classes.
+                _convertAlarms(obj)
+
             # convert registration form's "Personal Data" section to new format
             obj.getRegistrationForm()._convertPersonalData()
-
-            # handle sessions, that our iterator ignores
-            for session in obj.getSessionList():
-                _fixAccessController(session)
-
-            if hasattr(obj, '_Conference__alarmCounter'):
-                raise Exception("Conference Object %s (%s) seems to have been "
-                                "already converted" % (obj, obj.id))
-
-            existingKeys = obj.alarmList.keys()
-            existingKeys.sort()
-            nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
-            obj._Conference__alarmCounter = Counter(nstart)
-
-            # For each conference, take the existing tasks and
-            # convert them to the new object classes.
-            _convertAlarms(obj)
 
             # For each conference, fix the default style
             _fixDefaultStyle(obj, cdmr)
 
-        _fixAccessController(obj,
-                             fixSelf=(level != 'subcontrib'))
+        if currentVersion !="v0.98b1":
+            _fixAccessController(obj,
+                                 fixSelf=(level != 'subcontrib'))
 
-        # Convert RegistrationSessions to RegistrantSessions
-        if isinstance(obj, Conference):
-            for reg in obj.getRegistrants().itervalues():
-                if reg._sessions and \
-                       isinstance(reg._sessions[0], RegistrationSession):
-                    reg._sessions = [RegistrantSession(ses, reg) \
-                                     for ses in reg._sessions]
+            # Convert RegistrationSessions to RegistrantSessions
+            if isinstance(obj, Conference):
+                for reg in obj.getRegistrants().itervalues():
+                    if reg._sessions and \
+                           isinstance(reg._sessions[0], RegistrationSession):
+                        reg._sessions = [RegistrantSession(ses, reg) \
+                                         for ses in reg._sessions]
 
         if i % 1000 == 999:
             dbi.commit()
@@ -196,7 +195,7 @@ def runConferenceMigration(dbi, withRBDB):
         DALManager.commit()
 
 
-def runPluginMigration(dbi, withRBDB):
+def runPluginMigration(dbi, withRBDB, currentVersion):
     """
     Adding new plugins and adapting existing ones to new name policies
     """
@@ -232,7 +231,7 @@ def runPluginMigration(dbi, withRBDB):
         DALManager.commit()
 
 
-def runCategoryDateIndexMigration(dbi, withRBDB):
+def runCategoryDateIndexMigration(dbi, withRBDB, currentVersion):
     """
     Replacing category date indexes.
     """
@@ -250,14 +249,14 @@ If you still want to regenerate it, please, do it manually using """ \
         """bin/migration/CategoryDate.py"""
 
 
-def runCatalogMigration(dbi, withRBDB):
+def runCatalogMigration(dbi, withRBDB, currentVersion):
     """
     Initializing the new index catalog
     """
     Catalog.updateDB(dbi=dbi)
 
 
-def runCategoryConfDictToTreeSet(dbi, withRBDB):
+def runCategoryConfDictToTreeSet(dbi, withRBDB, currentVersion):
     """
     Replacing the conference dictionary in the Category objects by a OOTreeSet.
     """
@@ -268,7 +267,7 @@ def runCategoryConfDictToTreeSet(dbi, withRBDB):
             print "Problem migrating conf dict to tree set: %s" % categ.getId()
 
 
-def runRoomBlockingInit(dbi, withRBDB):
+def runRoomBlockingInit(dbi, withRBDB, currentVersion):
     """
     Initializing room blocking indexes.
     """
@@ -282,7 +281,7 @@ def runRoomBlockingInit(dbi, withRBDB):
         root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
 
 
-def runLangToGB(dbi, withRBDB):
+def runLangToGB(dbi, withRBDB, currentVersion):
     """
     Replacing en_US with en_GB.
     """
@@ -292,7 +291,7 @@ def runLangToGB(dbi, withRBDB):
             av.setLang("en_GB")
 
 
-def runMakoMigration(dbi, withRBDB):
+def runMakoMigration(dbi, withRBDB, currentVersion):
     """
     Installing new TPLs for meeting/lecture styles
     """
@@ -313,7 +312,7 @@ def runMakoMigration(dbi, withRBDB):
     styles['xml'] = ('xml','XML.xsl',None)
     sm.setStyles(styles)
 
-def runPluginOptionsRoomGUIDs(dbi, withRBDB):
+def runPluginOptionsRoomGUIDs(dbi, withRBDB, currentVersion):
     """
     Modifying Room GUIDs
     """
@@ -327,7 +326,7 @@ def runPluginOptionsRoomGUIDs(dbi, withRBDB):
             newValue.append(str(room.guid))
     opt.setValue(newValue)
 
-def runMigration(withRBDB=False):
+def runMigration(withRBDB=False, currentVersion=""):
 
     tasks = [ runPluginMigration,
               runCategoryACMigration,
@@ -352,7 +351,7 @@ def runMigration(withRBDB=False):
         if withRBDB:
             DALManager.connect()
 
-        task(dbi, withRBDB)
+        task(dbi, withRBDB, currentVersion)
 
         if withRBDB:
             DALManager.commit()
@@ -376,13 +375,14 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
     parser = argparse.ArgumentParser(description='Execute migration')
     parser.add_argument('--with-rb', dest='useRBDB', action='store_true',
                         help='Use the Room Booking DB')
+    parser.add_argument('--current-version', dest='currentVersion', help='Current version of Indico')
 
     args = parser.parse_args()
 
     if console.yesno("Are you sure you want to execute the "
                      "migration now?"):
         try:
-            return runMigration(withRBDB=args.useRBDB)
+            return runMigration(withRBDB=args.useRBDB, currentVersion=args.currentVersion)
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])
