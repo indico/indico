@@ -272,20 +272,20 @@
 
 <script type="text/javascript">
 
-function onsubmitManagementActions(data) {
+function onsubmitManagementActions() {
     if (checkFields()) {
-        setAuthorsParam(data);
+        setAuthorsParam();
         return true;
     } else {
         return false;
     }
-    //setAuthorsParam(data);
+    //setAuthorsParam();
     //return true;
 }
 
-function onsubmitDisplayActions(data) {
+function onsubmitDisplayActions() {
     if (checkFields() && hasPresenter()) {
-        setAuthorsParam(data);
+        setAuthorsParam();
         return true;
     } else {
         if (authorsManager.getPrAuthors().getUsersList().length.get() != 0 && !hasPresenter()) {
@@ -294,7 +294,7 @@ function onsubmitDisplayActions(data) {
         }
         return false;
     }
-    //setAuthorsParam(data);
+    //setAuthorsParam();
     //return true;
 }
 
@@ -311,7 +311,7 @@ var initialCoAuthors = ${ jsonEncode(coAuthors) };
 // manage both lists of authors.
 var authorsManager = new AuthorsManager(initialPrAuthors, initialCoAuthors);
 
-function setAuthorsParam(data) {
+function setAuthorsParam() {
     var usersList = authorsManager.getPrAuthors().getUsersList();
     if (usersList.length.get() == 0) {
         $E('prAuthors').set('[]');
@@ -394,7 +394,11 @@ function checkFields() {
     // restart track table class name if needed
     var condLimited = checkLimitedFields();
     var condMandatory = pmMandatoryFields.check();
+% if attachedFilesAllowed:
     var filesSize = attachedFilesManager.checkTotalFilesSize();
+% else:
+    var filesSize = true;
+% endif
 % if tracksMandatory and len(tracks):
     // To avoid 'gr' case
     if ($E('tracksTable').dom.className == 'gr') {
