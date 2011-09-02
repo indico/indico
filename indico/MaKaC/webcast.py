@@ -329,7 +329,7 @@ class WebcastManager(Persistent):
                 DBMgr.getInstance().commit()
                 Logger.get('webcast').info("Commit done.")
                 Logger.get('webcast').info("Calling the webcast synchronization URL: " + url)
-                answer = urlopen(url , 10).read(100000).strip()
+                answer = urlopen(url , timeout=10).read(100000).strip()
                 Logger.get('webcast').info("Got answer: " + answer)
                 return answer
 

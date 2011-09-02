@@ -71,7 +71,7 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
     Logger.get('EVO').info("""Evt:%s, booking:%s, sending request to EVO: [%s]""" % (eventId, bookingId, str(url)))
 
     try:
-        answer = urlopen(str(url), secondsToWait).read(readLimit).strip() #we remove any whitespaces, etc. We won't read more than 100k characters
+        answer = urlopen(str(url), timeout=secondsToWait).read(readLimit).strip() #we remove any whitespaces, etc. We won't read more than 100k characters
         Logger.get('EVO').info("""Evt:%s, booking:%s, got answer (unprocessed): [%s]""" % (eventId, bookingId, str(answer)))
 
     except HTTPError, e:
