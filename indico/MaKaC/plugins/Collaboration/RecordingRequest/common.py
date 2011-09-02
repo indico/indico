@@ -132,7 +132,7 @@ def getCommonTalkInformation(conference):
     talks = [cont for cont in conference.getContributionList() if filter.satisfies(cont)]
 
     #list of "locationName:roomName" strings
-    recordingCapableRooms = CollaborationTools.getOptionValue('RecordingRequest', "recordingCapableRooms")
+    recordingCapableRooms = CollaborationTools.getOptionValueRooms('RecordingRequest', "recordingCapableRooms")
     rRoomFullNames = [r.locationName + ':' + r.getFullName() for r in recordingCapableRooms]
     rRoomNames = [r.locationName + ':' + r.name for r in recordingCapableRooms]
     #a webcast-able talk is defined as a talk talking place in a webcast-able room
