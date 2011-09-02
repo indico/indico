@@ -367,7 +367,7 @@ type("ParticipantListWidget", ["ListWidget"],
 type("ParticipantListField", ["IWidget"],
     {
         _highlightNewParticipant: function(id) {
-            IndicoUI.Effect.highLightBackground(this.participantList.getId() + '_' + id);
+            IndicoUI.Effect.highLightBackground($E(this.participantList.getId() + '_' + id));
         },
 
         _addNewParticipant : function(participant, type) {
