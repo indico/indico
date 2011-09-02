@@ -798,7 +798,7 @@ var showLinkMenu = function(element, chatroom){
             each(links.get(chatroom.id).custom, function(linkType){
                 menuItems['Using ' + linkType.name] = linkType.link;
             });
-            joinMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList');
+            joinMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList',true, false, null, null,true);
             var pos = element.getAbsolutePosition();
             joinMenu.open(pos.x - 5, pos.y + element.dom.offsetHeight + 2);
             return false;
