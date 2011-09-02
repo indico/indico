@@ -297,7 +297,7 @@ class RHSubmitMaterialBase:
     def _setErrorList(self, fileEntry):
         res=[]
 
-        maxUploadFilesTotalSize = float(self._cfg.MaxUploadFilesTotalSize())
+        maxUploadFilesTotalSize = float(self._cfg.getMaxUploadFilesTotalSize())
 
         if self._uploadType == "file":
             if "filePath" in fileEntry and not fileEntry["filePath"].strip():
