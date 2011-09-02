@@ -133,7 +133,8 @@ def getCommonTalkInformation(conference):
 
     #list of "locationName:roomName" strings
     recordingCapableRooms = CollaborationTools.getOptionValue('RecordingRequest', "recordingCapableRooms")
-
+    rRoomFullNames = [r.locationName + ':' + r.getFullName() for r in recordingCapableRooms]
+    rRoomNames = [r.locationName + ':' + r.name for r in recordingCapableRooms]
     #a webcast-able talk is defined as a talk talking place in a webcast-able room
     recordingAbleTalks = []
     for t in talks:
@@ -142,4 +143,4 @@ def getCommonTalkInformation(conference):
         if location and room and (location.getName() + ":" + room.getName() in recordingCapableRooms):
             recordingAbleTalks.append(t)
 
-    return (talks, recordingCapableRooms, recordingAbleTalks)
+    return (talks, rRoomFullNames, rRoomNames, recordingAbleTalks)
