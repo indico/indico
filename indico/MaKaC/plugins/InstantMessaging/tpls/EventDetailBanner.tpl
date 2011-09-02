@@ -11,7 +11,7 @@
 <span class="CRDisplayMoreInfo" id="CRMoreInfo${cid}">More Info</span>\
         % if linksList:
 <span style="margin-left:8px;margin-right:8px;">|</span>\
-<span style="font-weight: bold;"><a id="joinLink${cid}" name="${cid}" class="dropDownMenu highlight" href="#" target="_blank">Join now!</a></span>
+<span style="font-weight: bold;"><a id="joinLink${cid}" name="${cid}" class="dropDownMenu highlight" href="#">${_("Join now!")}</a></span>
         % endif
 
         <!-- Start of a chat room info line -->
@@ -95,7 +95,7 @@
                             % for link in linksList:
                                 menuItems["Using ${link['name']}"] =" ${GeneralLinkGenerator(cr, link['structure']).generate()}";
                             % endfor
-                            joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList');
+                            joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList', true, false, null, null,true);
                             var pos = joinLink.getAbsolutePosition();
                             joinMenu.open(pos.x - 5, pos.y + joinLink.dom.offsetHeight + 2);
                             return false;

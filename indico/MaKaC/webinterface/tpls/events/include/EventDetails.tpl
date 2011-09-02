@@ -28,10 +28,10 @@
     </td>
     <td>
     % if webcastOnAirURL:
-         <a href="${webcastOnAirURL}"><strong>View the live webcast</strong></a>
+         <a href="${webcastOnAirURL}" target="_blank"><strong>View the live webcast</strong></a>
     % elif forthcomingWebcast:
          Please note that this event will be available <em>live</em> via the
-         <a href="${forthcomingWebcastURL}"><strong>Webcast Service</strong>.</a>
+         <a href="${forthcomingWebcastURL}" target="_blank"><strong>Webcast Service</strong>.</a>
     % endif
     </td>
 </tr>
