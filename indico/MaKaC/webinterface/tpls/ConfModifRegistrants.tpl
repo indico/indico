@@ -191,7 +191,7 @@
                             Export to:
                         </td>
                 <td valign="bottom" align="left">
-                    <a href="#" id="exportPDFSelectorLink1" name="pdf" class="iconDropDownMenu"> <img src=${ pdfIconURL} border="0"></a>
+                    <a href="#" id="exportPDFSelectorLink2" name="pdf" class="iconDropDownMenu"> <img src=${ pdfIconURL} border="0"></a>
                     <input id="pdfExportInputHidden" type="hidden" name="pdf">
                     <span class="iconSeparator"> |  </span>
                 </td>

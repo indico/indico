@@ -2132,7 +2132,7 @@ class RadioGroupInput(FieldInputType):
 
     def _getRadioGroupModifHTML(self, item, registrant, default=""):
         description = self._parent.getDescription()
-        price= self._parent.getCaption()
+        caption = self._parent.getCaption()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         value = default
@@ -3011,7 +3011,7 @@ class PersonalDataForm(GeneralSectionForm):
 
     def getRegistrantValues(self, registrant):
         mg = registrant.getMiscellaneousGroupById(self.getId())
-        return dict((name, mg.getResponseItemById(field.getId()).getValue()) for name, field in self._pdMap.iteritems())
+        return dict((name, mg.getResponseItemById(field.getId()).getValue()) for name, field in self._pdMap.iteritems() if not field.isDisabled())
 
     def getValuesFromAvatar(self, av):
         r = dict((k, '') for k in ['title', 'firstName', 'surname', 'institution',
