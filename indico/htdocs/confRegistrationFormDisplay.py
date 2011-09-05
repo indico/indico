@@ -19,7 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import MaKaC.webinterface.rh.registrationFormDisplay as registrationFormDisplay
-import MaKaC.webinterface.rh.CFADisplay as CFADisplay
 
 def index(req, **params):
     return registrationFormDisplay.RHRegistrationForm( req ).process( params )
@@ -32,13 +31,13 @@ def creation (req, **params):
 
 def creationDone (req, **params):
     return registrationFormDisplay.RHRegistrationFormCreationDone( req ).process( params )
-    
+
 def confirmBooking (req, **params):
     return registrationFormDisplay.RHRegistrationFormconfirmBooking( req ).process( params )
 
 def confirmBookingDone (req, **params):
     return registrationFormDisplay.RHRegistrationFormconfirmBookingDone( req ).process( params )
-    
+
 def signIn (req, **params):
     return registrationFormDisplay.RHRegistrationFormSignIn( req ).process( params )
 
@@ -47,9 +46,6 @@ def modify (req, **params):
 
 def performModify (req, **params):
     return registrationFormDisplay.RHRegistrationFormPerformModify( req ).process( params )
-
-def abstractSubmission(req, **params):
-    return CFADisplay.RHAbstractSubmissionRegistratant(req).process(params)
 
 def conditions (req, **params):
     return registrationFormDisplay.RHRegistrationFormConditions( req ).process( params )
