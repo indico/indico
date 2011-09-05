@@ -23,7 +23,7 @@ from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingMan
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.conference import ConferenceHolder, Contribution
 from MaKaC.common.logger import Logger
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NoReportError
 try:
     import MySQLdb
 except ImportError:
@@ -832,12 +832,15 @@ def createIndicoLink(IndicoID, CDSID):
 
 #    Logger.get('RecMan').debug("in createIndicoLink()")
     # From IndicoID, get info
-    talkInfo = parseIndicoID(IndicoID)
+    try:
+        talkInfo = parseIndicoID(IndicoID)
+    except NoReportError:
+        return False
     obj = talkInfo["object"]
 
     # Only one link per talk allowed.
     if doesExistIndicoLink(obj):
-        pass
+        return True # consider it a success anyway
     else:
 #        Logger.get('RecMan').info("creating a new link in Indico for talk %s, CDS record %s" % (IndicoID, CDSID))
 
@@ -854,6 +857,7 @@ def createIndicoLink(IndicoID, CDSID):
         material.addResource(videoLink)
         material.setMainResource(videoLink)
         obj.addMaterial(material)
+        return True
 
 def doesExistIndicoLink(obj):
     """This function will be called with a conference, session, contribution or subcontribution object.

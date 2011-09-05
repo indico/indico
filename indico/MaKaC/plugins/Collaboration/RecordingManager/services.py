@@ -130,9 +130,9 @@ class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
 
     def _getAnswer(self):
         # Create the Indico link
-        resultCreateIndicoLink = createIndicoLink(self._IndicoID, self._CDSID)
+        createIndicoLink(self._IndicoID, self._CDSID)
 
-        return str(resultCreateIndicoLink)
+        return 'None' # wtf, but let's keep the return value there used to be before..
 
 # In case we want to update list of orphans after page has loaded...
 class RMOrphansService(CollaborationPluginServiceBase):
