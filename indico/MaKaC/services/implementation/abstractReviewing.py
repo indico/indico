@@ -186,6 +186,14 @@ class AbstractReviewingRemoveReviewer(AbstractReviewingBase):
         self._conf.getTrackById(self._trackId).removeCoordinator(av)
         return fossilize(self._conf.getTrackById(self._trackId).getCoordinatorList())
 
+
+class AbstractReviewingChangeReviewerRights(AbstractReviewingBase):
+
+    def _getAnswer(self):
+        self._confAbstractReview.changeCanReviewerAccept()
+        return self._confAbstractReview.getCanReviewerAccept()
+
+
 methodMap = {
     "questions.changeNumberofAnswers": AbstractReviewingChangeNumAnswers,
     "questions.changeScale": AbstractReviewingChangeScale,
@@ -194,6 +202,8 @@ methodMap = {
     "questions.addQuestion": AbstractReviewingAddQuestion,
     "questions.removeQuestion": AbstractReviewingRemoveQuestion,
     "questions.editQuestion": AbstractReviewingEditQuestion,
+
+    "settings.changeReviewerRights": AbstractReviewingChangeReviewerRights,
 
     "team.addReviewer": AbstractReviewingAddReviewer,
     "team.removeReviewer": AbstractReviewingRemoveReviewer

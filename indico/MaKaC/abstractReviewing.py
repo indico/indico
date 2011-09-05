@@ -43,6 +43,7 @@ class ConferenceAbstractReview(Persistent):
         self._rbTitles = ["0", "1.7", "3.3", "5", "6.7", "8.3", "10"]
         self._questionCounter = Counter(1)
         self._answerCounter = Counter(1)
+        self._canReviewerAccept = False # shows if the reviewers have rights to accept/reject abstracts
         self.notifyModification()
 
     def getConference(self):
@@ -104,6 +105,19 @@ class ConferenceAbstractReview(Persistent):
     def getNumberOfAnswers(self):
         """ Returns the number of possible answers """
         return self._numberOfAnswers
+
+    def getCanReviewerAccept(self):
+        try:
+            return self._canReviewerAccept
+        except AttributeError:
+            self._canReviewerAccept = False
+        return self._canReviewerAccept
+
+    def changeCanReviewerAccept(self):
+        if self._canReviewerAccept:
+            self._canReviewerAccept = False
+        else:
+            self._canReviewerAccept = True
 
     def recalculateRBLabelsAndTitles(self):
         """ Recalculate the labels for the radio buttons """

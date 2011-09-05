@@ -750,8 +750,9 @@ class WPModEditData(WPAbstractManagment):
 
 class WAbstractManagmentAccept( wcomponents.WTemplated ):
 
-    def __init__( self, aw, abstract ):
+    def __init__( self, aw, abstract, track=None ):
         self._abstract = abstract
+        self._track = track
         self._aw = aw
         self._conf = abstract.getOwner().getOwner()
 
@@ -803,8 +804,14 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
         vars["tracks"] = "".join( self._getTrackItemsHTML() )
         vars["sessions"] = "".join( self._getSessionItemsHTML() )
         vars["types"] = "".join( self._getTypeItemsHTML() )
-        vars["acceptURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentAccept.getURL(self._abstract)))
-        vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
+        if self._track == None:
+            vars["acceptURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentAccept.getURL(self._abstract)))
+            vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
+            vars["trackTitle"] = ""
+        else:
+            vars["acceptURL"] = quoteattr(str(urlHandlers.UHTrackAbstractAccept.getURL(self._track, self._abstract)))
+            vars["cancelURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModif.getURL(self._track, self._abstract)))
+            vars["trackTitle"] = self._track.getTitle()
         return vars
 
 class WAbstractManagmentAcceptMultiple( wcomponents.WTemplated):
@@ -909,16 +916,23 @@ class WPModRejectConfirmation(WPAbstractManagment):
 
 class WAbstractManagmentReject( wcomponents.WTemplated ):
 
-    def __init__( self, aw, abstract ):
+    def __init__( self, aw, abstract, track=None ):
         self._abstract = abstract
+        self._track = track
         self._aw = aw
         self._conf = abstract.getOwner().getOwner()
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["abstractName"] = self._abstract.getTitle()
-        vars["rejectURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentReject.getURL(self._abstract)))
-        vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
+        if self._track == None:
+            vars["rejectURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentReject.getURL(self._abstract)))
+            vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
+            vars["trackTitle"] = ""
+        else:
+            vars["rejectURL"] = quoteattr(str(urlHandlers.UHTrackAbstractReject.getURL(self._track, self._abstract)))
+            vars["cancelURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModif.getURL(self._track, self._abstract)))
+            vars["trackTitle"] = self._track.getTitle()
         return vars
 
 

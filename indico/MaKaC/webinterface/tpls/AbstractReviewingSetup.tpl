@@ -1,4 +1,4 @@
-
+<% from MaKaC.common import Config %>
 <table id="reviewingQuestionsTable" width="90%" border="0" style="padding-bottom: 5px;">
     <tr>
         <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle">${ _("Reviewing questions")}</td>
@@ -39,6 +39,21 @@
         </td>
     </tr>
 </table>
+<table id="reviewingQuestionsTable" width="90%" border="0" style="padding-bottom: 5px;">
+    <tr>
+        <td colspan="5" class="groupTitle">${ _("Reviewer rights")}</td>
+    </tr>
+</table>
+<table>
+  <tr>
+    <td style="padding-left:25px;">
+        <span id="allowAccept" class="fakeLink">
+            <img id="allowImg" src="${ allowAccept }" border="0" style="padding: 2px 5px 0 0">
+            ${ _("Allow reviewers to accept/reject abstracts") }
+        </span>
+    </td>
+  </tr>
+</table>
 
 <script type="text/javascript">
 // Component for the review questions
@@ -63,5 +78,22 @@ $E('inPlaceEditNumberOfAnswers').set(new NumberAnswersEditWidget('abstractReview
 $E('inPlaceEditScale').set(new ScaleEditWidget('abstractReviewing.questions.changeScale',
        {conference: '${ abstractReview.getConference().getId() }'},
        {'min':'${ abstractReview.getScaleLower() }', 'max':'${ abstractReview.getScaleHigher() }'}).draw());
+
+$E('allowAccept').observeClick(function() {
+    indicoRequest('abstractReviewing.settings.changeReviewerRights',
+                  {conference: '${ abstractReview.getConference().getId() }'},
+                  function(result, error) {
+                      if (!error) {
+                          if (result) {
+                    	      $E('allowImg').dom.src = '${ str(Config.getInstance().getSystemIconURL("enabledSection")) }';
+                          } else {
+                        	  $E('allowImg').dom.src = '${ str(Config.getInstance().getSystemIconURL("disabledSection")) }';
+                          }
+                      } else {
+                    	  IndicoUtil.errorReport(error);
+                          return;
+                      }
+                  });
+});
 
 </script>

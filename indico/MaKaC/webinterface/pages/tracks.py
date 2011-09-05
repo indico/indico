@@ -34,6 +34,7 @@ from indico.util.i18n import i18nformat
 import MaKaC.user as user
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
+from MaKaC.webinterface.pages.abstracts import WAbstractManagmentAccept, WAbstractManagmentReject
 
 
 class WPTrackBase(WPConferenceBase):
@@ -946,10 +947,6 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         vars["modifyStatusURL"],vars["modifyStatusBtn"] = quoteattr(""),""
         vars["PA_defaults"] = ""
 
-        vars["proposeToAcceptButton"] = i18nformat("""<input type="submit" class="btn" value="_("propose to be accepted")" style="width:205px">""")
-        vars["proposeToRejectButton"] = i18nformat("""<input type="submit" class="btn" value="_("propose to be rejected")" style="width:205px">""")
-        vars["proposeForOtherTracksButton"] = i18nformat("""<input type="submit" class="btn" value="_("propose for other tracks")" style="width:205px">""")
-
         if isinstance(aStatus,_ASTrackViewPA):
             vars["PA_defaults"] = """
                 <input type="hidden" name="comment" value=%s>
@@ -963,15 +960,18 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         vars["proposeForOtherTracksURL"] = quoteattr( str( urlHandlers.UHTrackAbstractPropForOtherTrack.getURL( self._track, self._abstract) ) )
         vars["comments"] = self._abstract.getComments()
         vars["abstractId"] = self._abstract.getId()
+
         vars["duplicatedURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModMarkAsDup.getURL(self._track,self._abstract)))
-        vars["duplicatedButton"] = ""
         if aStatus.__class__ in [_ASTrackViewPA,_ASTrackViewPR,_ASTrackViewSubmitted,_ASTrackViewPFOT]:
-            vars["duplicatedButton"] = i18nformat("""<input type="submit" class="btn" value="_("mark as duplicated")" style="width:205px">""")
+            vars["isDuplicated"] = False
         elif aStatus.__class__ == _ASTrackViewDuplicated:
-            vars["duplicatedButton"] = i18nformat("""<input type="submit" class="btn" value="_("unmark as duplicated")" style="width:205px">""")
+            vars["isDuplicated"] = True
             vars["duplicatedURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModUnMarkAsDup.getURL(self._track,self._abstract)))
         vars["contribution"] = self._getContribHTML()
 
+        vars["buttonsStatus"] = "enabled"
+        if aStatus.__class__ in [_ASTrackViewAccepted, _ASTrackViewRejected, _ASTrackViewAcceptedForOther]:
+            vars["buttonsStatus"] = "disabled"
         rating = self._abstract.getRatingPerReviewer(self._rh.getAW().getUser(), self._track)
         if (rating == None):
             vars["rating"] = ""
@@ -982,6 +982,9 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
         vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
+        vars["showAcceptButton"] = self._abstract.getConference().getConfAbstractReview().getCanReviewerAccept()
+        vars["acceptURL"] = quoteattr(str(urlHandlers.UHTrackAbstractAccept.getURL(self._track, self._abstract)))
+        vars["rejectURL"] = quoteattr(str(urlHandlers.UHTrackAbstractReject.getURL(self._track, self._abstract)))
 
         return vars
 
@@ -990,6 +993,20 @@ class WPTrackAbstractModif( WPTrackAbstractModifBase ):
 
     def _getTabContent( self, params ):
         wc = WTrackAbstractModification( self._track, self._abstract )
+        return wc.getHTML()
+
+
+class WPTrackAbstractAccept(WPTrackAbstractModifBase):
+
+    def _getTabContent(self, params):
+        wc = WAbstractManagmentAccept(self._getAW(), self._abstract, self._track)
+        return wc.getHTML()
+
+
+class WPTrackAbstractReject(WPTrackAbstractModifBase):
+
+    def _getTabContent(self, params):
+        wc = WAbstractManagmentReject(self._getAW(), self._abstract, self._track)
         return wc.getHTML()
 
 

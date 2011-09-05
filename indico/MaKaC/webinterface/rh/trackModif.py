@@ -23,6 +23,7 @@ from BTrees.OOBTree import OOBTree
 import MaKaC.webinterface.pages.tracks as tracks
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
+import MaKaC.user as user
 import MaKaC.webinterface.common.abstractFilters as abstractFilters
 import MaKaC.review as review
 from MaKaC.webinterface.rh.conferenceBase import RHTrackBase
@@ -36,8 +37,13 @@ from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
+from MaKaC.abstractReviewing import ConferenceAbstractReview
 from MaKaC.paperReviewing import Answer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
+import MaKaC.webinterface.pages.abstracts as abstracts
+from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
+
 
 class RHTrackModifBase( RHTrackBase, RHModificationBaseProtected ):
 
@@ -368,6 +374,61 @@ class RHTrackAbstractDirectAccess( RHTrackAbstractBase ):
             return
 
 
+class RHTrackAbstractSetStatusBase(RHTrackAbstractBase):
+
+    """ This is the base class for the accept/reject functionality for the track coordinators  """
+
+    def _checkProtection(self):
+        RHTrackAbstractBase._checkProtection(self)
+        if  not self._abstract.getConference().getConfAbstractReview().getCanReviewerAccept():
+            raise MaKaCError("The acceptance or rejection of abstracts is not allowed. Only the managers of the conference can perform this action.")
+
+    def _checkParams(self, params):
+        RHTrackAbstractBase._checkParams(self, params)
+        self._action = params.get("accept", None)
+        if self._action:
+            self._typeId = params.get("type", "")
+        else:
+            self._action = params.get("reject", None)
+        self._comments = params.get("comments", "")
+
+
+
+class RHTrackAbstractAccept(RHTrackAbstractSetStatusBase):
+
+    def _process(self):
+        if self._action:
+            cType = self._abstract.getConference().getContribTypeById(self._typeId)
+            self._abstract.accept(self._getUser(), self._track, cType, self._comments)
+            st = review.AbstractStatusAccepted(self._abstract, None, self._track, cType)
+            wrapper = _AbstractWrapper(st)
+            tpl = self._abstract.getOwner().getNotifTplForAbstract(wrapper)
+            if tpl:
+                n = EmailNotificator()
+                self._abstract.notify(n, self._getUser())
+                self._redirect(urlHandlers.UHTrackModifAbstracts.getURL(self._track))
+        else:
+            p = tracks.WPTrackAbstractAccept(self, self._track, self._abstract)
+            return p.display(**self._getRequestParams())
+
+
+class RHTrackAbstractReject(RHTrackAbstractSetStatusBase):
+
+    def _process(self):
+        if self._action:
+            self._abstract.reject(self._getUser(), self._comments)
+            st = review.AbstractStatusRejected(self._abstract, None, None)
+            wrapper = _AbstractWrapper(st)
+            tpl = self._abstract.getOwner().getNotifTplForAbstract(wrapper)
+            if tpl:
+                n = EmailNotificator()
+                self._abstract.notify(n, self._getUser())
+                self._redirect(urlHandlers.UHTrackModifAbstracts.getURL(self._track))
+        else:
+            p = tracks.WPTrackAbstractReject(self, self._track, self._abstract)
+            return p.display(**self._getRequestParams())
+
+
 class RHTrackAbstractPropBase(RHTrackAbstractBase):
     """ Base class for propose to accept/reject classes """
 
@@ -489,7 +550,6 @@ class RHModAbstractMarkAsDup(RHTrackAbstractBase):
             return
         p = tracks.WPModAbstractMarkAsDup(self, self._track, self._abstract)
         return p.display(comments=self._comments, originalId=self._originalId)
-
 
 
 class RHModAbstractUnMarkAsDup(RHTrackAbstractBase):

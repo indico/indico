@@ -37,7 +37,7 @@ def abstractToPDF(req, **params):
 
 
 def directAccess(req, **params):
-    return trackModif.RHTrackAbstractDirectAccess( req ).process( params )  
+    return trackModif.RHTrackAbstractDirectAccess( req ).process( params )
 
 
 def proposeForOtherTracks( req, **params ):
@@ -67,3 +67,9 @@ def markAsDup(req,**params):
 
 def unMarkAsDup(req,**params):
     return trackModif.RHModAbstractUnMarkAsDup( req ).process( params )
+
+def accept(req,**params):
+    return trackModif.RHTrackAbstractAccept(req).process(params)
+
+def reject(req,**params):
+    return trackModif.RHTrackAbstractReject(req).process(params)

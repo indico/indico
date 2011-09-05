@@ -1041,6 +1041,12 @@ class UHTrackAbstractPropToAcc( UHTrackAbstractBase ):
 class UHTrackAbstractPropToRej( UHTrackAbstractBase ):
     _relativeURL = "trackAbstractModif.py/proposeToBeRej"
 
+class UHTrackAbstractAccept( UHTrackAbstractBase ):
+    _relativeURL = "trackAbstractModif.py/accept"
+
+class UHTrackAbstractReject( UHTrackAbstractBase ):
+    _relativeURL = "trackAbstractModif.py/reject"
+
 
 class UHTrackAbstractDirectAccess( URLHandler ):
     _relativeURL = "trackAbstractModif.py/directAccess"
