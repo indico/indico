@@ -2354,7 +2354,7 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
             if not self._block.canModify(self._getUser()):
                 raise MaKaCError("You are not authorized to modify this blocking.")
         else:
-            if not self._getUser().isResponsibleForRooms():
+            if not (self._getUser().isResponsibleForRooms() or self._getUser().isAdmin() or self._getUser().isRBAdmin()):
                 raise MaKaCError("Only users who own at least one room are allowed to create blockings.")
 
     def _process(self):

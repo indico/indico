@@ -106,7 +106,9 @@ class WPRoomBookingBase( WPMainBase ):
 
 
         if minfo.getRoomBookingModuleActive() and CrossLocationDB.isConnected():
-            self._showResponsible = ( self._getAW().getUser() != None ) and self._getAW().getUser().isResponsibleForRooms()
+            self._showResponsible = ( self._getAW().getUser() != None ) and (self._getAW().getUser().isResponsibleForRooms()
+                                                                             or self._getAW().getUser().isAdmin()
+                                                                             or self._getAW().getUser().isRBAdmin())
 
         self._roomsOpt = wcomponents.SideMenuSection(_("View Rooms"), \
                                         urlHandlers.UHRoomBookingSearch4Rooms.getURL() )
