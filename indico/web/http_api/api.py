@@ -27,8 +27,10 @@ import fnmatch
 import itertools
 import pytz
 import re
+import types
 import urllib
 from zope.interface import Interface, implements
+from ZODB.POSException import ConflictError
 from datetime import datetime, timedelta, date, time
 
 # indico imports
@@ -47,6 +49,7 @@ from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
 
 # indico legacy imports
+from MaKaC.common.db import DBMgr
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
@@ -78,12 +81,15 @@ class HTTPAPIHook(object):
 
     HOOK_LIST = []
     TYPES = None # abstract
+    PREFIX = 'export' # url prefix. must exist in indico_wsgi_url_parser.py, too! also used as function prefix
     RE = None # abstract
     DEFAULT_DETAIL = None # abstract
-    MAX_RECORDS = None # abstract
+    MAX_RECORDS = {}
     SERIALIZER_TYPE_MAP = {} # maps fossil type names to friendly names (useful for plugins e.g. RoomCERN --> Room)
     VALID_FORMATS = None # None = all formats
     GUEST_ALLOWED = True # When False, it forces authentication
+    COMMIT = False # commit database changes
+    HTTP_POST = False # require (and allow) HTTP POST
 
     @classmethod
     def parseRequest(cls, path, queryParams):
@@ -117,14 +123,14 @@ class HTTPAPIHook(object):
     def _matchPath(cls, path):
         if not hasattr(cls, '_RE'):
             types = '|'.join(cls.TYPES)
-            cls._RE = re.compile(r'/export/(' + types + r')/' + cls.RE + r'\.(\w+)$')
+            cls._RE = re.compile(r'/' + cls.PREFIX + '/(' + types + r')/' + cls.RE + r'\.(\w+)$')
         return cls._RE.match(path)
 
     @classmethod
     def _getPluginHooks(cls):
         for plugin in PluginsHolder().getPluginTypes():
             for expClsName in plugin.getHTTPAPIHookList():
-                yield getattr(plugin.getModule().export, expClsName)
+                yield getattr(plugin.getModule().http_api, expClsName)
 
     def __init__(self, queryParams, type, pathParams):
         self._queryParams = queryParams
@@ -169,25 +175,51 @@ class HTTPAPIHook(object):
     def _hasAccess(self, aw):
         return True
 
-    def __call__(self, aw):
+    def _performCall(self, func, aw):
+        resultList = []
+        complete = True
+        try:
+            res = func(aw)
+            if isinstance(res, types.GeneratorType):
+                for obj in res:
+                    resultList.append(obj)
+            else:
+                resultList = res
+        except LimitExceededException:
+            complete = (self._limit == self._userLimit)
+        return resultList, complete
+
+    def __call__(self, aw, req):
         """Perform the actual exporting"""
+        if self.HTTP_POST != (req.method == 'POST'):
+            raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), apache.HTTP_METHOD_NOT_ALLOWED)
         self._getParams()
         if not self.GUEST_ALLOWED and not aw.getUser():
             raise HTTPAPIError('Guest access to this hook is forbidden.', apache.HTTP_FORBIDDEN)
         if not self._hasAccess(aw):
             raise HTTPAPIError('Access to this hook is restricted.', apache.HTTP_FORBIDDEN)
-        resultList = []
-        complete = True
 
-        func = getattr(self, 'export_' + self._type, None)
+        func = getattr(self, self.PREFIX + '_' + self._type, None)
         if not func:
-            raise NotImplementedError('export_' + self._type)
+            raise NotImplementedError(self.PREFIX + '_' + self._type)
 
-        try:
-            for obj in func(aw):
-                resultList.append(obj)
-        except LimitExceededException:
-            complete = (self._limit == self._userLimit)
+        if not self.COMMIT:
+            # Just execute the function, we'll never have to repeat it
+            resultList, complete = self._performCall(func, aw)
+        else:
+            # Try it a few times until commit succeeds
+            dbi = DBMgr.getInstance()
+            for _retry in xrange(10):
+                dbi.sync()
+                resultList, complete = self._performCall(func, aw)
+                try:
+                    dbi.commit()
+                except ConflictError:
+                    pass # retry
+                else:
+                    break
+            else:
+                raise HTTPAPIError('An unresolvable database conflict has occured', apache.HTTP_INTERNAL_SERVER_ERROR)
 
         return resultList, complete, self.SERIALIZER_TYPE_MAP
 

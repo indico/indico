@@ -35,6 +35,7 @@ from ZODB.POSException import ConflictError
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
+from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
 from indico.web.http_api.util import remove_lists, get_query_parameter
 from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
@@ -120,11 +121,20 @@ def buildAW(ak, req, onlyPublic=False):
 def handler(req, **params):
     logger = Logger.get('httpapi')
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
-    # Parse the actual query string
-    queryParams = parse_qs(query)
+    if req.method == 'POST':
+        # Convert POST data to a query string
+        queryParams = dict(req.form)
+        for key, value in queryParams.iteritems():
+            queryParams[key] = [str(value)]
+        query = urllib.urlencode(remove_lists(queryParams))
+    else:
+        # Parse the actual query string
+        queryParams = parse_qs(query)
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
+
+    mode = path.split('/')[1]
 
     cache = RequestCache(HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL())
 
@@ -134,6 +144,10 @@ def handler(req, **params):
     no_cache = get_query_parameter(queryParams, ['nc', 'nocache'], 'no') == 'yes'
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
+
+    # Disable caching if we are not exporting
+    if mode != 'export':
+        no_cache = True
 
     # Get our handler function and its argument and response type
     func, dformat = HTTPAPIHook.parseRequest(path, queryParams)
@@ -167,13 +181,19 @@ def handler(req, **params):
                 addToCache = False
         if result is None:
             # Perform the actual exporting
-            result, complete, typeMap = func(aw)
+            res = func(aw, req)
+            if isinstance(res, tuple) and len(res) == 3:
+                result, complete, typeMap = res
+            else:
+                result, complete, typeMap = res, True, {}
         if result is not None and addToCache:
             cache.cacheObject(cache_key, (result, complete, typeMap))
     except HTTPAPIError, e:
         error = e
         if e.getCode():
             req.status = e.getCode()
+            if req.status == apache.HTTP_METHOD_NOT_ALLOWED:
+                req.headers_out['Allow'] = 'GET' if req.method == 'POST' else 'POST'
 
     if result is None and error is None:
         # TODO: usage page
@@ -196,13 +216,20 @@ def handler(req, **params):
             # (nothing was written)
             dbi.endRequest(False)
 
+        # Log successful POST api requests
+        if error is None and req.method == 'POST':
+            logger.info('API request: %s?%s' % (path, query))
+
         serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
                                        **remove_lists(queryParams))
 
         if error:
             resultFossil = fossilize(error)
         else:
-            resultFossil = fossilize(HTTPAPIResult(result, path, query, ts, complete))
+            iface = None
+            if mode == 'export':
+                iface = IHTTPAPIExportResultFossil
+            resultFossil = fossilize(HTTPAPIResult(result, path, query, ts, complete), iface)
 
         del resultFossil['_fossil']
 

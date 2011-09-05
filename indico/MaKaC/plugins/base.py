@@ -798,9 +798,9 @@ class PluginType (PluginBase):
                hasattr(pluginModule.actions, "pluginActions"):
             p.updateAllActions(pluginModule.actions.pluginActions)
 
-        if hasattr(pluginModule, "export") and \
+        if hasattr(pluginModule, "http_api") and \
                hasattr(pluginModule.options, "globalHTTPAPIHooks"):
-            p.updateAllHTTPAPIHooks(pluginModule.export.globalHTTPAPIHooks)
+            p.updateAllHTTPAPIHooks(pluginModule.http_api.globalHTTPAPIHooks)
 
         self._updateComponentInfo(p, pluginModule)
         self._updateHandlerInfo(p, pluginModule)
@@ -915,10 +915,10 @@ class PluginType (PluginBase):
 
     def _retrievePluginTypeHTTPAPIHooks(self):
 
-        hasExportModule = hasattr(self.getModule(), "export")
-        hasGlobalHTTPAPIHooksVariable = hasExportModule and hasattr(self.getModule().export, "globalHTTPAPIHooks")
-        if hasExportModule and hasGlobalHTTPAPIHooksVariable:
-            return self.getModule().export.globalHTTPAPIHooks
+        hasHTTPAPIModule = hasattr(self.getModule(), "http_api")
+        hasGlobalHTTPAPIHooksVariable = hasHTTPAPIModule and hasattr(self.getModule().http_api, "globalHTTPAPIHooks")
+        if hasHTTPAPIModule and hasGlobalHTTPAPIHooksVariable:
+            return self.getModule().http_api.globalHTTPAPIHooks
         else:
             return None
 

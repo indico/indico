@@ -42,10 +42,12 @@ class IHTTPAPIResultFossil(IFossil):
         pass
     getURL.name = 'url'
 
-    def getCount(self):
+    def getResults(self):
         pass
 
-    def getResults(self):
+
+class IHTTPAPIExportResultFossil(IHTTPAPIResultFossil):
+    def getCount(self):
         pass
 
     def getComplete(self):
