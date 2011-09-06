@@ -141,12 +141,9 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             return p.display()
         params = self._getRequestParams()
         email = self._regForm.getPersonalData().getValueFromParams(params, 'email')
-        if canManageRegistration:
-            matchedUsers = AvatarHolder().match({"email": email})
-            if matchedUsers:
-                user = matchedUsers[0]
-            else:
-                user = None
+        matchedUsers = AvatarHolder().match({"email": email})
+        if matchedUsers:
+            user = matchedUsers[0]
         else:
             user = None
         # Check if the user can register
