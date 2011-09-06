@@ -37,9 +37,11 @@ from indico.ext.livesync.struct import SetMultiPointerTrack
 from indico.ext.livesync.util import getPluginType
 from indico.ext.livesync.struct import EmptyTrackException
 from indico.ext.livesync.base import ILiveSyncAgentProvider, MPT_GRANULARITY
+from indico.ext.livesync.db import updateDBStructures
 
 # legacy indico imports
 from MaKaC import conference
+from MaKaC.common import DBMgr
 
 class QueryException(Exception):
     """
@@ -297,7 +299,11 @@ class SyncManager(Persistent):
         Returns the instance of SyncManager currently in the DB
         """
         storage = getPluginType().getStorage()
-        return storage['agent_manager']
+        if 'agent_manager' in storage:
+            return storage['agent_manager']
+        else:
+            root = DBMgr.getInstance().getDBConnection()
+            updateDBStructures(root)
 
     def reset(self, agentsOnly=False, trackOnly=False):
         """

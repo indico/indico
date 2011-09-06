@@ -25,10 +25,8 @@ This should be easy to adapt to InTRePId 2, in the case of its acceptance.
 """
 
 # plugin imports
-from indico.ext.livesync.util import getPluginType
-from indico.ext.livesync.agent import SyncManager
+
 from indico.ext.livesync.base import MPT_GRANULARITY
-from indico.core.extpoint.db import DBUpdateException
 
 
 def updateDBStructures(root, granularity=MPT_GRANULARITY):
@@ -36,15 +34,17 @@ def updateDBStructures(root, granularity=MPT_GRANULARITY):
     Updates the DB for use with livesync
     """
 
+    from indico.ext.livesync.util import getPluginType
+    from indico.ext.livesync.agent import SyncManager
+
     # get our storage
     ptype = getPluginType()
     storage = ptype.getStorage()
 
     # check if it is empty
-    if len(storage) == 0:
+    if 'agent_manager' in storage:
+        raise Exception("This DB seems to already have livesync installed")
+    else:
         # nice, let's fill it
         storage['agent_manager'] = SyncManager(granularity=granularity)
         return True
-
-    else:
-        raise Exception("This DB seems to already have livesync installed")
