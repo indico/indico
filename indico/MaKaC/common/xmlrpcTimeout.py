@@ -36,7 +36,7 @@ class RequestConnection:
             self.send_user_agent(h)
             self.send_content(h, request_body)
 
-            response = h.getresponse(buffering=True)
+            response = h.getresponse()
 
             if response.status == 200:
                 self.verbose = verbose
@@ -58,23 +58,28 @@ class RequestConnection:
             response.msg,
             )
 
-class TransportWithTimeout(xmlrpclib.Transport, RequestConnection):
+    def close(self):
+        if self._connection:
+            self._connection.close()
+            self._connection = None
+
+class TransportWithTimeout(RequestConnection, xmlrpclib.Transport):
 
     def setTimeout(self, timeout):
         self._timeout = timeout
 
     def make_connection(self, host):
-        return httplib.HTTPConnection(host, timeout=self._timeout)
+        self._connection = httplib.HTTPConnection(host, timeout=self._timeout)
+        return self._connection
 
-
-class SafeTransportWithTimeout(xmlrpclib.SafeTransport, RequestConnection):
+class SafeTransportWithTimeout(RequestConnection, xmlrpclib.SafeTransport):
 
     def setTimeout(self, timeout):
         self._timeout = timeout
 
     def make_connection(self, host):
-        return httplib.HTTPSConnection(host, timeout=self._timeout)
-
+        self._connection = httplib.HTTPSConnection(host, timeout=self._timeout)
+        return self._connection
 
 def getServerWithTimeout(uri, transport=None, encoding=None, verbose=0,
                          allow_none=0, use_datetime=0, timeout=None):
