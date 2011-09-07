@@ -22,8 +22,43 @@ import sys
 import xmlrpclib
 import httplib
 
+class RequestConnection:
 
-class TransportWithTimeout(xmlrpclib.Transport):
+    def request(self, host, handler, request_body, verbose=0):
+        # issue XML-RPC request
+
+        h = self.make_connection(host)
+        if verbose:
+            h.set_debuglevel(1)
+        try:
+            self.send_request(h, handler, request_body)
+            self.send_host(h, host)
+            self.send_user_agent(h)
+            self.send_content(h, request_body)
+
+            response = h.getresponse(buffering=True)
+
+            if response.status == 200:
+                self.verbose = verbose
+                return self.parse_response(response)
+        except xmlrpclib.Fault:
+            raise
+        except Exception:
+            # All unexpected errors leave connection in
+            # a strange state, so we clear it.
+            self.close()
+            raise
+
+        #discard any response data and raise exception
+        if (response.getheader("content-length", 0)):
+            response.read()
+        raise xmlrpclib.ProtocolError(
+            host + handler,
+            response.status, response.reason,
+            response.msg,
+            )
+
+class TransportWithTimeout(xmlrpclib.Transport, RequestConnection):
 
     def setTimeout(self, timeout):
         self._timeout = timeout
@@ -32,7 +67,7 @@ class TransportWithTimeout(xmlrpclib.Transport):
         return httplib.HTTPConnection(host, timeout=self._timeout)
 
 
-class SafeTransportWithTimeout(xmlrpclib.SafeTransport):
+class SafeTransportWithTimeout(xmlrpclib.SafeTransport, RequestConnection):
 
     def setTimeout(self, timeout):
         self._timeout = timeout
