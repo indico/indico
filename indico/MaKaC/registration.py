@@ -565,7 +565,7 @@ class RegistrationForm(Persistent):
             se.delete() # It'll decrease the no of places
         for mg in reg.getMiscellaneousGroupList():
             for item in mg.getResponseItemList():
-                item.getGeneralField()._beforeValueChange(item, False)
+                item.getGeneralField().getInput()._beforeValueChange(item, False)
 
     def delete(self):
         self.getSessionsForm().clearSessionList()
@@ -2725,9 +2725,11 @@ class GeneralField(Persistent):
             return
 
         for reg in self._parent.getRegistrationForm().getConference().getRegistrantsList():
-            item = reg.getMiscellaneousGroupById(self._parent.getId()).getResponseItemById(self.getId())
-            if item is not None and item.getQuantity():
-                self.increaseNoPlaces()
+            mg=reg.getMiscellaneousGroupById(self._parent.getId())
+            if mg:
+                item = mg.getResponseItemById(self.getId())
+                if item is not None and item.getQuantity():
+                    self.increaseNoPlaces()
 
     def getId(self):
         return self._id
