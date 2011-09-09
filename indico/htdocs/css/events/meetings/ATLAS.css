@@ -20,13 +20,7 @@
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-body {
-    background: #424242;
-}
-
-.pageHeader {
-    border-bottom: none;
-}
+@import url("IndicoMeeting.css");
 
 div.meetingEventHeader {
 	background: #1a64a0 url('../../../images/conference_atlas.png') left top no-repeat;

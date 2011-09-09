@@ -55,7 +55,7 @@
 
         <br/><br/>
         % if self.attr.minutes:
-            <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+            <% minutesText = conf.getMinutes().getText() if conf.getMinutes() else None %>
             % if minutesText:
                 ${common.renderDescription(minutesText)}
             % endif

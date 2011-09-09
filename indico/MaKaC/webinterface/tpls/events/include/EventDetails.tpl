@@ -47,7 +47,7 @@
         % endfor
         </div>
         % if minutes:
-            <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
+            <% minutesText = conf.getMinutes().getText() if conf.getMinutes() else None %>
             % if minutesText:
             <center>
                 <div class="minutesTable">

@@ -21,13 +21,7 @@
 */
 
 
-body {
-    background: #424242;
-}
-
-.pageHeader {
-    border-bottom: none;
-}
+@import url("IndicoMeeting.css");
 
 div.meetingEventHeader {
     background: #1a64a0 url('../../../images/totem.png') left top no-repeat;

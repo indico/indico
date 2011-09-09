@@ -21,10 +21,4 @@
 */
 
 
-body {
-    background: #424242;
-}
-
-.pageHeader {
-    border-bottom: none;
-}
+@import url("IndicoMeeting.css");

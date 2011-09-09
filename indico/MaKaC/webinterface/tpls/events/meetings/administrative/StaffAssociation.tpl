@@ -7,6 +7,7 @@
 %>
 
 <%block name="header">
+    <br/>&nbsp;<br/>
     <div class="eventHeader">
         ASSOCIATION DU PERSONNEL<br/>
         <span class="CERNTitle"> CERN </span>
