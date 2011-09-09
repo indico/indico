@@ -571,6 +571,11 @@ var IndicoUtil = {
                         error = Html.span({}, $T("Please choose an option"));
                     }
                 }
+                else if (dataType == "select" && !exists(extraCheckFunction)) {
+                    if (!allowEmpty && !self.checkSelect(component)) {
+                        error = Html.span({}, $T("Please choose an option"));
+                    }
+                }
                 else if (dataType == 'int' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
                     error = Html.span({}, $T("Field must be a number"));
                 }
@@ -625,7 +630,7 @@ var IndicoUtil = {
                     if (component.ErrorAware) {
                         oList = component.setError(error);
 
-                    } else if (dataType == 'checkBoxList' || dataType == 'radio') {
+                    } else if (dataType == 'checkBoxList' || dataType == 'radio' || dataType == 'select') {
                         var result = IndicoUtil.markInvalidField(component, error, true);
                         oList = result[1];
                     } else if (component.dom.type != 'radio') {
@@ -705,6 +710,10 @@ var IndicoUtil = {
                 }
             });
             return radioButtonChecks;
+        };
+
+        this.checkSelect = function(component) {
+            return (component.dom.value!="")
         };
 
         // component must be the parent element of all the checkboxes

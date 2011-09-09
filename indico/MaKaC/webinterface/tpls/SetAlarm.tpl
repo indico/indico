@@ -6,7 +6,7 @@
     <td>
 <br>
 <TABLE border="0" align="center" width="100%">
-<form method="POST" name="alarmForm">
+<form method="POST" name="alarmForm" id="alarmForm">
 <input type="hidden" name="alarmId" value="${ alarmId }">
     <tr>
       <td align="right">
@@ -20,7 +20,7 @@
 </tr>
 <tr>
     <td>
-        <input name="dateType" type="radio" value="1" ${ "checked" if dateType == 1 else "" }>  ${ _("At this date")}:
+        <input name="dateType" id="dateType" type="radio" value="1" ${ "checked" if dateType == 1 else "" }>  ${ _("At this date")}:
     </td>
     <td nowrap class="contentCellTD">
                 <span id="datePlace"></span>
@@ -34,10 +34,10 @@
 </tr>
 <tr>
    <td>
-        <input name="dateType" type="radio" value="2" ${ "checked" if dateType == 2 else "" }> ${ _("Time before the beginning of the event")}:
+        <input name="dateType" id="dateType" type="radio" value="2" ${ "checked" if dateType == 2 else "" }> ${ _("Time before the beginning of the event")}:
     </td>
     <td>
-        <input size="3" name="timeBefore" value="${timeBefore}">
+        <input size="3" name="timeBefore" id="timeBefore" value="${timeBefore}">
 
         <select name=timeTypeBefore >
                 <option value="hours" ${"selected" if dateType == 2 else ""}>${_("Hours")}
@@ -77,12 +77,12 @@
         <td colspan="2"><b>&nbsp; ${ _("Send alarm to")}:</b></td>
     </tr>
     <tr>
-        <td>&nbsp;<input type="checkbox" name="toAllParticipants" ${"checked" if toAllParticipants else ""}></td>
+        <td>&nbsp;<input type="checkbox" name="toAllParticipants" id="toAllParticipants" ${"checked" if toAllParticipants else ""}></td>
         <% toPartOrReg =  _("participants") if conference.getType() != "conference" else _("registrants") %>
         <td> ${_("Send alarm to all %s of the event.")%toPartOrReg }</td>
     </tr>
     <tr>
-        <td>&nbsp;<input type="checkbox" name="defineRecipients" onClick="setEmailsState()" ${ "checked" if Emails!="" else "" }></td>
+        <td>&nbsp;<input type="checkbox" name="defineRecipients" id="defineRecipients" ${ "checked" if Emails!="" else "" }></td>
         <td> ${ _("Define recipients (comma-separated list of email addresses)")} :</td>
     </tr>
     <tr>
@@ -108,10 +108,11 @@
     <tr>
         <td align="center" colspan="2">
             <br>
-            <input type="submit" class="btn" value="${ _("Save")}" onClick="this.form.action='${ urlHandlers.UHSaveAlarm.getURL( conference ) }'">
-            <input type="submit" class="btn" value="${_("Send now")}" onClick="this.form.action='${urlHandlers.UHSendAlarmNow.getURL(conference)}';">
-            <input type="submit" class="btn" value="${_("Send me as a test")}" onClick="return sendTestAlarm(this.form); return false;">
-             <input type="submit" class="btn" value="${ _("Cancel")}" onClick="this.form.action='${urlHandlers.UHConfDisplayAlarm.getURL( conference )}';">
+            <input type="submit" class="btn" value="${ _("Save")}" id="save">
+            <input type="submit" class="btn" value="${_("Send now")}" id="sendNow" >
+            <input type="submit" class="btn" value="${_("Send me as a test")}" id="sendTest">
+             <input type="submit" class="btn" value="${ _("Cancel")}" id="cancel">
+
         </td>
     </tr>
 </form>
@@ -122,16 +123,7 @@
 </table>
 
 <script type="text/javascript">
-var setEmailsState = function ()
-{
-    if ($("#email").is(":disabled")){
-        $("#email").removeAttr("disabled");
-    } else {
-        $("#email").attr("disabled",true);
-    }
-};
-
-var sendTestAlarm = function (form)
+var sendTestAlarm = function ()
 {
     var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending the test alarm..."));
     indicoRequest('event.alarm.sendTestNow', {
@@ -154,10 +146,63 @@ var sendTestAlarm = function (form)
 
 IndicoUI.executeOnLoad(function()
 {
+    $("#defineRecipients").click(function ()
+    {
+        if ($("#email").is(":disabled")){
+            $("#email").removeAttr("disabled");
+        } else {
+            $("#email").attr("disabled",true);
+        }
+    });
     var dateAlarm = IndicoUI.Widgets.Generic.dateField(true,null,['day', 'month', 'year','hour', 'minute']);
     $('#datePlace').append($(dateAlarm.dom));
     % if day != '':
         dateAlarm.set('${ day }/${ month }/${ year } ${ hour }:${ minute }');
     % endif
+    var checkRecipients = function(){
+        if(!$('#toAllParticipants').attr('checked') && (!$('#defineRecipients').attr('checked')||($('#defineRecipients').attr('checked') && $("#email").val()=="")) ){
+            return Html.span({}, $T("Please select the checkbox 'Send to all participants' or 'Define recipients' with a list of emails."));
+        }
+        return null;
+    };
+    var parameterManagerTest = new IndicoUtil.parameterManager();
+    parameterManagerTest.add($E('fromAddr'),'select',false,null);
+    var parameterManager = new IndicoUtil.parameterManager();
+    parameterManager.add($E('fromAddr'),'select',false,null);
+    parameterManager.add($E('toAllParticipants'),'checkbox',true,checkRecipients);
+    parameterManager.add($E('defineRecipients'),'checkbox',true,checkRecipients);
+    parameterManager.add($E('email'),'text',true,checkRecipients);
+    parameterManager.add($E('timeBefore'),'int',true,function(){
+        if($('[name=dateType]:checked').val() == "2" && (!IndicoUtil.isInteger($('#timeBefore').attr("value")) || $('#timeBefore').attr("value")<=0)){
+            return Html.span({}, $T("The time before must be a positive number"));
+        }
+        return null;
+    });
+    parameterManager.add($E('dateType'),'radio',false,null);
+    $('#Save').click(function(){
+        if (!parameterManager.check()) {
+            alert($T('The form contains some errors. Please, correct them and submit again.'));
+            return false;
+        }
+        return true;
+    });
+    $('#save').click(function(){
+        this.form.action = '${ urlHandlers.UHSaveAlarm.getURL( conference ) }';
+        return parameterManager.check();
+    });
+
+    $('#sendNow').click(function(){
+        this.form.action = '${urlHandlers.UHSendAlarmNow.getURL( conference )}';
+        return parameterManager.check();
+    });
+    $('#sendTest').click(function(){
+        if(parameterManagerTest.check()){
+            sendTestAlarm();
+        }
+        return false;
+    });
+    $('#cancel').click(function(){
+        this.form.action = '${urlHandlers.UHConfDisplayAlarm.getURL( conference )}';
+    });
 });
 </script>
