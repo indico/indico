@@ -594,10 +594,11 @@ var IndicoUtil = {
                 else if (dataType == 'shortURL' && !IndicoUtil.parseShortURL(component.get())) {
                     error = Html.span({}, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, _, - and ."));
                 }
-                else if (exists(extraCheckFunction)) {
-                    error = extraCheckFunction(component.get());
-                } else if (!allowEmpty && trim(component.get()) === '') {
+                else if (!allowEmpty && trim(component.get()) === '') {
                     error = Html.span({}, $T("Field is mandatory"));
+                }
+                if (exists(extraCheckFunction)) {
+                    error = extraCheckFunction(component.get());
                 }
                 //--------------------------------
 
@@ -741,6 +742,15 @@ var IndicoUtil = {
                 entryList.remove(removeEntry);
             }
         };
+
+        this.validate_number = function(opts) {
+            return function(value) {
+                var val = parseInt(value, 10);
+                if(opts.minimum && val < opts.minimum) Html.span({}, $T("The value must be bigger than "+opts.minimum));
+                if(opts.maximum && val > opts.maximum) Html.span({}, $T("The value must be less than "+opts.maximum));
+            }
+        };
+
     },
 
     waitLoad : function(preLoad, process) {

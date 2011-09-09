@@ -1494,10 +1494,9 @@ class NumberInput(FieldInputType):
             currency=item.getCurrency()
             htmlName=item.getHTMLName()
 
-        if self._parent.isMandatory():
-            param = """<script>addParam($E('%s'), 'non_negative_int', false);</script>""" % htmlName
-        else:
-            param = """<script>addParam($E('%s'), 'non_negative_int', true);</script>""" % htmlName
+        mandat = "false" if self._parent.isMandatory() else "true"
+        extra_check = "validate_number({minimum:%s})"%self.getMinValue() if self.getMinValue() != 0 else ""
+        param = """<script>addParam($E('%s'), 'non_negative_int', %s, %s);</script>""" % (htmlName, mandat, extra_check)
 
         disable=""
         if ( registrant is not None and billable and registrant.getPayed()):
@@ -1751,6 +1750,7 @@ class YesNoInput(FieldInputType):
     getName=classmethod(getName)
 
     def _getModifHTML(self, item, registrant, default=""):
+        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
