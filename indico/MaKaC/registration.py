@@ -1486,7 +1486,7 @@ class NumberInput(FieldInputType):
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
-        v=default or "0"
+        v=default or self.getMinValue()
         if item is not None:
             v=item.getValue()
             price= item.getPrice()
@@ -1495,7 +1495,7 @@ class NumberInput(FieldInputType):
             htmlName=item.getHTMLName()
 
         mandat = "false" if self._parent.isMandatory() else "true"
-        extra_check = "validate_number({minimum:%s})"%self.getMinValue() if self.getMinValue() != 0 else ""
+        extra_check = "IndicoUtil.validate_number({minimum:%s})"%self.getMinValue() if self.getMinValue() != 0 else ""
         param = """<script>addParam($E('%s'), 'non_negative_int', %s, %s);</script>""" % (htmlName, mandat, extra_check)
 
         disable=""

@@ -487,6 +487,19 @@ var IndicoUtil = {
     },
 
     /**
+     *  Used as extraCheckFunction within the parameter manager.
+     *  Extra checking for numbers (minimum, maximum).
+     *
+     */
+    validate_number: function(opts) {
+        return function(value) {
+            var val = parseInt(value, 10);
+            if(opts.minimum && val < opts.minimum) return Html.span({}, $T("The value must be bigger than "+opts.minimum));
+            if(opts.maximum && val > opts.maximum) return Html.span({}, $T("The value must be less than "+opts.maximum));
+        }
+    },
+
+    /**
      * Parameter manager.
      * Checks if all the parameters in a form are correct.
      * If not, it sets the input background-color to red and adds a tooltip explaining the error.
@@ -740,14 +753,6 @@ var IndicoUtil = {
 
             if (removeEntry) {
                 entryList.remove(removeEntry);
-            }
-        };
-
-        this.validate_number = function(opts) {
-            return function(value) {
-                var val = parseInt(value, 10);
-                if(opts.minimum && val < opts.minimum) Html.span({}, $T("The value must be bigger than "+opts.minimum));
-                if(opts.maximum && val > opts.maximum) Html.span({}, $T("The value must be less than "+opts.maximum));
             }
         };
 
