@@ -3147,7 +3147,7 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
         self._hour = int(params["hour"])
         self._minute = int(params["minute"])
         self._timeBefore = int(params.get("timeBefore", 0))
-        if self._timeBefore <= 0:
+        if self._dateType == "2" and  self._timeBefore <= 0:
             raise FormValuesError(_("Time before the beginning of the event should be bigger than zero"))
         self._timeTypeBefore = params["timeTypeBefore"]
         self._note = params.get("note","")

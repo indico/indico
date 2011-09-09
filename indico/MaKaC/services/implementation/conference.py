@@ -774,13 +774,16 @@ class ConferenceAlarmSendTestNow(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._fromAddr = pm.extract("fromAddr", pType=str, allowEmpty=False)
+        self._fromAddr = pm.extract("fromAddr", pType=str, allowEmpty=True, defaultValue="")
         self._note = pm.extract("note", pType=str, allowEmpty=True)
         self._includeConf = pm.extract("includeConf", pType=str, allowEmpty=True, defaultValue="")
 
     def _getAnswer(self):
         al = tasks.AlarmTask(self._conf, 0, datetime.timedelta(), relative=datetime.timedelta())
-        al.setFromAddr(self._fromAddr)
+        if self._fromAddr:
+            al.setFromAddr(self._fromAddr)
+        else:
+            raise NoReportError(_("""Please choose a "FROM" address for the test alarm"""))
         al.setNote(self._note)
         al.setConfSummary(self._includeConf == "1")
         if self._getUser():
