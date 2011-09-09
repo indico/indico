@@ -720,22 +720,22 @@ var checkAllHaveReferee = function(contributions, order, role, assignPerAttribut
         }
     }
     if (contributionsWithoutReferee.length == contributions.length) {
-        alert($T("None of the contributions you checked have a Referee.") +
+        (new AlertPopup($T("Warning"),$T("None of the contributions you checked have a Referee.") +
             $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee.")
-        );
+        )).open();
         return false;
     }
 
     if (contributionsWithoutReferee.length > 0) {
 
         if(assignPerAttribute){
-            alert($T("Some of the contributions you checked have a Referee.") +
-            $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."));
+            (new AlertPopup($T("Warning"),$T("Some of the contributions you checked have a Referee.") +
+            $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."))).open();
             return false;
         } else {
         title =$T('Contributions without referee');
 
-        var popup = new ExclusivePopup(title, function(){popup.close();});
+        var popup = new ExclusivePopupWithButtons(title, function(){popup.close();});
 
         popup.draw = function(){
 
@@ -753,9 +753,9 @@ var checkAllHaveReferee = function(contributions, order, role, assignPerAttribut
             noButton.observeClick(function(){
                 popup.close();
             });
-              var buttons = Widget.inline([yesButton, noButton])
-              var all = Widget.lines([span1, span2, span3, buttons])
-         return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]));
+              var buttons = Widget.inline([yesButton, noButton]);
+              var all = Widget.lines([span1, span2, span3, buttons]);
+         return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]),buttons);
                 };
              popup.open();
 
@@ -785,8 +785,7 @@ var removeReviewersAlerts = function(contributions, role) {
         }
     }
     if (contributionsWithoutReviewers.length == contributions.length) {
-        alert($T("There is no assigned Content Reviewer to remove.")
-        );
+        (new AlertPopup($T("Warning"),$T("There is no assigned Content Reviewer to remove."))).open();
         return false;
     }
 
@@ -844,8 +843,7 @@ var removeEditorAlerts = function(contributions, role) {
     }
 
     if (contributionsWithoutEditor.length == contributions.length) {
-        alert($T("There is no assigned Layout Reviewer to remove.")
-        );
+        (new AlertPopup($T("Warning"),$T("There is no assigned Layout Reviewer to remove."))).open();
         return false;
     }
 
@@ -865,8 +863,7 @@ var removeNoRefereeAlerts = function(contributions, role) {
     }
 
     if (contributionsWithoutEditor.length == contributions.length) {
-        alert($T("There is no assigned Referee to remove.")
-        );
+        (new AlertPopup($T("Warning"),$T("There is no assigned Referee to remove."))).open();
         return false;
     }
 
@@ -1147,7 +1144,7 @@ var fetchUsers = function(order, role) {
 
     var checkedContributions = getCheckedContributions();
     if (checkedContributions.length == 0) {
-        alert($T("Please select at least 1 contribution"));
+        (new AlertPopup($T("Warning"),$T("Please select at least 1 contribution"))).open();
         return;
     }
 
@@ -1191,62 +1188,62 @@ var fetchUsers = function(order, role) {
                     }
                 }
 
-                var popup = new ExclusivePopup(title, function(){popup.close();});
+                if (!result.length)
+                    (new AlertPopup($T('Warning'),$T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."))).open();
+                else {
+                    var popup = new ExclusivePopupWithButtons(title, function(){popup.close();});
 
-                popup.draw = function(){
-                        var users = $L();
-                        var userTemplate = function(user) {
-                            var li = Html.li();
-                            var userName = Widget.link(command(function(){
-                                userSelected(user);
-                                var killProgress = IndicoUI.Dialogs.Util.progress()
-                                popup.close();
-                                killProgress();
-                            }, user.name));
+                    popup.draw = function(){
+                            var users = $L();
+                            var userTemplate = function(user) {
+                                var li = Html.li();
+                                var userName = Widget.link(command(function(){
+                                    userSelected(user);
+                                    var killProgress = IndicoUI.Dialogs.Util.progress()
+                                    popup.close();
+                                    killProgress();
+                                }, user.name));
 
 
-                        var userCompetences = Html.span({style:{marginLeft:'5px'}},
-                            user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
-                        );
+                            var userCompetences = Html.span({style:{marginLeft:'5px'}},
+                                user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
+                            );
 
-                        li.set(Widget.inline([userName, userCompetences]));
-                        return li;
-                    }
-
-                        var userList = Html.ul();
-                        bind.element(userList, users, userTemplate);
-
-                        for (i in result) {
-                        users.append(result[i]);
+                            li.set(Widget.inline([userName, userCompetences]));
+                            return li;
                         }
 
-                       var cancelButton = Html.input('button', null, $T('Cancel'));
-                          cancelButton.observeClick(function(){
-                              popup.close();
-                          });
-                       var divButton = Html.div({style:{textAlign: 'center'}});
-                       divButton.append(cancelButton);
+                            var userList = Html.ul();
+                            bind.element(userList, users, userTemplate);
 
-                       var span1 = Html.span({}, "");
-                       var message = '';
-                       if(new_assign) {
-                            span1 = Html.span({}, removeRefereeAlertsMessage(checkedContributions));
-                       }
-                       if(role == 'reviewer' && order == 'remove') {
-                            if (checkedContributions.length == 1){
-                                    message = $T("The Reviewer you choose will be removed only from the contribution that is assigned to him/her.")
-                                } else {
-                                    message = $T("The Reviewer you choose will be removed only from the contributions that are assigned to him/her.")
-                                }
-                            span1 = Html.span({}, message);
-                       }
-                       if (!result.length)
-                           var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."));
-                       else
-                           var content = userList;
-                       return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, content, divButton]));
-                };
-             popup.open();
+                            for (i in result) {
+                            users.append(result[i]);
+                            }
+
+                           var cancelButton = Html.input('button', null, $T('Cancel'));
+                              cancelButton.observeClick(function(){
+                                  popup.close();
+                              });
+                           var divButton = Html.div({style:{textAlign: 'center'}});
+                           divButton.append(cancelButton);
+
+                           var span1 = Html.span({}, "");
+                           var message = '';
+                           if(new_assign) {
+                                span1 = Html.span({}, removeRefereeAlertsMessage(checkedContributions));
+                           }
+                           if(role == 'reviewer' && order == 'remove') {
+                                if (checkedContributions.length == 1){
+                                        message = $T("The Reviewer you choose will be removed only from the contribution that is assigned to him/her.")
+                                    } else {
+                                        message = $T("The Reviewer you choose will be removed only from the contributions that are assigned to him/her.")
+                                    }
+                                span1 = Html.span({}, message);
+                           }
+                           return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, userList]), divButton);
+                    };
+                 popup.open();
+             }
 
             } else {
                 IndicoUtil.errorReport(error);
@@ -1282,7 +1279,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                     title = $T('Follow the steps to ') + order + ' a ' + role + ':';
                 }
 
-                var popup = new ExclusivePopup(title, function(){popup.close();});
+                var popup = new ExclusivePopupWithButtons(title, function(){popup.close();});
 
                 popup.draw = function(){
 
@@ -1313,7 +1310,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                         var killProgress = IndicoUI.Dialogs.Util.progress()
                                         popup.close();
                                         killProgress();
-                                        alert('There is no '+attribute+' define.');
+                                        (new AlertPopup($T("Warning"),'There is no '+attribute+' define.')).open();
                                     }
                                     for (i in result) {
                                     attributes.append(result[i]);
@@ -1393,7 +1390,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                      assignButton.observeClick(function(){
                                 var chAtt = getCheckedAttributes();
                                 if(chAtt.length == 0){
-                                    alert($T('You must select at least one attribute.'));
+                                    (new AlertPopup($T("Warning"),$T('You must select at least one attribute.'))).open();
                                 } else {
                                     var checkedBtn = function(){
                                         var allBtn = document.getElementsByName('radioBtn');
@@ -1406,7 +1403,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                    }
                                    var checkedBtnId = checkedBtn();
                                    if(checkedBtnId == null){
-                                       alert($T('You must select at least one user.'));
+                                       (new AlertPopup($T("Warning"),$T('You must select at least one user.'))).open();
                                    } else {
                                        for (var i=0; i < users.length.get(); i++) {
                                            user = users.item(i);
@@ -1430,12 +1427,12 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                      if (!result.length) {
                          divButtons.append(cancelButton);
                          var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."));
-                         return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([content, divButtons])));
+                         return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([content])),divButtons);
                      }
                      else {
                          divButtons.append(assignButton);
                          divButtons.append(cancelButton);
-                         return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([AttributeDiv, step2, userList, divButtons])));
+                         return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([AttributeDiv, step2, userList])),divButtons);
                      }
 
                 };
@@ -1456,7 +1453,7 @@ var removeUser = function(role) {
 
     var checkedContributions = getCheckedContributions();
     if (checkedContributions.length == 0) {
-        alert($T("Please select at least 1 contribution"));
+        (new AlertPopup($T("Warning"),$T("Please select at least 1 contribution"))).open();
         return;
     }
 
