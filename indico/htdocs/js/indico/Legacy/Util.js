@@ -607,7 +607,7 @@ var IndicoUtil = {
                 else if (dataType == 'shortURL' && !IndicoUtil.parseShortURL(component.get())) {
                     error = Html.span({}, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, _, - and ."));
                 }
-                else if (!allowEmpty && trim(component.get()) === '') {
+                else if (!allowEmpty && component.get() != null && trim(component.get()) === '') {
                     error = Html.span({}, $T("Field is mandatory"));
                 }
                 if (exists(extraCheckFunction)) {
