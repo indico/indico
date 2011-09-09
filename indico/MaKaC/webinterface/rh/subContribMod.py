@@ -236,102 +236,24 @@ class RHEditPresenter( RHSubContribModifBase ):
 
             return p.display(**params)
 
-class RHSubContributionAddMaterial( RHSubContribModifBase ):
-    _uh = urlHandlers.UHSubContributionAddMaterial
 
-    def _checkParams( self, params ):
-        RHSubContribModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "notype" )
-        if typeMat=="notype" or typeMat.strip()=="":
-            raise FormValuesError("Please choose a material type")
-        self._mf = materialFactories.ContribMFRegistry().getById( typeMat )
-
-    def _process( self ):
-        if self._mf:
-            if not self._mf.needsCreationPage():
-                m = RHSubContributionPerformAddMaterial.create( self._target, self._mf, self._getRequestParams() )
-                self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
-                return
-        p = subContributions.WPSubContribAddMaterial( self, self._target, self._mf )
-        return p.display()
-
-
-class RHSubContributionPerformAddMaterial( RHSubContribModifBase ):
-    _uh = urlHandlers.UHSubContributionPerformAddMaterial
-
-    def _checkParams( self, params ):
-        RHSubContribModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "" )
-        self._mf = materialFactories.ContribMFRegistry().getById( typeMat )
-
-    def create( subContrib, matFactory, matData ):
-        if matFactory:
-            m = matFactory.create( subContrib )
-        else:
-            m = conference.Material()
-            subContrib.addMaterial( m )
-            m.setValues( matData )
-        return m
-    create = staticmethod( create )
-
-    def _process( self ):
-        m = self.create( self._target, self._mf, self._getRequestParams() )
-        self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
-
-class RHMaterialsAdd(RHSubContribModifBase):
+class RHMaterialsAdd(RHSubmitMaterialBase, RHSubContribModifBase):
     _uh = urlHandlers.UHSubContribModifAddMaterials
 
     def _checkProtection(self):
-        material, _ = self._rhSubmitMaterial._getMaterial(forceCreate = False)
+        material, _ = self._getMaterial(forceCreate = False)
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
             return
-        RHSubContribModifBase._checkProtection(self)
+        RHSubmitMaterialBase._checkProtection(self)
+
+    def __init__(self, req):
+        RHSubContribModifBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self, req)
 
     def _checkParams(self, params):
         RHSubContribModifBase._checkParams(self, params)
-        if not hasattr(self,"_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
-
-    def _process( self ):
-        if self._target.getConference().isClosed():
-            p = WPConferenceModificationClosed( self, self._target )
-            return p.display()
-        r=self._rhSubmitMaterial._process(self, self._getRequestParams())
-        if r is None:
-            self._redirect(self._uh.getURL(self._target))
-
-        return r
-
-
-class RHSubContributionRemoveMaterials( RHSubContribModifBase ):
-    _uh = urlHandlers.UHSubContributionRemoveMaterials
-
-    def _checkParams( self, params ):
-        RHSubContribModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "" )
-        #self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
-        self._materialIds = self._normaliseListParam( params.get("materialId", []) )
-        self._returnURL = params.get("returnURL","")
-
-    def _process( self ):
-        for id in self._materialIds:
-            #Performing the deletion of special material types
-            f = materialFactories.ContribMFRegistry().getById( id )
-            if f:
-                f.remove( self._target )
-            else:
-                #Performs the deletion of additional material types
-                mat = self._target.getMaterialById( id )
-                self._target.removeMaterial( mat )
-        if self._returnURL != "":
-            url = self._returnURL
-        else:
-            url = urlHandlers.UHSubContribModifMaterials.getURL( self._target )
-        self._redirect( url )
-
-
+        RHSubmitMaterialBase._checkParams(self, params)
 
 
 class RHSubContributionDeletion( RHSubContributionTools ):

@@ -1346,33 +1346,25 @@ class RHContributionRemoveMaterials(RHContribModifBaseSpecialSesCoordRights):
         self._redirect( url )
 
 
-class RHMaterialsAdd(RHContribModifBaseSpecialSesCoordRights):
+class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribModifAddMaterials
 
+    def __init__(self, req):
+        RHContribModifBaseSpecialSesCoordRights.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self, req)
+
+    def _checkParams(self, params):
+        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
+        RHSubmitMaterialBase._checkParams(self, params)
+
     def _checkProtection(self):
-        material, _ = self._rhSubmitMaterial._getMaterial(forceCreate = False)
+        material, _ = self._getMaterial(forceCreate = False)
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
             return
         if not (RCContributionPaperReviewingStaff.hasRights(self) and not self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
-            RHContribModifBaseSpecialSesCoordRights._checkProtection(self)
+            RHSubmitMaterialBase._checkProtection(self)
 
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        if not hasattr(self,"_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
-
-    def _process( self ):
-        if self._target.getConference().isClosed():
-            p = WPConferenceModificationClosed( self, self._target )
-            return p.display()
-        else:
-            r=self._rhSubmitMaterial._process(self, self._getRequestParams())
-        if r is None:
-            self._redirect(self._uh.getURL(self._target))
-
-        return r
 
 class RHContributionSelectManagers(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionSelectManagers

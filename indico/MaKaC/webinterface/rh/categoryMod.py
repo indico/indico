@@ -205,20 +205,16 @@ class RHCategoryFiles( RHCategModifBase ):
         return p.display()
 
 
-class RHAddMaterial( RHCategModifBase ):
+class RHAddMaterial(RHSubmitMaterialBase, RHCategModifBase):
     _uh = urlHandlers.UHCategoryAddMaterial
 
-    def _checkParams( self, params ):
-        RHCategModifBase._checkParams(self, params)
-        if not hasattr(self, "_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
+    def __init__(self, req):
+        RHCategModifBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self, req)
 
-    def _process( self ):
-        r=self._rhSubmitMaterial._process(self, self._getRequestParams())
-        if r is None:
-            self._redirect(self._uh.getURL(self._target))
-        return r
+    def _checkParams(self, params):
+        RHCategModifBase._checkParams(self, params)
+        RHSubmitMaterialBase._checkParams(self, params)
 
 
 class RHCategoryTasksAction( RHCategModifBase ):

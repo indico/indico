@@ -468,75 +468,6 @@ class RHChairEdit( RHConferenceModifBase ):
             return p.display(chair=c)
 
 
-class RHConfAddMaterial( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConferenceAddMaterial
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "notype" )
-        if typeMat=="notype" or typeMat.strip()=="":
-            raise FormValuesError("Please choose a material type")
-        self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
-
-    def _process( self ):
-        if self._mf:
-            if not self._mf.needsCreationPage():
-                m = RHConfPerformAddMaterial.create( self._conf, self._mf, self._getRequestParams() )
-                self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
-                return
-        p = conferences.WPConfAddMaterial( self, self._target, self._mf )
-        return p.display()
-
-
-class RHConfPerformAddMaterial( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConferencePerformAddMaterial
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "" )
-        self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
-
-    @staticmethod
-    def create( conf, matFactory, matData ):
-        if matFactory:
-            m = matFactory.create( conf )
-        else:
-            m = conference.Material()
-            conf.addMaterial( m )
-            m.setValues( matData )
-        return m
-
-    def _process( self ):
-        m = self.create( self._conf, self._mf, self._getRequestParams() )
-        self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
-
-
-class RHConfRemoveMaterials( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConferenceRemoveMaterials
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "" )
-        #self._mf = materialFactories.ConfMFRegistry.getById( typeMat )
-        self._materialIds = self._normaliseListParam( params.get("materialId", []) )
-        self._returnURL = params.get("returnURL","")
-
-    def _process( self ):
-        for id in self._materialIds:
-            #Performing the deletion of special material types
-            f = materialFactories.ConfMFRegistry().getById( id )
-            if f:
-                f.remove( self._target )
-            else:
-                #Performs the deletion of additional material types
-                mat = self._target.getMaterialById( id )
-                self._target.removeMaterial( mat )
-        if self._returnURL != "":
-            url = self._returnURL
-        else:
-            url = urlHandlers.UHConfModifMaterials.getURL( self._target )
-        self._redirect( url )
-
 #----------------------------------------------------------------
 
 class RHConfSessionSlots( RHConferenceModifBase ):
@@ -7450,25 +7381,17 @@ class RHConfModfReportNumberRemove(RHConferenceModifBase):
 
 
 
-class RHMaterialsAdd(RHConferenceModifBase):
+class RHMaterialsAdd(RHSubmitMaterialBase, RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifAddMaterials
+
+    def __init__(self, req):
+        RHConferenceModifBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self, req)
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
-        if not hasattr(self,"_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
+        RHSubmitMaterialBase._checkParams(self, params)
 
-    def _process( self ):
-        if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-        else:
-            r=self._rhSubmitMaterial._process(self, self._getRequestParams())
-        if r is None:
-            self._redirect(self._uh.getURL(self._target))
-
-        return r
 
 class RHMaterialsShow(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifShowMaterials
