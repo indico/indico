@@ -99,7 +99,7 @@
             $('#bookingForm').attr('action', '${saveBookingUH.getURL(conf)}');
         });
         $('#checkBooking').click(function(e) {
-            $('#bookingForm').attr('action', '${bookingFormURL}#conflicts');
+            $('#bookingForm').attr('action', '${bookingFormURL.getURL(conf)}#conflicts');
             if (!validate_period($('#bookingForm')[0], true, ${ allowPast })) {
                 alert(${_("'There are errors in the form. Please correct fields with red background.'")});
                 e.preventDefault();

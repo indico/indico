@@ -753,7 +753,7 @@ class RHRegistrantMiscInfoPerformModify( RHRegistrantModifBase ):
             pdForm = self._registrant.getRegistrationForm().getPersonalData()
             if self._miscInfo.getGeneralSection() is pdForm:
                 email = pdForm.getValueFromParams(params, 'email')
-                if self._conf.hasRegistrantByEmail(email, self._registrant):
+                if email != self._registrant.getEmail() and self._conf.hasRegistrantByEmail(email):
                     raise FormValuesError("""There is already a user with the email "%s". Please choose another one""" % email)
             for f in self._miscInfo.getGeneralSection().getSortedFields():
                 if not f.isDisabled():

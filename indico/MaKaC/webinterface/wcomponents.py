@@ -6330,18 +6330,19 @@ class WRoomBookingBookingForm( WTemplated ):
 
         vars["standalone"] = self._standalone
         vars["config"] = Config.getInstance()
-        vars["bookingFormURL"] = str(urlHandlers.UHRoomBookingBookingForm.getURL())
 
         if self._standalone:
             vars["conf"] = None
             vars["saveBookingUH"] = urlHandlers.UHRoomBookingSaveBooking
             vars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
             vars["calendarPreviewUH"] = urlHandlers.UHRoomBookingBookingForm
+            vars["bookingFormURL"] = urlHandlers.UHRoomBookingBookingForm
         else:
             vars["conf"] = self._rh._conf
             vars["saveBookingUH"] = urlHandlers.UHConfModifRoomBookingSaveBooking
             vars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
             vars["calendarPreviewUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
+            vars["bookingFormURL"] = urlHandlers.UHConfModifRoomBookingBookingForm
 
         vars["candResv"] = self._candResv
         vars["startDT"] = self._candResv.startDT

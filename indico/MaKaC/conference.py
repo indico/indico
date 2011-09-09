@@ -2201,7 +2201,7 @@ class Conference(CommonObjectBase, Locatable):
         self.setFullyPublic()
 
         # Room booking related
-        self.__roomBookingGuids = []
+        #self.__roomBookingGuids = []
 
 
     def getKeywords(self):
@@ -2224,29 +2224,14 @@ class Conference(CommonObjectBase, Locatable):
         Returns list of bookings for this conference.
         """
 
-        if not "__roomBookingGuids" in ','.join( dir( self ) ):
-            self.__roomBookingGuids = []
-            #self.__TMP_PopulateRoomBookings()
-
         resvs = []
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            for resvGuid in self.__roomBookingGuids:
-                r = resvGuid.getReservation()
-                if r == None:
-                    self.removeRoomBookingGuid( resvGuid )
-                elif r.isValid:
-                    resvs.append( r )
+        for resvGuid in self.getRoomBookingGuids():
+            r = resvGuid.getReservation()
+            if r == None:
+                self.removeRoomBookingGuid( resvGuid )
+            elif r.isValid:
+                resvs.append( r )
         return resvs
-
-    def getRoomBookingIds( self ):
-        """
-        Returns list of booking ids for this conference.
-        """
-        if not "__roomBookingGuids" in ','.join( dir( self ) ):
-            self.__roomBookingGuids = []
-            #self.__TMP_PopulateRoomBookings()
-        return self.__roomBookingGuids
 
     def getBookedRooms( self ):
         """
@@ -2255,15 +2240,15 @@ class Conference(CommonObjectBase, Locatable):
         """
         rooms = []
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            for r in self.getRoomBookingList():
-                if not r.room in rooms:
-                    rooms.append( r.room )
+        for r in self.getRoomBookingList():
+            if not r.room in rooms:
+                rooms.append( r.room )
         return rooms
 
     def getRoomBookingGuids( self ):
-        if not "__roomBookingGuids" in ','.join( dir( self ) ):
+        try:
+            self.__roomBookingGuids
+        except AttributeError:
             self.__roomBookingGuids = []
         return self.__roomBookingGuids
 
@@ -2271,15 +2256,11 @@ class Conference(CommonObjectBase, Locatable):
         self.__roomBookingGuids = guids
 
     def addRoomBookingGuid( self, guid ):
-        if not "__roomBookingGuids" in ','.join( dir( self ) ):
-            self.__roomBookingGuids = []
-        self.__roomBookingGuids.append( guid )
+        self.getRoomBookingGuids().append( guid )
         self._p_changed = True
 
     def removeRoomBookingGuid( self, guid ):
-        if not "__roomBookingGuids" in ','.join( dir( self ) ):
-            self.__roomBookingGuids = []
-        self.__roomBookingGuids.remove( guid )
+        self.getRoomBookingGuids().remove( guid )
         self._p_changed = True
 
     def __TMP_PopulateRoomBookings( self ):
