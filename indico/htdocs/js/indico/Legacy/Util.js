@@ -494,8 +494,8 @@ var IndicoUtil = {
     validate_number: function(opts) {
         return function(value) {
             var val = parseInt(value, 10);
-            if(opts.minimum && val < opts.minimum) return Html.span({}, $T("The value must be bigger than "+opts.minimum));
-            if(opts.maximum && val > opts.maximum) return Html.span({}, $T("The value must be less than "+opts.maximum));
+            if(opts.minimum && val < opts.minimum) return Html.span({}, $T("The value must be at least ") + opts.minimum);
+            if(opts.maximum && val > opts.maximum) return Html.span({}, $T("The value must be at maximum ") + opts.maximum);
         }
     },
 
