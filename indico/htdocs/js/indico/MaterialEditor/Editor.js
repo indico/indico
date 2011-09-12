@@ -654,8 +654,8 @@ type("UploadTemplateDialog", ["ExclusivePopup"], {
                 if (resp.status == "ERROR") {
                     IndicoUtil.errorReport(resp.info);
                 } else {
-                    this.close();
-                    this.onUpload(resp.info);
+                    self.close();
+                    self.onUpload(resp.info);
                 }
             }
         });
