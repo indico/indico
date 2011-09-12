@@ -806,15 +806,16 @@ class WTimetableBannerModif(WBannerModif):
         # Iterate till conference is reached
         conf = target.getConference()
         path = self._getOwnerBasePath(target)
+        scheduleModifURL = None
 
         # if user has access to top-level timetable
         if conf.canModify(aw):
             scheduleModifURL = urlHandlers.UHConfModifSchedule.getURL( conf )
-        else:
+        elif target.getSession():
             # otherwise, let them access only the session timetable
             scheduleModifURL = urlHandlers.UHSessionModifSchedule.getURL( target.getSession() )
-
-        path.append({"url": scheduleModifURL, "title": _("Timetable")})
+        if scheduleModifURL:
+            path.append({"url": scheduleModifURL, "title": _("Timetable")})
         # TITLE AND TYPE
         itemType = type(target).__name__
         title = target.getTitle()
