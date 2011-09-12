@@ -14,12 +14,12 @@
           </td>
           <td class="headerselected" align="right">
             <span style="font-weight:bold;">
-                <div style="float: left; height: 15px; width: 15px; padding-top: 7px;">
+                <span class="confTitle">
+                    ${conf.getTitle()}
+                </span>
+                <div style="float: right; height: 15px; width: 15px; padding-top: 7px; padding-left: 5px;">
                     <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True"/>
                 </div>
-            <span class="confTitle">
-                ${conf.getTitle()}
-            </span>
             </span>
             <span style="font-size:x-small;">
             % for rn in conf.getReportNumberHolder().listReportNumbers():
