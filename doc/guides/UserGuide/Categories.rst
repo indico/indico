@@ -151,6 +151,9 @@ access the category and add events. When a Category is made private,
 the option for domain control is omitted and any event or
 category made inside it will also be private. The category will be
 displayed with "(protected)" after its name to show it is private.
+As well, if the category is  PRIVATE the category manager will be able to set a
+'Contact in case of no access', so users with no access will know who to contact
+in order to request access.
 Inheriting: The category will have the same access protection as its
 parent category. This means that changing the parent's protection
 will change the protection of tha category.

@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Accessing the API &mdash; Indico v0.98 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.98',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Indico v0.98 documentation" href="../index.html" />
+    <link rel="up" title="Indico’s HTTP Export API" href="index.html" />
+    <link rel="next" title="2. Common Parameters" href="common.html" />
+    <link rel="prev" title="Indico’s HTTP Export API" href="index.html" />
+   <link type="text/css" href="../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="common.html" title="2. Common Parameters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Indico’s HTTP Export API"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Indico&#8217;s HTTP Export API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="accessing-the-api">
+<h1>1. Accessing the API<a class="headerlink" href="#accessing-the-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="url-structure">
+<h2>1.1. URL structure<a class="headerlink" href="#url-structure" title="Permalink to this headline">¶</a></h2>
+<p>Indico allows you to programmatically access the content of its
+database by exposing various information like category contents, events,
+rooms and room bookings through a web service, the HTTP Export API.</p>
+<p>The basic URL looks like:</p>
+<p><a class="reference external" href="http://my.indico.server/export/WHAT/[LOC/]ID.TYPE?PARAMS&amp;ak=KEY&amp;timestamp=TS&amp;signature=SIG">http://my.indico.server/export/WHAT/[LOC/]ID.TYPE?PARAMS&amp;ak=KEY&amp;timestamp=TS&amp;signature=SIG</a></p>
+<p>where:</p>
+<ul class="simple">
+<li><em>WHAT</em> is&nbsp;the&nbsp;element you want to export (one of <em>categ</em>, <em>event</em>, <em>room</em>, <em>reservation</em>)</li>
+<li><em>LOC</em> is&nbsp;the location of the element(s) specified by <em>ID</em> and only used
+for certain elements, for example, for the room booking (<a class="reference external" href="https://indico.server/export/room/CERN/120.json?ak=0">https://indico.server/export/room/CERN/120.json?ak=0</a>...)</li>
+<li><em>ID</em> is&nbsp;the&nbsp;ID of the element you want to export (can&nbsp;be&nbsp;a&nbsp;<em>-</em>&nbsp;separated&nbsp;list). As for example, the 120 in the above URL.</li>
+<li><em>TYPE</em> is&nbsp;the&nbsp;output&nbsp;format&nbsp;(one&nbsp;of&nbsp;<em>json</em>, <em>jsonp</em>, <em>xml</em>,&nbsp;<em>html</em>,&nbsp;<em>ics</em>,&nbsp;<em>atom</em>)</li>
+<li><em>PARAMS</em> are various parameters affecting (filtering, sorting, ...) the
+result list</li>
+<li><em>KEY</em>, <em>TS</em>, <em>SIG</em> are part of the <a class="reference internal" href="#api-authentication"><em>API Authentication</em></a>.</li>
+</ul>
+<p>Some examples could be:</p>
+<blockquote>
+<ul class="simple">
+<li>Export data about events in a category: <a class="reference external" href="https://my.indico/export/categ/2.json?from=today&amp;to=today&amp;pretty=yes">https://my.indico/export/categ/2.json?from=today&amp;to=today&amp;pretty=yes</a></li>
+<li>Export data about a event: <a class="reference external" href="https://indico.server/export/event/137346.json?occ=yes&amp;pretty=yes">https://indico.server/export/event/137346.json?occ=yes&amp;pretty=yes</a></li>
+<li>Export data about rooms: <a class="reference external" href="https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&amp;pretty=yes">https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&amp;pretty=yes</a></li>
+<li>Export your reservations: <a class="reference external" href="https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&amp;detail=reservations&amp;from=today&amp;to=today&amp;bookedfor=USERNAME&amp;pretty=yes">https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&amp;detail=reservations&amp;from=today&amp;to=today&amp;bookedfor=USERNAME&amp;pretty=yes</a></li>
+</ul>
+</blockquote>
+<p>See more details about querying in <a class="reference external" href="exporters/index.html">Exporters</a>.</p>
+</div>
+<div class="section" id="api-authentication">
+<span id="id1"></span><h2>1.2. API Authentication<a class="headerlink" href="#api-authentication" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general">
+<h3>1.2.1. General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h3>
+<p>The HTTP Export API uses an API key and - depending on the config - a
+cryptographic signature for each request.</p>
+<p>To create an API key, go to <em>My Profile » HTTP API</em> and click the
+<em>Create API key</em> button. This will create an <em>API Key</em> and a <em>Secret Key</em>
+(if signatures are required).</p>
+<p>It is recommended to always use the highest security level. That means if
+only an <em>API key</em> is available always include it and if a <em>secret key</em> is
+available, always sign your requests. Since you might want to retrieve only
+public information (instead of everything visible to your Indico user) you
+can add the param <em>onlypublic=yes</em> to the query string.</p>
+</div>
+<div class="section" id="request-signing">
+<h3>1.2.2. Request Signing<a class="headerlink" href="#request-signing" title="Permalink to this headline">¶</a></h3>
+<p>To sign a request, you need the following:</p>
+<ul class="simple">
+<li>The requested path, e.g. <em>/export/categ/123.json</em></li>
+<li>Any additional params, e.g. <em>nocache=yes&amp;limit=10</em></li>
+<li>The current UNIX timestamp</li>
+<li>You <em>API key</em> and <em>secret key</em></li>
+</ul>
+<ol class="arabic simple">
+<li>Add your API key to the params (<em>nocache=yes&amp;limit=10&amp;ak=your-api-key</em>)</li>
+<li>Add the current timestamp to the params (<em>nocache=yes&amp;limit=10&amp;ak=your-api-key&amp;timestamp=1234567890</em>)</li>
+<li>Sort the query string params (<em>ak=your-api-key&amp;limit=10&amp;nocache=yes&amp;timestamp=1234567890</em>)</li>
+<li>Merge path and the sorted query string to a single string (<em>/export/categ/123.json?ak=your-api-key&amp;limit=10&amp;nocache=yes&amp;timestamp=1234567890</em>)</li>
+<li>Create a HMAC-SHA1 signature of this string using your <em>secret key</em> as
+the key.</li>
+<li>Append the hex-encoded signature to your query string: <em>?ak=your-api-key&amp;limit=10&amp;nocache=yes&amp;timestamp=1234567890&amp;signature=your-signature</em></li>
+</ol>
+<p>Note that a signed request might be valid only for a few seconds or
+minutes, so you <strong>need</strong> to sign it right before sending it and not store
+the generated URL as it is likely to expire soon.</p>
+<p>You can find example code for Python and PHP in the following sections.</p>
+<div class="section" id="request-signing-for-python">
+<h4>1.2.2.1. Request Signing for Python<a class="headerlink" href="#request-signing-for-python" title="Permalink to this headline">¶</a></h4>
+<p>A simple example in Python:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">hmac</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<span class="k">def</span> <span class="nf">build_indico_request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secret_key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">only_public</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s">&#39;items&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">api_key</span><span class="p">:</span>
+        <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;apikey&#39;</span><span class="p">,</span> <span class="n">api_key</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">only_public</span><span class="p">:</span>
+        <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;onlypublic&#39;</span><span class="p">,</span> <span class="s">&#39;yes&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">secret_key</span><span class="p">:</span>
+        <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;timestamp&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))))</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">?</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;signature&#39;</span><span class="p">,</span> <span class="n">signature</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">items</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">path</span>
+    <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">?</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">API_KEY</span> <span class="o">=</span> <span class="s">&#39;00000000-0000-0000-0000-000000000000&#39;</span>
+    <span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s">&#39;00000000-0000-0000-0000-000000000000&#39;</span>
+    <span class="n">PATH</span> <span class="o">=</span> <span class="s">&#39;/export/categ/1337.json&#39;</span>
+    <span class="n">PARAMS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;nocache&#39;</span><span class="p">:</span> <span class="s">&#39;yes&#39;</span><span class="p">,</span>
+        <span class="s">&#39;limit&#39;</span><span class="p">:</span> <span class="mi">123</span>
+    <span class="p">}</span>
+    <span class="k">print</span> <span class="n">build_indico_request</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="n">PARAMS</span><span class="p">,</span> <span class="n">API_KEY</span><span class="p">,</span> <span class="n">SECRET_KEY</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="request-signing-for-php">
+<h4>1.2.2.2. Request Signing for PHP<a class="headerlink" href="#request-signing-for-php" title="Permalink to this headline">¶</a></h4>
+<p>A simple example in PHP:</p>
+<div class="highlight-python"><pre>&lt;?php
+
+function build_indico_request($path, $params, $api_key = null, $secret_key = null, $only_public = false) {
+    if($api_key) {
+        $params['apikey'] = $api_key;
+    }
+
+    if($only_public) {
+        $params['onlypublic'] = 'yes';
+    }
+
+    if($secret_key) {
+        $params['timestamp'] = time();
+        uksort($params, 'strcasecmp');
+        $url = $path . '?' . http_build_query($params);
+        $params['signature'] = hash_hmac('sha1', $url, $secret_key);
+    }
+
+    if(!$params) {
+        return $path;
+    }
+
+    return $path . '?' . http_build_query($params);
+}
+
+if(true) { // change to false if you want to include this file
+    $API_KEY = '00000000-0000-0000-0000-000000000000';
+    $SECRET_KEY = '00000000-0000-0000-0000-000000000000';
+    $PATH = '/export/categ/1337.json';
+    $PARAMS = array(
+        'nocache' =&gt; 'yes',
+        'limit' =&gt; 123
+    );
+    echo build_indico_request($PATH, $PARAMS, $API_KEY, $SECRET_KEY) . "\n";
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../_static/indico_logo.png" width="200px"/> 
+
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">1. Accessing the API</a><ul>
+<li><a class="reference external" href="#url-structure">1.1. URL structure</a></li>
+<li><a class="reference external" href="#api-authentication">1.2. API Authentication</a><ul>
+<li><a class="reference external" href="#general">1.2.1. General</a></li>
+<li><a class="reference external" href="#request-signing">1.2.2. Request Signing</a><ul>
+<li><a class="reference external" href="#request-signing-for-python">1.2.2.1. Request Signing for Python</a></li>
+<li><a class="reference external" href="#request-signing-for-php">1.2.2.2. Request Signing for PHP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Indico&#8217;s HTTP Export API</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="common.html"
+                                  title="next chapter">2. Common Parameters</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="common.html" title="2. Common Parameters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Indico’s HTTP Export API"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Indico&#8217;s HTTP Export API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

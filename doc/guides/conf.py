@@ -190,6 +190,8 @@ latex_documents = [
    u'Indico Team', 'manual'),
   ('Chat/XMPPClients', 'IndicoChatXMPPClients.tex', u'Indico Documentation',
    u'Indico Team', 'manual'),
+  ('Importer/Importer', 'IndicoImporter.tex', u'Indico Documentation',
+   u'Indico Team', 'manual'),
   ('QuickStartGuides/QSGAgendaUsers/index', 'IndicoQSGAgendaUsers.tex', u'Indico Documentation',
    u'Indico Team', 'manual'),
   ('QuickStartGuides/QSGContributionManager/index', 'IndicoQSGContributionManager.tex', u'Indico Documentation',

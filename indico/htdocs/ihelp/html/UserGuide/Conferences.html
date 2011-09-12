@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>2. Conferences &mdash; Indico v0.97 documentation</title>
+    <title>2. Conferences &mdash; Indico v0.98 documentation</title>
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.97',
+        VERSION:     '0.98',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.97 documentation" href="../index.html" />
+    <link rel="top" title="Indico v0.98 documentation" href="../index.html" />
     <link rel="up" title="Indico’s User Guide" href="index.html" />
     <link rel="next" title="3. Meetings" href="Meetings.html" />
     <link rel="prev" title="1. Categories" href="Categories.html" />
@@ -41,7 +41,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" accesskey="U">Indico&#8217;s User Guide</a> &raquo;</li> 
       </ul>
@@ -580,12 +580,9 @@ no registration submitted from this tab will be recorded.</p>
 <span id="epayment"></span><h5>2.4.5.1.4. E-payment<a class="headerlink" href="#e-payment" title="Permalink to this headline">¶</a></h5>
 <p>You can choose to enable or disable e-payment by clicking on
 <em>Enable</em>/<em>Disable</em>. From this tab, you can customize the text to display
-in the payment page, the payment conditions and the currency to use. See
-in the image below all the options.</p>
+in the payment page, the payment conditions, the email bodies related to epayment
+and the currency to use. See in the image below all the options.</p>
 <p><img alt="image119" src="../_images/epayment.png" /></p>
-<p><strong>Note</strong>: This option is only available to you if you are a manager and
-you define any aspect of your conference to be billable. If you are not a
-conference manager, you will not be presented with this option.</p>
 </div>
 </div>
 </div>
@@ -650,7 +647,7 @@ submitted to the conference:</p>
 <li><strong>Apply filters</strong>: Clicking on this link will open a box with many filters. Enabling or disabling any of them will have an impact on the abstracts shown in the list below. For example, you can choose to display only the abstracts belonging to a particular track or session.</li>
 <li><strong>Add New</strong>:  Submit a new abstract. When you click on this, a window will open:</li>
 </ul>
-<p><img alt="image109" src="../_images/submitAbstract.png" /></p>
+<p><img alt="image150" src="../_images/absSubForm.PNG" /></p>
 <p>You will need to fill in the form and click on <em>submit</em> .</p>
 <ul class="simple">
 <li><strong>Accept</strong>: If you have the correct rights, you can accept abstracts (if not, you can only propose to accept). Tick the corresponding box, and then click on <em>Accept</em>.  A new page will appear, where you can choose the destination track, session, the type of contribution and if you wish to send an email notification or not. Once you have chosen all the options, click on <em>accept</em>.</li>
@@ -789,7 +786,8 @@ abstracts added by the Conference Managers.</p>
 <li><strong>Apply Filters</strong>: Clicking on that link will open a list of criteria which allows you to filter the contributions. For example, you can choose to only display contributions included in one specific track or session.</li>
 <li><strong>Static URL for this result</strong>: Gives you the URL to access this page with the filters that you have applied until that moment.</li>
 <li><strong>Add new</strong>: Add a new contribution.</li>
-<li><strong>Assign to session</strong>: Assign one or more specific contributions to a session.</li>
+<li><strong>Delete</strong>: Delete the selected contributions. Beware that once deleted, you cannot restore them.</li>
+<li><strong>Move</strong>: Assign one or more specific contributions to a session.</li>
 <li><strong>Author list</strong>:  This will show you a list of the primary authors, the co-authors and presenters.  You need to select at least one contribution before clicking on <em>Author list</em>.</li>
 <li><strong>Material package</strong>: This allows you to export all the material from the contributions into a zip file[</li>
 <li><strong>Proceedings</strong>: Get a zip file with all the papers and a table of contents. To generate this, the conference organiser should go through all contributions, and mark the wanted papers as main resource (click on the <img alt="image133" src="../_images/markMainResource.png" /> icon. When the star is yellow, the material is marked as main resource). Once this is done,  Indico will generate a table of contents  for all the papers and organize all PDF files by chapters into a zip file.</li>
@@ -1030,8 +1028,11 @@ Conference Managers and Administrators can view the conference.
 When it is inheriting, it will have the same access protection as its
 parent categoy. Changing the parent&#8217;s access protection will change
 the conference&#8217;s access protection accordingly; see <a class="reference external" href="Protection.html#access-control"><em>Access Control Policy</em></a>.</p>
+<p>If the conference is  PRIVATE the event manager will be able to set a
+&#8216;Contact in case of no access&#8217;, so users with no access will know who to contact
+in order to request access.</p>
 <p><img alt="image49" src="../_images/confm29.png" /></p>
-<p>When private you can also add an Access Key which means anyone
+<p>Also when private you can also add an Access Key which means anyone
 with this key can access the conference without logging in. Users
 will get a message as the following:</p>
 <p><img alt="image50" src="../_images/confm30.png" /></p>
@@ -1231,8 +1232,11 @@ and view the abstracts they have submitted.</p>
 must be in the time range to allow you to submit an abstract. Once
 logged in you can fill in the form to submit your abstract.</p>
 <p><img alt="image80" src="../_images/confd9.png" /></p>
-<p>You need to fill in the title, content, and author details. If you
-need to you can add any co-authors. You can also choose which track
+<p>You need to fill in the title, content, and the mandatory fields specified
+(if any). You have to add/select at least one primary author. If you
+need to you can add any co-authors. It is possible to move authors and co-authors
+by doing drag and drop. Sometimes will be possible to attach files to the abstract,
+if the option has been set by the manager. You can also choose which track
 you would like your abstract to be included in as well as any
 comments you would like to add. You will receive an email notification
 after submitting.</p>
@@ -1598,7 +1602,7 @@ session. You may also make a PDF of the session.</p>
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.97 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" >Indico&#8217;s User Guide</a> &raquo;</li> 
       </ul>

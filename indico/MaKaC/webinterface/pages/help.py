@@ -42,8 +42,8 @@ class WHelp(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-
         vars["HasCollaboration"] = PluginsHolder().hasPluginType("Collaboration")
+        vars["HasImporter"] = PluginsHolder().hasPluginType("importer")
         vars["HasChat"] = PluginsHolder().hasPluginType("InstantMessaging")
         vars["IsAdmin"] = RCAdmin.hasRights(self._rh)
         if PluginsHolder().hasPluginType("Collaboration"):

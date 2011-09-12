@@ -272,8 +272,13 @@ of the meeting (see :ref:`access_control`)
 
 |image120|
 
-When private you can also add an Access Key which means anyone
+If the conference is  PRIVATE the event manager will be able to set a
+'Contact in case of no access', so users with no access will know who to contact
+in order to request access.
+
+Also, when private you can also add an Access Key which means anyone
 with this key can access the meeting without logging in.
+
 
 *Domain Control* This is available for public meetings. It allows you
 to specify which domain can access the meeting. For instance, choosing

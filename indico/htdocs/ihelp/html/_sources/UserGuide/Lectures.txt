@@ -169,7 +169,11 @@ When it is inheriting, it has the same access protection as its parent
 category. Changing the access protection of its parent category will
 change the access protection of the lecture.
 
-When private you can also add an Access Key which means anyone
+If the conference is  PRIVATE the event manager will be able to set a
+'Contact in case of no access', so users with no access will know who to contact
+in order to request access.
+
+Also when private you can also add an Access Key which means anyone
 with this key can access the lecture without logging in.
 
 |image146|

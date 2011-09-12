@@ -667,14 +667,12 @@ E-payment
 
 You can choose to enable or disable e-payment by clicking on
 *Enable*/*Disable*. From this tab, you can customize the text to display
-in the payment page, the payment conditions and the currency to use. See
-in the image below all the options.
+in the payment page, the payment conditions, the email bodies related to epayment
+and the currency to use. See in the image below all the options.
 
 |image119|
 
-**Note**: This option is only available to you if you are a manager and
-you define any aspect of your conference to be billable. If you are not a
-conference manager, you will not be presented with this option.
+
 
 -------------
 
@@ -920,7 +918,9 @@ From the contribution menu you can:
 
 * **Add new**: Add a new contribution.
 
-* **Assign to session**: Assign one or more specific contributions to a session.
+* **Delete**: Delete the selected contributions. Beware that once deleted, you cannot restore them.
+
+* **Move**: Assign one or more specific contributions to a session.
 
 * **Author list**:  This will show you a list of the primary authors, the co-authors and presenters.  You need to select at least one contribution before clicking on *Author list*.
 
@@ -1230,9 +1230,13 @@ When it is inheriting, it will have the same access protection as its
 parent categoy. Changing the parent's access protection will change
 the conference's access protection accordingly; see :ref:`access_control`.
 
+If the conference is  PRIVATE the event manager will be able to set a
+'Contact in case of no access', so users with no access will know who to contact
+in order to request access.
+
 |image49|
 
-When private you can also add an Access Key which means anyone
+Also when private you can also add an Access Key which means anyone
 with this key can access the conference without logging in. Users
 will get a message as the following:
 

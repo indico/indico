@@ -62,26 +62,13 @@ The result should look like this:
 
 |image164|
 
---------------
+Using the HTTP Export API
+-------------------------
 
-Using the export.py script
---------------------------
-
-Indico allows you to programmatically access the content of its
-database by exposing its events through a web service, the
-export.py script.
-
-A typical example of how to use this script is:
-
-http://my.indico.server/tools/export.py?fid=2l12&date=today&days=1000&of=xml
-
-where:
-
-* *fid* is the category from which you want to extract the events (can be a *+* separated list)
-* *date* is the starting date of the event (format: *yyyy-mm-dd* or *today*)
-* *days* is the number of days to export the events (starting on *date*)
-* *of* is the output format (one of *xml*, *html*, *ical*, *rss*)
-        
+Indico has an export API which allows you to
+export categories, events, rooms and room bookings in various formats such
+as JSON, XML, iCal and Atom. For details no how to use this API, see
+:doc:`/ExportAPI/index`.
 
 --------------
 

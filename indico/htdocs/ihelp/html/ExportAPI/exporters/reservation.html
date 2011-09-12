@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. Reservations &mdash; Indico v0.98 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.98',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Indico v0.98 documentation" href="../../index.html" />
+    <link rel="up" title="3. Exportable Elements" href="index.html" />
+    <link rel="next" title="Indico’s Glossary" href="../../Glossary/Glossary.html" />
+    <link rel="prev" title="3. Rooms" href="room.html" />
+   <link type="text/css" href="../../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../Glossary/Glossary.html" title="Indico’s Glossary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="room.html" title="3. Rooms"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+
+          <li><a href="../index.html" >Indico&#8217;s HTTP Export API</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">3. Exportable Elements</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="reservations">
+<h1>4. Reservations<a class="headerlink" href="#reservations" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general-information">
+<h2>4.1. General Information<a class="headerlink" href="#general-information" title="Permalink to this headline">¶</a></h2>
+<p>The reservation export is only availabled for authenticated users,
+i.e. when using an API key and a signature (if enabled).
+If the room booking system is restricted to certain users/groups this
+restriction applies for the reservation export API, too.</p>
+<p>Please note that the room export with the <em>reservations</em> detail level
+is much more appropriate if you need reservations for specific rooms.</p>
+</div>
+<div class="section" id="url-format">
+<h2>4.2. URL Format<a class="headerlink" href="#url-format" title="Permalink to this headline">¶</a></h2>
+<p><em>/export/reservation/LOCATION.TYPE</em></p>
+<p>The <em>LOCATION</em> should be the room location, e.g. <em>CERN</em>. A <em>-</em> separated
+list of multiple locations is allowed, too.</p>
+</div>
+<div class="section" id="parameters">
+<h2>4.3. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="5%" />
+<col width="16%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Param</th>
+<th class="head">Short</th>
+<th class="head">Values</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>occurrences</td>
+<td>occ</td>
+<td>yes, no</td>
+<td>Include all occurrences of room reservations.</td>
+</tr>
+<tr><td>cancelled</td>
+<td>cxl</td>
+<td>yes, no</td>
+<td>If specified only include cancelled (<em>yes</em>) or
+non-cancelled (<em>no</em>) reservations.</td>
+</tr>
+<tr><td>rejected</td>
+<td>rej</td>
+<td>yes, no</td>
+<td>If specified only include rejected/non-rejected resvs.</td>
+</tr>
+<tr><td>confirmed</td>
+<td><cite>-</cite></td>
+<td>yes, no, pending</td>
+<td>If specified only include bookings/pre-bookings with the
+given state.</td>
+</tr>
+<tr><td>archival</td>
+<td>arch</td>
+<td>yes, no</td>
+<td>If specified only include bookings (not) from the past.</td>
+</tr>
+<tr><td>recurring</td>
+<td>rec</td>
+<td>yes, no</td>
+<td>If specified only include bookings which are (not) recurring.</td>
+</tr>
+<tr><td>repeating</td>
+<td>rep</td>
+<td>yes, no</td>
+<td>Alias for <em>recurring</em></td>
+</tr>
+<tr><td>avc</td>
+<td>&nbsp;</td>
+<td>yes, no</td>
+<td>If specified only include bookings which (do not) use AVC.</td>
+</tr>
+<tr><td>avcsupport</td>
+<td>avcs</td>
+<td>yes, no</td>
+<td>If specified only include bookings which (do not) need AVC Support.</td>
+</tr>
+<tr><td>bookedfor</td>
+<td>bf</td>
+<td>text (wildcards)</td>
+<td>Only include bookings where the <em>booked for</em> field matches the
+given wildcard string.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="detail-levels">
+<h2>4.4. Detail Levels<a class="headerlink" href="#detail-levels" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>4.4.1. reservations<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Returns detailed data about the reservations and the most important
+information about the booked room.</p>
+<p>For example, <a class="reference external" href="https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&amp;detail=reservations&amp;from=today&amp;to=today&amp;bookedfor=*MONNICH*&amp;pretty=yes">https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&amp;detail=reservations&amp;from=today&amp;to=today&amp;bookedfor=*MONNICH*&amp;pretty=yes</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">&quot;_type&quot;</span><span class="p">:</span> <span class="s">&quot;HTTPAPIResult&quot;</span><span class="p">,</span>
+    <span class="s">&quot;complete&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+    <span class="s">&quot;url&quot;</span><span class="p">:</span> <span class="s">&quot;https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&amp;detail=reservations&amp;from=today&amp;to=today&amp;bookedfor=*MONNICH*&amp;pretty=yes&quot;</span><span class="p">,</span>
+    <span class="s">&quot;ts&quot;</span><span class="p">:</span> <span class="mi">1308923111</span><span class="p">,</span>
+    <span class="s">&quot;results&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;endDT&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-06-25&quot;</span><span class="p">,</span>
+                <span class="s">&quot;tz&quot;</span><span class="p">:</span> <span class="s">&quot;Europe/Zurich&quot;</span><span class="p">,</span>
+                <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;17:30:00&quot;</span>
+            <span class="p">},</span>
+            <span class="s">&quot;room&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;_fossil&quot;</span><span class="p">:</span> <span class="s">&quot;minimalRoomMetadata&quot;</span><span class="p">,</span>
+                <span class="s">&quot;_type&quot;</span><span class="p">:</span> <span class="s">&quot;RoomCERN&quot;</span><span class="p">,</span>
+                <span class="s">&quot;fullName&quot;</span><span class="p">:</span> <span class="s">&quot;500-1-201 - Mezzanine&quot;</span><span class="p">,</span>
+                <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="mi">120</span>
+            <span class="p">},</span>
+            <span class="s">&quot;isConfirmed&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s">&quot;isValid&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s">&quot;usesAVC&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;repeatability&quot;</span><span class="p">:</span> <span class="s">&quot;daily&quot;</span><span class="p">,</span>
+            <span class="s">&quot;_type&quot;</span><span class="p">:</span> <span class="s">&quot;ReservationCERN&quot;</span><span class="p">,</span>
+            <span class="s">&quot;vcList&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s">&quot;reason&quot;</span><span class="p">:</span> <span class="s">&quot;Just testing&quot;</span><span class="p">,</span>
+            <span class="s">&quot;location&quot;</span><span class="p">:</span> <span class="s">&quot;CERN&quot;</span><span class="p">,</span>
+            <span class="s">&quot;_fossil&quot;</span><span class="p">:</span> <span class="s">&quot;reservationMetadata&quot;</span><span class="p">,</span>
+            <span class="s">&quot;needsAVCSupport&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s">&quot;startDT&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;date&quot;</span><span class="p">:</span> <span class="s">&quot;2011-06-24&quot;</span><span class="p">,</span>
+                <span class="s">&quot;tz&quot;</span><span class="p">:</span> <span class="s">&quot;Europe/Zurich&quot;</span><span class="p">,</span>
+                <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;08:30:00&quot;</span>
+            <span class="p">},</span>
+            <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="mi">93094</span><span class="p">,</span>
+            <span class="s">&quot;bookingUrl&quot;</span><span class="p">:</span> <span class="s">&quot;http://indico.server/roomBooking.py/bookingDetails?roomLocation=CERN&amp;resvID=93094&quot;</span><span class="p">,</span>
+            <span class="s">&quot;bookedForName&quot;</span><span class="p">:</span> <span class="s">&quot;MONNICH, Jerome&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../../_static/indico_logo.png" width="200px"/> 
+
+            <h3><a href="../../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">4. Reservations</a><ul>
+<li><a class="reference external" href="#general-information">4.1. General Information</a></li>
+<li><a class="reference external" href="#url-format">4.2. URL Format</a></li>
+<li><a class="reference external" href="#parameters">4.3. Parameters</a></li>
+<li><a class="reference external" href="#detail-levels">4.4. Detail Levels</a><ul>
+<li><a class="reference external" href="#id1">4.4.1. reservations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="room.html"
+                                  title="previous chapter">3. Rooms</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="../../Glossary/Glossary.html"
+                                  title="next chapter">Indico&#8217;s Glossary</a></p>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../Glossary/Glossary.html" title="Indico’s Glossary"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="room.html" title="3. Rooms"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+
+          <li><a href="../index.html" >Indico&#8217;s HTTP Export API</a> &raquo;</li>
+          <li><a href="index.html" >3. Exportable Elements</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

@@ -6135,6 +6135,7 @@ div.fitInnerTimetableDialog {
 .indicoHelp .icons {
     float: right;
     padding-right: 5px;
+    vertical-align: top;
 }
 
 .indicoHelp .content {

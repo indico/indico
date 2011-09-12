@@ -36,6 +36,6 @@
             {"prevURL" : "${ prevURL }", "nextURL" : "${ nextURL }", "formUrl" : "${ calendarFormUrl }",
             "startD" : "${ startD }", "endD" : "${ endD }", "periodName" : "${ periodName }",
             "params" : ${ jsonEncode(calendarParams) }}, ${ str(manyRooms).lower() }
-            ${',"' + urlHandlers.UHRoomBookingRejectAllConflicting.getURL() + '"' if showRejectAllButton else ''});
+            ${',"' + str(urlHandlers.UHRoomBookingRejectAllConflicting.getURL()) + '"' if showRejectAllButton else ''});
     $E("roomBookingCal").set(roomBookingCalendar.draw());
     </script>
