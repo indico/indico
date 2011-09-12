@@ -1,6 +1,5 @@
 <%page args="modifying=None, showParent=None, conf=None, event=None, parentRoomInfo=None, eventId=None"/>
 <% import MaKaC %>
-<% import simplejson %>
 
 <tr>
   <td class="titleCellTD"><span class="titleCellFormat">${ _("Place")}</span></td>
@@ -36,8 +35,8 @@
   % endif
 
   % if conf:
-      var ttdata = ${ simplejson.dumps(MaKaC.schedule.ScheduleToJson.process(conf.getSchedule(), conf.getTimezone(), None,
-                                                                                days = None, mgmtMode = True)) } ;
+      var ttdata = ${ MaKaC.schedule.ScheduleToJson.process(conf.getSchedule(), conf.getTimezone(), None,
+                                                                                days = None, mgmtMode = True) | n,j } ;
       <% from MaKaC.common.Conversion import Conversion %>
       var bookedRooms = ${ Conversion.reservationsList(conf.getRoomBookingList()) };
       rbWidget = new RoomBookingReservationWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), ${ eventFavorites }, ${"null" if modifying else "Indico.Data.DefaultLocation"}, bookedRooms, ttdata, null, "${ eventId }");

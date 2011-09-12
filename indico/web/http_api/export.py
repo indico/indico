@@ -31,9 +31,6 @@ import urllib
 from zope.interface import Interface, implements
 from datetime import datetime, timedelta, date, time
 
-# external lib imports
-from simplejson import dumps
-
 # indico imports
 from indico.util.date_time import nowutc
 from indico.util.fossilize import fossilize
