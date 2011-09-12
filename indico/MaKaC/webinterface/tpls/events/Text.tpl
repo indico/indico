@@ -47,7 +47,7 @@
 <%def name="printSubContributionInfo(item)">
     &nbsp;&nbsp;&nbsp;o ${item.getTitle()}&nbsp;
    % if item.getSpeakerList() or item.getSpeakerText():
-        (${common.obtainUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), useSpan=False)})
+        (${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), useSpan=False)})
    % endif
    <br/>
    % if item.getDescription():
