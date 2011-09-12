@@ -70,6 +70,7 @@ function deselectAll()
           </td>
         </tr>
         <tr><td>&nbsp;</td></tr>
+        % if self_._conf.getType() == "conference":
         <tr>
             <td class="groupTitle"> ${ _("Main Resource")}</td>
         </tr>
@@ -79,6 +80,7 @@ function deselectAll()
             </td>
         </tr>
         <tr><td>&nbsp;</td></tr>
+        % endif
         <tr>
             <td class="groupTitle"> ${ _("Get material")}...</td>
         </tr>
