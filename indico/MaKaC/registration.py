@@ -2979,8 +2979,8 @@ class PersonalDataForm(GeneralSectionForm):
             { 'pd':'address', 'caption':'Address', 'lock':('input', 'delete') },
             { 'pd':'city', 'caption':'City', 'mandatory':True, 'lock':('input', 'delete') },
             { 'pd':'country', 'caption':'Country', 'input':'country', 'mandatory':True, 'lock':('input', 'delete') },
-            { 'pd':'phone', 'caption':'Phone', 'input':'telephone', 'lock':('input', 'delete') },
-            { 'pd':'fax', 'caption':'Fax', 'input':'telephone', 'lock':('input', 'delete') },
+            { 'pd':'phone', 'caption':'Phone', 'lock':('input', 'delete') },
+            { 'pd':'fax', 'caption':'Fax', 'lock':('input', 'delete') },
             { 'pd':'email', 'caption':'Email', 'mandatory':True, 'lock':('mandatory', 'input', 'delete', 'disable') },
             { 'pd':'personalHomepage', 'caption':'Personal homepage', 'lock':('input', 'delete') },
         )
