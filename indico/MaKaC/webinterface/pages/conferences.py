@@ -894,17 +894,17 @@ class WPSentEmail( WPConferenceDefaultDisplayBase ):
 
 class WEmail(wcomponents.WTemplated):
 
-    def __init__(self,conf,user,toUser):
+    def __init__(self,conf,user,toUsers):
         self._conf = conf
         self._from = user
-        self._to = toUser
+        self._to = toUsers
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         if vars.get("from", None) is None :
             vars["FromName"] = self._from
-        vars["fromField"] = """<input type="hidden" name="from" value="%s"></input>%s"""%(self._from.getId(),self._from.getFirstName() + " " +  self._from.getFamilyName())
-        vars["toField"] = """<input type="hidden" name="to" value="%s"></input>%s"""%(self._to.getId(),self._to.getFirstName() + " " +  self._to.getFamilyName())
+        vars["fromUser"] = self._from
+        vars["toUsers"] =  self._to
         if vars.get("postURL",None) is None :
             vars["postURL"]=urlHandlers.UHConferenceSendEmail.getURL(self._to)
         if vars.get("subject", None) is None :

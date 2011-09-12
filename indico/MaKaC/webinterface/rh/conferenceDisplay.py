@@ -562,8 +562,9 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
             self._emailto = author
 
     def _process(self):
+        postURL = urlHandlers.UHConferenceSendEmail.getURL(self._emailto)
         p=conferences.WPEMail(self, self._target)
-        return p.display(emailto=self._emailto)
+        return p.display(emailto=[self._emailto], postURL=postURL)
 
 class RHConferenceSendEmail (RHConferenceBaseDisplay, base.RHProtected):
     _uh = urlHandlers.UHConferenceSendEmail

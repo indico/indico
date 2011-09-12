@@ -2,15 +2,22 @@
 
     <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
-            <td colspan="2" class="groupTitle">${ _("Send Email")}</font></b></td>
+            <td colspan="2" class="groupTitle">${ _("Send Email")}</td>
         </tr>
         <tr>
             <td>To: </td>
-              <td>${ toField }</td>
+              <td>
+              <%listUsers=[]%>
+                  % for user in toUsers:
+                      <input type="hidden" name="to" value="${user.getId()}"></input>
+                      <% listUsers.append(user.getFirstName() + " " +  user.getFamilyName()) %>
+                  % endfor
+                  ${";".join(listUsers)}
+              </td>
         </tr>
         <tr>
             <td>From: </td>
-          <td>${ fromField }</td>
+          <td><input type="hidden" name="from" value="${fromUser.getId()}"></input>${fromUser.getFirstName() + " " +  fromUser.getFamilyName()}</td>
         </tr>
            <tr>
             <td>Subject:</td>

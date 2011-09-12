@@ -2205,7 +2205,7 @@ class RHConfModifParticipantsAction(RHConfModifParticipants):
         elif action == _("Ask for excuse") :
             data = self._conf.getParticipation().prepareAskForExcuse(self._getUser(), selectedList)
             if data is not None :
-                params["emailto"] = ", ".join(data["toList"])
+                params["emailto"] = data["toList"]
                 params["from"] = data["fromAddr"]
                 params["subject"] = data["subject"]
                 params["body"] = data["body"]
@@ -2237,8 +2237,8 @@ class RHConfModifParticipantsAction(RHConfModifParticipants):
             toList = []
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
-                toList.append(participant.getEmail())
-            params["emailto"] = ", ".join(toList)
+                toList.append(participant)
+            params["emailto"] = toList
             params["toDisabled"] = True
             params["fromDisabled"] = True
             p = conferences.WPConfModifParticipantsEMail( self, self._target )
@@ -2627,8 +2627,12 @@ class RHConfModifParticipantsSendEmail (RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams( self, params )
         self._data = {}
-        toList = params.get("to","")
-        toList = toList.split(", ")
+        toList =[]
+        selectedList = self._normaliseListParam(self._getRequestParams().get("to",[]))
+        for id in selectedList:
+            participant=self._conf.getParticipation().getParticipantById(id)
+            if participant is not None:
+                toList.append(participant.getEmail())
         self._data["toList"] = toList
         self._data["ccList"] = self._normaliseListParam(params.get("cc",[]))
         self._data["fromAddr"] = params.get("from","")

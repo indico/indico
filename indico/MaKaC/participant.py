@@ -516,7 +516,7 @@ class Participation(Persistent):
         for id in toIdList :
             p = self._participantList[id]
             if not p.isPresent() :
-                toList.append(p.getEmail())
+                toList.append(p)
         if len(toList) == 0 :
             return None
 
