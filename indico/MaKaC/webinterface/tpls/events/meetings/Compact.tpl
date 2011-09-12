@@ -69,8 +69,8 @@
                 <%
                     if subitem.__class__.__name__ != 'BreakTimeSchEntry':
                         subitem = subitem.getOwner()
-                    if not subitem.canView(accessWrapper):
-                        continue
+                        if not subitem.canView(accessWrapper):
+                            continue
                 %>
             % if getItemType(subitem) == "Break":
                 ${printBreak(subitem)}
