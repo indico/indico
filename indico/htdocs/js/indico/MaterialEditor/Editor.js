@@ -1058,7 +1058,7 @@ type("EditResourceDialog", ["EditMaterialResourceBase"], {
                  [
                   $T('Description'),
                   self.description
-                 ],
+                 ]
              ]);
     },
     _bindData: function(){
