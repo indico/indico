@@ -165,7 +165,7 @@ def sortSlotByDate(x,y):
     return cmp(x.getStartDate(),y.getStartDate())
 
 def sortCategoryByTitle(x,y):
-    return cmp(x.getTitle(),y.getTitle())
+    return cmp(x.getTitle().lower(),y.getTitle().lower())
 
 def sortPrincipalsByName(x,y):
     firstNamex, firstNamey = "", ""
