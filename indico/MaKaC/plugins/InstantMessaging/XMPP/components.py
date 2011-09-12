@@ -50,7 +50,11 @@ class ChatSMContributor(Component, Observable):
 
     @classmethod
     def fillManagementSideMenu(cls, obj, params={}):
-        params['Instant Messaging'] = wcomponents.SideMenuItem(_("Chat Rooms"),
+        instantMessagingAdmins = []
+        for imPlugin in PluginsHolder().getPluginType('InstantMessaging').getPluginList():
+            instantMessagingAdmins.extend(imPlugin.getOption("admins").getValue())
+        if obj._conf.canModify(obj._rh._aw) or  obj._rh._aw.getUser() in instantMessagingAdmins:
+            params['Instant Messaging'] = wcomponents.SideMenuItem(_("Chat Rooms"),
                                                                urlHandlers.UHConfModifChat.getURL( obj._conf ))
 
     @classmethod

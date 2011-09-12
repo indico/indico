@@ -28,7 +28,7 @@ from MaKaC.plugins.InstantMessaging.XMPP.helpers import LogLinkGenerator
 from MaKaC.plugins import InstantMessaging
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, ModificationError, ConferenceClosedError
 from MaKaC.i18n import _
 import urllib2, os
 
@@ -46,6 +46,14 @@ class RHInstantMessagingHtdocs(RHHtdocs):
 
 class RHChatModifBase(RHConferenceModifBase):
 
+
+    def _checkProtection( self ):
+        instantMessagingAdmins = []
+        for imPlugin in PluginsHolder().getPluginType('InstantMessaging').getPluginList():
+            instantMessagingAdmins.extend(imPlugin.getOption("admins").getValue())
+        if not self._getUser() in instantMessagingAdmins:
+            RHConferenceModifBase._checkProtection(self)
+
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
 
@@ -55,7 +63,7 @@ class RHChatModifBase(RHConferenceModifBase):
         #fill the tabs with the active plugins in the Instant Messaging module
         for plugin in PluginsHolder().getPluginType('InstantMessaging').getPluginList():
             if plugin.isActive():
-                  self._tabs.append(plugin.getName())
+                self._tabs.append(plugin.getName())
 
 
 class RHChatFormModif(RHChatModifBase):
