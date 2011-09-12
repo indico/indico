@@ -1361,10 +1361,11 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRigh
         material, _ = self._getMaterial(forceCreate = False)
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
-            return
-        if not (RCContributionPaperReviewingStaff.hasRights(self) and not self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
+            self._loggedIn = True
+        elif not (RCContributionPaperReviewingStaff.hasRights(self) and not self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
             RHSubmitMaterialBase._checkProtection(self)
-
+        else:
+            self._loggedIn = True
 
 class RHContributionSelectManagers(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionSelectManagers

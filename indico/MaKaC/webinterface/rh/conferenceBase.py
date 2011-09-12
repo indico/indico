@@ -225,7 +225,7 @@ class RHSubmitMaterialBase(object):
 
     def _checkProtection(self):
         self._loggedIn = True
-        if self._getUser() == None:
+        if self._getUser() == None and (isinstance(self._target, Category) or not self._target.getConference().canKeyModify(self._aw)):
             self._loggedIn = False
         else:
             super(RHSubmitMaterialBase, self)._checkProtection()

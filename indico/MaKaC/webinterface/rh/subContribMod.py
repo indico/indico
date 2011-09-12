@@ -244,6 +244,7 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHSubContribModifBase):
         material, _ = self._getMaterial(forceCreate = False)
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
+            self._loggedIn = True
             return
         RHSubmitMaterialBase._checkProtection(self)
 
