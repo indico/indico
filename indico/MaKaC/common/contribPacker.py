@@ -74,6 +74,10 @@ class ContribPacker:
 
     def __init__(self,conf):
         self._conf=conf
+        self._items=0
+
+    def getItems(self):
+        return self._items
 
     def _normalisePathItem(self,name):
         return str(name).translate(string.maketrans("",""),"\\/")
@@ -89,6 +93,7 @@ class ContribPacker:
             if "slides" in materialTypes and contrib.getSlides() is not None:
                 for res in contrib.getSlides().getResourceList():
                     if isinstance(res,conference.LocalFile):
+                        self._items += 1
                         fileHandler.add("%s/slides/%s-%s-%s"%(\
                             self._normalisePathItem(contribDirName),
                             self._normalisePathItem(contrib.getId()),
@@ -98,6 +103,7 @@ class ContribPacker:
             if "paper" in materialTypes and contrib.getPaper() is not None:
                 for res in contrib.getPaper().getResourceList():
                     if isinstance(res,conference.LocalFile):
+                        self._items += 1
                         fileHandler.add("%s/paper/%s-%s-%s"%(\
                             self._normalisePathItem(contribDirName),
                             self._normalisePathItem(contrib.getId()),
@@ -114,6 +120,10 @@ class ConferencePacker:
         self._conf=conf
         self._confDirName="%s"%self._normalisePathItem(self._conf.getTitle().strip())
         self._aw=aw
+        self._items=0
+
+    def getItems(self):
+        return self._items
 
     def _normalisePathItem(self,name):
         return str(name).translate(string.maketrans("",""),"\\/")
@@ -180,6 +190,7 @@ class ConferencePacker:
                 # URLs cannot be packed, only local files
                 if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
                     if fromDate == "" or resource.getCreationDate().strftime("%Y-%m-%d") >= fromDate.strftime("%Y-%m-%d"):
+                        self._items += 1
                         fileHandler.add("%s-%s" % (os.path.join(self._confDirName,
                                                            mat.getTitle()),
                                                            self._normalisePathItem(resource.getFileName())),
@@ -212,6 +223,7 @@ class ConferencePacker:
                     # URLs cannot be packed, only local files
                     if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
                         if fromDate == "" or resource.getCreationDate().strftime("%Y-%m-%d") >= fromDate.strftime("%Y-%m-%d"):
+                            self._items += 1
                             fileHandler.add("%s-%s%s-%s" % (os.path.join(self._confDirName,
                                                                      sessionDirName,
                                                                      slotDirName,
@@ -251,6 +263,10 @@ class ProceedingsPacker:
 
     def __init__(self,conf):
         self._conf=conf
+        self._items=0
+
+    def getItems(self):
+        return self._items
 
     def _normalisePathItem(self,name):
         return str(name).translate(string.maketrans("",""),"\\/")
@@ -294,11 +310,13 @@ class ProceedingsPacker:
                 # Get Chapter Separator
                 pdf = ProceedingsChapterSeparator(track)
                 fileHandler.addNewFile("%04d-CHAPTER_SEPARATOR.pdf"%i, pdf.getPDFBin())
+                self._items += 1
                 i += 1
                 for contrib in trackDict[track.getId()]:
                     paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
                     mr= contrib.getPaper().getMainResource()
                     fileHandler.add(paperName, mr.getFilePath())
+                    self._items += 1
                     contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
                     i += 1
             # Get TOC
@@ -322,6 +340,7 @@ class ProceedingsPacker:
                                     paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
                                     mr= contrib.getPaper().getMainResource()
                                     fileHandler.add(paperName, mr.getFilePath())
+                                    self._items += 1
                                     contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
                                     i += 1
                 elif isinstance(entry,schedule.LinkedTimeSchEntry) and \
@@ -334,6 +353,7 @@ class ProceedingsPacker:
                             paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
                             mr= contrib.getPaper().getMainResource()
                             fileHandler.add(paperName, mr.getFilePath())
+                            self._items += 1
                             contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
                             i += 1
             # Get TOC
@@ -341,6 +361,7 @@ class ProceedingsPacker:
 
         i = 0
         fileHandler.addNewFile("%04d-TOC.pdf"%i, pdf.getPDFBin())
+        self._items += 1
 
         fileHandler.close()
         return fileHandler.getPath()
@@ -355,6 +376,10 @@ class ReviewingPacker:
     def __init__(self, conf):
         self._conf = conf
         self._confDirName = "%s" % self._normalisePathItem(self._conf.getTitle().strip())
+        self._items = 0
+
+    def getItems(self):
+        return self._items
 
     def _normalisePathItem(self, name):
         return str(name).translate(string.maketrans("",""),"\\/")
@@ -373,6 +398,7 @@ class ReviewingPacker:
 
         for mat in contribution.getReviewManager().getLastReview().getMaterials():
             for res in mat.getResourceList():
+                self._items += 1
                 fileHandler.add("%s" % (os.path.join(self._confDirName,
                                                      self._normalisePathItem(contribution.getId()) + "-" + dirName,
                                                      self._normalisePathItem(res.getFileName()))),
