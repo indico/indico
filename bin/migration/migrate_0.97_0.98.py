@@ -21,13 +21,19 @@ from MaKaC.rb_location import CrossLocationQueries
 
 """
 Migration script: v0.97 -> v0.98
+
+NOTE: Methods should be specified in order of execution, since @since adds them to
+the task list in the order it is called.
 """
+
 
 import sys, traceback, argparse
 from BTrees.OOBTree import OOTreeSet, OOBTree
 from BTrees.IOBTree import IOBTree
 from dateutil import rrule
+from pkg_resources import parse_version
 
+from MaKaC import __version__
 from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayIndex
 from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
@@ -46,6 +52,16 @@ from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
      CategoryStatisticsUpdaterTask
 
 from indico.modules.scheduler import Client
+
+
+MIGRATION_TASKS = []
+
+
+def since(version):
+    def _since(f):
+        MIGRATION_TASKS.append((version, f))
+        return f
+    return _since
 
 
 def _fixAC(obj):
@@ -90,6 +106,7 @@ def _convertAlarms(obj):
 
     obj.alarmList = alarms
 
+
 def _fixDefaultStyle(conf, cdmr):
     confDM = cdmr.getDisplayMgr(conf, False)
     if confDM.getDefaultStyle() == 'administrative3':
@@ -97,36 +114,66 @@ def _fixDefaultStyle(conf, cdmr):
     if confDM.getDefaultStyle() == 'it':
         confDM.setDefaultStyle('standard')
 
-def runTaskMigration(dbi, withRBDB, currentVersion):
+
+@since('0.98b2')
+def runPluginMigration(dbi, withRBDB, prevVersion):
     """
-    Migrating database tasks from the old format to the new one
+    Adding new plugins and adapting existing ones to new name policies
     """
 
-    c = Client()
+    PLUGIN_REMAP = {
+        'PayPal': 'payPal',
+        'WorldPay': 'worldPay',
+        'YellowPay': 'yellowPay',
+        "Dummyimporter": "dummy",
+        "CDSInvenio": "invenio",
+        "CERNSearchPOST": "cern_search",
+        "InvenioBatchUploader": "invenio"
+    }
 
-    for t in HelperTaskList().getTaskListInstance().getTasks():
-        for obj in t.getObjList():
-            print console.colored("   * %s" % obj.__class__.__name__, 'blue')
-            if obj.__class__.__name__ == 'FoundationSync':
-                c.enqueue(
-                    FoundationSyncTask(rrule.DAILY, byhour=0, byminute=0))
-            elif obj.__class__.__name__ == 'StatisticsUpdater':
-                c.enqueue(CategoryStatisticsUpdaterTask(
-                    CategoryManager().getById('0'),
-                    rrule.DAILY,
-                    byhour=0, byminute=0))
-            elif obj.__class__.__name__ == 'sendMail':
-                # they have to be somewhere in the conference
-                alarm = t.conf.alarmList[t.id]
-                c.enqueue(alarm)
-            else:
-                raise Exception("Unknown task type!")
+    root = dbi.getDBConnection().root()
+    if 'plugins' in root:
+        ptl = []
+        ps = root['plugins']
+        for k, v in ps.iteritems():
+            if isinstance(v, PluginType):
+                ptl.append(v)
+        for pt in ptl:
+            pt.setUsable(True)
+            for p in pt.getPluginList(includeNonPresent=True,
+                                      includeTestPlugins=True,
+                                      includeNonActive=True):
+                if hasattr(p, '_Plugin__id'):
+                    pid = p.getId()
+                else:
+                    pid = p.getName()
 
+                if pid in PLUGIN_REMAP:
+                    pid = PLUGIN_REMAP[pid]
+
+                p.setId(pid)
+                p.setUsable(True)
+
+    dbi.commit()
     if withRBDB:
         DALManager.commit()
-    dbi.commit()
 
-def runCategoryACMigration(dbi, withRBDB, currentVersion):
+    # load new plugins, so that we can update them after
+    PluginsHolder().reloadAllPlugins()
+    dbi.commit()
+    if withRBDB:
+        DALManager.commit()
+
+    if prevVersion < parse_version("0.98b1"):
+        # update db for specific plugins
+        livesync.db.updateDBStructures(root)
+        dbi.commit()
+        if withRBDB:
+            DALManager.commit()
+
+
+@since('0.98b')
+def runCategoryACMigration(dbi, withRBDB, prevVersion):
     """
     Fixing AccessController for categories
     """
@@ -134,7 +181,9 @@ def runCategoryACMigration(dbi, withRBDB, currentVersion):
         _fixAccessController(categ)
         dbi.commit()
 
-def runConferenceMigration(dbi, withRBDB, currentVersion):
+
+@since('0.98b2')
+def runConferenceMigration(dbi, withRBDB, prevVersion):
     """
     Adding missing attributes to conference objects and children
     """
@@ -147,8 +196,9 @@ def runConferenceMigration(dbi, withRBDB, currentVersion):
         # only for conferences
         if level == 'event':
 
-            if currentVersion !="v0.98b1":
+            if prevVersion < parse_version("0.98b1"):
                 # handle sessions, that our iterator ignores
+                print '< v0.98b1 only'
                 for session in obj.getSessionList():
                     _fixAccessController(session)
 
@@ -171,7 +221,8 @@ def runConferenceMigration(dbi, withRBDB, currentVersion):
             # For each conference, fix the default style
             _fixDefaultStyle(obj, cdmr)
 
-        if currentVersion !="v0.98b1":
+        if prevVersion < parse_version("0.98b1"):
+            print '< v0.98b1 only'
             _fixAccessController(obj,
                                  fixSelf=(level != 'subcontrib'))
 
@@ -195,43 +246,51 @@ def runConferenceMigration(dbi, withRBDB, currentVersion):
         DALManager.commit()
 
 
-def runPluginMigration(dbi, withRBDB, currentVersion):
+@since('0.98b')
+def runTaskMigration(dbi, withRBDB, prevVersion):
     """
-    Adding new plugins and adapting existing ones to new name policies
+    Migrating database tasks from the old format to the new one
     """
-    root = dbi.getDBConnection().root()
-    if 'plugins' in root:
-        ptl = []
-        ps = root['plugins']
-        for k, v in ps.iteritems():
-            if isinstance(v, PluginType):
-                ptl.append(v)
-        for pt in ptl:
-            pt.setUsable(True)
-            for p in pt.getPluginList(includeNonPresent=True,
-                                      includeTestPlugins=True,
-                                      includeNonActive=True):
-                # new ids have no spaces
-                p.setId(p.getName().replace(" ", ""))
-                p.setUsable(True)
-    dbi.commit()
+
+    c = Client()
+
+    for t in HelperTaskList().getTaskListInstance().getTasks():
+        for obj in t.listObj.values():
+            print console.colored("   * %s" % obj.__class__.__name__, 'blue')
+            if obj.__class__.__name__ == 'FoundationSync':
+                c.enqueue(
+                    FoundationSyncTask(rrule.DAILY, byhour=0, byminute=0))
+            elif obj.__class__.__name__ == 'StatisticsUpdater':
+                c.enqueue(CategoryStatisticsUpdaterTask(
+                    CategoryManager().getById('0'),
+                    rrule.DAILY,
+                    byhour=0, byminute=0))
+            elif obj.__class__.__name__ == 'sendMail':
+                # they have to be somewhere in the conference
+                alarm = t.conf.alarmList[t.id]
+                c.enqueue(alarm)
+            else:
+                raise Exception("Unknown task type!")
+
     if withRBDB:
         DALManager.commit()
-
-    # load new plugins, so that we can update them after
-    PluginsHolder().reloadAllPlugins()
     dbi.commit()
-    if withRBDB:
-        DALManager.commit()
-
-    # update db for specific plugins
-    livesync.db.updateDBStructures(root)
-    dbi.commit()
-    if withRBDB:
-        DALManager.commit()
 
 
-def runCategoryDateIndexMigration(dbi, withRBDB, currentVersion):
+@since('0.98b')
+def runCategoryConfDictToTreeSet(dbi, withRBDB, prevVersion):
+    """
+    Replacing the conference dictionary in the Category objects by a OOTreeSet.
+    """
+    for categ in CategoryManager()._getIdx().itervalues():
+        categ.conferencesBackup = categ.conferences.values()
+        categ.conferences = OOTreeSet(categ.conferences.itervalues())
+        if len(categ.conferences) != len(categ.conferencesBackup):
+            print "Problem migrating conf dict to tree set: %s" % categ.getId()
+
+
+@since('0.98b')
+def runCategoryDateIndexMigration(dbi, withRBDB, prevVersion):
     """
     Replacing category date indexes.
     """
@@ -249,28 +308,22 @@ If you still want to regenerate it, please, do it manually using """ \
         """bin/migration/CategoryDate.py"""
 
 
-def runCatalogMigration(dbi, withRBDB, currentVersion):
+@since('0.98b')
+def runCatalogMigration(dbi, withRBDB, prevVersion):
     """
     Initializing the new index catalog
     """
     Catalog.updateDB(dbi=dbi)
 
 
-def runCategoryConfDictToTreeSet(dbi, withRBDB, currentVersion):
-    """
-    Replacing the conference dictionary in the Category objects by a OOTreeSet.
-    """
-    for categ in CategoryManager()._getIdx().itervalues():
-        categ.conferencesBackup = categ.conferences.values()
-        categ.conferences = OOTreeSet(categ.conferences.itervalues())
-        if len(categ.conferences) != len(categ.conferencesBackup):
-            print "Problem migrating conf dict to tree set: %s" % categ.getId()
-
-
-def runRoomBlockingInit(dbi, withRBDB, currentVersion):
+@since('0.98b2')
+def runRoomBlockingInit(dbi, withRBDB, prevVersion):
     """
     Initializing room blocking indexes.
     """
+    if not withRBDB:
+        return
+
     root = DALManager().getRoot()
     if not root.has_key( 'RoomBlocking' ):
         root['RoomBlocking'] = OOBTree()
@@ -281,7 +334,8 @@ def runRoomBlockingInit(dbi, withRBDB, currentVersion):
         root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
 
 
-def runLangToGB(dbi, withRBDB, currentVersion):
+@since('0.98b2')
+def runLangToGB(dbi, withRBDB, prevVersion):
     """
     Replacing en_US with en_GB.
     """
@@ -291,7 +345,8 @@ def runLangToGB(dbi, withRBDB, currentVersion):
             av.setLang("en_GB")
 
 
-def runMakoMigration(dbi, withRBDB, currentVersion):
+@since('0.98b2')
+def runMakoMigration(dbi, withRBDB, prevVersion):
     """
     Installing new TPLs for meeting/lecture styles
     """
@@ -312,52 +367,51 @@ def runMakoMigration(dbi, withRBDB, currentVersion):
     styles['xml'] = ('xml','XML.xsl',None)
     sm.setStyles(styles)
 
-def runPluginOptionsRoomGUIDs(dbi, withRBDB, currentVersion):
+
+@since('0.98b2')
+def runPluginOptionsRoomGUIDs(dbi, withRBDB, prevVersion):
     """
     Modifying Room GUIDs
     """
+    if not withRBDB:
+        return
+
     ph = PluginsHolder()
-    opt = ph.getPluginType('Collaboration').getPlugin('WebcastRequest').getOption('webcastCapableRooms')
-    newValue = []
-    for name in opt.getValue():
-        loc, name = name.split(':')
-        room = CrossLocationQueries.getRooms(location=loc, roomName=name)
-        if room:
-            newValue.append(str(room.guid))
-    opt.setValue(newValue)
+    for pluginName, roomsOpt in [('WebcastRequest', 'webcastCapableRooms'),
+                                 ('RecordingRequest', 'recordingCapableRooms')]:
+        opt = ph.getPluginType('Collaboration').getPlugin(pluginName).getOption(roomsOpt)
+        newValue = []
+        for name in opt.getValue():
+            loc, name = name.split(':')
+            room = CrossLocationQueries.getRooms(location=loc, roomName=name)
+            if room:
+                newValue.append(str(room.guid))
+        opt.setValue(newValue)
 
-def runMigration(withRBDB=False, currentVersion=""):
 
-    tasks = [ runPluginMigration,
-              runCategoryACMigration,
-              runConferenceMigration,
-              runTaskMigration,
-              runCategoryConfDictToTreeSet,
-              runCategoryDateIndexMigration,
-              runCatalogMigration,
-              runRoomBlockingInit,
-              runLangToGB,
-              runMakoMigration,
-              runPluginOptionsRoomGUIDs]
+def runMigration(withRBDB=False, prevVersion=parse_version(__version__)):
 
     print "\nExecuting migration...\n"
 
     dbi = DBMgr.getInstance()
 
-    for task in tasks:
-        print console.colored("->", 'green', attrs=['bold']), \
-              task.__doc__.replace('\n', '').strip()
-        dbi.startRequest()
-        if withRBDB:
-            DALManager.connect()
+    # go from older to newer version and execute corresponding tasks
+    for version, task in MIGRATION_TASKS:
+        if parse_version(version) > prevVersion:
+            print console.colored("->", 'green', attrs=['bold']), \
+                  task.__doc__.replace('\n', '').strip(),
+            print console.colored("(%s)" % version, 'yellow')
+            dbi.startRequest()
+            if withRBDB:
+                DALManager.connect()
 
-        task(dbi, withRBDB, currentVersion)
+            task(dbi, withRBDB, prevVersion)
 
-        if withRBDB:
-            DALManager.commit()
-        dbi.endRequest()
+            if withRBDB:
+                DALManager.commit()
+            dbi.endRequest()
 
-        print console.colored("   DONE\n", 'green', attrs=['bold'])
+            print console.colored("   DONE\n", 'green', attrs=['bold'])
 
     print console.colored("Database Migration successful!\n",
                           'green', attrs=['bold'])
@@ -375,14 +429,14 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
     parser = argparse.ArgumentParser(description='Execute migration')
     parser.add_argument('--with-rb', dest='useRBDB', action='store_true',
                         help='Use the Room Booking DB')
-    parser.add_argument('--current-version', dest='currentVersion', help='Current version of Indico')
+    parser.add_argument('--prev-version', dest='prevVersion', help='Previous version of Indico (used by DB)', default=__version__)
 
     args = parser.parse_args()
 
     if console.yesno("Are you sure you want to execute the "
                      "migration now?"):
         try:
-            return runMigration(withRBDB=args.useRBDB, currentVersion=args.currentVersion)
+            return runMigration(withRBDB=args.useRBDB, prevVersion=parse_version(args.prevVersion))
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])

@@ -493,18 +493,12 @@ class PluginBase(Persistent):
         """ Utility method that takes a dictionary with option attributes.
             It verifies some attributes and sets default values for others if they don't exist.
         """
-        if attributes.has_key("description"):
-            description = attributes["description"]
-        else:
-            raise PluginError('Option ' + str(name) + ' does not have a "description" attribute')
-
         if attributes.has_key("type"):
             optionType = attributes["type"]
         else:
             raise PluginError('Option ' + str(name) + ' does not have a "type" attribute')
 
-        return {"description": description,
-                "note": attributes.get("note", None),
+        return {"note": attributes.get("note", None),
                 "type": optionType,
                 "subType": attributes.get("subType", None),
                 "defaultValue": attributes.get("defaultValue", None),
@@ -577,7 +571,7 @@ class PluginBase(Persistent):
             attributes: a dictionary
             order: an integer with the order of the options
         """
-        self.__options[name] = PluginOption(name, attributes["description"], attributes["type"],
+        self.__options[name] = PluginOption(name, attributes["type"],
                                             attributes["defaultValue"], attributes["editable"], attributes["visible"],
                                             attributes["mustReload"], True, order, attributes["subType"], attributes["note"])
         self._notifyModification()
@@ -590,7 +584,6 @@ class PluginBase(Persistent):
         """
         option = self.getOption(name)
         option.setPresent(True)
-        option.setDescription(attributes["description"])
         option.setNote(attributes["note"])
         option.setType(attributes["type"])
         option.setSubType(attributes["subType"])
@@ -688,7 +681,7 @@ class PluginBase(Persistent):
         return self.__actions[actionName]
 
     def addAction(self, name, attributes, index):
-        newAction = PluginAction(name, self, attributes["buttonText"],
+        newAction = PluginAction(name, self,
                                  attributes["associatedOption"], attributes["visible"],
                                  attributes["executeOnLoad"], attributes["triggeredBy"], index)
         self.__actions[name] = newAction
@@ -816,6 +809,7 @@ class PluginType (PluginBase):
                                          includeNonActive=True):
             plugin.setPresent(False)
 
+
         # we get the list of modules (plugins) of this type
         pluginModules = PluginLoader.getPluginsByType(self.getId())
 
@@ -827,9 +821,11 @@ class PluginType (PluginBase):
             if metadata['ignore']:
                 continue
             else:
+                pass
                 self._updatePluginInfo(pluginModule.__plugin_id__,
                                        pluginModule,
                                        metadata)
+
 
         ptypeModule = self.getModule()
         ptypeMetadata = processPluginMetadata(ptypeModule)
@@ -1165,9 +1161,8 @@ class PluginOption(Persistent):
 
     }
 
-    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None, note=None):
+    def __init__(self, name, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None, note=None):
         self.__name = name
-        self.__description = description
         self.__note = note
         self.__type = valueType
         self.__subType = subType
@@ -1186,10 +1181,13 @@ class PluginOption(Persistent):
         return self.__name
 
     def getDescription(self):
-        return self.__description
+        return self.getOwner().getModule().options.globalOptions[self.getName()]
 
     def getNote(self):
         return self.__note
+
+    def getOwner(self):
+        return self.getSubType() or self.getType()
 
     def getType(self):
         return self.__type
@@ -1213,9 +1211,6 @@ class PluginOption(Persistent):
 
     def setName(self, value):
         self.__name = value
-
-    def setDescription(self, description):
-        self.__description = description
 
     def setNote(self, note):
         self.__note = note
@@ -1292,7 +1287,7 @@ class PluginAction(Persistent):
         Its name is the function inside the actions.py file of each plugin that will be called.
     """
 
-    def __init__(self, name, owner, buttonText, associatedOption=None, visible=True, executeOnLoad=False, triggeredBy=[], order=0):
+    def __init__(self, name, owner, associatedOption=None, visible=True, executeOnLoad=False, triggeredBy=[], order=0):
         """ Constructor for the PluginAction class
             name: the name of the action. It's also the name of the function inside the actions.py file of each plugin that will be called.
             owner: the Plugin or PluginType object that owns this action
@@ -1307,7 +1302,6 @@ class PluginAction(Persistent):
         """
         self.__name = name
         self.__owner = owner
-        self.__buttonText = buttonText
         self.__associatedOption = associatedOption
         self.__visible = visible
         self.__executeOnLoad = executeOnLoad
@@ -1321,7 +1315,7 @@ class PluginAction(Persistent):
         return self.__owner
 
     def getButtonText(self):
-        return self.__buttonText
+        return self.getOwner().actions.pluginActions[self.getName]['buttonText']
 
     def hasAssociatedOption(self):
         return self.__associatedOption is not None
@@ -1331,9 +1325,6 @@ class PluginAction(Persistent):
 
     def setName(self, name):
         self.__name = name
-
-    def setButtonText(self, buttonText):
-        self.__buttonText = buttonText
 
     def setAssociatedOption(self, associatedOption):
         self.__associatedOption = associatedOption
