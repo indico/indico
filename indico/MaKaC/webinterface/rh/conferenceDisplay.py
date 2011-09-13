@@ -556,6 +556,8 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
             self._emailto = chair.getEmail()
         if self._auth:
             authid=params.get("authId","")
+            if not contrib:
+                raise MaKaCError(_("The author's contribution does not exist anymore."))
             author = contrib.getAuthorById(authid)
             if author == None:
                 raise NotFoundError(_("The author you try to email does not exist."))
