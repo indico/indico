@@ -35,8 +35,6 @@ from MaKaC.common import HelperMaKaCInfo
 # indico imports
 from indico.tests.python.unit.util import IndicoTestFeature
 
-from MaKaC.common.spy import transaction
-
 class TestMemStorage(MappingStorage.MappingStorage,
                      ConflictResolution.ConflictResolvingStorage):
 
