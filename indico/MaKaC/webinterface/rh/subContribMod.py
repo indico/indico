@@ -250,7 +250,7 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHSubContribModifBase):
 
     def __init__(self, req):
         RHSubContribModifBase.__init__(self, req)
-        RHSubmitMaterialBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):
         RHSubContribModifBase._checkParams(self, params)
@@ -281,32 +281,6 @@ class RHSubContributionDeletion( RHSubContributionTools ):
         else:
             p = subContributions.WPSubContributionDeletion( self, self._target )
             return p.display(**self._getRequestParams())
-
-
-
-class RHSubContributionWriteMinutes( RHSubContributionTools ):
-    _uh = urlHandlers.UHSubContributionWriteMinutes
-
-    def _checkParams( self, params ):
-        RHSubContributionTools._checkParams( self, params )
-        self._cancel = params.has_key("cancel")
-        self._save = params.has_key("OK")
-        self._text = params.get("text", "")#.strip()
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if self._cancel:
-            self._redirect( urlHandlers.UHSubContribModifTools.getURL( self._target ) )
-        elif self._save:
-            #if self._text!="":
-                minutes = self._target.getMinutes()
-                if not minutes:
-                    minutes = self._target.createMinutes()
-                minutes.setText( self._text )
-                self._redirect( urlHandlers.UHSubContribModifTools.getURL( self._target ) )
-        else:
-            p = subContributions.WPSubContributionWriteMinutes( self, self._target )
-            return p.display(**params)
 
 
 class RHMaterials(RHSubContribModifBase):

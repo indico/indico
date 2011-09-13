@@ -29,9 +29,6 @@ if DEVELOPMENT:
 def index(req, **params):
     return sessionDisplay.RHSessionDisplay( req ).process( params )
 
-def writeMinutes(req, **params):
-    return sessionDisplay.RHWriteMinutes( req ).process( params )
-
 def ical( req, **params ):
     return sessionDisplay.RHSessionToiCal( req ).process( params )
 

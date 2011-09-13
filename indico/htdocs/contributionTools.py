@@ -31,6 +31,3 @@ def index( req, **params ):
 
 def delete( req, **params):
     return contribMod.RHContributionDeletion( req ).process( params )
-
-def writeMinutes( req, **params ):
-    return contribMod.RHContributionWriteMinutes( req ).process( params )

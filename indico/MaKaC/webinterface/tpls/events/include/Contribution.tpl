@@ -20,9 +20,9 @@
             <em>${prettyDuration(item.getDuration())}</em>\
         % endif
         % if getLocationInfo(item) != getLocationInfo(parent):
-<span style="margin-left: 15px;">\
-(${common.renderLocation(item, parent=parent, span='span')})
-</span>
+            <span style="margin-left: 15px;">\
+            (${common.renderLocation(item, parent=parent, span='span')})
+            </span>
         % endif
 
     </span>
@@ -59,14 +59,6 @@
         </tbody>
     </table>
 
-    % if item.getSubContributionList():
-    <ul class="${scListClass}">
-        % for subcont in item.getSubContributionList():
-            <%include file="SubContribution.tpl" args="item=subcont, minutes=minutes"/>
-        % endfor
-    </ul>
-    % endif
-
     % if minutes:
         <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
         % if minutesText:
@@ -75,5 +67,13 @@
                 <span>${common.renderDescription(minutesText)}</span>
             </div>
         % endif
+    % endif
+
+    % if item.getSubContributionList():
+    <ul class="${scListClass}">
+        % for subcont in item.getSubContributionList():
+            <%include file="SubContribution.tpl" args="item=subcont, minutes=minutes"/>
+        % endfor
+    </ul>
     % endif
 </li>

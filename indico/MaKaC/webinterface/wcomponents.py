@@ -1129,7 +1129,6 @@ class WContribModifTool(WTemplated):
         vars = WTemplated.getVars( self )
         vars["deleteIconURL"] = Configuration.Config.getInstance().getSystemIconURL("delete")
         vars["moveIconURL"] = Configuration.Config.getInstance().getSystemIconURL("move")
-        vars["writeIconURL"] = Configuration.Config.getInstance().getSystemIconURL("write_minutes")
         return vars
 
 
@@ -3319,27 +3318,6 @@ class WConfCreationControlFrame(WTemplated):
         vars["principalTable"] = WPrincipalTable().getHTML( self._categ.getConferenceCreatorList(), self._categ , vars["addCreatorsURL"], vars["removeCreatorsURL"], selectable=False )
         vars["notifyCreationList"] = quoteattr(self._categ.getNotifyCreationList())
         vars["setNotifyCreationURL"] = urlHandlers.UHCategorySetNotifyCreation.getURL(self._categ)
-        return vars
-
-
-class WWriteMinutes(WTemplated):
-
-    def __init__( self, target ):
-        self._target = target
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        minutes = self._target.getMinutes()
-        vars["text"] = ""
-        if minutes:
-            vars["text"] = minutes.getText()
-        vars["baseURL"]=Config.getInstance().getBaseURL()
-        vars["imageUploadURL"]=urlHandlers.UHConfModifDisplayAddPageFile.getURL(self._target)
-        vars["imageBrowserURL"]=urlHandlers.UHConfModifDisplayAddPageFileBrowser.getURL(self._target)
-        vars["compileButton"] = ""
-        if isinstance(self._target, conference.Conference):
-            vars["compileButton"] =  """
-                <input type="submit" class="btn"  name="compile" value="compile minutes" onClick= "return confirm('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.');">"""
         return vars
 
 class WMinutesDisplay(WTemplated):

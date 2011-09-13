@@ -31,6 +31,3 @@ def index(req, **params):
 
 def delete( req, **params ):
     return sessionModif.RHSessionDeletion( req ).process( params )
-
-def writeMinutes( req, **params ):
-    return sessionModif.RHSessionWriteMinutes( req ).process( params )

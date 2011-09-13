@@ -210,7 +210,7 @@ class RHAddMaterial(RHSubmitMaterialBase, RHCategModifBase):
 
     def __init__(self, req):
         RHCategModifBase.__init__(self, req)
-        RHSubmitMaterialBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):
         RHCategModifBase._checkParams(self, params)

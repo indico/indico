@@ -24,23 +24,6 @@ from MaKaC.webinterface.rh import subContribDisplay
 def index(req, **params):
     return subContribDisplay.RHSubContributionDisplay( req ).process( params )
 
-def writeMinutes(req, **params):
-    return subContribDisplay.RHWriteMinutes(req).process(params)
-
-def submit(req, **params):
-    return subContribDisplay.RHSubmitMaterial(req).process(params)
-
 def marcxml( req, **params ):
     return subContribDisplay.RHSubContributionToMarcXML( req ).process( params )
-
-def xml( req, **params ):
-    return subContribDisplay.RHSubContributionToXML( req ).process( params )
-    
-
-#def pdf( req, **params ):
-#    return contribDisplay.RHContributionToPDF( req ).process( params )
-
-
-#def ical( req, **params ):
-#    return contribDisplay.RHContributionToiCal( req ).process( params )
 

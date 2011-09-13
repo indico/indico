@@ -1351,7 +1351,7 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRigh
 
     def __init__(self, req):
         RHContribModifBaseSpecialSesCoordRights.__init__(self, req)
-        RHSubmitMaterialBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
@@ -1537,30 +1537,6 @@ class RHContributionPerformMove(RHContribModifBaseSpecialSesCoordRights):
         owner = self._target.getOwner()
         owner.removeContribution(self._target)
         newOwner.addContribution(self._target)
-
-
-class RHContributionWriteMinutes(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionWriteMinutes
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._cancel = params.has_key("cancel")
-        self._save = params.has_key("OK")
-        self._text = params.get("text", "")#.strip()
-
-    def _process(self):
-        if self._cancel:
-            self._redirect(urlHandlers.UHContribModifTools.getURL(self._target))
-        elif self._save:
-            #if self._text!="":
-                minutes = self._target.getMinutes()
-                if not minutes:
-                    minutes = self._target.createMinutes()
-                minutes.setText(self._text)
-                self._redirect(urlHandlers.UHContribModifTools.getURL(self._target))
-        else:
-            p = contributions.WPContributionWriteMinutes(self, self._target)
-            return p.display()
 
 class RHContributionToXML(RHContributionModification):
     _uh = urlHandlers.UHContribToXMLConfManager
@@ -1858,9 +1834,6 @@ class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
 
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordAndReviewingStaffRights._checkParams(self, params)
-        #if not hasattr(self, "_rhSubmitMaterial"):
-        #    self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        #self._rhSubmitMaterial._checkParams(params)
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]

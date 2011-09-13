@@ -18,21 +18,13 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import tempfile
-import os.path
-
-import MaKaC.conference as conference
 import MaKaC.webinterface.pages.subContributions as subContributions
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
     RoomBookingDBMixin
-from MaKaC.webinterface.rh.conferenceBase import RHSubContributionBase, RHSubmitMaterialBase
-from MaKaC.PDFinterface.conference import ContribToPDF
-from MaKaC.ICALinterface.conference import ContribToiCal
-from MaKaC.common.xmlGen import XMLGen
+from MaKaC.webinterface.rh.conferenceBase import RHSubContributionBase
 from MaKaC.common import Config
-from MaKaC.errors import MaKaCError, ModificationError
-import MaKaC.webinterface.materialFactories as materialFactories
+from MaKaC.errors import ModificationError
 
 
 
@@ -74,97 +66,3 @@ class RHSubContributionToMarcXML(RHSubContributionDisplayBase):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
-
-class RHWriteMinutes( RHSubContributionDisplayBase ):
-
-    def _checkProtection(self):
-        if not self._target.canModify( self.getAW() ):
-            if self._target.getModifKey() != "":
-                raise ModificationError()
-            if self._getUser() == None:
-                # there is a risk the session was closed during the write
-                # process and the minutes will be lost if we do not preserve
-                # them
-                self._preserveParams()
-                # then ask the user to login again
-                self._checkSessionUser()
-            else:
-                raise ModificationError()
-
-    def _preserveParams(self):
-        preservedParams = self._getRequestParams().copy()
-        self._websession.setVar("minutesPreservedParams",preservedParams)
-
-    def _getPreservedParams(self):
-        params = self._websession.getVar("minutesPreservedParams")
-        if params is None :
-            return {}
-        return params
-
-    def _removePreservedParams(self):
-        self._websession.setVar("minutesPreservedParams",None)
-
-    def _checkParams( self, params ):
-        RHSubContributionDisplayBase._checkParams( self, params )
-        preservedParams = self._getPreservedParams()
-        if preservedParams != {}:
-            params.update(preservedParams)
-            self._removePreservedParams()
-        self._cancel = params.has_key("cancel")
-        self._save = params.has_key("OK")
-        self._text = params.get("text", "")#.strip()
-
-    def _process( self ):
-        wf=self.getWebFactory()
-        if self._save:
-            minutes = self._target.getMinutes()
-            if not minutes:
-                minutes = self._target.createMinutes()
-            minutes.setText( self._text )
-        elif not self._cancel:
-            if wf is None:
-                wp = conferences.WPSubContributionDisplayWriteMinutes(self, self._target)
-            else:
-                wp = wf.getSubContributionDisplayWriteMinutes( self, self._target)
-            return wp.display()
-        if wf is None:
-            self._redirect( urlHandlers.UHSubContributionDisplay.getURL( self._target ) )
-        else:
-            self._redirect( urlHandlers.UHConferenceDisplay.getURL( self._target.getConference() ) )
-
-class RHSubmitMaterial(RHSubContributionDisplayBase):
-
-    def _checkProtection(self):
-        if not self._target.canModify( self.getAW() ) and not self._target.canUserSubmit( self.getAW().getUser() ):
-            if self._target.getModifKey() != "":
-                raise ModificationError()
-            if self._getUser() == None:
-                self._checkSessionUser()
-            else:
-                raise ModificationError()
-
-    #def _checkProtection(self):
-    #    if self.getAW().getUser() is None:
-    #        self._checkSessionUser()
-    #    elif not self._target.canModify(self.getAW()):
-    #        raise MaKaCError("you are not authorised to submit material for this subcontribution")
-
-    def _checkParams(self,params):
-        RHSubContributionDisplayBase._checkParams(self,params)
-        if not hasattr(self, "_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
-
-    def _process(self):
-        wf=self.getWebFactory()
-        if wf is None:
-            url=urlHandlers.UHSubContributionDisplay.getURL(self._target)
-            p=subContributions.WPSubmitMaterial
-        else:
-            url=urlHandlers.UHConferenceDisplay.getURL(self._target.getConference())
-            p=wf.getSubContribSubmitMaterial
-        r=self._rhSubmitMaterial._process(self, self._getRequestParams(), p)
-        if r is None:
-            self._redirect(url)
-        else:
-            return r

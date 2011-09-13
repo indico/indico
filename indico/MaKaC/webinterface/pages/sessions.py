@@ -2139,8 +2139,7 @@ class WPSessionModifTools( WPSessionModifBase ):
     def _getTabContent( self, params ):
         comp = WSessionModifTools( self._session )
         pars = {
-"deleteSessionURL": urlHandlers.UHSessionDeletion.getURL( self._session ), \
-"writeMinutesURL": urlHandlers.UHSessionWriteMinutes.getURL( self._session ) \
+"deleteSessionURL": urlHandlers.UHSessionDeletion.getURL( self._session ) \
                }
         return comp.getHTML( pars )
 
@@ -2157,15 +2156,6 @@ session, all the items below it will also be deleted"))
                         urlHandlers.UHSessionDeletion.getURL( self._session ), \
                         {}, \
                         confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No") )
-
-
-class WPSessionWriteMinutes( WPSessionModifTools ):
-
-    def _getTabContent( self, params ):
-        wc = wcomponents.WWriteMinutes( self._session )
-        pars = {"postURL": urlHandlers.UHSessionWriteMinutes.getURL(self._session) }
-        return wc.getHTML( pars )
-
 
 class WSessionModContribList(wcomponents.WTemplated):
 
@@ -2736,13 +2726,6 @@ class WPSessionDisplayRemoveMaterialsConfirm( WPSessionDefaultDisplayBase ):
         <br>"""%self._mat.getTitle()
         url=urlHandlers.UHSessionDisplayRemoveMaterial.getURL(self._mat.getOwner())
         return wc.getHTML(msg,url,{"deleteMaterial":self._mat.getId()})
-
-class WPSessionDisplayWriteMinutes( WPSessionDefaultDisplayBase ):
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._session )
-        pars = {"postURL": urlHandlers.UHSessionDisplayWriteMinutes.getURL(self._session) }
-        return wc.getHTML( pars )
 
 class WPSessionModifRelocate(WPSessionModifBase):
 

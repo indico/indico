@@ -103,10 +103,6 @@ class WebFactory(WebFactory):
         return WPMMaterialDisplay(rh, material)
     getMaterialDisplay = staticmethod(getMaterialDisplay)
 
-    def getConferenceDisplayWriteMinutes(rh, contrib):
-        return WPSEConferenceDisplayWriteMinutes(rh,contrib)
-    getConferenceDisplayWriteMinutes = staticmethod(getConferenceDisplayWriteMinutes)
-
     @staticmethod
     def getDisplayFullMaterialPackage(rh, conf):
         return WPSEDisplayFullMaterialPackage(rh,conf)
@@ -622,16 +618,6 @@ class WPSEEvaluationInactive (WPSEEvaluationBase, evaluations.WPEvaluationInacti
 
     def _getBody(self, params):
         return evaluations.WPEvaluationInactive._getBody(self, params)
-
-
-################# Minutes #########################################
-
-class WPSEConferenceDisplayWriteMinutes(WPSimpleEventDisplay):
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._conf )
-        pars = {"postURL": urlHandlers.UHConferenceDisplayWriteMinutes.getURL(self._conf) }
-        return wc.getHTML( pars )
 
 
 ######################## Get file package ######################

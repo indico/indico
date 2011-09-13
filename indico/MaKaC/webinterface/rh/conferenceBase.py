@@ -20,17 +20,14 @@
 
 import tempfile
 import os
-import shutil
 import stat
-from copy import copy
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.errors import MaKaCError
 from MaKaC.common.Configuration import Config
-from MaKaC.conference import LocalFile,Material,Link,Category,Conference
-import MaKaC.webinterface.materialFactories as materialFactories
+from MaKaC.conference import LocalFile,Link,Category
 from MaKaC.export import fileConverter
 from MaKaC.conference import Conference,Session,Contribution,SubContribution
 from MaKaC.i18n import _
@@ -452,8 +449,7 @@ class RHSubmitMaterialBase(object):
         user = self.getAW().getUser()
 
         if not self._loggedIn:
-            from MaKaC.services.interface.rpc import json
-            return "<html><head></head><body>%s</body></html>" % json.encode(
+            return "<html><head></head><body>%s</body></html>" % json.dumps(
                 {'status': 'ERROR',
                  'info': {'type': 'noReport',
                           'title': '',
@@ -489,7 +485,7 @@ class RHSubmitMaterialBase(object):
         except Exception, e:
             status = "ERROR"
             del self._params['file']
-            info = {'message': errorList or " %s: %s" % (e.__class__.__name__, str(e)),
+            info = {'message': self._errorList or " %s: %s" % (e.__class__.__name__, str(e)),
                     'code': '0',
                     'requestInfo': self._params}
             Logger.get('requestHandler').exception('Error uploading file')

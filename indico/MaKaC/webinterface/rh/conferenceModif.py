@@ -6979,7 +6979,7 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHConferenceModifBase):
 
     def __init__(self, req):
         RHConferenceModifBase.__init__(self, req)
-        RHSubmitMaterialBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)

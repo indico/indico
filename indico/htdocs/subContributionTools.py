@@ -22,15 +22,9 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import subContribMod
 
-if DEVELOPMENT:
-    contribMod = reload( contribMod )
-
 
 def index( req, **params ):
     return subContribMod.RHSubContributionTools( req ).process( params )
 
 def delete( req, **params):
     return subContribMod.RHSubContributionDeletion( req ).process( params )
-
-def writeMinutes( req, **params ):
-    return subContribMod.RHSubContributionWriteMinutes( req ).process( params )

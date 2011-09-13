@@ -857,9 +857,6 @@ class RHMaterials(RHSessionModCoordinationBase):
     def _checkParams(self, params):
         RHSessionModCoordinationBase._checkParams(self, params)
 
-        #if not hasattr(self, "_rhSubmitMaterial"):
-        #    self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        #self._rhSubmitMaterial._checkParams(params)
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]
@@ -879,7 +876,7 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHSessionModCoordinationBase):
 
     def __init__(self, req):
         RHSessionModCoordinationBase.__init__(self, req)
-        RHSubmitMaterialBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):
         RHSessionModCoordinationBase._checkParams(self, params)
@@ -1343,29 +1340,6 @@ class RHSessionDeletion( RHSessionModifBase ):
         else:
             return sessions.WPSessionDeletion( self, self._session ).display()
 
-
-class RHSessionWriteMinutes( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionWriteMinutes
-
-    def _checkParams( self, params ):
-        RHSessionModifBase._checkParams( self, params )
-        self._cancel = params.has_key("cancel")
-        self._save = params.has_key("OK")
-        self._text = params.get("text", "")#.strip()
-
-    def _process( self ):
-        if self._cancel:
-            self._redirect( urlHandlers.UHSessionModifTools.getURL( self._session ) )
-        elif self._save:
-            #if self._text!="":
-                minutes = self._session.getMinutes()
-                if not minutes:
-                    minutes = self._session.createMinutes()
-                minutes.setText( self._text )
-                self._redirect( urlHandlers.UHSessionModifTools.getURL( self._session ) )
-        else:
-            p = sessions.WPSessionWriteMinutes( self, self._session )
-            return p.display()
 
 class RHFitSession(RHSessionModCoordinationBase):
 

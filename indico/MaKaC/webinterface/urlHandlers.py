@@ -2541,12 +2541,6 @@ class UHGeneralInfoPerformModification( URLHandler ):
 class UHContributionDelete( URLHandler ):
     _relativeURL = "contributionTools.py/delete"
 
-class UHContributionWriteMinutes( URLHandler ):
-    _relativeURL = "contributionTools.py/writeMinutes"
-
-class UHContributionDisplayWriteMinutes( URLHandler ):
-    _relativeURL = "contributionDisplay.py/writeMinutes"
-
 class UHSubContributionDataModification( URLHandler ):
     _relativeURL = "subContributionModification.py/data"
 
@@ -2564,10 +2558,6 @@ class UHSubContributionDataModif( URLHandler ):
 
 class UHSubContributionDelete( URLHandler ):
     _relativeURL = "subContributionTools.py/delete"
-
-
-class UHSubContributionWriteMinutes( URLHandler ):
-    _relativeURL = "subContributionTools.py/writeMinutes"
 
 
 class UHSubContributionAddMaterial( URLHandler ):
@@ -2795,9 +2785,6 @@ class UHSessionModifCommEdit( URLHandler ):
 class UHSessionDeletion( URLHandler ):
     _relativeURL = "sessionModifTools.py/delete"
 
-class UHSessionWriteMinutes( URLHandler ):
-    _relativeURL = "sessionModifTools.py/writeMinutes"
-
 class UHContributionModification( URLHandler ):
     _relativeURL = "contributionModification.py"
 
@@ -2914,9 +2901,6 @@ class UHConferenceCFA( URLHandler ):
 class UHSessionDisplay( URLHandler ):
     _relativeURL = "sessionDisplay.py"
 
-class UHSessionDisplayWriteMinutes( URLHandler ):
-    _relativeURL = "sessionDisplay.py/writeMinutes"
-
 class UHSessionToiCal( URLHandler ):
     _relativeURL = "sessionDisplay.py/ical"
 
@@ -2928,9 +2912,6 @@ class UHContributionDisplayRemoveMaterial( URLHandler ):
 
 class UHSubContributionDisplay( URLHandler ):
     _relativeURL = "subContributionDisplay.py"
-
-class UHSubContributionDisplayWriteMinutes( URLHandler ):
-    _relativeURL = "subContributionDisplay.py/writeMinutes"
 
 class UHSubContributionModification( URLHandler ):
     _relativeURL = "subContributionModification.py"
@@ -3336,9 +3317,6 @@ class UHConferenceDisplayMenuClose( URLHandler ):
 
 class UHConferenceDisplayMenuOpen( URLHandler ):
     _relativeURL = "conferenceDisplay.py/openMenu"
-
-class UHConferenceDisplayWriteMinutes( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/writeMinutes"
 
 class UHSessionDisplayRemoveMaterial( URLHandler ):
     _relativeURL = "sessionDisplay.py/removeMaterial"

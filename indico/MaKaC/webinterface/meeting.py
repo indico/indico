@@ -125,10 +125,6 @@ class WebFactory(WebFactory):
         return WPMTimeTableCustomizePDF(rh, conf, view)
 
     @staticmethod
-    def getConferenceDisplayWriteMinutes(rh, contrib):
-        return WPMConferenceDisplayWriteMinutes(rh,contrib)
-
-    @staticmethod
     def getDisplayFullMaterialPackage(rh, conf):
         return WPMDisplayFullMaterialPackage(rh,conf)
 
@@ -147,10 +143,6 @@ class WebFactory(WebFactory):
     def getSubContributionDisplay(rh, subcontrib):
         return WPMSubContributionDisplay(rh, subcontrib)
     getSubContributionDisplay = staticmethod(getSubContributionDisplay)
-
-    def getSubContributionDisplayWriteMinutes(rh, session):
-        return WPMSubContributionDisplayWriteMinutes(rh,session)
-    getSubContributionDisplayWriteMinutes = staticmethod(getSubContributionDisplayWriteMinutes)
 
 ############# Contribution Display #############################################
 
@@ -195,19 +187,11 @@ class WebFactory(WebFactory):
         return WPMContribAddSC(rh,contrib)
     getContribAddSC = staticmethod(getContribAddSC)
 
-    def getContributionDisplayWriteMinutes(rh, contrib):
-        return WPMContributionDisplayWriteMinutes(rh,contrib)
-    getContributionDisplayWriteMinutes = staticmethod(getContributionDisplayWriteMinutes)
-
 ########## Session Display###########################################
 
     def getSessionDisplay(rh,session):
         return WPMSessionDisplay (rh,session)
     getSessionDisplay = staticmethod(getSessionDisplay)
-
-    def getSessionDisplayWriteMinutes(rh, session):
-        return WPMSessionDisplayWriteMinutes(rh,session)
-    getSessionDisplayWriteMinutes = staticmethod(getSessionDisplayWriteMinutes)
 
 ############Session Modificiations###########################################
     def getModSlotEdit(rh, slotData):
@@ -327,51 +311,6 @@ class WMeetingCreation(category.WConferenceCreation):
         vars["event_type"] = WebFactory.getId()
         return vars
 
-
-################# Minutes #########################################
-
-class WPMConferenceDisplayWriteMinutes(conferences.WPConferenceDefaultDisplayBase):
-
-    def _applyConfDisplayDecoration( self, body ):
-        frame = WMConfDisplayFrame( self._getAW(), self._conf )
-        frameParams = {\
-              "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
-                      }
-        if self._conf.getLogo():
-            frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
-
-        confTitle = self._conf.getTitle()
-        colspan=""
-        imgOpen=""
-        padding=""
-        padding=""" style="padding:0px" """
-
-        body = i18nformat("""
-                <td class="confBodyBox" %s %s>
-                    %s
-                    <table border="0" cellpadding="0" cellspacing="0"
-                                align="center" width="95%%">
-                        <tr>
-                            <td class="formTitle" width="100%%"> _("Minutes") - %s</td>
-                        </tr>
-                        <tr>
-                            <td align="left" valign="middle" width="100%%">
-                                <b><br>%s</b>
-                            </td>
-                       </tr>
-                    </table>
-                     <!--Main body-->
-                    %s
-                </td>""")%(colspan,padding,imgOpen,confTitle,
-                        self._getNavigationBarHTML(),
-                        body)
-        return frame.getHTML( body, frameParams)
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._conf )
-        pars = {"postURL": urlHandlers.UHConferenceDisplayWriteMinutes.getURL(self._conf) }
-        return wc.getHTML( pars )
-
 ################# Subcontribution Display ##############################
 
 class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
@@ -386,7 +325,6 @@ class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
         confTitle = self._conf.getTitle()
         colspan=""
         imgOpen=""
-        padding=""
         padding=""" style="padding:0px" """
 
         body = i18nformat("""
@@ -437,14 +375,6 @@ class WMSubContributionDisplayFull(WMSubContributionDisplayBase):
 
 class WMSubContributionDisplayMin (WMSubContributionDisplayBase):
     pass
-
-class WPMSubContributionDisplayWriteMinutes(WPMSubContributionDisplay):
-    navigationEntry=navigation.NESubContributionDisplay
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._subContrib )
-        pars = {"postURL": urlHandlers.UHSubContributionDisplayWriteMinutes.getURL(self._subContrib) }
-        return wc.getHTML( pars )
 
 
 ################# Contribution Display ################################
@@ -510,13 +440,6 @@ class WMContributionDisplayFull(WMContributionDisplayBase):
 
 class WMContributionDisplayMin (WMContributionDisplayBase):
     pass
-
-class WPMContributionDisplayWriteMinutes(WPMContributionDisplay):
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._contrib )
-        pars = {"postURL": urlHandlers.UHContributionDisplayWriteMinutes.getURL(self._contrib) }
-        return wc.getHTML( pars )
 
 #################Session Display ######################################
 
@@ -603,13 +526,6 @@ class WMSessionDisplayFull(WMSessionDisplayBase ):
             if tab is None:
                 tab=self._tabCtrl.getTabById("time_table")
             tab.setActive()
-
-class WPMSessionDisplayWriteMinutes(WPMSessionDisplay):
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._session )
-        pars = {"postURL": urlHandlers.UHSessionDisplayWriteMinutes.getURL(self._session) }
-        return wc.getHTML( pars )
 
 #################Contribution Modification##############################
 

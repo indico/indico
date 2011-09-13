@@ -38,11 +38,11 @@ from MaKaC.common.utils import isStringHTML,sortContributionByDate
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHSubmitMaterialBase
+from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.errors import MaKaCError, ModificationError, NoReportError, AccessError, KeyAccessError, NotFoundError
-from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF,TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, ProgrammeToPDF, TimetablePDFFormat
+from MaKaC.PDFinterface.conference import TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, ProgrammeToPDF, TimetablePDFFormat
 from xml.sax.saxutils import escape
 from MaKaC.participant import Participant
 from MaKaC.ICALinterface.conference import ConferenceToiCal
@@ -1195,95 +1195,6 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
-
-class RHWriteMinutes( RHConferenceBaseDisplay ):
-
-    def _checkProtection(self):
-        if not self._target.canModify( self.getAW() ):
-            if self._target.getModifKey() != "":
-                raise ModificationError()
-            if self._getUser() == None:
-                self._preserveParams()
-                self._checkSessionUser()
-            else:
-                raise ModificationError()
-
-    def _preserveParams(self):
-        preservedParams = self._getRequestParams().copy()
-        self._websession.setVar("minutesPreservedParams",preservedParams)
-
-    def _getPreservedParams(self):
-        params = self._websession.getVar("minutesPreservedParams")
-        if params is None :
-            return {}
-        return params
-
-    def _removePreservedParams(self):
-        self._websession.setVar("minutesPreservedParams",None)
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        preservedParams = self._getPreservedParams()
-        if preservedParams != {}:
-            params.update(preservedParams)
-            self._removePreservedParams()
-        self._cancel = params.has_key("cancel")
-        self._save = params.has_key("OK")
-        self._compile = params.has_key("compile")
-        self._text = params.get("text", "")#.strip()
-
-    def _getCompiledMinutes( self ):
-        minutes = []
-        isHTML = False
-        cList = self._target.getContributionList()
-        cList.sort(sortContributionByDate)
-        for c in cList:
-            if c.getMinutes():
-                minText = c.getMinutes().getText()
-                minutes.append([c.getTitle(),minText])
-                if isStringHTML(minText):
-                    isHTML = True
-        if isHTML:
-            lb = "<br>"
-        else:
-            lb = "\n"
-        text = "%s (%s)%s" % (self._target.getTitle(), self._target.getStartDate().strftime("%d %b %Y"), lb)
-        part = self._target.getParticipation().getPresentParticipantListText()
-        if part != "":
-            text += "Present: %s%s" % (part,lb)
-        uList = self._target.getChairList()
-        chairs = ""
-        for chair in uList:
-            if chairs != "":
-                chairs += "; "
-            chairs += chair.getFullName()
-        if len(uList) > 0:
-            text += "Chaired by: %s%s%s" % (chairs, lb, lb)
-        for min in minutes:
-            text += "==================%s%s%s==================%s%s%s%s" % (lb,min[0],lb,lb,min[1],lb,lb)
-        return text
-
-    def _process( self ):
-        wf=self.getWebFactory()
-        if self._compile:
-            minutes = self._target.getMinutes()
-            if not minutes:
-                minutes = self._target.createMinutes()
-            text = self._getCompiledMinutes()
-            minutes.setText( text )
-        if self._save:
-            minutes = self._target.getMinutes()
-            if not minutes:
-                minutes = self._target.createMinutes()
-            minutes.setText( self._text )
-        elif not self._cancel:
-            if wf is None:
-                wp = conferences.WPConfDisplayWriteMinutes(self, self._target)
-            else:
-                wp = wf.getConferenceDisplayWriteMinutes( self, self._conf)
-            return wp.display()
-        self._redirect( urlHandlers.UHConferenceDisplay.getURL( self._target ) )
-
 
 class RHInternalPageDisplay(RHConferenceBaseDisplay):
     _uh=urlHandlers.UHInternalPageDisplay

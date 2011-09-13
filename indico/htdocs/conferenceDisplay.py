@@ -60,12 +60,6 @@ def xml(req, **params):
 def marcxml(req, **params):
     return conferenceDisplay.RHConferenceToMarcXML( req ).process( params )
 
-def writeMinutes(req, **params):
-    return conferenceDisplay.RHWriteMinutes( req ).process( params )
-
-def submit(req, **params):
-    return conferenceDisplay.RHSubmitMaterial(req).process(params)
-
 def matPkg( req, **params ):
     return conferenceDisplay.RHFullMaterialPackage( req ).process( params )
 

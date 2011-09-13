@@ -39,11 +39,5 @@ def ical( req, **params ):
 def marcxml( req, **params ):
     return contribDisplay.RHContributionToMarcXML( req ).process( params )
 
-def submit(req, **params):
-    return contribDisplay.RHSubmitMaterial(req).process(params)
-
 def removeMaterial(req, **params):
     return contribDisplay.RHContributionDisplayRemoveMaterial(req).process(params)
-
-def writeMinutes(req, **params):
-    return contribDisplay.RHWriteMinutes(req).process(params)

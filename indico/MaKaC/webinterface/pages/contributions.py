@@ -493,8 +493,7 @@ class WPContributionModifTools( WPContributionModifBase ):
         wc = wcomponents.WContribModifTool( self._target )
         pars = { \
 "deleteContributionURL": urlHandlers.UHContributionDelete.getURL( self._target ), \
-"MoveContributionURL": urlHandlers.UHContributionMove.getURL( self._target ), \
-"writeMinutes": urlHandlers.UHContributionWriteMinutes.getURL( self._target ) }
+"MoveContributionURL": urlHandlers.UHContributionMove.getURL( self._target ) }
         return wc.getHTML( pars )
 
 class WPContributionModifMaterials( WPContributionModifBase ):
@@ -1482,13 +1481,6 @@ class WPcontribMove( WPContributionModifTools ):
         params["moveURL"] = urlHandlers.UHContributionPerformMove.getURL()
         return wc.getHTML( params )
 
-class WPContributionWriteMinutes( WPContributionModifTools ):
-
-    def _getTabContent( self, params ):
-        wc = wcomponents.WWriteMinutes( self._target )
-        pars = {"postURL": urlHandlers.UHContributionWriteMinutes.getURL(self._target) }
-        return wc.getHTML( pars )
-
 
 class WPModSubmittersSel(WPContribModifAC):
 
@@ -1520,14 +1512,6 @@ class WPContributionDisplayRemoveMaterialsConfirm( WPContributionDefaultDisplayB
         <br>""")%self._mat.getTitle()
         url=urlHandlers.UHContributionDisplayRemoveMaterial.getURL(self._mat.getOwner())
         return wc.getHTML(msg,url,{"deleteMaterial":self._mat.getId()})
-
-class WPContribDisplayWriteMinutes( WPContributionDefaultDisplayBase ):
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._contrib )
-        pars = {"postURL": urlHandlers.UHContributionDisplayWriteMinutes.getURL(self._contrib) }
-        return wc.getHTML( pars )
-
 
 class WPContributionReportNumberEdit(WPContributionModifBase):
 

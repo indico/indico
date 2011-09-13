@@ -960,14 +960,10 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
     def _getBodyVariables(self):
         pars = { \
         "modifyURL": urlHandlers.UHConferenceModification.getURL( self._conf ), \
-        "minutesURL":  urlHandlers.UHConferenceDisplayWriteMinutes.getURL(self._conf), \
         "iCalURL": urlHandlers.UHConferenceToiCal.getURL(self._conf), \
         "cloneURL": urlHandlers.UHConfClone.getURL( self._conf ), \
         "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL, \
         "contribModifyURLGen": urlHandlers.UHContributionModification.getURL, \
-        "contribMinutesURLGen": urlHandlers.UHContributionDisplayWriteMinutes.getURL, \
-        "sessionMinutesURLGen": urlHandlers.UHSessionDisplayWriteMinutes.getURL, \
-        "subContribMinutesURLGen": urlHandlers.UHSubContributionDisplayWriteMinutes.getURL, \
         "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL, \
         "materialURLGen": urlHandlers.UHMaterialDisplay.getURL, \
         "resourceURLGen": urlHandlers.UHFileAccess.getURL }
@@ -1209,7 +1205,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         elif itemType == 'SubContribution':
             info['parentProtection'] = item.getContribution().getAccessController().isProtected()
             if item.canModify(self._rh._aw):
-                info["modifyLink"] = urlHandlers.UHSubContributionDisplayWriteMinutes.getURL(item)
+                info["modifyLink"] = urlHandlers.UHSubContributionModification.getURL(item)
             if item.canModify(self._rh._aw) or item.canUserSubmit(self._rh._aw.getUser()):
                 info["minutesLink"] = True
                 info["materialLink"] = True
@@ -9308,17 +9304,13 @@ class WPXSLMeetingStaticDisplay( WPStaticMeetingBase ):
     def _getBody( self, params ):
         pars = { \
     "modifyURL": "", \
-        "minutesURL":  "", \
         "materialURL":  "", \
         "cloneURL": "", \
     "sessionModifyURLGen": "", \
     "contribModifyURLGen": "", \
-        "contribMinutesURLGen": "", \
         "contribMaterialURLGen": "", \
         "subContribMaterialURLGen": "", \
-        "sessionMinutesURLGen": "", \
         "sessionMaterialURLGen": "", \
-        "subContribMinutesURLGen": "", \
     "subContribModifyURLGen":  "", \
     "materialURLGen": urlHandlers.UHMStaticMaterialDisplay.getRelativeURL, \
     "resourceURLGen": urlHandlers.UHMStaticResourceDisplay.getRelativeURL}
@@ -10505,13 +10497,6 @@ class WPConfModifReschedule(WPConferenceModifBase):
         wc=WConfModifReschedule(self._targetDay)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifReschedule.getURL(self._conf)))}
         return wc.getHTML(p)
-
-class WPConfDisplayWriteMinutes( WPConferenceDefaultDisplayBase ):
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._conf )
-        pars = {"postURL": urlHandlers.UHConferenceDisplayWriteMinutes.getURL(self._conf) }
-        return wc.getHTML( pars )
 
 class WPConfModifRelocate(WPConferenceModifBase):
 

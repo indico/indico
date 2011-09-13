@@ -252,8 +252,7 @@ class WPSubContributionModifTools( WPSubContributionModifBase ):
     def _getTabContent( self, params ):
         wc = WSubContribModifTool( self._target )
         pars = { \
-"deleteSubContributionURL": urlHandlers.UHSubContributionDelete.getURL( self._target ), \
-"writeMinutes": urlHandlers.UHSubContributionWriteMinutes.getURL( self._target ) }
+"deleteSubContributionURL": urlHandlers.UHSubContributionDelete.getURL( self._target )}
         return wc.getHTML( pars )
 
 
@@ -302,7 +301,6 @@ class WPSubContributionModification( WPSubContribModifMain ):
         pars = { "dataModificationURL": urlHandlers.UHSubContributionDataModification.getURL( self._target ), \
                 "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
                 "deleteSubContribURL": urlHandlers.UHSubContributionDelete.getURL, \
-                "writeMinutesURL": urlHandlers.UHSubContributionWriteMinutes.getURL, \
                 "place": place, \
                 "duration": (datetime(1900,1,1)+self._target.getDuration()).strftime("%Hh%M'"), \
                 "confId": self._target.getConference().getId(), \
@@ -475,21 +473,6 @@ class WSubContribModifMain(wcomponents.WTemplated):
         vars["reportNumbersTable"]=wcomponents.WReportNumbersTable(self._subContrib,"subcontribution").getHTML()
         vars["keywords"] = self._subContrib.getKeywords()
         return vars
-
-class WPSubContributionWriteMinutes( WPSubContributionModifTools ):
-
-    def _getTabContent( self, params ):
-        wc = wcomponents.WWriteMinutes( self._target )
-        pars = {"postURL": urlHandlers.UHSubContributionWriteMinutes.getURL(self._target) }
-        return wc.getHTML( pars )
-
-class WPSubContributionDisplayWriteMinutes( WPSubContributionDefaultDisplayBase ):
-    navigationEntry=navigation.NESubContributionDisplay
-
-    def _getBody( self, params ):
-        wc = wcomponents.WWriteMinutes( self._target )
-        pars = {"postURL": urlHandlers.UHSubContributionDisplayWriteMinutes.getURL(self._target) }
-        return wc.getHTML( pars )
 
 class WPSubContributionReportNumberEdit(WPSubContributionModifBase):
 

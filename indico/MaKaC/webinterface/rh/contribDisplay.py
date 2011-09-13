@@ -159,34 +159,6 @@ class RHContributionMaterialSubmissionRightsBase(RHContributionDisplay):
             else:
                 raise ModificationError()
 
-class RHSubmitMaterial(RHContributionMaterialSubmissionRightsBase):
-
-    def _checkProtection(self):
-        RHContributionMaterialSubmissionRightsBase._checkProtection(self)
-        if self._target.getReviewManager().getLastReview().isAuthorSubmitted():
-            raise MaKaCError("You have already marked your materials as submitted")
-
-    def _checkParams(self,params):
-        RHContributionDisplay._checkParams(self,params)
-        if not hasattr(self, "_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
-
-    def _process(self):
-        wf=self.getWebFactory()
-        if wf is None:
-            url=urlHandlers.UHContributionDisplay.getURL(self._target)
-            p=contributions.WPSubmitMaterial
-        else:
-            url=urlHandlers.UHConferenceDisplay.getURL(self._target.getConference())
-            p=wf.getContribSubmitMaterial
-        r=self._rhSubmitMaterial._process(self, self._getRequestParams()) #, p)
-        if r is None:
-            self._redirect(url)
-        else:
-            return r
-
-
 class RHContributionDisplayRemoveMaterial( RHContributionDisplay ):
     _uh = urlHandlers.UHContributionDisplayRemoveMaterial
 
@@ -228,60 +200,3 @@ class RHContributionDisplayRemoveMaterial( RHContributionDisplay ):
                 return wp.display()
         self._redirect( urlHandlers.UHContributionDisplay.getURL( self._target ) )
 
-
-class RHWriteMinutes( RHContributionDisplay ):
-
-    def _checkProtection(self):
-        if not self._target.canModify( self.getAW() ) and not self._target.canUserSubmit(self._getUser()):
-            if self._target.getModifKey() != "":
-                raise ModificationError()
-            if self._getUser() == None:
-                # there is a risk the session was closed during the write
-                # process and the minutes will be lost if we do not preserve
-                # them
-                self._preserveParams()
-                # then ask the user to login again
-                self._checkSessionUser()
-            else:
-                raise ModificationError()
-
-    def _preserveParams(self):
-        preservedParams = self._getRequestParams().copy()
-        self._websession.setVar("minutesPreservedParams",preservedParams)
-
-    def _getPreservedParams(self):
-        params = self._websession.getVar("minutesPreservedParams")
-        if params is None :
-            return {}
-        return params
-
-    def _removePreservedParams(self):
-        self._websession.setVar("minutesPreservedParams",None)
-
-    def _checkParams( self, params ):
-        RHContributionDisplay._checkParams( self, params )
-        preservedParams = self._getPreservedParams()
-        if preservedParams != {}:
-            params.update(preservedParams)
-            self._removePreservedParams()
-        self._cancel = params.has_key("cancel")
-        self._save = params.has_key("OK")
-        self._text = params.get("text", "")#.strip()
-
-    def _process( self ):
-        wf=self.getWebFactory()
-        if self._save:
-            minutes = self._target.getMinutes()
-            if not minutes:
-                minutes = self._target.createMinutes()
-            minutes.setText( self._text )
-        elif not self._cancel:
-            if wf is None:
-                wp = contributions.WPContribDisplayWriteMinutes(self, self._target)
-            else:
-                wp = wf.getContributionDisplayWriteMinutes( self, self._contrib)
-            return wp.display()
-        if wf is None:
-            self._redirect( urlHandlers.UHContributionDisplay.getURL( self._target ) )
-        else:
-            self._redirect( urlHandlers.UHConferenceDisplay.getURL( self._target.getConference() ) )
