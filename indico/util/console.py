@@ -53,7 +53,7 @@ def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
 
     i = 1
     for id, conf in idx.iteritems():
-        if verbose and i % 10 == 99:
+        if verbose and i % 10 == 9:
             text = "[%d/%d %f%%] %s %s" % \
                    (i, total, (float(i) / total * 100.0), id, conf.getTitle())
             print text[:80].ljust(80), '\r',
