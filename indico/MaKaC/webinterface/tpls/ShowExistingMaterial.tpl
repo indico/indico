@@ -34,7 +34,7 @@ var mode = '${ mode }';
         subContId: '${ self_._target.getId() }',
         parentProtected: ${ jsBoolean(self_._target.isProtected()) }
     };
-    var uploadAction = Indico.Urls.UploadAction.subContribution;
+    var uploadAction = Indico.Urls.UploadAction.subcontribution;
     var targetType = '${ self_._target.getConference().getType() }';
 % elif isinstance(self_._target, conference.Contribution):
     var args = {

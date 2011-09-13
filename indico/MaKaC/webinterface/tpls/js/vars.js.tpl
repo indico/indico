@@ -121,7 +121,7 @@ var Indico = {
         FitSessionSlot: "${ urlHandlers.UHSessionFitSlot.getURL() }",
 
         UploadAction: {
-            subContribution: '${ str(urlHandlers.UHSubContribModifAddMaterials.getURL()) }',
+            subcontribution: '${ str(urlHandlers.UHSubContribModifAddMaterials.getURL()) }',
             contribution: '${ str(urlHandlers.UHContribModifAddMaterials.getURL()) }',
             session: '${ str(urlHandlers.UHSessionModifAddMaterials.getURL()) }',
             conference: '${ str(urlHandlers.UHConfModifAddMaterials.getURL()) }',
