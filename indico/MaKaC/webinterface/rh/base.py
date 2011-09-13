@@ -704,8 +704,8 @@ class RH(RequestHandlerBase):
         if not self._doProcess:
             return ""
 
-        if res == "" or res == None:
-            return "[done]"
+        if res is None:
+            return ""
 
         return res
 
