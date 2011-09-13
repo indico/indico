@@ -8,7 +8,7 @@
 
 <%def name="renderLocation(item, parent=None, span='')">
     <% location, room, url = getLocationInfo(item) %>
-    % if location and not parent or getLocationInfo(parent)[0] != location:
+    % if location and (not parent or getLocationInfo(parent)[0] != location):
          ${location}
          % if room:
              (
@@ -18,7 +18,7 @@
         ${'<a href="%s">'%url if url else ''}
             <span class="${span}">${room}</span>
         ${'</a>' if url else ''}
-        % if location and not parent or getLocationInfo(parent)[0] != location:
+        % if location and (not parent or getLocationInfo(parent)[0] != location):
             )
         % endif
     % endif
@@ -26,7 +26,7 @@
 
 <%def name="renderLocationAdministrative(item, parent=None)">
 <% location, room, url = getLocationInfo(item) %>
-    % if location and not parent or getLocationInfo(parent)[0] != location:
+    % if location and (not parent or getLocationInfo(parent)[0] != location):
          <b>${location}</b>
          % if room:
              ( ${room} )
@@ -38,7 +38,7 @@
 
 <%def name="renderLocationText(item, parent=None)">
     <% location, room, url = getLocationInfo(item) %>
-    % if location and not parent or getLocationInfo(parent)[0] != location:
+    % if location and (not parent or getLocationInfo(parent)[0] != location):
          <b>${location}</b>
          % if room:
              (
@@ -46,7 +46,7 @@
     % endif
     % if room:
         ${room}
-        % if location and not parent or getLocationInfo(parent)[0] != location:
+        % if location and (not parent or getLocationInfo(parent)[0] != location):
             )
         % endif
     % endif
