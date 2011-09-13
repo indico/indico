@@ -80,7 +80,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
 
 
 
-<div class="container">
+<div class="calendarContainer container">
     <div class="categoryHeader">
         <ul>
             <li><a href="${ categDisplayURL }">${ _("Go back to category page") }</a></li>

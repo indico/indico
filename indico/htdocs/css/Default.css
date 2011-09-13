@@ -6986,3 +6986,8 @@ table.infoQuestionsTable td.dataBold {
    padding: 3px 0px 8px 3px;
    font-weight: bold;
 }
+
+.calendarContainer
+{
+    overflow: visible;
+}
