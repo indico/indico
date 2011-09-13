@@ -198,7 +198,6 @@ def runConferenceMigration(dbi, withRBDB, prevVersion):
 
             if prevVersion < parse_version("0.98b1"):
                 # handle sessions, that our iterator ignores
-                print '< v0.98b1 only'
                 for session in obj.getSessionList():
                     _fixAccessController(session)
 
@@ -222,7 +221,6 @@ def runConferenceMigration(dbi, withRBDB, prevVersion):
             _fixDefaultStyle(obj, cdmr)
 
         if prevVersion < parse_version("0.98b1"):
-            print '< v0.98b1 only'
             _fixAccessController(obj,
                                  fixSelf=(level != 'subcontrib'))
 
