@@ -192,11 +192,14 @@ def runConferenceMigration(dbi, withRBDB, prevVersion):
     ch = ConferenceHolder()
     i = 0
 
-    for (level, obj) in console.conferenceHolderIterator(ch, deepness='subcontrib'):
+    from97 = prevVersion < parse_version("0.98b1")
+
+    # migrating from <=0.97.1 requires smaller granularity
+    for (level, obj) in console.conferenceHolderIterator(ch, deepness='subcontrib' if from97 else 'event'):
         # only for conferences
         if level == 'event':
 
-            if prevVersion < parse_version("0.98b1"):
+            if from97:
                 # handle sessions, that our iterator ignores
                 for session in obj.getSessionList():
                     _fixAccessController(session)
@@ -220,7 +223,7 @@ def runConferenceMigration(dbi, withRBDB, prevVersion):
             # For each conference, fix the default style
             _fixDefaultStyle(obj, cdmr)
 
-        if prevVersion < parse_version("0.98b1"):
+        if from97:
             _fixAccessController(obj,
                                  fixSelf=(level != 'subcontrib'))
 
@@ -234,13 +237,13 @@ def runConferenceMigration(dbi, withRBDB, prevVersion):
 
         if i % 1000 == 999:
             dbi.commit()
-            if withRBDB:
+            if withRBDB and from97:
                 DALManager.commit()
 
         i += 1
 
     dbi.commit()
-    if withRBDB:
+    if withRBDB and from97:
         DALManager.commit()
 
 
