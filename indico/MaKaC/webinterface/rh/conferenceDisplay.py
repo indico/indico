@@ -1414,9 +1414,7 @@ class RHFullMaterialPackagePerform(RHConferenceBaseDisplay):
                 p=ConferencePacker(self._conf, self._aw)
                 path=p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(),self._sessionList)
                 if not p.getItems():
-                    url = urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self._conf)
-                    url.addParam("errors", _("The selected package does not contain any items"))
-                    self._redirect(url)
+                    raise NoReportError(_("The selected package does not contain any items."))
                 filename = "full-material.zip"
                 cfg = Config.getInstance()
                 mimetype = cfg.getFileTypeMimeType( "ZIP" )

@@ -53,7 +53,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceDisplay
 from MaKaC.common import Config, info
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
-    ConferenceClosedError
+    ConferenceClosedError, NoReportError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
 from MaKaC.webinterface import locators
@@ -6454,9 +6454,7 @@ class RHFullMaterialPackagePerform(RHConferenceModifBase):
                 p=ConferencePacker(self._conf, self._aw)
                 path=p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(),self._sessionList)
                 if not p.getItems():
-                    url = urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf)
-                    url.addParam("errors", _("The selected package does not contain any items"))
-                    self._redirect(url)
+                    raise NoReportError(_("The selected package does not contain any items."))
                 filename = "full-material.zip"
                 cfg = Config.getInstance()
                 mimetype = cfg.getFileTypeMimeType( "ZIP" )
@@ -6464,9 +6462,7 @@ class RHFullMaterialPackagePerform(RHConferenceModifBase):
                 self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
                 self._req.sendfile(path)
             else:
-                url = urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf)
-                url.addParam("errors", _("You have to select at least one material type"))
-                self._redirect( url )
+                raise NoReportError(_("You have to select at least one material type"))
         else:
             self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
 
