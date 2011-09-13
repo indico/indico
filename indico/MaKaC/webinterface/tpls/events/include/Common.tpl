@@ -15,7 +15,7 @@
          % endif
     % endif
     % if room:
-        ${'<a href="${url}">' if url else ''}
+        ${'<a href="%s">'%url if url else ''}
             <span class="${span}">${room}</span>
         ${'</a>' if url else ''}
         % if location and not parent or getLocationInfo(parent)[0] != location:
