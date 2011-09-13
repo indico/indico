@@ -853,81 +853,7 @@ class RHConvenerEdit(RHSessionModifBase):
             return p.display(convener=c)
 
 
-class RHSessionAddMaterial( RHSessionModCoordinationBase ):
-    _uh = urlHandlers.UHSessionAddMaterial
-
-    def _checkParams( self, params ):
-        RHSessionModCoordinationBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "notype" )
-        if typeMat=="notype" or typeMat.strip()=="":
-            raise FormValuesError("Please choose a material type")
-        self._mf = materialFactories.SessionMFRegistry().getById( typeMat )
-
-    def _process( self ):
-        if self._mf:
-            if not self._mf.needsCreationPage():
-                m = RHSessionPerformAddMaterial.create( self._session, self._mf, self._getRequestParams() )
-                self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
-                return
-        p = sessions.WPSessionAddMaterial( self, self._session, self._mf )
-        wf = self.getWebFactory()
-        if wf != None:
-            p = wf.getSessionAddMaterial(self,self._session, self._mf)
-        return p.display()
-
-
-class RHSessionPerformAddMaterial( RHSessionModCoordinationBase ):
-    _uh = urlHandlers.UHSessionPerformAddMaterial
-
-    def _checkParams( self, params ):
-        RHSessionModCoordinationBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "" )
-        self._mf = materialFactories.SessionMFRegistry().getById( typeMat )
-
-    def create( session, matFactory, matData ):
-        if matFactory:
-            m = matFactory.create( session )
-        else:
-            m = conference.Material()
-            session.addMaterial( m )
-            m.setValues( matData )
-        return m
-    create = staticmethod( create )
-
-    def _process( self ):
-        m = self.create( self._session, self._mf, self._getRequestParams() )
-        self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
-
-
-class RHSessionRemoveMaterials( RHSessionModCoordinationBase ):
-    _uh = urlHandlers.UHSessionRemoveMaterials
-
-    def _checkParams( self, params ):
-        RHSessionModCoordinationBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "" )
-        self._materialIds = self._normaliseListParam( params.get("materialId", []) )
-        self._returnURL = params.get("returnURL","")
-
-    def _process( self ):
-        for id in self._materialIds:
-            #Performing the deletion of special material types
-            f = materialFactories.SessionMFRegistry().getById( id )
-            if f:
-                f.remove( self._session )
-            else:
-                #Performs the deletion of additional material types
-                mat = self._target.getMaterialById( id )
-                self._target.removeMaterial( mat )
-        if self._returnURL != "":
-            url = self._returnURL
-        else:
-            url = urlHandlers.UHSessionModifMaterials.getURL( self._session )
-        self._redirect( url )
-
-
 class RHMaterials(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHSessionModifMaterials
-
     def _checkParams(self, params):
         RHSessionModCoordinationBase._checkParams(self, params)
 
@@ -946,23 +872,18 @@ class RHMaterials(RHSessionModCoordinationBase):
         p = sessions.WPSessionModifMaterials( self, self._target )
         return p.display(**self._getRequestParams())
 
-class RHMaterialsAdd(RHSessionModCoordinationBase):
+
+
+class RHMaterialsAdd(RHSubmitMaterialBase, RHSessionModCoordinationBase):
     _uh = urlHandlers.UHSessionModifMaterials
+
+    def __init__(self, req):
+        RHSessionModCoordinationBase.__init__(self, req)
+        RHSubmitMaterialBase.__init__(self, req)
 
     def _checkParams(self, params):
         RHSessionModCoordinationBase._checkParams(self, params)
-        if not hasattr(self, "_rhSubmitMaterial"):
-            self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params)
-
-    def _process( self ):
-        if self._target.isClosed():
-            p = sessions.WPSessionModificationClosed( self, self._target )
-        else:
-            r=self._rhSubmitMaterial._process(self, self._getRequestParams())
-        if r is None:
-            self._redirect(self._uh.getURL(self._target))
-        return r
+        RHSubmitMaterialBase._checkParams(self, params)
 
 
 class RHReducedSessionScheduleAction(RHSessionModCoordinationBase):

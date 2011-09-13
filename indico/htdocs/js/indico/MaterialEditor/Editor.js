@@ -476,10 +476,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
             },
             success: function(resp){
                 if (resp.status == "ERROR") {
-                    IndicoUtil.errorReport({
-                        code: '0',
-                        requestInfo: {},
-                        message: resp.info });
+                    IndicoUI.Dialogs.Util.error(resp.info);
                 } else if (resp.status == "NOREPORT") {
                     IndicoUtil.errorReport({
                         type: "noReport",

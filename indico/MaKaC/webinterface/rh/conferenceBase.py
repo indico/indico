@@ -199,8 +199,7 @@ class RHAbstractBase( RHConferenceSite ):
         self._conf = self._abstract.getOwner().getOwner()
         self._setMenuStatus(params)
 
-
-class RHSubmitMaterialBase:
+class RHSubmitMaterialBase(object):
 
     _allowedMatsConference=["paper", "slides", "poster", "minutes"]
     _allowedMatsforReviewing=["reviewing"]
@@ -208,10 +207,7 @@ class RHSubmitMaterialBase:
     _allowedMatsForSE = [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ]
     _allowedMatsCategory = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
 
-    def __init__(self, target, rh = None):
-        self._target=target
-        self._callerRH = rh
-        self._req = rh._req
+    def __init__(self):
         self._repositoryIds = None
         self._errorList = []
         self._cfg = Config.getInstance()
@@ -230,7 +226,16 @@ class RHSubmitMaterialBase:
         f.close()
         return fileName
 
+    def _checkProtection(self):
+        self._loggedIn = True
+        if self._getUser() == None and (isinstance(self._target, Category) or not self._target.getConference().canKeyModify(self._aw)):
+            self._loggedIn = False
+        else:
+            super(RHSubmitMaterialBase, self)._checkProtection()
+
     def _checkParams(self,params):
+
+        self._params = params
         self._action = ""
         self._overwrite = False
         #if request has already been handled (DB conflict), then we keep the existing files list
@@ -272,8 +277,7 @@ class RHSubmitMaterialBase:
                     else:
                         fDict["filePath"] = self._saveFileToTemp(fileUpload.file)
                         fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
-                        if self._callerRH != None:
-                            self._callerRH._tempFilesToDelete.append(fDict["filePath"])
+                        self._tempFilesToDelete.append(fDict["filePath"])
 
                     self._setErrorList(fDict)
                     self._files.append(fDict)
@@ -350,7 +354,7 @@ class RHSubmitMaterialBase:
         from MaKaC.common.fossilize import fossilize
         from MaKaC.fossils.conference import ILocalFileExtendedFossil, ILinkFossil
 
-        Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._callerRH._req)))
+        Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._req)))
 
         mat, newlyCreated = self._getMaterial()
 
@@ -441,11 +445,19 @@ class RHSubmitMaterialBase:
         return mat, status, fossilize(info, {"MaKaC.conference.Link": ILinkFossil,
                                              "MaKaC.conference.LocalFile": ILocalFileExtendedFossil})
 
-    def _process(self, rh, params):
+    def _process(self):
 
         # We will need to pickle the data back into JSON
 
-        user = rh.getAW().getUser()
+        user = self.getAW().getUser()
+
+        if not self._loggedIn:
+            from MaKaC.services.interface.rpc import json
+            return "<html><head></head><body>%s</body></html>" % json.encode(
+                {'status': 'ERROR',
+                 'info': {'type': 'noReport',
+                          'title': '',
+                          'explanation': _('You are currently not authenticated. Please log in again.')}})
 
         try:
             owner = self._target
@@ -467,8 +479,7 @@ class RHSubmitMaterialBase:
 
         try:
             if len(self._errorList) > 0:
-                status = "NOREPORT"
-                info = self._errorList
+                raise Exception('Operation aborted')
             else:
                 mat, status, info = self._addMaterialType(text, user)
 
@@ -477,7 +488,10 @@ class RHSubmitMaterialBase:
                         entry['material'] = mat.getId()
         except Exception, e:
             status = "ERROR"
-            info = self._errorList + ["%s: %s" % (e.__class__.__name__, str(e))]
+            del self._params['file']
+            info = {'message': errorList or " %s: %s" % (e.__class__.__name__, str(e)),
+                    'code': '0',
+                    'requestInfo': self._params}
             Logger.get('requestHandler').exception('Error uploading file')
         # hackish, because of mime types. Konqueror, for instance, would assume text if there were no tags,
         # and would try to open it
