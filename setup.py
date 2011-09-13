@@ -162,8 +162,8 @@ class jsdist_indico:
         self.dataFiles += _generateDataPaths([
             ('htdocs/js/presentation/pack', findall('indico/htdocs/js/presentation/pack'), 35),
             ('htdocs/js/indico/pack', findall('indico/htdocs/js/indico/pack'), 29),
-            ('htdocs/js/livesync/pack', findall('indico/htdocs/js/indico/pack'), 31),
-            ('htdocs/js/jquery/pack', findall('indico/htdocs/js/indico/pack'), 29)])
+            ('htdocs/js/livesync/pack', findall('indico/htdocs/js/livesync/pack'), 31),
+            ('htdocs/js/jquery/pack', findall('indico/htdocs/js/jquery/pack'), 29)])
 
 
 def _bdist_indico(dataFiles):
