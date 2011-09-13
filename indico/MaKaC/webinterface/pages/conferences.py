@@ -1218,34 +1218,28 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         return info
 
     def _getHTMLHeader( self ):
-        tpl = wcomponents.WHTMLHeader();
-
-        return tpl.getHTML({"area": "",
-                            "baseurl": self._getBaseURL(),
-                            "conf": Config.getInstance(),
-                            "page": self,
-                            "extraCSS": self.getCSSFiles(),
-                            "extraJSFiles": self.getJSFiles(),
-                            "extraJS": self._extraJS,
-                            "language": self._getAW().getSession().getLang()
-                            })
+        return WPConferenceBase._getHTMLHeader(self)
 
     def _getHeadContent( self ):
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         htdocs = Config.getInstance().getHtdocsDir()
+        if self._rh._req.is_https() or self._rh._tohttps:
+            baseurl = Config.getInstance().getBaseSecureURL()
+        else:
+            baseurl = self._getBaseURL()
         # First include the default Indico stylesheet
         styleText = """<link rel="stylesheet" href="%s/css/%s">\n""" % \
-            (self._getBaseURL(), Config.getInstance().getCssStylesheetName())
+            (baseurl, Config.getInstance().getCssStylesheetName())
         # Then the common event display stylesheet
         if os.path.exists("%s/css/events/common.css" % htdocs):
-            styleText += """        <link rel="stylesheet" href="%s/css/events/common.css">\n""" % self._getBaseURL()
+            styleText += """        <link rel="stylesheet" href="%s/css/events/common.css">\n""" % baseurl
         if self._type == "simple_event":
             lectureStyle = styleMgr.getDefaultStyleForEventType("simple_event")
-            cssPath = os.path.join(self._getBaseURL(), 'css', 'events', styleMgr.getCSSFilename(lectureStyle))
+            cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(lectureStyle))
             styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
         # And finally the specific display stylesheet
         if styleMgr.existsCSSFile(self._view):
-            cssPath = os.path.join(self._getBaseURL(), 'css', 'events', styleMgr.getCSSFilename(self._view))
+            cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
             styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
         return styleText
 
@@ -1613,7 +1607,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
                 Logger.get('Conference').error("Exception while trying to access the plugin elements of the side menu: %s" %str(e))
 
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed(self._rh.getAW().getUser()):
-            from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
                 urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = self._rh.use_https()))
             self._generalSection.addItem( self._videoServicesMenuItem)

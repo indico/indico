@@ -138,7 +138,7 @@ class WPBase(OldObservable):
         baseurl = self._getBaseURL()
         if ((isinstance(self, WPSignIn) or isinstance(self, WPConfSignIn) or isinstance(self, WPRegistrationFormSignIn)) and \
             Config.getInstance().getLoginURL().startswith("https")) or \
-            self._rh._req.is_https() and self._rh._tohttps:
+            self._rh._req.is_https() or self._rh._tohttps:
             baseurl = baseurl.replace("http://","https://")
             baseurl = urlHandlers.setSSLPort( baseurl )
 
