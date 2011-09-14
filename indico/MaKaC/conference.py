@@ -9831,6 +9831,9 @@ class SubContribution(CommonObjectBase, Locatable):
         self.setFullyPublic()
         self.getOwner().updateFullyPublic()
 
+    def getAccessController(self):
+        return self.getOwner().getAccessController()
+
     def getKeywords(self):
         try:
             return self._keywords
