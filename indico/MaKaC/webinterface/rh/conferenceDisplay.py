@@ -553,7 +553,7 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
             chair = self._conf.getChairById(chairid)
             if chair == None:
                 raise NotFoundError(_("The chair you try to email does not exist."))
-            self._emailto = chair.getEmail()
+            self._emailto = chair
         if self._auth:
             authid=params.get("authId","")
             if not contrib:
