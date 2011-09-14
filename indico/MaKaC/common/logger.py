@@ -3,6 +3,7 @@ import logging.handlers, logging.config, logging
 import ConfigParser
 
 from MaKaC.common.Configuration import Config
+from MaKaC.common.contextManager import ContextManager
 
 class ExtraIndicoFilter(logging.Filter):
 
@@ -10,6 +11,23 @@ class ExtraIndicoFilter(logging.Filter):
         if record.name.split('.')[0] == 'indico':
             return 0
         return 1
+
+class IndicoMailFormatter(logging.Formatter):
+    def format(self, record):
+        s = super(IndicoMailFormatter, self).format(record)
+        return s + self._getRequestInfo()
+
+    def _getRequestInfo(self):
+        rh = ContextManager.get('currentRH', None)
+        if not rh:
+            return ''
+        info = ['Additional information:']
+        info.append('URL: %s' % rh.getRequestURL())
+        info.append('Params: %s' % rh._getTruncatedParams())
+        info.append('IP: %s' % rh._req.remote_ip)
+        info.append('User Agent: %s' % rh._req.headers_in.get('User-Agent', 'n/a'))
+        info.append('Referer: %s' % rh._req.headers_in.get('Referer', 'n/a'))
+        return '\n\n%s' % '\n'.join(info)
 
 class LoggerUtils:
 
@@ -34,6 +52,12 @@ class LoggerUtils:
         except:
             #TODO: this is just for backwards compatibility. It should be removed in v0.98 with p2.6
             formatters = cls._create_formatters(cp)
+
+        # Really ugly.. but logging fails to import MaKaC.common.logger.IndicoMailFormatter
+        # when using it in the class= option...
+        if 'mailFormatter' in formatters:
+            f = formatters['mailFormatter']
+            formatters['mailFormatter'] = IndicoMailFormatter(f._fmt, f.datefmt)
 
         logging._acquireLock()
         try:

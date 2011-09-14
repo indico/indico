@@ -361,7 +361,7 @@ class RH(RequestHandlerBase):
         """Unexpected errors
         """
 
-        Logger.get('requestHandler').exception('Request %s failed: "%s"\n\nurl: %s\n\nparameters: %s\n\n' % (id(self._req), e,self.getRequestURL(), self._getTruncatedParams()))
+        Logger.get('requestHandler').exception('Request %s failed: "%s"' % (id(self._req), e))
         p=errors.WPUnexpectedError(self)
         return p.display()
 
@@ -369,7 +369,7 @@ class RH(RequestHandlerBase):
         """Unexpected errors
         """
 
-        Logger.get('requestHandler').exception('Request %s failed: "%s"\n\nurl: %s\n\nparameters: %s\n\n' % (id(self._req), e,self.getRequestURL(), self._getTruncatedParams()))
+        Logger.get('requestHandler').exception('Request %s failed: "%s"' % (id(self._req), e))
         p=errors.WPHostnameResolveError(self)
         return p.display()
 
