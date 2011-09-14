@@ -1868,6 +1868,8 @@ class Abstract(Persistent):
         return False
 
     def canAuthorAccess(self, user):
+        if user is None:
+            return False
         el=self.getCoAuthorEmailList(True)+self.getPrimaryAuthorEmailList(True)
         for e in user.getEmails():
             if e.lower() in el:
