@@ -205,6 +205,8 @@ class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
         if not PluginsHolder().hasPluginType("Collaboration"):
             raise PluginError("Collaboration plugin system is not active")
 
+        self._checkSessionUser()
+
         hasRights = (not self._cannotViewTab) and \
                     (RCCollaborationAdmin.hasRights(self, None) or
                      RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins) or
