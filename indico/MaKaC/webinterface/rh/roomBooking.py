@@ -1128,12 +1128,14 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
 
         if not self._overload:
             self._resvs = []
+            day = None # Ugly but...othery way to avoid it?
             for day in days:
                 for loc in Location.allLocations:
                     self._resvs += CrossLocationQueries.getReservations( location = loc.friendlyName, resvExample = resvEx, rooms = self._rooms, archival = self._isArchival, heavy = self._isHeavy, days = [day] )
                 if len(self._resvs) > 400:
                     self._overload = 2
                     break
+            if day:
                 self._resvEx.endDT = datetime( day.year, day.month, day.day, 23, 59, 00 )
 
         p = roomBooking_wp.WPRoomBookingBookingList( self )
