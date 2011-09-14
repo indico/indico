@@ -1134,7 +1134,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 if len(self._resvs) > 400:
                     self._overload = 2
                     break
-            self._resvEx.endDT = datetime( day.year, day.month, day.day, 23, 59, 00 )
+                self._resvEx.endDT = datetime( day.year, day.month, day.day, 23, 59, 00 )
 
         p = roomBooking_wp.WPRoomBookingBookingList( self )
         return p.display()
