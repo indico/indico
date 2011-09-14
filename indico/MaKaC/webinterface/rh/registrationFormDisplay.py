@@ -165,7 +165,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
                 if canManageRegistration:
                     raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%email)
                 else:
-                    raise FormValuesError("You have already registered with the email address \"%s\". If you need to modify your registration, please contact the managers of the conference."%self._getUser().getEmail())
+                    raise FormValuesError("You have already registered with the email address \"%s\". If you need to modify your registration, please contact the managers of the conference."%email)
 
         rp = registration.Registrant()
         self._conf.addRegistrant(rp)
