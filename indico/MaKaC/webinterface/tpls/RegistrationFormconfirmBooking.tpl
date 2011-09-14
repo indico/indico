@@ -25,6 +25,7 @@
                   </td>
 
                 </tr>
+                % if len(payMods) > 0:
                 <tr><td colspan="3">
                     <table width="90%" align="center" border="0">
                       <tr>
@@ -59,6 +60,7 @@
                     </table>
 
                 </td></tr>
+                %endif
               </table>
             </td>
           </tr>
