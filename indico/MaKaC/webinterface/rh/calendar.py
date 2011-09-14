@@ -37,14 +37,19 @@ class RHCalendar(base.RHProtected):
     def _checkProtection(self):
         if self._getUser() == None:
             self._checkSessionUser()
+        categNoAccess = []
 
         for item in self._categList:
             if not item.canAccess(self.getAW()):
+                categNoAccess.append(item)
                 self._categList.remove(item)
-        self._target = self._categList
         if len(self._categList) > 0:
+            self._target = self._categList
             self._categ = self._categList[0]
         else:
+            # 'categNoAccess' is necessary in order to be able to retrieve the
+            # 'Contact Info' from all categs the user has no access (see WAccessError)
+            self._target = categNoAccess
             raise AccessError()
 
     def _checkParams( self, params ):
