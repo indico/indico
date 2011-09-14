@@ -150,6 +150,7 @@ def getTalks(conference, sort = False):
 
     for session in conference.getSessionList():
         event_info = {}
+        event_info["contId"] = ""
         event_info["speakers"] = ""
         event_info["type"]     = "session"
         event_info["IndicoID"] = generateIndicoID(conference = conference.getId(),
