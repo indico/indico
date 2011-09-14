@@ -590,9 +590,11 @@ class AlarmTask(SendMailTask):
         tvars['getDate'] = lambda date : format_date(date, format='yyyy-MM-dd')
         tvars['prettyDate'] = lambda date : format_date(date, format='full')
         tvars['getLocationInfo'] = lambda item: getLocationInfo(item, False)
-        from MaKaC.conference import SessionSlot
+        from MaKaC.conference import SessionSlot, AcceptedContribution
         tvars['getItemType'] = lambda item: "Break" if isinstance(item, schedule.BreakTimeSchEntry) \
-                                            else ("Session" if isinstance(item, SessionSlot) else item.__class__.__name__)
+                                            else ("Session" if isinstance(item, SessionSlot) \
+                                                  else ("Contribution" if isinstance(item, AcceptedContribution) \
+                                                                                else item.__class__.__name__))
         return tvars
 
     def _setMailText(self):

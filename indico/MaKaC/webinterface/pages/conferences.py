@@ -1140,6 +1140,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             return 'Break'
         elif itemClass == 'SessionSlot':
             return 'Session'
+        elif itemClass == 'AcceptedContribution':
+            return 'Contribution'
         else:
             # return Conference, Contribution or SubContribution
             return itemClass
