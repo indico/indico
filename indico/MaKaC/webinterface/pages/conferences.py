@@ -1316,7 +1316,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
         if self._view != 'xml':
             vars = self._getVariables(self._conf)
-            vars['getTime'] = lambda date : format_time(date.time())
+            vars['getTime'] = lambda date : format_time(date.time(), format="HH:mm")
             vars['isTime0H0M'] = lambda date : (date.hour, date.minute) == (0,0)
             vars['getDate'] = lambda date : format_date(date, format='yyyy-MM-dd')
             vars['prettyDate'] = lambda date : format_date(date, format='full')
