@@ -176,8 +176,10 @@ class WAccessError( WTemplated ):
             for item in self._rh._target:
                 contactInfo.append(item.getAccessController().getAnyContactInfo())
             vars["contactInfo"] = ";".join(contactInfo)
-        else:
+        elif self._rh._target is not None:
             vars["contactInfo"] = self._rh._target.getAccessController().getAnyContactInfo()
+        else:
+            vars["contactInfo"] = ""
         return vars
 
 class WAccessKeyError( WTemplated ):
