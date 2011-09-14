@@ -2413,7 +2413,7 @@ class RegistrantToPDF(PDFBase):
             elif key == "SocialEvents":
                 listSocialEvents = []
                 for se in self._reg.getSocialEvents():
-                    if ses is not None:
+                    if se is not None:
                         listSocialEvents.append("%s"%escape(se.getCaption()))
                 if len(listSocialEvents) > 0:
                     text = i18nformat("""<b> _("Social Events")</b> : """)
