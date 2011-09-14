@@ -59,7 +59,7 @@ class WPBase(OldObservable):
             # We can't use Loader.js as jQuery is included before any indico js
             return ['js/jquery/%s.js' % f for f in files] + ['js/indico/jquery/defaults.js']
         else:
-            return ['js/jquery/jquery.js.pack'] + ['js/indico/jquery/defaults.js']
+            return ['js/jquery/pack/jquery.js.pack'] + ['js/indico/jquery/defaults.js']
 
     def _includeJSFile(self, path, filename):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
