@@ -114,6 +114,7 @@
         $('#searchForm input[name="availability"]').change(function() {
             display_availability($(this).data('showAvailability'));
         });
+        display_availability($('input[name=availability]:checked').data('showAvailability'));
         $('#freeSearch').focus();
     });
 
