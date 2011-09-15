@@ -28,17 +28,17 @@ moreMenu.observeClick(function(e) {
     var menu = new PopupMenu(menuItems, [moreMenu], ${"'darkPopupList'" if dark else "null"});
 
     % if showExportToICal:
-    menuItems['${ _("Export event to iCal") }'] = '${ urlHandlers.UHConferenceToiCal.getURL(self_._rh._conf, detailLevel = "top") }';
-    menuItems['${ _("Export timetable to iCal") }'] = '${ urlHandlers.UHConferenceToiCal.getURL(self_._rh._conf, detailLevel = "contributions") }';
+    menuItems["${ _('Export event to iCal') }"] = '${ urlHandlers.UHConferenceToiCal.getURL(self_._rh._conf, detailLevel = "top") }';
+    menuItems["${ _('Export timetable to iCal') }"] = '${ urlHandlers.UHConferenceToiCal.getURL(self_._rh._conf, detailLevel = "contributions") }';
     % endif
     % if showExportToPDF:
-    menuItems['${ _("Export to PDF") }'] = '${ pdfURL }';
+    menuItems["${ _('Export to PDF') }"] = '${ pdfURL }';
     % endif
     % if showDLMaterial:
-    menuItems['${ _("Download material") }'] = '${ urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self_._rh._conf) }';
+    menuItems["${ _('Download material') }"] = '${ urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self_._rh._conf) }';
     % endif
     % if showLayout:
-    menuItems['${ _("Layout") }'] = new PopupMenu(layoutMenuItems, [moreMenu, menu], ${"'darkPopupList'" if dark else "null"}, null, null, null, '${ SelectedStyle }');
+    menuItems["{ _('Layout') }"] = new PopupMenu(layoutMenuItems, [moreMenu, menu], ${"'darkPopupList'" if dark else "null"}, null, null, null, '${ SelectedStyle }');
     % endif
 
     var pos = moreMenu.getAbsolutePosition();
