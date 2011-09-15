@@ -112,7 +112,7 @@
             forms_are_valid();
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
-                alert('${_("There are errors in the form. Please correct fields with red background.")}');
+                alert("${_('There are errors in the form. Please correct fields with red background.')}");
                 e.preventDefault();
             }
             else if(!confirm_search()) {
