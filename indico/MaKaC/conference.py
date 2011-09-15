@@ -9753,14 +9753,18 @@ class SubContribParticipation(Persistent, Fossilizable):
         return self._fax
 
     def getFullName( self ):
-        res = self.getFamilyName().upper()
+        res = self.getFullNameNoTitle()
+        if self.getTitle() != "":
+            res = "%s %s"%( self.getTitle(), res )
+        return res
+
+    def getFullNameNoTitle( self ):
+        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
         if self.getFirstName() != "":
             if res.strip() != "":
                 res = "%s, %s"%( res, self.getFirstName() )
             else:
                 res = self.getFirstName()
-        if self.getTitle() != "":
-            res = "%s %s"%( self.getTitle(), res )
         return res
 
     def getAbrName(self):
