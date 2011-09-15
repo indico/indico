@@ -185,7 +185,7 @@ i.e. try 'easy_install babel'"""
     gjs.run()
 
 
-def copytreeSilently(source, target):
+def copyTreeSilently(source, target):
     '''Copies source tree to target tree overwriting existing files'''
     source = os.path.normpath(source)
     target = os.path.normpath(target)

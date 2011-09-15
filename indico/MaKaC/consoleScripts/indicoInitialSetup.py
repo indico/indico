@@ -30,7 +30,7 @@ import shutil, getopt
 
 from distutils.sysconfig import get_python_lib
 
-from installBase import getIndicoInstallMode, setIndicoInstallMode, PWD_INDICO_CONF, indico_pre_install, indico_post_install, copytreeSilently
+from installBase import getIndicoInstallMode, setIndicoInstallMode, PWD_INDICO_CONF, indico_pre_install, indico_post_install, copyTreeSilently
 
 # The directory where the egg is located
 eggDir = os.path.join(os.path.dirname(__file__), '..', '..')
@@ -52,7 +52,7 @@ def copy_egg_datafiles_to_base(dstDir):
             print "You don't have write permissions for directory %s!" % dst
             print "Aborting."
             sys.exit(-1)
-        copytreeSilently(src, dst)
+        copyTreeSilently(src, dst)
 
 
 def main():

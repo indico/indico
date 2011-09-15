@@ -72,9 +72,10 @@ def _generateDataPaths(x):
 
     dataFilesDict = {}
 
-    for (baseDstDir, files, remove_first_x_chars) in x:
-        for f in files:
-            dst_dir = os.path.join(baseDstDir, os.path.dirname(f)[remove_first_x_chars:])
+    for (baseDstDir, srcDir) in x:
+        for f in findall(srcDir):
+            dst_dir = os.path.join(baseDstDir,
+                                   os.path.relpath(os.path.dirname(f), srcDir))
             if dst_dir not in dataFilesDict:
                 dataFilesDict[dst_dir] = []
             dataFilesDict[dst_dir].append(f)
@@ -105,16 +106,10 @@ def _getDataFiles(x):
     # first into a dict and then into a pallatable form for setuptools.
 
     # This re will be used to filter out etc/*.conf files and therefore not overwritting them
-    isAConfRe = re.compile('etc\/[^/]+\.conf$')
-
-    dataFiles = _generateDataPaths((('bin',           findall('bin'), 4),
-                                    ('doc', findall('doc'), 4),
-                                    ('etc', [xx for xx in findall('etc') if not isAConfRe.search(xx)], 4),
-                                    ('htdocs',        findall('indico/htdocs'), 14)))
+    dataFiles = _generateDataPaths((('bin', 'bin'),
+                                    ('doc', 'doc'),
+                                    ('etc', 'etc')))
     return dataFiles
-
-
-
 
 
 def _getInstallRequires():
@@ -159,11 +154,6 @@ class jsdist_indico:
     def jsCompress(self):
         from MaKaC.consoleScripts.installBase import jsCompress
         jsCompress()
-        self.dataFiles += _generateDataPaths([
-            ('htdocs/js/presentation/pack', findall('indico/htdocs/js/presentation/pack'), 35),
-            ('htdocs/js/indico/pack', findall('indico/htdocs/js/indico/pack'), 29),
-            ('htdocs/js/livesync/pack', findall('indico/htdocs/js/livesync/pack'), 31),
-            ('htdocs/js/jquery/pack', findall('indico/htdocs/js/jquery/pack'), 29)])
 
 
 def _bdist_indico(dataFiles):
@@ -578,15 +568,15 @@ if __name__ == '__main__':
 
     dataFiles = _getDataFiles(x)
 
-    foundPackages = find_packages(where = 'indico',
-                                  exclude = ('htdocs*', 'tests*', 'core*', 'ext*',
-                                             'modules*', 'util*', 'web*', 'locale'))
+    foundPackages = list('MaKaC.%s' % pkg for pkg in
+                         find_packages(where = 'indico/MaKaC'))
+    foundPackages.append('MaKaC')
+    foundPackages.append('htdocs')
 
     # add our namespace package
     foundPackages += list('indico.%s' % pkg for pkg in
                          find_packages(where = 'indico',
-                                       exclude = ('htdocs*','MaKaC*')))
-
+                                       exclude = ['htdocs*', 'MaKaC*']))
     foundPackages.append('indico')
 
     cmdclass = {'sdist': sdist_indico,
@@ -615,8 +605,6 @@ if __name__ == '__main__':
           platforms = ["any"],
           long_description = "Indico allows you to schedule conferences, from single talks to complex meetings with sessions and contributions. It also includes an advanced user delegation mechanism, allows paper reviewing, archival of conference information and electronic proceedings",
           license = "http://www.gnu.org/licenses/gpl-2.0.txt",
-          package_dir = { 'indico': 'indico',
-                          'MaKaC' : os.path.join('indico', 'MaKaC')},
           entry_points = """
             [console_scripts]
 
@@ -664,11 +652,14 @@ if __name__ == '__main__':
             """,
           zip_safe = False,
           packages = foundPackages,
+          package_dir = { 'indico': 'indico',
+                          'htdocs': os.path.join('indico', 'htdocs'),
+                          'MaKaC' : os.path.join('indico', 'MaKaC')},
+          package_data = {'indico': ['*.*']},
+          include_package_data=True,
           namespace_packages = ['indico'],
           install_requires = _getInstallRequires(),
           data_files = dataFiles,
-          package_data = {'indico': ['*.*'] },
-          include_package_data = True,
           dependency_links = [
                               EXTRA_RESOURCES_URL
                               ]
