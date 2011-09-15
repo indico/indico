@@ -1,18 +1,8 @@
 <% import datetime %>
 
-<script  type="text/javascript">
+<script type="text/javascript">
 
     var dates= new WatchList();
-
-    function setOtherLocation()
-    {
-        objRoom.set('other', true);
-    }
-
-    function setListLocation()
-    {
-        objRoom.set('fromList', true);
-    }
 
     function verifyDates()
     {
@@ -92,7 +82,7 @@
                 $E('nbDates').dom.value = currentOccurrences;
             }
         } else {
-            var popup = new AlertPopup($T("Adding new occurrence"), Html.span({}, $T("It is not possible to add a new occurrence for this lecture, the maximun number of occurrences is ") + maxOccurrences + "."));
+            var popup = new AlertPopup($T("Adding new occurrence"), Html.span({}, $T("It is not possible to add a new occurrence for this lecture, the maximum number of occurrences is ") + maxOccurrences + "."));
             popup.open();
         }
     }
