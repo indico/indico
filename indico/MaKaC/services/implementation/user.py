@@ -21,7 +21,7 @@ from MaKaC.services.implementation.base import LoggedOnlyService
 from MaKaC.services.implementation.base import ServiceBase
 
 import MaKaC.user as user
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
 from MaKaC.common import info
 
@@ -385,7 +385,7 @@ class UserSetPersonalData(UserPersonalDataBase):
                 if self._value in TitlesRegistry().getList():
                     self._user.setTitle(self._value)
                 else:
-                    raise ServiceError("ERR-U8", _("Invalid title value"))
+                    raise NoReportError(_("Invalid title value"))
             elif self._dataType == "surName":
                 self._user.setFieldSynced('surName', False)
                 surName = idxs.getById("surName")
@@ -409,7 +409,7 @@ class UserSetPersonalData(UserPersonalDataBase):
                 if self._value != self._avatar.getEmail():
                     other = user.AvatarHolder().match({"email": self._value}, forceWithoutExtAuth=True)
                     if other and other[0] != self._avatar:
-                        raise ServiceError("ERR-U9", _("The email address is already used by another user."))
+                        raise NoReportError(_("The email address %s is already used by another user.") % self._value)
                 email = idxs.getById("email")
                 email.unindexUser(self._avatar)
                 self._user.setEmail(self._value)
@@ -422,7 +422,7 @@ class UserSetPersonalData(UserPersonalDataBase):
                     if email != "":
                         av = user.AvatarHolder().match({"email": email}, forceWithoutExtAuth=True)
                         if av and av[0] != self._avatar:
-                            raise ServiceError("ERR-U10", _("The email address %s is already used by another user.") % email)
+                            raise NoReportError(_("The email address %s is already used by another user.") % email)
                         else:
                             secondaryEmails.append(email)
                 self._user.setSecondaryEmails(secondaryEmails)
