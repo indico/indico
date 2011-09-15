@@ -1205,22 +1205,14 @@ class RHInternalPageDisplay(RHConferenceBaseDisplay):
             pageId=params.get("pageId")
             intPagesMgr=internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._conf)
             self._page=intPagesMgr.getPageById(pageId)
-            self._target = self._page
+            self._target = self._conf
             if self._page is None:
                 raise MaKaCError( _("The webpage, you are trying to access, does not exist"))
         else:
             raise MaKaCError( _("The webpage, you are trying to access, does not exist"))
 
-    def _checkProtection(self):
-        if not self._conf.canView( self.getAW() ):
-            from MaKaC.conference import Link,LocalFile
-
-            if self._conf.getAccessKey() != "":
-                raise KeyAccessError()
-            if self._getUser() == None:
-                self._checkSessionUser()
-            else:
-                raise AccessError()
+    def getCurrentURL( self ):
+        return self._uh.getURL( self._page )
 
     def _process( self ):
         p=conferences.WPInternalPageDisplay(self,self._conf, self._page)
