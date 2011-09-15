@@ -78,7 +78,11 @@ class WPBase(OldObservable):
             return ['js/presentation/pack/Presentation.js.pack']
 
     def _getBaseURL( self ):
-        return Config.getInstance().getBaseURL()
+        if self._rh._req.is_https() and Config.getInstance().getBaseSecureURL():
+            baseurl = Config.getInstance().getBaseSecureURL()
+        else:
+            baseurl = Config.getInstance().getBaseURL()
+        return baseurl
 
     def _getTitle( self ):
         return self._title
@@ -135,13 +139,6 @@ class WPBase(OldObservable):
         from MaKaC.webinterface.rh.base import RHModificationBaseProtected
         from MaKaC.webinterface.rh.admins import RHAdminBase
 
-        baseurl = self._getBaseURL()
-        if ((isinstance(self, WPSignIn) or isinstance(self, WPConfSignIn) or isinstance(self, WPRegistrationFormSignIn)) and \
-            Config.getInstance().getLoginURL().startswith("https")) or \
-            self._rh._req.is_https() or self._rh.use_https():
-            baseurl = baseurl.replace("http://","https://")
-            baseurl = urlHandlers.setSSLPort( baseurl )
-
         area=""
         if isinstance(self._rh, RHModificationBaseProtected):
             area=i18nformat(""" - _("Management area")""")
@@ -157,7 +154,7 @@ class WPBase(OldObservable):
 
         return wcomponents.WHTMLHeader().getHTML({
                             "area": area,
-                            "baseurl": baseurl,
+                            "baseurl": self._getBaseURL(),
                             "conf": Config.getInstance(),
                             "page": self,
                             "extraCSS": self.getCSSFiles(),

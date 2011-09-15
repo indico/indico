@@ -26,7 +26,7 @@ ${ _("Warning: since you are not logged in, only results from public events will
 
 <div style="float: right; margin-top:10px;">
 <span style="color:#777">Search powered by</span>
-<a href="http://cdsware.cern.ch/invenio/"><img src="${ systemIcon('invenio') }" alt="CDS Invenio" title="${ _("IndicoSearch is powered by CDS Invenio")}" style="vertical-align: middle; border: 0px;" /></a>
+<a href="http://invenio-software.org"><img src="${ systemIcon('invenio') }" alt="CDS Invenio" title="${ _("IndicoSearch is powered by CDS Invenio")}" style="vertical-align: middle; border: 0px;" /></a>
 </div>
 
 <form method="GET" action="${ urlHandlers.UHSearch.getURL() }" style="width: 400px;">

@@ -4154,21 +4154,6 @@ class RHAbstractsListToExcel(RHConfModifCFABase):
 
 #-------------------------------------------------------------------------------------
 
-class RHConfModifDisplay( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplay
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-        self._formatOption = params.get("formatOption", "")
-        self._optionalParams={}
-        if params.has_key("modifiedText"):
-            self._optionalParams["modifiedText"]=params.has_key("modifiedText")
-
-    def _process( self ):
-        p = conferences.WPConfModifDisplay(self, self._target, self._linkId, self._formatOption, optionalParams=self._optionalParams )
-        return p.display()
-
 class RHConfModifDisplayCustomization( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifDisplayCustomization
 

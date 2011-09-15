@@ -67,8 +67,7 @@ class URLHandler(object):
         """
         rh = ContextManager.get('currentRH', None)
 
-        if (cls in [UHSignIn, UHSignOut, UHConfSignIn, UHConfRegistrationFormSignIn] and \
-            Config.getInstance().getBaseSecureURL()) or rh and (rh._req.is_https() or rh.use_https()):
+        if rh._req.is_https() and Config.getInstance().getBaseSecureURL():
             baseURL = Config.getInstance().getBaseSecureURL()
         else:
             baseURL = Config.getInstance().getBaseURL()

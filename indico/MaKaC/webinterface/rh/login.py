@@ -36,6 +36,8 @@ import MaKaC.common.info as info
 
 class RHSignIn( base.RH ):
 
+    _tohttps = True
+
     def _checkParams( self, params ):
         self._signIn = params.get("signIn", "").strip()
         self._login = params.get( "login", "" ).strip()
@@ -56,6 +58,8 @@ class RHSignIn( base.RH ):
             tz = tzUtil.getSessionTZ()
             self._getSession().setVar("ActiveTimezone",tz)
             self._getSession().setUser( av )
+            if Config.getInstance().getBaseSecureURL().startswith('https://'):
+                url = str(url).replace('http://', 'https://')
             self._redirect( url, noCache = True )
         if not self._signIn:
             p = signIn.WPSignIn( self )
@@ -85,6 +89,8 @@ class RHSignIn( base.RH ):
                     url += "&userId=%s"%self._userId
                 else:
                     url += "?userId=%s"%self._userId
+            if Config.getInstance().getBaseSecureURL().startswith('https://'):
+                url = str(url).replace('http://', 'https://')
             self._redirect( url, noCache = True )
 
 
@@ -106,11 +112,7 @@ class RHSignOut( base.RH ):
         if autoLogoutRedirect:
             self._redirect(autoLogoutRedirect)
         else:
-            # if not all the site is HTTPS, try moving user to plain HTTP
-            if not Config.getInstance().getBaseURL().startswith('https'):
-                self._redirect(str(self._returnURL).replace('https', 'http'))
-            else:
-                self._redirect(self._returnURL)
+            self._redirect(self._returnURL)
 
 
 class RHLogoutSSOHook( base.RH):

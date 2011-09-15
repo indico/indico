@@ -33,9 +33,9 @@ class RHBaseEvaluation( RHConferenceBaseDisplay ):
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams(self, params)
         self._evaluation = self._conf.getEvaluation()
-    
+
     def _processIfActive( self ):
-        """ only override this method if the Evaluation must be activated for 
+        """ only override this method if the Evaluation must be activated for
             carrying on the handler execution.
         """
         return "evaluation"
@@ -48,7 +48,7 @@ class RHBaseEvaluation( RHConferenceBaseDisplay ):
             return self._wpEvaluation("Inactive").display()
         else:
             return self._processIfActive()
-            
+
     def _wpEvaluation(self, pageToShow):
         """redirection to the right class, dependending on conference type.
             Params:
@@ -64,7 +64,7 @@ class RHBaseEvaluation( RHConferenceBaseDisplay ):
 class RHEvaluationMainInformation( RHBaseEvaluation ):
     """General information display."""
     _uh = urlHandlers.UHConfEvaluationMainInformation
-    
+
     def _processIfActive( self ):
         if self.getWebFactory()!=None : #Event == Meeting/Lecture
             self._redirect(urlHandlers.UHConferenceDisplay.getURL(self._conf))
@@ -75,7 +75,9 @@ class RHEvaluationMainInformation( RHBaseEvaluation ):
 class RHEvaluationSignIn( RHBaseEvaluation ):
     """Invite user to login/signin."""
     _uh = urlHandlers.UHConfEvaluationSignIn
-    
+    _tohttps = True
+
+
     def _processIfActive( self ):
         return self._wpEvaluation("SignIn").display()
 
@@ -92,23 +94,23 @@ class RHEvaluationDisplayBase( RHBaseEvaluation ):
         if Config.getInstance().getLoginURL().startswith("https"):
             urlLogin = urlLogin.replace("http://", "https://")
         return urlLogin
-        
+
     def _checkProtection( self ):
         RHBaseEvaluation._checkProtection(self)
         if self._evaluation.inEvaluationPeriod() and self._evaluation.isMandatoryAccount() and self._getUser()==None:
             self._redirect( self._getLoginURL() )
             self._doProcess = False
-        
+
 
 class RHEvaluationDisplay( RHEvaluationDisplayBase ):
     """Evaluation display."""
-    
+
     def _processIfActive( self ):
         if self._getUser()!=None and self._getUser().hasSubmittedEvaluation(self._evaluation):
             return self._wpEvaluation("DisplayModif").display()
-        else:      
+        else:
             return self._evaluationDisplay().display()
-    
+
     def _evaluationDisplay(self):
         """What to display."""
         if not self._evaluation.inEvaluationPeriod():
@@ -122,7 +124,7 @@ class RHEvaluationDisplay( RHEvaluationDisplayBase ):
 class RHEvaluationModif( RHEvaluationDisplayBase ):
     """Submitted evaluation modification."""
     _uh = urlHandlers.UHConfEvaluationDisplayModif
-    
+
     def _processIfActive( self ):
         if self._getUser()!=None and self._getUser().hasSubmittedEvaluation(self._conf.getEvaluation()):
             if not self._evaluation.inEvaluationPeriod():
@@ -134,7 +136,7 @@ class RHEvaluationModif( RHEvaluationDisplayBase ):
 
 class RHEvaluationSubmit (RHBaseEvaluation):
     """Submit the evaluation."""
-    
+
     def _checkParams( self, params ):
         RHBaseEvaluation._checkParams( self, params )
         self._submit = params.has_key("submit")
@@ -149,12 +151,12 @@ class RHEvaluationSubmit (RHBaseEvaluation):
                 self._redirect(urlHandlers.UHConferenceDisplay.getURL(self._conf))
             else : #Event == Conference
                 self._redirect(urlHandlers.UHConfEvaluationMainInformation.getURL(self._conf))
-        
+
         ########
         #SUBMIT#
         ########
         if self._submit:
-            
+
             ####################
             #get some variables#
             ####################
@@ -162,7 +164,7 @@ class RHEvaluationSubmit (RHBaseEvaluation):
             evaluation = self._conf.getEvaluation()
             mode = params.get("mode","")
             user = self._getUser()
-            
+
             ##########
             #Checking#
             ##########
@@ -181,7 +183,7 @@ class RHEvaluationSubmit (RHBaseEvaluation):
                     if mode==Evaluation._EDIT : mode=Evaluation._SUBMIT
             elif evaluation.isMandatoryAccount() or mode==Evaluation._EDIT :
                     self._userShouldBeLoggedIn()
-            
+
             ##########
             #Add mode#
             ##########
@@ -196,7 +198,7 @@ class RHEvaluationSubmit (RHBaseEvaluation):
                     submission.addNewAnswer(question, answerFromForm)
                 #notification
                 submission.notifySubmissionSubmitted()
-                        
+
             ###########
             #Edit mode#
             ###########
@@ -218,12 +220,12 @@ class RHEvaluationSubmit (RHBaseEvaluation):
                     submission.notifySubmissionModified()
                 elif HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive() :
                     raise Exception("Evaluation - Strange error... the submission of this user was not found!")
-            
+
             ##########
             #Redirect#
             ##########
             self._redirect(urlHandlers.UHConfEvaluationSubmitted.getURL(self._conf, mode=mode))
-            
+
     def _userShouldBeLoggedIn(self):
         """Strange error: the logged user is no more logged in..."""
         raise FormValuesError("""Something strange happened here: you are supposed to be logged in.<br/><br/>
@@ -236,7 +238,7 @@ class RHEvaluationSubmit (RHBaseEvaluation):
 class RHEvaluationSubmitted( RHBaseEvaluation ):
     """Show message : Evaluation submitted."""
     _uh = urlHandlers.UHConfEvaluationMainInformation
-    
+
     def _processIfActive( self ):
         mode = self.getRequestParams().get("mode","") or Evaluation._SUBMIT
         wf = self.getWebFactory()

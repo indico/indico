@@ -57,6 +57,8 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 class RHConfSignIn( conferenceBase.RHConferenceBase ):
 
+    _tohttps = True
+
     def _checkParams( self, params ):
         conferenceBase.RHConferenceBase._checkParams( self, params )
         self._login = params.get( "login", "" ).strip()
@@ -69,13 +71,14 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
 
 
     def _process( self ):
-        self._tohttps = True
         #Check for automatic login
         auth = AuthenticatorMgr()
         av = auth.autoLogin(self)
         if av:
             url = self._returnURL
             self._getSession().setUser( av )
+            if Config.getInstance().getBaseSecureURL().startswith('https://'):
+                url = str(url).replace('http://', 'https://')
             self._redirect( url )
         if not self._signIn:
             p = conferences.WPConfSignIn( self, self._conf )
@@ -98,6 +101,8 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
                 tzUtil = timezoneUtils.SessionTZ(av)
                 tz = tzUtil.getSessionTZ()
                 self._getSession().setVar("ActiveTimezone",tz)
+            if Config.getInstance().getBaseSecureURL().startswith('https://'):
+                url = str(url).replace('http://', 'https://')
             self._redirect( url )
 
 # REPLACED BY RHSignOut IN login.py

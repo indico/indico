@@ -446,7 +446,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         #This is used for fetching the default css file for the conference pages
         #And also the modificated uploaded css
 
-        path = baseurl = self._getBaseURL()
+        path = self._getBaseURL()
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
             """ % path
@@ -863,7 +863,7 @@ class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
 
     def _getHeadContent( self ):
         #This is used for fetching the css file for conference page
-        path = baseurl = self._getBaseURL()
+        path = self._getBaseURL()
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
             """ % path
@@ -1225,10 +1225,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
     def _getHeadContent( self ):
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         htdocs = Config.getInstance().getHtdocsDir()
-        if self._rh._req.is_https() or self._rh._tohttps:
-            baseurl = Config.getInstance().getBaseSecureURL()
-        else:
-            baseurl = self._getBaseURL()
+        baseurl = self._getBaseURL()
         # First include the default Indico stylesheet
         styleText = """<link rel="stylesheet" href="%s/css/%s">\n""" % \
             (baseurl, Config.getInstance().getCssStylesheetName())
@@ -1499,7 +1496,7 @@ class WPConferenceTimeTable( WPConferenceDefaultDisplayBase ):
 
     def _getHeadContent( self ):
         headContent=WPConferenceDefaultDisplayBase._getHeadContent(self)
-        baseurl = Config.getInstance().getBaseURL()
+        baseurl = self._getBaseURL()
         return """
                  %s
                  <link rel="stylesheet" type="text/css" href="%s/css/timetable.css">
@@ -5513,32 +5510,6 @@ class WPConfModifDisplayBase( WPConferenceModifBase ):
 
     def _setActiveSideMenuItem( self ):
         self._layoutMenuItem.setActive()
-
-class WPConfModifDisplay( WPConfModifDisplayBase ):
-
-    def __init__(self, rh, conf, linkId, formatOption=None, optionalParams={}):
-        WPConfModifDisplayBase.__init__(self, rh, conf)
-        self._linkId = linkId
-        self._formatOption = formatOption
-        self._menu=displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        if linkId:
-            self._link = self._menu.getLinkById(linkId)
-        else:
-            self._link = self._menu
-        self._optionalParams=optionalParams
-
-    def _getTabContent( self, params ):
-        wc = WConfModifDisplay( self._conf, self._linkId, self._formatOption )
-        return wc.getHTML(self._optionalParams)
-
-    def _getHeadContent( self ):
-        #This is used for fetching the css file for management - display
-        path = baseurl = self._getBaseURL()
-        saveurl = urlHandlers.UHSavePic.getURL(self._conf)
-        printCSS = """
-        <link rel="stylesheet" type="text/css" href="%s/css/ModifDisplay.css" >
-            """ %(path)
-        return printCSS
 
 class WPConfModifDisplayCustomization( WPConfModifDisplayBase ):
 
@@ -11297,8 +11268,6 @@ class WPConfModifPosterDesign( WPConfModifToolsBase ):
         return cmp(x.getFamilyName(),y.getFamilyName())
 
 class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
-    #from MaKaC.webinterface.pages import base
-   # from MaKaC.webinterface import wcomponents
 
     def __init__( self, rh, conf, selectedCSSId):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
@@ -11319,8 +11288,6 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         return "%s%s%s"%( self._getHeader(), body, self._getFooter() )
 
     def _getBody( self, params ):
-        path = self._getBaseURL()
-        htdocs = Config.getInstance().getHtdocsDir()
         params["URL2Back"] = urlHandlers.UHConfModifDisplay.getURL(self._conf)
         params["cssurl"] = ""
         params['selectedCSSId'] = ""

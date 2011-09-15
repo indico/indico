@@ -272,6 +272,6 @@
     </div>
 
     <br/>
-    <p><em>${ _("You can find more user guides, in different languages, provided by external collaborators") } <a href="http://cdswaredev.cern.ch/indico/wiki/User/UserGuides">here</a>.</em></p>
+    <p><em>${ _("You can find more user guides, in different languages, provided by external collaborators") } <a href="http://indico-software.org/wiki/User/UserGuides">here</a>.</em></p>
 
 </div>

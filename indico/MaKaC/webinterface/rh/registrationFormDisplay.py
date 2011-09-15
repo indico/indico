@@ -61,6 +61,7 @@ class RHRegistrationForm( RHBaseRegistrationForm ):
 
 class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
     _uh = urlHandlers.UHConfRegistrationFormSignIn
+    _tohttps = True
 
     def _checkParams( self, params ):
         RHBaseRegistrationForm._checkParams( self, params )
@@ -70,13 +71,14 @@ class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
 
 
     def _processIfActive( self ):
-        self._tohttps = True
         #Check for automatic login
         auth = AuthenticatorMgr()
         av = auth.autoLogin(self)
         if av:
             url = self._returnURL
             self._getSession().setUser( av )
+            if Config.getInstance().getBaseSecureURL().startswith('https://'):
+                url = str(url).replace('http://', 'https://')
             self._redirect( url )
         p = registrationForm.WPRegistrationFormSignIn(self, self._conf)
         return p.display()

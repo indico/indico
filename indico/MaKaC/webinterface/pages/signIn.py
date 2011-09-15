@@ -19,19 +19,18 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import MaKaC.webinterface.pages.base as base
-import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.common.general import *
 
 
 class WPSignIn( base.WPDecorated ):
-    
+
     def __init__(self, rh, login="", msg = ""):
         self._login = login
         self._msg = msg
         base.WPDecorated.__init__( self, rh)
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WSignIn()
         p = {"postURL": urlHandlers.UHSignIn.getURL(), \
@@ -44,53 +43,53 @@ class WPSignIn( base.WPDecorated ):
 
 
 class WPAccountAlreadyActivated( base.WPDecorated ):
-    
+
     def __init__(self, rh, av):
         base.WPDecorated.__init__( self, rh)
         self._av = av
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WAccountAlreadyActivated( self._av)
         params["mailLoginURL"] = urlHandlers.UHSendLogin.getURL(self._av)
-        
+
         return wc.getHTML( params )
 
 
 class WPAccountActivated( base.WPDecorated ):
-    
+
     def __init__(self, rh, av):
         base.WPDecorated.__init__( self, rh)
         self._av = av
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WAccountActivated( self._av)
         params["mailLoginURL"] = urlHandlers.UHSendLogin.getURL(self._av)
         params["loginURL"] = urlHandlers.UHSignIn.getURL()
-        
+
         return wc.getHTML( params )
 
 
 class WPAccountDisabled( base.WPDecorated ):
-    
+
     def __init__(self, rh, av):
         base.WPDecorated.__init__( self, rh)
         self._av = av
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WAccountDisabled( self._av)
         #params["mailLoginURL"] = urlHandlers.UHSendLogin.getURL(self._av)
-        
+
         return wc.getHTML( params )
 
 
 class WPUnactivatedAccount( base.WPDecorated ):
-    
+
     def __init__(self, rh, av):
         base.WPDecorated.__init__( self, rh)
         self._av = av
-    
+
     def _getBody( self, params ):
         wc = wcomponents.WUnactivatedAccount( self._av)
         params["mailActivationURL"] = urlHandlers.UHSendActivation.getURL(self._av)
-        
+
         return wc.getHTML( params )

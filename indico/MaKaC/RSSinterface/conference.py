@@ -84,8 +84,6 @@ class CategoryToRSS:
         else:
             confs = calIdx.getObjectsInDay(self._categ.getId(), self._date)
 
-        sconfs = set()
-
         sconfs = set(ACLfiltered(confs, self._req.getHostIP(), self._req.getAW()))
         res = list(sconfs)
         res.sort(sortByStartDate)
