@@ -1098,10 +1098,11 @@ class WCategoryStatistics(wcomponents.WTemplated):
         vars["name"] = self.__target.getName()
         vars["img"] = self.__target.getIconURL()
         vars["categDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self.__target)
+
         if self._stats != None:
             stats = []
             # Number of events:
-            if self._stats["events"] != None:
+            if self._stats["events"]:
                 wcsl=wcomponents.WCategoryStatisticsList( _("Number of events"), self._stats["events"] )
                 stats.append(wcsl.getHTML( self._aw ))
                 # Number of contributions:

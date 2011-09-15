@@ -3285,7 +3285,7 @@ class WCategoryStatisticsList(WTemplated):
         stats = {}
         years = self._stats.keys()
         years.sort()
-        for y in range(years[0], min(datetime.now().year+4,years[-1:][0]+1)):
+        for y in range(years[0], min(datetime.now().year + 4, years[-1] + 1)):
             stats[y] = self._stats.get(y,0)
         maximum = max(stats.values())
         years = stats.keys()
