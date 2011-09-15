@@ -86,7 +86,7 @@
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
                 e.preventDefault();
-                alert(${_("'There are errors in the form. Please correct the fields with red background.'")});
+                alert('${_("There are errors in the form. Please correct the fields with red background.")}');
             };
         }).keydown(function(e) {
             if(e.which == 13 && !$(e.target).is('textarea, :submit')) {
@@ -101,7 +101,7 @@
         $('#checkBooking').click(function(e) {
             $('#bookingForm').attr('action', '${bookingFormURL.getURL(conf)}#conflicts');
             if (!validate_period($('#bookingForm')[0], true, ${ allowPast })) {
-                alert(${_("'There are errors in the form. Please correct fields with red background.'")});
+                alert('${_("There are errors in the form. Please correct fields with red background.")}');
                 e.preventDefault();
             }
         });
