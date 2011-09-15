@@ -27,7 +27,7 @@ import MaKaC.errors as errors
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.mail as mail
 from MaKaC.common.general import *
-from MaKaC.errors import MaKaCError, ModificationError
+from MaKaC.errors import MaKaCError, ModificationError, NotFoundError
 from MaKaC.accessControl import AdminList
 from MaKaC.webinterface.rh.base import RH, RHProtected
 from MaKaC.authentication import AuthenticatorMgr
@@ -298,6 +298,8 @@ class RHUserBase( RHProtected ):
             raise MaKaCError( _("user id not specified"))
         ah = user.AvatarHolder()
         self._target = self._avatar = ah.getById( params["userId"] )
+        if self._avatar == None:
+            raise NotFoundError("The user id does not match any existing user.")
 
     def _checkProtection( self ):
 
