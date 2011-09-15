@@ -20,7 +20,7 @@
 
 import tempfile
 import os
-import stat
+import shutil
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -205,6 +205,7 @@ class RHSubmitMaterialBase(object):
     _allowedMatsCategory = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
 
     def __init__(self):
+        self._tempFiles = {}
         self._repositoryIds = None
         self._errorList = []
         self._cfg = Config.getInstance()
@@ -216,12 +217,14 @@ class RHSubmitMaterialBase(object):
         return tempFileName
 
     #XXX: improve routine to avoid saving in temporary file
-    def _saveFileToTemp( self, fd ):
-        fileName = self._getNewTempFile()
-        f = open( fileName, "wb" )
-        f.write( fd.read() )
-        f.close()
-        return fileName
+    def _saveFileToTemp(self, fd):
+        if fd not in self._tempFiles:
+            fileName = self._getNewTempFile()
+            fd.seek(0) # not really needed since we only copy once but it can't hurt
+            with open(fileName, 'wb') as f:
+                shutil.copyfileobj(fd, f)
+            self._tempFiles[fd] = fileName
+        return self._tempFiles[fd]
 
     def _checkProtection(self):
         self._loggedIn = True
@@ -273,7 +276,7 @@ class RHSubmitMaterialBase(object):
                         fDict["size"] = estimSize
                     else:
                         fDict["filePath"] = self._saveFileToTemp(fileUpload.file)
-                        fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
+                        fDict["size"] = os.path.getsize(fDict["filePath"])
                         self._tempFilesToDelete.append(fDict["filePath"])
 
                     self._setErrorList(fDict)
