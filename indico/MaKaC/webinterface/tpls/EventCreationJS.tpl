@@ -106,42 +106,10 @@
 
     function setNextDate() {
         // get the previus date and convert it to Date format
-        var prevDateStr = dateFieldList[currentOccurrences-1].get();
-        var dateStr = prevDateStr.split(' ')[0];
-        var hourStr = prevDateStr.split(' ')[1];
-        var day = parseInt(dateStr.split('/')[0]);
-        var month = parseInt(dateStr.split('/')[1]) - 1;
-        var year = parseInt(dateStr.split('/')[2]);
-        var hour = hourStr.split(':')[0];
-        var min = hourStr.split(':')[1];
-        var prevDate = new Date(year, month, day, hour, min);
-        // date in miliseconds
-        var ms = prevDate.getTime();
-        var msPerDay = 24*60*60*1000;
-        // calculate new date
-        var nextDate = new Date();
-        nextDate.setTime(ms + msPerDay);
-        if (nextDate.getDate() < 10)
-            day = "0" + nextDate.getDate();
-        else
-            day = nextDate.getDate();
-        if (nextDate.getMonth()+1 < 10)
-            month = "0" + (nextDate.getMonth()+1);
-        else
-            month = nextDate.getMonth();
-        if (nextDate.getHours() < 10)
-            hour = "0" + nextDate.getHours();
-        else
-            hour = nextDate.getHours();
-        if (nextDate.getMinutes() < 10)
-            min = "0" + nextDate.getMinutes();
-        else
-            min = nextDate.getMinutes();
-        year = nextDate.getFullYear();
-        var nextDateStr = day + "/" + month + "/" + year + " " + hour + ":" + min;
-
+        var date = Date.parse(dateFieldList[currentOccurrences-1].get());
+        date.add({days: 1});
         // set new string date
-        dateFieldList[currentOccurrences].set(nextDateStr);
+        dateFieldList[currentOccurrences].set(date.toString('dd/MM/yyyy HH:mm'));
         verifyDates();
     }
 
