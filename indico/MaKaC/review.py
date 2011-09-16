@@ -1918,6 +1918,9 @@ class Abstract(Persistent):
     def getAccessKey( self ):
         return ""
 
+    def getAccessController(self):
+        return self.getConference().getAccessController()
+
     def delete( self ):
         if self._owner:
             self.getSubmitter().delete()
