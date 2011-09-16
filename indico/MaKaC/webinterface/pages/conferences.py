@@ -7890,14 +7890,15 @@ class WConfAuthorIndex(wcomponents.WTemplated):
         contribList=[]
         for auth in pl:
             contrib=auth.getContribution()
-            url=urlHandlers.UHContributionDisplay.getURL(contrib)
-            if self._view=="full":
-                material = self._getMaterialHTML(contrib)
-                if material.strip()!="":
-                    material = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( %s )"%material
-                contribList.append("""<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a>%s</p>"""%(quoteattr(str(url)),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()), material ))
-            else:
-                contribList.append("""<a href=%s>#%s</a>"""%(quoteattr(str(url)),self.htmlText(contrib.getId())))
+            if contrib is not None:
+                url=urlHandlers.UHContributionDisplay.getURL(contrib)
+                if self._view=="full":
+                    material = self._getMaterialHTML(contrib)
+                    if material.strip()!="":
+                        material = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( %s )"%material
+                    contribList.append("""<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a>%s</p>"""%(quoteattr(str(url)),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()), material ))
+                else:
+                    contribList.append("""<a href=%s>#%s</a>"""%(quoteattr(str(url)),self.htmlText(contrib.getId())))
         if self._view=="full":
             res="""
                 <tr>
