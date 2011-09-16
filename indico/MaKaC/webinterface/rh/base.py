@@ -561,6 +561,7 @@ class RH(RequestHandlerBase):
                             else:
                                 res = self._process()
 
+
                         # notify components that the request has finished
                         self._notify('requestFinished', self._req)
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
