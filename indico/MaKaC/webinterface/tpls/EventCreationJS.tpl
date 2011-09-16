@@ -13,6 +13,18 @@
         return ret;
     }
 
+    var advOptSwitch = true;
+    function showAdvancedOptions() {
+        if (advOptSwitch) {
+            $('#advancedOptions').hide();
+            $('#advancedOptionsText').html($T('Show advanced options...'));
+        }else {
+            $('#advancedOptions').show();
+            $('#advancedOptionsText').html($T('Hide advanced options...'));
+        }
+        advOptSwitch = !advOptSwitch;
+    }
+    $('#advancedOptionsText').click(showAdvancedOptions);
 
 
     //------ LECTURES --------

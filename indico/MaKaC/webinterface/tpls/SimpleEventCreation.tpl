@@ -51,7 +51,7 @@
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td class="contentCellTD" style="font-style: italic; padding-top: 10px;"><span id="advancedOptionsText" class="fakeLink" onclick="showAdvancedOptions()">&nbsp;</span></td>
+            <td class="contentCellTD" style="font-style: italic; padding-top: 10px;"><span id="advancedOptionsText" class="fakeLink">&nbsp;</span></td>
         </tr>
 
         <tr id="advancedOptions" style="display:none"><td colspan="2">
@@ -98,19 +98,6 @@
 <%include file="EventCreationJS.tpl"/>
 
 <script  type="text/javascript">
-
-    var advOptSwitch = true;
-    function showAdvancedOptions() {
-        if (advOptSwitch) {
-            $E("advancedOptions").dom.style.display = "none";
-            $E("advancedOptionsText").set('${ _("Show advanced options...")}');
-        }else {
-            $E("advancedOptions").dom.style.display = "";
-            $E("advancedOptionsText").set('${ _("Hide advanced options...")}');
-        }
-        advOptSwitch = !advOptSwitch;
-    }
-
     //---- chairperson management
 
     var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
