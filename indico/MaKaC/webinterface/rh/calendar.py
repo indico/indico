@@ -57,7 +57,10 @@ class RHCalendar(base.RHProtected):
         self._categList = []
         cm = conference.CategoryManager()
         for id in categIdList:
-            self._categList.append( cm.getById(id) )
+            try:
+                self._categList.append( cm.getById(id) )
+            except KeyError:
+                continue
         self._target = self._categList
         if not self._categList:
             cm = conference.CategoryManager()
