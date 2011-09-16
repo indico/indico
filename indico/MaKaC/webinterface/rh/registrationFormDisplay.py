@@ -143,6 +143,8 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             return p.display()
         params = self._getRequestParams()
         email = self._regForm.getPersonalData().getValueFromParams(params, 'email')
+        if email is None:
+            raise FormValuesError(_("An email address has to be set in order to make the registration in the event."))
         matchedUsers = AvatarHolder().match({"email": email}, exact=1)
         if matchedUsers:
             user = matchedUsers[0]
