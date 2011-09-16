@@ -67,7 +67,7 @@ class URLHandler(object):
         """
         rh = ContextManager.get('currentRH', None)
 
-        if rh._req.is_https() and Config.getInstance().getBaseSecureURL():
+        if rh and rh._req.is_https() and Config.getInstance().getBaseSecureURL():
             baseURL = Config.getInstance().getBaseSecureURL()
         else:
             baseURL = Config.getInstance().getBaseURL()
