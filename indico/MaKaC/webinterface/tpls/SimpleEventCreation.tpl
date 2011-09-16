@@ -147,19 +147,19 @@
         showAdvancedOptions();
 
         if ("${categ["id"]}" != ""){
-            $E("buttonCategChooser").set("${ _("Change...")}");
+            $E("buttonCategChooser").set($T('Change...'));
         }
 
         protectionChooserExecOnLoad("${categ["id"]}", "${protection}");
 
         injectValuesInForm($E('eventCreationForm'),function() {
-                if (!verifyDates()) {
-                    var popup = new ErrorPopup("Invalid dates", ["${ _("Dates have an invalid format: dd/mm/yyyy hh:mm")}"], "");
+                if (!verifyLectureDates()) {
+                    var popup = new ErrorPopup("Invalid dates", [$T('Dates have an invalid format: dd/mm/yyyy hh:mm')], "");
                     popup.open();
                     return false
                 }
                 if ($E("createCategId").get() == "") {
-                    var popup = new ErrorPopup("${ _("Missing mandatory data")}", ["${ _("Please, choose a category (step 1)")}"], "");
+                    var popup = new ErrorPopup($T('Missing mandatory data'), [$T('Please, choose a category (step 1)')], "");
                     popup.open();
                     return false;
                 }
@@ -172,7 +172,7 @@
                 return false;
         });
 
-        verifyDates();
+        verifyLectureDates();
 
 
     var editor = new ParsedRichTextWidget(500, 200,"", "rich", "IndicoMinimal");

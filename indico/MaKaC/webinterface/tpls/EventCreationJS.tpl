@@ -1,118 +1,107 @@
 <% import datetime %>
 
 <script type="text/javascript">
+    var dates = new WatchList();
 
-    var dates= new WatchList();
-
-    function verifyDates()
-    {
+    function verifyDates() {
         var ret = true;
         dates.each(function(date) {
-                if (!date.processDate()) ret = false;
-            });
-
-        // TODO: check dates (startDate < endDate, etc)
-
+            if (!date.processDate()) {
+                ret = false;
+            }
+        });
         return ret;
     }
 
+
+
     //------ LECTURES --------
 
-    var maxOccurrences = 9;
     var currentOccurrences = 1;
-    var divDateElements = [];
     var dateFieldList = [];
 
-    function initializeDatesContainer() {
-
-        for (var i=1; i<maxOccurrences+1; i++) {
-
-            var divcont = Html.div({id:"datediv"+i})
-            divcont.append(Html.span({"id":"date"+i+"Place"}));
-            divcont.append(Html.input("hidden",{name:"sDay_"+i, id:"sDay_"+i},""));
-            divcont.append(Html.input("hidden",{name:"sMonth_"+i, id:"sMonth_"+i},""));
-            divcont.append(Html.input("hidden",{name:"sYear_"+i, id:"sYear_"+i},""));
-            divcont.append(Html.input("hidden",{name:"sHour_"+i, id:"sHour_"+i},"08"));
-            divcont.append(Html.input("hidden",{name:"sMinute_"+i, id:"sMinute_"+i},"00"));
-            divcont.append(Html.span({style:{paddingLeft:'5px', paddingRight:'5px'}}, $T("duration (in minutes):")));
-            divcont.append(Html.input("text",{id:"dur_"+i, name:"dur_"+i, size:"3"},"60"));
-            var remove = Html.span({id:'remove_'+i, className:'link', style:{paddingLeft:'5px'}}, $T("Remove"));
-            remove.observeClick(function(event) {
-                if (event.target) { // Firefox
-                    var spanId = event.target.id.split('_')[1];
-                } else { // IE
-                    var spanId = event.srcElement.id.split('_')[1];
-                }
-                updateDatesContainer(spanId);
-            });
-            if (i != 1)
-                divcont.append(remove);
-            $E("datesContainer").append(divcont);
-            var date = IndicoUI.Widgets.Generic.dateField(true,null,['sDay_'+i, 'sMonth_'+i, 'sYear_'+i, 'sHour_'+i, 'sMinute_'+i]);
-            date.counterId = i;
-            date.set('${ datetime.datetime.now().strftime("%d/%m/%Y 08:00") }');
-            $E('date'+i+'Place').set(date);
-            dates.append(date);
-            dateFieldList.push(date);
-            divDateElements.push(divcont);
-            // Set visibility
-            if (i != 1)
-                divcont.dom.style.display = 'none';
-        }
-        // add new date link
-        var addNewDateDiv = Html.div({style:{paddingTop:'5px'}});
-        var addNewDateLink = Html.span({className:'link'}, $T("Add another occurrence for the lecture"));
-        addNewDateDiv.append(addNewDateLink);
-        addNewDateLink.observeClick(addNewDate);
-        $E("datesContainer").append(addNewDateDiv);
-    }
-
-    function addNewDate() {
-        if (currentOccurrences < maxOccurrences) {
-            // check if the previous date is in correct format
-            if (!verifyDates()) {
-                var popup = new ErrorPopup("Invalid dates", ["${ _("Dates have an invalid format: dd/mm/yyyy hh:mm")}"], "");
-                popup.open();
-            } else {
-                // set next date
-                setNextDate();
-                // show element
-                divDateElements[currentOccurrences].dom.style.display = '';
-                currentOccurrences += 1;
-                $E('nbDates').dom.value = currentOccurrences;
+    function verifyLectureDates() {
+        var ret = true;
+        $.each(dateFieldList, function(i, field) {
+            if (!field.processDate()) {
+                ret = false;
+                return false;
             }
-        } else {
-            var popup = new AlertPopup($T("Adding new occurrence"), Html.span({}, $T("It is not possible to add a new occurrence for this lecture, the maximum number of occurrences is ") + maxOccurrences + "."));
-            popup.open();
+        });
+        return ret;
+    }
+
+
+    function createDateContainer(num) {
+        var id = _.uniqueId('lectureField_');
+        var cont = $('<div/>', {'class':'dateRow'});
+        var dateField = $('<span/>', {'class':'dateContainer'}).appendTo(cont);
+        // Create the fields used by the date picker
+        var fields = ['sDay', 'sMonth', 'sYear', 'sHour', 'sMinute'];
+        $.each(fields, function(i, name) {
+            $('<input/>', {
+                type: 'hidden',
+                name: name+'_'+num,
+                id: name+'_'+id
+            }).appendTo(cont);
+        });
+        $('#sHour_' + id).val('08');
+        $('#sMinute_' + id).val('00');
+        $('<span/>').css({paddingLeft:'5px', paddingRight:'5px'}).html($T('duration (in minutes):')).appendTo(cont);
+        $('<input/>', {type:'text', name:'dur_'+num, size:3}).val('60').appendTo(cont);
+        // "remove" link if it's not the first one
+        if(num != 1) {
+            $('<span/>', {'class': 'link remove'}).css('paddingLeft', '5px').html($T('Remove')).appendTo(cont);
+        }
+        $('#datesContainer').append(cont);
+        // create date picker
+        var date = IndicoUI.Widgets.Generic.dateField(true,null,['sDay_'+id, 'sMonth_'+id, 'sYear_'+id, 'sHour_'+id, 'sMinute_'+id]);
+        date.set('${ datetime.datetime.now().strftime("%d/%m/%Y 08:00") }');
+        $E(dateField[0]).set(date); // we need the element to be extended with processDate so we use $E
+        dateFieldList.push(date);
+        $('#nbDates').val(currentOccurrences);
+        // use last date + 1 day
+        if(num > 1) {
+            var date = Date.parse(dateFieldList[num - 2].get());
+            date.add({days: 1});
+            dateFieldList[num - 1].set(date.toString('dd/MM/yyyy HH:mm'));
+            verifyLectureDates();
         }
     }
 
-    function updateDatesContainer(datePosition) {
+    $('#datesContainer').delegate('.remove', 'click', function() {
+        var row = $(this).closest('.dateRow');
+        $('#nbDates').val(--currentOccurrences);
+        var successors = row.nextAll('.dateRow');
+        dateFieldList.splice(row.index(), 1);
+        row.remove();
+        // update the name of all fields after the removed one
+        successors.each(function() {
+            var num = $(this).index() + 1;
 
-        // Update the date fields
-        for (var i=parseInt(datePosition); i<currentOccurrences; i++) {
-            $E('dur_'+i).dom.value = $E('dur_'+(i+1)).dom.value;
-            dateFieldList[i-1].set(dateFieldList[i].get());
-        }
+            $('input[name]', this).attr('name', function(i, attr) {
+                return attr.split(/_/)[0] + '_' + num;
+            });
+        });
+        verifyLectureDates();
+    });
 
-        // Remove one element
-        divDateElements[currentOccurrences-1].dom.style.display = 'none';
-        dateFieldList[currentOccurrences-1].set('${ datetime.datetime.now().strftime("%d/%m/%Y 08:00") }');
-        $E('dur_'+(currentOccurrences)).dom.value = "60";
-        currentOccurrences -= 1;
-        $E('nbDates').dom.value = currentOccurrences;
-        verifyDates();
+    function initializeDatesContainer() {
+        // create "add date" link
+        var newDateDiv = $('<div/>').css('paddingTop', '5px');
+        $('<span/>', {
+            'class': 'link'
+        }).click(function() {
+            if (!verifyLectureDates()) {
+                new ErrorPopup("Invalid dates", [$T('Dates have an invalid format: dd/mm/yyyy hh:mm')], "").open();
+                return;
+            }
+            createDateContainer(++currentOccurrences);
+        }).html($T('Add another occurrence for the lecture')).appendTo(newDateDiv);
+        // create first date row
+        createDateContainer(1);
+        $('#datesContainer').after(newDateDiv);
     }
-
-    function setNextDate() {
-        // get the previus date and convert it to Date format
-        var date = Date.parse(dateFieldList[currentOccurrences-1].get());
-        date.add({days: 1});
-        // set new string date
-        dateFieldList[currentOccurrences].set(date.toString('dd/MM/yyyy HH:mm'));
-        verifyDates();
-    }
-
     //------ END LECTURES --------
 
 </script>
