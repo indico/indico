@@ -5907,10 +5907,12 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         # empty days are shown for "User bookings" and "User pre-bookings"
         # and for the calendar as well
         # but not for the booking search
-        showEmptyDays = ( self._rh._ofMyRooms or \
-                          (not self._rh._ofMyRooms and not self._rh._onlyMy) ) and \
-                          not self._rh._search
-        showEmptyRooms = showEmptyDays
+        #showEmptyDays = ( self._rh._ofMyRooms or \
+        #                  (not self._rh._ofMyRooms and not self._rh._onlyMy) ) and \
+        #                  not self._rh._search
+        #showEmptyRooms = showEmptyDays
+        # Always show empty rooms/days
+        showEmptyDays = showEmptyRooms = True
 
 
         # Calendar related stuff ==========
