@@ -859,7 +859,7 @@ class RHDisplayBaseProtected( RHProtected ):
                 target = self._target.getOwner()
             else:
                 target = self._target
-            if not isinstance(self._target, Category):
+            if not isinstance(self._target, Category) and target.isProtected():
                 if target.getAccessKey() != "" or target.getConference() and target.getConference().getAccessKey() != "":
                     raise KeyAccessError()
             if self._getUser() == None:
