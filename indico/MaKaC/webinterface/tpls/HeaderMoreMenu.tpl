@@ -38,7 +38,7 @@ moreMenu.observeClick(function(e) {
     menuItems["${ _('Download material') }"] = '${ urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self_._rh._conf) }';
     % endif
     % if showLayout:
-    menuItems["{ _('Layout') }"] = new PopupMenu(layoutMenuItems, [moreMenu, menu], ${"'darkPopupList'" if dark else "null"}, null, null, null, '${ SelectedStyle }');
+    menuItems["${ _('Layout') }"] = new PopupMenu(layoutMenuItems, [moreMenu, menu], ${"'darkPopupList'" if dark else "null"}, null, null, null, '${ SelectedStyle }');
     % endif
 
     var pos = moreMenu.getAbsolutePosition();

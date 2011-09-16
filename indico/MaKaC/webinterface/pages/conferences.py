@@ -7877,9 +7877,6 @@ class WConfAuthorIndex(wcomponents.WTemplated):
             return ""
         auth=pl[0]
         authCaption = auth.getFullNameNoTitle()
-        itemFormatFunc=self._getContribMinView
-        if self._view=="full":
-            itemFormatFunc=self._getContribFullView
 
         self._urlGen=urlHandlers.UHContributionDisplay.getURL
         if authCaption.strip()=="":

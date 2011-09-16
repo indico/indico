@@ -62,9 +62,6 @@ def addMaterial(req, **params):
 def performAddMaterial(req, **params):
     return contribMod.RHContributionPerformAddMaterial( req ).process( params )
 
-def schedule(req, **params):
-    return contribMod.RHContributionSchedule( req ).process( params )
-
 def materialsAdd(req, **params):
     return contribMod.RHMaterialsAdd(req).process(params)
 
