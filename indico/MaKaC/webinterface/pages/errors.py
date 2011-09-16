@@ -399,6 +399,9 @@ class WPNoReportError( WPDecorated ):
         self._msg = msg
         WPDecorated. __init__( self, rh)
 
+    def _getHeader(self):
+        return ""
+
     def _getBody( self, params ):
         wc = WNoReportError( self._msg )
         return wc.getHTML( params )

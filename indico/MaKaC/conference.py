@@ -4895,7 +4895,7 @@ class ConferenceHolder( ObjectHolder ):
         sDayStart=datetime(sday.year,sday.month,sday.day,0,0)
         sDayEnd=datetime(sday.year,sday.month,sday.day,23,59)
         for conf in self.getList():
-            if sday>=sDayStart and sdat<=sDayEnd:
+            if sday>=sDayStart and eday<=sDayEnd:
                 res.append(conf)
         return conf
 

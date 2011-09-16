@@ -211,7 +211,6 @@ class WPDecorated( WPBase ):
     def getLoginAsURL( self ):
         return urlHandlers.UHLogMeAs.getURL("%s"%self._rh.getCurrentURL())
 
-
     def _getHeader( self ):
         """
         """

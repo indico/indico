@@ -80,15 +80,6 @@ def selectChairs(req, **args):
 def addChairs(req,**params):
     return conferenceModif.RHConfModifAddChairs( req ).process( params)
 
-def addMaterial( req, **args ):
-    return conferenceModif.RHConfAddMaterial( req ).process( args )
-
-def performAddMaterial( req, **args ):
-    return conferenceModif.RHConfPerformAddMaterial( req ).process( args )
-
-def removeMaterials( req, **params ):
-    return conferenceModif.RHConfRemoveMaterials( req ).process( params )
-
 def sessionSlots( req, **params ):
     return conferenceModif.RHConfSessionSlots( req ).process( params )
 
