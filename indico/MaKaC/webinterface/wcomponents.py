@@ -5820,6 +5820,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
         vars["withPhoto"] = False
         vars["title"] = self._title
+        vars["search"] = rh._search
         vars["showRejectAllButton"] = rh._showRejectAllButton
 
         vars["prebookingsRejected"] = rh._prebookingsRejected
@@ -5912,7 +5913,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         #                  not self._rh._search
         #showEmptyRooms = showEmptyDays
         # Always show empty rooms/days
-        showEmptyDays = showEmptyRooms = True
+        showEmptyDays = showEmptyRooms = not self._rh._search
 
 
         # Calendar related stuff ==========

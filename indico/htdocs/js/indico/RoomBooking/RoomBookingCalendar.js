@@ -682,7 +682,7 @@ type("RoomBookingPrevNext", [],
                 calendarButton.observeClick(function() {
                     var dlg = new DateRangeSelector(self.startD, self.endD, function(startDate, endDate) {
 
-                        var redirectUrl =  self.formUrl + "?search=on&sDay=" + startDate.getDate() +"&sMonth=" + (startDate.getMonth() + 1) + "&sYear=" + startDate.getFullYear() +
+                        var redirectUrl =  self.formUrl + "?" + (self.search ? 'search=on&' : '') + "sDay=" + startDate.getDate() +"&sMonth=" + (startDate.getMonth() + 1) + "&sYear=" + startDate.getFullYear() +
                         "&eDay=" + endDate.getDate() +"&eMonth=" + (endDate.getMonth() + 1) + "&eYear=" + endDate.getFullYear();
 
                         for (var param in self.params)
@@ -708,6 +708,7 @@ type("RoomBookingPrevNext", [],
             this.startD = prevNextBarArgs.startD;
             this.endD = prevNextBarArgs.endD;
             this.params = prevNextBarArgs.params;
+            this.search = prevNextBarArgs.search;
         })
 
 /**
