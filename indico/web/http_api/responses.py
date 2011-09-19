@@ -49,7 +49,7 @@ class HTTPAPIError(Exception, Fossilizable):
 class HTTPAPIResult(Fossilizable):
     fossilizes(IHTTPAPIResultFossil)
 
-    def __init__(self, results, path='', query='', ts=None, complete=True):
+    def __init__(self, results, path='', query='', ts=None, complete=True, extra=None):
         if ts is None:
             ts = int(time.time())
         self._results = results
@@ -57,6 +57,7 @@ class HTTPAPIResult(Fossilizable):
         self._query = query
         self._ts = ts
         self._complete = complete
+        self._extra = extra or {}
 
     def getTS(self):
         return self._ts
@@ -75,3 +76,6 @@ class HTTPAPIResult(Fossilizable):
 
     def getComplete(self):
         return self._complete
+
+    def getAdditionalInfo(self):
+        return self._extra

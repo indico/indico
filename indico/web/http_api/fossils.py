@@ -53,6 +53,9 @@ class IHTTPAPIExportResultFossil(IHTTPAPIResultFossil):
     def getComplete(self):
         pass
 
+    def getAdditionalInfo(self):
+        pass
+
 
 class IPeriodFossil(IFossil):
     def startDT(self):
@@ -62,6 +65,24 @@ class IPeriodFossil(IFossil):
     def endDT(self):
         pass
     endDT.convert = Conversion.datetime
+
+
+class ICategoryMetadataFossil(IFossil):
+    def getId(self):
+        pass
+
+    def getName(self):
+        pass
+
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHCategoryDisplay)
+    getLocator.name = 'url'
+
+class ICategoryProtectedMetadataFossil(ICategoryMetadataFossil):
+    def getName(self):
+        pass
+    getName.produce = lambda x: None
 
 
 class IConferenceMetadataFossil(IFossil):

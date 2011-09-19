@@ -20,7 +20,7 @@
 
 import sys
 import os
-import stat
+import shutil
 from copy import copy
 import tempfile, types
 from persistent.list import PersistentList
@@ -4700,6 +4700,10 @@ class RHConfUseCSS( RHConferenceModifBase ):
 
 class RHConfSavePic( RHConferenceModifBase ):
 
+    def __init__(self, req):
+        RHConferenceModifBase.__init__(self, req)
+        self._tempFiles = {}
+
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
         tempPath = cfg.getUploadedFilesTempDir()
@@ -4707,11 +4711,13 @@ class RHConfSavePic( RHConferenceModifBase ):
         return tempFileName
 
     def _saveFileToTemp( self, fd ):
-        fileName = self._getNewTempFile()
-        f = open( fileName, "wb" )
-        f.write( fd.read() )
-        f.close()
-        return fileName
+        if fd not in self._tempFiles:
+            fileName = self._getNewTempFile()
+            fd.seek(0) # not really needed since we only copy once but it can't hurt
+            with open(fileName, 'wb') as f:
+                shutil.copyfileobj(fd, f)
+            self._tempFiles[fd] = fileName
+        return self._tempFiles[fd]
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
@@ -7609,8 +7615,7 @@ class RHConfBadgeGetBackground(RHConfBadgeBase):
 
     def __fileBin(self, filePath):
         file = open(filePath, "rb")
-        size = int(os.stat(filePath)[stat.ST_SIZE])
-        self._req.headers_out["Content-Length"]="%s"%size
+        self._req.headers_out["Content-Length"]=str(os.path.getsize(filePath))
         self._req.content_type="""%s"""%("unknown")
         self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%"tempBackground"
         r = file.read()
@@ -7888,8 +7893,7 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
 
     def __fileBin(self, filePath):
         file = open(filePath, "rb")
-        size = int(os.stat(filePath)[stat.ST_SIZE])
-        self._req.headers_out["Content-Length"]="%s"%size
+        self._req.headers_out["Content-Length"]=str(os.path.getsize(filePath))
         self._req.content_type="""%s"""%("unknown")
         self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%"tempBackground"
         r = file.read()

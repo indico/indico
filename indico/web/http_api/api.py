@@ -44,12 +44,14 @@ from indico.web.http_api.ical import ICalSerializer
 from indico.web.http_api.atom import AtomSerializer
 from indico.web.http_api.fossils import IConferenceMetadataFossil,\
     IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil,\
-    IConferenceMetadataWithSessionsFossil, IPeriodFossil
+    IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil,\
+    ICategoryProtectedMetadataFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
 
 # indico legacy imports
 from MaKaC.common.db import DBMgr
+from MaKaC.conference import CategoryManager
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
@@ -203,6 +205,9 @@ class HTTPAPIHook(object):
         if not func:
             raise NotImplementedError(self.PREFIX + '_' + self._type)
 
+        extraFunc = getattr(self, self.PREFIX + '_' + self._type + '_extra', None)
+        extra = extraFunc(aw) if extraFunc else None
+
         if not self.COMMIT:
             # Just execute the function, we'll never have to repeat it
             resultList, complete = self._performCall(func, aw)
@@ -221,7 +226,7 @@ class HTTPAPIHook(object):
             else:
                 raise HTTPAPIError('An unresolvable database conflict has occured', apache.HTTP_INTERNAL_SERVER_ERROR)
 
-        return resultList, complete, self.SERIALIZER_TYPE_MAP
+        return resultList, extra, complete, self.SERIALIZER_TYPE_MAP
 
 
 class DataFetcher(object):
@@ -407,6 +412,11 @@ class CategoryEventHook(HTTPAPIHook):
         expInt = CategoryEventFetcher(aw, self)
         return expInt.category(self._idList)
 
+    def export_categ_extra(self, aw):
+        return {
+            'categHierarchy': CategoryEventFetcher.getCategoryPath(self._idList, aw)
+        }
+
     def export_event(self, aw):
         expInt = CategoryEventFetcher(aw, self)
         return expInt.event(self._idList)
@@ -428,6 +438,24 @@ class CategoryEventFetcher(DataFetcher):
 
     def _postprocess(self, obj, fossil, iface):
         return self._addOccurrences(fossil, obj, self._fromDT, self._toDT)
+
+    @classmethod
+    def getCategoryPath(cls, idList, aw):
+        paths = {}
+        for id in idList:
+            paths['categ_' + id] = cls._getCategoryPath(id, aw)
+        return paths
+
+    @staticmethod
+    def _getCategoryPath(id, aw):
+        path = []
+        cat = CategoryManager().getById(id)
+        while cat:
+            iface = ICategoryMetadataFossil if cat.canAccess(aw) else ICategoryProtectedMetadataFossil
+            path.append(fossilize(cat, iface))
+            cat = cat.getOwner()
+        path.reverse()
+        return path
 
     @staticmethod
     def _eventDaysIterator(conf):

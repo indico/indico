@@ -53,7 +53,10 @@ class XMLSerializer(Serializer):
         if 'id' in fossil:
             attribs['id'] = str(fossil['id'])
 
-        typeName = self._typeMap.get(fossil['_type'], fossil['_type'])
+        if '_type' in fossil:
+            typeName = self._typeMap.get(fossil['_type'], fossil['_type'])
+        else:
+            typeName = 'collection'
         felement = etree.Element(typeName.lower(),
                                  attrib=attribs)
         if doc:

@@ -176,18 +176,18 @@ def handler(req, **params):
         if not no_cache:
             obj = cache.loadObject(cache_key)
             if obj is not None:
-                result, complete, typeMap = obj.getContent()
+                result, extra, complete, typeMap = obj.getContent()
                 ts = obj.getTS()
                 addToCache = False
         if result is None:
             # Perform the actual exporting
             res = func(aw, req)
-            if isinstance(res, tuple) and len(res) == 3:
-                result, complete, typeMap = res
+            if isinstance(res, tuple) and len(res) == 4:
+                result, extra, complete, typeMap = res
             else:
-                result, complete, typeMap = res, True, {}
+                result, extra, complete, typeMap = res, {}, True, {}
         if result is not None and addToCache:
-            cache.cacheObject(cache_key, (result, complete, typeMap))
+            cache.cacheObject(cache_key, (result, extra, complete, typeMap))
     except HTTPAPIError, e:
         error = e
         if e.getCode():
@@ -229,7 +229,7 @@ def handler(req, **params):
             iface = None
             if mode == 'export':
                 iface = IHTTPAPIExportResultFossil
-            resultFossil = fossilize(HTTPAPIResult(result, path, query, ts, complete), iface)
+            resultFossil = fossilize(HTTPAPIResult(result, path, query, ts, complete, extra), iface)
 
         del resultFossil['_fossil']
 

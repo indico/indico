@@ -1921,6 +1921,9 @@ class Abstract(Persistent):
     def getAccessController(self):
         return self.getConference().getAccessController()
 
+    def isProtected(self):
+        return self.getConference().isProtected()
+
     def delete( self ):
         if self._owner:
             self.getSubmitter().delete()
