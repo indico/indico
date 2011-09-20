@@ -77,14 +77,14 @@
         startDate.observe(function(value) {
             if (IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get())) {
                 endDate.set(startDate.get());
-                endDate.dom.trigger('change');
+                $(endDate.dom).trigger('change');
             }
         });
 
         endDate.observe(function(value) {
             if (IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get())) {
                 startDate.set(endDate.get());
-                startDate.dom.trigger('change');
+                $(startDate.dom).trigger('change');
             }
         });
 
