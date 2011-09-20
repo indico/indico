@@ -20,6 +20,7 @@
 
 from copy import copy
 from pytz import timezone
+from indico.util.i18n import i18nformat
 import ZODB
 from persistent import Persistent
 from persistent.list import PersistentList
