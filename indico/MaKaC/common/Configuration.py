@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from indico.util.contextManager import ContextManager
 
 """Contains the machinery that allows to access and modify in a more comfortable
 and transparent way the system configuration (this is mainly done through the
@@ -554,7 +555,7 @@ class Config:
             'RoomSmallPhotosDir'        : os.path.join(self.getHtdocsDir(), 'images', "rooms", "small_photos"),
             'CssDir'                    : "%s/css/" % (self.getHtdocsDir()),
             'CssBaseURL'                : "%s/css" % self.getBaseURL(),
-            'CssConfTemplateBaseURL'    : "%s/css/confTemplates" % self.getBaseURL(),
+            'CssConfTemplateBaseURL'    : self.getCssConfTemplateBaseURL(),
             'DefaultEventStylesheet'    : self.__defaultEventStylesheet,
             'ShortCategURL'             : '%s/%s' % (self.getBaseURL(), self.getShortCategTag()),
             'ShortEventURL'             : '%s/%s' % (self.getBaseURL(), self.getShortEventTag()),
@@ -695,6 +696,17 @@ class Config:
             template = defTemplate
 
         return '%s.css' % template
+
+    def getCssConfTemplateBaseURL(self):
+        rh = ContextManager.get('currentRH', None)
+
+        if rh and rh._req.is_https() and self.getBaseSecureURL():
+            baseURL = self.getBaseSecureURL()
+        else:
+            baseURL = self.getBaseURL()
+
+        return "%s/css/confTemplates" % baseURL
+
 
 
     def getPublicDir(self):
