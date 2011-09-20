@@ -33,7 +33,7 @@
             </tr>
         % endif
 
-        % if getLocationInfo(item) != getLocationInfo(item.getOwner()):
+        % if getLocationInfo(item) != getLocationInfo(item.getConference()):
             <tr>
                 <td class="leftCol">Location:</td>
                 <td>${common.renderLocation(item, parent=item.getOwner())}</td>
