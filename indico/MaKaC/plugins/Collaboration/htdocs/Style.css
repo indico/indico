@@ -30,7 +30,7 @@ div.EAFormSection{
 }
 
 form.EAChoiceButton{
-    text-align: center;
+    padding: 10px;
 }
 
 .EAInfo{

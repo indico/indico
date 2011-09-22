@@ -20,9 +20,8 @@
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase,\
     CollaborationTools
-from MaKaC.plugins.Collaboration.RecordingRequest.common import typeOfEvents,\
-    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions,\
-    getTalks
+from MaKaC.plugins.Collaboration.RecordingRequest.common import \
+    postingUrgency
 from MaKaC.conference import Contribution
 from MaKaC.common.timezoneUtils import isSameDay
 from MaKaC.common.fossilize import fossilize
@@ -84,13 +83,9 @@ class WNewBookingForm(WCSPageTemplateBase):
         else:
             vars["Contributions"] = []
 
-        vars["LectureOptions"] = lectureOptions
-        vars["TypesOfEvents"] = typeOfEvents
         vars["PostingUrgency"] = postingUrgency
-        vars["RecordingPurpose"] = recordingPurpose
-        vars["IntendedAudience"] = intendedAudience
-        vars["SubjectMatter"] = subjectMatter
         vars["linkToEA"] = collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(self._conf)
+        vars["agreementName"] = CollaborationTools.getOptionValue("RecordingRequest", "AgreementName")
         return vars
 
 class WMain (WJSBase):

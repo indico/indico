@@ -84,7 +84,9 @@ class SendElectronicAgreement(ConferenceModifBase):
         fullUrl = UHCollaborationElectronicAgreementForm().getURL(self._conf.getId(), speakerWrapper.getUniqueIdHash())
         url = "<a href='%s'>%s</a>"%(fullUrl, fullUrl)
 
-        return self.content.format(url=url, name= speakerWrapper.getObject().getDirectFullName())
+        talkTitle = speakerWrapper.getContribution().getTitle() if speakerWrapper.getContribution() else self._conf.getTitle()
+
+        return self.content.format(url=url, talkTitle = talkTitle, name= speakerWrapper.getObject().getDirectFullName())
 
     def _getAnswer(self):
         report = ""
@@ -96,7 +98,12 @@ class SendElectronicAgreement(ConferenceModifBase):
             else:
                 report += "%s."%email
 
-        if self.content.find('{url}') > -1: #{url} is mandatory to send the EA link
+        #{url} and {talkTitle} are mandatory to send the EA link
+        if self.content.find('{url}') == -1:
+            report = "url_error"
+        elif self.content.find('{talkTitle}') == -1:
+            report = "talkTitle_error"
+        else:
             manager = self._conf.getCSBookingManager()
             for uniqueId in self.uniqueIdList:
                 sw = manager.getSpeakerWrapperByUniqueId(uniqueId)
@@ -107,9 +114,6 @@ class SendElectronicAgreement(ConferenceModifBase):
                 GenericMailer.sendAndLog(notification, self._conf,
                                          "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
                                          None)
-        else:
-            report = "url_error"
-
         return report
 
 class RejectElectronicAgreement(ConferenceDisplayBase):

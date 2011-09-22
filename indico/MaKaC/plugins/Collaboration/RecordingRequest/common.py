@@ -28,56 +28,10 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 from indico.util.i18n import L_
 
-lectureOptions = [
-    ("none", L_("None")),
-    ("slides", L_("Slides")),
-    ("chalkboard", L_("Chalkboard")),
-    ("slidesAndChalkboard" , L_("Slides and Chalkboard"))
-]
-
-typeOfEvents = [
-    ("lecturePresentation" , L_("Lecture / Presentation")),
-    ("courseTutorial", L_("Course / Tutorial")),
-    ("panelDiscussion" , L_("Panel discussion")),
-    ("noAudience", L_("Remote teaching or candidate interview"))
-]
-
 postingUrgency = [
     ("withinHours" , L_("Within hours")),
     ("withinDay" , L_("Within a day")),
     ("withinWeek" , L_("Within a week"))
-]
-
-recordingPurpose = [
-    ("historicPreservation" , L_("Preservation of a historically valuable talk")),
-    ("remoteParticipants" , L_("Dissemination to participants unable to attend in person")),
-    ("trainingCourse" , L_("Training course")),
-    ("candidateInterview" , L_("Candidate interview")),
-    ("remoteTeaching" , L_("Remote teaching")),
-    ("savingTravel" , L_("Saving money on travel")),
-    ("publicOutreach" , L_("Public outreach"))
-]
-
-intendedAudience = [
-    ("collaborationMembers" , L_("Members of a particular collaboration or experiment")),
-    ("groupMembers" , L_("Members of a particular section or group")),
-    ("studentsGrad" , L_("Graduate students")),
-    ("studentsUndergrad" , L_("Undergraduate students")),
-    ("studentsHighSchool" , L_("High school students")),
-    ("studentsElementary" , L_("Elementary school students")),
-    ("CERNUsers" , L_("CERN users")),
-    ("CERNStaff" , L_("CERN staff")),
-    ("technicalPersonnel" , L_("Technical personnel")),
-    ("teachersHighSchool" , L_("High school teachers")),
-    ("generalPublic" , L_("General public"))
-]
-
-subjectMatter = [
-    ("physics" , L_("Physics")),
-    ("computerScience" , L_("Computer Science")),
-    ("engineering" , L_("Engineering")),
-    ("safety" , L_("Safety")),
-    ("techTraining" , L_("Technical Training"))
 ]
 
 def getTalks(conference, oneIsEnough = False, sort = False):

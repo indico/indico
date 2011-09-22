@@ -3,18 +3,17 @@
 
     % if canShow:
         <span class="RRNoteText" style="float:left;">
-            ${_("""To be allowed to publish the talks, we will need every speaker to sign in an agreement.<br/>
+            ${_("""Before any recording can be published, each speaker must sign the %s.<br/>
                      To do so, two different ways are available:
                      <ol>
-                        <li><span style="font-weight:bold;">Send an Email</span> containing the link to sign the agreement electronically.<br/>
+                        <li><span style="font-weight:bold;">Electronic signature: Send an Email</span> containing the link to sign the %s.<br/>
                             (Select the speakers you want to send the Email and then click on the "Send Email" button.)
                         </li>
-                        <li>Ask the speaker to sign the Paper Agreement that you can find
-                """)}
+                        <li>Ask the speaker to sign the """)%(agreementName, agreementName)}
 
             ${urlPaperAgreement}
 
-             ${_("""<br/>Then, <span style="font-weight:bold;">Upload</span> it from the list below.
+             ${_("""<br/>Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
                            </li>
                         </ol>
                 """)}
@@ -121,8 +120,9 @@
         </table>
     % else:
         <span class="RRNoteText">
-                ${_("No requests have been accepted so far.")} <br/>
-                ${_("In order to access this content your request has to be accepted first.")}
+                ${_("Before any lecture recording can be published, each speaker must sign the %s.")%agreementName} <br/>
+                ${_("Options and tools for managing and tracking these %s will appear on this page as soon as your recording request is accepted.")%agreementName}<br/>
+                ${_("Please come back here when your request is accepted.")}
         </span>
     % endif
     </form>

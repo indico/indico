@@ -77,6 +77,11 @@
     </div>
     % endif
 
+    <div>
+            <span style="color:#881122">${_("The recordings will not be published before all speakers have signed the %s (see Electronic Agreement tab)")%agreementName}</span>
+    </div>
+
+
 
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
         <!-- WHICH CONTRIBUTIONS SHOULD BE RECORDED -->
@@ -160,51 +165,11 @@
                 </ul>
             </div>
         </div>
-
-        <div class="RRFormSubsection">
-            <span class="RRQuestion">${ _('Please write here additional comments about talk selection:') }</span>
-            <input size="60" type="text" name="talkSelectionComments" style="display:block;">
-        </div>
     </div>
     % endif
 
-    <div class="RRFormSection">
-        <div class="RRFormSubsection">
-            <span class="RRQuestion">${ _('Do you commit to ensure that the speakers will give their permission to have their talks recorded?') }</span>
-            <br/>
-            <input type="radio" name="permission" id="permissionYesRB" value="Yes" >
-            <label for="permissionYesRB" id="permissionYesRBLabel">${ _('Yes') }</label>
-            <input type="radio" name="permission" id="permissionNoRB"value="No" >
-            <label for="permissionNoRB" id="permissionNoRBLabel">${ _('No') }</label>
-            ${'<span style="margin-left: 2em;">'+ ConsentForm +'</span>' if ConsentForm else ""}
-        </div>
-    </div>
-
     <!-- DRAW BOX AROUND SECTION 2: TECHNICAL DETAILS FOR RECORDING -->
     <div class="RRFormSection">
-        <!-- SLIDES? CHALKBOARD? -->
-        <div class="RRFormSubsection">
-            <span class="RRQuestion">${ _('Will slides and/or chalkboards be used?') }</span>
-            <br />
-            <select name="lectureOptions" id="lectureOptions">
-                <option value="chooseOne">-- ${ _('Choose one') } --</option>
-                % for value, text in LectureOptions:
-                <option value="${value}">${text}</option>
-                % endfor
-            </select>
-        </div>
-
-        <!-- WHAT TYPE OF TALK IS IT -->
-        <div class="RRFormSubsection">
-            <span class="RRQuestion">${ _('What type of event is it?') }</span>
-            <br />
-            <select name="lectureStyle" id="lectureStyle">
-                <option value="chooseOne">-- ${ _('Choose one') } --</option>
-                % for value, text in TypesOfEvents:
-                <option value="${value}">${text}</option>
-                % endfor
-            </select>
-        </div>
 
         <!-- HOW URGENTLY IS POSTING NEEDED -->
         <div class="RRFormSubsection">
@@ -237,47 +202,7 @@
         </div>
     </div>
 
-    <!-- DRAW BOX AROUND SECTION 3: METADATA AND SURVEY INFO -->
-    <div class="RRFormSection">
-        <!-- PURPOSE OF RECORDING -->
-        <div class="RRFormSubsection">
-            <span class="RRQuestion">${ _('Why do you need this event recorded? (check all that apply)') }</span>
-            <ul class="RROptionList">
-                % for value, text in RecordingPurpose:
-                <li>
-                    <input type="checkbox" name="recordingPurpose" value="${value}" id="${value}CB">
-                    <label for="${value}CB">${text}</label>
-                </li>
-                % endfor
-            </ul>
-        </div>
-        <!-- EXPECTED AUDIENCE -->
-        <div class="RRFormSubsection">
-            <span class="RRQuestion">${ _('Who is the intended audience? (check all that apply)') }</span>
-            <ul class="RROptionList">
-                % for value, text in IntendedAudience:
-                <li>
-                    <input type="checkbox" name="intendedAudience" value="${value}" id="${value}CB">
-                    <label for="${value}CB">${text}</label>
-                </li>
-                % endfor
-            </ul>
-        </div>
-        <!-- SUBJECT MATTER -->
-        <div class="RRFormSubsection">
-            <span class="RRQuestion">${ _('What is the subject matter? (check all that apply)') }</span>
-            <ul class="RROptionList">
-                % for value, text in SubjectMatter:
-                <li>
-                    <input type="checkbox" name="subjectMatter" value="${value}" id="${value}CB">
-                    <label for="${value}CB">${text}</label>
-                </li>
-                % endfor
-            </ul>
-        </div>
-    </div>
-
-    <!-- SECTION 4: Extra comments -->
+    <!-- SECTION 3: Extra comments -->
     <div class="RRFormSection">
         <div class="RRFormSubsection">
             <span class="RRQuestion">${ _('Please write here any other comments or instructions you may have:') }</span>

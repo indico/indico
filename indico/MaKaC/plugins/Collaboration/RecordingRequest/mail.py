@@ -21,9 +21,8 @@ from MaKaC.webinterface.mail import GenericNotification
 
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
-from MaKaC.plugins.Collaboration.RecordingRequest.common import typeOfEvents, \
-    postingUrgency, recordingPurpose, intendedAudience, subjectMatter, lectureOptions, \
-    getTalks
+from MaKaC.plugins.Collaboration.RecordingRequest.common import \
+    postingUrgency, getTalks
 
 
 class RecordingRequestNotificationBase(GenericNotification):
@@ -70,33 +69,6 @@ Request details:<br />
             <strong>Talk(s) to be recorded:</strong>
         </td>
         <td style="vertical-align: top;">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <strong>Comments about talk selection</strong><br />
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <strong>Have all the speakers given permission to have their talks recorded?</strong>  %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Lecture options:</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Type of event:</strong>
-        </td>
-        <td style="vertical-align: top">
             %s
         </td>
     </tr>
@@ -167,10 +139,6 @@ Request details:<br />
        MailTools.bookingCreationDate(self._booking),
        MailTools.bookingModificationDate(self._booking, typeOfMail),
        self._getTalksShortMessage(),
-       self._getTalkSelectionComments(),
-       bp["permission"],
-       dict(lectureOptions)[bp["lectureOptions"]],
-       dict(typeOfEvents)[bp['lectureStyle']],
        dict(postingUrgency)[bp['postingUrgency']],
        str(bp['numRemoteViewers']),
        str(bp['numAttendees']),
@@ -221,56 +189,11 @@ Request details:<br />
             else:
                 return """The user chose "Choose talks". The list of chosen talks can be found at the end of this e-mail."""
 
-    def _getTalkSelectionComments(self):
-        if self._isLecture:
-            return """(This event is a lecture. Therefore, it has no talk selection comments)"""
-        else:
-            comments = None
-            if self._bp["talkSelectionComments"]:
-                comments = self._bp["talkSelectionComments"].strip()
-            if comments:
-                return comments
-            return "(User didn't write any comments)"
-
     def _getComments(self):
         comments = self._bp["otherComments"].strip()
         if comments:
             return comments
         return "(User didn't write any comments)"
-
-    def _getLectureOptions(self):
-        options = self._bp['lectureOptions']
-        lodict = dict(lectureOptions)
-        if options:
-            return MailTools.listToStr([lodict[k] for k in options])
-        else:
-            return "No lecture options were selected"
-
-    def _getPurposes(self):
-        purposes = self._bp['recordingPurpose']
-        rpdict = dict(recordingPurpose)
-        if purposes:
-            return MailTools.listToStr([rpdict[k] for k in purposes])
-        else:
-            return "No purposes were selected"
-
-    def _getAudiences(self):
-        audiences = self._bp['intendedAudience']
-        iadict = dict(intendedAudience)
-        if audiences:
-            return MailTools.listToStr([iadict[k] for k in audiences])
-        else:
-            return "No audiences were selected"
-
-    def _getMatters(self):
-        matters = self._bp['subjectMatter']
-        smdict = dict(subjectMatter)
-        if matters:
-            return MailTools.listToStr([smdict[k] for k in matters])
-        else:
-            return "No audiences were selected"
-
-
 
 class RecordingRequestAdminNotificationBase(RecordingRequestNotificationBase):
     """ Base class to build an email notification to Admins

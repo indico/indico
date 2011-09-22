@@ -1,27 +1,6 @@
 {
     checkParams : function () {
         return {
-            "permission": ["radio", false, function(option, values){
-                var errors = [];
-                if (!exists(values["permission"])) {
-                    errors.push($T("Please answer if all the speakers given permission to have their talks webcasted."));
-                }
-                return errors;
-            }],
-            "lectureOptions": ["text", true, function(option, values){
-                var errors = [];
-                if (option == 'chooseOne') {
-                    errors.push($T("Please choose if slides and/or chalkboards will be used."));
-                }
-                return errors;
-            }],
-            "lectureStyle": ["text", true, function(option, values){
-                var errors = [];
-                if (option == 'chooseOne') {
-                    errors.push($T("Please choose a type of event."));
-                }
-                return errors;
-            }]
         }
     },
 
@@ -48,7 +27,7 @@
 
     clearForm : function () {
         var formNodes = IndicoUtil.findFormFields($E('WebcastRequestForm'));
-        IndicoUtil.setFormValues(formNodes, {'talkSelectionComments':'', 'otherComments':''})
+        IndicoUtil.setFormValues(formNodes, {'otherComments':''})
         if (!isLecture) {
             $E('allTalksRB').dom.checked = true;
             IndicoUI.Effect.disappear($E('contributionsDiv'));

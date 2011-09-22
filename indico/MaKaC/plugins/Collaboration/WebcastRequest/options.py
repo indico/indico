@@ -61,9 +61,15 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
-    ("ConsentFormURL", {"description" : "Link to the paper agreement",
+    ("ConsentFormURL", {"description" : _("Link to the paper agreement"),
                "type": str,
                "defaultValue": "",
+               "editable": True,
+               "visible": True}),
+
+    ("AgreementName", {"description" : _("Agreement name"),
+               "type": str,
+               "defaultValue": "agreement",
                "editable": True,
                "visible": True}),
 

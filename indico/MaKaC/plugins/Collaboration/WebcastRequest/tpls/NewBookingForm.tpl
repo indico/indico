@@ -78,6 +78,9 @@
     </div>
     % endif
 
+    <div>
+            <span style="color:#881122">${_("The webcast will not be broadcasted before all speakers have signed the %s (see Electronic Agreement tab)")%agreementName}</span>
+    </div>
 
 
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
@@ -173,22 +176,8 @@
                 </select>
             </div>
         </div>
-        <div class="WRFormSubsection">
-            <span class="WRQuestion">${_("Please write here additional comments about talk selection:")}</span>
-            <div><input size="60" type="text" name="talkSelectionComments"></div>
-        </div>
     </div>
 % endif
-
-    <div class="WRFormSection">
-        <div class="WRFormSubsection">
-        <span class="WRQuestion">
-            ${ 'Once your request has been accepted, all speakers will need to sign an electronic agreement.' | _}<br/>
-            ${ _('For more details about how to do so, please go <a href="%s">here</a>') % linkToEA}
-        </span>
-        <br/>
-        </div>
-    </div>
 
     <!-- SECTION 2: Extra comments -->
     <div class="WRFormSection">
