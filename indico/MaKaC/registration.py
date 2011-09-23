@@ -1035,6 +1035,7 @@ class BaseForm(Persistent):
 class FieldInputType(Persistent):
     _id=""
     _useLabelCol = True
+    _wholeRow = False
 
     def __init__(self, field):
         self._parent = field
@@ -1070,6 +1071,9 @@ class FieldInputType(Persistent):
         if not self._useLabelCol:
             return ""
         return self._parent.getCaption()
+
+    def useWholeRow(self):
+        return self._wholeRow
 
     def getMandatoryCol(self, item):
         mandatory = ""
@@ -1619,6 +1623,8 @@ class NumberInput(FieldInputType):
 
 class LabelInput(FieldInputType):
     _id="label"
+    _wholeRow = True
+
     def getName(cls):
         return "Label"
     getName=classmethod(getName)
@@ -1628,20 +1634,14 @@ class LabelInput(FieldInputType):
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
-        htmlName=self.getHTMLName()
         v=default
         if item is not None:
             v=item.getValue()
             price= item.getPrice()
             billable=item.isBillable()
             currency=item.getCurrency()
-            htmlName=item.getHTMLName()
-
-        disable=""
-        if ( registrant is not None and billable and registrant.getPayed()):
-            disable="disabled=\"true\""
             #pass
-        tmp= """ <td></td><td align="right" align="bottom">"""
+        tmp= """ <td>%s</td><td align="right" align="bottom">"""%self.getModifLabelCol()
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
         else:
@@ -1750,7 +1750,6 @@ class YesNoInput(FieldInputType):
     getName=classmethod(getName)
 
     def _getModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
@@ -1785,7 +1784,7 @@ class YesNoInput(FieldInputType):
             placesInfo = """&nbsp;[%s place(s) left]""" % (self.getParent().getNoPlacesLeft())
             if v != "yes" and not self.getParent().hasAvailablePlaces():
                 checkedYes += " disabled"
-        tmp = """%s <select id="%s" name="%s" %s><option value="">-- Choose a value --</option><option value="yes" %s>yes%s</option><option value="no" %s>no</option></select>%s""" % (caption, htmlName, htmlName, disable, checkedYes, placesInfo, checkedNo, param)
+        tmp = """<select id="%s" name="%s" %s><option value="">-- Choose a value --</option><option value="yes" %s>yes%s</option><option value="no" %s>no</option></select>%s""" % (htmlName, htmlName, disable, checkedYes, placesInfo, checkedNo, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
@@ -2141,8 +2140,7 @@ class RadioGroupInput(FieldInputType):
             currency = item.getCurrency()
             value = item.getValue()
 
-        tmp = """%s""" % (caption)
-        tmp = [""" <td>%s</td><td align="right" align="bottom" colspan="2"></td>""" % tmp]
+        tmp = [""" <td></td><td align="right" align="bottom" colspan="2"></td>"""]
 
         counter = 0
         for val in self.getItemsList():
