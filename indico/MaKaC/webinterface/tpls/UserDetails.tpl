@@ -238,7 +238,9 @@ var editFax = new InputEditWidget('user.setPersonalData',
 $E('inPlaceEditFax').set(editFax.draw());
 
 $E('inPlaceEditSecondaryEmails').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'secondaryEmails'}, ${ jsonEncode(secEmails) }, true, null, Util.Validation.isEmailList,
+        {'userId':'${ userId }', 'dataType':'secondaryEmails'}, ${ jsonEncode(secEmails) }, true, null, function(val) {
+            return !val || Util.Validation.isEmailList(val);
+        },
         $T("List contains invalid e-mail address or invalid separator"),
         $T("You can specify more than one email address separated by commas, semicolons or whitespaces.")).draw());
 
