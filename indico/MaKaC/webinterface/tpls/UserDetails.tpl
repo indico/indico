@@ -203,42 +203,42 @@ var beforeEdit = function(field) {
 
 
 $E('inPlaceEditTitle').set(new SelectEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'title'}, ${ titleList }, '${ title }', requestTitle).draw());
+        {'userId':'${ userId }', 'dataType':'title'}, ${ titleList }, ${ jsonEncode(title) }, requestTitle).draw());
 
 var editSurName =  new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'surName'}, '${ surName }', false, requestSurName, null, null, null,
+        {'userId':'${ userId }', 'dataType':'surName'}, ${ jsonEncode(surName) }, false, requestSurName, null, null, null,
         curry(beforeEdit, 'surName'));
 $E('inPlaceEditSurName').set(editSurName.draw());
 
 var editFirstName = new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'name'}, '${ name }', false, requestFirstName, null, null, null,
+        {'userId':'${ userId }', 'dataType':'name'}, ${ jsonEncode(name) }, false, requestFirstName, null, null, null,
         curry(beforeEdit, 'firstName'));
 $E('inPlaceEditName').set(editFirstName.draw());
 
 var editOrganisation = new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'organisation'}, '${ organisation }', false, curry(unlockField, 'affiliation'), null, null, null,
+        {'userId':'${ userId }', 'dataType':'organisation'}, ${ jsonEncode(organisation) }, false, curry(unlockField, 'affiliation'), null, null, null,
         curry(beforeEdit, 'affiliation'));
 $E('inPlaceEditOrganisation').set(editOrganisation.draw());
 
 $E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'email'}, '${ onlyEmail }', false, null, Util.Validation.isEmailAddress,
+        {'userId':'${ userId }', 'dataType':'email'}, ${ jsonEncode(onlyEmail) }, false, null, Util.Validation.isEmailAddress,
         $T("Invalid e-mail address")).draw());
 
 $E('inPlaceEditAddress').set(new TextAreaEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'address'}, $E('inPlaceEditAddress').dom.innerHTML, true).draw());
 
 var editTelephone = new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'telephone'}, '${ telephon }', true, curry(unlockField, 'phone'), null, null, null,
+        {'userId':'${ userId }', 'dataType':'telephone'}, ${ jsonEncode(telephon) }, true, curry(unlockField, 'phone'), null, null, null,
         curry(beforeEdit, 'phone'));
 $E('inPlaceEditTelephone').set(editTelephone.draw());
 
 var editFax = new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'fax'},'${ fax }', true, curry(unlockField, 'fax'), null, null, null,
+        {'userId':'${ userId }', 'dataType':'fax'}, ${ jsonEncode(fax) }, true, curry(unlockField, 'fax'), null, null, null,
         curry(beforeEdit, 'fax'));
 $E('inPlaceEditFax').set(editFax.draw());
 
 $E('inPlaceEditSecondaryEmails').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'secondaryEmails'}, '${ secEmails }', true, null, Util.Validation.isEmailList,
+        {'userId':'${ userId }', 'dataType':'secondaryEmails'}, ${ jsonEncode(secEmails) }, true, null, Util.Validation.isEmailList,
         $T("List contains invalid e-mail address or invalid separator"),
         $T("You can specify more than one email address separated by commas, semicolons or whitespaces.")).draw());
 
