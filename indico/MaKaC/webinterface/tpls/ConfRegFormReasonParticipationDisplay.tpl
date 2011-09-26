@@ -1,15 +1,17 @@
-<table width="100%" align="left" style="border-left:1px solid #777777;border-top:1px solid #777777;" cellspacing="0">
+<table class="regFormSectionTable" width="100%" align="left" cellspacing="0">
     <tr>
-        <td nowrap class="groupTitle" style="background:#E5E5E5; color:gray"><b>${ title }</b></td>
+        <td nowrap class="regFormSectionTitle">${ title }</td>
     </tr>
     <tr>
-        <td style="padding-left:10px">
+        <td style="padding: 5px 0 0 10px">
             <table width="100%">
                 <tr>
-                    <td align="left">&nbsp;${ description }</td>
+                    <td align="left" style="padding: 5px;">${ description }</td>
                 </tr>
                 <tr>
-                    <td align="left">&nbsp;<textarea name="reason" rows="5" cols="75">${ reasonParticipation }</textarea></td>
+                    <td align="left">
+                        <textarea name="reason" rows="4" cols="75">${ reasonParticipation }</textarea>
+                    </td>
                 </tr>
             </table>
         </td>

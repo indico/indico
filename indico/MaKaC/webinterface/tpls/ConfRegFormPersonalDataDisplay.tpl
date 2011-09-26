@@ -1,6 +1,6 @@
-<table width="100%" align="left" style="border-left:1px solid #777777;border-top:1px solid #777777;" cellspacing="0">
+<table width="100%" align="left" cellspacing="0">
     <tr>
-        <td nowrap class="groupTitle regSectionBackground"><b>${ _("Personal data")}</b></td>
+        <td nowrap class="regFormSectionTitle">${ _("Personal data")</td>
     </tr>
     <tr>
         <td style="padding-left:10px">

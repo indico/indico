@@ -35,6 +35,7 @@ from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.common import Config
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from MaKaC.registration import RadioGroupInput, TextareaInput
 
 ####
 # ----------------- MANAGEMENT AREA ---------------------------
@@ -1606,10 +1607,7 @@ class WConfRegistrationFormDisplay(wcomponents.WTemplated):
             if gs.isEnabled():
                 html.append( """
                             <tr>
-                              <td><br></td>
-                            </tr>
-                            <tr>
-                              <td align="left">
+                              <td align="left" style="padding-bottom:10px;">
                                 %s
                               </td>
                             </tr>
@@ -1655,24 +1653,37 @@ class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
             default = ""
             if self._generalSection is self._generalSection.getRegistrationForm().getPersonalData():
                 default = self._pdFormValues.get(f.getPDField(), "")
+
+            valign = "middle"
+            try:
+                description = f.getInput().getParent().getDescription()
+            except AttributeError: # just to avoid cases where description attribute is not defined (almost never)
+                description = None
+            # if the element is a textarea, it has description, or it contains radio buttons, we have to align it on top
+            if isinstance(f.getInput(), TextareaInput) or ("type=\"radio\"" in f.getInput().getModifHTML(miscItem, registrant, default)) or description:
+                valign = "top"
+
             if f.getInput().useWholeRow():
                 html.append("""
                         <tr>
-                          <td colspan="3" valign="top">
+                          <td colspan="2" valign="%s">
                              %s
                           </td>
                         </tr>
-                            """%f.getInput().getModifHTML(miscItem, registrant, default))
+                            """%(valign, f.getInput().getModifHTML(miscItem, registrant, default)))
             else:
                 html.append("""
                             <tr>
-                              <td valign="top">%s</td>
-                              <td valign="top" style="width:10px;">%s</td>
+                              <td class="regFormCaption" valign="%s">
+                                  <span class="regFormCaption">%s</span>
+                                  <span class="regFormMandatoryField">%s</span>
+                              </td>
                               <td>
                                  %s
                               </td>
                             </tr>
-                            """%(f.getInput().getModifLabelCol(), f.getInput().getMandatoryCol(miscItem), f.getInput().getModifHTML(miscItem, registrant, default)) )
+                            """%(valign, f.getInput().getModifLabelCol(), f.getInput().getMandatoryCol(miscItem), f.getInput().getModifHTML(miscItem, registrant, default)))
+
         return "".join(html)
 
     def getVars(self):
@@ -2038,7 +2049,7 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
                     seItem = se.getSocialEventItem()
                 placesLeft = ""
                 if seItem.getPlacesLimit() > 0:
-                    placesLeft = "<span style='color:green; font-style:italic;'>[%s place(s) left]</span>"%seItem.getNoPlacesLeft()
+                    placesLeft = "<span class='placesLeft'>[%s place(s) left]</span>"%seItem.getNoPlacesLeft()
                 priceCol = ""
                 if seItem.isBillable():
                     perPlace = ""

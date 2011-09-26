@@ -1,41 +1,47 @@
-<table width="100%" align="left" style="border-left:1px solid #777777;border-top:1px solid #777777;" cellspacing="0">
+<table class="regFormSectionTable" width="100%" align="left" cellspacing="0">
     <tr>
-        <td nowrap class="groupTitle" style="background:#E5E5E5; color:gray"><b>${ title }</b></td>
+        <td nowrap class="regFormSectionTitle">${ title }</td>
     </tr>
-    <tr><td>&nbsp;</td></tr>
+    % if description:
     <tr>
         <td style="padding-left:10px">
             <table width="100%">
                 <tr>
-                    <td align="left"><pre style="white-space:normal">${ description }</pre></td>
-                </tr>
-                <tr>
-                    <td align="left">&nbsp;</td>
+                    <td align="left" style="padding: 10px 0 0 5px;"><pre>${ description }</pre></td>
                 </tr>
             </table>
         </td>
     </tr>
+    % endif
     <tr>
-        <td style="padding-left:10px">
+        <td style="padding: 10px 0 0 15px">
             <table align="left">
                 <tr>
-                    <td align="left">&nbsp;<font color="red">* </font>${ _("Arrival date")}:</td>
-                    <td align="left">&nbsp; ${ arrivalDate }</td>
+                    <td align="left">
+                        <span>${ _("Arrival date")}</span>
+                        <span class="regFormMandatoryField">*</span>
+                    </td>
+                    <td align="left" style="padding-left: 5px;">${ arrivalDate }</td>
                 </tr>
                 <tr>
-                    <td align="left">&nbsp;<font color="red">* </font>${ _("Departure date")}:</td>
-                    <td align="left">&nbsp;${ departureDate }</td>
+                    <td align="left">
+                        <span>${ _("Departure date")}</span>
+                        <span class="regFormMandatoryField">*</span>
+                    </td>
+                    <td align="left" style="padding-left: 5px;">${ departureDate }</td>
                 </tr>
             </table>
         </td>
     </tr>
-    <tr><td>&nbsp;</td></tr>
 % if accommodationTypes != "":
     <tr>
-        <td style="padding-left:10px">
+        <td style="padding: 5px 0 0 15px;">
             <table align="left">
                 <tr>
-                    <td align="left">&nbsp;<font color="red">* </font><span id="accommodationTypeLabel" style="font-weight: bold;">${ _("Select your accommodation")}:</span></td>
+                    <td align="left">
+                        <span id="accommodationTypeLabel" class="subGroupTitleRegForm">${ _("Select your accommodation")}</span>
+                        <span class="regFormMandatoryField">*</span>
+                    </td>
                 </tr>
                 ${ accommodationTypes }
             </table>

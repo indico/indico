@@ -31,26 +31,25 @@
   }
 </script>
 
-<form action=${ postURL } method="POST" onSubmit="return formSubmit(this);" enctype="multipart/form-data">
-<table width="70%" align="center">
-    <tr><td>&nbsp;</td></tr>
+<form action=${ postURL } method="POST" onSubmit="return formSubmit(this);">
+<table width="80%" align="left" style="padding-left: 5px;">
+    % if title:
     <tr>
-        <td nowrap class="title"><center>${ title }</center></td>
+        <td nowrap align="center" class="title" style="padding-bottom:20px;">${ title }</td>
     </tr>
+    % endif
+    ${ otherSections }
     <tr>
-        <td colspan="2" align="left">
-            <br><b>${ _("""Please, note that fields marked with <font color="red">*</font> are mandatory""")}</b><br>
+        <td class="regFormMandatoryInfo">
+            <span>${ _("(All the fields marked with ") }</span>
+            <span class="regFormMandatoryField">*</span>
+            <span>${ _(" are mandantory)") }</span>
         </td>
     </tr>
     <tr>
-        <td><br></td>
-    </tr>
-    ${ otherSections }
-    <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td align="center" class="regFormBottomLine"><input type="submit" class="btn" value="register" onClick="return confirm('${ _("Are you sure you want to submit this form?") }');"></td>
+        <td align="center" style="padding-bottom: 40px;">
+            <input type="submit" class="regFormButton" value="Register" onClick="return confirm('${ _("Are you sure you want to submit this form?") }');">
+        </td>
     </tr>
 </table>
 <br>

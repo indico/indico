@@ -42,15 +42,16 @@
     </tr>
     ${ otherSections }
     <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td colspan="2" align="center">
-            <br><b>${ _("""Please, note that fields marked with <font color="red">*</font> are mandatory""")}</b><br>
+        <td class="regFormMandatoryInfo">
+            <span>${ _("(All the fields marked with ") }</span>
+            <span class="regFormMandatoryField">*</span>
+            <span>${ _(" are mandantory)") }</span>
         </td>
     </tr>
     <tr>
-        <td align="center" style="border-top: 2px solid #777777;padding-top:10px"><input type="submit" class="btn" value="${ _("modify")}"></td>
+        <td align="center" style="padding-bottom: 40px;">
+            <input type="submit" class="regFormButton" value="${ _("Modify")}">
+        </td>
     </tr>
 </table>
 <br>

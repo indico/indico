@@ -1,19 +1,20 @@
-<table width="100%" align="left" style="border-left:1px solid #777777;border-top:1px solid #777777;" cellspacing="0">
+<table class="regFormSectionTable" width="100%" align="left" cellspacing="0">
     <tr>
-        <td nowrap class="groupTitle" style="background:#E5E5E5; color:gray"><b>${ title }</b></td>
+        <td nowrap class="regFormSectionTitle">${ title }</td>
     </tr>
-    <tr><td>&nbsp;</td></tr>
+    % if description:
     <tr>
-        <td style="padding-left:10px">
+        <td style="padding: 10px 0 0 15px;">
             <table width="100%">
                 <tr>
-                    <td align="left"><pre style="white-space:normal">${ description }</pre></td>
+                    <td align="left"><pre>${ description }</pre></td>
                 </tr>
             </table>
         </td>
     </tr>
+    % endif
     <tr>
-        <td style="padding-left:10px" align="left" valign="top">
+        <td style="padding: 10px 0 0 15px;" align="left" valign="top">
             <table align="left" valign="top">
                 ${ fields }
             </table>

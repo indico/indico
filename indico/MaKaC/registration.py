@@ -1080,7 +1080,7 @@ class FieldInputType(Persistent):
     def getMandatoryCol(self, item):
         mandatory = ""
         if (item is not None and item.isMandatory()) or self.getParent().isMandatory():
-            mandatory = """<span style="color:red;">*</span>"""
+            mandatory = """<span class="regFormMandatoryField">*</span>"""
         return mandatory
 
     def getModifHTML(self, item, registrant, default=""):
@@ -1488,7 +1488,6 @@ class NumberInput(FieldInputType):
         self._minValue = 0
 
     def _getModifHTML(self,item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
@@ -1519,11 +1518,11 @@ class NumberInput(FieldInputType):
             onkeyup = """
                 onkeyup="$E('subtotal-%s').dom.innerHTML = ((isNaN(parseInt(this.value, 10)) || parseInt(this.value, 10) < 0) ? 0 : parseInt(this.value, 10)) * %s;"
             """ % (htmlName, price)
-        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s %s />&nbsp;&nbsp;<span class="regFormNumberCaption">%s</span> %s""" % (htmlName, htmlName, v, onkeyup, disable, length, caption, param)
+        tmp = """<input type="text" id="%s" name="%s" value="%s" %s %s %s /> %s""" % (htmlName, htmlName, v, onkeyup, disable, length, param)
         tmp= """ <td>%s</td>"""%tmp
         if billable:
             subTotal = (float(price)*int(v) or 0)
-            tmp= """%s<td align="right" align="bottom">&nbsp;&nbsp;<span class="regFormPrice">%s&nbsp;%s</span><span class="regFormSubtotal">Total: <span id="subtotal-%s">%s</span>&nbsp;%s</span></td> """%(tmp,price,currency,htmlName,subTotal,currency)
+            tmp= """%s<td align="right" align="bottom">&nbsp;&nbsp;<span>%s&nbsp;%s</span><span class="regFormSubtotal">Total: <span id="subtotal-%s">%s</span>&nbsp;%s</span></td> """%(tmp,price,currency,htmlName,subTotal,currency)
         if description:
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
@@ -1625,6 +1624,9 @@ class NumberInput(FieldInputType):
     def setMinValue(self, value):
         self._minValue = value
 
+    def getModifLabelCol(self):
+        return self._parent.getCaption()
+
 class LabelInput(FieldInputType):
     _id="label"
     _wholeRow = True
@@ -1713,7 +1715,7 @@ class CheckboxInput(FieldInputType):
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s """%(tmp, price, currency)
         if self.getParent().getPlacesLimit():
-            tmp += """&nbsp;<span style='color:green; font-style:italic;'>[%s place(s) left]</span>""" % (self.getParent().getNoPlacesLeft())
+            tmp += """&nbsp;<span class='placesLeft'>[%s place(s) left]</span>""" % (self.getParent().getNoPlacesLeft())
         tmp += """</td>"""
         if description:
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
@@ -2196,7 +2198,7 @@ class RadioGroupInput(FieldInputType):
             currency = item.getCurrency()
             value = item.getValue()
 
-        tmp = [""" <td></td><td align="right" align="bottom" colspan="2"></td>"""]
+        tmp = ["""<td align="right" align="bottom" colspan="2"></td>"""]
 
         counter = 0
         for val in self.getItemsList():
@@ -2219,7 +2221,7 @@ class RadioGroupInput(FieldInputType):
                 tmp.append("""&nbsp;&nbsp;%s&nbsp;%s""" % (val.getPrice(), currency))
             tmp.append("""</td><td align="right" style="vertical-align: bottom;" >""")
             if val.getPlacesLimit():
-                tmp.append("""&nbsp;<span style='color:green; font-style:italic;'>[%s place(s) left]</span>""" % (val.getNoPlacesLeft()))
+                tmp.append("""&nbsp;<span class='placesLeft'>[%s place(s) left]</span>""" % (val.getNoPlacesLeft()))
             tmp.append(""" </td></tr> """)
 
         if description:
@@ -2532,7 +2534,7 @@ class DateInput(FieldInputType):
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+            tmp = """%s</tr><tr><td>%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant, override=False):
@@ -4252,7 +4254,7 @@ class SocialEventForm(BaseForm):
         return None
 
     def _getDefaultIntroValue(self):
-        return "<strong>Select the social events you would like to attend and how many places you will need</strong>"
+        return "Select the social events you would like to attend and how many places you will need"
 
     def getIntroSentence(self):
         try:

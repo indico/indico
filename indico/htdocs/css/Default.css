@@ -6633,15 +6633,11 @@ div.invalid {
 }
 
 .regFormSubtotal{
-    background: #ECECEC;
     margin-left: 10px;
-    padding: 2px;
-}
-
-.regFormPrice{
-}
-
-.regFormNumberCaption {
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #3B4145;
+    font-weight: bold;
 }
 
 .regFormBottomLine {
@@ -7004,7 +7000,7 @@ table.infoQuestionsTable td.dataBold {
     padding-bottom: 8px;
 }
 
-.subGroupTitleAbstract{
+.subGroupTitleAbstract {
    font-size: 13px;
    font-family: Verdana, Arial;
    color: #523D04;
@@ -7217,4 +7213,62 @@ span.num_events {
     font-size: 10.5px;
 }
 
+.subGroupTitleRegForm {
+   font-size: 13px;
+   font-family: Verdana, Arial;
+   color: #3B4145;
+   font-weight: bold;
+}
 
+.placesLeft {
+    color:green;
+    font-style:italic;
+    padding-left: 5px;
+}
+
+.regFormSectionTitle {
+    font-family: "Times New Roman", Verdana, Arial;
+    font-size: 20px;
+    color: #0C4566;
+    padding: 3px 3px 3px 10px;
+    font-weight: bold;
+}
+
+.regFormSectionTable {
+    border: 1px solid #CCC;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    padding: 15px;
+}
+
+.regFormMandatoryInfo {
+    padding-bottom: 10px;
+    text-align: center;
+    color: #3B4145;
+    font-style: italic;
+}
+
+.regFormMandatoryField {
+    color: #812;
+}
+
+.regFormCaption {
+    min-width: 125px;
+    max-width: 225px;
+}
+
+.regFormItalic {
+    font-style: italic;
+}
+
+.regFormButton {
+    background-color: #0C4566;
+    border-color: #FFFFFF;
+    font-weight: bold;
+    width: 100px;
+    color: #FFFFFF;
+    height: 30px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    cursor: pointer;
+}
