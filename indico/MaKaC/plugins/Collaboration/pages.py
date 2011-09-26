@@ -162,14 +162,6 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
 
                 vars['cont'] = cont
 
-                if self.spkWrapper.getRequestType() == "recording":
-                    requestText = _("Your talk will be recorded, thus we will need your agreement to allow us to publish your contribution.")
-                elif self.spkWrapper.getRequestType() == "webcast":
-                    requestText = _("Your talk will be webcasted, thus we will need your agreement to allow us to publish your contribution.")
-                else:
-                    requestText = _("Your talk will be recorded and webcasted, thus we will need your agreement to allow us to publish your contribution.")
-
-                vars['requestText'] = requestText
                 vars['showContributionInfo'] = self.authKey
 
                 location = cont.getLocation()
@@ -190,6 +182,7 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
                 vars['contDate'] = "%s (%s)"%(formatTwoDates(cont.getStartDate(), cont.getEndDate(), tz = tz, showWeek = True), tz)
 
                 vars['linkToEvent'] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
+                vars['agreementName'] = CollaborationTools.getOptionValue("RecordingRequest", "AgreementName")
         else:
             vars['error'] = 'Error'
 
@@ -275,19 +268,19 @@ class WElectronicAgreement(wcomponents.WTemplated):
         requestType = CollaborationTools.getRequestTypeUserCanManage(self._conf, self._user)
         #return recordingFormURL
         if requestType == 'recording' and recordingFormURL != '':
-            return _("""<a href="%s">here</a>."""%recordingFormURL)
+            return _("""<a href="%s">Paper version</a>."""%recordingFormURL)
         elif requestType == 'webcast' and webcastFormURL != '':
-            return _("""<a href="%s">here</a>."""%webcastFormURL)
+            return _("""<a href="%s">Paper version</a>."""%webcastFormURL)
         elif requestType == 'both':
             if recordingFormURL == webcastFormURL and recordingFormURL != '': #same link, same file
-                return _("""<a href="%s">here</a>."""%recordingFormURL)
+                return _("""<a href="%s">Paper version</a>."""%recordingFormURL)
             elif recordingFormURL != '' and webcastFormURL != '':
-                return _("""<a href="%s">here</a> for the recording request or
-                        <a href="%s">here</a> for the webcast request."""%(recordingFormURL, webcastFormURL))
+                return _("""<a href="%s">Paper version</a> for the recording request or
+                        <a href="%s">Paper version</a> for the webcast request."""%(recordingFormURL, webcastFormURL))
             elif recordingFormURL != '':
-                return _("""<a href="%s">here</a>."""%recordingFormURL)
+                return _("""<a href="%s">Paper version</a>."""%recordingFormURL)
             elif webcastFormURL != '':
-                return _("""<a href="%s">here</a>."""%webcastFormURL)
+                return _("""<a href="%s">Paper version</a>."""%webcastFormURL)
             else:
                 return _("""<No agreement link available>.""")
         else:
@@ -335,4 +328,5 @@ class WElectronicAgreement(wcomponents.WTemplated):
         vars['user'] = self._user
         vars['collaborationUrlHandlers'] = collaborationUrlHandlers
         vars['urlPaperAgreement'] = self.getPaperAgreementURL()
+        vars['agreementName'] = CollaborationTools.getOptionValue("RecordingRequest", "AgreementName")
         return vars

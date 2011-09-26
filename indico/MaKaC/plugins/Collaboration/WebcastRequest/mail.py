@@ -72,17 +72,6 @@ Request details:<br />
     </tr>
     <tr>
         <td colspan="2">
-            <strong>Comments about talk selection</strong><br />
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <strong>Have all the speakers given permission to have their talks webcasted?</strong>  %s
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
             <strong>Audience:</strong><br />
             %s
         </td>
@@ -106,8 +95,6 @@ Request details:<br />
        MailTools.bookingCreationDate(self._booking),
        MailTools.bookingModificationDate(self._booking, typeOfMail),
        self._getTalksShortMessage(),
-       self._getTalkSelectionComments(),
-       bp["permission"],
        self._bp["audience"] or _("Public"),
        self._getComments(),
        self._getTalks())
@@ -149,17 +136,6 @@ Request details:<br />
                 return """Please see the talk selection comments"""
             else:
                 return """The user chose "Choose talks". The list of chosen talks can be found at the end of this e-mail."""
-
-    def _getTalkSelectionComments(self):
-        if self._isLecture:
-            return """(This event is a lecture. Therefore, it has no talk selection comments)"""
-        else:
-            comments = None
-            if self._bp["talkSelectionComments"]:
-                comments = self._bp["talkSelectionComments"].strip()
-            if comments:
-                return comments
-            return "(User didn't write any comments)"
 
     def _getComments(self):
         comments = self._bp["otherComments"].strip()

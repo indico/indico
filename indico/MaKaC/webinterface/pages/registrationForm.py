@@ -1652,15 +1652,24 @@ class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
             default = ""
             if self._generalSection is self._generalSection.getRegistrationForm().getPersonalData():
                 default = self._pdFormValues.get(f.getPDField(), "")
-            html.append("""
+            if f.getInput().useWholeRow():
+                html.append("""
                         <tr>
-                          <td nowrap="nowrap" valign="top">%s</td>
-                          <td valign="top" style="width:10px;">%s</td>
-                          <td>
+                          <td colspan="3" valign="top">
                              %s
                           </td>
                         </tr>
-                        """%(f.getInput().getModifLabelCol(), f.getInput().getMandatoryCol(miscItem), f.getInput().getModifHTML(miscItem, registrant, default)) )
+                            """%f.getInput().getModifHTML(miscItem, registrant, default))
+            else:
+                html.append("""
+                            <tr>
+                              <td valign="top">%s</td>
+                              <td valign="top" style="width:10px;">%s</td>
+                              <td>
+                                 %s
+                              </td>
+                            </tr>
+                            """%(f.getInput().getModifLabelCol(), f.getInput().getMandatoryCol(miscItem), f.getInput().getModifHTML(miscItem, registrant, default)) )
         return "".join(html)
 
     def getVars(self):

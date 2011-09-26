@@ -50,6 +50,8 @@ class MaKaCDB(DB):
             modulename="persistent.list"
         elif modulename.startswith("IndexedCatalog.BTrees."):
             modulename="BTrees.%s"%modulename[22:]
+        elif modulename.startswith("MaKaC.plugins.EPayment.CERNYellowPay."):
+            modulename="indico.ext.epayment.cern.%s"%modulename[len("MaKaC.plugins.EPayment.CERNYellowPay."):]
         return DB.classFactory(self, connection, modulename, globalname)
 
 

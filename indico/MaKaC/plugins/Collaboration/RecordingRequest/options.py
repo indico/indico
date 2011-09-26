@@ -67,6 +67,12 @@ globalOptions = [
                "editable": True,
                "visible": True}),
 
+    ("AgreementName", {"description" : _("Agreement text"),
+               "type": str,
+               "defaultValue": "agreement",
+               "editable": True,
+               "visible": True}),
+
     ("recordingCapableRooms", {"description": _("Rooms capable of recording"),
                       "type": "rooms",
                       "defaultValue": [],

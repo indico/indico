@@ -1796,7 +1796,9 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
                             self.close();
                         } else {
                             if(result == "url_error"){
-                                IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The [url] field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
+                                IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {url} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
+                            }else if(result == "talkTitle_error"){
+                                IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {talkTitle} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
                             }else{
                                 self.close();
                                 span1 = Html.div({}, $T("Email sent successfully !"));
@@ -1842,7 +1844,7 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
             self.rtWidget.set("Dear {name},<br />" +
                     "<br />" +
                     "The organiser asked to record the following event: <strong>"+self.confTitle+"</strong><br />" +
-                    "In order to allow us to publish the video recording of your talk, please sign the agreement form at this page:" +
+                    "In order to allow us to publish the video recording of your talk <strong>{talkTitle}</strong>, please sign the agreement form at this page:" +
                     "<br/><br/> {url} <br/>"+
                     "<br/>" +
                     "Best Regards,<br/><br />" +
@@ -1850,6 +1852,7 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
             legendTable = Html.table(
                                      {},
                                      Html.tr({}, Html.td({}, "{url} :"), Html.td({}, $T("field containing the url of the electronic agreement. (This field is mandatory)"))),
+                                     Html.tr({}, Html.td({}, "{talkTitle} :"), Html.td({}, $T("field containing the talk title. (This field is mandatory)"))),
                                      Html.tr({}, Html.td({}, "{name} :"), Html.td({}, $T("field containing the full name of the speaker.")))
                                      );
             legend = Html.div({style:{marginLeft: '20px',

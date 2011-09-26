@@ -82,6 +82,7 @@ class WNewBookingForm(WCSPageTemplateBase):
 
         vars["Audiences"] = CollaborationTools.getOptionValue('WebcastRequest', "webcastAudiences")
         vars["linkToEA"] = collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(self._conf)
+        vars["agreementName"] = CollaborationTools.getOptionValue("WebcastRequest", "AgreementName")
         return vars
 
 

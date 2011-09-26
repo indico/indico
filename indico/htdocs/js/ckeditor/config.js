@@ -44,7 +44,7 @@ CKEDITOR.editorConfig = function( config )
     config.protectedSource.push(/<[^<>\s]+:\/\/[^<>\s]+>/g);
 
     //email address in angle brackets
-    config.protectedSource.push(/<[^<>]+@[^<>]+>/g);
+    config.protectedSource.push(/<[^<>=]+@[^<>]+>/g);
 
     //done to avoid wrapping paragraphs with <p></p> tags
     config.enterMode = CKEDITOR.ENTER_BR

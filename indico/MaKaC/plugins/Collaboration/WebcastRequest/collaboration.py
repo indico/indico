@@ -45,9 +45,7 @@ class CSBooking(CSBookingBase):
 
     _simpleParameters = {
         "talks" : (str, ''),
-        "talkSelectionComments": (str, ''),
         "talkSelection": (list, []),
-        "permission": (str, ''),
         "otherComments": (str, ''),
         "audience": (str, '')}
 

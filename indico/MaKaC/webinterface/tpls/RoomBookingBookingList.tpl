@@ -34,7 +34,7 @@
     <script type="text/javascript">
     var roomBookingCalendar = new RoomBookingCalendar(${ jsonEncode(barsFossil) }, ${ jsonEncode(dayAttrs) }, ${ str(overload).lower() },
             {"prevURL" : "${ prevURL }", "nextURL" : "${ nextURL }", "formUrl" : "${ calendarFormUrl }",
-            "startD" : "${ startD }", "endD" : "${ endD }", "periodName" : "${ periodName }",
+            "startD" : "${ startD }", "endD" : "${ endD }", "periodName" : "${ periodName }", "search" : ${jsonEncode(search)},
             "params" : ${ jsonEncode(calendarParams) }}, ${ str(manyRooms).lower() }
             ${',"' + str(urlHandlers.UHRoomBookingRejectAllConflicting.getURL()) + '"' if showRejectAllButton else ''});
     $E("roomBookingCal").set(roomBookingCalendar.draw());

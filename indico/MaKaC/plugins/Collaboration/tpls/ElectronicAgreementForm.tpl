@@ -77,13 +77,26 @@
               </div>
               <div class="EAFormSection">
                 <div>
-                  <p>${requestText}</p>
-                  <p>[blablablabla]</p>
+                  <p>Do you agree with the following standard ${agreementName}:</p>
+                  <p>I hereby consent to the photographic, audio and video recording of my performance or
+presentation at CERN. The term “performance or presentation” includes any material
+incorporated therein including but not limited to text, images and references.</p>
+<p>
+I hereby grant CERN a royalty-free license to use my image and name as well as the aforementioned
+recordings, in whole or in part, and to broadcast or distribute same in any format, in
+the furtherance of CERN’s scientific and educational mission. I agree to the modification of the
+afore-mentioned recordings provided that the substance of the performance or presentation is
+preserved.</p>
+<p>
+I hereby confirm that the content of my performance or presentation does not infringe the
+copyright, intellectual property or privacy rights of any third party. I have cited and credited any
+third party contribution in accordance with applicable professional standards and legislation in
+matters of attribution.</p>
                 </div>
                 <form name="choiceButton" class="EAChoiceButton">
-                  <div><input type="radio" name="EAChoice" value="accept">I confirm that I read the Electronic Agreement form and <strong>accept</strong>.</input></div>
-                  <div><input type="radio" name="EAChoice" value="refuse">I confirm that I read the Electronic Agreement form but I <strong>refuse</strong>.</input></div>
-                  <div><input type="button" name="sendChoice" value="Submit" onclick="return signEA()"/></div>
+                  <div><input type="radio" name="EAChoice" value="accept">I <strong>agree</strong>.</input></div>
+                  <div><input type="radio" name="EAChoice" value="refuse">I <strong>disagree</strong> (my talk will not be published).</input></div>
+                  <div style="margin-top: 30px"><input type="button" name="sendChoice" value="Submit" onclick="return signEA()"/></div>
                 </form>
               </div>
               </div>

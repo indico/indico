@@ -45,26 +45,17 @@ class CSBooking(CSBookingBase):
 
     _simpleParameters = {
         "talks" : (str, ''),
-        "talkSelectionComments": (str, ''),
         "talkSelection": (list, []),
-        "permission": (str, ''),
-        "lectureOptions": (str, ''),
         "lectureStyle": (str, ''),
         "postingUrgency": (str, ''),
         "numRemoteViewers": (str, ''),
         "numAttendees": (str, ''),
-        "recordingPurpose": (list, []),
-        "intendedAudience" : (list, []),
-        "subjectMatter": (list, []),
         "otherComments": (str, '')}
 
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
 
     def _checkBookingParams(self):
-
-        if self._bookingParams["lectureOptions"] == 'chooseOne': #change when list of community names is ok
-            raise RecordingRequestException("lectureOptions parameter cannot be 'chooseOne'")
 
         if self._bookingParams["lectureStyle"] == 'chooseOne': #change when list of community names is ok
             raise RecordingRequestException("lectureStyle parameter cannot be 'chooseOne'")

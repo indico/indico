@@ -32,7 +32,8 @@ type ("RoomBookingRoom", [],
              */
             getBookingFormUrl: function(date){
                 return Indico.Urls.RoomBookingForm + "?roomLocation=" + this.location + "&roomID=" + this.id +
-                    "&year=" + date.substr(0,4) + "&month=" + date.substr(5,2) + "&day=" + date.substr(8,2);
+                    "&year=" + date.substr(0,4) + "&month=" + date.substr(5,2) + "&day=" + date.substr(8,2) +
+                    "&ignoreSession=1";
             },
             /**
              * Returns room details url.
@@ -70,7 +71,7 @@ type ("RoomBookingRoom", [],
             this.building = roomData["building"];
             this.name = roomData["name"];
             this.type = roomData["type"];
-            this.bookingUrl = roomData["bookingUrl"] + '&day=' + date.substring(8,10) + '&month=' + date.substring(5,7) + '&year=' + date.substring(0,4);
+            this.bookingUrl = roomData["bookingUrl"] + '&day=' + date.substring(8,10) + '&month=' + date.substring(5,7) + '&year=' + date.substring(0,4) + '&ignoreSession=1';
             this.id = roomData["id"];
             this.location = roomData["locationName"];
         })
@@ -682,7 +683,7 @@ type("RoomBookingPrevNext", [],
                 calendarButton.observeClick(function() {
                     var dlg = new DateRangeSelector(self.startD, self.endD, function(startDate, endDate) {
 
-                        var redirectUrl =  self.formUrl + "?search=on&sDay=" + startDate.getDate() +"&sMonth=" + (startDate.getMonth() + 1) + "&sYear=" + startDate.getFullYear() +
+                        var redirectUrl =  self.formUrl + "?" + (self.search ? 'search=on&' : '') + "sDay=" + startDate.getDate() +"&sMonth=" + (startDate.getMonth() + 1) + "&sYear=" + startDate.getFullYear() +
                         "&eDay=" + endDate.getDate() +"&eMonth=" + (endDate.getMonth() + 1) + "&eYear=" + endDate.getFullYear();
 
                         for (var param in self.params)
@@ -708,6 +709,7 @@ type("RoomBookingPrevNext", [],
             this.startD = prevNextBarArgs.startD;
             this.endD = prevNextBarArgs.endD;
             this.params = prevNextBarArgs.params;
+            this.search = prevNextBarArgs.search;
         })
 
 /**

@@ -279,14 +279,13 @@ class TestElectronicAgreement(IndicoTestCase):
 
         # Create a booking - Recording Request
         bookingParams =  {
-                            'otherComments': '', 'lectureOptions': 'none', 'endDate': '', 'permission': 'Yes', 'talkSelectionComments': '',
-                            'talkSelection': ['0'], 'numAttendees': '', 'subjectMatter': [], 'recordingPurpose': [], 'talks': '',
-                            'lectureStyle': 'lecturePresentation', 'numRemoteViewers': '', 'startDate': '', 'postingUrgency': 'withinWeek',
-                            'intendedAudience': []
+                            'otherComments': '', 'endDate': '', 'permission': 'Yes',
+                            'talkSelection': ['0'], 'numAttendees': '', 'talks': '',
+                            'lectureStyle': 'lecturePresentation', 'numRemoteViewers': '', 'startDate': '', 'postingUrgency': 'withinWeek'
                          }
         # Create a booking - Webcast Request
         bookingParamsWeb =  {
-                           'permission': 'Yes', 'talkSelectionComments': '',
+                           'permission': 'Yes',
                            'talkSelection': ['0'], 'talks': 'choose'
                         }
 
