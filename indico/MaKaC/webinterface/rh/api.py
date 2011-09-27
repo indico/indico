@@ -101,6 +101,7 @@ class RHAdminAPIOptionsSet(RHServicesBase):
     def _checkParams(self, params):
         RHServicesBase._checkParams(self, params)
         self._httpsRequired = bool(params.get('httpsRequired'))
+        self._persistentAllowed = bool(params.get('persistentAllowed'))
         self._apiMode = int(params.get('apiMode'))
         try:
             self._apiCacheTTL = int(params.get('apiCacheTTL', 0))
@@ -114,6 +115,7 @@ class RHAdminAPIOptionsSet(RHServicesBase):
 
     def _process(self):
         self._minfo.setAPIHTTPSRequired(self._httpsRequired)
+        self._minfo.setAPIPersistentAllowed(self._persistentAllowed)
         self._minfo.setAPIMode(self._apiMode)
         self._minfo.setAPICacheTTL(self._apiCacheTTL)
         self._minfo.setAPISignatureTTL(self._apiSignatureTTL)

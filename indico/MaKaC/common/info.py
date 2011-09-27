@@ -86,6 +86,7 @@ class MaKaCInfo(Persistent):
 
         # http api
         self._apiHTTPSRequired = False
+        self._apiPersistentAllowed = False
         self._apiMode = False
         self._apiCacheTTL = 600
         self._apiSignatureTTL = 600
@@ -428,6 +429,16 @@ class MaKaCInfo(Persistent):
 
     def setAPIHTTPSRequired(self, v):
         self._apiHTTPSRequired = v
+
+    def isAPIPersistentAllowed(self):
+        if hasattr(self, '_apiPersistentAllowed'):
+            return self._apiPersistentAllowed
+        else:
+            self._apiPersistentAllowed = False
+            return False
+
+    def setAPIPersistentAllowed(self, v):
+        self._apiPersistentAllowed = v
 
     def getAPIMode(self):
         if hasattr(self, '_apiMode'):

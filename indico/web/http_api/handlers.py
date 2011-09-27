@@ -74,9 +74,9 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
         return path
 
 
-def validateSignature(ak, signature, timestamp, path, query):
+def validateSignature(ak, minfo, signature, timestamp, path, query):
     ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPISignatureTTL()
-    if not timestamp and not ak.isPersistentAllowed():
+    if not timestamp and not (ak.isPersistentAllowed() and minfo.isAPIPersistentAllowed()):
         raise HTTPAPIError('Signature invalid (no timestamp)', apache.HTTP_FORBIDDEN)
     elif timestamp and abs(timestamp - int(time.time())) > ttl:
         raise HTTPAPIError('Signature invalid (bad timestamp)', apache.HTTP_FORBIDDEN)
@@ -101,7 +101,7 @@ def checkAK(apiKey, signature, timestamp, path, query):
     # Signature validation
     onlyPublic = False
     if signature:
-        validateSignature(ak, signature, timestamp, path, query)
+        validateSignature(ak, minfo, signature, timestamp, path, query)
     elif apiMode in (API_MODE_SIGNED, API_MODE_ALL_SIGNED):
         raise HTTPAPIError('Signature missing', apache.HTTP_FORBIDDEN)
     elif apiMode == API_MODE_ONLYKEY_SIGNED:

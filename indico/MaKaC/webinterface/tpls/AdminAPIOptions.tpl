@@ -13,6 +13,13 @@
             </td>
         </tr>
         <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">Persistent signatures</span></td>
+            <td class="blacktext">
+                <input type="checkbox" name="persistentAllowed" id="persistentAllowed" value="1"${' checked="checked"' if persistentAllowed else ''} />
+                <label for="persistentAllowed">${ _("Allow users to enable persistent signatures (without timestamp)")}</label>
+            </td>
+        </tr>
+        <tr>
             <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("API mode")}</span></td>
             <td class="blacktext">
                 <select name="apiMode">

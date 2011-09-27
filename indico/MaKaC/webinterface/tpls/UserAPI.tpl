@@ -60,21 +60,23 @@
             <td></td>
             <td>
                 % if not apiKey:
-                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" onsubmit="return confirm($T('Please only create an API key if you actually need one. Unused API keys might be deleted after some time.'));">
+                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" style="display: inline;" onsubmit="return confirm($T('Please only create an API key if you actually need one. Unused API keys might be deleted after some time.'));">
                         <input type="submit" value="${_('Create API key')}" />
                     </form>
                 % else:
-                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" onsubmit="return confirm($T('Warning: When creating a new API key pair, your old key pair will stop working immediately!'));">
+                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" style="display: inline;" onsubmit="return confirm($T('Warning: When creating a new API key pair, your old key pair will stop working immediately!'));">
                         <input type="submit" value="${_('Create a new API key pair')}" />
                     </form>
-                    % if apiKey.isPersistentAllowed():
-                        <form action="${urlHandlers.UHUserAPIPersistent.getURL(avatar)}" method="POST" onsubmit="return confirm($T('When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'));">
-                            <input type="submit" value="${_('Disable persistent signatures')}" />
-                        </form>
-                    % else:
-                        <form action="${urlHandlers.UHUserAPIPersistent.getURL(avatar)}" method="POST" onsubmit="return confirm($T('With persistent signatures signed requests without a timestamp are allowed. By enabling them you agree to keep those links private and ensure that no unauthorized people will use them.'));">
-                            <input type="submit" value="${_('Enable persistent signatures')}" />
-                        </form>
+                    % if persistentAllowed:
+                        % if apiKey.isPersistentAllowed():
+                            <form action="${urlHandlers.UHUserAPIPersistent.getURL(avatar)}" method="POST" style="display: inline;" onsubmit="return confirm($T('When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'));">
+                                <input type="submit" value="${_('Disable persistent signatures')}" />
+                            </form>
+                        % else:
+                            <form action="${urlHandlers.UHUserAPIPersistent.getURL(avatar)}" method="POST" style="display: inline;" onsubmit="return confirm($T('Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'));">
+                                <input type="submit" value="${_('Enable persistent signatures')}" />
+                            </form>
+                        % endif
                     % endif
                 % endif
             </td>

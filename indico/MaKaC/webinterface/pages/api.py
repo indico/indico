@@ -48,6 +48,7 @@ class WUserAPI(WTemplated):
         vars['apiKey'] = self._avatar.getAPIKey()
         vars['isAdmin'] = self._rh._getUser().isAdmin()
         vars['signingEnabled'] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+        vars['persistentAllowed'] = minfo.isAPIPersistentAllowed()
         return vars
 
 
@@ -68,6 +69,7 @@ class WAdminAPIOptions(WTemplated):
         vars = WTemplated.getVars(self)
         vars['apiMode'] = minfo.getAPIMode()
         vars['httpsRequired'] = minfo.isAPIHTTPSRequired()
+        vars['persistentAllowed'] = minfo.isAPIPersistentAllowed()
         vars['apiCacheTTL'] = minfo.getAPICacheTTL()
         vars['apiSignatureTTL'] = minfo.getAPISignatureTTL()
         return vars
