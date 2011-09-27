@@ -56,6 +56,13 @@
                 <input type="hidden" value="" id="allowedUsers" name="allowedUsers"/>
             </td>
         </tr>
+        % if numConferences:
+            <tr>
+                <td colspan="2">
+                    <p class="warningText">${_('Warning: The parent category contains %d events which will be moved to the new sub-category.') % numConferences}</p>
+                </td>
+            </tr>
+        % endif
         <tr>
             <td>&nbsp;</td>
             <td>

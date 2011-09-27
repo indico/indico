@@ -1646,6 +1646,7 @@ class WCategoryCreation(wcomponents.WTemplated):
             vars["categProtection"] = "private"
         else :
             vars["categProtection"] = "public"
+        vars["numConferences"] = len(self.__target.conferences)
 
         return vars
 
