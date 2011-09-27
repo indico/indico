@@ -57,7 +57,7 @@ class ConfDisplayMgrRegistery:
         """
         self._getDisplayMgrRegistery()[ conference.getId() ] = dispMgr
 
-    def getDisplayMgr( self, conference, update=True ):
+    def getDisplayMgr( self, conference, update=False ):
         """Gives back the webfactory associated with a given conference or None
             if no association exists
         """

@@ -108,7 +108,7 @@ def _convertAlarms(obj):
 
 
 def _fixDefaultStyle(conf, cdmr):
-    confDM = cdmr.getDisplayMgr(conf, False)
+    confDM = cdmr.getDisplayMgr(conf, True)
     if confDM.getDefaultStyle() == 'administrative3':
         confDM.setDefaultStyle('administrative')
     if confDM.getDefaultStyle() == 'it':
