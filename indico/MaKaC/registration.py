@@ -3817,9 +3817,7 @@ class RegistrationSession(Persistent):
         self._billable = v
 
     def getCurrency(self):
-        try:
-            return self._currency
-        except:
+        if not hasattr(self, "_currency") or not self._currency:
             # it may happen that _regForm doesn't exist (session was removed from it)
             if self._regForm:
                 self._currency = self._regForm.getCurrency()
@@ -5286,9 +5284,7 @@ class RegistrantSession(Persistent):
         self._registrant = reg
 
     def getCurrency(self):
-        try:
-            return self._currency
-        except:
+        if not hasattr(self, "_currency") or not self._currency:
             self._currency = self._regSession.getCurrency()
         return self._currency
 

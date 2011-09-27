@@ -7226,7 +7226,7 @@ span.num_events {
     padding-left: 5px;
 }
 
-.regFormSectionTitle {
+.regFormSectionTitle, .regFormDoneTitle {
     font-family: "Times New Roman", Verdana, Arial;
     font-size: 20px;
     color: #0C4566;
@@ -7234,7 +7234,12 @@ span.num_events {
     font-weight: bold;
 }
 
-.regFormSectionTable {
+.regFormDoneTitle {
+    font-size: 18px;
+    padding: 0 0 0 0;
+}
+
+.regFormSectionTable, .regFormDoneTable {
     border: 1px solid #CCC;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -7261,6 +7266,11 @@ span.num_events {
     font-style: italic;
 }
 
+.regFormDonePlacesNeeded {
+    font-style: italic;
+    padding-left: 5px;
+}
+
 .regFormButton {
     background-color: #0C4566;
     border-color: #FFFFFF;
@@ -7271,4 +7281,12 @@ span.num_events {
     border-radius: 5px;
     -moz-border-radius: 5px;
     cursor: pointer;
+}
+
+.regFormDoneData {
+    padding-left: 5px;
+}
+
+.regFormDoneCaption {
+    color: black;
 }

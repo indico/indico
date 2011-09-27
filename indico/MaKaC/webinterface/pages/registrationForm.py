@@ -2184,22 +2184,21 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                 text=  i18nformat("""
                         <table>
                           <tr>
-                            <td align="right"><b> _("First Priority"):</b></td>
-                            <td align="left">%s</td>
+                            <td align="left" class="regFormDoneCaption">_("First Priority"):</td>
+                            <td align="left" class="regFormDoneData">%s</td>
                           </tr>
                           <tr>
-                            <td align="right"><b> _("Other option"):</b></td>
-                            <td align="left">%s</td>
+                            <td align="left" class="regFormDoneCaption">_("Other option"):</td>
+                            <td align="left" class="regFormDoneData">%s</td>
                           </tr>
                         </table>
                         """)%(session1, session2)
                 return  _("""
                         <tr>
-                          <td style="color:black"><b>%s</b></td>
-                          <td bgcolor="white" class="blacktext">%s</td>
+                          <td class="regFormDoneTitle">%s</td>
                         </tr>
                         <tr>
-                          <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
+                          <td style="padding-bottom: 15px;">%s</td>
                         </tr>
                         """)%(regForm.getSessionsForm().getTitle(),text)
             if regForm.getSessionsForm().getType() == "all":
@@ -2222,11 +2221,10 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                         """%(sessionList)
                 return  _("""
                         <tr>
-                          <td style="color:black"><b>%s</b></td>
-                          <td bgcolor="white" class="blacktext">%s</td>
+                          <td class="regFormDoneTitle">%s</td>
                         </tr>
                         <tr>
-                          <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
+                          <td style="padding-bottom: 15px;">%s</td>
                         </tr>
                         """)%(regForm.getSessionsForm().getTitle(), text)
         return ""
@@ -2251,30 +2249,29 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             if regForm.getAccommodationForm().getAccommodationTypesList() !=[]:
                 accoTypeHTML = """
                           <tr>
-                            <td align="right"><b>Accommodation type:</b></td>
-                            <td align="left">%s %s</td>
+                            <td align="left" class="regFormDoneCaption">Accommodation type</td>
+                            <td align="left" class="regFormDoneData">%s %s</td>
                           </tr>"""%(accoType, cancelled)
 
             text = i18nformat("""
                         <table>
                           <tr>
-                            <td align="right"><b> _("Arrival date"):</b></td>
-                            <td align="left">%s</td>
+                            <td align="left" class="regFormDoneCaption">_("Arrival date")</td>
+                            <td align="left" class="regFormDoneData">%s</td>
                           </tr>
                           <tr>
-                            <td align="right"><b> _("Departure date"):</b></td>
-                            <td align="left">%s</td>
+                            <td align="left" class="regFormDoneCaption">_("Departure date")</td>
+                            <td align="left" class="regFormDoneData">%s</td>
                           </tr>
                           %s
                         </table>
                         """)%(arrivalDate, departureDate, accoTypeHTML)
             return i18nformat("""
                     <tr>
-                      <td style="color:black"><b> _("Accommodation")</b></td>
-                      <td bgcolor="white" class="blacktext">%s</td>
+                      <td class="regFormDoneTitle">_("Accommodation")</td>
                     </tr>
                     <tr>
-                      <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
+                      <td style="padding-bottom: 15px;">%s</td>
                     </tr>
                     """)%(text)
         return ""
@@ -2293,7 +2290,11 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                         cancelled =  i18nformat("""<font color=\"red\">( _("cancelled"): %s)</font>""")%se.getCancelledReason().strip()
                 r.append( i18nformat("""
                             <tr>
-                              <td align="left">%s <b>[%s  _("place(s) needed")]</b> %s</td>
+                              <td align="left">
+                                  <span class="regFormDoneCaption">%s</span>
+                                  <span class="regFormDonePlacesNeeded">(%s  _("place(s) needed"))</span>
+                                  <span>%s</span>
+                            </td>
                             </tr>
                          """)%(se.getCaption(), se.getNoPlaces(), cancelled))
             if r == []:
@@ -2306,11 +2307,10 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                         """%("".join(r))
             text =  _("""
                     <tr>
-                      <td style="color:black"><b>%s</b></td>
-                      <td bgcolor="white" class="blacktext">%s</td>
+                      <td class="regFormDoneTitle">%s</td>
                     </tr>
                     <tr>
-                      <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
+                      <td style="padding-bottom: 15px;">%s</td>
                     </tr>
                     """)%(regForm.getSocialEventForm().getTitle(), text)
         return text
@@ -2320,11 +2320,10 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         if regForm.getReasonParticipationForm().isEnabled():
             return  i18nformat("""
                     <tr>
-                      <td style="color:black"><b> _("Reason for participation")</b></td>
-                      <td bgcolor="white" class="blacktext">%s</td>
+                      <td class="regFormDoneTitle">_("Reason for participation")</td>
                     </tr>
                     <tr>
-                      <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
+                      <td class="regFormDoneData" style="padding-bottom: 15px;">%s</td>
                     </tr>
                     """)%(self.htmlText( self._registrant.getReasonParticipation() ))
         return ""
@@ -2361,11 +2360,11 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             if v is None : v=""
             html.append("""
                     <tr>
-                       <td align="right"><b>%s%s</b></td>
-                       <td align="left">%s</td>
-                       <td align="right">%s&nbsp;&nbsp;%s</td>
+                       <td align="left" class="regFormDoneCaption">%s</td>
+                       <td class="regFormDoneData">%s</td>
+                       <td align="right" class="regFormDoneData">%s&nbsp;&nbsp;%s</td>
                     </tr>
-                    """%(f.getCaption(), ":" if not isinstance(fieldInput, LabelInput) else '', self._formatValue(fieldInput, v), price, currancy) )
+                    """%(f.getCaption(), self._formatValue(fieldInput, v), price, currancy) )
         if miscGroup is not None:
             for miscItem in miscGroup.getResponseItemList():
                     f=gsf.getFieldById(miscItem.getId())
@@ -2410,12 +2409,12 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                 if(quantity>0):
                     html.append("""
                             <tr>
-                               <td ><b>%i</b></td>
-                               <td>%s:%s%s</td>
+                               <td style="padding-left: 5px;">%s:%s%s</td>
+                               <td align="right" style="padding-right:10px;">%i</td>
                                <td align="right" style="padding-right:10px" nowrap >%s</td>
                                <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
                             </tr>
-                            """%(quantity,gsf.getTitle(),caption,self._formatValue(fieldInput, value),price,price*quantity,currency) )
+                            """%(gsf.getTitle(), caption, self._formatValue(fieldInput, value), quantity, price,price*quantity,currency) )
         return "".join(html)
 
 
@@ -2430,12 +2429,12 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             if quantity > 0:
                 html.append("""
                         <tr>
-                           <td><b>%i</b></td>
-                           <td>%s</td>
+                           <td align="left" style="padding-left: 5px;">%s</td>
+                           <td align="right" style="padding-right:10px;">%i</td>
                            <td align="right" style="padding-right:10px" nowrap >%s</td>
                            <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
                         </tr>
-                        """%(quantity, caption, price, price*quantity, currency))
+                        """%(caption, quantity, price, price*quantity, currency))
         return "".join(html)
 
 
@@ -2444,11 +2443,10 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         if gsf.isEnabled():
             html.append("""
                 <tr>
-                  <td style="color:black"><b>%s</b></td>
-                  <td bgcolor="white" class="blacktext">%s</td>
+                  <td class="regFormDoneTitle">%s</td>
                 </tr>
                 <tr>
-                  <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
+                  <td style="padding-bottom: 15px;">%s</td>
                 </tr>
                 """%(gsf.getTitle(), self._getMiscInfoItemsHTML(gsf) ) )
         return "".join(html)
@@ -2460,14 +2458,15 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         if modPay.isActivated() and self._registrant.doPay():
             total={}
             total["value"]=0
-            html.append( i18nformat(""" <tr><td colspan="2"><table width="100%%">
+            html.append( i18nformat(""" <tr><td colspan="2"><table width="100%" cellpadding="3">
                             <tr>
-                            <tr><td colspan="4" class="title"><b>_("Payment summary")</b></td></tr>
+                                <td colspan="4" class="regFormDoneTitle">_("Payment summary")</td>
+                            </tr>
                             <tr>
-                                <td style="color:black"><b> _("Quantity")</b></td>
-                                <td style="color:black"><b> _("Item")</b></td>
-                                <td style="color:black;padding-right:10px" nowrap ><b>_("Unit Price")</b></td>
-                                <td style="color:black"><b> _("Cost")</b></td>
+                                <td class="subGroupTitleRegForm" style="padding-left: 5px;">_("Item")</td>
+                                <td class="subGroupTitleRegForm" style="padding-right:10px;">_("Quantity")</td>
+                                <td nowrap class="subGroupTitleRegForm" style="padding-right:10px;">_("Unit Price")</td>
+                                <td align="right" class="subGroupTitleRegForm">_("Cost")</td>
                             </tr>
                         """))
             for gsf in self._registrant.getMiscellaneousGroupList():
@@ -2491,25 +2490,22 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                                 </tr>"""%str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf))
 
             html.append( i18nformat("""
-                            <tr>&nbsp;</tr>
                             <tr>
-                               <td ><b> _("TOTAL")</b></td>
                                <td></td>
                                <td></td>
-                               <td align="right"nowrap>%s&nbsp;&nbsp;%s</td>
+                               <td align="right" class="subGroupTitleRegForm" style="padding: 10px 10px 0 0;">_("TOTAL")</td>
+                               <td align="right" nowrap class="subGroupTitleRegForm" style="padding-top: 10px;">%s&nbsp;&nbsp;%s</td>
                             </tr>
                             <form name="epay" action="%s" method="POST">
                             <tr>
                               <table width="100%%">
-
-                                <tr><td>&nbsp;</td></tr>
                                 %s
                                 <tr>
-                                  <td align="right" nowrap><input type="submit" value="Next ->" onclick="return checkConditions()" ></td>
+                                  <td align="right" nowrap><input type="submit" class="regFormButton" value="Next ->" onclick="return checkConditions()" ></td>
                                 </tr>
                                </table>
                             </tr>
-                            </form> <td  colspan="4" style="border-top:2px solid black">&nbsp;</td></tr>
+                            </form></tr>
                             </table></td></tr>
                             """)%(total["value"],regForm.getCurrency(),url,condChecking))
         return "".join(html)
@@ -2543,7 +2539,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         vars["paymentInfo"]  = self._getPaymentInfo()
         vars["epaymentAnnounce"] = ""
         if self._conf.getModPay().isActivated() and self._registrant.doPay():
-            vars["epaymentAnnounce"] = """<br><font color="black">Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</font>"""
+            vars["epaymentAnnounce"] = """<br><span>Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</span>"""
         return vars
 
 class WPRegistrationFormconfirmBooking( conferences.WPConferenceDefaultDisplayBase ):

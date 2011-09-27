@@ -10,7 +10,7 @@
     <tr>
         <td nowrap style="padding: 10px 0 5px 15px;">
             <span>${ _("Select your preferred choice")}</span>
-            <span class="mandatoryField">*</span>
+            <span class="regFormMandatoryField">*</span>
         </td>
         <td width="100%" align="left" style="padding: 10px 0 5px 15px;">${ sessions1 }</td>
     </tr>

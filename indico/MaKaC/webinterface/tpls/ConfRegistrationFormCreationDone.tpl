@@ -14,52 +14,37 @@ function checkConditions(){
 }
 -->
 </script>
-
-<center>
-  <table width="80%">
+<table width="80%" align="center">
     <tr>
-      <td colspan="2" align="center">
-        <table bgcolor="white">
-          <tr bgcolor="white">
-            <td>
-              <table>
-                <tr>
-                  <td width="10">&nbsp;</td>
-                </tr>
-                <tr>
-                  <td width="10">&nbsp;</td>
-                  <td>${ _("Thank you for completing the registration form which has been sent to the organisers for their attention.")} ${ epaymentAnnounce }<br><br></td>
-                  <td width="10">&nbsp;</td>
-                </tr>
-                <tr><td colspan="3">
-                    <table width="90%" align="center" border="0">
-                      <tr>
-                        <td>
-                          <table width="100%" align="left" border="0" style="border-top:2px solid black">
-                            <tr>
-                              <td style="color:black"><b>${ _("Registrant ID")}</b></td>
-                              <td bgcolor="white">${ id }</td>
-                            </tr>
-                            <tr>
-                              <td style="color:black"><b>${ _("Registration date")}</b></td>
-                              <td bgcolor="white" class="blacktext">${ registrationDate }</td>
-                            </tr>
-                            <tr>
-                              <td colspan="3" style="border-top:2px solid black">&nbsp;</td>
-                            </tr>
-                            ${ otherSections }
-                            ${ paymentInfo }
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-
-                </td></tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </td>
+        <td style="padding: 15px 0 15px 0">
+            ${ _("Thank you for completing the registration form which has been sent to the organisers for their attention.")}
+            ${ epaymentAnnounce }
+        </td>
     </tr>
-  </table>
-</center>
+    <tr>
+        <td>
+            <span class="subGroupTitleRegForm">${ _("Registrant ID: ")}</span>
+            <span class="regFormDoneData">${ id }</span>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 15px;">
+            <span class="subGroupTitleRegForm">${ _("Registration date:")}</span>
+            <span class="regFormDoneData">${ registrationDate }</span>
+        </td>
+    </tr>
+    <tr>
+    <td colspan="3">
+        <table width="100%" align="left" class="regFormDoneTable">
+            <tr>
+                <td>
+                    <table width="100%" align="left">
+                        ${ otherSections }
+                        ${ paymentInfo }
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </td>
+    </tr>
+</table>
