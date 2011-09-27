@@ -414,9 +414,9 @@ def daysBetween(dtStart, dtEnd):
     return days
 
 
-def formatDateTime(dateTime, showWeek=False, format=None):
+def formatDateTime(dateTime, showWeek=False, format=None, locale=None):
     week = ""
-    locale = str(currentLocale())
+    locale = str(locale or currentLocale())
     if showWeek:
         week = "EEEE "
     if not format:

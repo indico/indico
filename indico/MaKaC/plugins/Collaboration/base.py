@@ -118,6 +118,7 @@ class CSBookingManager(Persistent, Observer):
             Otherwise, just those of the type "filterByType" if filterByType is a string,
             or if it is a list of strings, those who have a type included in filterByType.
         """
+
         if not hasattr(self, "_bookingsByType"): #TODO: remove when safe
             self._bookingsByType = {}
 
@@ -955,16 +956,8 @@ class CSBookingBase(Persistent, Fossilizable):
             -_startingParams: the parameters necessary to start the booking.
                               They will be used on the client for the local start action.
                               Needs to be defined by the implementing class, as keys with empty values.
-            -_statusMessage, _statusClass : they represent the status message (and its CSS class) that will be displayed.
-                 The status of a booking can be, for example: "Booking Accepted" (in green), "Booking refused" (in red)
             -_warning: A warning is a plugin-defined object, with information to show to the user when
                        the operation went well but we still have to show some info to the user.
-            -_canBeStarted: If its value is true, the "start" button for the booking will be able to be pushed.
-                            It can be false if, for example:
-                              + The plugin didn't like the booking parameters and doesn't give permission for the booking to be started,
-                              + The booking has already been started, so the "start" button has to be faded in order not to be pressed twice.
-            -_canBeStopped: If its value is true, the "stop" button for the booking will be able to be pushed.
-                            For example, before starting a booking the "stop" button for the booking will be faded.
             -_permissionToStart : Even if the "start" button for a booking is able to be pushed, there may be cases where the booking should
                             not start. For example, if it's not the correct time yet.
                             In that case "permissionToStart" should be set to false so that the booking doesn't start.
@@ -983,18 +976,15 @@ class CSBookingBase(Persistent, Fossilizable):
         self._endDate = None
         self._startDateTimestamp = None
         self._endDateTimestamp = None
-        self._statusMessage = ""
-        self._statusClass = ""
         self._acceptRejectStatus = None #None = not yet accepted / rejected; True = accepted; False = rejected
         self._rejectReason = ""
         self._bookingParams = {}
         self._canBeDeleted = True
-        self._canBeStarted = self._hasStart
-        self._canBeStopped = False
         self._permissionToStart = False
         self._permissionToStop = False
         self._needsToBeNotifiedOfDateChanges = self._canBeNotifiedOfEventDateChanges
         self._hidden = False
+        self._play_status = None
 
         setattr(self, "_" + bookingType + "Options", CollaborationTools.getPlugin(bookingType).getOptions())
         #NOTE:  Should maybe notify the creation of a new booking, specially if it's a single booking
@@ -1150,7 +1140,7 @@ class CSBookingBase(Persistent, Fossilizable):
         if self._startDate == None:
             return ""
         else:
-            return formatDateTime(self.getAdjustedStartDate())
+            return formatDateTime(self.getAdjustedStartDate(), locale='en_US')
 
     def setStartDate(self, startDate):
         """ Sets the start date as an datetime object with timezone information (adjusted to the meeting's timezone)
@@ -1177,6 +1167,14 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return self._endDate
 
+    def isHappeningNow(self):
+        now = nowutc()
+        return self.getStartDate() < now and self.getEndDate() > now
+
+    def hasHappened(self):
+        now = nowutc()
+        return now > self.getEndDate()
+
     def getAdjustedEndDate(self, tz=None):
         """ Returns the booking end date, adjusted to a given timezone.
             If no timezone is provided, the event's timezone is used
@@ -1190,13 +1188,14 @@ class CSBookingBase(Persistent, Fossilizable):
 
     def setEndDateTimestamp(self, endDateTimestamp):
         self._endDateTimestamp = endDateTimestamp
+
     def getEndDateAsString(self):
         """ Returns the start date as a string, expressed in the meeting's timezone
         """
         if self._endDate == None:
             return ""
         else:
-            return formatDateTime(self.getAdjustedEndDate())
+            return formatDateTime(self.getAdjustedEndDate(), locale='en_US')
 
     def setEndDate(self, endDate):
         """ Sets the start date as an datetime object with timezone information (adjusted to the meeting's timezone)
@@ -1222,27 +1221,27 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Returns the status message as a string.
             This attribute will be available in Javascript with the "statusMessage"
         """
-        return _(self._statusMessage)
-
-    def setStatusMessage(self, statusMessage):
-        """ Sets the status message as a string.
-            This attribute will be available in Javascript with the "statusMessage"
-        """
-        self._statusMessage = statusMessage
+        status = self.getPlayStatus()
+        if status == None:
+            if self.isHappeningNow():
+                return _("Ready to start!")
+            elif self.hasHappened():
+                return _("Already took place")
+            else:
+                return _("Booking created")
+        elif status:
+            return _("Conference started")
+        elif not status:
+            return _("Conference stopped")
 
     def getStatusClass(self):
         """ Returns the status message CSS class as a string.
             This attribute will be available in Javascript with the "statusClass"
         """
-        if not hasattr(self, "_statusClass"): #TODO: remove when safe
-            self._statusClass = ""
-        return self._statusClass
-
-    def setStatusClass(self, statusClass):
-        """ Sets the status message CSS class as a string.
-            This attribute will be available in Javascript with the "statusClass"
-        """
-        self._statusClass = statusClass
+        if self.getPlayStatus() == None or self.hasHappened():
+            return "statusMessageOther"
+        else:
+            return "statusMessageOK"
 
     def accept(self, user = None):
         """ Sets this booking as accepted
@@ -1539,9 +1538,10 @@ class CSBookingBase(Persistent, Fossilizable):
             This attribute will be available in Javascript with the "canBeDeleted" attribute
         """
 
-        if not hasattr(self, '_canBeDeleted'):
-            self._canBeDeleted = True
-        return self._canBeDeleted
+        if self.isHappeningNow() or self.hasHappened():
+            return False
+        else:
+            return True
 
     def setCanBeDeleted(self, canBeDeleted):
         """ Sets if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed.
@@ -1553,13 +1553,13 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Returns if this booking can be started, in the sense that the "Start" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeStarted" attribute
         """
-        return self._canBeStarted
+        return self.isHappeningNow()
 
     def canBeStopped(self):
         """ Returns if this booking can be stopped, in the sense that the "Stop" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeStopped" attribute
         """
-        return self._canBeStopped
+        return self.isHappeningNow()
 
     def isPermittedToStart(self):
         """ Returns if this booking is allowed to start, in the sense that it will be started after the "Start" button is pressed.
@@ -1588,7 +1588,7 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Returns if bookings of this type should be able to be notified
             of their owner Event changing start date, end date or timezone.
         """
-        return self._canBeNotifiedOfEventDateChanges
+        return False
 
     def needsToBeNotifiedOfDateChanges(self):
         """ Returns if this booking in particular needs to be notified
@@ -1796,6 +1796,11 @@ class CSBookingBase(Persistent, Fossilizable):
                     """Could not send BookingDeletedNotification for booking with id %s of event with id %s, exception: %s""" %
                     (self.getId(), self._conf.getId(), str(e)))
                 raise
+
+    def getPlayStatus(self):
+        if not hasattr(self, '_play_status'):
+            self._play_status = None
+        return self._play_status
 
 class WCSTemplateBase(wcomponents.WTemplated):
     """ Base class for Collaboration templates.

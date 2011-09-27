@@ -194,8 +194,6 @@ class CSBooking(CSBookingBase): #already Fossilizable
             self._phoneBridgePassword = returnedAttributes.get("phonepass", None)
 
             self.bookingOK()
-            self.checkCanStart()
-
 
 #            if self._bookingParams["sendMailToManagers"]:
 #                try:
@@ -236,7 +234,6 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 self._phoneBridgePassword = returnedAttributes.get("phonepass", None)
 
                 self.bookingOK()
-                self.checkCanStart()
 
 #                if self._bookingParams["sendMailToManagers"]:
 #                    try:
@@ -270,8 +267,20 @@ class CSBooking(CSBookingBase): #already Fossilizable
             A last check on the EVO server is performed.
         """
         self._checkStatus()
-        if self._canBeStarted:
+        if self.canBeStarted():
             self._permissionToStart = True
+
+    def _canBeNotifiedOfEventDateChanges(self):
+        return not self.hasHappened()
+
+    def needsToBeNotifiedOfDateChanges(self):
+        """ Returns if this booking in particular needs to be notified
+            of their owner Event changing start date, end date or timezone.
+        """
+        if self.hasHappened():
+            return False
+        else:
+            return self._needsToBeNotifiedOfDateChanges
 
     def _notifyOnView(self):
         """ This method is called every time that the user sees a booking.
@@ -283,17 +292,11 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
         remainingTime = self.getAdjustedStartDate('UTC') - nowutc()
 
-        checkDone = False
-
         for index, check in enumerate(checksToDo):
             if remainingTime < check and not check in self._checksDone:
                 self._checkStatus()
                 self._checksDone.extend(checksToDo[index:])
-                checkDone = True
                 break
-
-        if not checkDone:
-            self.checkCanStart()
 
     def _checkStatus(self):
         if self._created:
@@ -304,7 +307,6 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 returnedAttributes = parseEVOAnswer(answer)
 
                 self.assignAttributes(returnedAttributes)
-                self.checkCanStart()
 
             except EVOControlledException, e:
                 if e.message == "UNKNOWN_MEETING":
@@ -405,37 +407,11 @@ class CSBooking(CSBookingBase): #already Fossilizable
         self._bookingParams["type"] = attributes["type"]
         self._bookingParams["communityId"] = attributes["com"]
 
-        self.checkCanStart()
-
         if changesFromEVO:
             return ChangesFromEVOError(changesFromEVO)
 
     def bookingOK(self):
-        self._statusMessage = "Booking created"
-        self._statusClass = "statusMessageOK"
         self._created = True
-
-    def checkCanStart(self, changeMessage = True):
-        if self._created:
-            now = nowutc()
-            self._canBeDeleted = True
-            self._canBeNotifiedOfEventDateChanges = CSBooking._canBeNotifiedOfEventDateChanges
-            if self.getStartDate() < now and self.getEndDate() > now:
-                self._canBeStarted = True
-                self._canBeDeleted = False
-                if changeMessage:
-                    self._statusMessage = "Ready to start!"
-                    self._statusClass = "statusMessageOK"
-            else:
-                self._canBeStarted = False
-                if now > self.getEndDate() and changeMessage:
-                    self._canBeDeleted = False
-                    self._statusMessage = "Already took place"
-                    self._statusClass = "statusMessageOther"
-                    self._needsToBeNotifiedOfDateChanges = False
-                    self._canBeNotifiedOfEventDateChanges = False
-                elif changeMessage:
-                    self.bookingOK()
 
     def _sendMail(self, operation):
         """

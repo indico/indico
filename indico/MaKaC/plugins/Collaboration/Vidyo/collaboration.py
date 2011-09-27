@@ -79,6 +79,15 @@ class CSBooking(CSBookingBase):
 
     ## setters and getters for complex params and internal params ##
 
+    def canBeStarted(self):
+        return self._created
+
+    def canBeStopped(self):
+        return False
+
+    def canBeDeleted(self):
+        return True
+
     def getPin(self):
         """ This method returns the PIN that will be displayed in the indico page
         """
@@ -250,21 +259,7 @@ class CSBooking(CSBookingBase):
             We do not do checks if the room was already marked as non present
             or if there are no more checks to do.
         """
-        if self._created:
-            checksToDo = [timedelta(hours = int(hours)) for hours in getVidyoOptionValue("checkTimes")]
-            checksToDo.sort()
-
-            minimumCheckDate = self.getConference().getAdjustedEndDate() + timedelta(days = int(getVidyoOptionValue("maxDaysBeforeClean")))
-            for index, check in enumerate(checksToDo):
-                if nowutc() > minimumCheckDate + check and not check in self.getChecksDone():
-                    try:
-                        self._checkStatus() #will call self.setBookingNotPresent() if room has been removed
-                        self.getChecksDone().extend(checksToDo[index:])
-                        self._p_changed = 1
-                    except Exception:
-                        Logger.get("Vidyo").exception("Calling _checkStatus() during _notifyOnView() for booking %s of conf %s" % (str(self.getId()), str(self.getConference().getId())))
-                    break
-
+        pass
 
 
     def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
@@ -340,6 +335,19 @@ class CSBooking(CSBookingBase):
                 'launchLink' : str(self.getURL()),
                 'launchTooltip': _("Click here to join the Vidyo room!")}
 
+    def getStatusMessage(self):
+        """ Returns the status message as a string.
+            This attribute will be available in Javascript with the "statusMessage"
+        """
+        status = self.getPlayStatus()
+        if not self._created:
+            return _("Room no longer exists")
+        elif status == None:
+                return _("Public room created")
+        elif status:
+            return _("Conference started")
+        elif not status:
+            return _("Conference stopped")
 
     ## end of overriding methods
 
@@ -347,22 +355,14 @@ class CSBooking(CSBookingBase):
         """ Changes some of the booking's attributes when the room has been properly created
         """
         self._created = True
-        self._statusMessage = "Public room created"
-        self._statusClass = "statusMessageOK"
-        self._canBeStarted = True
-
 
     def setBookingNotPresent(self):
         """ Changes some of the booking's attributes when the room is still in the Indico DB
             but not in the remote system any more.
         """
         self._created = False
-        self._statusMessage = "Room no longer exists"
-        self._statusClass = "statusMessageOther"
-        self._canBeStarted = False
         #booking is not present remotely so no need to delete it later
         VidyoTools.getEventEndDateIndex().unindexBooking(self)
-
 
     def _sendNotificationToOldNewOwner(self, oldOwner):
 
@@ -486,8 +486,6 @@ class CSBooking(CSBookingBase):
         cs.setWarning(self.getWarning())
         cs.setStartDate(self.getStartDate())
         cs.setEndDate(self.getEndDate())
-        cs.setStatusMessage(self.getStatusMessage())
-        cs.setStatusClass(self.getStatusClass())
         cs.setCanBeDeleted(self.canBeDeleted())
         cs.setHidden(self.isHidden())
         cs.setPin(self.getPin())

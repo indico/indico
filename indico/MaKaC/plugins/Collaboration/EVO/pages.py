@@ -200,7 +200,6 @@ class ServiceInformation(object):
 
     @classmethod
     def getLaunchInfo(cls, booking, displayTz=None):
-        booking.checkCanStart()
         if (booking.canBeStarted()):
             return {
                 "launchText" : _("Join Now!"),

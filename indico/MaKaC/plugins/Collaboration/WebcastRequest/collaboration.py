@@ -55,6 +55,15 @@ class CSBooking(CSBookingBase):
     def _checkBookingParams(self):
         return False
 
+    def getStatusMessage(self):
+        return self._statusMessage
+
+    def hasHappened(self):
+        return False
+
+    def isHappeningNow(self):
+        return False
+
     def _create(self):
         self._statusMessage = "Request successfully sent"
         self._statusClass = "statusMessageOther"
