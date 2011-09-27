@@ -46,6 +46,7 @@ class APIKey(Persistent):
         self._lastQuery = None
         self._lastUseAuthenticated = False
         self._oldKeys = PersistentList()
+        self._persistentAllowed = False
 
     def getUser(self):
         return self._user
@@ -98,6 +99,12 @@ class APIKey(Persistent):
 
     def getOldKeys(self):
         return self._oldKeys
+
+    def isPersistentAllowed(self):
+        return getattr(self, '_persistentAllowed', False)
+
+    def setPersistentAllowed(self, val):
+        self._persistentAllowed = val
 
     def used(self, ip, path, query, authenticated):
         self._lastUsedDT = datetime.datetime.now()

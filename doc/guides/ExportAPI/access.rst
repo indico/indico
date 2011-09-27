@@ -79,6 +79,11 @@ the generated URL as it is likely to expire soon.
 
 You can find example code for Python and PHP in the following sections.
 
+If persistent signatures are enabled, you can also omit the timestamp.
+In this case the URL is valid forever. When using this feature, please
+make sure to use these URLs only where necessary - use timestamped
+URLs whenever possible.
+
 Request Signing for Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -90,14 +95,15 @@ A simple example in Python::
     import time
 
 
-    def build_indico_request(path, params, api_key=None, secret_key=None, only_public=False):
+    def build_indico_request(path, params, api_key=None, secret_key=None, only_public=False, persistent=False):
         items = params.items() if hasattr(params, 'items') else list(params)
         if api_key:
             items.append(('apikey', api_key))
         if only_public:
             items.append(('onlypublic', 'yes'))
         if secret_key:
-            items.append(('timestamp', str(int(time.time()))))
+            if not persistent:
+                items.append(('timestamp', str(int(time.time()))))
             items = sorted(items, key=lambda x: x[0].lower())
             url = '%s?%s' % (path, urllib.urlencode(items))
             signature = hmac.new(secret_key, url, hashlib.sha1).hexdigest()
@@ -124,7 +130,7 @@ A simple example in PHP::
 
     <?php
 
-    function build_indico_request($path, $params, $api_key = null, $secret_key = null, $only_public = false) {
+    function build_indico_request($path, $params, $api_key = null, $secret_key = null, $only_public = false, $persistent = false) {
         if($api_key) {
             $params['apikey'] = $api_key;
         }
@@ -134,7 +140,9 @@ A simple example in PHP::
         }
 
         if($secret_key) {
-            $params['timestamp'] = time();
+            if(!$persistent) {
+                $params['timestamp'] = time();
+            }
             uksort($params, 'strcasecmp');
             $url = $path . '?' . http_build_query($params);
             $params['signature'] = hash_hmac('sha1', $url, $secret_key);
