@@ -24,9 +24,13 @@ from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
 from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink
+from MaKaC.plugins.Collaboration.pages import WElectronicAgreement
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.conference import ConferenceHolder
+from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 
 
-globalHTTPAPIHooks = ['CollaborationAPIHook']
+globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook']
 
 class CollaborationAPIHook(HTTPAPIHook):
     PREFIX = 'api'
@@ -51,3 +55,44 @@ class CollaborationAPIHook(HTTPAPIHook):
 
         success = createIndicoLink(self._indicoID, self._cdsID)
         return {'success': success}
+
+
+class CollaborationExportHook(HTTPAPIHook):
+    TYPES = ('eAgreements',)
+    RE = r'(?P<confId>\w+)'
+    GUEST_ALLOWED = False
+    VALID_FORMATS = ('json', 'jsonp', 'xml')
+
+    def _hasAccess(self, aw):
+        return RCCollaborationAdmin.hasRights(user=aw.getUser())
+
+    def _getParams(self):
+        super(CollaborationExportHook, self)._getParams()
+        self._conf = ConferenceHolder().getById(self._pathParams['confId'], True)
+        if not self._conf:
+            raise HTTPAPIError('Conference does not exist.', apache.HTTP_BAD_REQUEST)
+
+    def export_eAgreements(self, aw):
+        manager = self._conf.getCSBookingManager()
+        requestType = CollaborationTools.getRequestTypeUserCanManage(self._conf, aw.getUser())
+        contributions = manager.getContributionSpeakerByType(requestType)
+        for cont, speakers in contributions.items():
+            for spk in speakers:
+                sw = manager.getSpeakerWrapperByUniqueId('%s.%s' % (cont, spk.getId()))
+                status = sw.getStatus() if sw else None
+                signed = None
+                if status in (SpeakerStatusEnum.FROMFILE, SpeakerStatusEnum.SIGNED):
+                    signed = True
+                elif status == SpeakerStatusEnum.REFUSED:
+                    signed = False
+                yield {
+                    'type': sw and sw.getRequestType(),
+                    'status': status,
+                    'signed': signed,
+                    'contrib': cont,
+                    'speaker': {
+                        'id': spk.getId(),
+                        'name': spk.getFullName(),
+                        'email': spk.getEmail()
+                    }
+                }
