@@ -4,4 +4,5 @@ User-agent: *
 Disallow: /categoryMap.py
 Disallow: /wcalendar.py
 Disallow: /categOverview.py
+Disallow: /search.py
 Crawl-delay: 10
