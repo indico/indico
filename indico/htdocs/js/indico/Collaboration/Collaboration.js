@@ -177,7 +177,8 @@ type("CSParameterManager", [], {
 
 
 var formatDateStringCS = function(dateString) {
-    return (dateString.substring(0,10) + ' at ' + dateString.substring(11, 16));
+    var dt = dateString.split(' ')
+    return (dt[0] + ' at ' + dt[1]);
 };
 
 var formatDateTimeCS = function(date) {
