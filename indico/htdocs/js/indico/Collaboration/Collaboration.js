@@ -1921,7 +1921,7 @@ var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
             function(result,error) {
                 if (!error) {
                     killProgress();
-                    informationPopup($T("Your choice has been successfully recorded."), redirectionLink);
+                    informationPopup($T("The acceptance of the agreement has been successfully recorded."), redirectionLink);
                 } else {
                     killProgress();
                     IndicoUtil.errorReport(error);
@@ -1960,7 +1960,7 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
                 function(result,error) {
                     if (!error) {
                         killProgress();
-                        informationPopup($T("The rejection of the Electronic Agreement has been sent."), redirectionLink);
+                        informationPopup($T("The rejection of the agreement has been successfully recorded."), redirectionLink);
                     } else {
                         killProgress();
                         IndicoUtil.errorReport(error);
