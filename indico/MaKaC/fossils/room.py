@@ -20,6 +20,7 @@
 
 from MaKaC.common.fossilize import IFossil
 
+# is this used anywhere?!
 class IRoomMapFossil(IFossil):
 
     def id(self):
