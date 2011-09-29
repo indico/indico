@@ -1538,10 +1538,7 @@ class CSBookingBase(Persistent, Fossilizable):
             This attribute will be available in Javascript with the "canBeDeleted" attribute
         """
 
-        if self.isHappeningNow() or self.hasHappened():
-            return False
-        else:
-            return True
+        return self._canBeDeleted
 
     def setCanBeDeleted(self, canBeDeleted):
         """ Sets if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed.

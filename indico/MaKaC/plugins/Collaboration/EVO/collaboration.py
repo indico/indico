@@ -270,6 +270,9 @@ class CSBooking(CSBookingBase): #already Fossilizable
         if self.canBeStarted():
             self._permissionToStart = True
 
+    def _canBeDeleted(self):
+        return not (self.isHappeningNow() or self.hasHappened())
+
     def _canBeNotifiedOfEventDateChanges(self):
         return not self.hasHappened()
 
