@@ -1,21 +1,7 @@
 % if not error:
     <script>
-    function getChoice(){
-        chosen = "";
-        len = document.choiceButton.EAChoice.length;
-        for (i = 0; i<len; i++){
-            if (document.choiceButton.EAChoice[i].checked)
-                chosen = document.choiceButton.EAChoice[i].value;
-        }
-
-        if(chosen == ""){
-            return "None";
-        }else{
-            return chosen;
-        }
-    }
     function signEA(){
-        choice = getChoice();
+        var choice = $('input[name="EAChoice"]:checked').val();
 
         if(choice == "accept"){
             // Update and store info, popup confirmation and redirect to event page.
