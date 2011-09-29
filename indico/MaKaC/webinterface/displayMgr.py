@@ -262,6 +262,10 @@ class Menu(Persistent):
                 newList.append(link.clone(newMenu))
         if len(newList) != 0:
             newMenu._listLink = newList
+
+        # change system links to new event id
+        newMenu.updateSystemLink()
+
         return newMenu
 
     def enable(self):
