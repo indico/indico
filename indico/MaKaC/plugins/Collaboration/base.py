@@ -40,6 +40,9 @@ from MaKaC.plugins.Collaboration import mail
 from MaKaC.common.mail import GenericMailer
 import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
+from indico.modules.scheduler.client import Client
+from indico.modules.scheduler.tasks import HTTPTask
+from indico.util import json
 from indico.util.i18n import gettext_lazy
 from indico.util.date_time import now_utc
 from MaKaC.common.fossilize import Fossilizable, fossilizes
@@ -2052,3 +2055,39 @@ class SpeakerWrapper(Persistent, Fossilizable):
 
     def getLocator(self):
         return self.getContribution().getLocator()
+
+    def triggerNotification(self):
+        if self.getRequestType() in ('recording', 'webcast'):
+            self._triggerNotification(self.getRequestType())
+        elif self.getRequestType() == 'both':
+            self._triggerNotification('recording')
+            self._triggerNotification('webcast')
+
+    def _triggerNotification(self, type):
+        url = None
+        if type == 'recording':
+            url =  CollaborationTools.getOptionValue('RecordingRequest', 'AgreementNotificationURL')
+        elif type == 'webcast':
+            url =  CollaborationTools.getOptionValue('WebcastRequest', 'AgreementNotificationURL')
+        if not url:
+            return
+        signed = None
+        if self.getStatus() in (SpeakerStatusEnum.FROMFILE, SpeakerStatusEnum.SIGNED):
+            signed = True
+        elif self.getStatus() == SpeakerStatusEnum.REFUSED:
+            signed = False
+        spk = self.getObject()
+        payload = {
+            'confId': self.getConference().getId(),
+            'contrib': self.getContId(),
+            'type': type,
+            'status': self.getStatus(),
+            'signed': signed,
+            'speaker': {
+                'id': spk.getId(),
+                'name': spk.getFullName(),
+                'email': spk.getEmail()
+            }
+        }
+        cl = Client()
+        cl.enqueue(HTTPTask(url, {'data': json.dumps(payload)}))

@@ -49,7 +49,7 @@ else:
   </td>
 
   <td class="CRLabstractLeftDataCell" nowrap>
-    <a href="" onclick="new UploadElectronicAgreementPopup('${conf.getId()}','${spkWrapper.getUniqueId()}','${collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(conf)}').open();return false;" id="upload${spkWrapper.getUniqueId()}">Upload</a>
+    <a href="#" onclick="new UploadElectronicAgreementPopup('${conf.getId()}','${spkWrapper.getUniqueId()}','${collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(conf)}').open();return false;" id="upload${spkWrapper.getUniqueId()}">Upload</a>
 
     % if spkWrapper.getLocalFile():
       <a href="${collaborationUrlHandlers.UHCollaborationElectronicAgreementGetFile.getURL(conf, spkWrapper.getUniqueId())}">

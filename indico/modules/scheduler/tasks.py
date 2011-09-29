@@ -21,6 +21,7 @@
 import copy, logging, os, time
 from dateutil import rrule
 from datetime import timedelta
+import urllib
 import zope.interface
 
 # Required by specific tasks
@@ -706,6 +707,20 @@ class RoomReservationStartedTask(RoomReservationTaskBase):
 class RoomReservationFinishedTask(RoomReservationTaskBase):
     which = 'end'
     delay = 10
+
+class HTTPTask(OneShotTask):
+    def __init__(self, url, data=None):
+        super(HTTPTask, self).__init__(base.TimeSource.get().getCurrentTime())
+        self._url = url
+        self._data = data
+
+    def run(self):
+        method = 'POST' if self._data is not None else 'GET'
+        self.getLogger().info('Executing HTTP task: %s %s' % (method, self._url))
+        data = urllib.urlencode(self._data) if self._data is not None else None
+        req = urllib.urlopen(self._url, data)
+        req.close()
+
 
 class SampleOneShotTask(OneShotTask):
     def run(self):

@@ -79,17 +79,19 @@ class CollaborationExportHook(HTTPAPIHook):
         for cont, speakers in contributions.items():
             for spk in speakers:
                 sw = manager.getSpeakerWrapperByUniqueId('%s.%s' % (cont, spk.getId()))
-                status = sw.getStatus() if sw else None
+                if not sw:
+                    continue
                 signed = None
-                if status in (SpeakerStatusEnum.FROMFILE, SpeakerStatusEnum.SIGNED):
+                if sw.getStatus() in (SpeakerStatusEnum.FROMFILE, SpeakerStatusEnum.SIGNED):
                     signed = True
-                elif status == SpeakerStatusEnum.REFUSED:
+                elif sw.getStatus() == SpeakerStatusEnum.REFUSED:
                     signed = False
                 yield {
-                    'type': sw and sw.getRequestType(),
-                    'status': status,
-                    'signed': signed,
+                    'confId': sw.getConference().getId(),
                     'contrib': cont,
+                    'type': sw.getRequestType(),
+                    'status': sw.getStatus(),
+                    'signed': signed,
                     'speaker': {
                         'id': spk.getId(),
                         'name': spk.getFullName(),
