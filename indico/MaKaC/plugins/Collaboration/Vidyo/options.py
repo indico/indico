@@ -114,11 +114,6 @@ globalOptions = [
                        "editable": True,
                        "defaultValue": 500 }),
 
-    ('checkTimes', {"description": _("""Times after room should have deleted (for being "old") that we will check if it exists in Vidyo when an user sees it (in hours)"""),
-                       "type": list,
-                       "editable": True,
-                       "defaultValue": [0,12,24,48,96,168,720,1440] }),
-
     ('phoneNumbers', {"description": _("""VidyoVoice Phone Numbers"""),
                        "type": "list_multiline",
                        "editable": True,
