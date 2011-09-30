@@ -1203,7 +1203,7 @@ class TextIndex(IntStringMappedIndex):
     def unindex(self, entryId):
         intId = self.getInteger(entryId)
 
-        if intId:
+        if intId != None:
             self.removeString(entryId)
             self._textIdx.unindex_doc(intId)
         else:
