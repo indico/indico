@@ -57,7 +57,6 @@ class RHCategModifBase( RHModificationBaseProtected ):
         self._target = l.getObject()
         if self._target == None:
             raise NoReportError(_("The specified category with id \"%s\" does not exist or has been deleted")%params["categId"])
-        self._getSession().setVar("currentCategoryId", self._target.getId())
 
 
 class RHCategoryModification( RHCategModifBase ):

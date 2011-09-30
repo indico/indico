@@ -33,7 +33,6 @@ from MaKaC.common.logger import Logger
 class PSession( base.Session, Persistent ):
     """
     Keys which are already used in the data dictionary of each session:
-        - currentCategoryId: it is used for knowing which is the category that contains the current conference.
         - menuStatus: it is used for knowing if the conference display menu is closed or opened.
         - accessKeys: contains all the access keys entered by the user in this session
         - modifKeys: contains all the modification keys entered by the user in this session
