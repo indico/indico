@@ -94,7 +94,7 @@ def getCommonTalkInformation(conference):
     for t in talks:
         location = t.getLocation()
         room = t.getRoom()
-        if location and room and (location.getName() + ":" + room.getName() in recordingCapableRooms):
+        if location and room and (location.getName() + ":" + room.getName() in rRoomNames):
             recordingAbleTalks.append(t)
 
     return (talks, rRoomFullNames, rRoomNames, recordingAbleTalks)

@@ -256,15 +256,11 @@ type("WatchOrderedDict", ["WatchObject"],
          var self = this;
 
          this.each = function(iterator) {
-
-             // follow the order
-
-             var self = this;
-             each(this.order,
-                  function (key) {
-                      iterator(self.get(key), key);
-                  });
-         };
+             self.order.each(function(val, i){
+                 return iterator(self.get(val), val);
+             });
+             return iterator.result;
+         }
 
          this.set = function(key, value) {
              this.order.add(key);

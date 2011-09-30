@@ -57,7 +57,7 @@ class ConfDisplayMgrRegistery:
         """
         self._getDisplayMgrRegistery()[ conference.getId() ] = dispMgr
 
-    def getDisplayMgr( self, conference, update=True ):
+    def getDisplayMgr( self, conference, update=False ):
         """Gives back the webfactory associated with a given conference or None
             if no association exists
         """
@@ -262,6 +262,10 @@ class Menu(Persistent):
                 newList.append(link.clone(newMenu))
         if len(newList) != 0:
             newMenu._listLink = newList
+
+        # change system links to new event id
+        newMenu.updateSystemLink()
+
         return newMenu
 
     def enable(self):

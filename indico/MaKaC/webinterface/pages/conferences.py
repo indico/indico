@@ -108,10 +108,6 @@ class WPConferenceBase( base.WPDecorated ):
             else:
                 dates=" (%s - %s)"%(sDate.strftime("%d %B %Y"), eDate.strftime("%d %B %Y"))
         self._setTitle( "%s %s"%(strip_ml_tags(self._conf.getTitle()), dates ))
-        self._parentCateg = None
-        categId = rh._getSession().getVar("currentCategoryId")
-        if categId != None:
-            self._parentCateg = self._conf.getOwnerById(categId)
 
     def _getFooter( self ):
         """
@@ -1033,10 +1029,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
     def __init__( self, rh, conference, view, type, params ):
         WPXSLConferenceDisplay.__init__( self, rh, conference, view, type, params )
-        self._parentCateg = None
-        categId = rh._getSession().getVar("currentCategoryId")
-        if categId != None:
-            self._parentCateg = self._conf.getOwnerById(categId)
 
     def _getVariables(self, conf):
         vars = {}
@@ -1529,10 +1521,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
     def __init__( self, rh, conference ):
         main.WPMainBase.__init__( self, rh )
         self._navigationTarget = self._conf = conference
-        self._parentCateg = None
-        categId = rh._getSession().getVar("currentCategoryId")
-        if categId != None:
-            self._parentCateg = self._conf.getOwnerById(categId)
 
     def getJSFiles(self):
         return main.WPMainBase.getJSFiles(self) + \
@@ -9259,10 +9247,6 @@ class WPXSLMeetingStaticDisplay( WPStaticMeetingBase ):
         self._params["showSession"] = "all"
         self._params["detailLevel"] = "contribution"
         self._conf = self._target=target
-        self._parentCateg = None
-        categId = rh._getSession().getVar("currentCategoryId")
-        if categId != None:
-            self._parentCateg = self._conf.getOwnerById(categId)
         self._staticPars = staticPars
 
     def _getBody( self, params ):

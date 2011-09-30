@@ -126,7 +126,6 @@ class XMLGenerator(object):
 
     @classmethod
     def getCustomBookingXML(cls, booking, displayTz, out):
-        booking.checkCanStart()
         if (booking.canBeStarted()):
             out.openTag("launchInfo")
             out.writeTag("launchText", _("Join Now!"))
@@ -200,7 +199,6 @@ class ServiceInformation(object):
 
     @classmethod
     def getLaunchInfo(cls, booking, displayTz=None):
-        booking.checkCanStart()
         if (booking.canBeStarted()):
             return {
                 "launchText" : _("Join Now!"),

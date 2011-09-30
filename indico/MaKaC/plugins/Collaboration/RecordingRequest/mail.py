@@ -97,30 +97,6 @@ Request details:<br />
         </td>
     </tr>
     <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Recording purpose(s):</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Intended audience(s):</strong>
-        </td>
-        <td style="vertical-align: top; white-space : nowrap;">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Subject matter(s):</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
         <td colspan="2">
             <strong>Additional comments:</strong><br />
             %s
@@ -142,9 +118,6 @@ Request details:<br />
        dict(postingUrgency)[bp['postingUrgency']],
        str(bp['numRemoteViewers']),
        str(bp['numAttendees']),
-       self._getPurposes(),
-       self._getAudiences(),
-       self._getMatters(),
        self._getComments(),
        self._getTalks())
 

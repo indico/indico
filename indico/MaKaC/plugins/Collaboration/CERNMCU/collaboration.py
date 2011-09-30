@@ -90,6 +90,18 @@ class CSBooking(CSBookingBase): #already Fossilizable
         self._created = False
         self._creationTriesCounter = 0
 
+    def canBeStarted(self):
+        if self.isHappeningNow():
+            return self._numberOfDisconnectedParticipants > 0
+        else:
+            return False
+
+    def canBeStopped(self):
+        if self.isHappeningNow():
+            return self._numberOfConnectedParticipants > 0
+        else:
+            return False
+
     def getMCUStartTime(self):
         return MCUTime(self.getAdjustedStartDate(getCERNMCUOptionValueByName("MCUTZ")))
 
@@ -192,13 +204,30 @@ class CSBooking(CSBookingBase): #already Fossilizable
         self._p_changed = 1
 
     def updateNumberOfConnectedParticipants(self):
-        self._numberOfConnectedParticipants = 0
-        self._numberOfDisconnectedParticipants = 0
+        connected, disconnected = 0, 0
         for participant in self.getParticipantList():
             if participant.getCallState() == "connected":
-                self._numberOfConnectedParticipants = self._numberOfConnectedParticipants + 1
+                connected += 1
             else:
-                self._numberOfDisconnectedParticipants = self._numberOfDisconnectedParticipants + 1
+                disconnected += 1
+
+        # we do these checks since we don't want to write in the DB
+        # unless we are sure the values changed
+        # (avoids DB writes in display pages)
+
+        if connected != self._numberOfConnectedParticipants:
+            self._numberOfConnectedParticipants = connected
+
+        if disconnected != self._numberOfDisconnectedParticipants:
+            self._numberOfDisconnectedParticipants = disconnected
+
+            if self._numberOfConnectedParticipants == 0:
+                if self._numberOfDisconnectedParticipants == 0:
+                    self._play_status = None
+                else:
+                    self._play_status = False
+            else:
+                self._play_status = True
 
     ## overriding methods
     def _getTitle(self):
@@ -305,12 +334,11 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 if not result is True:
                     return result
 
-            self._statusMessage = "Booking created"
-            self._statusClass = "statusMessageOK"
             self._bookingParams["id"] = numericId
             self._oldName = self._bookingParams["name"]
             self._created = True
-            self.checkCanStart()
+
+            self.updateNumberOfConnectedParticipants()
 
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, calling conference.create. Got error: %s""" % (self._conf.getId(), str(e)))
@@ -420,7 +448,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                             return result
 
                 self._created = True
-                self.checkCanStart()
+                self.updateNumberOfConnectedParticipants()
 
             except Fault, e:
                 Logger.get('CERNMCU').warning("""Evt:%s, booking:%s, calling conference.modify. Got error: %s""" % (self._conf.getId(), self.getId(), str(e)))
@@ -432,15 +460,14 @@ class CSBooking(CSBookingBase): #already Fossilizable
         else: #not yet created because of errors: try to recreate
             self._create()
 
-
     def _start(self):
         self._checkStatus()
-        if self._canBeStarted:
+        if self.canBeStarted():
             for p in self.getParticipantList(returnSorted = True):
                 self._connectParticipant(p)
 
-            self._statusMessage = "Conference started!"
-            self.checkCanStart(changeMessage = False)
+            # True = started
+        self.updateNumberOfConnectedParticipants()
 
     def _connectParticipant(self, participant):
         """
@@ -450,6 +477,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
         """
 
         try:
+            self.updateNumberOfConnectedParticipants()
             mcu = MCU.getInstance()
             if (participant.getCallState() == "disconnected" or participant.getCallState() == "dormant") and participant.getParticipantType() != "ad_hoc":
                 params = MCUParams(conferenceName = self._bookingParams["name"],
@@ -461,6 +489,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.connect. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 
                 participant.setCallState("connected")
+                self.updateNumberOfConnectedParticipants()
 
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, booking:%s, calling participant.connect. Got error: %s""" % (self._conf.getId(), self.getId(), str(e)))
@@ -473,23 +502,24 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
     def startSingleParticipant(self, participant):
         self._checkStatus()
-        if self._canBeStarted:
+        if self.canBeStarted():
             result = self._connectParticipant(participant)
-            self.checkCanStart(changeMessage = False)
             return result
+        self.updateNumberOfConnectedParticipants()
 
     def _stop(self):
         self._checkStatus()
-        if self._canBeStopped:
+        if self.canBeStopped():
             for p in self.getParticipantList(returnSorted = True):
                 self._disconnectParticipant(p)
 
-            self.checkCanStart()
-            self._statusMessage = "Conference stopped"
-            self._statusClass = "statusMessageOther"
+            # False = stopped
+
+        self.updateNumberOfConnectedParticipants()
 
     def _disconnectParticipant(self, participant):
         try:
+            self.updateNumberOfConnectedParticipants()
             mcu = MCU.getInstance()
 
             if participant.getCallState() == "connected":
@@ -509,6 +539,8 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 # not a local...
                 del self._participants[participant.getId()]
 
+            self.updateNumberOfConnectedParticipants()
+
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, booking:%s, calling participant.disconnect. Got error: %s""" % (self._conf.getId(), self.getId(), str(e)))
             fault = self.handleFault('stop', e)
@@ -520,19 +552,18 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
     def stopSingleParticipant(self, participant):
         self._checkStatus()
-        if self._canBeStopped:
+        if self.canBeStopped():
             result = self._disconnectParticipant(participant)
-            self.checkCanStart(changeMessage = False)
             return result
 
     def _notifyOnView(self):
-        self.checkCanStart()
+        pass
 
     def _checkStatus(self):
         if self._created:
+            self.updateNumberOfConnectedParticipants()
             self.queryConference()
             self._cleanupAdHocParticipants()
-            self.checkCanStart()
 
     def _delete(self):
         if self._created:
@@ -577,12 +608,9 @@ class CSBooking(CSBookingBase): #already Fossilizable
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.add. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 
 
-            self.checkCanStart()
             if self._numberOfConnectedParticipants > 0:
                 #we have to connect the new participant
                 self._connectParticipant(participant)
-                self.checkCanStart(changeMessage = False)
-
 
             return True
 
@@ -660,26 +688,6 @@ class CSBooking(CSBookingBase): #already Fossilizable
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, calling participant.remove. Got error: %s""" % (self._conf.getId(), str(e)))
             return self.handleFault('remove', e)
-
-    def checkCanStart(self, changeMessage = True):
-        if self._created:
-            now = nowutc()
-            self._canBeNotifiedOfEventDateChanges = CSBooking._canBeNotifiedOfEventDateChanges
-            self.updateNumberOfConnectedParticipants()
-            if self.getStartDate() < now and self.getEndDate() > now:
-                self._canBeStarted = self._numberOfDisconnectedParticipants > 0
-                self._canBeStopped = self._numberOfConnectedParticipants > 0
-                if changeMessage:
-                    self._statusMessage = "Ready to start!"
-                    self._statusClass = "statusMessageOK"
-            else:
-                self._canBeStarted = False
-                self._canBeStopped = False
-                if now > self.getEndDate() and changeMessage:
-                    self._statusMessage = "Already took place"
-                    self._statusClass = "statusMessageOther"
-                    self._needsToBeNotifiedOfDateChanges = False
-                    self._canBeNotifiedOfEventDateChanges = False
 
     def _cleanupAdHocParticipants(self):
         """

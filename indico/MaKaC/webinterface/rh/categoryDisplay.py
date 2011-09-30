@@ -68,8 +68,6 @@ class RHCategDisplayBase( base.RHDisplayBaseProtected ):
         # throw an error if the category was not found
         if mustExist and self._target == None:
             raise NoReportError(_("The specified category with id \"%s\" does not exist or has been deleted")%params["categId"])
-        if self._target:
-            self._getSession().setVar("currentCategoryId", self._target.getId())
 
 
 class RHCategoryDisplay( RHCategDisplayBase ):

@@ -47,7 +47,7 @@
         this.italic = false;
         this.textAlign = "Center";
         this.color = "black";
-        this.fontSize = "25pt";
+        this.fontSize = "medium";
         this.width = 400;
         this.text = "(Type your text)" // Only for fixed text items
 

@@ -72,7 +72,7 @@ class WPLinkModifBase( WPLinkBase ):
         if self._conf is None:
             target = self._file.getCategory()
         else:
-            target = self._parentCateg
+            target = self._conf.getOwner()
 
         pars = {"target": target, "isModif": True}
         return wcomponents.WNavigationDrawer( pars )

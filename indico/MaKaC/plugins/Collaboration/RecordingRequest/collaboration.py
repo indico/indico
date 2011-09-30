@@ -55,6 +55,15 @@ class CSBooking(CSBookingBase):
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
 
+    def getStatusMessage(self):
+        return self._statusMessage
+
+    def hasHappened(self):
+        return False
+
+    def isHappeningNow(self):
+        return False
+
     def _checkBookingParams(self):
 
         if self._bookingParams["lectureStyle"] == 'chooseOne': #change when list of community names is ok

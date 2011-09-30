@@ -138,7 +138,7 @@
         if (booking.error && booking.errorMessage) {
             return '<span class="collaborationWarning">' + booking.errorMessage + '<\/span>'
         } else {
-            return booking.bookingParams.startDate.substring(11) + " to " + booking.bookingParams.endDate.substring(11) + " for " + booking.bookingParams.communityName;
+            return booking.bookingParams.startDate.split(' ')[1] + " to " + booking.bookingParams.endDate.split(' ')[1] + " for " + booking.bookingParams.communityName;
         }
     },
 

@@ -2918,7 +2918,7 @@ class RegistrantsListToBadgesPDF:
             style = ParagraphStyle({})
             style.alignment = RegistrantsListToBadgesPDF.__alignments[item.getTextAlign()]
             style.textColor = RegistrantsListToBadgesPDF.__colors[item.getColor()]
-            style.fontSize = RegistrantsListToBadgesPDF.__fontSizes[item.getFontSize()]
+            style.fontSize = RegistrantsListToBadgesPDF.__fontSizes.get(item.getFontSize(), 25)
             style.leading = style.fontSize
 
             if item.isBold() and item.isItalic():
