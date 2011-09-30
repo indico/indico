@@ -472,14 +472,12 @@ class MaterialFactoryRegistry:
         # NOTE: This method is a bit alien. It's just here because
         # we couldn't find a better place
 
-        matDict = dict((title.lower(), title) for title in cls.getAllowed(target))
+        matDict = dict((title.lower(), title.title()) for title in cls.getAllowed(target))
 
-        for material in target.getMaterialList():
-            title = material.getTitle().lower()
-            matDict[title] = material.getId()
+        for material in target.getAllMaterialList():
+            matDict[material.getId()] = material.getTitle()
 
-        return sorted(list((matId, title.title())
-                 for title, matId in matDict.iteritems()))
+        return sorted(matDict.iteritems(), key=lambda x: x[1])
 
 
 
