@@ -5155,16 +5155,6 @@ class WAbstracts( wcomponents.WTemplated ):
 
         return "<tr><td colspan=4 style='padding: 5px 0px 10px;' nowrap>Select: <a style='color: #0B63A5;' alt='Select all' onclick='javascript:selectAll()'> All</a>, <a style='color: #0B63A5;' alt='Unselect all' onclick='javascript:deselectAll()'>None</a></td></tr><tr><td></td></tr><tr>%s</tr>"%("\n".join(l))
 
-    def _getOpenMenuURL(self):
-        url = urlHandlers.UHConfAbstractManagmentOpenMenu.getURL(self._conf)
-        url.addParam("currentURL", self._getURL())
-        return url
-
-    def _getCloseMenuURL(self):
-        url = urlHandlers.UHConfAbstractManagmentCloseMenu.getURL(self._conf)
-        url.addParam("currentURL", self._getURL())
-        return url
-
     def _getFilterMenu(self):
 
         options = [

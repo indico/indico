@@ -951,30 +951,6 @@ class RHContributionListToPDF(RHConferenceBaseDisplay):
         return data
 
 
-class RHConferenceMenuClose(RHConferenceBaseDisplay):
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        websession = self._getSession()
-        websession.setVar("menuStatus", "close")
-        self._redirect(self._currentURL)
-
-
-class RHConferenceMenuOpen(RHConferenceBaseDisplay):
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        websession = self._getSession()
-        websession.setVar("menuStatus", "open")
-        self._redirect(self._currentURL)
-
-
 class RHAbstractBook(RHConferenceBaseDisplay):
     _uh=urlHandlers.UHConfAbstractBook
 
