@@ -408,9 +408,9 @@ class SessionManager:
             # Session has no useful info -- forget it.  If it previously
             # had useful information and no longer does, we have to
             # explicitly forget it.
-            if self.has_session(session.id):
-                del self[session.id]
-                self.revoke_session_cookie(request)
+            #if self.has_session(session.id):
+            #    del self[session.id]
+            #    self.revoke_session_cookie(request)
             return
         if not self.has_session(session.id):
             # This is the first time this session has had useful

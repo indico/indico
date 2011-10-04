@@ -25,9 +25,6 @@ from MaKaC.webinterface.rh import conferenceDisplay
 def index( req, **params ):
     return conferenceModif.RHConfModifSchedule( req ).process( params )
 
-def graphic( req, **params ):
-    return conferenceModif.RHConfModifScheduleGraphic( req ).process( params )
-
 def entries( req, **params ):
     return conferenceModif.RHConfModifScheduleEntries( req ).process( params )
 
