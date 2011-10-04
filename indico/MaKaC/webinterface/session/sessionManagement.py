@@ -112,6 +112,7 @@ class PSession( base.Session, Persistent ):
 
     def setLang(self, lang):
         self._lang = lang
+        self._v_modified = True
 
     def _p_resolveConflict(self, oldState, savedState, newState):
         """
