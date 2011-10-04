@@ -236,18 +236,14 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         self._myTracksOpt=self._sectionMenu.getLinkByName("mytracks")
         lt=self._conf.getCoordinatedTracks(awUser)
         self._myTracksOpt.setVisible(len(lt)>0)
-        if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
+        if not self._conf.getAbstractMgr().isActive():
             self._myTracksOpt.setVisible(False)
         self._myContribsOpt=self._sectionMenu.getLinkByName("mycontribs")
         lc=self._conf.getContribsForSubmitter(awUser)
         self._myContribsOpt.setVisible(len(lc)>0)
-        self._trackMgtOpt.setVisible(False)
-        tracks = self._conf.getCoordinatedTracks( awUser )
-
-        if tracks:
-            self._trackMgtOpt.setVisible(True)
-            if not self._conf.getAbstractMgr().isActive():
-                self._trackMgtOpt.setVisible(False)
+        self._trackMgtOpt.setVisible(len(lt)>0)
+        if not self._conf.getAbstractMgr().isActive():
+            self._trackMgtOpt.setVisible(False)
 
         #paper reviewing related
         self._paperReviewingOpt = self._sectionMenu.getLinkByName("paperreviewing")
