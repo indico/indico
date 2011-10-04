@@ -223,8 +223,12 @@ class fetchdeps_indico(fetchdeps, Command):
 
 class develop_indico(Command):
     description = "prepares the current directory for Indico development"
-    user_options = []
+    user_options = [('www-uid=', None, "Set user for cache/log/db (typically apache user)"),
+                    ('www-gid=', None, "Set group for cache/log/db (typically apache group)")]
     boolean_options = []
+
+    www_uid = None
+    www_gid = None
 
     def initialize_options(self):
         pass
@@ -281,7 +285,7 @@ Please specify the directory where you'd like it to be placed.
 
         if sys.platform == "linux2":
             # find the apache user/group
-            user, group = _findApacheUserGroup(None, None)
+            user, group = _findApacheUserGroup(self.www_uid, self.www_gid)
             _checkDirPermissions(directories, dbInstalledBySetupPy = directories['db'], accessuser = user, accessgroup = group)
 
         _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath, 'etc'), directories['tmp'], user)
