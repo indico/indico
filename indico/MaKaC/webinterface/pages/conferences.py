@@ -231,19 +231,11 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         self._myStuffOpt=self._sectionMenu.getLinkByName("mystuff")
         self._myStuffOpt.setVisible(awUser is not None)
         self._mySessionsOpt=self._sectionMenu.getLinkByName("mysessions")
-        from sets import Set
-        ls = Set(self._conf.getCoordinatedSessions(awUser))
-        ls = list(ls | Set(self._conf.getManagedSession(awUser)))
+        ls = set(self._conf.getCoordinatedSessions(awUser)) | set(self._conf.getManagedSession(awUser))
         self._mySessionsOpt.setVisible(len(ls)>0)
-        if len(ls)==1:
-            self._mySessionsOpt.setCaption( _("My session"))
-            self._mySessionsOpt.setURL(urlHandlers.UHSessionModification.getURL(ls[0]))
         self._myTracksOpt=self._sectionMenu.getLinkByName("mytracks")
         lt=self._conf.getCoordinatedTracks(awUser)
         self._myTracksOpt.setVisible(len(lt)>0)
-        if len(lt)==1:
-            self._myTracksOpt.setCaption( _("My track"))
-            self._myTracksOpt.setURL(urlHandlers.UHTrackModifAbstracts.getURL(lt[0]))
         if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             self._myTracksOpt.setVisible(False)
         self._myContribsOpt=self._sectionMenu.getLinkByName("mycontribs")
@@ -252,26 +244,13 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         self._trackMgtOpt.setVisible(False)
         tracks = self._conf.getCoordinatedTracks( awUser )
 
-
-
         if tracks:
-            if len(tracks)>1:
-                self._trackMgtOpt.setCaption( _("Manage my tracks"))
-                url = urlHandlers.UHConferenceProgram.getURL( self._conf )
-            else:
-                self._trackMgtOpt.setCaption( _("Manage my track"))
-                url = urlHandlers.UHTrackModifAbstracts.getURL( tracks[0] )
-            self._trackMgtOpt.setURL(str(url))
             self._trackMgtOpt.setVisible(True)
-            if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
+            if not self._conf.getAbstractMgr().isActive():
                 self._trackMgtOpt.setVisible(False)
-
 
         #paper reviewing related
         self._paperReviewingOpt = self._sectionMenu.getLinkByName("paperreviewing")
-        self._paperReviewingOpt.setURL(urlHandlers.UHPaperReviewingDisplay.getURL(self._conf))
-        self._paperReviewingOpt.setCaption( _("Paper Reviewing"))
-
         self._paperReviewingMgtOpt=self._sectionMenu.getLinkByName("managepaperreviewing")
         self._paperReviewingMgtOpt.setVisible(False)
 
@@ -287,12 +266,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         self._judgeeditorListOpt.setVisible(False)
 
         self._uploadPaperOpt = self._sectionMenu.getLinkByName("uploadpaper")
-        self._uploadPaperOpt.setURL(urlHandlers.UHUploadPaper.getURL(self._conf))
-        self._uploadPaperOpt.setCaption( _("Upload paper"))
-
         self._downloadTemplateOpt = self._sectionMenu.getLinkByName("downloadtemplate")
-        self._downloadTemplateOpt.setURL(urlHandlers.UHDownloadPRTemplate.getURL(self._conf))
-        self._downloadTemplateOpt.setCaption( _("Download Template"))
 
         if self._conf.getConfPaperReview().hasReviewing():
             self._paperReviewingOpt.setVisible(True)
@@ -8266,7 +8240,7 @@ class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
 
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._myStuffOpt)
+        self._sectionMenu.setCurrentItem(self._myTracksOpt)
 
 class WConfMyStuff(wcomponents.WTemplated):
 

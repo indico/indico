@@ -888,8 +888,13 @@ class RHConfMyStuffMySessions(RHConferenceBaseDisplay,base.RHProtected):
         base.RHProtected._checkProtection(self)
 
     def _process(self):
-        p=conferences.WPConfMyStuffMySessions(self,self._target)
-        return p.display()
+        ls = set(self._conf.getCoordinatedSessions(self._aw.getUser())) | \
+             set(self._conf.getManagedSession(self._aw.getUser()))
+        if len(ls) == 1:
+            self._redirect(urlHandlers.UHSessionModification.getURL(ls.pop()))
+        else:
+            p = conferences.WPConfMyStuffMySessions(self, self._target)
+            return p.display()
 
 class RHConfMyStuffMyContributions(RHConferenceBaseDisplay,base.RHProtected):
     _uh=urlHandlers.UHConfMyStuffMyContributions
@@ -908,8 +913,13 @@ class RHConfMyStuffMyTracks(RHConferenceBaseDisplay,base.RHProtected):
         base.RHProtected._checkProtection(self)
 
     def _process(self):
-        p=conferences.WPConfMyStuffMyTracks(self,self._target)
-        return p.display()
+        ltracks = self._target.getCoordinatedTracks(self._aw.getUser())
+
+        if len(ltracks) == 1:
+            self._redirect(urlHandlers.UHTrackModifAbstracts.getURL(ltracks[0]))
+        else:
+            p = conferences.WPConfMyStuffMyTracks(self, self._target)
+            return p.display()
 
 
 class RHContribsActions:
