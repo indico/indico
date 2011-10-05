@@ -90,7 +90,7 @@ var Indico = {
         ${ simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) }
     ,
     Urls: {
-        JsonRpcService: "${ urlHandlers.UHJsonRpcService.getURL() }",
+        JsonRpcService: window.location.protocol == "https:"?"${ urlHandlers.UHJsonRpcService.getURL(secure=True) }":"${ urlHandlers.UHJsonRpcService.getURL() }",
 
         ImagesBase: "${ Config.getInstance().getImagesBaseURL() }",
         SecureImagesBase: "${ Config.getInstance().getImagesBaseSecureURL() }",

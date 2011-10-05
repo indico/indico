@@ -138,59 +138,59 @@ div.RMLOSelected {
 }
 
 div.RMcolumnStatusNone {
-    width: 40px;
-    height: 23px;
+    width: 48px;
+    height: 28px;
     text-align: center;
 }
 
 div.RMcolumnStatusAgreedDone{
-    width: 40px;
-    height: 23px;
+    width: 48px;
+    height: 28px;
     text-align: center;
-    background-image: url(./images/RecordingManagerAgreedCheck.png);
+    background-image: url(/images/RecordingManagerAgreedCheck.png);
 }
 
 div.RMcolumnStatusAgreedNotDone{
-    width: 40px;
-    height: 23px;
+    width: 48px;
+    height: 28px;
     text-align: center;
-    background-image: url(./images/RecordingManagerAgreedNotCheck.png);
+    background-image: url(/images/RecordingManagerAgreedNotCheck.png);
 }
 
 div.RMcolumnStatusMicalaDone {
-    width: 40px;
-    height: 23px;
+    width: 48px;
+    height: 28px;
     text-align: center;
-    background-image: url(./images/RecordingManagerMicalaCheck.png);
+    background-image: url(/images/RecordingManagerMicalaCheck.png);
 }
 
 div.RMcolumnStatusCDSPending {
-    width: 40px;
-    height: 23px;
+    width: 48px;
+    height: 28px;
     text-align: center;
-    background-image: url(./images/RecordingManagerCDSPending.png);
+    background-image: url(/images/RecordingManagerCDSPending.png);
 }
 
 div.RMcolumnStatusCDSDone {
-    width: 40px;
-    height: 23px;
+    width: 48px;
+    height: 28px;
     text-align: center;
-    background-image: url(./images/RecordingManagerCDSCheck.png);
+    background-image: url(/images/RecordingManagerCDSCheck.png);
 }
 
 div.RMcolumnStatusCDSDoneHover {
-    width: 40px;
-    height: 23px;
+    width: 48px;
+    height: 28px;
     text-align: center;
     cursor: pointer;
-    background-image: url(./images/RecordingManagerCDSHover.png);
+    background-image: url(/images/RecordingManagerCDSHover.png);
 }
 
 div.RMcolumnStatusIndicoDone {
-    width: 40px;
-    height: 23px;
+    width: 48px;
+    height: 28px;
     text-align: center;
-    background-image: url(./images/RecordingManagerIndicoCheck.png);
+    background-image: url(/images/RecordingManagerIndicoCheck.png);
 }
 
 div.RMlowerPane {

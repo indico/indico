@@ -1699,11 +1699,12 @@ class CheckboxInput(FieldInputType):
             quantity = item.getQuantity()
         if ( registrant is not None and billable and registrant.getPayed()) or (not self.getParent().hasAvailablePlaces() and not quantity):
             disable="disabled=\"disabled\""
-            #pass
         if v=="yes":
             checked="checked=\"checked\""
-
-        tmp = """<input type="checkbox" id="%s" name="%s" %s %s> %s""" % (htmlName, htmlName, checked, disable, caption)
+        pm = ''
+        if self._parent.isMandatory():
+            pm = """<script>addParam($E('%s'), 'checkBox', false);</script>""" % htmlName
+        tmp = """<input type="checkbox" id="%s" name="%s" %s %s> %s%s""" % (htmlName, htmlName, checked, disable, caption, pm)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s """%(tmp, price, currency)
@@ -1723,6 +1724,8 @@ class CheckboxInput(FieldInputType):
         if params.has_key(self.getHTMLName()):
             item.setValue("yes")
             item.setQuantity(1)
+        elif not override and self.getParent().isMandatory():
+            raise FormValuesError(_('The checkbox "%s" is mandatory. Please enable it.') % self.getParent().getCaption())
         else:
             item.setValue("no")
             item.setQuantity(0)

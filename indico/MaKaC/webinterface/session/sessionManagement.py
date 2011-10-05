@@ -45,13 +45,22 @@ class PSession( base.Session, Persistent ):
         self.datadict = PersistentMapping()
         base.Session.__init__(self, request, id)
         self._lang = minfo.getLang()
-        self.setVar("ActiveTimezone","LOCAL")
+        self.datadict["ActiveTimezone"] = "LOCAL"
+
+    def has_info (self):
+        """has_info() -> boolean
+
+        Return true if this session contains any information that must
+        be saved.
+        """
+        # This flag will indicate when to commit a session
+        return getattr(self, '_v_modified', False)
 
     def setUser( self, newUser ):
         if newUser:
             self._lang = newUser.getLang()
         self.user = newUser
-        #get_transaction().commit()
+        self._v_modified = True
 
     def getUser( self ):
         return self.user
@@ -65,6 +74,7 @@ class PSession( base.Session, Persistent ):
         except AttributeError:
             self.datadict = PersistentMapping()
             self.datadict[key] = value
+        self._v_modified = True
 
     def getVar(self, key):
         try:
@@ -84,6 +94,7 @@ class PSession( base.Session, Persistent ):
             return None
         if self.datadict.has_key(key):
             del self.datadict[key]
+            self._v_modified = True
 
     def getLang(self):
         try:
@@ -101,6 +112,7 @@ class PSession( base.Session, Persistent ):
 
     def setLang(self, lang):
         self._lang = lang
+        self._v_modified = True
 
     def _p_resolveConflict(self, oldState, savedState, newState):
         """

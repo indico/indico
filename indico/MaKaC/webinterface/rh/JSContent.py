@@ -29,7 +29,14 @@ class RHTemplateContentJS(base.RH):
         """
         return hashlib.md5(str(value)).hexdigest()
 
-    def _checkParams( self, params ):
+    def _setHeaders(self):
+        # send out the Etag and Last-Modified headers
+        creationTime = datetime.datetime.fromtimestamp(os.path.getctime(self._htmlPath))
+        self._req.headers_out["Etag"] = self._generateEtag(creationTime)
+        self._req.headers_out["Last-Modified"] = formatdate(time.mktime(creationTime.timetuple()))
+        self._req.content_type = "application/x-javascript"
+
+    def process( self, params ):
 
         # Check incoming headers
         self._etag = self._req.headers_in.get("If-None-Match", None)
@@ -50,48 +57,40 @@ class RHTemplateContentJS(base.RH):
         # if the file has already been generated
         if os.access(self._htmlPath, os.R_OK):
 
-            self._regenerate = False;
-
             # get the OS creation time
             creationTime = datetime.datetime.fromtimestamp(os.path.getctime(self._htmlPath))
             if not self._needsRefresh(creationTime):
                 # if the etag the same, send NOT_MODIFIED
                 self._req.status = apache.HTTP_NOT_MODIFIED
-                self._doProcess = False
+                return
             else:
-                self._regenerate = True
-        else:
-            # file needs to be regenerated
-            self._regenerate = True
+                # Read and send the file
+                fh = open(self._htmlPath, "r")
+                self._htmlData = fh.read()
+                fh.close()
+                self._setHeaders()
+                return self._htmlData
+        # file needs to be regenerated
+        return base.RH.process(self, params)
 
 
     def _process( self ):
         try:
-            # regenerate file if needed
-            if self._regenerate:
-                self._dict["__rh__"] = self
-                self._dict["user"] = None
+            # regenerate file is needed
+            self._dict["__rh__"] = self
+            self._dict["user"] = None
 
-                htmlData = templateEngine.render(self._tplFile, self._dict)
-                fh = open(self._htmlPath, "w")
-                fh.write(htmlData)
-                fh.close()
-            else:
-                # otherwise just send it to the client
-                fh = open(self._htmlPath, "r")
-                htmlData = fh.read()
-                fh.close()
+            self._htmlData = templateEngine.render(self._tplFile, self._dict)
+            fh = open(self._htmlPath, "w")
+            fh.write(self._htmlData)
+            fh.close()
 
-            # send out the Etag and Last-Modified headers
-            creationTime = datetime.datetime.fromtimestamp(os.path.getctime(self._htmlPath))
-            self._req.headers_out["Etag"] = self._generateEtag(creationTime)
-            self._req.headers_out["Last-Modified"] = formatdate(time.mktime(creationTime.timetuple()))
-            self._req.content_type = "application/x-javascript"
+            self._setHeaders()
 
         except Exception, e:
             return 'indicoError: %s' % e
 
-        return htmlData
+        return self._htmlData
 
 class RHGetVarsJs(RHTemplateContentJS):
     _uh = urlHandlers.Derive(RHTemplateContentJS, "getVars")

@@ -55,15 +55,10 @@ class RHCustomizable( RH ):
 
 class RHConferenceSite( RHCustomizable ):
 
-    def _setMenuStatus(self,params):
-        if params.has_key("menuStatus"):
-            self._getSession().setVar("menuStatus",params["menuStatus"])
-
     def _checkParams( self, params ):
         l = locators.WebLocator()
         l.setConference( params )
         self._conf = self._target = l.getObject()
-        self._setMenuStatus(params)
 
     def _getLoginURL( self ):
         url = self.getRequestURL()
@@ -89,7 +84,6 @@ class RHSessionBase( RHConferenceSite ):
         l.setSession( params )
         self._session = self._target = l.getObject()
         self._conf = self._session.getConference()
-        self._setMenuStatus(params)
 
 class RHSessionSlotBase( RHConferenceSite ):
 
@@ -99,7 +93,6 @@ class RHSessionSlotBase( RHConferenceSite ):
         self._slot = self._target = l.getObject()
         self._session = self._slot.getSession()
         self._conf = self._session.getConference()
-        self._setMenuStatus(params)
 
 
 class RHContributionBase( RHConferenceSite ):
@@ -109,7 +102,6 @@ class RHContributionBase( RHConferenceSite ):
         l.setContribution( params )
         self._contrib = self._target = l.getObject()
         self._conf = self._contrib.getConference()
-        self._setMenuStatus(params)
 
 class RHSubContributionBase( RHConferenceSite ):
 
@@ -119,7 +111,6 @@ class RHSubContributionBase( RHConferenceSite ):
         self._subContrib = self._target = l.getObject()
         self._contrib = self._subContrib.getParent()
         self._conf = self._contrib.getConference()
-        self._setMenuStatus(params)
 
 
 class RHMaterialBase( RHConferenceSite ):
@@ -133,7 +124,6 @@ class RHMaterialBase( RHConferenceSite ):
         self._conf = self._material.getConference()
         if self._conf == None:
             self._categ=self._material.getCategory()
-        self._setMenuStatus(params)
 
 
 class RHFileBase( RHConferenceSite ):
@@ -147,7 +137,6 @@ class RHFileBase( RHConferenceSite ):
         self._conf = self._file.getConference()
         if self._conf == None:
             self._categ = self._file.getCategory()
-        self._setMenuStatus(params)
 
 
 class RHAlarmBase( RHConferenceSite ):
@@ -157,7 +146,6 @@ class RHAlarmBase( RHConferenceSite ):
         l.setAlarm( params )
         self._alarm = self._target = l.getObject()
         self._conf = self._alarm.getConference()
-        self._setMenuStatus(params)
 
 
 class RHLinkBase( RHConferenceSite ):
@@ -169,7 +157,6 @@ class RHLinkBase( RHConferenceSite ):
         self._conf = self._link.getConference()
         if self._conf == None:
             self._categ=self._link.getCategory()
-        self._setMenuStatus(params)
 
 
 class RHTrackBase( RHConferenceSite ):
@@ -182,7 +169,6 @@ class RHTrackBase( RHConferenceSite ):
         self._subTrack = None
         if params.has_key("subTrackId"):
             self._subTrack = self._track.getSubTrackById(params["subTrackId"])
-        self._setMenuStatus(params)
 
 
 class RHAbstractBase( RHConferenceSite ):
@@ -194,7 +180,6 @@ class RHAbstractBase( RHConferenceSite ):
         if self._abstract is None:
             raise MaKaCError( _("The abstract you are trying to access does not exist"))
         self._conf = self._abstract.getOwner().getOwner()
-        self._setMenuStatus(params)
 
 class RHSubmitMaterialBase(object):
 

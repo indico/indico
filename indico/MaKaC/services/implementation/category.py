@@ -168,13 +168,17 @@ class SetShowPastEventsForCateg(CategoryDisplayBase):
         session = self._aw.getSession()
         if not session.getVar("fetchPastEventsFrom"):
             session.setVar("fetchPastEventsFrom",set())
+
+        fpef = session.getVar("fetchPastEventsFrom")
+        cid = self._categ.getId()
+
         if self._showPastEvents:
-            fpef = session.getVar("fetchPastEventsFrom")
-            fpef.add(self._categ.getId())
-            session.setVar("fetchPastEventsFrom", fpef)
+            # check to avoid unnecessary session write (and db write)
+            if cid not in fpef:
+                fpef.add(cid)
+                session.setVar("fetchPastEventsFrom", fpef)
         else:
-            fpef = session.getVar("fetchPastEventsFrom")
-            fpef.remove(self._categ.getId())
+            fpef.remove(cid)
             session.setVar("fetchPastEventsFrom", fpef)
 
 class CategoryProtectionUserList(CategoryModifBase):

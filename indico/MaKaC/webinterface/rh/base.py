@@ -247,7 +247,6 @@ class RH(RequestHandlerBase):
             except session.SessionError, e:
                 sm.revoke_session_cookie( self._req )
                 self._websession = sm.get_session( self._req )
-            sm.maintain_session( self._req, self._websession )
 
     def _getSession( self ):
         """Returns the web session associated to the received mod_python
@@ -561,6 +560,9 @@ class RH(RequestHandlerBase):
                             else:
                                 res = self._process()
 
+                        # Save web session, just when needed
+                        sm = session.getSessionManager()
+                        sm.maintain_session( self._req, self._websession )
 
                         # notify components that the request has finished
                         self._notify('requestFinished', self._req)

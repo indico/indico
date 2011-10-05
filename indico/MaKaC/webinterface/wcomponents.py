@@ -5944,9 +5944,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             bars = addOverlappingPrebookings( bars )
             bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
 
-            rooms = []
-            for r in rh._resvs:
-                rooms.append(r.room)
+            rooms = set(r.room for r in rh._resvs)
 
             #CrossLocationQueries.getRooms( location = self.location )
             if not self._rh._onlyMy:
