@@ -4292,7 +4292,7 @@ class UHConfModifPosterPrintingPDF ( URLHandler ):
 """
 URL Handlers for Javascript Packages
 """
-class UHJsonRpcService (URLHandler):
+class UHJsonRpcService (OptionallySecureURLHandler):
     _relativeURL = "services/json-rpc"
 
 class UHJavascriptCalendar (URLHandler):
