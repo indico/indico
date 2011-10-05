@@ -117,14 +117,14 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Short URL tag</span></td>
             <td bgcolor="white" width="100%%">
-               <span class="blacktext"><em> <%=Config.getInstance().getShortEventURL() %></em></span><input type="text" name="shortURLTag" value=%(shortURLTag)s size="30">
+               <span class="blacktext"><em> <%=Config.getInstance().getShortEventURL() %></em></span>
+               <span id="shortTag"></span>
             </td>
         </tr>
         <% end %>
         <tr align="left">
             <td align="center" width="100%%" colspan="2" class="buttonBar">
-		<input type="submit" class="btn" value="<%= _("ok")%>">
-		<input type="submit" class="btn" value="<%= _("cancel")%>" name="cancel">
+                <span id="submitPlace"></span>
             </td>
         </tr>
     </table>
@@ -134,6 +134,8 @@
 
         IndicoUI.executeOnLoad(function()
 	{
+        var parameterManager = new IndicoUtil.parameterManager();
+
         var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute']);
         $E('sDatePlace').set(startDate);
 
