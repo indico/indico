@@ -2057,7 +2057,7 @@ class WPrincipalTable(WTemplated):
         ContextManager.set("principalTableCounter", self._principalTableId + 1)
 
     def getHTML( self, principalList, target, addPrincipalsURL, removePrincipalsURL, pendings=[], selectable=True ):
-        self.__principalList = principalList
+        self.__principalList = principalList[:]
         self.__principalList.sort(utils.sortPrincipalsByName)
         self.__pendings = pendings
         self.__target = target
