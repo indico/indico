@@ -205,9 +205,6 @@ class HTTPAPIHook(object):
         if not func:
             raise NotImplementedError(self.PREFIX + '_' + self._type)
 
-        extraFunc = getattr(self, self.PREFIX + '_' + self._type + '_extra', None)
-        extra = extraFunc(aw) if extraFunc else None
-
         if not self.COMMIT:
             # Just execute the function, we'll never have to repeat it
             resultList, complete = self._performCall(func, aw)
@@ -226,6 +223,8 @@ class HTTPAPIHook(object):
             else:
                 raise HTTPAPIError('An unresolvable database conflict has occured', apache.HTTP_INTERNAL_SERVER_ERROR)
 
+        extraFunc = getattr(self, self.PREFIX + '_' + self._type + '_extra', None)
+        extra = extraFunc(aw, resultList) if extraFunc else None
         return resultList, extra, complete, self.SERIALIZER_TYPE_MAP
 
 
@@ -412,9 +411,10 @@ class CategoryEventHook(HTTPAPIHook):
         expInt = CategoryEventFetcher(aw, self)
         return expInt.category(self._idList)
 
-    def export_categ_extra(self, aw):
+    def export_categ_extra(self, aw, resultList):
+        ids = set((event['categoryId'] for event in resultList))
         return {
-            'categHierarchy': CategoryEventFetcher.getCategoryPath(self._idList, aw)
+            'eventCategories': CategoryEventFetcher.getCategoryPath(ids, aw)
         }
 
     def export_event(self, aw):
@@ -441,17 +441,22 @@ class CategoryEventFetcher(DataFetcher):
 
     @classmethod
     def getCategoryPath(cls, idList, aw):
-        paths = {}
+        res = []
         for id in idList:
-            paths['categ_' + id] = cls._getCategoryPath(id, aw)
-        return paths
+            res.append({
+                '_type': 'CategoryPath',
+                'categoryId': id,
+                'path': cls._getCategoryPath(id, aw)
+            })
+        return res
 
     @staticmethod
     def _getCategoryPath(id, aw):
         path = []
-        cat = CategoryManager().getById(id)
+        firstCat = cat = CategoryManager().getById(id)
         while cat:
-            iface = ICategoryMetadataFossil if cat.canAccess(aw) else ICategoryProtectedMetadataFossil
+            # the first category (containing the event) is always shown, others only with access
+            iface = ICategoryMetadataFossil if firstCat or cat.canAccess(aw) else ICategoryProtectedMetadataFossil
             path.append(fossilize(cat, iface))
             cat = cat.getOwner()
         path.reverse()

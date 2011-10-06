@@ -112,6 +112,10 @@ class IConferenceMetadataFossil(IFossil):
     getOwner.convert = lambda x: x.getTitle()
     getOwner.name = 'category'
 
+    def getCategoryId(self):
+        pass
+    getCategoryId.produce = lambda x: x.getOwner().getId()
+
     def getTimezone(self):
         pass
 
