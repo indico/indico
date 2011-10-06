@@ -566,6 +566,11 @@ var IndicoUtil = {
                         error = Html.span({}, $T("At least one must be selected"));
                     }
                 }
+                else if (dataType == 'checkBox' && !exists(extraCheckFunction)) {
+                    if (!allowEmpty && !component.dom.checked) {
+                        error = Html.span({}, $T("Please enable the checkbox"));
+                    }
+                }
                 else if (dataType == "radio" && !exists(extraCheckFunction)) {
                     if (!allowEmpty && !self.checkRadioButton(component)) {
                         error = Html.span({}, $T("Please choose an option"));

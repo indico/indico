@@ -33,12 +33,6 @@ def getCSS(req, **params):
 def getPic(req, **params):
     return conferenceDisplay.RHConferenceGetPic( req ).process( params )
 
-def closeMenu(req, **params):
-    return conferenceDisplay.RHConferenceMenuClose( req ).process( params )
-
-def openMenu(req, **params):
-    return conferenceDisplay.RHConferenceMenuOpen( req ).process( params )
-
 def abstractBook(req, **params):
     return conferenceDisplay.RHAbstractBook(req).process(params)
 

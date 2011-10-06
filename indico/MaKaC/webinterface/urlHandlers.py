@@ -764,13 +764,6 @@ class UHConfAbstractManagment( URLHandler ):
 class UHConfAbstractList(URLHandler):
     _relativeURL = "abstractsManagment.py"
 
-class UHConfAbstractManagmentCloseMenu( URLHandler ):
-    _relativeURL = "abstractsManagment.py/closeMenu"
-
-
-class UHConfAbstractManagmentOpenMenu( URLHandler ):
-    _relativeURL = "abstractsManagment.py/openMenu"
-
 
 class UHAbstractSubmission( URLHandler ):
     _relativeURL = "abstractSubmission.py"
@@ -4299,7 +4292,7 @@ class UHConfModifPosterPrintingPDF ( URLHandler ):
 """
 URL Handlers for Javascript Packages
 """
-class UHJsonRpcService (URLHandler):
+class UHJsonRpcService (OptionallySecureURLHandler):
     _relativeURL = "services/json-rpc"
 
 class UHJavascriptCalendar (URLHandler):

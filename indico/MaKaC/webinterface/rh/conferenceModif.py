@@ -7024,7 +7024,6 @@ class RHConfModifRoomBookingChooseEvent( RHConferenceModifRoomBookingBase, RHRoo
         locator = locators.WebLocator()
         locator.setConference( params )
         self._conf = locator.getConference()
-        self._setMenuStatus( params )
         RHConferenceModifRoomBookingBase._checkParams( self, params )
 
         self._forNewBooking = True
@@ -7120,7 +7119,6 @@ class RHConfModifRoomBookingSearch4Rooms( RHConferenceModifRoomBookingBase, RHRo
 
         self._setDefaultFormValues()
 
-        self._setMenuStatus( params )
         RHConferenceModifRoomBookingBase._checkParams( self, params )
 
     def _process( self ):
@@ -7141,7 +7139,6 @@ class RHConfModifRoomBookingRoomList( RHConferenceModifRoomBookingBase, RHRoomBo
         locator.setConference( params )
         self._conf = locator.getConference()
         self._target = self._conf
-        self._setMenuStatus( params )
 
         RHRoomBookingRoomList._checkParams( self, params )
 
@@ -7168,7 +7165,6 @@ class RHConfModifRoomBookingList( RHConferenceModifRoomBookingBase, RHRoomBookin
         locator = locators.WebLocator()
         locator.setConference( params )
         self._conf = self._target = locator.getConference()
-        self._setMenuStatus( params )
 
     def _process( self ):
         if self._target.isClosed():
@@ -7194,7 +7190,6 @@ class RHConfModifRoomBookingRoomDetails( RHConferenceModifRoomBookingBase, RHRoo
         locator = locators.WebLocator()
         locator.setConference( params )
         self._conf = locator.getConference()
-        self._setMenuStatus( params )
 
         self._target = self._conf
 
@@ -7211,7 +7206,6 @@ class RHConfModifRoomBookingDetails( RHConferenceModifRoomBookingBase, RHRoomBoo
         locator = locators.WebLocator()
         locator.setConference( params )
         self._conf = locator.getConference()
-        self._setMenuStatus( params )
 
         RHRoomBookingBookingDetails._checkParams( self, params )
         self._target = self._conf
@@ -7236,7 +7230,6 @@ class RHConfModifRoomBookingBookingForm( RHConferenceModifRoomBookingBase, RHRoo
         locator.setConference( params )
         self._conf = locator.getConference()
         self._target = self._conf     #self._candResv
-        self._setMenuStatus( params )
 
     def _process( self ):
         self._businessLogic()
@@ -7273,7 +7266,6 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
             if self._conf  and  websession.getVar( "dontAssign" ) != True: # True or None
                 self._assign2Conference = self._conf
 
-        self._setMenuStatus( params )
 
     def _process( self ):
         self._candResv.room.setOwner( self._conf )

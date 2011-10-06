@@ -249,7 +249,6 @@ class Menu(Persistent):
         self._conf = conf
         self._indent = "&nbsp;&nbsp;&nbsp;&nbsp;"
         self._linkGenerator = Counter()
-        self._currentItem = None
 
     def clone( self, cdm ):
         newMenu = cdm.getMenu()
@@ -458,13 +457,13 @@ class Menu(Persistent):
         return l
 
     def isCurrentItem(self, item):
-        return self._currentItem == item
+        return self.getCurrentItem() == item
 
     def setCurrentItem(self, value):
-        self._currentItem = value
+        self._v_currentItem = value
 
     def getCurrentItem(self):
-        return self._currentItem
+        return getattr(self, '_v_currentItem', None)
 
     def __str__(self):
         str = ""
@@ -837,8 +836,8 @@ class SystemLinkData(Observable):
                 "URL": str(urlHandlers.UHAbstractSubmission.getURL(conf)), \
                 "parent": "CFA"}, \
             "manageTrack": { \
-                "caption": "Manage my track", \
-                "URL": str(urlHandlers.UHTrackModifAbstracts.getURL(conf)), \
+                "caption": "Manage my tracks", \
+                "URL": str(urlHandlers.UHConfMyStuffMyTracks.getURL(conf)), \
                 "parent": "programme"}, \
             "timetable": { \
                 "caption": "Timetable", \

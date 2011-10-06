@@ -80,7 +80,7 @@ class ChatSMContributor(Component, Observable):
     @classmethod
     def confDisplaySMShow(cls, obj, params):
         obj._instantMessaging = obj._sectionMenu.getLinkByName("instantMessaging")
-        if not DBHelpers.roomsToShow(obj._conf):
+        if obj._instantMessaging and not DBHelpers.roomsToShow(obj._conf):
             obj._instantMessaging.setVisible(False)
 
 
