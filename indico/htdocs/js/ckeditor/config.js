@@ -40,6 +40,8 @@ CKEDITOR.editorConfig = function( config )
 
     config.toolbarCanCollapse = false;
 
+    config.extraPlugins = 'onchange';
+
     //url int angle brackets
     config.protectedSource.push(/<[^<>\s]+:\/\/[^<>\s]+>/g);
 
