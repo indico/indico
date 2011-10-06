@@ -44,7 +44,7 @@ subclass SessionManager if you want to implement persistent sessions.
 DEFAULT_SESSION_COOKIE_NAME = "MAKACSESSION"
 DEFAULT_SESSION_COOKIE_DOMAIN = None
 DEFAULT_SESSION_COOKIE_PATH = "/"
-DEFAULT_CHECK_SESSION_ADDR = 0
+DEFAULT_CHECK_SESSION_ADDR = True
 DEFAULT_SESSION_VALIDITY = float(24 * 3600)
 
 import MaKaC.common.info as info
@@ -412,12 +412,12 @@ class SessionManager:
             #    del self[session.id]
             #    self.revoke_session_cookie(request)
             return
+
         if not self.has_session(session.id):
             # This is the first time this session has had useful
             # info -- store it and set the session cookie.
             self[session.id] = session
             self.set_session_cookie(request, session.id)
-
         elif session.is_dirty():
             # We have already stored this session, but it's dirty
             # and needs to be stored again.  This will never happen
@@ -452,10 +452,10 @@ class SessionManager:
         this request does not see the cookie's revoked value.
         """
         response = request.response
-        response.set_cookie(self._getSessionCookieName(), "",
-                            domain = self._getSessionCookieDomain(),
-                            path = self._getSessionCookiePath(),
-                            max_age = 0)
+        response.set_cookie(self._getSessionCookieName(), '',
+                            Domain = self._getSessionCookieDomain(),
+                            Path = self._getSessionCookiePath(),
+                            Max_Age = 0)
         if request.cookies.has_key(self._getSessionCookieName()):
             del request.cookies[self._getSessionCookieName()]
 
@@ -768,7 +768,7 @@ class ResponseWrapper:
         for (name, value) in attrs.items():
             if value is None:
                 continue
-            if name in ("Max_age", "Path", "Domain", "Path", "Version"):
+            if name in ("Max_Age", "Path", "Domain", "Version"):
                 name = name.replace("_", "-")
                 options += "; %s=%s"%(name, value)
             elif name =="secure" and value:

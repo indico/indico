@@ -244,7 +244,7 @@ class RH(RequestHandlerBase):
             sm = session.getSessionManager()
             try:
                 self._websession = sm.get_session( self._req )
-            except session.SessionError, e:
+            except session.SessionError:
                 sm.revoke_session_cookie( self._req )
                 self._websession = sm.get_session( self._req )
 
@@ -562,7 +562,7 @@ class RH(RequestHandlerBase):
 
                         # Save web session, just when needed
                         sm = session.getSessionManager()
-                        sm.maintain_session( self._req, self._websession )
+                        sm.maintain_session(self._req, self._websession)
 
                         # notify components that the request has finished
                         self._notify('requestFinished', self._req)
