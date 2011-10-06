@@ -51,7 +51,7 @@
     % if not isTime0H0M(session.getAdjustedStartDate(timezone)):
         (until ${getTime(item.getAdjustedEndDate(timezone))})
     % endif
-    % if getLocationInfo(item) != getLocationInfo(item.getOwner()):
+    % if getLocationInfo(item) != getLocationInfo(item.getConference()):
         (${getLocationInfo(item)[1]})
     % endif
     <div style="float:right">
