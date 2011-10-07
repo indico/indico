@@ -46,12 +46,16 @@ def lookupHandler(method):
 def processRequest(method, params, req):
     # lookup handler
     handler = lookupHandler(method)
+    websession = getSession(req)
 
     # invoke handler
     if hasattr(handler, "process"):
-        result = handler(params, getSession(req), req).process()
+        result = handler(params, websession, req).process()
     else:
-        result = handler(params, getSession(req), req)
+        result = handler(params, websession, req)
+
+    # commit session if necessary
+    session.getSessionManager().maintain_session(req, websession)
 
     return result
 
@@ -118,7 +122,6 @@ def getSession(req):
     except session.SessionError, e:
         sm.revoke_session_cookie(req)
         websession = sm.get_session(req)
-    sm.maintain_session(req, websession)
     return websession
 
 from MaKaC.rb_location import CrossLocationDB
