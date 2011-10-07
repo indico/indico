@@ -3003,7 +3003,7 @@ class PersonalDataForm(GeneralSectionForm):
             f = field.clone(pf)
             pf.addToSortedFields(f)
             if f.getPDField():
-                self._pdMap[f.getPDField()] = f
+                pf._pdMap[f.getPDField()] = f
         return pf
 
     def getValueFromParams(self, params, field):
