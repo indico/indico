@@ -148,7 +148,49 @@ class IContributionParticipationMetadataFossil(IFossil):
         pass
 
 
-class IContributionMetadataFossil(IFossil):
+class IResourceMetadataFossil(IFossil):
+
+    def getName(self):
+        pass
+
+
+class ILocalFileMetadataFossil(IResourceMetadataFossil):
+
+    def getURL(self):
+        pass
+    getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
+    getURL.name = 'url'
+
+
+class ILinkMetadataFossil(IResourceMetadataFossil):
+
+    def getURL(self):
+        pass
+    getURL.name = 'url'
+
+class IMaterialMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getTitle( self ):
+        pass
+
+    def getResourceList(self):
+        pass
+    getResourceList.result = {'MaKaC.conference.Link': ILinkMetadataFossil, 'MaKaC.conference.LocalFile': ILocalFileMetadataFossil}
+    getResourceList.name = 'resources'
+
+
+class _IncludeMaterialFossil(IFossil):
+
+    def getAllMaterialList(self):
+        pass
+    getAllMaterialList.name = 'material'
+    getAllMaterialList.result = IMaterialMetadataFossil
+
+
+class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
 
     def getId(self):
         pass
@@ -223,7 +265,7 @@ class IContributionMetadataWithSubContribsFossil(IContributionMetadataFossil):
     getSubContributionList.name = 'subContributions'
 
 
-class IConferenceMetadataWithContribsFossil(IConferenceMetadataFossil):
+class IConferenceMetadataWithContribsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 
     def getContributionList(self):
         pass
@@ -231,7 +273,7 @@ class IConferenceMetadataWithContribsFossil(IConferenceMetadataFossil):
     getContributionList.name = 'contributions'
 
 
-class IConferenceMetadataWithSubContribsFossil(IConferenceMetadataFossil):
+class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 
     def getContributionList(self):
         pass
@@ -247,7 +289,7 @@ class ISessionMetadataFossil(ISessionFossil):
     getContributionList.name = 'contributions'
 
 
-class IConferenceMetadataWithSessionsFossil(IConferenceMetadataFossil):
+class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 
     def getSessionList(self):
         pass
