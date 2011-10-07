@@ -133,6 +133,21 @@ class IConferenceMetadataFossil(IFossil):
     getRoom.convert = lambda r: r and r.getName()
 
 
+class IContributionParticipationMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getFullName(self):
+        pass
+
+    def getEmail(self):
+        pass
+
+    def getAffiliation(self):
+        pass
+
+
 class IContributionMetadataFossil(IFossil):
 
     def getId(self):
@@ -164,6 +179,11 @@ class IContributionMetadataFossil(IFossil):
     def getDescription(self):
         pass
 
+    def getSpeakerList(self):
+        pass
+    getSpeakerList.name = 'speakers'
+    getSpeakerList.result = IContributionParticipationMetadataFossil
+
     def getTrack( self ):
         pass
     getTrack.convert = lambda t: t and t.getTitle()
@@ -188,6 +208,11 @@ class ISubContributionMetadataFossil(IFossil):
     def getDuration(self):
         pass
     getDuration.convert = Conversion.duration
+
+    def getSpeakerList(self):
+        pass
+    getSpeakerList.name = 'speakers'
+    getSpeakerList.result = IContributionParticipationMetadataFossil
 
 
 class IContributionMetadataWithSubContribsFossil(IContributionMetadataFossil):
