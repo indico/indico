@@ -602,7 +602,10 @@ class WAbstractManagment( wcomponents.WTemplated ):
         html = """<b>%s</b>"""%AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
         tzUtil = DisplayTZ(self._aw,self._conf)
         tz = tzUtil.getDisplayTZ()
-        respPerson = i18nformat(""" _("by") %s""")%self._getAuthorHTML(status.getResponsible()) if status.getResponsible() else ""
+        if hasattr(status, 'getResponsible'):
+            respPerson = i18nformat(""" _("by") %s""")%self._getAuthorHTML(status.getResponsible()) if status.getResponsible() else ""
+        else:
+            respPerson = ""
 
         if status.__class__  == review.AbstractStatusAccepted:
             trackTitle, contribTitle = "", ""
