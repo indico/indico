@@ -28,7 +28,7 @@ CKEDITOR.editorConfig = function( config )
         ['Source','-','Preview','Templates'],
          ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
          ['Outdent', 'Indent', '-', 'NumberedList','BulletedList','Blockquote','-','Link','Unlink','Anchor'],
-         ['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
+         ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
          ['SpecialChar','-','About']
      ] ;
 
