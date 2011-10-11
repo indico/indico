@@ -4,6 +4,7 @@
   hideTime = True
   materialSession = False
   minutes = False
+  showOrder = True
 %>
 <table class="eventWrapper">
     <tr>
@@ -83,7 +84,7 @@
                             <td></td>
                         </tr>
                     % endif
-                    <%include file="${INCLUDEADM}/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order"/>
+                    <%include file="${INCLUDEADM}/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=self.attr.showOrder"/>
                     % if getItemType(item) == "Session":
                         <% order += item.getSession().getNumberOfContributions() %>
                     % elif getItemType(item) == "Contribution":
