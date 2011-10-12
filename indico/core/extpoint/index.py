@@ -22,10 +22,8 @@
 from indico.core.extpoint import IContributor
 
 
-class IPluginSettingsContributor(IContributor):
-
-    def hasPluginSettings(self, obj, ptype, plugin):
-        pass
-
-    def getPluginSettingsHTML(self, obj, ptype, plugin):
-        pass
+class ICatalogIndexProvider(IContributor):
+    def catalogIndexProvider(self):
+        """
+        Should provide a (name, class) tuple
+        """

@@ -32,13 +32,16 @@ from BTrees.OOBTree import OOBTree
 
 from MaKaC.common import info
 
+from MaKaC.rb_room import RoomBase
 from MaKaC.rb_location import RoomGUID, ReservationGUID, Location
 
 from MaKaC.plugins.RoomBooking.CERN.equipmentManagerCERN import EquipmentManagerCERN
 from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
 from MaKaC.plugins.RoomBooking.CERN.factoryCERN import FactoryCERN
 import MaKaC
-from MaKaC.user import AvatarHolder
+
+from indico.core.index import Catalog
+
 
 def deleteRoomBookingBranches( force = False ):
     """
@@ -134,7 +137,8 @@ def initializeRoomBookingDB( location, force = False ):
     if force or not root.has_key( 'EquipmentList' ):
         root['EquipmentList'] = {}
 
-    AvatarHolder().invalidateRoomManagerIdList()
+    # update Catalog with new rb indexes
+    Catalog.updateDB()
 
     DALManagerCERN().commit()
 

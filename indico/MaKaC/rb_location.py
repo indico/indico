@@ -29,24 +29,26 @@ global ids of objects, and cross-location queries.
 """
 
 from persistent import Persistent
+from zope.interface import Interface, implements
+
 from MaKaC.common.Locators import Locator
 import MaKaC
-from indico.util.i18n import i18nformat
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.plugins import PluginLoader
+
+from indico.util.i18n import i18nformat
+from indico.core.index import IUniqueIdProvider
+
+
+class IIndexableByManagerIds(Interface):
+    pass
 
 
 # ZODB branches name
 _DEFAULT_ROOM_BOOKING_LOCATION = 'DefaultRoomBookingLocation'
 _ROOM_BOOKING_LOCATION_LIST = 'RoomBookingLocationList'
 
-
-
-def _ensureZODBBranch( force = False ):
-    root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
-    if force or not root.get( _ROOM_BOOKING_LOCATION_LIST ):
-        root[_ROOM_BOOKING_LOCATION_LIST] = [ ]
 
 def mapper(src, dest, properties):
     if isinstance(src, dict) and not isinstance(dest, dict):
@@ -189,7 +191,6 @@ class Location( Persistent, object ):
 
     @staticmethod
     def insertLocation( location ):
-        _ensureZODBBranch()
         if not isinstance( location, Location ):
             raise MaKaCError('location attribute must be of Location class')
         if Location.parse(location.friendlyName):
@@ -204,7 +205,6 @@ class Location( Persistent, object ):
 
     @staticmethod
     def removeLocation( locationName ):
-        _ensureZODBBranch()
         if not isinstance( locationName, str ):
             raise MaKaCError('locationName attribute must be string')
         root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
@@ -258,7 +258,6 @@ class Location( Persistent, object ):
 
     class GetAllLocations( object ):
         def __get__( self, obj, cls = None ):
-            _ensureZODBBranch()
 
             root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
             return root[_ROOM_BOOKING_LOCATION_LIST]
@@ -389,6 +388,9 @@ class RoomGUID( Persistent, object ):
 
     This is intented for cross-location (and cross-plugin!) room identification.
     """
+
+    implements(IUniqueIdProvider, IIndexableByManagerIds)
+
     location = None   # Location - determines the plugin
     id = None         # str - custom id, identifies object in external database
 
@@ -431,6 +433,21 @@ class RoomGUID( Persistent, object ):
         """
         return CrossLocationQueries.getRooms(
             location = self.location.friendlyName, roomID = self.id )
+
+    def __cmp__(self, obj):
+        if not isinstance(obj, RoomGUID):
+            return -1
+        else:
+            return cmp(str(self), str(obj))
+
+    def getUniqueId( self ):
+        return self
+
+    def __conform__(self, proto):
+        if proto == IIndexableByManagerIds:
+            return list(m.getId() for m in self.getRoom().getAllManagers())
+
+
 
 class CrossLocationQueries( object ):
     """

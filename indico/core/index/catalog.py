@@ -23,6 +23,7 @@ from BTrees.OOBTree import OOBTree
 from indico.core.index.event import CategoryEventStartDateIndex
 
 from MaKaC.common import DBMgr
+from MaKaC.plugins.base import extension_point
 
 
 # TODO: decorator for annoying 'db parameter'
@@ -39,11 +40,21 @@ class Catalog(OOBTree):
 
         catalog = cls()
 
-        for indexName, clazz in cls._indexMap.iteritems():
+        for indexName, clazz in cls._iterIndexes():
             newIdx = clazz()
             catalog[indexName] = newIdx
 
         db.root()['catalog'] = catalog
+
+    @classmethod
+    def _iterIndexes(cls):
+        for t in cls._indexMap.iteritems():
+            yield t
+
+        # ask plugins for their indexes
+        for lcomp in extension_point('catalogIndexProvider'):
+            for t in lcomp:
+                yield t
 
     @classmethod
     def getIdx(cls, indexName, db=None):
@@ -66,7 +77,8 @@ class Catalog(OOBTree):
         if not 'catalog' in root:
             cls.initialize(db=db)
 
-        for indexName, clazz in cls._indexMap.iteritems():
-            newIdx = clazz()
-            root['catalog'][indexName] = newIdx
-            newIdx.initialize(dbi=dbi)
+        for indexName, clazz in cls._iterIndexes():
+            if indexName not in root['catalog']:
+                newIdx = clazz()
+                root['catalog'][indexName] = newIdx
+                newIdx.initialize(dbi=dbi)

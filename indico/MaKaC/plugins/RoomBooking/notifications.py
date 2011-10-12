@@ -17,9 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from indico.core.extpoint.reservation import IReservationListener, IReservationStartStopListener
-from indico.core.extpoint.base import Component
-from zope.interface import implements
+
 from datetime import datetime, timedelta
 from persistent import Persistent
 from indico.modules.scheduler.client import Client
@@ -30,31 +28,9 @@ from MaKaC.common.utils import getEmailList, formatDateTime
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 from MaKaC.webinterface import urlHandlers
+from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 
-class ReservationStartEndNotificationListener(Component):
-    implements(IReservationListener)
-
-    def reservationCreated(self, resv):
-        if getRoomBookingOption('notificationEnabled'):
-            resv.getStartEndNotification().resvCreated()
-
-    def reservationUpdated(self, resv):
-        if getRoomBookingOption('notificationEnabled'):
-            resv.getStartEndNotification().resvUpdated()
-
-    def reservationDeleted(self, resv):
-        pass
-
-class ReservationStartEndEmailListener(Component):
-    implements(IReservationStartStopListener)
-
-    def reservationStarted(self, obj, resv):
-        sendReservationStartStopNotification(resv, 'start')
-
-    def reservationFinished(self, obj, resv):
-        sendReservationStartStopNotification(resv, 'end')
 
 def sendReservationStartStopNotification(resv, which):
     if which == 'start' and resv.room.resvStartNotification:
@@ -173,8 +149,3 @@ class ReservationStartEndNotification(Persistent, Observable):
             return self._startActionTriggered
         elif which == 'end':
             return self._endActionTriggered
-
-
-
-
-

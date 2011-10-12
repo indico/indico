@@ -21,6 +21,7 @@
 """Template engine."""
 
 import os.path
+from MaKaC.common import DBMgr
 from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.user import Avatar
@@ -308,15 +309,9 @@ def registerHelpers(objDict):
         from MaKaC.webinterface.asyndico import macros
         objDict['macros'] = macros
     if not 'roomBookingActive' in objDict:
-        try:
+        if DBMgr.getInstance().isConnected():
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             objDict['roomBookingActive'] = minfo.getRoomBookingModuleActive()
-        except:
-            # if the connection to the database is not started, there is no need to set the variable and
-            # we avoid an error report.
-            # THIS IS NEEDED, when using JSContent. JSContent does not need connection to the database
-            # and this is causing an unexpected exception.
-            pass
     if not 'user' in objDict:
         if not '__rh__' in objDict or not objDict['__rh__']:
             objDict['user'] = "ERROR: Assign self._rh = rh in your WTemplated.__init__( self, rh ) method."

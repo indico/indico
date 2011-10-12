@@ -46,6 +46,7 @@ from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.plugins import PluginLoader
 from MaKaC import plugins
 from MaKaC.plugins.RoomBooking.default.reservation import ResvHistoryEntry
+from MaKaC.plugins.RoomBooking.default.room import Room
 from MaKaC.search.cache import MapOfRoomsCache
 from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 from MaKaC.plugins.RoomBooking.default.roomblocking import RoomBlockingPrincipal,\
@@ -655,10 +656,6 @@ class RHRoomBookingWelcome( RHRoomBookingBase ):
             self._redirect( urlHandlers.UHRoomBookingMapOfRooms.getURL())
         else:
             self._redirect( urlHandlers.UHRoomBookingSearch4Rooms.getURL( forNewBooking = True ))
-        #if self._getUser().isResponsibleForRooms():
-        #    self._redirect( urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, autoCriteria = True ) )
-        #    return
-        #self._redirect( urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True, autoCriteria = True ) )
 
 
 # 1. Searching
@@ -2371,7 +2368,7 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
             if not self._block.canModify(self._getUser()):
                 raise MaKaCError("You are not authorized to modify this blocking.")
         else:
-            if not (self._getUser().isResponsibleForRooms() or self._getUser().isAdmin() or self._getUser().isRBAdmin()):
+            if not (Room.isAvatarResponsibleForRooms(self._getUser()) or self._getUser().isAdmin() or self._getUser().isRBAdmin()):
                 raise MaKaCError("Only users who own at least one room are allowed to create blockings.")
 
     def _process(self):

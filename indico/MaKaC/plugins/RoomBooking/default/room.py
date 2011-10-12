@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os as os
+from BTrees.OOBTree import OOBTree, OOSet
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from MaKaC.rb_room import RoomBase
@@ -26,6 +27,7 @@ from MaKaC.rb_location import CrossLocationQueries, Location
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.rb_tools import qbeMatch
 from MaKaC.common.Configuration import Config
+from MaKaC.common import DBMgr
 from MaKaC.webinterface import urlHandlers
 
 # fossils
@@ -33,9 +35,13 @@ from MaKaC.fossils.roomBooking import IRoomMapFossil, IRoomCalendarFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 import datetime
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.user import GroupHolder
+
+from indico.core.index import Catalog
 
 # Branch name in ZODB root
 _ROOMS = 'Rooms'
+
 
 class Room( Persistent, RoomBase, Fossilizable ):
     """
@@ -59,7 +65,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
         try:
             if self._nonBookableDates:
                 pass
-        except AttributeError, e:
+        except AttributeError:
             self._nonBookableDates = []
             self._p_changed = 1
         return self._nonBookableDates
@@ -105,6 +111,17 @@ class Room( Persistent, RoomBase, Fossilizable ):
     def getRoot():
         return Room.__dalManager.getRoot(_ROOMS)
 
+    def getAllManagers(self):
+        managers = set([self.getResponsible()])
+        if self.customAtts.get('Simba List'):
+            groups = GroupHolder().match({'name': self.customAtts['Simba List']},
+                                         exact=True, forceWithoutExtAuth=True)
+            if not groups:
+                groups = GroupHolder().match({'name': self.customAtts['Simba List']}, exact=True)
+            if groups and len(groups) == 1:
+                managers |= set(groups[0].getMemberList())
+        return list(managers)
+
     def insert( self ):
         """ Documentation in base class. """
         RoomBase.insert( self )
@@ -118,6 +135,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
                 self.id = 1 # Can not use maxKey for 1st record in a tree
         # Add self to the BTree
         roomsBTree[self.id] = self
+        Catalog.getIdx('user_room').index_obj(self.guid)
 
     def update( self ):
         """ Documentation in base class. """
@@ -133,6 +151,11 @@ class Room( Persistent, RoomBase, Fossilizable ):
             if not groups:
                 self.customAtts['Simba List'] = 'Error: unknown mailing list'
 
+        # reindex - needed due to possible manager changes
+        # super slow, though...
+        Catalog.getIdx('user_room').unindex_obj(self.guid)
+        Catalog.getIdx('user_room').index_obj(self.guid)
+
         self._p_changed = True
 
     def remove( self ):
@@ -140,8 +163,11 @@ class Room( Persistent, RoomBase, Fossilizable ):
         RoomBase.remove( self )
         roomsBTree = Room.getRoot()
         del roomsBTree[self.id]
-        from MaKaC.user import AvatarHolder
-        AvatarHolder().invalidateRoomManagerIdList()
+        Catalog.getIdx('user_room').unindex_obj(self.guid)
+
+    @classmethod
+    def isAvatarResponsibleForRooms(cls, avatar):
+        return Catalog.getIdx('user_room').get(avatar.getId()) is not None
 
     # Typical actions
     @staticmethod

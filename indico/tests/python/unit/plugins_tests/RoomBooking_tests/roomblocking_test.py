@@ -39,7 +39,7 @@ from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 
 
 class RoomBooking_Feature(IndicoTestFeature):
-    _requires = ['db.DummyUser']
+    _requires = ['db.DummyUser', 'plugins.Plugins']
 
     def start(self, obj):
         super(RoomBooking_Feature, self).start(obj)
@@ -49,6 +49,8 @@ class RoomBooking_Feature(IndicoTestFeature):
             minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
             cfg = Configuration.Config.getInstance()
             minfo.setRoomBookingDBConnectionParams(cfg.getDBConnectionParams())
+
+            obj._ph.getById('RoomBooking').setActive(True)
 
             DALManagerCERN.connect()
             initializeRoomBookingDB("Universe", force=False)
@@ -111,8 +113,6 @@ class RoomBooking_Feature(IndicoTestFeature):
                 obj._rooms.append(room)
                 setattr(obj, '_room%d' % i, room)
 
-    def destroy(self, obj):
-        super(RoomBooking_Feature, self).destroy(obj)
 
 class RoomBookingTestCase(IndicoTestCase):
     _requires = ['db.DummyUser', RoomBooking_Feature]

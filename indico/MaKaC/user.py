@@ -56,6 +56,9 @@ from xml.dom.minidom import parseString
 from copy import deepcopy
 from MaKaC.plugins.base import PluginsHolder
 
+from indico.util.contextManager import ContextManager
+from indico.util.caching import order_dict
+
 """Contains the classes that implement the user management subsystem
 """
 
@@ -424,7 +427,6 @@ class GroupHolder(ObjectHolder):
         return result
 
     def match(self,criteria,forceWithoutExtAuth=False, exact=False):
-
         crit={}
         result = []
         for f,v in criteria.items():
@@ -1336,13 +1338,6 @@ class Avatar(Persistent, Fossilizable):
         self._v_isMember[simbaListName] = False
         return False
 
-    def isResponsibleForRooms( self ):
-        """
-        Returns True if this user is responsible for at least
-        one active meeting room.
-        """
-        return self.id in AvatarHolder().getRoomManagerIdList()
-
     def isAdmin( self ):
         """
         Convenience method for checking whether this user is an admin.
@@ -1486,31 +1481,6 @@ class AvatarHolder( ObjectHolder ):
     counterName = "PRINCIPAL"
     _indexes = [ "email", "name", "surName","organisation", "status" ]
 
-    def getRoomManagerIdList( self ):
-        root = DBMgr.getInstance().getDBConnection().root()
-        if not root.has_key( "roomManagerIdList" ):
-            root["roomManagerIdList"] = []
-            self.invalidateRoomManagerIdList()
-        return root["roomManagerIdList"]
-
-    def invalidateRoomManagerIdList( self ):
-        from MaKaC.rb_location import CrossLocationQueries
-        root = DBMgr.getInstance().getDBConnection().root()
-        allRooms = CrossLocationQueries.getRooms()
-
-        idList = [ room.getResponsible().id for room in allRooms if room.getResponsible()]
-
-        for room in allRooms:
-            if room.customAtts.get( 'Simba List' ):
-                groups = GroupHolder().match( { 'name': room.customAtts['Simba List'] }, exact=True, forceWithoutExtAuth = True )
-                if not groups:
-                    groups = GroupHolder().match( { 'name': room.customAtts['Simba List'] }, exact=True )
-                if groups and len( groups ) == 1:
-                    avatars = groups[0].getMemberList()
-                    idList += [ avatar.id for avatar in avatars ]
-
-        root["roomManagerIdList"] = idList
-
     def matchFirstLetter( self, index, letter, onlyActivated=True, forceWithoutExtAuth=False ):
         result = {}
         if index not in self._indexes:
@@ -1528,6 +1498,16 @@ class AvatarHolder( ObjectHolder ):
         return result.values()
 
     def match(self, criteria, exact=0, onlyActivated=True, forceWithoutExtAuth=False):
+        # for external requests, attemp caching
+        # this is a simple request-level cache that should be replaced
+        # by an appropriate one when the auth system is re-done
+        cache_result = not forceWithoutExtAuth
+        if not forceWithoutExtAuth:
+            cache = ContextManager.setdefault('external_user_cache', {})
+            key = order_dict(criteria)
+            if key in cache:
+                return cache[key]
+
         result = {}
         iset = set()
         for f,v in criteria.items():
@@ -1556,7 +1536,7 @@ class AvatarHolder( ObjectHolder ):
                     else:
                        raise MaKaCError(
                            _("Authentication type " + authId + " is not known."))
-                    for email in dict.keys():
+                    for email in dict.iterkeys():
                         # TODO and TOSTUDY: result.keys should be replace it with
                         # l=[]; for av in result.values(): l.append(av.getAllEmails())
                         if not email in result.keys():
@@ -1574,6 +1554,9 @@ class AvatarHolder( ObjectHolder ):
                                 av = self.match({'email': email}, exact=1, forceWithoutExtAuth=True)[0]
                                 if self._userMatchCriteria(av, criteria, exact):
                                     result[av.getEmail()] = av
+        if cache_result:
+            cache[key] = result.values()
+
         return result.values()
 
     def _userMatchCriteria(self, av, criteria, exact):

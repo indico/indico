@@ -37,7 +37,7 @@ class EquipmentManager( EquipmentManagerBase ):
     @staticmethod
     def getRoot():
         return Factory.getDALManager().getRoot(_EQUIPMENT_LIST)
- 
+
     @staticmethod
     def getPossibleEquipment( *args, **kwargs ):
         from MaKaC.rb_location import Location

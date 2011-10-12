@@ -20,6 +20,7 @@
 
 from zope.interface import Interface
 
+
 class IIndexableByStartDateTime(Interface):
 
     def getAdjustedStartDate(self):
@@ -41,4 +42,12 @@ class IIndexableByArbitraryDateTime(Interface):
     def getIndexingDateTime():
         """
         Return an arbitrary tz-aware datetime (class will decide what)
+        """
+
+
+class IIndexableById(Interface):
+
+    def getId():
+        """
+        Return the id of the object
         """

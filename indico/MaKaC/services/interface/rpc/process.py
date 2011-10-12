@@ -17,6 +17,7 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.services.interface.rpc.common import CausedError, NoReportError
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
+
 import copy
 
 

@@ -5538,6 +5538,7 @@ class WModifReportNumberEdit(WTemplated):
 
 from MaKaC.rb_reservation import ReservationBase, Collision, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
+from MaKaC.plugins.RoomBooking.default.room import Room
 from MaKaC.rb_tools import iterdays
 from calendar import day_name
 from MaKaC.rb_location import Location, CrossLocationFactory
@@ -5660,6 +5661,7 @@ class WRoomBookingSearch4Rooms( WTemplated ):
         vars["possibleEquipment"] = self._rh._equipment
         vars["forNewBooking"] = self._rh._forNewBooking
         vars["eventRoomName"] = self._rh._eventRoomName
+        vars["isResponsibleForRooms"] = Room.isAvatarResponsibleForRooms(self._rh.getAW().getUser())
 
         vars["preview"] = False
 
@@ -5695,7 +5697,7 @@ class WRoomBookingSearch4Bookings( WTemplated ):
         vars["Location"] = Location
         vars["rooms"] = self._rh._rooms
         vars["repeatability"] = None
-
+        vars["isResponsibleForRooms"] = Room.isAvatarResponsibleForRooms(self._rh.getAW().getUser())
         vars["roomBookingBookingListURL"] = urlHandlers.UHRoomBookingBookingList.getURL( None )
 
         return vars

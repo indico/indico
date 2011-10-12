@@ -18,12 +18,12 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.common.general import *
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.rb_location import CrossLocationDB, Location
+from MaKaC.plugins.RoomBooking.default.room import Room
 import MaKaC.common.info as info
 
 #import MaKaC.common.info as info
@@ -106,9 +106,11 @@ class WPRoomBookingBase( WPMainBase ):
 
 
         if minfo.getRoomBookingModuleActive() and CrossLocationDB.isConnected():
-            self._showResponsible = ( self._getAW().getUser() != None ) and (self._getAW().getUser().isResponsibleForRooms()
-                                                                             or self._getAW().getUser().isAdmin()
-                                                                             or self._getAW().getUser().isRBAdmin())
+            self._showResponsible = \
+                (self._getAW().getUser() != None) and \
+                (Room.isAvatarResponsibleForRooms(self._getAW().getUser()) \
+                 or self._getAW().getUser().isAdmin() \
+                 or self._getAW().getUser().isRBAdmin())
 
         self._roomsOpt = wcomponents.SideMenuSection(_("View Rooms"), \
                                         urlHandlers.UHRoomBookingSearch4Rooms.getURL() )

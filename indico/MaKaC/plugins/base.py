@@ -49,17 +49,29 @@ def pluginId(mod):
     return mod.__name__.split('.')[-1]
 
 
+def extension_point(event, *args, **kwargs):
+    """
+    "light" version of notification - no need for inheritance
+    """
+    _self = kwargs.pop('self', None)
+    return PluginsHolder().getComponentsManager().notifyComponent(
+        event, _self, *args, **kwargs)
+
 class Observable(object):
+    """
+    DEPRECATED: just use "extension_point" above
+    """
     def _notify(self, event, *params):
-        return PluginsHolder().getComponentsManager().notifyComponent(event, self, *params)
+        return extension_point(event, *params, self=self)
 
 
 class OldObservable:
     """
     Version for old style classes
+    DEPRECATED: just use "extension_point" above
     """
     def _notify(self, event, *params):
-        return PluginsHolder().getComponentsManager().notifyComponent(event, self, *params)
+        return extension_point(event, *params, self=self)
 
 
 class ComponentsManager(Persistent):

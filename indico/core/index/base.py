@@ -82,16 +82,20 @@ class SIndex(Index):
 
     def index_obj(self, obj):
 
-        value = self._adapter(obj)
-        vset = self._fwd_index.get(value, self._fwd_set_class())
+        values = self._adapter(obj)
 
-        if obj in vset:
-            raise InconsistentIndexException("%s already in fwd[%s]", (obj, value))
-        else:
-            vset.insert(obj)
-            self._num_objs.change(1)
+        if type(values) != list:
+            values = [values]
 
-        self._fwd_index[value] = vset
+        for value in values:
+            vset = self._fwd_index.get(value, self._fwd_set_class())
+            if obj in vset:
+                raise InconsistentIndexException("%r already in fwd[%r]" % (obj, value))
+            else:
+                vset.add(obj)
+            self._fwd_index[value] = vset
+        self._num_objs.change(1)
+
 
     def _unindex_obj_from_key(self, key, obj):
         if key in self._fwd_index:
@@ -111,10 +115,12 @@ class SIndex(Index):
         Slightly dumber than the one in DIndex, takes the indexation value (key)
         instead of looking it up in the reverse index
         """
-        key = self._adapter(obj)
-        self._unindex_obj_from_key(key, obj)
+        keys = self._adapter(obj)
+        if type(keys) != list:
+            keys = [keys]
+        for k in keys:
+            self._unindex_obj_from_key(k, obj)
         self._num_objs.change(-1)
-
 
     def values(self, *args):
         res = self._fwd_set_class()
@@ -150,6 +156,15 @@ class SIndex(Index):
     def get(self, item, default=None):
         return self._fwd_index.get(item, default)
 
+    def clear(self):
+        """
+        Initialize index
+        """
+
+        # The forward index maps indexed values to a sequence of docids
+        self._fwd_index = self._fwd_class()
+        self._num_objs = Length(0)
+
 
 class DIndex(SIndex):
     """
@@ -179,17 +194,22 @@ class DIndex(SIndex):
                 "Object %r doesn't provide %r as required" % (obj, self._adapter))
 
         uid = obj.getUniqueId()
-        value = self._adapter(obj)
+        values = self._adapter(obj)
+        if type(values) != list:
+            values = [values]
 
+        # reverse index
         ts = self._rev_index.get(uid, self._rev_set_class())
 
-        if value in ts:
-            raise ElementAlreadyInIndexException((value, obj))
-        else:
-            ts.insert(value)
+        for value in values:
+            if value in ts:
+                raise ElementAlreadyInIndexException((value, obj))
+            else:
+                ts.insert(value)
 
         self._rev_index[uid] = ts
 
+        # fwd index
         super(DIndex, self).index_obj(obj)
 
         return (uid, value)
@@ -216,18 +236,17 @@ class DIndex(SIndex):
         i = 0
         # check that the elements in fwd index are also in rev index
         cls = self.__class__.__name__
-        for ts, eset in self._fwd_index.iteritems():
+        for key, eset in self._fwd_index.iteritems():
             if not eset:
                 yield "[%s] Element set at '%s' is empty" % ts
             for elem in eset:
                 uid = elem.getUniqueId()
-                key = self._adapter(elem)
                 if uid not in self._rev_index:
                     yield "[%s] An entry for '%s'(%s) should exist in _rev_index" \
                           % (cls, uid, ts)
                 elif key not in self._rev_index[uid]:
                     yield "[%s] Element '%s'(%s) should be in _rev_index['%s']" \
-                          % (cls, uid, ts, key)
+                      % (cls, uid, ts, key)
             if dbi and i % 1000 == 999:
                 dbi.abort()
             i += 1
@@ -236,12 +255,19 @@ class DIndex(SIndex):
         for uid, kset in self._rev_index.iteritems():
             for key in kset:
                 if key not in self._fwd_index:
-                    yield "[%s] Key '%s' not found in _fwd_index" % (cls, key)
+                    yield "[%s] uid %s: key '%s' not found in _fwd_index" % (cls, uid, key)
                 elif uid not in map(lambda x:x.getUniqueId(), self._fwd_index[key]):
                     yield "[%s] Object '%s' not in _fwd_index[%s]" % (cls, uid, key)
             if dbi and i % 1000 == 999:
                 dbi.abort()
             i += 1
+
+    def clear(self):
+        """
+        Initialize forward and reverse mappings.
+        """
+        super(DIndex, self).clear()
+        self._rev_index = self._rev_class()
 
 
 class SIOIndex(DIndex):

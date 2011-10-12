@@ -576,6 +576,7 @@ class RH(RequestHandlerBase):
                             raise ConflictError
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
                         DBMgr.getInstance().endRequest( True )
+
                         Logger.get('requestHandler').info('Request %s successful' % (id(self._req)))
                         #request succesfull, now, doing tas that must be done only once
                         try:

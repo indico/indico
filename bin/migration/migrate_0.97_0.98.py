@@ -43,6 +43,7 @@ from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
+from MaKaC.plugins.RoomBooking.default.room import Room
 from MaKaC.webinterface import displayMgr
 
 from indico.core.index import Catalog
@@ -57,9 +58,9 @@ from indico.modules.scheduler import Client
 MIGRATION_TASKS = []
 
 
-def since(version):
+def since(version, always=False):
     def _since(f):
-        MIGRATION_TASKS.append((version, f))
+        MIGRATION_TASKS.append((version, f, always))
         return f
     return _since
 
@@ -116,7 +117,7 @@ def _fixDefaultStyle(conf, cdmr):
 
 
 @since('0.98b2')
-def runPluginMigration(dbi, withRBDB, prevVersion):
+def pluginMigration(dbi, withRBDB, prevVersion):
     """
     Adding new plugins and adapting existing ones to new name policies
     """
@@ -173,7 +174,7 @@ def runPluginMigration(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b')
-def runCategoryACMigration(dbi, withRBDB, prevVersion):
+def categoryACMigration(dbi, withRBDB, prevVersion):
     """
     Fixing AccessController for categories
     """
@@ -183,7 +184,7 @@ def runCategoryACMigration(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b2')
-def runConferenceMigration(dbi, withRBDB, prevVersion):
+def conferenceMigration(dbi, withRBDB, prevVersion):
     """
     Adding missing attributes to conference objects and children
     """
@@ -248,7 +249,7 @@ def runConferenceMigration(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b')
-def runTaskMigration(dbi, withRBDB, prevVersion):
+def taskMigration(dbi, withRBDB, prevVersion):
     """
     Migrating database tasks from the old format to the new one
     """
@@ -279,7 +280,7 @@ def runTaskMigration(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b')
-def runCategoryConfDictToTreeSet(dbi, withRBDB, prevVersion):
+def categoryConfDictToTreeSet(dbi, withRBDB, prevVersion):
     """
     Replacing the conference dictionary in the Category objects by a OOTreeSet.
     """
@@ -291,7 +292,7 @@ def runCategoryConfDictToTreeSet(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b')
-def runCategoryDateIndexMigration(dbi, withRBDB, prevVersion):
+def categoryDateIndexMigration(dbi, withRBDB, prevVersion):
     """
     Replacing category date indexes.
     """
@@ -302,23 +303,23 @@ def runCategoryDateIndexMigration(dbi, withRBDB, prevVersion):
         newIdx.buildIndex()
         IndexesHolder()._getIdx()["categoryDate"] = newIdx
     else:
-        print """runCategoryDateIndexMigration: new categoryDate index has """ \
+        print """categoryDateIndexMigration: new categoryDate index has """ \
         """NOT been generated because the index backup already exists.
 
 If you still want to regenerate it, please, do it manually using """ \
         """bin/migration/CategoryDate.py"""
 
 
-@since('0.98b')
-def runCatalogMigration(dbi, withRBDB, prevVersion):
+@since('0.98b', always=True)
+def catalogMigration(dbi, withRBDB, prevVersion):
     """
-    Initializing the new index catalog
+    Initializing/updating index catalog
     """
     Catalog.updateDB(dbi=dbi)
 
 
 @since('0.98b2')
-def runRoomBlockingInit(dbi, withRBDB, prevVersion):
+def roomBlockingInit(dbi, withRBDB, prevVersion):
     """
     Initializing room blocking indexes.
     """
@@ -336,7 +337,7 @@ def runRoomBlockingInit(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b2')
-def runLangToGB(dbi, withRBDB, prevVersion):
+def langToGB(dbi, withRBDB, prevVersion):
     """
     Replacing en_US with en_GB.
     """
@@ -347,7 +348,7 @@ def runLangToGB(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b2')
-def runMakoMigration(dbi, withRBDB, prevVersion):
+def makoMigration(dbi, withRBDB, prevVersion):
     """
     Installing new TPLs for meeting/lecture styles
     """
@@ -370,7 +371,7 @@ def runMakoMigration(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b2')
-def runPluginOptionsRoomGUIDs(dbi, withRBDB, prevVersion):
+def pluginOptionsRoomGUIDs(dbi, withRBDB, prevVersion):
     """
     Modifying Room GUIDs
     """
@@ -390,15 +391,18 @@ def runPluginOptionsRoomGUIDs(dbi, withRBDB, prevVersion):
         opt.setValue(newValue)
 
 
-def runMigration(withRBDB=False, prevVersion=parse_version(__version__)):
+def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
+                 specified=[]):
 
     print "\nExecuting migration...\n"
 
     dbi = DBMgr.getInstance()
 
     # go from older to newer version and execute corresponding tasks
-    for version, task in MIGRATION_TASKS:
-        if parse_version(version) > prevVersion:
+    for version, task, always in MIGRATION_TASKS:
+        if specified and task.__name__ not in specified:
+            continue
+        if parse_version(version) > prevVersion or always:
             print console.colored("->", 'green', attrs=['bold']), \
                   task.__doc__.replace('\n', '').strip(),
             print console.colored("(%s)" % version, 'yellow')
@@ -430,6 +434,8 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
     parser = argparse.ArgumentParser(description='Execute migration')
     parser.add_argument('--with-rb', dest='useRBDB', action='store_true',
                         help='Use the Room Booking DB')
+    parser.add_argument('--run-only', dest='specified', default='',
+                        help='Specify which step(s) to run (comma-separated)')
     parser.add_argument('--prev-version', dest='prevVersion', help='Previous version of Indico (used by DB)', default=__version__)
 
     args = parser.parse_args()
@@ -437,7 +443,9 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
     if console.yesno("Are you sure you want to execute the "
                      "migration now?"):
         try:
-            return runMigration(withRBDB=args.useRBDB, prevVersion=parse_version(args.prevVersion))
+            return runMigration(withRBDB=args.useRBDB,
+                                prevVersion=parse_version(args.prevVersion),
+                                specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))))
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])

@@ -270,7 +270,7 @@
                                                             <br />
                                                         </td>
                                                     </tr>
-                                                    % if user.isResponsibleForRooms():
+                                                    % if isResponsibleForRooms:
                                                     <tr>
                                                         <td width="165px" align="right" valign="top"><small>Of my rooms&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">

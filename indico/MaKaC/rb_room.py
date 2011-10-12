@@ -21,8 +21,8 @@ from MaKaC.conference import ConferenceHolder
 
 """
 Part of Room Booking Module (rb_)
-Responsible: Piotr Wlodarek
 """
+
 from MaKaC.rb_tools import Impersistant, checkPresence, iterdays
 from MaKaC.rb_location import Location, RoomGUID, CrossLocationQueries
 from MaKaC.user import Avatar, AvatarHolder
@@ -30,16 +30,14 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
 
+from zope.interface import implements
+
 
 class RoomBase( object ):
     """
     Generic room, Data Access Layer independant.
     Represents physical room suitable for meetings and/or conferences.
     """
-
-    # !=> Properties are in the end of class definition
-
-    # Management -------------------------------------------------------------
 
     def __init__( self ):
         """
@@ -51,21 +49,19 @@ class RoomBase( object ):
 
     def insert( self ):
         """
-        Inserts room into database (SQL: INSERT).
+        Inserts room into database
         """
-        AvatarHolder().invalidateRoomManagerIdList()
         self.checkIntegrity()
 
     def update( self ):
         """
-        Updates room in database (SQL: UPDATE).
+        Updates room in database
         """
-        #AvatarHolder().invalidateRoomManagerIdList()
         self.checkIntegrity()
 
     def remove( self ):
         """
-        Removes room from database (SQL: DELETE).
+        Removes room from database
         """
         pass
 

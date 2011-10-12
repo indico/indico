@@ -66,6 +66,7 @@ class SchedulerApp(object):
         finally:
             return return_val
 
+
 def _setup(args):
 
     cfg = Config.getInstance()
@@ -90,10 +91,10 @@ def _setup(args):
         mp_logger.setLevel(level)
         mp_logger.addHandler(handler)
 
+
 def _check_running():
 
     dbi = DBMgr.getInstance()
-    return_val = 0
 
     dbi.startRequest()
     c = Client()
@@ -101,6 +102,7 @@ def _check_running():
     dbi.endRequest()
 
     return running
+
 
 def _start(args):
 
@@ -122,6 +124,7 @@ def _start(args):
             SchedulerApp(args).run()
 
         return 0
+
 
 def _stop(args):
 
@@ -147,14 +150,15 @@ def _stop(args):
             dbi.sync()
     else:
         print "FAILED!"
-        return_val = -1
 
     print "DONE!"
     dbi.endRequest()
 
+
 def _restart(args):
     _stop(args)
     _start(args)
+
 
 def _show(args):
 
@@ -187,6 +191,7 @@ Tasks:
 
     dbi.endRequest()
 
+
 def _cmd(args):
 
     dbi = DBMgr.getInstance()
@@ -199,8 +204,16 @@ def _cmd(args):
 
     dbi.endRequest()
 
+
 def _run(args):
     _setup(args)
+
+    formatter = logging.Formatter("%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)s: %(message)s")
+
+    root = logging.getLogger('')
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
@@ -221,6 +234,7 @@ def _run(args):
         DALManager.commit()
         DALManager.disconnect()
     dbi.endRequest()
+
 
 def main():
     """
@@ -288,6 +302,7 @@ def main():
     except Exception, e:
         print e
         return -1
+
 
 if __name__ == "__main__":
     main()

@@ -26,6 +26,7 @@ Responsible: Piotr Wlodarek
 from datetime import datetime, timedelta, date
 from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodsOverlap, overlap, Period, Impersistant, checkPresence, fromUTC, toUTC, formatDateTime, formatDate,\
     datespan
+from MaKaC.rb_room import RoomBase
 from MaKaC.rb_location import ReservationGUID, Location, CrossLocationQueries
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.errors import MaKaCError
@@ -1833,58 +1834,3 @@ class Test:
         Factory.getDALManager().commit()
         Factory.getDALManager().disconnect()
         DBMgr.getInstance().endRequest()
-
-    @staticmethod
-    def simba():
-        from MaKaC.rb_factory import Factory
-        from MaKaC.common.db import DBMgr
-        DBMgr.getInstance().startRequest()
-        Factory.getDALManager().connect()
-
-
-        AvatarHolder().invalidateRoomManagerIdList()
-
-
-        Factory.getDALManager().commit()
-        Factory.getDALManager().disconnect()
-        DBMgr.getInstance().endRequest()
-
-    @staticmethod
-    def assignBookings2DanieleLajust():
-        from MaKaC.rb_factory import Factory
-        from MaKaC.common.db import DBMgr
-        DBMgr.getInstance().startRequest()
-        Factory.getDALManager().connect()
-
-        from MaKaC.rb_room import RoomBase
-
-        print "Connected..."
-
-        avatar = AvatarHolder().match( { "email": "Daniele.Lajust@cern.ch" } )[0]
-
-        resvEx = ReservationBase()
-        resvEx.isConfirmed = None
-        resvEx.bookedForName = "daniele lajust"
-
-        allResvs = CrossLocationQueries.getReservations( resvExample = resvEx )
-        for r in allResvs:
-            r.createdBy = avatar.id
-        #print len( allResvs )
-
-        Factory.getDALManager().commit()
-        Factory.getDALManager().disconnect()
-        DBMgr.getInstance().endRequest()
-
-if __name__ == '__main__':
-    #Test.getNextRepeating()
-    #Test.splitToPeriods()
-    #Test.weekNumber()
-    #Test.overlapsOn()
-    #Test.statistics()
-    #Test.getCollisions()
-    #Test.addUsesAVC()
-    Test.addLocationAVCSupportEmails()
-    #Test.addNeedsAVCSupport()
-    #Test.problem()
-    #Test.assignBookings2DanieleLajust()
-    pass

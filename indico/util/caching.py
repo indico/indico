@@ -18,14 +18,28 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from indico.util.contextManager import ContextManager
 
-from indico.core.extpoint import IContributor
+
+def request_cached(f):
+    def _wrapper(*args, **kwargs):
+        # if there are kwargs, skip caching
+        if kwargs:
+            return f(*args, **kwargs)
+        else:
+            # create a unique key
+            k = (f, args)
+            cache = ContextManager.setdefault('request_cache', {})
+            if k not in cache:
+                cache[k] = f(*args)
+            return cache[k]
+    return _wrapper
 
 
-class IPluginSettingsContributor(IContributor):
-
-    def hasPluginSettings(self, obj, ptype, plugin):
-        pass
-
-    def getPluginSettingsHTML(self, obj, ptype, plugin):
-        pass
+def order_dict(dict):
+    """
+    Very simple method that returns an sorted tuple of (k, v) tuples
+    This is supposed to be used for converting shallow dicts into "hashable"
+    values.
+    """
+    return tuple(sorted(dict.iteritems()))
