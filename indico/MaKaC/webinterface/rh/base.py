@@ -491,7 +491,8 @@ class RH(RequestHandlerBase):
         profile = Config.getInstance().getProfile()
         proffilename = ""
         res = ""
-        retry = 10
+        MAX_RETRIES = 10
+        retry = MAX_RETRIES
         textLog = []
         self._startTime = datetime.now()
 
@@ -511,12 +512,13 @@ class RH(RequestHandlerBase):
         # notify components that the request has started
         self._notify('requestStarted', self._req)
 
+        forcedConflicts = Config.getInstance().getForceConflicts()
         try:
             while retry>0:
 
-                if retry < 10:
+                if retry < MAX_RETRIES:
                     # notify components that the request is being retried
-                    self._notify('requestRetry', self._req, 10 - retry)
+                    self._notify('requestRetry', self._req, MAX_RETRIES - retry)
 
                 try:
                     Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), self.getHostIP()))
@@ -567,7 +569,9 @@ class RH(RequestHandlerBase):
                         # notify components that the request has finished
                         self._notify('requestFinished', self._req)
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
-
+                        # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
+                        if retry > (MAX_RETRIES - forcedConflicts):
+                            raise ConflictError
                         DBMgr.getInstance().endRequest( True )
                         Logger.get('requestHandler').info('Request %s successful' % (id(self._req)))
                         #request succesfull, now, doing tas that must be done only once
@@ -582,7 +586,9 @@ class RH(RequestHandlerBase):
                         res = self._processError(e)
                 except (ConflictError, POSKeyError):
                     import traceback
-                    Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
+                    # only log conflict if it wasn't forced
+                    if retry <= (MAX_RETRIES - forcedConflicts):
+                        Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1

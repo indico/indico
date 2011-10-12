@@ -64,6 +64,8 @@ class ServiceRunner(Observable):
 
     def invokeMethod(self, method, params, req):
 
+        MAX_RETRIES = 10
+
         # clear the context
         ContextManager.destroy()
 
@@ -75,12 +77,13 @@ class ServiceRunner(Observable):
         # notify components that the request has started
         self._notify('requestStarted', req)
 
+        forcedConflicts = Config.getInstance().getForceConflicts()
+        retry = MAX_RETRIES
         try:
-            retry = 10
             while retry > 0:
-                if 10 - retry > 0:
+                if retry < MAX_RETRIES:
                     # notify components that the request is being retried
-                    self._notify('requestRetry', req, 10 - retry)
+                    self._notify('requestRetry', req, MAX_RETRIES - retry)
 
                 try:
                     DBMgr.getInstance().sync()
@@ -94,7 +97,9 @@ class ServiceRunner(Observable):
                     self._notify('requestFinished', req)
 
                     _endRequestSpecific2RH( True )
-
+                    # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
+                    if retry > (MAX_RETRIES - forcedConflicts):
+                        raise ConflictError
                     DBMgr.getInstance().endRequest(True)
                     break
                 except ConflictError:
@@ -106,7 +111,7 @@ class ServiceRunner(Observable):
                     _abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
-                    time.sleep(10 - retry)
+                    time.sleep(MAX_RETRIES - retry)
                     continue
         except CausedError:
             raise
