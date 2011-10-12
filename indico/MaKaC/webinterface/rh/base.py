@@ -571,10 +571,10 @@ class RH(RequestHandlerBase):
 
                         # notify components that the request has finished
                         self._notify('requestFinished', self._req)
-                        self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
                         # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
                         if retry > (MAX_RETRIES - forcedConflicts):
                             raise ConflictError
+                        self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
                         DBMgr.getInstance().endRequest( True )
                         Logger.get('requestHandler').info('Request %s successful' % (id(self._req)))
                         #request succesfull, now, doing tas that must be done only once

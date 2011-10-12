@@ -99,11 +99,10 @@ class ServiceRunner(Observable):
 
                     # notify components that the request has ended
                     self._notify('requestFinished', req)
-
-                    _endRequestSpecific2RH( True )
                     # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
                     if retry > (MAX_RETRIES - forcedConflicts):
                         raise ConflictError
+                    _endRequestSpecific2RH( True )
                     DBMgr.getInstance().endRequest(True)
                     GenericMailer.flushQueue(True) # send emails
                     break
