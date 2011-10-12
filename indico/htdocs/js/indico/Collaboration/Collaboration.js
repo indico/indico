@@ -1757,7 +1757,7 @@ type("UploadElectronicAgreementPopup", ["ExclusivePopupWithButtons"],{
     }
 );
 
-type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
+type("SpeakersEmailPopup", ["BasicEmailPopup"],{
 
         _getButtons: function() {
             var self = this;
@@ -1800,63 +1800,73 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
             ];
         },
 
-        _drawWidget: function(){
-            var self = this;
-            // drop down list with senders
-            optionList = Array();
-            for(var i in self.fromList){
-                optionList.push(Html.option({value: self.fromList[i]}, "Indico Mailer <"+self.fromList[i]+">"));
-            }
-            var selectFromAddress = Html.select({id:"fromEmailAddress"}, optionList);
-
-            var fromField = Html.tr({},
-                    Html.td({width:"15%"}, Html.span({}, $T("From:"))),
-                    Html.td({width:"85%"}, selectFromAddress)
-            );
-
-            var addressTable = Html.table({width:"95%", style:{margin:"20px"}}, fromField);
-
-            // Text editor with default message
-            self.rtWidget = new ParsedRichTextEditor(700, 400, 'IndicoMinimal');
-
-            self.rtWidget.set("Dear {name},<br />" +
-                    "<br />" +
-                    "The organiser asked to record the following event: <strong>"+self.confTitle+"</strong><br />" +
-                    "In order to allow us to publish the video recording of your talk <strong>{talkTitle}</strong>, please sign the agreement form at this page:" +
-                    "<br/><br/> {url} <br/>"+
-                    "<br/>" +
-                    "Best Regards,<br/><br />" +
-            "Cern Recording Team");
-            legendTable = Html.table(
-                                     {},
-                                     Html.tr({}, Html.td({}, "{url} :"), Html.td({}, $T("field containing the url of the electronic agreement. (This field is mandatory)"))),
-                                     Html.tr({}, Html.td({}, "{talkTitle} :"), Html.td({}, $T("field containing the talk title. (This field is mandatory)"))),
-                                     Html.tr({}, Html.td({}, "{name} :"), Html.td({}, $T("field containing the full name of the speaker.")))
-                                     );
-            legend = Html.div({style:{marginLeft: '20px',
-                                      fontStyle:'italic',
-                                      color:'gray'}
-                               },
-                               Html.div({style:{fontWeight:'bold'}}, $T("Legend:")),
-                               legendTable
-                     );
-
-            return Html.div({}, addressTable, self.rtWidget.draw(), legend);
-        },
-
-        draw: function(){
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
-        }
-    },
-    function(confTitle, confId, uniqueIdList, fromList, userId){
+    _drawFromAddress: function(){
         var self = this;
-        self.confTitle = confTitle;
-        self.confId = confId;
+        // drop down list with senders
+        optionList = Array();
+        for(var i in self.fromList){
+            optionList.push(Html.option({value: self.fromList[i]}, "Indico Mailer <"+self.fromList[i]+">"));
+        }
+        var selectFromAddress = Html.select({id:"fromEmailAddress"}, optionList);
+
+        var fromField = Html.tr({},
+                Html.td({width:"15%"}, Html.span({}, $T("From:"))),
+                Html.td({width:"85%"}, selectFromAddress)
+        );
+
+        return Html.table({width:"95%", style:{margin:"20px"}}, fromField);
+    },
+
+    _drawToAddress: function(){
+        return null;
+    },
+
+    draw: function(){
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
+    },
+
+    _drawSubject: function(){
+        return null;
+    }
+
+},
+    function(confTitle, confId, uniqueIdList, fromList, subject, defaultText, legends){
+        var self = this;
         self.uniqueIdList = uniqueIdList;
         self.fromList = fromList;
-        self.userId = userId
+        self.sendFunction=function(){
+            indicoRequest(
+                "collaboration.sendElectronicAgreement",
+                {
+                    conference : self.confId,
+                    uniqueIdList: self.uniqueIdList,
+                    from: $E("fromEmailAddress"),
+                    content: self.rtWidget.get()
+                },
+                function(result, error){
+                    if (error) {
+                        IndicoUtil.errorReport(error);
+                        self.close();
+                    } else {
+                        if(result == "url_error"){
+                            IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {url} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
+                        }else if(result == "talkTitle_error"){
+                            IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {talkTitle} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
+                        }else{
+                            self.close();
+                            span1 = Html.div({}, $T("Email sent successfully !"));
+                            span2 = Html.div({}, $T("The Electronic Agreement email has been sent to:"));
+                            span3 = Html.div({}, $T(""+result));
 
-        this.ExclusivePopupWithButtons($T("Send Email to Speakers"));
+                            informationPopup(Html.div({}, span1, span2, span3), null);
+                        }
+                    }
+                }
+            );
+            //self.close();
+        };
+        title = $T("Send Email to Speakers");
+        this.BasicEmailPopup(title, confTitle, confId, subject, defaultText, legends);
     }
 );
 

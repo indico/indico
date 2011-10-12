@@ -731,14 +731,14 @@ class ConferenceApplyParticipant(ConferenceDisplayBase):
     def _checkParams(self):
         ConferenceDisplayBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._title = pm.extract("title", pType=str, allowEmpty=True)
+        self._title = pm.extract("title", pType=str, allowEmpty=True, defaultValue="")
         self._familyName = pm.extract("surName", pType=str, allowEmpty=False)
         self._firstName = pm.extract("name", pType=str, allowEmpty=False)
         self._email = pm.extract("email", pType=str, allowEmpty=False)
-        self._affiliation = pm.extract("affiliation", pType=str, allowEmpty=True)
-        self._address = pm.extract("address", pType=str, allowEmpty=True)
-        self._telephone = pm.extract("phone", pType=str, allowEmpty=True)
-        self._fax = pm.extract("fax", pType=str, allowEmpty=True)
+        self._affiliation = pm.extract("affiliation", pType=str, allowEmpty=True, defaultValue="")
+        self._address = pm.extract("address", pType=str, allowEmpty=True, defaultValue="")
+        self._telephone = pm.extract("phone", pType=str, allowEmpty=True, defaultValue="")
+        self._fax = pm.extract("fax", pType=str, allowEmpty=True, defaultValue="")
 
     def _getAnswer(self):
         if self._conf.getStartDate() < timezoneUtils.nowutc() :

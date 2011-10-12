@@ -238,7 +238,7 @@ class WPConfModifCollaboration(WPConfModifCSBase):
                    ['Collaboration/%s/Style.css' % plugin.getId()]
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Collaboration') + self._includeJSPackage("Management")
+        return WPMainBase.getJSFiles(self) + self._includeJSPackage("Display") + self._includeJSPackage('Collaboration') + self._includeJSPackage("Management")
 
     ######### private methods ###############
     def _buildExtraJS(self):

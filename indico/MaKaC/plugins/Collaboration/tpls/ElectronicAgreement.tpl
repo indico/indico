@@ -141,7 +141,18 @@ $(function() {
         // make sure at least one is selected
         if($('.speakerLine input:not(:disabled):checked').length) {
             var uniqueIdList = $('.speakerLine input:checked').map(function(){return this.id;}).toArray();
-            var popup = new SpeakersEmailPopup("${conf.getTitle()}", ${conf.getId()}, uniqueIdList, ${fromList} , ${user.getId()});
+            var defaultText = "Dear {name},<br />" +
+                            "<br />" +
+                            "The organiser asked to record the following event: <strong>"+self.confTitle+"</strong><br />" +
+                            "In order to allow us to publish the video recording of your talk <strong>{talkTitle}</strong>, please sign the agreement form at this page:" +
+                            "<br/><br/> {url} <br/>"+
+                            "<br/>" +
+                            "Best Regards,<br/><br />" +
+                            "Cern Recording Team";
+            var legends = {'url':$T('field containing the url of the electronic agreement. (This field is mandatory)'),
+                    'talkTitle':$T('field containing the talk title. (This field is mandatory)'),
+                    'name':$T('field containing the full name of the speaker.')};
+            var popup = new SpeakersEmailPopup("${conf.getTitle()}", ${conf.getId()}, uniqueIdList, ${fromList} , ${user.getId()}, defaultText, legends);
             popup.open();
         } else {
             var dialog = new WarningPopup($T("Warning"), $T("No entry selected! Please select at least one."));
