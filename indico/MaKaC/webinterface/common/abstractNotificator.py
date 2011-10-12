@@ -246,5 +246,5 @@ class EmailNotificator(Notificator):
         if tpl.getFromAddr().strip() == "":
             tpl.setFromAddr(tpl.getConference().getSupportEmail(returnNoReply=True))
 
-        sm=GenericMailer.send(self.apply(abstract,tpl))
+        GenericMailer.send(self.apply(abstract,tpl))
 

@@ -51,6 +51,7 @@ from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 from MaKaC.plugins.RoomBooking.default.roomblocking import RoomBlockingPrincipal,\
     BlockedRoom
 from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
+from MaKaC.common.mail import GenericMailer
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -1442,7 +1443,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
     def _businessLogic( self ):
 
         candResv = self._candResv
-        self._emailsToBeSent = []
+        emailsToBeSent = []
         self._confirmAdditionFirst = False;
 
         # Set confirmation status
@@ -1476,7 +1477,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                 # Form is OK and (no conflicts or skip conflicts)
                 if self._formMode == FormMode.NEW:
                     candResv.insert()
-                    self._emailsToBeSent += candResv.notifyAboutNewReservation()
+                    emailsToBeSent += candResv.notifyAboutNewReservation()
                     if candResv.isConfirmed:
                         session.setVar( "title", 'You have successfully made a booking.' )
                         session.setVar( "description", 'NOTE: Your booking is complete. However, be <b>aware</b> that in special cases the person responsible for a room may reject your booking. In that case you would be instantly notified by e-mail.' )
@@ -1491,7 +1492,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                         self._loadResvCandidateFromParams( self._orig_candResv, self._params )
                     self._orig_candResv.update()
                     self._orig_candResv.indexDayReservations()
-                    self._emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
+                    emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
 
                     # Add entry to the log
                     info = []
@@ -1500,7 +1501,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                     # If no modification was observed ("Save" was pressed but no field
                     # was changed) no entry is added to the log
                     if len(info) > 1 :
-                        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+                        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
                         self._orig_candResv.getResvHistory().addHistoryEntry(histEntry)
 
                     session.setVar( "title", 'Booking updated.' )
@@ -1518,7 +1519,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                             collResv.reject()    # Just sets isRejected = True
                             collResv.update()
                             emails = collResv.notifyAboutRejection()
-                            self._emailsToBeSent += emails
+                            emailsToBeSent += emails
 
                             # Add entry to the booking history
                             info = []
@@ -1531,7 +1532,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                             collResv.excludeDay(rejectDate, unindex=True)
                             collResv.update()
                             emails = collResv.notifyAboutRejection(date=rejectDate, reason=rejectionReason)
-                            self._emailsToBeSent += emails
+                            emailsToBeSent += emails
 
                             # Add entry to the booking history
                             info = []
@@ -1555,6 +1556,9 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
         # Form is not properly filled OR there are conflicts
         self._errors = errors
+
+        for notification in emailsToBeSent:
+            GenericMailer.send(notification)
 
     def _process( self ):
 
@@ -1777,16 +1781,18 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
 
     def _process( self ):
         # Booking deletion is always possible - just delete
-        self._emailsToBeSent = []
         self._resv.cancel()    # Just sets isCancel = True
         self._resv.update()
-        self._emailsToBeSent += self._resv.notifyAboutCancellation()
+        emailsToBeSent = self._resv.notifyAboutCancellation()
 
         # Add entry to the booking history
         info = []
         info.append("Booking cancelled")
-        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
         self._resv.getResvHistory().addHistoryEntry(histEntry)
+
+        for notification in emailsToBeSent:
+            GenericMailer.send(notification)
 
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Booking has been cancelled." )
@@ -1815,16 +1821,18 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
-        self._emailsToBeSent = []
         self._resv.excludeDay( self._date, unindex=True )
         self._resv.update()
-        self._emailsToBeSent += self._resv.notifyAboutCancellation( date = self._date )
+        emailsToBeSent = self._resv.notifyAboutCancellation( date = self._date )
 
         # Add entry to the booking history
         info = []
         info.append("Booking occurence of the %s cancelled" %self._date.strftime("%d %b %Y"))
-        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
         self._resv.getResvHistory().addHistoryEntry(histEntry)
+
+        for notification in emailsToBeSent:
+            GenericMailer.send(notification)
 
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Selected occurrence has been cancelled." )
@@ -1854,17 +1862,19 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
-        self._emailsToBeSent = []
         self._resv.reject()    # Just sets isRejected = True
         self._resv.update()
-        self._emailsToBeSent += self._resv.notifyAboutRejection()
+        emailsToBeSent = self._resv.notifyAboutRejection()
 
         # Add entry to the booking history
         info = []
         info.append("Booking rejected")
         info.append("Reason : '%s'" %self._resv.rejectionReason)
-        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
         self._resv.getResvHistory().addHistoryEntry(histEntry)
+
+        for notification in emailsToBeSent:
+            GenericMailer.send(notification)
 
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Booking has been rejected." )
@@ -1889,7 +1899,7 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
 
     def _process( self ):
         userRooms = self._getUser().getRooms()
-        self._emailsToBeSent = []
+        emailsToBeSent = []
 
         resvEx = ReservationBase()
         resvEx.isConfirmed = False
@@ -1909,12 +1919,12 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
                 resv.rejectionReason = "Your PRE-booking conflicted with exiting booking. (Please note it IS possible even if you were the first one to PRE-book the room)."
                 resv.reject()    # Just sets isRejected = True
                 resv.update()
-                self._emailsToBeSent += resv.notifyAboutRejection()
+                emailsToBeSent += resv.notifyAboutRejection()
                 counter += 1
                 # Add entry to the history of the rejected reservation
                 info = []
                 info.append("Booking rejected due to conflict with existing booking")
-                histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+                histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
                 resv.getResvHistory().addHistoryEntry(histEntry)
             resv.isConfirmed = tmpConfirmed
         self._websession.setVar( 'prebookingsRejected', True )
@@ -1924,6 +1934,8 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
         else:
             self._websession.setVar( 'title', "There are no conflicting PRE-bookings for your rooms." )
             self._websession.setVar( 'description', "" )
+        for notification in emailsToBeSent:
+            GenericMailer.send(notification)
         url = urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, onlyPrebookings = True, autoCriteria = True )
         self._redirect( url ) # Redirect to booking details
 
@@ -1948,18 +1960,18 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
-        self._emailsToBeSent = []
+        emailsToBeSent = []
         session = self._websession
         if len( self._resv.getCollisions( sansID = self._resv.id ) ) == 0:
             # No conflicts
             self._resv.isConfirmed = True
             self._resv.update()
-            self._emailsToBeSent += self._resv.notifyAboutConfirmation()
+            emailsToBeSent += self._resv.notifyAboutConfirmation()
 
             # Add entry to the booking history
             info = []
             info.append("Booking accepted")
-            histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+            histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
             self._resv.getResvHistory().addHistoryEntry(histEntry)
 
             session.setVar( 'actionSucceeded', True )
@@ -1982,7 +1994,8 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             self._saveResvCandidateToSession( self._resv )
             url = urlHandlers.UHRoomBookingBookingForm.getURL( self._resv.room )
             self._redirect( url ) # Redirect to booking details
-
+        for notification in emailsToBeSent:
+            GenericMailer.send(notification)
 
 class RHRoomBookingStatement( RHRoomBookingBase ):
 
@@ -2233,17 +2246,19 @@ class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
-        self._emailsToBeSent = []
         self._resv.excludeDay( self._date, unindex=True )
         self._resv.update()
-        self._emailsToBeSent += self._resv.notifyAboutRejection( date = self._date, reason = self._rejectionReason )
+        emailsToBeSent = self._resv.notifyAboutRejection( date = self._date, reason = self._rejectionReason )
 
         # Add entry to the booking history
         info = []
         info.append("Booking occurence of the %s rejected" %self._date.strftime("%d %b %Y"))
         info.append("Reason : '%s'" %self._rejectionReason)
-        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
         self._resv.getResvHistory().addHistoryEntry(histEntry)
+
+        for notification in emailsToBeSent:
+            GenericMailer.send(notification)
 
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Selected occurrence of this booking has been rejected." )

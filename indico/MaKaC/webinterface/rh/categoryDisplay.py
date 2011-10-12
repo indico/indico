@@ -50,6 +50,7 @@ from MaKaC.i18n import _
 from MaKaC.rb_location import Location, CrossLocationQueries
 from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
+from MaKaC.common.mail import GenericMailer
 
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
@@ -274,7 +275,6 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
 
     def alertCreation(self, confs):
         conf = confs[0]
-        self._emailsToBeSent = []
         fromAddr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         addrs = [ info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail() ]
         eventType = conf.getType()
@@ -327,12 +327,12 @@ _Access%s_
         msg = ("Content-Type: text/plain; charset=\"utf-8\"\r\nFrom: %s\r\nReturn-Path: %s\r\nTo: %s\r\nCc: \r\nSubject: %s\r\n\r\n"%(fromAddr, fromAddr, addrs, subject))
         msg = msg + text
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
-        self._emailsToBeSent.append(maildata)
+        GenericMailer.send(maildata)
         # Category notification
         if conf.getOwner().getNotifyCreationList() != "":
             addrs2 = [ conf.getOwner().getNotifyCreationList() ]
             maildata2 = { "fromAddr": fromAddr, "toList": addrs2, "subject": subject, "body": text }
-            self._emailsToBeSent.append(maildata2)
+            GenericMailer.send(maildata2)
 
 
 class UtilPersons:

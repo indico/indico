@@ -43,12 +43,13 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 import MaKaC.webinterface.session as session
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
+from MaKaC.webinterface.common.baseNotificator import Notification
 from MaKaC.common.general import *
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
 from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
+from MaKaC.webinterface.mail import GenericMailer
 from xml.sax.saxutils import escape
 
 from MaKaC.common.utils import truncate
@@ -525,6 +526,8 @@ class RH(RequestHandlerBase):
                     try:
                         # clear the fossile cache at the start of each request
                         fossilize.clearCache()
+                        # delete all queued emails
+                        GenericMailer.flushQueue(False)
 
                         DBMgr.getInstance().sync()
                         # keep a link to the web session in the access wrapper
@@ -576,7 +579,7 @@ class RH(RequestHandlerBase):
                         Logger.get('requestHandler').info('Request %s successful' % (id(self._req)))
                         #request succesfull, now, doing tas that must be done only once
                         try:
-                            self._sendEmails()
+                            GenericMailer.flushQueue(True) # send emails
                             self._deleteTempFiles()
                         except:
                             pass
@@ -717,11 +720,6 @@ class RH(RequestHandlerBase):
             return ""
 
         return res
-
-    def _sendEmails( self ):
-        if hasattr( self, "_emailsToBeSent" ):
-            for email in self._emailsToBeSent:
-                GenericMailer.send(GenericNotification(email))
 
     def _deleteTempFiles( self ):
         if len(self._tempFilesToDelete) > 0:

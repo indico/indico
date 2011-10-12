@@ -12,6 +12,7 @@ import MaKaC.errors
 
 from MaKaC.common import DBMgr, Config
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.mail import GenericMailer
 
 from MaKaC.services.interface.rpc.common import CausedError, NoReportError
 from MaKaC.services.interface.rpc.common import RequestError
@@ -86,6 +87,9 @@ class ServiceRunner(Observable):
                     self._notify('requestRetry', req, MAX_RETRIES - retry)
 
                 try:
+                    # delete all queued emails
+                    GenericMailer.flushQueue(False)
+
                     DBMgr.getInstance().sync()
 
                     try:
@@ -101,6 +105,7 @@ class ServiceRunner(Observable):
                     if retry > (MAX_RETRIES - forcedConflicts):
                         raise ConflictError
                     DBMgr.getInstance().endRequest(True)
+                    GenericMailer.flushQueue(True) # send emails
                     break
                 except ConflictError:
                     _abortSpecific2RH()

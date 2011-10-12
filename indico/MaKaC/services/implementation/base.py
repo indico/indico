@@ -208,14 +208,6 @@ class ServiceBase(RequestHandlerBase):
 
         return ''.join(trace)
 
-    def _sendEmails( self ):
-        if hasattr( self, "_emailsToBeSent" ):
-            ExternalOperationsManager.execute(self, "sendMailsAJAX", self.atomicSendMails)
-
-    def atomicSendMails(self):
-        for email in self._emailsToBeSent:
-            GenericMailer.send(GenericNotification(email))
-
     def _deleteTempFiles( self ):
         if len(self._tempFilesToDelete) > 0:
             for file in self._tempFilesToDelete:
@@ -242,8 +234,6 @@ class ServiceBase(RequestHandlerBase):
 
         if self._doProcess:
             answer = self._getAnswer()
-
-            self._sendEmails()
             self._deleteTempFiles()
 
             return answer
