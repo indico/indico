@@ -5,4 +5,8 @@ Disallow: /categoryMap.py
 Disallow: /wcalendar.py
 Disallow: /categOverview.py
 Disallow: /search.py
+Disallow: /scripts/export.py
+Disallow: /search.py
+Disallow: /export
+Disallow: /api
 Crawl-delay: 10

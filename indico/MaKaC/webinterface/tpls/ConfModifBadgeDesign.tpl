@@ -62,8 +62,8 @@
 
     Item.prototype.toHTML = function () {
         return '<table border="2" cellpadding="0" cellspacing="0"' +
-               ' width="' + this.width + '" bgcolor="' + (this.selected ? "#CCCCFF" : "white") +
-               '" style="cursor:move; font-weight:' + (this.bold ? 'bold' : 'normal') + '; font-style:' + (this.italic ? 'italic' : 'normal') +
+               ' width="' + this.width + '"'  +
+               ' style="background-color: '+(this.selected ? "#ccf" : "#fff")+';cursor:move; font-weight:' + (this.bold ? 'bold' : 'normal') + '; font-style:' + (this.italic ? 'italic' : 'normal') +
                '; text-align: ' + this.textAlign.replace('Justified', 'justify') + ';"' +
                '><tbody><tr><td><span style="color:' + this.color + '; font-family: ' + this.fontFamily + '; font-size:' + this.fontSize + ';">' +
                (this.key == "Fixed Text" ? this.text : translate[this.key]) +
@@ -149,12 +149,12 @@
         if (lastSelectedDiv) {
             var lastId = lastSelectedDiv.attr('id');
             items[lastId].selected = false;
-            lastSelectedDiv.html(items[lastId].toHTML());
+            lastSelectedDiv.find('> table').css('backgroundColor', '#fff');
         }
 
         var newSelectedItem = items[id];
         newSelectedItem.selected = true;
-        newSelectedDiv.html(newSelectedItem.toHTML());
+        newSelectedDiv.find('> table').css('backgroundColor', '#ccf');
         lastSelectedDiv = newSelectedDiv;
         $('#removeButton').prop('disabled', false);
 
@@ -194,7 +194,7 @@
             for (var i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i < Math.ceil(templateDimensions.height / pixelsPerCm); i++) {
                 $('<tr/>', {
                     id: 'rulerv' + i
-                }).append('<td><img src="${ baseURL }//images/ruler/rulerv' + i + '.png" align="center"/></td>').appendTo(vRuler);
+                }).append('<td><img src="${ baseURL }/images/ruler/rulerv' + i + '.png" align="center"/></td>').appendTo(vRuler);
             }
         }
         else if (templateDimensions.height < previousTemplateDimensions.height) {

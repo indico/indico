@@ -1,4 +1,4 @@
-<%page args="item, parent, hideTime=False, allMaterial=False, minutes=False, order=1" />
+<%page args="item, parent, hideTime=False, allMaterial=False, minutes=False, order=1, showOrder=True" />
 
 <%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
 
@@ -7,11 +7,16 @@
 </tr>
 <tr>
     <td class="itemTopAlign itemLeftAlign ">
-        % if not hideTime:
-            <span class="itemTime">${getTime(item.getAdjustedStartDate(timezone))}</span>&nbsp;&nbsp;${order}.
-        % else:
-            ${order}.
+        % if showOrder:
+            % if not hideTime:
+                <span class="itemTime">${getTime(item.getAdjustedStartDate(timezone))}</span>&nbsp;&nbsp;${order}.
+            % else:
+                ${order}.
+            % endif
+        % elif not hideTime:
+               <span class="itemTime">${getTime(item.getAdjustedStartDate(timezone))}</span>
         % endif
+
     </td>
     <td class="itemTopAlign itemLeftAlign">
         ${item.getTitle()}

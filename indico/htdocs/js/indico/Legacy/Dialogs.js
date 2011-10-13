@@ -677,7 +677,7 @@ extend(IndicoUI.Dialogs,
 
                        rtWidget.set(req.get(), !req.get());
 
-                       rtWidget.observe(function(value){
+                       rtWidget.getEditor().on('change',function(ev){
                            changedText.set(true);
                        });
 

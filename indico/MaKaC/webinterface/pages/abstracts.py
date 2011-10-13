@@ -602,6 +602,10 @@ class WAbstractManagment( wcomponents.WTemplated ):
         html = """<b>%s</b>"""%AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
         tzUtil = DisplayTZ(self._aw,self._conf)
         tz = tzUtil.getDisplayTZ()
+        if hasattr(status, 'getResponsible'):
+            respPerson = i18nformat(""" _("by") %s""")%self._getAuthorHTML(status.getResponsible()) if status.getResponsible() else ""
+        else:
+            respPerson = ""
 
         if status.__class__  == review.AbstractStatusAccepted:
             trackTitle, contribTitle = "", ""
@@ -609,24 +613,25 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 trackTitle = " for %s"%self.htmlText(status.getTrack().getTitle())
             if status.getType():
                 contribTitle = " as %s"%self.htmlText(status.getType().getName())
-            html = i18nformat("""%s%s%s<br><font size="-1"> _("by") %s _("on") %s</font>""")%( \
+            html = i18nformat("""%s%s%s<br><font size="-1">%s _("on") %s</font>""")%( \
                             html, trackTitle, contribTitle,\
-                            self._getAuthorHTML(status.getResponsible()), \
+                            respPerson, \
                             getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
         elif status.__class__ == review.AbstractStatusRejected:
-            html = i18nformat("""%s<br><font size="-1"> _("by") %s _("on") %s</font>""")%( \
+            html = i18nformat("""%s<br><font size="-1">%s _("on") %s</font>""")%( \
                             html, \
-                            self._getAuthorHTML( status.getResponsible() ), \
+                            respPerson, \
                             getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
         elif status.__class__ == review.AbstractStatusWithdrawn:
-            html = i18nformat("""%s <font size="-1"> _("by") %s _("on") %s</font>""")%( \
-                            html,self._getAuthorHTML(status.getResponsible()),\
+            html = i18nformat("""%s<font size="-1">%s _("on") %s</font>""")%( \
+                            html,\
+                            respPerson, \
                             getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
@@ -634,9 +639,9 @@ class WAbstractManagment( wcomponents.WTemplated ):
         elif status.__class__ == review.AbstractStatusDuplicated:
             original=status.getOriginal()
             url=urlHandlers.UHAbstractManagment.getURL(original)
-            html = i18nformat("""%s (<a href=%s>%s-<i>%s</i></a>) <font size="-1"> _("by") %s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(original.getId()),\
+            html = i18nformat("""%s (<a href=%s>%s-<i>%s</i></a>) <font size="-1">%s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(original.getId()),\
                 self.htmlText(original.getTitle()),\
-                self._getAuthorHTML(status.getResponsible()), \
+                respPerson, \
                 getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
@@ -644,9 +649,9 @@ class WAbstractManagment( wcomponents.WTemplated ):
         elif status.__class__ == review.AbstractStatusMerged:
             target=status.getTargetAbstract()
             url=urlHandlers.UHAbstractManagment.getURL(target)
-            html = i18nformat("""<font color="black"><b>%s</b></font> (<a href=%s>%s-<i>%s</i></a>) <font size="-1"> _("by") %s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(target.getId()),\
+            html = i18nformat("""<font color="black"><b>%s</b></font> (<a href=%s>%s-<i>%s</i></a>) <font size="-1">%s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(target.getId()),\
                 self.htmlText(target.getTitle()),\
-                self._getAuthorHTML(status.getResponsible()), \
+                respPerson, \
                 getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\

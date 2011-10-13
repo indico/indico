@@ -1,4 +1,4 @@
-<%page args="item, parent=None, allMaterial=False, hideTime=True, materialSession=False, order=1"/>
+<%page args="item, parent=None, allMaterial=False, hideTime=True, materialSession=False, order=1, showOrder=True"/>
 
 <%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
 
@@ -63,7 +63,7 @@
                 if not subitem.canView(accessWrapper):
                     continue
         %>
-        <%include file="${getItemType(subitem)}.tpl" args="item=subitem, parent=item, hideTime=hideTime, order=order"/>
+        <%include file="${getItemType(subitem)}.tpl" args="item=subitem, parent=item, hideTime=hideTime, order=order, showOrder=showOrder"/>
         % if getItemType(subitem) == "Contribution":
             <% order +=1 %>
         % endif

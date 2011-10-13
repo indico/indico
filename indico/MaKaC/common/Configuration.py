@@ -473,6 +473,7 @@ class Config:
         'ExportACL'           : {},
         'MaxUploadFilesTotalSize' : '0',
         'MaxUploadFileSize' : '0',
+        'ForceConflicts' : 0,
         # Authentication
         'LDAPConfig': {'host': 'myldapserver.example.com',
                        'useTLS': True,

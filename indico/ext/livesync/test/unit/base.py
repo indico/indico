@@ -21,7 +21,7 @@
 import time, contextlib, dateutil
 
 from indico.ext.livesync import SyncManager, db
-from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
+from indico.tests.python.unit.util import IndicoTestFeature
 from indico.util.date_time import nowutc, int_timestamp
 from indico.ext.livesync.tasks import LiveSyncUpdateTask
 
@@ -43,7 +43,7 @@ class LiveSync_Feature(IndicoTestFeature):
         super(LiveSync_Feature, self).destroy(obj)
 
 
-class _TestSynchronization(IndicoTestCase):
+class _TestSynchronization(object):
 
     _requires = ['db.DummyUser', LiveSync_Feature, 'util.RequestEnvironment']
 
@@ -65,7 +65,7 @@ class _TestSynchronization(IndicoTestCase):
         self.assertEqual(expected, res)
 
 
-class _TUpload(IndicoTestCase):
+class _TUpload(object):
 
     _requires = ['db.DummyUser', LiveSync_Feature, 'util.RequestEnvironment']
 

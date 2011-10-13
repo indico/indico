@@ -279,13 +279,11 @@ class TestElectronicAgreement(IndicoTestCase):
 
         # Create a booking - Recording Request
         bookingParams =  {
-                            'otherComments': '', 'endDate': '', 'permission': 'Yes',
-                            'talkSelection': ['0'], 'numAttendees': '', 'talks': '',
+                            'otherComments': '', 'endDate': '', 'talkSelection': ['0'], 'numAttendees': '', 'talks': '',
                             'lectureStyle': 'lecturePresentation', 'numRemoteViewers': '', 'startDate': '', 'postingUrgency': 'withinWeek'
                          }
         # Create a booking - Webcast Request
         bookingParamsWeb =  {
-                           'permission': 'Yes',
                            'talkSelection': ['0'], 'talks': 'choose'
                         }
 
@@ -317,7 +315,7 @@ class TestElectronicAgreement(IndicoTestCase):
 
     def sendEmailService(self, uniqueId):
         fromField = "no-reply@test.ch"
-        content = "This is a test {url}..."
+        content = "This is a test {url} {talkTitle}..."
 
         params = {
                   'from':fromField,

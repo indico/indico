@@ -112,6 +112,10 @@ class IConferenceMetadataFossil(IFossil):
     getOwner.convert = lambda x: x.getTitle()
     getOwner.name = 'category'
 
+    def getCategoryId(self):
+        pass
+    getCategoryId.produce = lambda x: x.getOwner().getId()
+
     def getTimezone(self):
         pass
 
@@ -129,7 +133,64 @@ class IConferenceMetadataFossil(IFossil):
     getRoom.convert = lambda r: r and r.getName()
 
 
-class IContributionMetadataFossil(IFossil):
+class IContributionParticipationMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getFullName(self):
+        pass
+
+    def getEmail(self):
+        pass
+
+    def getAffiliation(self):
+        pass
+
+
+class IResourceMetadataFossil(IFossil):
+
+    def getName(self):
+        pass
+
+
+class ILocalFileMetadataFossil(IResourceMetadataFossil):
+
+    def getURL(self):
+        pass
+    getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
+    getURL.name = 'url'
+
+
+class ILinkMetadataFossil(IResourceMetadataFossil):
+
+    def getURL(self):
+        pass
+    getURL.name = 'url'
+
+class IMaterialMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getTitle( self ):
+        pass
+
+    def getResourceList(self):
+        pass
+    getResourceList.result = {'MaKaC.conference.Link': ILinkMetadataFossil, 'MaKaC.conference.LocalFile': ILocalFileMetadataFossil}
+    getResourceList.name = 'resources'
+
+
+class _IncludeMaterialFossil(IFossil):
+
+    def getAllMaterialList(self):
+        pass
+    getAllMaterialList.name = 'material'
+    getAllMaterialList.result = IMaterialMetadataFossil
+
+
+class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
 
     def getId(self):
         pass
@@ -160,6 +221,11 @@ class IContributionMetadataFossil(IFossil):
     def getDescription(self):
         pass
 
+    def getSpeakerList(self):
+        pass
+    getSpeakerList.name = 'speakers'
+    getSpeakerList.result = IContributionParticipationMetadataFossil
+
     def getTrack( self ):
         pass
     getTrack.convert = lambda t: t and t.getTitle()
@@ -185,6 +251,11 @@ class ISubContributionMetadataFossil(IFossil):
         pass
     getDuration.convert = Conversion.duration
 
+    def getSpeakerList(self):
+        pass
+    getSpeakerList.name = 'speakers'
+    getSpeakerList.result = IContributionParticipationMetadataFossil
+
 
 class IContributionMetadataWithSubContribsFossil(IContributionMetadataFossil):
 
@@ -194,7 +265,7 @@ class IContributionMetadataWithSubContribsFossil(IContributionMetadataFossil):
     getSubContributionList.name = 'subContributions'
 
 
-class IConferenceMetadataWithContribsFossil(IConferenceMetadataFossil):
+class IConferenceMetadataWithContribsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 
     def getContributionList(self):
         pass
@@ -202,7 +273,7 @@ class IConferenceMetadataWithContribsFossil(IConferenceMetadataFossil):
     getContributionList.name = 'contributions'
 
 
-class IConferenceMetadataWithSubContribsFossil(IConferenceMetadataFossil):
+class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 
     def getContributionList(self):
         pass
@@ -218,7 +289,7 @@ class ISessionMetadataFossil(ISessionFossil):
     getContributionList.name = 'contributions'
 
 
-class IConferenceMetadataWithSessionsFossil(IConferenceMetadataFossil):
+class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 
     def getSessionList(self):
         pass

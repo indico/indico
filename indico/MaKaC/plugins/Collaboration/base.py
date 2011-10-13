@@ -940,6 +940,7 @@ class CSBookingBase(Persistent, Fossilizable):
     _hasEventDisplay = False
     _hasTitle = False
     _adminOnly = False
+    _complexParameters = []
 
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.

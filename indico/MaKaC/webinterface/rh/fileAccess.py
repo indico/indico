@@ -68,7 +68,7 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
                 pass
             self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self._file.getFileName())
 
-            if cfg.getUseXSendFile():
+            if cfg.getUseXSendFile() and self._req.headers_in['User-Agent'].find('Android') == -1:
                 # X-Send-File support makes it easier, just let the web server
                 # do all the heavy lifting
                 return self._req.send_x_file(self._file.getFilePath())

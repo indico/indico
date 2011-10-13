@@ -24,11 +24,37 @@ from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 
 from MaKaC.common.logger import Logger
+from MaKaC.common.contextManager import ContextManager
 
 class GenericMailer:
 
+    @classmethod
+    def send(cls, notification, skipQueue=False):
+        if isinstance(notification, dict):
+            # Wrap a raw dictionary in a notification class
+            from MaKaC.webinterface.mail import GenericNotification
+            notification = GenericNotification(notification)
+        # enqueue emails if we have a rh and do not skip queuing, otherwise send immediately
+        rh = ContextManager.get('currentRH', None)
+        if skipQueue or not rh:
+            cls._send(notification)
+        else:
+            ContextManager.setdefault('emailQueue', []).append(notification)
+
+    @classmethod
+    def flushQueue(cls, send):
+        queue = ContextManager.get('emailQueue', None)
+        if not queue:
+            return
+        if send:
+            # send all emails
+            for mail in queue:
+                cls._send(mail)
+        # clear the queue no matter if emails were sent or not
+        del queue[:]
+
     @staticmethod
-    def send(notification):
+    def _send(notification):
         server=smtplib.SMTP(*Config.getInstance().getSmtpServer())
         if Config.getInstance().getSmtpUseTLS():
             server.ehlo()
@@ -73,13 +99,18 @@ class GenericMailer:
 
         Logger.get('mail').info('Mail sent to %s' % to)
 
-    def sendAndLog(notification, conference, module="", user = None):
-        GenericMailer.send(notification)
-        logData = {}
-        logData["fromAddr"] = notification.getFromAddr()
-        logData["toList"] = notification.getToList()
-        logData["ccList"] = notification.getCCList()
-        logData["subject"] = notification.getSubject()
-        logData["body"] = notification.getBody()
-        conference.getLogHandler().logEmail(logData,module,user)
-    sendAndLog = staticmethod(sendAndLog)
+    @classmethod
+    def _log(cls, data):
+        data['conference'].getLogHandler().logEmail(data['data'], data['module'], data['user'])
+
+    @classmethod
+    def sendAndLog(cls, notification, conference, module='', user=None, skipQueue=False):
+        cls.send(notification, skipQueue=skipQueue)
+        logData = {
+            'fromAddr': notification.getFromAddr(),
+            'toList': notification.getToList(),
+            'ccList': notification.getCCList(),
+            'subject': notification.getSubject(),
+            'body': notification.getBody()
+        }
+        conference.getLogHandler().logEmail(logData, module, user)

@@ -12,6 +12,7 @@ import MaKaC.errors
 
 from MaKaC.common import DBMgr, Config
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.mail import GenericMailer
 
 from MaKaC.services.interface.rpc.common import CausedError, NoReportError
 from MaKaC.services.interface.rpc.common import RequestError
@@ -46,12 +47,16 @@ def lookupHandler(method):
 def processRequest(method, params, req):
     # lookup handler
     handler = lookupHandler(method)
+    websession = getSession(req)
 
     # invoke handler
     if hasattr(handler, "process"):
-        result = handler(params, getSession(req), req).process()
+        result = handler(params, websession, req).process()
     else:
-        result = handler(params, getSession(req), req)
+        result = handler(params, websession, req)
+
+    # commit session if necessary
+    session.getSessionManager().maintain_session(req, websession)
 
     return result
 
@@ -59,6 +64,8 @@ def processRequest(method, params, req):
 class ServiceRunner(Observable):
 
     def invokeMethod(self, method, params, req):
+
+        MAX_RETRIES = 10
 
         # clear the context
         ContextManager.destroy()
@@ -71,14 +78,18 @@ class ServiceRunner(Observable):
         # notify components that the request has started
         self._notify('requestStarted', req)
 
+        forcedConflicts = Config.getInstance().getForceConflicts()
+        retry = MAX_RETRIES
         try:
-            retry = 10
             while retry > 0:
-                if 10 - retry > 0:
+                if retry < MAX_RETRIES:
                     # notify components that the request is being retried
-                    self._notify('requestRetry', req, 10 - retry)
+                    self._notify('requestRetry', req, MAX_RETRIES - retry)
 
                 try:
+                    # delete all queued emails
+                    GenericMailer.flushQueue(False)
+
                     DBMgr.getInstance().sync()
 
                     try:
@@ -88,10 +99,12 @@ class ServiceRunner(Observable):
 
                     # notify components that the request has ended
                     self._notify('requestFinished', req)
-
+                    # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
+                    if retry > (MAX_RETRIES - forcedConflicts):
+                        raise ConflictError
                     _endRequestSpecific2RH( True )
-
                     DBMgr.getInstance().endRequest(True)
+                    GenericMailer.flushQueue(True) # send emails
                     break
                 except ConflictError:
                     _abortSpecific2RH()
@@ -102,7 +115,7 @@ class ServiceRunner(Observable):
                     _abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
-                    time.sleep(10 - retry)
+                    time.sleep(MAX_RETRIES - retry)
                     continue
         except CausedError:
             raise
@@ -118,7 +131,6 @@ def getSession(req):
     except session.SessionError, e:
         sm.revoke_session_cookie(req)
         websession = sm.get_session(req)
-    sm.maintain_session(req, websession)
     return websession
 
 from MaKaC.rb_location import CrossLocationDB

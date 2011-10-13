@@ -85,9 +85,9 @@ class TestIIIndex(unittest.TestCase):
         Check that queries over the index work
         """
         self.testIndexCollisionOperation()
-        self.assertEqual(list(self._idx.apply((1500,3000))), [1, 2, 3, 4, 5])
-        self.assertEqual(list(self._idx.apply((1500,1500))), [3, 4, 5])
-        self.assertEqual(list(self._idx.apply((4000,5000))), [])
+        self.assertEqual(list(self._idx.apply((1500, 3000))), [1, 2, 3, 4, 5])
+        self.assertEqual(list(self._idx.apply((1500, 1500))), [3, 4, 5])
+        self.assertEqual(list(self._idx.apply((4000, 5000))), [])
 
     def testFaultyUnindex(self):
         """
@@ -119,6 +119,9 @@ class DummyObject(object):
 
     def getUniqueId(self):
         return self._id
+
+    def __cmp__(self, obj):
+        return cmp(self._id, obj._id)
 
     def __conform__(self, proto):
         if proto == IDummyAdapter:
@@ -155,7 +158,7 @@ class TestIOIndex(unittest.TestCase):
 
         self.assertEqual(len(self._idx), 0)
 
-        for i in range(0,20):
+        for i in range(0, 20):
             self.assertEqual(self._idx.get(i), None)
 
     def testUnindexingNonExisting(self):

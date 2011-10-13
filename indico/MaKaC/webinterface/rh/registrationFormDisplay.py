@@ -28,6 +28,7 @@ from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 
 from MaKaC.authentication import AuthenticatorMgr
+from MaKaC.common.mail import GenericMailer
 
 
 class RHBaseRegistrationForm( RHConferenceBaseDisplay ):
@@ -179,13 +180,9 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             user.addRegistrant(rp)
             rp.setAvatar(user)
         # avoid multiple sending in case of db conflict
-        if not hasattr(self, "_emailSent"):
-            email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
-            if email:
-                if not hasattr(self, "_emailsToBeSent"):
-                    self._emailsToBeSent = []
-                self._emailsToBeSent.append(email)
-                self._emailSent = True
+        email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
+        if email:
+            GenericMailer.send(email)
         if not canManageRegistration:
             self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
         else:
@@ -225,10 +222,8 @@ class RHRegistrationFormconfirmBooking( RHRegistrationFormDisplayBase ):
 
     def _processIfActive( self ):
         if self._registrant is not None:
-            # avoid multiple sending in case of db conflict
-            if not hasattr(self, "_emailSent") and self._regForm.isSendReceiptEmail():
+            if self._regForm.isSendReceiptEmail():
                 self._regForm.getNotification().sendEmailNewRegistrantDetailsPay(self._regForm,self._registrant)
-                self._emailSent = True
             url=urlHandlers.UHConfRegistrationFormconfirmBookingDone.getURL(self._conf)
             url.addParam("registrantId",self._registrant.getId())
             self._redirect(url)
@@ -286,10 +281,7 @@ class RHRegistrationFormPerformModify( RHRegistrationFormCreation ):
                 if self._getRequestParams().get("email","") != rp.getEmail() and self._conf.hasRegistrantByEmail(self._getRequestParams().get("email","")):
                     raise FormValuesError(_("There is already a user with the email \"%s\". Please choose another one")%self._getRequestParams().get("email","--no email--"))
                 rp.setValues(self._getRequestParams(), self._getUser())
-                # avoid multiple sending in case of db conflict
-                if not hasattr(self, "_emailSent"):
-                    self._regForm.getNotification().sendEmailModificationRegistrant(self._regForm, rp)
-                    self._emailSent = True
+                self._regForm.getNotification().sendEmailModificationRegistrant(self._regForm, rp)
                 if rp.doPay():
                     self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
                 else:

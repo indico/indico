@@ -166,7 +166,7 @@ class BaseTask(TimedEvent):
         curTime = self._getCurrentDateTime()
         tsDiff = int_timestamp(curTime) - int_timestamp(self.getStartOn())
 
-        if tsDiff < 0:
+        if tsDiff > 0:
             self.getLogger().debug('Task %s will wait for some time. (%s) > (%s)' % \
                                    (self.id, self.getStartOn(), curTime))
             base.TimeSource.get().sleep(tsDiff)
