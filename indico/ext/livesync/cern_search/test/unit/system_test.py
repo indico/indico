@@ -34,6 +34,8 @@ from threading import Thread
 # dependency imports
 from lxml import etree
 
+from indico.tests.python.unit.util import IndicoTestCase
+
 # plugin imports
 from indico.ext.livesync.cern_search import CERNSearchUploadAgent
 from indico.ext.livesync.test.unit.base import _TUpload
@@ -103,6 +105,6 @@ class FakeCERNSearch(Thread):
             self._server.server_close()
 
 
-class TestUpload(_TUpload):
+class TestUpload(_TUpload, IndicoTestCase):
     _server = FakeCERNSearch
     _agent = CERNSearchUploadAgent

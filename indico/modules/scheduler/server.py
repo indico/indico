@@ -449,14 +449,15 @@ class Scheduler(object):
 
         oldStatus = task.getStatus()
 
+        self._logger.info("dequeueing %s from status %s" % \
+                          (task, base.status(oldStatus)))
+
         # it doesn't matter if the task is already running again,
         # get rid of it
         self._db_moveTask(task,
                           oldStatus,
                           base.TASK_STATUS_NONE)
 
-        self._logger.info("%s dequeued from status %s" % \
-                          (task, base.status(oldStatus)))
 
     def _checkAWOLTasks(self):
 

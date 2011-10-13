@@ -25,12 +25,13 @@ Here, the notification parts of the plugin are tested in a global way.
 """
 
 from indico.util.i18n import currentLocale
+from indico.tests.python.unit.util import IndicoTestCase
 
 # plugin imports
 from indico.ext.livesync.test.unit.base import _TestSynchronization
 
 
-class TestBasicOperations(_TestSynchronization):
+class TestBasicOperations(_TestSynchronization, IndicoTestCase):
 
     def testEventCreation(self):
         """
@@ -151,7 +152,7 @@ class TestBasicOperations(_TestSynchronization):
                                    (scont1, 'deleted')]))
 
 
-class TestProtectionChanges(_TestSynchronization):
+class TestProtectionChanges(_TestSynchronization, IndicoTestCase):
 
     def testDirectConferenceProtectionChanges(self):
         """
