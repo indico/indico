@@ -1,8 +1,8 @@
 <%def name="renderDescription(text)">
     % if isStringHTML(text):
-        ${text}
+        <span itemprop="description">${text}</span>
     % else:
-        <pre>${text}</pre>
+        <pre itemprop="description">${text}</pre>
     % endif
 </%def>
 
@@ -56,7 +56,10 @@
     <%
     result = []
     for user in userList:
-        userText = "%s %s" % (user.getFirstName(), user.getFamilyName())
+        if useSpan:
+            userText = '<span itemprop="givenName">%s</span> <span itemprop="lastName">%s</span>' % (user.getFirstName(), user.getFamilyName())
+        else:
+            userText = "%s %s" % (user.getFirstName(), user.getFamilyName())
         if title:
             userText = user.getTitle() + " " + userText
         if user.getAffiliation():
@@ -65,7 +68,7 @@
                 affiliation = '<i>' +  affiliation + '</i>'
             userText += ' (%s)' % affiliation
         if useSpan:
-            result.append('<span class="%s">%s</span>' % (spanClass, userText))
+            result.append('<span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="%s">%s</span>' % (spanClass, userText))
         else:
             result.append(userText)
     if unformatted:
@@ -74,19 +77,23 @@
     ${separator.join(result)}
 </%def>
 
+<%def name="timeTag(name, dt, text)">
+      <time itemprop="${name}" datetime="${dt.isoformat()}">${text}</time>
+</%def>
+
 <%def name="renderEventTime(startDate, endDate, timezone, strong=True)">
     <% timeFormat = "<strong>%s</strong>" if strong else "%s" %>
     % if getDate(startDate) == getDate(endDate):
         ${prettyDate(startDate)}
         % if not isTime0H0M(startDate):
-            from ${timeFormat % getTime(startDate)}
+            from ${timeTag('startDate', startDate, timeFormat % getTime(startDate))}
         % endif
         % if not isTime0H0M(endDate):
-            to ${timeFormat % getTime(endDate)}
+            to ${timeTag('endDate', endDate, timeFormat % getTime(endDate))}
         % endif
     % else:
-        from ${prettyDate(startDate)} at ${timeFormat % getTime(startDate)}
-        to ${prettyDate(endDate)} at ${timeFormat % getTime(endDate)}
+        from ${timeTag('startDate', startDate, '%s at %s' % (prettyDate(startDate), (timeFormat % getTime(startDate))))}
+        to ${timeTag('endDate', endDate, '%s at %s' % (prettyDate(endDate), (timeFormat % getTime(endDate))))}
     % endif
     (${str(timezone)})
 </%def>

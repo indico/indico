@@ -18,6 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from persistent.dict import PersistentDict
+
 import string
 import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -138,28 +140,6 @@ class RHGeneralInfoModification( RHAdminBase ):
     def _process( self ):
         p = admins.WPGenInfoModification( self )
         return p.display()
-
-class RHAdminLocalDefinitions( RHAdminBase ):
-    _uh = urlHandlers.UHAdminLocalDefinitions
-
-    def _process( self ):
-        p = admins.WPAdminLocalDefinitions( self )
-        return p.display()
-
-class RHAdminSaveTemplateSet( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSaveTemplateSet
-
-    def _checkParams( self, params ):
-        self._params = params
-        self._defSet = params.get("templateSet",None)
-        if self._defSet == "None":
-            self._defSet = None
-        RHAdminBase._checkParams( self, params )
-
-    def _process( self ):
-        self._minfo.setDefaultTemplateSet(self._defSet)
-        self._redirect( urlHandlers.UHAdminLocalDefinitions.getURL() )
-
 
 class RHAdminSwitchCacheActive( RHAdminBase ):
     _uh = urlHandlers.UHAdminSwitchCacheActive
@@ -349,6 +329,47 @@ class RHAddStyle(RHAdminBase):
     def _process( self ):
         p = admins.WPAdminsAddStyle( self )
         return p.display()
+
+
+class RHAdminLayoutGeneral(RHAdminBase):
+    _uh = urlHandlers.UHAdminLayoutGeneral
+
+    def _process(self):
+        p = admins.WPAdminLayoutGeneral(self)
+        return p.display()
+
+
+class RHAdminLayoutSaveTemplateSet( RHAdminBase ):
+    _uh = urlHandlers.UHAdminLayoutSaveTemplateSet
+
+    def _checkParams( self, params ):
+        self._params = params
+        self._defSet = params.get("templateSet",None)
+        if self._defSet == "None":
+            self._defSet = None
+        RHAdminBase._checkParams( self, params )
+
+    def _process( self ):
+        self._minfo.setDefaultTemplateSet(self._defSet)
+        self._redirect( urlHandlers.UHAdminLayoutGeneral.getURL() )
+
+
+class RHAdminLayoutSaveSocial(RHAdminBase):
+    _uh = urlHandlers.UHAdminLayoutSaveSocial
+
+    def _checkParams( self, params ):
+        self._params = params
+        RHAdminBase._checkParams( self, params )
+
+    def _process(self):
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        cfg = minfo.getSocialAppConfig()
+        if 'socialActive' in self._params:
+            cfg['active'] = self._params.get('socialActive') == 'yes'
+        if 'facebook_appId' in self._params:
+            cfg.setdefault('facebook', PersistentDict())['appId'] = self._params.get('facebook_appId')
+        self._redirect( urlHandlers.UHAdminLayoutGeneral.getURL() )
+
 
 #Plugin admin start
 class RHAdminPluginsBase(RoomBookingDBMixin, RHAdminBase):

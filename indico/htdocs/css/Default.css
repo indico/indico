@@ -13,15 +13,16 @@ div.wrapper {
     min-height: 100%;
     height: auto !important;
     height: 100%;
-    margin: 0 auto -100px; /* the bottom margin is the negative value of the footer's height */
 }
+
+div.main {
+    padding-bottom: 40px;
+}
+
 /*
     Used to create empty space in end of wrapper
     which is used but the footer
 */
-div.wrapper .emptyFooter {
-    height: 100px; /* The height of the footer */
-}
 
 .smallLabel {
     font-size: 10px;
@@ -100,10 +101,8 @@ a.note:hover {
 }
 
 
-/* News styles*/
-
 body {
-    font-family: arial, serif;
+    font-family: verdana, arial, serif;
     background: #fff;
     padding: 0px;
     margin: 0px;
@@ -3333,26 +3332,45 @@ ul.listCompact {
 /* Footer */
 
 .footer {
-    text-align: center;
-    color: #444444;
-    height: 80px;
-    margin-bottom: 5px;
-    padding-top: 10px;
-    bottom: 0;
-    width: 100%;
+    color: #555;
+    position: relative;
+    margin-top: -60px; /* negative value of footer height */
+    height: 40px;
+    clear:both;
+    padding: 10px 5px 5px 5px;
+    font-size: 11px;
 }
 
-.longFooter {
-    /*margin-top: -80px;*/
+.footer.footerDark {
+    font-weight: bold;
+    color: #222;
 }
 
-
-.footerDark {
-    color: #888888;
+.footer.footerDark a {
+    color: #222;
+    font-size: 11px;
 }
 
-.footerDark a {
-    color: #53A0DF;
+.footer.footerDark a:hover {
+    text-decoration: underline;
+}
+
+.footer div.text {
+    margin-top: 20px;
+    float: left;
+    vertical-align: middle;
+}
+
+.footer a#cern_link {
+    margin: auto;
+    float: left;
+    vertical-align: middle;
+}
+
+.footer .shorturl {
+    margin-top: 25px;
+    color: #1A64A0;
+    float: right;
 }
 
 .footer img
@@ -6990,4 +7008,114 @@ table.infoQuestionsTable td.dataBold {
 .calendarContainer
 {
     overflow: visible;
+}
+
+div#social {
+    float: right;
+    display: none;
+    border-radius: 10px;
+    opacity: 0.5;
+}
+
+div#social_share {
+    display: none;
+}
+
+.social_share_tooltip {
+    max-width: 300px;
+    color: #fff;
+}
+
+.social_share_tooltip input {
+    background: #ddd;
+    border: 1px solid #999;
+}
+
+.social_share_tooltip input[type=text] {
+    width: 100%;
+    cursor: text;
+    color: #000;
+}
+
+.social_share_tooltip.ui-tooltip-dark h3 {
+    color: #aaa;
+    font-size: 15px;
+}
+
+.social_share_tooltip.ui-tooltip-blue h3 {
+    color: #1F8DD1;
+    font-size: 15px;
+}
+
+.social_share_tooltip.ui-tooltip-dark h4 {
+    margin-bottom: 5px;
+    color: #aaa;
+}
+
+.social_share_tooltip.ui-tooltip-blue h4 {
+    margin-bottom: 5px;
+    color: #1F8DD1;
+}
+
+.social_share_tooltip .note {
+    font-style: italic;
+    font-size: 11px;
+    float: right;
+}
+
+.social_share_tooltip.ui-tooltip-dark .note {
+    color: #555;
+}
+
+.social_share_tooltip.ui-tooltip-blue .note {
+    color: #999;
+}
+
+.social_share_tooltip.ui-tooltip-dark .ui-tooltip-content{
+    background: rgba(40,40,40,0.96);
+}
+
+.social_share_tooltip .social_site img {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#fb-like {
+    visibility: hidden;
+}
+
+.social_share_tooltip .social_site {
+    padding: 5px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    overflow: hidden;
+    vertical-align: middle;
+    height: 25px;
+}
+
+.social_share_tooltip.ui-tooltip-dark .social_site {
+    background: rgba(0,0,0,0.15);
+}
+
+.social_share_tooltip.ui-tooltip-blue .social_site {
+    background: rgba(255,255,255,0.6);
+}
+
+.social_share_tooltip .social_site * {
+    vertical-align: middle !important;
+}
+
+div#social a {
+    display: block;
+    overflow: auto;
+}
+
+div#social:hover {
+    opacity: 1;
+}
+
+span.num_events {
+    font-size: 10px;
+    margin-left: 10px;
+    color: #aaa;
 }

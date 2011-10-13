@@ -29,6 +29,8 @@ import MaKaC
 import MaKaC.common.info as info
 import xml.sax.saxutils
 
+from indico.util.date_time import format_number
+from indico.util.i18n import ungettext
 
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
@@ -340,3 +342,7 @@ def registerHelpers(objDict):
     if not 'fossilize' in objDict:
         from MaKaC.common.fossilize import fossilize
         objDict['fossilize'] = fossilize
+    if not 'ngettext' in objDict:
+        objDict['N_'] = ungettext
+    if not 'format_number' in objDict:
+        objDict['format_number'] = format_number

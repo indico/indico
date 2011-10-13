@@ -20,6 +20,7 @@
 
 import os
 from persistent import Persistent
+from persistent.dict import PersistentDict
 from BTrees import OOBTree
 from db import DBMgr
 from Configuration import Config
@@ -68,6 +69,9 @@ class MaKaCInfo(Persistent):
         # template set
         self._defaultTemplateSet = None
 
+        # social sites
+        self.getSocialAppConfig()
+
         # Define if Indico use a proxy (load balancing)
         self. _proxy = False
         # Define the volume used in archiving:
@@ -95,6 +99,11 @@ class MaKaCInfo(Persistent):
         except:
             self._styleMgr = StyleManager()
             return self._styleMgr
+
+    def getSocialAppConfig( self ):
+        if not hasattr(self, '_socialAppConfig'):
+            self._socialAppConfig = PersistentDict({'active': False, 'facebook': {}})
+        return self._socialAppConfig
 
     def isDebugActive( self ):
         if hasattr( self, "_debugActive" ):

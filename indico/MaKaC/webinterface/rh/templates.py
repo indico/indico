@@ -31,19 +31,9 @@ import MaKaC.conference as conference
 class RHTemplatesBase(admins.RHAdminBase):
     pass
 
-class RHTemplates( RHTemplatesBase ):
-    _uh = urlHandlers.UHTemplates
-
-    def _checkParams( self, params ):
-        admins.RHAdminBase._checkParams( self, params )
-        self._params = params
-
-    def _process( self ):
-        p = adminPages.WPBadgeTemplates(self)
-        return p.display()
 
 class RHBadgeTemplates( RHTemplatesBase ):
-    _uh = urlHandlers.UHTemplates
+    _uh = urlHandlers.UHBadgeTemplates
 
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
@@ -54,7 +44,7 @@ class RHBadgeTemplates( RHTemplatesBase ):
         return p.display()
 
 class RHPosterTemplates( RHTemplatesBase ):
-    _uh = urlHandlers.UHTemplates
+    _uh = urlHandlers.UHPosterTemplates
 
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )

@@ -11,7 +11,7 @@ else:
 %>
 
 
-<div class="conf clearfix">
+<div class="conf clearfix" itemscope itemtype="http://schema.org/Event">
     <div class="confheader clearfix" ${ bgColorStyle }>
         <div class="confTitleBox" ${ bgColorStyle }>
             <div class="confTitle">
@@ -23,9 +23,9 @@ else:
                                    ${ logo }
                                 </div>
                             % endif
-                            ${ confTitle }
+                            <span itemprop="title">${ confTitle }</span>
                         </span>
-                    </a>
+      </a>
                 </h1>
            </div>
         </div>

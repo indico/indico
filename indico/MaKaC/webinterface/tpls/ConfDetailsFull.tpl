@@ -1,4 +1,4 @@
-${ description }
+<span itemprop="description">${ description }</span>
 <table class="conferenceDetails">
     <tr>
         <td colspan="2"><br></td>

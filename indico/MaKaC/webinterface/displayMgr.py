@@ -125,6 +125,8 @@ class ConfDisplayMgr(DisplayMgr):
         # Displaying navigation bar
         self._displayNavigationBar = True
 
+        self._showSocialApps = True
+
     def clone(self, conf):
         newCdm = ConfDisplayMgrRegistery().getDisplayMgr(conf, update=False)
         # default style
@@ -169,6 +171,13 @@ class ConfDisplayMgr(DisplayMgr):
     # Fermi timezone awareness(end) #
     #################################
 
+    def getShowSocialApps(self):
+        if not hasattr(self, '_showSocialApps'):
+            self._showSocialApps = True
+        return self._showSocialApps
+
+    def setShowSocialApps(self, value):
+        self._showSocialApps = value
 
     def getDisplayNavigationBar(self):
         if not hasattr(self, "_displayNavigationBar"):

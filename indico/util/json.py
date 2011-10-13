@@ -23,6 +23,7 @@ try:
 except ImportError:
     import json as _json
 
+from persistent.dict import PersistentDict
 from datetime import datetime
 from indico.util.i18n import LazyProxy
 
@@ -36,10 +37,14 @@ else:
 class _JSONEncoder(_json.JSONEncoder):
     """
     Custom JSON encoder that supports more types
+     * datetime objects
+     * PersistentDict
     """
     def default(self, o):
         if isinstance(o, LazyProxy):
             return str(o)
+        elif isinstance(o, PersistentDict):
+            return dict(o)
         elif type(o) is datetime:
             return {'date': str(o.date()), 'time': str(o.time()), 'tz': str(o.tzinfo)}
         return _json.JSONEncoder.default(self, o)

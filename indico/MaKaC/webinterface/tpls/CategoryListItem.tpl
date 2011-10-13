@@ -3,8 +3,15 @@
       <span>
           <a href="${ categoryDisplayURLGen(lItem) }">${ escape(lItem.getName().strip()) or _("[no title]") }</a>
 
-        <em>(${ lItem.getNumConferences() })</em>
-
+       <% nconf = lItem.getNumConferences() %>
+       <span class="num_events">
+         % if nconf == 0:
+           ${_("empty")}
+         % else:
+           ${N_('%s event',
+                '%s events', nconf) % format_number(nconf)}
+         % endif
+       </span>
         % if lItem.hasAnyProtection():
               <span class="protected">
                 % if lItem.getDomainList() != []:

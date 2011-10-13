@@ -25,6 +25,7 @@ from indico.util.i18n import currentLocale
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
 from babel.dates import format_date as _format_date
+from babel.numbers import format_number as _format_number
 
 
 def utc_timestamp(datetimeVal):
@@ -60,6 +61,10 @@ def format_time(t, format='short', locale=None, timezone=None):
 
 now_utc = nowutc
 
+def format_number(number, locale=None):
+    if not locale:
+        locale = currentLocale()
+    return _format_number(number, locale=locale).encode('utf-8')
 
 ## ATTENTION: Do not use this one for new developments ##
 # It is flawed, as even though the returned value is DST-safe,

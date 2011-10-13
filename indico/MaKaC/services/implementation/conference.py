@@ -793,6 +793,13 @@ class ConferenceAlarmSendTestNow(ConferenceModifBase):
         al.run(check = False)
         return True
 
+
+class ConferenceSocialBookmarksToggle(ConferenceModifBase):
+    def _getAnswer(self):
+        val = self._conf.getDisplayMgr().getShowSocialApps()
+        self._conf.getDisplayMgr().setShowSocialApps(not val)
+
+
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupportEmail": ConferenceSupportEmailModification,
@@ -811,6 +818,7 @@ methodMap = {
     "contributions.list" : ConferenceListContributions,
     "contributions.delete": ConferenceDeleteContributions,
     "pic.delete": ConferencePicDelete,
+    "social.toggle": ConferenceSocialBookmarksToggle,
     "showConcurrentEvents": ShowConcurrentEvents,
 #    "getFields": ConferenceGetFields,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,

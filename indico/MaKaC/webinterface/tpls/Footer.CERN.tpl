@@ -6,15 +6,6 @@ else:
     dark_ = False;
 %>
 
-<!-- TODO: remove? -->
-<script type="text/javascript">
-function envoi(){
-    //alert('Le code de la langue choisie est '+document.forms["changeSesLang"].elements["lang"].value)
-    document.forms["changeSesLang"].submit()
-}
-</script>
-
-<!-- TODO: remove permanently? -->
 % if isFrontPage:
     <div id="policyOfUse">
         <h1>${ _("Policy of Use")}</h1>
@@ -24,24 +15,14 @@ function envoi(){
     </div>
 % endif
 
-<div id="poweredBy" class="${"longFooter " if shortURL != "" and not isFrontPage else ""}footer${" footerDark" if dark_ == True else ""}">
-
-<div style="margin-bottom: 15px; font-family: monospace; font-size: 10px;">
-  % if shortURL != "" and not isFrontPage:
-  <div>${ shortURL }</div>
-  % endif
-
-  % if modificationDate != "":
-  <div>${ _("Last modified: ") + modificationDate }</div>
-  % endif
-</div>
-
-            <a href="http://www.cern.ch">
-              <img src="${ systemIcon("cern_small") }" alt="${ _("Indico - Integrated Digital Conference")}" style="vertical-align: middle; margin-right: 12px;"/>
+<div id="footer" class="${"longFooter " if shortURL != "" and not isFrontPage else ""}footer${" footerDark" if dark_ == True else ""}">
+<%block name="footer">
+            <a id="cern_link" href="http://www.cern.ch">
+              <img src="${ systemIcon("cern_small" if shortURL else "cern_small_light") }" alt="${ _("Indico - Integrated Digital Conference")}" class="cern_logo" style="vertical-align: middle; margin-right: 12px;"/>
             </a>
-            <span style="vertical-align: middle;">${ _("Powered by ")}<a href="http://indico-software.org">Indico</a></span>
-
-            % if Configuration.Config.getInstance().getWorkerName()!="":
-                <span style="display: none;">${ Configuration.Config.getInstance().getWorkerName() }</span>
-            % endif
+            <div class="text" style="width: 200px">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></div>
+</%block>
 </div>
+% if Configuration.Config.getInstance().getWorkerName()!="":
+  <!-- worker: ${ Configuration.Config.getInstance().getWorkerName() } -->
+% endif

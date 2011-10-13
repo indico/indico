@@ -2119,12 +2119,6 @@ class UHAdminArea( URLHandler ):
 class UHAdminSwitchCacheActive( URLHandler ):
     _relativeURL = "adminList.py/switchCacheActive"
 
-class UHAdminLocalDefinitions( URLHandler ):
-    _relativeURL = "adminLocal.py"
-
-class UHAdminSaveTemplateSet( URLHandler ):
-    _relativeURL = "adminLocal.py/saveTemplateSet"
-
 class UHAdminSwitchDebugActive( URLHandler ):
     _relativeURL = "adminList.py/switchDebugActive"
 
@@ -2144,16 +2138,16 @@ class UHAdminsRemoveUsers( URLHandler ):
     _relativeURL = "adminList.py/removeAdmins"
 
 class UHAdminsStyles( URLHandler ):
-    _relativeURL = "adminStyles.py"
+    _relativeURL = "adminLayout.py/styles"
 
 class UHAdminsConferenceStyles( URLHandler ):
     _relativeURL = "adminConferenceStyles.py"
 
 class UHAdminsAddStyle( URLHandler ):
-    _relativeURL = "adminStyles.py/add"
+    _relativeURL = "adminLayout.py/addStyle"
 
 class UHAdminsDeleteStyle( URLHandler ):
-    _relativeURL = "adminStyles.py/delete"
+    _relativeURL = "adminLayout.py/deleteStyle"
 
 class UHAdminsSystem( URLHandler ):
     _relativeURL = "adminSystem.py"
@@ -3412,11 +3406,17 @@ class UHMaintenanceWebsessionCleanup( URLHandler ):
 class UHMaintenancePerformWebsessionCleanup( URLHandler ):
     _relativeURL = "adminMaintenance.py/performWebsessionCleanup"
 
-class UHTemplates( URLHandler ):
-    _relativeURL = "adminTemplates.py"
+class UHAdminLayoutGeneral( URLHandler ):
+    _relativeURL = "adminLayout.py"
+
+class UHAdminLayoutSaveTemplateSet( URLHandler ):
+    _relativeURL = "adminLayout.py/saveTemplateSet"
+
+class UHAdminLayoutSaveSocial( URLHandler ):
+    _relativeURL = "adminLayout.py/saveSocial"
 
 class UHTemplatesSetDefaultPDFOptions( URLHandler ):
-    _relativeURL = "adminTemplates.py/setDefaultPDFOptions"
+    _relativeURL = "adminLayout.py/setDefaultPDFOptions"
 
 class UHServices( URLHandler ):
     _relativeURL = "adminServices.py"
