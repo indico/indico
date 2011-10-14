@@ -65,8 +65,8 @@
 
     Item.prototype.toHTML = function () {
         return '<table border="2" cellpadding="0" cellspacing="0"' +
-               ' width="' + this.width + '" bgcolor="' + (this.selected ? "#CCCCFF" : "white") +
-               '" style="cursor:move; font-weight:' + (this.bold ? 'bold' : 'normal') + '; font-style:' + (this.italic ? 'italic' : 'normal') +
+               ' width="' + this.width + '" bgcolor="' + '"' +
+               '" style="background-color: '+(this.selected ? "#ccf" : "#fff")+';cursor:move; font-weight:' + (this.bold ? 'bold' : 'normal') + '; font-style:' + (this.italic ? 'italic' : 'normal') +
                '; text-align: ' + this.textAlign.replace('Justified', 'justify') + ';"' +
                '><tbody><tr><td><span style="color:' + this.color + '; font-family: ' + this.fontFamily + '; font-size:' + this.fontSize + ';">' +
                (this.key == "Fixed Text" ? this.text : translate[this.key]) +
@@ -152,12 +152,12 @@
         if (lastSelectedDiv) {
             var lastId = lastSelectedDiv.attr('id');
             items[lastId].selected = false;
-            lastSelectedDiv.html(items[lastId].toHTML());
+            lastSelectedDiv.find('> table').css('backgroundColor', '#fff');
         }
 
         var newSelectedItem = items[id];
         newSelectedItem.selected = true;
-        newSelectedDiv.html(newSelectedItem.toHTML());
+        newSelectedDiv.find('> table').css('backgroundColor', '#ccf');
         lastSelectedDiv = newSelectedDiv;
         $('#removeButton').prop('disabled', false);
 
