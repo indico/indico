@@ -57,17 +57,26 @@
         <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>
         % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText():
             'Delete minutes': function(m) {
-                IndicoUI.Dialogs.deleteMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
-                m.close();
+                var popupHandler = function(action){
+                    if(action){
+                        IndicoUI.Dialogs.deleteMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
+                    }
+                    m.close();
+
+                };
+                (new ConfirmPopup($T('Delete minutes'),$T('Are you sure you want to delete this minutes?'),popupHandler, $T("Yes"), $T("No"))).open();
                 return false;},
         % endif
 
         % if getItemType(item) == 'Conference':
             'Compile minutes': function(m) {
-                if (confirm('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.')) {
-                    IndicoUI.Dialogs.writeMinutes('${conf.getId()}','','','',true);
+                var popupHandler = function(action){
+                    if(action){
+                        IndicoUI.Dialogs.writeMinutes('${conf.getId()}','','','',true);
+                    }
                     m.close();
-                }
+                };
+                (new ConfirmPopup($T('Compile minutes'),$T('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.'),popupHandler, $T("Yes"), $T("No"))).open();
                 return false;},
         % endif
 
