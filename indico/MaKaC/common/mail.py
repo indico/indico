@@ -36,10 +36,11 @@ class GenericMailer:
             notification = GenericNotification(notification)
         # enqueue emails if we have a rh and do not skip queuing, otherwise send immediately
         rh = ContextManager.get('currentRH', None)
+        mailData = cls._prepare(notification)
         if skipQueue or not rh:
-            cls._send(notification)
+            cls._send(mailData)
         else:
-            ContextManager.setdefault('emailQueue', []).append(notification)
+            ContextManager.setdefault('emailQueue', []).append(mailData)
 
     @classmethod
     def flushQueue(cls, send):
@@ -54,19 +55,7 @@ class GenericMailer:
         del queue[:]
 
     @staticmethod
-    def _send(notification):
-        server=smtplib.SMTP(*Config.getInstance().getSmtpServer())
-        if Config.getInstance().getSmtpUseTLS():
-            server.ehlo()
-            (code, errormsg) = server.starttls()
-            if code != 220:
-                raise MaKaCError( _("Can't start secure connection to SMTP server: %d, %s")%(code, errormsg))
-        if Config.getInstance().getSmtpLogin():
-            login = Config.getInstance().getSmtpLogin()
-            password = Config.getInstance().getSmtpPassword()
-            (code, errormsg) = server.login(login, password)
-            if code != 235:
-                raise MaKaCError( _("Can't login on SMTP server: %d, %s")%(code, errormsg))
+    def _prepare(notification):
         fromAddr=notification.getFromAddr()
         for to in notification.getToList() :
             if len(to) == 0 :
@@ -89,15 +78,39 @@ class GenericMailer:
         body=notification.getBody()
         msg="""Content-Type: %s; charset=\"utf-8\"\r\nFrom: %s\r\nTo: %s\r\n%sSubject: %s\r\n\r\n%s"""%(ct, fromAddr,\
                 to,cc,subject,body)
+        toList = notification.getToList()
+        ccList = notification.getCCList()
+        return {
+            'msg': msg,
+            'toList': toList,
+            'ccList': ccList,
+            'fromAddr': fromAddr,
+            'to': to
+        }
+
+    @staticmethod
+    def _send(msgData):
+        server=smtplib.SMTP(*Config.getInstance().getSmtpServer())
+        if Config.getInstance().getSmtpUseTLS():
+            server.ehlo()
+            (code, errormsg) = server.starttls()
+            if code != 220:
+                raise MaKaCError( _("Can't start secure connection to SMTP server: %d, %s")%(code, errormsg))
+        if Config.getInstance().getSmtpLogin():
+            login = Config.getInstance().getSmtpLogin()
+            password = Config.getInstance().getSmtpPassword()
+            (code, errormsg) = server.login(login, password)
+            if code != 235:
+                raise MaKaCError( _("Can't login on SMTP server: %d, %s")%(code, errormsg))
+
         try:
-            Logger.get('mail').info("Mailing %s  CC: %s" % (notification.getToList(), notification.getCCList()))
-            server.sendmail(fromAddr,notification.getToList()+notification.getCCList(),msg)
+            Logger.get('mail').info("Mailing %s  CC: %s" % (msgData['toList'], msgData['ccList']))
+            server.sendmail(msgData['fromAddr'], msgData['toList'] + msgData['ccList'], msgData['msg'])
         except smtplib.SMTPRecipientsRefused,e:
             server.quit()
-            raise MaKaCError( _("Email address is not valid: ")+str(e.recipients))
+            raise MaKaCError("Email address is not valid: %s" % e.recipients)
         server.quit()
-
-        Logger.get('mail').info('Mail sent to %s' % to)
+        Logger.get('mail').info('Mail sent to %s' % msgData['to'])
 
     @classmethod
     def _log(cls, data):
