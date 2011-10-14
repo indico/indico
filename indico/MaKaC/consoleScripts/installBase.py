@@ -300,12 +300,17 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
 
     print "\nWe need to 'sudo' in order to set the permissions of some directories..."
 
-    dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache', 'archive'] if directories.has_key(x))
-    if dbInstalledBySetupPy:
-        dirs2check.append(dbInstalledBySetupPy)
+    if sys.platform == "linux2":
+        dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache', 'archive'] if directories.has_key(x))
+        if dbInstalledBySetupPy:
+            dirs2check.append(dbInstalledBySetupPy)
 
-    for dir in dirs2check:
-        print commands.getoutput("if test $(which sudo); then CMD=\"sudo\"; fi; $CMD chown -R %s:%s %s" % (accessuser, accessgroup, dir))
+        for dir in dirs2check:
+            stat_info = os.stat(dir)
+            if pwd.getpwuid(int(stat_info.st_uid)).pw_name != accessuser:
+                print commands.getoutput("if test $(which sudo); then CMD=\"sudo\"; fi; $CMD chown -R %s:%s %s" % (accessuser, accessgroup, dir))
+            elif grp.getgrgid(int(stat_info.st_gid)).gr_name != accessgroup:
+                os.chown(dir,pwd.getpwnam(accessuser).pw_uid,grp.getgrnam(accessgroup).gr_gid)
 
 
 def _existingConfiguredEgg():
