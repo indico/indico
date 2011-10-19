@@ -1416,7 +1416,7 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
         am = AuthenticatorMgr()
         authTagList = [i.getId() for i in am.getList()]
 
-        vars["identityItems"] = filter(lambda x: not x.getAuthenticatorTag() in authTagList, self._avatar.getIdentityList())
+        vars["identityItems"] = filter(lambda x: x.getAuthenticatorTag() in authTagList, self._avatar.getIdentityList())
         vars["avatar"] = self._avatar
         vars["locator"] = self._avatar.getLocator().getWebForm()
         vars["accountManagementActive"] = 'Local' in authTagList
