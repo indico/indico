@@ -179,13 +179,12 @@ IndicoUI.executeOnLoad(function()
         return null;
     });
     parameterManager.add($E('dateType'),'radio',false,null);
-    $('#Save').click(function(){
-        if (!parameterManager.check()) {
-            alert($T('The form contains some errors. Please, correct them and submit again.'));
-            return false;
-        }
-        return true;
-    });
+    var parameterManagerNow = new IndicoUtil.parameterManager();
+    parameterManagerNow.add($E('fromAddr'),'select',false,null);
+    parameterManagerNow.add($E('toAllParticipants'),'checkbox',true,checkRecipients);
+    parameterManagerNow.add($E('defineRecipients'),'checkbox',true,checkRecipients);
+    parameterManagerNow.add($E('email'),'text',true,checkRecipients);
+
     $('#save').click(function(){
         this.form.action = '${ urlHandlers.UHSaveAlarm.getURL( conference ) }';
         return parameterManager.check();
@@ -193,7 +192,7 @@ IndicoUI.executeOnLoad(function()
 
     $('#sendNow').click(function(){
         this.form.action = '${urlHandlers.UHSendAlarmNow.getURL( conference )}';
-        return parameterManager.check();
+        return parameterManagerNow.check();
     });
     $('#sendTest').click(function(){
         if(parameterManagerTest.check()){
