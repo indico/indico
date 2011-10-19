@@ -129,9 +129,15 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
-    ("CDSUploadURL", {"description" : _("URL for CDS web upload"),
+    ("CDSUploadURL", {"description" : _("URL for CDS web upload (%s is the callback url)"),
                "type": str,
-               "defaultValue": "http://cdsdev.cern.ch/webupload.py",
+               "defaultValue": "http://cdsdev.cern.ch/webupload.py?cds_callback=%s",
+               "editable": True,
+               "visible": True} ),
+
+    ("CDSUploadCallbackURL", {"description" : _("URL for CDS web upload callback (%s is the IndicoID)"),
+               "type": str,
+               "defaultValue": "http://micala.cern.ch/webservices/api.py?indico_id=%s",
                "editable": True,
                "visible": True} ),
 

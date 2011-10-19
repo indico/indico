@@ -36,7 +36,7 @@ from MaKaC.common.output import outputGenerator, XSLTransformer
 from MaKaC.conference import Link
 from MaKaC import conference
 
-from urllib import urlencode
+from urllib import urlencode, quote_plus
 from urllib2 import Request, urlopen, HTTPError
 import re
 import os
@@ -607,7 +607,11 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
         "mode": "-ir"
     })
     headers = {"User-Agent": "invenio_webupload"}
-    req = Request(CollaborationTools.getOptionValue("RecordingManager", "CDSUploadURL"), data, headers)
+    url = CollaborationTools.getOptionValue("RecordingManager", "CDSUploadURL")
+    if '%s' in url:
+        callback_url = CollaborationTools.getOptionValue("RecordingManager", "CDSUploadCallbackURL")
+        url = url % quote_plus(callback_url % IndicoID)
+    req = Request(url, data, headers)
 #    Logger.get('RecMan').debug("req = %s" % str(req))
 
     try:
