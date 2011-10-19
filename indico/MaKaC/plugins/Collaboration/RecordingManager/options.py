@@ -137,7 +137,7 @@ globalOptions = [
 
     ("CDSUploadCallbackURL", {"description" : _("URL for CDS web upload callback (%s is the IndicoID)"),
                "type": str,
-               "defaultValue": "http://micala.cern.ch/webservices/api.py?indico_id=%s",
+               "defaultValue": "https://micala.cern.ch/webservices/api.py?IndicoId=%s",
                "editable": True,
                "visible": True} ),
 
