@@ -626,8 +626,7 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
             result += _("CDS webupload response: %s\n") % cds_response
     except HTTPError, e:
         flagSuccess = False
-        result += _("CDS returned an error when submitting to %s: %s\n") % \
-            (CollaborationTools.getOptionValue("RecordingManager", "CDSUploadURL"), e)
+        result += _("CDS returned an error when submitting to %s: %s\n") % (url, e)
     except Exception, e:
         flagSuccess = False
         result += _("Unknown error occured when submitting CDS record: %s.\n") % e
