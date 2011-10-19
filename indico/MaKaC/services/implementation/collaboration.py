@@ -23,7 +23,7 @@ from MaKaC.services.implementation.base import ParameterManager, AdminService
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.plugins.Collaboration.base import CollaborationException, CollaborationServiceException
 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin,\
-    RCCollaborationPluginAdmin, RCVideoServicesManager
+    RCCollaborationPluginAdmin, RCVideoServicesManager, RCVideoServicesUser
 from MaKaC.i18n import _
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins import PluginsHolder
@@ -132,20 +132,31 @@ class CollaborationCreateCSBooking(CollaborationBase):
 
     def _checkProtection(self):
         CollaborationBase._checkCanManagePlugin(self, self._type)
+        if not RCVideoServicesUser.hasRights(self, None, self._type):
+            raise CollaborationException(_("You dot have access to create a %s booking")%self._type)
 
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.createBooking(self._type, bookingParams = self._bookingParams),
                          None, tz = self._conf.getTimezone())
 
-class CollaborationRemoveCSBooking(CollaborationBookingModifBase):
+class CollaborationBookingModif(CollaborationBookingModifBase):
+    """ Specific to check the authorised users and groups editing and removing.
+    """
+    def _checkProtection(self):
+        CollaborationBookingModifBase._checkProtection(self)
+        if not RCVideoServicesUser.hasRights(self, None, self._type):
+            raise CollaborationException(_("You dot have access to modify a %s booking")%self._type)
+
+class CollaborationRemoveCSBooking(CollaborationBookingModif):
     """ Removes a booking
     """
+
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.removeBooking(self._bookingId),
                          None, tz = self._conf.getTimezone())
 
 
-class CollaborationEditCSBooking(CollaborationBookingModifBase):
+class CollaborationEditCSBooking(CollaborationBookingModif):
     """ Edits a booking
     """
     def _checkParams(self):

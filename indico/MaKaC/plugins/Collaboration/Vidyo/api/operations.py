@@ -20,6 +20,7 @@
 from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue, VidyoError, VidyoTools
 from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
 from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi
+from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCVideoServicesUser
 from suds import WebFault
 
 class VidyoOperations(object):

@@ -29,6 +29,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.webinterface.rh.admins import RCAdmin, RHAdminBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
+from MaKaC.user import Group, Avatar
 
 
 class RCCollaborationAdmin(object):
@@ -119,6 +120,40 @@ class RCVideoServicesManager(object):
                 if csbm.isPluginManager(plugin, user):
                     return True
 
+        return False
+
+class RCVideoServicesUser(object):
+    @staticmethod
+    def hasRights(request=None, user = None, pluginName=""):
+        """ Returns True if the logged in user is an authorised user to create bookings.
+            This is true if:
+                  - The user is in the list of authorised user and groups
+            request: an RH or Service object
+            pluginName: the plugin to check
+        """
+        if not PluginsHolder().hasPluginType("Collaboration"):
+            return False
+
+        if user is None:
+            if request is None:
+                return False
+            else:
+                user = request._getUser()
+
+        if user:
+            collaborationPluginType = CollaborationTools.getCollaborationPluginType()
+            plugin = collaborationPluginType.getPlugin(pluginName)
+            if plugin.hasOption("AuthorisedUsersGroups"):
+                if plugin.getOption("AuthorisedUsersGroups").getValue():
+                    for entity in plugin.getOption("AuthorisedUsersGroups").getValue():
+                        if isinstance(entity, Group) and entity.containsUser(user) or \
+                            isinstance(entity, Avatar) and entity == user:
+                                return True
+                    return False
+                else:
+                    return True
+            else:
+                return True
         return False
 
 ################################################### Server Wide pages #########################################

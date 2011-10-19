@@ -294,8 +294,14 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         vars["Tab"] = self._activeTab
         vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
 
-        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesUser
         vars["UserIsAdmin"] = RCCollaborationAdmin.hasRights(user = self._user) or RCCollaborationPluginAdmin.hasRights(user = self._user, plugins = self._tabPlugins)
+
+        hasCreatePermissions = {}
+        for plugin in plugins:
+            hasCreatePermissions[plugin.getName()] = RCVideoServicesUser.hasRights(user = self._user, pluginName = plugin.getName())
+
+        vars["HasCreatePermissions"] = hasCreatePermissions
 
         singleBookingForms = {}
         multipleBookingForms = {}

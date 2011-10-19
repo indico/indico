@@ -41,6 +41,12 @@ globalOptions = [
                       "editable": True,
                       "visible": True}),
 
+    ( "AuthorisedUsersGroups", {"description": "Users and Groups authorised to create Vidyo bookings",
+                                "type": 'usersGroups',
+                                "defaultValue": [],
+                                "editable": True,
+                                "visible": True}),
+
     #Vidyo Options
 
     ("sendMailNotifications", {"description" : _("Should mail notifications be sent to Vidyo admins?"),

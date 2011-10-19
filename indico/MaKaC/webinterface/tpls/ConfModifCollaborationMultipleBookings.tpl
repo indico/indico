@@ -104,6 +104,8 @@ ${ ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm)
 
 var bookings = $L(${ jsonEncode(BookingsM) });
 
+var hasCreatePermissions = ${ jsonEncode(HasCreatePermissions) };
+
 var createButton;
 var createButtonTooltip;
 

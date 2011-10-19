@@ -1292,7 +1292,15 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
     }
 );
 
-
+var checkPermissions = function(pluginName, action) {
+    if(!hasCreatePermissions[pluginName]){
+        CSErrorPopup($T("User has not permissions"),
+                [$T("You do not have enough permissions to " + action + " " + pluginName + " bookings." ),
+                 $T("If you think that you should have permissions please contact to " + pluginName + " support." )]);
+        return false;
+        }
+    return true;
+};
 
 /**
  * Function that will be called when the user presses the "Create" button.
@@ -1301,13 +1309,9 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
  * @param {string} conferenceId the conferenceId of the current event
  */
 var createBooking = function(pluginName, conferenceId) {
-    // Code that has to be executed before the dialog is presented
-    if (pluginHasFunction(pluginName, "beforeCreate")) {
-        // let the function define whether we're going to draw the
-        // dialog or not
-        if (!codes[pluginName].beforeCreate(pluginName, conferenceId)) {
-            return false;
-        }
+
+    if (!checkPermissions(pluginName, $T("create"))) {
+        return false;
     }
 
     var popup = new BookingPopup('create', pluginName, null, conferenceId);
@@ -1332,6 +1336,10 @@ var createBooking = function(pluginName, conferenceId) {
  */
 var editBooking = function(booking, conferenceId) {
 
+    if (!checkPermissions(booking.type, $T("edit"))) {
+        return false;
+    }
+
     var popup = new BookingPopup('edit', booking.type, booking, conferenceId);
     popup.open();
 
@@ -1352,6 +1360,10 @@ var editBooking = function(booking, conferenceId) {
  * @param {object} booking The booking object corresponding to the "remove" button that was pressed.
  */
 var removeBooking = function(booking, conferenceId) {
+
+    if (!checkPermissions(booking.type, $T("delete"))) {
+        return false;
+    }
 
     var confirmHandler = function(confirm) { if (confirm) {
 

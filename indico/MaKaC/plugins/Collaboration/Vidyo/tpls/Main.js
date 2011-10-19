@@ -88,6 +88,7 @@
             if (error.errorType === 'contributionNotDefined') {
                 CSErrorPopup($T("Invalid owner"), [$T("A contribution must be set.")]);
             }
+
         }
 
         if (event === 'edit' && error.errorType === 'unknownRoom') {
@@ -309,10 +310,6 @@
 
     onEdit: function(booking, bookingPopup) {
         this.addComponents(bookingPopup);
-    },
-
-    beforeCreate: function(pluginName, conferenceId) {
-        return true;
     },
 
     postCreate: function(booking) {
