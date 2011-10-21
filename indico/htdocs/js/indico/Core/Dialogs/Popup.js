@@ -482,15 +482,17 @@ type("AlertPopup", ["ExclusivePopup"],
              var okButton = Html.input('button', {style:{marginTop: pixels(20)}}, $T('OK'));
              okButton.observeClick(function(){
                  self.close();
+                 self.callback();
              });
 
              return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {maxWidth: pixels(400), padding: pixels(10), textAlign: 'center'}}, Html.div({style: {textAlign: 'left'}}, this.content), okButton));
          }
     },
 
-    function(title, content) {
+    function(title, content, callback) {
         this.content = content;
-        this.ExclusivePopup(Html.div({style:{textAlign: 'center'}}, title), positive);
+        this.callback = callback || positive;
+        this.ExclusivePopup(Html.div({style:{textAlign: 'center'}}, title), this.callback);
     }
 );
 
