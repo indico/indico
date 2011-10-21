@@ -7098,7 +7098,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         Returns the object from which the room/location
         information should be inherited
         """
-        return self.session
+        return self.session.conference
 
     def delete(self):
         self.getSchedule().clear()

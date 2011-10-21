@@ -94,7 +94,7 @@ extend(IndicoUI.Dialogs,
                        popup.draw = function(){
                            var self = this;
                            info.set('roomInfo', $O(roomInfo));
-                           roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms, null, bookedRooms, timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData(), info);
+                           roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms, null, bookedRooms, timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData(), info, undefined, $T('event'));
 
                            var convListWidget = new UserListField(
                                'VeryShortPeopleListDiv', 'PeopleList',
@@ -347,7 +347,14 @@ extend(IndicoUI.Dialogs,
                            }/******************************************************/
                            else {
                                info.set("conveners", params.sessionConveners);
-                               info.set('roomInfo', $O({location: null, room: null}));
+                               // using default session location or event location (if sessions's one is inheriting)
+                               if (roomInfo.location !== parentRoomInfo.get('location') ||
+                                       roomInfo.room !== parentRoomInfo.get('room') ||
+                                       roomInfo.address !== parentRoomInfo.get('address')) {
+                                   info.set('roomInfo', $O(roomInfo));
+                               } else {
+                                   info.set('roomInfo', $O({location: null, room: null}));
+                               }
                            }
 
                            if(timetable) {
@@ -360,14 +367,16 @@ extend(IndicoUI.Dialogs,
                                                               bookedRooms,
                                                               timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData(),
                                                               info,
-                                                              editOn?params.id:null);
+                                                              editOn?params.id:null,
+                                                              $T('event'));
                            } else {
                                roomEditor = new RoomBookingWidget(Indico.Data.Locations,
                                        info.get('roomInfo'),
                                        parentRoomInfo,
                                        nullRoomInfo(info.get('roomInfo')),
                                        favoriteRooms,
-                                       null);
+                                       null,
+                                       $T('event'));
                            }
 
                            var sessionRename = new SessionRenameWidget(
@@ -678,41 +687,41 @@ extend(IndicoUI.Dialogs,
                    });
 
                popup.commitChanges = function() {
-                   killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
-                   if(rtWidget.clean()){
-                       changedText.set(false);
-                       wasChanged = true;
+                       killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
+                       if(rtWidget.clean()){
+                           changedText.set(false);
+                           wasChanged = true;
                        saveButton.button('disable');
-                       req.set(rtWidget.get());
-                   }
-                   killProgress();
+                           req.set(rtWidget.get());
+                       }
+                       killProgress();
                }
 
                popup.commitChangesAndClose = function() {
-                   saveAndClose = true;
+                       saveAndClose = true;
                    this.commitChanges();
-               };
+                   };
 
                popup.closeMinutesPopup = function(){
                    var self = this;
-                   var confirmation = function(confirmed){
-                       if (confirmed == 1){
+                       var confirmation = function(confirmed){
+                           if (confirmed == 1){
                            self.commitChangesAndClose();
-                       }
-                       else if (confirmed == 2){
+                           }
+                           else if (confirmed == 2){
+                               closeMinutes();
+                           }
+                       };
+
+                       if (changedText.get()){
+                       var popupConfirm = new SaveConfirmPopup($T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}},
+                                                                    $T("You have modified your text since you last saved.")),
+                                                                    Html.div({}, $T("Do you want to save your changes?"))), confirmation);
+                           popupConfirm.open();
+                       } else {
                            closeMinutes();
                        }
                    };
-
-                   if (changedText.get()){
-                       var popupConfirm = new SaveConfirmPopup($T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}},
-                                                                $T("You have modified your text since you last saved.")),
-                                                                Html.div({}, $T("Do you want to save your changes?"))), confirmation);
-                       popupConfirm.open();
-                   } else {
-                       closeMinutes();
-                   }
-               };
 
                popup.draw = function() {
                    var content = Html.div({}, rtWidget.draw());

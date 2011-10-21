@@ -22,7 +22,7 @@
     <tr>
 
 
-        <%include file="EventLocationInfo.tpl" args="event=self_._rh._break, modifying=True, parentRoomInfo=roomInfo(self_._rh._break, level='inherited'), showParent=True, conf = False"/>
+        <%include file="EventLocationInfo.tpl" args="event=self_._rh._break, modifying=True, parentRoomInfo=roomInfo(self_._rh._break, level='inherited'), showParent=True, conf = False, parentName = _('session') if contrib.getSession() else _('event')"/>
 
     </tr>
     <tr>

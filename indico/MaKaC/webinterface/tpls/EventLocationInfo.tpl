@@ -1,4 +1,4 @@
-<%page args="modifying=None, showParent=None, conf=None, event=None, parentRoomInfo=None, eventId=None"/>
+<%page args="modifying=None, showParent=None, conf=None, event=None, parentRoomInfo=None, eventId=None, parentName=None"/>
 <% import MaKaC %>
 
 <tr>
@@ -18,11 +18,12 @@
     var info = $O();
   % endif
 
-  var parentEvt =
   % if showParent:
-    $O(${ jsonEncode(parentRoomInfo) })
+    var parentEvt = $O(${ jsonEncode(parentRoomInfo) });
+    var parentName = ${ jsonEncode(parentName) };
   % else:
-    false
+    var parentEvt = false;
+    var parentName = null;
   % endif
 ;
 
@@ -39,9 +40,9 @@
                                                                                 days = None, mgmtMode = True) | n,j } ;
       <% from MaKaC.common.Conversion import Conversion %>
       var bookedRooms = ${ Conversion.reservationsList(conf.getRoomBookingList()) };
-      rbWidget = new RoomBookingReservationWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), ${ eventFavorites }, ${"null" if modifying else "Indico.Data.DefaultLocation"}, bookedRooms, ttdata, null, "${ eventId }");
+      rbWidget = new RoomBookingReservationWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), ${ eventFavorites }, ${"null" if modifying else "Indico.Data.DefaultLocation"}, bookedRooms, ttdata, null, "${ eventId }", parentName);
   % else:
-      rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), ${ eventFavorites }, ${"null" if modifying else "Indico.Data.DefaultLocation"});
+      rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), ${ eventFavorites }, ${"null" if modifying else "Indico.Data.DefaultLocation"}, parentName);
   % endif
 
   var domContent = rbWidget.draw();

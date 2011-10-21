@@ -39,7 +39,7 @@
     </tr>
     % endif
 
-    <%include file="EventLocationInfo.tpl" args="event=self_._rh._target, modifying=True, parentRoomInfo=roomInfo(self_._rh._target, level='inherited'), showParent=True, conf = self_._conf, eventId = self_.getContribId()"/>
+    <%include file="EventLocationInfo.tpl" args="event=self_._rh._target, modifying=True, parentRoomInfo=roomInfo(self_._rh._target, level='inherited'), showParent=True, conf = self_._conf, eventId = self_.getContribId(), parentName=_('session') if contrib.getSession() else _('event')"/>
 
 
     ${ Board }

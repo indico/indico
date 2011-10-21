@@ -330,7 +330,15 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         else
             var ttdata = null
 
-        this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null, self.bookedRooms, ttdata, info);
+        var parentName = {
+            Event: $T('event'),
+            Contribution: $T('contribution'),
+            SessionContribution: $T('contribution'),
+            Session: $T('session'),
+            SessionSlot: $T('session')
+        }[this.info.get('parentType')];
+
+        this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null, self.bookedRooms, ttdata, info, undefined, parentName);
 
         var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
@@ -480,28 +488,28 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                     self.method = self.timetable.managementActions.methods.Contribution.add;
                 }
 
-                each(self.args, function(value, key) {
-                    self.info.set(key, value);
-                });
+            each(self.args, function(value, key) {
+                self.info.set(key, value);
+            });
 
-                if (self.parameterManager.check()) {
-                    var killProgress = IndicoUI.Dialogs.Util.progress();
-                    indicoRequest(self.method, self.info, function(result, error){
-                        killProgress();
-                        if (error) {
-                            IndicoUtil.errorReport(error);
-                        }
-                        else {
-                            self.close();
-                            // Only one element is returned but put it in an array
-                            // since the successFunc expects arrays
-                            self.successFunc([result]);
-                        }
-                    });
-                }
+            if (self.parameterManager.check()) {
+                var killProgress = IndicoUI.Dialogs.Util.progress();
+                indicoRequest(self.method, self.info, function(result, error){
+                    killProgress();
+                    if (error) {
+                        IndicoUtil.errorReport(error);
+                    }
+                    else {
+                        self.close();
+                        // Only one element is returned but put it in an array
+                        // since the successFunc expects arrays
+                        self.successFunc([result]);
+                    }
+                });
+            }
             }],
             [$T('Cancel'), function() {
-                self.close();
+            self.close();
             }]
         ];
     },
@@ -562,6 +570,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
 
          this.previousDate = dayStartDate;
          this.info = new WatchObject();
+         this.info.set('parentType', args.parentType);
 
          if (this.timeStartMethod === null) {
              args.schedule = false;
@@ -693,7 +702,7 @@ type("ChangeEditDialog", // silly name!
              });
 
          this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args, title);
-     });
+                            });
 
 
 type("AddBreakDialog", ["ChangeEditDialog"],
@@ -712,25 +721,25 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                  [this.isEdit ? $T('Save') : $T('Add'), function() {
                      // check if the day changed
                      if(Util.formatDateTime(self.conferenceDays.get(),
-                                            IndicoDateTimeFormats.ServerHourless,
-                                            IndicoDateTimeFormats.Ordinal) !=
-                         self.previousDate.substr(0,10)){
-                         self.dayChanged = true;
+                                        IndicoDateTimeFormats.ServerHourless,
+                                        IndicoDateTimeFormats.Ordinal) !=
+                     self.previousDate.substr(0,10)){
+                     self.dayChanged = true;
+                 }
+                 if (self.isEdit) {
+                     self._saveInfo();
+                 } else {
+                     //in case we're inside a session and the break is added to a different day, we suppose it's not inside the session anymore
+                     if(self.dayChanged){
+                         self.method = self.managementActions.methods.Break.add;
                      }
-                     if (self.isEdit) {
-                         self._saveInfo();
-                     } else {
-                         //in case we're inside a session and the break is added to a different day, we suppose it's not inside the session anymore
-                         if(self.dayChanged){
-                             self.method = self.managementActions.methods.Break.add;
+                     else{
+                         if(exists(self.managementActions.timetable.parentTimetable)) {
+                             self.method = self.managementActions.methods.SessionBreak.add;
                          }
-                         else{
-                             if(exists(self.managementActions.timetable.parentTimetable)) {
-                                 self.method = self.managementActions.methods.SessionBreak.add;
-                             }
-                         }
-                         self._submitInfo();
                      }
+                     self._submitInfo();
+                 }
                  }],
                  [$T('Cancel'), function() {
                      self.close();
@@ -741,6 +750,14 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          draw: function(){
              var self = this;
 
+             var parentName = {
+                 Event: $T('event'),
+                 Contribution: $T('contribution'),
+                 SessionContribution: $T('contribution'),
+                 Session: $T('session'),
+                 SessionSlot: $T('session')
+             }[this.info.get('parentType')];
+
              this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations,
                                                      this.info.get('roomInfo'),
                                                      this.parentRoomInfo,
@@ -750,7 +767,8 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                                                      this.bookedRooms,
                                                      this.managementActions.timetable.parentTimetable?this.managementActions.timetable.parentTimetable.getData():this.managementActions.timetable.getData(),
                                                      this.info,
-                                                     this.isEdit?this.info.get("id"):null);
+                                                     this.isEdit?this.info.get("id"):null,
+                                                     parentName);
 
 
              //Create the list of the days in which the conference is being held
@@ -1440,7 +1458,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         var self = this;
         return [
             [$T('Reschedule'), function() {
-                self.__reschedule();
+            self.__reschedule();
             }],
             [$T('Cancel'), function() {
                 self.close();

@@ -355,11 +355,14 @@ type("TimetableManagementActions", [], {
         var params = this._addParams(type);
 
         params.startDate = Util.formatDateTime(session.startDate, IndicoDateTimeFormats.Server);
-        params.roomInfo = {
-            location: session.location,
-            room: session.room,
-            address: session.address
-        };
+        if(type != 'SessionSlot') {
+            // If it's not for a session slot, we take the location from the session
+            params.roomInfo = {
+                location: session.location,
+                room: session.room,
+                address: session.address
+            };
+        }
 
         params.sessionConveners = session.sessionConveners;
 
@@ -389,6 +392,7 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Contribution');
         }
 
+        params.args.parentType = params.parentType;
         var dialog = new AddContributionDialog(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
@@ -509,7 +513,7 @@ type("TimetableManagementActions", [], {
             this.methods[params.type].add,
             this.isSessionTimetable?this.methods.Session.dayEndDate:this.methods.Event.dayEndDate,
             params,
-            params.roomInfo,
+            {'location': session.location, 'room': session.room, 'address': session.address},
             $O(params.roomInfo),
             params.startDate,
             params.selectedDay,
@@ -540,7 +544,7 @@ type("TimetableManagementActions", [], {
             params[key] = value;
         });
 
-        var parentRoomInfo = this.eventInfo.sessions[eventData.sessionId];
+        var parentRoomInfo = this.eventInfo;
 
         IndicoUI.Dialogs.addSessionSlot(
             this.methods[params.type].edit,

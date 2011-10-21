@@ -44,11 +44,11 @@ type("RoomBookingWidget", ["IWidget"],
 
          draw: function() {
 
-             var rbActive = Indico.Settings.RoomBookingModuleActive
+             var rbActive = Indico.Settings.RoomBookingModuleActive;
 
              this.inheritText = this.parentInfo?Html.span(
                  {},
-                 $T('Inherit from parent: '),
+                 $T('Inherit from parent {0}: ').format(this.parentName),
                  Html.span({},
                            this.parentInfo.get('room') + " (" +
                            this.parentInfo.get('location') + ")")):'';
@@ -130,11 +130,12 @@ type("RoomBookingWidget", ["IWidget"],
 
          }
      },
-     function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation) {
+     function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, parentName) {
          var self = this;
          var rbActive = Indico.Settings.RoomBookingModuleActive
 
          this.defaultLocation = defaultLocation;
+         this.parentName = parentName || '';
          this.locationChooser = new FlexibleSelect(locations, 177);
 
          if ( rbActive ) {
@@ -378,9 +379,9 @@ type("RoomBookingReservationWidget", ["RoomBookingWidget"],
                  this.dateTime = info;
              }
         },
-        function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent){
+        function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent, parentName){
 
-            this.RoomBookingWidget(locations, info, parent, inheritDefault, [], defaultLocation)
+            this.RoomBookingWidget(locations, info, parent, inheritDefault, [], defaultLocation, parentName);
             this.bookedRooms = $D(bookedRooms || {} );
             this.dateTime = dateTime;
             this.timetableData = timetableData;
@@ -395,7 +396,7 @@ type("RoomBookingVerticalReservationWidget", ["RoomBookingReservationWidget"],
 
                 this.inheritText = this.parentInfo?Html.span(
                     {},
-                    $T('Inherit from parent: '),
+                    $T('Inherit from parent {0}: ').format(this.parentName),
                     Html.span({},
                               this.parentInfo.get('room') + " (" +
                               this.parentInfo.get('location') + ")")):'';
@@ -416,8 +417,8 @@ type("RoomBookingVerticalReservationWidget", ["RoomBookingReservationWidget"],
             }
 
         },
-        function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent){
-            this.RoomBookingReservationWidget(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent);
+        function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent, parentName){
+            this.RoomBookingReservationWidget(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent, parentName);
         });
 
 

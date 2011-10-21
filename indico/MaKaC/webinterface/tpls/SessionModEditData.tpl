@@ -19,7 +19,7 @@
     </tr>
 
 
-    <%include file="EventLocationInfo.tpl" args="event=self_._rh._target, modifying=True, parentRoomInfo=roomInfo(self_._rh._target, level='inherited'), showParent=True, conf = False"/>
+    <%include file="EventLocationInfo.tpl" args="event=self_._rh._target, modifying=True, parentRoomInfo=roomInfo(self_._rh._target, level='inherited'), showParent=True, conf = False, parentName=_('event')"/>
 
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat">${ _("Start date")}</span></td>

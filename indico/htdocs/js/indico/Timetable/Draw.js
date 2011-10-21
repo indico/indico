@@ -1162,6 +1162,13 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 self.roomEditor.inheritCheckbox.set(self.eventData.inheritRoom && self.eventData.inheritLoc)
             };
 
+            var parentName = {
+                Event: $T('event'),
+                Contribution: $T('contribution'),
+                SessionContribution: $T('contribution'),
+                Session: $T('session'),
+                SessionSlot: $T('session')
+            }[this.info.get('parentType')];
 
             this.roomEditor = new RoomBookingVerticalReservationWidget(Indico.Data.Locations,
                                                                        this.info,
@@ -1172,7 +1179,8 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                                                                        this.bookedRooms,
                                                                        this.timetableData,
                                                                        this.startEndTimeField.accessor,
-                                                                       this.eventData.id);
+                                                                       this.eventData.id,
+                                                                       parentName);
 
             var roomEditorDiv = Html.div({id:'roomEditor'},this.roomEditor.draw());
             roomEditorDiv.dom.style.display = 'none';
@@ -1192,11 +1200,10 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             var parent;
             if(this.managementActions.session)
                 parent = this.managementActions.session;
-            else if(this.eventData.sessionId)
-                parent = this.managementActions.eventInfo.sessions[this.eventData.sessionId];
             else
                 parent = this.managementActions.eventInfo;
 
+            this.info.set('parentType', parent.entryType || 'Event');
             this.parentInfo = new WatchObject();
             this.parentInfo.set('room',parent.room);
             this.parentInfo.set('location',parent.location);
