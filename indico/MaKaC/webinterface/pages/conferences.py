@@ -779,7 +779,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         if location:
             vars["location"] = "<i>%s</i><br><pre>%s</pre>"%( location.getName(), location.getAddress() )
             room = self._conf.getRoom()
-            if room:
+            if room and room.getName():
                 roomLink = linking.RoomLinker().getHTMLLink( room, location )
                 vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
         vars["chairs"] = self._getChairsHTML()
