@@ -539,8 +539,8 @@ class outputGenerator:
             modificons = 0
         else:
             modificons = 1
-        out.openTag("session", [["color",session.getColor()],["textcolor",session.getTextColor()]])
-        out.writeTag("ID",session.getId())
+        out.openTag("session", [["color", session.getColor()], ["textcolor", session.getTextColor()]])
+        out.writeTag("ID", session.getId())
 
         if session.getCode() not in ["no code", ""]:
             out.writeTag("code",session.getCode())
@@ -649,8 +649,8 @@ class outputGenerator:
             modificons = 0
         else:
             modificons = 1
-        out.openTag("session", [["color",session.getColor()],["textcolor",session.getTextColor()]])
-        out.writeTag("ID",session.getId())
+        out.openTag("session", [["color", session.getColor()],["textcolor", session.getTextColor()]])
+        out.writeTag("ID", session.getId())
 
         out.writeTag("parentProtection", simplejson.dumps(session.getAccessController().isProtected()))
         out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(session)))
@@ -1092,14 +1092,14 @@ class outputGenerator:
     def _breakToXML(self,br, out=None):
         if not out:
             out = self._XMLGen
-        out.openTag("break", [["color",br.getColor()],["textcolor",br.getTextColor()]])
-        out.writeTag("name",br.getTitle())
-        tzUtil = DisplayTZ(self.__aw,br.getOwner())
+        out.openTag("break", [["color", br.getColor()], ["textcolor", br.getTextColor()]])
+        out.writeTag("name", br.getTitle())
+        tzUtil = DisplayTZ(self.__aw, br.getOwner())
         tz = tzUtil.getDisplayTZ()
         startDate = br.getStartDate().astimezone(timezone(tz))
         endDate = br.getEndDate().astimezone(timezone(tz))
-        out.writeTag("startDate","%d-%s-%sT%s:%s:00" %(startDate.year, string.zfill(startDate.month,2), string.zfill(startDate.day,2),string.zfill(startDate.hour,2), string.zfill(startDate.minute,2)))
-        out.writeTag("endDate","%d-%s-%sT%s:%s:00" %(endDate.year, string.zfill(endDate.month,2), string.zfill(endDate.day,2),string.zfill(endDate.hour,2), string.zfill(endDate.minute,2)))
+        out.writeTag("startDate", "%d-%s-%sT%s:%s:00" % (startDate.year, string.zfill(startDate.month, 2), string.zfill(startDate.day, 2), string.zfill(startDate.hour, 2), string.zfill(startDate.minute, 2)))
+        out.writeTag("endDate", "%d-%s-%sT%s:%s:00" % (endDate.year, string.zfill(endDate.month, 2), string.zfill(endDate.day, 2), string.zfill(endDate.hour, 2), string.zfill(endDate.minute, 2)))
         out.writeTag("duration","%s:%s"%((string.zfill((datetime(1900,1,1)+br.getDuration()).hour,2), string.zfill((datetime(1900,1,1)+br.getDuration()).minute,2))))
         if br.getDescription() != "":
             out.writeTag("description", br.getDescription())

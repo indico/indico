@@ -285,7 +285,7 @@ Please specify the directory where you'd like it to be placed.
 
         # find the apache user/group
         user, group = _findApacheUserGroup(self.www_uid, self.www_gid)
-        _checkDirPermissions(directories, dbInstalledBySetupPy = directories['db'], accessuser = user, accessgroup = group)
+        _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
 
         _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath, 'etc'), directories['tmp'], user)
 

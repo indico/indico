@@ -313,7 +313,7 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
             if pwd.getpwuid(int(stat_info.st_uid)).pw_name != accessuser:
                 print commands.getoutput("if test $(which sudo); then CMD=\"sudo\"; fi; $CMD chown -R %s:%s %s" % (accessuser, accessgroup, dir))
             elif grp.getgrgid(int(stat_info.st_gid)).gr_name != accessgroup:
-                os.chown(dir,pwd.getpwnam(accessuser).pw_uid,grp.getgrnam(accessgroup).gr_gid)
+                os.chown(dir, pwd.getpwnam(accessuser).pw_uid, grp.getgrnam(accessgroup).gr_gid)
 
 
 def _existingConfiguredEgg():
