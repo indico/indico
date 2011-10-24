@@ -1,4 +1,4 @@
-
+<% declareTemplate(newTemplateStyle=True) %>
 <form action="<%= removeIdentityURL %>" method="POST" style="margin: 0;">
 <table>
 <% for item in identityItems: %>
@@ -22,7 +22,6 @@
     External account
     <% end %>
   </td>
-</td>
 </tr>
 <% end %>
     <tr>
