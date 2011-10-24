@@ -24,9 +24,8 @@
 </table>
 
 <script type="text/javascript">
-  ${ macros.genericField(macros.FIELD_TEXT, 'inPlaceCacheTTL', 'upcomingEvents.admin.changeCacheTTL', dict(), preCache=True, rh=self_._rh) }
-
-  ${ macros.genericField(macros.FIELD_TEXT, 'inPlaceNumberItems', 'upcomingEvents.admin.changeNumberItems', dict(), preCache=True, rh=self_._rh) }
+  $E('inPlaceCacheTTL').set(new InputEditWidget('upcomingEvents.admin.changeCacheTTL', {}, ${ jsonEncode(cacheTTL) }, false, null, null, null).draw());
+  $E('inPlaceNumberItems').set(new InputEditWidget('upcomingEvents.admin.changeNumberItems', {}, ${ jsonEncode(numberItems) }, false, null, null, null).draw());
 
   var categEventSelector = new UpcomingEventFavoritesWidget();
   $E('categoryEventList').set(categEventSelector.draw());

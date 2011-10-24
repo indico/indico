@@ -28,7 +28,7 @@ class ChangeCacheTTL(ConfigUpcomingEventsBase):
         self._newTTL = self._pm.extract("value", pType=int, allowEmpty=True)
 
     def _getResult(self, module):
-        if self._newTTL:
+        if self._newTTL >= 0:
             module.setCacheTTL(datetime.timedelta(minutes=self._newTTL))
 
         return module.getCacheTTL().seconds/60

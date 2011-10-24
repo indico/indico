@@ -51,7 +51,7 @@
 
 <%
 urlConference = urlHandlers.UHConferenceCreation.getURL(currentCategory)
-urlConference.addParam("event_type","default")
+urlConference.addParam("event_type","conference")
 
 urlLecture = urlHandlers.UHConferenceCreation.getURL(currentCategory)
 urlLecture.addParam("event_type","simple_event")

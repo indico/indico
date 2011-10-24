@@ -343,6 +343,9 @@ class WConfigUpcomingEvents(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        module = ModuleHolder().getById("upcoming_events")
+        vars["cacheTTL"] = module.getCacheTTL().seconds/60
+        vars["numberItems"] = module.getNumberItems()
         return vars
 
 

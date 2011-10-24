@@ -81,6 +81,12 @@
                 </td>
                 </tr>
                 <tr>
+                    <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Default layout style")}</span></td>
+                    <td  class="contentCellTD">
+                        <select name="defaultStyle">${ styleOptions }</select>
+                    </td>
+                </tr>
+                <tr>
                     <td nowrap class="titleCellTD">
                         <span class="titleCellFormat">${ _("Chairperson") }</span>
                     </td>
