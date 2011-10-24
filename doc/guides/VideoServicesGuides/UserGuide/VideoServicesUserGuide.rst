@@ -188,7 +188,7 @@ this:
 If the Vidyo meeting is not yet ongoing, the *Join Now!* button will not be
 shown.
 
-To launch an ongoing Vydio videoconference associated with an Indico event, just
+To launch an ongoing Vidyo videoconference associated with an Indico event, just
 click on the *Join Now!* link:
 
 |image13|

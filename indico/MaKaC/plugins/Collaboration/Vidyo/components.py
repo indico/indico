@@ -34,12 +34,12 @@ class VidyoContributor(Component):
     @classmethod
     def addCheckBox2CloneConf(cls, obj, list):
         """ we show the clone checkbox if:
-            * The Vydio Plugin is active.
+            * The Vidyo Plugin is active.
             * There are vydio services in the event created by the user who wants to clone
         """
         #list of creators of the chat rooms
         if PluginsWrapper('Collaboration', 'Vidyo').isActive() and len(obj._conf.getCSBookingManager().getBookingList(filterByType="Vidyo")) !=0:
-            list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneVidyo" id="cloneVidyo" value="1" />Vydio</li>""")
+            list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneVidyo" id="cloneVidyo" value="1" />Vidyo</li>""")
 
     @classmethod
     def fillCloneDict(self, obj, params):
