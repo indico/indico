@@ -231,7 +231,9 @@ class AbstractParticipation(Persistent):
     def setEmail( self, email ):
         email = email.strip().lower()
         if email != self.getEmail():
+            self._unindex()
             self._email = email
+            self._index()
             self._notifyModification()
 
     def getEmail( self ):
