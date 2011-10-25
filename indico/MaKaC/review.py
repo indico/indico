@@ -405,6 +405,8 @@ class _AuthIdx(Persistent):
         if not self._idx.has_key(key):
             return
         abstractId=str(auth.getAbstract().getId())
+        if abstractId not in self._idx[key]:
+            return
         self._idx[key][abstractId]-=1
         if self._idx[key][abstractId]<=0:
             del self._idx[key][abstractId]
