@@ -33,10 +33,10 @@ try:
     from babel.support import Translations
     from translations import *
 
-    _ = ugettext = gettext = lazyTranslations.ugettext
-    ngettext = ungettext = lazyTranslations.ungettext
+    _ = gettext = lazyTranslations.gettext
+    ngettext = lazyTranslations.ngettext
 
-    L_ = gettext_lazy = forceLazyTranslations.ugettext
+    L_ = gettext_lazy = forceLazyTranslations.gettext
 
 except ImportError:
     # no Babel

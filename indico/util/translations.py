@@ -80,18 +80,18 @@ class LazyTranslations(Translations):
         if 'translation' in ContextManager.get() and not self.force:
             # straight translation
             translation = ContextManager.get('translation')
-            return getattr(translation, func)(*args, **kwargs).encode('utf-8')
+            return getattr(translation, func)(*args, **kwargs)
         else:
             # otherwise, defer translation to eval time
             return LazyProxy(_tr_eval, func, *args, **kwargs)
 
-    def ugettext(self, text):
-        return self._wrapper('ugettext', text)
+    def gettext(self, text):
+        return self._wrapper('gettext', text)
 
-    def ungettext(self, singular, plural, n):
-        return self._wrapper('ungettext', singular, plural, n)
+    def ngettext(self, singular, plural, n):
+        return self._wrapper('ngettext', singular, plural, n)
 
 
 lazyTranslations = LazyTranslations()
 forceLazyTranslations = LazyTranslations(forceLazy=True)
-lazyTranslations.install(unicode=True)
+lazyTranslations.install(unicode=False)
