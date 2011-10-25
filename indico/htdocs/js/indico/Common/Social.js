@@ -16,12 +16,6 @@ function inject_facebook(appId) {
 $(function() {
     var theme = $('#social').data('theme');
 
-    $('#social_button').click(function(){
-        // jsut keep link from loading
-        return false;
-    });
-
-    $('#direct_link').click(function(e){ $(this).select(); });
 
     $('#social_button').qtip({
 
@@ -33,9 +27,7 @@ $(function() {
             my: 'bottom right',
             at: 'top center'
         },
-        content: function() {
-            return $('#social_share');
-        },
+        content: $('#social_share'),
         show: {
             event: 'click',
             effect: function() {
@@ -52,7 +44,12 @@ $(function() {
         },
         events: {
             render: function(event, api) {
-                inject_facebook($('#social').data('appData').facebook.appId);
+
+                $('#direct_link').click(function(e){
+                    $(this).select();
+                });
+
+               inject_facebook($('#social').data('appData').facebook.appId);
                 $.getScript('//apis.google.com/js/plusone.js');
                 $.getScript('//platform.twitter.com/widgets.js');
             },

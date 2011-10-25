@@ -28,8 +28,6 @@
 </div>
 
 <div id="social" data-url="${url}" data-theme="${'dark' if dark else 'light'}" data-app-data="${app_data|n,j,h}">
-  <a href="#" id="social_button">
-    <img src="${systemIcon('social.png')}" alt="${_("Social Networks")}"
-         title="${_("Social Networks")}" />
-  </a>
+  <img src="${systemIcon('social.png')}" alt="${_("Social Networks")}"
+       title="${_("Social Networks")}" id="social_button"/>
 </div>
