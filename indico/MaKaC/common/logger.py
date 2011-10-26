@@ -228,11 +228,12 @@ class Logger:
 
     @classmethod
     def removeHandler(cls, handlerName):
-        handler = cls.handlers.get(handlerName)
+        if cls.handlers:
+            handler = cls.handlers.get(handlerName)
 
-        if handler:
-            del cls.handlers[handlerName]
-            logging.root.handlers.remove(handler)
+            if handler:
+                del cls.handlers[handlerName]
+                logging.root.handlers.remove(handler)
 
     @classmethod
     def get(cls, module=None):

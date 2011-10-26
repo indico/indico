@@ -37,7 +37,12 @@ class TestConfig:
         Initializes the proxy object, loading the configuration data
         from tests.conf
         """
-        execfile(os.path.join(os.path.dirname(__file__), 'tests.conf'))
+        fpath = os.path.join(os.path.dirname(__file__), 'tests.conf')
+        if os.path.exists(fpath):
+            execfile(fpath)
+        else:
+            print "tests.conf not found, using sample file instead"
+            execfile("%s.sample" % fpath)
         self.testsConf = locals()
 
     def __getattr__(self, attr):
