@@ -419,7 +419,7 @@ class test_indico(Command):
 
     def checkTestPackages(self):
         packagesList = ['figleaf',
-                        'nose',
+                        'nose>=0.11',
                         'rednose',
                         'selenium',
                         'twill']
