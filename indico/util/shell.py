@@ -1,9 +1,18 @@
 import sys, getopt, logging, argparse, urlparse, re
-from IPython.Shell import IPShellEmbed
+
+# check for ipytho support
+try:
+    from IPython.Shell import IPShellEmbed
+    HAS_IPYTHON = True
+except ImportError:
+    import code
+    HAS_IPYTHON = False
+
 from wsgiref.simple_server import make_server
 from wsgiref.util import shift_path_info
 
 from indico.web.wsgi.indico_wsgi_handler import application
+from indico.core.index import Catalog
 
 ## indico legacy imports
 import MaKaC
@@ -12,8 +21,12 @@ from MaKaC.common.db import DBMgr
 from MaKaC.conference import Conference, Category, ConferenceHolder, CategoryManager
 from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
+
+
+SHELL_BANNER = '\nindico %s\n' % MaKaC.__version__
 
 
 def add(namespace, element, name=None, doc=None):
@@ -22,7 +35,7 @@ def add(namespace, element, name=None, doc=None):
         name = element.__name__
     namespace[name] = element
 
-    print "Added '%s'" % name,
+    print "+ '%s'" % name,
     if doc:
         print ": %s" % doc
     else:
@@ -71,6 +84,8 @@ def setupNamespace(dbi):
     add(namespace, GroupHolder)
     add(namespace, HelperMaKaCInfo)
     add(namespace, PluginsHolder)
+    add(namespace, Catalog)
+    add(namespace, IndexesHolder)
 
     add(namespace, HelperMaKaCInfo.getMaKaCInfoInstance(), 'minfo', 'MaKaCInfo instance')
 
@@ -104,12 +119,16 @@ def main():
 
         namespace = setupNamespace(dbi)
 
-        ipshell = IPShellEmbed(remainingArgs,
-                               banner='Indico Shell',
-                               exit_msg='Good luck',
-                               user_ns=namespace)
+        if HAS_IPYTHON:
+            ipshell = IPShellEmbed(remainingArgs,
+                                   banner=SHELL_BANNER,
+                                   exit_msg='Good luck',
+                                   user_ns=namespace)
 
-        ipshell()
+            ipshell()
+        else:
+            console = code.InteractiveConsole(namespace)
+            console.interact(SHELL_BANNER)
 
         dbi.abort()
         dbi.endRequest()
