@@ -103,6 +103,7 @@ class TestManager(object):
          * options - test options (such as verbosity...)
         """
         result = False
+        killself = options.pop('killself', False)
 
         TestManager._title("Starting test framework\n")
 
@@ -123,8 +124,13 @@ class TestManager(object):
                                   'red') % test
         finally:
             # whatever happens, clean this mess up
-            self._stopManageDB()
+            self._stopManageDB(killself)
             self._stopSMTPServer()
+
+        if killself:
+            # Forcefully kill ourselves. This avoids waiting for the db to shutdown (SLOW)
+            self._info('Committing suicide to avoid waiting for slow database shutdown')
+            os.kill(os.getpid(), 9)
 
         if result:
             return 0
@@ -181,11 +187,11 @@ class TestManager(object):
         self._info("Starting fake DB in port %s" % port)
         self._startFakeDB('localhost', port)
 
-    def _stopManageDB(self):
+    def _stopManageDB(self, killself=False):
         """
         Stops the temporary DB
         """
-        self._stopFakeDB()
+        self._stopFakeDB(killself)
 
     def _startFakeDB(self, zeoHost, zeoPort):
         """
@@ -199,7 +205,7 @@ class TestManager(object):
             os.path.join(self.dbFolder, "Data.fs"),
             zeoHost, zeoPort)
 
-    def _stopFakeDB(self):
+    def _stopFakeDB(self, killself=False):
         """
         Stops the temporary DB
         """
@@ -207,7 +213,7 @@ class TestManager(object):
         print colored("-- Stopping test DB", "cyan")
 
         try:
-            self.zeoServer.shutdown()
+            self.zeoServer.shutdown(killself)
             self._removeDBFile()
         except OSError, e:
             print ("Problem terminating ZEO Server: " + str(e))

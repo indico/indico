@@ -339,7 +339,8 @@ class test_indico(Command):
                     ('parallel', None, "Parallel test execution using Selenium Grid (for --functional)"),
                     ('threads=', None, "Parallel test execution with several threads (for --functional)"),
                     ('repeat=', None, "Number of repetitions (for --functional)"),
-                    ('silent', None, "Don't output anything in the console, just generate the report")]
+                    ('silent', None, "Don't output anything in the console, just generate the report"),
+                    ('killself', None, "Kill this script right after the tests finished without waiting for db shutdown.")]
     boolean_options = []
 
     specify = None
@@ -353,6 +354,7 @@ class test_indico(Command):
     jsspecify = None
     grid = None
     silent = False
+    killself = False
     html = False
     record = False
     parallel = False
@@ -395,6 +397,7 @@ class test_indico(Command):
 
 
         options = {'silent': self.silent,
+                   'killself': self.killself,
                    'html': self.html,
                    'specify': self.specify,
                    'coverage': self.coverage,
