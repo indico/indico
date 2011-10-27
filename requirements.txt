@@ -1,4 +1,3 @@
-indico
 argparse
 wsgiref
 Babel
