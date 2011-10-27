@@ -153,7 +153,7 @@ class TestManager(object):
             'BaseSecureURL': 'http://localhost:8000',
             'UseXSendFile': False,
             'AuthenticatorList': ['Local'],
-            'SmtpServer': ('localhost', 8025),
+            'SmtpServer': ('localhost', 58025),
             'SmtpUseTLS': 'no',
             'DBConnectionParams': ('localhost', TestConfig.getInstance().getFakeDBPort()),
             'LogDir': os.path.join(temp, 'log'),
@@ -240,7 +240,7 @@ class TestManager(object):
 
     @classmethod
     def _startSMTPServer(cls):
-        cls._smtpd = FakeMailThread(('localhost', 8025))
+        cls._smtpd = FakeMailThread(('localhost', 58025))
         cls._smtpd.start()
 
     @classmethod
