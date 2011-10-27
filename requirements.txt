@@ -15,6 +15,7 @@ pyatom>=1.2
 python-dateutil<2.0
 pytz>=2011k
 simplejson>=2.2.1
+distribute
 transaction
 zc.lockfile
 zc.queue
@@ -22,3 +23,8 @@ zdaemon
 zope.event
 zope.index
 zope.interface
+pojson>=0.3
+argh
+polib
+py
+pytest
