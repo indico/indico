@@ -55,12 +55,16 @@ class TestZEOServer(Process):
         """
         self.server.main()
 
-    def shutdown(self):
+    def shutdown(self, killself=False):
         """
         This is basically a 'blocking' terminate()
         """
 
         self.terminate()
+
+        if killself:
+            # Do not wait for shutdown if we are going to kill ourselves
+            return
 
         # wait till i'm dead
         while self.is_alive():

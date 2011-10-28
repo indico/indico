@@ -4921,7 +4921,7 @@ msgstr ""
 #: indico/MaKaC/plugins/Collaboration/Vidyo/components.py:42
 msgid ""
 "<li><input type=\"checkbox\" name=\"cloneVidyo\" id=\"cloneVidyo\" "
-"value=\"1\" />Vydio</li>"
+"value=\"1\" />Vidyo</li>"
 msgstr ""
 
 #: MaKaC/plugins/Collaboration/Vidyo/options.py:24

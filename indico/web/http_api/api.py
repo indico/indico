@@ -503,7 +503,7 @@ class CategoryEventFetcher(DataFetcher):
                 return True
 
         for catId in idlist:
-            for obj in self._process(idx.iterateObjectsIn(catId, self._fromDT, self._toDT), filter, IConferenceMetadataFossil):
+            for obj in self._process(idx.iterateObjectsIn(catId, self._fromDT, self._toDT), filter):
                 yield obj
 
     def event(self, idlist):

@@ -170,7 +170,7 @@
     };
 
     var openCategoryChooser = function() {
-        var categoryChooserPopup = new CategoryChooser(${ categ }, categoryChooserHandler, true);
+        var categoryChooserPopup = new CategoryChooser(${ categ | n,j}, categoryChooserHandler, true);
         categoryChooserPopup.open();
     }
 

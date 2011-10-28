@@ -60,5 +60,6 @@ class SOAPObjectFactory(object):
 
         newFilter = vidyoClient.factory.create('Filter')
         newFilter.query = query
+        newFilter.dir = 'DESC'
 
         return newFilter

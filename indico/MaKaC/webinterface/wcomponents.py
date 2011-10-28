@@ -26,6 +26,7 @@ from xml.sax.saxutils import escape, quoteattr
 from copy import copy
 from datetime import timedelta,datetime,date,time
 import exceptions
+import urllib
 from operator import attrgetter
 from MaKaC.common.db import DBMgr
 import MaKaC.conference as conference
@@ -274,7 +275,7 @@ class WHeader(WTemplated):
         self._currentuser = aw.getUser()
         self._locTZ = locTZ
         self._aw = aw
-        self.__isFrontPage = isFrontPage
+        self._isFrontPage = isFrontPage
         self.__currentCategory = currentCategory
 
     """
@@ -323,7 +324,7 @@ class WHeader(WTemplated):
 
         vars["imgLogo"] = imgLogo
         vars["imgLogin"] = imgLogin
-        vars["isFrontPage"] = self.__isFrontPage
+        vars["isFrontPage"] = self._isFrontPage
         vars["currentCategory"] = self.__currentCategory
 
         if self._aw.getSession():
@@ -719,12 +720,12 @@ class WFooter(WTemplated):
 
     def __init__(self, tpl_name = None, isFrontPage = False):
         WTemplated.__init__(self, tpl_name)
-        self.__isFrontPage = isFrontPage
+        self._isFrontPage = isFrontPage
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
 
-        vars["isFrontPage"] = self.__isFrontPage;
+        vars["isFrontPage"] = self._isFrontPage;
 
         if not vars.has_key("modificationDate"):
             vars["modificationDate"] = ""
@@ -733,6 +734,43 @@ class WFooter(WTemplated):
             vars["shortURL"] = ""
 
         return vars
+
+
+class WEventFooter(WFooter):
+    """
+    Specialization of WFooter that provides extra info for events
+    """
+    def __init__(self, conf, tpl_name = None, isFrontPage = False):
+        WFooter.__init__(self, tpl_name, isFrontPage)
+        self._conf = conf
+
+    def _gCalDateFormat(self, dtime):
+        return dtime.strftime("%Y%m%dT%H%M%SZ")
+
+    def getVars(self):
+        v = WFooter.getVars(self)
+        v['gc_params'] = urllib.urlencode({
+            'action': 'TEMPLATE',
+            'text': self._conf.getTitle(),
+            'dates': "%s/%s" % (self._gCalDateFormat(self._conf.getStartDate()),
+                                self._gCalDateFormat(self._conf.getEndDate())),
+            'details': self._conf.getDescription(),
+            'location': self._conf.getLocation().getName(),
+            'trp': False,
+            'sprop': [str(urlHandlers.UHConferenceDisplay.getURL(self._conf)),
+                      'name:indico']
+            })
+
+        cid = self._conf.getUrlTag().strip() or self._conf.getId()
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        app_data = minfo.getSocialAppConfig()
+
+        v['icalURL'] = urlHandlers.UHConferenceToiCal.getURL(self._conf)
+        v["shortURL"] = Config.getInstance().getShortEventURL() + cid
+        v["app_data"] = app_data
+        v["showSocial"] = app_data.get('active', False) and self._conf.getDisplayMgr().getShowSocialApps()
+        return v
+
 
 class WNavigationDrawer(WTemplated):
 

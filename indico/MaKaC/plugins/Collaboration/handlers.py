@@ -90,6 +90,7 @@ class RHElectronicAgreement(RHConfModifCSBookings):
             # if no error, update the speaker wrapper...
             spkWrapper.setStatus(SpeakerStatusEnum.FROMFILE) #change status
             spkWrapper.setLocalFile(f) # set path to file
+            spkWrapper.triggerNotification() # trigger notification task
         except:
             raise MaKaCError("Unexpected error while uploading file")
 

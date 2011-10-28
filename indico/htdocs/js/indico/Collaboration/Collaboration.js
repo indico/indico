@@ -1783,6 +1783,7 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
 
             var sendButton = Widget.button(command(function(){
 
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending..."));
                 indicoRequest(
                     "collaboration.sendElectronicAgreement",
                     {
@@ -1792,6 +1793,7 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
                         content: self.rtWidget.get(),
                     },
                     function(result, error){
+                        killProgress();
                         if (error) {
                             IndicoUtil.errorReport(error);
                             self.close();
@@ -1802,11 +1804,11 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
                                 IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {talkTitle} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
                             }else{
                                 self.close();
-                                span1 = Html.div({}, $T("Email sent successfully !"));
-                                span2 = Html.div({}, $T("The Electronic Agreement email has been sent to:"));
-                                span3 = Html.div({}, $T(""+result));
+                                span1 = Html.div({}, $T("Email sent successfully!"));
+                                span2 = Html.div({}, $T("The email has been sent to:"));
+                                span3 = Html.div({}, result);
 
-                                informationPopup(Html.div({}, span1, span2, span3), null);
+                                informationPopup(Html.div({}, span1, span2, span3));
                             }
                         }
                     }
@@ -1891,24 +1893,14 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
 
 //Information popup, will print an information and redirect to the redirectionLink when click on OK
 var informationPopup = function(information, redirectionLink){
-    var popup = new ExclusivePopupWithButtons($T("Confirmation"), function(){window.location = redirectionLink;});
 
-    popup.draw = function(){
-        var self = this;
-        var span = Html.span('', $T(information));
-        var okButton = Html.input('button', '', $T("OK"));
-        okButton.observeClick(function() {
-            if (redirectionLink != null)
-                window.location = redirectionLink;
-            else
-                window.location = window.location.href;
-            });
-
-        return this.ExclusivePopupWithButtons.prototype.draw.call(this, span, okButton);
-    };
-
-    popup.open();
-}
+    (new AlertPopup($T("Confirmation"), information, function() {
+        if (redirectionLink)
+            window.location = redirectionLink;
+        else
+            window.location = window.location.href;
+    })).open();
+};
 
 var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
     var killProgress = IndicoUI.Dialogs.Util.progress($T("Accepting Electronic Agreement..."));
@@ -1921,14 +1913,14 @@ var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
             function(result,error) {
                 if (!error) {
                     killProgress();
-                    informationPopup($T("Your choice has been successfully recorded."), redirectionLink);
+                    informationPopup($T("The acceptance of the agreement has been successfully recorded."), redirectionLink);
                 } else {
                     killProgress();
                     IndicoUtil.errorReport(error);
                 }
             }
         );
-}
+};
 
 var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
 
@@ -1960,7 +1952,7 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
                 function(result,error) {
                     if (!error) {
                         killProgress();
-                        informationPopup($T("The rejection of the Electronic Agreement has been sent."), redirectionLink);
+                        informationPopup($T("The rejection of the agreement has been successfully recorded."), redirectionLink);
                     } else {
                         killProgress();
                         IndicoUtil.errorReport(error);

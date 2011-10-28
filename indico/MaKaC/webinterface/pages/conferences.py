@@ -93,6 +93,7 @@ def stringToDate( str ):
     [ day, month, year ] = str.split("-")
     return datetime(int(year),months[month],int(day))
 
+
 class WPConferenceBase( base.WPDecorated ):
 
     def __init__( self, rh, conference ):
@@ -115,7 +116,8 @@ class WPConferenceBase( base.WPDecorated ):
         wc = wcomponents.WFooter()
 
         p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),
-             "subArea": self._getSiteArea()}
+             "subArea": self._getSiteArea()
+             }
         return wc.getHTML(p)
 
     def getLoginURL( self ):
@@ -149,11 +151,9 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         wc = wcomponents.WFooter()
         p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),
                 "subArea": self._getSiteArea()}
-        if Config.getInstance().getShortEventURL():
-            id=self._conf.getUrlTag().strip()
-            if not id:
-                id = self._conf.getId()
-            p["shortURL"] =  Config.getInstance().getShortEventURL() + id
+
+        cid = self._conf.getUrlTag().strip() or self._conf.getId()
+        p["shortURL"] =  Config.getInstance().getShortEventURL() + cid
         return wc.getHTML(p)
 
     def _getHeader( self ):
@@ -412,19 +412,42 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         #This is used for fetching the default css file for the conference pages
         #And also the modificated uploaded css
 
+        dmgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         path = self._getBaseURL()
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
             """ % path
-        confCSS = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager().getCSS()
+        confCSS = dmgr.getStyleManager().getCSS()
 
         if confCSS:
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
+
         return printCSS
 
     def _applyDecoration( self, body ):
         body = self._applyConfDisplayDecoration( body )
         return WPConferenceBase._applyDecoration( self, body )
+
+
+class WConfMetadata(wcomponents.WTemplated):
+    def __init__(self, conf):
+        self._conf = conf
+
+    def getVars(self):
+        v = wcomponents.WTemplated.getVars( self )
+        minfo =  info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        v['site_name'] = minfo.getTitle()
+        v['fb_config'] = minfo.getSocialAppConfig().get('facebook', {})
+
+        if self._conf.getLogo():
+            v['image'] = urlHandlers.UHConferenceLogo.getURL(self._conf)
+        else:
+            v['image'] = Config.getInstance().getSystemIconURL("indico_small")
+
+        v['description'] = self._conf.getDescription()[:200]
+        return v
+
 
 class WConfDisplayFrame(wcomponents.WTemplated):
 
@@ -779,7 +802,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         if location:
             vars["location"] = "<i>%s</i><br><pre>%s</pre>"%( location.getName(), location.getAddress() )
             room = self._conf.getRoom()
-            if room:
+            if room and room.getName():
                 roomLink = linking.RoomLinker().getHTMLLink( room, location )
                 vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
         vars["chairs"] = self._getChairsHTML()
@@ -836,8 +859,12 @@ class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
         confCSS = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager().getCSS()
         if confCSS:
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
-        return printCSS
+        confMetadata = WConfMetadata(self._conf).getHTML()
+        return printCSS + confMetadata
 
+    def _getFooter(self):
+        wc = wcomponents.WEventFooter(self._conf)
+        return wc.getHTML()
 
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
@@ -1207,7 +1234,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
     def _getFooter( self ):
         """
         """
-        wc = wcomponents.WFooter()
+        wc = wcomponents.WEventFooter(self._conf)
         p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),"subArea": self._getSiteArea(),"dark":True}
         if Config.getInstance().getShortEventURL():
             id=self._conf.getUrlTag().strip()
@@ -5480,6 +5507,7 @@ class WConfModifDisplayCustom(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
+        vars["conf"]=self._conf
         vars["saveLogo"]=urlHandlers.UHSaveLogo.getURL(self._conf)
         vars["logoURL"]=""
         if self._conf.getLogo():
@@ -5489,8 +5517,6 @@ class WConfModifDisplayCustom(wcomponents.WTemplated):
         vars["formatTitleBgColor"] = WFormatColorOptionModif("titleBgColor", self._format, self._conf, 4).getHTML()
 
         #indico-style "checkboxes"
-        vars["enablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "enabledSection" )))
-        vars["disablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "disabledSection" )))
         enabledText = _("Click to disable")
         disabledText = _("Click to enable")
 

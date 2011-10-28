@@ -1,21 +1,7 @@
 % if not error:
     <script>
-    function getChoice(){
-        chosen = "";
-        len = document.choiceButton.EAChoice.length;
-        for (i = 0; i<len; i++){
-            if (document.choiceButton.EAChoice[i].checked)
-                chosen = document.choiceButton.EAChoice[i].value;
-        }
-
-        if(chosen == ""){
-            return "None";
-        }else{
-            return chosen;
-        }
-    }
     function signEA(){
-        choice = getChoice();
+        var choice = $('input[name="EAChoice"]:checked').val();
 
         if(choice == "accept"){
             // Update and store info, popup confirmation and redirect to event page.
@@ -77,7 +63,7 @@
               </div>
               <div class="EAFormSection">
                 <div>
-                  <p>Do you agree with the following standard ${agreementName}:</p>
+                  <p><strong>Do you agree with the following standard ${agreementName}:</strong></p>
                   <p>I hereby consent to the photographic, audio and video recording of my performance or
 presentation at CERN. The term “performance or presentation” includes any material
 incorporated therein including but not limited to text, images and references.</p>

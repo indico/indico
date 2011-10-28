@@ -677,10 +677,11 @@ extend(IndicoUI.Dialogs,
 
                        rtWidget.set(req.get(), !req.get());
 
-                       rtWidget.getEditor().on('change',function(ev){
-                           changedText.set(true);
+                       _.defer(function(){
+                               rtWidget.getEditor().on('change',function(ev){
+                               changedText.set(true);
+                           });
                        });
-
                        if (killProgress) {
                            killProgress();
                            changedText.set(false);

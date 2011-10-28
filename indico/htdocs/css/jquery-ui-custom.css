@@ -7,13 +7,3 @@
 .ui-daterange {
     width: 37em;
 }
-
-/* Indico styled tooltips USED WITH qTip2 */
-
-.ui-tooltip-default .ui-tooltip-content {
-    border: solid 1px #888;
-    color: #222;
-    background-color: #F0F0F0;
-    font-size: 11px;
-    padding: 2px;
-}

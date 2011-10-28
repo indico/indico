@@ -242,7 +242,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td align="right" class="subFieldWidth" valign="top"><small><span style="color: Red;"> ${ _("I need assistance")}</span>&nbsp;&nbsp;</small></td>
+                                                <td align="right" class="subFieldWidth" valign="top"><small><span style="color: Red;"> ${ _("I need assistance with this video-conf. system")}</span>&nbsp;&nbsp;</small></td>
                                                 <td align="left" class="blacktext">
                                                     <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} />
                                                     ${contextHelp('iNeedAVCSupport' )}

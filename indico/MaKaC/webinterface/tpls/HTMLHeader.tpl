@@ -1,16 +1,17 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
             "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html xmlns:fb="http://ogp.me/ns/fb#" xmlns:og="http://opengraph.org/schema/">
     <head>
         <title>${ page._getTitle() }${ area }</title>
         <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
         <link rel="shortcut icon" type="image/x-icon" href="${ systemIcon('addressBarIcon') }">
-        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/${ stylesheet }">
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/calendar-blue.css" >
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui.css">
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery.qtip.css">
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui-custom.css">
+
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/${ stylesheet }">
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 

@@ -107,5 +107,32 @@
         </td>
     </tr>
 
+    <tr>
+        <td colspan="2">
+            <a name="logo"></a>
+
+            <div class="groupTitle">${ _("Page Footer")}</div>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="dataCaptionTD">
+            <span class="dataCaptionFormat">${ _("Social bookmarks") }</span>
+        </td>
+        <td class="blacktext" id="social_bookmarks">
+        </td>
+    </tr>
+
 </table>
 </div>
+
+<script type="text/javascript">
+$(function() {
+    var button = new RemoteSwitchButton(${conf.getDisplayMgr().getShowSocialApps()|n,j},
+                                        Html.img({src:'${systemIcon('enabledSection')}'}),
+                                        Html.img({src:'${systemIcon('disabledSection')}'}),
+                                        'event.social.toggle', 'event.social.toggle',
+                                        {conference: ${conf.getId()|n,j}});
+    $E('social_bookmarks').set(button.draw());
+});
+</script>

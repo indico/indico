@@ -231,7 +231,9 @@ class AbstractParticipation(Persistent):
     def setEmail( self, email ):
         email = email.strip().lower()
         if email != self.getEmail():
+            self._unindex()
             self._email = email
+            self._index()
             self._notifyModification()
 
     def getEmail( self ):
@@ -405,6 +407,8 @@ class _AuthIdx(Persistent):
         if not self._idx.has_key(key):
             return
         abstractId=str(auth.getAbstract().getId())
+        if abstractId not in self._idx[key]:
+            return
         self._idx[key][abstractId]-=1
         if self._idx[key][abstractId]<=0:
             del self._idx[key][abstractId]
@@ -427,6 +431,19 @@ class _PrimAuthIdx(_AuthIdx):
         for abs in self._mgr.getAbstractList():
             for auth in abs.getPrimaryAuthorList():
                 self.index(auth)
+
+class _AuthEmailIdx(_AuthIdx):
+
+    def __init__(self, mgr):
+        _AuthIdx.__init__(self, mgr)
+        for abs in self._mgr.getAbstractList():
+            for auth in abs.getPrimaryAuthorList():
+                self.index(auth)
+            for auth in abs.getCoAuthorList():
+                self.index(auth)
+
+    def _getKey(self, auth):
+        return auth.getEmail().lower()
 
 class AbstractField(Persistent):
     _fieldTypes = [ 'input', 'textarea' ]
@@ -675,6 +692,7 @@ class AbstractMgr(Persistent):
         self.__notifTplsCounter=Counter()
         self._authorizedSubmitter = PersistentList()
         self._primAuthIdx =_PrimAuthIdx(self)
+        self._authEmailIdx =_AuthEmailIdx(self)
         self._abstractFieldsMgr=AbstractFieldsMgr()
         self._submissionNotification=SubmissionNotification()
         self._multipleTracks = True
@@ -966,18 +984,8 @@ class AbstractMgr(Persistent):
         return res
 
     def getAbstractListForAuthorEmail(self, email):
-        ''' Get list of abstracts where the email belongs to a primary author
-        '''
-        res = set()
-        for abs in self._abstracts.values():
-            for author in abs.getPrimaryAuthorList():
-                if email == author.getEmail():
-                    res.add(abs)
-
-            for author in abs.getCoAuthorList():
-                if email == author.getEmail():
-                    res.add(abs)
-        return list(res)
+        """ Get list of abstracts where the email belongs to an author"""
+        return [self.getAbstractById(i) for i in self._getAuthEmailIndex().match(email)]
 
     def getNotificationTplList(self):
         try:
@@ -1101,11 +1109,13 @@ class AbstractMgr(Persistent):
         a=auth.getAbstract()
         if a.isPrimaryAuthor(auth):
             self._getPrimAuthIndex().index(auth)
+        self._getAuthEmailIndex().index(auth)
 
     def unindexAuthor(self,auth):
         a=auth.getAbstract()
         if a.isPrimaryAuthor(auth):
             self._getPrimAuthIndex().unindex(auth)
+        self._getAuthEmailIndex().unindex(auth)
 
     def _getPrimAuthIndex(self):
         try:
@@ -1114,6 +1124,11 @@ class AbstractMgr(Persistent):
         except AttributeError:
             self._primAuthIdx=_PrimAuthIdx(self)
         return self._primAuthIdx
+
+    def _getAuthEmailIndex(self):
+        if not hasattr(self, '_authEmailIdx'):
+            self._authEmailIdx = _AuthEmailIdx(self)
+        return self._authEmailIdx
 
     def getAbstractsMatchingAuth(self,query,onlyPrimary=True):
         if str(query).strip()=="":

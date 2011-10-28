@@ -22,15 +22,15 @@
 URL handlers for Collaboration plugins
 """
 
-from MaKaC.webinterface.urlHandlers import SecureURLHandler, OptionallySecureURLHandler
+from MaKaC.webinterface.urlHandlers import SecureURLHandler, URLHandler
 
-class UHCollaborationElectronicAgreement(OptionallySecureURLHandler):
+class UHCollaborationElectronicAgreement(URLHandler):
     """
     URL handler for Electronic Agreement Manager
     """
     _relativeURL = "Collaboration/elecAgree"
 
-class UHCollaborationElectronicAgreementGetFile(OptionallySecureURLHandler):
+class UHCollaborationElectronicAgreementGetFile(URLHandler):
     """
     URL handler for Electronic Agreement Manager to get Paper
     """

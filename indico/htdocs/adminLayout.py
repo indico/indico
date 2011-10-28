@@ -18,14 +18,26 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import MaKaC.webinterface.rh.templates as templates
 from MaKaC.webinterface.rh import admins
 
-
 def index(req, **params):
+    return admins.RHAdminLayoutGeneral(req).process(params)
+
+def saveTemplateSet(req, **params):
+    return admins.RHAdminLayoutSaveTemplateSet(req).process(params)
+
+def saveSocial(req, **params):
+    return admins.RHAdminLayoutSaveSocial(req).process(params)
+
+def setDefaultPDFOptions(req, **params):
+    return templates.RHSetDefaultPDFOptions(req).process(params)
+
+def styles(req, **params):
     return admins.RHStyles(req).process(params)
 
-def add(req, **params):
+def addStyle(req, **params):
     return admins.RHAddStyle(req).process(params)
 
-def delete(req, **params):
+def deleteStyle(req, **params):
     return admins.RHDeleteStyle(req).process(params)

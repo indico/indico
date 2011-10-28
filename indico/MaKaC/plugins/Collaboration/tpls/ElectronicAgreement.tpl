@@ -6,10 +6,9 @@
             ${_("""Before any recording can be published, each speaker must sign the %s.<br/>
                      To do so, two different ways are available:
                      <ol>
-                        <li><span style="font-weight:bold;">Electronic signature: Send an Email</span> containing the link to sign the %s.<br/>
-                            (Select the speakers you want to send the Email and then click on the "Send Email" button.)
+                        <li><span style="font-weight:bold;">Electronic signature:</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
                         </li>
-                        <li>Ask the speaker to sign the """)%(agreementName, agreementName)}
+                        <li>Ask the speaker to sign the """)%(agreementName)}
 
             ${urlPaperAgreement}
 

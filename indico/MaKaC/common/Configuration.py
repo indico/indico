@@ -209,6 +209,7 @@ class Config:
                  "logoCERN": "CERNlogo-grey.png",
                  "timezone": "timezone.png",
                  "cern_small": "cern_small.png",
+                 "cern_small_light": "cern_small_light.png",
                  "home": "home.png",
                  "upCategory": "up_arrow.png",
                  "manage": "manage.png",
@@ -258,6 +259,10 @@ class Config:
                  "VISA": "VISA.gif",
                  "syncOff": "sync_off.png",
                  "syncOn": "sync_on.png",
+                 "facebook": "facebook.png",
+                 "twitter": "twitter.png",
+                 "gplus": "gplus.png",
+                 "gcal": "gcal.png"
     }
 
 

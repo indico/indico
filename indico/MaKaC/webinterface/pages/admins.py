@@ -89,10 +89,6 @@ class WPAdminsBase( WPMainBase ):
             urlHandlers.UHAdminArea.getURL())
         mainSection.addItem( self._generalSettingsMenuItem)
 
-        self._localdefMenuItem = wcomponents.SideMenuItem(_("Local Definitions"),
-            urlHandlers.UHAdminLocalDefinitions.getURL())
-        mainSection.addItem( self._localdefMenuItem)
-
         self._usersAndGroupsMenuItem = wcomponents.SideMenuItem(_("Users and Groups"),
             urlHandlers.UHUserManagement.getURL())
         mainSection.addItem( self._usersAndGroupsMenuItem)
@@ -105,8 +101,8 @@ class WPAdminsBase( WPMainBase ):
             urlHandlers.UHRoomBookingPluginAdmin.getURL())
         mainSection.addItem( self._roomsMenuItem)
 
-        self._templatesMenuItem = wcomponents.SideMenuItem(_("Templates"),
-            urlHandlers.UHTemplates.getURL())
+        self._templatesMenuItem = wcomponents.SideMenuItem(_("Layout"),
+            urlHandlers.UHAdminLayoutGeneral.getURL())
         mainSection.addItem( self._templatesMenuItem)
 
         self._servicesMenuItem = wcomponents.SideMenuItem(_("Services"),
@@ -279,50 +275,6 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         vars["timezone"]=TimezoneRegistry.getShortSelectItemsHTML(selected_tz)
         vars["language"]= genInfo.getLang()
         return vars
-
-
-class WPAdminLocalDefinitions( WPAdminsBase ):
-
-    def __init__(self, rh):
-        WPAdminsBase.__init__(self, rh)
-
-    def __getAvailableTemplates(self):
-        tplDir = Config.getInstance().getTPLDir()
-
-        tplRE = re.compile('^([^\.]+)\.([^\.]+)\.tpl$')
-
-        templates = {}
-
-        fnames = os.listdir(tplDir);
-        for fname in fnames:
-            m = tplRE.match(fname)
-            if m:
-                templates[m.group(2)] = None
-
-        tplRE = re.compile('^([^\.]+)\.([^\.]+)\.wohl$')
-
-        fnames = os.listdir(os.path.join(tplDir,'chelp'));
-        for fname in fnames:
-            m = tplRE.match(fname)
-            if m:
-                templates[m.group(2)] = None
-
-        return templates.keys()
-
-    def _getPageContent( self, params ):
-        wc = WAdminLocalDefinitions()
-        pars = {    "defaultTemplateSet": info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet(),
-                    "availableTemplates": self.__getAvailableTemplates(),
-                    "formURL": urlHandlers.UHAdminSaveTemplateSet.getURL() }
-        return wc.getHTML( pars )
-
-    def _setActiveSideMenuItem( self ):
-        self._localdefMenuItem.setActive()
-
-class WAdminLocalDefinitions(wcomponents.WTemplated):
-
-    pass
-
 
 
 class WPGenInfoModification( WPAdmins ):
@@ -792,7 +744,6 @@ class WPWebcastSelectManager( WPWebcastSetup ):
         params["addURL"] =  urlHandlers.UHWebcastAddManager.getURL()
         return wc.getHTML( params )
 
-
 class WPTemplatesCommon( WPAdminsBase ):
 
     def _setActiveSideMenuItem(self):
@@ -801,14 +752,16 @@ class WPTemplatesCommon( WPAdminsBase ):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabBadges = self._tabCtrl.newTab( "badges", _("Badges"), \
-                urlHandlers.UHBadgeTemplates.getURL() )
-        self._subTabPosters = self._tabCtrl.newTab( "posters", _("Posters"), \
-                urlHandlers.UHPosterTemplates.getURL() )
+        self._subTabGeneral = self._tabCtrl.newTab( "general", _("General Definitions"), \
+                urlHandlers.UHAdminLayoutGeneral.getURL() )
         self._subTabStyles = self._tabCtrl.newTab( "styles", _("Timetable Styles"), \
                 urlHandlers.UHAdminsStyles.getURL() )
         self._subTabCSSTpls = self._tabCtrl.newTab( "styles", _("Conference Styles"), \
                 urlHandlers.UHAdminsConferenceStyles.getURL() )
+        self._subTabBadges = self._tabCtrl.newTab( "badges", _("Badges"), \
+                urlHandlers.UHBadgeTemplates.getURL() )
+        self._subTabPosters = self._tabCtrl.newTab( "posters", _("Posters"), \
+                urlHandlers.UHPosterTemplates.getURL() )
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
@@ -816,6 +769,55 @@ class WPTemplatesCommon( WPAdminsBase ):
             return WPAdminsBase._getBody( self, params )
         else:
             return self._getTabContent( params )
+
+
+class WPAdminLayoutGeneral( WPTemplatesCommon ):
+
+    def _setActiveTab( self ):
+        self._subTabGeneral.setActive()
+
+    def __getAvailableTemplates(self):
+        tplDir = Config.getInstance().getTPLDir()
+
+        tplRE = re.compile('^([^\.]+)\.([^\.]+)\.tpl$')
+
+        templates = {}
+
+        fnames = os.listdir(tplDir);
+        for fname in fnames:
+            m = tplRE.match(fname)
+            if m:
+                templates[m.group(2)] = None
+
+        tplRE = re.compile('^([^\.]+)\.([^\.]+)\.wohl$')
+
+        fnames = os.listdir(os.path.join(tplDir,'chelp'));
+        for fname in fnames:
+            m = tplRE.match(fname)
+            if m:
+                templates[m.group(2)] = None
+
+        return templates.keys()
+
+    def _getTabContent(self, params):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        socialCfg = minfo.getSocialAppConfig()
+        wc = WAdminLayoutGeneral()
+        pars = {
+            "defaultTemplateSet": minfo.getDefaultTemplateSet(),
+            "availableTemplates": self.__getAvailableTemplates(),
+            "templateSetFormURL": urlHandlers.UHAdminLayoutSaveTemplateSet.getURL(),
+            "socialFormURL": urlHandlers.UHAdminLayoutSaveSocial.getURL(),
+            "socialActive": socialCfg.get('active', True),
+            # {'facebook': '269567379750914'}
+            "facebookData": socialCfg.get('facebook', {})
+            }
+        return wc.getHTML( pars )
+
+
+class WAdminLayoutGeneral(wcomponents.WTemplated):
+    pass
+
 
 class WPAdminsConferenceStyles( WPTemplatesCommon ):
 
@@ -825,6 +827,7 @@ class WPAdminsConferenceStyles( WPTemplatesCommon ):
 
     def _setActiveTab( self ):
         self._subTabCSSTpls.setActive()
+
 
 class WAdminsConferenceStyles(wcomponents.WTemplated):
 
@@ -1416,7 +1419,7 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
         am = AuthenticatorMgr()
         authTagList = [i.getId() for i in am.getList()]
 
-        vars["identityItems"] = filter(lambda x: not x.getAuthenticatorTag() in authTagList, self._avatar.getIdentityList())
+        vars["identityItems"] = filter(lambda x: x.getAuthenticatorTag() in authTagList, self._avatar.getIdentityList())
         vars["avatar"] = self._avatar
         vars["locator"] = self._avatar.getLocator().getWebForm()
         vars["accountManagementActive"] = 'Local' in authTagList

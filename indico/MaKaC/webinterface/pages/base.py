@@ -233,7 +233,7 @@ class WPDecorated( WPBase ):
     def _applyDecoration( self, body ):
         """
         """
-        return "<div class=\"wrapper\">%s%s<div class=\"emptyFooter\"></div></div>%s"%( self._getHeader(), body, self._getFooter() )
+        return "<div class=\"wrapper\"><div class=\"main\">%s%s</div></div>%s"%( self._getHeader(), body, self._getFooter() )
 
     def _display( self, params ):
 

@@ -132,6 +132,7 @@ class RejectElectronicAgreement(ConferenceDisplayBase):
         if spkWrapper:
             spkWrapper.setStatus(SpeakerStatusEnum.REFUSED)
             spkWrapper.setRejectReason(self.reason)
+            spkWrapper.triggerNotification()
 
 class AcceptElectronicAgreement(ConferenceDisplayBase):
     def _checkParams(self):
@@ -147,6 +148,7 @@ class AcceptElectronicAgreement(ConferenceDisplayBase):
 
         if spkWrapper:
             spkWrapper.setStatus(SpeakerStatusEnum.SIGNED, self._req.get_remote_ip())
+            spkWrapper.triggerNotification()
 
 methodMap = {
     "collaboration.setEmailSpeaker": SetSpeakerEmailAddress,

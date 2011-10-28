@@ -73,6 +73,13 @@ globalOptions = [
                "editable": True,
                "visible": True}),
 
+    ("AgreementNotificationURL", {"description" : _("URL to send agreement notification to"),
+               "type": str,
+               "defaultValue": "",
+               "editable": True,
+               "visible": True}),
+
+
     ("recordingCapableRooms", {"description": _("Rooms capable of recording"),
                       "type": "rooms",
                       "defaultValue": [],
