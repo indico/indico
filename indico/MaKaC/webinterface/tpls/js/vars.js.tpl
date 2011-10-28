@@ -84,7 +84,8 @@ var Indico = {
         arrow_down: "${ iconFileName("downArrow")}",
         indico_small: "${ iconFileName("indico_small")}",
         protected: "${ iconFileName("protected")}",
-        calendarWidget: "${ iconFileName("calendarWidget") }"
+        calendarWidget: "${ iconFileName("calendarWidget") }",
+        tt_time: "${ iconFileName("tt_time") }"
     },
     FileTypeIcons:
         ${ simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) }

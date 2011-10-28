@@ -1073,9 +1073,9 @@ class MoveEntryBase(ScheduleOperation):
         self._schEntryId = pManager.extract("scheduleEntryId", pType=int, allowEmpty=False)
         self._sessionId = pManager.extract("sessionId", pType=str, allowEmpty=True, defaultValue=None)
         self._sessionSlotId = pManager.extract("sessionSlotId", pType=str, allowEmpty=True, defaultValue=None)
+        self._keepTime = pManager.extract("keepTime", pType=bool, allowEmpty=True, defaultValue=False)
 
     def _performOperation(self):
-
         if (self._sessionId != None and self._sessionSlotId != None):
             self._schEntry = self._conf.getSessionById(self._sessionId).getSlotById(self._sessionSlotId).getSchedule().getEntryById(self._schEntryId)
         else:
@@ -1112,7 +1112,10 @@ class MoveEntryBase(ScheduleOperation):
                             self._schEntry.setStartDate(slot.getStartDate())
                             self._schEntry.setDuration(dur=slot.getDuration())
                         else:
-                            self._schEntry.setStartDate(slot.getSchedule().calculateEndDate())
+                            if self._keepTime:
+                                self._schEntry.setStartDate(oldDate)
+                            else:
+                                self._schEntry.setStartDate(slot.getSchedule().calculateEndDate())
                             #self._schEntry.setDuration(dur=session.getContribDuration())
                         # add it to new container
                         slot.getSchedule().addEntry(self._schEntry, check=2)

@@ -19,15 +19,24 @@ IndicoUI.Dialogs.Util = {
         };
     },
 
-    blockMoveProgress: function(text) {
-      var message = (text != undefined) ? $T(text) : "";
-      var loadingImage = $('<div class= "blockMoveProgressImage"></div>');
-      var loadingText = $('<div class="blockMoveProgressText"></div>').html(message);
-      var progress = $('<div class="blockMoveProgress"></div>').append(loadingImage, loadingText);
+    ttStatusInfo: function(text) {
+        var stext = $('<div class="text"></div>').text(text ? $T(text) : null);
+        var image = $('<img/>', {
+            src: "images/loading.gif",
+            alt: $T('Loading...')
+        });
 
-      $('body').append(progress);
+        var progress = $('<div id="tt_status_info"></div>').
+            append(image, stext);
+
+        if (!$('#tt_status_info').length) {
+            $('body').append(progress);
+        } else {
+            $('#tt_status_info').replaceWith(progress);
+        }
+
         return function() {
-          $(progress).remove();
+            $(progress).remove();
         };
     },
 

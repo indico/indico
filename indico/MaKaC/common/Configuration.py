@@ -114,6 +114,7 @@ class Config:
                  "indico_small": "indico_small.png",
                  "indico_co": "indico_co.png",
                  "login": "pict_login.png",
+                 "tt_time": "tt_time.png",
                  "table": "img_table.png",
                  "lectureMenu": "pict_event_negb.png",
                  "meetingMenu": "pict_meet_negb.png",

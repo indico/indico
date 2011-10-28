@@ -1,4 +1,3 @@
-
 <div id="timetable" style="position: relative;">
 
 <div class="timetablePreLoading" style="width: 700px; height: 300px;">

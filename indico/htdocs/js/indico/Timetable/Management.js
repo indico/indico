@@ -1,4 +1,4 @@
-type("TimetableManagementActions", [], {
+type("TimetableManagementActions", ["UndoMixin"], {
     methods: {
         'SessionSlot': {
             add: 'schedule.session.addSlot',
@@ -143,7 +143,7 @@ type("TimetableManagementActions", [], {
     /*
      * Edit start and end date. date format has to be dd/mm/yy mm:hh
      */
-    editEntryStartEndDate: function(startDate, endDate, eventData, reschedule) {
+    editEntryStartEndDate: function(startDate, endDate, eventData, reschedule, undo) {
         var self = this;
         var info = new WatchObject();
 
@@ -170,25 +170,88 @@ type("TimetableManagementActions", [], {
             }
         }
 
-      //Displays a "loading ..." div at the righthand bottom side
-      var killProgress = IndicoUI.Dialogs.Util.blockMoveProgress();
+        var dfr = $.Deferred();
+
+        //Displays a "loading ..." div at the righthand bottom side
+        var killProgress = IndicoUI.Dialogs.Util.ttStatusInfo($T('saving...'));
 
         indicoRequest(this.methods[type].modifyStartEndDate, info, function(result, error){
-            killProgress();
+            if (!undo) {
+                killProgress();
+            }
+
             if (error) {
                 IndicoUtil.errorReport(error);
-            }
-            else {
+                dfr.reject(error);
+                if (undo) {
+                    killProgress();
+                }
+            } else {
                 // Depending on whether 'reschedule' was selected or not,
                 // update the whole day or just one entry
 
+                if(undo) {
+                    self.enableUndo(undo, {eventData: eventData,
+                                           shifted: reschedule});
+                }
+
                 if (reschedule) {
-                    self.timetable._updateDay(result);
+                    self.timetable._updateDay(result).done(function() {
+                        dfr.resolve();
+                    });
                 } else {
-                    self.timetable._updateEntry(result, result.id);
+                    self.timetable._updateEntry(result, result.id).done(function() {
+                        dfr.resolve();
+                    });
                 }
             }
         });
+
+        return dfr.promise();
+    },
+
+    /* Takes care of moving a contribution/timeblock to another session/timetable.
+     * This goes for both "drag and drop" as well as the regular "MoveEntry Dialog clicking"*/
+    moveToSession: function(eventData, value, undo, keep_time) {
+        var self = this;
+
+        // if nothing has been selected yet
+        if (value === null || value === undefined) {
+            return false;
+        }
+
+        // Displays a "loading ..." div at the righthand bottom side
+        var killProgress = IndicoUI.Dialogs.Util.ttStatusInfo($T("saving..."));
+        var dfr = $.Deferred();
+
+        indicoRequest(this.methods[this.isSessionTimetable ? 'SessionEntry' : 'Event'].moveEntry, {
+            value : value,
+            conference : eventData.conferenceId,
+            scheduleEntryId : eventData.scheduleEntryId,
+            sessionId : eventData.sessionId,
+            sessionSlotId : eventData.sessionSlotId,
+            keepTime: keep_time || false
+        }, function(result, error) {
+
+            if (!undo) {
+                killProgress();
+            }
+
+            if (error) {
+                IndicoUtil.errorReport(error);
+                dfr.reject(error);
+            } else {
+                if (undo) {
+                    self.enableUndo(undo, {'eventData': eventData,
+                                           'entry': result.entry}, null);
+                    self.drawUndoDiv();
+                }
+                // change json and repaint timetable
+                self.timetable._updateMovedEntry(result, result.old.id).done(function() {
+                    dfr.resolve()
+                });
+            }});
+        return dfr.promise();
     },
 
     editRoomLocation: function(room, location, eventData) {
@@ -586,13 +649,8 @@ type("TimetableManagementActions", [], {
         var moveEntryDiag = new MoveEntryDialog(
             this,
             this.timetable,
-            eventData.entryType,
-            eventData.sessionId,
-            eventData.sessionSlotId,
-            timetable.currentDay,
-            eventData.scheduleEntryId,
-            eventData.conferenceId,
-            eventData.startDate.date );
+            eventData,
+            timetable.currentDay);
         moveEntryDiag.open();
     },
 

@@ -95,7 +95,6 @@ class ParameterManager(object):
 
         value = self._paramList.get(paramName)
 
-
         if (not allowEmpty) and (value == None):
             raise EmptyParameterException(paramName)
 

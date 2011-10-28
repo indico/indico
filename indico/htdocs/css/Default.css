@@ -5012,8 +5012,37 @@ div.timetableContribution  {
     background-color: #f8f2e8;
 }
 
-/* Timetable drag n drop,
-   droppable styles starts here. */
+.timetableBlock {
+    box-shadow: 0px 0px 5px #DDD;
+}
+
+/* Timetable drag n drop */
+
+#tt_hour_tip {
+    cursor: pointer;
+    overflow: auto;
+    background: white;
+    position: absolute;
+    z-index: 1;
+}
+
+#tt_hour_tip:hover {
+    opacity: 0.7;
+}
+
+.hourLine {
+    position: absolute;
+    border-top: 1px solid #E8E8E8;
+    font-size: 11px;
+}
+
+.ui-state-disabled.hourLine {
+    opacity: 1.0 !important;
+}
+
+.ui-droppable-disabled {
+    opacity: 0.7 !important;
+}
 
 /* For when the  Shift is held down */
 div.shiftIndicator {
@@ -5047,21 +5076,8 @@ div.ui-draggable:hover {
 }
 
 div.ui-draggable-dragging {
-    border: 3px solid gold;
-    /*background-color: gold;*/
-    /*To make the current dragged element
-      on top of everything*/
     z-index: 9000;
-}
-
-div.dragTip {
-    /* Just over 9000! (To be "above" the draggable, which has z-index 9000) */
-    z-index: 9001;
-    position: absolute;
-    width: 100%;
-    top: 350;
-    border-top: 1px dotted red;
-    font-weight: bold;
+    opacity: 0.5;
 }
 
 /* Timetable drag n drop,
@@ -5792,28 +5808,28 @@ div.timetableManagementInfoArea ul li{
     background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
 }
 
-div.blockMoveProgressText {
-/*
-    position: fixed;
-    bottom: 0px;*/
+#tt_status_info .text {
     padding: 3px 8px 3px;
     text-align: center;
-    color: #DDD;
+    color: #aaa;
+    float: right;
 }
 
-div.blockMoveProgressImage {
-    background: transparent url("../images/load_lightblue.gif") no-repeat center center;
-    padding-bottom: 49px;
+#tt_status_info img {
+    margin-top: 2px;
 }
 
-div.blockMoveProgress {
-    width: 100px;
-    background-color: #424242;
+#tt_status_info {
+    background: #fefefe;
+    border: 1px solid #eee;
+    padding: 5px;
     position: fixed;
-    bottom: 1px;
-    left: 91.8%;
+    bottom: 5px;
+    right: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
+    opacity: 0.9;
+    box-shadow: 0px 0px 2px rgba(220, 220, 200, 0.4);
 }
 
 /* MODIF DISPLAY*/
@@ -7387,6 +7403,7 @@ ul.UIAuthorList li .authorMove {
 ul.UIAuthorList li.UIAuthorMove {
     background: white url("../images/drag.png") left top no-repeat;
 }
+
 .arrow {
     background: #ECECEC;
     background-image: url("../images/menu_arrow_black.png") !important;
@@ -7575,3 +7592,27 @@ ul.buttonMenuPopupList li a:hover {
     margin: 0;
 }
 
+#dragTip {
+    position: absolute;
+    background: #f0f0f0;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-size: 10px;
+    padding: 4px;
+    opacity: 0.7;
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.3);
+}
+
+#dragTip .pointer {
+    position: absolute;
+    background: url('../images/pointer_tip.png');
+    height: 7px;
+    width: 5px;
+    top: 6px;
+    right: -5px;
+}
+
+.ui-resizable-resizing {
+    opacity: 0.9;
+    z-index: 1000;
+}

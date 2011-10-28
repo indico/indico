@@ -165,10 +165,10 @@ var Util = {
 
     dateTimeIndicoToJS: function(obj) {
         m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
-        m2 = obj.time.match(/(\d+):(\d+):(\d+)/);
+        m2 = obj.time.match(/(\d+):(\d+)(?::(\d+))?/);
 
 
-        var date = new Date(m1[1],m1[2] - 1,m1[3]);
+        var date = new Date(m1[1],m1[2] - 1,m1[3]||0);
         setTime(date, [m2[1],m2[2],m2[3]]);
 
         return date;

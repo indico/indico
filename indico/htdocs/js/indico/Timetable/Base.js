@@ -51,7 +51,7 @@ type("TimeTable", ["HistoryListener"], {
         return $('<div/>').css({width: this.width}).append(
             $('<div/>').css('display', 'block'),
             this.legend,
-            this.header.dom,
+            this.header,
             timetableDiv.dom,
             this.loadingIndicator.dom).get();
     },
@@ -67,6 +67,10 @@ type("TimeTable", ["HistoryListener"], {
 
     getData: function() {
         return this.data;
+    },
+
+    get_elem: function(blkId) {
+        return $(this.getTimetableDrawer()._blockMap[blkId]);
     },
 
     getById: function(id) {
@@ -94,6 +98,16 @@ type("TimeTable", ["HistoryListener"], {
                 return this.data[day][compositeId];
             }
         }
+    },
+
+    setSelectedTab: function(val) {
+        // same as inherited, but return deferred
+        var dfr = $.Deferred();
+        $('body').one('timetable_ready', function() {
+            dfr.resolve();
+        });
+        this.LookupTabWidget.prototype.setSelectedTab.call(this, val)
+        return dfr.promise();
     },
 
     getTimetableDrawer: function() {
@@ -134,35 +148,9 @@ type("TimeTable", ["HistoryListener"], {
         return;
     },
 
-    _shiftKeyListener: function() {
-      var indicatorDiv = $('.shiftIndicator');
-
-      //If its not already drawn/appended
-      if(!(indicatorDiv.length > 0)) {
-        indicatorDiv = (Html.div('shiftIndicator', $T("Shifting later entries ENABLED"))).dom;
-        $('body').append(indicatorDiv);
-      }
-
-      //< Keyboard Key "Shift" held down > listener for shifting while dragging blocks
-      $(window).keydown(function(e) {
-        //if Shift is pushed down
-        if(e.keyCode == '16') {
-          $(window).data('shiftIsPressed', true);
-          $(indicatorDiv).fadeIn("fast");
-        }}).keyup(function(e){
-          if(e.keyCode == '16') {
-            $(window).data('shiftIsPressed', false);
-            $(indicatorDiv).fadeOut("fast");
-          }
-        });
-
-      $(window).data('shiftIsPressed', false); //default value is false
-    }
 },
      function(data, width, wrappingElement, detailLevel, managementMode) {
          var self = this;
-         this._shiftKeyListener();
-
          this.data = data;
 
          this.enabled = true;
@@ -447,6 +435,7 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
     },
 
     switchToInterval : function(intervalId) {
+        var dfr = $.Deferred();
         this.disable();
 
         var intervalInfo = this.data[this.currentDay][intervalId];
@@ -465,20 +454,30 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
         this.intervalTimeTable.setData(intervalInfo);
         var content = this.intervalTimeTable.draw();
         this.canvas.html(content[0]);
+        this.intervalTimeTable.postDraw();
         $(this.menu.dom).hide();
 
+        $('body').trigger('timetable_switch_interval', this.intervalTimeTable);
+
+        dfr.resolve();
+        return dfr.promise();
     },
 
     postDraw: function() {
         this.TimeTable.prototype.postDraw.call(this);
     },
 
-    switchToTopLevel : function() {
+    switchToTopLevel : function(day) {
+        var dfr = $.Deferred();
         this.enable();
-        this.setSelectedTab(this.currentDay);
+        this.setSelectedTab(day || this.currentDay);
         $(this.menu.dom).show();
         this._generateContent(this.getSelectedPanel());
         this.timetableDrawer.redraw();
+        $('body').trigger('timetable_switch_toplevel', this);
+
+        dfr.resolve();
+        return dfr.promise();
     }
 },
      function(data, width, wrappingElement, detailLevel, managementActions, historyBroker, timetableLayoutId) {
@@ -591,6 +590,10 @@ type("IntervalTimeTableMixin", [], {
             " (", $B(Html.span({}), this.slotStartTime), " - ", $B(Html.span({}), this.slotEndTime),")" )));
     },
 
+    postDraw: function() {
+        this.timetableDrawer.postDraw();
+    },
+
     setData: function(data) {
         var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(data.startDate));
         var ttData = {};
@@ -621,7 +624,7 @@ type("IntervalTimeTableMixin", [], {
 
 
 },
-     function(parent, width, wrappingElement, managementActions) {
+     function(parent, width, wrappingElement, managementActions, layout) {
 
          this.managementActions = managementActions;
          this.parentTimetable = parent;
@@ -631,7 +634,8 @@ type("IntervalTimeTableMixin", [], {
                                                             this._functionButtons(),
                                                             this.loadingIndicator,
                                                             !!managementActions,
-                                                            managementActions);
+                                                            managementActions,
+                                                            layout || 'compact');
      });
 
 
@@ -691,6 +695,34 @@ type("ManagementTimeTable",["TimeTable"], {
                                return Html.li({}, span);
                            }),
                        closeButton);
+    },
+
+
+    _updateMovedEntry: function(result, oldEntryId) {
+        return this._updateEntry(result, oldEntryId, function(data){
+
+            var oldDay = Util.formatDateTime(Util.parseDateTime(result.old.startDate, IndicoDateTimeFormats.Default),
+                                          IndicoDateTimeFormats.Ordinal);
+
+            if (result.old.sessionId) {
+                // block was inside session slot
+                delete data[oldDay]['s' + result.old.sessionId + 'l' + result.old.sessionSlotId].entries[result.old.id];
+            } else {
+                // block was in top level
+                delete data[oldDay][result.old.id];
+            }
+
+            if(result.slotEntry){
+                // block moves inside session slot
+                data[result.day][result.slotEntry.id].entries[result.id] = result.entry;
+                // updates the time of the session if it has to be extended
+                data[result.day][result.slotEntry.id].startDate.time = result.slotEntry.startDate.time;
+                data[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
+            } else {
+                // block moves to top level
+                data[result.day][result.id]=result.entry;
+            }
+        });
     },
 
     /*
@@ -845,7 +877,12 @@ type("ManagementTimeTable",["TimeTable"], {
                              this.contextInfo.isPoster?null:this.separator2,
                              this.contextInfo.isPoster?null:this.fitInnerTimetableLink,
                              customLinks);
-        return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
+
+        var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>', {src: imageSrc(Indico.SystemIcons.tt_time),
+                                                                                  title:"Add one hour"}))
+
+        return $('<div/>').append(this.warningArea.dom, $('<div class="clearfix"/>').
+                                  append(this.menu.dom, this.infoBox.dom, tt_hour_tip));
         },
 
 },
@@ -1100,6 +1137,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
     _updateEntry: function(result, oldEntryId, updateCycle) {
 
+        var self = this;
         var data = this.getData();
 
         // AutoOp Warnings (before updates are done)
@@ -1139,7 +1177,13 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             this.eventInfo.endDate.time = result.entry.endDate.time;
         }
 
+        var dfr = $.Deferred();
+        $('body').one('timetable_redraw', function() {
+            $('body').trigger('timetable_update', self);
+            dfr.resolve();
+        });
         this.timetableDrawer.redraw();
+        return dfr.promise();
     },
 
     /**
@@ -1181,20 +1225,8 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         }
 
         this.timetableDrawer.redraw();
-    },
+        $('body').trigger('timetable_update', this);
 
-    _updateMovedEntry: function(result, oldEntryId) {
-        this._updateEntry(result, oldEntryId, function(data){
-            if (exists(result.slotEntry)) {
-                // move into a session slot
-                data[result.day][result.slotEntry.id].entries[result.id] = result.entry;
-                // updates the time of the session if it has to be extended
-                data[result.day][result.slotEntry.id].startDate.time = result.slotEntry.startDate.time;
-                data[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
-            } else {
-                data[result.day][result.id] = result.entry;
-            }
-        });
     },
 
     _updateSessionData: function(sessionId, fields, newValues) {
@@ -1269,6 +1301,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
     _updateEntry: function(result, oldEntryId, updateCycle) {
 
+        var self = this;
         var slot = this.contextInfo;
         var data = this.getData();
 
@@ -1306,23 +1339,13 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
         }
 
-        this.timetableDrawer.redraw();
-
-    },
-
-    _updateMovedEntry: function(result, oldEntryId) {
-        this._updateEntry(result, oldEntryId, function(data){
-            if(exists(result.slotEntry)){
-                // from slot to slot
-                data[result.day][result.slotEntry.id].entries[result.id] = result.entry;
-                // updates the time of the session if it has to be extended
-                data[result.day][result.slotEntry.id].startDate.time = result.slotEntry.startDate.time;
-                data[result.day][result.slotEntry.id].endDate.time = result.slotEntry.endDate.time;
-            } else {
-                // from slot to top level
-                data[result.day][result.id]=result.entry;
-            }
+        var dfr = $.Deferred();
+        $('body').one('timetable_redraw', function() {
+            $('body').trigger('timetable_update', self);
+            dfr.resolve();
         });
+        this.timetableDrawer.redraw();
+        return dfr.promise();
     },
 
     /**
@@ -1363,7 +1386,12 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
                               result.slotEntry.endDate.time);
         }
 
+        var dfr = $.Deferred();
+        $('body').bind('timetable_redraw', function() {
+            dfr.resolve();
+        });
         this.timetableDrawer.redraw();
+        return dfr.promise();
     },
 
     getTTMenu: function() {
@@ -1397,13 +1425,14 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
          this.ManagementTimeTable(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks);
          var managementActions = new IntervalTimeTableManagementActions(this, eventInfo, contextInfo, isSessionTimetable);
-         this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions);
+         this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions, 'proportional');
 
          this.canvas = Html.div({});
          this.isPoster = contextInfo.isPoster;
 
          this.setData = IntervalTimeTableMixin.prototype.setData;
          this.getById = IntervalTimeTableMixin.prototype.getById;
+         this.postDraw = IntervalTimeTableMixin.prototype.postDraw;
 
      });
 

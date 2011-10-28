@@ -215,6 +215,7 @@ type("TimetableLayoutManager", [],
 
 type("IncrementalLayoutManager", ["TimetableLayoutManager"],
      {
+         name: 'incremental',
          drawDay: function(data, detailLevel, startTime, endTime) {
              var self = this;
 
@@ -264,8 +265,14 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
 
              var hEnd;
 
-             for (var minutes = 0; minutes < ((endingHour + 1 - startingHour) * 60); minutes += TimetableDefaults.resolution) {
+             // add hour before start
+             if (startingHour > 0) {
+                 for (var min = 0; min < 60 ; min += TimetableDefaults.resolution) {
+                     self.processTimeBlock(startingHour - 1, startingHour, (startingHour - 1) * 60, min, algData);
+                 }
+             }
 
+             for (var minutes = 0; minutes < ((endingHour + 1 - startingHour) * 60); minutes += TimetableDefaults.resolution) {
                  // current block is [minutes, minutes + 5]
                  var startMin = (startingHour * 60 + minutes);
                  endMin = (startingHour * 60 + minutes + TimetableDefaults.resolution);
@@ -273,13 +280,13 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
                  hEnd = zeropad(parseInt(endMin/60, 10))+''+zeropad(endMin%60);
 
                  self.processTimeBlock(hStart, hEnd, startMin, minutes, algData);
-
              }
 
              if ($L(ks).indexOf('nextday') !== null) {
                  self.processTimeBlock('nextday', 'nextday', (startingHour * 60 + minutes), minutes, algData);
-             } else {
+             } else if (endMin/60 < 25){
                  // add last hour + 1 to the grid
+                 // (only if the next hour is not after midnight)
                  algData.grid.push([(endMin/60) % 24, algData.topPx]);
              }
 
@@ -291,7 +298,6 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
                  });
                  counter++;
              });
-
              return [algData.topPx, algData.grid, algData.blocks, algData.groups, algData.wholeDayBlocks];
 
          }
@@ -301,6 +307,7 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
 type("CompactLayoutManager", ["IncrementalLayoutManager"],
      {
 
+         name: 'compact',
          processTimeBlock: function(hStart, hEnd, startMin, minutes, algData) {
              var self = this;
 
@@ -410,7 +417,7 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
 
 type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
      {
-
+         name: 'proportional',
          processTimeBlock: function(hStart, hEnd, startMin, minutes, algData) {
              var self = this;
 
@@ -457,8 +464,9 @@ type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
                  }
              });
 
-             if (minutes % 60 === 0) {
-                 algData.grid.push([startMin/60%24, algData.topPx]);
+             var hour = startMin / 60;
+             if (minutes % 60 === 0 && hour <= 24) {
+                 algData.grid.push([hour % 24, algData.topPx]);
              }
 
              if (!algData.active) {
@@ -580,4 +588,3 @@ type("PosterLayoutManager", ["TimetableLayoutManager"],
             return data;
         }
     });
-

@@ -1034,7 +1034,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                 rb.dom.value = "conf:" + currentDay;
 
                 // disable the radio button where the item already belongs to
-                if (!this.inSession && this.startDate.replaceAll('-', '') == currentDay) {
+                if (!this.inSession && Util.formatDateTime(this.eventData.startDate, IndicoDateTimeFormats.Ordinal) == currentDay) {
                     rb.dom.disabled = 'disabled';
                 }
 
@@ -1055,7 +1055,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                     });
                     rb.dom.value = value.sessionId + ':' + value.sessionSlotId;
 
-                    if (this.inSession && value.sessionId == this.sessionId && value.sessionSlotId == this.slotId) {
+                    if (this.inSession && value.sessionId == this.eventData.sessionId && value.sessionSlotId == this.eventData.sessionSlotId) {
                         rb.dom.disabled = 'disabled';
                     }
 
@@ -1107,27 +1107,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                         }
 
                         var value = self.getChosenValue();
-                        self.handleBlockMove(self, value);
-
-                        var killProgress = IndicoUI.Dialogs.Util.progress($T('Moving the entry...'));
-
-                        indicoRequest(self.managementActions.methods[self.inSession?'SessionEntry':'Event'].moveEntry, {
-                            value : value,
-                            conference : self.confId,
-                            scheduleEntryId : self.scheduleEntryId,
-                            sessionId : self.sessionId,
-                            sessionSlotId : self.slotId
-                        }, function(result, error) {
-                            if (error) {
-                                killProgress();
-                                IndicoUtil.errorReport(error);
-                            } else {
-                                // change json and repaint timetable
-                                self.managementActions.timetable._updateMovedEntry(result, result.old.id);
-                                killProgress();
-                                self.close();
-                            }
-                        });
+                        self.managementActions.moveToSession(self.eventData, value, 'drop');
                     }],
                     [$T('Cancel'), function() {
                         self.close();
@@ -1137,13 +1117,12 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
 
             draw: function() {
                 var self = this;
-                this.inSession = true;
 
-                if (self.sessionId === null && self.slotId === null) {
+                if (this.eventData.sessionId === null && this.eventData.slotId === null) {
                     this.inSession = false;
                 }
                 // populate the tabslist
-                var tabData = self.topLevelTimetableData;
+                var tabData = this.topLevelTimetableData;
 
                 // sort tabs according to days
                 var dateKeys = $L(keys(tabData));
@@ -1162,7 +1141,8 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                 // define where the contribution is (display purpose)
                 var contribLocation = null;
                 if (this.inSession) {
-                    contribLocation = self.topLevelTimetableData[self.currentDay]['s' + self.sessionId + 'l' + self.slotId].title +
+                    contribLocation = self.topLevelTimetableData[this.currentDay]
+                    ['s' + this.eventData.sessionId + 'l' + this.eventData.sessionSlotId].title +
                         " (interval #" + self.slotId + ")";
                 } else {
                     contribLocation = Html.span({style:{fontWeight: 'bold'}},
@@ -1205,64 +1185,25 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
             postDraw: function(){
                 this.tabWidget.postDraw();
                 this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
-            },
-
-          /* Takes care of moving a contribution/timeblock to another session/timetable.
-           * This goes for both "drag and drop" as well as the regular "MoveEntry Dialog clicking"*/
-          handleBlockMove: function(eventData, value) {
-            var self = this;
-
-            // if nothing has been selected yet
-            if (!value) {
-              return false;
             }
-
-            //Displays a "loading ..." div at the righthand bottom side
-            var killProgress = IndicoUI.Dialogs.Util.blockMoveProgress("Moving the entry...");
-
-            self.inSession = true;
-            if (eventData.sessionId == null && eventData.sessionSlotId == null) {
-              self.inSession = false;
-            }
-
-            indicoRequest(self.managementActions.methods[self.inSession?'SessionEntry':'Event'].moveEntry, {
-                            value : value,
-                            conference : self.confId,
-                            scheduleEntryId : eventData.scheduleEntryId,
-                            sessionId : eventData.sessionId,
-                            sessionSlotId : self.slotId
-                          }, function(result, error) {
-                            if (error) {
-                              killProgress();
-                              IndicoUtil.errorReport(error);
-                            } else {
-                              // change json and repaint timetable
-                              self.managementActions.timetable._updateMovedEntry(result, result.old.id);
-                              killProgress();
-                              self.close();
-                            }});
-          }
         },
-        function(managementActions, timetable, entryType, sessionId, slotId, currentDay, scheduleEntryId, confId, startDate) {
-            this.managementActions = managementActions;
-            this.timetableData = timetable.getData();
-            this.topLevelTimetableData = timetable.parentTimetable?timetable.parentTimetable.getData():this.timetableData;
-            this.timetable = timetable ;
-            this.entryType = entryType;
-            this.sessionId = sessionId;
-            this.slotId = slotId;
-            this.currentDay = currentDay;
-            this.scheduleEntryId = scheduleEntryId;
-            this.confId = confId;
-            this.startDate = startDate;
+     function(managementActions, timetable, eventData, currentDay) {
+         this.managementActions = managementActions;
+         this.timetableData = timetable.getData();
+         this.topLevelTimetableData = timetable.parentTimetable?timetable.parentTimetable.getData():this.timetableData;
+         this.timetable = timetable;
+         this.currentDay = currentDay;
+         this.eventData = eventData;
 
-            var self = this;
+         this.inSession = (eventData.sessionId != null) && (eventData.sessionSlotId != null);
 
-            this.ExclusivePopupWithButtons($T("Move Timetable Entry"),
+         var self = this;
+
+         this.ExclusivePopupWithButtons($T("Move Timetable Entry"),
             function() {
-              self.close();
+                self.close();
             });
-        });
+     });
 
 
 /**

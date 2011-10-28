@@ -26,19 +26,6 @@ type("TimetableBlockBase", [],
 
          openPopup: function(event) {
              var self = this;
-
-             //All elements currently being dragged
-             /* We don't want to trigger the popup
-              if something is being dragged by the mouse */
-             var draggingElements = $('.ui-draggable-dragging');
-
-              // If popup alredy shown do nothing
-             if (self.popupActive || self.materialMenuOpen ||
-                 (draggingElements.length > 0)) {
-
-                 return;
-             }
-
              self.popupActive = true;
              self.div.dom.style.cursor = 'default';
              var cursor = getMousePointerCoordinates(event);
@@ -80,7 +67,7 @@ type("TimetableBlockBase", [],
          createMaterialButton: function(material) {
              var self = this;
 
-             this.materialMenuOpen = false;
+            this.materialMenuOpen = false;
 
              var button = Html.div('timetableBlockMaterial');
              button.observeClick(function(e) {
@@ -229,29 +216,22 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 'Break': breakClass
              };
 
-                this.block = Html.div({style:
-                        {
-                            position: 'absolute',
-                            top: pixels(this.topPos),
-                            height: pixels(this.height),
-                            backgroundColor: this.printableVersion ? 'white' : this.eventData.color,
-                            color: this.printableVersion ? 'black' : this.eventData.textColor,
-                            borderColor: this.printableVersion ? 'black' : '',
-                            left: pixels(this.leftPos),
-                            width: pixels(this.width-3),
-                            borderBottomStyle: this.blockData.unfinished?'dashed':''
-                        },
-                                       className: 'timetableBlock ' + classTable[this.eventData.entryType]
-                                      }, this._blockDescription()
-               );
+                $(this.block.dom).css({
+                    position: 'absolute',
+                    top: pixels(this.topPos),
+                    height: pixels(this.height),
+                    'background-color': this.printableVersion ? 'white' : this.eventData.color,
+                    color: this.printableVersion ? 'black' : this.eventData.textColor,
+                    'border-color': this.printableVersion ? 'black' : '',
+                    left: pixels(this.leftPos),
+                    width: pixels(this.width-3),
+                    'border-bottom-style': this.blockData.unfinished?'dashed':''
+                });
 
-              self.makeDraggable(self.block, self.eventData);
-              self.makeResizable(self.block, self.eventData);
+                $(this.block.dom).addClass('timetableBlock ' +
+                                           classTable[this.eventData.entryType]);
 
-              //When you drop something on a session timeBlock.
-              if(this.eventData.entryType == 'Session') {
-                self.makeMoveDroppable(self.block, self.eventData);
-              }
+                this.block.set(this._blockDescription());
 
                // This is a special case, when users shows contribution details it doesn't
                // apply to poster sessions. Instead add some grpahical elements to indicate
@@ -278,7 +258,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
 
                if (!self.printableVersion) {
                    $(this.block.dom).click(function(e) {
-                     self.openPopup(e);
+                       if (!self.timetable.getTimetableDrawer().eventsDisabled) {
+                           $(this).trigger('tt_block.balloon', e);
+                       }
                    });
                    highlightWithMouse(this.div, this.block);
                    showWithMouse(this.div, this.arrows);
@@ -286,225 +268,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                return this.block;
             },
 
-          makeResizable: function(block, eventData) {
-            var self = this;
-            var originalHeight = $(block.dom).height();
-            $(block.dom).data('originalheight', originalHeight);
-            var currentEndHour = null;
-            var currentStartHour = null;
-
-            var resizable = $(block.dom).resizable({
-              containment: $('#timetableDiv'),
-              maxWidth: $(block.dom).width(),
-              minWidth: $(block.dom).width(),
-
-              resize: function(event, ui) {
-                //Array of the form [hour] = '..position().top' (relative to timetable)
-                var hourLines = self.timetable.timetableDrawer.hourLinesArray;
-                var mouseTop = event.pageY;
-
-                var curBestDiff = Number.MAX_VALUE;
-                var curHour = null;
-                var diff = null;
-
-                //This loop extracts the hour you're resizing on.
-                //"The older for loop" is much faster than jQuery by the way
-                for(i in hourLines) {
-                  if(hourLines[i] != undefined) {
-
-                    // If you pull the resize "edge" where there is
-                    // no hourLine div
-                    if(!($("#hourLine_"+i).length > 0)) {
-                      return;
-                    }
-
-                    diff = (mouseTop - $("#hourLine_"+i).offset().top);
-                    if((diff > 0) && (diff < curBestDiff)) {
-                      curBestDiff = diff;
-                      curHour = i;
-                    }
-                  }
-                }
-
-                //returns array, with array[0] = ending hour, array[1] = ending minute (rounded to closest 5-divisible)
-                var gridTime = self.timetable.getTimetableDrawer().fetchTimeDragOnHour($(block.dom), $("#hourLine_"+curHour), curHour, "end");
-                if(gridTime != null) {
-                  currentStartHour = gridTime[0];
-                  currentEndHour = gridTime[1];
-                }
-                return;
-              },
-              stop: function(event, ui) {
-                $('.dragTip').hide();
-                self.timetable.getTimetableDrawer().releaseResizeOnHour(currentStartHour, currentEndHour, eventData, block);
-              }
-            });
-          },
-
-          makeDraggable: function(block, eventData) {
-            var self = this;
-
-            var originalWidth = $(block.dom).width();
-            var originalHeight = $(block.dom).height();
-
-            /* Resize timeblock if nedeed */
-            var maxCol = self.timetable.getTimetableDrawer().maxCol;
-            var newWidth = (Math.round($('#timetableDiv').width()/(maxCol)));
-
-            var heightThreshold = 450;
-            var heightChange = (originalHeight > heightThreshold);
-            var newHeight =  (heightChange) ? heightThreshold : originalHeight;
-
-            var widthChange = (!(newWidth == originalWidth));
-
-            var draggable = $(block.dom).draggable({
-              //Center the mouse in the middle of the block while dragging
-              cursorAt: {
-                left: ((newWidth == undefined) ? 0 : Math.round(newWidth/2)),
-                top: Math.round(newHeight/2) },
-              containment: $('#timetableDiv'),
-              revert: 'invalid',
-              start: function() {
-                /* Resize timeblock if nedeed */
-                maxCol = self.timetable.getTimetableDrawer().maxCol;
-                newWidth = (maxCol > 1) ? Math.round($('#timetableDiv').width()/(maxCol)) : originalWidth;
-
-                $(block.dom).width(newWidth);
-                $(block.dom).height(newHeight);
-
-                //(fulhack) Ugly hack [Begin] on jQuery to make the changed width come in to effect while dragging
-                $(this).data('draggable').helperProportions.width = newWidth;
-                $(this).data('draggable').helperProportions.height = newHeight;
-                $(this).data('draggable')._setContainment();
-                //Ugly hack [End]
-
-                self.timetable.getTimetableDrawer().createDragToolTip();
-
-                var pos = $(block.dom).position();
-                draggable.data('initialPosition', pos);
-              },
-              stop: function() {
-                //reset original width
-                if(widthChange || heightChange) {
-                  $(block.dom).animate({
-                    width: originalWidth,
-                    height: originalHeight
-                  });
-                }
-                $('.dragTip').remove();
-              },
-              drag: function(event) {
-              }});
-
-            draggable.data('blockInfo', block);
-            draggable.data('eventData', eventData);
-          },
-
-          /* This is the function that take care of time block drops
-            ON a session */
-          makeMoveDroppable: function(block, eventData) {
-            var self = this;
-
-            function isSession(ui) {
-              return ($(ui.draggable).hasClass("timetableSession"));
-            }
-
-            function isTouchingWall(ui) {
-             var ret = (($(ui.draggable).position().left == 0)
-                        || ($(ui.draggable).position().left ==
-                         ($('#timetableDiv').width()-$(ui.draggable).width())));
-              return ret;
-            };
-
-            $(block.dom).droppable({
-              drop: function( event, ui ) {
-                $('.dragTip').remove();
-
-                //If a session is dropped on top do nothing.
-                if(isSession(ui)) {
-                  return;
-                }
-
-                /* If the dragged block dropped to the left most side,
-                 * or the right most side (touches left/right wall)
-                 * AND..
-                 * the drop is handled by the drop-on-session-handler (since we're inside here now...)
-                 * THEN
-                 * handle it as a normal "HourLine drop". */
-
-                if(isTouchingWall(ui)) {
-                    $('.ui-droppable').droppable('enable');
-                    var ttDrawer = self.timetable.getTimetableDrawer();
-                    ttDrawer.releaseDragOnHour(ui, ttDrawer.curStartHour, ttDrawer.curStartMinute);
-                    return;
-                }
-
-                var blockInfo = $(ui.draggable).data('blockInfo');
-                var blockEventData = $(ui.draggable).data('eventData');
-
-                var moveEntryDialog = new MoveEntryDialog(
-                  self.managementActions,
-                  self.timetable,
-                  eventData.entryType,
-                  eventData.sessionId,
-                  eventData.sessionSlotId,
-                  timetable.currentDay,
-                  eventData.scheduleEntryId,
-                  eventData.conferenceId,
-                  eventData.startDate.date);
-
-                var chosenValue = eventData.sessionId + ':' + eventData.sessionSlotId;
-
-                var initialPosition = $(ui.draggable).data('initialPosition');
-
-                //Store Undo data
-                // TODO - not functioning at the moment
-                //self.timetable.getTimetableDrawer().enableUndo("drop", blockEventData);
-
-                moveEntryDialog.handleBlockMove(blockEventData, chosenValue);
-
-                // Non-instanced call, which fails on self.slotId inside the indicoRequest, inside moveEntryDialog(...)
-                /* MoveEntryDialog.prototype.handleBlockMove.call(self, blockEventData,
-                  chosenValue, self.managementActions); */
-
-                return;
-              },
-              greedy: true,
-              tolerance: 'intersect',
-              activate: function() {
-                $(block.dom).css('border', '2px solid green');
-              },
-              deactivate: function() {
-                $(block.dom).css('border', '');
-              },
-              over: function(event, ui) {
-                /* If you touch the wall while also
-                 * over a session - show that session with the style of
-                 * "not current drop target"
-                 *
-                 */
-                  function(event) {
-                    if(isTouchingWall(ui)) {
-                      $('.ui-droppable').droppable('enable');
-                    }
-                  };
-
-                if(isSession(ui) || isTouchingWall(ui)) {
-                  return;
-                }
-
-                $('.dragTip').hide();
-                $('.ui-droppable').not(this).droppable('disable');
-              },
-              out: function(event, ui) {
-                if(isSession(ui)) {
-                  return;
-                }
-                $('.dragTip').show();
-                $('.ui-droppable').not(this).droppable('enable');
-              },
-           });
-          },
+            _postDraw: function() {
+            },
 
             postDraw: function(hook) {
                 var self = this;
@@ -584,43 +349,42 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 }
 
                 // If content height <= div height then nothing needs to be done
-                if (contentHeight() <= parentDivHeight) {
-                    return;
+                if (contentHeight() > parentDivHeight) {
+                    // Try to remove the location info, and set title font weight to non bold,
+                    // if this works, then we're done. Otherwise, start to truncate the title as well.
+                    if (this.timeDiv.dom.style.display == 'none') {
+                        this.locationDiv.dom.style.display = 'none';
+                    }
+
+                    if (contentHeight() > parentDivHeight) {
+                        // Calculates the the width of title, presenters and possible arrows
+                        var topContentWidth = function() {
+                            var width = 2 * self.margin;
+                            if(self.titleDiv)
+                                width += self.titleDiv.dom.offsetWidth;
+                            if(self.presentersDiv)
+                                width += self.presentersDiv.dom.offsetWidth;
+
+                            self._postDraw()
+                            return width;
+                        }
+
+                        // Truncate title based on a ratio: div height / content height
+                        title = this.truncateTitle(Math.ceil(title.length * ((parentDivHeight) / contentHeight())), title);
+                        this.titleDiv.set(title);
+                        //String will be shorten by the value of 'step'
+                        var step = 2;
+                        //Truncating the title since it can be displayed in a single line
+                        // title !== "..." avoids the endless loop
+                        while (title !== "..." && contentHeight() > parentDivHeight && topContentWidth() > parentDivWidth * 0.8) {
+                            title = this.truncateTitle(-step, title);
+                            this.titleDiv.set(title);
+                        }
+                    }
                 }
 
-                // Try to remove the location info, and set title font weight to non bold,
-                // if this works, then we're done. Otherwise, start to truncate the title as well.
-                if (this.timeDiv.dom.style.display == 'none') {
-                    this.locationDiv.dom.style.display = 'none';
-                }
-
-                if (contentHeight() <= parentDivHeight) {
-                    return;
-                }
-
-                //Calculates the the width of title, presenters and possible arrows
-                var topContentWidth = function() {
-                    var width = 2 * self.margin;
-                    if(self.titleDiv)
-                        width += self.titleDiv.dom.offsetWidth;
-                    if(self.presentersDiv)
-                        width += self.presentersDiv.dom.offsetWidth;
-
-                    return width;
-                }
-
-                // Truncate title based on a ratio: div height / content height
-                title = this.truncateTitle(Math.ceil(title.length * ((parentDivHeight) / contentHeight())), title);
-                this.titleDiv.set(title);
-                //String will be shorten by the value of 'step'
-                var step = 2;
-                //Truncating the title since it can be displayed in a single line
-                // title !== "..." avoids the endless loop
-                while (title !== "..." && contentHeight() > parentDivHeight && topContentWidth() > parentDivWidth * 0.8) {
-                    title = this.truncateTitle(-step, title);
-                    this.titleDiv.set(title);
-                }
-
+                this._postDraw();
+                return null;
             },
             createPileEffect: function() {
                 var self = this;
@@ -642,9 +406,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 this.block.dom.style.backgroundColor = bgColor;
                 this.block.dom.style.color = textColor;
             }
+
         },
      function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel){
-
          this.TimetableBlockBase(timetable);
          this.compactMode = compactMode;
          this.eventData = eventData;
@@ -653,6 +417,14 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
          this.printableVersion = printableVersion;
          this.detailLevel = detailLevel;
          this.arrows = Html.span({});
+         this.block = Html.div({});
+
+         var self = this;
+         $(this.block.dom).bind('tt_block.balloon', function(event, originalEvent){
+             if (!self.popupActive) {
+                 self.openPopup(originalEvent);
+             }
+         })
         }
    );
 
@@ -746,7 +518,7 @@ type("TimetableBlockDisplayMixin",[],
 
      });
 
-type("TimetableBlockManagementMixin",[],
+type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
      {
          _drawPopup: function() {
 
@@ -802,6 +574,7 @@ type("TimetableBlockManagementMixin",[],
          this.arrows = Html.div({},
                              Html.div({className: "ttentryArrowsBackground"}),
                              Html.div({className: "ttentryArrows"}, arrowUp, arrowDown));
+         this.DragAndDropBlockMixin();
      });
 
 type("TimetableBlockWholeDayDisplay", ["TimetableBlockWholeDayBase", "TimetableBlockDisplayMixin"],
@@ -820,7 +593,7 @@ type("TimetableBlockWholeDayManagement", ["TimetableBlockWholeDayBase", "Timetab
          this.TimetableBlockManagementMixin();
 
          this._getRightSideDecorators = TimetableBlockManagementMixin.prototype._getRightSideDecorators;
-
+         this._postDraw = TimetableBlockManagementMixin.prototype._postDraw;
      });
 
 
@@ -853,7 +626,7 @@ type("TimetableBlockNormalManagement", ["TimetableBlockNormal", "TimetableBlockM
          this.TimetableBlockManagementMixin();
 
          this._getRightSideDecorators = TimetableBlockManagementMixin.prototype._getRightSideDecorators;
-
+         this._postDraw = TimetableBlockManagementMixin.prototype._postDraw;
      });
 
 type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
@@ -1585,7 +1358,7 @@ type("TimetablePopup", ["ExclusivePopup"], {
      }
     );
 
-type("TimetableDrawer", ["IWidget"],
+type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
      {
 
          _minuteDifference: function(time1, time2) {
@@ -1596,10 +1369,13 @@ type("TimetableDrawer", ["IWidget"],
          },
 
          _drawGrid: function(scale) {
-           var scaleDiv = Html.div({style: {
-             position:'relative',
-             top: pixels(TimetableDefaults.topMargin)
-           }});
+
+           var scaleDiv = Html.div({
+               id: 'timetable_grid',
+               style: {
+                   position:'relative',
+                   top: pixels(TimetableDefaults.topMargin),
+               }});
 
              last = scale[scale.length-1][0];
 
@@ -1613,429 +1389,24 @@ type("TimetableDrawer", ["IWidget"],
                          position: 'absolute',
                          top: pixels(px),
                          width: pixels(this.width),
-                         height: hour==last?'20px':scale[n+1][1]-px,
+                         height: hour==last?'0px':scale[n+1][1]-px,
                          borderTop: '1px dotted red',
                          fontSize: '11px'}}));
                      continue;
                  }
 
-               var hourLineDiv = Html.div({id: 'hourLine_'+parseInt(hour), className: 'hourLine', style:
-                                           { position: 'absolute',
-                                           top: pixels(px),
-                                           width: pixels(this.width),
-                                           height: hour==last?'20px':scale[n+1][1]-px,
-                                           borderTop: '1px solid #E8E8E8',
-                                           fontSize: '11px'}}, zeropad(hour)+':00');
-               this._makeHourLineDroppable(hourLineDiv, parseInt(hour));
+                 var hourLineDiv = Html.div({id: 'hourLine_' + parseInt(hour), className: 'hourLine', style:
+                                             { top: pixels(px),
+                                               width: pixels(this.width),
+                                               height: hour == last ? '20px' : scale[n + 1][1] - px}
+                                            }, zeropad(hour) + ':00');
 
-               this.hourLinesArray[hour] = px;
+                 this.make_droppable($(hourLineDiv.dom), parseInt(hour));
 
-               scaleDiv.append(hourLineDiv);
+                 scaleDiv.append(hourLineDiv);
              }
              return Html.div({}, this.layoutChooser.get().getHeader(this.width), scaleDiv);
          },
-
-
-       createDragToolTip: function() {
-         /*A dragging "tooltip" line that follows wherever a timeblock
-          * is being dragged and displays the current start time
-          * at that current dragging position.  */
-           $('#timetableDiv').append($('<div class="dragTip"></div>'));
-       },
-
-
-         _calculateRelativeMinuteOffset: function(position, hour) {
-             //If the current hour does not have an hourLine div
-             if(($("#hourLine_"+hour).position() == null)) {
-                 return null;
-             }
-
-             var hourTop = $("#hourLine_"+hour).position().top;
-             var hourHeight = $("#hourLine_"+hour).height();
-
-             var offsetHeight = (position - hourTop);
-
-             var minute = Math.floor((offsetHeight/hourHeight) * 59);
-             return ((minute > 60) || (minute < 0))? null : minute;
-         },
-
-       _makeHourLineDroppable: function(hourDiv, hour) {
-         var self = this;
-
-         var checkpoints = self.layoutChooser.get().checkpoints;
-
-         ///* Just a small function to pick out smallest + largest value...
-         var maxMinExtract = function(operator, list) {
-
-           var significantValue = (operator == "min") ? (Number.MAX_VALUE) : null;
-           _(keys(list)).each(function(x) {
-             //We're actually only interested in the value x for these checkpoints
-             if(operator == "max") {
-               significantValue = (x > significantValue) ? x : significantValue;
-             } else if(operator == "min") {
-               significantValue = (x < significantValue) ? x : significantValue;
-             }
-             });
-           return significantValue;
-         };
-
-         //Extract the hours from the strings of the form: HHMMSS
-         var dayStartHour = parseInt(new String(maxMinExtract("min", checkpoints)).substring(0,2));
-         var dayEndHour = parseInt(new String(maxMinExtract("max", checkpoints)).substring(0,2));
-
-         self.dayEndHour = (dayEndHour == 24) ? 00 : dayEndHour;
-         self.dayStartHour = dayStartHour;
-
-         var isDisallowedTime = function(ui, hourCompare) {
-           /* IF its outside the timetable div topside OR before day-start-hour OR
-            * past midnight, when the day ends prior to 00:00 */
-           return ($(ui.draggable).offset().top < $(hourDiv.dom).offset().top)
-             || (hourCompare < dayStartHour) || ((dayEndHour == 0) && (hourCompare > 0));
-         };
-
-         //"unique" name for each drag-handler per hourLine
-         var thisDragSpaceName = ("drag."+hour);
-
-         //These variables are used below
-         var startHour = null;
-         var startMinute = null;
-
-         $(hourDiv.dom).droppable({
-           drop: function(event, ui) {
-             if(isDisallowedTime(ui, startHour)) {
-               self.revertBlockPos(ui.draggable);
-               return;
-             }
-
-             self.releaseDragOnHour(ui, startHour, startMinute);
-           },
-           tolerance: 'touch',
-           over: function(event, ui) {
-             $(ui.draggable).bind(thisDragSpaceName, function(newEvent, newUi) {
-               if(isDisallowedTime(ui, hour)) {
-                 return;
-               }
-
-               var gridTime = self.fetchTimeDragOnHour(ui.draggable, hourDiv.dom, hour, "start");
-
-               //null means that the drag is not allowed
-               if((gridTime == null)) {
-                 return;
-               }
-               startHour = gridTime[0];
-               startMinute = gridTime[1];
-               self.curStartHour = startHour;
-               self.curStartMinute = startMinute;
-
-               });
-           },
-           out: function(event, ui) {
-             if(thisDragSpaceName != null) {
-               $(ui.draggable).unbind(thisDragSpaceName);
-             }
-             $('.dragTip').hide();
-           }
-           });
-       },
-
-       /* This function determines what hour + minute the time block
-        * should start at for the current dragging pixel position in the timetable.
-        * This function is used by over:, in _makeHourLineDroppable
-        * Args:
-        * ui is the same one that drop(ui,events) is using.
-        * hour = the current "hourLineDiv" being dragged upon
-        *
-        * significantEdge = start or end, whichever is being used to measure with
-        * (start = dragging, end = resizing..)
-        *
-        * Returns an array, where array[0] = startHour, array[1] = startMinute
-        * */
-       fetchTimeDragOnHour: function(draggingBlock, hourDiv, hour, significantEdge) {
-         var self = this;
-
-         var setToolTipPos = function(newTop) {
-           //Sets the drag-tooltip at the current dragging/resizing position
-           $('.dragTip').offset({
-             left: $('.dragTip').offset().left,
-             top: newTop
-           });
-         };
-
-         var dragTipTop = null;
-         try {
-           //If we're DRAGGING, and the dragTip is already created...
-           dragTipTop = $(draggingBlock).offset().top;
-         } catch (Exception) {
-           dragTipTop = 0;
-           dragTipTop = $(draggingBlock).offset().top;
-           setToolTipPos(dragTipTop);
-         }
-
-         //Top left Position of the current hourLine div
-         var hourPos = $(hourDiv).position();
-
-         var blockPosTop = $(draggingBlock).position().top;
-         var blockHeight = $(draggingBlock).height();
-         var hourLowerLeftCorner = (hourPos.top+$(hourDiv).height());
-         var hourTopLeftCorner = (hourPos.top);
-
-         //Difference of time block and hour block in height
-         var diffBlockTopLine = blockPosTop - hourTopLeftCorner;
-
-         var startHour = hour;
-         var startMinute = self._calculateRelativeMinuteOffset(blockPosTop, startHour);
-
-         var endHour = hour;
-
-         var blockEnd = (blockPosTop+blockHeight);
-         endMinute = self._calculateRelativeMinuteOffset(blockEnd, endHour);
-
-         if(!($('.dragTip').length > 0)) {
-           self.timetable.getTimetableDrawer().createDragToolTip();
-         }
-
-         var gridTime = null;
-         //significantEdge is set by the caller of this whole function
-         // It represents the significant edge to measure with of a time block
-         //That is, if youre resizing, then it will be "end"
-         //Dragging --> "start"
-         if(significantEdge == "start") {
-           setToolTipPos($(draggingBlock).offset().top);
-           //Returns closest 5-minute-divisible, hour and minute in an array
-           gridTime = self.round5(startHour, startMinute);
-         } else if(significantEdge == "end") {
-           setToolTipPos($(draggingBlock).offset().top+blockHeight);
-           gridTime = self.round5(startHour, endMinute);
-         }
-
-         if(gridTime == null) {
-           return null;
-         }
-
-         if($('.dragTip').length > 0) {
-           $('.dragTip').show();
-           $('.dragTip').html(gridTime[0]+":"+gridTime[1]);
-         }
-
-         return gridTime;
-       },
-
-       enableUndo: function(undoLabel, currentEventData, shifted) {
-         var undoArrayInfo = new Array();
-         undoArrayInfo[0] = undoLabel;
-
-         //Copying original values before they get modified
-         undoArrayInfo[1] = currentEventData.startDate.date;
-         undoArrayInfo[2] = currentEventData.startDate.time;
-         undoArrayInfo[3] = currentEventData.endDate.date;
-         undoArrayInfo[4] = currentEventData.endDate.time;
-         undoArrayInfo[5] = currentEventData.duration;
-         undoArrayInfo[6] = currentEventData.entryType;
-         undoArrayInfo[7] = currentEventData.conferenceId;
-
-         //If shifting entries was enabled
-         undoArrayInfo[8] = shifted;
-         //Also keep a reference to the soon-to-be modified eventData
-         undoArrayInfo[9] = currentEventData;
-         $(window).data('undo', undoArrayInfo);
-         this.drawUndoDiv();
-       },
-
-       undoLastAction: function() {
-         var self = this;
-         var undoArrayInfo = $(window).data('undo');
-         var undoLabel = undoArrayInfo[0];
-
-         //[**] Fetch stored values for undo
-
-         //String of the form "HH:MM:SS"
-         var startDate = new Object();
-         startDate.date = undoArrayInfo[1];
-         startDate.time = undoArrayInfo[2];
-
-         var endDate = new Object();
-         endDate.date = undoArrayInfo[3];
-         endDate.time = undoArrayInfo[4];
-
-         var duration = undoArrayInfo[5];
-         var entryType = undoArrayInfo[6];
-         var conferenceId = undoArrayInfo[7];
-
-         var shifted = undoArrayInfo[8];
-
-         var currentEventData = undoArrayInfo[9];
-
-         //[**] end
-
-         /* conferenceId and entryType is cleared it seems at some point when
-          * running editEntryStartEndDate on the original... hmm...
-          *  - so here the values are just re-assigned from the original (stored PRIOR to calling editEntrySt...) */
-         currentEventData.entryType = entryType;
-         currentEventData.conferenceId = conferenceId;
-
-         var startDT = new Date((Util.dateTimeIndicoToJS(startDate)).getTime());
-         var endDT = new Date((Util.dateTimeIndicoToJS(endDate)).getTime());
-
-         if((undoLabel == "placementChange") || (undoLabel == "resize")) {
-           self.managementActions.editEntryStartEndDate(Util.formatDateTime(startDT, IndicoDateTimeFormats.Server),
-             Util.formatDateTime(endDT, IndicoDateTimeFormats.Server), currentEventData, $(window).data('shiftIsPressed'));
-         } else if(undoLabel == "drop") {
-           // Here goes code to handle drop undo
-           // However I didnt have time to find a reasonable way
-
-             // Something in the right direction below (debug/test)
-           /*
-           var moveEntryDiag = new MoveEntryDialog(
-             self.managementActions,
-             self.timetable,
-             currentEventData.entryType,
-             currentEventData.sessionId,
-             currentEventData.sessionSlotId,
-             self.timetable.currentDay,
-             currentEventData.scheduleEntryId,
-             currentEventData.conferenceId,
-             currentEventData.startDate.date);
-
-           var chosenValue = currentEventData.sessionId;
-           moveEntryDiag.handleBlockMove(currentEventData, chosenValue+":0", self.managementActions);
-            */
-         }
-
-         $(window).data('undo', undefined);
-         $('#undoDiv').remove();
-         return;
-       },
-
-       /* A "button" that appears after an action is performed */
-       drawUndoDiv: function() {
-         //If it isnt drawn already
-         if(!($('#undoDiv').length > 0)) {
-           var self = this;
-           var undoLink = Html.a({}, "Undo last action");
-           undoLink.observeClick(
-             function(e) {
-               self.undoLastAction();
-             });
-
-           var undoDiv =
-             Html.div({
-             id: 'undoDiv',
-             className: 'undoDiv',
-               style: {
-                 padding: '5px',
-                 background: '#FFF',
-                 border: '3px solid black',
-                 position: 'fixed',
-                 bottom: '0px',
-                 left: '50%'
-               }}, undoLink);
-           $('#timetableDiv').append(undoDiv.dom);
-         }
-       },
-
-       /* The function to execute when a drop occurs ON an hour.
-        * The argument ui is the same one that drop(ui,events) is using.
-        *
-        * startHour is the hour where it is being dropped (0 to 23)
-        * startMinute is the minute where it is being dropped, a 5-divisible in the range 0-55
-        * startHour and startMinute is determined by fetchTimeDragOnHour(..)
-        *
-        * This function is used by drop:, in _makeHourLineDroppable
-        */
-       releaseDragOnHour: function(ui, startHour, startMinute) {
-         var self = this;
-         $('.dragTip').remove();
-
-         if((startMinute == null) || (startHour == 00)) {
-           self.revertBlockPos(ui.draggable);
-           return false;
-         }
-
-           //originalEventData is used for the undo functionality
-           var eventData = $(ui.draggable).data('eventData');
-
-           //Store Undo data
-           self.enableUndo("placementChange", eventData, $(window).data('shiftIsPressed'));
-
-           eventData.startDate.time = startHour+":"+startMinute+":00";
-
-           var startDT = Util.dateTimeIndicoToJS(eventData.startDate);
-           var endDT = new Date(startDT.getTime() + eventData.duration*60000);
-
-           //If it doesnt end on the same day, revert drag
-           if(endDT.getDay() > startDT.getDay()) {
-             self.revertBlockPos(ui.draggable);
-             return false;
-           }
-
-         self.managementActions.editEntryStartEndDate(Util.formatDateTime(eventData.startDate, IndicoDateTimeFormats.Server),
-                                                      Util.formatDateTime(endDT, IndicoDateTimeFormats.Server), eventData, $(window).data('shiftIsPressed'));
-
-         return true;
-       },
-
-       releaseResizeOnHour: function(endHour, endMinute, eventData, block) {
-         var self = this;
-         self.enableUndo("resize", eventData);
-
-         eventData.endDate.time = endHour+":"+endMinute+":00";
-         var endDT = Util.dateTimeIndicoToJS(eventData.endDate);
-         var startDT = Util.dateTimeIndicoToJS(eventData.startDate);
-
-         // HERE GOES CODE TO LIMIT RESIZE FOR THE CURRENT DAY ONLY
-         //If it doesnt end on the same day, revert drag
-         /*
-         if((self.dayEndHour == 0) && (false))  {
-           self.revertBlockHeight(block);
-           return false;
-         }
-          */
-
-         self.managementActions.editEntryStartEndDate(Util.formatDateTime(eventData.startDate, IndicoDateTimeFormats.Server),
-           Util.formatDateTime(endDT, IndicoDateTimeFormats.Server),
-           eventData, false);
-
-         //Store Undo-data
-         return true;
-       },
-
-       revertBlockHeight: function(block) {
-         $(block.dom).animate({
-         height: $(block.dom).data('originalheight')
-           });
-       },
-
-       /* Returns a draggable to its initial position */
-       revertBlockPos: function(draggable) {
-         var initPos = $(draggable).data('initialPosition');
-
-         $(draggable).animate({
-           left: initPos.left,
-           top: initPos.top
-         });
-         $('.dragTip').remove();
-       },
-
-       round5: function (hour, minute) {
-
-         //Rounds the number to the closest 5-divisible,..
-         //Also appends padding to the number, such that 0 = 00, 1 = 01...
-         closestFive = (minute % 5) >= 2.5 ? parseInt(minute / 5) * 5 + 5 : parseInt(minute / 5) * 5;
-         var newHour = ((minute > 55) && (closestFive == 60)) ? (hour+1) : hour;
-         var timeArray = new Array();
-         if(newHour > 23) {
-           return null;
-         }
-         timeArray[0] = zeropad(newHour);
-         timeArray[1] = zeropad((closestFive == 60) ? 00 : closestFive);
-         return timeArray;
-       },
-
-       /* Since javascripts mod (%) function/operator can't
-        * properly handle negative numbers here's a real one */
-       properModulus: function(num, modn) {
-         return ((num%modn)+modn)%modn;
-       },
 
          _drawWholeDayBlocks: function(data, blocks) {
              var self = this;
@@ -2080,8 +1451,8 @@ type("TimetableDrawer", ["IWidget"],
                                           top: pixels(TimetableDefaults.topMargin)
                                       }
                                      });
-
-             self.blocks = []
+             this.blocks = []
+             this._blockMap = {}
 
              each(blocks, function(blockData) {
 
@@ -2118,12 +1489,13 @@ type("TimetableDrawer", ["IWidget"],
                  //    compactMode = true;
 
                  if (self.managementMode) {
-
                      block = new TimetableBlockNormalManagement(self.timetable, eventData, blockData, compactMode, self.printableVersion, self.detail.get(), self.managementActions);
+
                  } else {
                      block = new TimetableBlockNormalDisplay(self.timetable, eventData, blockData, compactMode, self.printableVersion, self.detail.get());
                  }
                  blockDiv.append(block.draw(leftPos, width));
+                 self._blockMap[blockData.id] = block.block.dom;
                  self.blocks.push(block);
              });
 
@@ -2131,10 +1503,12 @@ type("TimetableDrawer", ["IWidget"],
          },
 
          setLayout: function(layout) {
+             this.layout.set(layout);
              this.layoutChooser.set(layout);
          },
 
          redraw: function(day) {
+
              if (this.preventRedraw) {
                  return;
              }
@@ -2157,17 +1531,22 @@ type("TimetableDrawer", ["IWidget"],
              var height = dayData[0]+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
              this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 
-             var grid = this._drawGrid(dayData[1]);
+             this.grid.length = 0;
+             $.merge(this.grid, dayData[1])
+
+             var gridElems = this._drawGrid(this.grid);
              var blocks = this._drawBlocks(dayFiltered, dayData[2], dayData[3]);
              var wholeDayBlocks = this._drawWholeDayBlocks(dayFiltered, dayData[4]);
 
              // Only do if not all days are drawn
-             this.canvas.set([wholeDayBlocks, Html.div({style: {position: 'relative'}}, grid, blocks)]);
+             this.canvas.set([wholeDayBlocks, Html.div({style: {position: 'relative'}}, gridElems, blocks)]);
              var totalHeight = height + wholeDayBlocks.dom.offsetHeight;
 
              this.canvas.dom.style.height = pixels(totalHeight);
 
              this.postDraw();
+
+             $('body').trigger('timetable_redraw', this);
 
              return totalHeight;
          },
@@ -2348,7 +1727,9 @@ type("TimetableDrawer", ["IWidget"],
              if (this.loading > 0) {
                  this.loadingIndicator.dom.style.visibility = 'visible';
                  setTimeout(function() {
+                     // call redraw function
                      funcToCall.call(self, arg);
+                     $('body').trigger('timetable_ready', self.timetable);
                      self.setLoading(false);
                  }, 100);
              } else {
@@ -2361,17 +1742,23 @@ type("TimetableDrawer", ["IWidget"],
              this.endTime = endTime;
              this.data = data;
              this.redraw();
+         },
+         toggleEvents: function(value) {
+             if (value === undefined) {
+                 this.eventsDisabled = !this.eventsDisabled;
+             } else {
+                 this.eventsDisabled = !value;
+             }
          }
+
      },
      function(timetable, width, wrappingElement, detailLevel, extraButtons, loadingIndicator, managementMode, managementActions, defaultLayout) {
 
-
          var self = this;
 
-         this.hourLinesArray = new Array();
-
+         this.grid = [];
          this.wrappingElement = wrappingElement;
-         this.canvas = Html.div({});
+         this.canvas = Html.div({'id': 'timetable_canvas'});
          this.filterList = new WatchList();
          this.data = timetable.data;
          this.timetable = timetable;
@@ -2403,7 +1790,7 @@ type("TimetableDrawer", ["IWidget"],
          this.layoutChooser.set(any(defaultLayout, 'compact'));
          // default detail level is 'session'
          this.detail.set(any(detailLevel, 'session'));
-
+         this.eventsDisabled = false;
 
          var filterState = map(TimetableDefaults.filters,
              function(value, key) {
@@ -2427,6 +1814,8 @@ type("TimetableDrawer", ["IWidget"],
                  self.setLoading(true, self.redraw);
              }
          });
+
+         this.DroppableTimetableMixin();
      });
 
 
@@ -2496,23 +1885,19 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
             return blockDiv;
         },
 
-        postDraw: function() {
-
-        },
-
         setData: function(data, day, isPoster) {
             this.isPoster = isPoster;
             this.day = day;
             if (this.isPoster) {
                 this.setLayout('poster');
             } else {
-                this.setLayout('compact');
+                this.setLayout(this.layout.get());
             }
             this.TimetableDrawer.prototype.setData.call(this, data);
         }
     },
-    function(data, canvas, width, wrappingElement, extraButtons, loadingIndicator, managementMode, managementActions) {
-        this.TimetableDrawer(data, canvas, width, wrappingElement, 'session', extraButtons, loadingIndicator, managementMode, managementActions, data.isPoster?'poster':null);
+     function(data, width, wrappingElement, extraButtons, loadingIndicator, managementMode, managementActions, layout) {
+         this.TimetableDrawer(data, width, wrappingElement, 'session', extraButtons, loadingIndicator, managementMode, managementActions, data.isPoster?'poster':'proportional');
         this.wrappingElement = data.parentTimetable.timetableDrawer.wrappingElement;
 
     }
