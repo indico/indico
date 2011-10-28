@@ -845,7 +845,7 @@ methodMap = {
     "main.changeBooking": ConferenceBookingModification,
     "main.displayBooking": ConferenceBookingModification,
     "main.changeShortURL": ConferenceShortURLModification,
-    "main.changeKeywords": ConferenceShortURLModification,
+    "main.changeKeywords": ConferenceKeywordsModification,
     "main.changeTimezone": ConferenceTimezoneModification,
     "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributions,
