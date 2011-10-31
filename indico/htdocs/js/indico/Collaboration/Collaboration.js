@@ -1916,54 +1916,45 @@ var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
 };
 
 var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
+    var popup = new ExclusivePopupWithButtons($T('Reason for rejection'), positive, false, false, true);
 
-    var title = $T("Reason for rejection");
+    popup._getButtons = function() {
+        var self = this;
+        return [
+            [$T('OK'), function() {
+                var reason = self.textarea.get() || $T('No reason specified');
 
-    var popup = new ExclusivePopup(title, function(){return true;});
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Rejecting Electronic Agreement..."));
+                indicoRequest(
+                    'collaboration.rejectElectronicAgreement',
+                    {
+                        confId: confId,
+                        reason: reason,
+                        authKey: authKey
+                    },
+                    function(result,error) {
+                        killProgress();
+                        if (!error) {
+                            self.close();
+                            informationPopup($T("The rejection of the agreement has been successfully recorded."), redirectionLink);
+                        } else {
+                            IndicoUtil.errorReport(error);
+                        }
+                    }
+                );
+            }],
+            [$T('Cancel Rejection'), function() {
+                self.close();
+            }]
+        ];
+    }
 
     popup.draw = function(){
-        var self = this;
         var span1 = Html.span('', $T("Please write the reason of your rejection (short):"));
-        var textarea = Html.textarea({style:{marginTop: '5px', marginBottom: '5px'}, id: "rejectionTextarea", rows: 3, cols: 30});
+        this.textarea = Html.textarea({style:{marginTop: '5px', marginBottom: '5px'}, id: "rejectionTextarea", rows: 3, cols: 30});
         var span2 = Html.span('', $T("The reason will be displayed to the administrators."));
 
-        // We construct the "ok" button and what happens when it's pressed
-        var okButton = Html.input('button', '', $T("OK"));
-        okButton.observeClick(function() {
-            var killProgress = IndicoUI.Dialogs.Util.progress($T("Rejecting Electronic Agreement..."));
-            var reason = textarea.get();
-            if (reason == "")
-                reason = $T("No reason specified");
-
-            indicoRequest(
-                'collaboration.rejectElectronicAgreement',
-                {
-                    confId: confId,
-                    reason: reason,
-                    authKey: authKey
-                },
-                function(result,error) {
-                    if (!error) {
-                        killProgress();
-                        informationPopup($T("The rejection of the agreement has been successfully recorded."), redirectionLink);
-                    } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-            );
-            self.close();
-        });
-
-        // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, $T("Cancel Rejection"));
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-
-        var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, okButton, cancelButton)
-
-        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, Html.br(), textarea, Html.br(), span2, Html.br(), buttonDiv]));
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br(), this.textarea, Html.br(), span2, Html.br()]));
     };
 
     popup.open();
