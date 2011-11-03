@@ -373,7 +373,7 @@ class FoundationSyncTask(PeriodicUniqueTask):
 
     def run(self):
         from MaKaC.common.FoundationSync.foundationSync import FoundationSync
-        FoundationSync(self.getLogger()).doAll()
+        FoundationSync(self.getLogger()).doAll(None)
 
 
 class SendMailTask(OneShotTask):
