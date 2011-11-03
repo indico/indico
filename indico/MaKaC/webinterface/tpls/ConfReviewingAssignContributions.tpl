@@ -710,57 +710,60 @@ var deselectWithoutReviewer = function(contributions) {
  * @param {Object} order
  * @param {Object} role
  */
-var checkAllHaveReferee = function(contributions, order, role, assignPerAttribute) {
-    var contributionsWithoutReferee = []
-    for (i in contributions) {
-        contributionId = contributions[i]
-        contribution = getContribution(contributionId)
+function checkAllHaveReferee(contributions, order, role, assignPerAttribute) {
+    var contributionsWithoutReferee = [];
+    for (var i in contributions) {
+        contributionId = contributions[i];
+        contribution = getContribution(contributionId);
         if (contribution.reviewManager.referee == null) {
-            contributionsWithoutReferee.push(contributionId)
+            contributionsWithoutReferee.push(contributionId);
         }
     }
     if (contributionsWithoutReferee.length == contributions.length) {
-        (new AlertPopup($T("Warning"),$T("None of the contributions you checked have a Referee.") +
-            $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee.")
-        )).open();
+        (new AlertPopup($T("Warning"), $T("None of the contributions you checked have a Referee.") + $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."))).open();
         return false;
     }
 
     if (contributionsWithoutReferee.length > 0) {
 
-        if(assignPerAttribute){
-            (new AlertPopup($T("Warning"),$T("Some of the contributions you checked have a Referee.") +
-            $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."))).open();
+        if (assignPerAttribute) {
+            (new AlertPopup($T("Warning"), $T("Some of the contributions you checked have a Referee.") + $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."))).open();
             return false;
         } else {
-        title =$T('Contributions without referee');
+            title = $T('Contributions without referee');
 
-        var popup = new ExclusivePopupWithButtons(title, function(){popup.close();});
-
-        popup.draw = function(){
-
-            var span1 = Html.span({}, $T("Some of the contributions you checked do not have a Referee."));
-            var span2 = Html.span({}, $T("You can only add an editor or a reviewer if the contribution has a referee."));
-            var span3 = Html.span({}, $T("Do you want to add that " + role + " only to the contributions with a referee?"));
-            var yesButton = Html.button('popUpButton', $T("Yes"));
-            yesButton.observeClick(function(){
-                deselectWithoutReferee(contributions);
-                fetchUsers(order, role);
+            var popup = new ExclusivePopupWithButtons(title, function () {
                 popup.close();
             });
 
-             var noButton = Html.button('popUpButton', $T("No"));
-            noButton.observeClick(function(){
-                popup.close();
-            });
-              var buttons = Widget.inline([yesButton, noButton]);
-              var all = Widget.lines([span1, span2, span3, buttons]);
-         return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]),buttons);
-                };
-             popup.open();
+            popup.draw = function () {
+                var span1 = Html.span({}, $T("Some of the contributions you checked do not have a Referee."));
+                var span2 = Html.span({}, $T("You can only add an editor or a reviewer if the contribution has a referee."));
+                var span3 = Html.span({}, $T("Do you want to add that " + role + " only to the contributions with a referee?"));
+                var yesButton = Html.button('popUpButton', $T("Yes"));
+                yesButton.observeClick(function () {
+                    deselectWithoutReferee(contributions);
+                    fetchUsers(order, role);
+                    popup.close();
+                });
 
-        return false;
-    }
+                var noButton = Html.button('popUpButton', $T("No"));
+                noButton.observeClick(function () {
+                    popup.close();
+                });
+                var buttons = Widget.inline([yesButton, noButton]);
+                var all = Widget.lines([span1, span2, span3, buttons]);
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({
+                    style: {
+                        height: '130px',
+                        width: '420px'
+                    }
+                }, [all]), buttons);
+            };
+            popup.open();
+
+            return false;
+        }
     }
     return true;
 }
