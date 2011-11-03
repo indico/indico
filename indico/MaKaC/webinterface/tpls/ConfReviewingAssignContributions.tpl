@@ -734,34 +734,34 @@ function checkAllHaveReferee(contributions, order, role, assignPerAttribute) {
 
             var popup = new ExclusivePopupWithButtons(title, function () {
                 popup.close();
-            });
+            }, false, false, true);
+
+            popup._getButtons = function() {
+                return [
+                    [$T('Yes'), function() {
+                        deselectWithoutReferee(contributions);
+                        fetchUsers(order, role);
+                        popup.close();
+                    }],
+                    [$T('No'), function() {
+                        popup.close();
+                    }]
+                ];
+            };
 
             popup.draw = function () {
                 var span1 = Html.span({}, $T("Some of the contributions you checked do not have a Referee."));
                 var span2 = Html.span({}, $T("You can only add an editor or a reviewer if the contribution has a referee."));
                 var span3 = Html.span({}, $T("Do you want to add that " + role + " only to the contributions with a referee?"));
-                var yesButton = Html.button('popUpButton', $T("Yes"));
-                yesButton.observeClick(function () {
-                    deselectWithoutReferee(contributions);
-                    fetchUsers(order, role);
-                    popup.close();
-                });
-
-                var noButton = Html.button('popUpButton', $T("No"));
-                noButton.observeClick(function () {
-                    popup.close();
-                });
-                var buttons = Widget.inline([yesButton, noButton]);
-                var all = Widget.lines([span1, span2, span3, buttons]);
+                var all = Widget.lines([span1, span2, span3]);
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({
                     style: {
                         height: '130px',
                         width: '420px'
                     }
-                }, [all]), buttons);
+                }, [all]));
             };
             popup.open();
-
             return false;
         }
     }
@@ -810,23 +810,24 @@ var removeReviewersAlerts = function(contributions, role) {
     if (contributionsWithoutReviewers.length > 0) {
         title =$T('Contributions without reviewer');
 
-        var popup = new ExclusivePopup(title, function(){popup.close();});
-
+        var popup = new ExclusivePopupWithButtons(title, function(){popup.close();}, false, false, true);
+        popup._getButtons = function() {
+            return [
+                [$T('OK'), function() {
+                    deselectWithoutReviewer(contributions);
+                    removeUser('allReviewers');
+                    popup.close();
+                }]
+            ];
+        }
         popup.draw = function(){
 
             var span1 = Html.span({}, $T("The Content Reviewers will be removed only from the contributions that have one."));
-            var okButton = Html.button('popUpButton', $T("OK"));
-            okButton.observeClick(function(){
-                deselectWithoutReviewer(contributions);
-                removeUser('allReviewers');
-                popup.close();
-            });
 
-              var all = Widget.lines([span1, okButton])
-              okButton.dom.align = 'center';
-              return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '100px', width: '250px'}},[all]));
-                };
-             popup.open();
+            var all = Widget.lines([span1]);
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({style: {height: '100px', width: '250px'}},[all]));
+        };
+        popup.open();
 
         return false;
     }
@@ -1143,11 +1144,11 @@ var fetchContributions = function() {
  * @param {string} order The action that will be taken on the users: 'assign', 'remove'.
  * @param {string} role The role of the users: 'referee', 'editor', 'reviewer'.
  */
-var fetchUsers = function(order, role) {
+function fetchUsers(order, role) {
 
     var checkedContributions = getCheckedContributions();
     if (checkedContributions.length == 0) {
-        (new AlertPopup($T("Warning"),$T("Please select at least 1 contribution"))).open();
+        (new AlertPopup($T("Warning"), $T("Please select at least 1 contribution"))).open();
         return;
     }
 
@@ -1157,105 +1158,113 @@ var fetchUsers = function(order, role) {
                 return;
             }
         % endif
-   }
+    }
 
-   if (order == 'remove' && role == 'reviewer')  {
+    if (order == 'remove' && role == 'reviewer') {
         if (!removeReviewersAlerts(checkedContributions, role)) {
             return;
         }
-   }
+    }
 
 
-    indicoRequest(
-        'reviewing.conference.userCompetencesList',
-        {conference: '${ Conference.getId() }', role: role},
-        function(result,error) {
-            if (!error) {
+    indicoRequest('reviewing.conference.userCompetencesList', {
+        conference: '${ Conference.getId() }',
+        role: role
+    }, function (result, error) {
+        if (!error) {
 
-                action = order + '_' + role;
+            action = order + '_' + role;
 
-                var title = '';
-                var new_assign = '';
-                if (role == 'editor') {
-                    title = $T('Click on a user name to ') + order + $T(' a layout reviewer:');
-                }
-                if (role == 'reviewer') {
-                    title = $T('Click on a user name to ') + order + ' a ' + $T('content reviewer:');
-                } else {
-                    if (order == 'assign') {
-                    title = $T('Click on a user name to ') + order + ' a ' + role + ':';
-                    } if(order == 'new_assign' && !removeRefereeAlerts(checkedContributions)) {
-                        action = 'assign_' + role;
-                        title = $T('Click on a user name to assign new ') + role + ':';
-                        new_assign = 'True';
-                    }
-                }
-
-                if (!result.length)
-                    (new AlertPopup($T('Warning'),$T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."))).open();
-                else {
-                    var popup = new ExclusivePopupWithButtons(title, function(){popup.close();});
-
-                    popup.draw = function(){
-                            var users = $L();
-                            var userTemplate = function(user) {
-                                var li = Html.li();
-                                var userName = Widget.link(command(function(){
-                                    userSelected(user);
-                                    var killProgress = IndicoUI.Dialogs.Util.progress()
-                                    popup.close();
-                                    killProgress();
-                                }, user.name));
-
-
-                            var userCompetences = Html.span({style:{marginLeft:'5px'}},
-                                user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
-                            );
-
-                            li.set(Widget.inline([userName, userCompetences]));
-                            return li;
-                        }
-
-                            var userList = Html.ul();
-                            bind.element(userList, users, userTemplate);
-
-                            for (i in result) {
-                            users.append(result[i]);
-                            }
-
-                           var cancelButton = Html.input('button', null, $T('Cancel'));
-                              cancelButton.observeClick(function(){
-                                  popup.close();
-                              });
-                           var divButton = Html.div({style:{textAlign: 'center'}});
-                           divButton.append(cancelButton);
-
-                           var span1 = Html.span({}, "");
-                           var message = '';
-                           if(new_assign) {
-                                span1 = Html.span({}, removeRefereeAlertsMessage(checkedContributions));
-                           }
-                           if(role == 'reviewer' && order == 'remove') {
-                                if (checkedContributions.length == 1){
-                                        message = $T("The Reviewer you choose will be removed only from the contribution that is assigned to him/her.")
-                                    } else {
-                                        message = $T("The Reviewer you choose will be removed only from the contributions that are assigned to him/her.")
-                                    }
-                                span1 = Html.span({}, message);
-                           }
-                           return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, userList]), divButton);
-                    };
-                 popup.open();
-             }
-
-            } else {
-                IndicoUtil.errorReport(error);
+            var title = '';
+            var new_assign = '';
+            if (role == 'editor') {
+                title = $T('Click on a user name to ') + order + $T(' a layout reviewer:');
             }
+            if (role == 'reviewer') {
+                title = $T('Click on a user name to ') + order + ' a ' + $T('content reviewer:');
+            } else {
+                if (order == 'assign') {
+                    title = $T('Click on a user name to ') + order + ' a ' + role + ':';
+                }
+                if (order == 'new_assign' && !removeRefereeAlerts(checkedContributions)) {
+                    action = 'assign_' + role;
+                    title = $T('Click on a user name to assign new ') + role + ':';
+                    new_assign = 'True';
+                }
+            }
+
+            if (!result.length) {
+                (new AlertPopup($T('Warning'), $T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."))).open();
+            }
+            else {
+                var popup = new ExclusivePopupWithButtons(title, function () {
+                    popup.close();
+                }, false, false, true);
+
+                popup._getButtons = function () {
+                    return [
+                        [$T('Cancel'), function () {
+                            popup.close();
+                        }]
+                    ];
+                };
+
+
+                popup.draw = function () {
+                    var users = $L();
+                    var userTemplate = function (user) {
+                        var li = Html.li();
+                        var userName = Widget.link(command(function () {
+                            userSelected(user);
+                            var killProgress = IndicoUI.Dialogs.Util.progress()
+                            popup.close();
+                            killProgress();
+                        }, user.name));
+
+
+                        var userCompetences = Html.span({
+                            style: {
+                                marginLeft: '5px'
+                            }
+                        }, user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')');
+
+                        li.set(Widget.inline([userName, userCompetences]));
+                        return li;
+                    }
+
+                    var userList = Html.ul();
+                    bind.element(userList, users, userTemplate);
+
+                    for (var i in result) {
+                        users.append(result[i]);
+                    }
+
+
+                    var span1 = Html.span({}, "");
+                    var message = '';
+                    if (new_assign) {
+                        span1 = Html.span({}, removeRefereeAlertsMessage(checkedContributions));
+                    }
+                    if (role == 'reviewer' && order == 'remove') {
+                        if (checkedContributions.length == 1) {
+                            message = $T("The Reviewer you choose will be removed only from the contribution that is assigned to him/her.");
+                        } else {
+                            message = $T("The Reviewer you choose will be removed only from the contributions that are assigned to him/her.");
+                        }
+                        span1 = Html.span({}, message);
+                    }
+                    return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, userList]));
+                };
+                popup.open();
+            }
+
+        } else {
+            IndicoUtil.errorReport(error);
         }
-    );
+    });
 }
 
-var fetchUsersPerAttribute = function(order, role, attribute) {
+function fetchUsersPerAttribute(order, role, attribute) {
 
     var checkedContributions = getCheckedContributions();
     if (checkedContributions.length > 0) {
@@ -1263,189 +1272,221 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
     }
 
 
-    indicoRequest(
-        'reviewing.conference.userCompetencesList',
-        {conference: '${ Conference.getId() }', role: role},
-        function(result,error) {
-            if (!error) {
+    indicoRequest('reviewing.conference.userCompetencesList', {
+        conference: '${ Conference.getId() }',
+        role: role
+    }, function (result, error) {
+        if (!error) {
 
-                action = order + '_' + role;
+            action = order + '_' + role;
 
-                var title = '';
-                if (role == 'editor') {
-                    title = $T('Follow the steps to ') + order + $T(' a layout reviewer:');
-                }
-                if (role == 'reviewer') {
-                    title = $T('Follow the steps to ') + order + $T(' a content reviewer:');
-                }
-                if (role == 'referee') {
-                    title = $T('Follow the steps to ') + order + ' a ' + role + ':';
-                }
+            var title = '';
+            if (role == 'editor') {
+                title = $T('Follow the steps to ') + order + $T(' a layout reviewer:');
+            }
+            if (role == 'reviewer') {
+                title = $T('Follow the steps to ') + order + $T(' a content reviewer:');
+            }
+            if (role == 'referee') {
+                title = $T('Follow the steps to ') + order + ' a ' + role + ':';
+            }
 
-                var popup = new ExclusivePopupWithButtons(title, function(){popup.close();});
+            var popup = new ExclusivePopupWithButtons(title, function () {
+                popup.close();
+            }, false, false, true);
 
-                popup.draw = function(){
+            popup.draw = function () {
 
-                     var AttributeDiv = Html.div();
+                var AttributeDiv = Html.div();
 
-                     var attributeList = function () {
-                        indicoRequest(
-                        'reviewing.conference.attributeList',
-                        {conference: '${ Conference.getId()}', attribute: attribute},
-                        function(result, error){
-                            if(!error){
-                                    var attributes = $L();
-                                    var attributeTemplate = function(att){
-                                        var li = Html.li({style:{listStyleType:"none", paddingBottom:'3px'}});
-                                        var id = (att.id);
-                                        var name = ("selected"+attribute);
-                                        var checkbox = Html.input('checkbox', {id: id, name: name});
-                                        var attributeName = Html.span({style:{marginLeft:'5px', fontSize: '13px'}}, att.title);
-
-                                        li.set(Widget.inline([checkbox, attributeName]));
-
-                                        return li;
+                var attributeList = function () {
+                    indicoRequest('reviewing.conference.attributeList', {
+                        conference: '${ Conference.getId()}',
+                        attribute: attribute
+                    }, function (result, error) {
+                        if (!error) {
+                            var attributes = $L();
+                            var attributeTemplate = function (att) {
+                                var li = Html.li({
+                                    style: {
+                                        listStyleType: "none",
+                                        paddingBottom: '3px'
                                     }
-                                    var step1 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 1: Choose a '+ attribute);
-                                    var attList = Html.ul();
-                                    bind.element(attList, attributes, attributeTemplate);
-                                    if(result.length==0) {
-                                        var killProgress = IndicoUI.Dialogs.Util.progress()
-                                        popup.close();
-                                        killProgress();
-                                        (new AlertPopup($T("Warning"),'There is no '+attribute+' define.')).open();
+                                });
+                                var id = (att.id);
+                                var name = ("selected" + attribute);
+                                var checkbox = Html.input('checkbox', {
+                                    id: id,
+                                    name: name
+                                });
+                                var attributeName = Html.span({
+                                    style: {
+                                        marginLeft: '5px',
+                                        fontSize: '13px'
                                     }
-                                    for (i in result) {
-                                    attributes.append(result[i]);
-                                    }
+                                }, att.title);
 
-                                    AttributeDiv.set(Widget.block([step1,attList]));
-                            } else {
-                                    IndicoUtil.errorReport(error);
+                                li.set(Widget.inline([checkbox, attributeName]));
+
+                                return li;
+                            }
+                            var step1 = Html.span({
+                                style: {
+                                    fontSize: '18px'
+                                },
+                                className: 'groupTitle groupTitleNoBorder'
+                            }, 'Step 1: Choose a ' + attribute);
+                            var attList = Html.ul();
+                            bind.element(attList, attributes, attributeTemplate);
+                            if (result.length == 0) {
+                                var killProgress = IndicoUI.Dialogs.Util.progress()
+                                popup.close();
+                                killProgress();
+                                (new AlertPopup($T("Warning"), 'There is no ' + attribute + ' define.')).open();
+                            }
+                            for (var i in result) {
+                                attributes.append(result[i]);
+                            }
+
+                            AttributeDiv.set(Widget.block([step1, attList]));
+                        } else {
+                            IndicoUtil.errorReport(error);
+                        }
+                    });
+                }
+
+                var users = $L();
+                var contrPerAttribute = [];
+
+                var contributionsIdList = function (user, chAtt) {
+                    indicoRequest('reviewing.conference.contributionsIdPerSelectedAttribute', {
+                        conference: '${ Conference.getId()}',
+                        attribute: attribute,
+                        selectedAttributes: chAtt
+                    }, function (result, error) {
+                        if (!error) {
+                            for (var i in result) {
+                                contrPerAttribute.push(result[i]);
+                            }
+                            if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
+                                % if not(ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
+                                    if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
+                                        return;
+                                    }
+                                % endif
+                            }
+                            userSelected(user, contrPerAttribute);
+                        } else {
+                            IndicoUtil.errorReport(error);
+                        }
+                    });
+                }
+                var userTemplate = function (user) {
+                    var li = Html.li({
+                        style: {
+                            listStyleType: "none",
+                            paddingBottom: '3px'
+                        }
+                    });
+                    var name = ("radioBtn");
+                    var radioButton = Html.input('radio', {
+                        id: user.id,
+                        name: name
+                    });
+                    var userName = Html.label({
+                        style: {
+                            fontWeight: 'normal'
+                        }
+                    }, user.name);
+
+                    var userCompetences = Html.span({
+                        style: {
+                            marginLeft: '5px',
+                            fontSize: '11px'
+                        }
+                    }, user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')');
+
+                    li.set(Widget.inline([radioButton, userName, userCompetences]));
+                    return li;
+                }
+                var step2 = Html.span({
+                    style: {
+                        fontSize: '18px'
+                    },
+                    className: 'groupTitle groupTitleNoBorder'
+                }, 'Step 2: Click on a user name to assign a ' + role);
+                var userList = Html.ul();
+                bind.element(userList, users, userTemplate);
+
+                for (var i in result) {
+                    users.append(result[i]);
+                }
+
+                attributeList();
+
+                this.__assignClicked = function() {
+                    var chAtt = $('input[name="selected' + attribute + '"]:checkbox:checked').map(function() {
+                        return this.id;
+                    }).get();
+                    if (chAtt.length == 0) {
+                        (new AlertPopup($T("Warning"), $T('You must select at least one attribute.'))).open();
+                    } else {
+                        var checkedBtnId = $('input[name="radioBtn"]:radio:checked').prop('id');
+                        if (checkedBtnId === undefined) {
+                            (new AlertPopup($T("Warning"), $T('You must select exactly one user.'))).open();
+                        } else {
+                            for (var i = 0; i < users.length.get(); i++) {
+                                user = users.item(i);
+                                if (user.id == checkedBtnId) {
+                                    contributionsIdList(user, chAtt);
+                                }
                             }
                         }
-                        );
-                     }
-
-                     var getCheckedAttributes = function() {
-                            var checkBoxes = document.getElementsByName("selected"+attribute);
-                            var checkedAttributes = []
-                            for (var i=0; i<checkBoxes.length; i++) {
-                                var cb = checkBoxes[i];
-                                if (cb.checked) {
-                                    checkedAttributes.push(cb.id)
-                                }
-                            }
-                            return checkedAttributes;
-                     }
-                     var assignButton = Html.input('button', null, $T('Assign'));
-
-                     var users = $L();
-                     var contrPerAttribute = [];
-
-                     var contributionsIdList = function (user, chAtt){
-                                    indicoRequest(
-                                        'reviewing.conference.contributionsIdPerSelectedAttribute',
-                                        {conference: '${ Conference.getId()}', attribute: attribute, selectedAttributes:chAtt },
-                                        function(result, error){
-                                            if(!error){
-                                                    for (i in result) {
-                                                          contrPerAttribute.push(result[i]);
-                                                    }
-                                                    if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-                                                            % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
-                                                                if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
-                                                                    return;
-                                                                }
-                                                            % endif
-                                                       }
-                                                    userSelected(user, contrPerAttribute);
-                                            }
-                                            else {
-                                                IndicoUtil.errorReport(error);
-                                            }
-                                        }
-                                   );
-                                }
-                     var userTemplate = function(user) {
-                            var li = Html.li({style:{listStyleType:"none", paddingBottom:'3px'}});
-                            var name = ("radioBtn");
-                            var radioButton = Html.input('radio', {id: user.id, name: name});
-                            var userName = Html.label({style:{fontWeight: 'normal'}}, user.name);
-
-                            var userCompetences = Html.span({style:{marginLeft:'5px', fontSize: '11px'}},
-                                user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
-                            );
-
-                            li.set(Widget.inline([radioButton, userName, userCompetences]));
-                            return li;
-                     }
-                     var step2 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 2: Click on a user name to assign a '+ role);
-                     var userList = Html.ul();
-                     bind.element(userList, users, userTemplate);
-
-                     for (i in result) {
-                        users.append(result[i]);
-                     }
-
-                     attributeList();
-
-                     assignButton.observeClick(function(){
-                                var chAtt = getCheckedAttributes();
-                                if(chAtt.length == 0){
-                                    (new AlertPopup($T("Warning"),$T('You must select at least one attribute.'))).open();
-                                } else {
-                                    var checkedBtn = function(){
-                                        var allBtn = document.getElementsByName('radioBtn');
-                                        for (var i=0; i<allBtn.length; i++) {
-                                            var cb = allBtn[i];
-                                            if (cb.checked) {
-                                               return cb.id
-                                            }
-                                        }
-                                   }
-                                   var checkedBtnId = checkedBtn();
-                                   if(checkedBtnId == null){
-                                       (new AlertPopup($T("Warning"),$T('You must select at least one user.'))).open();
-                                   } else {
-                                       for (var i=0; i < users.length.get(); i++) {
-                                           user = users.item(i);
-                                           if (user.id == checkedBtnId) {
-                                               contributionsIdList(user, chAtt);
-                                           }
-                                       }
-                                       var killProgress = IndicoUI.Dialogs.Util.progress()
-                                       popup.close();
-                                       killProgress();
-                                   }
-                                }
-                            });
-
-                     var cancelButton = Html.input('button', null, $T('Cancel'));
-                     cancelButton.observeClick(function(){
-                         popup.close();
-                     });
-                     var divButtons = Html.div({style:{textAlign: 'center'}});
-
-                     if (!result.length) {
-                         divButtons.append(cancelButton);
-                         var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."));
-                         return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([content])),divButtons);
-                     }
-                     else {
-                         divButtons.append(assignButton);
-                         divButtons.append(cancelButton);
-                         return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([AttributeDiv, step2, userList])),divButtons);
-                     }
-
+                    }
                 };
-              popup.open();
 
-              } else {
-                  IndicoUtil.errorReport(error);
-              }
+                var assignButton = this.buttons.eq(0);
+                if (!result.length) {
+                    assignButton.button('disable');
+                    var content = Html.div({
+                        style: {
+                            textAlign: 'center',
+                            paddingBottom: '10px'
+                        }
+                    }, $T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."));
+                    return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({
+                        style: {
+                            height: 'auto',
+                            width: 'auto'
+                        }
+                    }, Widget.block([content])));
+                } else {
+                    assignButton.button('enable');
+                    return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({
+                        style: {
+                            height: 'auto',
+                            width: 'auto'
+                        }
+                    }, Widget.block([AttributeDiv, step2, userList])));
+                }
+
+            };
+            popup._getButtons = function() {
+                return [
+                    [$T('Assign'), function() {
+                        popup.__assignClicked();
+                    }],
+                    [$T('Cancel'), function() {
+                        popup.close();
+                    }]
+                ];
+            };
+            popup.open();
+
+        } else {
+            IndicoUtil.errorReport(error);
         }
-    );
+    });
 }
 
 /**
