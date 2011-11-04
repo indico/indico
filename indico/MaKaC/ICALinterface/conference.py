@@ -24,6 +24,8 @@ from MaKaC.ICALinterface.base import ICALBase
 from MaKaC.RSSinterface.conference import ACLfiltered
 from MaKaC.common.utils import encodeUnicode
 from MaKaC.common.indexes import IndexesHolder
+from MaKaC.webinterface.common.tools import strip_ml_tags
+
 
 
 class ProgrammeToiCal(ICALBase):
@@ -93,7 +95,7 @@ class ConferenceToiCal(ICALBase):
                 fullchair = "%s (%s)" % (fullchair,av.getAffiliation())
         if not self._protected:
             if self._conf.getDescription() != "":
-                desc = self._lt(self._conf.getDescription())+"\\n"
+                desc = strip_ml_tags(self._lt(self._conf.getDescription()) + "\\n")
             if fullchair != "":
                 desc = "%s%s\\n" % (desc,self._lt(fullchair))
 

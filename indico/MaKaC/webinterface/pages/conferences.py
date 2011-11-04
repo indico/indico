@@ -445,7 +445,7 @@ class WConfMetadata(wcomponents.WTemplated):
         else:
             v['image'] = Config.getInstance().getSystemIconURL("indico_co")
 
-        v['description'] = self._conf.getDescription()[:200]
+        v['description'] = strip_ml_tags(self._conf.getDescription()[:500])
         return v
 
 
