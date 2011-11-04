@@ -816,6 +816,8 @@ class SystemLink(Link):
         return str(getattr(urlHandlers, self._URLHandler).getURL(conf))
 
     def getURLHandler(self):
+        if not hasattr(self, '_URLHandler'):
+            self.getMenu().updateSystemLink()
         return self._URLHandler
 
     def setURLHandler(self, url):
