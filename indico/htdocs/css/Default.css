@@ -7026,7 +7026,7 @@ div#social img#social_button:hover{
 }
 
 .social_share_tooltip {
-    max-width: 300px;
+    max-width: 420px;
     color: #fff;
 }
 
@@ -7092,7 +7092,7 @@ div#social img#social_button:hover{
     padding: 5px;
     border-radius: 8px;
     margin-bottom: 5px;
-    overflow: hidden;
+    overflow: visible;
     vertical-align: middle;
     height: 25px;
 }

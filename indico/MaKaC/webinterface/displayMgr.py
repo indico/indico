@@ -813,7 +813,11 @@ class SystemLink(Link):
         if not hasattr(self, '_URLHandler'):
             self.getMenu().updateSystemLink()
         conf = self.getMenu().getConference()
-        return str(getattr(urlHandlers, self._URLHandler).getURL(conf))
+        if isinstance(self._URLHandler, str):
+            handler = getattr(urlHandlers, self._URLHandler)
+        else:
+            handler = self._URLHandler
+        return str(handler.getURL(conf))
 
     def getURLHandler(self):
         if not hasattr(self, '_URLHandler'):

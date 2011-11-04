@@ -68,7 +68,7 @@ class ChatSMContributor(Component, Observable):
 
         sideMenuItemsDict["instantMessaging"] =  { \
                 "caption": "Chat Rooms", \
-                "URL": str(urlHandlers.UHConferenceInstantMessaging.getURL(conf)), \
+                "URL": urlHandlers.UHConferenceInstantMessaging, \
                 "staticURL": "", \
                 "parent": ""}
 

@@ -23,7 +23,7 @@
     <h4>${_('Calendaring')}</h4>
   </div>
   <div class="social_site">
-    <a href="http://www.google.com/calendar/event?${gc_params}" target="_blank"><img src="http://www.google.com/calendar/images/ext/gc_button1.gif" alt="0" border="0"></a>
+    <a href="http://www.google.com/calendar/event?${gc_params}" target="_blank"><img src="//www.google.com/calendar/images/ext/gc_button1.gif" alt="0" border="0"></a>
   </div>
 </div>
 
