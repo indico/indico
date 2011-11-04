@@ -443,7 +443,7 @@ class WConfMetadata(wcomponents.WTemplated):
         if self._conf.getLogo():
             v['image'] = urlHandlers.UHConferenceLogo.getURL(self._conf)
         else:
-            v['image'] = Config.getInstance().getSystemIconURL("indico_small")
+            v['image'] = Config.getInstance().getSystemIconURL("indico_co")
 
         v['description'] = self._conf.getDescription()[:200]
         return v
@@ -1229,7 +1229,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         if styleMgr.existsCSSFile(self._view):
             cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
             styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
-        return styleText
+
+        confMetadata = WConfMetadata(self._conf).getHTML()
+
+        return styleText + confMetadata
 
     def _getFooter( self ):
         """
