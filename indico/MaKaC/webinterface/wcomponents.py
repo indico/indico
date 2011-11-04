@@ -755,7 +755,7 @@ class WEventFooter(WFooter):
             'dates': "%s/%s" % (self._gCalDateFormat(self._conf.getStartDate()),
                                 self._gCalDateFormat(self._conf.getEndDate())),
             'details': self._conf.getDescription(),
-            'location': self._conf.getLocation().getName(),
+            'location': self._conf.getLocation().getName() if self._conf.getLocation() else '',
             'trp': False,
             'sprop': [str(urlHandlers.UHConferenceDisplay.getURL(self._conf)),
                       'name:indico']
