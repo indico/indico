@@ -322,8 +322,9 @@ type("JTabWidget", ["IWidget"], {
         return $('.ui-tabs-nav > li', this.canvas).eq(index);
     },
     getTabIndex: function(label) {
-        return $('.ui-tabs-nav > li', this.canvas).filter(function() {
-            return $(this).text() == label;
+        var self = this;
+        return $('.ui-tabs-nav > li', self.canvas).filter(function() {
+            return $(this).text() == self._titleTemplate(label);
         }).eq(0).index();
     },
     getSelectedTab: function() {
@@ -415,7 +416,7 @@ type("JLookupTabWidget", ["JTabWidget"], {
         }
         container.html(content);
     }
-}, function(tabs, width, height, initialSelection, canvas) {
+}, function(tabs, width, height, initialSelection, __extraButtons, canvas) {
     var self = this;
     self.JTabWidget(tabs, width, height, initialSelection, canvas);
     self.canvas.bind('tabsshow', function(e, ui) {
