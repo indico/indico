@@ -304,6 +304,8 @@ type("JTabWidget", ["IWidget"], {
         return text;
     },
     draw: function() {
+        // We are going to be visible right after this function, so let's update the scroll buttons when size information is available
+        _.defer(_.bind(this._updateScrollButtons, this));
         return this.canvas[0];
     },
     enable: function() {
@@ -327,16 +329,21 @@ type("JTabWidget", ["IWidget"], {
             return $(this).text() == self._titleTemplate(label);
         }).eq(0).index();
     },
+    getSelectedIndex: function() {
+        return this.canvas.tabs('option', 'selected');
+    },
     getSelectedTab: function() {
-        return this.getLabel(this.canvas.tabs('option', 'selected'));
+        return this.getLabel(this.getSelectedIndex());
     },
     setSelectedTab: function(labelOrIndex){
         if(_.isNumber(labelOrIndex)) {
-            this.canvas.tabs('select', labelOrIndex);
+            var idx = labelOrIndex;
         }
         else {
-            this.canvas.tabs('select', this.getTabIndex(labelOrIndex));
+            var idx = this.getTabIndex(labelOrIndex);
         }
+        this.canvas.tabs('select', idx);
+        this.scrollToTab(idx);
     },
     getSelectedPanel: function() {
         var index = this.canvas.tabs('option', 'selected');
@@ -347,6 +354,103 @@ type("JTabWidget", ["IWidget"], {
         $('> div', this.canvas).each(function() {
             maxHeight = Math.max(maxHeight, $(this).height());
         }).height(maxHeight);
+    },
+    makeScrollable: function() {
+        var self = this;
+        if(self.scrollable) {
+            return;
+        }
+        self.scrollable = true;
+        var nav = $('> .ui-tabs-nav', self.canvas);
+        nav.wrap($('<div/>').css({
+            whiteSpace: 'nowrap',
+            overflow: 'hidden'
+        }));
+        nav.find('> li').css({
+            'display': 'inline-block',
+            'float': 'none'
+        });
+
+        var arrowsTopMargin = '4px';
+        var arrowsCommonCss = {
+            cursor: 'pointer',
+            zIndex: 100,
+            position: 'absolute',
+            top: '3px',
+            height: '26px'
+        };
+
+        self.scrollOffset = 0;
+        self.scrollButtons = $('<div/>')
+            .disableSelection()
+            .css({
+                position: 'relative',
+                'zIndex': 101
+            })
+            .append(
+                $('<span/>')
+                    .disableSelection()
+                    .attr('title', $T('Previous tab'))
+                    .css(arrowsCommonCss)
+                    .addClass('ui-state-active ui-corner-tl ui-corner-bl')
+                    .css('left', '-17px')
+                    .append($('<span/>').disableSelection().addClass('ui-icon ui-icon-carat-1-w').html($T('Previous tab')).css('marginTop', arrowsTopMargin))
+                    .click(function() {
+                        if($(this).hasClass('ui-state-disabled')) {
+                            return;
+                        }
+                        self.scrollToTab(Math.max(0, self.scrollOffset - 1));
+                    }),
+                $('<span/>')
+                    .disableSelection()
+                    .attr('title', $T('Next tab'))
+                    .css(arrowsCommonCss)
+                    .addClass('ui-state-active ui-corner-tr ui-corner-br')
+                    .css('right', '-15px')
+                    .append($('<span/>').addClass('ui-icon ui-icon-carat-1-e').html($T('Next tab')).css('marginTop', arrowsTopMargin))
+                    .click(function() {
+                        if($(this).hasClass('ui-state-disabled')) {
+                            return;
+                        }
+                        self.scrollToTab(Math.min(nav.find('> li').length - 1, self.scrollOffset + 1));
+                    })
+            )
+            .prependTo(self.canvas);
+
+        self.scrollToTab(self.getSelectedIndex());
+    },
+    _updateScrollButtons: function() {
+        if(!this.scrollable) {
+            return;
+        }
+        var nav = $('.ui-tabs-nav:first', this.canvas);
+        var visibleTabs = 0;
+        var width = 0;
+        var navWidth = nav.width();
+        nav.find('> li:visible').each(function() {
+            width += $(this).outerWidth(true);
+            if(width >= navWidth) {
+                return false;
+            }
+            visibleTabs++;
+        });
+        var lastElementShown = false;
+        if(this.scrollOffset + visibleTabs == nav.find('> li').length) {
+            lastElementShown = true;
+        }
+        console.log(nav.find('> li').length, this.scrollOffset, visibleTabs, lastElementShown);
+        // no prev allowed if scrolled to the far left
+        this.scrollButtons.children().eq(0).toggleClass('ui-state-disabled', this.scrollOffset == 0);
+        // no next allowed if last element is visible
+        this.scrollButtons.children().eq(1).toggleClass('ui-state-disabled', lastElementShown);
+    },
+    scrollToTab: function(idx) {
+        if(!this.scrollable) {
+            return;
+        }
+        this.scrollOffset = idx;
+        $('.ui-tabs-nav:first > li', this.canvas).show().slice(0, this.scrollOffset).hide();
+        this._updateScrollButtons();
     },
     showNotification: function(index, text) {
         var label = this.getLabel(index);
@@ -372,6 +476,7 @@ type("JTabWidget", ["IWidget"], {
     _notifyTabChange: function() { }
 }, function(tabs, width, height, initialSelection, canvas) {
     var self = this;
+    self.scrollable = false;
     // create canvas element
     if(canvas) {
         canvas = canvas.dom || canvas;
@@ -399,7 +504,6 @@ type("JTabWidget", ["IWidget"], {
     if(initialSelection) {
         self.setSelectedTab(initialSelection);
     }
-
 });
 
 type("JLookupTabWidget", ["JTabWidget"], {
