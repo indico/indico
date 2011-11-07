@@ -304,9 +304,17 @@ type("JTabWidget", ["IWidget"], {
         return text;
     },
     draw: function() {
+        var self = this;
         // We are going to be visible right after this function, so let's update the scroll buttons when size information is available
-        _.defer(_.bind(this._updateScrollButtons, this));
-        return this.canvas[0];
+        _.defer(function() {
+            self._updateScrollButtons();
+            // Also call the on draw functions here
+            $.each(self._onDraw, function(i, func) {
+                func();
+            });
+            self._onDraw = [];
+        });
+        return self.canvas[0];
     },
     enable: function() {
         this.canvas.tabs('enable');
@@ -343,7 +351,7 @@ type("JTabWidget", ["IWidget"], {
             var idx = this.getTabIndex(labelOrIndex);
         }
         this.canvas.tabs('select', idx);
-        this.scrollToTab(idx);
+        this.scrollToTab(idx, true);
     },
     getSelectedPanel: function() {
         var index = this.canvas.tabs('option', 'selected');
@@ -417,7 +425,7 @@ type("JTabWidget", ["IWidget"], {
             )
             .prependTo(self.canvas);
 
-        self.scrollToTab(self.getSelectedIndex());
+        self.scrollToTab(self.getSelectedIndex(), true);
     },
     _updateScrollButtons: function() {
         if(!this.scrollable) {
@@ -438,19 +446,65 @@ type("JTabWidget", ["IWidget"], {
         if(this.scrollOffset + visibleTabs == nav.find('> li').length) {
             lastElementShown = true;
         }
-        console.log(nav.find('> li').length, this.scrollOffset, visibleTabs, lastElementShown);
         // no prev allowed if scrolled to the far left
         this.scrollButtons.children().eq(0).toggleClass('ui-state-disabled', this.scrollOffset == 0);
         // no next allowed if last element is visible
         this.scrollButtons.children().eq(1).toggleClass('ui-state-disabled', lastElementShown);
     },
-    scrollToTab: function(idx) {
-        if(!this.scrollable) {
+    scrollToTab: function(idx, fuzzy) {
+        var self = this;
+        if(!self.scrollable) {
             return;
         }
-        this.scrollOffset = idx;
-        $('.ui-tabs-nav:first > li', this.canvas).show().slice(0, this.scrollOffset).hide();
-        this._updateScrollButtons();
+        if(fuzzy && !$('.ui-tabs-nav:first', self.canvas).width()) {
+            // If we want a fuzzy selection (show as many tabs as possible) and we do not have size information yet, delay everything
+            self._onDraw.push(function() {
+                self.scrollToTab(idx, fuzzy);
+            });
+            return;
+        }
+        else if(fuzzy && idx > 0) {
+            var nav = $('.ui-tabs-nav:first', self.canvas);
+            var origIdx = idx;
+            while(idx > 0) {
+                self.scrollToTab(idx - 1); // try scrolling left 1 tab
+                if(nav.find(' > li').eq(origIdx).is(':hidden')) { // if our tab is now hidden, scroll one tab forward again and stop
+                    self.scrollToTab(idx);
+                    return;
+                }
+                idx--;
+            }
+            // if we did not break before, something probably went wrong - let's scroll to the tab directly
+            self.scrollToTab(origIdx);
+            return;
+        }
+
+        self.scrollOffset = idx;
+        // show all tabs and then hide those before the visible ones
+        $('.ui-tabs-nav:first > li', self.canvas).show().slice(0, self.scrollOffset).hide();
+        // hide the tabs after the visible ones (to ensure we don't get a "half" tab)
+        var nav = $('.ui-tabs-nav:first', self.canvas);
+        var visibleTabs = 0;
+        var width = 0;
+        var updateTabsAfter = function() {
+            var navWidth = nav.width();
+            nav.find('> li:visible').each(function() {
+                width += $(this).outerWidth(true);
+                if(width >= navWidth) {
+                    return false;
+                }
+                visibleTabs++;
+            });
+            $('.ui-tabs-nav:first > li', self.canvas).slice(self.scrollOffset + visibleTabs).hide();
+        };
+        // We only have a width if the tab widget is already visible - otherwise don't do anything
+        if(nav.width()) {
+            updateTabsAfter();
+        }
+        else {
+            self._onDraw.push(updateTabsAfter);
+        }
+        self._updateScrollButtons();
     },
     showNotification: function(index, text) {
         var label = this.getLabel(index);
@@ -477,6 +531,7 @@ type("JTabWidget", ["IWidget"], {
 }, function(tabs, width, height, initialSelection, canvas) {
     var self = this;
     self.scrollable = false;
+    self._onDraw = [];
     // create canvas element
     if(canvas) {
         canvas = canvas.dom || canvas;
@@ -485,8 +540,9 @@ type("JTabWidget", ["IWidget"], {
     else {
         self.canvas = $('<div><ul/></div>');
     }
-    if(width) {
-        self.canvas.width(width);
+    self.width = exists(width) ? ((typeof(width)=='string' && width.indexOf('%') >= 0) ? width : pixels(width)) : width;
+    if(self.width) {
+        self.canvas.width(self.width);
     }
     if(height) {
         self.canvas.css('minHeight', height);
