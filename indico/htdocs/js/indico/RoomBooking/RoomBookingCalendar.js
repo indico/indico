@@ -208,6 +208,10 @@ type ("RoomBookingCalendarDrawer", [],
                 var left = ( startHour<0?0:startHour * 60 + bar.startDT.getMinutes() ) / (24*60) * DAY_WIDTH_PX;
                 var diff = ( bar.endDT.getHours() - bar.startDT.getHours() + (startHour<0?startHour:0) ) * 60 + ( bar.endDT.getMinutes() - bar.startDT.getMinutes() );
                 var width = diff / (24*60) * DAY_WIDTH_PX - 1;
+                if (width < 0) {
+                    // TODO: This shouldn't happen! See ticket #942
+                    return Html.div({});
+                }
                 var resvInfo = bar.startDT.print("%H:%M") + "  -  " +
                                bar.endDT.print("%H:%M") + "<br />" + bar.owner +
                                "<br />" + bar.reason;
