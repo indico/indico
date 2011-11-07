@@ -483,11 +483,11 @@ class PDFBase:
             if lsize < maximumWidth:
                 line = lineAux
             else:
-                draw(width,height, escape(line))
+                draw(width,height, line)
                 height -= lineSpacing*measurement
                 line = word
         if line.strip() != "":
-            draw(width, height, escape(line))
+            draw(width, height, line)
         return height
 
     def _drawLogo(self, c, drawTitle = True):
