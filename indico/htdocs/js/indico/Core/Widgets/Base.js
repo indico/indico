@@ -294,11 +294,11 @@ type("SelectableListWidget", ["ListWidget"],
 );
 
 type("JTabWidget", ["IWidget"], {
-    _addTab: function(label, content) {
+    _addTab: function(label, content, data) {
         var id = _.uniqueId('x-tab-');
         $(content).css('display', '').find('script').remove();
-        var container = $('<div/>', { id: id }).html(content);
-        this.canvas.append(container).tabs('add', '#' + id, this._titleTemplate(label));
+        var container = $('<div/>', { id: id }).data(data || {}).html(content);
+        this.widget.append(container).tabs('add', '#' + id, this._titleTemplate(label));
     },
     _titleTemplate: function(text) {
         return text;
@@ -314,31 +314,43 @@ type("JTabWidget", ["IWidget"], {
             });
             self._onDraw = [];
         });
-        return self.canvas[0];
+        return self.widget[0];
     },
     enable: function() {
-        this.canvas.tabs('enable');
+        this.widget.tabs('enable');
+        for(var i = 0, num = this.widget.tabs('length'); i < num; i++) {
+            this.enableTab(i);
+        }
+        if(this.scrollable) {
+            this._updateScrollButtons();
+        }
     },
     disable: function() {
-        this.canvas.tabs('disable');
+        this.widget.tabs('disable');
+        for(var i = 0, num = this.widget.tabs('length'); i < num; i++) {
+            this.disableTab(i);
+        }
+        if(this.scrollable) {
+            this.scrollButtons.children().addClass('ui-state-disabled');
+        }
     },
     enableTab: function(index) {
-        this.canvas.tabs('enable', index);
+        this.widget.tabs('enable', index);
     },
     disableTab: function(index) {
-        this.canvas.tabs('disable', index);
+        this.widget.tabs('disable', index);
     },
     getLabel: function(index) {
-        return $('.ui-tabs-nav > li', this.canvas).eq(index);
+        return $('.ui-tabs-nav > li', this.widget).eq(index);
     },
     getTabIndex: function(label) {
         var self = this;
-        return $('.ui-tabs-nav > li', self.canvas).filter(function() {
+        return $('.ui-tabs-nav > li', self.widget).filter(function() {
             return $(this).text() == self._titleTemplate(label);
         }).eq(0).index();
     },
     getSelectedIndex: function() {
-        return this.canvas.tabs('option', 'selected');
+        return this.widget.tabs('option', 'selected');
     },
     getSelectedTab: function() {
         return this.getLabel(this.getSelectedIndex());
@@ -350,16 +362,16 @@ type("JTabWidget", ["IWidget"], {
         else {
             var idx = this.getTabIndex(labelOrIndex);
         }
-        this.canvas.tabs('select', idx);
+        this.widget.tabs('select', idx);
         this.scrollToTab(idx, true);
     },
     getSelectedPanel: function() {
-        var index = this.canvas.tabs('option', 'selected');
-        return $('> div', this.canvas).eq(index);
+        var index = this.widget.tabs('option', 'selected');
+        return $('> div.ui-tabs-panel', this.widget).eq(index);
     },
     heightToTallestTab: function() {
         var maxHeight = 0;
-        $('> div', this.canvas).each(function() {
+        $('> div.ui-tabs-panel', this.widget).each(function() {
             maxHeight = Math.max(maxHeight, $(this).height());
         }).height(maxHeight);
     },
@@ -369,7 +381,7 @@ type("JTabWidget", ["IWidget"], {
             return;
         }
         self.scrollable = true;
-        var nav = $('> .ui-tabs-nav', self.canvas);
+        var nav = $('> .ui-tabs-nav', self.widget);
         nav.wrap($('<div/>').css({
             whiteSpace: 'nowrap',
             overflow: 'hidden'
@@ -393,7 +405,7 @@ type("JTabWidget", ["IWidget"], {
             .disableSelection()
             .css({
                 position: 'relative',
-                'zIndex': 101
+                zIndex: 101
             })
             .append(
                 $('<span/>')
@@ -423,7 +435,7 @@ type("JTabWidget", ["IWidget"], {
                         self.scrollToTab(Math.min(nav.find('> li').length - 1, self.scrollOffset + 1));
                     })
             )
-            .prependTo(self.canvas);
+            .prependTo(self.widget);
 
         self.scrollToTab(self.getSelectedIndex(), true);
     },
@@ -431,7 +443,7 @@ type("JTabWidget", ["IWidget"], {
         if(!this.scrollable) {
             return;
         }
-        var nav = $('.ui-tabs-nav:first', this.canvas);
+        var nav = $('.ui-tabs-nav:first', this.widget);
         var visibleTabs = 0;
         var width = 0;
         var navWidth = nav.width();
@@ -456,7 +468,7 @@ type("JTabWidget", ["IWidget"], {
         if(!self.scrollable) {
             return;
         }
-        if(fuzzy && !$('.ui-tabs-nav:first', self.canvas).width()) {
+        if(fuzzy && !$('.ui-tabs-nav:first', self.widget).width()) {
             // If we want a fuzzy selection (show as many tabs as possible) and we do not have size information yet, delay everything
             self._onDraw.push(function() {
                 self.scrollToTab(idx, fuzzy);
@@ -464,7 +476,7 @@ type("JTabWidget", ["IWidget"], {
             return;
         }
         else if(fuzzy && idx > 0) {
-            var nav = $('.ui-tabs-nav:first', self.canvas);
+            var nav = $('.ui-tabs-nav:first', self.widget);
             var origIdx = idx;
             while(idx > 0) {
                 self.scrollToTab(idx - 1); // try scrolling left 1 tab
@@ -481,9 +493,9 @@ type("JTabWidget", ["IWidget"], {
 
         self.scrollOffset = idx;
         // show all tabs and then hide those before the visible ones
-        $('.ui-tabs-nav:first > li', self.canvas).show().slice(0, self.scrollOffset).hide();
+        $('.ui-tabs-nav:first > li', self.widget).show().slice(0, self.scrollOffset).hide();
         // hide the tabs after the visible ones (to ensure we don't get a "half" tab)
-        var nav = $('.ui-tabs-nav:first', self.canvas);
+        var nav = $('.ui-tabs-nav:first', self.widget);
         var visibleTabs = 0;
         var width = 0;
         var updateTabsAfter = function() {
@@ -495,7 +507,7 @@ type("JTabWidget", ["IWidget"], {
                 }
                 visibleTabs++;
             });
-            $('.ui-tabs-nav:first > li', self.canvas).slice(self.scrollOffset + visibleTabs).hide();
+            $('.ui-tabs-nav:first > li', self.widget).slice(self.scrollOffset + visibleTabs).hide();
         };
         // We only have a width if the tab widget is already visible - otherwise don't do anything
         if(nav.width()) {
@@ -532,22 +544,22 @@ type("JTabWidget", ["IWidget"], {
     var self = this;
     self.scrollable = false;
     self._onDraw = [];
+    self.widget = $('<div><ul/></div>');
     // create canvas element
     if(canvas) {
-        canvas = canvas.dom || canvas;
-        self.canvas = $(canvas).append('<ul/>');
+        self.canvas = $(canvas.dom || canvas);
     }
     else {
-        self.canvas = $('<div><ul/></div>');
+        self.canvas = $('<div/>');
     }
     self.width = exists(width) ? ((typeof(width)=='string' && width.indexOf('%') >= 0) ? width : pixels(width)) : width;
     if(self.width) {
-        self.canvas.width(self.width);
+        self.widget.width(self.width);
     }
     if(height) {
-        self.canvas.css('minHeight', height);
+        self.widget.css('minHeight', height);
     }
-    self.canvas.tabs({
+    self.widget.tabs({
         select: function(e, ui) {
             self._notifyTabChange();
         }
@@ -564,22 +576,25 @@ type("JTabWidget", ["IWidget"], {
 
 type("JLookupTabWidget", ["JTabWidget"], {
     _addTab: function(label, generator) {
-        var content = $('<div/>').data('generator', generator);
-        this.JTabWidget.prototype._addTab.call(this, label, content);
+        var content = '<div/>';
+        this.JTabWidget.prototype._addTab.call(this, label, content, {generator: generator});
     },
     _generateContent: function(panel) {
         var container = $('> div', panel);
-        var generator = container.data('generator');
-        var content = generator();
+        var generator = $(panel).data('generator');
+        try {
+            var content = generator();
+        } catch(e) { alert(e); return; }
         if(content.dom) {
             content = content.dom;
         }
-        container.html(content);
+        this.canvas.empty().append(content);
+        container.empty().append(this.canvas);
     }
 }, function(tabs, width, height, initialSelection, __extraButtons, canvas) {
     var self = this;
     self.JTabWidget(tabs, width, height, initialSelection, canvas);
-    self.canvas.bind('tabsshow', function(e, ui) {
+    self.widget.bind('tabsshow', function(e, ui) {
         self._generateContent(ui.panel);
     });
     self._generateContent(self.getSelectedPanel());
