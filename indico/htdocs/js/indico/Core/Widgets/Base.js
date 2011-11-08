@@ -539,12 +539,26 @@ type("JTabWidget", ["IWidget"], {
         var label = this.getLabel(index);
         label.qtip('destroy');
     },
+    _drawExtraButtons: function() {
+        // Add any extra buttons displayed under the tabs
+        var container = $('<div class="tabExtraButtons"/>');
+        $.each(this.extraButtons, function(i, btnData) {
+            var btn = $('<div class="buttonContainer"/>').append(btnData.btn.dom || btnData.btn).click(function() {
+                btnData.onclick(btn);
+            });
+            container.append(btn);
+        });
+        container.children(':first').addClass('buttonContainerLeft');
+        container.children(':last').addClass('buttonContainerRight');
+        this.widget.append(container);
+    },
     _notifyTabChange: function() { }
-}, function(tabs, width, height, initialSelection, canvas) {
+}, function(tabs, width, height, initialSelection, extraButtons, canvas) {
     var self = this;
     self.scrollable = false;
     self._onDraw = [];
     self.widget = $('<div><ul/></div>');
+    self.extraButtons = extraButtons || [];
     // create canvas element
     if(canvas) {
         self.canvas = $(canvas.dom || canvas);
@@ -558,6 +572,9 @@ type("JTabWidget", ["IWidget"], {
     }
     if(height) {
         self.widget.css('minHeight', height);
+    }
+    if(self.extraButtons) {
+        self._drawExtraButtons();
     }
     self.widget.tabs({
         select: function(e, ui) {
@@ -591,9 +608,9 @@ type("JLookupTabWidget", ["JTabWidget"], {
         this.canvas.empty().append(content);
         container.empty().append(this.canvas);
     }
-}, function(tabs, width, height, initialSelection, __extraButtons, canvas) {
+}, function(tabs, width, height, initialSelection, extraButtons, canvas) {
     var self = this;
-    self.JTabWidget(tabs, width, height, initialSelection, canvas);
+    self.JTabWidget(tabs, width, height, initialSelection, extraButtons, canvas);
     self.widget.bind('tabsshow', function(e, ui) {
         self._generateContent(ui.panel);
     });

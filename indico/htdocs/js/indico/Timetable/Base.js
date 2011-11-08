@@ -271,7 +271,7 @@ type("DisplayTimeTable", ["TimeTable"], {
         var self = this;
         this.filter = new TimeTableFilter(this.timetableDrawer, function () {
             // When closed restore the filter button color
-            self.filterButtonContainer.dom.style.background = "";
+            self.filterButtonContainer.css('background', '');
             return true;
         });
         this.filter.draw();
@@ -349,7 +349,7 @@ type("DisplayTimeTable", ["TimeTable"], {
               self.filter.toggle();
               var state = self.filter.state.get();
               self._filterActive = state;
-              btnContainer.dom.style.background = state ? "#9F883B" : "";
+              btnContainer.css('background', state ? "#9F883B" : "");
             }
         };
 
