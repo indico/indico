@@ -7818,10 +7818,9 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
             self._tempFilePath = None
 
     def _process(self):
-
+        from MaKaC.services.interface.rpc import json
         if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p
+            return json.encode_iframe({'status': 'error'})
         else:
             if self._tempFilePath is not None:
                 if self._conf.getPosterTemplateManager().hasTemplate(self.__templateId):
@@ -7843,22 +7842,13 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
                         value.append((self._tempFilePath,self._bgPosition))
                         backgroundId = len(value) - 1
 
+                return json.encode_iframe({
+                    'status': 'OK',
+                    'id': backgroundId,
+                    'url': str(urlHandlers.UHConfModifPosterGetBackground.getURL(self._conf, self.__templateId, backgroundId)),
+                    'pos': self._bgPosition
+                })
 
-
-                return "".join(['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">',
-                                '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>',
-                                '<span id="background_id">',
-                                  str(backgroundId),
-                                  '</span>',
-                                  '<span id="background_url">',
-                                  str(urlHandlers.UHConfModifPosterGetBackground.getURL(self._conf, self.__templateId, backgroundId)),
-                                  '</span>',
-                                  '<span id="background_pos">',
-                                  str(self._bgPosition),
-                                  '</span>',
-
-                                  '</body></html>'
-                                  ])
 
 class RHConfPosterGetBackground(RHConferenceModifBase):
     """ Class used to obtain a background in order to display it

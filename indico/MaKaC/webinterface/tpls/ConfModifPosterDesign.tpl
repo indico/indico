@@ -400,26 +400,6 @@
         $('#saveForm').submit();
     }
 
-    function sent() {
-        var iframeDocument = $('#uploadTarget')[0].contentDocument || $('#uploadTarget')[0].contentWindow;
-        if (iframeDocument.document) {
-            iframeDocument = iframeDocument.document;
-        }
-
-        try {
-            if (backgroundId != -1) {
-                $('#background').remove();
-            }
-            backgroundId = $('#background_id', iframeDocument).html();
-            var backgroundURL = $('#background_url', iframeDocument).html();
-            backgroundPos = $('#background_pos', iframeDocument).html();
-            displayBackground(backgroundURL);
-        }
-        catch (err) {
-            $('#loadingIcon').hide();
-        }
-    }
-
     function setBackgroundPos(mode) {
         var background = $('#background');
         var hiddenField = $('#bgPosition');
@@ -516,10 +496,25 @@
             snapToGrid = this.checked;
         }).change();
 
-        // show a throbber when uploading a background
-        $('#bgForm').submit(function() {
-            $('#uploadTarget').one('load', sent);
-            $('#loadingIcon').show();
+        $('#bgForm').ajaxForm({
+            dataType: 'json',
+            iframe: true,
+            success: function(data) {
+                if(data.status != 'OK') {
+                    alert($T('An error occurred.'));
+                    $('#loadingIcon').hide();
+                    return;
+                }
+                if (backgroundId != -1) {
+                    $('#background').remove();
+                }
+                backgroundId = data.id;
+                backgroundPos = data.pos;
+                displayBackground(data.url);
+            },
+            beforeSubmit: function() {
+                $('#loadingIcon').show();
+            }
         });
 
         $('#removeBackground').click(function(e) {
@@ -567,8 +562,6 @@
 </script>
 
 
-<iframe id="uploadTarget" name="uploadTarget" src="" style="width:0px;height:0px;border:0"></iframe>
-
 <div style="width:100%">
   <br/>
 
@@ -589,7 +582,7 @@
         <td class="titleCellTD">
           <span class="titleCellFormat">${_("Background")}</span>
         </td>
-        <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data" target="uploadTarget">
+        <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data">
         <td height="20px" NOWRAP align="left" colspan="3">
           <input name="file" size="58" type="file">
           <input class="btn" value="${_("Send File")}" type="submit">
