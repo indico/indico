@@ -296,19 +296,19 @@ type("TimetableManagementActions", [], {
 
         if (this._allowCreateHere('Session')) {
             if (keys(this.eventInfo.sessions).length === 0) {
-                menuItems[$T('Session')] = function() { self.addSession(); };
+                menuItems[$T('Session')] = function() { self.addSession(); return false; };
             } else {
                 var sessions = {};
                 each(this.eventInfo.sessions, function(session, key) {
                     sessions[session.id] = {};
-                    sessions[session.id].func = function() { self.addSessionSlot(session); };
+                    sessions[session.id].func = function() { self.addSessionSlot(session); self.addMenu.close(); };
                     sessions[session.id].color = self._retrieveSessionColor(session);
                     sessions[session.id].title = session.title;
                 });
 
                 var menuu = {
                     '' : {
-                        'Create a new session': function() { self.addSession(); }
+                        'Create a new session': function() { self.addSession(); self.addMenu.close(); }
                     },
                     'Add another block to:': sessions
                 };

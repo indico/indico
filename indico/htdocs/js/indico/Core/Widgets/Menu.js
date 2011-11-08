@@ -120,15 +120,12 @@ type("PopupMenu", ["ChainedPopupWidget"],
                                       var target = pair.get();
                                       target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
 
-                                      if(self.closeOnClick) {
-                                          self.close();
-                                      }
                                       return false;
                                   }:
                                   function() {
                                       // assume it's a callback function
-                                      pair.get()(self);
-                                      if (self.closeOnClick) {
+                                      var ret = pair.get()(self);
+                                      if ((self.closeOnClick && ret !== false) || ret === true) {
                                           self.close();
                                       }
                                   });
@@ -194,7 +191,7 @@ type("SectionPopupMenu", ["PopupMenu"], {
                 }
 
                 // add the menu items
-                var tmp = $B(Html.ul('subPopupList'), item, self._processItem);
+                var tmp = $B(Html.ul('subPopupList'), item, _.bind(self._processItem, self));
                 sectionContent.append(Html.li({}, section, tmp));
             });
 
@@ -214,7 +211,6 @@ type("SectionPopupMenu", ["PopupMenu"], {
 /* For add Session menu popup, we add some colored squares for each session */
 type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
     _processItem: function(pair) {
-
         var self = this;
         var value = pair.get();
         var color = null;
