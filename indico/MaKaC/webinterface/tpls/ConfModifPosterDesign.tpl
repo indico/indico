@@ -37,8 +37,6 @@
     // List of poster template items
     var items = [];
 
-    var firstLoad = true;
-
     // Item class
     function Item(itemId, key) {
         this.id = itemId;
@@ -403,27 +401,22 @@
     }
 
     function sent() {
-        if (firstLoad) {
-            firstLoad = false;
+        var iframeDocument = $('#uploadTarget')[0].contentDocument || $('#uploadTarget')[0].contentWindow;
+        if (iframeDocument.document) {
+            iframeDocument = iframeDocument.document;
         }
-        else {
-            var iframeDocument = $('#uploadTarget')[0].contentDocument || $('#uploadTarget')[0].contentWindow;
-            if (iframeDocument.document) {
-                iframeDocument = iframeDocument.document;
-            }
 
-            try {
-                if (backgroundId != -1) {
-                    $('#background').remove();
-                }
-                backgroundId = $('#background_id', iframeDocument).html();
-                var backgroundURL = $('#background_url', iframeDocument).html();
-                backgroundPos = $('#background_pos', iframeDocument).html();
-                displayBackground(backgroundURL);
+        try {
+            if (backgroundId != -1) {
+                $('#background').remove();
             }
-            catch (err) {
-                $('#loadingIcon').hide();
-            }
+            backgroundId = $('#background_id', iframeDocument).html();
+            var backgroundURL = $('#background_url', iframeDocument).html();
+            backgroundPos = $('#background_pos', iframeDocument).html();
+            displayBackground(backgroundURL);
+        }
+        catch (err) {
+            $('#loadingIcon').hide();
         }
     }
 
@@ -525,6 +518,7 @@
 
         // show a throbber when uploading a background
         $('#bgForm').submit(function() {
+            $('#uploadTarget').one('load', sent);
             $('#loadingIcon').show();
         });
 
@@ -569,8 +563,6 @@
             e.preventDefault();
             save();
         });
-
-        $('#uploadTarget').load(sent);
     });
 </script>
 
