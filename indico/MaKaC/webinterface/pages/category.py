@@ -1148,7 +1148,7 @@ class WPCategoryStatistics( WPCategoryDisplayBase ):
 
 class WConferenceCreation( wcomponents.WTemplated ):
 
-    def __init__( self, targetCateg, type="", rh = None ):
+    def __init__( self, targetCateg, type="conference", rh = None ):
         self._categ = targetCateg
         self._type = type
         self._rh = rh
@@ -1224,12 +1224,12 @@ class WConferenceCreation( wcomponents.WTemplated ):
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         styles = styleMgr.getExistingStylesForEventType(self._type)
         styleoptions = ""
+        defStyle = ""
+        if self._categ:
+            defStyle = self._categ.getDefaultStyle(self._type)
+        if defStyle == "":
+            defStyle = styleMgr.getDefaultStyleForEventType(self._type)
         for styleId in styles:
-            defStyle = ""
-            if self._categ:
-                defStyle = self._categ.getDefaultStyle(self._type)
-            if defStyle == "":
-                defStyle = styleMgr.getDefaultStyleForEventType(self._type)
             if styleId == defStyle:
                 selected = "selected"
             else:
@@ -1271,7 +1271,7 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
         return wcomponents.WNavigationDrawer( pars )
 
     def _getWComponent( self ):
-        return WConferenceCreation( self._target, "", self._rh )
+        return WConferenceCreation( self._target, self._rh._event_type, self._rh )
 
     def _getBody( self, params ):
         ## TODO: TO REMOVE?????????

@@ -1568,21 +1568,30 @@ type("SelectEditWidget", ["InlineEditWidget"],
                 var content = Html.span({style:{paddingBottom:'3px'}});
                 var option;
                 this.select = Html.select();
-                var self = this;
-                jQuery.each(this.options, function(key, caption) {
+                var functionDict = function(key, caption) {
                     option = Html.option({value:key}, caption);
                     self.select.append(option);
                     if (self.currentValue == caption) {
                         option.dom.selected = true;
-                    }
-                });
-
+                    }};
+                var self = this;
+                if(self.options.Dictionary){
+                    self.options.each(functionDict);
+                }
+                else{
+                    jQuery.each(this.options, functionDict);
+                }
                 content.append(this.select)
                 return content;
             },
 
             _handleDisplayMode: function(value) {
-                this.currentValue = this.options[value];
+                if(this.options.Dictionary){
+                    this.currentValue = this.options.get(value);
+                }
+                else{
+                    this.currentValue = this.options[value];
+                }
                 return Html.span({}, this.currentValue);
             },
 
@@ -1624,7 +1633,12 @@ type("InputEditWidget", ["InlineEditWidget", "ErrorAware"],
             },
 
             _handleDisplayMode: function(value) {
-                var content = Html.span({}, value);
+                if(str(value)!=""){
+                    var content = Html.span({}, value);
+                }
+                else{
+                    var content = Html.em({}, "No text");
+                }
                 return content;
             },
 
@@ -1673,6 +1687,25 @@ type("InputEditWidget", ["InlineEditWidget", "ErrorAware"],
             this.helpMsg = helpMsg;
             this.InlineEditWidget(method, attributes, initValue, beforeEdit);
         });
+
+type("URLPathEditWidget", ["InputEditWidget"],
+        {
+            _handleDisplayMode: function(value) {
+                var self = this;
+                var content = "";
+                if(value !=""){
+                    content = Html.span({}, self.basePath + value);
+                } else{
+                    content = Html.em({}, $T("There is not any short url yet. Click \"edit\" to setup."));
+                }
+                return content;
+            }
+        },
+        function(method, attributes, basePath, initValue, allowEmpty, successHandler, validation, errorMsg, helpMsg, beforeEdit) {
+            this.basePath = basePath;
+            this.InputEditWidget(method, attributes, initValue, allowEmpty, successHandler, validation, errorMsg, helpMsg, beforeEdit);
+        });
+
 
 
 type('AutocheckTextBox', ['RealtimeTextBox'],

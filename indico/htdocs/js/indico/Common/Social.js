@@ -20,7 +20,7 @@ $(function() {
     $('#social_button').qtip({
 
         style: {
-            width: '290px',
+            width: '420px',
             classes: 'ui-tooltip-rounded ui-tooltip-shadow social_share_tooltip' + (theme=='dark'?' ui-tooltip-dark':' ui-tooltip-blue')
         },
         position: {

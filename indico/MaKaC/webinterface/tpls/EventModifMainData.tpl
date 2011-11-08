@@ -92,8 +92,8 @@ additionalInfo = confObj.getContactInfo()
     <td class="dataCaptionTD">
         <span class="dataCaptionFormat">${ _("Timezone")}</span>
     </td>
-    <td class="blacktext">
-        ${timezone}
+     <td class="blacktext">
+        <span id="inPlaceEditTimezone">${timezone}</span>
     </td>
 </tr>
 <!-- Fermi timezone awareness(end) -->
@@ -154,9 +154,7 @@ additionalInfo = confObj.getContactInfo()
         <span class="dataCaptionFormat">${ _("Keywords")}</span>
     </td>
     <td class="blacktext">
-        %if keywords:
-<pre>${ keywords }</pre>
-        % endif
+        <span id="inPlaceEditKeywords">${keywords }</span>
     </td>
 </tr>
 
@@ -165,11 +163,9 @@ additionalInfo = confObj.getContactInfo()
       <td class="dataCaptionTD">
         <span class="dataCaptionFormat">${ _("Short display URL")}</span>
       </td>
-      % if shortURL == "" :
-        <td class="blacktext"><em>${ _("There is not any short url yet. Click \"Modify\" to setup.")}</em></td>
-      % else :
-      <td class="blacktext">${shortURL}</td>
-      % endif
+      <td  class="blacktext">
+          <span id="inPlaceEditShortURL">${shortURLTag}</span>
+      </td>
     % endif
 </tr>
 
@@ -234,14 +230,18 @@ function removeItem(number, form)
 
 var confFossile = ${ jsonEncode(confObj.fossilize(IConferenceFossil, tz=confObj.getTimezone())) };
 
-${ macros.genericField(macros.FIELD_TEXT, 'inPlaceEditTitle', 'event.main.changeTitle', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh) }
+$E('inPlaceEditTitle').set(new InputEditWidget('event.main.changeTitle',
+        {'conference':'${ conferenceId }'}, ${ jsonEncode(title) }, false, null, null,
+        null).draw());
 
 <% dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(confObj) %>
 
 $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'caption': "${ dMgr.getSupportEmailCaption() }", 'email': confFossile.supportEmail}).draw());
 
 % if evtType == 'lecture':
-    ${ macros.genericField(macros.FIELD_TEXT, 'inPlaceEditOrganiserText', 'event.main.changeOrganiserText', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh) }
+    $E('inPlaceEditOrganiserText').set(new InputEditWidget('event.main.changeOrganiserText',
+            {'conference':'${ conferenceId }'}, ${ jsonEncode(confObj.getOrgText()) }, true, null, null,
+            null).draw());
 % endif
 
 <%
@@ -250,19 +250,39 @@ styleOptions = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().get
 styleOptions = dict(map(lambda k: (k, styleOptions[k][0]), styleOptions))
 %>
 
-${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=styleOptions, orderOptionsBy = "value") }
+$E('inPlaceEditDefaultStyle').set(new SelectEditWidget('event.main.changeDefaultStyle',
+        {'conference':'${ conferenceId }'}, ${ styleOptions }, ${ jsonEncode(defaultStyle) }, null).draw());
 
-${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditVisibility', 'event.main.changeVisibility', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=visibilityList, orderOptionsBy = "key") }
+$E('inPlaceEditVisibility').set(new SelectEditWidget('event.main.changeVisibility',
+        {'conference':'${ conferenceId }'}, ${ visibilityList }, ${ jsonEncode(visibility) }, null).draw());
 
-${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditType', 'event.main.changeType', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=typeList, orderOptionsBy = "value") }
+$E('inPlaceEditType').set(new SelectEditWidget('event.main.changeType',
+        {'conference':'${ conferenceId }'}, ${ typeList }, ${ jsonEncode(eventType) }, null).draw());
 
 $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}, confFossile.type != 'simple_event').draw());
 
-$E('inPlaceEditDescription').set(new ParsedRichTextInlineEditWidget('event.main.changeDescription', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, confFossile.description).draw());
+$E('inPlaceEditDescription').set(new ParsedRichTextInlineEditWidget('event.main.changeDescription', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, confFossile.description, null, null, "${_('No description')}").draw());
 
 % if evtType == 'conference':
-    $E('inPlaceEditAdditionalInfo').set(new RichTextInlineEditWidget('event.main.changeAdditionalInfo', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(additionalInfo) }, 600, 45).draw());
+    $E('inPlaceEditAdditionalInfo').set(new RichTextInlineEditWidget('event.main.changeAdditionalInfo', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(additionalInfo) }, 600, 45, "${_('No additional info')}").draw());
 % endif
+
+$E('inPlaceEditShortURL').set(new URLPathEditWidget('event.main.changeShortURL',
+        {'conference':'${ conferenceId }'}, ${ jsonEncode(shortURLBase) }, ${ jsonEncode(shortURLTag) }, true, null, null,
+        null).draw());
+
+$E('inPlaceEditKeywords').set(new TextAreaEditWidget('event.main.changeKeywords', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(keywords) }).draw());
+
+var timezoneList = $D(${dict((item,item) for item in timezoneList)| n,j});
+
+timezoneList.sort(function(val1, val2){
+return SortCriteria.Default(timezoneList.get(val1), timezoneList.get(val2));
+});
+
+
+$E('inPlaceEditTimezone').set(new SelectEditWidget('event.main.changeTimezone',
+        {'conference':'${ conferenceId }'}, timezoneList, ${ jsonEncode(timezone) }, null).draw());
+
 
 // Room parameters widget
 var context = new WidgetEditableContext();

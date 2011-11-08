@@ -3117,7 +3117,6 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
             al = self._conf.getAlarmById(self._alarmId)
             c = Client()
             if dryRun:
-                al.setStartOn(dtStart)
                 c.dequeue(al)
             else:
                 c.moveTask(al, dtStart)

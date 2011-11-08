@@ -1226,7 +1226,7 @@ class TimeTablePlain(PDFWithTOC):
                 for sessionId in self._showSessions:
                     session=self._conf.getSessionById(sessionId)
                     if session is not None:
-                        caption.append("%s"%escape(session.getTitle()))
+                        caption.append(session.getTitle())
                 p=Paragraph("%s"%"\n".join(caption),style2)
                 self._story.append(p)
             self._story.append(Spacer(inch, 2*cm))
@@ -1238,7 +1238,7 @@ class TimeTablePlain(PDFWithTOC):
             c.saveState()
             if self._ttPDFFormat.showLogo():
                 self._drawLogo(c, False)
-            height=self._drawWrappedString(c, escape(self._conf.getTitle()))
+            height = self._drawWrappedString(c, self._conf.getTitle())
             c.setFont('Times-Bold',modifiedFontSize(15, self._fontsize))
             height-=2*cm
             c.drawCentredString(self._PAGE_WIDTH/2.0,height,

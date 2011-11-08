@@ -443,9 +443,9 @@ class WConfMetadata(wcomponents.WTemplated):
         if self._conf.getLogo():
             v['image'] = urlHandlers.UHConferenceLogo.getURL(self._conf)
         else:
-            v['image'] = Config.getInstance().getSystemIconURL("indico_small")
+            v['image'] = Config.getInstance().getSystemIconURL("indico_co")
 
-        v['description'] = self._conf.getDescription()[:200]
+        v['description'] = strip_ml_tags(self._conf.getDescription()[:500])
         return v
 
 
@@ -1229,7 +1229,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         if styleMgr.existsCSSFile(self._view):
             cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
             styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
-        return styleText
+
+        confMetadata = WConfMetadata(self._conf).getHTML()
+
+        return styleText + confMetadata
 
     def _getFooter( self ):
         """
@@ -2172,22 +2175,8 @@ class WConfModifMainData(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         type = vars["type"]
-        defaultStyle = i18nformat("""--_("not set")--""")
-        defStyle = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDefaultStyle()
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        defaultStyle = styleMgr.getStyleName(defStyle)
-        vars["defaultStyle"] = defaultStyle
-        visibility = self._conf.getVisibility()
-        categpath = self._conf.getCategoriesPath()[0]
-        categpath.reverse()
-        if visibility > len(categpath):
-            vars["visibility"] = _("Everywhere")
-        elif visibility == 0:
-            vars["visibility"] = _("Nowhere")
-        else:
-            categId = categpath[visibility-1]
-            cat = conference.CategoryManager().getById(categId)
-            vars["visibility"] = cat.getName()
+        vars["defaultStyle"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDefaultStyle()
+        vars["visibility"] = self._conf.getVisibility()
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHConfDataModif.getURL(self._conf)))
         vars["addTypeURL"]=urlHandlers.UHConfAddContribType.getURL(self._conf)
         vars["removeTypeURL"]=urlHandlers.UHConfRemoveContribType.getURL(self._conf)
@@ -2244,12 +2233,9 @@ class WConfModifMainData(wcomponents.WTemplated):
         #------------------------------------------------------
         vars["reportNumbersTable"]=wcomponents.WReportNumbersTable(self._conf).getHTML()
         vars["eventType"] = self._conf.getType()
-        if vars["eventType"] == "simple_event":
-            vars["eventType"] = "lecture"
         vars["keywords"] = self._conf.getKeywords()
-        vars["shortURL"] =  ""
-        if self._conf.getUrlTag() and Config.getInstance().getShortEventURL():
-            vars["shortURL"] =  Config.getInstance().getShortEventURL() + self._conf.getUrlTag()
+        vars["shortURLBase"] = Config.getInstance().getShortEventURL()
+        vars["shortURLTag"] = self._conf.getUrlTag()
         vars["screenDatesURL"] = urlHandlers.UHConfScreenDatesEdit.getURL(self._conf)
         ssdate = self._conf.getAdjustedScreenStartDate().strftime("%A %d %B %Y %H:%M")
         if self._conf.getScreenStartDate() == self._conf.getStartDate():
@@ -2263,7 +2249,7 @@ class WConfModifMainData(wcomponents.WTemplated):
             sedate += i18nformat(""" <font color='red'> _("(modified)")</font>""")
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
         vars["screenDates"] = "%s -> %s" % (ssdate, sedate)
-
+        vars["timezoneList"] = TimezoneRegistry.getList()
         return vars
 ############# End of old collaboration related ##############################
 

@@ -290,8 +290,8 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
                     } else {
                         doc = $E(iframeId).dom.contentDocument;
                     }
-                    if (value == "") {
-                        value = '<em>No description</em>';
+                    if (value == "" && self.noValueText) {
+                        value = '<em>' + self.noValueText + '</em>';
                     }
                     doc.body.innerHTML = '<link href="css/Default.css" type="text/css" rel="stylesheet">' + (Util.Validation.isHtml(value)?value:escapeHTML(value));
                 };
@@ -314,9 +314,10 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
                 return this.description.get();
             }
         },
-        function(method, attributes, initValue, width, height) {
+        function(method, attributes, initValue, width, height, noValueText) {
             this.width = width ? width:600;
             this.height = height ? height:100;
+            this.noValueText = noValueText;
             this.InlineEditWidget(method, attributes, initValue);
         });
 
@@ -352,8 +353,8 @@ type("ParsedRichTextInlineEditWidget", ["RichTextInlineEditWidget"],
 
             }
         },
-        function(method, attributes, initValue, width, height) {
-            this.RichTextInlineEditWidget(method, attributes, initValue, width, height)
+        function(method, attributes, initValue, width, height, noValueText) {
+            this.RichTextInlineEditWidget(method, attributes, initValue, width, height, noValueText);
         });
 
 

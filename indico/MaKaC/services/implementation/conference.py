@@ -262,6 +262,36 @@ class ConferenceBookingDisplay( ConferenceDisplayBase ):
                  'room': roomName,
                  'address': locAddress }
 
+class ConferenceShortURLModification( ConferenceTextModificationBase ):
+    """
+    Conference short URL modification
+    """
+    def _handleSet(self):
+        self._target.setUrlTag(self._value)
+
+    def _handleGet(self):
+        return self._target.getUrlTag()
+
+class ConferenceTimezoneModification( ConferenceTextModificationBase ):
+    """
+    Conference Timezone modification
+    """
+    def _handleSet(self):
+        self._target.setTimezone(self._value)
+
+    def _handleGet(self):
+        return self._target.getTimezone()
+
+class ConferenceKeywordsModification( ConferenceTextModificationBase ):
+    """
+    Conference keywords modification
+    """
+    def _handleSet(self):
+        self._target.setKeywords(self._value)
+
+    def _handleGet(self):
+        return self._target.getKeywords()
+
 class ConferenceSpeakerTextModification( ConferenceTextModificationBase ):
     """ Conference chairman text modification (for conferences and meetings)
     """
@@ -814,6 +844,9 @@ methodMap = {
     "main.changeDates": ConferenceStartEndDateTimeModification,
     "main.changeBooking": ConferenceBookingModification,
     "main.displayBooking": ConferenceBookingModification,
+    "main.changeShortURL": ConferenceShortURLModification,
+    "main.changeKeywords": ConferenceKeywordsModification,
+    "main.changeTimezone": ConferenceTimezoneModification,
     "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributions,
     "contributions.delete": ConferenceDeleteContributions,

@@ -27,5 +27,6 @@
     },IndicoUI.Buttons.addButton()));
     $E("newsToolBar").set(addButton);
 
-    ${ macros.genericField(macros.FIELD_TEXT, 'inPlaceEditRecentDays', 'news.setRecentDays', dict(), preCache=True, rh=self_._rh) }
+
+    $E('inPlaceEditRecentDays').set(new InputEditWidget('news.setRecentDays', {}, ${ jsonEncode(recentDays) }, false, null, null, null).draw());
 </script>

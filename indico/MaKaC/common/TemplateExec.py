@@ -307,9 +307,6 @@ def registerHelpers(objDict):
     if not 'roomInfo' in objDict:
         from MaKaC.services.interface.rpc.offline import roomInfo
         objDict['roomInfo'] = roomInfo
-    if not 'macros' in objDict:
-        from MaKaC.webinterface.asyndico import macros
-        objDict['macros'] = macros
     if not 'roomBookingActive' in objDict:
         if DBMgr.getInstance().isConnected():
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
