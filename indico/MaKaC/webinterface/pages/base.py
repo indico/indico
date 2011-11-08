@@ -145,23 +145,24 @@ class WPBase(OldObservable):
         elif isinstance(self._rh, RHAdminBase):
             area=i18nformat(""" - _("Administrator area")""")
 
+        info = HelperMaKaCInfo().getMaKaCInfoInstance()
         websession = self._getAW().getSession()
         if websession:
             language = websession.getLang()
         else:
-            info = HelperMaKaCInfo().getMaKaCInfoInstance()
             language = info.getLang()
 
         return wcomponents.WHTMLHeader().getHTML({
-                            "area": area,
-                            "baseurl": self._getBaseURL(),
-                            "conf": Config.getInstance(),
-                            "page": self,
-                            "extraCSS": self.getCSSFiles(),
-                            "extraJSFiles": self.getJSFiles(),
-                            "extraJS": self._extraJS,
-                            "language": language
-                            })
+            "area": area,
+            "baseurl": self._getBaseURL(),
+            "conf": Config.getInstance(),
+            "page": self,
+            "extraCSS": self.getCSSFiles(),
+            "extraJSFiles": self.getJSFiles(),
+            "extraJS": self._extraJS,
+            "language": language,
+            "social": info.getSocialAppConfig()
+            })
 
     def _getHTMLFooter( self ):
         return """
