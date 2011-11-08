@@ -62,7 +62,7 @@ type("TimeTable", ["HistoryListener"], {
 
     postDraw: function() {
         this.timetableDrawer.postDraw();
-        this.LookupTabWidget.prototype.postDraw.call(this);
+        //this.LookupTabWidget.prototype.postDraw.call(this);
     },
 
     getData: function() {
@@ -371,10 +371,10 @@ type("DisplayTimeTable", ["TimeTable"], {
     );
 
 
-type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
+type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
 
     draw: function() {
-      return this.LookupTabWidget.prototype.draw.call(this);
+      return this.JLookupTabWidget.prototype.draw.call(this);
     },
 
     getDays: function() {
@@ -383,12 +383,12 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
     disable: function() {
         this.enabled = false;
-        this.LookupTabWidget.prototype.disable.call(this);
+        this.JLookupTabWidget.prototype.disable.call(this);
     },
 
     enable: function() {
         this.enabled = true;
-        this.LookupTabWidget.prototype.enable.call(this);
+        this.JLookupTabWidget.prototype.enable.call(this);
     },
 
     _titleTemplate : function(text) {
@@ -431,29 +431,27 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                                  intervalInfo,
                                                                  this.eventInfo,
                                                                  this.width.slice(0,-2),
-                                                                 this.canvas,
+                                                                 this.canvas[0],
                                                                  'contribution',
                                                                  this.isSessionTimetable,
                                                                  this.customLinks);
 
         this.intervalTimeTable.setData(intervalInfo);
         var content = this.intervalTimeTable.draw();
-        this.canvas.set(content);
-        this.menu.dom.style.display = 'none';
+        this.canvas.html(content[0]);
+        $(this.menu.dom).hide();
 
     },
 
     postDraw: function() {
         this.TimeTable.prototype.postDraw.call(this);
-        var self = this;
-
     },
 
     switchToTopLevel : function() {
         this.enable();
         this.setSelectedTab(this.currentDay);
-        this._drawContent();
-        this.menu.dom.style.display = 'block';
+        $(this.menu.dom).show();
+        this._generateContent(this.getSelectedPanel());
         this.timetableDrawer.redraw();
     }
 },
@@ -505,7 +503,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
 
          this.currentDay = initialTab;
 
-         this.LookupTabWidget( translate(this.sortedKeys, function(key) {
+         this.JLookupTabWidget(translate(this.sortedKeys, function(key) {
 
              return [key, function() {
 
@@ -531,6 +529,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                  }
              }];
          }), this.width, 100, initialTab, this._functionButtons(), this.canvas);
+         this.makeScrollable();
 
          if (dayAndInterval[1]) {
              var subref = dayAndInterval[1];

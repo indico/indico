@@ -1129,7 +1129,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                 var dateKeys = $L(keys(tabData));
                 dateKeys.sort();
 
-                this.tabWidget = new TabWidget(
+                this.tabWidget = new JTabWidget(
                     translate(dateKeys,
                               function(key) {
                                   return [
@@ -1137,6 +1137,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                                       self._drawMoveEntryDay(tabData[key], key)
                                   ];
                               }), 400, 200, self._titleTemplate(self.currentDay));
+                this.tabWidget.makeScrollable();
 
                 // define where the contribution is (display purpose)
                 var contribLocation = null;
