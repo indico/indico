@@ -14,4 +14,14 @@ $(document).ready(function() {
             $this.unbind('click.tabs');
         });
     });
+
+    // Use qtip for context help
+    $('.contextHelp[title]').qtip();
+    $('.contextHelp[data-src]').qtip({
+        content: {
+            text: function() {
+                return $($(this).data('src')).removeClass('tip');
+            }
+        }
+    });
 });
