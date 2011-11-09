@@ -84,8 +84,8 @@ function oncontentready(classID) {
 	rect.style.position = 'absolute';
 	rect.style.top = this_pos.y +'px';
 	rect.style.left = this_pos.x +'px';
-	rect.style.width = rect_size.width +'px';
-	rect.style.height = rect_size.height +'px';
+	rect.style.width = Math.max(0, rect_size.width) +'px';
+	rect.style.height = Math.max(0, rect_size.height) +'px';
 	rect.style.antialias = true;
 	rect.style.zIndex = el_zindex - 1;
 
