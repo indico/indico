@@ -2,37 +2,36 @@
 <% from MaKaC.paperReviewing import ConferencePaperReview as CPR %>
 
 <table width="100%" align="center">
-
-<tr>
-  <td>
-    <table align="center" width="95%" border="0" style="border: 1px solid #777777;">
-    <tr>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <td>
-        <table align="center" width="95%" border="0">
-        ${ withdrawnNotice }
+  <tr>
+    <td>
+      <table align="center" width="95%" border="0" style="border: 1px solid #777777;">
         <tr>
-          <td align="center">${ modifIcon }<font size="+1" color="black"><b>${ title }</b></font></td>
-    </tr>
-        <tr>
-      <td width="100%">&nbsp;<td>
-    </tr>
-        % if not self_._rh._target.getConference().getAbstractMgr().isActive() or not self_._rh._target.getConference().hasEnabledSection("cfa") or not self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-    <tr>
-      <td>
-            <table align="center">
-            <tr>
-              <td>${ description }</td>
-            </tr>
-            </table>
-          </td>
+          <td>&nbsp;</td>
         </tr>
         <tr>
-      <td width="100%">&nbsp;<td>
-    </tr>
-    % endif
+          <td>
+            <table align="center" width="95%" border="0">
+              ${ withdrawnNotice }
+              <tr>
+                <td align="center">${ modifIcon }<font size="+1" color="black"><b>${ title }</b></font></td>
+              </tr>
+              <tr>
+                <td width="100%">&nbsp;</td>
+              </tr>
+              % if not self_._rh._target.getConference().getAbstractMgr().isActive() or not self_._rh._target.getConference().hasEnabledSection("cfa") or not self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
+              <tr>
+                 <td>
+                  <table align="center">
+                    <tr>
+                      <td>${ description }</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td width="100%">&nbsp;<td>
+              </tr>
+              % endif
     <tr>
       <td>
             <table align="center" width="95%">
@@ -96,12 +95,13 @@
                     ${ inSession }
                     ${ inTrack }
                     ${ subConts }
+                </table>
+                </div>
+                </td>
+                </tr>
+
                     % if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() and not isWithdrawn:
                         % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw):
-                        </table>
-                        </div>
-                        </td>
-                        </tr>
                         <tr><td align="right" valign="top" class="displayField" nowrap>
                                 <b>${_("Reviewing material")}:</b>
                                 ${inlineContextHelp(_('Here you should add the materials for reviewing. They will be judged by the reviewing team.'))}
@@ -143,9 +143,7 @@
                           % else:
                             <tr>
                                 <td></td>
-                                <td>
-
-                                </td>
+                                <td></td>
                             </tr>
                           % endif
                       % if len(Contribution.getReviewManager().getVersioning()) > 1:
