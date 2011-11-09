@@ -9,7 +9,7 @@
 *   http://en.wikipedia.org/wiki/MIT_License
 *   http://en.wikipedia.org/wiki/GNU_General_Public_License
 *
-* Date: Sun Oct  2 09:21:22.0000000000 2011
+* Date: Fri Nov  4 13:47:48.0000000000 2011
 */
 
 /*jslint browser: true, onevar: true, undef: true, nomen: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true */
@@ -234,7 +234,7 @@ function QTip(target, options, id, attr)
 		}
 		else {
 			elements.button = $('<a />', {
-				'class': 'ui-state-default ' + (options.style.widget ? '' : uitooltip+'-icon'),
+				'class': 'ui-state-default ui-tooltip-close ' + (options.style.widget ? '' : uitooltip+'-icon'),
 				'title': close,
 				'aria-label': close
 			})
@@ -279,16 +279,15 @@ function QTip(target, options, id, attr)
 		.insertBefore(elements.content)
 
 		// Button-specific events
-		.delegate('.ui-state-default', 'mousedown keydown mouseup keyup mouseout', function(event) {
+		.delegate('.ui-tooltip-close', 'mousedown keydown mouseup keyup mouseout', function(event) {
 			$(this).toggleClass('ui-state-active ui-state-focus', event.type.substr(-4) === 'down');
 		})
-		.delegate('.ui-state-default', 'mouseover mouseout', function(event){
+		.delegate('.ui-tooltip-close', 'mouseover mouseout', function(event){
 			$(this).toggleClass('ui-state-hover', event.type === 'mouseover');
 		});
 
 		// Create button if enabled
 		if(options.content.title.button) { createButton(); }
-
 
 		// Redraw the tooltip dimensions if it's rendered
 		else if(self.rendered){ self.redraw(); } 
@@ -438,6 +437,7 @@ function QTip(target, options, id, attr)
 				hide: options.hide.target,
 				viewport: $(posOptions.viewport),
 				document: $(document),
+				body: $(document.body),
 				window: $(window)
 			},
 			events = {
@@ -450,9 +450,6 @@ function QTip(target, options, id, attr)
 		function showMethod(event)
 		{
 			if(tooltip.hasClass(disabled)) { return FALSE; }
-
-			// If set, hide tooltip when inactive for delay period
-			targets.show.trigger('qtip-'+id+'-inactive');
 
 			// Clear hide timers
 			clearTimeout(self.timers.show);
@@ -550,11 +547,11 @@ function QTip(target, options, id, attr)
 
 		// Hide tooltip on document mousedown if unfocus events are enabled
 		if(('' + options.hide.event).indexOf('unfocus') > -1) {
-			targets.document.bind('mousedown'+namespace, function(event) {
+			targets.body.bind('mousedown'+namespace, function(event) {
 				var $target = $(event.target),
 					enabled = !tooltip.hasClass(disabled) && tooltip.is(':visible');
 
-				if($target[0] !== tooltip[0] && $target.parents(selector).length === 0 && $target.add(target).length > 1 && !$target.is(':disabled')) {
+				if($target[0] !== tooltip[0] && $target.parents(selector).length === 0 && $target.add(target).length > 1 && !$target.attr('disabled')) {
 					self.hide(event);
 				}
 			});
@@ -933,11 +930,8 @@ function QTip(target, options, id, attr)
 
 		toggle: function(state, event)
 		{
-			// Make sure tooltip is rendered
-			if(!self.rendered) {
-				if(state) { self.render(1); } // Render the tooltip if showing and it isn't already
-				else { return self; }
-			}
+			// Render the tooltip if showing and it isn't already
+			if(!self.rendered) { return state ? self.render(1) : self; }
 
 			var type = state ? 'show' : 'hide',
 				opts = options[type],
@@ -1035,6 +1029,9 @@ function QTip(target, options, id, attr)
 					callback = $.Event('tooltipvisible');
 					callback.originalEvent = event ? cache.event : NULL;
 					tooltip.trigger(callback, [self]);
+
+					// If set, hide tooltip when inactive for delay period
+					opts.target.trigger('qtip-'+id+'-inactive');
 				}
 				else {
 					// Reset CSS states
@@ -1856,9 +1853,11 @@ PLUGINS = QTIP.plugins = {
 
 		/* 
 		 * Taken directly from jQuery 1.8.2 widget source code
-		 * Trigger 'remove' event on all elements on removal if jQuery UI isn't present 
+		 * Trigger 'remove' event on all elements on removal
 		 */
 		remove: $.ui ? NULL : function( selector, keepData ) {
+			if($.ui) { return; } // We don't need to do this if jQuery UI is present!
+
 			$(this).each(function() {
 				if (!keepData) {
 					if (!selector || $.filter( selector, [ this ] ).length) {
@@ -2354,18 +2353,19 @@ function Tip(qTip, command)
 			return self.corner.string() !== 'centercenter';
 		},
 
-		detectColours: function() {
+		detectColours: function(actual) {
 			var i, fill, border,
-				tip = elems.tip.css({ backgroundColor: '', border: '' }),
-				corner = self.corner,
+				tip = elems.tip.css('cssText', ''),
+				corner = actual || self.corner,
 				precedance = corner[ corner.precedance ],
 
 				borderSide = 'border-' + precedance + '-color',
 				borderSideCamel = 'border' + precedance.charAt(0) + precedance.substr(1) + 'Color',
 
-				invalid = /rgba?\(0, 0, 0(, 0)?\)|transparent/i,
+				invalid = /rgba?\(0, 0, 0(, 0)?\)|transparent|#123456/i,
 				backgroundColor = 'background-color',
 				transparent = 'transparent',
+				important = ' !important',
 
 				bodyBorder = $(document.body).css('color'),
 				contentColour = qTip.elements.content.css('color'),
@@ -2379,7 +2379,7 @@ function Tip(qTip, command)
 			// Detect tip colours from CSS styles
 			color.fill = fill = tip.css(backgroundColor);
 			color.border = border = tip[0].style[ borderSideCamel ] || tip.css(borderSide) || tooltip.css(borderSide);
-			
+
 			// Make sure colours are valid
 			if(!fill || invalid.test(fill)) {
 				color.fill = colorElem.css(backgroundColor) || transparent;
@@ -2389,13 +2389,13 @@ function Tip(qTip, command)
 			}
 			if(!border || invalid.test(border) || border === bodyBorder) {
 				color.border = colorElem.css(borderSide) || transparent;
-				if(invalid.test(color.border) || color.border === contentColour) {
+				if(invalid.test(color.border)) {
 					color.border = border;
 				}
 			}
 
 			// Reset background and border colours
-			$('*', tip).add(tip).css(backgroundColor, transparent).css('border', '');
+			$('*', tip).add(tip).css('cssText', backgroundColor+':'+transparent+important+';border:0'+important+';');
 
 			// Remove fluid class
 			tooltip.removeClass(fluidClass);
@@ -2456,7 +2456,7 @@ function Tip(qTip, command)
 			precedance = mimic.precedance;
 
 			// Update our colours
-			self.detectColours();
+			self.detectColours(corner);
 
 			// Detect border width, taking into account colours
 			if(color.border !== 'transparent' && color.border !== '#123456') {
@@ -2716,7 +2716,7 @@ function Modal(api)
 				if(oEvent && event.type === 'tooltiphide' && /mouse(leave|enter)/.test(oEvent.type) && $(oEvent.relatedTarget).closest(overlay[0]).length) {
 					try { event.preventDefault(); } catch(e) {}
 				}
-				else if(oEvent && !oEvent.solo){
+				else if(!oEvent || (oEvent && !oEvent.solo)) {
 					self[ event.type.replace('tooltip', '') ](event, duration);
 				}
 			})
