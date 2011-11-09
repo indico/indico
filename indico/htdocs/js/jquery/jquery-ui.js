@@ -8348,8 +8348,8 @@ function Datepicker() {
 		altFormat: '', // The date format to use for the alternate field
 		constrainInput: true, // The input is constrained by the current date format
 		showButtonPanel: false, // True to show button panel, false to not show it
-        autoSize: false, // True to size the input for the date format, false to leave as is
-        unifyNumRows: false, // True to always use six rows; ensuring datepickers showing different months having the same height
+		autoSize: false, // True to size the input for the date format, false to leave as is
+		unifyNumRows: false, // True to always use six rows; ensuring datepickers showing different months having the same height
 		disabled: false // The initial disabled state
 	};
 	$.extend(this._defaults, this.regional['']);
@@ -9721,8 +9721,8 @@ $.extend(Datepicker.prototype, {
 		var beforeShowDay = this._get(inst, 'beforeShowDay');
 		var showOtherMonths = this._get(inst, 'showOtherMonths');
 		var selectOtherMonths = this._get(inst, 'selectOtherMonths');
-        var calculateWeek = this._get(inst, 'calculateWeek') || this.iso8601Week;
-        var unifyNumRows = this._get(inst, 'unifyNumRows');
+		var calculateWeek = this._get(inst, 'calculateWeek') || this.iso8601Week;
+		var unifyNumRows = this._get(inst, 'unifyNumRows');
 		var defaultDate = this._getDefaultDate(inst);
 		var html = '';
 		for (var row = 0; row < numMonths[0]; row++) {
