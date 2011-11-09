@@ -1239,6 +1239,8 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         var actionChooseTitle = Html.div("rescheduleTitle", $T("Step 1: Choose type of rescheduling"));
 
         var startTimeRescheduleRB = Html.radio({name:"rescheduleAction", id:"startTimeRescheduleRB", style:{verticalAlign: "middle"}});
+        var startTimeRescheduleExample = Html.a({href: Indico.Urls.ImagesBase + '/resched_ex_1.png', title: 'Starting Time Example'}, $T("See an example"));
+        $(startTimeRescheduleExample.dom).colorbox();
         var startTimeRescheduleLabel = Html.label({style: {fontWeight: "normal"}},
                 Html.div("rescheduleLabelTitle", $T("Adjust starting time of all entries")),
                 Html.div("rescheduleLabelDetails",
@@ -1250,11 +1252,13 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                             $T("The first entry will start when the event starts (") + this.tt.eventInfo.startDate.time.slice(0,5) + "), " :
                             $T("The first entry will start when the interval starts (") + this.tt.contextInfo.startDate.time.slice(0,5) + "), " ,
                     $T("and the other entries will follow consecutively after it. The durations of the entries will not change. "),
-                    Html.a({href: Indico.Urls.ImagesBase + '/resched_ex_1.png', rel: 'lightbox', title: 'Starting Time Example', onclick: "showLightbox(this); return false;"}, $T("See an example"))));
+                    startTimeRescheduleExample));
 
         startTimeRescheduleLabel.dom.htmlFor = "startTimeRescheduleRB";
 
         var durationRescheduleRB = Html.radio({name:"rescheduleAction", id:"durationRescheduleRB", style:{verticalAlign: "middle"}});
+        var durationRescheduleExample = Html.a({href: Indico.Urls.ImagesBase + '/resched_ex_2.png', title: 'Duration Example'}, $T("See an example"));
+        $(durationRescheduleExample.dom).colorbox();
         var durationRescheduleLabel = Html.label({style: {fontWeight: "normal"}},
                 Html.div("rescheduleLabelTitle", $T("Adjust duration of all entries")),
                 Html.div("rescheduleLabelDetails",
@@ -1265,7 +1269,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                         $T(" to fill the gaps between them, so that their starting time don't change. " +
                         		"If a time gap is specified, the duration will be extended up to the value of " +
                         		"this time gap before the starting time of the next entry. "),
-                        Html.a({href: Indico.Urls.ImagesBase + '/resched_ex_2.png', rel: 'lightbox', title: 'Duration Example', onclick: "showLightbox(this); return false;"}, $T("See an example"))));
+                        durationRescheduleExample));
 
         durationRescheduleLabel.dom.htmlFor = "durationRescheduleRB";
 

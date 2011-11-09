@@ -24,4 +24,7 @@ $(document).ready(function() {
             }
         }
     });
+
+    // Enable colorbox for links with rel="lightbox"
+    $('a[rel="lightbox"]').colorbox();
 });

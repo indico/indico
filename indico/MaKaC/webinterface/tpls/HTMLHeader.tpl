@@ -9,6 +9,7 @@
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/calendar-blue.css" >
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui.css">
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery.qtip.css">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery.colorbox.css">
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui-custom.css">
 
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/${ stylesheet }">

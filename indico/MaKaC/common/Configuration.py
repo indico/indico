@@ -489,10 +489,7 @@ class Config:
                        'membershipQuery': 'memberof={0}',
                        'accessCredentials': ('CN=user,OU=Users,'
                                              'DC=example,DC=com',
-                                             'secret_password')},
-        # Room Booking Related
-        'LightboxCssStylesheetName' : "lightbox/lightbox.css",
-        'LightboxJavascriptName'    : "lightbox/lightbox.js"
+                                             'secret_password')}
         }
 
     if sys.platform == 'win32':

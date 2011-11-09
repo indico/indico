@@ -49,10 +49,6 @@ import MaKaC.common.info as info
 #        baseurl = self._getBaseURL()
 #        conf = Config.getInstance()
 #        return """
-#        <!-- Lightbox -->
-#        <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
-#        <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
-#
 #        <!-- Our libs -->
 #        <script type="text/javascript" src="%s/js/indico/validation.js"></script>
 #
@@ -60,8 +56,8 @@ import MaKaC.common.info as info
 #        <link rel="stylesheet" type="text/css" href="%s/css/calendar-blue.css" />
 #        <script type="text/javascript" src="%s"></script>
 #        <script type="text/javascript" src="%s"></script>
-#        """ % ( baseurl, baseurl, baseurl, baseurl, urlHandlers.UHJavascriptCalendar.getURL(),
-#                urlHandlers.UHJavascriptCalendarSetup.getURL() )
+#        """ % (baseurl, baseurl, urlHandlers.UHJavascriptCalendar.getURL(),
+#                urlHandlers.UHJavascriptCalendarSetup.getURL())
 
 
 class WPRoomBookingBase( WPMainBase ):
@@ -89,13 +85,9 @@ class WPRoomBookingBase( WPMainBase ):
         """
         baseurl = self._getBaseURL()
         return """
-        <!-- Lightbox -->
-        <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
-        <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
-
         <!-- Our libs -->
         <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>
-        """ % ( baseurl, baseurl, baseurl)
+        """ % (baseurl)
 
     def _getSideMenu(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()

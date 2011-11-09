@@ -9,3 +9,7 @@ $.fn.qtip.defaults = $.extend(true, {}, $.fn.qtip.defaults, {
     position: { my: 'top left', at: 'bottom right'},
     style: {tip: {corner: true}}
 });
+
+$.extend($.colorbox.settings, {
+    opacity: 0.6
+});

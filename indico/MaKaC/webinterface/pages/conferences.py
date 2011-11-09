@@ -2632,12 +2632,7 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         baseurl = self._getBaseURL()
         pluginCSSFiles = {"paths" : []}
         self._notify("includeTimetableCSSFiles", pluginCSSFiles)
-        cssPaths = ".".join(["""<link rel="stylesheet" href="%s/%s">"""%(baseurl,path) for path in pluginCSSFiles['paths']])
-        return """
-        <!-- Lightbox -->
-        <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
-        <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
-        """ % ( baseurl, baseurl) + cssPaths
+        return ".".join(["""<link rel="stylesheet" href="%s/%s">"""%(baseurl,path) for path in pluginCSSFiles['paths']])
 
     def _getPageContent(self, params):
         return self._getTTPage(params)
@@ -10527,14 +10522,10 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
         """
         baseurl = self._getBaseURL()
         return """
-        <!-- Lightbox -->
-        <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
-        <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
-
         <!-- Our libs -->
         <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>
 
-        """ % ( baseurl, baseurl, baseurl )
+        """ % (baseurl)
 
     def _setActiveSideMenuItem(self):
         self._roomBookingMenuItem.setActive()
