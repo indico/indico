@@ -12,9 +12,8 @@ var vidyoMarkBookingNotPresent = function(booking) {
  */
 var VidyoPINHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;">' +
-            $T('If you want to <strong>protect<\/strong> your Vidyo room with a PIN, please input it here. Otherwise, leave this field empty.') +
-        '<\/div>');
+        $T('If you want to <strong>protect<\/strong> your Vidyo room with a PIN, please input it here. Otherwise, leave this field empty.')
+    );
 };
 
 /**
@@ -22,10 +21,9 @@ var VidyoPINHelpPopup = function(event) {
  */
 var VidyoDisplayPinHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-            '<div style="padding:3px; width: 300px;"">' +
                 $T("The public room's PIN will be displayed in the event page. " +
-                   '<strong>Any person that can see the event page will see the PIN.</strong> Please use this option carefully.') +
-            '<\/div>');
+                   '<strong>Any person that can see the event page will see the PIN.</strong> Please use this option carefully.')
+    );
 };
 
 /**
@@ -33,10 +31,9 @@ var VidyoDisplayPinHelpPopup = function(event) {
  */
 var VidyoOwnerHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-            '<div style="padding:3px; width: 300px;"">' +
                 $T("This person will be the owner of the public room. This means that this person will be able to " +
-                    " invite people to the room, fix a maximum number of attendees, etc.") +
-            '<\/div>');
+                " invite people to the room, fix a maximum number of attendees, etc.")
+    );
 };
 
 /**

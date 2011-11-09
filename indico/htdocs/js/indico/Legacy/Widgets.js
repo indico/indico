@@ -276,30 +276,23 @@ IndicoUI.Widgets = {
          * @param {String} content Whatever content is desired.
          */
         tooltip: function(in_this, event, content) {
-            domTT_activate(in_this, event,
-                           'content',
-                           content,
-                           'type',
-                           'greasy',
-                           'caption',
-                           false ,
-                           'trail',
-                           false,
-                           'delay',
-                           0,
-                           'maxWidth',
-                           500,
-                           'styleClass',
-                           'tip' );
+            var $this = $(in_this);
+            if($this.data('hasTooltip')) {
+                return;
+            }
+            $this.data('hasTooltip', true).qtip({
+                content: {
+                    text: content
+                },
+                show: {
+                    ready: true
+                }
+            });
 
             // Return the onmouseout handler in case
             // it needs to be called from outside
-            return function(in_event) {
-                // Hides the tooltip
-                domTT_mouseout(in_this, in_event);
-                // This resets the tooltip in case it's redrawn
-                // with a different content
-                domTT_tooltips.set(in_this.id, null)
+            return function() {
+                $this.qtip('hide');
             };
         },
 

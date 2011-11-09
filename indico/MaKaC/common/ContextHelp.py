@@ -375,16 +375,14 @@ class ContextHelp:
                 filteredText = ttText.replace('\n','').replace('"','&quot;');
 
                 if ttType == 'explicit':
-                    snippets['snip'+str(count)] ="""<span onmouseover="domTT_activate(this, event, 'content', '%s', 'type', 'greasy', 'caption', false , 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );">
+                    snippets['snip'+str(count)] ="""<span class="contextHelp" title="%s">
                                                 <span style="color: Green; margin-left: 6px; font-size:smaller;"><img style="border: None;display:inline-block;vertical-align: middle" src="%s"/></span>
                                                 </span>""" % (filteredText,Config.getInstance().getSystemIconURL( "help" ))
 
                     elem.append(builder.E.span(content))
                 elif ttType == 'hover':
-                    snippets['snip'+str(count)] ="""domTT_activate(this, event, 'content', '%s', 'type', 'greasy', 'caption', false ,'trail', false, 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );""" \
-                                                % filteredText
-
-                    elem.set('onmouseover', content)
+                    elem.set('class', ('contextHelp ' + elem.get('class')).strip())
+                    elem.set('title', filteredText)
 
                 else:
                     raise Exception( _('Tooltip type not recognized: ') + str(type))

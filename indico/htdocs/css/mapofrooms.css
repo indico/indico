@@ -65,9 +65,7 @@ div.caption {
 }
 
 .mapRoomTooltipTitle {
-    font-weight: bold;
-    padding-left: 3px;
-    padding-top: 2px;
+    font-size: 13px;
 }
 
 .mapRoomTooltipClose {
@@ -82,6 +80,7 @@ div.caption {
 .mapRoomTooltipDescription {
     padding-left: 8px;
     padding-right: 8px;
+    max-width: 220px;
 }
 
 .mapResultsInfo {

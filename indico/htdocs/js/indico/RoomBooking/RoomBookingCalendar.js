@@ -223,8 +223,10 @@ type ("RoomBookingCalendarDrawer", [],
                         window.location = bar.bookingUrl;
                     });
                 }
-                barDiv.observeEvent('mouseover', function(event){
-                    domTT_activate(barDiv.dom, event, 'content', resvInfo, 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );
+                $(barDiv.dom).qtip({
+                    content: {
+                        text: resvInfo
+                    }
                 });
                 return barDiv;
             },
@@ -393,8 +395,10 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                         Html.div({style:{cssFloat:'left'}},
                         Html.div('dayCalendarDiv',bars, this.drawSmallHours())));
                     if(tt) {
-                        link.observeEvent('mouseover', function(e){
-                            domTT_activate(link.dom, e, 'content', tt, 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip');
+                        $(link.dom).qtip({
+                            content: {
+                                text: tt
+                            }
                         });
                     }
                     return div;

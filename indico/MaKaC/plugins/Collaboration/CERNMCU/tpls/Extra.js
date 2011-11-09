@@ -603,12 +603,10 @@ type("CERNMCUBuildParticipantsInfo", ["IWidget"], {
  */
 var CERNMCUPINHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;"">' +
             $T('If you want to <strong>protect<\/strong> your MCU conference with a PIN, write it here. ' +
             'The PIN has to be <strong>numeric<\/strong> (only digits, no letters). ' +
             'Users will have to input the PIN in order to access the conference. ' +
-            'Otherwise, leave empty.') +
-        '<\/div>');
+            'Otherwise, leave empty.'));
 };
 
 /**
@@ -616,10 +614,8 @@ var CERNMCUPINHelpPopup = function(event) {
  */
 var CERNMCUCustomIDHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 250px;"">' +
             $T('If for some reason you want to choose yourself the MCU ID of this conference, type it here. ' +
-            'The MCU ID has to be a <strong>5-digit number.</strong>') +
-        '<\/div>');
+            'The MCU ID has to be a <strong>5-digit number.</strong>'));
 };
 
 /**
@@ -627,10 +623,8 @@ var CERNMCUCustomIDHelpPopup = function(event) {
  */
 var CERNMCUDisplayPinHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-            '<div style="padding:3px; width: 300px;"">' +
                 $T("The MCU conference's PIN will be displayed in the event page. " +
-                   '<strong>Any person that can see the event page will see the PIN.</strong> Please use this option carefully.') +
-            '<\/div>');
+                   '<strong>Any person that can see the event page will see the PIN.</strong> Please use this option carefully.'));
 };
 
 

@@ -6,7 +6,7 @@
       <b> ${ _("Submitters")}</b><br/>
       <ul>
         <li><input class="btn" type="submit" name="${selectSubmitters}" value="${selectSubmitters}" style="width:100px"/>
-          <span onmouseover="domTT_activate(this, event, 'content', '${submittersContext}', 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );">
+          <span class="contextHelp" title="${submittersContext}">
             ${ _("Currently selected")}: <small>${submittersVisible}</small>
           </span>
         </li>

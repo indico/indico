@@ -38,11 +38,6 @@
       loadDictionary(currentLanguage);
     </script>
 
-        <!-- Tooltip -->
-        <script type="text/javascript" src="${ baseurl }/js/tooltip/domLib.js"></script>
-        <script type="text/javascript" src="${ baseurl }/js/tooltip/domTT.js"></script>
-        <script type="text/javascript" src="${ baseurl }/js/tooltip/domTT_drag.js"></script>
-
         <!-- Calendar Widget -->
         ${ page._getJavaScriptInclude(baseurl + "/js/calendar/calendar.js") }
         ${ page._getJavaScriptInclude(baseurl + "/js/calendar/calendar-setup.js") }

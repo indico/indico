@@ -537,16 +537,6 @@ class WPSEConfModifParticipantsNewPending(WPSimpleEventDisplay,conferences.WPCon
 class WPSEEvaluationBase( WPSimpleEventDisplay ):
     """[DisplayArea] Base class."""
 
-    def _getHeadContent( self ):
-        """import needed javascript"""
-        baseurl = self._getBaseURL()
-        return """
-        <!-- Tooltip -->
-        <script type="text/javascript" src="%s/js/tooltip/domLib.js"></script>
-        <script type="text/javascript" src="%s/js/tooltip/domTT.js"></script>
-        <script type="text/javascript" src="%s/js/tooltip/domTT_drag.js"></script>
-        """ % ( baseurl, baseurl, baseurl )
-
 class WPSEEvaluationDisplay (WPSEEvaluationBase, evaluations.WPEvaluationDisplay):
     """[Meeting] Evaluation default display."""
 

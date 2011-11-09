@@ -67,7 +67,6 @@ type ("RoomMap", ["IWidget"],
         createMapClickHandler: function() {
             var self = this;
             return function() {
-                self.closeTooltips();
                 self.closeInfoBaloon();
             }
         },
@@ -107,7 +106,6 @@ type ("RoomMap", ["IWidget"],
 
                 // closed the tooltips and info baloon
                 self.closeInfoBaloon();
-                self.closeTooltips();
 
                 // show the info baloon
                 self.activeInfoWindow = marker.infoWindow;
@@ -121,10 +119,6 @@ type ("RoomMap", ["IWidget"],
                 this.activeInfoWindow.close();
                 this.activeInfoWindow = null;
             }
-        },
-
-        closeTooltips: function() {
-            domTT_closeAll();
         },
 
         setSelectedAspectStyle: function(link) {
@@ -143,7 +137,6 @@ type ("RoomMap", ["IWidget"],
             // execute this every time the user clicks on some aspect and changes the visible map area
             return function() {
                 self.activeAspect = aspect;
-                self.closeTooltips();
                 self.map.setCenter(new google.maps.LatLng(aspect.centerLatitude, aspect.centerLongitude));
                 self.map.setZoom(parseInt(aspect.zoomLevel));
                 self.setSelectedAspectStyle(link);
@@ -255,17 +248,39 @@ type ("RoomMap", ["IWidget"],
             details = Html.span({className:'mapRoomDetailsLink'}, details);
 
             // room details elements
-            var title = Html.table({className: 'mapRoomTooltipTitle', width: '100%', cellpadding: 0, cellspacing: 0}, Html.tbody({}, Html.tr({}, Html.td({width: '75%'}, caption.dom), Html.td({width: '25%'}, details.dom))));
-            var img = Html.img({src: room.tipPhotoURL, width: 212, height: 140, className: 'mapRoomTooltipImage'});
-            var desc = Html.div({className: 'mapRoomTooltipDescription'}, room.markerDescription);
-            var all = Widget.lines([img, desc]);
-            var help = Html.div({className: 'tip'}, all.dom);
+            var title = $('<div/>', {'class': 'mapRoomTooltipTitle'}).append(
+                $('<div/>').css('float', 'left').append(caption.dom),
+                $('<div/>').css({
+                    float: 'right',
+                    marginRight: '25px'
+                }).append(details.dom)
+            );
+            var help = $('<div/>').append(
+                $('<img/>', {
+                    src: room.tipPhotoURL,
+                    width: '212px',
+                    height: '140px',
+                    'class': 'mapRoomTooltipImage'
+                }),
+                $('<div class="mapRoomTooltipDescription"/>').html(room.markerDescription)
+            );
+            help.children().wrap('<p/>');
 
             // when the "More" link is clicked, show a tooltip with room details
-            more.observeClick(function(event) {
-                self.closeTooltips();
-                var closeLink = Html.span({className: 'mapRoomTooltipClose'}, 'x');
-                domTT_activate(more.dom, event, 'content', help.dom, 'maxWidth', 223, 'type', 'sticky', 'caption', title.dom, 'closeLink', closeLink.dom);
+            $(more.dom).qtip({
+                content: {
+                    text: help,
+                    title: {
+                        text: title,
+                        button: true
+                    }
+                },
+                show: { event: 'click' },
+                hide: { event: 'unfocus' },
+                position: {
+                    target: 'mouse',
+                    adjust: { mouse: false }
+                }
             });
 
             var roomInfo = Html.p({className:'mapRoomInfo'}, addr, ' - ', book.dom, more.dom);
@@ -804,7 +819,6 @@ type ("RoomMap", ["IWidget"],
 
             setTimeout(function() {
                 mapView.resetFilteringCycle();
-                mapView.closeTooltips();
                 mapView.closeInfoBaloon();
                 if (isStartup) {
                     mapView.addStartupFiltersToCriteria(buildingCriteria, roomCriteria);

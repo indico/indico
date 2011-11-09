@@ -6,7 +6,7 @@ $.extend(true, $.cern.daterange.prototype.options, {
 });
 
 $.fn.qtip.defaults = $.extend(true, {}, $.fn.qtip.defaults, {
-    position: { my: 'top left', at: 'bottom right'},
+    position: { my: 'top left', at: 'bottom right', viewport: $(window) },
     style: {tip: {corner: true}}
 });
 

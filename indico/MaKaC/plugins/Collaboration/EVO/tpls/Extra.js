@@ -4,11 +4,9 @@
 
 var EVOLaunchClientHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px;width:300px;">' +
             $T('If you are using Internet Explorer, Indico cannot load the EVO client directly; '  +
             'you need to click on the link. ' +
-            'You can avoid this by using another browser. Sorry for the inconvenience.') +
-        '<\/div>');
+            'You can avoid this by using another browser. Sorry for the inconvenience.'));
 };
 
 type("EVOLaunchClientPopup", ["AlertPopup"],
@@ -49,11 +47,10 @@ type("EVOLaunchClientPopup", ["AlertPopup"],
  */
 var EVOStartDateHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;"">' +
             $T('Please create your booking between <strong>${ MinStartDate }</strong> and <strong>${ MaxEndDate }</strong> ' +
             "(Allowed dates \/ times based on your event's start date and end date). " +
-            'Also, please remember the start date cannot be more than ${ AllowedStartMinutes } minutes in the past.') +
-        '<\/div>');
+            'Also, please remember the start date cannot be more than ${ AllowedStartMinutes } minutes in the past.')
+    );
 };
 
 /**
@@ -61,10 +58,9 @@ var EVOStartDateHelpPopup = function(event) {
  */
 var EVOEndDateHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;"">' +
             $T('Please create your booking between <strong>${ MinStartDate }</strong> and <strong>${ MaxEndDate }</strong> ' +
-            "(Allowed dates \/ times based on your event's start date and end date).") +
-        '<\/div>');
+            "(Allowed dates \/ times based on your event's start date and end date).")
+    );
 };
 
 /**
@@ -72,10 +68,8 @@ var EVOEndDateHelpPopup = function(event) {
  */
 var EVOPasswordHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;"">' +
             $T('If you want to <strong>protect<\/strong> your EVO meeting with a password, please input it here. ' +
-                    'Otherwise, leave this field empty.') +
-        '<\/div>');
+                    'Otherwise, leave this field empty.'));
 };
 
 
@@ -84,10 +78,9 @@ var EVOPasswordHelpPopup = function(event) {
  */
 var EVODisplayPasswordHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;"">' +
             $T('The EVO Meeting password will be displayed in the event page. '+
-               '<strong>Any person that can see the event page will see the password.</strong> Please use this option carefully.') +
-        '<\/div>');
+               '<strong>Any person that can see the event page will see the password.</strong> Please use this option carefully.')
+    );
 };
 
 /**
@@ -95,10 +88,9 @@ var EVODisplayPasswordHelpPopup = function(event) {
  */
 var EVODisplayPhonePasswordHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;"">' +
         $T('The Phone bridge password will be displayed in the event page. '+
-           '<strong>Any person that can see the event page will see the password.</strong> Please use this option carefully.') +
-        '<\/div>');
+           '<strong>Any person that can see the event page will see the password.</strong> Please use this option carefully.')
+    );
 };
 
 /**
@@ -106,10 +98,9 @@ var EVODisplayPhonePasswordHelpPopup = function(event) {
  */
 var EVODisplayURLHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px; width: 300px;">' +
             $T('Please note that regardless of this option, when the EVO meeting starts, '+
-               'a <em>Join Now!</em> link will appear.') +
-        '<\/div>');
+               'a <em>Join Now!</em> link will appear.')
+    );
 };
 
 /**
