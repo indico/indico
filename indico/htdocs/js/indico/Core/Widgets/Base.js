@@ -390,6 +390,11 @@ type("JTabWidget", ["IWidget"], {
             'display': 'inline-block',
             'float': 'none'
         });
+        // save some space for the scroll buttons
+        nav.css({
+            marginLeft: '17px',
+            marginRight: '15px'
+        });
 
         var arrowsTopMargin = '4px';
         var arrowsCommonCss = {
@@ -413,7 +418,6 @@ type("JTabWidget", ["IWidget"], {
                     .attr('title', $T('Previous tab'))
                     .css(arrowsCommonCss)
                     .addClass('ui-state-active ui-corner-tl ui-corner-bl')
-                    .css('left', '-17px')
                     .append($('<span/>').disableSelection().addClass('ui-icon ui-icon-carat-1-w').html($T('Previous tab')).css('marginTop', arrowsTopMargin))
                     .click(function() {
                         if($(this).hasClass('ui-state-disabled')) {
@@ -426,7 +430,7 @@ type("JTabWidget", ["IWidget"], {
                     .attr('title', $T('Next tab'))
                     .css(arrowsCommonCss)
                     .addClass('ui-state-active ui-corner-tr ui-corner-br')
-                    .css('right', '-15px')
+                    .css('right', '0')
                     .append($('<span/>').addClass('ui-icon ui-icon-carat-1-e').html($T('Next tab')).css('marginTop', arrowsTopMargin))
                     .click(function() {
                         if($(this).hasClass('ui-state-disabled')) {
