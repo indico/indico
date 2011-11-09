@@ -145,6 +145,7 @@ class CacheStorage(object):
     def remove(self, path, name):
         raise NotImplementedError
 
+
 @CacheStorage.register(True)
 class FileCacheStorage(CacheStorage):
     STORAGE_NAME = 'files'
@@ -162,9 +163,11 @@ class FileCacheStorage(CacheStorage):
         filePath = os.path.join(fsPath, name)
         f = open(filePath, 'wb')
         OSSpecific.lockFile(f, 'LOCK_EX')
-        pickle.dump(data, f)
-        OSSpecific.lockFile(f, 'LOCK_UN')
-        f.close()
+        try:
+            pickle.dump(data, f)
+        finally:
+            OSSpecific.lockFile(f, 'LOCK_UN')
+            f.close()
 
     def load(self, path, name, default=None):
         filePath = os.path.join(self._dir, path, name)
@@ -172,10 +175,12 @@ class FileCacheStorage(CacheStorage):
             return default, None
         f = open(filePath, 'rb')
         OSSpecific.lockFile(f, 'LOCK_SH')
-        obj = pickle.load(f)
-        mtime = os.path.getmtime(filePath)
-        OSSpecific.lockFile(f, 'LOCK_UN')
-        f.close()
+        try:
+            obj = pickle.load(f)
+            mtime = os.path.getmtime(filePath)
+        finally:
+            OSSpecific.lockFile(f, 'LOCK_UN')
+            f.close()
         return obj, mtime
 
     def remove(self, path, name):

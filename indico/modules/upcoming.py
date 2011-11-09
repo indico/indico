@@ -204,8 +204,12 @@ class UpcomingEventsModule(Module):
 
     def getUpcomingEventList(self):
 
-        # check if there's a valid cached copy first
-        fromCache = self._cache.loadObject()
+        try:
+            # check if there's a valid cached copy first
+            fromCache = self._cache.loadObject()
+        except:
+            Logger.get('upcoming_events').exception("Upcoming events cache read error")
+            fromCache = None
 
         if fromCache:
             # Cache hit!

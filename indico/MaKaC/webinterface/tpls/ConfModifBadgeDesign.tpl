@@ -33,9 +33,6 @@
     // List of badge template items
     var items = [];
 
-    var firstLoad = true;
-
-
     // Item class
     function Item(itemId, key) {
         this.id = itemId;
@@ -365,30 +362,6 @@
         $('#saveForm').submit();
     }
 
-    function sent() {
-        if (firstLoad) {
-            firstLoad = false;
-        }
-        else {
-            var iframeDocument = $('#uploadTarget')[0].contentDocument || $('#uploadTarget')[0].contentWindow;
-            if (iframeDocument.document) {
-                iframeDocument = iframeDocument.document;
-            }
-
-            try {
-                if (backgroundId != -1) {
-                    $('#background').remove();
-                }
-                backgroundId = $('#background_id', iframeDocument).html();
-                var backgroundURL = $('#background_url', iframeDocument).html();
-                displayBackground(backgroundURL);
-            }
-            catch (err) {
-                $('#loadingIcon').hide();
-            }
-        }
-    }
-
     function displayBackground(backgroundURL) {
         $('<img/>', {
             id: 'background',
@@ -428,9 +401,24 @@
             snapToGrid = this.checked;
         }).change();
 
-        // show a throbber when uploading a background
-        $('#bgForm').submit(function() {
-            $('#loadingIcon').show();
+        $('#bgForm').ajaxForm({
+            dataType: 'json',
+            iframe: true,
+            success: function(data) {
+                if(data.status != 'OK') {
+                    alert($T('An error occurred.'));
+                    $('#loadingIcon').hide();
+                    return;
+                }
+                if (backgroundId != -1) {
+                    $('#background').remove();
+                }
+                backgroundId = data.id;
+                displayBackground(data.url);
+            },
+            beforeSubmit: function() {
+                $('#loadingIcon').show();
+            }
         });
 
         $('#removeBackground').click(function(e) {
@@ -474,8 +462,6 @@
             e.preventDefault();
             save();
         });
-
-        $('#uploadTarget').load(sent);
     });
 </script>
 
@@ -492,8 +478,6 @@
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 
-
-<iframe id="uploadTarget" name="uploadTarget" src="" style="width:0px;height:0px;border:0"></iframe>
 
 <div style="width:100%">
   <br/>
@@ -515,7 +499,7 @@
         <td class="titleCellTD">
           <span class="titleCellFormat"> ${ _("Background")}<br><small>(${ _("picture file in jpeg, png or gif")})</small></span>
         </td>
-        <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data" target="uploadTarget">
+        <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data">
         <td height="20px" NOWRAP align="left" colspan="3">
           <input name="file" size="58" type="file">
           <input class="btn" value="${ _("Send File")}" type="submit">
