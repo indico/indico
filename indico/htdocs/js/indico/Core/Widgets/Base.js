@@ -607,7 +607,12 @@ type("JLookupTabWidget", ["JTabWidget"], {
         var generator = $(panel).data('generator');
         try {
             var content = generator();
-        } catch(e) { alert(e); return; }
+        } catch(e) {
+            if(e == 'stopDrawing') {
+                return;
+            }
+            throw e;
+        }
         if(content.dom) {
             content = content.dom;
         }
