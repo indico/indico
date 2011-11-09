@@ -181,20 +181,19 @@ class WUpcomingEvents(wcomponents.WTemplated):
             return formatDateTime(dateTime, format="d MMM YYYY")
 
     def _getUpcomingEvents(self):
-        upcomingMod = ModuleHolder().getById('upcoming_events')
-
         # Just convert UTC to display timezone
 
         return map(lambda x: (x[0], x[1].astimezone(self._timezone), x[2], x[3]),
-                   upcomingMod.getUpcomingEventList())
+                   self._list)
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars['upcomingEvents'] = self._getUpcomingEvents()
         return vars
 
-    def __init__(self, timezone):
+    def __init__(self, timezone, upcoming_list):
         self._timezone = timezone
+        self._list = upcoming_list
         wcomponents.WTemplated.__init__(self)
 
 class WMainBase(wcomponents.WTemplated):
@@ -218,10 +217,16 @@ class WMainBase(wcomponents.WTemplated):
         if self._sideMenu:
             vars["sideMenu"] = self._sideMenu.getHTML()
 
+        upcoming = ModuleHolder().getById('upcoming_events')
+
         # if this is the front page, include the
-        # upcoming event information
+        # upcoming event information (if there are any)
         if self._isFrontPage:
-            vars["upcomingEvents"] = WUpcomingEvents(self._timezone).getHTML(vars)
+            upcoming_list = upcoming.getUpcomingEventList()
+            if upcoming_list:
+                vars["upcomingEvents"] = WUpcomingEvents(self._timezone, upcoming_list).getHTML(vars)
+            else:
+                vars["upcomingEvents"] = ''
 
         vars["navigation"] = ""
         if self._navigation:

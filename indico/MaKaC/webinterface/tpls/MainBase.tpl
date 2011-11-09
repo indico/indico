@@ -41,10 +41,12 @@
                     <h1>${ _("News") }</h1>
                     <%include file="WelcomeHeader.tpl" args="tz = timezone"/>
                 </div>
+                % if upcomingEvents:
                 <div class="smallSideBox" style="margin-bottom: 20px;">
                     <h1>${ _("Upcoming events") }</h1>
                         ${ upcomingEvents }
                 </div>
+                % endif
               </div>
             </div>
         % endif
