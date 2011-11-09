@@ -381,7 +381,8 @@ type("JTabWidget", ["IWidget"], {
             return;
         }
         self.scrollable = true;
-        var nav = $('> .ui-tabs-nav', self.widget);
+        var nav = $('> .ui-tabs-nav', self.widget); // the ul containing the tabs
+        // by wrapping the div and disabling floating for tabs we ensure tabs do not wrap into another line
         nav.wrap($('<div/>').css({
             whiteSpace: 'nowrap',
             overflow: 'hidden'
@@ -405,42 +406,40 @@ type("JTabWidget", ["IWidget"], {
             height: '26px'
         };
 
-        self.scrollOffset = 0;
-        self.scrollButtons = $('<div/>')
+        self.scrollOffset = 0; // how many tabs did the user scroll to the right
+        // Create buttons to scroll left/right
+        self.scrollButtons = $('<div/>').disableSelection().css({
+            position: 'relative',
+            zIndex: 101
+        });
+        $('<span/>')
             .disableSelection()
-            .css({
-                position: 'relative',
-                zIndex: 101
-            })
-            .append(
-                $('<span/>')
-                    .disableSelection()
-                    .attr('title', $T('Previous tab'))
-                    .css(arrowsCommonCss)
-                    .addClass('ui-state-active ui-corner-tl ui-corner-bl')
-                    .append($('<span/>').disableSelection().addClass('ui-icon ui-icon-carat-1-w').html($T('Previous tab')).css('marginTop', arrowsTopMargin))
-                    .click(function() {
-                        if($(this).hasClass('ui-state-disabled')) {
-                            return;
-                        }
-                        self.scrollToTab(Math.max(0, self.scrollOffset - 1));
-                    }),
-                $('<span/>')
-                    .disableSelection()
-                    .attr('title', $T('Next tab'))
-                    .css(arrowsCommonCss)
-                    .addClass('ui-state-active ui-corner-tr ui-corner-br')
-                    .css('right', '0')
-                    .append($('<span/>').addClass('ui-icon ui-icon-carat-1-e').html($T('Next tab')).css('marginTop', arrowsTopMargin))
-                    .click(function() {
-                        if($(this).hasClass('ui-state-disabled')) {
-                            return;
-                        }
-                        self.scrollToTab(Math.min(nav.find('> li').length - 1, self.scrollOffset + 1));
-                    })
-            )
-            .prependTo(self.widget);
-
+            .attr('title', $T('Previous tab'))
+            .css(arrowsCommonCss)
+            .css('left', 0)
+            .addClass('ui-state-active ui-corner-tl ui-corner-bl')
+            .append($('<span/>').disableSelection().addClass('ui-icon ui-icon-carat-1-w').html($T('Previous tab')).css('marginTop', arrowsTopMargin))
+            .click(function() {
+                if($(this).hasClass('ui-state-disabled')) {
+                    return;
+                }
+                self.scrollToTab(Math.max(0, self.scrollOffset - 1));
+            }).appendTo(self.scrollButtons);
+        $('<span/>')
+            .disableSelection()
+            .attr('title', $T('Next tab'))
+            .css(arrowsCommonCss)
+            .css('right', 0)
+            .addClass('ui-state-active ui-corner-tr ui-corner-br')
+            .append($('<span/>').addClass('ui-icon ui-icon-carat-1-e').html($T('Next tab')).css('marginTop', arrowsTopMargin))
+            .click(function() {
+                if($(this).hasClass('ui-state-disabled')) {
+                    return;
+                }
+                self.scrollToTab(Math.min(nav.find('> li').length - 1, self.scrollOffset + 1));
+            }).appendTo(self.scrollButtons);
+        self.scrollButtons.prependTo(self.widget);
+        // Scroll to the currently selected tab
         self.scrollToTab(self.getSelectedIndex(), true);
     },
     _updateScrollButtons: function() {
@@ -480,6 +479,8 @@ type("JTabWidget", ["IWidget"], {
             return;
         }
         else if(fuzzy && idx > 0) {
+            // Yuck! Since tabs have different sizes (due to content and also selected/unselected) we need to test how far we need to scroll.
+            // Would be much nicer if we could calculate it but the width is not available at all for hidden elements.
             var nav = $('.ui-tabs-nav:first', self.widget);
             var origIdx = idx;
             while(idx > 0) {
@@ -495,6 +496,7 @@ type("JTabWidget", ["IWidget"], {
             return;
         }
 
+        // Here we perform the actual "scrolling" (which is actually just hiding the "scrolled out" tabs)
         self.scrollOffset = idx;
         // show all tabs and then hide those before the visible ones
         $('.ui-tabs-nav:first > li', self.widget).show().slice(0, self.scrollOffset).hide();
