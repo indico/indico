@@ -6,52 +6,49 @@
 
 <% conf = item.getConference() %>
 
-
-% if len(conf.getSessionList()) != 1:
-    <tr>
-        <td>
-            <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
-        </td>
-        <td class="itemLeftAlign sessionInfo" colspan="2"><br/>
-            <span class="sessionTitle">
-                ${session.getTitle()}
-            </span>
-            % if getLocationInfo(item) == getLocationInfo(parent):
-                (${common.renderLocationAdministrative(parent)})
-            % elif getLocationInfo(item)!=('','',''):
-                (${common.renderLocationAdministrative(item)})
-            % endif
-            <br/>
-        </td>
-        <td class="itemRightAlign" >
-            % if len(session.getAllMaterialList()) > 0 and allMaterial:
-                % for material in session.getAllMaterialList():
-                    % if material.canView(accessWrapper):
-                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
+<tr>
+    <td>
+        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+    </td>
+    <td class="itemLeftAlign sessionInfo" colspan="2"><br/>
+        <span class="sessionTitle">
+            ${session.getTitle()}
+        </span>
+        % if getLocationInfo(item) == getLocationInfo(parent):
+            (${common.renderLocationAdministrative(parent)})
+        % elif getLocationInfo(item)!=('','',''):
+            (${common.renderLocationAdministrative(item)})
+        % endif
+        <br/>
+    </td>
+    <td class="itemRightAlign" >
+        % if len(session.getAllMaterialList()) > 0 and allMaterial:
+            % for material in session.getAllMaterialList():
+                % if material.canView(accessWrapper):
+                    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
+                % endif
+            % endfor
+        % elif materialSession and len(session.getAllMaterialList()) > 0:
+            % for material in session.getAllMaterialList():
+                % if material.canView(accessWrapper):
+                    % if material.getTitle()!='document' or not conf.getReportNumberHolder().listReportNumbers():
+                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>
                     % endif
-                % endfor
-            % elif materialSession and len(session.getAllMaterialList()) > 0:
-                % for material in session.getAllMaterialList():
-                    % if material.canView(accessWrapper):
-                        % if material.getTitle()!='document' or not conf.getReportNumberHolder().listReportNumbers():
-                            <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>
-                        % endif
-                    % endif
-                % endfor
-            % endif
-        </td>
+                % endif
+            % endfor
+        % endif
+    </td>
 
-    </tr>
-    <tr>
-        <td class="itemLeftAlign sessionInfo" colspan="4">
+</tr>
+<tr>
+    <td class="itemLeftAlign sessionInfo" colspan="4">
+        <hr width="100%"/>
+        % if session.getDescription():
+            ${session.getDescription()}
             <hr width="100%"/>
-            % if session.getDescription():
-                ${session.getDescription()}
-                <hr width="100%"/>
-            % endif
-        </td>
-    </tr>
-%endif
+        % endif
+    </td>
+</tr>
 
 % if len(item.getSchedule().getEntries()) > 0:
     <% subentries = item.getSchedule().getEntries()%>
