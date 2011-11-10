@@ -106,7 +106,7 @@
 
 .ui-tabs {
     position: relative;
-    padding: none;
+    padding: 0;
     zoom: 1;
 }
 
