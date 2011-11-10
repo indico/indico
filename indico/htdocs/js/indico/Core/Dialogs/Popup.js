@@ -121,7 +121,7 @@ type("ExclusivePopup", ["Printable"], {
             }
         }
         // Escape key
-        else if(e.keyCode && e.keyCode === $.ui.keyCode.ESCAPE) {
+        else if(e.originalEvent && e.originalEvent.keyCode === $.ui.keyCode.ESCAPE) {
             e.stopPropagation(); // otherwise this triggers twice for some reason
             if(this.closeHandler === null || !this.showCloseButton) {
                 // Ignore escape if we don't have a close button
