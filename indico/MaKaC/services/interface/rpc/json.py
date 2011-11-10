@@ -42,10 +42,6 @@ class Json:
 def encode(obj):
     return dumps(obj, ensure_ascii=True)
 
-def encode_iframe(obj):
-    s = encode(obj)
-    return "<html><head></head><body><textarea>%s</textarea></body></html>" % s
-
 def decode(str):
     return unicodeToUtf8(loads(str))
 

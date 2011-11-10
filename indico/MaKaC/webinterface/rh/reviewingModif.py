@@ -30,6 +30,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import Config
 from MaKaC.i18n import _
+from indico.util import json
 
 
 class RCPaperReviewManager:
@@ -265,8 +266,7 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
         else:
             self._conf.getConfPaperReview().setTemplate(self._name, self._description, self._format, self._templatefd, self._id, self._ext)
             #self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-            from MaKaC.services.interface.rpc import json
-            return json.encode_iframe({
+            return json.dumps({
                 'status': 'OK',
                 'info': {
                     'name': self._name,
@@ -274,7 +274,7 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
                     'format': self._format,
                     'id': self._id
                 }
-            })
+            }, textarea=True)
 
 class RHDownloadTemplate(RHConferenceBaseDisplay):
 

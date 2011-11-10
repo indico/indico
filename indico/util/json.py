@@ -56,7 +56,13 @@ def dumps(obj, **kwargs):
     """
     if kwargs.pop('pretty', False):
         kwargs['indent'] = 4 * ' '
-    return _json_dumps(obj, cls=_JSONEncoder, **kwargs)
+    textarea = kwargs.pop('textarea', False)
+    ret = _json_dumps(obj, cls=_JSONEncoder, **kwargs)
+    if textarea:
+        return '<html><head></head><body><textarea>%s</textarea></body></html>' % ret
+    else:
+        return ret
+
 
 
 def loads(string):

@@ -431,18 +431,19 @@ class RHSubmitMaterialBase(object):
                                              "MaKaC.conference.LocalFile": ILocalFileExtendedFossil})
 
     def _process(self):
-        from MaKaC.services.interface.rpc import json
-
         # We will need to pickle the data back into JSON
 
         user = self.getAW().getUser()
 
         if not self._loggedIn:
-            return json.encode_iframe(
-                {'status': 'ERROR',
-                 'info': {'type': 'noReport',
-                          'title': '',
-                          'explanation': _('You are currently not authenticated. Please log in again.')}})
+            return json.dumps({
+                'status': 'ERROR',
+                'info': {
+                    'type': 'noReport',
+                    'title': '',
+                    'explanation': _('You are currently not authenticated. Please log in again.')
+                }
+            }, textarea=True)
 
         try:
             owner = self._target
@@ -478,4 +479,4 @@ class RHSubmitMaterialBase(object):
                     'code': '0',
                     'requestInfo': self._params}
             Logger.get('requestHandler').exception('Error uploading file')
-        return json.encode_iframe({'status': status, 'info': info})
+        return json.dumps({'status': status, 'info': info}, textarea=True)

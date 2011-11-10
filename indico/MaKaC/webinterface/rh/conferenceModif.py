@@ -88,7 +88,7 @@ import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.rb_tools import FormMode
 
 from indico.modules.scheduler import tasks, Client
-
+from indico.util import json
 
 
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
@@ -4732,11 +4732,10 @@ class RHConfSavePic( RHConferenceModifBase ):
         f.setFilePath( self._filePath )
         im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
         pic = im.addPic( f )
-        from MaKaC.services.interface.rpc import json
         info={"name": f.getFileName(),
                 "id": f.getId(),
                 "picURL": str(urlHandlers.UHConferencePic.getURL(pic))}
-        return json.encode_iframe({'status': "OK", 'info': info})
+        return json.dumps({'status': "OK", 'info': info}, textarea=True)
 
 class RHConfModifTickerTapeAction( RHConferenceModifBase ):
 
@@ -7551,9 +7550,8 @@ class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
             self._tempFilePath = None
 
     def _process(self):
-        from MaKaC.services.interface.rpc import json
         if self._target.isClosed():
-            return json.encode_iframe({'status': 'error'})
+            return json.dumps({'status': 'error'}, textarea=True)
         else:
             if self._tempFilePath is not None:
                 if self._conf.getBadgeTemplateManager().hasTemplate(self.__templateId):
@@ -7570,11 +7568,11 @@ class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
                         value.append(self._tempFilePath)
                         backgroundId = len(value) - 1
 
-                return json.encode_iframe({
+                return json.dumps({
                     'status': 'OK',
                     'id': backgroundId,
                     'url': str(urlHandlers.UHConfModifBadgeGetBackground.getURL(self._conf, self.__templateId, backgroundId))
-                })
+                }, textarea=True)
 
 class RHConfBadgeGetBackground(RHConfBadgeBase):
     """ Class used to obtain a background in order to display it
@@ -7812,9 +7810,8 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
             self._tempFilePath = None
 
     def _process(self):
-        from MaKaC.services.interface.rpc import json
         if self._target.isClosed():
-            return json.encode_iframe({'status': 'error'})
+            return json.dumps({'status': 'error'}, textarea=True)
         else:
             if self._tempFilePath is not None:
                 if self._conf.getPosterTemplateManager().hasTemplate(self.__templateId):
@@ -7836,12 +7833,12 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
                         value.append((self._tempFilePath,self._bgPosition))
                         backgroundId = len(value) - 1
 
-                return json.encode_iframe({
+                return json.dumps({
                     'status': 'OK',
                     'id': backgroundId,
                     'url': str(urlHandlers.UHConfModifPosterGetBackground.getURL(self._conf, self.__templateId, backgroundId)),
                     'pos': self._bgPosition
-                })
+                }, textarea=True)
 
 
 class RHConfPosterGetBackground(RHConferenceModifBase):

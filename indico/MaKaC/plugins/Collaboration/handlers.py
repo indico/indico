@@ -28,6 +28,7 @@ import os, tempfile, time
 # legacy indico imports
 
 # indico api imports
+from indico.util import json
 from indico.web.rh import RHHtdocs
 from MaKaC.webinterface.rh.collaboration import RHConfModifCSBookings
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -98,8 +99,7 @@ class RHElectronicAgreement(RHConfModifCSBookings):
     def _process(self):
         if self.spkUniqueId and self.file:
             self.uploadProcess()
-            from MaKaC.services.interface.rpc import json
-            return json.encode_iframe({'status': 'OK'})
+            return json.dumps({'status': 'OK'}, textarea=True)
 
         if self._cannotViewTab:
             raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
