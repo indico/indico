@@ -139,42 +139,6 @@ class WConfModifEPaymentWorldPayDataModif( WTemplated ):
 
 
 
-class WEPaymentWorldPayModifFrame( WTemplated ):
-
-    def __init__(self, conf, aw):
-        self._conf = conf
-        self._aw = aw
-        self._worldPay = self._conf.getModPay().getPayModByTag(MODULE_ID)
-
-    def getHTML( self, body, **params ):
-        params["body"] = body
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
-        vars["title"] = self._worldPay.getTitle()
-        vars["titleTabPixels"] = self.getTitleTabPixels()
-        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-        vars["closeHeaderTags"] = self.getCloseHeaderTags()
-        return vars
-
-    def getOwnerComponent( self ):
-        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
-        return wc
-
-    def getIntermediateVTabPixels( self ):
-        wc = self.getOwnerComponent()
-        return 7 + wc.getIntermediateVTabPixels()
-
-    def getTitleTabPixels( self ):
-        wc = self.getOwnerComponent()
-        return wc.getTitleTabPixels() - 7
-
-    def getCloseHeaderTags( self ):
-        wc = self.getOwnerComponent()
-        return "</table></td></tr>" + wc.getCloseHeaderTags()
-
 ### classes needed by callback
 class WPConfirmEPaymentWorldPay( conferences.WPConferenceDefaultDisplayBase ):
     """Confirmation page for Worldpay callback """
