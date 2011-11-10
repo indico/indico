@@ -508,7 +508,37 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
                                           '%d/%m/%Y %H:%M')
 
 
+class ConferenceListSessions (ConferenceListModificationBase):
+    """ Returns a dictionary of all the Sessions within the current Conference, 
+        ordered by index only """
+
+    def _getAnswer(self):
+        sessions = self._conf.getSessionList()
+        result = {}
+
+        for sess in sessions:
+            result[sess.getUniqueId()] = sess.getTitle()
+
+        return result
+
+
 class ConferenceListContributions (ConferenceListModificationBase):
+    """ Returns a dictionary of all the Contributions within the current Conference,
+        if the Contribution is part of a Session, the Session name is appended 
+        to the name of the Contribution in parenthesis """
+
+    def _getAnswer(self):
+        contributions = self._conf.getContributionList()
+        result = {}
+
+        for cont in contributions:
+            session = (" (" + cont.getSession().getTitle() + ")") if (cont.getSession() is not None) else ""
+            result[cont.getUniqueId()] = cont.getTitle() + session
+
+        return result
+
+
+class ConferenceListContributionsReview (ConferenceListModificationBase):
     """ Returns a list of all contributions of a conference, ordered by id
     """
 
@@ -848,8 +878,10 @@ methodMap = {
     "main.changeKeywords": ConferenceKeywordsModification,
     "main.changeTimezone": ConferenceTimezoneModification,
     "rooms.list" : ConferenceListUsedRooms,
-    "contributions.list" : ConferenceListContributions,
+    "contributions.list" : ConferenceListContributionsReview,
+    "contributions.listAll" : ConferenceListContributions,
     "contributions.delete": ConferenceDeleteContributions,
+    "sessions.listAll" : ConferenceListSessions,
     "pic.delete": ConferencePicDelete,
     "social.toggle": ConferenceSocialBookmarksToggle,
     "showConcurrentEvents": ShowConcurrentEvents,

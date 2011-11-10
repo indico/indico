@@ -340,6 +340,9 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
              return selKey;
          },
 
+         getName: function() {
+             return this.name;
+         },
 
          enable: function() {
              each(this.radioDict,
@@ -424,7 +427,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
          }
      },
 
-     function(items, cssClassRadios) {
+     function(items, cssClassRadios, name) {
          this.items = {};
          this.radioDict = {};
          this.options = new WatchObject();
@@ -433,8 +436,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
 
          var self = this;
 
-
-         var name = Html.generateId();
+         this.name = (name === undefined) ? Html.generateId() : name;
 
          this.orderedItems = $L();
          each(items,
@@ -446,7 +448,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
                   // add some extra stuff, since we're in the loop
                   self.visibility.set(key, true);
                   self.options.set(key, false);
-                  self.radioDict[key] = Html.radio({'name': name,
+                  self.radioDict[key] = Html.radio({'name': this.name,
                                                     style: {verticalAlign: 'middle'}});
               });
 
@@ -505,15 +507,19 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
          },
          unbind: function() {
              bind.detach(this.select);
+         },
+         getName: function() {
+             return this.name;
          }
 
      },
-     function(method, args, callback) {
-         this.select = Html.select({});
+     function(method, args, callback, name) {
+         this.select = Html.select({'name':name});
          this.selected = new WatchValue();
          // Load data source on startup
          this.InlineRemoteWidget(method, args, true, callback);
          this.loadOnStartup = false;
+         this.name = name;
      });
 
 

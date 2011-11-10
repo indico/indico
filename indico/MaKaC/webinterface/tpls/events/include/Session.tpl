@@ -18,6 +18,11 @@
             ${session.getTitle()}
         % endif
         </span>
+        % if conf.getCSBookingManager().hasVideoService(session.getUniqueId()):
+            % for video in conf.getCSBookingManager().getVideoServicesById(session.getUniqueId()):
+                <%include file="VideoService.tpl" args="video=video, videoId=session.getId()"/>
+            % endfor
+        % endif
     </span>
 
     % if session.getDescription():

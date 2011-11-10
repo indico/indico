@@ -108,6 +108,7 @@ var createButton;
 var createButtonTooltip;
 
 var confLocationRoom = '${ Conference.getRoom().getName() if Conference.getRoom() else ""}';
+var confId = ${ Conference.getId() };
 
 /* ------------------------------ UTILITY / HELPER FUNCTIONS -------------------------------*/
 
@@ -214,6 +215,5 @@ IndicoUI.executeOnLoad(function(){
     % endfor
 });
 % endif
-
 </script>
 

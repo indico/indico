@@ -18,6 +18,20 @@
     </tr>
 
     <tr>
+        <td class="bookingFormFieldLink" style="vertical-align: top;">
+            <span>Event linking</span>
+        </td>
+        <td>
+            <span id="videoEventLinkType"></span>
+            <span id="videoEventLinkSelection">
+                <select id="dummy" disabled="disabled">
+                    <option>${_('Default association')}</option>
+                </select>
+            </span>
+        </td>
+    </tr>
+
+    <tr>
         <td class="bookingFormFieldName">
             <span>Owner</span>
         </td>

@@ -1,4 +1,6 @@
 {
+    ajaxPendingAll : false,
+
     start : function(booking, iframeElement) {
         window.open(booking.url);
     },
@@ -155,65 +157,121 @@
             Html.td("collaborationInfoLeftCol", $T('Last modified on:')),
             Html.td({}, formatDateTimeCS(booking.modificationDate))));
 
+        infoTbody.append(Html.tr({},
+            Html.td("collaborationInfoLeftCol", $T('Linked to:')),
+            Html.td({}, booking.bookingParams.linkText)));
+
         return Html.div({}, Html.table({}, infoTbody));
     },
 
-    onCreate: function(bookingPopup) {
-        vidyoOwnerField = new SingleUserField(${ jsonEncode(LoggedInUser) },
+    observeRadioButtons: function(vidyoComponents) {
+        vidyoComponents["link"].observe(function(value){
+            switch(value) {
+            case"session":
+                if (vidyoComponents["changed"] == false) {
+                    vidyoComponents["dummy"] = $('#videoEventLinkSelection').html();
+                    vidyoComponents["changed"] = true;
+                }
+                $E('videoEventLinkSelection').set(vidyoComponents["session"].draw());
+                break;
+            case"contribution":
+                if (vidyoComponents["changed"] == false) {
+                    vidyoComponents["dummy"] = $('#videoEventLinkSelection').html();
+                    vidyoComponents["changed"] = true;
+                }
+                $E('videoEventLinkSelection').set(vidyoComponents["contribution"].draw());
+                break;
+            case"None":
+            default:
+                if (vidyoComponents["changed"]) {
+                    $('#videoEventLinkSelection').html(vidyoComponents["dummy"]);
+                }
+                break;
+            }
+        });
+    },
+
+    getVidyoComponents : function(ajaxPending) {
+        var self = this;
+        var params = {conference : confId};
+
+        return {
+            params : params,
+            ownerField : new SingleUserField(${ jsonEncode(LoggedInUser) },
                 'owner',
                 true, true, null,
                 null, false,
                 false, false,
-                singleUserNothing, singleUserNothing);
-        $E('owner').set(vidyoOwnerField.draw());
+                singleUserNothing, singleUserNothing),
+            pinField : new ShowablePasswordField('pin', '', false),
+            link : new RadioFieldWidget([
+                 ['None', $T("Leave default Vidyo association.")],
+                 ['contribution', $T("Link to a contribution.")],
+                 ['session', $T("Link to a session.")]
+             ], 'nobulletsListInline','videoLinkType'),
+            session : new SelectRemoteWidget('event.sessions.listAll', 
+                params, function() {
+                    if (ajaxPending !== false) {
+                        ajaxPending["session"].resolve();
+                    }
+                }, 'videoLinkSession'),
+            contribution : new SelectRemoteWidget('event.contributions.listAll', 
+                params, function() {
+                    if (ajaxPending !== false) {
+                        ajaxPending["contribution"].resolve();
+                    }
+                }, 'videoLinkContribution'),
+            dummy : "",
+            changed : false
+        };
+    },
 
-        var vidyoPinField = new ShowablePasswordField('pin', '', false);
-        $E('PINField').set(vidyoPinField.draw());
+    onCreate: function(bookingPopup) {
+        var self = this;
+        var vidyoComponents = self.getVidyoComponents();
 
-        bookingPopup.addComponent(vidyoOwnerField);
-        bookingPopup.addComponent(vidyoPinField);
+        $E('owner').set(vidyoComponents["ownerField"].draw());
+        $E('PINField').set(vidyoComponents["pinField"].draw());
+        $E('videoEventLinkType').set(vidyoComponents["link"].draw());
+        vidyoComponents["link"].select('None');
+        self.observeRadioButtons(vidyoComponents);
 
-        vidyoDrawContextHelpIcons(vidyoPinField);
+        bookingPopup.addComponent(vidyoComponents["ownerField"]);
+        bookingPopup.addComponent(vidyoComponents["pinField"]);
+        bookingPopup.addComponent(vidyoComponents["link"]);
+        bookingPopup.addComponent(vidyoComponents["session"]);
+        bookingPopup.addComponent(vidyoComponents["contribution"]);
+        vidyoDrawContextHelpIcons(vidyoComponents["pinField"]);
     },
 
     onEdit: function(booking, bookingPopup) {
-        vidyoOwnerField = new SingleUserField(null,
-                'owner',
-                true, true, null,
-                null, false,
-                false, false,
-                singleUserNothing, singleUserNothing);
-        $E('owner').set(vidyoOwnerField.draw());
+        var self = this;
+        var ajaxPending = {
+                session : $.Deferred(),
+                contribution : $.Deferred()
+        };
+        var vidyoComponents = self.getVidyoComponents(ajaxPending);
 
-        var vidyoPinField = new ShowablePasswordField('pin', '', false);
-        $E('PINField').set(vidyoPinField.draw());
+        $E('owner').set(vidyoComponents["ownerField"].draw());
+        $E('PINField').set(vidyoComponents["pinField"].draw());
+        $E('videoEventLinkType').set(vidyoComponents["link"].draw());
+        self.observeRadioButtons(vidyoComponents);
 
-        bookingPopup.addComponent(vidyoOwnerField);
-        bookingPopup.addComponent(vidyoPinField);
+        $.when(ajaxPending["session"], ajaxPending["contribution"]).done(function() {
+            self.ajaxPendingAll.resolve();
+        });
 
-        vidyoDrawContextHelpIcons();
+        bookingPopup.addComponent(vidyoComponents["ownerField"]);
+        bookingPopup.addComponent(vidyoComponents["pinField"]);
+        bookingPopup.addComponent(vidyoComponents["session"]);
+        bookingPopup.addComponent(vidyoComponents["contribution"]);
+        bookingPopup.addComponent(vidyoComponents["link"]); /* This must be the last component added. */
+        vidyoDrawContextHelpIcons(vidyoComponents["pinField"]);
     },
 
 
     beforeCreate: function(pluginName, conferenceId) {
-        var allowCreation = true;
-
-        each(bookings, function(booking) {
-            if (booking.type == 'Vidyo') {
-                allowCreation = false;
-            }
-        });
-
-        if (!allowCreation) {
-            CSErrorPopup($T("Whoops..."),
-                         [Html.unescaped.div({},
-                                   $T("There is already a Vidyo booking present. " +
-                                      "Right now it is only possible to create " +
-                                      "<strong>a single Vidyo booking per event</strong>. " +
-                                      "Please delete it if you want to create a new one."))]);
-        }
-
-        return allowCreation;
+        return true;
     },
 
     postCreate: function(booking) {
@@ -253,3 +311,4 @@
         }
     }
 }
+

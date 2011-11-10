@@ -27,7 +27,7 @@ from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\
     datetimeToUnixTimeInt
 from MaKaC.webinterface import wcomponents, urlHandlers
 from MaKaC.plugins import PluginsHolder
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NoReportError
 from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.logger import Logger
@@ -47,6 +47,7 @@ from indico.util.i18n import gettext_lazy
 from indico.util.date_time import now_utc
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
+from BTrees.OOBTree import OOBTree
 
 from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil, ICSSanitizationErrorFossil,\
     ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil,\
@@ -74,6 +75,9 @@ class CSBookingManager(Persistent, Observer):
 
         # an index of bookings by type. The key will be a booking type (string), the value a list of booking id
         self._bookingsByType = {}
+
+        # an index of bookings to video services by event.uniqueId : video.uniqueId pairind. 
+        self._bookingsToVideoServices = OOBTree()
 
         # a list of ids with hidden bookings
         self._hiddenBookings = set()
@@ -236,12 +240,25 @@ class CSBookingManager(Persistent, Observer):
                 if isinstance(createResult, CSErrorBase):
                     return createResult
                 else:
+                    uniqueId = None
+
+                    if bookingParams['videoLinkType'] == "session":
+                        uniqueId = bookingParams['videoLinkSession']
+                    elif bookingParams['videoLinkType'] == "contribution":
+                        uniqueId = bookingParams['videoLinkContribution']
+
+                    if (self.hasVideoService(uniqueId)): # Restriction: 1 video service per session or contribution.
+                        raise NoReportError(_('Only one video service per contribution or session is allowed.'))
+
                     self._bookings[newId] = newBooking
                     self._bookingsByType.setdefault(bookingType,[]).append(newId)
                     if newBooking.isHidden():
                         self.getHiddenBookings().add(newId)
                     self._indexBooking(newBooking)
                     self._notifyModification()
+
+                    if uniqueId is not None: # if we're here and uniqueId has a value, register the video service.
+                        self.addVideoService(uniqueId, newBooking)
 
                     if MailTools.needToSendEmails(bookingType):
                         newBooking._sendNotifications('new')
@@ -269,7 +286,6 @@ class CSBookingManager(Persistent, Observer):
 
         booking = self.getBooking(bookingId)
 
-
         oldStartDate = booking.getStartDate()
         oldModificationDate = booking.getModificationDate()
         oldBookingParams = booking.getBookingParams() #this is a copy so it's ok
@@ -295,6 +311,37 @@ class CSBookingManager(Persistent, Observer):
                     self.getHiddenBookings().add(booking.getId())
                 elif booking.getId() in self.getHiddenBookings():
                     self.getHiddenBookings().remove(booking.getId())
+
+                eventLinkUpdated = False
+                if booking.hasSessionOrContributionLink():
+                    oldLinkData = booking.getLinkIdDict()
+                    oldLinkId = oldLinkData.values()[0]
+
+                    # Details changed, we need to remove the association and re-create it
+                    if not (oldLinkData.has_key(bookingParams['videoLinkType'])
+                        and ((oldLinkId == bookingParams['videoLinkSession']) 
+                        or (oldLinkId == bookingParams['videoLinkContribution']))):
+
+                        self.removeVideoSingleService(booking.getLinkId(), booking)
+                        eventLinkUpdated = True
+
+                if eventLinkUpdated or bookingParams['videoLinkType'] != "None":
+                    newLinkId = None
+                    if bookingParams['videoLinkType'] == "session":
+                        newLinkId = bookingParams['videoLinkSession']
+                    elif bookingParams['videoLinkType'] == "contribution":
+                        newLinkId = bookingParams['videoLinkContribution']
+
+                    if self.hasVideoService(booking.getLinkId(), booking):
+                        pass # No change in the event linking
+                    elif newLinkId is not None:
+                        if (self.hasVideoService(newLinkId)): # Only one booking per item
+                            raise NoReportError(_('Only one video service per contribution or session is allowed.'))
+                        else:
+                            self.addVideoService(newLinkId, booking)
+                            booking.setLinkType({bookingParams['videoLinkType']: newLinkId})
+                    else: # If it's still None, event linking has been completely removed.
+                        booking.resetLinkParams()
 
                 self._changeStartDateInIndex(booking, oldStartDate, booking.getStartDate())
                 self._changeModificationDateInIndex(booking, oldModificationDate, modificationDate)
@@ -345,6 +392,7 @@ class CSBookingManager(Persistent, Observer):
         """
         booking = self.getBooking(id)
         bookingType = booking.getType()
+        bookingLinkId = booking.getLinkId()
 
         removeResult = booking._delete()
         if isinstance(removeResult, CSErrorBase):
@@ -357,6 +405,9 @@ class CSBookingManager(Persistent, Observer):
             if id in self.getHiddenBookings():
                 self.getHiddenBookings().remove(id)
 
+            # If there is an association to a session or contribution, remove it
+            if bookingLinkId is not None:
+                self.removeVideoSingleService(bookingLinkId, booking)
             self._unindexBooking(booking)
 
             self._notifyModification()
@@ -871,6 +922,84 @@ class CSBookingManager(Persistent, Observer):
                 list.append(spkWrap.getObject().getEmail())
 
         return list
+
+    def addVideoService(self, uniqueId, videoService):
+        """ Adds a video service to Contribution / Session link in the tracking
+            dictionary in order {uniqueId : videoService}
+        """
+
+        if self.getVideoServices().has_key(uniqueId):
+            self.getVideoServices()[uniqueId].append(videoService)
+        else:
+            self.getVideoServices()[uniqueId] = [videoService]
+
+    def removeVideoAllServices(self, uniqueId):
+        """ Removes all associations of Contributions / Sessions with video 
+            services from the dictionary, key included.
+        """
+
+        if not self.hasVideoService(uniqueId):
+            return None
+
+        del self.getVideoServices()[uniqueId]
+
+    def removeVideoSingleService(self, uniqueId, videoService):
+        """ Removes a specific video service from a specific contribution. As 
+            the list of services is unordered, iterate through to match for 
+            removal - performance cost therefore occurs here.
+        """
+
+        if not self.hasVideoService(uniqueId):
+            return None
+
+        target = self.getVideoServicesById(uniqueId)
+
+        for service in target:
+            if service == videoService:
+                target.remove(service)
+                break
+
+        # There are no more entries, therefore remove the dictionary entry too.
+        if len(target) == 0:
+            self.removeVideoAllServices(uniqueId)
+
+    def getVideoServices(self):
+        """ Returns the OOBTree associating event unique IDs with the List
+            of video services associated.
+        """
+
+        if not hasattr(self, "_bookingsToVideoServices"):
+            self._bookingsToVideoServices = OOBTree()
+
+        return self._bookingsToVideoServices
+
+    def getVideoServicesById(self, uniqueId):
+        """ Returns a list of video services associated with the uniqueId
+            for printing in event timetable. Returns None if no video services 
+            are found.
+        """
+
+        if not self.hasVideoService(uniqueId):
+            return None
+
+        return self.getVideoServices()[uniqueId] 
+
+    def hasVideoService(self, uniqueId, service=None):
+        """ Returns True if the uniqueId of the Contribution or Session provided 
+            has an entry in the self._bookingsToVideoServices dictionary, thusly 
+            denoting the presence of linked bookings. Second parameter is for more 
+            specific matching, i.e. returns True if unique ID is associated with 
+            specific service.
+        """
+        if service is None:
+            return self.getVideoServices().has_key(uniqueId)
+
+        if self.getVideoServices().has_key(uniqueId):
+            for serv in self.getVideoServicesById(uniqueId):
+                if serv == service:
+                    return True
+        else:
+            return self.getVideoServices().has_key(uniqueId)
 
     def isAnyRequestAccepted(self):
         '''
@@ -1966,7 +2095,6 @@ class CSSanitizationError(CSErrorBase): #already Fossilizable
 
     def invalidFields(self):
         return self._invalidFields
-
 
 class CollaborationException(MaKaCError):
     """ Error for the Collaboration System "core". Each plugin should declare their own EVOError, etc.

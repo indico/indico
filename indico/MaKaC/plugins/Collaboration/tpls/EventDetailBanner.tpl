@@ -1,12 +1,20 @@
-% if bookings:
+<%
+    ## Only show event-level video services.
+    event_bookings = filter(lambda x: x.hasSessionOrContributionLink() != True, bookings)
+%>
+% if event_bookings:
+<script type="text/javascript">
+## Move this into js folder
+var videoServiceLaunchInfo = {};
+</script>
 <tr>
 <td class="leftCol">Video Services</td>
 <td>
 <div>
-% for pos, booking in enumerate(bookings):
+% for pos, booking in enumerate(event_bookings):
     <% bookingId = booking.getId() %>
     % if pos == 2:
-        <div id="collShowBookingsDiv">
+        <div id="collShowBookingsDiv" class="collaborationDisplayInfoLine">
             <span class="collShowHideBookingsText">
                 <%
                 moreOngoing = sum(1 for b in bookings[pos + 1:] if getBookingType(b) == 'ongoing')
@@ -26,7 +34,7 @@
         </div>
     </div>
 
-    <div id="collHiddenBookings" style="visibility: hidden; overflow: hidden;">
+    <div id="collHiddenBookings" style="display:none; overflow: hidden;">
     % endif
 
     <!-- Start of a booking line -->
@@ -34,42 +42,44 @@
     <% launchInfo = data.getLaunchInfo(booking) %>
     <% bookingInfo = data.getInformation(booking) %>
     <div class="collaborationDisplayBookingLine">
-    <span class="collaborationDisplayBookingType">${data.getDisplayName()}</span>\
-    % if booking.hasStartDate():
-        ${getBookingType(booking)}
-        ${formatTwoDates(booking.getAdjustedStartDate(timezone),
-                         booking.getAdjustedEndDate(timezone),
-                         useToday=True, useTomorrow=True, dayFormat='%a %d/%m', capitalize=False)}\
+    <span class="videoServiceWrapper">
+        <span class="collaborationDisplayBookingType">${data.getDisplayName()}</span>
+        <span class="collaborationDisplayBookingTitle">
+        % if booking.hasStartDate():
+            ${getBookingType(booking)}
+            ${formatTwoDates(booking.getAdjustedStartDate(timezone),
+                             booking.getAdjustedEndDate(timezone),
+                             useToday=True, useTomorrow=True, dayFormat='%a %d/%m', capitalize=False)}\
+        % endif
+        % if data.getFirstLineInfo(booking):
+    : ${data.getFirstLineInfo(booking)}\
+        % else:
+    .\
     % endif
-    % if data.getFirstLineInfo(booking):
-: ${data.getFirstLineInfo(booking)}\
-    % else:
-.\
-% endif
-<span style="margin-left:20px;"></span>\
-    % if bookingInfo:
-<span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo${bookingId}">More Info</span>
-    % endif
+    </span>
+    <!-- <span style="margin-left:20px;"></span>  -->
 
-    % if bookingInfo and launchInfo:
-    <span style="margin-left:8px;margin-right:8px;">|</span>
-    % endif
+        % if launchInfo:
+        <a target="_blank" href="${launchInfo['launchLink']}" class="bookingLaunchLink" data-id="${bookingId}">
+            ${launchInfo['launchText']}
+        </a>
+        <script type="text/javascript">
+            videoServiceLaunchInfo["${bookingId}"] = ${jsonEncode(launchInfo['launchTooltip'])};
+        </script>
+        % endif
 
-    % if launchInfo:
-    <a target="_blank" href="${launchInfo['launchLink']}" id="bookingLaunchLink${bookingId}">
-        ${launchInfo['launchText']}
-    </a>
-    <script type="text/javascript">
-        $E('bookingLaunchLink${bookingId}').dom.onmouseover = function (event) {
-            IndicoUI.Widgets.Generic.tooltip($E('bookingLaunchLink${bookingId}').dom, event,
-                '<div class="collaborationLinkTooltipMeetingLecture">${launchInfo['launchTooltip']}</div>');
-        }
-    </script>
-    % endif
+        % if bookingInfo and launchInfo:
+        <span style="margin-left:3px;margin-right:3px;">|</span>
+        % endif
 
+        % if bookingInfo:
+    <span class="collaborationDisplayMoreInfo">More Info</span>
+        % endif
+    </span>
+    
     % if bookingInfo:
     <!-- Start of a booking info line -->
-    <div id="collaborationInfoLine${bookingId}" style="visibility: hidden; overflow: hidden;">
+    <div class="collabInfoInline" style="overflow: hidden; display: none;">
         <div class="collaborationDisplayInfoLine">
             <table>
                 <tbody>
@@ -92,60 +102,13 @@
             </table>
         </div>
     </div>
-
-    <script type="text/javascript">
-        $E('collaborationBookingMoreInfo${bookingId}').dom.onmouseover = function (event) {
-            IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingMoreInfo${bookingId}').dom, event,
-                '<div class="collaborationLinkTooltipMeetingLecture">Click here to show / hide detailed information.</div>');
-        }
-        var bookingInfoState${bookingId} = false;
-        var height${bookingId} = IndicoUI.Effect.prepareForSlide('collaborationInfoLine${bookingId}', true);
-
-        $E('collaborationBookingMoreInfo${bookingId}').observeClick(function() {
-            if (bookingInfoState${bookingId}) {
-                IndicoUI.Effect.slide('collaborationInfoLine${bookingId}', height${bookingId});
-                $E('collaborationBookingMoreInfo${bookingId}').set('More Info');
-                $E('collaborationBookingMoreInfo${bookingId}').dom.className = "collaborationDisplayMoreInfo";
-            } else {
-                IndicoUI.Effect.slide('collaborationInfoLine${bookingId}', height${bookingId});
-                $E('collaborationBookingMoreInfo${bookingId}').set('Hide Info');
-                $E('collaborationBookingMoreInfo${bookingId}').dom.className = "collaborationDisplayHideInfo";
-            }
-            bookingInfoState${bookingId} = !bookingInfoState${bookingId}
-        });
-    </script>
-
     % endif
     <!-- End of a booking info line -->
-
     </div>
     <!-- End of a booking line -->
 % endfor
-
-% if len(bookings) > 2:
-    <div class="collHideBookingsDiv">
-      <span class="fakeLink collHideBookingsText" id="collHideBookings">Hide additional bookings</span>
-    </div>
-% endif
 </div>
 </td>
 </tr>
 
-<script type="text/javascript">
-    var hideHook = function() {
-        IndicoUI.Effect.appear($E('collShowBookingsDiv'));
-    }
-    if (exists($E('collHiddenBookings'))) {
-        var height = IndicoUI.Effect.prepareForSlide('collHiddenBookings', true);
-        $E('collShowBookings').observeClick(function() {
-            IndicoUI.Effect.disappear($E('collShowBookingsDiv'));
-            IndicoUI.Effect.slide('collHiddenBookings', height);
-            IndicoUI.Effect.appear($E('collHideBookings'));
-        });
-        $E('collHideBookings').observeClick(function() {
-            height = $E('collHiddenBookings').dom.offsetHeight;
-            IndicoUI.Effect.slide('collHiddenBookings', height, null, hideHook);
-        });
-    }
-</script>
 % endif

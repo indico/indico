@@ -1328,7 +1328,9 @@ var createBooking = function(pluginName, conferenceId) {
 
 /**
  * Function that will be called when the user presses the "Edit" button of a booking.
- * Will use the 'BookingPopup' class.
+ * Will use the 'BookingPopup' class. Checks the plugin to see whether or not it has a 
+ * deferred object, that is whether it should postpone the display of the popup until 
+ * all AJAX requests have been completed.
  * @param {object} booking The booking object corresponding to the "edit" button that was pressed.
  * @param {string} conferenceId the conferenceId of the current event
  */
@@ -1336,10 +1338,24 @@ var editBooking = function(booking, conferenceId) {
 
     var popup = new BookingPopup('edit', booking.type, booking, conferenceId);
     popup.open();
+
+    var ajaxDeferrer = false; /* For active waiting until AJAX complete. */
+  
+    if (pluginHasFunction(booking.type, "getDeferred")) {
+        ajaxDeferrer = codes[booking.type].getDeferred();
+    }
     if (pluginHasFunction(booking.type, "onEdit")) {
         codes[booking.type].onEdit(booking, popup);
     }
-    popup.postDraw();
+
+    if (ajaxDeferrer) {
+        $.when(ajaxDeferrer).done(function() {
+            popup.postDraw();
+        });
+    }
+    else {
+        popup.postDraw();
+    }
 }
 
 /**

@@ -221,6 +221,7 @@ class ServiceInformation(object):
             "title" : _('Description:'),
             'lines' : [booking.getBookingParamByName("roomDescription")],
         })
+
         return sections
 
 

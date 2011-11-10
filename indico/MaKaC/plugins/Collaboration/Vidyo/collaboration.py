@@ -33,6 +33,7 @@ from datetime import timedelta
 from MaKaC.common.logger import Logger
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
+from MaKaC.plugins.Collaboration.Vidyo.pages import ServiceInformation
 
 class CSBooking(CSBookingBase):
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
@@ -57,6 +58,10 @@ class CSBooking(CSBookingBase):
 
     _hasEventDisplay = True
 
+    _linkVideoType = None
+    _linkVideoId = None
+    _serviceInformation = ServiceInformation() # See method getSections()
+
     _commonIndexes = ["All Videoconference"]
 
     _simpleParameters = {
@@ -64,7 +69,10 @@ class CSBooking(CSBookingBase):
         "roomDescription": (str, ''),
         "displayPin": (bool, False),
         "displayURL": (bool, True),
-        "displayPhoneNumbers": (bool, True)}
+        "displayPhoneNumbers": (bool, True),
+        "videoLinkType": (str, ''),
+        "videoLinkContribution": (str, ''),
+        "videoLinkSession": (str, '')}
 
     _complexParameters = ["pin", "hasPin", "owner"]
 
@@ -111,6 +119,39 @@ class CSBooking(CSBookingBase):
     def setHasPin(self, value):
         #ignore, will be called only on rollback
         pass
+
+    def getBookingParams(self):
+        """ Overloaded method to append which contribution or session (if any) 
+            this booking is linked to for the managerial view. 
+        """
+
+        params = super(CSBooking, self).getBookingParams()
+        linkText = ""
+        import re
+
+        if self.hasSessionOrContributionLink():
+            title = ""
+
+            # Should move this into a utility function.
+            confId = re.search('(?<=a)\d+', self._linkVideoId)
+            sessId = re.search('(?<=s)\d+', self._linkVideoId)
+            contId = re.search('(?<=t)\d+', self._linkVideoId)
+
+            from MaKaC.conference import ConferenceHolder
+            ch = ConferenceHolder()
+            ch = ch.getById(confId.group())
+
+            if self.isLinkedToConribution():
+                title = ch.getContributionById(contId.group()).getTitle()
+            else:
+                title = ch.getSessionById(sessId.group()).getTitle()
+
+            linkText = title + " (" + self._linkVideoType + ")"
+        else:
+            linkText = _("Whole event.")
+
+        params["linkText"] = linkText
+        return params
 
     def getOwner(self):
         """ Returns the owner, fossilized, so that it is used by the collaboration core
@@ -187,6 +228,74 @@ class CSBooking(CSBookingBase):
     def setChecksDone(self, checksDone):
         self._checksDone = checksDone
 
+    def hasBookingInformation(self):
+        """ Determines whether this booking has further information associated 
+            with it, i.e. a ServiceInformation attribute, for populating 
+            drop-down 'more info.
+        """
+        return hasattr(self, "_serviceInformation")
+
+    def getBookingInformation(self):
+        """ For retreiving the ServiceInformation sections dict built for the 
+            Event Header, delegated here for use with Vidyo only at this time.
+            If event linking is required for other video services, this will 
+            need to be moved to parent or some other mechanism implemented.
+        """
+        return self._serviceInformation.getInformation(self, True)
+
+    ## methods relating to the linking of Vidyo objects to Contributions & Sessions
+
+    def hasSessionOrContributionLink(self):
+        return (self.isLinkedToConribution() or self.isLinkedToSession())
+
+    def isLinkedToSession(self):
+        return (self._linkVideoType == "session")
+
+    def isLinkedToConribution(self):
+        return (self._linkVideoType == "contribution")
+
+    def getLinkId(self):
+        """ Returns the unique ID of the Contribution or Session which this 
+            object is associated with, completely agnostic of the link type.
+            Returns None if no association (default) found.
+        """
+        if not self.hasSessionOrContributionLink():
+            return None
+        
+        return self._linkVideoId
+
+    def getLinkIdDict(self):
+        """ Returns a dictionary of structure linkType (session | contribution) 
+            : unique ID of referenced object.
+            Returns None if no association is found.
+        """
+        linkId = self.getLinkId()
+
+        if linkId == None:
+            return linkId
+
+        return {self._linkVideoType : linkId}
+
+    def getLinkType(self):
+        """ Returns a string denoting the link type, that is whether linked 
+            to a session or contribution.
+        """
+
+        return self._linkVideoType
+
+    def setLinkType(self, linkDict):
+        """ Accepts a dictionary of linkType: linkId """
+
+        self._linkVideoType = linkDict.keys()[0]
+        self._linkVideoId = linkDict.values()[0]
+
+    def resetLinkParams(self):
+        """ Removes all association with a Session or Contribution from this
+            CSBooking only. 
+        """
+
+        self._linkVideoType = self._linkVideoId = None
+
     ## overriding methods
     def _getTitle(self):
         return self._bookingParams["roomName"]
@@ -223,12 +332,18 @@ class CSBooking(CSBookingBase):
             Returns None if success.
             Returns a VidyoError if there is a problem, such as the name being duplicated.
         """
-        result = ExternalOperationsManager.execute(self, "createRoom", VidyoOperations.createRoom, self)
-
+        #result = ExternalOperationsManager.execute(self, "createRoom", VidyoOperations.createRoom, self)
+        result = True
         if isinstance(result, VidyoError):
             return result
 
         else:
+            # Link to a Session or Contribution if requested
+            if not self._bookingParams["videoLinkType"] == "None":
+                params = self._bookingParams
+                linkId = params["videoLinkSession"] if params["videoLinkType"] == "session" \
+                    else params["videoLinkContribution"]
+                self.setLinkType({params["videoLinkType"] : linkId})
             self._roomId = str(result.roomID) #we need to convert values read to str or there will be a ZODB exception
             self._extension = str(result.extension)
             self._url = str(result.RoomMode.roomURL)
@@ -241,12 +356,10 @@ class CSBooking(CSBookingBase):
         """ Modifies the Vidyo public room in the remote system
         """
         result = ExternalOperationsManager.execute(self, "modifyRoom", VidyoOperations.modifyRoom, self, oldBookingParams)
-
         if isinstance(result, VidyoError):
             if result.getErrorType() == 'unknownRoom':
                 self.setBookingNotPresent()
             return result
-
         else:
             self._extension = str(result.extension)
             self._url = str(result.RoomMode.roomURL)
@@ -292,7 +405,6 @@ class CSBooking(CSBookingBase):
             The User API call of VidyoOperations.queryRoom will not be necessary any more.
         """
         result = VidyoOperations.queryRoom(self, self._roomId)
-
         if isinstance(result, VidyoError):
             self.setBookingNotPresent()
             return result
