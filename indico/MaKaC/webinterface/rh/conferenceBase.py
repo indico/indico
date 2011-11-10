@@ -431,13 +431,14 @@ class RHSubmitMaterialBase(object):
                                              "MaKaC.conference.LocalFile": ILocalFileExtendedFossil})
 
     def _process(self):
+        from MaKaC.services.interface.rpc import json
 
         # We will need to pickle the data back into JSON
 
         user = self.getAW().getUser()
 
         if not self._loggedIn:
-            return "<html><head></head><body>%s</body></html>" % json.dumps(
+            return json.encode_iframe(
                 {'status': 'ERROR',
                  'info': {'type': 'noReport',
                           'title': '',
@@ -477,7 +478,4 @@ class RHSubmitMaterialBase(object):
                     'code': '0',
                     'requestInfo': self._params}
             Logger.get('requestHandler').exception('Error uploading file')
-        # hackish, because of mime types. Konqueror, for instance, would assume text if there were no tags,
-        # and would try to open it
-        return "<html><head></head><body>%s</body></html>" %\
-               json.dumps({'status': status, 'info': info})
+        return json.encode_iframe({'status': status, 'info': info})

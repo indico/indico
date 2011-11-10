@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import simplejson, os
+import os
 
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
@@ -265,8 +265,16 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
         else:
             self._conf.getConfPaperReview().setTemplate(self._name, self._description, self._format, self._templatefd, self._id, self._ext)
             #self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-            return "<html><head></head><body>%s</body></html>"  % simplejson.dumps({'status': 'OK',
-                                     'info': {'name': self._name, 'description': self._description, 'format': self._format, 'id': self._id}})
+            from MaKaC.services.interface.rpc import json
+            return json.encode_iframe({
+                'status': 'OK',
+                'info': {
+                    'name': self._name,
+                    'description': self._description,
+                    'format': self._format,
+                    'id': self._id
+                }
+            })
 
 class RHDownloadTemplate(RHConferenceBaseDisplay):
 
