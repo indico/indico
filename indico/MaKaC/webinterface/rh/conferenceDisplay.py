@@ -1003,52 +1003,6 @@ class RHAbstractBook(RHConferenceBaseDisplay):
         self._req.headers_out['Content-Disposition'] = 'inline; filename="%s"' % pdfFilename.replace('\r\n', ' ')
         return data
 
-
-class RHConfParticipantsNewPending(RHConferenceDisplay):
-    _uh = urlHandlers.UHConfParticipantsNewPending
-
-    def _process( self ):
-        params = self._getRequestParams()
-
-        errorList = []
-        if self._conf.getStartDate() < timezoneUtils.nowutc() :
-            errorList.append("This event began on %s"%self._conf.getStartDate())
-            errorList.append("You cannot apply for participation after the event began")
-
-        if not self._conf.getParticipation().isAllowedForApplying() :
-            errorList.append("Participation in this event is restricted to persons invited")
-            errorList.append("If you insist on taking part in this event, please contact the event manager")
-
-        if errorList:
-            self._reqParams["errorMsg"] = errorList
-            return RHConferenceDisplay._process(self)
-
-        params["formAction"] = str(urlHandlers.UHConfParticipantsAddPending.getURL(self._conf))
-        user = self._getUser()
-        if user is not None :
-            params["titleValue"] = user.getTitle()
-            params["surNameValue"] = user.getFamilyName()
-            params["nameValue"] = user.getName()
-            params["emailValue"] = user.getEmail()
-            params["addressValue"] = user.getAddress()
-            params["affiliationValue"] = user.getAffiliation()
-            params["phoneValue"] = user.getTelephone()
-            params["faxValue"] = user.getFax()
-
-            params["disabledTitle"] = params["disabledSurName"] = True
-            params["disabledName"] = params["disabledEmail"] = True
-            params["disabledAddress"] = params["disabledPhone"] = True
-            params["disabledFax"] = params["disabledAffiliation"] = True
-
-
-        wf=self.getWebFactory()
-        if wf is not None:
-            p = wf.getConfModifParticipantsNewPending(self, self._conf)
-        else :
-            p = conferences.WPConfModifParticipantsNewPending( self, self._target )
-        return p.display(**params)
-
-
 class RHConfParticipantsRefusal(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConfParticipantsRefusal
 

@@ -1703,143 +1703,53 @@ class RHBookingDetail(RHBookingListModifBase):
 class RHConfModifParticipants( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifParticipants
 
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._errorMsg = ""
-        self._infoMsg = ""
+    def _process( self ):
+        if self._conf.isClosed():
+            return conferences.WPConferenceModificationClosed( self, self._target ).display()
+        else:
+            return conferences.WPConfModifParticipantsSetup( self, self._target ).display()
+
+class RHConfModifParticipantsList(RHConferenceModifBase):
+    _uh = urlHandlers.UHConfModifParticipantsList
 
     def _process( self ):
         if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
+            return conferences.WPConferenceModificationClosed( self, self._target ).display()
         else:
-            p = conferences.WPConfModifParticipants( self, self._target )
-            return p.display(errorMsg=self._errorMsg, infoMsg=self._infoMsg)
-
-
-class RHConfModifParticipantsObligatory(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsObligatory
-
-    def _process( self ):
-        if self._conf.getParticipation().isObligatory() :
-            self._conf.getParticipation().setInobligatory(self._getUser())
-        else:
-            self._conf.getParticipation().setObligatory(self._getUser())
-        return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
-
-class RHConfModifParticipantsDisplay(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsDisplay
-
-    def _process( self ):
-        if self._conf.getParticipation().displayParticipantList() :
-            self._conf.getParticipation().participantListHide()
-        else:
-            self._conf.getParticipation().participantListDisplay()
-        return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
-
-
-class RHConfModifParticipantsAddedInfo(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipants
-
-    def _process( self ):
-        if self._conf.getParticipation().isAddedInfo() :
-            self._conf.getParticipation().setNoAddedInfo(self._getUser())
-        else:
-            self._conf.getParticipation().setAddedInfo(self._getUser())
-        return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
-
-class RHConfModifParticipantsAllowForApplying(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsAllowForApplying
-
-    def _process( self ):
-        if self._conf.getParticipation().isAllowedForApplying() :
-            self._conf.getParticipation().setNotAllowedForApplying(self._getUser())
-        else:
-            self._conf.getParticipation().setAllowedForApplying(self._getUser())
-        return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
-
-class RHConfModifParticipantsToggleAutoAccept(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsToggleAutoAccept
-
-    def _process( self ):
-        participantion = self._conf.getParticipation()
-        participantion.setAutoAccept(not participantion.getAutoAccept(), self._getUser())
-        return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
+            return conferences.WPConfModifParticipants( self, self._target ).display()
 
 class RHConfModifParticipantsPending(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifParticipantsPending
 
     def _process( self ):
-        p = conferences.WPConfModifParticipantsPending( self, self._target )
-        return p.display()
+        if self._conf.isClosed():
+            return conferences.WPConferenceModificationClosed( self, self._target ).display()
+        elif self._target.getParticipation().getPendingParticipantList():
+            return conferences.WPConfModifParticipantsPending( self, self._target ).display()
+        else:
+            return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
 
+class RHConfModifParticipantsDeclined(RHConferenceModifBase):
+    _uh = urlHandlers.UHConfModifParticipantsDeclined
+
+    def _process( self ):
+        if self._conf.isClosed():
+            return conferences.WPConferenceModificationClosed( self, self._target ).display()
+        elif self._target.getParticipation().getDeclinedParticipantList():
+            return conferences.WPConfModifParticipantsDeclined( self, self._target ).display()
+        else:
+            return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
 
 class RHConfModifParticipantsAction(RHConfModifParticipants):
     _uh = urlHandlers.UHConfModifParticipantsAction
 
     def _process( self ):
-        errorList = []
-        infoList = []
         params = self._getRequestParams()
-        action = params.get("participantsAction","")
-        selectedList = self._normaliseListParam(self._getRequestParams().get("participants",[]))
-
-        if action == _("Remove participant") :
-            for id in selectedList :
-                self._conf.getParticipation().removeParticipant(id, self._getUser())
-        elif action == _("Mark absence") :
-            for id in selectedList :
-                participant = self._conf.getParticipation().getParticipantById(id)
-                participant.setAbsent()
-        elif action == _("Mark present"):
-            for id in selectedList :
-                participant = self._conf.getParticipation().getParticipantById(id)
-                participant.setPresent()
-        elif action == _("Ask for excuse") :
-            data = self._conf.getParticipation().prepareAskForExcuse(self._getUser(), selectedList)
-            if data is not None :
-                params["emailto"] = data["toList"]
-                params["from"] = data["fromAddr"]
-                params["subject"] = data["subject"]
-                params["body"] = data["body"]
-                params["postURL"] = "postURL"
-                params["toDisabled"] = True
-                params["fromDisabled"] = True
-                p = conferences.WPConfModifParticipantsEMail( self, self._target )
-                return p.display(**params)
-            else :
-                if self._getUser() is None :
-                    errorList.append( _("""You have to log in to send a message as a manager of this event"""))
-                if len(selectedList) == 0 :
-                    errorList.append( _("""No participants have been selected - please indicate to whom
-                     the message should be send"""))
-                if not self._conf.getParticipation().isObligatory() :
-                    errorList.append( _("""You cannot ask for excuse because the attendance to this event
-                     is NOT OBLIGATORY"""))
-                if self._getUser() is not None and len(selectedList) > 0 and self._conf.getParticipation().isObligatory() :
-                    errorList.append( _("""One of the error situations listed below occured :"""))
-                    errorList.append( _(""" - None of the selected participants was absent in the event"""))
-                    errorList.append( _(""" - None of the selected participants has an email address specified"""))
-        elif action == _("Excuse absence") :
-            for id in selectedList :
-                participant = self._conf.getParticipation().getParticipantById(id)
-                if not participant.setStatusExcused() and participant.isPresent() :
-                    errorList.append( _("""You cannot excuse absence of %s %s %s - this participant was present
-                    in the event""")%(participant.getTitle(), participant.getFirstName(), participant.getFamilyName()))
-        elif action == _("Send email to") :
-            toList = []
-            for id in selectedList :
-                participant = self._conf.getParticipation().getParticipantById(id)
-                toList.append(participant)
-            params["emailto"] = toList
-            params["toDisabled"] = True
-            params["fromDisabled"] = True
-            p = conferences.WPConfModifParticipantsEMail( self, self._target )
-            return p.display(**params)
-        elif action == _("Export to Excel") :
+        if params.has_key("excel.x"):
+            selectedList = self._normaliseListParam(self._getRequestParams().get("participants",[]))
             toList = []
             if selectedList == []:
-                toList = self._conf.getParticipation().getParticipantList()
+                raise FormValuesError(_("No participant selected! Please select at least one."))
             else:
                 for id in selectedList :
                     participant = self._conf.getParticipation().getParticipantById(id)
@@ -1853,224 +1763,18 @@ class RHConfModifParticipantsAction(RHConfModifParticipants):
             self._req.content_type = """%s"""%(mimetype)
             self._req.headers_out["Content-Disposition"] = 'inline; filename="%s\"'%filename
             return data
-        elif action == _("Inform about adding") :
-            selected = []
-            for id in selectedList :
-                selected.append(self._conf.getParticipation().getParticipantById(id))
-            eventManager = self._getUser()
-            if eventManager is None :
-                errorList.append( _("Information about adding to the event has'n been sent."))
-                errorList.append( _("Please note, that only logged in event manager can send this message."))
-            elif len(selected) == 0 :
-                errorList.append( _("Information about adding to the event has'n been sent."))
-                errorList.append( _("No participants has been selected."))
-            else :
-                for participant in selected :
-                    data = self._conf.getParticipation().prepareAddedInfo(participant, eventManager)
-                    if data is None :
-                        errorList.append( _("The message has'n been sent to %s %s - no email provided")%(participant.getFirstName(), participant.getFamilyName()))
-                    else :
-                        GenericMailer.sendAndLog(GenericNotification(data),self._conf,"participants",self._getUser())
-                        infoList.append( _("The message has been send to  %s %s.")%(participant.getFirstName(), participant.getFamilyName()))
-        if errorList:
-            self._infoMsg = infoList
-            self._errorMsg = errorList
-        return RHConfModifParticipants._process(self)
-
-
+        return self._redirect(RHConfModifParticipantsList._uh.getURL(self._conf))
 
 class RHConfModifParticipantsStatistics(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifParticipantsStatistics
 
     def _process( self ):
-        p = conferences.WPConfModifParticipantsStatistics( self, self._target )
-        return p.display()
+        if self._conf.isClosed():
+            return conferences.WPConferenceModificationClosed( self, self._target ).display()
+        else:
+            return conferences.WPConfModifParticipantsStatistics( self, self._target ).display()
 
-
-class RHConfModifParticipantsNewToInvite(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsNewToInvite
-
-    def _process( self ):
-        params = self._getRequestParams()
-        params["formAction"] = str(urlHandlers.UHConfModifParticipantsInviteNew.getURL(self._conf))
-        p = conferences.WPConfModifParticipantsNew( self, self._target )
-        return p.display(**params)
-
-
-class RHConfModifParticipantsInviteNew(RHConfModifParticipants):
-    _uh = urlHandlers.UHConfModifParticipantsInviteNew
-
-    def _process( self ):
-        params = self._getRequestParams()
-        errorList = []
-        if params.has_key("ok") :
-            eventManager = self._getUser()
-            participant = Participant(self._conf)
-            participant.setTitle(params.get("title",""))
-            participant.setFamilyName(params.get("surName",""))
-            participant.setFirstName(params.get("name",""))
-            participant.setEmail(params.get("email",""))
-            participant.setAffiliation(params.get("affiliation",""))
-            participant.setAddress(params.get("address",""))
-            participant.setTelephone(params.get("phone",""))
-            participant.setFax(params.get("fax",""))
-            if not self._conf.getParticipation().inviteParticipant(participant, eventManager) :
-                if self._conf.getParticipation().alreadyParticipating(participant) != 0 :
-                        errorList.append( _("""The participant identified by email '%s'
-                        is already in the participants' list""")%participant.getEmail())
-
-        if errorList:
-            self._errorMsg = errorList
-        return RHConfModifParticipants._process(self)
-
-
-class RHConfModifParticipantsEdit(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsEdit
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if params.has_key("ok") :
-            participantId = params["participantId"]
-            participant = self._conf.getParticipation().getParticipantById(participantId)
-            participant.setTitle(params.get("title",""))
-            participant.setFamilyName(params.get("surName",""))
-            participant.setFirstName(params.get("name",""))
-            participant.setEmail(params.get("email",""))
-            participant.setAffiliation(params.get("affiliation",""))
-            participant.setAddress(params.get("address",""))
-            participant.setTelephone(params.get("phone",""))
-            participant.setFax(params.get("fax",""))
-
-        p = conferences.WPConfModifParticipants( self, self._target )
-        return p.display()
-
-
-class RHConfModifParticipantsDetails(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsDetails
-
-    def _process( self ):
-        params = self._getRequestParams()
-        participantId = params["participantId"]
-        del params["participantId"]
-        participant = self._conf.getParticipation().getParticipantById(participantId)
-        params["formTitle"] =  _("Participant's details")
-        if participant is not None :
-            params["titleValue"] = participant.getTitle()
-            params["surNameValue"] = participant.getFamilyName()
-            params["nameValue"] = participant.getFirstName()
-            params["emailValue"] = participant.getEmail()
-            params["addressValue"] = participant.getAddress()
-            params["affiliationValue"] = participant.getAffiliation()
-            params["phoneValue"] = participant.getTelephone()
-            params["faxValue"] = participant.getFax()
-
-        formAction = urlHandlers.UHConfModifParticipantsEdit.getURL(self._conf)
-        formAction.addParam("participantId",participantId)
-        params["formAction"] = str(formAction)
-
-        p = conferences.WPConfModifParticipantsNew( self, self._target )
-        return p.display(**params)
-
-
-class RHConfModifParticipantsPendingAction(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsPendingAction
-
-    def _process( self ):
-        params = self._getRequestParams()
-        action = params.get("pendingAction","")
-        notification = params.get("emailNotification","yes")
-        selectedList = self._normaliseListParam(self._getRequestParams().get("pending",[]))
-
-        if action == "Accept selected" :
-            for key in selectedList :
-                pending = self._conf.getParticipation().getPendingParticipantByKey(key)
-                self._conf.getParticipation().addParticipant(pending)
-        elif action == "Reject selected" :
-            if (notification == 'yes'):
-                for key in selectedList :
-                    pending = self._conf.getParticipation().getPendingParticipantByKey(key)
-                    pending.setStatusDeclined(sendMail=True)
-            else:
-                for key in selectedList :
-                    pending = self._conf.getParticipation().getPendingParticipantByKey(key)
-                    pending.setStatusDeclined(sendMail=False)
-
-        return self._redirect(RHConfModifParticipantsPending._uh.getURL(self._conf))
-
-
-class RHConfModifParticipantsPendingDetails(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsPendingDetails
-
-    def _process( self ):
-        params = self._getRequestParams()
-        pendingId = params["pendingId"]
-        del params["pendingId"]
-        pending = self._conf.getParticipation().getPendingParticipantByKey(pendingId)
-
-        if pending is not None :
-            params["titleValue"] = pending.getTitle()
-            params["surNameValue"] = pending.getFamilyName()
-            params["nameValue"] = pending.getFirstName()
-            params["emailValue"] = pending.getEmail()
-            params["addressValue"] = pending.getAddress()
-            params["affiliationValue"] = pending.getAffiliation()
-            params["phoneValue"] = pending.getTelephone()
-            params["faxValue"] = pending.getFax()
-
-        formAction = urlHandlers.UHConfModifParticipantsPendingEdit.getURL(self._conf)
-        formAction.addParam("pendingId",pendingId)
-        params["formAction"] = str(formAction)
-
-        p = conferences.WPConfModifParticipantsNew( self, self._target )
-        return p.display(**params)
-
-
-class RHConfModifParticipantsPendingEdit(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsPendingEdit
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if params.has_key("ok") :
-            pendingId = params["pendingId"]
-            pending = self._conf.getParticipation().getPendingParticipantByKey(pendingId)
-            pending.setTitle(params.get("title",""))
-            pending.setFamilyName(params.get("surName",""))
-            pending.setFirstName(params.get("name",""))
-            pending.setEmail(params.get("email",""))
-            pending.setAffiliation(params.get("affiliation",""))
-            pending.setAddress(params.get("address",""))
-            pending.setTelephone(params.get("phone",""))
-            pending.setFax(params.get("fax",""))
-
-        p = conferences.WPConfModifParticipantsPending( self, self._target )
-        return p.display()
-
-
-
-class RHConfModifParticipantsSendEmail (RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsSendEmail
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams( self, params )
-        self._data = {}
-        toList =[]
-        user = self._getUser()
-        selectedList = self._normaliseListParam(self._getRequestParams().get("to",[]))
-        for id in selectedList:
-            participant=self._conf.getParticipation().getParticipantById(id)
-            if participant is not None:
-                toList.append(participant.getEmail())
-        self._data["toList"] = toList
-        self._data["ccList"] = self._normaliseListParam(params.get("cc",[]))
-        self._data["fromAddr"] = "%s <%s>" % (user.getStraightFullName(), user.getEmail())
-        self._data["subject"] = params.get("subject","")
-        self._data["body"] = params.get("body","")
-        self._send = params.has_key("OK")
-
-    def _process(self):
-        if self._send:
-            GenericMailer.sendAndLog(GenericNotification(self._data),self._conf,"participants", self._getUser())
-        self._redirect(urlHandlers.UHConfModifParticipants.getURL(self._conf))
+#######################################################################################
 
 class RHConfAllParticipants( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfAllSessionsConveners

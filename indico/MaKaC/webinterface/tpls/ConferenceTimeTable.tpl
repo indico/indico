@@ -25,19 +25,7 @@ IndicoUI.executeOnLoad(function(){
 
 
 $(window).scroll(function(){
-    $.each($('.follow-scroll'),function(){
-        if (!$(this).data('original-offset')){
-            $(this).data('original-offset', $(this).offset());
-        }
-
-        var eloffset = $(this).data('original-offset');
-        var windowpos = $(window).scrollTop();
-        if(windowpos > eloffset.top) {
-            $(this).addClass('scrolling');
-        } else {
-            $(this).removeClass('scrolling');
-        }
-    });
+    IndicoUI.Effect.followScroll();
 });
 
 </script>

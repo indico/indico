@@ -1,214 +1,341 @@
 <% from MaKaC.common.timezoneUtils import nowutc %>
-        <table>
-            <!-- <tr>
-                <td>
-                    <div>
-                        % if not nowutc() > self_._conf.getStartDate():
-                            <form action="${ urlHandlers.UHConfModifParticipantsObligatory.getURL(self_._conf) }" method="post">
-                                Attendance to this event is
-                                    <select onchange="javascript:this.form.submit()">
-                                        <option ${"selected" if self_._conf.getParticipation().isObligatory() else ""}>mandatory</option>
-                                        <option ${"selected" if not self_._conf.getParticipation().isObligatory() else ""}>not mandatory</option>
-                                    </select>
-                            </form>
-                        % else:
-                            The attendance to this event is&nbsp;
-                                % if self_._conf.getParticipation().isObligatory():
-                                    <strong>mandatory</strong>
-                                % else:
-                                    <strong>not mandatory</strong>
-                                % endif
-                        % endif
-                    </div>
+<form action="${ participantsAction }" method="post" name="participantsForm" id="participantsForm">
 
-                </td>
-            </tr>-->
-            <tr>
-                <td>
-                    <div>
-                        % if not nowutc() > self_._conf.getStartDate():
-                            <form action="${ urlHandlers.UHConfModifParticipantsAddedInfo.getURL(self_._conf) }" method="post">
-                                ${ _("When an event manager adds a participant, email notification will")}
-                                    <select onchange="javascript:this.form.submit()">
-                                        <option ${"selected" if self_._conf.getParticipation().isAddedInfo() else ""}>${ _("be sent")}</option>
-                                        <option ${"selected" if not self_._conf.getParticipation().isAddedInfo() else ""}>${ _("not be sent")}</option>
-                                    </select> ${ _("to the participant")}
-                            </form>
-                        % else:
-                            ${ _("When an event manager adds a participant, email notification will")}&nbsp;
-                                % if self_._conf.getParticipation().isAddedInfo():
-                                    <strong>${ _("be sent")}</strong>
-                                % else:
-                                    <strong>${ _("not be sent")}</strong>
-                                % endif
-                        % endif
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td><form action="${ urlHandlers.UHConfModifParticipantsDisplay.getURL(self_._conf) }" method="post">
-                        <div>
-                            ${ _("The list of participants is")}
-                                <select onchange="javascript:this.form.submit()">
-                                    <option ${"selected" if self_._conf.getParticipation().displayParticipantList() else ""}>${ _("displayed")}</option>
-                                    <option ${"selected" if not self_._conf.getParticipation().displayParticipantList() else ""}>${ _("not displayed")}</option>
-                                </select>
-                            ${ _("on the event page")}
-                        </div>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div>
-                        % if not nowutc() > self_._conf.getStartDate():
-                            <form action="${ urlHandlers.UHConfModifParticipantsAllowForApplying.getURL(self_._conf) }" method="post">
-                                ${ _("Users")}
-                                    <select onchange="javascript:this.form.submit()">
-                                        <option ${"selected" if self_._conf.getParticipation().isAllowedForApplying() else ""}>${ _("may apply")}</option>
-                                        <option ${"selected" if not self_._conf.getParticipation().isAllowedForApplying() else ""}>${ _("may not apply")}</option>
-                                    </select> ${ _("to participate in this event")}
-                            </form>
-                        % else:
-                            ${ _("Users")}&nbsp;
-                                % if self_._conf.getParticipation().isAllowedForApplying():
-                                    <strong>${ _("may apply")}</strong>
-                                % else:
-                                    <strong>${ _("may not apply")}</strong>
-                                % endif
- ${ _("to participate in this event")}
-                        % endif
-                    </div>
-                </td>
-
-            </tr>
-            <tr>
-                <td>
-                    <div>
-                        % if not nowutc() > self_._conf.getStartDate():
-                            <form action="${ urlHandlers.UHConfModifParticipantsToggleAutoAccept.getURL(self_._conf) }" method="post">
-                            ${ _("Participation requests")}
-                                <select onchange="javascript:this.form.submit()" ${'disabled="disabled"' if not self_._conf.getParticipation().isAllowedForApplying() else ""}>
-                                    <option ${"selected" if self_._conf.getParticipation().getAutoAccept() else ""}${ _(">are auto-approved")}</option>
-                                    <option ${"selected" if not self_._conf.getParticipation().getAutoAccept() else ""}>${ _("must be approved by the event managers (you)")}</option>
-                                </select>
-                            </form>
-                        % else:
-                            ${ _("Participation requests")}&nbsp;
-                                % if self_._conf.getParticipation().getAutoAccept():
-                                    <strong>${ _("are auto-approved")}</strong>
-                                % else:
-                                    <strong>${ _("must be approved by the event managers (you)")}</strong>
-                                % endif
-                        % endif
-                    </div>
-                </td>
-            </tr>
-
-               % if self_._conf.getParticipation().getPendingNumber() > 0 :
-                <tr>
-                    <td>
-                          <span style="color:green">${ _("""Some users have applied for participation in this event.
-                            See""")} <a href="${ urlHandlers.UHConfModifParticipantsPending.getURL(self_._conf) }">${ _("pending participants")}</a>
-                        </span>
+<table width="100%" cellspacing="0" align="center" border="0">
+    <tr>
+       <td nowrap colspan="10">
+            <div class="CRLgroupTitleNoBorder">${ _("Displaying")} <span id="numberParticipants" style="font-weight: bold;">${numberParticipants}</span>
+                 <span id="numberParticipantsText"> ${ _("participant") if numberParticipants == 1 else _("participants")}</span>
+            </div>
+        </td>
+    </tr>
+    <tr id="headPanel" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);" class="follow-scroll">
+        <td valign="bottom" width="100%" align="left" style="padding-top:5px;" colspan="9">
+            <table>
+                <tr >
+                    <td valign="bottom" align="left">
+                        <ul class="buttons">
+                            <li class="button left" id="addParticipant"><div class="arrow">${_("Add")}</div>
+                            % if nowutc() < self_._conf.getStartDate() :
+                                <li class="button middle" id="inviteUsers">${ _("Invite")}
+                            % endif
+                                <li class="button middle" id="removeParticipants">${_("Remove")}
+                            % if nowutc() > self_._conf.getStartDate() :
+                                 <li class="button middle" id="attendance"><div class="arrow">${_("Manage attendance")}</div>
+                            % endif
+                            <li class="button right" id="sendEmail" >${_("Email")}
+                        </ul>
+                    </td>
+                    <td align="left" valign="middle"> Export to: </td>
+                    <td align="left" valign="middle">
+                        <input border="0" type="image" src=${excelIconURL} name="excel" style="margin-top:3px;">
                     </td>
                 </tr>
-            % endif
-        </table>
+            </table>
+        </td>
+    </tr>
+    <tr id="selectBar" style="display:none">
+        <td colspan=10 style="padding: 5px 5px 10px;" nowrap>
+        Select: <a style="color: #0B63A5;" id="selectAll"> All</a>, <a style="color: #0B63A5;" id="deselectAll">None</a>
+        </td>
+    </tr>
+    <tr id="headParticipants"  style="display:none">
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat" align="right" width="3%"></td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Name")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Affiliation")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Email")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Address")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Telephone")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Fax")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Status")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Presence")}
+        </td>
+    </tr>
+    <tr id="noParticipantsInfo" style="display:none">
+        <td colspan=10 style="font-style: italic; padding:15px 0px 15px 15px; border-bottom: 1px solid #DDDDDD;" nowrap>
+            <span class="collShowBookingsText">${_("There are no participants yet")}</span>
+        </td>
+    </tr>
+        % for p in self_._conf.getParticipation().getParticipantList():
+             <%include file="ConferenceParticipant.tpl" args="participant=p,conference=conf"/>
+        % endfor
+    <tr>
 
-        ${ errorMsg }
-        ${ infoMsg }
-
-        <table style="margin-top: 20px;">
-                <tr>
-                    <td>${ _("Add participant: ")}</td>
-
-                    <td>
-                        <div><input type="button" value="${ _("Search database")}" onclick="meetingParticipantsListManager.searchUser('add');"/></div>
-                    </td>
-                    <td>
-                        <div><input type="button" value="${ _("Define new")}" onclick="meetingParticipantsListManager.defineNew();"  /></div>
-                    </td>
-
-                    % if inviteAction:
-                    <td>
-                        <div><input type="button" value="${ _("Invite participant")}" onclick="meetingParticipantsListManager.searchUser('invite');"/></div>
-                    </td>
-                    % endif
-
-                </tr>
-
-        </table>
-
-
-        <div style="position: relative; overflow: auto; margin-top: 10px;">
-        <form action="${ statisticAction }" method="post" id="statisticsForm"></form>
-            <form action="${ participantsAction }" method="post" name="participantsForm">
-
-                <div style="float: left; padding-right: 30px; min-width: 400px; min-height: 270px;">
-                            <table id="participantsTable">
-                                <tr>
-                                    <th class="titleCellFormat">
-                                        <img src="${ selectAll }" alt="${ _("Select all")}" title="${ _("Select all")}" onclick="meetingParticipantsListManager.selectAll()">
-                                        <img src="${ deselectAll }" alt="${ _("Deselect all")}" title="${ _("Deselect all")}" onclick="meetingParticipantsListManager.deselectAll()">
-                                        ${ _("Name")}
-                                    </th>
-                                    <th class="titleCellFormat">&nbsp;${ _("Status")}</th>
-                                    <th class="titleCellFormat">&nbsp;${ _("Presence")}</th>
-                                </tr>
-                            % for p in participantsList:
-                                <% participantDetailsURL.addParam("participantId",p.getId()) %>
-                                <tr>
-                                    <td class="abstractDataCell">
-                                        <input type="checkbox" name="participants" value="${ p.getId() }" />
-                                        <a href="${ participantDetailsURL }">${ p.getTitle()} ${ p.getFirstName() } ${ p.getFamilyName() }</a>
-                                    </td>
-                                    <td class="abstractDataCell">${ p.getStatus() }</td>
-                                    <td class="abstractDataCell">${ p.getPresenceText() }</td>
-                                </tr>
-                            % endfor
-                            </table>
-                </div>
-
-                <div style="padding-top: 30px;" class="uniformButtonVBar">
-
-                            <div><input type="button" class="btn" style="margin-bottom: 20px" value="${ _("View attendance") }" onclick="javascript:$E('statisticsForm').dom.submit();" /></div>
-
-                            % if presenceButton:
-                                <div>${ presenceButton }</div>
-                            % endif
-
-                            % if absenceButton:
-                                <div>${ absenceButton }</div>
-                            % endif
-
-                            % if askButton:
-                                <div>${ askButton }</div>
-                            % endif
-
-                            % if excuseButton:
-                                <div>${ excuseButton }</div>
-                            % endif
-
-                            % if sendButton:
-                                <div style="margin-bottom: 20px">${ sendButton }</div>
-                            % endif
-
-                            % if sendAddedInfoButton:
-                                <div>${ sendAddedInfoButton }</div>
-                            % endif
-                            <div>${ excelButton }</div>
-                            <div>${ removeButton }</div>
-
-                </div>
+    </tr>
+</table>
+</form>
 
 
-            </form>
-        </div>
+<script type="text/javascript">
+var actionParticipantRows = function(){
+    $("[id^=checkParticipant]").click(function(){
+        if(this.checked){
+            $(this).parents('tr[id^=participant]').css('background-color',"#CDEB8B");
+        }else{
+            $(this).parents('tr[id^=participant]').css('background-color',"transparent");
+        }
+    });
 
-<script>
+    $("tr[id^=participant]").hover(function () {
+        if($(this).find('input:checkbox:checked[id^=checkParticipant]').size() == 0){
+            $(this).css({'background-color' : 'rgb(255, 246, 223)'});
+        }}
+        , function () {
+          if($(this).find('input:checkbox:checked[id^=checkParticipant]').size() > 0){
+              $(this).css('background-color',"#CDEB8B");
+          }else{
+              $(this).css('background-color',"transparent");
+          }
+    });
+    $('input:checkbox:checked[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"#CDEB8B");
+};
 
-var meetingParticipantsListManager = new MeetingParticipantsListManager('${ confId }', $E('participantsTable'),
-                                               '${ participantEditURL }', '${ selectAll }', '${ deselectAll }');
+var selectAll = function () {
+    $('input:checkbox[id^=checkParticipant]').attr('checked', 'checked');
+    $('input:checkbox[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"#CDEB8B");
+};
+
+var deselectAll = function () {
+    $('input:checkbox[id^=checkParticipant]').removeAttr('checked');
+    $('input:checkbox[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"transparent");
+};
+
+var checkNumberParticipants = function(){
+    $('#numberParticipants').text($('input:checkbox[id^=checkParticipant]').length);
+    if($('input:checkbox:checked[id^=checkParticipant]').length == 1) {
+        $('#numberParticipantsText').text("participant");
+    } else {
+        $('#numberParticipantsText').text("participants");
+    }
+    if($('input:checkbox[id^=checkParticipant]').length == 0){
+        $('#selectBar, #headParticipants').hide();
+        $('#noParticipantsInfo').show();
+    }else{
+        $('#selectBar, #headParticipants').show();
+        $('#noParticipantsInfo').hide();
+    }
+};
+
+var legends = {'confTitle':$T('field containing the conference title.'),
+        'name':$T('field containing the full name of the participant.'),
+        'url':$T('field containing the url of the event.'),
+        'urlRefusal':$T('field containing the url of the refusal to attend to the meeting.'),
+        'urlInvitation':$T('field containing the url of the invitation to attend to the meeting.')};
+
+IndicoUI.executeOnLoad(function(){
+    var addParticipantMenu = null;
+    var attendanceMenu = null;
+
+    actionParticipantRows();
+    checkNumberParticipants();
+
+    $("#selectAll").click(function(){selectAll();});
+    $("#deselectAll").click(function(){deselectAll();});
+
+    var atLeastOneParticipantSelected = function(){
+        if ($("input:checkbox:checked[id^=checkParticipant]").length>0){
+            return true;
+        } else{
+            var dialog = new WarningPopup($T("Warning"), $T("No participant selected! Please select at least one."));
+            dialog.open();
+            return false;
+        }
+
+    };
+
+    var successAddParticipantsHandler = function(result){
+        if(result.infoWarning){
+            (new WarningPopup($T("Warning"),result.infoWarning)).open();
+        }
+        if(result.added)
+        {
+            $(result.added).insertAfter($("#headParticipants")).filter("tr[id^=participant]").effect("highlight",{},3000)
+            actionParticipantRows();
+            checkNumberParticipants();
+        }
+    };
+
+
+    var searchParticipants = function(method,peopleList){
+        var killProgress = IndicoUI.Dialogs.Util.progress("Processing...");
+        jsonRpc(Indico.Urls.JsonRpcService, method,
+                { confId: "${self_._conf.getId()}",
+                  userIds: peopleList },
+                function(result, error){
+                    killProgress();
+                    if (exists(error)) {
+                        IndicoUtil.errorReport(error);
+                    } else {
+                        successAddParticipantsHandler(result);
+                    }
+                });
+    };
+
+    var actionUsers = function(method){
+        var arrayChecked=[];
+        if (atLeastOneParticipantSelected()){
+            $("input:checkbox:checked").each(function() {
+                   arrayChecked.push($(this).val());
+            });
+        var killProgress = IndicoUI.Dialogs.Util.progress("Processing...");
+        var success = false;
+        jsonRpc(Indico.Urls.JsonRpcService, method,
+                { confId: "${self_._conf.getId()}",
+                  userIds: arrayChecked },
+                function(result, error){
+                    killProgress();
+                    if (exists(error)) {
+                        IndicoUtil.errorReport(error);
+                    } else if(result.infoWarning){
+                        (new WarningPopup($T("Warning"),result.infoWarning)).open();
+                    } else if(result.emailed){
+                        success = true;
+                        (new WarningPopup($T("Done"),result.emailed)).open();
+                    }
+                    success = true;
+                });
+        return success;
+    }};
+
+    var addNew = function(){
+        var onSuccess = function(result){
+            $(result).insertAfter($("#headParticipants")).effect("highlight", {}, 3000);
+            actionParticipantRows();
+            checkNumberParticipants();
+        };
+        new ApplyForParticipationPopup("${self_._conf.getId()}","event.participation.addParticipant",  $T("Add participant"), {}, onSuccess, true);
+        return false;
+    };
+
+    var searchUsers = function(title, handler) {
+        var chooseUsersPopup = new ChooseUsersPopup(title, true, ${self_._conf.getId()}, true,
+                true, null, false, false, handler);
+        chooseUsersPopup.execute();
+        return false;
+    };
+
+    var removeParticipants = function(){
+        var arrayChecked=[];
+        if (atLeastOneParticipantSelected()){
+            $("input:checkbox:checked").each(function() {
+                   arrayChecked.push($(this).val());
+            });
+            var killProgress = IndicoUI.Dialogs.Util.progress("Processing...");
+            jsonRpc(Indico.Urls.JsonRpcService, "event.participation.removeParticipants",
+                    { confId: "${self_._conf.getId()}",
+                      userIds: arrayChecked },
+                    function(result, error){
+                        killProgress();
+                        if (exists(error)) {
+                            IndicoUtil.errorReport(error);
+                        } else {
+                            $("input:checkbox:checked").parents("tr[id^=participant]").hide("highlight", {color:"#881122"}, 1500, function(){$(this).remove();checkNumberParticipants();});
+                        }
+                    });
+            }
+        return false;
+    };
+
+    var composeEmail = function(method){
+        var participantsChecked={};
+        if (atLeastOneParticipantSelected()){
+            $("input:checkbox:checked").each(function() {
+                participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=nameParticipant]").children("[id^=participantEdit]").text();
+            });
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, method, participantsChecked, "${currentUser.getStraightFullName()}" ,null, null, legends, deselectAll);
+            popup.open();
+        }
+        return false;
+    };
+
+    var manageAttendance = function(method, target, type){
+        if(actionUsers(method) == true) {
+            $('input:checkbox:checked[id^=checkParticipant]').parent().siblings("td[id^="+target+"]").text(type);
+            $('input:checkbox:checked[id^=checkParticipant]').parents('tr[id^=participant]').effect("highlight", {}, 1500, deselectAll());
+        }
+        return false;
+    };
+
+    $("#addParticipant").click(function(){
+
+        if (addParticipantMenu != null && addParticipantMenu.isOpen()) {
+            addParticipantMenu.close();
+            addParticipantMenu = null;
+            return false;
+        }
+
+        var menuItems = {};
+        menuItems['${_("Existing user")}'] = function () {
+            var peopleAddedHandler = function(peopleList){
+                searchParticipants("event.participation.addParticipants", peopleList);
+            };
+            return searchUsers("Add User(s)", peopleAddedHandler);};
+        menuItems['${_("New user")}'] = function () {return addNew();};
+        addParticipantMenu = new PopupMenu(menuItems, [$E(this)], "buttonMenuPopupList");
+        addParticipantMenu.open(this.offsetLeft, this.offsetTop + this.offsetHeight , null, null, false, true);
+        return false;
+    });
+
+    $("#inviteUsers").click(function(){
+        var inviteHandler = function(peopleList){
+            var text = 'Dear {name}, event manager of {confTitle} would like to invite you to take part in this event, ' +
+            'which will take place on ${conf.getAdjustedStartDate()}. Further information on this event are available at {url}' +
+            '<br/><br/>' +
+            'You are kindly requested to accept or decline your participation in this event by clicking on the link below :<br/>' +
+            '{urlInvitation}' +
+            'Looking forward to meeting you at {confTitle} <br/>' +
+            'Best regards';
+            var subject = "Invitation to ${conf.getTitle()}";
+            var popup = new ParticipantsInvitePopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, "event.participation.inviteParticipants", peopleList, "${currentUser.getFullName()}" ,subject, text, legends, successAddParticipantsHandler);
+            popup.open();
+        };
+        return searchUsers("Invite Participant(s)", inviteHandler);
+    });
+    $("#removeParticipants").click(function(){return removeParticipants();});
+    $("#sendEmail").click(function(){
+        return composeEmail("event.participation.emailParticipants");
+    });
+
+    $("#attendance").click(function(){
+
+        if (attendanceMenu != null && attendanceMenu.isOpen()) {
+            attendanceMenu.close();
+            attendanceMenu = null;
+            return false;
+        }
+
+        var menuItems = {};
+        menuItems['${_("Set as present")}'] = function () {return manageAttendance('event.participation.markPresent', 'presence','${_("present")}');};
+        menuItems['${_("Set as absent")}'] = function () {return manageAttendance('event.participation.markAbsence', 'presence', '${_("absent")}');};
+        menuItems['${_("Excuse absence")}'] = function () {return manageAttendance('event.participation.excuseAbsence', 'status', '${_("excused")}');};
+
+        attendanceMenu = new PopupMenu(menuItems, [$E(this)], "buttonMenuPopupList");
+        attendanceMenu.open(this.offsetLeft, this.offsetTop + this.offsetHeight , null, null, false, true);
+        return false;
+    });
+
+    $("[name=excel]").click(function(){
+        return atLeastOneParticipantSelected();
+    });
+
+    $(window).scroll(function(){
+        IndicoUI.Effect.followScroll();
+    });
+});
 
 </script>

@@ -151,3 +151,105 @@ function(title, confTitle, confId, subject, defaultText, legends){
     this.ExclusivePopupWithButtons(title);
 }
 );
+
+type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
+
+    _drawFromAddress: function(){
+        var self = this;
+        var fromField = Html.tr({},
+                Html.td({width:"15%"}, Html.span({}, $T("From:"))),
+                Html.td({width:"85%"}, Html.span({}, self.from))
+        );
+
+        return Html.table({width:"95%"}, fromField);
+    },
+
+    _drawToAddress: function(){
+        var self = this;
+        var toField = Html.tr({},
+                Html.td({width:"15%"}, Html.span({}, $T("To:"))),
+                Html.td({width:"85%"}, _.values(self.toParticipants).join('; '))
+        );
+
+        return Html.table({width:"95%"}, toField);
+    },
+
+    _drawSubject: function(){
+        var self = this;
+        var subjectField = Html.tr({},
+                Html.td({width:"15%"}, Html.span({}, $T("Subject:"))),
+                Html.td({width:"85%"}, $B(Html.edit({style: {width: '100%'}}), self.subject.accessor()))
+        );
+        return Html.table({width:"95%"}, subjectField);
+    },
+
+    _drawExtras: function(){
+        legendTable = Html.table(
+                {},
+                Html.tr({}, Html.td({}, "{url} :"), Html.td({}, $T("field containing the url of the electronic agreement. (This field is mandatory)"))),
+                Html.tr({}, Html.td({}, "{confTitle} :"), Html.td({}, $T("field containing the conference title."))),
+                Html.tr({}, Html.td({}, "{name} :"), Html.td({}, $T("field containing the full name of the participant.")))
+                );
+        return Html.div({style:{marginLeft: '20px',
+                         fontStyle:'italic',
+                         color:'gray'}
+                  },
+                  Html.div({style:{fontWeight:'bold'}}, $T("Legend:")),
+                  legendTable);
+    }
+
+},
+    function(title,confTitle, confId, method, toParticipants, from, subject, defaultContent, legends, successHandler){
+        var self = this;
+        self.toParticipants = toParticipants;
+        self.from = from;
+        self.toUserIds = any(self.toUserIds,_.keys(toParticipants))
+        this.sendFunction=function(){
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending email..."));
+            jsonRpc(Indico.Urls.JsonRpcService, method,
+                {
+                    conference : self.confId,
+                    userIds: self.toUserIds,
+                    subject: self.subject.get(),
+                    body: self.rtWidget.get()
+                },
+                function(result, error){
+                    if (error) {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                        self.close();
+                    } else {
+                        killProgress();
+                        successHandler(result);
+                        self.close();
+                    }
+                }
+            );
+        };
+        this.BasicEmailPopup(title, confTitle, confId, subject, defaultContent, legends);
+    }
+
+);
+
+type("ParticipantsInvitePopup", ["ParticipantsEmailPopup"],{
+
+    _drawToAddress: function(){
+        var self = this;
+        var to = [];
+        for (p in self.toParticipants){
+            to.push(self.toParticipants[p].name);
+        }
+        var toField = Html.tr({},
+                Html.td({width:"15%"}, Html.span({}, $T("To:"))),
+                Html.td({width:"85%"}, to.join("; "))
+        );
+
+        return Html.table({width:"95%"}, toField);
+    }
+},
+    function(title,confTitle, confId, method, toParticipants, from, subject, defaultContent, legends, successHandler){
+        this.toUserIds = toParticipants;
+        this.ParticipantsEmailPopup(title,confTitle, confId, method, toParticipants, from, subject, defaultContent, legends, successHandler);
+    }
+
+);

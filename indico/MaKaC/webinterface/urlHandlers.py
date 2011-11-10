@@ -1597,75 +1597,26 @@ class UHRemoveCSS( URLHandler ):
 class UHSavePic( URLHandler ):
     _relativeURL = "confModifDisplay.py/savePic"
 
-class UHConfModifParticipantsObligatory( URLHandler ):
-    _relativeURL = "confModifParticipants.py/obligatory"
-
-class UHConfModifParticipantsDisplay( URLHandler ):
-    _relativeURL = "confModifParticipants.py/display"
-
-class UHConfModifParticipantsAddedInfo( URLHandler ):
-    _relativeURL = "confModifParticipants.py/addedInfo"
-
-class UHConfModifParticipantsAllowForApplying( URLHandler ):
-    _relativeURL = "confModifParticipants.py/allowForApplying"
-
-class UHConfModifParticipantsToggleAutoAccept( URLHandler ):
-    _relativeURL = "confModifParticipants.py/toggleAutoAccept"
+class UHConfModifParticipantsList( URLHandler ):
+    _relativeURL = "confModifParticipants.py/list"
 
 class UHConfModifParticipantsPending( URLHandler ):
     _relativeURL = "confModifParticipants.py/pendingParticipants"
 
+class UHConfModifParticipantsDeclined( URLHandler ):
+    _relativeURL = "confModifParticipants.py/declinedParticipants"
 
 class UHConfModifParticipantsAction( URLHandler ):
     _relativeURL = "confModifParticipants.py/action"
 
-
 class UHConfModifParticipantsStatistics( URLHandler ):
     _relativeURL = "confModifParticipants.py/statistics"
-
-
-class UHConfModifParticipantsNewToInvite( URLHandler ):
-    _relativeURL = "confModifParticipants.py/newToInvite"
-
-
-class UHConfModifParticipantsInviteNew( URLHandler ):
-    _relativeURL = "confModifParticipants.py/inviteNew"
-
-
-class UHConfModifParticipantsDetails( URLHandler ):
-    _relativeURL = "confModifParticipants.py/details"
-
-
-class UHConfModifParticipantsEdit( URLHandler ):
-    _relativeURL = "confModifParticipants.py/edit"
-
-
-class UHConfModifParticipantsPendingAction( URLHandler ):
-    _relativeURL = "confModifParticipants.py/pendingAction"
-
-
-class UHConfModifParticipantsPendingDetails( URLHandler ):
-    _relativeURL = "confModifParticipants.py/pendingDetails"
-
-
-class UHConfModifParticipantsPendingEdit( URLHandler ):
-    _relativeURL = "confModifParticipants.py/pendingEdit"
-
-
-class UHConfParticipantsNewPending( URLHandler ):
-    _relativeURL = "confModifParticipants.py/newPending"
-
 
 class UHConfParticipantsInvitation( URLHandler ):
     _relativeURL = "confModifParticipants.py/invitation"
 
-
 class UHConfParticipantsRefusal( URLHandler ):
     _relativeURL = "confModifParticipants.py/refusal"
-
-
-class UHConfModifParticipantsSendEmail( URLHandler ):
-    _relativeURL = "confModifParticipants.py/sendEmail"
 
 class UHConfModifToggleSearch( URLHandler ):
     _relativeURL = "confModifDisplay.py/toggleSearch"

@@ -234,11 +234,6 @@ class WebFactory(WebFactory):
         return WPMSessionModifSchedule(rh,session)
     getSessionModifSchedule = staticmethod(getSessionModifSchedule)
 
-#################### Participants #####################################
-
-    def getConfModifParticipantsNewPending(rh, conf):
-        return WPMConfModifParticipantsNewPending(rh, conf)
-    getConfModifParticipantsNewPending = staticmethod(getConfModifParticipantsNewPending)
 
 #################### Evaluation #####################################
 
@@ -1543,16 +1538,6 @@ class WMeetingFullDisplay(WMeetingBaseDisplay):
 
 class WMeetingMinimalDisplay(WMeetingBaseDisplay):
     pass
-
-#################### Participants #####################################
-
-class WPMConfModifParticipantsNewPending(WPMeetingDisplay,conferences.WPConfModifParticipantsNewPending):
-
-    def __init__(self, rh, conf):
-        WPMeetingDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return conferences.WPConfModifParticipantsNewPending._getBody(self, params)
 
 #################### Evaluation #####################################
 

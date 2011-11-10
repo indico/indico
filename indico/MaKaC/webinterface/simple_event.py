@@ -521,16 +521,6 @@ class WSimpleEventFullDisplay(WSimpleEventBaseDisplay):
 class WSimpleEventMinDisplay(WSimpleEventBaseDisplay):
     pass
 
-#################### Participants #####################################
-
-class WPSEConfModifParticipantsNewPending(WPSimpleEventDisplay,conferences.WPConfModifParticipantsNewPending):
-
-   def __init__(self, rh, conf):
-       WPSimpleEventDisplay.__init__(self, rh, conf)
-
-   def _getBody(self, params):
-       return conferences.WPConfModifParticipantsNewPending._getBody(self, params)
-
 #################### Evaluation #####################################
 
 class WPSEEvaluationBase( WPSimpleEventDisplay ):

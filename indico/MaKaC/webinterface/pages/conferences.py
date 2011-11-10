@@ -84,6 +84,7 @@ from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.user import AvatarHolder
+from MaKaC.webinterface.general import WebFactory
 
 
 def stringToDate( str ):
@@ -3307,6 +3308,96 @@ class WPConfCloneConfirm( WPConfModifToolsBase ):
 
 #---------------------------------------------------------------------------
 
+
+class WPConferenceModifParticipantBase( WPConferenceModifBase ):
+
+    def __init__(self, rh, conf):
+        WPConferenceModifBase.__init__(self, rh, conf)
+
+    def _createTabCtrl(self):
+        self._tabCtrl = wcomponents.TabControl()
+
+        self._tabParticipantsSetup = self._tabCtrl.newTab( "participantsetup", _("Setup"), urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
+        self._tabParticipantsList = self._tabCtrl.newTab( "participantsList", _("Participants"), urlHandlers.UHConfModifParticipantsList.getURL( self._conf ) )
+        self._tabStatistics = self._tabCtrl.newTab("statistics", _("Statistics"), urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
+        if self._conf.getParticipation().getPendingParticipantList() and nowutc() < self._conf.getStartDate():
+            self._tabParticipantsPendingList = self._tabCtrl.newTab( "pendingList", _("Pending"), urlHandlers.UHConfModifParticipantsPending.getURL( self._conf ) )
+        if self._conf.getParticipation().getDeclinedParticipantList():
+            self._tabParticipantsDeclinedList = self._tabCtrl.newTab( "declinedList", _("Declined"), urlHandlers.UHConfModifParticipantsDeclined.getURL( self._conf ) )
+
+        self._setActiveTab()
+
+    def _getPageContent(self, params):
+        self._createTabCtrl()
+
+        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+               self._includeJSPackage('Display')
+
+    def _setActiveSideMenuItem( self ):
+        self._participantsMenuItem.setActive()
+
+    def _getTabContent(self, params):
+        return "nothing"
+
+    def _setActiveTab(self):
+        pass
+
+
+class WConferenceParticipant(wcomponents.WTemplated):
+
+    def __init__(self, conference, participant):
+        self._conf = conference
+        self._participant = participant
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["conference"] = self._conf
+        vars["participant"] = self._participant
+        return vars
+
+class WConferenceParticipantPending(wcomponents.WTemplated):
+
+    def __init__(self, conference, id, pending):
+        self._conf = conference
+        self._id = id
+        self._pending = pending
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["conference"] = self._conf
+        vars["id"] = self._id
+        vars["pending"] = self._pending
+        return vars
+
+class WConferenceParticipantsSetup(wcomponents.WTemplated):
+
+    def __init__(self, conference):
+        self._conf = conference
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["confId"] = self._conf.getId()
+        vars["isObligatory"] = self._conf.getParticipation().isObligatory()
+        vars["allowDisplay"] = self._conf.getParticipation().displayParticipantList()
+        vars["addedInfo"] = self._conf.getParticipation().isAddedInfo()
+        vars["allowForApply"] = self._conf.getParticipation().isAllowedForApplying()
+        vars["autopAccept"] = self._conf.getParticipation().autoAccept()
+        return vars
+
+class WPConfModifParticipantsSetup( WPConferenceModifParticipantBase ):
+
+    def _setActiveTab( self ):
+        self._tabParticipantsSetup.setActive()
+
+    def _getTabContent( self, params ):
+        p = WConferenceParticipantsSetup( self._conf )
+        return p.getHTML(params)
+
+#---------------------------------------------------------------------------
+
 class WConferenceParticipants(wcomponents.WTemplated):
 
     def __init__(self, conference):
@@ -3314,230 +3405,153 @@ class WConferenceParticipants(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["confTitle"] = self._conf.getTitle()
-        vars["confId"] = self._conf.getId()
-        vars["contribSetIndex"]='index'
 
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
 
-        vars["participantsList"] = self._conf.getParticipation().getParticipantList()
-        vars["participantDetailsURL"] = urlHandlers.UHConfModifParticipantsDetails.getURL(self._conf)
-        vars["participantEditURL"] = urlHandlers.UHConfModifParticipantsDetails.getURL(self._conf)
-        vars["nowutc"] = nowutc()
-        vars["confStartDate"] = self._conf.getStartDate()
-
-
-        vars["statisticAction"] = str(urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
-        vars["sendButton"] = i18nformat("""<input type="submit" class="btn" value="_("Send email to")" name="participantsAction" />""")
-        vars["excelButton"] = i18nformat("""<input type="submit" class="btn" value="_("Export to Excel")" name="participantsAction"/>""")
         vars["participantsAction"] = str(urlHandlers.UHConfModifParticipantsAction.getURL(self._conf))
-        if nowutc() < self._conf.getStartDate() :
-            vars["inviteAction"] = True
-            vars["sendAddedInfoButton"] = i18nformat("""<input type="submit" class="btn" value="_("Inform about adding")" name="participantsAction" />""")
-
-            vars["presenceButton"] = vars["absenceButton"] = vars["askButton"] = vars["excuseButton"] = ""
-
-        else :
-            vars["absenceButton"] = i18nformat("""<input type="submit" class="btn" value="_("Mark absence")" name="participantsAction" />""")
-            vars["presenceButton"] = i18nformat("""<input type="submit" class="btn" value="_("Mark present")" name="participantsAction" />""")
-            vars["askButton"] = i18nformat("""<input type="submit" class="btn" value="_("Ask for excuse")" name="participantsAction" />""")
-            vars["excuseButton"] = i18nformat("""<input type="submit" class="btn" value="_("Excuse absence")" name="participantsAction" />""")
-
-            vars["inviteAction"] = False
-            vars["removeButton"] = vars["sendAddedInfoButton"] = ""
-
-        vars["removeButton"] = i18nformat("""<input type="submit" class="btn" value="_("Remove participant")" name="participantsAction" />""")
+        vars["hasStarted"] = nowutc() < self._conf.getStartDate()
+        vars["currentUser"] = self._rh._aw.getUser()
+        vars["numberParticipants"] = len(self._conf.getParticipation().getParticipantList())
+        vars["conf"] = self._conf
+        vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
 
         return vars
 
+class WPConfModifParticipants( WPConferenceModifParticipantBase ):
 
-class WPConfModifParticipants( WPConferenceModifBase ):
+    def _setActiveTab( self ):
+        self._tabParticipantsList.setActive()
 
-    def _setActiveSideMenuItem( self ):
-        self._participantsMenuItem.setActive()
-
-    def _getPageContent( self, params ):
+    def _getTabContent( self, params ):
         p = WConferenceParticipants( self._conf )
         return p.getHTML(params)
 
 #---------------------------------------------------------------------------
 
+
 class WConferenceParticipantsPending(wcomponents.WTemplated):
 
     def __init__(self, conference):
-        self.__conf = conference
+        self._conf = conference
 
     def getVars(self):
-
         vars = wcomponents.WTemplated.getVars(self)
-        vars["confTitle"] = self.__conf.getTitle()
-        vars["confId"] = self.__conf.getId()
 
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
-
-        if len(vars.get("errorMsg", [])) > 0 :
-            vars["errorMsg"] = wcomponents.WErrorMessage().getHTML(vars)
-        else :
-            vars["errorMsg"] = ""
-
-        text = button = action = ""
-        action = str(urlHandlers.UHConfModifParticipantsPendingAction.getURL(self.__conf))
-
         vars["pending"] = self._getPendingParticipantsList()
-        vars["pendingAction"] = action
-        vars["conf"] = self.__conf
-        vars["conferenceStarted"] = nowutc() > self.__conf.getStartDate()
+        vars["numberPending"] =  self._conf.getParticipation().getPendingNumber()
+        vars["conf"] = self._conf
+        vars["conferenceStarted"] = nowutc() > self._conf.getStartDate()
+        vars["currentUser"] = self._rh._aw.getUser()
 
         return vars
 
     def _getPendingParticipantsList(self):
         l = []
 
-        for k in self.__conf.getParticipation().getPendingParticipantList().keys() :
-            p = self.__conf.getParticipation().getPendingParticipantByKey(k)
+        for k in self._conf.getParticipation().getPendingParticipantList().keys() :
+            p = self._conf.getParticipation().getPendingParticipantByKey(k)
             l.append((k, p))
         return l
 
-class WPConfModifParticipantsPending( WPConfModifParticipants ):
+class WPConfModifParticipantsPending( WPConferenceModifParticipantBase ):
 
-    def _getPageContent( self, params ):
-        banner = wcomponents.WParticipantsBannerModif(self._conf).getHTML()
+    def _setActiveTab( self ):
+        self._tabParticipantsPendingList.setActive()
+
+    def _getTabContent( self, params ):
         p = WConferenceParticipantsPending( self._conf )
-        return banner+p.getHTML()
+        return p.getHTML()
 
 #---------------------------------------------------------------------------
 
-class WConferenceParticipantsStatistics(wcomponents.WTemplated):
+
+class WConferenceParticipantsDeclined(wcomponents.WTemplated):
 
     def __init__(self, conference):
-        self.__conf = conference
+        self._conf = conference
 
     def getVars(self):
 
         vars = wcomponents.WTemplated.getVars(self)
-        vars["confTitle"] = self.__conf.getTitle()
-        vars["confId"] = self.__conf.getId()
+        vars["declined"] = self._getDeclinedParticipantsList()
+        vars["numberDeclined"] =  self._conf.getParticipation().getDeclinedNumber()
+        return vars
 
-        vars["invited"] = self.__conf.getParticipation().getInvitedNumber()
-        vars["rejected"] = self.__conf.getParticipation().getRejectedNumber()
-        vars["added"] = self.__conf.getParticipation().getAddedNumber()
-        vars["refused"] = self.__conf.getParticipation().getRefusedNumber()
-        vars["pending"] = self.__conf.getParticipation().getPendingNumber()
+    def _getDeclinedParticipantsList(self):
+        l = []
 
-        if nowutc() < self.__conf.getStartDate() :
-            vars["present"] = vars["absent"] = vars["excused"] = ""
-        else :
-            vars["present"] = i18nformat("""
-            <tr>
-                <td class="titleCellFormat"> _("Present participants") </td>
-                <td><b>%s</b></td>
-            </tr>
-            """)%self.__conf.getParticipation().getPresentNumber()
+        for k in self._conf.getParticipation().getDeclinedParticipantList().keys() :
+            p = self._conf.getParticipation().getDeclinedParticipantByKey(k)
+            l.append((k, p))
+        return l
 
-            vars["absent"] = i18nformat("""
-            <tr>
-                <td class="titleCellFormat"> _("Absent participants") </td>
-                <td><b>%s</b></td>
-            </tr>
-            """)%self.__conf.getParticipation().getAbsentNumber()
+class WPConfModifParticipantsDeclined( WPConferenceModifParticipantBase ):
 
-            vars["excused"] = i18nformat("""
-            <tr>
-                <td class="titleCellFormat"> _("Excused participants") </td>
-                <td><b>%s</b></td>
-            </tr>
-            """)%self.__conf.getParticipation().getExcusedNumber()
+    def _setActiveTab( self ):
+        self._tabParticipantsDeclinedList.setActive()
 
+    def _getTabContent( self, params ):
+        p = WConferenceParticipantsDeclined( self._conf )
+        return p.getHTML()
+
+#---------------------------------------------------------------------------
+class WConferenceParticipantsStatistics(wcomponents.WTemplated):
+
+    def __init__(self, conference):
+        self._conf = conference
+
+    def getVars(self):
+
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["invited"] = self._conf.getParticipation().getInvitedNumber()
+        vars["rejected"] = self._conf.getParticipation().getRejectedNumber()
+        vars["added"] = self._conf.getParticipation().getAddedNumber()
+        vars["refused"] = self._conf.getParticipation().getRefusedNumber()
+        vars["pending"] = self._conf.getParticipation().getPendingNumber()
+        vars["declined"] = self._conf.getParticipation().getDeclinedNumber()
+        vars["conferenceStarted"] = nowutc() > self._conf.getStartDate()
+        vars["present"] = self._conf.getParticipation().getPresentNumber()
+        vars["absent"] = self._conf.getParticipation().getAbsentNumber()
+        vars["excused"] = self._conf.getParticipation().getExcusedNumber()
         return vars
 
 
-class WPConfModifParticipantsStatistics( WPConfModifParticipants ):
+class WPConfModifParticipantsStatistics( WPConferenceModifParticipantBase ):
 
-    def _getPageContent( self, params ):
-        params["action"] = "search"
-        banner = wcomponents.WParticipantsBannerModif(self._conf).getHTML()
+    def _setActiveTab( self ):
+        self._tabStatistics.setActive()
+
+    def _getTabContent( self, params ):
         p = WConferenceParticipantsStatistics( self._conf )
-        return banner+p.getHTML(params)
-
+        return p.getHTML(params)
 
 #---------------------------------------------------------------------------
 
-class WPConfModifParticipantsNew( WPConfModifParticipants ):
+class WPConfModifParticipantsInvitationBase(WPConferenceDisplayBase):
 
-    def _getPageContent( self, params ):
-        p = wcomponents.WNewPerson()
-        if params.get("formTitle",None) is None :
-            params["formTitle"] = _("Define new participant")
-        if params.get("titleValue",None) is None :
-            params["titleValue"] = ""
-        if params.get("surNameValue",None) is None :
-            params["surNameValue"] = ""
-        if params.get("nameValue",None) is None :
-            params["nameValue"] = ""
-        if params.get("emailValue",None) is None :
-            params["emailValue"] = ""
-        if params.get("addressValue",None) is None :
-            params["addressValue"] = ""
-        if params.get("affiliationValue",None) is None :
-            params["affiliationValue"] = ""
-        if params.get("phoneValue",None) is None :
-            params["phoneValue"] = ""
-        if params.get("faxValue",None) is None :
-            params["faxValue"] = ""
-        return p.getHTML(params)
-
-class WPConfModifParticipantsNewPending( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-
-    def _getBody( self, params ):
-        p = wcomponents.WNewPerson()
-        params["formTitle"] = _("Apply for participation")
-        if params.get("titleValue",None) is None :
-            params["titleValue"] = ""
-        if params.get("surNameValue",None) is None :
-            params["surNameValue"] = ""
-        if params.get("nameValue",None) is None :
-            params["nameValue"] = ""
-        if params.get("emailValue",None) is None :
-            params["emailValue"] = ""
-        if params.get("addressValue",None) is None :
-            params["addressValue"] = ""
-        if params.get("affiliationValue",None) is None :
-            params["affiliationValue"] = ""
-        if params.get("phoneValue",None) is None :
-            params["phoneValue"] = ""
-        if params.get("faxValue",None) is None :
-            params["faxValue"] = ""
-
-        params["disabledTitle"] = params.get("disabledTitle",False)
-        params["disabledSurName"] = params.get("disabledSurName",False)
-        params["disabledName"] = params.get("disabledName",False)
-        params["disabledEmail"] = params.get("disabledEmail",False)
-        params["disabledAddress"] = params.get("disabledAddress",False)
-        params["disabledPhone"] = params.get("disabledPhone",False)
-        params["disabledFax"] = params.get("disabledFax",False)
-        params["disabledAffiliation"] = params.get("disabledAffiliation",False)
-
-        return p.getHTML(params)
-
+    def _getHeader( self ):
+        """
+        """
+        wc = wcomponents.WMenuSimpleEventHeader( self._getAW(),self._conf )
+        return wc.getHTML( { "loginURL": self.getLoginURL(),\
+                             "logoutURL": self.getLogoutURL(),\
+                             "confId": self._conf.getId(),\
+                             "currentView": "static",\
+                             "type": WebFactory.getId(),\
+                             "dark": True,\
+                             "loginAsURL": self.getLoginAsURL() } )
 
 #---------------------------------------------------------------------------
 
-class WPConfModifParticipantsInvite(WPConferenceDefaultDisplayBase):
 
-    def __init__(self, rh, conf):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-
-    def _defineSectionMenu(self):
-        self._sectionMenu = None
+class WPConfModifParticipantsInvite(WPConfModifParticipantsInvitationBase):
 
     def _getBody( self, params ):
         msg = i18nformat("""
-        _("Please indicate whether you want to accept or reject the invitation to the") <i>"%s"</i>?<br>
+         <font size="+2">_("Please indicate whether you want to accept or reject the invitation to '%s'")? </font>
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
         url = urlHandlers.UHConfParticipantsInvitation.getURL( self._conf )
@@ -3547,35 +3561,17 @@ class WPConfModifParticipantsInvite(WPConferenceDefaultDisplayBase):
 
 #---------------------------------------------------------------------------
 
-class WPConfModifParticipantsRefuse(WPConferenceDefaultDisplayBase):
-
-    def __init__(self, rh, conf):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
+class WPConfModifParticipantsRefuse(WPConfModifParticipantsInvitationBase):
 
     def _getBody( self, params ):
         msg = i18nformat("""
-        <font size="+2"> _("Are you sure you want to refuse to attend the "%s"")?</font>
+        <font size="+2"> _("Are you sure you want to refuse to attend the '%s'")?</font>
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
         url = urlHandlers.UHConfParticipantsRefusal.getURL( self._conf )
         url.addParam("participantId",params["participantId"])
         return wc.getHTML( msg, url, {}, \
                         confirmButtonCaption= _("Refuse"), cancelButtonCaption= _("Cancel") )
-
-#---------------------------------------------------------------------------
-
-class WPConfModifParticipantsEMail(WPConferenceModifBase):
-    def __init__(self, rh, conf):
-        WPConferenceModifBase.__init__(self, rh, conf)
-
-    def _setActiveTab( self ):
-        self._tabParticipants.setActive()
-
-    def _getPageContent( self, params ):
-        toemail = params["emailto"]
-        params["postURL"] = urlHandlers.UHConfModifParticipantsSendEmail.getURL( self._conf )
-        wc = WEmail(self._conf, self._getAW().getUser(), toemail)
-        return wc.getHTML(params)
 
 #---------------------------------------------------------------------------
 
@@ -11062,4 +11058,3 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
 
 class WPreviewPage( wcomponents.WTemplated ):
     pass
-

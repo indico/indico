@@ -542,10 +542,6 @@ class WMenuConferenceHeader( WConferenceHeader ):
         # Save to session
         vars["hideContributions"] = hideContributions;
 
-        if self._conf.getType() == "meeting" and self._conf.getParticipation().isAllowedForApplying() and self._conf.getStartDate() > nowutc():
-            vars["applyForParticipation"] = i18nformat("""<a href="%s">_("Apply for participation")</a>""")%urlHandlers.UHConfParticipantsNewPending.getURL(self._conf)
-        else :
-            vars["applyForParticipation"] = ""
         evaluation = self._conf.getEvaluation()
         if self._conf.hasEnabledSection("evaluation") and evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions()>0 :
             vars["evaluation"] =  i18nformat("""<a href="%s"> _("Evaluation")</a>""")%urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)

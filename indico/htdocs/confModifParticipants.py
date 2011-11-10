@@ -25,23 +25,14 @@ from MaKaC.webinterface.rh import conferenceDisplay
 def index( req, **params ):
     return conferenceModif.RHConfModifParticipants( req ).process( params )
 
-def obligatory ( req, **params ):
-    return conferenceModif.RHConfModifParticipantsObligatory( req ).process( params )
-
-def display ( req, **params ):
-    return conferenceModif.RHConfModifParticipantsDisplay( req ).process( params )
-
-def addedInfo ( req, **params ):
-    return conferenceModif.RHConfModifParticipantsAddedInfo( req ).process( params )
-
-def allowForApplying( req, **params ):
-    return conferenceModif.RHConfModifParticipantsAllowForApplying( req ).process( params )
-
-def toggleAutoAccept( req, **params ):
-    return conferenceModif.RHConfModifParticipantsToggleAutoAccept( req ).process( params )
+def list ( req, **params ):
+    return conferenceModif.RHConfModifParticipantsList( req ).process( params )
 
 def pendingParticipants( req, **params ):
     return conferenceModif.RHConfModifParticipantsPending( req ).process( params )
+
+def declinedParticipants( req, **params ):
+    return conferenceModif.RHConfModifParticipantsDeclined( req ).process( params )
 
 def action( req, **params ):
     return conferenceModif.RHConfModifParticipantsAction( req ).process( params )
@@ -49,35 +40,9 @@ def action( req, **params ):
 def statistics( req, **params ):
     return conferenceModif.RHConfModifParticipantsStatistics( req ).process( params )
 
-def newToInvite( req, **params ):
-    return conferenceModif.RHConfModifParticipantsNewToInvite( req ).process( params )
-
-def inviteNew( req, **params ):
-    return conferenceModif.RHConfModifParticipantsInviteNew( req ).process( params )
-
-def details( req, **params ):
-    return conferenceModif.RHConfModifParticipantsDetails( req ).process( params )
-
-def edit( req, **params ):
-    return conferenceModif.RHConfModifParticipantsEdit( req ).process( params )
-
-def pendingAction( req, **params ):
-    return conferenceModif.RHConfModifParticipantsPendingAction( req ).process( params )
-
-def pendingDetails( req, **params ):
-    return conferenceModif.RHConfModifParticipantsPendingDetails( req ).process( params )
-
-def pendingEdit( req, **params ):
-    return conferenceModif.RHConfModifParticipantsPendingEdit( req ).process( params )
-
-def newPending( req, **params ):
-    return conferenceDisplay.RHConfParticipantsNewPending( req ).process( params )
-
 def invitation( req, **params ):
     return conferenceDisplay.RHConfParticipantsInvitation( req ).process( params )
 
 def refusal( req, **params ):
     return conferenceDisplay.RHConfParticipantsRefusal( req ).process( params )
 
-def sendEmail( req, **params ):
-    return conferenceModif.RHConfModifParticipantsSendEmail( req ).process( params )

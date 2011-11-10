@@ -43,8 +43,10 @@ class Participation(Persistent):
         self._autoAccept = False
         self._participantList = {}
         self._pendingParticipantList = {}
+        self._declinedParticipantList = {}
         self._participantIdGenerator = 0
         self._pendingIdGenerator = 0
+        self._declinedIdGenerator = 0
         self._dateNegotiation = None
         self._displayParticipantList = True
 
@@ -117,7 +119,7 @@ class Participation(Persistent):
         self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
         self.notifyModification()
 
-    def getAutoAccept(self):
+    def autoAccept(self):
         try:
             return self._autoAccept
         except AttributeError :
@@ -132,6 +134,7 @@ class Participation(Persistent):
         }
         self._conference.getLogHandler().logAction(logData, "participants", responsibleUser)
         self.notifyModification()
+
 
     def alreadyParticipating(self, participant):
         if participant is None :
@@ -265,6 +268,29 @@ class Participation(Persistent):
 
         return data
 
+    def getDeclinedParticipantList(self):
+        try:
+            return self._declinedParticipantList
+        except AttributeError :
+            self._declinedParticipantList = {}
+        return self._declinedParticipantList
+
+    def declineParticipant(self, participant, responsibleUser = None):
+        if participant.getConference().getId() != self._conference.getId() :
+            return False
+        self.removePendingParticipant(participant)
+        self.getDeclinedParticipantList()["%d"%self._newDeclinedId()] = participant
+        logData = participant.getParticipantData()
+        logData["subject"] = _("Participant declined : %s")%participant.getWholeName()
+        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.notifyModification()
+
+
+    def getDeclinedParticipantByKey(self, key):
+        if key is not None :
+            return self.getDeclinedParticipantList().get(key, None)
+        else :
+            return None
 
     def addParticipant(self, participant, eventManager = None):
 
@@ -326,61 +352,12 @@ class Participation(Persistent):
         logData["subject"] = _("New participant invited : %s")%participant.getWholeName()
         self._conference.getLogHandler().logAction(logData,"participants",eventManager)
         participant.setStatusInvited()
-        data = {}
-        title = ""
-        firstName = ""
-        familyName = ""
-        eventURL = urlHandlers.UHConferenceDisplay.getURL( self._conference )
-        actionURL = urlHandlers.UHConfParticipantsInvitation.getURL( self._conference )
-        actionURL.addParam("participantId","%d"%self._lastParticipantId())
-        toList = []
-        if participant.getAvatar() is not None :
-            toList.append(participant.getAvatar().getEmail())
-            data["toList"] = toList
-            title = participant.getAvatar().getTitle()
-            familyName = participant.getAvatar().getFamilyName()
-            firstName = participant.getAvatar().getFirstName()
+        if participant.getAvatar() is not None:
+            if not participant.getAvatar().getEmail() or participant.getAvatar().getEmail() == "":
+                return False
         else :
-            toList.append(participant.getEmail())
-            data["toList"] = toList
-            title = participant.getTitle()
-            familyName = participant.getFamilyName()
-            firstName = participant.getFamilyName()
-        locationName = locationAddress = ""
-        if self._conference.getLocation() is not None :
-            locationName = self._conference.getLocation().getName()
-            locationAddress = self._conference.getLocation().getAddress()
-        if data["toList"] is None or len(data["toList"]) == 0 :
-            return False
-        if title is None or title == "" :
-            title = firstName
-        data["fromAddr"] = eventManager.getEmail()
-        data["subject"] = _("Invitation to %s")%self._conference.getTitle()
-        data["body"] = _("""
-        Dear %s %s,
-
-        %s %s, event manager of '%s' would like to invite you to take part in this event,
-        which will take place on %s in %s, %s. Further information on this event are
-        available at %s
-        You are kindly requested to accept or decline your participation in this event by
-        clicking on the link below :
-         %s
-
-        Looking forward to meeting you at %s
-        Your Indico
-        on behalf of %s %s
-
-        """)%(title, familyName, \
-             eventManager.getFirstName(), eventManager.getFamilyName(), \
-             self._conference.getTitle(), \
-             self._conference.getAdjustedStartDate(), \
-             locationName, locationAddress, \
-             eventURL, actionURL, \
-             self._conference.getTitle(), \
-             eventManager.getFirstName(), eventManager.getFamilyName())
-        GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants")
-        #if participant.getAvatar() is None :
-        #    self.sendEncouragementToCreateAccount(participant)
+            if not participant.getEmail() or participant.getEmail() == "":
+                return False
         self.notifyModification()
         return True
 
@@ -435,7 +412,7 @@ class Participation(Persistent):
             return False
         if self.alreadyParticipating(participant) != 0 :
             return False
-        if self.getAutoAccept():
+        if self.autoAccept():
             self.addParticipant(participant)
         else:
             self._pendingParticipantList["%d"%self._newPendingId()] = participant
@@ -738,6 +715,9 @@ on behalf of %s %s
                 counter += 1
         return counter
 
+    def getDeclinedNumber(self):
+        return len(self.getDeclinedParticipantList())
+
     def _newParticipantId(self):
         self._participantIdGenerator += 1
         return self._participantIdGenerator
@@ -751,6 +731,20 @@ on behalf of %s %s
 
     def _lastPendingId(self):
         return self._pendingIdGenerator
+
+    def _newDeclinedId(self):
+        try:
+            self._declinedIdGenerator += 1
+        except AttributeError:
+            self._declinedIdGenerator = 1
+        return self._declinedIdGenerator
+
+    def _lastDeclinedId(self):
+        try:
+            return self._declinedIdGenerator
+        except AttributeError:
+            self._declinedIdGenerator = 0
+        return self._declinedIdGenerator
 
     def displayParticipantList(self):
         try :
@@ -1034,7 +1028,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
         return True
 
-    def setStatusDeclined(self, responsibleUser=None, sendMail=True):
+    def setStatusDeclined(self, responsibleUser=None):
         if self._status != "pending" :
             return False
         self._status = "declined"
@@ -1042,29 +1036,6 @@ class Participant (Persistent, Negotiator, Fossilizable):
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to DECLINED")%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
-
-        if sendMail:
-            data = {}
-            data["fromAddr"] = Config.getInstance().getNoReplyEmail()
-            confTitle = self._participation.getConference().getTitle()
-            data["subject"] = _("Your application for attendance in %s declined")%confTitle
-            toList = []
-            toList.append(self._email)
-            title = ""
-            if self._title == "" or self._title is None :
-                title = self._firstName
-            else:
-                title = self._title
-            data["toList"] = toList
-            data["body"] = _("""
-            Dear %s %s,
-
-            your request to attend the %s has been declined by the event manager.
-
-            Your Indico
-            """)%(title, self._familyName, confTitle)
-
-            GenericMailer.sendAndLog(GenericNotification(data),self.getConference(),"participants",responsibleUser)
 
         return True
 

@@ -1,71 +1,200 @@
-<script type="text/javascript">
-<!--
-function selectAll()
-{
-    //document.pendingForm.trackShowNoValue.checked=true
-    if (!document.pendingForm.pending.length){
-        document.pendingForm.pending.checked=true
-    } else {
-        for (i = 0; i < document.pendingForm.pending.length; i++) {
-            document.pendingForm.pending[i].checked=true
-        }
-    }
-}
-
-function deselectAll()
-{
-    //document.pendingForm.trackShowNoValue.checked=false
-    if (!document.pendingForm.pending.length)    {
-        document.pendingForm.pending.checked=false
-    } else {
-       for (i = 0; i < document.pendingForm.pending.length; i++) {
-           document.pendingForm.pending[i].checked=false
-       }
-    }
-}
-//-->
-</script>
-
-<h2 class="bannerTitle">${ _("List of Pending Participants")}</h2>
-
-<p>
-    ${ _("This is a list of persons who have applied for participation in this event")}
-</p>
-
-${ errorMsg }
-${ infoMsg }
-
-<form action="${ pendingAction }" method="post" name="pendingForm">
-    <table>
-        <tr>
-            <td class="titleCellFormat">
-                <img src="${ selectAll }" alt="${ _("Select all")}" onclick="javascript:selectAll()">
-                <img src="${ deselectAll }" alt="${ _("Deselect all")}" onclick="javascript:deselectAll()">
-                &nbsp;${ _("Name")}
+<table width="100%" cellspacing="0" align="center" border="0">
+    <tr>
+       <td nowrap colspan="10">
+            <div class="CRLgroupTitleNoBorder">${ _("Displaying")} <span id="numberParticipants" style="font-weight: bold;">${numberPending}</span>
+                 ${_("pending")} <span id="numberParticipantsText">${ _("participant") if numberPending == 1 else _("participants")}</span>
+            </div>
+        </td>
+    </tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+    % if not conferenceStarted:
+        <tr id="headPanel" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);" class="follow-scroll">
+            <td valign="bottom" width="100%" align="left" style="padding-top:5px;" colspan="9">
+                <ul class="buttons" style="margin-top:0px;">
+                        <li class="button left" id="accept" >${ _("Accept")}
+                        <li class="button right" id="reject"><div class="arrow">${ _("Reject")}</div>
+                </ul>
             </td>
-            <td class="titleCellFormat">&nbsp;${ _("Status")}</td>
         </tr>
-        % for (key, p) in pending:
-            <% url = urlHandlers.UHConfModifParticipantsPendingDetails.getURL(conf) %>
-            <% url.addParam("pendingId",key) %>
-            <tr>
-                <td valign="top" class="abstractDataCell">
-                    <input type="checkbox" name="pending" value="${ key }" />&nbsp;
-                    <a href="${ url }">${ p.getTitle() }&nbsp;${ p.getFirstName() }&nbsp;${ p.getFamilyName() }</a>
-                </td>
-                <td valign="top" class="abstractDataCell">&nbsp;&nbsp;${ p.getStatus() }</td>
-            </tr>
-        % endfor
-    </table>
-    % if not conferenceStarted :
-        <div style="margin-top: 20px;">
-            <input type="submit" class="btn" value="${ _("Accept selected")}" name="pendingAction" style="margin-right: 20px;"/>
-            <input type="submit" class="btn" value="${ _("Reject selected")}" name="pendingAction" />
-            <select name="emailNotification">
-                <option value="yes" selected>${ _("with email notification")}</option>
-                <option value="no">${ _("without email notification")}</option>
-            </select>
-        </div>
+        <tr id="selectBar" style="display:none">
+            <td colspan=10 style="padding: 5px 0px 10px;" nowrap>
+            Select: <a style="color: #0B63A5;" id="selectAll"> All</a>, <a style="color: #0B63A5;" id="deselectAll">None</a>
+            </td>
+        </tr>
     % endif
-</form>
+    <tr id="headPending">
+        <td nowrap="" align="right" width="3%" style="border-bottom: 1px solid #DDDDDD;" class="titleCellFormat"></td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Name")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Affiliation")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Email")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Address")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Telephone")}
+        </td>
+        <td style="border-bottom: 1px solid #DDDDDD; padding-left:5px" class="titleCellFormat">
+            ${_("Fax")}
+        </td>
+    </tr>
+    <tr id="noPendingInfo">
+        <td colspan=10 style="font-style: italic; padding:15px 0px 15px 15px; border-bottom: 1px solid #DDDDDD;" nowrap>
+            <span class="collShowBookingsText">${_("There are no pending participants yet")}</span>
+        </td>
+    </tr>
+    % for key, p in pending:
+         <%include file="ConferenceParticipantPending.tpl" args="id=key, pending=p,conference=conf"/>
+    % endfor
+</table>
 
+<script type="text/javascript">
+var actionPendingRows = function(){
+    $("input:checkbox[id^=checkPending]").click(function(){
+        if(this.checked){
+            $(this).parents('tr[id^=pending]').css('background-color',"#CDEB8B");
+        }else{
+            $(this).parents('tr[id^=pending]').css('background-color',"transparent");
+        }
+    });
+
+    $("tr[id^=pending]").hover(function () {
+        if($(this).find('input:checkbox:checked[id^=checkPending]').size() == 0){
+            $(this).css({'background-color' : 'rgb(255, 246, 223)'});
+        }}
+        , function () {
+          if($(this).find('input:checkbox:checked[id^=checkPending]').size() > 0){
+              $(this).css('background-color',"#CDEB8B");
+          }else{
+              $(this).css('background-color',"transparent");
+          }
+    });
+};
+
+var checkNumberPending = function(){
+    $('#numberParticipants').text($('input:checkbox[id^=checkPending]').length);
+    if($('input:checkbox:checked[id^=checkPending]').length == 1) {
+        $('#numberParticipantsText').text("participant");
+    } else {
+        $('#numberParticipantsText').text("participants");
+    }
+    if($('tr[id^=pending]').length == 0){
+        $('#selectBar, #headPending').hide();
+        $('#noPendingInfo').show();
+    }else{
+        $('#selectBar, #headPending').show();
+        $('#noPendingInfo').hide();
+    }
+};
+
+IndicoUI.executeOnLoad(function(){
+    var rejectMenu = null;
+
+    actionPendingRows();
+    checkNumberPending();
+
+    $("#selectPending").click(function(){
+        if($(this).attr('checked')){
+            $('input:checkbox[id^=checkPending]').attr('checked', 'checked');
+            $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"#CDEB8B");
+        }else{
+            $('input:checkbox[id^=checkPending]').removeAttr('checked');
+            $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
+        }
+    });
+
+
+    var atLeastOneParticipantSelected = function(){
+        if ($('input:checkbox:checked').length>0){
+            return true;
+        } else{
+            new WarningPopup($T("Warning"), $T('No pending participant selected! Please select at least one.')).open();
+            return false;
+        }
+    };
+
+    var pendingHandler = function(){
+        $('input:checkbox:checked[id^=checkPending]').parents('tr[id^=pending]').hide("highlight", {color:"#881122"}, 1500, function(){
+            $(this).remove();
+            checkNumberPending();
+            });
+    };
+
+    var actionUsers = function(method){
+        var arrayChecked=[];
+        if (atLeastOneParticipantSelected()){
+            $('input:checkbox:checked').each(function() {
+                   arrayChecked.push($(this).val());
+            });
+        var killProgress = IndicoUI.Dialogs.Util.progress("Processing...");
+        jsonRpc(Indico.Urls.JsonRpcService, method,
+                { confId: '${self_._conf.getId()}',
+                  userIds: arrayChecked},
+                function(result, error){
+                    killProgress();
+                    if (exists(error)) {
+                        IndicoUtil.errorReport(error);
+                    } else {
+                        pendingHandler();
+                    }
+                });
+        return false;
+    }};
+
+    var composeEmail = function(){
+        var participantsChecked={};
+        if (atLeastOneParticipantSelected()){
+            $("input:checkbox:checked").each(function() {
+                participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=namePending]").children("[id^=pending]").text();
+            });
+            var subject = 'Your application for attendance in \'${conf.getTitle()}\' declined';
+            var body = 'Dear {name},<br/><br/>' +
+                        'your request to attend the \'{confTitle}\' has been declined by the event manager.<br/>';
+            var legends = {'confTitle':$T('field containing the conference title. (This field is mandatory)'),
+                           'name':$T('field containing the full name of the participant.(This field is mandatory)')};
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, 'event.participation.rejectPending', participantsChecked, '${currentUser.getStraightFullName()}' ,subject, body, legends, pendingHandler);
+            popup.open();
+        }
+        return false;
+    };
+
+    $('#selectAll').click(function () {
+        $('input:checkbox[id^=checkPending]').attr('checked', 'checked');
+        $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"#CDEB8B");
+    });
+
+    $('#deselectAll').click(function () {
+        $('input:checkbox[id^=checkPending]').removeAttr('checked');
+        $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
+    });
+
+    $('#accept').click(function(){
+       actionUsers("event.participation.acceptPending")
+    });
+
+    $("#reject").click(function(){
+        if (rejectMenu != null && rejectMenu.isOpen()) {
+            rejectMenu.close();
+            rejectMenu = null;
+            return false;
+        }
+
+        var menuItems = {};
+        menuItems['With email notification'] = function () {return composeEmail();};
+        menuItems['Without email notification'] = function () {return actionUsers("event.participation.rejectPending");};
+
+        rejectMenu = new PopupMenu(menuItems, [$E(this)], "buttonMenuPopupList");
+        rejectMenu.open($(this).offset().left, $(this).offset().top + this.offsetHeight , null, null, false, true);
+        return false;
+    });
+
+    $(window).scroll(function(){
+        IndicoUI.Effect.followScroll();
+    });
+});
+</script>
