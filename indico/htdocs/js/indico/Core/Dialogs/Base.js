@@ -184,10 +184,10 @@ type("ProgressDialog",["ExclusivePopup"],
          draw: function() {
              return this.ExclusivePopup.prototype.draw.call(
                  this,
-                 Html.div('loadingPopup',
-                          Html.div('text', this.text)),
+                 $('<div class="loadingPopup"/>').append($('<div class="text"/>').html(this.text)),
                  {background: '#424242', border: 'none', padding: '20px', overflow: 'visible'},
-                 {background: '#424242', border: 'none', padding: '1px', overflow: 'auto'});
+                 {background: '#424242', border: 'none', padding: '1px', overflow: 'auto'}
+             );
          }
      },
      function(text) {
