@@ -332,8 +332,8 @@ class CSBooking(CSBookingBase):
             Returns None if success.
             Returns a VidyoError if there is a problem, such as the name being duplicated.
         """
-        #result = ExternalOperationsManager.execute(self, "createRoom", VidyoOperations.createRoom, self)
-        result = True
+        result = ExternalOperationsManager.execute(self, "createRoom", VidyoOperations.createRoom, self)
+
         if isinstance(result, VidyoError):
             return result
 
