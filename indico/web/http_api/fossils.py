@@ -85,6 +85,21 @@ class ICategoryProtectedMetadataFossil(ICategoryMetadataFossil):
     getName.produce = lambda x: None
 
 
+class IConferenceChairMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getFullName(self):
+        pass
+
+    def getEmail(self):
+        pass
+
+    def getAffiliation(self):
+        pass
+
+
 class IConferenceMetadataFossil(IFossil):
 
     def getId(self):
@@ -118,6 +133,11 @@ class IConferenceMetadataFossil(IFossil):
 
     def getTimezone(self):
         pass
+
+    def getChairList(self):
+        pass
+    getChairList.name = 'chairs'
+    getChairList.result = IConferenceChairMetadataFossil
 
     def getLocation(self):
         """ Location (CERN/...) """
