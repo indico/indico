@@ -1,5 +1,6 @@
 {
     ajaxPendingAll : false,
+    vidyoComponents : null,
 
     start : function(booking, iframeElement) {
         window.open(booking.url);
@@ -33,7 +34,7 @@
     errorHandler: function(event, error, booking) {
         if (event === 'create' || event === 'edit') {
             if (error.errorType === 'invalidName') {
-                var message = $T("That room name is not valid. Please write a new name that starts " +
+                var message = $T("That room name is not valid. Please write a new name that starts " + 
                                  "with a letter or a number, and does not contain punctuation, except periods, underscores or dashes. " +
                                  "Unicode characters are allowed (é, ñ, 漢字) but some may cause problems.");
                 IndicoUtil.markInvalidField($E('roomName'), message);
@@ -57,11 +58,11 @@
             }
 
             if (error.errorType === 'badOwner') {
-                CSErrorPopup($T("Invalid owner"), [$T("The user ") + vidyoOwnerField.get().name + $T(" does not have a Vidyo account.")]);
+                CSErrorPopup($T("Invalid owner"), [$T("The user ") + this.vidyoComponents["ownerField"].get().name + $T(" does not have a Vidyo account.")]);
             }
 
             if (error.errorType === 'userHasNoAccounts') {
-                CSErrorPopup($T("Invalid owner"), [$T("The user ") + vidyoOwnerField.get().name + $T(" does not have an account in Indico.")]);
+                CSErrorPopup($T("Invalid owner"), [$T("The user ") + this.vidyoComponents["ownerField"].get().name + $T(" does not have an account in Indico.")]);
             }
         }
 
@@ -195,7 +196,7 @@
         var self = this;
         var params = {conference : confId};
 
-        return {
+        self.vidyoComponents = {
             params : params,
             ownerField : new SingleUserField(${ jsonEncode(LoggedInUser) },
                 'owner',
@@ -224,6 +225,8 @@
             dummy : "",
             changed : false
         };
+
+        return self.vidyoComponents;
     },
 
     onCreate: function(bookingPopup) {
