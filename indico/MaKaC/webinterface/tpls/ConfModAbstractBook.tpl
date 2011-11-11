@@ -1,7 +1,7 @@
 <div style="padding:20px 0px">
 
-<form action="${ urlHandlers.UHConfAbstractBook.getURL( conf ) }" method="POST">
-<input type="submit" class="btn" name="createAbstractsBook" value="Create book of abstracts now" />
+<form action="${ urlHandlers.UHConfAbstractBook.getURL(conf, cache=0) }" method="POST">
+<input type="submit" class="btn" name="createAbstractsBook" value="(Re-)create/download book of abstracts now" />
 </form>
 <br /><br />
 % if bookOfAbstractsActive:
@@ -13,6 +13,8 @@
 % else:
     ${ _("Note that you need to enable call for abstracts if you wish to provide a link in the <a href='%s'>event home page</a> menu, so users can download your book of abstracts")% urlHandlers.UHConferenceDisplay.getURL( conf ) }.
 % endif
+    <br />
+    ${_('Please note that you must click the above button after making customizations or users will receive an old version of the book of abstracts.')}
 </div>
 
 <div class="groupTitle">${ _("Customisation")}</div>

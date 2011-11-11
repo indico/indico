@@ -964,21 +964,37 @@ class RHContributionListToPDF(RHConferenceBaseDisplay):
 class RHAbstractBook(RHConferenceBaseDisplay):
     _uh=urlHandlers.UHConfAbstractBook
 
-    def _checkProtection( self ):
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self._noCache = params.get('cache') == '0'
+
+    def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
         if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
 
-    def _process( self ):
-        tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
-        filename = "%s - Book of abstracts.pdf"%cleanHTMLHeaderFilename(self._target.getTitle())
-        pdf = AbstractBook(self._target,self.getAW(), tz=tz)
-        data = pdf.getPDFBin()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
+    def _getCacheFileName(self):
+        dir = os.path.join(Config().getInstance().getXMLCacheDir(), "abstract_books")
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        return os.path.join(dir, '%s.pdf' % self._conf.getId())
+
+    def _process(self):
+        pdfFilename = "%s - Book of abstracts.pdf" % cleanHTMLHeaderFilename(self._target.getTitle())
+        cacheFile = self._getCacheFileName()
+        if os.path.isfile(cacheFile) and not self._noCache:
+            with open(cacheFile, 'rb') as f:
+                data = f.read()
+        else:
+            tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
+            pdf = AbstractBook(self._target,self.getAW(), tz=tz)
+            data = pdf.getPDFBin()
+            with open(cacheFile, 'wb') as f:
+                f.write(data)
+        self._req.headers_out['Content-Length'] = str(len(data))
         cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.content_type = cfg.getFileTypeMimeType('PDF')
+        self._req.headers_out['Content-Disposition'] = 'inline; filename="%s"' % pdfFilename.replace('\r\n', ' ')
         return data
 
 
