@@ -41,6 +41,7 @@ from indico.web.http_api.util import remove_lists, get_query_parameter
 from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.metadata.serializer import Serializer
+from indico.util.network import _get_remote_ip
 
 # indico legacy imports
 from MaKaC.common import DBMgr
@@ -204,7 +205,7 @@ def handler(req, **params):
             for _retry in xrange(10):
                 dbi.sync()
                 normPath, normQuery = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
-                ak.used(req.remote_ip, normPath, normQuery, not onlyPublic)
+                ak.used(_get_remote_ip(req), normPath, normQuery, not onlyPublic)
                 try:
                     dbi.endRequest(True)
                 except ConflictError:
