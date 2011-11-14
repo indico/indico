@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from indico.web.http_api.responses import HTTPAPIError
+from indico.web.wsgi import webinterface_handler_config as apache
 
 """
 Utility functions
@@ -36,7 +38,7 @@ def get_query_parameter(queryParams, keys, default=None, integer=False):
                 del queryParams[k]
                 return val
             else:
-                raise Exception("duplicate argument' %s'!" % k)
+                raise HTTPAPIError("duplicate argument '%s'" % k, apache.HTTP_BAD_REQUEST)
     return default
 
 def remove_lists(data):
