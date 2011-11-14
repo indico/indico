@@ -21,7 +21,8 @@ limit       n      Return no more than the X results.
 offset      O      Skip the first X results.
 detail      d      Specify the detail level (values depend on the exported
                    element)
-order       o      Sort the results. Must be one of *id*, *end*, *title*.
+order       o      Sort the results. Must be one of *id*, *start*, *end*,
+                   *title*.
 descending  c      Sort the results in descending order when set to *yes*.
 tz          `-`    Use the given timezone when returning time information.
 ==========  =====  =======================================================

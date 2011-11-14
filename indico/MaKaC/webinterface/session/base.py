@@ -47,9 +47,11 @@ DEFAULT_SESSION_COOKIE_PATH = "/"
 DEFAULT_CHECK_SESSION_ADDR = True
 DEFAULT_SESSION_VALIDITY = float(24 * 3600)
 
-import MaKaC.common.info as info
 import sys, string, re
 from time import time, localtime, strftime, clock
+from indico.util.network import _get_remote_ip
+
+
 try:
     from indico.web.wsgi import webinterface_handler_config as apache
 except ImportError:
@@ -61,17 +63,6 @@ _qparm_re = re.compile(r'([\0- ]*'
 _parm_re = re.compile(r'([\0- ]*'
                       r'([^\0- ;,="]+)=([^\0- ;,"]*)'
                       r'([\0- ]*[;,])?[\0- ]*)')
-
-def _get_remote_ip(req):
-    hostIP = str(req.get_remote_ip())
-
-    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    if minfo.useProxy():
-        # if we're behind a proxy, use X-Forwarded-For
-        return req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
-    else:
-        return hostIP
-
 
 def parse_cookie (text):
     result = {}

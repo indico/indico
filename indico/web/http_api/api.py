@@ -142,8 +142,8 @@ class HTTPAPIHook(object):
 
     def _getParams(self):
         self._offset = get_query_parameter(self._queryParams, ['O', 'offset'], 0, integer=True)
-        self._orderBy = get_query_parameter(self._queryParams, ['o', 'order'], 'start')
-        self._descending = get_query_parameter(self._queryParams, ['c', 'descending'], False)
+        self._orderBy = get_query_parameter(self._queryParams, ['o', 'order'])
+        self._descending = get_query_parameter(self._queryParams, ['c', 'descending'], 'no') == 'yes'
         self._detail = get_query_parameter(self._queryParams, ['d', 'detail'], self.DEFAULT_DETAIL)
         tzName = get_query_parameter(self._queryParams, ['tz'], None)
 
@@ -236,6 +236,7 @@ class DataFetcher(object):
                 'tomorrow': timedelta(1)}
 
     _sortingKeys = {'id': lambda x: x.getId(),
+                    'start': lambda x: x.getStartDate(),
                     'end': lambda x: x.getEndDate(),
                     'title': lambda x: x.getTitle()}
 
@@ -337,18 +338,15 @@ class DataFetcher(object):
     def _sortedIterator(self, iterator, limit, orderBy, descending):
 
         exceeded = False
-        if (orderBy and orderBy != 'start') or descending:
+        if orderBy or descending:
             sortingKey = self._sortingKeys.get(orderBy)
             try:
                 limitedIterable = sorted(self._limitIterator(iterator, limit),
-                                         key=sortingKey)
+                                         key=sortingKey, reverse=descending)
             except LimitExceededException:
                 exceeded = True
                 limitedIterable = sorted(self._intermediateResults,
-                                         key=sortingKey)
-
-            if descending:
-                limitedIterable.reverse()
+                                         key=sortingKey, reverse=descending)
         else:
             limitedIterable = self._limitIterator(iterator, limit)
 
@@ -404,6 +402,9 @@ class CategoryEventHook(HTTPAPIHook):
     def _getParams(self):
         super(CategoryEventHook, self)._getParams()
         self._idList = self._pathParams['idlist'].split('-')
+        self._eventType = get_query_parameter(self._queryParams, ['T', 'type'])
+        if self._eventType == 'lecture':
+            self._eventType = 'simple_event'
         self._occurrences = get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no') == 'yes'
         self._location = get_query_parameter(self._queryParams, ['l', 'location'])
         self._room = get_query_parameter(self._queryParams, ['r', 'room'])
@@ -433,6 +434,7 @@ class CategoryEventFetcher(DataFetcher):
 
     def __init__(self, aw, hook):
         super(CategoryEventFetcher, self).__init__(aw, hook)
+        self._eventType = hook._eventType
         self._occurrences = hook._occurrences
         self._location = hook._location
         self._room = hook._room
@@ -490,8 +492,10 @@ class CategoryEventFetcher(DataFetcher):
         idx = IndexesHolder().getById('categoryDate')
 
         filter = None
-        if self._room or self._location:
+        if self._room or self._location or self._eventType:
             def filter(obj):
+                if self._eventType and obj.getType() != self._eventType:
+                    return False
                 if self._location:
                     name = obj.getLocation() and obj.getLocation().getName()
                     if not name or not fnmatch.fnmatch(name.lower(), self._location.lower()):

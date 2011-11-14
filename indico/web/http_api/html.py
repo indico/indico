@@ -20,6 +20,7 @@
 
 # python stdlib imports
 import os
+from collections import defaultdict
 from operator import itemgetter
 
 # module imports
@@ -39,10 +40,14 @@ class HTML4Serializer(Serializer):
         if type(results) != list:
             results = [results]
 
-        unorderedFossils = {}
+        unorderedFossils = defaultdict(list)
         for fossil in results:
-            unorderedFossils.setdefault(fossil['startDate'].date(), []).append(fossil)
+            unorderedFossils[fossil['startDate'].date()].append(fossil)
 
+        # Sort top level (by date)
         orderedFossils = sorted(unorderedFossils.items(), key=itemgetter(0))
+        # Sort day level (by date/time, actually only time because it's only a single day)
+        for day, events in orderedFossils:
+            events.sort(key=itemgetter('startDate'))
         return render(os.path.join(os.path.dirname(__file__), 'html4.tpl'),
                       {'fossils': orderedFossils, 'ts': fossils['ts']})

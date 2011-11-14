@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
 ##
 ## CDS Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,15 +19,18 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-This script has been removed. If you wish to obtain metadata from Indico, consider using the new HTTP API:
-
-{indico_server}/ihelp/html/ExportAPI/index.html
+Network-related utility functions
 """
 
+from MaKaC.common.info import HelperMaKaCInfo
 
-from MaKaC.common import Config
 
-def index(req, **params):
-    req.content_type = 'text/plain'
-    config = Config.getInstance()
-    return globals()['__doc__'].format(indico_server=config.getBaseURL())
+def _get_remote_ip(req):
+    hostIP = str(req.get_remote_ip())
+
+    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+    if minfo.useProxy():
+        # if we're behind a proxy, use X-Forwarded-For
+        return req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
+    else:
+        return hostIP
