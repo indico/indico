@@ -132,6 +132,8 @@ def initializeRoomBookingDB( location, force = False ):
         root['UserReservationsIndex'] = OOBTree()
     if force or not root.has_key( 'DayReservationsIndex' ):
         root['DayReservationsIndex'] = OOBTree()
+    if force or not root.has_key( 'RoomDayReservationsIndex' ):
+        root['RoomDayReservationsIndex'] = OOBTree()
 
     # Create possible equipment branch
     if force or not root.has_key( 'EquipmentList' ):

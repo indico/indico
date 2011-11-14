@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from BTrees.OOBTree import OOSet
 from ZODB import FileStorage, DB
 from ZODB.DB import DB, transaction
 from ZODB.PersistentMapping import PersistentMapping
@@ -42,6 +43,7 @@ _RESERVATIONS = 'Reservations'
 _ROOM_RESERVATIONS_INDEX = 'RoomReservationsIndex'
 _USER_RESERVATIONS_INDEX = 'UserReservationsIndex'
 _DAY_RESERVATIONS_INDEX = 'DayReservationsIndex'
+_ROOM_DAY_RESERVATIONS_INDEX = 'RoomDayReservationsIndex'
 
 class Reservation( Persistent, ReservationBase, Observable ):
     """
@@ -89,6 +91,10 @@ class Reservation( Persistent, ReservationBase, Observable ):
     def getDayReservationsIndexRoot( ):
         return Reservation.__dalManager.getRoot(_DAY_RESERVATIONS_INDEX)
 
+    @staticmethod
+    def getRoomDayReservationsIndexRoot():
+        return Reservation.__dalManager.getRoot(_ROOM_DAY_RESERVATIONS_INDEX)
+
     def insert( self ):
         """ Documentation in base class. """
         ReservationBase.insert( self )
@@ -130,6 +136,9 @@ class Reservation( Persistent, ReservationBase, Observable ):
         # Update day => reservations index
         self._addToDayReservationsIndex()
 
+        # Update room+day => reservations index
+        self._addToRoomDayReservationsIndex()
+
         self._notify('reservationCreated')
 
         # Warning:
@@ -156,10 +165,12 @@ class Reservation( Persistent, ReservationBase, Observable ):
 
     def indexDayReservations( self ):
         self._addToDayReservationsIndex()
+        self._addToRoomDayReservationsIndex()
         self._p_changed = True
 
     def unindexDayReservations( self ):
         self._removeFromDayReservationsIndex()
+        self._removeFromRoomDayReservationsIndex()
         self._p_changed = True
 
     def remove( self ):
@@ -181,6 +192,8 @@ class Reservation( Persistent, ReservationBase, Observable ):
 
         # Update day => reservations index
         self._removeFromDayReservationsIndex()
+        # Update room+day => reservations index
+        self._removeFromRoomDayReservationsIndex()
 
         self._notify('reservationDeleted')
 
@@ -209,6 +222,29 @@ class Reservation( Persistent, ReservationBase, Observable ):
                 resvs.remove(self)
                 dayReservationsIndexBTree[day] = resvs
 
+    def _addToRoomDayReservationsIndex(self):
+        roomDayReservationsIndexBTree = Reservation.getRoomDayReservationsIndexRoot()
+
+        for period in self.splitToPeriods():
+            day = period.startDT.date()
+            key = (self.room.id, day)
+            resvs = roomDayReservationsIndexBTree.get(key)
+            if resvs is None:
+                resvs = OOSet()
+            resvs.add(self)
+            roomDayReservationsIndexBTree[key] = resvs
+
+    def _removeFromRoomDayReservationsIndex(self):
+        roomDayReservationsIndexBTree = Reservation.getRoomDayReservationsIndexRoot()
+
+        for period in self.splitToPeriods():
+            day = period.startDT.date()
+            key = (self.room.id, day)
+            resvs = roomDayReservationsIndexBTree.get(key)
+            if resvs is not None and self in resvs:
+                resvs.remove(self)
+                roomDayReservationsIndexBTree[key] = resvs
+
     @staticmethod
     def getReservations( *args, **kwargs ):
         """ Documentation in base class. """
@@ -232,41 +268,48 @@ class Reservation( Persistent, ReservationBase, Observable ):
         resvCandidates = None
 
         alreadyRoomFiltered = False
-        if rooms and len( rooms ) <= 10:
+        # If we filter by room but not by day, we can use the RoomReservations index
+        if rooms and not days and len(rooms) <= 10:
             # Use room => room reservations index
-            resvCandidates = []
+            resvCandidates = set()
             for room in rooms:
                 if location != None and room.locationName != location:
                     continue # Skip rooms from different locations
                 roomResvs = Reservation.getRoomReservationsIndexRoot().get( room.id )
                 if roomResvs != None:
-                    resvCandidates += roomResvs
+                    resvCandidates.update(roomResvs)
             alreadyRoomFiltered = True
 
+        # If we don't have reservations yet but filter by creator, use the UserReservations index
         if resvCandidates == None and resvEx != None and resvEx.createdBy != None:
-            resvCandidates = Reservation.getUserReservationsIndexRoot().get( resvEx.createdBy )
-            if resvCandidates == None:
-                resvCandidates = []
+            resvCandidates = set(Reservation.getUserReservationsIndexRoot().get(resvEx.createdBy, []))
 
-        if days:
-            resvsInDays = {}
+        # If we want to filter by day, we can choose indexes.
+        dayFilteredResvs = None
+        if days and rooms:
+            # If there's a room filter, too - use the RoomDayReservations index
+            dayFilteredResvs = set()
+            for key in ((room.id, day) for day in days for room in rooms):
+                dayRoomResvs = Reservation.getRoomDayReservationsIndexRoot().get(key, [])
+                dayFilteredResvs.update(dayRoomResvs)
+            alreadyRoomFiltered = True
+        elif days:
+            # If we only filter by days, use the DayReservations index
+            dayFilteredResvs = set()
             for day in days:
-                dayResvs = Reservation.getDayReservationsIndexRoot().get( day )
+                dayResvs = Reservation.getDayReservationsIndexRoot().get(day, [])
+                dayFilteredResvs.update(dayResvs)
 
-                if dayResvs:
-                    for resv in dayResvs:
-                        resvsInDays[resv] = None
-            if resvCandidates == None:
-                resvCandidates = resvsInDays.iterkeys()
+        # If we have some day-filtered reservations, use that list or restrict the existing one
+        if dayFilteredResvs is not None:
+            if resvCandidates is None:
+                resvCandidates = dayFilteredResvs
             else:
                 # Intersection
-                new = []
-                for resv in resvCandidates:
-                    if resvsInDays.has_key( resv ):
-                        new.append( resv )
-                resvCandidates = new
+                resvCandidates = dayFilteredResvs & resvCandidates
 
-        if resvCandidates == None:
+        # If we still have nothing, get all reservations and filter them later in the loop (slow!)
+        if resvCandidates is None:
             resvCandidates = Reservation.getReservationsRoot().itervalues()
 
         for resvCandidate in resvCandidates:

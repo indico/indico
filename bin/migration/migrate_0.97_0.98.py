@@ -352,6 +352,22 @@ def roomBlockingInit(dbi, withRBDB, prevVersion):
         root['RoomBlocking']['Indexes']['DayBlockings'] = CalendarDayIndex()
         root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
 
+@since('0.98b2')
+def runRoomDayIndexInit(dbi, withRBDB, prevVersion):
+    """
+    Initializing room+day => reservation index.
+    """
+    if not withRBDB:
+        return
+
+    root = DALManager().getRoot()
+    if not root.has_key('RoomDayReservationsIndex'):
+        root['RoomDayReservationsIndex'] = OOBTree()
+        for i, resv in enumerate(CrossLocationQueries.getReservations()):
+            resv._addToRoomDayReservationsIndex()
+            if i % 1000 == 0:
+                DALManager.commit()
+    DALManager.commit()
 
 @since('0.98b2')
 def langToGB(dbi, withRBDB, prevVersion):

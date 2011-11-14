@@ -87,7 +87,7 @@ class DBConnection:
                 if name in ["Rooms", "Reservations"]:
                     self.root[name] = IOBTree()
                 elif name in ["RoomReservationsIndex", "UserReservationsIndex",
-                              "DayReservationsIndex"]:
+                              "DayReservationsIndex", "RoomDayReservationsIndex"]:
                     self.root[name] = OOBTree()
                 elif name in ["EquipmentList", "CustomAttributesList"]:
                     self.root[name] = {}
