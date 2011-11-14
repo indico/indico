@@ -141,8 +141,8 @@ class HTTPAPIHook(object):
 
     def _getParams(self):
         self._offset = get_query_parameter(self._queryParams, ['O', 'offset'], 0, integer=True)
-        self._orderBy = get_query_parameter(self._queryParams, ['o', 'order'], 'start')
-        self._descending = get_query_parameter(self._queryParams, ['c', 'descending'], False)
+        self._orderBy = get_query_parameter(self._queryParams, ['o', 'order'])
+        self._descending = get_query_parameter(self._queryParams, ['c', 'descending'], 'no') == 'yes'
         self._detail = get_query_parameter(self._queryParams, ['d', 'detail'], self.DEFAULT_DETAIL)
         tzName = get_query_parameter(self._queryParams, ['tz'], None)
 
@@ -235,6 +235,7 @@ class DataFetcher(object):
                 'tomorrow': timedelta(1)}
 
     _sortingKeys = {'id': lambda x: x.getId(),
+                    'start': lambda x: x.getStartDate(),
                     'end': lambda x: x.getEndDate(),
                     'title': lambda x: x.getTitle()}
 
@@ -336,18 +337,15 @@ class DataFetcher(object):
     def _sortedIterator(self, iterator, limit, orderBy, descending):
 
         exceeded = False
-        if (orderBy and orderBy != 'start') or descending:
+        if orderBy or descending:
             sortingKey = self._sortingKeys.get(orderBy)
             try:
                 limitedIterable = sorted(self._limitIterator(iterator, limit),
-                                         key=sortingKey)
+                                         key=sortingKey, reverse=descending)
             except LimitExceededException:
                 exceeded = True
                 limitedIterable = sorted(self._intermediateResults,
-                                         key=sortingKey)
-
-            if descending:
-                limitedIterable.reverse()
+                                         key=sortingKey, reverse=descending)
         else:
             limitedIterable = self._limitIterator(iterator, limit)
 
