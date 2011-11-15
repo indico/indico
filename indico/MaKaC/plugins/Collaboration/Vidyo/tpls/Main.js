@@ -8,6 +8,11 @@
         return true;
     },
 
+    checkConnect : function(booking) {
+        booking.permissionToConnect = true;
+        return true;
+    },
+
     checkParams: function() {
         return {
             'roomName' : ['text', false, function(name, values){
@@ -71,6 +76,22 @@
                     [$T("This public room seems to have been deleted in Vidyo."),
                      $T("Please delete it and try to create it again.")]);
 
+        }
+
+        if (event === 'connect' && error.errorType === 'noValidConferenceRoom') {
+            CSErrorPopup($T("Not valid conference room"),
+                    [$T("The conference room is not a valid Vidyo capable room."),
+                     $T("Please select one that is Vidyo capable.")]);
+
+        }
+
+        if (event === 'connect' && error.errorType === 'unknownRoom') {
+            CSErrorPopup($T("Public room removed from Vidyo"),
+                    [$T("This public room seems to have been deleted from Vidyo."),
+                     $T("Please delete it and try to create it again.")]);
+        }
+        if (event === 'connect' && error.errorType === 'connectFailed') {
+            CSErrorPopup($T("Public room removed from Vidyo"),[error.userMessage]);
         }
     },
 
@@ -173,8 +194,10 @@
         vidyoDrawContextHelpIcons();
     },
 
+
     beforeCreate: function(pluginName, conferenceId) {
         var allowCreation = true;
+
         each(bookings, function(booking) {
             if (booking.type == 'Vidyo') {
                 allowCreation = false;

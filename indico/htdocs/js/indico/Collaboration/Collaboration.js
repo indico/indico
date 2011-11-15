@@ -223,7 +223,7 @@ var refreshTableHead = function() {
         var firstCell = Html.td();
         headRow.append(firstCell);
 
-        var typeCell = Html.td({className: "collaborationTitleCell"});
+        var typeCell = Html.td({className: "collaborationTitleCellNarrow"});
         var typeSpan = Html.span({style:{fontSize: "medium"}}, "Type");
         typeCell.set(typeSpan);
         headRow.append(typeCell);
@@ -238,10 +238,7 @@ var refreshTableHead = function() {
         infoCell.set(infoSpan);
         headRow.append(infoCell);
 
-        var emptyCell = Html.td({className: "collaborationTitleCell"});
-        headRow.append(emptyCell);
-
-        var actionsCell = Html.td({className: "collaborationTitleCell", colspan: 10, colSpan: 10});
+        var actionsCell = Html.td({className: "collaborationTitleCellNarrow", colspan: 10, colSpan: 10});
         var actionsSpan = Html.span({style:{fontSize: "medium"}}, "Actions");
         actionsCell.set(actionsSpan);
         headRow.append(actionsCell);
@@ -374,7 +371,7 @@ var bookingTemplateM = function(booking) {
     }
     row.append(cellCustom);
 
-    var cellEditRemove = Html.td({className : "collaborationCell"});
+    var cellEditRemove = Html.td({className : "collaborationCellNarrow"});
     var editButton = Widget.link(command(function(){edit(booking);}, IndicoUI.Buttons.editButton()));
     if (booking.canBeDeleted) {
         var removeButton = Widget.link(command(function(){remove(booking);}, IndicoUI.Buttons.removeButton()));
@@ -386,10 +383,26 @@ var bookingTemplateM = function(booking) {
     row.append(cellEditRemove);
 
     var cellStart;
+
+
+    if (booking.hasConnect){
+        if (booking.canBeConnected) {
+            var cellConnect = Html.td({className : "collaborationCellNarrow"});
+            var connectButton = Widget.link( command(function(){connect(booking);} ,IndicoUI.Buttons.playButtonText($T("Connect ") + booking.bookingParams.locationRoom, "left" )) );
+            cellConnect.set(connectButton);
+            row.append(cellConnect);
+        }
+    }
+
     if (booking.hasStart) {
         var cellStart = Html.td({className : "collaborationCellNarrow"});
         if (booking.canBeStarted) {
-            var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButton(false) ) );
+            if(booking.type=="Vidyo"){
+                var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButtonText($T("Start desktop"), "right") ) );
+            }else{
+                var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButton(false)) );
+            }
+
         } else {
             var playButton = IndicoUI.Buttons.playButton(true);
         }
@@ -408,7 +421,7 @@ var bookingTemplateM = function(booking) {
         }
         cellStop.set(stopButton);
         row.append(cellStop);
-    };
+    }
 
     //var cellMail = Html.td({className : "collaborationCellNarrow"});
     //cellMail.set(Html.img({src: imageSrc("mail_big"), style: {'verticalAlign': 'middle', marginLeft: '3px', marginRight: '3px'}}));
@@ -663,6 +676,66 @@ var stopBooking = function(booking, conferenceId) {
 var stopBookingLocal = function(booking) {
     if (booking.requiresClientCallForStop && booking.permissionToStop) {
         codes[booking.type].stop(booking, frames["iframeTarget" + booking.id]);
+    }
+};
+
+
+/**
+ * -Function that will be called when the user presses the "Connect" button of a booking.
+ * -If the booking's plugin has defined a "checkConnect" function, it will be called to verify (locally)
+ * that the booking can be connected. If the booking cannot connect, nothing happens (other than what
+ * the "checkConnect" function wants to do in that case, like popping up an alert).
+ * -If the booking's plugin has set "requiresServerCallForConnect" to true, the server is notified
+ * of the booking connect. The server can then take appropiate actions, or change the booking object.
+ * -The "connectBookingLocal" function will be called in any case (this function will verify if there should be a local action).
+ * @param {object} booking The booking object corresponding to the "connect" button that was pressed.
+ */
+var connectBooking = function(booking, conferenceId) {
+
+    if (!pluginHasFunction(booking.type, "checkConnect") || codes[booking.type].checkConnect(booking)) {
+
+        if (booking.requiresServerCallForConnect) {
+            var killProgress = IndicoUI.Dialogs.Util.progress("Connecting...");
+            indicoRequest(
+                'collaboration.connectCSBooking',
+                {
+                    conference: conferenceId,
+                    bookingId: booking.id
+                },
+                function(result,error) {
+                    if (!error) {
+                        if (result.error){
+                            killProgress();
+                            codes[booking.type].errorHandler('connect', result, booking);
+                        }
+                        else {
+                            connectBookingLocal(result);
+                            killProgress();
+                            new AlertPopup($T("Success"), $T("The room ") + booking.bookingParams.locationRoom  + $T(" has been conected to the Vidyo room.") ).open();
+                            refreshBooking(result);
+                        }
+                    } else {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+            );
+        } else {
+            connectBookingLocal(booking);
+        }
+    }
+};
+
+/**
+ * Function called to execute the local action when connecting a booking.
+ * It will verify that the booking's plugin has an actual client-side action configured,
+ * that the booking is authorized to connect.
+ * Then the "cinnect" Javascript function of the booking will be called, passing the booking object and its corresponding iframe
+ * in case it is needed for something (loading an URL to send a message / download Koala / etc ).
+ */
+var connectBookingLocal = function(booking) {
+    if (booking.requiresClientCallForConnect && booking.permissionToConnect) {
+        codes[booking.type].connect(booking, frames["iframeTarget" + booking.id]);
     }
 };
 

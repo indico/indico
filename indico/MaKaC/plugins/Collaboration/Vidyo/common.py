@@ -30,6 +30,10 @@ from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.plugins.Collaboration.Vidyo.indexes import EventEndDateIndex
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
+from MaKaC.common.logger import Logger
+from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
+from MaKaC.common import info
+
 
 
 def getVidyoOptionValue(optionName):
@@ -191,6 +195,22 @@ class VidyoTools(object):
         """
         return nowutc() - timedelta(days = getVidyoOptionValue("maxDaysBeforeClean"))
 
+    @classmethod
+    def getConferenceRoomIp(cls, conf):
+        location = conf.getLocation()
+        room = conf.getRoom()
+        roomIp = ""
+        if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
+            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+            if minfo.getRoomBookingModuleActive():
+                CrossLocationDB.connect()
+                try:
+                    roomInfo = CrossLocationQueries.getRooms( location = location.getName(), roomName = room.getName())
+                    roomIp = roomInfo.customAtts["H323 IP"]
+                except Exception, e:
+                    Logger.get("Vidyo").warning("Location: " + location.getName() + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
+        return roomIp
+
 
 class FakeAvatarOwner(Persistent, Fossilizable):
     """ Used when a Vidyo admin changes the owner of a room to an account
@@ -217,7 +237,7 @@ class VidyoError(CSErrorBase):
         CSErrorBase.__init__(self)
         self._errorType = errorType
         self._operation = operation
-        self._userMessage = None
+        self._userMessage = userMessage
 
     def getErrorType(self):
         return self._errorType

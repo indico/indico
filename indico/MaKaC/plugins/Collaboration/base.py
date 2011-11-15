@@ -388,6 +388,13 @@ class CSBookingManager(Persistent, Observer):
         else:
             raise CollaborationException(_("Tried to stop booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be stopped."))
 
+    def connectBooking(self, id):
+        booking = self._bookings[id]
+        if booking.canBeConnected():
+            return booking._connect()
+        else:
+            raise CollaborationException(_("Tried to connect booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be connected."))
+
     def checkBookingStatus(self, id):
         booking = self._bookings[id]
         if booking.hasCheckStatus():
@@ -909,12 +916,15 @@ class CSBookingBase(Persistent, Fossilizable):
         Every class that implements the CSBookingBase has to declare the following class attributes:
             _hasStart : True if the plugin has a "start" concept. Otherwise, the "start" button will not appear, etc.
             _hasStop : True if the plugin has a "stop" concept. Otherwise, the "stop" button will not appear, etc.
+            _hasConnect : True if the plugin has a "connect" concept. Otherwise, the "connect" button will not appear, etc.
             _hasCheckStatus: True if the plugin has a "check status" concept. Otherwise, the "check status" button will not appear, etc.
             _hasAcceptReject: True if the plugin has a "accept or reject" concept. Otherwise, the "accept" and "reject" buttons will not appear, etc.
             _requiresServerCallForStart : True if we should notify the server when the user presses the "start" button.
             _requiresServerCallForStop : True if we should notify the server when the user presses the "stop" button.
+            _requiresServerCallForConnect : True if we should notify the server when the user presses the "connect" button.
             _requiresClientCallForStart : True if the browser should execute some JS action when the user presses the "start" button.
             _requiresClientCallForStop : True if the browser should execute some JS action when the user presses the "stop" button.
+            _requiresClientCallForConnect : True if the browser should execute some JS action when the user presses the "connect" button.
             _needsBookingParamsCheck : True if the booking parameters should be checked after the booking is added / edited.
                                        If True, the _checkBookingParams method will be called by the setBookingParams method.
             _needsToBeNotifiedOnView: True if the booking object needs to be notified (through the "notifyOnView" method)
@@ -926,13 +936,16 @@ class CSBookingBase(Persistent, Fossilizable):
 
     _hasStart = False
     _hasStop = False
+    _hasConnect = False
     _hasCheckStatus = False
     _hasAcceptReject = False
     _hasStartStopAll = False
     _requiresServerCallForStart = False
     _requiresServerCallForStop = False
+    _requiresServerCallForConnect = False
     _requiresClientCallForStart = False
     _requiresClientCallForStop = False
+    _requiresClientCallForConnect = False
     _needsBookingParamsCheck = False
     _needsToBeNotifiedOnView = False
     _canBeNotifiedOfEventDateChanges = True
@@ -966,6 +979,7 @@ class CSBookingBase(Persistent, Fossilizable):
                             not start. For example, if it's not the correct time yet.
                             In that case "permissionToStart" should be set to false so that the booking doesn't start.
             -_permissionToStop: Same as permissionToStart. Sometimes the booking should not be allowed to stop even if the "stop" button is available.
+            -_permissionToConnect: Same as permissionToStart. Sometimes the booking should not be allowed to connect even if the "connect" button is available.
         """
         self._id = None
         self._type = bookingType
@@ -986,6 +1000,7 @@ class CSBookingBase(Persistent, Fossilizable):
         self._canBeDeleted = True
         self._permissionToStart = False
         self._permissionToStop = False
+        self._permissionToConnect = False
         self._needsToBeNotifiedOfDateChanges = self._canBeNotifiedOfEventDateChanges
         self._hidden = False
         self._play_status = None
@@ -1327,7 +1342,8 @@ class CSBookingBase(Persistent, Fossilizable):
             bookingParams["notifyOnDateChanges"] = ["yes"]
         if self.isHidden():
             bookingParams["hidden"] = ["yes"]
-
+        if self._conf.getRoom():
+            bookingParams["locationRoom"] = self._conf.getRoom().getName()
         return bookingParams
 
 
@@ -1501,6 +1517,14 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return self._hasStop
 
+    def hasConnect(self):
+        """ Returns if this booking belongs to a plugin who has a "connect" concept.
+            This attribute will be available in Javascript with the "hasConnect" attribute
+        """
+        if not hasattr(self, '_hasConnect'):
+            self._hasConnect = False
+        return self._hasConnect
+
     def hasCheckStatus(self):
         """ Returns if this booking belongs to a plugin who has a "check status" concept.
             This attribute will be available in Javascript with the "hasCheckStatus" attribute
@@ -1525,6 +1549,14 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return self._requiresServerCallForStop
 
+    def requiresServerCallForConnect(self):
+        """ Returns if this booking belongs to a plugin who requires a server call when the connect button is pressed.
+            This attribute will be available in Javascript with the "requiresServerCallForConnect" attribute
+        """
+        if not hasattr(self, '_requiresServerCallForConnect'):
+            self._requiresServerCallForConnect = False
+        return self._requiresServerCallForConnect
+
     def requiresClientCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the start button is pressed.
             This attribute will be available in Javascript with the "requiresClientCallForStart" attribute
@@ -1536,6 +1568,14 @@ class CSBookingBase(Persistent, Fossilizable):
             This attribute will be available in Javascript with the "requiresClientCallForStop" attribute
         """
         return self._requiresClientCallForStop
+
+    def requiresClientCallForConnect(self):
+        """ Returns if this booking belongs to a plugin who requires a client call when the connect button is pressed.
+            This attribute will be available in Javascript with the "requiresClientCallForConnect" attribute
+        """
+        if not hasattr(self, '_requiresClientCallForConnect'):
+            self._requiresClientCallForConnect = False
+        return self._requiresClientCallForConnect
 
     def canBeDeleted(self):
         """ Returns if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed.
@@ -1562,6 +1602,12 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return self.isHappeningNow()
 
+    def canBeConnected(self):
+        """ Returns if this booking can be connected, in the sense that the "Connect" button will be active and able to be pressed.
+            This attribute will be available in Javascript with the "canBeConnected" attribute
+        """
+        return self.isHappeningNow()
+
     def isPermittedToStart(self):
         """ Returns if this booking is allowed to start, in the sense that it will be started after the "Start" button is pressed.
             For example a booking should not be permitted to start before a given time, even if the button is active.
@@ -1574,6 +1620,14 @@ class CSBookingBase(Persistent, Fossilizable):
             This attribute will be available in Javascript with the "isPermittedToStop" attribute
         """
         return self._permissionToStop
+
+    def isPermittedToConnect(self):
+        """ Returns if this booking is allowed to stop, in the sense that it will be connect after the "Connect" button is pressed.
+            This attribute will be available in Javascript with the "isPermittedToConnect" attribute
+        """
+        if not hasattr(self, '_permissionToConnect'):
+            self._permissionToConnect = False
+        return self._permissionToConnect
 
     def needsBookingParamsCheck(self):
         """ Returns if this booking belongs to a plugin that needs to verify the booking parameters.
@@ -1702,6 +1756,17 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         if self.hasStop():
             raise CollaborationException("Method _stop was not overriden for the plugin type " + str(self._type))
+        else:
+            pass
+
+    def _connect(self):
+        """ To be overriden by inheriting classes
+            This method is called when the user presses the "Connect" button in a plugin who has a "Connect" concept
+            and whose flag _requiresServerCallForConnect is True.
+            Often this will involve communication with another entity.
+        """
+        if self.hasConnect():
+            raise CollaborationException("Method _connect was not overriden for the plugin type " + str(self._type))
         else:
             pass
 

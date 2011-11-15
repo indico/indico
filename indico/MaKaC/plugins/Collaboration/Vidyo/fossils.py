@@ -65,6 +65,8 @@ class IVidyoErrorFossil(ICSErrorBaseFossil):
     def getOperation(self):
         """ A string with the operation (creation, edition, etc.) that produced the error """
 
+    def getUserMessage(self):
+        """ A string with the user message"""
 
 class IFakeAvatarOwnerFossil(IFossil):
 

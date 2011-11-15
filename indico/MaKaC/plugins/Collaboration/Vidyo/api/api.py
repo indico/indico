@@ -51,21 +51,21 @@ class AdminApi(ApiBase):
 
     @classmethod
     def addRoom(cls, newRoom, confId, bookingId):
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
         try:
             vidyoClient = AdminClient.getInstance()
         except Exception, e:
             raise VidyoConnectionException(e)
 
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's addRoom operation with room: %s""" %
-                                (confId, bookingId, str(newRoom)))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's addRoom operation with room: %s""" %
+        #                        (confId, bookingId, str(newRoom)))
         try:
             answer = vidyoClient.service.addRoom(newRoom)
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's addRoom operation got answer: %s""" %
-                                    (confId, bookingId, str(answer)))
+        #    Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's addRoom operation got answer: %s""" %
+        #                            (confId, bookingId, str(answer)))
             return answer
         except WebFault, e:
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's addRoom operation got WebFault: %s""" %
+            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's addRoom operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
             raise
 
@@ -75,23 +75,23 @@ class AdminApi(ApiBase):
 
     @classmethod
     def updateRoom(cls, roomId, updatedRoom, confId, bookingId):
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
         try:
             vidyoClient = AdminClient.getInstance()
         except Exception, e:
             raise VidyoConnectionException(e)
 
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's updateRoom operation with roomId: %s and room: %s""" %
-                                (confId, bookingId, str(roomId), str(updatedRoom)))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's updateRoom operation with roomId: %s and room: %s""" %
+        #                        (confId, bookingId, str(roomId), str(updatedRoom)))
         try:
             answer = vidyoClient.service.updateRoom(roomId, updatedRoom)
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's updateRoom operation got answer: %s""" %
-                                    (confId, bookingId, str(answer)))
+        #    Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's updateRoom operation got answer: %s""" %
+        #                            (confId, bookingId, str(answer)))
 
             return answer
 
         except WebFault, e:
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's updateRoom operation got WebFault: %s""" %
+            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's updateRoom operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
             raise
 
@@ -103,18 +103,18 @@ class AdminApi(ApiBase):
     def getRooms(cls, searchFilter, confId, bookingId):
         #WARNING: until bug is corrected, name description and groupName in returned rooms are wrong
 
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
         try:
             vidyoClient = AdminClient.getInstance()
         except Exception, e:
             raise VidyoConnectionException(e)
 
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's getRooms operation with search filter: %s""" %
-                                         (confId, bookingId, str(searchFilter)))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's getRooms operation with search filter: %s""" %
+        #                                 (confId, bookingId, str(searchFilter)))
         try:
             answer = vidyoClient.service.getRooms(searchFilter)
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's getRooms operation got answer: %s""" %
-                                             (confId, bookingId, str(answer)))
+        #    Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's getRooms operation got answer: %s""" %
+        #                                     (confId, bookingId, str(answer)))
 
             return answer
 
@@ -131,23 +131,23 @@ class AdminApi(ApiBase):
     def getRoom(cls, roomId, confId, bookingId):
         #WARNING: until bug is corrected, name description and groupName in returned rooms are wrong
 
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
         try:
             vidyoClient = AdminClient.getInstance()
         except Exception, e:
             raise VidyoConnectionException(e)
 
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's getRoom operation with roomId: %s""" %
-                                         (confId, bookingId, str(roomId)))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's getRoom operation with roomId: %s""" %
+        #                                 (confId, bookingId, str(roomId)))
         try:
             answer = vidyoClient.service.getRoom(roomId)
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's getRoom operation got answer: %s""" %
-                                             (confId, bookingId, str(answer)))
+        #    Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's getRoom operation got answer: %s""" %
+        #                                     (confId, bookingId, str(answer)))
 
             return answer
 
         except WebFault, e:
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s""" %
+            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
             raise
 
@@ -157,22 +157,22 @@ class AdminApi(ApiBase):
 
     @classmethod
     def deleteRoom(cls, roomId, confId, bookingId):
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
         try:
             vidyoClient = AdminClient.getInstance()
         except Exception, e:
             raise VidyoConnectionException(e)
 
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's deleteRoom operation with roomId: %s""" %
-                                         (confId, bookingId, str(roomId)))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling Admin API's deleteRoom operation with roomId: %s""" %
+        #                                 (confId, bookingId, str(roomId)))
         try:
             answer = vidyoClient.service.deleteRoom(roomId)
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's deleteRoom operation got answer: %s""" %
-                                             (confId, bookingId, str(answer)))
+        #    Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's deleteRoom operation got answer: %s""" %
+        #                                     (confId, bookingId, str(answer)))
 
             return answer
         except WebFault, e:
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s""" %
+            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
             raise
 
@@ -180,6 +180,25 @@ class AdminApi(ApiBase):
             cls._handleServiceCallException(e)
 
 
+    @classmethod
+    def connectRoom(cls, roomId, confId, bookingId, legacyMember):
+        try:
+            vidyoClient = AdminClient.getInstance()
+        except Exception, e:
+            raise VidyoConnectionException(e)
+        try:
+            answer = vidyoClient.service.inviteToConference(roomId,entityID=legacyMember)
+            #Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's connectRoom operation got answer: %s""" %
+            #                                 (confId, bookingId, str(answer)))
+
+            return answer
+        except WebFault, e:
+            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's connectRoom operation got WebFault: %s""" %
+                                    (confId, bookingId, e.fault.faultstring))
+            raise
+
+        except Exception, e:
+            cls._handleServiceCallException(e)
 
 class UserApi(ApiBase):
     """ This class performs low-level operations by getting the corresponding
@@ -190,23 +209,23 @@ class UserApi(ApiBase):
 
     @classmethod
     def search(cls, searchFilter, confId, bookingId):
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
         try:
             vidyoClient = UserClient.getInstance()
         except Exception, e:
             raise VidyoConnectionException(e)
 
-        Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling User API's search operation with filter: %s""" %
-                                         (confId, bookingId, str(searchFilter)))
+        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling User API's search operation with filter: %s""" %
+        #                                 (confId, bookingId, str(searchFilter)))
         try:
             answer = vidyoClient.service.search(searchFilter)
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, User API's search operation got answer: %s""" %
-                                             (confId, bookingId, str(answer)))
+        #    Logger.get('Vidyo').info("""Evt:%s, booking:%s, User API's search operation got answer: %s""" %
+        #                                     (confId, bookingId, str(answer)))
 
             return answer
 
         except WebFault, e:
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, User API's search operation operation got WebFault: %s""" %
+            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, User API's search operation operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
             raise
 

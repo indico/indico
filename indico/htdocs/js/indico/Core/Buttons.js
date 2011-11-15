@@ -79,6 +79,13 @@ IndicoUI.Buttons = {
             }
         });
     },
+
+    /**
+     * Returns a text with a 'play' icon
+     */
+    playButtonText: function(text, position){
+        return Html.div({className: 'buttonWithPlay ' + position + 'ButtonWithPlay' }, text);
+    },
     /**
      * Returns an image with an 'stop' icon
      */
