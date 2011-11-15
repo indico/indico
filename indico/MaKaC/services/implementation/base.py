@@ -27,7 +27,7 @@ from datetime import datetime, date
 
 from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
-from MaKaC.common import security
+from MaKaC.common import security, Config
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag, TimingError
@@ -238,7 +238,20 @@ class ServiceBase(RequestHandlerBase):
             raise HTMLSecurityError('ERR-X0','HTML Security problem. %s ' % str(e))
 
         if self._doProcess:
-            answer = self._getAnswer()
+            if Config.getInstance().getProfile():
+                import profile, pstats, random
+                proffilename = os.path.join(Config.getInstance().getTempDir(), "service%s.prof" % random.random())
+                result = [None]
+                profile.runctx("result[0] = self._getAnswer()", globals(), locals(), proffilename)
+                answer = result[0]
+                rep = Config.getInstance().getTempDir()
+                stats = pstats.Stats(proffilename)
+                stats.strip_dirs()
+                stats.sort_stats('cumulative', 'time', 'calls')
+                stats.dump_stats(os.path.join(rep, "IndicoServiceRequestProfile.log"))
+                os.remove(proffilename)
+            else:
+                answer = self._getAnswer()
             self._deleteTempFiles()
 
             return answer
