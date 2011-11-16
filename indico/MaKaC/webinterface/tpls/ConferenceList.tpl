@@ -9,15 +9,22 @@
 
     % if numOfEventsInTheFuture > 0:
     <div class="topBar" style="margin-bottom: 10px">
-        <div class="content smaller"><span id="futureEventsText">There are ${ numOfEventsInTheFuture } more events in the <em>future</em>. <span class='fakeLink' onclick='toggleFutureEvents();'>Show them.</span></span></div>
+        <div class="content smaller">
+            <span id="futureEventsShow">
+                There are ${ numOfEventsInTheFuture } events in the <em>future</em>.
+                <span class="fakeLink futureEventsLink">Show them.</span>
+            </span>
+            <span id="futureEventsHide" style="display: none;">
+                <span class="fakeLink futureEventsLink">Hide</span> the events in the future (${ numOfEventsInTheFuture })
+            </span>
+        </div>
     </div>
-    <div id="futureEvents" style="visibility: hidden; overflow:hidden;">
+    <div id="futureEvents" style="display: none;">
         <%include file="ConferenceListEvents.tpl" args="items=futureItems, aw=self_._aw, conferenceDisplayURLGen=conferenceDisplayURLGen"/>
-
     </div>
     % endif
     <div>
-    <%include file="ConferenceListEvents.tpl" args="items=presentItems, aw=self_._aw, conferenceDisplayURLGen=conferenceDisplayURLGen"/>
+        <%include file="ConferenceListEvents.tpl" args="items=presentItems, aw=self_._aw, conferenceDisplayURLGen=conferenceDisplayURLGen"/>
     </div>
 
     % if numOfEventsInThePast > 0:
@@ -38,7 +45,6 @@
         </div>
     </div>
     % endif
-
 </div>
 
 <script type="text/javascript">
@@ -47,22 +53,20 @@
 
     // Future events
     % if numOfEventsInTheFuture > 0:
-    var futureSwitch = false;
-    var futureEvents = $E("futureEvents");
-    var futureEventsDivHeight=futureEvents.dom.offsetHeight;
-    futureEvents.dom.style.height = '0';
-    //futureEvents.dom.style.visibility = "visible";
-    futureEvents.dom.style.opacity = "0";
-    function toggleFutureEvents() {
-        if (futureSwitch) {
-            IndicoUI.Effect.slide("futureEvents", futureEventsDivHeight);
-            $E("futureEventsText").dom.innerHTML = "There are ${ numOfEventsInTheFuture } more events in the <em>future</em>. <span class='fakeLink' onclick='toggleFutureEvents()'>Show them.</a>";
-        }else {
-            IndicoUI.Effect.slide("futureEvents", futureEventsDivHeight);
-            $E("futureEventsText").dom.innerHTML = '<span class="fakeLink" onclick="toggleFutureEvents()">Hide</span> the events in the future (${ numOfEventsInTheFuture }).';
+    $('.futureEventsLink').click(function() {
+        var fe = $('#futureEvents');
+        if (fe.is(':visible')) {
+            $('#futureEventsShow').show();
+            $('#futureEventsHide').hide();
+            fe.slideUp('medium');
         }
-        futureSwitch = !futureSwitch;
-    }
+        else {
+            $('#futureEventsHide').show();
+            $('#futureEventsShow').hide();
+            fe.slideDown('medium');
+        }
+
+    });
     % endif
 
     // Past events
