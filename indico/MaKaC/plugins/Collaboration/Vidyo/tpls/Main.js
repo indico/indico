@@ -91,7 +91,7 @@
                      $T("Please delete it and try to create it again.")]);
         }
         if (event === 'connect' && error.errorType === 'connectFailed') {
-            CSErrorPopup($T("Public room removed from Vidyo"),[error.userMessage]);
+            CSErrorPopup($T("Connect room failed"),[error.userMessage]);
         }
     },
 

@@ -238,7 +238,7 @@ var refreshTableHead = function() {
         infoCell.set(infoSpan);
         headRow.append(infoCell);
 
-        var actionsCell = Html.td({className: "collaborationTitleCellNarrow", colspan: 10, colSpan: 10});
+        var actionsCell = Html.td({className: "collaborationTitleCell", colspan: 10, colSpan: 10});
         var actionsSpan = Html.span({style:{fontSize: "medium"}}, "Actions");
         actionsCell.set(actionsSpan);
         headRow.append(actionsCell);
@@ -371,7 +371,7 @@ var bookingTemplateM = function(booking) {
     }
     row.append(cellCustom);
 
-    var cellEditRemove = Html.td({className : "collaborationCellNarrow"});
+    var cellEditRemove = Html.td({className : "collaborationCell"});
     var editButton = Widget.link(command(function(){edit(booking);}, IndicoUI.Buttons.editButton()));
     if (booking.canBeDeleted) {
         var removeButton = Widget.link(command(function(){remove(booking);}, IndicoUI.Buttons.removeButton()));
@@ -398,7 +398,11 @@ var bookingTemplateM = function(booking) {
         var cellStart = Html.td({className : "collaborationCellNarrow"});
         if (booking.canBeStarted) {
             if(booking.type=="Vidyo"){
-                var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButtonText($T("Start desktop"), "right") ) );
+                var align="";
+                if (booking.hasConnect && booking.canBeConnected){
+                    align = "right";
+                }
+                var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButtonText($T("Start desktop"), align) ) );
             }else{
                 var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButton(false)) );
             }
