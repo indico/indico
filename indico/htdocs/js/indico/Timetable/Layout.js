@@ -92,7 +92,7 @@ type("TimetableLayoutManager", [],
              assigned[newElem] = block;
          },
 
-         reorderAssigned: function(assigned, lastAssigned, currentGroup) {
+         reorderAssigned: function(assigned, lastAssigned, currentGroup, currentPos) {
 
              var correctlyAssigned = function(block) {
                  return exists(lastAssigned[block.sessionId]) && lastAssigned[block.sessionId].col == block.assigned;
@@ -120,6 +120,7 @@ type("TimetableLayoutManager", [],
 
              // Changes the column of a block
              var reassign = function(block, col) {
+                 console.log('reassign', block.id, col)
                  block.assigned = col;
                  assigned[col] = block;
                  if (!exists(block.sessionId)) {
@@ -153,26 +154,14 @@ type("TimetableLayoutManager", [],
                  var preferedCol = lastAssigned[block.sessionId].col;
                  var existingBlock = assigned[preferedCol];
 
-                 // If there's no block on the prefered column it means
-                 // that there are fewer columns this time.
+                 // If there's no block on the prefered column
                  if (!existingBlock) {
-                     // Forcing to use prefered column is not very nice
-                     // for now do nothing
-                     /*
-                     for (var i = preferedCol-1; i >= 0; i--) {
-                         if (!assigned[preferedCol]) {
-                             existingBlock = assigned[i];
-                             preferedCol = i;
-                             break;
-                         }
+                     // if the block starts at the current position, it is safe to move it to a free place
+                     // otherwise we can overlap an exisiting one
+                     if (block.start == currentPos && preferedCol < _(assigned).size()) {
+                         reassign(block, preferedCol);
                      }
-                     reassign(block, preferedCol);
-                     */
-                     continue;
-                 }
-
-                 // Try to place the block in the prefered column
-                 if (!exists(existingBlock.sessionId) || !exists(lastAssigned[existingBlock.sessionId]) ||
+                 } else if (!exists(existingBlock.sessionId) || !exists(lastAssigned[existingBlock.sessionId]) ||
                      numAssignedBlocks(block.sessionId) > numAssignedBlocks(existingBlock.sessionId)) {
 
                      // The block currently placed in the prefered column has either no prefered column
@@ -392,9 +381,9 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                  }
              });
 
-             // Try to reaorder the assigned blocks based on their previous position
+             // Try to reaorder the assigned blocks based on their session siblings' position
              if (blockAdded) {
-                 self.reorderAssigned(algData.assigned, algData.lastAssigned, algData.currentGroup);
+                 self.reorderAssigned(algData.assigned, algData.lastAssigned, algData.currentGroup, algData.topPx);
              }
 
              if (algData.active > 0) {
