@@ -22,7 +22,7 @@
 Asynchronous request handlers for category-related services.
 """
 
-import datetime
+from datetime import datetime
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
@@ -31,7 +31,7 @@ import MaKaC.conference as conference
 from MaKaC.common.logger import Logger
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 import MaKaC.webinterface.locators as locators
-from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvents
+from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvents, WConferenceListItem
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import PrincipalHolder, Avatar, Group
 from indico.core.index import Catalog
@@ -155,8 +155,28 @@ class GetPastEventsList(CategoryDisplayBase):
 
     def _getAnswer( self ):
         index = Catalog.getIdx('categ_conf_sd').getCategory(self._categ.getId())
-        pastEvents = list(islice(index.itervalues(), self._lastIdx))
-        return WConferenceListEvents(pastEvents, self._aw).getHTML()
+        skip = max(0, self._lastIdx - 100)
+        pastEvents = {}
+        num = 0
+        for event in islice(index.itervalues(), skip, self._lastIdx):
+            sd = event.getStartDate()
+            key = (sd.year, sd.month)
+            if key not in pastEvents:
+                pastEvents[key] = {
+                    'events': [],
+                    'title': datetime(sd.year, sd.month, 1).strftime("%B %Y"),
+                    'year': sd.year,
+                    'month': sd.month
+                }
+            eventHTML = WConferenceListItem(event, self._aw).getHTML()
+            pastEvents[key]['events'].append(eventHTML)
+            num += 1
+        for monthData in pastEvents.itervalues():
+            monthData['events'].reverse()
+        return {
+            'num': num,
+            'events': [v for k, v in sorted(pastEvents.iteritems(), reverse=True)]
+        }
 
 class SetShowPastEventsForCateg(CategoryDisplayBase):
 

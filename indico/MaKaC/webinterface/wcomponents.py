@@ -3206,6 +3206,18 @@ class WConferenceListEvents(WTemplated):
         vars["aw"] = self._aw
         return vars
 
+class WConferenceListItem(WTemplated):
+    def __init__(self, event, aw):
+        self._event = event
+        self._aw = aw
+
+    def getVars( self ):
+        vars = WTemplated.getVars( self )
+        vars["lItem"] = self._event
+        vars["conferenceDisplayURLGen"] = urlHandlers.UHConferenceDisplay.getURL
+        vars["aw"] = self._aw
+        return vars
+
 class WEmptyCategory(WTemplated):
 
     def __init__(self, materialList):
