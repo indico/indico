@@ -4450,6 +4450,7 @@ td.collaborationInfoLeftCol {
 td.bookingFormFieldName {
     text-align: right;
     padding-right: 5px;
+    color: #523D04;
 }
 
 span.bookingFormWarning {
@@ -7139,6 +7140,7 @@ span.num_events {
     border: 1px solid #dcdcdc;
     color: #555555;
     border-radius: 5px;
+    display: inline;
 }
 
 .buttonWithPlay:hover{

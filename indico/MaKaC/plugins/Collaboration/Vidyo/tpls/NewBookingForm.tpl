@@ -1,6 +1,6 @@
 <table style="margin-top: 10px;">
     <tr>
-        <td class="bookingFormFieldName">
+        <td class="bookingFormFieldName" nowrap>
             <span>Room name</span>
         </td>
         <td>
@@ -9,7 +9,7 @@
     </tr>
 
     <tr>
-        <td class="bookingFormFieldName" style="vertical-align: top;">
+        <td class="bookingFormFieldName" style="vertical-align: top;" nowrap>
             <span>Description</span>
         </td>
         <td>
@@ -18,21 +18,21 @@
     </tr>
 
     <tr>
-        <td class="bookingFormFieldLink" style="vertical-align: top;">
+        <td class="bookingFormFieldName" style="vertical-align: top;" nowrap>
             <span>Event linking</span>
         </td>
         <td>
-            <span id="videoEventLinkType"></span>
-            <span id="videoEventLinkSelection">
+            <div id="videoEventLinkType"></div>
+            <div id="videoEventLinkSelection"  style="padding-left: 25px;">
                 <select id="dummy" disabled="disabled">
                     <option>${_('Default association')}</option>
                 </select>
-            </span>
+            </div>
         </td>
     </tr>
 
     <tr>
-        <td class="bookingFormFieldName">
+        <td class="bookingFormFieldName" nowrap>
             <span>Owner</span>
         </td>
         <td>
@@ -42,7 +42,7 @@
     </tr>
 
     <tr>
-        <td class="bookingFormFieldName">
+        <td class="bookingFormFieldName" nowrap>
             <span>PIN</span>
         </td>
         <td>

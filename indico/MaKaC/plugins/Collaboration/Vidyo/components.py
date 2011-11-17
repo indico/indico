@@ -39,7 +39,7 @@ class VidyoContributor(Component):
         """
         #list of creators of the chat rooms
         if PluginsWrapper('Collaboration', 'Vidyo').isActive() and len(obj._conf.getCSBookingManager().getBookingList(filterByType="Vidyo")) !=0:
-            list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneVidyo" id="cloneVidyo" value="1" checked/>Vidyo</li>""")
+            list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneVidyo" id="cloneVidyo" value="1" checked="checked"/>Vidyo</li>""")
 
     @classmethod
     def fillCloneDict(self, obj, params):

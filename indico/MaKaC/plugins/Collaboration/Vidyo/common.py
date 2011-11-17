@@ -196,9 +196,9 @@ class VidyoTools(object):
         return nowutc() - timedelta(days = getVidyoOptionValue("maxDaysBeforeClean"))
 
     @classmethod
-    def getConferenceRoomIp(cls, conf):
-        location = conf.getLocation()
-        room = conf.getRoom()
+    def getLinkRoomIp(cls, linkVideo):
+        location = linkVideo.getLocation()
+        room = linkVideo.getRoom()
         roomIp = ""
         if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()

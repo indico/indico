@@ -76,7 +76,7 @@ class CSBookingManager(Persistent, Observer):
         # an index of bookings by type. The key will be a booking type (string), the value a list of booking id
         self._bookingsByType = {}
 
-        # an index of bookings to video services by event.uniqueId : video.uniqueId pairind. 
+        # an index of bookings to video services by event.uniqueId : video.uniqueId pairind.
         self._bookingsToVideoServices = OOBTree()
 
         # a list of ids with hidden bookings
@@ -201,6 +201,34 @@ class CSBookingManager(Persistent, Observer):
             return len(self.getBookingList(filterByType = type)) == 0
         return True
 
+    def checkVideoLink(self, bookingParams):
+
+        if bookingParams.get('videoLinkType',"") == "session":
+            sessSlotId = bookingParams.get("videoLinkSession","")
+            import re
+            regExp = re.match(r"""(s[0-9a]*)(l[0-9]*)""", sessSlotId)
+            if not regExp:
+                raise NoReportError(_('No session has been passed when the type is session.'))
+            sessionId = regExp.group(1)[1:]
+            slotId = regExp.group(2)[1:]
+            session = self._conf.getSessionById(sessionId)
+            if session is None:
+                raise NoReportError(_('The session does not exist.'))
+            slot = session.getSlotById(slotId)
+            if slot is None:
+                raise NoReportError(_('The session does not exist.'))
+            return slot.getUniqueId()
+
+        elif bookingParams.get('videoLinkType',"") == "contribution":
+            contId = bookingParams.get("videoLinkContribution","")
+            if contId == "":
+                raise NoReportError(_('No contribution has been passed when the type is contribution.'))
+            cont = self._conf.getContributionById(contId)
+            if cont is None:
+                raise NoReportError(_('The contribution does not exist.'))
+            return cont.getUniqueId()
+
+        return self._conf.getUniqueId()
 
     def addBooking(self, booking):
         """ Adds an existing booking to the list of bookings.
@@ -225,7 +253,15 @@ class CSBookingManager(Persistent, Observer):
                            if "startDate" and "endDate" are among the keys, they will be taken out of the dictionary.
         """
         if self.canCreateBooking(bookingType):
+
+            uniqueId = self.checkVideoLink(bookingParams)
+
+            if (self.hasVideoService(uniqueId) and bookingParams.has_key("videoLinkType") and bookingParams.get("videoLinkType","") != "event"): # Restriction: 1 video service per session or contribution.
+                raise NoReportError(_('Only one video service per contribution or session is allowed.'))
+
             newBooking = CollaborationTools.getCSBookingClass(bookingType)(bookingType, self._conf)
+            if bookingParams.has_key("videoLinkType"):
+                newBooking.setLinkType({bookingParams["videoLinkType"] : uniqueId})
 
             error = newBooking.setBookingParams(bookingParams)
 
@@ -240,16 +276,6 @@ class CSBookingManager(Persistent, Observer):
                 if isinstance(createResult, CSErrorBase):
                     return createResult
                 else:
-                    uniqueId = None
-
-                    if bookingParams['videoLinkType'] == "session":
-                        uniqueId = bookingParams['videoLinkSession']
-                    elif bookingParams['videoLinkType'] == "contribution":
-                        uniqueId = bookingParams['videoLinkContribution']
-
-                    if (self.hasVideoService(uniqueId)): # Restriction: 1 video service per session or contribution.
-                        raise NoReportError(_('Only one video service per contribution or session is allowed.'))
-
                     self._bookings[newId] = newBooking
                     self._bookingsByType.setdefault(bookingType,[]).append(newId)
                     if newBooking.isHidden():
@@ -283,7 +309,6 @@ class CSBookingManager(Persistent, Observer):
         'modify the booking' can mean that maybe the booking will be rejected with the new parameters.
         if 'startDate' and 'endDate' are among the keys, they will be taken out of the dictionary.
         """
-
         booking = self.getBooking(bookingId)
 
         oldStartDate = booking.getStartDate()
@@ -313,25 +338,18 @@ class CSBookingManager(Persistent, Observer):
                     self.getHiddenBookings().remove(booking.getId())
 
                 eventLinkUpdated = False
+                newLinkId = self.checkVideoLink(bookingParams)
+
                 if booking.hasSessionOrContributionLink():
                     oldLinkData = booking.getLinkIdDict()
                     oldLinkId = oldLinkData.values()[0]
 
                     # Details changed, we need to remove the association and re-create it
-                    if not (oldLinkData.has_key(bookingParams['videoLinkType'])
-                        and ((oldLinkId == bookingParams['videoLinkSession']) 
-                        or (oldLinkId == bookingParams['videoLinkContribution']))):
-
+                    if not (oldLinkData.has_key(bookingParams.get('videoLinkType','')) and oldLinkId == newLinkId):
                         self.removeVideoSingleService(booking.getLinkId(), booking)
                         eventLinkUpdated = True
 
-                if eventLinkUpdated or bookingParams['videoLinkType'] != "None":
-                    newLinkId = None
-                    if bookingParams['videoLinkType'] == "session":
-                        newLinkId = bookingParams['videoLinkSession']
-                    elif bookingParams['videoLinkType'] == "contribution":
-                        newLinkId = bookingParams['videoLinkContribution']
-
+                if eventLinkUpdated or (bookingParams.has_key("videoLinkType") and bookingParams.get("videoLinkType","") != "event"):
                     if self.hasVideoService(booking.getLinkId(), booking):
                         pass # No change in the event linking
                     elif newLinkId is not None:
@@ -339,7 +357,8 @@ class CSBookingManager(Persistent, Observer):
                             raise NoReportError(_('Only one video service per contribution or session is allowed.'))
                         else:
                             self.addVideoService(newLinkId, booking)
-                            booking.setLinkType({bookingParams['videoLinkType']: newLinkId})
+                            if bookingParams.has_key("videoLinkType"):
+                                booking.setLinkType({bookingParams['videoLinkType']: newLinkId})
                     else: # If it's still None, event linking has been completely removed.
                         booking.resetLinkParams()
 
@@ -934,7 +953,7 @@ class CSBookingManager(Persistent, Observer):
             self.getVideoServices()[uniqueId] = [videoService]
 
     def removeVideoAllServices(self, uniqueId):
-        """ Removes all associations of Contributions / Sessions with video 
+        """ Removes all associations of Contributions / Sessions with video
             services from the dictionary, key included.
         """
 
@@ -944,8 +963,8 @@ class CSBookingManager(Persistent, Observer):
         del self.getVideoServices()[uniqueId]
 
     def removeVideoSingleService(self, uniqueId, videoService):
-        """ Removes a specific video service from a specific contribution. As 
-            the list of services is unordered, iterate through to match for 
+        """ Removes a specific video service from a specific contribution. As
+            the list of services is unordered, iterate through to match for
             removal - performance cost therefore occurs here.
         """
 
@@ -975,20 +994,20 @@ class CSBookingManager(Persistent, Observer):
 
     def getVideoServicesById(self, uniqueId):
         """ Returns a list of video services associated with the uniqueId
-            for printing in event timetable. Returns None if no video services 
+            for printing in event timetable. Returns None if no video services
             are found.
         """
 
         if not self.hasVideoService(uniqueId):
             return None
 
-        return self.getVideoServices()[uniqueId] 
+        return self.getVideoServices()[uniqueId]
 
     def hasVideoService(self, uniqueId, service=None):
-        """ Returns True if the uniqueId of the Contribution or Session provided 
-            has an entry in the self._bookingsToVideoServices dictionary, thusly 
-            denoting the presence of linked bookings. Second parameter is for more 
-            specific matching, i.e. returns True if unique ID is associated with 
+        """ Returns True if the uniqueId of the Contribution or Session provided
+            has an entry in the self._bookingsToVideoServices dictionary, thusly
+            denoting the presence of linked bookings. Second parameter is for more
+            specific matching, i.e. returns True if unique ID is associated with
             specific service.
         """
         if service is None:
@@ -1086,6 +1105,8 @@ class CSBookingBase(Persistent, Fossilizable):
     _hasTitle = False
     _adminOnly = False
     _complexParameters = []
+    _linkVideoType = None
+    _linkVideoId = None
 
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
@@ -1428,6 +1449,58 @@ class CSBookingBase(Persistent, Fossilizable):
         if not hasattr(self, "_rejectReason"):
             self._rejectReason = ""
         return self._rejectReason
+
+    ## methods relating to the linking of CSBooking objects to Contributions & Sessions
+
+    def hasSessionOrContributionLink(self):
+        return (self.isLinkedToContribution() or self.isLinkedToSession())
+
+    def isLinkedToSession(self):
+        return (self._linkVideoType == "session")
+
+    def isLinkedToContribution(self):
+        return (self._linkVideoType == "contribution")
+
+    def getLinkId(self):
+        """ Returns the unique ID of the Contribution or Session which this
+            object is associated with, completely agnostic of the link type.
+            Returns None if no association (default) found.
+        """
+        if not self.hasSessionOrContributionLink():
+            return None
+
+        return self._linkVideoId
+
+    def getLinkIdDict(self):
+        """ Returns a dictionary of structure linkType (session | contribution)
+            : unique ID of referenced object.
+            Returns None if no association is found.
+        """
+        linkId = self.getLinkId()
+
+        if linkId == None:
+            return linkId
+
+        return {self._linkVideoType : linkId}
+
+    def getLinkType(self):
+        """ Returns a string denoting the link type, that is whether linked
+            to a session or contribution.
+        """
+
+        return self._linkVideoType
+
+    def setLinkType(self, linkDict):
+        """ Accepts a dictionary of linkType: linkId """
+        self._linkVideoType = linkDict.keys()[0]
+        self._linkVideoId = linkDict.values()[0]
+
+    def resetLinkParams(self):
+        """ Removes all association with a Session or Contribution from this
+            CSBooking only.
+        """
+
+        self._linkVideoType = self._linkVideoId = None
 
     def getBookingParams(self):
         """ Returns a dictionary with the booking params.

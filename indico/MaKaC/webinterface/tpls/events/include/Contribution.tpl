@@ -26,7 +26,7 @@
         % endif
         % if conf.getCSBookingManager().hasVideoService(item.getUniqueId()):
             % for video in conf.getCSBookingManager().getVideoServicesById(item.getUniqueId()):
-                <%include file="VideoService.tpl" args="video=video, videoId=item.getId()"/>
+                <%include file="VideoService.tpl" args="video=video, videoId=item.getUniqueId()"/>
             % endfor
         % endif
     </span>

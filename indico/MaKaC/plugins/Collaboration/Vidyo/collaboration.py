@@ -58,8 +58,6 @@ class CSBooking(CSBookingBase):
 
     _hasEventDisplay = True
 
-    _linkVideoType = None
-    _linkVideoId = None
     _serviceInformation = ServiceInformation() # See method getSections()
 
     _commonIndexes = ["All Videoconference"]
@@ -97,7 +95,7 @@ class CSBooking(CSBookingBase):
         return False
 
     def canBeConnected(self):
-        return self._created and VidyoTools.getConferenceRoomIp(self._conf)!=""
+        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject(self._linkVideoId))!=""
 
     def canBeDeleted(self):
         return True
@@ -119,39 +117,6 @@ class CSBooking(CSBookingBase):
     def setHasPin(self, value):
         #ignore, will be called only on rollback
         pass
-
-    def getBookingParams(self):
-        """ Overloaded method to append which contribution or session (if any) 
-            this booking is linked to for the managerial view. 
-        """
-
-        params = super(CSBooking, self).getBookingParams()
-        linkText = ""
-        import re
-
-        if self.hasSessionOrContributionLink():
-            title = ""
-
-            # Should move this into a utility function.
-            confId = re.search('(?<=a)\d+', self._linkVideoId)
-            sessId = re.search('(?<=s)\d+', self._linkVideoId)
-            contId = re.search('(?<=t)\d+', self._linkVideoId)
-
-            from MaKaC.conference import ConferenceHolder
-            ch = ConferenceHolder()
-            ch = ch.getById(confId.group())
-
-            if self.isLinkedToConribution():
-                title = ch.getContributionById(contId.group()).getTitle()
-            else:
-                title = ch.getSessionById(sessId.group()).getTitle()
-
-            linkText = title + " (" + self._linkVideoType + ")"
-        else:
-            linkText = _("Whole event.")
-
-        params["linkText"] = linkText
-        return params
 
     def getOwner(self):
         """ Returns the owner, fossilized, so that it is used by the collaboration core
@@ -187,6 +152,13 @@ class CSBooking(CSBookingBase):
                 self._owner = avatar
             else:
                 self._owner = FakeAvatarOwner(ownerAccount)
+
+    def getLinkVideoText(self):
+        return self._generateLinkVideoText()
+
+    def getLinkVideoRoomLocation(self):
+        linkObject = self.getLinkObject(self._linkVideoId)
+        return linkObject.getRoom().getName() if linkObject.getRoom() else ""
 
     def getRoomId(self):
         """ The Viydo internal room id for this booking
@@ -229,72 +201,19 @@ class CSBooking(CSBookingBase):
         self._checksDone = checksDone
 
     def hasBookingInformation(self):
-        """ Determines whether this booking has further information associated 
-            with it, i.e. a ServiceInformation attribute, for populating 
+        """ Determines whether this booking has further information associated
+            with it, i.e. a ServiceInformation attribute, for populating
             drop-down 'more info.
         """
         return hasattr(self, "_serviceInformation")
 
     def getBookingInformation(self):
-        """ For retreiving the ServiceInformation sections dict built for the 
+        """ For retreiving the ServiceInformation sections dict built for the
             Event Header, delegated here for use with Vidyo only at this time.
-            If event linking is required for other video services, this will 
+            If event linking is required for other video services, this will
             need to be moved to parent or some other mechanism implemented.
         """
         return self._serviceInformation.getInformation(self, True)
-
-    ## methods relating to the linking of Vidyo objects to Contributions & Sessions
-
-    def hasSessionOrContributionLink(self):
-        return (self.isLinkedToConribution() or self.isLinkedToSession())
-
-    def isLinkedToSession(self):
-        return (self._linkVideoType == "session")
-
-    def isLinkedToConribution(self):
-        return (self._linkVideoType == "contribution")
-
-    def getLinkId(self):
-        """ Returns the unique ID of the Contribution or Session which this 
-            object is associated with, completely agnostic of the link type.
-            Returns None if no association (default) found.
-        """
-        if not self.hasSessionOrContributionLink():
-            return None
-        
-        return self._linkVideoId
-
-    def getLinkIdDict(self):
-        """ Returns a dictionary of structure linkType (session | contribution) 
-            : unique ID of referenced object.
-            Returns None if no association is found.
-        """
-        linkId = self.getLinkId()
-
-        if linkId == None:
-            return linkId
-
-        return {self._linkVideoType : linkId}
-
-    def getLinkType(self):
-        """ Returns a string denoting the link type, that is whether linked 
-            to a session or contribution.
-        """
-
-        return self._linkVideoType
-
-    def setLinkType(self, linkDict):
-        """ Accepts a dictionary of linkType: linkId """
-
-        self._linkVideoType = linkDict.keys()[0]
-        self._linkVideoId = linkDict.values()[0]
-
-    def resetLinkParams(self):
-        """ Removes all association with a Session or Contribution from this
-            CSBooking only. 
-        """
-
-        self._linkVideoType = self._linkVideoId = None
 
     ## overriding methods
     def _getTitle(self):
@@ -324,6 +243,42 @@ class CSBooking(CSBookingBase):
 
         return False
 
+    def getLinkObject(self, linkVideoId):
+        import re
+
+        confId = re.search('(?<=a)\d+', linkVideoId)
+        sessId = re.search('(?<=s)\d+', linkVideoId)
+        slotId = re.search('(?<=l)\d+', linkVideoId)
+        contId = re.search('(?<=t)\d+', linkVideoId)
+
+        from MaKaC.conference import ConferenceHolder
+        ch = ConferenceHolder()
+        conf = ch.getById(confId.group())
+        linkObject = conf
+        if contId:
+            linkObject = conf.getContributionById(contId.group())
+        elif sessId:
+            session = conf.getSessionById(sessId.group())
+            if session is not None:
+                linkObject = session.getSlotById (slotId.group())
+        return linkObject
+
+    def _generateLinkVideoText(self):
+        linkVideoText = ""
+
+        if self.hasSessionOrContributionLink():
+            title = ""
+
+            linkObject = self.getLinkObject(self._linkVideoId)
+            if self.isLinkedToContribution():
+                title = linkObject.getTitle()
+            else:
+                title = linkObject.getSession().getTitle() + (" - " + linkObject.getTitle() if linkObject.getTitle() else "")
+            linkVideoText = title + " (" + self._linkVideoType + ")"
+        else:
+            linkVideoText = _("Whole event")
+
+        return linkVideoText
 
     def _create(self):
         """ Creates the Vidyo public room that will be associated to this CSBooking,
@@ -333,17 +288,11 @@ class CSBooking(CSBookingBase):
             Returns a VidyoError if there is a problem, such as the name being duplicated.
         """
         result = ExternalOperationsManager.execute(self, "createRoom", VidyoOperations.createRoom, self)
-
         if isinstance(result, VidyoError):
             return result
 
         else:
             # Link to a Session or Contribution if requested
-            if not self._bookingParams["videoLinkType"] == "None":
-                params = self._bookingParams
-                linkId = params["videoLinkSession"] if params["videoLinkType"] == "session" \
-                    else params["videoLinkContribution"]
-                self.setLinkType({params["videoLinkType"] : linkId})
             self._roomId = str(result.roomID) #we need to convert values read to str or there will be a ZODB exception
             self._extension = str(result.extension)
             self._url = str(result.RoomMode.roomURL)
@@ -389,7 +338,7 @@ class CSBooking(CSBookingBase):
     def _connect(self):
         self._checkStatus()
         if self.canBeConnected():
-            confRoomIp = VidyoTools.getConferenceRoomIp(self._conf)
+            confRoomIp = VidyoTools.getLinkRoomIp(self._conf if self._linkVideoType==None else self.getLinkObject(self._linkVideoId))
             if confRoomIp == "":
                 return VidyoError("noValidConferenceRoom", "connect")
             prefixConnect = getVidyoOptionValue("prefixConnect")

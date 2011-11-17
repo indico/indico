@@ -76,7 +76,7 @@ var videoServiceLaunchInfo = {};
     <span class="collaborationDisplayMoreInfo">More Info</span>
         % endif
     </span>
-    
+
     % if bookingInfo:
     <!-- Start of a booking info line -->
     <div class="collabInfoInline" style="overflow: hidden; display: none;">

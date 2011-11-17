@@ -107,7 +107,6 @@ var bookings = $L(${ jsonEncode(BookingsM) });
 var createButton;
 var createButtonTooltip;
 
-var confLocationRoom = '${ Conference.getRoom().getName() if Conference.getRoom() else ""}';
 var confId = ${ Conference.getId() };
 
 /* ------------------------------ UTILITY / HELPER FUNCTIONS -------------------------------*/

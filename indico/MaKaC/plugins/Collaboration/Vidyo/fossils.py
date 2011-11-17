@@ -37,6 +37,12 @@ class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
         """ returns the public room auto-join url """
     getURL.name = 'url'
 
+    def getLinkVideoText(self):
+        """"returns the link to the booking"""
+
+    def getLinkVideoRoomLocation(self):
+        """"returns the room location of the booking"""
+
 
 def removePin(bookingParams):
     del bookingParams["pin"]

@@ -382,24 +382,20 @@ var bookingTemplateM = function(booking) {
     cellEditRemove.append(removeButton);
     row.append(cellEditRemove);
 
-    var cellStart;
-
+    var cellButtons = Html.td({className : "collaborationCellNarrow"});;
 
     if (booking.hasConnect){
         if (booking.canBeConnected) {
-            var cellConnect = Html.td({className : "collaborationCellNarrow"});
-            var connectButton = Widget.link( command(function(){connect(booking);} ,IndicoUI.Buttons.playButtonText($T("Connect ") + confLocationRoom, "left" )) );
-            cellConnect.set(connectButton);
-            row.append(cellConnect);
+            var connectButton = Widget.link( command(function(){connect(booking);} ,IndicoUI.Buttons.playButtonText($T("Connect ") + booking.linkVideoRoomLocation, "left" )) );
+            cellButtons.append(connectButton);
         }
     }
 
     if (booking.hasStart) {
-        var cellStart = Html.td({className : "collaborationCellNarrow"});
         if (booking.canBeStarted) {
-            if(booking.type=="Vidyo"){
+            if(booking.hasConnect){
                 var align="";
-                if (booking.hasConnect && booking.canBeConnected){
+                if (booking.canBeConnected){
                     align = "right";
                 }
                 var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButtonText($T("Start desktop"), align) ) );
@@ -410,11 +406,8 @@ var bookingTemplateM = function(booking) {
         } else {
             var playButton = IndicoUI.Buttons.playButton(true);
         }
-        cellStart.set(playButton);
-    } else {
-        var cellStart = Html.td();
+        cellButtons.append(playButton);
     }
-    row.append(cellStart);
 
     if (booking.hasStop) {
         var cellStop = Html.td({className : "collaborationCellNarrow"});
@@ -423,9 +416,11 @@ var bookingTemplateM = function(booking) {
         } else {
             var stopButton = IndicoUI.Buttons.stopButton(true);
         }
-        cellStop.set(stopButton);
-        row.append(cellStop);
+        cellButtons.append(stopButton);
     }
+
+    row.append(cellButtons);
+
 
     //var cellMail = Html.td({className : "collaborationCellNarrow"});
     //cellMail.set(Html.img({src: imageSrc("mail_big"), style: {'verticalAlign': 'middle', marginLeft: '3px', marginRight: '3px'}}));
@@ -715,7 +710,7 @@ var connectBooking = function(booking, conferenceId) {
                         else {
                             connectBookingLocal(result);
                             killProgress();
-                            new AlertPopup($T("Success"), $T("The room ") + confLocationRoom  + $T(" has been conected to the Vidyo room.") ).open();
+                            new AlertPopup($T("Success"), $T("The room ") + booking.linkVideoRoomLocation  + $T(" has been conected to the Vidyo room.") ).open();
                             refreshBooking(result);
                         }
                     } else {
@@ -1321,6 +1316,7 @@ var createBooking = function(pluginName, conferenceId) {
     if (pluginHasFunction(pluginName, "onCreate")) {
         codes[pluginName].onCreate(popup);
     }
+
     popup.postDraw();
 
     return true;
@@ -1328,8 +1324,8 @@ var createBooking = function(pluginName, conferenceId) {
 
 /**
  * Function that will be called when the user presses the "Edit" button of a booking.
- * Will use the 'BookingPopup' class. Checks the plugin to see whether or not it has a 
- * deferred object, that is whether it should postpone the display of the popup until 
+ * Will use the 'BookingPopup' class. Checks the plugin to see whether or not it has a
+ * deferred object, that is whether it should postpone the display of the popup until
  * all AJAX requests have been completed.
  * @param {object} booking The booking object corresponding to the "edit" button that was pressed.
  * @param {string} conferenceId the conferenceId of the current event
@@ -1339,23 +1335,11 @@ var editBooking = function(booking, conferenceId) {
     var popup = new BookingPopup('edit', booking.type, booking, conferenceId);
     popup.open();
 
-    var ajaxDeferrer = false; /* For active waiting until AJAX complete. */
-  
-    if (pluginHasFunction(booking.type, "getDeferred")) {
-        ajaxDeferrer = codes[booking.type].getDeferred();
-    }
     if (pluginHasFunction(booking.type, "onEdit")) {
         codes[booking.type].onEdit(booking, popup);
     }
 
-    if (ajaxDeferrer) {
-        $.when(ajaxDeferrer).done(function() {
-            popup.postDraw();
-        });
-    }
-    else {
-        popup.postDraw();
-    }
+    popup.postDraw();
 }
 
 /**

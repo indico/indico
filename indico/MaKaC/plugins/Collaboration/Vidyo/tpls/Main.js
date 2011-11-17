@@ -1,6 +1,9 @@
 {
-    ajaxPendingAll : false,
     vidyoComponents : null,
+    loaded: {
+        session: false,
+        contribution: false
+    },
 
     start : function(booking, iframeElement) {
         window.open(booking.url);
@@ -17,24 +20,39 @@
     },
 
     checkParams: function() {
+        var self = this;
         return {
             'roomName' : ['text', false, function(name, values){
                 var maxNameLength = ${ MaxNameLength };
-                errors = [];
+                var errors = [];
                 if (name.length > maxNameLength) {
                     errors.push($T("The room name cannot be longer than ") + maxNameLength + $T(" characters."));
                 }
                 return errors;
             }],
             'roomDescription' : ['text', false],
-            'pin': ['non_negative_int', true]
+            'pin': ['non_negative_int', true],
+            'videoLinkSession': ['text', false, function(option, values){
+                var errors = [];
+                if(self.vidyoComponents["link"].get()=="session" && option == "None"){
+                    errors.push($T("No session has been defined."));
+                }
+                return errors;
+            }],
+            'videoLinkContribution': ['text', false, function(option, values){
+                var errors = [];
+                if(self.vidyoComponents["link"].get()=="contribution" && option == "None"){
+                    errors.push($T("No contribution has been defined."));
+                }
+                return errors;
+            }]
         };
     },
 
     errorHandler: function(event, error, booking) {
         if (event === 'create' || event === 'edit') {
             if (error.errorType === 'invalidName') {
-                var message = $T("That room name is not valid. Please write a new name that starts " + 
+                var message = $T("That room name is not valid. Please write a new name that starts " +
                                  "with a letter or a number, and does not contain punctuation, except periods, underscores or dashes. " +
                                  "Unicode characters are allowed (é, ñ, 漢字) but some may cause problems.");
                 IndicoUtil.markInvalidField($E('roomName'), message);
@@ -63,6 +81,12 @@
 
             if (error.errorType === 'userHasNoAccounts') {
                 CSErrorPopup($T("Invalid owner"), [$T("The user ") + this.vidyoComponents["ownerField"].get().name + $T(" does not have an account in Indico.")]);
+            }
+            if (error.errorType === 'sessionNotDefined') {
+                CSErrorPopup($T("No session defined"), [$T("A session must be set.")]);
+            }
+            if (error.errorType === 'contributionNotDefined') {
+                CSErrorPopup($T("Invalid owner"), [$T("A contribution must be set.")]);
             }
         }
 
@@ -160,12 +184,14 @@
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Linked to:')),
-            Html.td({}, booking.bookingParams.linkText)));
+            Html.td({}, booking.linkVideoText)));
 
         return Html.div({}, Html.table({}, infoTbody));
     },
 
     observeRadioButtons: function(vidyoComponents) {
+        var self = this;
+
         vidyoComponents["link"].observe(function(value){
             switch(value) {
             case"session":
@@ -173,14 +199,23 @@
                     vidyoComponents["dummy"] = $('#videoEventLinkSelection').html();
                     vidyoComponents["changed"] = true;
                 }
-                $E('videoEventLinkSelection').set(vidyoComponents["session"].draw());
+                if(self.loaded["session"] === true && vidyoComponents["session"]){
+                    $E('videoEventLinkSelection').set(vidyoComponents["session"].draw());
+                }else{
+                    $E('videoEventLinkSelection').set(progressIndicator(true, true));
+                }
                 break;
             case"contribution":
                 if (vidyoComponents["changed"] == false) {
                     vidyoComponents["dummy"] = $('#videoEventLinkSelection').html();
                     vidyoComponents["changed"] = true;
                 }
-                $E('videoEventLinkSelection').set(vidyoComponents["contribution"].draw());
+                if(self.loaded["contribution"] === true && vidyoComponents["contribution"]){
+                    $E('videoEventLinkSelection').set(vidyoComponents["contribution"].draw());
+                }else{
+                    $E('videoEventLinkSelection').set(progressIndicator(true, true));
+                }
+
                 break;
             case"None":
             default:
@@ -206,22 +241,18 @@
                 singleUserNothing, singleUserNothing),
             pinField : new ShowablePasswordField('pin', '', false),
             link : new RadioFieldWidget([
-                 ['None', $T("Leave default Vidyo association.")],
-                 ['contribution', $T("Link to a contribution.")],
-                 ['session', $T("Link to a session.")]
+                 ['event', $T("Leave default Vidyo association")],
+                 ['contribution', $T("Link to a contribution")],
+                 ['session', $T("Link to a session")]
              ], 'nobulletsListInline','videoLinkType'),
-            session : new SelectRemoteWidget('event.sessions.listAll', 
+            session :new SelectRemoteWidget('event.sessions.listAll',
                 params, function() {
-                    if (ajaxPending !== false) {
                         ajaxPending["session"].resolve();
-                    }
-                }, 'videoLinkSession'),
-            contribution : new SelectRemoteWidget('event.contributions.listAll', 
+                }, 'videoLinkSession', "No sessions"),
+            contribution : new SelectRemoteWidget('event.contributions.listAll',
                 params, function() {
-                    if (ajaxPending !== false) {
                         ajaxPending["contribution"].resolve();
-                    }
-                }, 'videoLinkContribution'),
+                }, 'videoLinkContribution', "No contributions"),
             dummy : "",
             changed : false
         };
@@ -229,40 +260,20 @@
         return self.vidyoComponents;
     },
 
-    onCreate: function(bookingPopup) {
+    addComponents: function(bookingPopup){
         var self = this;
-        var vidyoComponents = self.getVidyoComponents();
-
-        $E('owner').set(vidyoComponents["ownerField"].draw());
-        $E('PINField').set(vidyoComponents["pinField"].draw());
-        $E('videoEventLinkType').set(vidyoComponents["link"].draw());
-        vidyoComponents["link"].select('None');
-        self.observeRadioButtons(vidyoComponents);
-
-        bookingPopup.addComponent(vidyoComponents["ownerField"]);
-        bookingPopup.addComponent(vidyoComponents["pinField"]);
-        bookingPopup.addComponent(vidyoComponents["link"]);
-        bookingPopup.addComponent(vidyoComponents["session"]);
-        bookingPopup.addComponent(vidyoComponents["contribution"]);
-        vidyoDrawContextHelpIcons(vidyoComponents["pinField"]);
-    },
-
-    onEdit: function(booking, bookingPopup) {
-        var self = this;
-        var ajaxPending = {
-                session : $.Deferred(),
-                contribution : $.Deferred()
+        self.loaded["session"] = false;
+        self.loaded["contribution"] = false;
+        ajaxPending= {
+            session : $.Deferred(),
+            contribution : $.Deferred()
         };
+
         var vidyoComponents = self.getVidyoComponents(ajaxPending);
 
         $E('owner').set(vidyoComponents["ownerField"].draw());
         $E('PINField').set(vidyoComponents["pinField"].draw());
         $E('videoEventLinkType').set(vidyoComponents["link"].draw());
-        self.observeRadioButtons(vidyoComponents);
-
-        $.when(ajaxPending["session"], ajaxPending["contribution"]).done(function() {
-            self.ajaxPendingAll.resolve();
-        });
 
         bookingPopup.addComponent(vidyoComponents["ownerField"]);
         bookingPopup.addComponent(vidyoComponents["pinField"]);
@@ -270,8 +281,35 @@
         bookingPopup.addComponent(vidyoComponents["contribution"]);
         bookingPopup.addComponent(vidyoComponents["link"]); /* This must be the last component added. */
         vidyoDrawContextHelpIcons(vidyoComponents["pinField"]);
+
+        $.when(ajaxPending["session"]).done(function() {
+            if(vidyoComponents["link"].get() == "session"){
+                $E('videoEventLinkSelection').set(vidyoComponents["session"].draw());
+            }
+            self.loaded["session"] = true;
+        });
+
+        $.when(ajaxPending["contribution"]).done(function() {
+            if(vidyoComponents["link"].get() == "contribution"){
+                $E('videoEventLinkSelection').set(vidyoComponents["contribution"].draw());
+            }
+            self.loaded["contribution"] = true;
+        });
+
+        self.observeRadioButtons(vidyoComponents);
+
+        return vidyoComponents;
     },
 
+    onCreate: function(bookingPopup) {
+        var vidyoComponents = this.addComponents(bookingPopup);
+        vidyoComponents["link"].select('event');
+
+    },
+
+    onEdit: function(booking, bookingPopup) {
+        this.addComponents(bookingPopup);
+    },
 
     beforeCreate: function(pluginName, conferenceId) {
         return true;

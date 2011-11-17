@@ -76,13 +76,13 @@
 <script type="text/javascript">
     var slideSpeed = 'fast';
     var tooltipMsgs = {moreinfo : $T('Click here to show / hide detailed information'),
-                       morebookings : $T('There are more bookings than is currently shown.<br /> ' + 
+                       morebookings : $T('There are more bookings than is currently shown.<br /> ' +
                                          'Click here to show / hide more information.')};
 
     $('#collShowBookings').qtip({
-        content: tooltipMsgs["morebookings"], 
+        content: tooltipMsgs["morebookings"],
         position: {
-            my: 'bottom middle', 
+            my: 'bottom middle',
             at: 'top middle'
         },
         style: {
@@ -109,9 +109,9 @@
     $('.bookingLaunchLinkInline').qtip({
         content: {
             text: function() { return videoServiceInfo[$(this).data('id')]; }
-        }, 
+        },
         position: {
-            my: 'top middle', 
+            my: 'top middle',
             at: 'bottom middle'
         },
         show: {
@@ -134,7 +134,7 @@
             text: function() { return videoServiceLaunchInfo[$(this).data('id')]; }
         },
         position: {
-            my: 'bottom middle', 
+            my: 'bottom middle',
             at: 'top middle'
         },
         style: {

@@ -29,7 +29,7 @@ from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceB
 import MaKaC.webinterface.displayMgr as displayMgr
 
 from MaKaC.common import filters
-from MaKaC.common.utils import validMail, setValidEmailSeparators
+from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common import indexes, info
 from MaKaC.common.fossilize import fossilize
 
@@ -58,8 +58,6 @@ from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
 from MaKaC.fossils.contribution import IContributionFossil
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
-from MaKaC.common.Configuration import Config
-
 
 class ConferenceBase:
     """
@@ -509,7 +507,7 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
 
 
 class ConferenceListSessions (ConferenceListModificationBase):
-    """ Returns a dictionary of all the Sessions within the current Conference, 
+    """ Returns a dictionary of all the Sessions within the current Conference,
         ordered by index only """
 
     def _getAnswer(self):
@@ -517,23 +515,25 @@ class ConferenceListSessions (ConferenceListModificationBase):
         result = {}
 
         for sess in sessions:
-            result[sess.getUniqueId()] = sess.getTitle()
+            for slot in sess.getSortedSlotList():
+                time = " (" + formatDateTime(slot.getAdjustedStartDate(), format = "dd MMM yyyy HH:mm") + ")"
+                result["s"+sess.getId()+"l"+slot.getId()] = sess.getTitle() + (" - " + slot.getTitle() if slot.getTitle() else "") + time
 
         return result
 
 
 class ConferenceListContributions (ConferenceListModificationBase):
     """ Returns a dictionary of all the Contributions within the current Conference,
-        if the Contribution is part of a Session, the Session name is appended 
+        if the Contribution is part of a Session, the Session name is appended
         to the name of the Contribution in parenthesis """
 
     def _getAnswer(self):
         contributions = self._conf.getContributionList()
         result = {}
-
         for cont in contributions:
             session = (" (" + cont.getSession().getTitle() + ")") if (cont.getSession() is not None) else ""
-            result[cont.getUniqueId()] = cont.getTitle() + session
+            time = " (" + formatDateTime(cont.getAdjustedStartDate(), format = "dd MMM yyyy HH:mm") + ")"
+            result[cont.getId()] = cont.getTitle() + session + time
 
         return result
 

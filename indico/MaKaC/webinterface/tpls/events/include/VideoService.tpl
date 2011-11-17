@@ -12,7 +12,7 @@
 </span>
 % if video.hasBookingInformation():
 <script type="text/javascript">
-<% 
+<%
     tempString = '<div class="videoServiceInlinePopup">'
 
     for section in video.getBookingInformation():
