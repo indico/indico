@@ -120,7 +120,6 @@ type("TimetableLayoutManager", [],
 
              // Changes the column of a block
              var reassign = function(block, col) {
-                 console.log('reassign', block.id, col)
                  block.assigned = col;
                  assigned[col] = block;
                  if (!exists(block.sessionId)) {
