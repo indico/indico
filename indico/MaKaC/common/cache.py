@@ -25,8 +25,10 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.logger import Logger
 from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
+from MaKaC.common.contextManager import ContextManager
 
 import hashlib, os, shutil, pickle, datetime, time
+from itertools import izip
 
 
 class IndicoCache:
@@ -324,3 +326,73 @@ class MultiLevelCache(object):
         """
 
         return '%s_%s' % (entry.getId(), version)
+
+
+class GenericMemCache(object):
+    def __init__(self, namespace):
+        self._client = None
+        self._namespace = namespace
+
+    def __repr__(self):
+        return 'GenericMemCache(%r)' % self._namespace
+
+    def _connect(self):
+        # Maybe we already have a client in this instance
+        if self._client is not None:
+            return
+        # If not, we might have one from another instance
+        self._client = ContextManager.get('GenericMemCacheClient', None)
+        if self._client is not None:
+            return
+        # If not, create a new one
+        import memcache
+        self._client = memcache.Client(Config.getInstance().getMemcachedServers())
+        ContextManager.set('GenericMemCacheClient', self._client)
+
+    def _makeKey(self, key):
+        if not isinstance(key, basestring):
+            # In case we get something not a string (number, list, whatever)
+            key = repr(key)
+        # Hashlib doesn't allow unicode so let's ensure it's not!
+        key = key.encode('utf-8')
+        return '%s.%s' % (self._namespace, hashlib.sha256(key).hexdigest())
+
+    def set(self, key, val, time=0):
+        self._connect()
+        self._client.set(self._makeKey(key), val, time)
+
+    def set_multi(self, mapping, time=0):
+        self._connect()
+        mapping = dict(((self._makeKey(key), val) for key, val in mapping.iteritems()))
+        self._client.set_multi(mapping, time)
+
+    def get(self, key, default=None):
+        self._connect()
+        res = self._client.get(self._makeKey(key))
+        if res is None:
+            return default
+        return res
+
+    def get_multi(self, keys, default=None, asdict=True):
+        self._connect()
+        real_keys = map(self._makeKey, keys)
+        data = self._client.get_multi(real_keys)
+        # Add missing keys
+        for real_key in real_keys:
+            if real_key not in data:
+                data[real_key] = default
+        # Get data in the same order as our keys
+        sorted_data = (data[rk] for rk in real_keys)
+        if asdict:
+            return dict(izip(keys, sorted_data))
+        else:
+            return list(sorted_data)
+
+    def delete(self, key):
+        self._connect()
+        self._client.delete(self._makeKey(key))
+
+    def delete_multi(self, keys):
+        self._connect()
+        keys = map(self._makeKey, keys)
+        self._client.delete_multi(keys)
