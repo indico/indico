@@ -388,7 +388,7 @@ var bookingTemplateM = function(booking) {
     if (booking.hasConnect){
         if (booking.canBeConnected) {
             var cellConnect = Html.td({className : "collaborationCellNarrow"});
-            var connectButton = Widget.link( command(function(){connect(booking);} ,IndicoUI.Buttons.playButtonText($T("Connect ") + booking.bookingParams.locationRoom, "left" )) );
+            var connectButton = Widget.link( command(function(){connect(booking);} ,IndicoUI.Buttons.playButtonText($T("Connect ") + confLocationRoom, "left" )) );
             cellConnect.set(connectButton);
             row.append(cellConnect);
         }
@@ -715,7 +715,7 @@ var connectBooking = function(booking, conferenceId) {
                         else {
                             connectBookingLocal(result);
                             killProgress();
-                            new AlertPopup($T("Success"), $T("The room ") + booking.bookingParams.locationRoom  + $T(" has been conected to the Vidyo room.") ).open();
+                            new AlertPopup($T("Success"), $T("The room ") + confLocationRoom  + $T(" has been conected to the Vidyo room.") ).open();
                             refreshBooking(result);
                         }
                     } else {

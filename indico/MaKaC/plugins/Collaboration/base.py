@@ -1342,8 +1342,6 @@ class CSBookingBase(Persistent, Fossilizable):
             bookingParams["notifyOnDateChanges"] = ["yes"]
         if self.isHidden():
             bookingParams["hidden"] = ["yes"]
-        if self._conf.getRoom():
-            bookingParams["locationRoom"] = self._conf.getRoom().getName()
         return bookingParams
 
 
