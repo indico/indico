@@ -53,6 +53,7 @@ from MaKaC.plugins.RoomBooking.default.roomblocking import RoomBlockingPrincipal
     BlockedRoom
 from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 from MaKaC.common.mail import GenericMailer
+from MaKaC.common.cache import GenericMemCache
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -1124,7 +1125,36 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 periods = resvEx.splitToPeriods(endDT = resvEx.endDT)
                 days = [ period.startDT.date() for period in periods ]
 
+        # We only use the cache if no options except a start/end date are sent and all rooms are included
+        self._useCache = (self._allRooms and
+            not self._onlyPrebookings and
+            not self._onlyBookings and
+            not self._onlyMy and
+            not self._ofMyRooms and
+            not self._search and
+            not self._isArchival and
+            not self._isHeavy and
+            not self._resvEx.bookedForName and
+            not self._resvEx.reason and
+            not self._resvEx.createdBy and
+            not self._resvEx.isRejected and
+            not self._resvEx.isCancelled and
+            not self._resvEx.needsAVCSupport and
+            not self._resvEx.usesAVC and
+            self._resvEx.isConfirmed is None)
+        self._cache = None
+        self._updateCache = False
+
+        self._dayBars = {}
         if not self._overload:
+            if self._useCache:
+                self._cache = GenericMemCache('RoomBookingCalendar')
+                self._dayBars = dict((day, bar) for day, bar in self._cache.get_multi(map(str, days)).iteritems() if bar)
+                dayMap = dict(((str(day), day) for day in days))
+                for day in self._dayBars.iterkeys():
+                    days.remove(dayMap[day])
+                self._updateCache = bool(len(days))
+
             self._resvs = []
             day = None # Ugly but...othery way to avoid it?
             for day in days:

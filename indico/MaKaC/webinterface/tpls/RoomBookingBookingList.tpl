@@ -10,10 +10,10 @@
                             <span class="formTitle" style="border-bottom-width: 0px">
                             % if not title:
                                 <!-- Generic title -->
-                                ${ len( reservations ) } ${ _("Booking(s) found")}:
+                                ${ numResvs } ${ _("Booking(s) found")}:
                             % endif
                             % if title:
-                                ${ title + " (" + str(len(reservations)) + ")" }:
+                                ${ title + " (" + str(numResvs) + ")" }:
                             % endif
                             </span>
 

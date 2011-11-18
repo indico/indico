@@ -5829,7 +5829,6 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
     def getVars( self ):
         vars = WTemplated.getVars( self )
         rh = self._rh
-        vars["reservations"] = rh._resvs
 
         #vars["smallPhotoUH"] = urlHandlers.UHSendRoomPhoto
         vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
@@ -5939,7 +5938,6 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         # there's at least one reservation
         if len( rh._resvs ) > 0:
 
-
             # Prepare the list of Collisions
             # (collision is just a helper object, it's not the best notion here)
 
@@ -5987,10 +5985,22 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
 
         fossilizedBars = {}
         for key in bars:
-            fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
+            cachedDayBars = self._rh._dayBars.get(str(key))
+            if not cachedDayBars:
+                fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
+            else:
+                fossilizedBars[str(key)] = cachedDayBars
+        if self._rh._updateCache:
+            self._rh._cache.set_multi(fossilizedBars)
+        resvIds = set()
+        for dayBars in fossilizedBars.itervalues():
+            for roomBars in dayBars:
+                for bar in roomBars['bars']:
+                    resvIds.add(bar['forReservation']['id'])
+        numResvs = len(resvIds)
         vars["barsFossil"] = fossilizedBars
+        vars["numResvs"] = numResvs
         vars["dayAttrs"] = fossilize({})
-        vars["bars"] = bars
         vars["showEmptyRooms"] = showEmptyRooms
         vars["manyRooms"] = not self._rh._rooms or len(self._rh._rooms) > 1
         vars["calendarParams"] = {}
