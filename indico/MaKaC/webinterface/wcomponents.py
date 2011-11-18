@@ -6077,7 +6077,7 @@ def addOverlappingPrebookings( bars ):
 
                         # If there is an overlap, add PRECONCURRENT bar
                         over = overlap( bar.startDT, bar.endDT, collCand.startDT, collCand.endDT )
-                        if over and bar.forReservation.room == collCand.forReservation.room:
+                        if over and bar.forReservation.room == collCand.forReservation.room and collCand.forReservation != bar.forReservation:
                             collision = Collision( over, collCand.forReservation )
                             dayBars.append( Bar( collision, Bar.PRECONCURRENT ) )
 
