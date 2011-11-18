@@ -33,6 +33,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder, Avatar
 from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common.cache import GenericMemCache
 from MaKaC.conference import ConferenceHolder
 from indico.util.fossilize import Fossilizable, fossilizes
 from MaKaC.fossils.roomBooking import IReservationFossil
@@ -108,6 +109,7 @@ class ReservationBase( Fossilizable ):
         if self.startDT.date() == self.endDT.date():
             self.repeatability = None
         self.checkIntegrity()
+        self.clearCalendarCache()
 
     def update( self ):
         """
@@ -116,12 +118,13 @@ class ReservationBase( Fossilizable ):
         if self.startDT.date() == self.endDT.date():
             self.repeatability = None
         self.checkIntegrity()
+        self.clearCalendarCache()
 
     def remove( self ):
         """
         Removes reservation from database (SQL: DELETE)
         """
-        pass
+        self.clearCalendarCache()
 
     def cancel( self ):
         """
@@ -129,6 +132,7 @@ class ReservationBase( Fossilizable ):
         When user cancels reservation.
         """
         self.isCancelled = True
+        self.clearCalendarCache()
 
     def reject( self ):
         """
@@ -136,6 +140,11 @@ class ReservationBase( Fossilizable ):
         When responsible rejects reservation.
         """
         self.isRejected = True
+        self.clearCalendarCache()
+
+    def clearCalendarCache(self):
+        cache = GenericMemCache('RoomBookingCalendar')
+        cache.delete_multi((str(p.startDT.date()) for p in self.splitToPeriods()))
 
     # Notifications ----------------------------------------------------------
 

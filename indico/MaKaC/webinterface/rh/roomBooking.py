@@ -1513,6 +1513,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                         session.setVar( "description", 'NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail with acceptance/rejection information.' )
                 elif self._formMode == FormMode.MODIF:
                     self._orig_candResv.unindexDayReservations()
+                    self._orig_candResv.clearCalendarCache()
                     if self._forceAddition:
                         self._loadResvCandidateFromSession( self._orig_candResv, self._params )
                     else:
