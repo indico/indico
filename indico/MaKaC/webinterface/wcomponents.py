@@ -5991,7 +5991,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             else:
                 fossilizedBars[str(key)] = cachedDayBars
         if self._rh._updateCache:
-            self._rh._cache.set_multi(fossilizedBars)
+            self._rh._cache.set_multi(fossilizedBars, 7200)
         resvIds = set()
         for dayBars in fossilizedBars.itervalues():
             for roomBars in dayBars:
