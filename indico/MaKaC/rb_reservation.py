@@ -883,6 +883,7 @@ class ReservationBase( Fossilizable ):
         [ date1, date2, date3, ... ]
         Dates are of date type (NOT datetime).
         """
+        self.clearCalendarCache()
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         for d in excludedDays:
@@ -894,6 +895,7 @@ class ReservationBase( Fossilizable ):
         Inserts dayD into list of excluded days.
         dayD should be of date type (NOT datetime).
         """
+        self.clearCalendarCache()
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
@@ -904,6 +906,7 @@ class ReservationBase( Fossilizable ):
         Inserts dayD into list of excluded days.
         dayD should be of date type (not datetime).
         """
+        self.clearCalendarCache()
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
