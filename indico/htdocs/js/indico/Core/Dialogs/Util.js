@@ -29,14 +29,11 @@ IndicoUI.Dialogs.Util = {
         var progress = $('<div id="tt_status_info"></div>').
             append(image, stext);
 
-        if (!$('#tt_status_info').length) {
-            $('body').append(progress);
-        } else {
-            $('#tt_status_info').replaceWith(progress);
-        }
+        $('#tt_status_info').replaceWith(progress).show();
+        progress.fadeIn();
 
         return function() {
-            $(progress).remove();
+            progress.hide();
         };
     },
 

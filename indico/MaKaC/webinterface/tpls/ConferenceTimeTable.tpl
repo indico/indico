@@ -22,9 +22,6 @@ IndicoUI.executeOnLoad(function(){
   timetable.postDraw();
 });
 
-
-$(window).scroll(function(){
-    IndicoUI.Effect.followScroll();
-});
+$.ui.sticky();
 
 </script>

@@ -1,4 +1,4 @@
-type("TimetableManagementActions", ["UndoMixin"], {
+type("TimetableManagementActions", [], {
     methods: {
         'SessionSlot': {
             add: 'schedule.session.addSlot',
@@ -191,8 +191,8 @@ type("TimetableManagementActions", ["UndoMixin"], {
                 // update the whole day or just one entry
 
                 if(undo) {
-                    self.enableUndo(undo, {eventData: eventData,
-                                           shifted: reschedule});
+                    self.timetable.enableUndo(undo, {eventData: eventData,
+                                                     shifted: reschedule});
                 }
 
                 if (reschedule) {
@@ -244,7 +244,6 @@ type("TimetableManagementActions", ["UndoMixin"], {
                 if (undo) {
                     self.enableUndo(undo, {'eventData': eventData,
                                            'entry': result.entry}, null);
-                    self.drawUndoDiv();
                 }
                 // change json and repaint timetable
                 self.timetable._updateMovedEntry(result, result.old.id).done(function() {

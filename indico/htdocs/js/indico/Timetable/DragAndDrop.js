@@ -582,6 +582,10 @@ function switchTT(event, tt) {
 $(function() {
     // bind several timetable events to the switchTT function (timetable transitions)
     $("body").bind('timetable_ready', function(event, tt) {
+        $('#tt_menu').css('width', $('#tt_menu').width());
+        // initialize sticky headers
+        $.ui.sticky();
+
         switchTT(event, tt);
         $('#tt_hour_tip').unbind();
         $('#tt_hour_tip').click(function(evt){
@@ -594,4 +598,5 @@ $(function() {
     $("body").bind('timetable_switch_toplevel', switchTT);  // switch to top level
     $("body").bind('timetable_switch_interval', switchTT);  // switch to interval
     $("body").bind('timetable_update', switchTT);  // changes in local timetable
+
 });

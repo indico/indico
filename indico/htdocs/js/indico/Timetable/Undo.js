@@ -1,8 +1,8 @@
 type("UndoMixin", [], {
 
-    drawUndoDiv: function() {
+    updateUndoDiv: function(tt_status_info) {
         /* A "button" that appears after an action is performed */
-        var undo_contents =  $('<a href="#">').append($T('Undo last operation')).
+        var undo_contents =  $('<a href="#">').text($T('Undo last operation')).
             click(function() {
                 // "Undo" should be executed over the _current_ timetable, not the original source of
                 // the event. Being so, we call a global event that will then invoke the correct TT
@@ -11,7 +11,12 @@ type("UndoMixin", [], {
                 $('body').trigger('timetable_undo');
                 return false;
             });
-        $('#tt_status_info').html(undo_contents.get(0));
+        var elem = tt_status_info || $('#tt_status_info');
+        if ($(window).data('undo')) {
+            elem.show().html(undo_contents).prepend($('<span class="icon">↺</span>'));
+        } else {
+            elem.hide();
+        }
     },
 
     enableUndo: function(undoLabel, savedData) {
@@ -21,7 +26,7 @@ type("UndoMixin", [], {
             // store current event data
             data: $.extend(true, {}, savedData)
         });
-        this.drawUndoDiv();
+        this.updateUndoDiv();
     }
 });
 
@@ -31,7 +36,7 @@ function highlight_undo(elemId) {
     if ((elem.offset().top > ($(window).scrollTop() + $(window).height())) ||
         ((elem.offset().top  + elem.height()) < $(window).scrollTop())) {
         $('html, body').animate({
-            scrollTop: elem.offset().top - 50
+            scrollTop: elem.offset().top - 150
         }, 500);
     }
     elem.effect("pulsate", {times: 3}, 500)
@@ -57,15 +62,15 @@ function undo_action() {
         dfr = management.moveToSession(data.entry, oldBlock,
                                        null, true);
     }
-    dfr.done(function() {
+    return dfr.done(function() {
         highlight_undo(data.eventData.id);
     });
 }
 
 
 function goto_slot(slotId) {
-    activeTT.switchToInterval(slotId).done(function() {
-        undo_action();
+    return activeTT.switchToInterval(slotId).pipe(function() {
+        return undo_action();
     });
 }
 
@@ -74,45 +79,42 @@ function goto_origin(data) {
     var ordinalStartDate = Util.formatDateTime(data.eventData.startDate, IndicoDateTimeFormats.Ordinal);
     var parentTT = activeTT.parentTimetable ? activeTT.parentTimetable : activeTT;
     var inSlot = !!activeTT.parentTimetable;
-    var toSlot = !!data.eventData.sessionId;
-
+    var toSlot = !!data.eventData.sessionId && data.eventData.entryType == 'Contribution';
 
     var goto_day = function(day) {
         var next_step = function() {
             if (toSlot) {
                 var slotId = 's' + data.eventData.sessionId + 'l' + data.eventData.sessionSlotId;
-                goto_slot(slotId);
+                return goto_slot(slotId);
             } else {
-                undo_action();
+                return undo_action();
             }
         };
 
         if (parentTT.currentDay != day) {
             // wrong day? change it.
-            parentTT.setSelectedTab(day).done(function() {
-                next_step()
-            });
+            return parentTT.setSelectedTab(day).pipe(next_step);
         } else {
-            next_step();
+            return next_step();
         }
     };
 
     if (inSlot) {
         if(toSlot && activeTT.contextInfo.id == ('s' + data.eventData.sessionId + 'l' + data.eventData.sessionSlotId)) {
             // if we are in a slot which happens to be the one we want to go to
-            undo_action();
+            return undo_action();
         } else {
             // otherwise, we are still in a slot but we want to go somewhere else
             // first step, go up to top level
-            parentTT.switchToTopLevel().done(function() {
+            return parentTT.switchToTopLevel().pipe(function() {
                 // then go to desired day
-                goto_day(ordinalStartDate);
+                return goto_day(ordinalStartDate);
             });
         }
     } else if (!inSlot){
         // ok, we are not in a slot
         // we have to go to the correct day first (regardless of where we want to go)
-        goto_day(ordinalStartDate);
+        return goto_day(ordinalStartDate);
     }
 }
 
@@ -124,10 +126,12 @@ $(function() {
         var data = undo_info.data;
         var ordinalStartDate = Util.formatDateTime(data.eventData.startDate, IndicoDateTimeFormats.Ordinal);
 
-        goto_origin(data);
-
-        // in case (and when) the operation succeeds
-        $(window).data('undo', undefined);
-        return;
+        goto_origin(data).done(function() {
+            // at the end, just remove the undo info
+            $(window).removeData('undo');
+        });
+    }).bind("timetable_ready", function(event, tt) {
+        // each time the timetable reloads, update the undo
+        tt.updateUndoDiv();
     });
 });

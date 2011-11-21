@@ -639,7 +639,7 @@ type("IntervalTimeTableMixin", [], {
      });
 
 
-type("ManagementTimeTable",["TimeTable"], {
+type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
     _generateSlotTitle: function(slotData) {
         return slotData.title + (slotData.slotTitle ? ": " + slotData.slotTitle : '');
@@ -880,9 +880,13 @@ type("ManagementTimeTable",["TimeTable"], {
 
         var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>', {src: imageSrc(Indico.SystemIcons.tt_time),
                                                                                   title:"Add one hour"}))
+        var tt_status_info = $('<div id="tt_status_info" />');
 
-        return $('<div/>').append(this.warningArea.dom, $('<div class="clearfix"/>').
-                                  append(this.menu.dom, this.infoBox.dom, tt_hour_tip));
+
+        return $('<div/>').append(
+            this.warningArea.dom, $('<div class="clearfix ui-follow-scroll" id="tt_menu"/>').
+                append(this.menu.dom, tt_status_info, this.infoBox.dom),
+            tt_hour_tip);
         },
 
 },
@@ -963,7 +967,7 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
         });
 
         var sessions = self.legendSessionInfo[this.currentDay];
-        var container = $('<div id="timeTableLegend" class="timeTableLegend follow-scroll">').append(closeButton)
+        var container = $('<div id="timeTableLegend" class="timeTableLegend ui-follow-scroll">').append(closeButton)
 
         if (sessions.length) {
             // Returns a div with each color + session name element
