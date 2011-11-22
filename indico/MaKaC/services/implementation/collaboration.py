@@ -176,6 +176,13 @@ class CollaborationStopCSBooking(CollaborationBookingModifBase):
         return fossilize(self._CSBookingManager.stopBooking(self._bookingId),
                                   timezone = self._conf.getTimezone())
 
+class CollaborationConnectCSBooking(CollaborationBookingModifBase):
+    """ Performs server-side actions when a booking is connected
+    """
+    def _getAnswer(self):
+        return fossilize(self._CSBookingManager.connectBooking(self._bookingId),
+                                  timezone = self._conf.getTimezone())
+
 class CollaborationCheckCSBookingStatus(CollaborationBookingModifBase):
     """ Performs server-side actions when a booking's status is checked
     """
@@ -428,6 +435,7 @@ methodMap = {
     "editCSBooking": CollaborationEditCSBooking,
     "startCSBooking": CollaborationStartCSBooking,
     "stopCSBooking": CollaborationStopCSBooking,
+    "connectCSBooking": CollaborationConnectCSBooking,
     "checkCSBookingStatus": CollaborationCheckCSBookingStatus,
     "acceptCSBooking": CollaborationAcceptCSBooking,
     "rejectCSBooking": CollaborationRejectCSBooking,

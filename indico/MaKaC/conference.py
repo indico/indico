@@ -2760,13 +2760,16 @@ class Conference(CommonObjectBase, Locatable):
             oldInterval = oldEndDate - oldStartDate
             newInterval = eDate - sDate
 
-            if oldInterval > newInterval:
-                raise TimingError(
-                    _("The start/end dates were not changed since the selected "
-                      "timespan is not large enough to accomodate the contained "
-                      "timetable entries and spacings."),
-                    explanation =
-                    _("You should try using a larger timespan."))
+            entries = self.getSchedule().getEntries()
+            if oldInterval > newInterval and entries:
+                eventInterval = entries[-1].getEndDate() - entries[0].getStartDate()
+                diff = entries[0].getStartDate() - oldStartDate
+                if sDate + diff + eventInterval > eDate:
+                    raise TimingError(
+                        _("The start/end dates were not changed since the selected "
+                          "timespan is not large enough to accomodate the contained "
+                          "timetable entries and spacings."),
+                        explanation=_("You should try using a larger timespan."))
 
         # so, we really need to try changing something
 

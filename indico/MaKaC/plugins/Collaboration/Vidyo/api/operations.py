@@ -22,7 +22,6 @@ from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
 from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi
 from suds import WebFault
 
-
 class VidyoOperations(object):
     """ This class has several class methods,
         each of which represents a high-level operation,
@@ -248,3 +247,23 @@ class VidyoOperations(object):
             else:
                 raise
 
+    @classmethod
+    def connectRoom(cls, booking, roomId, extension):
+        confId = booking.getConference().getId()
+        bookingId = booking.getId()
+        try:
+            searchFilter = SOAPObjectFactory.createFilter('user', extension)
+            userApiAnswer = UserApi.search(searchFilter, confId, bookingId)
+            legacyMember = userApiAnswer.Entity[0].entityID
+            AdminApi.connectRoom(roomId, confId, bookingId, legacyMember)
+        except WebFault, e:
+            faultString = e.fault.faultstring
+            if faultString.startswith('ConferenceID is invalid'):
+                return VidyoError("unknownRoom", "connect")
+            if faultString.startswith('Failed to Invite to Conference'):
+                message = _("The connection has failed.")
+                if getVidyoOptionValue("contactSupport"):
+                    message += _("""\nPlease try again or contact %s for help.""")%getVidyoOptionValue("contactSupport")
+                return VidyoError("connectFailed", "connect", message)
+            else:
+                raise

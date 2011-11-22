@@ -42,11 +42,16 @@ globalOptions = [
                       "visible": True}),
 
     #Vidyo Options
+
     ("sendMailNotifications", {"description" : _("Should mail notifications be sent to Vidyo admins?"),
                "type": bool,
                "defaultValue": False,
                "editable": True,
                "visible": True}),
+
+    ("contactSupport" , {"description" : _("Vidyo email support"),
+                      "type": str,
+                      "defaultValue": ""}),
 
     ("additionalEmails", {"description": _("Additional email addresses who will receive notifications (always)"),
                           "type": list,
@@ -78,6 +83,11 @@ globalOptions = [
                        "type": str,
                        "editable": True,
                        "defaultValue": "9" }),
+
+    ("prefixConnect", {"description": _("Prefix to use when connecting a CERN capable room to a Vidyo room"),
+                       "type": str,
+                       "editable": True,
+                       "defaultValue": "21" }),
 
     ("indicoGroup", {"description": _("Group name for Public Rooms created by Indico"),
                        "type": str,

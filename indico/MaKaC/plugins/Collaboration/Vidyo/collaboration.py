@@ -40,6 +40,7 @@ class CSBooking(CSBookingBase):
     _hasTitle = True
     _hasStart = True
     _hasStop = False
+    _hasConnect = True
     _hasCheckStatus = True
 
     _hasStartDate = False
@@ -47,6 +48,9 @@ class CSBooking(CSBookingBase):
 
     _requiresServerCallForStart = False
     _requiresClientCallForStart = True
+
+    _requiresServerCallForConnect = True
+    _requiresClientCallForConnect = False
 
     _needsBookingParamsCheck = True
     _needsToBeNotifiedOnView = True
@@ -76,7 +80,6 @@ class CSBooking(CSBookingBase):
         self._created = False
         self._checksDone = []
 
-
     ## setters and getters for complex params and internal params ##
 
     def canBeStarted(self):
@@ -84,6 +87,9 @@ class CSBooking(CSBookingBase):
 
     def canBeStopped(self):
         return False
+
+    def canBeConnected(self):
+        return self._created and VidyoTools.getConferenceRoomIp(self._conf)!=""
 
     def canBeDeleted(self):
         return True
@@ -267,6 +273,17 @@ class CSBooking(CSBookingBase):
         """
         VidyoTools.getEventEndDateIndex().moveBooking(self, oldEndDate)
 
+    def _connect(self):
+        self._checkStatus()
+        if self.canBeConnected():
+            confRoomIp = VidyoTools.getConferenceRoomIp(self._conf)
+            if confRoomIp == "":
+                return VidyoError("noValidConferenceRoom", "connect")
+            prefixConnect = getVidyoOptionValue("prefixConnect")
+            result = ExternalOperationsManager.execute(self, "connectRoom", VidyoOperations.connectRoom, self, self._roomId, prefixConnect + confRoomIp)
+            if isinstance(result, VidyoError):
+                return result
+            return self
 
     def _checkStatus(self):
         """ Queries the data for the Vidyo Public room associated to this CSBooking

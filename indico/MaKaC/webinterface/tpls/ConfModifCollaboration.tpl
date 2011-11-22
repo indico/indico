@@ -92,6 +92,14 @@ var stop = function(booking) {
 }
 
 /**
+ * Function that will be called when the user presses the "Connect" button of a booking.
+ * It will call in turn 'stopBooking' in Collaboration.js
+ */
+var connect = function(booking) {
+    connectBooking(booking, '${ Conference.getId() }');
+}
+
+/**
  * Function called when the user presses the "Check Status" button of a booking.
  * The booking will be refreshed after its status has been updated.
  * It will call in turn 'checkBookingStatus' in Collaboration.js

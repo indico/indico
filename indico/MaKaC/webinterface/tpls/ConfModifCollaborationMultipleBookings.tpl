@@ -84,6 +84,7 @@ ${ ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm)
   * Different flags that depend on the plugin to which the booking belongs to, but are present in all booking objects for convenience:
   *     -hasStart : true if the plugin has a "start" concept. Otherwise, the "start" button will not appear, etc.
   *     -hasStop : true if the plugin has a "stop" concept. Otherwise, the "stop" button will not appear, etc.
+  *     -hasConnect : true if the plugin has a "connect" concept. Otherwise, the "connect" button will not appear, etc.
   *     -requiresServerCallForStart: true if we should notify the server when the user presses the "start" button.
   *     -requiresServerCallForStop: true if we should notify the server when the user presses the "stop" button.
   *     -requiresClientCallForStart: true if the browser should execute some JS action when the user presses the "start" button.
@@ -106,6 +107,7 @@ var bookings = $L(${ jsonEncode(BookingsM) });
 var createButton;
 var createButtonTooltip;
 
+var confLocationRoom = '${ Conference.getRoom().getName() if Conference.getRoom() else ""}';
 
 /* ------------------------------ UTILITY / HELPER FUNCTIONS -------------------------------*/
 
