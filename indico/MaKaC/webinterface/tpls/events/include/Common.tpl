@@ -7,7 +7,7 @@
 </%def>
 
 <%def name="renderLocation(item, parent=None, span='')">
-    <% location, room, url = getLocationInfo(item) %>
+    <% location, room, url = getLocationInfo(item, fullName=True) %>
     % if location and (not parent or getLocationInfo(parent)[0] != location):
          ${location}
          % if room:

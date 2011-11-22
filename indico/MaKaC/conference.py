@@ -39,6 +39,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
+from MaKaC.rb_location import CrossLocationQueries
 from indico.util.i18n import L_
 
 
@@ -1528,10 +1529,12 @@ class CustomRoom(Persistent):
 
     def setValues(self, data):
         self.setName(data.get("name",""))
+        self.setFullName(data.get("fullName"))
 
     def getValues(self):
         d={}
         d["name"]=self.getName()
+        d["fullName"]=self.getFullName()
         return d
 
     def getId(self):
@@ -1547,6 +1550,20 @@ class CustomRoom(Persistent):
 
     def getName( self ):
         return self.name
+
+    def retrieveFullName(self, location):
+        if not location:
+            return
+        room = CrossLocationQueries.getRooms(roomName=self.name, location=location)
+        self.fullName = room.getFullName() if room else None
+
+    def setFullName(self, newFullName):
+        self.fullName = newFullName
+
+    def getFullName(self):
+        if not hasattr(self, 'fullName'):
+            self.fullName = None
+        return self.fullName
 
 
 class ConferenceParticipation(Persistent, Fossilizable, Observable):

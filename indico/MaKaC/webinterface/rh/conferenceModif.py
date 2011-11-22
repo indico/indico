@@ -7286,6 +7286,7 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
                 if assign2:
                     croom = CustomRoom()         # Boilerplate class, has only 'name' attribute
                     croom.setName( self._candResv.room.name )
+                    croom.setFullName(self._candResv.room.getFullName())
                     assign2.setRoom( croom )
 
             # Redirect

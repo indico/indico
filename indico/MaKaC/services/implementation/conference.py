@@ -204,6 +204,7 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
 
         if room.getName() != newRoom:
             room.setName(newRoom)
+            room.retrieveFullName(newLocation)
             changed = True
 
         if loc == None:

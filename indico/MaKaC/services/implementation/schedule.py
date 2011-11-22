@@ -80,6 +80,7 @@ class LocationSetter:
                 r = conference.CustomRoom()
             target.setRoom(r)
             r.setName(room)
+            r.retrieveFullName(location)
 
 class ScheduleOperation:
 

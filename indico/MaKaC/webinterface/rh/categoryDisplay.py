@@ -485,6 +485,7 @@ class UtilsConference:
 
             if r.getName() != newRoom:
                 r.setName(newRoom)
+                r.retrieveFullName(newLocation)
                 changed = True
 
         if changed:

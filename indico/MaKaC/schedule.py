@@ -1181,6 +1181,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
                 room = CustomRoom()
             self.setRoom( room )
             room.setName( data["roomName"] )
+            room.retrieveFullName(data.get('locationName', ''))
         self._color=data.get("backgroundColor","#90C0F0")
         if data.has_key("autotextcolor"):
             self._textColor=utils.getTextColorFromBackgroundColor(self.getColor())

@@ -27,6 +27,7 @@ from MaKaC import user, errors
 from indico.util.i18n import currentLocale
 from babel.dates import format_datetime
 from MaKaC.webinterface.linking import RoomLinker
+from MaKaC.rb_location import CrossLocationQueries
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
@@ -690,11 +691,20 @@ class OSSpecific(object):
             'LOCK_SH': None
             }
 
-def getLocationInfo(item, roomLink=True):
+def getLocationInfo(item, roomLink=True, fullName=False):
     """Return a tuple (location, room, url) containing
     information about the location of the item."""
     location = item.getLocation().getName() if item.getLocation() else ""
-    roomName = item.getRoom().getName() if item.getRoom() else ""
+    customRoom = item.getRoom()
+    if not customRoom:
+        roomName = ''
+    elif fullName and location:
+        roomName = customRoom.getFullName()
+        if not roomName:
+            customRoom.retrieveFullName(location) # try to fetch the full name
+            roomName = customRoom.getFullName() or customRoom.getName()
+    else:
+        roomName = customRoom.getName()
     # TODO check if the following if is required
     if roomName in ['', '0--', 'Select:']:
         roomName = ''
