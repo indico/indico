@@ -496,6 +496,12 @@ class CSBookingManager(Persistent, Observer):
         else:
             raise ServiceError("ERR-COLL10", _("Tried to reject booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be rejected."))
 
+    def makeMeModeratorBooking(self, id, user):
+        booking = self._bookings[id]
+        bookingParams = booking.getBookingParams()
+        bookingParams["owner"] = user
+        return self.changeBooking(id,bookingParams)
+
     def _addToPendingIndex(self, booking):
         if booking.shouldBeIndexed():
             indexes = self._getPendingIndexList(booking)

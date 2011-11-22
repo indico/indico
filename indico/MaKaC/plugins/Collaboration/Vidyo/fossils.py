@@ -38,10 +38,13 @@ class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
     getURL.name = 'url'
 
     def getLinkVideoText(self):
-        """"returns the link to the booking"""
+        """returns the link to the booking"""
 
     def getLinkVideoRoomLocation(self):
-        """"returns the room location of the booking"""
+        """returns the room location of the booking"""
+
+    def getLinkId(self):
+        """returns the uniqueId"""
 
 
 def removePin(bookingParams):

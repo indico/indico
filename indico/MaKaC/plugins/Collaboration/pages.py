@@ -78,6 +78,7 @@ class WEventDetailBanner(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         vars['getBookingType'] = WEventDetailBanner.getBookingType
         vars['formatTwoDates'] = formatTwoDates
+        vars["conf"] = self._rh._conf
         return vars
 
 

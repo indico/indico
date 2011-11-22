@@ -6,6 +6,7 @@
 <script type="text/javascript">
 ## Move this into js folder
 var videoServiceLaunchInfo = {};
+
 </script>
 <tr>
 <td class="leftCol">Video Services</td>
@@ -92,8 +93,11 @@ var videoServiceLaunchInfo = {};
                         % for line in section.get('lines', []):
                         <div>${line}</div>
                         % endfor
+                        % if section['title'] == _("Moderator") and conf.canModify(self_._rh._aw) and booking.getOwner()["id"] != self_._rh._getUser().getId():
+                        <div><a href="#" onClick= "makeMeModerator(this,${conf.getId()},${booking.getId()}, successMakeEventModerator)">${_("Make me moderator")}</a></div>
+                        % endif
                         % for caption, href in section.get('linkLines', []):
-                        <div><a href="${href}">${caption}</a></div>
+                        <div><a href="${href}" target="_blank">${caption}</a></div>
                         % endfor
                     </td>
                 </tr>

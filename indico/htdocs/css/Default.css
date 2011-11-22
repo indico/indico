@@ -7212,3 +7212,12 @@ span.num_events {
     width: 50%;
     float: left;
 }
+
+.videoServiceInlinePopup .lineWrapper .rightCol a{
+    font-size: 10.5px;
+}
+.videoServiceInlinePopup .lineWrapper .rightCol input {
+    font-size: 10.5px;
+}
+
+

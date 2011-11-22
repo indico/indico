@@ -148,7 +148,7 @@
             Html.td({}, booking.extension)));
 
         infoTbody.append(Html.tr({},
-            Html.td("collaborationInfoLeftCol", $T('Room owner:')),
+            Html.td("collaborationInfoLeftCol", $T('Room moderator:')),
             Html.td({}, booking.bookingParams.owner.name)));
 
         var pinInfo;

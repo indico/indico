@@ -1,5 +1,9 @@
 <%page args="minutes=False"/>
 <%namespace name="common" file="include/Common.tpl"/>
+<script  type="text/javascript">
+## dict to store inline video service popup information, populated in VideoService.tpl
+var videoServiceInfo = {};
+</script>
 
 <div class="meetingEventSubHeader">
     <table class="eventDetails">
@@ -37,9 +41,6 @@
             goToDayMenu.open(pos.x + goToDayLink.dom.offsetWidth + 10, pos.y + goToDayLink.dom.offsetHeight + 3);
             return false;
         });
-
-        ## dict to store inline video service popup information, populated in VideoService.tpl
-        var videoServiceInfo = {};
     </script>
 
     <ul class="dayList">
@@ -141,4 +142,5 @@
             classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
         }
     });
+
 </script>

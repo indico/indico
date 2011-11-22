@@ -428,6 +428,14 @@ class CollaborationCreateTestCSBooking(CollaborationCreateCSBooking):
         return fossilize(self._CSBookingManager.createTestBooking(bookingParams = self._bookingParams),
                          None, tz = self._conf.getTimezone())
 
+class CollaborationMakeMeModeratorCSBooking(CollaborationBookingModifBase):
+    """ Service that creates a 'test' booking for performance test.
+        Avoids to use any of the plugins except DummyPlugin
+    """
+    def _getAnswer(self):
+        return fossilize(self._CSBookingManager.makeMeModeratorBooking(self._bookingId, fossilize(self.getAW().getUser())),
+                                  None, tz = self._conf.getTimezone())
+
 
 methodMap = {
     "createCSBooking": CollaborationCreateCSBooking,
@@ -442,5 +450,6 @@ methodMap = {
     "bookingIndexQuery": CollaborationBookingIndexQuery,
     "addPluginManager": CollaborationAddPluginManager,
     "removePluginManager": CollaborationRemovePluginManager,
-    "pluginService": CollaborationCustomPluginService
+    "pluginService": CollaborationCustomPluginService,
+    "makeMeModerator": CollaborationMakeMeModeratorCSBooking
 }

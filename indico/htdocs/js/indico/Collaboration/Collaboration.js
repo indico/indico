@@ -1979,6 +1979,51 @@ var informationPopup = function(information, redirectionLink){
     })).open();
 };
 
+var makeMeModerator = function(videoLink, confId, bookingId, successFunction) {
+    $E(videoLink).set(progressIndicator(true,true));
+    jsonRpc(Indico.Urls.JsonRpcService, "collaboration.makeMeModerator",
+            { confId: confId,
+              bookingId: str(bookingId) },
+            function(result, error){
+                  if (exists(error)) {
+                      IndicoUtil.errorReport(error);
+                  } else {
+                      successFunction(videoLink, result);
+                  }
+    });
+};
+
+var successMakeModerator = function(videoLink, result){
+    $(videoLink).parent().parent().html(result.bookingParams.owner["name"]);
+    var bookingPopup = $(videoServiceInfo[result.id]);
+    bookingPopup.find("#"+$T("Moderator")).html(Html.div({},result.bookingParams.owner["name"]).dom);
+    videoServiceInfo[result.id] = $(bookingPopup).wrap('<div/>').parent().html();
+};
+
+var successMakeEventModerator = function(videoLink, result){
+    $(videoLink).parent().parent().html(Html.div({}, result.bookingParams.owner["name"]).dom);
+};
+
+var drawBookingPopup = function (videoInformation, confId, bookingId, displayModeratorLink) {
+    var divWrapper = Html.div({className:"videoServiceInlinePopup"});
+    for(section in videoInformation){
+        var leftCol = Html.div({className:"leftCol"}, videoInformation[section]["title"]);
+        var rightCol = Html.div({className:"rightCol", id: videoInformation[section]["title"]});
+        for(line in videoInformation[section]["lines"]){
+            rightCol.append(Html.div({}, videoInformation[section]["lines"][line]));
+        }
+        for(line in videoInformation[section]["linkLines"]){
+            rightCol.append(Html.div({}, Html.input("text",{onClick: '$(this).select();'}, videoInformation[section]["linkLines"][line][1])));
+        }
+        if(videoInformation[section]["title"] == $T("Moderator") && displayModeratorLink){
+            var link = Html.a({href:'#', onClick:'makeMeModerator(this,'+confId+','+bookingId+', successMakeModerator)'},$T("Make me moderator"));
+            rightCol.append(Html.div({}, " ", link));
+        }
+        divWrapper.append(Html.div({className: "lineWrapper"}, leftCol, rightCol));
+    }
+    return $(divWrapper.dom).wrap("<div/>").parent().html();
+};
+
 var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
     var killProgress = IndicoUI.Dialogs.Util.progress($T("Accepting Electronic Agreement..."));
     indicoRequest(

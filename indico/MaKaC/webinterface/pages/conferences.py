@@ -1282,10 +1282,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
         # TODO: find way to check if the user is able to manage
         # anything inside the conference (sessions, ...)
-
         modules += self._includeJSPackage('Management')
         modules += self._includeJSPackage('MaterialEditor')
         modules += self._includeJSPackage('Display')
+        modules += self._includeJSPackage('Collaboration')
         return modules
 
     def _applyDecoration( self, body ):
