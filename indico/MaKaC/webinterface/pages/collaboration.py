@@ -386,6 +386,10 @@ class WConfModifCollaborationProtection(wcomponents.WTemplated):
 ################################################### Event Display pages ###############################################
 class WPCollaborationDisplay(WPConferenceDefaultDisplayBase):
 
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Collaboration')
+
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._collaborationOpt)
@@ -414,7 +418,7 @@ class WCollaborationDisplay(wcomponents.WTemplated):
         scheduledBookings = {} #date, list of bookings
 
         for b in bookings:
-            if b.canBeStarted():
+            if b.isHappeningNow():
                 ongoingBookings.append(b)
             if b.getStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
                 scheduledBookings.setdefault(b.getAdjustedStartDate(self._tz).date(), []).append(b)

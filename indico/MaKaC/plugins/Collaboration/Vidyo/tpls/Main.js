@@ -80,7 +80,7 @@
             }
 
             if (error.errorType === 'userHasNoAccounts') {
-                CSErrorPopup($T("Invalid owner"), [$T("The user ") + this.vidyoComponents["ownerField"].get().name + $T(" does not have an account in Indico.")]);
+                CSErrorPopup($T("Invalid owner"), [$T("The user ") + this.vidyoComponents["ownerField"].get().name + $T(" is currently not registered to use Vidyo, please see http://cern.ch/Vidyo for how to register")]);
             }
             if (error.errorType === 'sessionNotDefined') {
                 CSErrorPopup($T("No session defined"), [$T("A session must be set.")]);

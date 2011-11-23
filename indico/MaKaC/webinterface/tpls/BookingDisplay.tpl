@@ -77,11 +77,11 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
         <span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo${id}">${ _("More Info") }</span>
     % endif
 
-    % if displayInfo and Kind == 'ongoing' and launchInfo:
+    % if displayInfo and ((Kind == 'ongoing' and launchInfo) or Booking.getType()=="Vidyo"):
         <span style="margin-left: 5px; margin-right:5px;">|</span>
     % endif
 
-    % if Kind == 'ongoing' and launchInfo:
+    % if (Kind == 'ongoing' and launchInfo) or Booking.getType()=="Vidyo":
         <a href="${ launchInfo['launchLink'] }" id="bookingLink${id}">
             ${ launchInfo['launchText'] }
         </a>

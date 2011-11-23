@@ -160,6 +160,18 @@ class CSBooking(CSBookingBase):
         linkObject = self.getLinkObject(self._linkVideoId)
         return linkObject.getRoom().getName() if linkObject.getRoom() else ""
 
+    def getEndDate(self):
+        """ Returns the end date of the link object
+        """
+        linkObject = self.getLinkObject(self._linkVideoId)
+        return linkObject.getAdjustedEndDate()
+
+    def getStartDate(self):
+        """ Returns the start date of the link object
+        """
+        linkObject = self.getLinkObject(self._linkVideoId)
+        return linkObject.getAdjustedStartDate()
+
     def getRoomId(self):
         """ The Viydo internal room id for this booking
         """
