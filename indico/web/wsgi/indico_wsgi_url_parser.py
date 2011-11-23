@@ -48,8 +48,8 @@ urlMapping = {'':   ((DIR_HTDOCS, 'index.py'), 'index', '', None), \
                         {'queryReplacement': 'tag'}), \
     'categ':        ((DIR_HTDOCS, 'categoryDisplay.py'), 'index', 'genericRewrite', \
                         {'queryReplacement': 'categId'}),
-    'export':       ((DIR_MODULES, 'handlers.py'), 'handler', '', None),
-    'api':          ((DIR_MODULES, 'handlers.py'), 'handler', '', None)
+    'export':       ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None),
+    'api':          ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None)
 }
 
 def is_static_path(path):
