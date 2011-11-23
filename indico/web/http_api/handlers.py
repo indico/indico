@@ -34,7 +34,6 @@ from ZODB.POSException import ConflictError
 # indico imports
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.auth import APIKeyHolder
-from indico.web.http_api.cache import RequestCache
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
 from indico.web.http_api.util import remove_lists, get_query_parameter
@@ -42,6 +41,7 @@ from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLY
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.metadata.serializer import Serializer
 from indico.util.network import _get_remote_ip
+from indico.util.contextManager import ContextManager
 
 # indico legacy imports
 from MaKaC.common import DBMgr
@@ -49,6 +49,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.fossilize import fossilize
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common.cache import GenericCache
 
 
 # Remove the extension at the end or before the querystring
@@ -120,6 +121,7 @@ def buildAW(ak, req, onlyPublic=False):
     return aw
 
 def handler(req, **params):
+    ContextManager.destroy()
     logger = Logger.get('httpapi')
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
     if req.method == 'POST':
@@ -136,8 +138,6 @@ def handler(req, **params):
     dbi.startRequest()
 
     mode = path.split('/')[1]
-
-    cache = RequestCache(HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL())
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     signature = get_query_parameter(queryParams, ['signature'])
@@ -173,12 +173,12 @@ def handler(req, **params):
 
         obj = None
         addToCache = True
+        cache = GenericCache('HTTPAPI')
         cache_key = RE_REMOVE_EXTENSION.sub('', cache_key)
         if not no_cache:
-            obj = cache.loadObject(cache_key)
+            obj = cache.get(cache_key)
             if obj is not None:
-                result, extra, complete, typeMap = obj.getContent()
-                ts = obj.getTS()
+                result, extra, ts, complete, typeMap = obj
                 addToCache = False
         if result is None:
             # Perform the actual exporting
@@ -188,7 +188,8 @@ def handler(req, **params):
             else:
                 result, extra, complete, typeMap = res, {}, True, {}
         if result is not None and addToCache:
-            cache.cacheObject(cache_key, (result, extra, complete, typeMap))
+            ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL()
+            cache.set(cache_key, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError, e:
         error = e
         if e.getCode():
