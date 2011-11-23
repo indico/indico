@@ -27,7 +27,8 @@ from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
 from MaKaC.common.contextManager import ContextManager
 
-import hashlib, os, shutil, pickle, datetime, time
+import hashlib, os, shutil, datetime, time
+import cPickle as pickle
 from itertools import izip
 
 
@@ -328,26 +329,110 @@ class MultiLevelCache(object):
         return '%s_%s' % (entry.getId(), version)
 
 
-class GenericMemCache(object):
+class FileCacheClient(object):
+    """File-based cache with a memcached-like API.
+
+    Contains only features needed by GenericCache.
+    """
+    def __init__(self, dir):
+        self._dir = os.path.join(dir, 'generic_cache')
+
+    def _getFilePath(self, key, mkdir=True):
+        # We assume keys have a 'namespace.hashedKey' format
+        parts = key.split('.', 1)
+        if len(parts) == 1:
+            namespace = '_'
+            filename = parts[0]
+        else:
+            namespace, filename = parts
+        dir = os.path.join(self._dir, namespace)
+        if mkdir and not os.path.exists(dir):
+            os.makedirs(dir)
+        return os.path.join(dir, filename)
+
+    def set(self, key, val, ttl=0):
+        f = open(self._getFilePath(key), 'wb')
+        OSSpecific.lockFile(f, 'LOCK_EX')
+        try:
+            expiry = int(time.time()) + ttl if ttl else None
+            data = (expiry, val)
+            pickle.dump(data, f)
+        finally:
+            OSSpecific.lockFile(f, 'LOCK_UN')
+            f.close()
+        return 1
+
+    def set_multi(self, mapping, ttl=0):
+        notstored = []
+        for key, val in mapping.iteritems():
+            if self.set(key, val, ttl) == 0:
+                notstored.append(key)
+        return notstored
+
+    def get(self, key):
+        path = self._getFilePath(key)
+        if not os.path.exists(path):
+            return None
+        f = open(path, 'rb')
+        OSSpecific.lockFile(f, 'LOCK_SH')
+        expiry = val = None
+        try:
+            expiry, val = pickle.load(f)
+        finally:
+            OSSpecific.lockFile(f, 'LOCK_UN')
+            f.close()
+        if expiry and time.time() > expiry:
+            return None
+        return val
+
+    def get_multi(self, keys):
+        values = {}
+        for key in keys:
+            val = self.get(key)
+            if val is not None:
+                values[key] = val
+        return values
+
+    def delete(self, key):
+        path = self._getFilePath(key, False)
+        if os.path.exists(path):
+            os.remove(path)
+        return 1
+
+    def delete_multi(self, keys):
+        for key in keys:
+            self.delete(key)
+        return 1
+
+
+class GenericCache(object):
     def __init__(self, namespace):
         self._client = None
         self._namespace = namespace
 
     def __repr__(self):
-        return 'GenericMemCache(%r)' % self._namespace
+        return 'GenericCache(%r)' % self._namespace
 
     def _connect(self):
         # Maybe we already have a client in this instance
         if self._client is not None:
             return
         # If not, we might have one from another instance
-        self._client = ContextManager.get('GenericMemCacheClient', None)
+        self._client = ContextManager.get('GenericCacheClient', None)
         if self._client is not None:
             return
         # If not, create a new one
-        import memcache
-        self._client = memcache.Client(Config.getInstance().getMemcachedServers())
-        ContextManager.set('GenericMemCacheClient', self._client)
+        backend = Config.getInstance().getCacheBackend()
+        if backend == 'memcached':
+            import memcache
+            self._client = memcache.Client(Config.getInstance().getMemcachedServers())
+        else:
+            self._client = FileCacheClient(Config.getInstance().getXMLCacheDir())
+
+        ContextManager.set('GenericCacheClient', self._client)
+
+    def _hashKey(self, key):
+        return hashlib.sha256(key).hexdigest()
 
     def _makeKey(self, key):
         if not isinstance(key, basestring):
@@ -355,7 +440,7 @@ class GenericMemCache(object):
             key = repr(key)
         # Hashlib doesn't allow unicode so let's ensure it's not!
         key = key.encode('utf-8')
-        return '%s.%s' % (self._namespace, hashlib.sha256(key).hexdigest())
+        return '%s.%s' % (self._namespace, self._hashKey(key))
 
     def set(self, key, val, time=0):
         self._connect()

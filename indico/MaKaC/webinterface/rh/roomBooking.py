@@ -53,7 +53,7 @@ from MaKaC.plugins.RoomBooking.default.roomblocking import RoomBlockingPrincipal
     BlockedRoom
 from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 from MaKaC.common.mail import GenericMailer
-from MaKaC.common.cache import GenericMemCache
+from MaKaC.common.cache import GenericCache
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -1148,7 +1148,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._dayBars = {}
         if not self._overload:
             if self._useCache:
-                self._cache = GenericMemCache('RoomBookingCalendar')
+                self._cache = GenericCache('RoomBookingCalendar')
                 self._dayBars = dict((day, bar) for day, bar in self._cache.get_multi(map(str, days)).iteritems() if bar)
                 dayMap = dict(((str(day), day) for day in days))
                 for day in self._dayBars.iterkeys():
