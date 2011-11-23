@@ -47,7 +47,6 @@ from MaKaC.plugins import PluginLoader
 from MaKaC import plugins
 from MaKaC.plugins.RoomBooking.default.reservation import ResvHistoryEntry
 from MaKaC.plugins.RoomBooking.default.room import Room
-from MaKaC.search.cache import MapOfRoomsCache
 from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 from MaKaC.plugins.RoomBooking.default.roomblocking import RoomBlockingPrincipal,\
     BlockedRoom
@@ -764,7 +763,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
     def __init__(self, *args, **kwargs):
         RHRoomBookingBase.__init__(self, *args, **kwargs)
-        self._cache = MapOfRoomsCache()
+        self._cache = GenericCache('MapOfRooms')
 
     def _setGeneralDefaultsInSession( self ):
         now = datetime.now()
@@ -822,16 +821,13 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         self._buildings = buildings_with_coords
 
     def _process(self):
-        self._businessLogic()
-        page = roomBooking_wp.WPRoomBookingMapOfRoomsWidget(self, self._aspects, self._buildings, self._defaultLocation, self._forVideoConference, self._roomID)
-
         params = self._getRequestParams()
-        entry = self._cache.loadObject('', params)
-        if entry:
-            html = entry.getContent()
-        else:
+        html = self._cache.get(params)
+        if not html:
+            self._businessLogic()
+            page = roomBooking_wp.WPRoomBookingMapOfRoomsWidget(self, self._aspects, self._buildings, self._defaultLocation, self._forVideoConference, self._roomID)
             html = page.display()
-            self._cache.cacheObject('', html, params)
+            self._cache.set(params, html, 300)
         return html
 
 # 2. List of ...

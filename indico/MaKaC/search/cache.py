@@ -51,36 +51,3 @@ class SECache(MultiLevelCache):
     def isDirty(self, mtime, object):
         """ TODO: implement this one (websession date?) """
         return False
-
-
-class MapOfRoomsCacheEntry(MultiLevelCacheEntry):
-    def __init__(self, query):
-        MultiLevelCacheEntry.__init__(self)
-        self._query = query
-
-    def getQuery(self):
-        return self._query
-
-    @classmethod
-    def create(cls, content, query):
-        entry = cls(query)
-        entry.setContent(content)
-        return entry
-
-class MapOfRoomsCache(MultiLevelCache):
-    """
-    Cache that stores the appropriate record numbers for a specific search query,
-    in order to allow users to browse map of rooms
-    """
-
-    _entryFactory = MapOfRoomsCacheEntry
-    _entryTTL = 300
-
-    def __init__(self):
-        super(MapOfRoomsCache, self).__init__('mapOfRooms')
-
-    def _generateFileName(self, entry, version):
-        return '%s_%s' % (entry.getQuery(), version)
-
-    def _generatePath(self, entry):
-        return ['maps']
