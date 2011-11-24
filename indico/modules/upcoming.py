@@ -25,7 +25,7 @@ import os, datetime, pickle, operator, time
 from pytz import timezone
 from persistent import Persistent
 
-from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
+from MaKaC.common.cache import GenericCache
 from MaKaC.common import timezoneUtils, indexes
 
 from MaKaC.common.fossilize import Fossilizable, fossilizes
@@ -37,56 +37,6 @@ from MaKaC.common.logger import Logger
 from indico.modules import Module
 
 
-class UECacheEntry(MultiLevelCacheEntry):
-
-    def getId(self):
-        """
-        Fixed id
-        """
-        return 'events'
-
-    @classmethod
-    def create(cls, content):
-        entry = cls()
-        entry.setContent(content)
-        return entry
-
-
-class UpcomingEventsCache(MultiLevelCache, Persistent):
-
-    """
-    Cache for upcoming events (per user)
-    """
-
-    _entryFactory = UECacheEntry
-
-    def __init__(self, ttl=datetime.timedelta(minutes=5), dirty=False):
-        MultiLevelCache.__init__(self, 'upcoming_events')
-        self._dirty = dirty
-        self.setTTL(ttl)
-
-    def _generateFileName(self, entry, version):
-        return entry.getId()
-
-    def isDirty(self, mtime, object):
-        return self._dirty or super(UpcomingEventsCache, self).isDirty(mtime, object)
-
-    def invalidate(self):
-        self._dirty = True;
-
-    def setTTL(self, ttl):
-        if isinstance(ttl, datetime.timedelta):
-            ttl = (86400 * ttl.days + ttl.seconds)
-        super(UpcomingEventsCache, self).setTTL(ttl)
-
-    def loadObject(self):
-        # TODO: Use user IDs, private events
-        return MultiLevelCache.loadObject(self, '')
-
-    def cacheObject(self, object):
-        # TODO: Use user IDs, private events
-        MultiLevelCache.cacheObject(self, '', object)
-        self._dirty = False
 
 class ObservedObject(Persistent, Fossilizable):
 
@@ -127,18 +77,24 @@ class UpcomingEventsModule(Module):
         # events in the list
         self._objects = []
         self._maxEvents = 10
-        self._cache = UpcomingEventsCache()
+        self._ttl = 300
+
+    @property
+    def _cache(self):
+        return GenericCache('UpcomingEvents')
 
     def setCacheTTL(self, ttl):
-        self._cache.setTTL(ttl)
-        self._cache.invalidate()
+        self._ttl = ttl
+        self._cache.delete('public')
 
     def getCacheTTL(self):
-        return datetime.timedelta(seconds=self._cache.getTTL())
+        if not hasattr(self, '_ttl'):
+            self._ttl = datetime.timedelta(minutes=5)
+        return self._ttl
 
     def setNumberItems(self, number):
         self._maxEvents = number
-        self._cache.invalidate()
+        self._cache.delete('public')
 
     def getNumberItems(self):
         return self._maxEvents
@@ -149,7 +105,7 @@ class UpcomingEventsModule(Module):
         weight - integer (negative allowed), zero by default
         """
         self._objects.append(ObservedObject(object, weight, delta))
-        self._cache.invalidate()
+        self._cache.delete('public')
         self._p_changed = 1
 
     def removeObject(self, obj):
@@ -162,7 +118,7 @@ class UpcomingEventsModule(Module):
         if not element:
             raise Exception('Element not in list')
         self._objects.remove(element)
-        self._cache.invalidate()
+        self._cache.delete('public')
         self._p_changed = 1
 
     def hasObject(self, obj):
@@ -204,21 +160,12 @@ class UpcomingEventsModule(Module):
 
     def getUpcomingEventList(self):
 
-        try:
-            # check if there's a valid cached copy first
-            fromCache = self._cache.loadObject()
-        except:
-            Logger.get('upcoming_events').exception("Upcoming events cache read error")
-            fromCache = None
+        # check if there's a valid cached copy first
+        resultList = self._cache.get('public')
 
-        if fromCache:
-            # Cache hit!
-            resultList = fromCache.getContent()
-        else:
+        if resultList is None:
             resultList = map(self._processEventDisplay, self._generateList())
-
-            # cache the results
-            self._cache.cacheObject(resultList)
+            self._cache.set('public', resultList, self.getCacheTTL())
 
         return resultList
 

@@ -446,13 +446,20 @@ class GenericCache(object):
         key = key.encode('utf-8')
         return '%s.%s' % (self._namespace, self._hashKey(key))
 
+    def _processTime(self, ts):
+        if isinstance(ts, datetime.timedelta):
+            ts = ts.seconds + (ts.days * 24 * 3600)
+        return ts
+
     def set(self, key, val, time=0):
         self._connect()
+        time = self._processTime(time)
         Logger.get('GenericCache/%s' % self._namespace).debug('SET %r (%d)' % (key, time))
         self._client.set(self._makeKey(key), val, time)
 
     def set_multi(self, mapping, time=0):
         self._connect()
+        time = self._processTime(time)
         mapping = dict(((self._makeKey(key), val) for key, val in mapping.iteritems()))
         self._client.set_multi(mapping, time)
 
