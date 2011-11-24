@@ -30,7 +30,7 @@ from MaKaC.common.logger import Logger
 import MaKaC.webinterface.locators as locators
 import MaKaC.conference as conference
 from MaKaC.search.base import ConferenceEntry, ContributionEntry
-from MaKaC.search.cache import SECache, SECacheEntry
+from MaKaC.common.cache import GenericCache
 
 class RHSearchBase:
 
@@ -86,16 +86,16 @@ class RHSearchBase:
         return md5.new(uniqueId).hexdigest()
 
     def _getStartingRecord(self, queryHash, page):
-        obj = SECache().loadObject('', self._sessionHash, queryHash)
+        obj = GenericCache('Search').get((self._sessionHash, queryHash), {})
 
         if page == 1:
             Logger.get("search").debug("first page")
             # first page, start with 0
             return 0, None
-        elif obj and obj.getContent().has_key(page):
-            Logger.get("search").debug("hit! %s %s", (obj.getContent()[page], obj))
+        elif page in obj:
+            Logger.get("search").debug("hit! %s %s", (obj[page], obj))
             # cache hit!
-            return obj.getContent()[page], obj
+            return obj[page], obj
         else:
             Logger.get("search").debug("miss")
             # cache miss, force first page to be loaded
@@ -112,7 +112,7 @@ class RHSearchBase:
 
         Logger.get("search").debug("set page: %s" % data)
 
-        SECache().cacheObject('', data, self._sessionHash, queryHash)
+        GenericCache('Search').set((self._sessionHash, queryHash), data, 12*3600)
 
 
     def _loadBatchOfRecords(self, user, collection, number, start):
