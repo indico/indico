@@ -59,18 +59,34 @@ class NiceAuthenticator(Authenthicator):
             email = req.subprocess_env["ADFS_EMAIL"]
             login = req.subprocess_env["ADFS_LOGIN"]
             personId = req.subprocess_env["ADFS_PERSONID"]
+            phone = req.subprocess_env.get("ADFS_PHONENUMBER","")
+            fax = req.subprocess_env.get("ADFS_FAXNUMBER","")
+            lastname = req.subprocess_env.get("ADFS_LASTNAME","")
+            firstname = req.subprocess_env.get("ADFS_FIRSTNAME","")
+            institute = req.subprocess_env.get("ADFS_HOMEINSTITUTE","")
             if personId == '-1':
                 personId = None
             from MaKaC.user import AvatarHolder
             ah = AvatarHolder()
-            av = ah.match({"email":email},exact=1, forceWithoutExtAuth=True)
+            av = ah.match({"email":email},exact=1, onlyActivated=False, forceWithoutExtAuth=True)
             if av:
                 av = av[0]
-                phone = req.subprocess_env.get("ADFS_PHONENUMBER","")
-                fax = req.subprocess_env.get("ADFS_FAXNUMBER","")
-                lastname = req.subprocess_env.get("ADFS_LASTNAME","")
-                firstname = req.subprocess_env.get("ADFS_FIRSTNAME","")
-                institute = req.subprocess_env.get("ADFS_HOMEINSTITUTE","")
+                # don't allow disabled accounts
+                if av.isDisabled():
+                    return None
+#                # TODO: is this checking necessary?
+#                if av.getStatus() == 'NotCreated':
+#                    #checking if comming from Nice
+#                    if av.getId()[:len(self.id)] == self.id:
+#                        av.setId("")
+#                        ah.add(av) #XXXXX
+#                        av.activateAccount()
+#                    else:
+#                        return None
+                # if not activated
+                elif not av.isActivated():
+                    av.activateAccount()
+
                 av.clearAuthenticatorPersonalData()
                 av.setAuthenticatorPersonalData('phone', phone)
                 av.setAuthenticatorPersonalData('fax', fax)
@@ -89,38 +105,24 @@ class NiceAuthenticator(Authenthicator):
                     av.setAffiliation(institute, reindex=True)
                 if personId != None and personId != av.getPersonId():
                     av.setPersonId(personId)
-                return av
             else:
-                avDict = NiceUser().getByLoginOrUPN(login)
-                if avDict:
-                    # In the case of connected accounts (serveral accounts are related just to one
-                    # of them), even if the login/email is different, the master account can already
-                    # exist:
-                    av = ah.match({"email":avDict["email"][0]},exact=1, forceWithoutExtAuth=True)
-                    if av:
-                        av = av[0]
-                        # don't allow disabled accounts
-                        if av.isDisabled():
-                            return None
-                        # if not created, create and activate
-                        if av.getStatus() == 'NotCreated':
-                            #checking if comming from Nice
-                            if av.getId()[:len(self.id)] == self.id:
-                                av.setId("")
-                                ah.add(av)
-                                av.activateAccount()
-                            else:
-                                return None
-                        # if not activated
-                        elif not av.isActivated():
-                            av.activateAccount()
-                    else:
-                        av = Avatar(avDict)
-                        ah.add(av)
-                        av.activateAccount()
-                    if not av.getPersonId():
-                        av.setPersonId(personId)
-                    return av
+                avDict = {"email": email,
+                          "name": firstname,
+                          "surName": lastname,
+                          "organisation": institute,
+                          "telephone": phone,
+                          "login": login}
+
+                av = Avatar(avDict)
+                ah.add(av)
+                av.setPersonId(personId)
+                av.activateAccount()
+
+            if login != "" and not self.hasKey(login):
+                ni=NiceIdentity(login, av)
+                self.add(ni)
+            return av
+
         return None
 
     def autoLogout(self, rh):
