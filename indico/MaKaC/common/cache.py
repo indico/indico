@@ -238,7 +238,13 @@ class MultiLevelCacheEntry(object):
 
 class MultiLevelCache(object):
     """
-    A multilevel cache
+    A multilevel cache.
+
+    DEPRECATED in favour of GenericCache!
+    Do not use it. It is only left because the XMLCache relies on it.
+    Why we don't migrate it to GenericCache? XMLCache is not used right now and when
+    its caveats are fixed it will probably be enabled. At this point it should be migrated
+    to GenericCache and MultiLevelCache / MultiLevelCacheEntry removed!
     """
 
     _entryFactory = None
