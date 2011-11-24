@@ -21,8 +21,6 @@
 from Configuration import Config
 from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
-
-from MaKaC.common.logger import Logger
 from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
 from MaKaC.common.contextManager import ContextManager
@@ -444,6 +442,7 @@ class GenericCache(object):
 
     def set(self, key, val, time=0):
         self._connect()
+        Logger.get('GenericCache/%s' % self._namespace).debug('SET %r (%d)' % (key, time))
         self._client.set(self._makeKey(key), val, time)
 
     def set_multi(self, mapping, time=0):
@@ -454,6 +453,7 @@ class GenericCache(object):
     def get(self, key, default=None):
         self._connect()
         res = self._client.get(self._makeKey(key))
+        Logger.get('GenericCache/%s' % self._namespace).debug('GET %r -> %r' % (key, res is not None))
         if res is None:
             return default
         return res
@@ -475,6 +475,7 @@ class GenericCache(object):
 
     def delete(self, key):
         self._connect()
+        Logger.get('GenericCache/%s' % self._namespace).debug('DEL %r' % key)
         self._client.delete(self._makeKey(key))
 
     def delete_multi(self, keys):
