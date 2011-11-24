@@ -37,16 +37,16 @@ class RHSearchBase:
     def _checkParams( self, params ):
 
         self._params = params
-        self._noQuery = False        
+        self._noQuery = False
         self._page = int(params.get('page', 1))
 
         isearch = Config.getInstance().getIndicoSearchServer()
         SEAClassName = Config.getInstance().getIndicoSearchClass()
-        
+
         moduleName = '.'.join(SEAClassName.split('.')[:-1])
         self._SEAClassName = SEAClassName.split('.')[-1]
         self._searchingPrivate = self.getAW().getUser() != None
-    
+
         # and now for some introspection magic...
         # load the requestClass from wherever it is, and instantiate a classobj
         clazz = getattr(__import__(moduleName,globals(),locals(),['']), self._SEAClassName)
@@ -58,18 +58,18 @@ class RHSearchBase:
             self._sessionHash = "%s_%s" % (self._getSession().getId(), self.getAW().getUser().getId())
         else:
             self._sessionHash = 'PUBLIC'
-        
+
     def _filterParams(self, params, seaInstance):
         ret = {}
-        
+
         allowedParams = seaInstance.getAllowedParams()
-        
+
         for param in allowedParams:
             if param in params:
                 ret[param] = params[param]
             else:
                 ret[param] = ''
-                
+
         return ret
 
     def _getQueryHash(self, params):
@@ -80,7 +80,7 @@ class RHSearchBase:
         # same dictionary, we should generated a list, sorted by
         # keys, since this way we guarantee that str() will
         # have always the same output
-        
+
         uniqueId = str(list((key,params[key]) for key in keys))
 
         return md5.new(uniqueId).hexdigest()
@@ -120,8 +120,8 @@ class RHSearchBase:
         record = start
 
         # by default, we should have several pages of results
-        shortResult = False   
-        
+        shortResult = False
+
         # if we're searching the private repository,
         # always request twice the number of items per page
         # (in order to account for invisible records)
@@ -147,7 +147,7 @@ class RHSearchBase:
                                                    f = self._filteredParams['f'],
                                                    sortField = "518__d", # this is the markxml for date. TODO: add more sortFields.
                                                    sortOrder = self._filteredParams['sortOrder'])
-            results.extend(r)            
+            results.extend(r)
 
             # filter
             for r in results:
@@ -162,7 +162,7 @@ class RHSearchBase:
                 break
 
             Logger.get("search").debug("fResults (%s)" % len(fResults))
-            
+
             start += numRequest
 
         Logger.get("search").debug("%s %s %s" % (len(fResults), numHits, number))
@@ -190,7 +190,7 @@ class RHSearchBase:
         results, numHits, shortResult, record = self._loadBatchOfRecords(user, collection, number, start)
 
         self._cacheNextStartingRecord(queryHash, self._page, record, cachedObj)
-        
+
         return (numHits, shortResult, record, results)
 
     def _process(self):
@@ -202,8 +202,8 @@ class RHSearchBase:
             if phrase.strip() == '':
                 self._noQuery = True
 
-            params = copy.copy(self._filteredParams)        
-                
+            params = copy.copy(self._filteredParams)
+
             nEvtRec, nContRec = 0, 0
             numEvtHits, numContHits = 0, 0
             eventResults, contribResults = [], []
@@ -225,17 +225,17 @@ class RHSearchBase:
 
             params['nEventResult'] = nEvtRec
             params['nContribResult'] = nContRec
-            
+
             params['numHits'] = numEvtHits + numContHits
             params['page'] = self._page
-            
+
             params['targetObj'] = self._target
 
             params['searchingPublicWarning'] = self._SEAClassName != 'InvenioPublicSEA' and not self._searchingPrivate
 
             return self._getPage().display(**params)
         else:
-            # translate                   
+            # translate
             search = self._seAdapter.translateParameters(self._filteredParams)
             url = self._seAdapter.getRequestAddress()
             self._redirect('http://'+url+'?'+urllib.urlencode(search))
