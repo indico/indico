@@ -26,7 +26,7 @@ IndicoUI.Dialogs.Util = {
             alt: $T('Loading...')
         });
 
-        var progress = $('<div id="tt_status_info"></div>').
+        var progress = $('<div id="tt_status_info" class="tt_tmp_button"></div>').
             append(image, stext);
 
         $('#tt_status_info').replaceWith(progress).show();

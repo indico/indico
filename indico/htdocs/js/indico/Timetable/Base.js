@@ -468,6 +468,7 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
     },
 
     switchToTopLevel : function(day) {
+        day = day || this.currentDay;
         var dfr = $.Deferred();
         this.enable();
         this.setSelectedTab(day || this.currentDay);
@@ -475,6 +476,8 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
         this._generateContent(this.getSelectedPanel());
         this.timetableDrawer.redraw();
         $('body').trigger('timetable_switch_toplevel', this);
+
+        window.location = '#' + day;
 
         dfr.resolve();
         return dfr.promise();
@@ -812,82 +815,170 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         return null;
     },
 
+    _allowCreateHere: function(elementType) {
+        switch(elementType) {
+        case 'Session':
+            return (this.contextInfo._type == "Conference");
+        case 'Break':
+            return (this.contextInfo._type == "Conference" ? true : (this.contextInfo.isPoster === false));
+        case 'Contribution':
+            return true;
+        }
+
+    },
+
+    _retrieveSessionColor: function(session){
+        return this.getById("s"+session.id).color;
+    },
+
+    _openSessionMenu: function(triggerElement, parent) {
+
+        if (exists(this.addMenu) && this.addMenu.isOpen()) {
+            return;
+        }
+
+        var self = this;
+
+        var menuItems = {};
+
+        var sessions = {};
+        each(this.eventInfo.sessions, function(session, key) {
+            sessions[session.id] = {};
+            sessions[session.id].func = function() { self.managementActions.addSessionSlot(session); };
+            sessions[session.id].color = self._retrieveSessionColor(session);
+            sessions[session.id].title = session.title;
+        });
+
+        var menu = {
+            '' : {
+                'Create a new session': function() { self.managementActions.addSession(); }
+            },
+            'Add another block to:': sessions
+        };
+
+        var te = new Html(triggerElement.find('a').get(0));
+        var sessMenu = new SessionSectionPopupMenu(menu, te, 'timetableSectionPopupList popupListChained', true, true);
+
+        var pos = triggerElement.position();
+        sessMenu.open(pos.left, pos.top - 1);
+        parent.append($('.timetableSectionPopupList').parent());
+    },
+
+    _createAddMenu: function(elem) {
+
+        var self = this;
+        var menuItems = {};
+        var ul = $('<ul/>').appendTo(elem);
+
+        if (this._allowCreateHere('Session')) {
+            var sessionAdd = $('<a href="#"/>').text($T('Session')).appendTo(ul).wrap("<li/>");
+            sessionAdd.bind('menu_select', function() {
+                if (keys(self.eventInfo.sessions).length === 0) {
+                    self.managementActions.addSession();
+                } else {
+                    self._openSessionMenu($(this).parent(), ul);
+                }
+                return true;
+            });
+
+        }
+
+        if (this._allowCreateHere('Contribution')){
+            $('<a href="#"/>').text($T('Contribution')).bind('menu_select', function() {
+                self.managementActions.addContribution();
+                return false;
+            }).appendTo(ul).wrap("<li/>");
+        }
+        if (this._allowCreateHere('Break')){
+            $('<a href="#"/>').text($T('Break')).bind('menu_select', function() {
+                self.managementActions.addBreak();
+                return false;
+            }).appendTo(ul).wrap("<li/>");
+        }
+
+    },
+
     _getHeader: function() {
 
         var self = this;
 
         this.infoBox = Html.div({className: 'timetableInfoBox'});
 
-        if (this.contextInfo.isPoster) {
-            this.addMenuLink = Html.a({className: 'fakeLink', style: {margin: '0 15px'}}, 'Add poster');
-            this.addMenuLink.observeClick(function() {
+        this.addMenuLink = this.contextInfo.isPoster ?
+            $('<a href="#">').text($T('Add poster')).bind('menu_select', function() {
                 self.managementActions.addContribution();
-            });
-        }else {
-            this.addMenuLink = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
-            this.addMenuLink.observeClick(function() {
-                self.managementActions._openAddMenu(self.addMenuLink, self.contextInfo);
-            });
-        }
+            }) : $('<a href="#">').text($T('Add new'));
 
-        this.separator = Html.span({}, " | ");
 
-        this.rescheduleLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Reschedule'));
-        this.rescheduleLink.observeClick(function(){
+        this.rescheduleLink = $('<a href="#">').text($T('Reschedule')).bind('menu_select', function() {
             var popup = new RescheduleDialog(self);
             popup.open();
+            return false;
         });
 
-        this.addIntervalLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Add new block'));
-        this.separator2 = Html.span({}, " | ");
-        this.fitInnerTimetableLink = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T('Fit to content'));
-
-
-        if (self.isSessionTimetable) {
-            this.addIntervalLink.observeClick(function() {
-                self.managementActions.addSessionSlot(self.eventInfo.timetableSession);
-            });
-        }
-
-        this.fitInnerTimetableLink.observeClick(function(){
+        this.fitInnerTimetableLink = $('<a href="#">').text($T('Fit to content')).bind('menu_select', function() {
             var popup = new FitInnerTimetableDialog(self);
             popup.open();
+            return false;
         });
 
-        var customLinks = Html.span({});
+        this.addIntervalLink = $('<a href="#">').text($T('Add new block')).bind('menu_select', function() {
+            self.managementActions.addSessionSlot(self.eventInfo.timetableSession);
+            return false;
+        });
+
+
+        var customLinks = $();
         for(linkName in this.customLinks){
-            var linkDiv = Html.span({className: 'fakeLink', style:{paddingLeft: pixels(15), paddingRight: pixels(15)}}, $T(linkName));
-            linkDiv.observeClick(function(event){
+            var link = $('<a href="#"/>').text(linkName).bind('menu_selecr', function(event) {
                 var elem = event.srcElement?event.srcElement:event.currentTarget;
                 var func = eval(self.customLinks[elem.innerHTML]);
                 func(self);
             });
-            customLinks.append("|");
-            customLinks.append(linkDiv);
+            customLinks = customLinks.add(link);
         }
 
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
-        this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}},
-                             this.getTTMenu(),
-                             this.addMenuLink,
-                             this.addIntervalLink,
-                             this.contextInfo.isPoster?null:this.separator,
-                             this.contextInfo.isPoster?null:this.rescheduleLink,
-                             this.contextInfo.isPoster?null:this.separator2,
-                             this.contextInfo.isPoster?null:this.fitInnerTimetableLink,
-                             customLinks);
+
+        this.menu = $('<ul/>').append(
+            this.addMenuLink);
+
+        if (this.isSessionTimetable) {
+            this.menu.prepend(this.addIntervalLink)
+        }
+
+        if (!this.contextInfo.isPoster) {
+            if (this.contextInfo.entryType == 'Session') {
+                this.fitInnerTimetableLink.appendTo(this.menu);
+            }
+            this.rescheduleLink.appendTo(this.menu);
+        }
+
+        customLinks.appendTo(this.menu);
 
         var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>', {src: imageSrc(Indico.SystemIcons.tt_time),
                                                                                   title:"Add one hour"}))
-        var tt_status_info = $('<div id="tt_status_info" />');
+        var tt_status_info = $('<div id="tt_status_info" class="tt_tmp_button"/>');
 
+        this.menu.children('a').wrap('<li/>');
 
-        return $('<div/>').append(
+        if (!this.contextInfo.isPoster) {
+            this._createAddMenu(this.addMenuLink.parent());
+        }
+
+        var ret = $('<div/>').append(
             this.warningArea.dom, $('<div class="clearfix ui-follow-scroll" id="tt_menu"/>').
-                append(this.menu.dom, tt_status_info, this.infoBox.dom),
+                append(this.menu.dropdown({effect_on: 'slideDown'}), tt_status_info, this.infoBox.dom),
             tt_hour_tip);
-        },
+
+        var extra = this.getTTMenu();
+        if (extra) {
+            ret.find('#tt_menu > ul').after(extra);
+        }
+
+        return ret;
+    },
 
 },
      function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks) {
@@ -1228,8 +1319,14 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             this.eventInfo.endDate.time = latestTime;
         }
 
+        var self = this;
+        var dfr = $.Deferred();
+        $('body').bind('timetable_redraw', function() {
+            dfr.resolve();
+            $('body').trigger('timetable_update', self);
+        });
         this.timetableDrawer.redraw();
-        $('body').trigger('timetable_update', this);
+        return dfr.promise();
 
     },
 
@@ -1255,19 +1352,7 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
     },
 
     getTTMenu: function() {
-
-        this.separator2.dom.style.display = "none";
-        this.fitInnerTimetableLink.dom.style.display = "none";
-        if (this.isSessionTimetable) {
-            this.addMenuLink.dom.style.display = "none";
-            this.addIntervalLink.dom.style.display = "inline";
-            this.rescheduleLink.dom.style.display = "none";
-            this.separator.dom.style.display = "none";
-        } else {
-            this.addIntervalLink.dom.style.display = "none";
-        }
-
-        return '';
+        return null;
     },
 
     _retrieveHistoryState: function(hash) {
@@ -1400,28 +1485,16 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
     getTTMenu: function() {
         var self = this;
-
-        if (this.isSessionTimetable) {
-            this.addMenuLink.dom.style.display = "inline";
-            this.addIntervalLink.dom.style.display = "none";
-            this.separator2.dom.style.display = "none";
-            this.fitInnerTimetableLink.dom.style.display = "none";
-            this.rescheduleLink.dom.style.display = "none";
-            this.separator.dom.style.display = "inline";
-        } else {
-            this.addIntervalLink.dom.style.display = "none";
-        }
-
-        var goBackLink = Html.span({}, Html.a({className: 'fakeLink', style: {fontWeight: 'bold', margin: '0 15px'}}, 'Go back to timetable'), ' | ');
-        goBackLink.observeClick(function() {
-            self.parentTimetable.switchToTopLevel();
-            self._hideWarnings();
-            self.session = null;
-
-        });
+        var goBackLink = $('<a class="go_back tt_tmp_button" href="#">').text($T('Up to timetable')).
+            prepend('<span class="arrow">▲</span>').
+            click(function() {
+                self.parentTimetable.switchToTopLevel();
+                self._hideWarnings();
+                self.session = null;
+                return false;
+            });
 
         return goBackLink;
-
     }
 
 },

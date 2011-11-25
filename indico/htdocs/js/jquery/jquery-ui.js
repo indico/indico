@@ -1948,6 +1948,7 @@ $.widget("ui.droppable", {
 		if(this.accept.call(this.element[0],(draggable.currentItem || draggable.element))) {
 			if(this.options.activeClass) this.element.removeClass(this.options.activeClass);
 			if(this.options.hoverClass) this.element.removeClass(this.options.hoverClass);
+
 			this._trigger('drop', event, this.ui(draggable));
 			return this.element;
 		}

@@ -1245,7 +1245,7 @@ type("PopupWidget", [], {
 
         styles = any(styles, {
             // If the canvas has been set to fixed position don't change it
-            position: this.canvas.dom.style.position == 'fixed' ? 'fixed' : 'absolute',
+            position: 'absolute',
             left: pixels(x),
             top: pixels(y)
         });

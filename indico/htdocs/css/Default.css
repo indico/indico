@@ -5044,24 +5044,48 @@ div.timetableContribution  {
     opacity: 0.7 !important;
 }
 
-/* For when the  Shift is held down */
-div.shiftIndicator {
+.key {
+	display: inline;
+	min-width: 1em;
+	padding: .2em .3em;
+	text-align: center;
+	-moz-border-radius: .3em;
+	-webkit-border-radius: .3em;
+	border-radius: .3em;
+	border: none;
+	cursor: default;
+	background: rgb(250, 250, 250);
+	color:  rgb(50, 50, 50);
+	text-shadow: 0 0 2px rgb(255, 255, 255);
+	-moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+	-webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+	box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+}
+
+div.bottomTip {
+    color: #888;
+    margin-left: 5px;
+    border: 1px solid #aaa;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 3px 5px 3px 5px;
+    box-shadow: inset 0 0 25px #e8e8e8, 0px 0px 2px rgba(220, 220, 200, 0.4);
     display: none;
-    color: #118822;
-    font-weight: bold;
     text-align: center;
-    margin-left: -96px;
     padding: 10px;
-    background: #FFF;
-    border-top: 1px solid #202020;
-    border-left: 1px solid #202020;
-    border-right: 1px solid #202020;
+    background: rgba(255,255,255,0.7);
     position: fixed;
-    bottom: 0px;
-    left: 50%;
-    border-radius: 10px 10px 0px 0px;
-    -moz-border-radius: 10px 10px 0px 0px;
-    -webkit-border-radius: 10px 10px 0px 0px;
+    bottom: 15px;
+    right: 50px;
+
+}
+
+div.bottomTip .circle{
+    font-size: 20px;
+    color: #666;
+    margin-right: 5px;
+    vertical-align: middle;
 }
 
 div.ui-state-hightlight {
@@ -5813,29 +5837,39 @@ div.timetableManagementInfoArea ul li{
 }
 
 #tt_status_info .icon {
-    font-size: 15px;
-    vertical-align: middle;
     margin-right: 5px;
 }
 
-#tt_status_info {
+#tt_status_info a {
+}
+
+.tt_tmp_button {
+    line-height: 26px;
+    height: 26px;
     float: right;
     background: #fefefe;
-    border: 1px solid #eee;
-    margin: -5px 5px;
-    padding: 3px 6px 2px 4px;
+    border: 1px solid #aaa;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
+    border-radius: 5px;
     opacity: 0.9;
     box-shadow: 0px 0px 2px rgba(220, 220, 200, 0.4);
+    margin-right: 10px;
+    vertical-align: middle;
+    padding: 0 5px;
+}
+
+#tt_status_info {
+    display: none;
 }
 
 #tt_status_info .text {
-    padding: 3px 8px 3px;
+    vertical-align: middle;
     text-align: center;
     color: #aaa;
     float: right;
 }
+
 
 #tt_menu.scrolling {
     position: fixed;
@@ -5848,6 +5882,85 @@ div.timetableManagementInfoArea ul li{
     opacity: 0.95;
 }
 
+#tt_menu .go_back .arrow {
+    color: #aaa;
+    margin-right: 5px;
+}
+
+.ui-list-menu .arrow {
+    float: right;
+    margin-right: 10px;
+    padding: 5px 0;
+}
+
+.ui-list-menu-level  {
+    position: absolute;
+    background: #fff;
+    padding: 0px;
+    z-index: 1;
+    border: 1px solid #aaa;
+    box-shadow: inset 0 0 25px #e8e8e8, 0px 0px 2px rgba(220, 220, 200, 0.4);
+}
+
+.ui-list-menu-level > li:hover {
+    background: #f0f0f0;
+}
+
+.ui-list-menu-level > li {
+    display: block;
+    min-width: 1em;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    list-style-type: none;
+}
+
+.ui-list-menu {
+    margin-right: 10px;
+    border: 1px solid #aaa;
+}
+
+.ui-list-menu li > a {
+    display: block;
+    padding: 5px 5px;
+}
+
+.ui-list-menu li.selected {
+    background: #eee;
+}
+
+.ui-list-menu > li {
+}
+
+.ui-list-menu-level-0 {
+    background: none;
+    box-shadow: none;
+    position: relative;
+    display: block;
+    float: right;
+    margin-top: 0px;
+    padding: 0px;
+}
+
+.ui-list-menu-level-0 > li {
+    list-style-type: none;
+    display: inline-block;
+    border-right: 1px solid #aaa;
+    box-shadow: inset 0 0 25px #e8e8e8, 0px 0px 2px rgba(220, 220, 200, 0.4);
+    min-width: 100px;
+}
+
+.ui-list-menu-level-0 > li:last-child {
+    border-right: none;
+}
+
+.ui-list-menu-level-1{
+    z-index: 0;
+    width: 100px;
+}
+
+.ui-list-menu-level-2{
+    width: 100px;
+}
 
 /* MODIF DISPLAY*/
 
@@ -6638,6 +6751,7 @@ div.cloneElements {
     padding: 2px;
     position: absolute;
     right:0px;
+    cursor: pointer;
 }
 
 .filterTable {

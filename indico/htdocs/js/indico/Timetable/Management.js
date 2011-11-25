@@ -242,7 +242,7 @@ type("TimetableManagementActions", [], {
                 dfr.reject(error);
             } else {
                 if (undo) {
-                    self.enableUndo(undo, {'eventData': eventData,
+                    self.timetable.enableUndo(undo, {'eventData': eventData,
                                            'entry': result.entry}, null);
                 }
                 // change json and repaint timetable
@@ -335,71 +335,6 @@ type("TimetableManagementActions", [], {
         return new Date(year, month-1, day);
     },
 
-    _allowCreateHere: function(elementType) {
-
-        switch(elementType) {
-        case 'Session':
-            return (this.session === null);
-        case 'Break':
-            return (this.session?this.session.isPoster === false:true);
-        case 'Contribution':
-            return true;
-        }
-
-    },
-
-    _openAddMenu: function(triggerElement, target) {
-
-        if (exists(this.addMenu) && this.addMenu.isOpen()) {
-            return;
-        }
-
-        this.session = target.entryType=="Session"?target:null;
-
-        var self = this;
-
-        var menuItems = {};
-        this.addMenu = new PopupMenu(menuItems, [triggerElement], null, true, true);
-
-        if (this._allowCreateHere('Session')) {
-            if (keys(this.eventInfo.sessions).length === 0) {
-                menuItems[$T('Session')] = function() { self.addSession(); return false; };
-            } else {
-                var sessions = {};
-                each(this.eventInfo.sessions, function(session, key) {
-                    sessions[session.id] = {};
-                    sessions[session.id].func = function() { self.addSessionSlot(session); self.addMenu.close(); };
-                    sessions[session.id].color = self._retrieveSessionColor(session);
-                    sessions[session.id].title = session.title;
-                });
-
-                var menuu = {
-                    '' : {
-                        'Create a new session': function() { self.addSession(); self.addMenu.close(); }
-                    },
-                    'Add another block to:': sessions
-                };
-
-                menuItems[$T('Session')] = new SessionSectionPopupMenu(menuu, [triggerElement, this.addMenu], 'timetableSectionPopupList popupListChained', true, true);
-            }
-
-        }
-
-        if (this._allowCreateHere('Contribution')){
-            menuItems[$T('Contribution')] = function() { self.addContribution(); };
-        }
-
-        if (this._allowCreateHere('Break')){
-            menuItems[$T('Break')] = function () { self.addBreak(); };
-        }
-
-        var pos = triggerElement.getAbsolutePosition();
-        this.addMenu.open(pos.x + triggerElement.dom.offsetWidth + 10, pos.y + triggerElement.dom.offsetHeight + 2);
-    },
-
-    _retrieveSessionColor: function(session){
-        return this.timetable.getById("s"+session.id).color;
-    },
     _addParams: function(type) {
         return {
             startDate: Util.formatDateTime(this.eventInfo.startDate, IndicoDateTimeFormats.Server),

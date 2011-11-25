@@ -1,31 +1,15 @@
-$.widget("ui.reset_resizable", $.extend({}, $.ui.resizable.prototype, {
-    resetContainment: function() {
-        var element = this.containerElement, p = [];
-
-        $([ "Top", "Right", "Left", "Bottom" ]).each(function(i, name) {
-            p[i] = parseInt(element.css("padding" + name), 10) || 0;
-        });
-
-        this.containerSize = {
-            height: (element.innerHeight() - p[3]),
-            width: (element.innerWidth() - p[1])
-        };
-        this.parentData.width = this.containerSize.width;
-        this.parentData.height = this.containerSize.height;
-    }
-}));
-
 function _revert_element(ui) {
-   /*if (ui.originalPosition) {
-        ui.helper.offset(ui.originalPosition);
-    }*/
+    // make element assume previous size
     if (ui.originalSize) {
         ui.helper.height(ui.originalSize.height);
     }
 }
 
+
 type("TimeDisplacementManager", [],
      {
+
+         // some caching, in order to speed up computation
          _cached_attrs: {
              gridTop: function() { return $('#timetable_grid').offset().top },
              heightLimits: function() { return [$('.hourLine:first').offset().top,
@@ -43,6 +27,7 @@ type("TimeDisplacementManager", [],
              this._cache[param] = val;
          },
 
+         // tooltip (shows time while dragging)
          _initializeTooltip: function() {
              var tip = $('<div id="dragTip"><span>' + $T('move to resize') + '</span></div>');
              tip.append($('<div class="pointer"/>'));
@@ -69,6 +54,8 @@ type("TimeDisplacementManager", [],
 
          _snap: function(block, time) {
 
+             // snapping blocks to tooltip "grid"
+
              type = type || 'resize';
 
              var hourline = $('#hourLine_' + parseFloat(time[0]));
@@ -87,6 +74,9 @@ type("TimeDisplacementManager", [],
 
          release: function(startHour, startMinute, endHour, endMinute,
                            eventData, ui, undo_caption) {
+
+             // 
+
              var self = this;
 
              var startDT = (startHour === null) ? eventData.startDate :
@@ -105,6 +95,7 @@ type("TimeDisplacementManager", [],
                  Util.formatDateTime(endDT, IndicoDateTimeFormats.Server),
                  eventData, $(window).data('shiftIsPressed'), undo_caption).fail(
                      function(error) {
+                         // if something goes wrong, reset the element
                          _revert_element(ui);
                      }
                  );
@@ -304,16 +295,14 @@ type("DraggableBlockMixin", [],
              var newHeight =  (heightChange) ? heightThreshold : originalHeight;
 
              var widthChange = (!(newWidth == originalWidth));
+             var hourLine_mode = false;
 
-             var draggable = this.element.draggable({
+             var draggable = this.element.super_draggable({
                  //Center the mouse in the middle of the block while dragging
-                 cursorAt: {
-                     left: ((newWidth == undefined) ? 0 : Math.round(newWidth/2)),
-                     top: Math.round(newHeight/2) },
                  containment: $('#timetableDiv'),
                  revert: 'invalid',
                  refreshPositions: true,
-                 start: function(event, ui) {
+                 start: function(event, ui) {/*
                      /* Resize timeblock if nedeed */
                      maxCol = self.timetable.getTimetableDrawer().maxCol;
                      newWidth = (maxCol > 1) ? Math.round($('#timetableDiv').width()/(maxCol)) : originalWidth;
@@ -321,16 +310,24 @@ type("DraggableBlockMixin", [],
                      ui.helper.animate({width: newWidth});
                      ui.helper.height(newHeight);
 
-                     //(fulhack) Ugly hack [Begin] on jQuery to make the changed width come in to effect while dragging
-                     $(this).data('draggable').helperProportions.width = newWidth;
-                     $(this).data('draggable').helperProportions.height = newHeight;
-                     $(this).data('draggable')._setContainment();
-                     //Ugly hack [End]
+                     $(this).data('draggable')._setContainment(newWidth, newHeight);
 
                      self._initializeTooltip();
 
                      var pos = ui.helper.position();
                      draggable.data('initialPosition', pos);
+                 },
+                 drag: function(event, ui) {
+                     if (hourLine_mode && $(this).position().left > 0) {
+                         hourLine_mode = false;
+                         $('.ui-droppable').super_droppable('enable');
+                     }
+                     if ($(this).position().left == 0) {
+                         $('.hourLine.ui-droppable').super_droppable('enable');
+                         $('.timetableBlock.ui-droppable').super_droppable('disable');
+                         hourLine_mode = true;
+                     }
+
                  },
                  stop: function(event, ui) {
                      //reset original width
@@ -403,24 +400,24 @@ type("ResizableBlockMixin", [],
 type("DroppableTimetableMixin", ["TimeDisplacementManager"],
      {
          _shiftKeyListener: function() {
-             var indicatorDiv = $('.shiftIndicator');
+             var indicatorDiv = $('.bottomTip');
 
              //If its not already drawn/appended
              if(!(indicatorDiv.length > 0)) {
-                 indicatorDiv = (Html.div('shiftIndicator', $T("Shifting later entries ENABLED"))).dom;
-                 $('body').append(indicatorDiv);
+                 indicatorDiv = $('<div class="bottomTip"/>').html(
+                     $T('<span class="key light">Shift</span> is currently pressed. Changes will be applied to blocks after.')).appendTo('body');
              }
 
-             //< Keyboard Key "Shift" held down > listener for shifting while dragging blocks
+             // Keyboard Key "Shift" pressed > listener for shifting while dragging blocks
              $(window).keydown(function(e) {
-                 //if Shift is pushed down
+                 // if Shift is currently pressed
                  if(e.keyCode == '16') {
                      $(window).data('shiftIsPressed', true);
-                     $(indicatorDiv).fadeIn("fast");
+                     indicatorDiv.fadeIn("fast");
                  }}).keyup(function(e){
                      if(e.keyCode == '16') {
                          $(window).data('shiftIsPressed', false);
-                         $(indicatorDiv).fadeOut("fast");
+                         indicatorDiv.fadeOut("fast");
                      }
                  });
 
@@ -490,19 +487,12 @@ type("DroppableBlockMixin", [],
 
              var inside = false;
 
-             this.element.droppable({
+             this.element.super_droppable({
                  drop: function( event, ui ) {
                      $('#dragTip').remove();
 
                      //If a session is dropped on top do nothing.
-                     if(isSession(ui)) {
-                         return;
-                     }
-
-                     if(isTouchingWall(ui)) {
-                         $('.ui-droppable').droppable('enable');
-                         var ttDrawer = self.timetable.getTimetableDrawer();
-                         ttDrawer.releaseDragOnHour(ui, ttDrawer.curStartHour, ttDrawer.curStartMinute);
+                     if(isSession(ui) || isTouchingWall(ui)) {
                          return;
                      }
 
@@ -524,17 +514,23 @@ type("DroppableBlockMixin", [],
                       * "not current drop target"
                       */
 
-
                      if(isSession(ui) || isTouchingWall(ui)) {
                          return;
                      }
 
                      if (!inside) {
-                         ui.draggable.animate({width: $(this).width() * 0.75});
-                         ui.draggable.height({height: $(this).height() * 0.75});
+                         var newWidth = $(this).width() * 0.75, newHeight = $(this).height() * 0.75;
+                         ui.draggable.data('draggingWidth', ui.draggable.width());
+                         ui.draggable.data('draggingHeight', ui.draggable.height());
 
+                         ui.draggable.animate({width: newWidth});
+                         ui.draggable.height({height: newHeight});
+
+                         ui.draggable.data('draggable')._setContainment(newWidth, newHeight);
+
+                         $('.timetableBlock.ui-droppable').not(this).super_droppable('disable');
+                         $('.hourLine.ui-droppable').droppable('disable');
                          $('#dragTip').hide();
-                         $('.ui-droppable').not(this).droppable('disable');
                          inside = true;
                      }
                  },
@@ -543,8 +539,17 @@ type("DroppableBlockMixin", [],
                      if(isSession(ui)) {
                          return;
                      }
+
+                     ui.draggable.width(ui.draggable.data('draggingWidth'));
+                     ui.draggable.height(ui.draggable.data('draggingHeight'));
+
                      $('#dragTip').show();
-                     $('.ui-droppable').not(this).droppable('enable');
+                     $('.timetableBlock.ui-droppable').not(this).super_droppable('enable');
+                     $('.hourLine.ui-droppable').droppable('enable');
+
+                     $('#tt_bottom_move').fadeOut(500, function() {
+                         $(this).remove();
+                     });
                  },
              });
          }
@@ -582,9 +587,7 @@ function switchTT(event, tt) {
 $(function() {
     // bind several timetable events to the switchTT function (timetable transitions)
     $("body").bind('timetable_ready', function(event, tt) {
-        $('#tt_menu').css('width', $('#tt_menu').width());
-        // initialize sticky headers
-        $.ui.sticky();
+        $('#tt_menu').css('width', tt.width);
 
         switchTT(event, tt);
         $('#tt_hour_tip').unbind();
@@ -595,6 +598,19 @@ $(function() {
         });
 
     });  // postDraw
+
+    $("body").one('timetable_ready', function() {
+        var closeMenu = function() {
+            $('#tt_menu > ul').dropdown('close');
+        };
+
+        // initialize sticky headers
+        $.ui.sticky({
+            sticky: closeMenu,
+            normal: closeMenu
+        });
+    });
+
     $("body").bind('timetable_switch_toplevel', switchTT);  // switch to top level
     $("body").bind('timetable_switch_interval', switchTT);  // switch to interval
     $("body").bind('timetable_update', switchTT);  // changes in local timetable
