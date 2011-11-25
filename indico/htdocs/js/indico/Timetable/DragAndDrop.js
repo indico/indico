@@ -485,6 +485,12 @@ type("DroppableBlockMixin", [],
                  return $(ui.draggable).position().left == 0;
              };
 
+             function removeBottomMove(ui) {
+                 $('#tt_bottom_move').fadeOut(500, function() {
+                     $(this).remove();
+                 });
+             }
+
              var inside = false;
 
              this.element.super_droppable({
@@ -499,6 +505,8 @@ type("DroppableBlockMixin", [],
                      var blockEventData = $(ui.draggable).data('eventData');
                      var chosenValue = self.eventData.sessionId + ':' + self.eventData.sessionSlotId;
                      var initialPosition = $(ui.draggable).data('initialPosition');
+
+                     removeBottomMove();
 
                      self._withNoEvents(function() {
                          self.managementActions.moveToSession(blockEventData, chosenValue, 'drop', true);
@@ -532,6 +540,14 @@ type("DroppableBlockMixin", [],
                          $('.hourLine.ui-droppable').droppable('disable');
                          $('#dragTip').hide();
                          inside = true;
+
+                         if (!$('#tt_bottom_move').length) {
+                             $('<div class="bottomTip" id="tt_bottom_move"/>').
+                                 html('<span class="circle">𐌏</span>' + $T('Drop to move block inside session')).appendTo('body').fadeIn();
+                         } else {
+                             $('#tt_bottom_move').stop(true).fadeTo(500, 1);
+                         }
+
                      }
                  },
                  out: function(event, ui) {
@@ -547,9 +563,7 @@ type("DroppableBlockMixin", [],
                      $('.timetableBlock.ui-droppable').not(this).super_droppable('enable');
                      $('.hourLine.ui-droppable').droppable('enable');
 
-                     $('#tt_bottom_move').fadeOut(500, function() {
-                         $(this).remove();
-                     });
+                     removeBottomMove();
                  },
              });
          }
