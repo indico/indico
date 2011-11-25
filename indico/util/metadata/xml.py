@@ -24,6 +24,7 @@ from datetime import datetime
 
 # module imports
 from indico.util.metadata.serializer import Serializer
+from MaKaC.common.logger import Logger
 
 
 class XMLSerializer(Serializer):
@@ -48,10 +49,11 @@ class XMLSerializer(Serializer):
 
     def _xmlForFossil(self, fossil, doc=None):
         attribs = {}
+        id = None
         if '_fossil' in fossil:
             attribs['fossil'] = fossil['_fossil']
         if 'id' in fossil:
-            attribs['id'] = str(fossil['id'])
+            id = attribs['id'] = str(fossil['id'])
 
         if '_type' in fossil:
             typeName = self._typeMap.get(fossil['_type'], fossil['_type'])
@@ -80,7 +82,12 @@ class XMLSerializer(Serializer):
                 elif type(v) == dict:
                     elem.append(self._xmlForFossil(v))
                 else:
-                    elem.text = self._convert(v)
+                    txt = self._convert(v)
+                    try:
+                        elem.text = txt
+                    except Exception, e:
+                        Logger.get('xmlSerializer').error('Setting XML text value failed: %s (id: %s)' % (e, id))
+
 
         return felement
 
