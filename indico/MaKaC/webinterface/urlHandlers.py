@@ -1792,9 +1792,6 @@ class UHUserAPI( URLHandler ):
 class UHUserAPICreate( URLHandler ):
     _relativeURL = "userAPI.py/create"
 
-class UHUserAPIPersistent( URLHandler ):
-    _relativeURL = "userAPI.py/persistent"
-
 class UHUserAPIBlock( URLHandler ):
     _relativeURL = "userAPI.py/block"
 

@@ -48,21 +48,6 @@ class RHUserAPICreate(RHUserBase):
             ak.newSignKey()
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
 
-class RHUserAPIPersistent(RHUserBase):
-    def _checkParams(self, params):
-        RHUserBase._checkParams(self, params)
-        self._ak = self._avatar.getAPIKey()
-
-    def _checkProtection(self):
-        RHUserBase._checkProtection(self)
-        ak = self._avatar.getAPIKey()
-        if ak and ak.isBlocked():
-            raise AccessError()
-
-    def _process(self):
-        self._ak.setPersistentAllowed(not self._ak.isPersistentAllowed())
-        self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
-
 class RHUserAPIBlock(RHUserBase):
     def _checkParams(self, params):
         RHUserBase._checkParams(self, params)

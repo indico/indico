@@ -68,15 +68,8 @@
                         <input type="submit" value="${_('Create a new API key pair')}" />
                     </form>
                     % if persistentAllowed:
-                        % if apiKey.isPersistentAllowed():
-                            <form action="${urlHandlers.UHUserAPIPersistent.getURL(avatar)}" method="POST" style="display: inline;" onsubmit="return confirm($T('When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'));">
-                                <input type="submit" value="${_('Disable persistent signatures')}" />
-                            </form>
-                        % else:
-                            <form action="${urlHandlers.UHUserAPIPersistent.getURL(avatar)}" method="POST" style="display: inline;" onsubmit="return confirm($T('Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'));">
-                                <input type="submit" value="${_('Enable persistent signatures')}" />
-                            </form>
-                        % endif
+                         <input type="submit" id="enablePersistentSignatures" data-enabled="${'1' if apiKey.isPersistentAllowed() else '0'}" value="${(_('Disable') if apiKey.isPersistentAllowed() else _('Enable')) + _(' persistent signatures')}" />
+                         <div style="display:inline;" id="progressPersistentSignatures"></div>
                     % endif
                 % endif
             </td>
@@ -125,3 +118,24 @@
         % endif
     % endif
 </table>
+
+<script type="text/javascript">
+    var disableText = $T('When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!');
+    var enableText =$T('Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.');
+    $('#enablePersistentSignatures').click(function(e) {
+        if(confirm(this.dataset.enabled == "1" ? disableText : enableText)){
+            $E('progressPersistentSignatures').set(progressIndicator(true, false));
+            indicoRequest('user.togglePersistentSignatures', {},
+                function(result, error) {
+                    $E('progressPersistentSignatures').set('');
+                    if (error){
+                        IndicoUI.Dialogs.Util.error(error);
+                    }
+                    else{
+                        $('#enablePersistentSignatures').attr('value', (result == true ? $T('Disable') : $T('Enable')) + $T(' persistent signatures') )
+                        $('#enablePersistentSignatures')[0].dataset.enabled = result == true ? "1" : "0";
+                    }
+                });
+        }
+    });
+</script>

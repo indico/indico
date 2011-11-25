@@ -454,6 +454,21 @@ class UserSyncPersonalData(UserPersonalDataBase):
             getattr(self._user, setter)(val)
         return dict(val=val)
 
+class UserSetPersistentSignatures(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        self._target = self._avatar = self.getAW().getUser()
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        ak = self._avatar.getAPIKey()
+        if ak and ak.isBlocked():
+            raise ServiceAccessError((_("The API Key is blocked")))
+    def _getAnswer( self):
+        ak = self._avatar.getAPIKey()
+        ak.setPersistentAllowed(not ak.isPersistentAllowed())
+        return ak.isPersistentAllowed()
 
 methodMap = {
     "event.list": UserListEvents,
@@ -474,6 +489,7 @@ methodMap = {
     "getDisplayTimezones": UserGetDisplayTimezones,
     "setDisplayTimezone": UserSetDisplayTimezone,
     "setPersonalData": UserSetPersonalData,
-    "syncPersonalData": UserSyncPersonalData
+    "syncPersonalData": UserSyncPersonalData,
+    "togglePersistentSignatures": UserSetPersistentSignatures
 
 }
