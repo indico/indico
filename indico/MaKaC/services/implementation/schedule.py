@@ -581,16 +581,17 @@ class ModifyStartEndDate(ScheduleOperation):
 
         # if we want to reschedule other entries, let's store the old parameters
         # and the list of entries that will be rescheduled (after this one)
+
         if self._reschedule:
             oldStartDate=copy.copy(self._schEntry.getStartDate())
             oldDuration=copy.copy(self._schEntry.getDuration())
             i = self._schEntry.getSchedule().getEntries().index(self._schEntry) + 1
-            while(i < len(self._schEntry.getSchedule().getEntries()) and
-                  self._schEntry.getStartDate() >= self._schEntry.getSchedule().getEntries()[i].getStartDate()):
+            lentries = len(self._schEntry.getSchedule().getEntries())
+            while i < lentries and self._schEntry.getStartDate() >= self._schEntry.getSchedule().getEntries()[i].getStartDate():
                 i += 1
             j = i
-            while(j < len(self._schEntry.getSchedule().getEntries()) and
-                  self._schEntry.getStartDate().date() == self._schEntry.getSchedule().getEntries()[j].getStartDate().date()):
+            while j < lentries and self._schEntry.getAdjustedStartDate().date() == \
+                      self._schEntry.getSchedule().getEntries()[j].getAdjustedStartDate().date():
                 j += 1
             entriesList = self._schEntry.getSchedule().getEntries()[i:j]
 
