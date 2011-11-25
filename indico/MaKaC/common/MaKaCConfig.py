@@ -28,7 +28,11 @@ if indico_conf == '': # we may be in development mode or in installation mode
     indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf')
     if not os.path.exists(indico_conf):
         # eggmode
+        indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
+    if not os.path.exists(indico_conf):
         indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf.sample')
+
+print indico_conf
 
 execfile(indico_conf)
 
