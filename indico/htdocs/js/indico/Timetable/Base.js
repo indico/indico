@@ -905,24 +905,24 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.infoBox = Html.div({className: 'timetableInfoBox'});
 
         this.addMenuLink = this.contextInfo.isPoster ?
-            $('<a href="#">').text($T('Add poster')).bind('menu_select', function() {
+            $('<a href="#"/>').text($T('Add poster')).bind('menu_select', function() {
                 self.managementActions.addContribution();
-            }) : $('<a href="#">').text($T('Add new'));
+            }) : $('<a href="#"/>').text($T('Add new'));
 
 
-        this.rescheduleLink = $('<a href="#">').text($T('Reschedule')).bind('menu_select', function() {
+        this.rescheduleLink = $('<a href="#"/>').text($T('Reschedule')).bind('menu_select', function() {
             var popup = new RescheduleDialog(self);
             popup.open();
             return false;
         });
 
-        this.fitInnerTimetableLink = $('<a href="#">').text($T('Fit to content')).bind('menu_select', function() {
+        this.fitInnerTimetableLink = $('<a href="#"/>').text($T('Fit to content')).bind('menu_select', function() {
             var popup = new FitInnerTimetableDialog(self);
             popup.open();
             return false;
         });
 
-        this.addIntervalLink = $('<a href="#">').text($T('Add new block')).bind('menu_select', function() {
+        this.addIntervalLink = $('<a href="#"/>').text($T('Add new block')).bind('menu_select', function() {
             self.managementActions.addSessionSlot(self.eventInfo.timetableSession);
             return false;
         });
@@ -930,7 +930,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         var customLinks = $();
         for(linkName in this.customLinks){
-            var link = $('<a href="#"/>').text(linkName).bind('menu_selecr', function(event) {
+            var link = $('<a href="#"/>').text(linkName).bind('menu_select', function(event) {
                 var elem = event.srcElement?event.srcElement:event.currentTarget;
                 var func = eval(self.customLinks[elem.innerHTML]);
                 func(self);
@@ -1485,7 +1485,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
     getTTMenu: function() {
         var self = this;
-        var goBackLink = $('<a class="go_back tt_tmp_button" href="#">').text($T('Up to timetable')).
+        var goBackLink = $('<a class="go_back tt_tmp_button" href="#"/>').text($T('Up to timetable')).
             prepend('<span class="arrow">▲</span>').
             click(function() {
                 self.parentTimetable.switchToTopLevel();

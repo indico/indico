@@ -189,7 +189,7 @@
         _create: function() {
             var self = this;
             this._menuize(this.element);
-            $(window).click(function() {
+            $('html').live('click', function() {
                 self._close_all();
             });
         },
