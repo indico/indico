@@ -74,7 +74,6 @@ def application(environ, start_response):
     req = SimulatedModPythonRequest(environ, start_response)
 
     if req.method == 'OPTIONS':
-        data = 'Access-Control-Allow-Methods: POST, GET, OPTIONS, HEAD'
         start_response("501 Not Implemented", [], None)
         return ''
 
