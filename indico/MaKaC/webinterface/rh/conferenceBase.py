@@ -472,7 +472,8 @@ class RHSubmitMaterialBase(object):
                         entry['material'] = mat.getId()
         except Exception, e:
             status = "ERROR"
-            del self._params['file']
+            if 'file' in self._params:
+                del self._params['file']
             info = {'message': self._errorList or " %s: %s" % (e.__class__.__name__, str(e)),
                     'code': '0',
                     'requestInfo': self._params}
