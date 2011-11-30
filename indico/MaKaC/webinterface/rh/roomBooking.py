@@ -216,7 +216,9 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         session.setVar( "isReservable", c.isReservable )
         session.setVar( "resvsNeedConfirmation", c.resvsNeedConfirmation )
         session.setVar( "resvStartNotification", c.resvStartNotification )
+        session.setVar( "resvStartNotificationBefore", c.resvStartNotificationBefore )
         session.setVar( "resvEndNotification", c.resvEndNotification )
+        session.setVar( "resvNotificationToResponsible", c.resvNotificationToResponsible )
 
         session.setVar( "responsibleId", c.responsibleId )
         session.setVar( "whereIsKey", c.whereIsKey )
@@ -291,7 +293,9 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.isReservable = True
         candRoom.resvsNeedConfirmation = False
         candRoom.resvStartNotification = False
+        candRoom.resvStartNotificationBefore = None
         candRoom.resvEndNotification = False
+        candRoom.resvNotificationToResponsible = False
         candRoom.photoId = None
         candRoom.externalId = None
 
@@ -315,8 +319,10 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.isActive = bool( session.getVar( "isActive" ) )
         candRoom.isReservable = bool( session.getVar( "isReservable" ) )
         candRoom.resvsNeedConfirmation = bool( session.getVar( "resvsNeedConfirmation" ) )
-        candRoom.resvStartNotification = bool( session.getVar( "resvStartNotification" ) )
+        candRoom.resvStartNotification = session.getVar("resvStartNotification")
+        candRoom.resvStartNotificationBefore = session.getVar("resvStartNotificationBefore")
         candRoom.resvEndNotification = bool( session.getVar( "resvEndNotification" ) )
+        candRoom.resvNotificationToResponsible = bool( session.getVar( "resvNotificationToResponsible" ) )
 
         candRoom.responsibleId = session.getVar( "responsibleId" )
         candRoom.whereIsKey = session.getVar( "whereIsKey" )
@@ -352,7 +358,10 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.isReservable = bool( params.get( "isReservable" ) ) # Safe
         candRoom.resvsNeedConfirmation = bool( params.get( "resvsNeedConfirmation" ) ) # Safe
         candRoom.resvStartNotification = bool( params.get( "resvStartNotification" ) )
+        tmp = params.get("resvStartNotificationBefore")
+        candRoom.resvStartNotificationBefore = intd(tmp) if tmp else None
         candRoom.resvEndNotification = bool( params.get( "resvEndNotification" ) )
+        candRoom.resvNotificationToResponsible = bool(params.get('resvNotificationToResponsible'))
 
 
         candRoom.responsibleId = params.get( "responsibleId" )

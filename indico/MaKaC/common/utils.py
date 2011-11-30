@@ -703,3 +703,20 @@ def getLocationInfo(item, roomLink=True):
     else:
         url = ""
     return (location, roomName, url)
+
+
+# http://code.activestate.com/recipes/576563-cached-property/
+# Modified to use a volatile dict so it doesn't go to the DB under any circumstances
+def cached_property(f):
+    """returns a cached property that is calculated by function f"""
+    def get(self):
+        try:
+            return self._v_property_cache[f]
+        except AttributeError:
+            self._v_property_cache = {}
+            x = self._v_property_cache[f] = f(self)
+            return x
+        except KeyError:
+            x = self._v_property_cache[f] = f(self)
+            return x
+    return property(get)

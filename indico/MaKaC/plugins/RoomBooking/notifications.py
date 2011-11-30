@@ -20,44 +20,49 @@
 from indico.core.extpoint.reservation import IReservationListener, IReservationStartStopListener
 from indico.core.extpoint.base import Component
 from zope.interface import implements
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time
 from persistent import Persistent
+from itertools import ifilter
 from indico.modules.scheduler.client import Client
-from indico.modules.scheduler import tasks
+from indico.modules.scheduler.tasks import RoomReservationEndTask
 from MaKaC.plugins.base import Observable, PluginsHolder
 from MaKaC.webinterface.wcomponents import WTemplated
-from MaKaC.common.utils import getEmailList, formatDateTime
+from MaKaC.common.utils import getEmailList, formatDateTime, cached_property
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.Configuration import Config
+from MaKaC.rb_tools import fromUTC, toUTC, Period
+from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
+from MaKaC.rb_room import RoomBase
+from MaKaC.common.timezoneUtils import server2utc
 
-class ReservationStartEndNotificationListener(Component):
-    implements(IReservationListener)
+DEBUG = False # enable various debug prints and ignore the notification hour setting
 
-    def reservationCreated(self, resv):
-        if getRoomBookingOption('notificationEnabled'):
-            resv.getStartEndNotification().resvCreated()
+def _getRoomSpecificNotificationBeforeDays():
+    """Get the resvStartNotificationBefore for all rooms that uses notifications. """
+    def _filter(r):
+        return (r.resvStartNotification or r.resvEndNotification) and r.resvStartNotificationBefore is not None
+    return set(r.resvStartNotificationBefore for r in ifilter(_filter, RoomBase.getRooms()))
 
-    def reservationUpdated(self, resv):
-        if getRoomBookingOption('notificationEnabled'):
-            resv.getStartEndNotification().resvUpdated()
+def sendStartNotifications(logger):
+    if getRoomBookingOption('notificationHour') != datetime.now().hour:
+        if DEBUG:
+            print 'Outside notification hour. Continuing anyway due to debug mode.'
+        else:
+            return
+    days = _getRoomSpecificNotificationBeforeDays()
+    days.add(getRoomBookingOption('notificationBefore'))
+    dates = [date.today() + timedelta(days=day) for day in days]
+    if DEBUG:
+        print 'Dates to check: %r' % map(str, dates)
+    for resv in ReservationBase.getReservations(days=dates, location='Test'): # for testing, remove location later
+        se = resv.getStartEndNotification()
+        se.sendStartNotification(logger)
 
-    def reservationDeleted(self, resv):
-        pass
-
-class ReservationStartEndEmailListener(Component):
-    implements(IReservationStartStopListener)
-
-    def reservationStarted(self, obj, resv):
-        sendReservationStartStopNotification(resv, 'start')
-
-    def reservationFinished(self, obj, resv):
-        sendReservationStartStopNotification(resv, 'end')
-
-def sendReservationStartStopNotification(resv, which):
+def sendReservationStartStopNotification(resv, which, occurrence):
     if which == 'start' and resv.room.resvStartNotification:
         msg = getRoomBookingOption('startNotificationEmail')
         subject = getRoomBookingOption('startNotificationEmailSubject')
@@ -79,16 +84,20 @@ def sendReservationStartStopNotification(resv, which):
         'roomAtts': resv.room.customAtts,
         'bookingStart': formatDateTime(resv.startDT),
         'bookingEnd': formatDateTime(resv.endDT),
+        'occStart': formatDateTime(occurrence.startDT),
+        'occEnd': formatDateTime(occurrence.endDT),
         'detailsLink': urlHandlers.UHRoomBookingBookingDetails.getURL(resv)
     }
 
-    recipients = []
-    recipients += getRoomBookingOption('notificationEmails')
+    recipients = set()
+    recipients.update(getRoomBookingOption('notificationEmails'))
     if getRoomBookingOption('notificationEmailsToBookedFor'):
-        recipients += getEmailList(resv.contactEmail)
+        recipients.update(getEmailList(resv.contactEmail))
+    if resv.room.resvNotificationToResponsible:
+        recipients.add(resv.room.getResponsible().getEmail())
     maildata = {
         'fromAddr': Config.getInstance().getNoReplyEmail(),
-        'toList': recipients,
+        'toList': list(recipients),
         'subject': subject.format(**msgArgs),
         'body': msg.format(**msgArgs)
     }
@@ -97,85 +106,59 @@ def sendReservationStartStopNotification(resv, which):
 class ReservationStartEndNotification(Persistent, Observable):
 
     def __init__(self, resv):
-        minutes = getRoomBookingOption('notificationBefore')
-        self._notificationBefore = timedelta(minutes=minutes)
-        self._startActionTriggered = False
-        self._endActionTriggered = False
         self._resv = resv
-        self._startDT = self._resv.getLocalizedStartDT() - self._notificationBefore
-        self._endDT = self._resv.getLocalizedEndDT()
-        self._hasTasks = False
+        self._notificationsSent = set()
 
-    def resvCreated(self):
-        if self._resv.endDT > datetime.now():
-            self.createTasks()
+    @cached_property
+    def _daysBefore(self):
+        roomSpecificDays = self._resv.room.resvStartNotificationBefore
+        if roomSpecificDays is not None:
+            return timedelta(days=roomSpecificDays)
+        return timedelta(days=getRoomBookingOption('notificationBefore'))
 
-    def resvUpdated(self):
-        #self._startActionTriggered = self._endActionTriggered = False # XXX REMOVE THIS LATER XXX
-        # Event was created in the past and is still in the past -> don't do anything
-        if not self._hasTasks and self._resv.endDT <= datetime.now():
+    def sendStartNotification(self, logger):
+        # If we want to notify 2 days before, we need to go back 3 days since the
+        # chosen day will *not* be checked by getNextRepeating()
+        delta = self._daysBefore - timedelta(days=1)
+        occurrence = self._resv.getNextRepeating(date.today() + delta)
+        if not occurrence:
             return
-        if self._startDT != self._resv.getLocalizedStartDT() - self._notificationBefore:
-            self._startDT = self._resv.getLocalizedStartDT() - self._notificationBefore
-            if self._endActionTriggered:
-                if self._resv.startDT > datetime.now():
-                    # If the booking had finished but it was changed to start in the future, we can safely re-execute both actions
-                    self._startActionTriggered = False
-                    self._endActionTriggered = False
-                # In any other case we don't need to change flags
-            if not self._startActionTriggered:
-                self.createTasks('start')
-        if self._endDT != self._resv.getLocalizedEndDT() or not self._hasTasks:
-            self._endDT = self._resv.getLocalizedEndDT()
-            if not self._endActionTriggered:
-                self.createTasks('end')
 
-    def createTasks(self, which=None):
-        # We cannot get an ID for the task here and since RB can use a separate DB we also cannot store the task itself in the DB.
-        # So we have no way of modifying/removing our task when the booking is updated/cancelled/rejected.
-        # Instead we always add a new task and the task checks if it's valid when being executed
-        # If a notification has been sent before, we don't send a new one (e.g. if someone changes the end time of an expired event)
-        self._hasTasks = True
-        cl = Client()
-        if not which or which == 'start':
-            cl.enqueue(tasks.RoomReservationStartedTask(self._resv, self._startDT))
-        if not which or which == 'end':
-            cl.enqueue(tasks.RoomReservationFinishedTask(self._resv, self._endDT))
+        if self._resv.repeatability == RepeatabilityEnum.daily:
+            # If the booking has daily repetition we do not want to spam people and
+            # thus handle it as one occurence over the whole lifetime of the booking
+            if DEBUG:
+                print 'Booking has daily repetition, only considering the whole period'
+            if occurrence.startDT != self._resv.startDT:
+                if DEBUG:
+                    print 'Occurrence is not the first one (%s != %s)' % (occurrence.startDT, self._resv.startDT)
+                return
+            if DEBUG:
+                print 'Original occurrence: %s' % occurrence
+            occurrence = Period(self._resv.startDT, self._resv.endDT)
 
-    def taskTriggered(self, which, task):
-        if not self._shouldTriggerActions(task.getStartOn(), which, task.getLogger()):
+        if occurrence.startDT.date() != date.today() + self._daysBefore:
+            if DEBUG:
+                print 'Occurence %s is on the wrong date' % occurrence
             return
-        if which == 'start':
-            self._notify('reservationStarted', self._resv)
-        elif which == 'end' and self.isActionTriggered('start'):
-            self._notify('reservationFinished', self._resv)
-        self.actionTriggered(which)
+        elif occurrence.startDT < datetime.now():
+            if DEBUG:
+                print 'Occurence %s already started' % occurrence
+            return
 
-    def _shouldTriggerActions(self, now, which, logger):
-        if which == 'start' and self._startDT != now:
-            logger.info('Reservation %s did not start yet (%s != %s), not triggering actions' % (self._resv.guid, self._startDT, now))
-            return False
-        elif which == 'end' and self._endDT != now:
-            logger.info('Reservation %s did not finish yet (%s != %s), not triggering actions' % (self._resv.guid, self._endDT, now))
-            return False
-        elif self.isActionTriggered(which):
-            logger.info('Reservation %s already had its %s actions sent, not triggering actions' % (self._resv.guid, which))
-            return False
-        return True
+        if occurrence in self._notificationsSent:
+            if DEBUG:
+                print 'Occurrence %s already had a notification' % occurrence
+            return
+        elif DEBUG:
+            print 'Sending notification for occurrence: %s' % occurrence
 
-    def actionTriggered(self, which):
-        if which == 'start':
-            self._startActionTriggered = True
-        elif which == 'end':
-            self._endActionTriggered = True
+        self._notificationsSent.add(occurrence)
+        self._p_changed = 1
+        if self._resv.room.resvStartNotification:
+            sendReservationStartStopNotification(self._resv, 'start', occurrence)
+        if self._resv.room.resvEndNotification:
+            Client().enqueue(RoomReservationEndTask(self._resv, server2utc(occurrence.endDT), occurrence))
 
-    def isActionTriggered(self, which):
-        if which == 'start':
-            return self._startActionTriggered
-        elif which == 'end':
-            return self._endActionTriggered
-
-
-
-
-
+    def sendEndNotification(self, occurrence):
+        sendReservationStartStopNotification(self._resv, 'end', occurrence)

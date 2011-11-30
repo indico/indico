@@ -41,6 +41,7 @@ class Period:
     def __init__( self, startDT, endDT ):
         self.startDT = startDT
         self.endDT = endDT
+
     def __cmp__( self, other ):
         if self.__class__.__name__ == 'NoneType' and other.__class__.__name__ == 'NoneType':
             return 0
@@ -50,6 +51,13 @@ class Period:
             return cmp( 1, None )
 
         return cmp( self.startDT, other.startDT )
+
+    def __hash__(self):
+        return hash((self.startDT, self.endDT))
+
+    def __repr__(self):
+        return 'Period(%r, %r)' % (self.startDT, self.endDT)
+
     def __str__( self ):
         return str( self.startDT  ) + " -- " + str( self.endDT )
 

@@ -714,6 +714,8 @@ class RoomBase( object ):
 rNeedConfirmation: #{self.resvsNeedConfirmation}
 startNotification: #{self.resvStartNotification}
   endNotification: #{self.resvEndNotification}
+startNotificationBefore:   #{self.resvStartNotificationBefore}
+notificationToResponsible: #{self.resvNotificationToResponsible}
 
              site: #{self.site}
          capacity: #{self.capacity}
@@ -781,7 +783,9 @@ startNotification: #{self.resvStartNotification}
     externalId = None     # str - custom external room id, i.e. for locating on the map
 
     resvStartNotification = False # bool - whether to send notifications on booking start
+    resvStartNotificationBefore = None # bool - whether to send notifications on booking start
     resvEndNotification = False # bool - whether to send notifications on booking end
+    resvNotificationToResponsible = False # bool - whether to send notifications to the room responsible, too
 
     telephone = None      # str
     surfaceArea = None    # int, positive - in meters^2

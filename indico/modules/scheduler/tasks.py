@@ -684,29 +684,28 @@ Best Regards
         self._setMailText()
         return True
 
-class RoomReservationTaskBase(OneShotTask, Observable):
-    which = None
-    delay = None
-
-    def __init__(self, resv, startDateTime):
-        super(RoomReservationTaskBase, self).__init__(startDateTime)
+class RoomReservationEndTask(OneShotTask, Observable):
+    def __init__(self, resv, endDT, occurrence):
+        super(RoomReservationEndTask, self).__init__(endDT)
         self.resvGUID = str(resv.guid)
+        self.resvOccurrence = occurrence
 
     def run(self):
-        if self._executionDelay > 20: # assume the task daemon was dead -> delay tasks:
-            raise TaskDelayed(self.delay)
         resv = ReservationGUID.parse(self.resvGUID).getReservation()
         if not resv:
-            self.getLogger().info('Reservation %r does not exist anymore, not triggering events' % self.resvGUID)
+            self.getLogger().info('Reservation %r does not exist anymore, not triggering end notification' % self.resvGUID)
             return
-        resv.getStartEndNotification().taskTriggered(self.which, self)
+        resv.getStartEndNotification().sendEndNotification(self.resvOccurrence)
 
-class RoomReservationStartedTask(RoomReservationTaskBase):
-    which = 'start'
-    delay = 5
-class RoomReservationFinishedTask(RoomReservationTaskBase):
-    which = 'end'
-    delay = 10
+class RoomReservationTask(PeriodicUniqueTask):
+    """
+    Sends room reservation start notifications.
+    Also takes care of creating the end notification task.
+    """
+
+    def run(self):
+        from MaKaC.plugins.RoomBooking.notifications import sendStartNotifications
+        sendStartNotifications(self.getLogger())
 
 class HTTPTask(OneShotTask):
     def __init__(self, url, data=None):

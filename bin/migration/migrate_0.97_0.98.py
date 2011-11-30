@@ -343,6 +343,25 @@ def runRoomBlockingInit(dbi, withRBDB, prevVersion):
 
 
 @since('0.98b2')
+def runReservationNotificationMigration(dbi, withRBDB, prevVersion):
+    """
+    Migrate the reservation notification system.
+    """
+    if not withRBDB:
+        return
+
+    # Delete old start end notification data
+    for i, resv in enumerate(CrossLocationQueries.getReservations()):
+        if hasattr(resv, '_startEndNotification'):
+            resv._startEndNotification = None
+        if i % 1000 == 0:
+            DALManager.commit()
+    # Create start notification task
+    Client().enqueue(RoomReservationTask(rrule.HOURLY, byminute=0, bysecond=0))
+    DALManager.commit()
+
+
+@since('0.98b2')
 def runLangToGB(dbi, withRBDB, prevVersion):
     """
     Replacing en_US with en_GB.
