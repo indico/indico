@@ -95,6 +95,11 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
          _sendReport: function(email) {
              var self = this;
              this.error.userMail = email.get();
+
+             // make sure the HTML sanitization filter won't ruin everything
+             _(this.error.inner).each(function(line, i) {
+                 self.error.inner[i] = Util.HTMLEscape(line);
+             });
              indicoRequest('system.error.report',
                            this.error,
                            function(result, error){

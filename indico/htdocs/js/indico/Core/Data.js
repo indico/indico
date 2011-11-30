@@ -177,6 +177,11 @@ var Util = {
     dateTimeJSToIndico: function(obj){
         return {date:  obj.getFullYear()+ '-'+ zeropad(obj.getMonth()+1) + '-' + zeropad(obj.getDate()),
                 time: zeropad(obj.getHours())+':'+zeropad(obj.getMinutes())+':'+zeropad(obj.getSeconds())};
+    },
+
+    HTMLEscape: function(text) {
+        // escape special HTML chars - kind of hacky but works
+        return $('<p/>').text(text).html();
     }
 
 };
