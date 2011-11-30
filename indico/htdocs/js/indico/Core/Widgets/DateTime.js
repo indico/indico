@@ -75,7 +75,7 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
 
              var value = this.get();
 
-             if (this.mandatory ? !value : value === undefined) {
+             if (this.mandatory ? !value : value === undefined || !Util.parseJSDateTime(value, IndicoDateTimeFormats.Server)) {
                  return $T('Date is invalid');
              } else {
                  return null;

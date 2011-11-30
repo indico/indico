@@ -136,8 +136,14 @@ var Util = {
             return null;
         }
 
-        var date = new Date(results['%Y'],results['%m']-1,results['%d']);
-        setTime(date, [results['%H'],results['%M'],results['%S']]);
+        var date = new Date(results['%Y'], results['%m']-1, results['%d']);
+
+        if (date.getDate() != results['%d'] || (date.getMonth() + 1) != results['%m']) {
+            // stuff such as 31/11
+            return null
+        }
+
+        setTime(date, [results['%H'], results['%M'], results['%S']]);
 
         return date;
     },

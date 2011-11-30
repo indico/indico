@@ -46,11 +46,6 @@ from MaKaC.common.contextManager import ContextManager
 base module for asynchronous server requests
 """
 
-# Just for Python 2.4 compatibility
-def parseDateTime(dt, format):
-    return datetime(*(time.strptime(dt, format)[0:6]))
-
-
 class ExpectedParameterException(ServiceError):
     """
     Represents an exception that occurs when a type of parameter was expected
@@ -67,6 +62,13 @@ class EmptyParameterException(ServiceError):
     """
     def __init__(self, paramName=""):
         ServiceError.__init__(self, "ERR-P3","Expected parameter '%s' is empty"%paramName)
+
+class DateTimeParameterException(ServiceError):
+    """
+    Thrown when a parameter that should have a value is empty
+    """
+    def __init__(self, paramName, value):
+        ServiceError.__init__(self, "ERR-P4","Date/Time %s = '%s' is not valid " % (paramName, value))
 
 
 class ParameterManager(object):
@@ -108,11 +110,14 @@ class ParameterManager(object):
             # format will possibly be accomodated to different standards,
             # in the future
 
-            # both strings and objects are accepted
-            if type(value) == str:
-                naiveDate = parseDateTime(value,'%Y/%m/%d %H:%M')
-            else:
-                naiveDate = parseDateTime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
+            try:
+                # both strings and objects are accepted
+                if type(value) == str:
+                    naiveDate = datetime.strptime(value, '%Y/%m/%d %H:%M')
+                else:
+                    naiveDate = datetime.strptime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
+            except ValueError:
+                raise DateTimeParameterException(paramName, value)
 
             if self._timezone:
                 value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
@@ -121,7 +126,7 @@ class ParameterManager(object):
         elif pType == date:
             # format will possibly be accomodated to different standards,
             # in the future
-            value = parseDateTime(value,'%Y/%m/%d').date()
+            value = datetime.strptime(value,'%Y/%m/%d').date()
         elif pType == int:
             if value == None and allowEmpty:
                 value = None
