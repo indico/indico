@@ -73,6 +73,7 @@ class IConferenceFossil(IConferenceMinimalFossil):
     def getSupportEmail(self):
         """ Support Email """
 
+
 class IConferenceParticipationMinimalFossil(IFossil):
 
     def getFirstName( self ):
@@ -232,6 +233,9 @@ class IMaterialFossil(IMaterialMinimalFossil):
 
     def getType(self):
         """ The type of material"""
+
+    def isBuiltin(self):
+        """ The material is a default one (builtin) """
 
 
 class ISessionFossil(IFossil):

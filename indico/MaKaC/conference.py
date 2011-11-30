@@ -10854,8 +10854,19 @@ class Material(CommonObjectBase):
     def getAccessController(self):
         return self.__ac
 
+    def isBuiltin(self):
+        return False
 
-class Reviewing(Material):
+
+class BuiltinMaterial(Material):
+    """
+    Non-customizable material types
+    """
+    def isBuiltin(self):
+        return True
+
+
+class Reviewing(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10869,7 +10880,7 @@ class Reviewing(Material):
             return self.getOwner().getContribution()
         return Material.getContribution(self)
 
-class Paper(Material):
+class Paper(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10880,7 +10891,7 @@ class Paper(Material):
 
 
 
-class Slides(Material):
+class Slides(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10891,7 +10902,7 @@ class Slides(Material):
 
 
 
-class Video(Material):
+class Video(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10900,7 +10911,7 @@ class Video(Material):
     def setId( self, newId ):
         return
 
-class Poster(Material):
+class Poster(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10909,7 +10920,7 @@ class Poster(Material):
     def setId( self, newId ):
         return
 
-class Minutes(Material):
+class Minutes(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
