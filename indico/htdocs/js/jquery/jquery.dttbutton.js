@@ -31,22 +31,14 @@
                 width: '100%'
             }).appendTo(wrapper);
 
-            // TODO: use mouseenter/mouseleave or simply hover when we have a proper tooltip (qtip2)
-            this.options.tooltipElem = null;
-            this.overlay.mousemove(function(e) {
-                var text = $.isFunction(self.options.tooltip) ? self.options.tooltip() : self.options.tooltip;
-                if(text) {
-                    if(self.tooltipElem) {
-                        self.tooltipElem.remove();
-                    }
-                    self.tooltipElem = $(IndicoUI.Widgets.Generic.errorTooltip(e.clientX, e.clientY, text, self.options.tooltipClass).dom);
-                }
-            }).mouseout(function(e) {
-                if(self.tooltipElem) {
-                    self.tooltipElem.remove();
+            this.overlay.qtip({
+                content: {
+                    text: self.options.tooltip
+                },
+                position: {
+                    target: this.element
                 }
             });
-
             this._update();
         },
 
@@ -58,9 +50,6 @@
         destroy: function() {
             if(!this.element.hasClass('ui-dttbutton')) {
                 return;
-            }
-            if(this.tooltipElem) {
-                this.tooltipElem.remove();
             }
             this.overlay.remove();
             this.element.removeClass('ui-dttbutton').unwrap();
