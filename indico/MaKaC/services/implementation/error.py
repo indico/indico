@@ -39,8 +39,8 @@ class SendErrorReport(ServiceBase):
     def _checkParams(self):
         pManager = ParameterManager(self._params)
         self._userMail = pManager.extract("userMail", pType=str, allowEmpty=True)
-        self._code = pManager.extract("code", pType=str)
-        self._message = pManager.extract("message", pType=str)
+        self._code = pManager.extract("code", pType=str, allowEmpty=True)
+        self._message = pManager.extract("message", pType=str, allowEmpty=True)
         self._inner = pManager.extract("inner", pType=str, allowEmpty=True)
         self._requestInfo = pManager.extract("requestInfo", pType=dict)
 
@@ -56,4 +56,3 @@ class SendErrorReport(ServiceBase):
             # error during sending report: maybe there's
             # no support address, or we couldn't connect to STMP server...
             return False
-

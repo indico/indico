@@ -120,7 +120,7 @@ class ServiceRunner(Observable):
                     continue
         except CausedError:
             raise
-        except Exception, e:
+        except Exception:
             raise ProcessError("ERR-P0", "Error processing method.")
 
         return result
@@ -129,7 +129,7 @@ def getSession(req):
     sm = session.getSessionManager()
     try:
         websession = sm.get_session(req)
-    except session.SessionError, e:
+    except session.SessionError:
         sm.revoke_session_cookie(req)
         websession = sm.get_session(req)
     return websession

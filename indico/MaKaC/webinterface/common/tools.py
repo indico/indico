@@ -243,7 +243,7 @@ def escape_html(text, escape_quotes=False):
                           ' => &#34;
     """
     if type(text) != str:
-        return ""
+        text = str(text)
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
     text = text.replace('>', '&gt;')
