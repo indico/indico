@@ -317,7 +317,7 @@ class EditMaterialClassBase(MaterialModifBase, UserListChange):
         if self._material.isBuiltin() and self._material.getTitle() != self._title:
             raise ServiceError("", "You can't change the name of a built-in material.")
 
-        self.changeUserList(self._material, self._newUserLis)
+        self.changeUserList(self._material, self._newUserList)
 
         self._material.setTitle(self._title);
         self._material.setDescription(self._description);
