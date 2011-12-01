@@ -106,7 +106,7 @@ type("TimeTable", ["HistoryListener"], {
         $('body').one('timetable_ready', function() {
             dfr.resolve();
         });
-        this.LookupTabWidget.prototype.setSelectedTab.call(this, val)
+        this.JLookupTabWidget.prototype.setSelectedTab.call(this, val)
         return dfr.promise();
     },
 

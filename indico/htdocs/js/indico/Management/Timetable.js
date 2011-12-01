@@ -1107,7 +1107,10 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                         }
 
                         var value = self.getChosenValue();
-                        self.managementActions.moveToSession(self.eventData, value, 'drop');
+                        self.managementActions.moveToSession(self.eventData, value, 'drop').done(
+                            function() {
+                                self.close();
+                            });
                     }],
                     [$T('Cancel'), function() {
                         self.close();
