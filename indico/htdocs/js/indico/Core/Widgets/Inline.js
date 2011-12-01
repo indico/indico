@@ -376,6 +376,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
                 to the widgets or not (useful for
                 distinguishing initialization)*/
 
+
              var self = this;
              var widget = this.items[state];
              if (widget.IWidget) {

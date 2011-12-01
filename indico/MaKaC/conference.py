@@ -6862,8 +6862,8 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         return self.id
 
     def getUniqueId( self ):
-        """returns (string) the unique identiffier of the item"""
-        """used mainly in the web session access key table"""
+        """Returns (string) the unique identiffier of the item.
+           Used mainly in the web session access key table"""
         return "%sl%s" % (self.getSession().getUniqueId(),self.id)
 
     def setTitle( self, newTitle ):

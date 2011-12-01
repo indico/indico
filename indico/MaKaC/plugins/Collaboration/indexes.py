@@ -371,7 +371,12 @@ class BookingConferenceIndex(Persistent):
     def indexBooking(self, booking, conference, key):
         if not key in self._tree:
             self._tree[key] = (conference, set())
-        self._tree[key][1].add(booking)
+        #self._tree[key][1].add(booking)
+        # for some reason we need to get the set, append the object, and re-add it to the index
+        # otherwise it is not saving it in the DB
+        s=self._tree[key][1]
+        s.add(booking)
+        self._tree[key] = (conference, s)
         self._tree._p_changed = 1
         self._numberOfBookings = self._numberOfBookings + 1
 

@@ -125,7 +125,7 @@
 
     customText: function(booking) {
         if (!booking.error) {
-            return $T("Extension: ") + booking.extension;
+            return $T("Ext: ") + booking.extension + $T("; Linked to: ") + Util.truncate(booking.linkVideoText, 15);
         } else {
             return '';
         }

@@ -185,4 +185,3 @@ class HtmlForbiddenTag(MaKaCError):
     """
     """
     pass
-

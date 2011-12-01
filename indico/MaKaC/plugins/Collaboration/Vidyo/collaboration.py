@@ -29,7 +29,6 @@ from MaKaC.plugins.Collaboration.Vidyo.fossils import ICSBookingConfModifFossil,
     ICSBookingIndexingFossil
 from MaKaC.common.utils import unicodeLength
 from MaKaC.common.timezoneUtils import nowutc
-from datetime import timedelta
 from MaKaC.common.logger import Logger
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
@@ -58,8 +57,6 @@ class CSBooking(CSBookingBase):
 
     _hasEventDisplay = True
 
-    _serviceInformation = ServiceInformation() # See method getSections()
-
     _commonIndexes = ["All Videoconference"]
 
     _simpleParameters = {
@@ -68,7 +65,7 @@ class CSBooking(CSBookingBase):
         "displayPin": (bool, False),
         "displayURL": (bool, True),
         "displayPhoneNumbers": (bool, True),
-        "videoLinkType": (str, ''),
+        "videoLinkType": (str, 'event'),
         "videoLinkContribution": (str, ''),
         "videoLinkSession": (str, '')}
 
@@ -95,7 +92,7 @@ class CSBooking(CSBookingBase):
         return False
 
     def canBeConnected(self):
-        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject(self._linkVideoId))!=""
+        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject())!=""
 
     def canBeDeleted(self):
         return True
@@ -157,20 +154,20 @@ class CSBooking(CSBookingBase):
         return self._generateLinkVideoText()
 
     def getLinkVideoRoomLocation(self):
-        linkObject = self.getLinkObject(self._linkVideoId)
-        return linkObject.getRoom().getName() if linkObject.getRoom() else ""
+        linkObject = self.getLinkObject()
+        return linkObject.getRoom().getName() if linkObject and linkObject.getRoom() else ""
 
     def getEndDate(self):
         """ Returns the end date of the link object
         """
-        linkObject = self.getLinkObject(self._linkVideoId)
-        return linkObject.getAdjustedEndDate()
+        linkObject = self.getLinkObject()
+        return linkObject.getEndDate()
 
     def getStartDate(self):
         """ Returns the start date of the link object
         """
-        linkObject = self.getLinkObject(self._linkVideoId)
-        return linkObject.getAdjustedStartDate()
+        linkObject = self.getLinkObject()
+        return linkObject.getStartDate()
 
     def getRoomId(self):
         """ The Viydo internal room id for this booking
@@ -212,20 +209,13 @@ class CSBooking(CSBookingBase):
     def setChecksDone(self, checksDone):
         self._checksDone = checksDone
 
-    def hasBookingInformation(self):
-        """ Determines whether this booking has further information associated
-            with it, i.e. a ServiceInformation attribute, for populating
-            drop-down 'more info.
-        """
-        return hasattr(self, "_serviceInformation")
-
     def getBookingInformation(self):
         """ For retreiving the ServiceInformation sections dict built for the
             Event Header, delegated here for use with Vidyo only at this time.
             If event linking is required for other video services, this will
             need to be moved to parent or some other mechanism implemented.
         """
-        return self._serviceInformation.getInformation(self, True)
+        return ServiceInformation().getInformation(self, True)
 
     ## overriding methods
     def _getTitle(self):
@@ -255,22 +245,21 @@ class CSBooking(CSBookingBase):
 
         return False
 
-    def getLinkObject(self, linkVideoId):
+    def getLinkObject(self):
         import re
 
-        confId = re.search('(?<=a)\d+', linkVideoId)
-        sessId = re.search('(?<=s)\d+', linkVideoId)
-        slotId = re.search('(?<=l)\d+', linkVideoId)
-        contId = re.search('(?<=t)\d+', linkVideoId)
+        if self.getLinkId():
+            sessId = re.search('(?<=s)\d+', self._linkVideoId)
+            slotId = re.search('(?<=l)\d+', self._linkVideoId)
+            contId = re.search('(?<=t)\d+', self._linkVideoId)
+        else:
+            return self._conf
 
-        from MaKaC.conference import ConferenceHolder
-        ch = ConferenceHolder()
-        conf = ch.getById(confId.group())
-        linkObject = conf
+        linkObject = self._conf
         if contId:
-            linkObject = conf.getContributionById(contId.group())
+            linkObject = self._conf.getContributionById(contId.group())
         elif sessId:
-            session = conf.getSessionById(sessId.group())
+            session = self._conf.getSessionById(sessId.group())
             if session is not None:
                 linkObject = session.getSlotById (slotId.group())
         return linkObject
@@ -281,7 +270,9 @@ class CSBooking(CSBookingBase):
         if self.hasSessionOrContributionLink():
             title = ""
 
-            linkObject = self.getLinkObject(self._linkVideoId)
+            linkObject = self.getLinkObject()
+            if linkObject is None:
+                return _("Removed %s")%_("contribution") if self.isLinkedToContribution() else _("session")
             if self.isLinkedToContribution():
                 title = linkObject.getTitle()
             else:
@@ -350,7 +341,7 @@ class CSBooking(CSBookingBase):
     def _connect(self):
         self._checkStatus()
         if self.canBeConnected():
-            confRoomIp = VidyoTools.getLinkRoomIp(self._conf if self._linkVideoType==None else self.getLinkObject(self._linkVideoId))
+            confRoomIp = VidyoTools.getLinkRoomIp(self.getLinkObject())
             if confRoomIp == "":
                 return VidyoError("noValidConferenceRoom", "connect")
             prefixConnect = getVidyoOptionValue("prefixConnect")

@@ -147,7 +147,7 @@ class CSBookingManager(Persistent, Observer):
         if sorted:
             keys.sort(key = lambda k: int(k))
 
-        bookingList = [self._bookings[k] for k in keys]
+        bookingList = [self._bookings[k] for k in keys if not self._bookings[k].hasSessionOrContributionLink() or self._bookings[k].getLinkObject()]
 
         #we notify all the bookings that they have been viewed. If a booking doesn't need to be viewed, nothing will happen
         if notify:
@@ -208,24 +208,24 @@ class CSBookingManager(Persistent, Observer):
             import re
             regExp = re.match(r"""(s[0-9a]*)(l[0-9]*)""", sessSlotId)
             if not regExp:
-                raise NoReportError(_('No session has been passed when the type is session.'))
+                raise CollaborationException(_('No session has been passed when the type is session.'))
             sessionId = regExp.group(1)[1:]
             slotId = regExp.group(2)[1:]
             session = self._conf.getSessionById(sessionId)
             if session is None:
-                raise NoReportError(_('The session does not exist.'))
+                raise CollaborationException(_('The session does not exist.'))
             slot = session.getSlotById(slotId)
             if slot is None:
-                raise NoReportError(_('The session does not exist.'))
+                raise CollaborationException(_('The session does not exist.'))
             return slot.getUniqueId()
 
         elif bookingParams.get('videoLinkType',"") == "contribution":
             contId = bookingParams.get("videoLinkContribution","")
             if contId == "":
-                raise NoReportError(_('No contribution has been passed when the type is contribution.'))
+                raise CollaborationException(_('No contribution has been passed when the type is contribution.'))
             cont = self._conf.getContributionById(contId)
             if cont is None:
-                raise NoReportError(_('The contribution does not exist.'))
+                raise CollaborationException(_('The contribution does not exist.'))
             return cont.getUniqueId()
 
         return self._conf.getUniqueId()
@@ -353,7 +353,7 @@ class CSBookingManager(Persistent, Observer):
                     if self.hasVideoService(booking.getLinkId(), booking):
                         pass # No change in the event linking
                     elif newLinkId is not None:
-                        if (self.hasVideoService(newLinkId)): # Only one booking per item
+                        if (self.hasVideoService(newLinkId) and bookingParams.has_key("videoLinkType") and bookingParams.get("videoLinkType","") != "event"): # Restriction: 1 video service per session or contribution.
                             raise NoReportError(_('Only one video service per contribution or session is allowed.'))
                         else:
                             self.addVideoService(newLinkId, booking)

@@ -11,8 +11,6 @@
         </a>
     </span>
 </span>
-% if video.hasBookingInformation():
-    <script type="text/javascript">
-        videoServiceInfo["${video.getId()}"] = drawBookingPopup(${jsonEncode(video.getBookingInformation())}, ${conf.getId()},'${video.getId()}', ${jsonEncode(conf.canModify(self_._rh._aw) and video.getOwner()["id"] != self_._rh._getUser().getId())});
-    </script>
-% endif
+<script type="text/javascript">
+    videoServiceInfo["${video.getId()}"] = drawBookingPopup(${jsonEncode(video.getBookingInformation())}, ${conf.getId()},'${video.getId()}', ${jsonEncode(conf.canModify(self_._rh._aw) and video.getOwner()["id"] != self_._rh._getUser().getId())});
+</script>

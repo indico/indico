@@ -180,7 +180,7 @@ H.323 device. To use it in your PC,  you need the Vidyo client installed and a
 webcam and audio device connected (please go to `recommendations page <http://it-multimedia.web.cern.ch/it-multimedia/collaborative/recommendations.php>`_
 for videoconferencing PC hardware).
 
-The ongoing Vidyo videoconferences can be associated to an Indico event and its sessions and contributions, and will appear like
+The ongoing Vidyo videoconferences associated to an Indico event (or sessions or contributions) will appear like
 this:
 
 |image16|
@@ -189,7 +189,7 @@ The information related to the Vidyo videoconferences associated to the event wi
 
 |image12|
 
-If you are not the moderator of the Vidyo videoconference associated and you are manager of the event the link *Make me moderator* will be shown:
+If you are not the moderator of the Vidyo videoconference associated and you are manager of the event, the link *Make me moderator* will be shown:
 
 |image17|
 

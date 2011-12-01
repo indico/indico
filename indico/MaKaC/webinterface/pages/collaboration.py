@@ -298,10 +298,16 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         vars["UserIsAdmin"] = RCCollaborationAdmin.hasRights(user = self._user) or RCCollaborationPluginAdmin.hasRights(user = self._user, plugins = self._tabPlugins)
 
         hasCreatePermissions = {}
+        videoServSupport = {}
         for plugin in plugins:
-            hasCreatePermissions[plugin.getName()] = RCVideoServicesUser.hasRights(user = self._user, pluginName = plugin.getName())
-
+            pname = plugin.getName()
+            hasCreatePermissions[pname] = RCVideoServicesUser.hasRights(user = self._user, pluginName = pname)
+            videoServSupport[pname] = plugin.getOption("contactSupport").getValue() if plugin.hasOption("contactSupport") else ""
         vars["HasCreatePermissions"] = hasCreatePermissions
+        vars["VideoServiceSupport"] = videoServSupport
+
+
+
 
         singleBookingForms = {}
         multipleBookingForms = {}

@@ -197,6 +197,8 @@ class VidyoTools(object):
 
     @classmethod
     def getLinkRoomIp(cls, linkVideo):
+        if linkVideo is None:
+            return ""
         location = linkVideo.getLocation()
         room = linkVideo.getRoom()
         roomIp = ""
@@ -257,7 +259,7 @@ class VidyoError(CSErrorBase):
                 return _("This Public room could not be created or changed because Vidyo considers the resulting public room name as duplicated.")
 
             elif self._errorType == "badOwner":
-                return _("This Public room could not be created or changed because the specified owner does not have a Vidyo account.")
+                return _("This Public room could not be created or changed because the specified moderator does not have a Vidyo account.")
 
             elif self._errorType == "unknownRoom" and self._operation == "delete":
                 return _("This Public room could not be deleted because it did not exist.")

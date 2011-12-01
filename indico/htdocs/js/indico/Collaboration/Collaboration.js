@@ -1193,7 +1193,6 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                                     }
                                 } else {
                                     killProgress();
-                                    self.close();
                                     IndicoUtil.errorReport(error);
                                 }
                             }
@@ -1228,7 +1227,6 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                                     }
                                 } else {
                                     killProgress();
-                                    self.close();
                                     IndicoUtil.errorReport(error);
                                 }
                             }
@@ -1294,9 +1292,10 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
 
 var checkPermissions = function(pluginName, action) {
     if(!hasCreatePermissions[pluginName]){
-        CSErrorPopup($T("User has not permissions"),
-                [$T("You do not have enough permissions to " + action + " " + pluginName + " bookings." ),
-                 $T("If you think that you should have permissions please contact to " + pluginName + " support." )]);
+        var psupport = videoServiceSupport[pluginName]?videoServiceSupport[pluginName]:pluginName + " support.";
+        new WarningPopup($T("User has not permissions"),
+                $T("You do not have enough permissions to " + action + " " + pluginName + " bookings. " +
+                 "If you think that you should have permissions please contact " + psupport) ).open();
         return false;
         }
     return true;
@@ -1999,6 +1998,9 @@ var makeMeModerator = function(videoLink, confId, bookingId, successFunction) {
             function(result, error){
                   if (exists(error)) {
                       IndicoUtil.errorReport(error);
+                  } else if (exists(result.error) && result.error) {
+                      $('.ui-tooltip').qtip('hide');
+                      new WarningPopup($T("Cannot become moderator"), result.userMessage).open();
                   } else {
                       successFunction(videoLink, result);
                   }

@@ -1279,9 +1279,9 @@ In the *Basic* tab, you should fill in the following fields:
 
 - *Description* : this is the description of room
 
-- *Event linking* : this is the link of the room. It can be the event, a session or a contribution. The event can be linked to several rooms. However the sessions and contributions can be linked only to one room.
+- *Event linking* : one can link a vidyo booking to the event (default), a session or a contribution. The event can be linked to several vidyo rooms, however the sessions and contributions can be linked only to one vidyo room
 
-- *Moderator* : this is the person who will own the room. The moderator will be the room responsible and the meeting moderator
+- *Moderator* : The moderator will be the room responsible and will own the rights to moderate the vidyo room
 
 - *PIN* : this is the code to protect the room
 
@@ -1326,7 +1326,7 @@ The details given are:
 
 - *Extension* : this is the numeric extension of the room, that gives another possibility of joining it. If one is logged in the Vidyo portal, one can join a room by entering the extension in the field "Select from list or Enter name to call"
 
-- *Room moderator* : this is the owner of the room, which has moderator rights.
+- *Room moderator* : this is the owner of the room, which has moderation rights.
 
 - *PIN* : this is the code to protect the room
 
@@ -1345,7 +1345,7 @@ The details given are:
 - *Last modified on* : this shows the last time that the
   booking information was modified.
 
-- *Linked to* : this is the link of the room: the event, a session or a contribution.
+- *Linked to* : this is the link of the vidyo room: it can be the event, a session or a contribution.
 
 Also, in case of problems, there will be information in red in the
 details. More on that in section
@@ -1369,7 +1369,7 @@ to launch the Vidyo client and have your PC join the videoconference
 automatically.
 
 8. |figure81| button (*connect room* ). Press this button
-to launch the Vidyo client in the conferences/session/contribution room. In order to have this button enabled the link has to be in a capable Vidyo room.
+to launch the Vidyo client in the conferences/session/contribution physical room. In order to have this button enabled the room has to be a capable Vidyo room.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Problems when creating or modifying a Vidyo booking
