@@ -1867,7 +1867,7 @@ class FileInput(FieldInputType):
         # if 'str': it means that we are receiving the name of the already existing file. Do not modify.
         # if file descriptor: replace previous file with new one
         # if 'empty' value: just remove
-        elif isinstance(v, str):
+        elif not isinstance(v, str):
             # delete
             registrant.deleteFile(item.getValue().getId())
             item.setValue(None)

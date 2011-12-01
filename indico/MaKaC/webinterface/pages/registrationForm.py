@@ -2597,6 +2597,10 @@ class WConfRegistrationFormSignIn(wcomponents.WTemplated):
 class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NERegistrationFormModify
 
+    def getJSFiles(self):
+        return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+               self._includeJSPackage('Management')
+
     def _getBody( self, params ):
         wc = WConfRegistrationFormModify( self._conf, self._rh._getUser() )
         pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
