@@ -1000,6 +1000,10 @@ class CategoryDateIndexLtd(CategoryDateIndex):
 
 class CategoryDayIndex(CategoryDateIndex):
 
+    def __init__(self, visibility=True):
+        super(CategoryDayIndex, self).__init__()
+        self._useVisibility = visibility
+
     def _indexConf(self, categid, conf):
         # only the more restrictive setup is taken into account
         if self._idxCategItem.has_key(categid):
@@ -1016,10 +1020,10 @@ class CategoryDayIndex(CategoryDateIndex):
     def indexConf(self, conf):
         level = 0
         for categ in conf.getOwnerPath():
-            if conf.getFullVisibility() > level:
+            if not self._useVisibility or conf.getFullVisibility() > level:
                 self._indexConf(categ.getId(),conf)
             level+=1
-        if conf.getFullVisibility() > level:
+        if not self._useVisibility or conf.getFullVisibility() > level:
             self._indexConf("0",conf)
 
     def buildIndex(self):
@@ -1220,7 +1224,7 @@ class IndexesHolder( ObjectHolder ):
     counterName = None
     __allowedIdxs = [ "email", "name", "surName", "organisation", "group",
                     "status", "calendar", "category", "categoryDate",
-                    "categoryName",
+                    "categoryDateAll", "categoryName",
                     "pendingSubmitters",
                     "pendingSubmittersTasks", "pendingManagers",
                     "pendingManagersTasks", "pendingCoordinators",

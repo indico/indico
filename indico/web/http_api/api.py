@@ -489,7 +489,7 @@ class CategoryEventFetcher(DataFetcher):
         return fossil
 
     def category(self, idlist):
-        idx = IndexesHolder().getById('categoryDate')
+        idx = IndexesHolder().getById('categoryDateAll')
 
         filter = None
         if self._room or self._location or self._eventType:

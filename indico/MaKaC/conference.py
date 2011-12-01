@@ -840,6 +840,8 @@ class Category(CommonObjectBase):
         catIdx.reindexCateg(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateIdx.reindexCateg(self)
+        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
+        catDateAllIdx.reindexCateg(self)
 
     def isRoot( self ):
         #to be improved
@@ -969,13 +971,16 @@ class Category(CommonObjectBase):
     def move( self, newOwner ):
         oldOwner = self.getOwner()
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
+        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
 
         catDateIdx.unindexCateg(self)
+        catDateAllIdx.unindexCateg(self)
 
         self.getOwner()._removeSubCategory( self )
         newOwner._addSubCategory( self )
         self._reindex()
         catDateIdx.indexCateg(self)
+        catDateAllIdx.indexCateg(self)
 
         self._notify('moved', oldOwner, newOwner)
 
@@ -2411,7 +2416,9 @@ class Conference(CommonObjectBase, Locatable):
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.reindexConf(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
+        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
         catDateIdx.reindexConf(self)
+        catDateAllIdx.reindexConf(self)
 
     def isClosed( self ):
         try:
@@ -2430,7 +2437,9 @@ class Conference(CommonObjectBase, Locatable):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.indexConf(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
+        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
         catDateIdx.indexConf(self)
+        catDateAllIdx.indexConf(self)
 
         Catalog.getIdx('categ_conf_sd').index_obj(self)
 
@@ -2438,7 +2447,9 @@ class Conference(CommonObjectBase, Locatable):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.unindexConf(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
+        catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
         catDateIdx.unindexConf(self)
+        catDateAllIdx.unindexConf(self)
 
         Catalog.getIdx('categ_conf_sd').unindex_obj(self)
 

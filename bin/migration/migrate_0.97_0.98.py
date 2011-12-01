@@ -315,6 +315,19 @@ If you still want to regenerate it, please, do it manually using """ \
         """bin/migration/CategoryDate.py"""
 
 
+@since('0.98b2')
+def categoryDateIndexWithoutVisibility(dbi, withRBDB, prevVersion):
+    """
+    Create category date indexe without visiblity.
+    """
+    IndexesHolder()._getIdx()['categoryDate']._useVisibility = True
+    if 'categoryDateAll' not in IndexesHolder()._getIdx():
+        newIdx = CategoryDayIndex(visibility=False)
+        newIdx.buildIndex()
+        IndexesHolder()._getIdx()['categoryDateAll'] = newIdx
+
+
+
 @since('0.98b', always=True)
 def catalogMigration(dbi, withRBDB, prevVersion):
     """
