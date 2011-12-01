@@ -402,7 +402,7 @@ type("JTabWidget", ["IWidget"], {
             cursor: 'pointer',
             zIndex: 100,
             position: 'absolute',
-            top: '4px',
+            top: '1px',
             height: '26px'
         };
 

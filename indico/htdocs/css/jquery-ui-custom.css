@@ -77,6 +77,10 @@
     outline: none;
 }
 
+.ui-tabs .ui-tabs-nav {
+    padding: 0;
+}
+
 .ui-tabs .ui-tabs-nav .ui-state-disabled {
     display: none;
 }
@@ -102,6 +106,9 @@
     -moz-border-radius-topright: 0px;
     -webkit-border-top-right-radius: 0px;
     border-top-right-radius: 0px;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
 }
 
 .ui-tabs {
@@ -112,7 +119,6 @@
 
 .ui-tabs .ui-tabs-nav {
     margin: 0;
-    padding: .2em 0 0 !important;
 }
 
 .ui-tabs .ui-tabs-nav li a {
