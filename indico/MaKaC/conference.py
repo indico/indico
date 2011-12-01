@@ -3528,8 +3528,11 @@ class Conference(CommonObjectBase, Locatable):
         contributions.sort(key = lambda c: c.getId())
         return contributions
 
-    def getNumberOfContributions(self):
-        return len(self.contributions)
+    def getNumberOfContributions(self, only_scheduled=False):
+        if only_scheduled:
+            return len(filter(lambda c: c.isScheduled(), self.contributions.itervalues()))
+        else:
+            return len(self.contributions)
 
     def getProgramDescription(self):
         try:
@@ -6144,8 +6147,11 @@ class Session(CommonObjectBase, Locatable):
     def getContributionList( self ):
         return self.contributions.values()
 
-    def getNumberOfContributions( self ):
-        return len(self.contributions)
+    def getNumberOfContributions(self, only_scheduled=False):
+        if only_scheduled:
+            return len(filter(lambda c: c.isScheduled(), self.contributions.itervalues()))
+        else:
+            return len(self.contributions)
 
     def canIPAccess( self, ip ):
         if not self.__ac.canIPAccess( ip ):

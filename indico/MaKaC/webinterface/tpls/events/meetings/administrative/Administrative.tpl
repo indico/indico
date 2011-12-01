@@ -86,7 +86,7 @@
                     % endif
                     <%include file="${INCLUDEADM}/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=self.attr.showOrder"/>
                     % if getItemType(item) == "Session":
-                        <% order += item.getSession().getNumberOfContributions() %>
+                        <% order += item.getSession().getNumberOfContributions(only_scheduled=True) %>
                     % elif getItemType(item) == "Contribution":
                         <% order +=1 %>
                     % endif
