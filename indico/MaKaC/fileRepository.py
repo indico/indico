@@ -36,6 +36,7 @@ from MaKaC.common.Counter import Counter
 
 from MaKaC.common.logger import Logger
 from MaKaC.review import Abstract
+from MaKaC.registration import Registrant
 
 class Repository:
     """Generic class for file repositories. A file repository knows where to
@@ -138,9 +139,12 @@ class MaterialLocalRepository(Persistent):
             session = None
             cont = None
             subcont = None
+            registrant = None
 
             if (isinstance(newFile.getOwner(), Abstract)):
                 abstract = newFile.getOwner()
+            elif (isinstance(newFile.getOwner(), Registrant)):
+                registrant = newFile.getOwner()
             else:
                 session = newFile.getSession()
                 cont = newFile.getContribution()
@@ -165,6 +169,9 @@ class MaterialLocalRepository(Persistent):
             elif abstract:
                 #the file is attach to an abstract. Then create a directory for the abstract
                 interPath = os.path.join( interPath, "abs%s"%abstract.getId())
+            elif registrant:
+                #the file is attach to a a registrant. Then create a directory for the registrant
+                interPath = os.path.join( interPath, "reg%s"%registrant.getId())
             else:
                 #the file is attach directly to the conference, then don't add directory
                 pass

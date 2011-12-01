@@ -4002,6 +4002,9 @@ class UHRegistrantDataModification( URLHandler ):
 class UHRegistrantPerformDataModification( URLHandler ):
     _relativeURL = "confModifRegistrants.py/performDataModification"
 
+class UHRegistrantAttachmentFileAccess(URLHandler):
+    _relativeURL = "confModifRegistrants.py/getAttachedFile"
+
 class UHConfModifRegFormEnableSection( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/enableSection"
 

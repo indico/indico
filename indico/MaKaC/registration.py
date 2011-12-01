@@ -42,7 +42,7 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.webinterface.common.countries import CountryHolder
 import re
-
+import tempfile, os
 import string
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 
@@ -566,6 +566,8 @@ class RegistrationForm(Persistent):
         for mg in reg.getMiscellaneousGroupList():
             for item in mg.getResponseItemList():
                 item.getGeneralField().getInput()._beforeValueChange(item, False)
+        for attachment in reg.getAttachments().keys():
+            reg.deleteFile(attachment)
 
     def delete(self):
         self.getSessionsForm().clearSessionList()
@@ -1832,6 +1834,54 @@ class YesNoInput(FieldInputType):
                 </tr>""")%(self._parent.getPlacesLimit())
         return html
 
+class FileInput(FieldInputType):
+    _id="file"
+
+    def getName(cls):
+        return "File"
+    getName=classmethod(getName)
+
+    def getValueDisplay(self, value):
+        return """<a href="%s" target="_blank">%s</a>"""%(urlHandlers.UHRegistrantAttachmentFileAccess.getURL(value), value.getFileName())
+
+    def _getModifHTML(self, item, registrant, default=None):
+        from MaKaC.webinterface.pages.registrationForm import WFileInputField
+
+        wc = WFileInputField(self, item, default)
+        return wc.getHTML()
+
+    def _setResponseValue(self, item, params, registrant, override=False):
+        v=params.get(self.getHTMLName(),"")
+        valueEmpty = v.strip() == "" if isinstance(v, str) else v.filename==""
+        if not override and self.getParent().isMandatory() and valueEmpty:
+            raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())
+
+        item.setMandatory(self.getParent().isMandatory())
+        item.setHTMLName(self.getHTMLName())
+
+        # Create or modify when was not set in the creation
+        if item.getValue () == None:
+            # there is a value
+            if not valueEmpty:
+                file = registrant.saveFile(v)
+                item.setValue(file)
+        # modify when there was a value before
+        elif not isinstance(v, str):
+            if  item.getValue().getFileName() != v.filename:
+                # delete
+                registrant.deleteFile(item.getValue().getId())
+                item.setValue(None)
+                if not valueEmpty:
+                    file = registrant.saveFile(v)
+                    item.setValue(file)
+
+    def _getSpecialOptionsHTML(self):
+        return ""
+
+    def clone(self, gf):
+        ti = FieldInputType.clone(self, gf)
+        return ti
+
 class RadioItem(Persistent):
 
     def __init__(self, parent):
@@ -2548,6 +2598,7 @@ class FieldInputs:
                       CountryInput.getId(): CountryInput, \
                       DateInput.getId(): DateInput, \
                       TelephoneInput.getId(): TelephoneInput, \
+                      FileInput.getId(): FileInput
                      }
 
     def getAvailableInputs(cls):
@@ -4484,7 +4535,7 @@ class Registrant(Persistent):
 
 
         self._randomId = self._generateRandomId()
-
+        self._attachmentsCounter = Counter()
     def isPayedText(self):
         if self.getPayed() :
             return "Yes"
@@ -4957,8 +5008,8 @@ class Registrant(Persistent):
 
     def removeStatus(self, s):
         if self.getStatuses().has_key(s.getId()):
-           del self.getStatuses()[s.getId()]
-           self.notifyModification()
+            del self.getStatuses()[s.getId()]
+            self.notifyModification()
 
     def getStatusById(self, id):
         v=self.getStatuses().get(id, None)
@@ -4969,6 +5020,74 @@ class Registrant(Persistent):
                 v.setStatusValue(st.getDefaultValue())
             self.addStatus(v)
         return v
+
+    def setModificationDate(self):
+        pass
+
+    def canIPAccess(self, ip):
+        return self.getOwner().canIPAccess(ip)
+
+    def isProtected(self):
+        return self.getOwner().isProtected()
+
+    def getAttachments(self):
+        try:
+            if self._attachments:
+                pass
+        except AttributeError:
+            self._attachments = {}
+        return self._attachments
+
+    def getAttachmentList(self):
+        return self.getAttachments().values()
+
+    def getAttachmentById(self, id):
+        return self.getAttachments().get(id, None)
+
+    def _getAttachmentsCounter(self):
+        try:
+            if self._attachmentsCounter:
+                pass
+        except AttributeError:
+            self._attachmentsCounter = Counter()
+        return self._attachmentsCounter.newCount()
+
+    def __addFile(self, file):
+        file.archive(self.getConference()._getRepository())
+        self.getAttachments()[file.getId()] = file
+        self.notifyModification()
+
+    def saveFile(self, fileUploaded):
+        from MaKaC.conference import LocalFile
+        cfg = Config.getInstance()
+        tempPath = cfg.getUploadedFilesTempDir()
+        tempFileName = tempfile.mkstemp(suffix="IndicoRegistrant.tmp", dir=tempPath)[1]
+        f = open(tempFileName, "wb")
+        f.write(fileUploaded.file.read() )
+        f.close()
+        file = LocalFile()
+        file.setFileName(fileUploaded.filename)
+        file.setFilePath(tempFileName)
+        file.setOwner(self)
+        file.setId(self._getAttachmentsCounter())
+        self.__addFile(file)
+        return file
+
+    def deleteFile(self, fileId):
+        file = self.getAttachments()[fileId]
+        file.delete()
+        del self.getAttachments()[fileId]
+        self.notifyModification()
+
+    def removeResource(self, res):
+        """Necessary because LocalFile.delete (see _deleteFile) is calling this method.
+        In our case, nothing to do.
+        """
+        pass
+
+    def canUserModify(self, user):
+        return self.getConference().canUserModify( user ) or user == self.getAvatar()
+
 
 class BilledItemsWrapper(object):
 

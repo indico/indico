@@ -27,7 +27,6 @@ from MaKaC import registration
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from MaKaC.webinterface.common.currency import CurrencyRegistry
 from MaKaC.common import Configuration
 from datetime import timedelta
 from MaKaC.common.timezoneUtils import nowutc
@@ -2685,4 +2684,26 @@ class WConfRegistrationFormConditions(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["conditions"]=self._conf.getModPay().getConditions()
+        return vars
+
+class WFileInputField(wcomponents.WTemplated):
+
+    def __init__(self, field, item, default = None ):
+        self._field = field
+        self._item = item
+        self._default = default
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars( self )
+        vars["field"] = self._field
+
+        htmlName = self._field.getHTMLName()
+        value = self._default
+
+        if self._item is not None:
+            value =self._item.getValue() if self._item.getValue() else None
+            htmlName = self._item.getHTMLName()
+
+        vars["value"] = value
+        vars["htmlName"] = htmlName
         return vars

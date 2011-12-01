@@ -90,3 +90,6 @@ def modifyStatuses(req, **params):
 
 def performModifyStatuses(req, **params):
     return registrantsModif.RHRegistrantStatusesPerformModify( req ).process( params )
+
+def getAttachedFile(req, **params):
+    return registrantsModif.RHGetAttachedFile( req ).process(params)

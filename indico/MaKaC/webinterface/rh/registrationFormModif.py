@@ -34,8 +34,6 @@ class RHRegistrationFormModifBase( conferenceModif.RHConferenceModifBase ):
             conferenceModif.RHConferenceModifBase._checkProtection(self)
         if self._target.getConference().isClosed():
             raise ConferenceClosedError(self._target.getConference())
-        if not self._conf.hasEnabledSection("regForm"):
-            raise MaKaCError( _("The registration form was disabled by the conference managers"))
 
 
 class RHRegistrationPreview ( RHRegistrationFormModifBase ):

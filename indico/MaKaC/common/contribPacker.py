@@ -403,3 +403,34 @@ class ReviewingPacker:
                                                      self._normalisePathItem(contribution.getId()) + "-" + dirName,
                                                      self._normalisePathItem(res.getFileName()))),
                                         res.getFilePath())
+
+
+class RegistrantPacker:
+    """
+    """
+
+    def __init__(self,conf):
+        self._conf=conf
+        self._items=0
+
+    def getItems(self):
+        return self._items
+
+    def _normalisePathItem(self,name):
+        return str(name).translate(string.maketrans("",""),"\\/")
+
+    def pack(self,regList=[], fileHandler=None):
+        if len(regList)<=0:
+            raise MaKaCError( _("no registrant to pack"))
+        for registrant in regList:
+            for attachment in registrant.getAttachmentList():
+                if isinstance(attachment,conference.LocalFile):
+                    self._items += 1
+                    fileHandler.add("%s/%s-%s-%s"%(\
+                        self._normalisePathItem(registrant.getId()),
+                        self._normalisePathItem(registrant.getId()),
+                        self._normalisePathItem(attachment.getId()),
+                        self._normalisePathItem(attachment.getFileName())),
+                    attachment.getFilePath())
+        fileHandler.close()
+        return fileHandler.getPath()

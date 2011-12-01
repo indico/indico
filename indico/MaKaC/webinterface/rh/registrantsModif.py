@@ -22,13 +22,14 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrants as registrants
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
+from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 import MaKaC.webinterface.mail as mail
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.export.excel import RegistrantsListToExcel
 from MaKaC.common import filters
 import MaKaC.webinterface.common.regFilters as regFilters
 from MaKaC.common import Config
-from MaKaC.errors import FormValuesError
+from MaKaC.errors import FormValuesError, NoReportError
 from MaKaC.common import utils
 from MaKaC.registration import SocialEvent, MiscellaneousInfoGroup
 from MaKaC.webinterface.common import registrantNotificator
@@ -37,6 +38,7 @@ from MaKaC import epayment
 from MaKaC.i18n import _
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.webinterface.rh import registrationFormModif
+from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
 import re
 
@@ -277,6 +279,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         self._reglist = params.get("reglist","").split(",")
         self._display = self._normaliseListParam(params.get("disp",[]))
         self._printBadgesSelected = params.has_key("printBadgesSelected")
+        self._package = params.has_key("PKG")
 
     def _process( self ):
         if self._addNew:
@@ -330,6 +333,13 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
                 return wp.display()
             else:
                 self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
+        elif self._package:
+            regs =[]
+            for reg in self._selectedRegistrants:
+                if self._conf.getRegistrantById(reg) !=None:
+                    regs.append(self._conf.getRegistrantById(reg))
+            r = RHRegistrantPackage(self, self._conf,regs)
+            return r.pack()
         else:
             self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
 
@@ -497,6 +507,23 @@ class RHRegistrantSendEmail( RHRegistrationFormModifBase ):
         else:
             self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
 
+class RHRegistrantPackage:
+
+    def __init__( self, rh, conf, reglist ):
+        self._conf = conf
+        self._list = reglist
+        self._rh = rh
+
+    def pack( self ):
+        from MaKaC.common.contribPacker import ZIPFileHandler,RegistrantPacker
+        p=RegistrantPacker(self._conf)
+        path=p.pack(self._list, ZIPFileHandler())
+        filename = "registrants.zip"
+        cfg = Config.getInstance()
+        mimetype = cfg.getFileTypeMimeType( "ZIP" )
+        self._rh._req.content_type = """%s"""%(mimetype)
+        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._rh._req.sendfile(path)
 
 class RHRegistrantPerformDataModification( RHRegistrantModifBase ):
 
@@ -790,3 +817,14 @@ class RHRegistrantStatusesPerformModify( RHRegistrantModifBase ):
                     rst=self._registrant.getStatusById(stkey)
                     rst.setStatusValue(v)
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
+
+
+class RHGetAttachedFile(RHFileAccess, RHRegistrationFormModifBase):
+
+    def _checkProtection( self ):
+
+        if(self._target.getOwner().getAvatar() != self.getAW().getUser()):
+            tempTarget = self._target
+            self._target = self._conf
+            RHRegistrationFormModifBase._checkProtection(self)
+            self._target = tempTarget
