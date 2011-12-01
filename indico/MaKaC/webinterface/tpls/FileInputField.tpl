@@ -24,6 +24,9 @@ var existingAttachment = Html.div({}, $('${field.getValueDisplay(value) if value
 
 $(imageRemove.dom).click(function(e) {
     $E("newAttachment${htmlName}").set(uploadFileInput);
+    % if field._parent.isMandatory():
+        addParam($E('${htmlName}'), 'text', false);
+    % endif
 });
 
 % if value:

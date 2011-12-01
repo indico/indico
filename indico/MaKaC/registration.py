@@ -1852,28 +1852,29 @@ class FileInput(FieldInputType):
 
     def _setResponseValue(self, item, params, registrant, override=False):
         v=params.get(self.getHTMLName(),"")
-        valueEmpty = v.strip() == "" if isinstance(v, str) else v.filename==""
-        if not override and self.getParent().isMandatory() and valueEmpty:
+        newValueEmpty = v.strip() == "" if isinstance(v, str) else v.filename==""
+        if not override and self.getParent().isMandatory() and newValueEmpty:
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())
 
         item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
-
-        # Create or modify when was not set in the creation
+        # There was no file saved on DB
         if item.getValue () == None:
-            # there is a value
-            if not valueEmpty:
-                file = registrant.saveFile(v)
-                item.setValue(file)
-        # modify when there was a value before
-        elif not isinstance(v, str):
-            if  item.getValue().getFileName() != v.filename:
-                # delete
-                registrant.deleteFile(item.getValue().getId())
-                item.setValue(None)
-                if not valueEmpty:
-                    file = registrant.saveFile(v)
-                    item.setValue(file)
+            if not newValueEmpty: # user submits a new file
+                f = registrant.saveFile(v)
+                item.setValue(f)
+        # There was already a file on DB
+        # if 'str': it means that we are receiving the name of the already existing file. Do not modify.
+        # if file descriptor: replace previous file with new one
+        # if 'empty' value: just remove
+        elif isinstance(v, str):
+            # delete
+            registrant.deleteFile(item.getValue().getId())
+            item.setValue(None)
+            # new file
+            if not newValueEmpty:
+                f = registrant.saveFile(v)
+                item.setValue(f)
 
     def _getSpecialOptionsHTML(self):
         return ""
@@ -5023,12 +5024,6 @@ class Registrant(Persistent):
 
     def setModificationDate(self):
         pass
-
-    def canIPAccess(self, ip):
-        return self.getOwner().canIPAccess(ip)
-
-    def isProtected(self):
-        return self.getOwner().isProtected()
 
     def getAttachments(self):
         try:

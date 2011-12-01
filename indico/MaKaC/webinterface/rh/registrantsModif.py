@@ -302,28 +302,28 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         elif self._tablePDF:
             regs =[]
             for reg in self._selectedRegistrants:
-                if self._conf.getRegistrantById(reg) !=None:
+                if self._conf.getRegistrantById(reg) != None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantListPDF(self,self._conf,regs, self._display)
             return r.pdf()
         elif self._bookPDF:
             regs =[]
             for reg in self._selectedRegistrants:
-                if self._conf.getRegistrantById(reg) !=None:
+                if self._conf.getRegistrantById(reg) != None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantBookPDF(self,self._conf,regs, self._display)
             return r.pdf()
         elif self._info:
             regs =[]
             for reg in self._selectedRegistrants:
-                if self._conf.getRegistrantById(reg) !=None:
+                if self._conf.getRegistrantById(reg) != None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantsInfo(self,self._conf,regs)
             return r.info()
         elif self._excel:
             regs =[]
             for reg in self._selectedRegistrants:
-                if self._conf.getRegistrantById(reg) !=None:
+                if self._conf.getRegistrantById(reg) != None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantListExcel(self,self._conf,regs, self._display, not self._linuxAgent)
             return r.excel()
@@ -336,7 +336,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         elif self._package:
             regs =[]
             for reg in self._selectedRegistrants:
-                if self._conf.getRegistrantById(reg) !=None:
+                if self._conf.getRegistrantById(reg) != None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantPackage(self, self._conf,regs)
             return r.pack()
@@ -823,7 +823,7 @@ class RHGetAttachedFile(RHFileAccess, RHRegistrationFormModifBase):
 
     def _checkProtection( self ):
 
-        if(self._target.getOwner().getAvatar() != self.getAW().getUser()):
+        if self._target.getOwner().getAvatar() != self._getUser() or self._getUser() is None:
             tempTarget = self._target
             self._target = self._conf
             RHRegistrationFormModifBase._checkProtection(self)
