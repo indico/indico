@@ -119,6 +119,9 @@ function goto_origin(data) {
 }
 
 $(function() {
+    if ($('#timetableDiv').data('mode') != 'management') {
+        return;
+    }
     $("body").bind('timetable_undo', function() {
         // global event handler, executes undo on whatever timetable is active at the time
 
