@@ -1364,7 +1364,7 @@ type("HistoryListener", [],
 type("ErrorAware", [],
      {
          _setElementErrorState: function(element, text) {
-             return IndicoUtil.markInvalidField(element, text)[1];
+             return IndicoUtil.markInvalidField(element, text);
          },
 
          setError: function(text) {

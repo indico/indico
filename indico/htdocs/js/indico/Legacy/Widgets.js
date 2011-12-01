@@ -297,35 +297,6 @@ IndicoUI.Widgets = {
         },
 
 
-        /**
-         * Creates an error tooltip at the specified position, by adding it to the document body with position: fixed
-         * Also returns the div with the tooltip.
-         * @param {Integer} mouseX
-         * @param {Integer} mouseX
-         * @param {String} content The content inside the tooltip, for example an Html.span()
-         * @param {String} klass The CSS class that will be applied to the div sourrounding the tooltip. If null, the default will be 'tooltip'
-         */
-        errorTooltip: function(mouseX, mouseY, content, klass) {
-            var div = Html.div({style:{top: pixels(mouseY),
-                left: pixels(mouseX),
-                marginTop: pixels(10),
-                marginLeft: pixels(10),
-                position:'fixed',
-                zIndex: IndicoUI.__globalLayerLevel + 2000}},
-                content);
-
-            if (!klass) {
-                klass="tooltip";
-            }
-
-            div.dom.className = klass;
-            Dom.Content.add(document.body, div);
-
-            return div;
-        },
-
-
-
         simpleButton: function(elem, method, attributes, handler, caption) {
             var button = Widget.button(command(function(){
                 indicoRequest(method, attributes, handler);

@@ -17,7 +17,7 @@
                 % endfor
             </select>
             <div id="createBookingDiv" style="display: inline;">
-                <input type="button" value="${ _("Create")}" disabled>
+
             </div>
             <div id="createBookingHelp" style="display: inline;">
             </div>
@@ -105,7 +105,6 @@ ${ ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm)
 var bookings = $L(${ jsonEncode(BookingsM) });
 
 var createButton;
-var createButtonTooltip;
 
 var confLocationRoom = '${ Conference.getRoom().getName() if Conference.getRoom() else ""}';
 
@@ -124,9 +123,9 @@ var getSelectedPlugin = function() {
 var pluginSelectChanged = function() {
     selectedPlugin = getSelectedPlugin();
     if (exists(selectedPlugin)) {
-        createButton.enable();
+        createButton.disabledButtonWithTooltip('enable');
     } else {
-        createButton.disable();
+        createButton.disabledButtonWithTooltip('disable');
     }
 }
 
@@ -160,16 +159,6 @@ var edit = function(booking) {
     editBooking(booking, '${ Conference.getId() }');
 };
 
-/**
- * Mouseover help popup for the 'Create' button
- */
-var CreateHelpPopup = function(event) {
-    IndicoUI.Widgets.Generic.tooltip(this, event,
-        '<div style="padding:3px">' +
-            $T('Select a <strong>booking type<\/strong> from the drop-down list and press the "Create" button.') +
-        '<\/div>');
-};
-
 /* ------------------------------ STUFF THAT HAPPENS WHEN PAGE IS LOADED -------------------------------*/
 
 IndicoUI.executeOnLoad(function(){
@@ -177,25 +166,22 @@ IndicoUI.executeOnLoad(function(){
     // and IE doesn't like when this is done at page load by a script that is not inside the body element.
 
     // We configure the "create" button and the list of plugins.
-    createButton = new DisabledButton(Html.input("button", {disabled:true, style:{marginLeft: '6px'}}, $T("Create") ));
-
-    createButton.observeEvent('mouseover', function(event) {
-        if (!createButton.isEnabled()) {
-            createButtonTooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY,
-                     $T("Please select a booking type from the list."), "tooltipError");
-        }
+    createButton = $('<input/>', {type: 'button'}).css('marginLeft', '6px').val($T('Create'));
+    createButton.appendTo('#createBookingDiv');
+    createButton.disabledButtonWithTooltip({
+        disabled: true,
+        tooltip: $T('Please select a booking type from the list.')
     });
 
-    createButton.observeEvent('mouseout', function(event){
-        Dom.List.remove(document.body, createButtonTooltip);
-    });
-
-    createButton.observeClick(function(){ create() });
-
-    $E('createBookingDiv').set(createButton.draw());
+    createButton.on('click', create);
 
     var createHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-    createHelpImg.dom.onmouseover = CreateHelpPopup;
+    $(createHelpImg.dom).qtip({
+        content: {
+            text: $T('Select a <strong>booking type<\/strong> from the drop-down list and press the "Create" button.')
+        }
+    });
+    $T('Select a <strong>booking type<\/strong> from the drop-down list and press the "Create" button.')
     $E('createBookingHelp').set(createHelpImg);
 
     $E('pluginSelect').dom.value = 'noneSelected';

@@ -235,10 +235,4 @@
         "${ orphan["idLecture"]   }": ${ jsonEncode(orphan) },
     % endfor
     };
-
-    // Draw the two buttons, which start out as disabled until
-    // the user has selected both talk and LO
-    $E('RMbuttonCreateCDSRecord').set(ButtonCreateCDSRecord.draw());
-    $E('RMbuttonCreateIndicoLink').set(ButtonCreateIndicoLink.draw());
-
 </script>

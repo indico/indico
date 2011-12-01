@@ -68,7 +68,7 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
 
          _setElementErrorState: function(element, text) {
              // use "passive" mode, so that fields can be verified live
-             return IndicoUtil.markInvalidField(element, text, true)[1];
+             return IndicoUtil.markInvalidField(element, text, true);
          },
 
          _checkErrorState: function() {

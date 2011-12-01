@@ -443,7 +443,6 @@ var IndicoUtil = {
             }
         }
 
-        var tooltip;
         var oList = []; //list of functions that we will call to stop observing events
 
         var stopObserving = function(){
@@ -454,36 +453,21 @@ var IndicoUtil = {
 
         // we'll add a function that removes the coloring first of all
         oList.push(function() {
-                Dom.List.remove(document.body, tooltip);
-                component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
+            component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
+            $(component.dom).qtip('destroy');
         });
 
-        oList.push(component.observeEvent('mouseover', function(event){
-            tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");
-        }));
-
-        oList.push(component.observeEvent('mouseout', function(event){
-            Dom.List.remove(document.body, tooltip);
-        }));
+        $(component.dom).qtip({
+            content: {
+                text: error.dom ? $(error.dom) : error
+            }
+        });
 
         if (!passive) {
-
-            oList.push(component.observeEvent('keypress', function(event){
-                stopObserving();
-            }));
-
-            oList.push(component.observeEvent('change', function(event){
-                stopObserving();
-            }));
-
-            if ( startsWith(component.dom.type, 'select')) {
-                oList.push(component.observeEvent('click', function(event){
-                    stopObserving();
-                }));
-            }
+            $(component.dom).on('keypress change select click', stopObserving);
         }
 
-        return [tooltip, oList];
+        return oList;
     },
 
     /**
@@ -636,52 +620,43 @@ var IndicoUtil = {
                         oList = component.setError(error);
 
                     } else if (dataType == 'checkBoxList' || dataType == 'radio' || dataType == 'select') {
-                        var result = IndicoUtil.markInvalidField(component, error, true);
-                        oList = result[1];
+                        oList = IndicoUtil.markInvalidField(component, error);
                     } else if (component.dom.type != 'radio') {
-                        var result = IndicoUtil.markInvalidField(component, error);
-                        oList = result[1];
-
+                        oList = IndicoUtil.markInvalidField(component, error);
                     } else {
-                        component.dom.className += ' invalid';
-                        $E(component.dom.id + 'Label').dom.className += ' invalidLabel';
-
-                        var tooltip;
-                        oList = []; //list of functions that we will call to stop observing events
-
-                        var stopObserving = component.observeEvent('mouseover', function(event){
-                            tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");
+                        // XXX: Is this code still used anywhere?!
+                        // If yes, please add a comment where, if not let's remove it!
+                        // The jQuery/qtip things here are untested btw.. if you find out where this is used, please test it. :)
+                        var $label = $('#' + component.dom.id + 'Label');
+                        var $component = $(component.dom);
+                        $label.addClass('invalidLabel');
+                        $component.addClass('invalid');
+                        $component.add($label).qtip({
+                            content: {
+                                text: error.dom ? $(error.dom) : error
+                            }
                         });
-                        oList.push(stopObserving);
 
-                        var stopObservingLabel = $E(component.dom.id + 'Label').observeEvent('mouseover', function(event){
-                            tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, error, "tooltipError");
-                        });
+                        var stopObserving = function() {
+                            $component.qtip('destroy');
+                            $label.qtip('destroy');
+                        };
+                        oList = [stopObserving]; //list of functions that we will call to stop observing events
 
                         if (!exists(radioButtonLabelStopObserving[component.dom.name])) {
-                            radioButtonLabelStopObserving[component.dom.name] = []
+                            radioButtonLabelStopObserving[component.dom.name] = [];
                         }
                         radioButtonLabelStopObserving[component.dom.name].push(stopObserving);
-                        radioButtonLabelStopObserving[component.dom.name].push(stopObservingLabel);
-
-                        oList.push(component.observeEvent('mouseout', function(event){
-                            Dom.List.remove(document.body, tooltip);
-                        }));
-
-                        $E(component.dom.id + 'Label').observeEvent('mouseout', function(event){
-                            Dom.List.remove(document.body, tooltip);
-                        });
 
                         each($N(component.dom.name), function(component){
                             component.observeEvent('click', function(event) {
-                                each($N(component.dom.name), function(component){
-                                    component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
-                                    $E(component.dom.id + 'Label').dom.className = component.dom.className.substring(0, component.dom.className.length-13);
+                                each($N(component.dom.name), function(subcomponent){
+                                    $(subcomponent.dom).removeClass('invalid');
+                                    $('#' + subcomponent.dom.id + 'Label').removeClass('invalidLabel');
                                 });
                                 if (exists(radioButtonLabelStopObserving[component.dom.name])) {
                                     each (radioButtonLabelStopObserving[component.dom.name], function(stopObserver) {stopObserver()});
                                 }
-                                Dom.List.remove(document.body, tooltip);
                             });
                         });
                     }
