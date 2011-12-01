@@ -720,14 +720,14 @@ function checkAllHaveReferee(contributions, order, role, assignPerAttribute) {
         }
     }
     if (contributionsWithoutReferee.length == contributions.length) {
-        (new AlertPopup($T("Warning"), $T("None of the contributions you checked have a Referee.") + $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."))).open();
+        (new AlertPopup($T("Warning"), $T("None of the contributions you checked have a Referee. You can only add a layout reviewer or a content reviewer if the contribution has a referee."))).open();
         return false;
     }
 
     if (contributionsWithoutReferee.length > 0) {
 
         if (assignPerAttribute) {
-            (new AlertPopup($T("Warning"), $T("Some of the contributions you checked have a Referee.") + $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."))).open();
+            (new AlertPopup($T("Warning"), $T("Some of the contributions you checked have a Referee. You can only add a layout reviewer or a content reviewer if the contribution has a referee."))).open();
             return false;
         } else {
             title = $T('Contributions without referee');
@@ -752,7 +752,7 @@ function checkAllHaveReferee(contributions, order, role, assignPerAttribute) {
             popup.draw = function () {
                 var span1 = Html.span({}, $T("Some of the contributions you checked do not have a Referee."));
                 var span2 = Html.span({}, $T("You can only add an editor or a reviewer if the contribution has a referee."));
-                var span3 = Html.span({}, $T("Do you want to add that " + role + " only to the contributions with a referee?"));
+                var span3 = Html.span({}, $T("Do you want to add that {0} only to the contributions with a referee?").format(role));
                 var all = Widget.lines([span1, span2, span3]);
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({
                     style: {
@@ -1342,7 +1342,7 @@ function fetchUsersPerAttribute(order, role, attribute) {
                                 var killProgress = IndicoUI.Dialogs.Util.progress()
                                 popup.close();
                                 killProgress();
-                                (new AlertPopup($T("Warning"), 'There is no ' + attribute + ' define.')).open();
+                                (new AlertPopup($T("Warning"), $T('There is no {0} defined.').format(attribute)).open();
                             }
                             for (var i in result) {
                                 attributes.append(result[i]);
