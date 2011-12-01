@@ -52,6 +52,7 @@ from BTrees.OOBTree import OOBTree
 from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil, ICSSanitizationErrorFossil,\
     ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil,\
     ISpeakerWrapperBaseFossil
+from MaKaC.conference import Contribution
 
 
 class CSBookingManager(Persistent, Observer):
@@ -241,6 +242,17 @@ class CSBookingManager(Persistent, Observer):
             self.getHiddenBookings().add(booking.getId())
         self._indexBooking(booking)
         self._notifyModification()
+        if booking.hasSessionOrContributionLink():
+            # the unique id can be diferent for the new conference
+            booking.setLinkType({booking.getLinkType():ContextManager.get('clone.unique_id_map').get(booking.getLinkId(),"")})
+            bp=booking.getBookingParams()
+            linkObject = booking.getLinkObject()
+            if isinstance(linkObject, Contribution):
+                bp["videoLinkContribution"] = linkObject.getId()
+            else: #session
+                bp["videoLinkSession"] = linkObject.getId()
+            booking.setBookingParams(bp)
+            self.addVideoService(booking.getLinkId(), booking)
 
     def createBooking(self, bookingType, bookingParams = {}):
         """ Adds a new booking to the list of bookings.
@@ -952,7 +964,6 @@ class CSBookingManager(Persistent, Observer):
         """ Adds a video service to Contribution / Session link in the tracking
             dictionary in order {uniqueId : videoService}
         """
-
         if self.getVideoServices().has_key(uniqueId):
             self.getVideoServices()[uniqueId].append(videoService)
         else:
@@ -1498,6 +1509,11 @@ class CSBookingBase(Persistent, Fossilizable):
 
     def setLinkType(self, linkDict):
         """ Accepts a dictionary of linkType: linkId """
+
+        # case of non-linked bookings
+        if linkDict is None:
+            return
+
         self._linkVideoType = linkDict.keys()[0]
         self._linkVideoId = linkDict.values()[0]
 

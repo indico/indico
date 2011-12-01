@@ -576,4 +576,5 @@ class CSBooking(CSBookingBase):
         cs.setURL(self.getURL())
         cs.setChecksDone(self.getChecksDone())
         cs.setCreated(self.isCreated())
+        cs.setLinkType(self.getLinkIdDict())
         return cs

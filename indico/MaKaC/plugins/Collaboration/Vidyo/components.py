@@ -55,5 +55,11 @@ class VidyoContributor(Component):
 
         if options.get("vydio", True):
             for vs in confToClone.getCSBookingManager().getBookingList(filterByType="Vidyo"):
-                newBooking = vs.clone(conf)
-                conf.getCSBookingManager().addBooking(newBooking)
+                # Do not cloning the booking when were are NOT cloning the timetable (optionas has sessions and contribs)
+                # and the booking is linked to a contrib/session
+                if (options.get('sessions', False) and options.get('contributions', False)) or not vs.hasSessionOrContributionLink():
+                    newBooking = vs.clone(conf)
+                    conf.getCSBookingManager().addBooking(newBooking)
+
+
+

@@ -4232,7 +4232,9 @@ class Conference(CommonObjectBase, Locatable):
         # Meetings' and conferences' sessions cloning
         if options.get("sessions",False) :
             for s in self.getSessionList() :
-                conf.addSession(s.clone(timeDelta, conf, options))
+                newSes = s.clone(timeDelta, conf, options)
+                ContextManager.setdefault("clone.unique_id_map", {})[s.getUniqueId()] = newSes.getUniqueId()
+                conf.addSession(newSes)
         # Materials' cloning
         if options.get("materials",False) :
             for m in self.getMaterialList() :
@@ -4295,6 +4297,7 @@ class Conference(CommonObjectBase, Locatable):
                         nc = cont.clone(conf, options, timeDelta)
                         conf.addContribution(nc)
                         sch.addEntry(nc.getSchEntry())
+                    ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
         # Participants' module settings and list cloning
         if options.get("participants",False) :
             self.getParticipation().clone(conf, options, eventManager)
@@ -5751,6 +5754,7 @@ class Session(CommonObjectBase, Locatable):
         for slot in self.getSlotList() :
             newslot = slot.clone(ses, options)
             ses.addSlot(newslot)
+            ContextManager.setdefault("clone.unique_id_map", {})[slot.getUniqueId()] = newslot.getUniqueId()
 
         ses.notifyModification()
 
@@ -6646,6 +6650,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
                     contrib = entry.getOwner()
                     newcontrib = contrib.clone(session, options, timeDifference)
                     slot.getSchedule().addEntry(newcontrib.getSchEntry(),0)
+                    ContextManager.setdefault("clone.unique_id_map", {})[contrib.getUniqueId()] = newcontrib.getUniqueId()
 
         slot.setContribDuration(0, 0, self.getContribDuration())
         slot.notifyModification()
