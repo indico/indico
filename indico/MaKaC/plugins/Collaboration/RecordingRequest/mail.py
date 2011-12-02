@@ -23,6 +23,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.RecordingRequest.common import \
     postingUrgency, getTalks
+from MaKaC.common.Configuration import Config
 
 
 class RecordingRequestNotificationBase(GenericNotification):
@@ -38,7 +39,7 @@ class RecordingRequestNotificationBase(GenericNotification):
 
         self._modifLink = str(booking.getModificationURL())
 
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer <%s>"%Config.getInstance().getSupportEmail())
         self.setContentType("text/html")
 
     def _getRequestDetails(self, typeOfMail):

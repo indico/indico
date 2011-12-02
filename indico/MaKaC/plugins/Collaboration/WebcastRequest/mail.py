@@ -22,6 +22,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInformation
+from MaKaC.common.Configuration import Config
 
 
 class WebcastRequestNotificationBase(GenericNotification):
@@ -36,7 +37,7 @@ class WebcastRequestNotificationBase(GenericNotification):
 
         self._modifLink = str(booking.getModificationURL())
 
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%Config.getInstance().getSupportEmail())
         self.setContentType("text/html")
 
     def _getRequestDetails(self, typeOfMail):

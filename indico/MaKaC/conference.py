@@ -3132,7 +3132,7 @@ class Conference(CommonObjectBase, Locatable):
         self.description = desc
         self.notifyModification()
 
-    def getSupportEmail( self, returnNoReply=False, caption=False ):
+    def getSupportEmail(self, returnNoReply=False, caption=False):
         """
         Returns the support email address associated with the conference
         :param returnNoReply: Return no-reply address in case there's no support e-mail (default True)
@@ -3142,12 +3142,12 @@ class Conference(CommonObjectBase, Locatable):
         try:
             if self._supportEmail:
                 pass
-        except AttributeError, e:
+        except AttributeError:
             self._supportEmail = ""
         if self._supportEmail.strip() == "" and returnNoReply:
             # In case there's no conference support e-mail, return the no-reply
             # address, and the 'global' support e-mail if there isn't one
-            return HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+            return Config.getInstance().getNoReplyEmail()
         else:
             supportCaption = self.getDisplayMgr().getSupportEmailCaption()
 

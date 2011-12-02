@@ -275,8 +275,8 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
 
     def alertCreation(self, confs):
         conf = confs[0]
-        fromAddr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
-        addrs = [ info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail() ]
+        fromAddr = Config.getInstance().getSupportEmail()
+        addrs = [ Config.getInstance().getSupportEmail() ]
         eventType = conf.getType()
         if eventType == "conference":
             type = "conference"

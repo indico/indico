@@ -9919,7 +9919,7 @@ class WDVDDone( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["supportAddr"]=info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        vars["supportAddr"]=Config.getInstance().getSupportEmail()
         return vars
 
 class WPDVDDone( WPConfModifToolsBase ):

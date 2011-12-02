@@ -213,8 +213,8 @@ class toExec:
         ty, ex, tb = sys.exc_info()
         tracebackList = traceback.format_list( traceback.extract_tb( tb ) )
         sm = sendMail()
-        sm.setFromAddr(HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
-        sm.addToAddr(HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        sm.setFromAddr(Config.getInstance().getSupportEmail())
+        sm.addToAddr(Config.getInstance().getSupportEmail())
         sm.setSubject("[Indico] Error running a task")
         sm.setText("""
 

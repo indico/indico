@@ -29,6 +29,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common import utils
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from MaKaC.common.Configuration import Config
 
 class Participation(Persistent):
 
@@ -455,7 +456,7 @@ class Participation(Persistent):
 
             data = {}
             data["toList"] = toList
-            data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            data["fromAddr"] = Config.getInstance().getSupportEmail()
             data["subject"] = _("New pending participant for %s")%self._conference.getTitle()
             data["body"] = _("""
             Dear Event Manager,
@@ -581,7 +582,7 @@ on behalf of %s %s
             title = participant.getFirstName()
 
         createURL = urlHandlers.UHUserCreation.getURL()
-        data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+        data["fromAddr"] = Config.getInstance().getNoReplyEmail()
         toList = []
         toList.append(participant.getEmail())
         data["toList"] = toList
@@ -615,7 +616,7 @@ on behalf of %s %s
             return False
 
         data = {}
-        data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+        data["fromAddr"] = Config.getInstance().getNoReplyEmail()
         if len(self._dateNegotiation.getSolutionList()) == 0:
 
             """ TODO: Prepate URLs..!! """
@@ -1032,7 +1033,7 @@ class Participant (Persistent, Negotiator):
 
         if sendMail:
             data = {}
-            data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+            data["fromAddr"] = Config.getInstance().getNoReplyEmail()
             confTitle = self._participation.getConference().getTitle()
             data["subject"] = _("Your application for attendance in %s declined")%confTitle
             toList = []

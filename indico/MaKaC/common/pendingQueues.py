@@ -30,6 +30,7 @@ from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from MaKaC.common.Configuration import Config
 ###---------------------------- General Pending Queues ---------------------------------
 
 #---GENERAL----
@@ -123,7 +124,7 @@ class _PendingNotification(object):
         supEmail=self._psList[0].getConference().getSupportEmail(returnNoReply=True)
         if self._forceIndicoFromAddress or supEmail.strip()=="":
             info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            return "%s <%s>"%(info.getTitle(), info.getSupportEmail())
+            return "%s <%s>"%(info.getTitle(), Config.getInstance().getSupportEmail())
         return supEmail
 
     def getToList( self ):

@@ -32,6 +32,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.modules.scheduler import Client
 from indico.modules.scheduler.tasks import AlarmTask
+from MaKaC.common.Configuration import Config
 
 
 class Evaluation(Persistent):
@@ -430,7 +431,7 @@ class Evaluation(Persistent):
                     if self.getStartDate() != alarm.getStartOn():
                         alarm.move(self.getStartDate())
 
-                alarm.setFromAddr( HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail() )
+                alarm.setFromAddr( Config.getInstance().getSupportEmail() )
                 alarm.setToAddrList(notification.getToList())
                 alarm.setCcAddrList(notification.getCCList())
                 alarm.setSubject( self.getTitle() )

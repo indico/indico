@@ -32,6 +32,7 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 from MaKaC.webinterface import urlHandlers
+from MaKaC.common.Configuration import Config
 
 class ReservationStartEndNotificationListener(Component):
     implements(IReservationListener)
@@ -86,7 +87,7 @@ def sendReservationStartStopNotification(resv, which):
     if getRoomBookingOption('notificationEmailsToBookedFor'):
         recipients += getEmailList(resv.contactEmail)
     maildata = {
-        'fromAddr': HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True),
+        'fromAddr': Config.getInstance().getNoReplyEmail(),
         'toList': recipients,
         'subject': subject.format(**msgArgs),
         'body': msg.format(**msgArgs)

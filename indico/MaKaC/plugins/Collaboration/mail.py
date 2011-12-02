@@ -22,6 +22,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.common.TemplateExec import beautify
+from MaKaC.common.Configuration import Config
 
 class CollaborationNotificationBase(GenericNotification):
     """ Base class to build an email notification for the Recording request plugin.
@@ -35,7 +36,7 @@ class CollaborationNotificationBase(GenericNotification):
 
         self._modifLink = str(self._booking.getModificationURL())
 
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer <%s>"%Config.getInstance().getSupportEmail())
         self.setToList(MailTools.getAdminEmailList())
         self.setContentType("text/html")
 

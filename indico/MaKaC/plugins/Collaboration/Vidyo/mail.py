@@ -30,6 +30,7 @@ from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
 from MaKaC.common.TemplateExec import escape
+from MaKaC.common.Configuration import Config
 
 
 
@@ -48,7 +49,7 @@ class VidyoNotificationBase(GenericNotification):
 
         self._modifLink = str(booking.getModificationURL())
 
-        self.setFromAddr("Indico Mailer<%s>" % HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getSupportEmail())
         self.setContentType("text/html")
 
     def _getBookingDetails(self, typeOfMail):
@@ -395,7 +396,7 @@ class VidyoCleaningDoneNotification(GenericNotification):
 
     def __init__(self, maxDate, previousTotal, newTotal, error = None, attainedDate = None):
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>" % HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getSupportEmail())
         self.setContentType("text/html")
         self.setToList(MailTools.getAdminEmailList('Vidyo'))
         serverTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
@@ -450,7 +451,7 @@ class VidyoOwnerChosenNotification(VidyoOwnerNotificationBase):
         self._booking = booking
         self._owner = booking.getOwnerObject()
 
-        self.setFromAddr("Indico Mailer<%s>" % HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getSupportEmail())
         self.setContentType("text/html")
 
         event = booking.getConference()
@@ -507,7 +508,7 @@ class VidyoOwnerRemovedNotification(VidyoOwnerNotificationBase):
     def __init__(self, booking, oldOwner):
         VidyoOwnerNotificationBase.__init__(self)
         self._owner = oldOwner
-        self.setFromAddr("Indico Mailer<%s>" % HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getSupportEmail())
         self.setContentType("text/html")
 
         event = booking.getConference()
@@ -537,7 +538,7 @@ class VidyoRoomDeletedOwnerNotification(VidyoOwnerNotificationBase):
         VidyoOwnerNotificationBase.__init__(self)
         self._owner = booking.getOwnerObject()
 
-        self.setFromAddr("Indico Mailer<%s>" % HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getSupportEmail())
         self.setContentType("text/html")
 
         owner = booking.getOwnerObject()

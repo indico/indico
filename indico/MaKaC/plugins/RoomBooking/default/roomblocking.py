@@ -32,6 +32,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
+from MaKaC.common.Configuration import Config
 
 # Branch name in ZODB root
 _ROOMBLOCKING = 'RoomBlocking'
@@ -391,7 +392,7 @@ class RoomBlockingNotification(object):
             'block': block,
             'roomBlockings': roomBlockings
         })
-        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+        fromAddr = Config.getInstance().getNoReplyEmail()
         mailData = {
             "fromAddr": fromAddr,
             "toList": [to],
@@ -424,7 +425,7 @@ class RoomBlockingNotification(object):
             'roomBlocking': roomBlocking,
             'verb': verb
         })
-        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        fromAddr = Config.getInstance().getSupportEmail()
         mailData = {
             "fromAddr": fromAddr,
             "toList": [to],

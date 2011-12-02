@@ -38,9 +38,6 @@ class MaKaCInfo(Persistent):
         # server description fields
         self._title = ""
         self._organisation = ""
-        self._supportEmail = ""
-        self._publicSupportEmail = ""
-        self._noReplyEmail = ""
         self._city = ""
         self._country = ""
         self._lang = "en_GB"
@@ -223,39 +220,6 @@ class MaKaCInfo(Persistent):
 
     def setOrganisation( self, newOrg ):
         self._organisation = newOrg.strip()
-
-    def getSupportEmail( self ):
-        if not hasattr( self, "_supportEmail" ) or (self._supportEmail == "" and Config.getInstance().getSupportEmail() != ""):
-            self._supportEmail = Config.getInstance().getSupportEmail()
-        return self._supportEmail
-
-    def setSupportEmail( self, newEmail ):
-        self._supportEmail = newEmail.strip()
-
-    def getPublicSupportEmail( self ):
-        if not hasattr( self, "_publicSupportEmail" ) or (self._publicSupportEmail == "" and Config.getInstance().getPublicSupportEmail() != ""):
-            self._publicSupportEmail = Config.getInstance().getPublicSupportEmail()
-        return self._publicSupportEmail
-
-    def setPublicSupportEmail( self, newEmail ):
-        self._publicSupportEmail = newEmail.strip()
-
-    def getNoReplyEmail( self, returnSupport=False ):
-        if not hasattr( self, "_noReplyEmail" ) or (self._noReplyEmail == "" and Config.getInstance().getNoReplyEmail() != ""):
-            self._noReplyEmail = Config.getInstance().getNoReplyEmail()
-
-        if self._noReplyEmail != "":
-            return self._noReplyEmail
-        elif returnSupport:
-            return self.getSupportEmail()
-        else:
-            return ""
-
-        return self._noReplyEmail
-
-    def setNoReplyEmail( self, newEmail ):
-        self._noReplyEmail = newEmail.strip()
-
 
     def getCity( self ):
         return self._city

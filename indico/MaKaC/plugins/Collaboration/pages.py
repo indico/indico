@@ -312,7 +312,7 @@ class WElectronicAgreement(wcomponents.WTemplated):
         vars["conf"] = self._conf
         vars["contributions"] = self.getTableContent()
 
-        self._fromList.append(info.HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=False))
+        self._fromList.append(Config.getInstance().getNoReplyEmail())
         vars['fromList'] = self._fromList
         manager = self._conf.getCSBookingManager()
         vars['manager'] = manager
