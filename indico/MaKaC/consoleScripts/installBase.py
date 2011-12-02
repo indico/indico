@@ -206,7 +206,7 @@ def jsCompress():
     '''Packs and minifies javascript files'''
 
     try:
-        pkg_resources.require('jstools')
+        pkg_resources.require('JSTools')
     except pkg_resources.DistributionNotFound:
         print """
 JSTools not found! JSTools is needed for JavaScript compression, if you're building Indico from source. Please install it.
