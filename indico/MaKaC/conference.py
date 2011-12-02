@@ -4292,12 +4292,13 @@ class Conference(CommonObjectBase, Locatable):
                         conf.addContribution(nc)
                         if cont.isScheduled() :
                             sch.addEntry(nc.getSchEntry())
+                        ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
                     elif cont.isScheduled():
                         # meetings...only scheduled
                         nc = cont.clone(conf, options, timeDelta)
                         conf.addContribution(nc)
                         sch.addEntry(nc.getSchEntry())
-                    ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
+                        ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
         # Participants' module settings and list cloning
         if options.get("participants",False) :
             self.getParticipation().clone(conf, options, eventManager)
