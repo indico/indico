@@ -1185,7 +1185,9 @@ class TextInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed() ):
             disable="disabled=\"true\""
             #pass
-        if self._parent.isMandatory():
+        if self._parent.getPDField() == 'email':
+            param = """<script>addParam($E('%s'), 'email', %s);</script>""" % (htmlName, 'false' if self._parent.isMandatory() else 'true')
+        elif self._parent.isMandatory():
             param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
         else:
             param = ''

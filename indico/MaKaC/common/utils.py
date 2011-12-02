@@ -190,7 +190,7 @@ def sortPrincipalsByName(x,y):
         cmpRes = cmp(firstNamex.lower(),firstNamey.lower())
     return cmpRes
 
-def validMail(emailstr):
+def validMail(emailstr, allowMultiple=True):
     """
     Check the validity of an email address or serie of email addresses
     - emailstr: a string representing a single email address or several
@@ -205,6 +205,9 @@ def validMail(emailstr):
 
     # Creates a list of emails
     emaillist = emails.split(",")
+
+    if not allowMultiple and len(emaillist) > 1:
+        return False
 
     # Checks the validity of each email in the list
     if emaillist != None or emaillist != []:

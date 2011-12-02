@@ -29,6 +29,7 @@ from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.mail import GenericMailer
+from MaKaC.common.utils import validMail
 
 
 class RHBaseRegistrationForm( RHConferenceBaseDisplay ):
@@ -146,6 +147,8 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         email = self._regForm.getPersonalData().getValueFromParams(params, 'email')
         if email is None:
             raise FormValuesError(_("An email address has to be set in order to make the registration in the event."))
+        elif not validMail(email, False):
+            raise FormValuesError(_("The given email address is not valid."))
         matchedUsers = AvatarHolder().match({"email": email}, exact=1)
         if matchedUsers:
             user = matchedUsers[0]
