@@ -49,6 +49,8 @@ class WUserAPI(WTemplated):
         vars['isAdmin'] = self._rh._getUser().isAdmin()
         vars['signingEnabled'] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
         vars['persistentAllowed'] = minfo.isAPIPersistentAllowed()
+        vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+        vars['apiPersistentDisableAgreement'] = minfo.getAPIPersistentDisableAgreement()
         return vars
 
 
@@ -72,6 +74,8 @@ class WAdminAPIOptions(WTemplated):
         vars['persistentAllowed'] = minfo.isAPIPersistentAllowed()
         vars['apiCacheTTL'] = minfo.getAPICacheTTL()
         vars['apiSignatureTTL'] = minfo.getAPISignatureTTL()
+        vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+        vars['apiPersistentDisableAgreement'] = minfo.getAPIPersistentDisableAgreement()
         return vars
 
 

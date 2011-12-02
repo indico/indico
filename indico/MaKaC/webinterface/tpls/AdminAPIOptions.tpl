@@ -20,6 +20,19 @@
             </td>
         </tr>
         <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Enable persistent signatures agreement") }</span></td>
+            <td class="blacktext">
+                <textarea name="apiPersistentEnableAgreement" cols="60" rows="5" id="apiPersistentEnableAgreement">${apiPersistentEnableAgreement}</textarea>
+            </td>
+
+        </tr>
+        <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Disable persistent signatures agreement") }</span></td>
+            <td class="blacktext">
+                <textarea name="apiPersistentDisableAgreement" cols="60" rows="5" id="apiPersistentDisableAgreement">${apiPersistentDisableAgreement}</textarea>
+            </td>
+        </tr>
+        <tr>
             <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("API mode")}</span></td>
             <td class="blacktext">
                 <select name="apiMode">

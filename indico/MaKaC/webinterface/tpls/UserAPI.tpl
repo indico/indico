@@ -120,8 +120,8 @@
 </table>
 
 <script type="text/javascript">
-    var disableText = $T('When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!');
-    var enableText =$T('Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.');
+    var disableText = $T('${apiPersistentDisableAgreement}');
+    var enableText = $T('${apiPersistentEnableAgreement}');
     $('#enablePersistentSignatures').click(function(e) {
         if(confirm(this.dataset.enabled == "1" ? disableText : enableText)){
             $E('progressPersistentSignatures').set(progressIndicator(true, false));

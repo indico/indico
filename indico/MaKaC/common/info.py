@@ -94,6 +94,10 @@ class MaKaCInfo(Persistent):
         # Event display style manager
         self._styleMgr = StyleManager()
 
+        self._apiPersistentEnableAgreement = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
+        self._apiPersistentDisableAgreement = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
+
+
     def getStyleManager( self ):
         try:
             return self._styleMgr
@@ -205,10 +209,10 @@ class MaKaCInfo(Persistent):
 
     def isHighlightActive ( self ):
         if hasattr( self, "_highlightActive" ):
-           return self._highlightActive
+            return self._highlightActive
         else:
-           self._highlightActive = False
-           return False
+            self._highlightActive = False
+            return False
 
     def setHighlightActive (self, bool=True ):
         self._highlightActive = bool
@@ -467,6 +471,22 @@ class MaKaCInfo(Persistent):
 
     def setAnalyticsCodeLocation(self, v):
         self._analyticsCodeLocation = v
+
+    def getAPIPersistentEnableAgreement(self):
+        if not hasattr(self, '_apiPersistentEnableAgreement'):
+            self._apiPersistentEnableAgreement = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
+        return self._apiPersistentEnableAgreement
+
+    def getAPIPersistentDisableAgreement(self):
+        if not hasattr(self, '_apiPersistentDisableAgreement'):
+            self._apiPersistentDisableAgreement = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
+        return self._apiPersistentDisableAgreement
+
+    def setAPIPersistentEnableAgreement(self, v):
+        self._apiPersistentEnableAgreement = v
+
+    def setAPIPersistentDisableAgreement(self, v):
+        self._apiPersistentDisableAgreement = v
 
 class HelperMaKaCInfo:
     """Helper class used for getting and instance of MaKaCInfo.
