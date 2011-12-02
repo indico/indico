@@ -519,7 +519,7 @@ class VidyoOwnerRemovedNotification(VidyoOwnerNotificationBase):
 
         self.setBody("""Dear %s%s,<br />
 <br />
-We are sorry to inform you that you are no longer the owner of the Vidyo room with name "%s" in the event <a href="%s">%s</a>.<br />
+This is an automatic email to inform you that you are no longer the owner of the Vidyo room with name "%s" in the event <a href="%s">%s</a>. The new owner is %s.<br />
 <br />
 Thank you for using our system.<br />
 """ %
@@ -527,7 +527,8 @@ Thank you for using our system.<br />
                       oldOwner.getStraightFullName(),
                       booking.getBookingParamByName("roomName"),
                       urlHandlers.UHConferenceDisplay.getURL(event),
-                      event.getTitle()))
+                      event.getTitle(),
+                      booking.getOwner()["name"]))
 
 
 class VidyoRoomDeletedOwnerNotification(VidyoOwnerNotificationBase):

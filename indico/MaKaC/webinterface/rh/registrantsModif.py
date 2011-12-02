@@ -20,16 +20,13 @@
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrants as registrants
-import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
-import MaKaC.webinterface.mail as mail
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.export.excel import RegistrantsListToExcel
-from MaKaC.common import filters
 import MaKaC.webinterface.common.regFilters as regFilters
 from MaKaC.common import Config
-from MaKaC.errors import FormValuesError, NoReportError
+from MaKaC.errors import FormValuesError
 from MaKaC.common import utils
 from MaKaC.registration import SocialEvent, MiscellaneousInfoGroup
 from MaKaC.webinterface.common import registrantNotificator
@@ -38,9 +35,9 @@ from MaKaC import epayment
 from MaKaC.i18n import _
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.webinterface.rh import registrationFormModif
-from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
 import re
+import os
 
 class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBase ):
     pass
@@ -521,6 +518,7 @@ class RHRegistrantPackage:
         filename = "registrants.zip"
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ZIP" )
+        self._rh._req.set_content_length(os.path.getsize(path))
         self._rh._req.content_type = """%s"""%(mimetype)
         self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         self._rh._req.sendfile(path)

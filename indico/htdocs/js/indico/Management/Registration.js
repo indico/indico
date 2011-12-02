@@ -17,7 +17,7 @@ type("RegistrationUploadFile",[],
             });
 
             var uploadFileInput = Html.input('file', {id: id, name: id});
-            var existingAttachment = Html.div({}, $(valueDisplay)[0],
+            var existingAttachment = Html.div({id:'existingAttachment'+id}, $(valueDisplay)[0],
                                                   imageRemove,
                                                   Html.input("hidden",{id: id, name: id}, fileName));
 

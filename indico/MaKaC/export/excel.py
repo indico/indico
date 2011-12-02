@@ -24,7 +24,7 @@ from MaKaC.common import utils
 from datetime import datetime
 from MaKaC.conference import Link
 from MaKaC.webinterface import urlHandlers
-
+from MaKaC.conference import LocalFile
 import csv
 
 class ExcelGenerator:
@@ -100,7 +100,10 @@ class RegistrantsListToExcel:
 
     def _formatGenericValue(self, fieldInput, value):
         try:
-            value = fieldInput.getValueDisplay(value)
+            if not isinstance(value, LocalFile):
+                value = fieldInput.getValueDisplay(value)
+            else: # if file, use just the filename, not the html link returned by getValueDisplay
+                value = str(value).strip()
         except:
             value = str(value).strip()
         return value

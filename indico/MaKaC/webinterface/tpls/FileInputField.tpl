@@ -1,6 +1,4 @@
-<div id="attachment${htmlName}"></div>
-
-<td></td>
+<td><div id="attachment${htmlName}" class="existingAttachment"></div></td>
 <td align="right" valign="bottom"></td>
 </tr>
 % if field._parent.getDescription():
