@@ -12,7 +12,11 @@
 $E("attachment${htmlName}").set(new RegistrationUploadFile(${htmlName | n,j},
         ${field.getValueDisplay(value) if value else "" | n,j},
         ${value.getFileName() if value else "" | n,j},
-        ${field._parent.isMandatory() | n,j}).draw());
+        ${field.getParent().isMandatory() | n,j}).draw());
+
+if(field.getParent().isMandatory()){
+    addParam($E(id), 'text', false);
+}
 
 </script>
 
