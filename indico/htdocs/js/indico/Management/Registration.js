@@ -7,16 +7,17 @@ type("RegistrationUploadFile",[],
 
         },
         function(id, valueDisplay, fileName, mandatory){
+
             var imageRemove = Html.img({
                 src: imageSrc("remove"),
                 alt: $T('Remove attachment'),
                 title: $T('Remove this attachment'),
-                id: id,
+                id: 'remove'+id,
                 style:{marginLeft:'15px', cursor:'pointer', verticalAlign:'bottom'}
             });
 
             var uploadFileInput = Html.input('file', {id: id, name: id});
-            var existingAttachment = Html.div({}, $(valueDisplay)[0],
+            var existingAttachment = Html.div({id:'existingAttachment'+id}, $(valueDisplay)[0],
                                                   imageRemove,
                                                   Html.input("hidden",{id: id, name: id}, fileName));
 
@@ -26,10 +27,6 @@ type("RegistrationUploadFile",[],
                     addParam($E(id), 'text', false);
                 }
             });
-
-            if(mandatory){
-                addParam($E(id), 'text', false);
-            }
 
             if(valueDisplay){
                 this.uploadWidget = existingAttachment

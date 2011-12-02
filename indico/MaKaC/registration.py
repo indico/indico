@@ -1185,7 +1185,9 @@ class TextInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed() ):
             disable="disabled=\"true\""
             #pass
-        if self._parent.isMandatory():
+        if self._parent.getPDField() == 'email':
+            param = """<script>addParam($E('%s'), 'email', %s);</script>""" % (htmlName, 'false' if self._parent.isMandatory() else 'true')
+        elif self._parent.isMandatory():
             param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
         else:
             param = ''
@@ -2660,7 +2662,7 @@ class GeneralField(Persistent):
         if self.isMandatory() and self.isLocked('mandatory'):
             self.setMandatory(True)
         else:
-            self.setMandatory(data.has_key("mandatory") and data["mandatory"])
+            self.setMandatory("mandatory" in data)
         if self.isLocked('disable'):
             self.setDisabled(False)
         else:

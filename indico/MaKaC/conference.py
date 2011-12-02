@@ -11496,6 +11496,9 @@ class LocalFile(Resource):
     def getRepository(self):
         return self.__repository
 
+    def __str__( self ):
+        return self.getFileName()
+
     #getURL is removed at the moment from the LocalFile and the file access
     #   is completely delegated to the web interface; the web interface will
     #   have to access the files locally (using the getFilePath) or the readBin

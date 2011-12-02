@@ -37,9 +37,9 @@
                 ${ _('Moderator')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <div>${ Booking.getOwnerObject().getStraightFullName() }</div>
+                <div style="display:inline">${ Booking.getOwnerObject().getStraightFullName() }</div>
                 % if Booking.getConference().canModify(self_._rh._aw) and Booking.getOwner()["id"] != self_._rh._getUser().getId():
-                    <div><a href="#" onClick= "makeMeModerator(this,${Booking.getConference().getId()},${Booking.getId()}, successMakeEventModerator)">${_("Make me moderator")}</a></div>
+                    <div style="display:inline"><a href="#" style="font-size:12px" onClick= "makeMeModerator(this,${Booking.getConference().getId()},${Booking.getId()}, successMakeEventModerator)">${_("Make me moderator")}</a></div>
                 % endif
             </td>
         </tr>

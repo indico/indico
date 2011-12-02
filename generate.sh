@@ -12,6 +12,7 @@ do
   esac
 done
 
+
 CLONE_DIR=`pwd`
 mkdir /tmp/indico-build
 pushd /tmp/indico-build
