@@ -15,7 +15,7 @@ $E("attachment${htmlName}").set(new RegistrationUploadFile(${htmlName | n,j},
         ${field.getParent().isMandatory() | n,j}).draw());
 
 if(${field.getParent().isMandatory() | n,j}){
-    addParam($E(id), 'text', false);
+    addParam($E('${htmlName}'), 'text', false);
 }
 
 </script>

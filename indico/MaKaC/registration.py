@@ -2660,7 +2660,7 @@ class GeneralField(Persistent):
         if self.isMandatory() and self.isLocked('mandatory'):
             self.setMandatory(True)
         else:
-            self.setMandatory(data.has_key("mandatory") and data["mandatory"])
+            self.setMandatory("mandatory" in data)
         if self.isLocked('disable'):
             self.setDisabled(False)
         else:
