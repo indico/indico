@@ -4250,7 +4250,7 @@ class SocialEventForm(BaseForm):
         return None
 
     def _getDefaultIntroValue(self):
-        return i18nformat("""<b> _("Select the social events you would like to attend and how many places you will need"):</b>""")
+        return "<strong>Select the social events you would like to attend and how many places you will need</strong>"
 
     def getIntroSentence(self):
         try:
