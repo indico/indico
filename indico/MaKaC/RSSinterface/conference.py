@@ -99,7 +99,7 @@ class CategoryToRSS:
         rss.writeTag("pubDate", nowutc().astimezone(timezone(self._tz)).strftime("%a, %d %b %Y %H:%M:%S %Z"))
         rss.writeTag("category","")
         rss.writeTag("generator", "CDS Indico %s" % Config.getInstance().getVersion())
-        rss.writeTag("webMaster", info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        rss.writeTag("webMaster", Config.getInstance().getSupportEmail())
         rss.writeTag("ttl","1440")
         for conf in res:
             rss = ConferenceToRSS(conf, tz=self._tz).getCore(rss)

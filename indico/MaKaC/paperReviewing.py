@@ -1064,7 +1064,7 @@ class ConferenceReviewingNotification(GenericNotification):
 
     def __init__(self, user, role, conference):
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
+        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] You have been chosen as %s for the conference "%s" (id: %s)"""
                         % (role, conference.getTitle(), str(conference.getId())))
@@ -1085,7 +1085,7 @@ class ConferenceReviewingRemoveNotification(GenericNotification):
 
     def __init__(self, user, role, conference):
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
+        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] You have been removed as %s of the conference "%s" (id: %s)"""
                         % (role, conference.getTitle(), str(conference.getId())))

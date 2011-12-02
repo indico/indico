@@ -144,7 +144,7 @@ def process(req):
 
     try:
         jsonResponse = encode(responseBody)
-    except:
+    except UnicodeError:
         Logger.get('rpc').exception("Problem encoding JSON response")
         # This is to avoid exceptions due to old data encodings (based on iso-8859-1)
         responseBody["result"] = responseBody["result"].decode('iso-8859-1').encode('utf-8')

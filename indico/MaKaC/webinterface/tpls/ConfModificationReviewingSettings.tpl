@@ -1,4 +1,3 @@
-
 <% from MaKaC.paperReviewing import ConferencePaperReview %>
 <% from MaKaC.paperReviewing import Template %>
 <% from MaKaC.common.utils import formatDateTime %>
@@ -626,7 +625,7 @@ var TemplateList = function(){
                     var cellName = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, nameSpan);
 
                     var cellFormat = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, '${ t.getFormat()}');
-                    var cellDescription = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, '${ t.getDescription()}');
+                    var cellDescription = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, ${t.getDescription() | n,j});
                     var downloadSpan = Html.span({className:'link'}, "Download");
                     var barSpan = Html.span({className:'horizontalSeparator'}, "|");
                     var removeSpan = Html.span({className:'link'}, "Remove");

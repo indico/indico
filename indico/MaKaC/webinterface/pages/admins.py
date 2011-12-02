@@ -162,9 +162,9 @@ class WAdmins(wcomponents.WTemplated):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["title"] = minfo.getTitle()
         vars["organisation"] = minfo.getOrganisation()
-        vars["supportEmail"] = minfo.getSupportEmail()
-        vars["publicSupportEmail"] = minfo.getPublicSupportEmail()
-        vars["noReplyEmail"] = minfo.getNoReplyEmail()
+        vars['supportEmail'] = Config.getInstance().getSupportEmail()
+        vars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
+        vars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
         vars["lang"] = minfo.getLang()
         vars["address"] = ""
         if minfo.getCity() != "":
@@ -263,11 +263,8 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         genInfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["title"] = genInfo.getTitle()
         vars["organisation"] = genInfo.getOrganisation()
-        vars["supportEmail"] = genInfo.getSupportEmail()
-        vars["publicSupportEmail"] = genInfo.getPublicSupportEmail()
         vars["city"] = genInfo.getCity()
         vars["country"] = genInfo.getCountry()
-        vars["noReplyEmail"] = genInfo.getNoReplyEmail()
         try:
             selected_tz = genInfo.getTimezone()
         except:

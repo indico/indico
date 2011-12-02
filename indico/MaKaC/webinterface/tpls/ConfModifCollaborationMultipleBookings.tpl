@@ -104,9 +104,12 @@ ${ ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm)
 
 var bookings = $L(${ jsonEncode(BookingsM) });
 
+var hasCreatePermissions = ${ jsonEncode(HasCreatePermissions) };
+var videoServiceSupport = ${ jsonEncode(VideoServiceSupport) };
+
 var createButton;
 
-var confLocationRoom = '${ Conference.getRoom().getName() if Conference.getRoom() else ""}';
+var confId = ${ Conference.getId() };
 
 /* ------------------------------ UTILITY / HELPER FUNCTIONS -------------------------------*/
 
@@ -200,6 +203,5 @@ IndicoUI.executeOnLoad(function(){
     % endfor
 });
 % endif
-
 </script>
 

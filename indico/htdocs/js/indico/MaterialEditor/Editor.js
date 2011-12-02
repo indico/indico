@@ -925,16 +925,22 @@ type("EditMaterialDialog", ["EditMaterialResourceBase"], {
         self.materialTitle = Html.input("text",{'name':'title', style:{width:'220px'}});
         self.description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
 
+        if (self.material.get('isBuiltin')) {
+            $(self.materialTitle.dom).attr('readonly', 'readonly').css('color', '#888').qtip(
+                {content: $T("This is a default material type and its name cannot be changed. You should create a new type instead."),
+                 position: {my: 'bottom center', at: 'top center'}});
+        }
+
         return IndicoUtil.createFormFromMap(
                 [
-                 [
-                  $T('Description'),
-                  self.description
-                 ],
                  [
                      $T('Title'),
                      Html.div({}, self.materialTitle,
                                   Html.div("smallGrey", $T("'Title' will be used instead of the original name")))
+                 ],
+                 [
+                  $T('Description'),
+                  self.description
                  ]
              ]);
     },

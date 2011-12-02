@@ -29,7 +29,7 @@ from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceB
 import MaKaC.webinterface.displayMgr as displayMgr
 
 from MaKaC.common import filters
-from MaKaC.common.utils import validMail, setValidEmailSeparators
+from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common import indexes, info
 from MaKaC.common.fossilize import fossilize
 
@@ -58,8 +58,6 @@ from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
 from MaKaC.fossils.contribution import IContributionFossil
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
-from MaKaC.common.Configuration import Config
-
 
 class ConferenceBase:
     """
@@ -508,7 +506,39 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
                                           '%d/%m/%Y %H:%M')
 
 
+class ConferenceListSessions (ConferenceListModificationBase):
+    """ Returns a dictionary of all the Sessions within the current Conference,
+        ordered by index only """
+
+    def _getAnswer(self):
+        sessions = self._conf.getSessionList()
+        result = {}
+
+        for sess in sessions:
+            for slot in sess.getSortedSlotList():
+                time = " (" + formatDateTime(slot.getAdjustedStartDate(), format = "dd MMM yyyy HH:mm") + ")"
+                result["s"+sess.getId()+"l"+slot.getId()] = sess.getTitle() + (" - " + slot.getTitle() if slot.getTitle() else "") + time
+
+        return result
+
+
 class ConferenceListContributions (ConferenceListModificationBase):
+    """ Returns a dictionary of all the Contributions within the current Conference,
+        if the Contribution is part of a Session, the Session name is appended
+        to the name of the Contribution in parenthesis """
+
+    def _getAnswer(self):
+        contributions = self._conf.getContributionList()
+        result = {}
+        for cont in contributions:
+            session = (" (" + cont.getSession().getTitle() + ")") if (cont.getSession() is not None) else ""
+            time = " (" + formatDateTime(cont.getAdjustedStartDate(), format = "dd MMM yyyy HH:mm") + ")"
+            result[cont.getId()] = cont.getTitle() + session + time
+
+        return result
+
+
+class ConferenceListContributionsReview (ConferenceListModificationBase):
     """ Returns a list of all contributions of a conference, ordered by id
     """
 
@@ -848,8 +878,10 @@ methodMap = {
     "main.changeKeywords": ConferenceKeywordsModification,
     "main.changeTimezone": ConferenceTimezoneModification,
     "rooms.list" : ConferenceListUsedRooms,
-    "contributions.list" : ConferenceListContributions,
+    "contributions.list" : ConferenceListContributionsReview,
+    "contributions.listAll" : ConferenceListContributions,
     "contributions.delete": ConferenceDeleteContributions,
+    "sessions.listAll" : ConferenceListSessions,
     "pic.delete": ConferencePicDelete,
     "social.toggle": ConferenceSocialBookmarksToggle,
     "showConcurrentEvents": ShowConcurrentEvents,

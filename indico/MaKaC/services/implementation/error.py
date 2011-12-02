@@ -12,7 +12,6 @@ class SendErrorReport(ServiceBase):
     """
 
     def _sendReport( self ):
-        info = HelperMaKaCInfo().getMaKaCInfoInstance()
         cfg = Config.getInstance()
 
         # if no e-mail address was specified,
@@ -22,7 +21,7 @@ class SendErrorReport(ServiceBase):
         else:
             fromAddr = 'indico-reports@example.org'
 
-        toAddr = info.getSupportEmail()
+        toAddr = Config.getInstance().getSupportEmail()
 
         Logger.get('errorReport').debug('mailing %s' % toAddr)
 

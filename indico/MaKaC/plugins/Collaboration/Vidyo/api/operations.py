@@ -21,6 +21,7 @@ from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue, VidyoE
 from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
 from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi
 from suds import WebFault
+from MaKaC.plugins.Collaboration.base import CollaborationException
 
 class VidyoOperations(object):
     """ This class has several class methods,
@@ -145,7 +146,7 @@ class VidyoOperations(object):
             #we produce the list of possible account names. We will loop through them to attempt to create the room
             possibleLogins = VidyoTools.getAvatarLoginList(newOwner)
             if not possibleLogins:
-                return VidyoError("userHasNoAccounts", "modify")
+                raise CollaborationException(_("The moderator has no login information"))
 
 
         roomModified = False

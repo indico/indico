@@ -24,7 +24,11 @@
             (${common.renderLocation(item, parent=parent, span='span')})
             </span>
         % endif
-
+        % if conf.getCSBookingManager().hasVideoService(item.getUniqueId()):
+            % for video in conf.getCSBookingManager().getVideoServicesById(item.getUniqueId()):
+                <%include file="VideoService.tpl" args="video=video"/>
+            % endfor
+        % endif
     </span>
 
     % if item.getDescription():
@@ -56,7 +60,6 @@
             </td>
         </tr>
         % endif
-        </tbody>
     </table>
 
     % if minutes:

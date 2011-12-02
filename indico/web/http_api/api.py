@@ -506,9 +506,8 @@ class CategoryEventFetcher(DataFetcher):
                         return False
                 return True
 
-        for catId in idlist:
-            for obj in self._process(idx.iterateObjectsIn(catId, self._fromDT, self._toDT), filter):
-                yield obj
+        iters = itertools.chain(*(idx.iterateObjectsIn(catId, self._fromDT, self._toDT) for catId in idlist))
+        return self._process(iters, filter)
 
     def event(self, idlist):
         ch = ConferenceHolder()

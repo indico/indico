@@ -29,10 +29,10 @@ from MaKaC.plugins.Collaboration.Vidyo.fossils import ICSBookingConfModifFossil,
     ICSBookingIndexingFossil
 from MaKaC.common.utils import unicodeLength
 from MaKaC.common.timezoneUtils import nowutc
-from datetime import timedelta
 from MaKaC.common.logger import Logger
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
+from MaKaC.plugins.Collaboration.Vidyo.pages import ServiceInformation
 
 class CSBooking(CSBookingBase):
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
@@ -64,7 +64,10 @@ class CSBooking(CSBookingBase):
         "roomDescription": (str, ''),
         "displayPin": (bool, False),
         "displayURL": (bool, True),
-        "displayPhoneNumbers": (bool, True)}
+        "displayPhoneNumbers": (bool, True),
+        "videoLinkType": (str, 'event'),
+        "videoLinkContribution": (str, ''),
+        "videoLinkSession": (str, '')}
 
     _complexParameters = ["pin", "hasPin", "owner"]
 
@@ -89,7 +92,7 @@ class CSBooking(CSBookingBase):
         return False
 
     def canBeConnected(self):
-        return self._created and VidyoTools.getConferenceRoomIp(self._conf)!=""
+        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject())!=""
 
     def canBeDeleted(self):
         return True
@@ -147,6 +150,25 @@ class CSBooking(CSBookingBase):
             else:
                 self._owner = FakeAvatarOwner(ownerAccount)
 
+    def getLinkVideoText(self):
+        return self._generateLinkVideoText()
+
+    def getLinkVideoRoomLocation(self):
+        linkObject = self.getLinkObject()
+        return linkObject.getRoom().getName() if linkObject and linkObject.getRoom() else ""
+
+    def getEndDate(self):
+        """ Returns the end date of the link object
+        """
+        linkObject = self.getLinkObject()
+        return linkObject.getEndDate()
+
+    def getStartDate(self):
+        """ Returns the start date of the link object
+        """
+        linkObject = self.getLinkObject()
+        return linkObject.getStartDate()
+
     def getRoomId(self):
         """ The Viydo internal room id for this booking
         """
@@ -187,6 +209,14 @@ class CSBooking(CSBookingBase):
     def setChecksDone(self, checksDone):
         self._checksDone = checksDone
 
+    def getBookingInformation(self):
+        """ For retreiving the ServiceInformation sections dict built for the
+            Event Header, delegated here for use with Vidyo only at this time.
+            If event linking is required for other video services, this will
+            need to be moved to parent or some other mechanism implemented.
+        """
+        return ServiceInformation().getInformation(self, True)
+
     ## overriding methods
     def _getTitle(self):
         return self._bookingParams["roomName"]
@@ -215,6 +245,43 @@ class CSBooking(CSBookingBase):
 
         return False
 
+    def getLinkObject(self):
+        import re
+
+        if self.getLinkId():
+            sessId = re.search('(?<=s)\d+', self._linkVideoId)
+            slotId = re.search('(?<=l)\d+', self._linkVideoId)
+            contId = re.search('(?<=t)\d+', self._linkVideoId)
+        else:
+            return self._conf
+
+        linkObject = self._conf
+        if contId:
+            linkObject = self._conf.getContributionById(contId.group())
+        elif sessId:
+            session = self._conf.getSessionById(sessId.group())
+            if session is not None:
+                linkObject = session.getSlotById (slotId.group())
+        return linkObject
+
+    def _generateLinkVideoText(self):
+        linkVideoText = ""
+
+        if self.hasSessionOrContributionLink():
+            title = ""
+
+            linkObject = self.getLinkObject()
+            if linkObject is None:
+                return _("Removed %s")%_("contribution") if self.isLinkedToContribution() else _("session")
+            if self.isLinkedToContribution():
+                title = linkObject.getTitle()
+            else:
+                title = linkObject.getSession().getTitle() + (" - " + linkObject.getTitle() if linkObject.getTitle() else "")
+            linkVideoText = title + " (" + self._linkVideoType + ")"
+        else:
+            linkVideoText = _("Whole event")
+
+        return linkVideoText
 
     def _create(self):
         """ Creates the Vidyo public room that will be associated to this CSBooking,
@@ -224,11 +291,11 @@ class CSBooking(CSBookingBase):
             Returns a VidyoError if there is a problem, such as the name being duplicated.
         """
         result = ExternalOperationsManager.execute(self, "createRoom", VidyoOperations.createRoom, self)
-
         if isinstance(result, VidyoError):
             return result
 
         else:
+            # Link to a Session or Contribution if requested
             self._roomId = str(result.roomID) #we need to convert values read to str or there will be a ZODB exception
             self._extension = str(result.extension)
             self._url = str(result.RoomMode.roomURL)
@@ -241,12 +308,10 @@ class CSBooking(CSBookingBase):
         """ Modifies the Vidyo public room in the remote system
         """
         result = ExternalOperationsManager.execute(self, "modifyRoom", VidyoOperations.modifyRoom, self, oldBookingParams)
-
         if isinstance(result, VidyoError):
             if result.getErrorType() == 'unknownRoom':
                 self.setBookingNotPresent()
             return result
-
         else:
             self._extension = str(result.extension)
             self._url = str(result.RoomMode.roomURL)
@@ -276,7 +341,7 @@ class CSBooking(CSBookingBase):
     def _connect(self):
         self._checkStatus()
         if self.canBeConnected():
-            confRoomIp = VidyoTools.getConferenceRoomIp(self._conf)
+            confRoomIp = VidyoTools.getLinkRoomIp(self.getLinkObject())
             if confRoomIp == "":
                 return VidyoError("noValidConferenceRoom", "connect")
             prefixConnect = getVidyoOptionValue("prefixConnect")
@@ -292,7 +357,6 @@ class CSBooking(CSBookingBase):
             The User API call of VidyoOperations.queryRoom will not be necessary any more.
         """
         result = VidyoOperations.queryRoom(self, self._roomId)
-
         if isinstance(result, VidyoError):
             self.setBookingNotPresent()
             return result
@@ -512,4 +576,5 @@ class CSBooking(CSBookingBase):
         cs.setURL(self.getURL())
         cs.setChecksDone(self.getChecksDone())
         cs.setCreated(self.isCreated())
+        cs.setLinkType(self.getLinkIdDict())
         return cs

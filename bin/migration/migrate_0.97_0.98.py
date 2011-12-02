@@ -48,7 +48,7 @@ from MaKaC.webinterface import displayMgr
 
 from indico.core.index import Catalog
 from indico.ext import livesync
-from indico.util import console
+from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
      CategoryStatisticsUpdaterTask
 
@@ -57,6 +57,7 @@ from indico.modules.scheduler import Client
 
 MIGRATION_TASKS = []
 
+i18n.setLocale('en_GB')
 
 def since(version, always=False):
     def _since(f):
@@ -89,8 +90,12 @@ def _convertAlarms(obj):
     obj._legacyAlarmList = obj.getAlarmList()
 
     for alarm in obj.getAlarmList():
-        sdate = alarm.getStartDate()
-        newTask = AlarmTask(obj, alarm.id, sdate)
+        if alarm.timeBefore:
+            newTask = AlarmTask(obj, alarm.id, relative=alarm.timeBefore)
+        elif alarm.getStartDate():
+            newTask = AlarmTask(obj, alarm.id, alarm.getStartDate())
+        else:
+            continue
         newTask.setSubject(alarm.getSubject())
         newTask.setText(alarm.getText())
 

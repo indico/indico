@@ -24,24 +24,6 @@
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Support email")}<br>${ _("(for automatic messages)")}</span></td>
-      <td bgcolor="white" width="100%">&nbsp;
-        <input type="text" size="50" name="supportEmail" value="${ supportEmail }">
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Support email")}<br>${ _("(for public display in page footers)")}</span></td>
-      <td bgcolor="white" width="100%">&nbsp;
-        <input type="text" size="50" name="publicSupportEmail" value="${ publicSupportEmail }">
-      </td>
-    </tr>
-    <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("No reply email")}<br>${ _("(for automatic messages that don't need answer)")}</span></td>
-      <td bgcolor="white" width="100%">&nbsp;
-        <input type="text" size="50" name="noReplyEmail" value="${ noReplyEmail }">
-      </td>
-    </tr>
-    <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Language")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
          <select name="lang">

@@ -340,6 +340,9 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
              return selKey;
          },
 
+         getName: function() {
+             return this.name;
+         },
 
          enable: function() {
              each(this.radioDict,
@@ -372,6 +375,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
                 structure should be updated according
                 to the widgets or not (useful for
                 distinguishing initialization)*/
+
 
              var self = this;
              var widget = this.items[state];
@@ -424,7 +428,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
          }
      },
 
-     function(items, cssClassRadios) {
+     function(items, cssClassRadios, name) {
          this.items = {};
          this.radioDict = {};
          this.options = new WatchObject();
@@ -433,8 +437,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
 
          var self = this;
 
-
-         var name = Html.generateId();
+         this.name = (name === undefined) ? Html.generateId() : name;
 
          this.orderedItems = $L();
          each(items,
@@ -446,7 +449,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
                   // add some extra stuff, since we're in the loop
                   self.visibility.set(key, true);
                   self.options.set(key, false);
-                  self.radioDict[key] = Html.radio({'name': name,
+                  self.radioDict[key] = Html.radio({'name': this.name,
                                                     style: {verticalAlign: 'middle'}});
               });
 
@@ -458,7 +461,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
 
      });
 
-type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
+type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"],
      {
          _drawItem: function(item) {
              var option = Widget.option(item);// Html.option({value: item.key}, item.get());
@@ -472,8 +475,23 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
              return option;
          },
 
+         _setErrorState: function(text) {
+             this._stopErrorList = this._setElementErrorState(this.select, text);
+         },
+
+         _drawNoItems: function() {
+             var option = Widget.option(new WatchPair("None", this.noOptionsText));
+             option.accessor('disabled').set("disabled");
+             option.accessor('selected').set("selected");
+             return option;
+         },
+
          _handleContent: function() {
              var self = this;
+
+             var options = this.source.get();
+
+             if(_.size(self.source.get()) > 0){
 
              return bind.element(this.select,
                                  this.source,
@@ -483,6 +501,13 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
                                      }
                                      return self._drawItem(item);
                                  });
+             }
+             else{
+                 self.select = Html.select({'name':name});
+                 self.select.append(self._drawNoItems());
+                 return self.select;
+
+             }
          },
 
          observe: function(func) {
@@ -505,15 +530,20 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
          },
          unbind: function() {
              bind.detach(this.select);
+         },
+         getName: function() {
+             return this.name;
          }
 
      },
-     function(method, args, callback) {
-         this.select = Html.select({});
+     function(method, args, callback, name, noOptionsText) {
+         this.select = Html.select({'name':name});
          this.selected = new WatchValue();
+         this.noOptionsText = any(noOptionsText,$T("No options"));
          // Load data source on startup
          this.InlineRemoteWidget(method, args, true, callback);
          this.loadOnStartup = false;
+         this.name = name;
      });
 
 

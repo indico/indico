@@ -2530,7 +2530,7 @@ class WUserCreated(WTemplated):
         if minfo.getModerateAccountCreation():
             vars["however"] =  _("However, you will not be able to log into the system until the site administrator has accepted your account creation request. You will be notified of the decision by email")+".<br>"
         vars["signInURL"] = quoteattr( str( vars["signInURL"] ) )
-        vars["supportAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        vars["supportAddr"] = Config.getInstance().getSupportEmail()
         return vars
 
 
@@ -2548,7 +2548,7 @@ class WUserSendIdentity(WTemplated):
         vars["org"] = self._avatar.getOrganisation()
         vars["title"] = self._avatar.getTitle()
         vars["address"] = self._avatar.getAddresses()[0]
-        vars["contactEmail"]  = info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        vars["contactEmail"]  = Config.getInstance().getSupportEmail()
         return vars
 
 

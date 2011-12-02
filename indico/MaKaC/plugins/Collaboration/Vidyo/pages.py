@@ -188,39 +188,41 @@ class ServiceInformation(object):
     def getInformation(cls, booking, displayTz=None):
         sections = []
         sections.append({
-            "title" : _('Room name:'),
+            "title" : _('Room name'),
             'lines' : [booking.getBookingParamByName("roomName")],
         })
         sections.append({
-            "title" : _('Extension:'),
+            "title" : _('Extension'),
             'lines' : [booking.getExtension()],
         })
         if booking.getHasPin():
             pinSection = {}
-            pinSection['title'] = _('PIN:')
+            pinSection['title'] = _('PIN')
             if booking.getBookingParamByName("displayPin"):
                 pinSection['lines'] = [booking.getPin()]
             else:
                 pinSection['lines'] = [_('This Vidyo room is protected by a PIN')]
+
         sections.append({
-            "title" : _('Owner:'),
-            'lines' : [booking.getOwnerObject().getFullName()],
+            "title" : _('Moderator'),
+            'lines' : [booking.getOwnerObject().getStraightFullName()],
         })
 
-        if booking.getBookingParamByName("displayURL"):
-            autojoinSection = {}
-            autojoinSection['title'] = _('Auto-join URL:')
-            autojoinSection['linkLines'] = [(booking.getURL(), booking.getURL())]
-            sections.append(autojoinSection)
+
         if booking.getBookingParamByName("displayPhoneNumbers") and getVidyoOptionValue("phoneNumbers"):
             sections.append({
-                "title" : _('VidyoVoice phone numbers:'),
+                "title" : _('VidyoVoice phone numbers'),
                 'lines' : [', '.join(getVidyoOptionValue("phoneNumbers"))],
             })
         sections.append({
-            "title" : _('Description:'),
+            "title" : _('Description'),
             'lines' : [booking.getBookingParamByName("roomDescription")],
         })
+        if booking.getBookingParamByName("displayURL"):
+            autojoinSection = {}
+            autojoinSection['title'] = _('Auto-join URL')
+            autojoinSection['linkLines'] = [(booking.getURL(), booking.getURL())]
+            sections.append(autojoinSection)
         return sections
 
 

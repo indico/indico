@@ -73,6 +73,10 @@ def application(environ, start_response):
     ## see: <http://code.google.com/p/modwsgi/wiki/ApplicationIssues>
     req = SimulatedModPythonRequest(environ, start_response)
 
+    if req.method == 'OPTIONS':
+        start_response("501 Not Implemented", [], None)
+        return ''
+
     possible_module, possible_handler = is_mp_legacy_publisher_path(req)
 
     # The POST form processing has to be done after checking the path

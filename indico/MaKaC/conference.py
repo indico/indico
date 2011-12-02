@@ -3132,7 +3132,7 @@ class Conference(CommonObjectBase, Locatable):
         self.description = desc
         self.notifyModification()
 
-    def getSupportEmail( self, returnNoReply=False, caption=False ):
+    def getSupportEmail(self, returnNoReply=False, caption=False):
         """
         Returns the support email address associated with the conference
         :param returnNoReply: Return no-reply address in case there's no support e-mail (default True)
@@ -3142,12 +3142,12 @@ class Conference(CommonObjectBase, Locatable):
         try:
             if self._supportEmail:
                 pass
-        except AttributeError, e:
+        except AttributeError:
             self._supportEmail = ""
         if self._supportEmail.strip() == "" and returnNoReply:
             # In case there's no conference support e-mail, return the no-reply
             # address, and the 'global' support e-mail if there isn't one
-            return HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+            return Config.getInstance().getNoReplyEmail()
         else:
             supportCaption = self.getDisplayMgr().getSupportEmailCaption()
 
@@ -3528,8 +3528,11 @@ class Conference(CommonObjectBase, Locatable):
         contributions.sort(key = lambda c: c.getId())
         return contributions
 
-    def getNumberOfContributions(self):
-        return len(self.contributions)
+    def getNumberOfContributions(self, only_scheduled=False):
+        if only_scheduled:
+            return len(filter(lambda c: c.isScheduled(), self.contributions.itervalues()))
+        else:
+            return len(self.contributions)
 
     def getProgramDescription(self):
         try:
@@ -4229,7 +4232,9 @@ class Conference(CommonObjectBase, Locatable):
         # Meetings' and conferences' sessions cloning
         if options.get("sessions",False) :
             for s in self.getSessionList() :
-                conf.addSession(s.clone(timeDelta, conf, options))
+                newSes = s.clone(timeDelta, conf, options)
+                ContextManager.setdefault("clone.unique_id_map", {})[s.getUniqueId()] = newSes.getUniqueId()
+                conf.addSession(newSes)
         # Materials' cloning
         if options.get("materials",False) :
             for m in self.getMaterialList() :
@@ -4287,11 +4292,13 @@ class Conference(CommonObjectBase, Locatable):
                         conf.addContribution(nc)
                         if cont.isScheduled() :
                             sch.addEntry(nc.getSchEntry())
+                        ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
                     elif cont.isScheduled():
                         # meetings...only scheduled
                         nc = cont.clone(conf, options, timeDelta)
                         conf.addContribution(nc)
                         sch.addEntry(nc.getSchEntry())
+                        ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
         # Participants' module settings and list cloning
         if options.get("participants",False) :
             self.getParticipation().clone(conf, options, eventManager)
@@ -4891,16 +4898,6 @@ class ConferenceHolder( ObjectHolder ):
     def _newId( self ):
         id = ObjectHolder._newId( self )
         return "%s"%id
-
-    def getByStartDate( self, sday, eday = None ):
-        # XXX This function seems strange?
-        res=[]
-        sDayStart=datetime(sday.year,sday.month,sday.day,0,0)
-        sDayEnd=datetime(sday.year,sday.month,sday.day,23,59)
-        for conf in self.getList():
-            if sday>=sDayStart and eday<=sDayEnd:
-                res.append(conf)
-        return conf
 
     def getById( self, id, quiet=False ):
         """returns an object from the index which id corresponds to the one
@@ -5758,6 +5755,7 @@ class Session(CommonObjectBase, Locatable):
         for slot in self.getSlotList() :
             newslot = slot.clone(ses, options)
             ses.addSlot(newslot)
+            ContextManager.setdefault("clone.unique_id_map", {})[slot.getUniqueId()] = newslot.getUniqueId()
 
         ses.notifyModification()
 
@@ -6154,8 +6152,11 @@ class Session(CommonObjectBase, Locatable):
     def getContributionList( self ):
         return self.contributions.values()
 
-    def getNumberOfContributions( self ):
-        return len(self.contributions)
+    def getNumberOfContributions(self, only_scheduled=False):
+        if only_scheduled:
+            return len(filter(lambda c: c.isScheduled(), self.contributions.itervalues()))
+        else:
+            return len(self.contributions)
 
     def canIPAccess( self, ip ):
         if not self.__ac.canIPAccess( ip ):
@@ -6650,6 +6651,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
                     contrib = entry.getOwner()
                     newcontrib = contrib.clone(session, options, timeDifference)
                     slot.getSchedule().addEntry(newcontrib.getSchEntry(),0)
+                    ContextManager.setdefault("clone.unique_id_map", {})[contrib.getUniqueId()] = newcontrib.getUniqueId()
 
         slot.setContribDuration(0, 0, self.getContribDuration())
         slot.notifyModification()
@@ -6870,6 +6872,11 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
 
     def getId( self ):
         return self.id
+
+    def getUniqueId( self ):
+        """Returns (string) the unique identiffier of the item.
+           Used mainly in the web session access key table"""
+        return "%sl%s" % (self.getSession().getUniqueId(),self.id)
 
     def setTitle( self, newTitle ):
         self.title=newTitle
@@ -10854,8 +10861,19 @@ class Material(CommonObjectBase):
     def getAccessController(self):
         return self.__ac
 
+    def isBuiltin(self):
+        return False
 
-class Reviewing(Material):
+
+class BuiltinMaterial(Material):
+    """
+    Non-customizable material types
+    """
+    def isBuiltin(self):
+        return True
+
+
+class Reviewing(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10869,7 +10887,7 @@ class Reviewing(Material):
             return self.getOwner().getContribution()
         return Material.getContribution(self)
 
-class Paper(Material):
+class Paper(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10880,7 +10898,7 @@ class Paper(Material):
 
 
 
-class Slides(Material):
+class Slides(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10891,7 +10909,7 @@ class Slides(Material):
 
 
 
-class Video(Material):
+class Video(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10900,7 +10918,7 @@ class Video(Material):
     def setId( self, newId ):
         return
 
-class Poster(Material):
+class Poster(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )
@@ -10909,7 +10927,7 @@ class Poster(Material):
     def setId( self, newId ):
         return
 
-class Minutes(Material):
+class Minutes(BuiltinMaterial):
 
     def __init__( self, materialData = None ):
         Material.__init__( self, materialData )

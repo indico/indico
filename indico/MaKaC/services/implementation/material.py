@@ -314,6 +314,9 @@ class EditMaterialClassBase(MaterialModifBase, UserListChange):
         Updates the material with the new properties
         """
 
+        if self._material.isBuiltin() and self._material.getTitle() != self._title:
+            raise ServiceError("", "You can't change the name of a built-in material.")
+
         self.changeUserList(self._material, self._newUserList)
 
         self._material.setTitle(self._title);

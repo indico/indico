@@ -294,8 +294,20 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         vars["Tab"] = self._activeTab
         vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
 
-        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesUser
         vars["UserIsAdmin"] = RCCollaborationAdmin.hasRights(user = self._user) or RCCollaborationPluginAdmin.hasRights(user = self._user, plugins = self._tabPlugins)
+
+        hasCreatePermissions = {}
+        videoServSupport = {}
+        for plugin in plugins:
+            pname = plugin.getName()
+            hasCreatePermissions[pname] = RCVideoServicesUser.hasRights(user = self._user, pluginName = pname)
+            videoServSupport[pname] = plugin.getOption("contactSupport").getValue() if plugin.hasOption("contactSupport") else ""
+        vars["HasCreatePermissions"] = hasCreatePermissions
+        vars["VideoServiceSupport"] = videoServSupport
+
+
+
 
         singleBookingForms = {}
         multipleBookingForms = {}
@@ -386,6 +398,10 @@ class WConfModifCollaborationProtection(wcomponents.WTemplated):
 ################################################### Event Display pages ###############################################
 class WPCollaborationDisplay(WPConferenceDefaultDisplayBase):
 
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Collaboration')
+
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._collaborationOpt)
@@ -414,7 +430,7 @@ class WCollaborationDisplay(wcomponents.WTemplated):
         scheduledBookings = {} #date, list of bookings
 
         for b in bookings:
-            if b.canBeStarted():
+            if b.isHappeningNow():
                 ongoingBookings.append(b)
             if b.getStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
                 scheduledBookings.setdefault(b.getAdjustedStartDate(self._tz).date(), []).append(b)

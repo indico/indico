@@ -180,10 +180,18 @@ H.323 device. To use it in your PC,  you need the Vidyo client installed and a
 webcam and audio device connected (please go to `recommendations page <http://it-multimedia.web.cern.ch/it-multimedia/collaborative/recommendations.php>`_
 for videoconferencing PC hardware).
 
-An ongoing Vidyo videoconference associated to an Indico event will appear like
+The ongoing Vidyo videoconferences associated to an Indico event (or sessions or contributions) will appear like
 this:
 
+|image16|
+
+The information related to the Vidyo videoconferences associated to the event will be shown:
+
 |image12|
+
+If you are not the moderator of the Vidyo videoconference associated and you are manager of the event, the link *Make me moderator* will be shown:
+
+|image17|
 
 If the Vidyo meeting is not yet ongoing, the *Join Now!* button will not be
 shown.
@@ -193,7 +201,15 @@ click on the *Join Now!* link:
 
 |image13|
 
-This will connect you to the Vidyo Portal where you will be asked for your
+In the case of sessions and contributions a popup will appear when the mouse passes over the "Join Vidyo" link:
+
+|image18|
+
+The popup will also show the information related to the room and, if you are manager of the event and you are not the moderator a link *Make me moderator* will appear.
+
+|image19|
+
+These links will connect you to the Vidyo Portal where you will be asked for your
 account name and password. For information about registration, please go to
 http://cern.ch/vidyo-service/. If you are not yet registered in the system,
 you can also choose a Guest name:
@@ -223,3 +239,7 @@ video and audio from/to the meeting.
 .. |image13| image:: images/image13.png
 .. |image14| image:: images/image14.png
 .. |image15| image:: images/image15.png
+.. |image16| image:: images/image16.png
+.. |image17| image:: images/image17.png
+.. |image18| image:: images/image18.png
+.. |image19| image:: images/image19.png

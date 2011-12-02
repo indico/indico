@@ -106,7 +106,7 @@ class OfflineWebsiteCreator(OneShotTask):
                     --
                     Indico
                     """)%ofu
-        maildata = { "fromAddr": info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail(), "toList": [self._toUser.getEmail()], "subject": _("[Indico] Offline website creation done"), "body": text }
+        maildata = { "fromAddr": Config.getInstance().getSupportEmail(), "toList": [self._toUser.getEmail()], "subject": _("[Indico] Offline website creation done"), "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
     def _sendErrorEmail(self, e):
@@ -129,7 +129,7 @@ class OfflineWebsiteCreator(OneShotTask):
 
                     <Indico support> indico-project @ cern.ch
                     """)%(self._conf.getId(), self._toUser.getFullName(), self._toUser.getEmail(), e, "\n".join( tracebackList ))
-        maildata = { "fromAddr": HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail(), "toList": [HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()], "subject": _("[Indico] Error in task: Offline website creation"), "body": text }
+        maildata = { "fromAddr": Config.getInstance().getSupportEmail(), "toList": [Config.getInstance().getSupportEmail()], "subject": _("[Indico] Error in task: Offline website creation"), "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
     def _normalisePath(self,path):

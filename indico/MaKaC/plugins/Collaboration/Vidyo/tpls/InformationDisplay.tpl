@@ -2,7 +2,7 @@
     <tbody>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('Room Name:')}
+                ${ _('Room Name')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getBookingParamByName("roomName") }
@@ -10,7 +10,7 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('Extension:')}
+                ${ _('Extension')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getExtension() }
@@ -19,7 +19,7 @@
         % if Booking.getHasPin():
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('PIN:')}
+                ${ _('PIN')}
             </td>
             % if Booking.getBookingParamByName("displayPin"):
             <td class="collaborationConfDisplayInfoRightCol">
@@ -34,16 +34,21 @@
         % endif
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('Owner:')}
+                ${ _('Moderator')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                ${ Booking.getOwnerObject().getFullName() }
+                <div>${ Booking.getOwnerObject().getStraightFullName() }</div>
+                % if Booking.getConference().canModify(self_._rh._aw) and Booking.getOwner()["id"] != self_._rh._getUser().getId():
+                    <div><a href="#" onClick= "makeMeModerator(this,${Booking.getConference().getId()},${Booking.getId()}, successMakeEventModerator)">${_("Make me moderator")}</a></div>
+                % endif
             </td>
         </tr>
+
+
         % if Booking.getBookingParamByName("displayURL"):
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('Auto-join URL:')}
+                ${ _('Auto-join URL')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <a href="${ Booking.getURL() }">${ Booking.getURL() }</a>
@@ -53,7 +58,7 @@
         % if Booking.getBookingParamByName("displayPhoneNumbers") and PhoneNumbers:
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('VidyoVoice phone numbers:')}
+                ${ _('VidyoVoice phone numbers')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <ul style="margin: 0;">
@@ -64,10 +69,18 @@
         % endif
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span>${ _('Description')}:</span>
+                <span>${ _('Description')}</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getBookingParamByName("roomDescription") }
+            </td>
+        </tr>
+        <tr>
+            <td class="collaborationConfDisplayInfoLeftCol">
+                <span>${ _('Linked to')}</span>
+            </td>
+            <td class="collaborationConfDisplayInfoRightCol">
+                ${ Booking.getLinkVideoText() }
             </td>
         </tr>
     </tbody>

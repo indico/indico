@@ -1,25 +1,39 @@
 <table style="margin-top: 10px;">
     <tr>
-        <td class="bookingFormFieldName">
-            <span>Room name</span>
+        <td class="bookingFormFieldName" nowrap>
+            <span>${_("Room name")}</span>
         </td>
         <td>
-            <input id="roomName" type="text" size="60" name="roomName" value="${ EventTitle }" />
+            <input id="roomName" type="text" size="55" name="roomName" value="${ EventTitle }" />
         </td>
     </tr>
 
     <tr>
-        <td class="bookingFormFieldName" style="vertical-align: top;">
-            <span>Description</span>
+        <td class="bookingFormFieldName" style="vertical-align: top;" nowrap>
+            <span>${_("Description")}</span>
         </td>
         <td>
-            <textarea rows="3" cols="60" name="roomDescription">${ EventDescription }</textarea>
+            <textarea rows="3" cols="55" name="roomDescription">${ EventDescription }</textarea>
         </td>
     </tr>
 
     <tr>
-        <td class="bookingFormFieldName">
-            <span>Owner</span>
+        <td class="bookingFormFieldName" style="vertical-align: top;" nowrap>
+            <span>${_("Event linking")}</span>
+        </td>
+        <td>
+            <div id="videoEventLinkType"></div>
+            <div id="videoEventLinkSelection"  style="padding-left: 25px;">
+                <select id="dummy" disabled="disabled">
+                    <option>${_("Default association")}</option>
+                </select>
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="bookingFormFieldName" nowrap>
+            <span>${_("Moderator")}</span>
         </td>
         <td>
             <span id="owner"></span>
@@ -28,8 +42,8 @@
     </tr>
 
     <tr>
-        <td class="bookingFormFieldName">
-            <span>PIN</span>
+        <td class="bookingFormFieldName" nowrap>
+            <span>${_("PIN")}</span>
         </td>
         <td>
             <span id="PINField"></span>

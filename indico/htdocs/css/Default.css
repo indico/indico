@@ -4200,10 +4200,6 @@ ul.errorList {
     margin-left: 20px;
 }
 
-ul.errorList li {
-    color: #881122;
-}
-
 .errorList {
     width: 400px;
 }
@@ -4216,13 +4212,11 @@ ul.warningList {
 
 span.errorTitle {
     font-size: medium;
-    color: #881122;
     font-weight: bold;
 }
 
 span.messageAfterErrors {
     margin-top: 1em;
-    color: #881122;
 }
 
 span.warningTitle {
@@ -4449,6 +4443,7 @@ td.collaborationInfoLeftCol {
 td.bookingFormFieldName {
     text-align: right;
     padding-right: 5px;
+    color: #523D04;
 }
 
 span.bookingFormWarning {
@@ -4882,6 +4877,7 @@ td.collaborationConfDisplayInfoLeftCol {
     text-align: right;
     padding-right: 10px;
     padding-left: 5px;
+    font-weight: bold;
 }
 
 td.collaborationConfDisplayInfoLeftCol, td.collaborationConfDisplayInfoRightCol {
@@ -7133,6 +7129,7 @@ span.num_events {
     border: 1px solid #dcdcdc;
     color: #555555;
     border-radius: 5px;
+    display: inline;
 }
 
 .buttonWithPlay:hover{
@@ -7157,3 +7154,59 @@ span.num_events {
     -moz-border-radius-bottomleft: 0;
     border-bottom-left-radius: 0;
 }
+
+.videoServiceWrapper {
+    display: block;
+    width: auto;
+    padding-bottom: 3px;
+}
+
+.videoServiceWrapperInline {
+    display: inline-block;
+    padding-left: 5px;
+}
+
+.videoServiceType {
+    font-weight: bold;
+}
+
+.videoServiceTitle {
+    font-style: italic;
+}
+
+.videoServiceInlinePopup {
+    font-size: 1.1em;
+    line-height: 1.4em;
+    display: block;
+    width: 350px;
+}
+
+.videoServiceInlinePopup .lineWrapper {
+    display: block;
+    width: auto;
+    clear: both;
+}
+
+.videoServiceInlinePopup .lineWrapper .leftCol {
+    font-weight: bold;
+    display: inline-block;
+    text-align: right;
+    width: 25%;
+    padding-right: 5px;
+    float: left;
+}
+
+.videoServiceInlinePopup .lineWrapper .rightCol {
+    display: inline-block;
+    width: 50%;
+    float: left;
+}
+
+.videoServiceInlinePopup .lineWrapper .rightCol a{
+    font-size: 10.5px;
+}
+.videoServiceInlinePopup .lineWrapper .rightCol input {
+    font-size: 10.5px;
+}
+
+

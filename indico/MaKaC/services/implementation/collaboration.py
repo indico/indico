@@ -23,7 +23,7 @@ from MaKaC.services.implementation.base import ParameterManager, AdminService
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.plugins.Collaboration.base import CollaborationException, CollaborationServiceException
 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin,\
-    RCCollaborationPluginAdmin, RCVideoServicesManager
+    RCCollaborationPluginAdmin, RCVideoServicesManager, RCVideoServicesUser
 from MaKaC.i18n import _
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins import PluginsHolder
@@ -81,12 +81,11 @@ class CollaborationBookingModifBase(CollaborationBase):
             booking = self._CSBookingManager.getBooking(self._bookingId)
             self._bookingType = booking.getType()
             self._bookingPlugin = booking.getPlugin()
-
         else:
             raise CollaborationException(_("Booking id not set when trying to modify a booking on meeting ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
 
     def _checkProtection(self):
-        CollaborationBase._checkCanManagePlugin(self, self._bookingPlugin)
+        CollaborationBase._checkCanManagePlugin(self, self._bookingType)
 
 class CollaborationAdminBookingModifBase(CollaborationBookingModifBase):
     """ Base class for services on booking objects that can only be requested by Server Admins,
@@ -112,15 +111,25 @@ class AdminCollaborationBase(AdminService):
 
 ##! End of base classes
 
+class CollaborationBookingModif(CollaborationBookingModifBase):
+    """ Specific to check the authorised users and groups creating, editing and removing.
+        It is different to CollaborationBookingModifBase because:
+        * CollaborationBookingModif: people that can create, edit, remove
+        * CollaborationBookingModifBase: people that can start, stop, sync, etc
+    """
+    def _checkProtection(self):
+        CollaborationBookingModifBase._checkProtection(self)
+        if not RCVideoServicesUser.hasRights(self, None, self._bookingType):
+            raise CollaborationException(_("You dot have access to modify a %s booking")%self._bookingType)
 
-class CollaborationCreateCSBooking(CollaborationBase):
+class CollaborationCreateCSBooking(CollaborationBase, CollaborationBookingModif):
     """ Adds a new booking
     """
     def _checkParams(self):
         CollaborationBase._checkParams(self)
 
         if 'type' in self._params:
-            self._type = self._params['type']
+            self._bookingType = self._params['type']
         else:
             raise CollaborationException(_("type parameter not set when trying to create a booking on meeting ") + str(self._conf.getId() ))
 
@@ -131,25 +140,26 @@ class CollaborationCreateCSBooking(CollaborationBase):
             raise CollaborationException(_("Custom parameters for plugin ") + str(self._type) + _(" not set when trying to create a booking on meeting ") + str(self._conf.getId() ))
 
     def _checkProtection(self):
-        CollaborationBase._checkCanManagePlugin(self, self._type)
+        CollaborationBookingModif._checkProtection(self)
 
     def _getAnswer(self):
-        return fossilize(self._CSBookingManager.createBooking(self._type, bookingParams = self._bookingParams),
+        return fossilize(self._CSBookingManager.createBooking(self._bookingType, bookingParams = self._bookingParams),
                          None, tz = self._conf.getTimezone())
 
-class CollaborationRemoveCSBooking(CollaborationBookingModifBase):
+class CollaborationRemoveCSBooking(CollaborationBookingModif):
     """ Removes a booking
     """
+
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.removeBooking(self._bookingId),
                          None, tz = self._conf.getTimezone())
 
 
-class CollaborationEditCSBooking(CollaborationBookingModifBase):
+class CollaborationEditCSBooking(CollaborationBookingModif):
     """ Edits a booking
     """
     def _checkParams(self):
-        CollaborationBookingModifBase._checkParams(self)
+        CollaborationBookingModif._checkParams(self)
 
         if self._params.has_key('bookingParams'):
             pm = ParameterManager(self._params)
@@ -428,6 +438,14 @@ class CollaborationCreateTestCSBooking(CollaborationCreateCSBooking):
         return fossilize(self._CSBookingManager.createTestBooking(bookingParams = self._bookingParams),
                          None, tz = self._conf.getTimezone())
 
+class CollaborationMakeMeModeratorCSBooking(CollaborationBookingModifBase):
+    """ Service that creates a 'test' booking for performance test.
+        Avoids to use any of the plugins except DummyPlugin
+    """
+    def _getAnswer(self):
+        return fossilize(self._CSBookingManager.makeMeModeratorBooking(self._bookingId, fossilize(self.getAW().getUser())),
+                                  None, tz = self._conf.getTimezone())
+
 
 methodMap = {
     "createCSBooking": CollaborationCreateCSBooking,
@@ -442,5 +460,6 @@ methodMap = {
     "bookingIndexQuery": CollaborationBookingIndexQuery,
     "addPluginManager": CollaborationAddPluginManager,
     "removePluginManager": CollaborationRemovePluginManager,
-    "pluginService": CollaborationCustomPluginService
+    "pluginService": CollaborationCustomPluginService,
+    "makeMeModerator": CollaborationMakeMeModeratorCSBooking
 }

@@ -22,7 +22,8 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.common.info import HelperMaKaCInfo
-        
+from MaKaC.common.Configuration import Config
+
 
 class WPContact(WPMainBase):
     def _getNavigationDrawer(self):
@@ -34,10 +35,9 @@ class WPContact(WPMainBase):
 
 
 class WContact(wcomponents.WTemplated):
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["supportEmail"] = minfo.getPublicSupportEmail()
-        vars["teamEmail"] = minfo.getSupportEmail()
+        vars["supportEmail"] = Config.getInstance().getPublicSupportEmail()
+        vars["teamEmail"] = Config.getInstance().getSupportEmail()
         return vars

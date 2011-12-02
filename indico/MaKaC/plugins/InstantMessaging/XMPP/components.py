@@ -39,6 +39,7 @@ import zope.interface
 
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import INavigationContributor
+from MaKaC.common.Configuration import Config
 
 
 class ChatSMContributor(Component, Observable):
@@ -298,7 +299,7 @@ class ChatroomsNotification(GenericNotification):
 
     def __init__(self, room, userList):
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer <%s>"%Config.getInstance().getSupportEmail())
         self.setToList(userList)
 
     def create(self, room, conference=None):

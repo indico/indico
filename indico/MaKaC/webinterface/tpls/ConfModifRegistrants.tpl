@@ -144,6 +144,9 @@
                   <input type="submit" class="btn" name="printBadgesSelected" value="${ _("Print badges")}">
                 </td>
                 <td valign="bottom" align="left">
+                  <input type="submit" class="btn" name="PKG" value="${ _("Attachments")}">
+                </td>
+                <td valign="bottom" align="left">
                   <input type="submit" class="btn" name="info.x" value="${ _("Show stats")}">
                 </td>
                 <td valign="middle" align="left">
@@ -183,6 +186,9 @@
                         </td>
                         <td valign="bottom" align="left">
                             <input type="submit" class="btn" name="printBadgesSelected" value="${ _("Print badges")}">
+                        </td>
+                        <td valign="bottom" align="left">
+                            <input type="submit" class="btn" name="PKG" value="${ _("Attachments")}">
                         </td>
                         <td valign="bottom" align="left">
                             <input type="submit" class="btn" name="info.x" value="${ _("Show stats")}">

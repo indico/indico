@@ -31,7 +31,7 @@
   }
 </script>
 
-<form action=${ postURL } method="POST" onSubmit="return formSubmit(this);">
+<form action=${ postURL } method="POST" onSubmit="return formSubmit(this);" enctype="multipart/form-data">
 <br>
 <table width="60%" align="center" style="border-left:1px solid #777777;border-top:1px solid #777777;" cellspacing="0">
   <tr>
