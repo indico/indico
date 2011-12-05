@@ -58,8 +58,8 @@
         </tr>
         % if numConferences:
             <tr>
-                <td colspan="2">
-                    <p class="warningText">${_('Warning: The parent category contains %d events which will be moved to the new sub-category.') % numConferences}</p>
+                <td colspan="2" class="categoryWarning">
+                    <p class="warningText">${_('<strong>Warning:</strong> The parent category contains %d events which will be moved to the new sub-category.') % numConferences}</p>
                 </td>
             </tr>
         % endif

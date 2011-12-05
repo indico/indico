@@ -4179,6 +4179,14 @@ select.invalidSelect {
     color: #881122;
 }
 
+.categoryWarning p.warningText {
+    padding: 15px;
+    border: 1px solid #ddd;
+    margin-left: 15%;
+    width: 600px;
+    border-radius: 5px;
+}
+
 .successText {
     color: #118822;
 }
