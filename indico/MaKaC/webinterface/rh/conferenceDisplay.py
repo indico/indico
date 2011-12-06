@@ -19,7 +19,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from datetime import timedelta,datetime, time
-import os, re, sys
+import os, re, sys, pytz
 import MaKaC.common.info as info
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
@@ -980,9 +980,15 @@ class RHAbstractBook(RHConferenceBaseDisplay):
         return os.path.join(dir, '%s.pdf' % self._conf.getId())
 
     def _process(self):
+        boaConfig = self._conf.getBOAConfig()
         pdfFilename = "%s - Book of abstracts.pdf" % cleanHTMLHeaderFilename(self._target.getTitle())
         cacheFile = self._getCacheFileName()
-        if os.path.isfile(cacheFile) and not self._noCache:
+        if os.path.isfile(cacheFile):
+            mtime = pytz.utc.localize(datetime.utcfromtimestamp(os.path.getmtime(cacheFile)))
+        else:
+            mtime = None
+
+        if mtime and mtime > boaConfig.lastChanged and not self._noCache:
             with open(cacheFile, 'rb') as f:
                 data = f.read()
         else:

@@ -1,20 +1,18 @@
 <div style="padding:20px 0px">
 
-<form action="${ urlHandlers.UHConfAbstractBook.getURL(conf, cache=0) }" method="POST">
-<input type="submit" class="btn" name="createAbstractsBook" value="(Re-)create/download book of abstracts now" />
-</form>
-<br /><br />
+<a href="${urlHandlers.UHConfAbstractBook.getURL(conf)}">${_("Download book of abstracts")}</a>
+
+<div style="margin-top: 10px;">
 % if bookOfAbstractsActive:
     % if bookOfAbstractsMenuActive:
-        ${ _("Note that your customizations will be saved and users will be able to download this book of abstract from the <a href='%s'>event home page</a>")% urlHandlers.UHConferenceDisplay.getURL( conf ) }.
+        ${ _("Users will be able to download the book from the <a href='%s'>event home page</a>. You can disable the download from the <a href='%s'>Layout->Menu</a> configuration page.") % (urlHandlers.UHConferenceDisplay.getURL(conf), urlHandlers.UHConfModifDisplayMenu.getURL(conf))}
     % else:
-        ${ _("Note that you need to enable the book of abstracts link in <a href='%s'>Layout->Menu</a>")% urlHandlers.UHConfModifDisplayMenu.getURL( conf ) }.
+        ${ _("Note that you need to enable the book of abstracts link in <a href='%s'>Layout->Menu</a>") % urlHandlers.UHConfModifDisplayMenu.getURL(conf) }.
     % endif
 % else:
-    ${ _("Note that you need to enable call for abstracts if you wish to provide a link in the <a href='%s'>event home page</a> menu, so users can download your book of abstracts")% urlHandlers.UHConferenceDisplay.getURL( conf ) }.
+    ${ _("Note that you need to enable call for abstracts if you wish to provide a link in the <a href='%s'>event home page</a> menu, so users can download your book of abstracts")% urlHandlers.UHConferenceDisplay.getURL(conf) }.
 % endif
-    <br />
-    ${_('Please note that you must click the above button after making customizations or users will receive an old version of the book of abstracts.')}
+</div>
 </div>
 
 <div class="groupTitle">${ _("Customisation")}</div>

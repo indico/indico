@@ -12075,12 +12075,14 @@ class BOAConfig(Persistent):
         self._text=""
         self._showIds= False
         self._sortBy = "number"
+        self._modificationDS = nowutc()
 
     def getText(self):
         return self._text
 
     def setText(self,newText):
         self._text=newText.strip()
+        self._notifyModification()
 
     def getShowIds(self):
         if not hasattr(self, "_showIds"):
@@ -12089,6 +12091,7 @@ class BOAConfig(Persistent):
 
     def setShowIds(self,showIds):
         self._showIds=showIds
+        self._notifyModification()
 
     def getSortBy(self):
         if not hasattr(self, "_sortBy"):
@@ -12097,7 +12100,17 @@ class BOAConfig(Persistent):
 
     def setSortBy(self,sortBy):
         self._sortBy=sortBy
+        self._notifyModification()
 
     @staticmethod
     def getSortByTypes():
         return BOAConfig.sortByTypes
+
+    def _notifyModification(self):
+        self._modificationDS = nowutc()
+
+    @property
+    def lastChanged(self):
+        if not hasattr(self, '_modificationDS'):
+            self._modificationDS = nowutc()
+        return self._modificationDS
