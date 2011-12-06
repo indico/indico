@@ -352,7 +352,7 @@ def roomBlockingInit(dbi, withRBDB, prevVersion):
         root['RoomBlocking']['Indexes']['DayBlockings'] = CalendarDayIndex()
         root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
 
-@since('0.98b2')
+@since('0.98.1')
 def runRoomDayIndexInit(dbi, withRBDB, prevVersion):
     """
     Initializing room+day => reservation index.
