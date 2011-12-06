@@ -164,7 +164,7 @@ class ServiceBase(RequestHandlerBase):
         @param req: HTTP Request provided by the previous layer
         """
         RequestHandlerBase.__init__(self, req)
-        self._params = params
+        self._reqParams = self._params = params
         self._requestStarted = False
         self._websession = session
         # Fill in the aw instance with the current information

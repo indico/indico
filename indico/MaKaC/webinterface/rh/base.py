@@ -166,6 +166,21 @@ class RequestHandlerBase(OldObservable):
         else:
             return hostIP
 
+    def _getTruncatedParams(self):
+        """ Truncates params, so that file objects do not show up in the logs """
+
+        params = {}
+
+        for key,value in self._reqParams.iteritems():
+            if isinstance(value, Field):
+                params[key] = "<FILE>"
+            elif type(value) == str:
+                params[key] = truncate(value, 1024)
+            else:
+                params[key] = value
+
+        return params
+
     accessWrapper = property( getAW )
 
 
@@ -340,22 +355,6 @@ class RH(RequestHandlerBase):
 
         p=errors.WPGenericError(self)
         return p.display()
-
-
-    def _getTruncatedParams(self):
-        """ Truncates params, so that file objects do not show up in the logs """
-
-        params = {}
-
-        for key,value in self._reqParams.iteritems():
-            if isinstance(value, Field):
-                params[key] = "<FILE>"
-            elif type(value) == str:
-                params[key] = truncate(value, 1024)
-            else:
-                params[key] = value
-
-        return params
 
     def _processUnexpectedError(self,e):
         """Unexpected errors
