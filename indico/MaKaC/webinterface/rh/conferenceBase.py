@@ -393,10 +393,10 @@ class RHSubmitMaterialBase(object):
         # already stored
         repoIDs = []
         for i, resource in enumerate(resources):
-            if self._repositoryIds is None:
-                mat.addResource(resource, forcedFileId=None)
-            else:
+            if self._repositoryIds:
                 mat.addResource(resource, forcedFileId=self._repositoryIds[i])
+            else:
+                mat.addResource(resource, forcedFileId=None)
 
             #apply conversion
             if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
