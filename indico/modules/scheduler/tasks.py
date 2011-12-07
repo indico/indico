@@ -39,7 +39,6 @@ from indico.modules.scheduler import base, TaskDelayed
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 from MaKaC.common.utils import getEmailList
 from MaKaC.plugins.base import Observable
-from MaKaC.rb_location import ReservationGUID
 from MaKaC.accessControl import AccessWrapper
 from MaKaC import schedule
 from MaKaC.common.utils import getLocationInfo
@@ -683,29 +682,6 @@ Best Regards
                 ))
         self._setMailText()
         return True
-
-class RoomReservationEndTask(OneShotTask, Observable):
-    def __init__(self, resv, endDT, occurrence):
-        super(RoomReservationEndTask, self).__init__(endDT)
-        self.resvGUID = str(resv.guid)
-        self.resvOccurrence = occurrence
-
-    def run(self):
-        resv = ReservationGUID.parse(self.resvGUID).getReservation()
-        if not resv:
-            self.getLogger().info('Reservation %r does not exist anymore, not triggering end notification' % self.resvGUID)
-            return
-        resv.getStartEndNotification().sendEndNotification(self.resvOccurrence)
-
-class RoomReservationTask(PeriodicUniqueTask):
-    """
-    Sends room reservation start notifications.
-    Also takes care of creating the end notification task.
-    """
-
-    def run(self):
-        from MaKaC.plugins.RoomBooking.notifications import sendStartNotifications
-        sendStartNotifications(self.getLogger())
 
 class HTTPTask(OneShotTask):
     def __init__(self, url, data=None):

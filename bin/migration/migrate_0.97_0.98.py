@@ -43,13 +43,15 @@ from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
+from MaKaC.plugins.RoomBooking.tasks import RoomReservationTask
 from MaKaC.webinterface import displayMgr
 
 from indico.core.index import Catalog
 from indico.ext import livesync
 from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
-     CategoryStatisticsUpdaterTask, RoomReservationTask
+     CategoryStatisticsUpdaterTask
+
 
 from indico.modules.scheduler import Client
 

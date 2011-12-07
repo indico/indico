@@ -28,6 +28,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
+from MaKaC.plugins.RoomBooking.tasks import RoomReservationEndTask
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.Configuration import Config
 from MaKaC.rb_tools import fromUTC, toUTC, Period
@@ -38,7 +39,6 @@ from MaKaC.common.timezoneUtils import server2utc
 from indico.core.extpoint.reservation import IReservationListener, IReservationStartStopListener
 from indico.core.extpoint.base import Component
 from indico.modules.scheduler.client import Client
-from indico.modules.scheduler.tasks import RoomReservationEndTask
 from indico.util.caching import cached_property
 
 
