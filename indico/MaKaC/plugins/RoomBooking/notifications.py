@@ -17,17 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from indico.core.extpoint.reservation import IReservationListener, IReservationStartStopListener
-from indico.core.extpoint.base import Component
 from zope.interface import implements
 from datetime import datetime, timedelta, date, time
 from persistent import Persistent
 from itertools import ifilter
-from indico.modules.scheduler.client import Client
-from indico.modules.scheduler.tasks import RoomReservationEndTask
 from MaKaC.plugins.base import Observable, PluginsHolder
 from MaKaC.webinterface.wcomponents import WTemplated
-from MaKaC.common.utils import getEmailList, formatDateTime, cached_property
+from MaKaC.common.utils import getEmailList, formatDateTime
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
@@ -38,6 +34,13 @@ from MaKaC.rb_tools import fromUTC, toUTC, Period
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_room import RoomBase
 from MaKaC.common.timezoneUtils import server2utc
+
+from indico.core.extpoint.reservation import IReservationListener, IReservationStartStopListener
+from indico.core.extpoint.base import Component
+from indico.modules.scheduler.client import Client
+from indico.modules.scheduler.tasks import RoomReservationEndTask
+from indico.util.caching import cached_property
+
 
 DEBUG = False # enable various debug prints and ignore the notification hour setting
 
@@ -58,7 +61,7 @@ def sendStartNotifications(logger):
     dates = [date.today() + timedelta(days=day) for day in days]
     if DEBUG:
         print 'Dates to check: %r' % map(str, dates)
-    for resv in ReservationBase.getReservations(days=dates, location='Test'): # for testing, remove location later
+    for resv in ReservationBase.getReservations(days=dates): # for testing, remove location later
         se = resv.getStartEndNotification()
         se.sendStartNotification(logger)
 
