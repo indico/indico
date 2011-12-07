@@ -149,6 +149,15 @@ class TestIOIndex(unittest.TestCase):
         self.assertEqual(list(self._idx[1]), objs[10:20])
         self.assertEqual(len(self._idx), 200)
 
+    def testFwdIndex(self):
+        objs = self._indexSomeElements()
+        for i in range(0, 200):
+            self.assertIn(objs[i], self._idx._fwd_index[i/10])
+
+    def testRevIndex(self):
+        self._indexSomeElements()
+        for i in range(0, 200):
+            self.assertEqual(list(self._idx._rev_index[i]), [i/10])
 
     def testUnindexing(self):
         objs = self._indexSomeElements()
