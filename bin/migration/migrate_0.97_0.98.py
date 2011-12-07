@@ -49,7 +49,7 @@ from indico.core.index import Catalog
 from indico.ext import livesync
 from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
-     CategoryStatisticsUpdaterTask
+     CategoryStatisticsUpdaterTask, RoomReservationTask
 
 from indico.modules.scheduler import Client
 
@@ -342,7 +342,7 @@ def runRoomBlockingInit(dbi, withRBDB, prevVersion):
         root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
 
 
-@since('0.98b2')
+@since('0.98-rc2')
 def runReservationNotificationMigration(dbi, withRBDB, prevVersion):
     """
     Migrate the reservation notification system.
