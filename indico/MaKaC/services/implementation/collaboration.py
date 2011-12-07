@@ -20,6 +20,7 @@
 
 from datetime import timedelta
 from MaKaC.services.implementation.base import ParameterManager, AdminService
+from MaKaC.services.interface.rpc.json import NoReportError
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.plugins.Collaboration.base import CollaborationException, CollaborationServiceException
 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin,\
@@ -79,6 +80,9 @@ class CollaborationBookingModifBase(CollaborationBase):
         if self._params.has_key('bookingId'):
             self._bookingId = self._params['bookingId']
             booking = self._CSBookingManager.getBooking(self._bookingId)
+            if booking == None:
+                raise NoReportError(_("The booking that you are trying to modify does not exist. Maybe it was already deleted, please refresh the page."))
+
             self._bookingType = booking.getType()
             self._bookingPlugin = booking.getPlugin()
         else:
