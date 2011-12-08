@@ -17,7 +17,7 @@
 
             % if getLocationInfo(conf) != ('', '', ''):
                 <br/>at <strong>${common.renderLocation(conf, span='headerRoomLink')}</strong>
-                <br/> <em>${conf.getLocation().getAddress()}</em>
+                <div class="address">${conf.getLocation().getAddress()}</div>
             % endif
         </div>
         <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=True, alignRight=True"/>

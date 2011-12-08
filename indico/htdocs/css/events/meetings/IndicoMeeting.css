@@ -51,3 +51,9 @@ div.meetingEventHeader > span.chairedBy {
     -moz-box-shadow: 0px 0px 10px #000;
     -webkit-box-shadow: 0px 0px 10px #000;
 }
+
+.details .address {
+    color: #aaa;
+    font-size: 12px;
+    text-shadow: none;
+}

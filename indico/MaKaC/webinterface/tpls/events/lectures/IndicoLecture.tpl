@@ -14,7 +14,7 @@
 
             % if getLocationInfo(conf) != ('', '', ''):
                 <br />at ${common.renderLocation(conf, span='headerRoomLink')}
-                <br /> <em>${conf.getLocation().getAddress()}</em>
+                <div class="address">${conf.getLocation().getAddress()}</div>
             % endif
         </div>
 
