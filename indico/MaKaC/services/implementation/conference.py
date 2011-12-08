@@ -204,7 +204,13 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
 
         if room.getName() != newRoom:
             room.setName(newRoom)
-            room.retrieveFullName(newLocation)
+
+            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+            if minfo.getRoomBookingModuleActive():
+                room.retrieveFullName(newLocation)
+            else:
+                # invalidate full name, as we have no way to know it
+                room.fullName = None
             changed = True
 
         if loc == None:

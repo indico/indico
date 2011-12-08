@@ -23,6 +23,7 @@ from random import randint
 from datetime import datetime, date, timedelta
 from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
+from MaKaC.common import info
 from MaKaC import user, errors
 from indico.util.i18n import currentLocale
 from babel.dates import format_datetime
@@ -694,11 +695,13 @@ class OSSpecific(object):
 def getLocationInfo(item, roomLink=True, fullName=False):
     """Return a tuple (location, room, url) containing
     information about the location of the item."""
+    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
     location = item.getLocation().getName() if item.getLocation() else ""
     customRoom = item.getRoom()
     if not customRoom:
         roomName = ''
-    elif fullName and location:
+    elif fullName and location and minfo.getRoomBookingModuleActive():
+        # if we want the full name and we have a RB DB to search in
         roomName = customRoom.getFullName()
         if not roomName:
             customRoom.retrieveFullName(location) # try to fetch the full name
