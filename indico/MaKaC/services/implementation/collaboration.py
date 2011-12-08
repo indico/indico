@@ -20,7 +20,7 @@
 
 from datetime import timedelta
 from MaKaC.services.implementation.base import ParameterManager, AdminService
-from MaKaC.services.interface.rpc.json import NoReportError
+from MaKaC.services.interface.rpc.common import NoReportError
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.plugins.Collaboration.base import CollaborationException, CollaborationServiceException
 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin,\
