@@ -1002,25 +1002,11 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
             }
         },
 
-        /**
-         * Opens the popup, but does NOT call postdraw()
-         * Necessary so that we can call plugin's onCreate() or onEdit() between draw() and postdraw()
-         */
-        open: function() {
-            $E(document.body).append(this.draw());
-            this.isopen = true;
-            $('#dateSyncHelpImg').qtip(
-            {
-            	content :  $T('This option ensures that ' +'if a manager changes the event\'s dates, ' +
-            			'this booking\'s dates change accordingly. ' +'The event already took place, ' +
-            			'so you cannot activate this option.')
-        				});
-            $('#dateSyncHelpImg').qtip(
-            {
-            	content :   $T('This option ensures that ' +
-            			'if a manager changes the event\'s dates, ' +
-            			'this booking\'s dates change accordingly. ')
-            });
+        _onOpen: function() {
+            this.ExclusivePopup.prototype._onOpen.call(this);
+            $('#dateSyncHelpImg').qtip({
+                content :   $T("This option ensures that if a manager changes the event's dates," +
+                               "this booking's dates change accordingly.")});
         },
 
         draw: function() {

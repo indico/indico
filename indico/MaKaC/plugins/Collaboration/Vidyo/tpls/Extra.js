@@ -1,10 +1,10 @@
 var vidyoOwnerField = null;
 
 var vidyoMarkBookingNotPresent = function(booking) {
-	booking.statusMessage = $T("Room no longer exists");
-	booking.statusClass = "statusMessageOther";
-	booking.canBeStarted = false;
-	refreshBookingM(booking, false);
+        booking.statusMessage = $T("Room no longer exists");
+        booking.statusClass = "statusMessageOther";
+        booking.canBeStarted = false;
+        refreshBookingM(booking, false);
 }
 
 /**
@@ -51,30 +51,16 @@ var VidyoDisplayURLHelpPopup = function(event) {
  * Draws the context help icons and assigns the appropiate popups to each one.
  */
 var vidyoDrawContextHelpIcons = function() {
-	$('#PINHelpImg')
-			.qtip(
-					{
-						content : $T('If you want to <strong>protect<\/strong> your Vidyo room with a PIN, please input it here. Otherwise, leave this field empty.')
-					});
-	$('#displayURLHelpImg').qtip(
-			{
-				content : $T('Please note that regardless of this option, '
-						+ 'a <em>Join Now!</em> link will appear.')
-			});
-	$('#hiddenHelpImg').qtip(
-			{
-				content : $T('This option hides the booking in the event page.')
-			});
-	$('#ownerHelpImg')
-			.qtip(
-					{
-						content : $T("This person will be the owner of the public room. This means that this person will be able to "
-								+ " invite people to the room, fix a maximum number of attendees, etc.")
-					});
-	$('#displayPinHelpImg')
-			.qtip(
-					{
-						content : $T("The public room's PIN will be displayed in the event page. "
-								+ '<strong>Any person that can see the event page will see the PIN.</strong> Please use this option carefully.')
-					});
+    $('#PINHelpImg').qtip({
+        content : $T('If you want to <strong>protect<\/strong> your Vidyo room with a PIN, please input it here. Otherwise, leave this field empty.')});
+    $('#displayURLHelpImg').qtip({
+        content : $T('Please note that regardless of this option, a <em>Join Now!</em> link will appear.')});
+    $('#hiddenHelpImg').qtip({
+        content : $T('This option hides the booking in the event page.')});
+    $('#ownerHelpImg').qtip({
+        content : $T("This person will be the owner of the public room. This means that this person will be able to " +
+                     "invite people to the room, fix a maximum number of attendees, etc.")});
+    $('#displayPinHelpImg').qtip({
+        content : $T("The public room's PIN will be displayed in the event page. "
+                     + "<strong>Any person that can see the event page will see the PIN.</strong> Please use this option carefully.")});
 }
