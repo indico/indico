@@ -18,11 +18,14 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.web.http_api import HTTPAPIHook
+from indico.web.http_api import HTTPAPIHook, DataFetcher
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
+from indico.util.fossilize import fossilize, IFossil
+from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink
 from MaKaC.plugins.Collaboration.pages import WElectronicAgreement
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
@@ -30,7 +33,7 @@ from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 
 
-globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook']
+globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook', 'VideoEventHook']
 
 class CollaborationAPIHook(HTTPAPIHook):
     PREFIX = 'api'
@@ -45,6 +48,8 @@ class CollaborationAPIHook(HTTPAPIHook):
         return RCCollaborationAdmin.hasRights(user=aw.getUser())
 
     def _getParams(self):
+        # import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
+        
         super(CollaborationAPIHook, self)._getParams()
         self._indicoID = get_query_parameter(self._queryParams, ['iid', 'indicoID'])
         self._cdsID = get_query_parameter(self._queryParams, ['cid', 'cdsID'])
@@ -58,7 +63,7 @@ class CollaborationAPIHook(HTTPAPIHook):
 
 
 class CollaborationExportHook(HTTPAPIHook):
-    TYPES = ('eAgreements',)
+    TYPES = ('eAgreements', )
     RE = r'(?P<confId>\w+)'
     GUEST_ALLOWED = False
     VALID_FORMATS = ('json', 'jsonp', 'xml')
@@ -98,3 +103,193 @@ class CollaborationExportHook(HTTPAPIHook):
                         'email': spk.getEmail()
                     }
                 }
+
+""" Container for utilitarian tools for use with the Collaboration export API
+"""
+class CollaborationAPIUtils():
+
+    """ The CSBooking object which can be passed through to the fossil
+        may be linked to a Contribution, in the case of WebcastRequest etc,
+        therefore the URL may be more specific than the event in this instance.
+    """
+    @staticmethod
+    def getConferenceOrContributionURL(event):
+        from MaKaC.conference import Conference, Contribution
+        from MaKaC.webinterface.urlHandlers import UHConferenceDisplay, UHContributionDisplay
+        url = ""
+
+        # Webcast and Recording Request specific:
+        if hasattr(event, '_conf'):
+            event = event._conf
+
+        if isinstance(event, Conference):
+            url = UHConferenceDisplay.getURL(event)
+        elif isinstance(event, Contribution):
+            url = UHContributionDisplay(event)
+
+        return url
+
+    @staticmethod
+    def getBookingTitle(booking):
+        title = ""
+        if hasattr(booking, 'getTitle'):
+            title = booking.getTitle()
+        elif hasattr(booking, '_getTitle'):
+            title = booking._getTitle()
+        elif hasattr(booking, '_conf'):
+            title = booking._conf.getTitle()
+
+        return title if title is not None else 'No title defined.'
+
+""" MetadataFossil created for use with iCal serialisation of Collaboration /
+    VideoService events.
+"""
+class ICollaborationMetadataFossil(IFossil):
+
+    def getStartDateAsString(self):
+        pass
+
+    def getAcceptRejectStatus(self):
+        pass
+    getAcceptRejectStatus.produce = lambda s: 'Pending' if s is None else 'Accepted'
+    getAcceptRejectStatus.name = 'status'
+
+    def getStartDate(self):
+        pass
+
+    def getEndDate(self):
+        pass
+
+    def _getTitle(self):
+        pass
+    _getTitle.produce = lambda s: CollaborationAPIUtils.getBookingTitle(s._conf)
+    _getTitle.name = 'title'
+
+    def getType(self):
+        pass
+
+    def getUniqueId(self):
+        pass
+
+    def getURL(self):
+        pass
+    getURL.produce = lambda s: CollaborationAPIUtils.getConferenceOrContributionURL(s)
+    getURL.name = 'url'
+
+""" This has been defined as a separate hook to CollaborationExportHook et al
+    due to the different input expected for both. It would be beneficial to
+    find a way to amalgamate the two at a later date.
+"""
+class VideoEventHook(HTTPAPIHook):
+    TYPES = ('video', )
+    RE = r'(?P<idlist>\w+(?:-\w+)*)'
+    DEFAULT_DETAIL = 'all'
+    MAX_RECORDS = { # @TODO: Ascertain reasonable limits for each section.
+        'all': 100000,
+        'vidyo': 50000,
+        'webcast': 50000,
+        'mcu': 50000,
+        'evo': 50000
+    }
+
+    def _getParams(self):
+        super(VideoEventHook, self)._getParams()
+
+        """ In this case, idlist refers to the different indicies which can
+            be called, e.g: vidyo, evo, mcu etc.
+        """
+        self._idList = self._pathParams['idlist'].split('-')
+
+        if not self._queryParams.has_key('alarms'):
+            self._alarms = None
+        else:
+            self._alarms = get_query_parameter(self._queryParams, ['alarms'], 0, True)
+
+    def export_video(self, aw):
+        expInt = VideoEventFetcher(aw, self)
+        return expInt.video(self._idList, self._alarms)
+
+
+class VideoEventFetcher(DataFetcher):
+    DETAIL_INTERFACES = {
+        'all' : ICollaborationMetadataFossil
+    }
+    ID_TO_IDX = {
+        'all' : 'all',
+        'vidyo' : 'Vidyo',
+        'webcast' : 'WebcastRequest',
+        'recording' : 'RecordingRequest',
+        'mcu' : 'CERNMCU',
+        'evo' : 'EVO'
+    }
+
+    def __init__(self, aw, hook):
+        super(VideoEventFetcher, self).__init__(aw, hook)
+        self._alarm = None
+
+    def _postprocess(self, obj, fossil, iface):
+        if self._alarm is not None:
+            fossil['alarm'] = self._alarm
+
+        return fossil
+
+    def video(self, idList, alarm = None):
+        idx = IndexesHolder().getById('collaboration');
+        bookings = []
+        dateFormat = '%d/%m/%Y'
+        self._alarm = alarm
+
+        for id in idList:
+            tempBookings = idx.getBookings(self.ID_TO_IDX[id], "conferenceStartDate", 
+                                           self._orderBy, self._fromDT, self._toDT,
+                                           'UTC', False, None, None, False, dateFormat)
+            bookings.extend(tempBookings.getResults())
+
+        """ Iterate the bookings and yield the results for fossilization, the form
+            by this point should be objs[i] = tuple('arranger', [CSBooking Objects]).
+        """
+        def _iter_bookings(objs):
+            for obj in objs:
+                for bk in obj[1]:
+                    bk._conf = obj[0] # Ensure all CSBookings are aware of their Conference
+
+                    """ This is for plugins whose structure include 'talkSelected',
+                        examples of which in CERN Indico being WebcastRequest and
+                        RecordingRequest.
+                    """
+                    if bk.hasTalkSelection():
+                        ts = bk.getTalkSelectionList()
+                        contributions = []
+
+                        if ts is None: # No individual talks, therefore an event for every contribution
+                            contributions = bk._conf.getContributionList()
+                        else:
+                            for contribId in ts:
+                                tempContrib = bk._conf.getContributionById(contribId)
+                                contributions.append(tempContrib)
+
+                        if len(contributions) == 0: # If we are here, no contributions but a request exists.
+                            bk.setStartDate(bk._conf.getStartDate())
+                            bk.setEndDate(bk._conf.getEndDate())
+                            yield bk
+                        else: # contributions is the list of all to be exported now
+                            for contrib in contributions:
+                                bk.setStartDate(contrib.getStartDate())
+                                bk.setEndDate(contrib.getEndDate())
+                                yield bk
+
+                        continue
+
+                    yield bk
+
+        """ Simple filter, as this method can return None for Pending and True
+            for accepted, both are valid booking statuses for exporting.
+        """
+        def filter(obj):
+            return obj.getAcceptRejectStatus() is not False
+
+        iface = self.DETAIL_INTERFACES.get('all')
+
+        for booking in self._process(_iter_bookings(bookings), filter, iface):
+            yield booking
+

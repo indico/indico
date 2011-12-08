@@ -101,6 +101,33 @@ class ICalSerializer(Serializer):
             event.set('rrule', rrule)
         return event
 
+    def _serialize_collaboration(self, fossil, now):
+        event = ical.Event()
+        url = str(fossil['url'])
+        event.set('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
+        event.set('dtstamp', now)
+        event.set('dtstart', fossil['startDate'])
+        event.set('dtend', fossil['endDate'])
+        event.set('url', url)
+        event.set('categories', "VideoService - " + fossil['type'])
+        event['summary'] = "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title']
+        event['description'] = url
+
+        # If there is an alarm required, add a subcomponent to the Event
+        if fossil.has_key('alarm'):
+            event.add_component(self._serialize_collaboration_alarm(fossil, now))
+
+        return event
+
+    def _serialize_collaboration_alarm(self, fossil, now):
+        alarm = ical.Alarm()
+        trigger = "-PT" + str(fossil['alarm']) + "M" #iCalendar spec for pre-event trigger
+        alarm['trigger'] = trigger
+        alarm['action'] = 'DISPLAY'
+        alarm['summary'] = "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title']
+        alarm['description'] = str(fossil['url'])
+        return alarm
+
     def __call__(self, fossils):
         results = fossils['results']
         if type(results) != list:
@@ -116,5 +143,7 @@ class ICalSerializer(Serializer):
                 cal.add_component(self._serialize_conference(fossil, now))
             elif fossil['_fossil'] == 'reservationMetadata':
                 cal.add_component(self._serialize_reservation(fossil, now))
+            elif fossil['_fossil'] == 'collaborationMetadata':
+                cal.add_component(self._serialize_collaboration(fossil, now))
 
         return str(cal)

@@ -2090,6 +2090,41 @@ class CSBookingBase(Persistent, Fossilizable):
             self._play_status = None
         return self._play_status
 
+    """ Methods relating to the certain plugin architectures whereby talk
+        selection is appropriate through the inheriting class' attributes.
+    """
+    def hasTalkSelection(self):
+        """ Some plugin types select individual contributions stored as a list
+            of IDs in this parameter, returns param if this instance is one of them.
+        """
+        return self._bookingParams.has_key('talkSelection')
+
+    def _getTalkSelection(self):
+        """ Returns the attribute if it is defined, None on error. """
+        if self.hasTalkSelection():
+            return self._bookingParams.get('talkSelection')
+        return None
+
+    def _hasTalkSelectionContent(self):
+        """ If the talkSelection attribute is present and it has a quantity of
+            items in its list greater than 0, individual talks have been chosen.
+        """
+        ts = self._getTalkSelection()
+
+        if ts is None:
+            return False
+
+        return len(ts) > 0
+
+    def getTalkSelectionList(self):
+        """ Returns the resultant list if it is present and populated. None if
+            neither are true.
+        """
+        if not self._hasTalkSelectionContent():
+            return None
+
+        return self._getTalkSelection()
+
 class WCSTemplateBase(wcomponents.WTemplated):
     """ Base class for Collaboration templates.
         It stores the following attributes:

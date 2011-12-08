@@ -8,3 +8,4 @@ Exportable Elements
    ./event.rst
    ./room.rst
    ./reservation.rst
+   ./videoservices.rst

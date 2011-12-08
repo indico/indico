@@ -320,3 +320,7 @@ class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceM
         pass
     getContributionListWithoutSessions.result = IContributionMetadataWithSubContribsFossil
     getContributionListWithoutSessions.name = 'contributions'
+
+
+
+
