@@ -30,6 +30,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 
 from MaKaC.common import filters
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
+from MaKaC.common.url import ShortURLMapper
 from MaKaC.common import indexes, info
 from MaKaC.common.fossilize import fossilize
 
@@ -265,7 +266,11 @@ class ConferenceShortURLModification( ConferenceTextModificationBase ):
     Conference short URL modification
     """
     def _handleSet(self):
+        mapper = ShortURLMapper()
+        mapper.remove(self._target)
         self._target.setUrlTag(self._value)
+        if self._value:
+            mapper.add(self._value, self._target)
 
     def _handleGet(self):
         return self._target.getUrlTag()
