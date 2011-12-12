@@ -164,7 +164,7 @@ class CSBookingManager(Persistent, Observer):
     def getBooking(self, id):
         """ Returns a booking given its id.
         """
-        return self._bookings[id]
+        return self._bookings.get(id,None)
 
     def getSingleBooking(self, type, notify = False):
         """ Returns the single booking of a plugin who only allows one booking.

@@ -25,6 +25,7 @@ import itertools
 from xml.sax.saxutils import escape, quoteattr
 from copy import copy
 from datetime import timedelta,datetime,date,time
+from dateutil.relativedelta import relativedelta
 import exceptions
 import urllib
 from operator import attrgetter
@@ -3244,7 +3245,7 @@ class WConferenceList(WTemplated):
         today = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0)
         thisMonth = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0, day=1)
         thisMonthTS = utc_timestamp(thisMonth)
-        nextMonthTS = utc_timestamp(thisMonth.replace(month = (thisMonth.month % 12) + 1))
+        nextMonthTS = utc_timestamp(thisMonth + relativedelta(months=1))
         todayTS = utc_timestamp(thisMonth)
         oneMonthTS = utc_timestamp((today - timedelta(days=30)).replace(day=1))
         future = []

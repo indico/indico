@@ -19,11 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 _emailReplacerNote = """
-You can use the following placeholders:<br />{bookedForUser}, {roomName}, {roomAtts[ATTNAME]}, {bookingStart}, {bookingEnd}, {detailsLink}
+You can use the following placeholders:<br />{bookedForUser}, {roomName}, {roomAtts[ATTNAME]}, {bookingStart}, {bookingEnd}, {occStart}, {occEnd}, {detailsLink}
 """.strip()
 
 _emailSubjectReplacerNote = """
-You can use the following placeholders:<br />{roomName}, {roomAtts[ATTNAME]}, {bookingStart}, {bookingEnd}
+You can use the following placeholders:<br />{roomName}, {roomAtts[ATTNAME]}, {bookingStart}, {bookingEnd}, {occStart}, {occEnd}
 """.strip()
 
 globalOptions = [
@@ -39,10 +39,6 @@ globalOptions = [
                                 "visible": True}),
     ("bookingsForRealUsers", {
         "description": _("Should bookings require an existing user in the 'booked for' field"),
-        "type" : bool,
-        "defaultValue": False}),
-    ("notificationEnabled", {
-        "description": _("Enable the tasks for booking start/end notification. Only bookings created/modified after enabling it will trigger notifications"),
         "type" : bool,
         "defaultValue": False}),
     ("notificationEmails", {
@@ -75,6 +71,11 @@ globalOptions = [
         "type" : 'textarea',
         "defaultValue": '',
         "note": _emailReplacerNote}),
-    ("notificationBefore", {"description" : _("Trigger start notifications X minutes before the booking starts. Changes will not affect existing bookings"),
-                           "type": int,
-                           "defaultValue": 0} )]
+    ("notificationHour", {"description" : _("Hour at which the start notifications should be sent (0-23)"),
+                            "type": int,
+                            "defaultValue": 6}),
+    ("notificationBefore", {"description" : _("Trigger start notifications X days before the booking (occurrence) starts."),
+                            "type": int,
+                            "defaultValue": 0})
+
+]

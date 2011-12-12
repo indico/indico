@@ -22,6 +22,8 @@ from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
 from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi
 from suds import WebFault
 from MaKaC.plugins.Collaboration.base import CollaborationException
+from MaKaC.common.logger import Logger
+
 
 class VidyoOperations(object):
     """ This class has several class methods,
@@ -93,6 +95,8 @@ class VidyoOperations(object):
                     extension = baseExtension + str(extensionSuffix)
                     extensionSuffix = extensionSuffix + 1
                 else:
+                    Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's addRoom operation got WebFault: %s""" %
+                                (confId, bookingId, e.fault.faultstring))
                     raise
 
         #if we could not create the room, the owner did not have any Vidyo accounts
@@ -178,6 +182,8 @@ class VidyoOperations(object):
                         loginToUse = loginToUse + 1
 
                 else:
+                    Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's updateRoom operation got WebFault: %s""" %
+                                    (confId, bookingId, e.fault.faultstring))
                     raise
 
         #if we could not create the room, the owner did not have any Vidyo accounts
@@ -193,6 +199,10 @@ class VidyoOperations(object):
             faultString = e.fault.faultstring
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "modify")
+            else:
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s""" %
+                            (confId, bookingId, e.fault.faultstring))
+                raise
 
         return modifiedRoom
 
@@ -218,6 +228,8 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "checkStatus")
             else:
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s""" %
+                            (confId, bookingId, e.fault.faultstring))
                 raise
 
         extension = str(adminApiRoom.extension)
@@ -246,6 +258,8 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "delete")
             else:
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s""" %
+                            (confId, bookingId, e.fault.faultstring))
                 raise
 
     @classmethod
@@ -267,4 +281,6 @@ class VidyoOperations(object):
                     message += _("""\nPlease try again or contact %s for help.""")%getVidyoOptionValue("contactSupport")
                 return VidyoError("connectFailed", "connect", message)
             else:
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's connectRoom operation got WebFault: %s""" %
+                        (confId, bookingId, e.fault.faultstring))
                 raise

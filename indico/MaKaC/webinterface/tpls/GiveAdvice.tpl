@@ -99,7 +99,7 @@ var showWidgets = function(firstLoad) {
         % for q in ConfReview.getReviewingQuestions():
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
 
-            newDiv.append(Html.span(null,"${q.getText()}"));
+            newDiv.append(Html.span(null,${q.getText() | n,j}));
             newDiv.append(Html.br());
 
             if (firstLoad) {

@@ -33,8 +33,14 @@
         <div id="resvStartNotificationCH" class="tip">
              ${ _("Whether to trigger notifications when a booking for the room begins.") }
         </div>
+        <div id="resvStartNotificationBeforeCH" class="tip">
+             ${ _("Send the start notification X days before an occurence (leave empty to use default)") }
+        </div>
         <div id="resvEndNotificationCH" class="tip">
              ${ _("Whether to trigger notifications when a booking for the room ends.") }
+        </div>
+        <div id="resvNotificationToResponsibleCH" class="tip">
+             ${ _("Send start/end notifications to the room responsible, too.") }
         </div>
         <div id="whereIsKeyCH" class="tip">
              ${ _("How to obtain a key. Typically a phone number.")}
@@ -162,8 +168,16 @@
                                             <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvStartNotification else ''} id="resvStartNotification" name="resvStartNotification" /> ${ contextHelp( 'resvStartNotificationCH' ) }</td>
                                         </tr>
                                         <tr>
+                                            <td align="right" valign="top"><small> ${ _("Notification on booking start - X days before")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="text" style="width: 15px;" maxlength="1" id="resvStartNotificationBefore" name="resvStartNotificationBefore" value="${'' if not room.resvStartNotificationBefore else room.resvStartNotificationBefore}" /> ${ contextHelp( 'resvStartNotificationBeforeCH' ) }</td>
+                                        </tr>
+                                        <tr>
                                             <td align="right" valign="top"><small> ${ _("Notification on booking end")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvEndNotification else ''} id="resvEndNotification" name="resvEndNotification" /> ${ contextHelp( 'resvEndNotificationCH' ) }</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> ${ _("Notification to responsible, too")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvNotificationToResponsible else ''} id="resvNotificationToResponsible" name="resvNotificationToResponsible" /> ${ contextHelp( 'resvNotificationToResponsibleCH' ) }</td>
                                         </tr>
                                     </table>
                                 </td>

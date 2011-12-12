@@ -39,7 +39,6 @@ from indico.modules.scheduler import base, TaskDelayed
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 from MaKaC.common.utils import getEmailList
 from MaKaC.plugins.base import Observable
-from MaKaC.rb_location import ReservationGUID
 from MaKaC.accessControl import AccessWrapper
 from MaKaC import schedule
 from MaKaC.common.utils import getLocationInfo
@@ -683,30 +682,6 @@ Best Regards
                 ))
         self._setMailText()
         return True
-
-class RoomReservationTaskBase(OneShotTask, Observable):
-    which = None
-    delay = None
-
-    def __init__(self, resv, startDateTime):
-        super(RoomReservationTaskBase, self).__init__(startDateTime)
-        self.resvGUID = str(resv.guid)
-
-    def run(self):
-        if self._executionDelay > 20: # assume the task daemon was dead -> delay tasks:
-            raise TaskDelayed(self.delay)
-        resv = ReservationGUID.parse(self.resvGUID).getReservation()
-        if not resv:
-            self.getLogger().info('Reservation %r does not exist anymore, not triggering events' % self.resvGUID)
-            return
-        resv.getStartEndNotification().taskTriggered(self.which, self)
-
-class RoomReservationStartedTask(RoomReservationTaskBase):
-    which = 'start'
-    delay = 5
-class RoomReservationFinishedTask(RoomReservationTaskBase):
-    which = 'end'
-    delay = 10
 
 class HTTPTask(OneShotTask):
     def __init__(self, url, data=None):

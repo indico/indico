@@ -1949,31 +1949,28 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
         html=[]
         for atype in self._accommodation.getAccommodationTypesList():
             if not atype.isCancelled():
+                selected = ""
+                if currentAccoType == atype:
+                    selected = "checked=\"checked\""
+                disabled = ""
+                if alreadyPaid and (atype.isBillable() or (currentAccoType and currentAccoType.isBillable())):
+                    disabled = ' disabled="disabled"'
+                placesLeft = ""
                 if atype.getPlacesLimit() <= 0 or atype.hasAvailablePlaces():
-                    selected = ""
-                    if currentAccoType == atype:
-                        selected = "checked=\"checked\""
-                    disabled = ""
-                    if alreadyPaid and (atype.isBillable() or (currentAccoType and currentAccoType.isBillable())):
-                        disabled = ' disabled="disabled"'
-                    placesLeft = ""
-                    if atype.getNoPlacesLeft() > 0:
-                        placesLeft = " <span style='color:green; font-style:italic;'>[%s place(s) left]</span>"%atype.getNoPlacesLeft()
-                    priceCol = ""
-                    if atype.isBillable():
-                        priceCol = """<td align="right">%s %s per night</td>""" % (atype.getPrice(), self._conf.getRegistrationForm().getCurrency())
-
-                    html.append("""<tr>
-                                        <td align="left" style="padding-left:10px"><input type="radio" id="accommodationType" name="accommodationType" value="%s" %s%s>%s%s</td>
-                                        %s
-                                    </tr>
-                                """%(atype.getId(), selected, disabled, atype.getCaption(), placesLeft, priceCol ) )
+                    placesLeft = " <span style='color:green; font-style:italic;'>[%s place(s) left]</span>"%atype.getNoPlacesLeft()
                 else:
-                    html.append("""<tr>
-                                     <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">\
-                                     (no places left)</font></td>
-                                   </tr>
-                        """%(atype.getCaption() ) )
+                    placesLeft = " <span style='color:red;'>(no places left)</span>"
+                    if currentAccoType != atype and not disabled:
+                        disabled = ' disabled="disabled"'
+                priceCol = ""
+                if atype.isBillable():
+                    priceCol = """<td align="right">%s %s per night</td>""" % (atype.getPrice(), self._conf.getRegistrationForm().getCurrency())
+
+                html.append("""<tr>
+                                    <td align="left" style="padding-left:10px"><input type="radio" id="accommodationType" name="accommodationType" value="%s" %s%s>%s%s</td>
+                                    %s
+                                </tr>
+                            """%(atype.getId(), selected, disabled, atype.getCaption(), placesLeft, priceCol ) )
             else:
                 html.append( i18nformat("""<tr>
                                  <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">( _("not available at present") )</font></td>

@@ -65,8 +65,6 @@ class AdminApi(ApiBase):
         #                            (confId, bookingId, str(answer)))
             return answer
         except WebFault, e:
-            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's addRoom operation got WebFault: %s""" %
-                                    (confId, bookingId, e.fault.faultstring))
             raise
 
         except Exception, e:
@@ -91,8 +89,6 @@ class AdminApi(ApiBase):
             return answer
 
         except WebFault, e:
-            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's updateRoom operation got WebFault: %s""" %
-                                    (confId, bookingId, e.fault.faultstring))
             raise
 
         except Exception, e:
@@ -147,8 +143,6 @@ class AdminApi(ApiBase):
             return answer
 
         except WebFault, e:
-            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s""" %
-                                    (confId, bookingId, e.fault.faultstring))
             raise
 
         except Exception, e:
@@ -172,10 +166,7 @@ class AdminApi(ApiBase):
 
             return answer
         except WebFault, e:
-            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s""" %
-                                    (confId, bookingId, e.fault.faultstring))
             raise
-
         except Exception, e:
             cls._handleServiceCallException(e)
 
@@ -193,10 +184,7 @@ class AdminApi(ApiBase):
 
             return answer
         except WebFault, e:
-            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's connectRoom operation got WebFault: %s""" %
-                                    (confId, bookingId, e.fault.faultstring))
             raise
-
         except Exception, e:
             cls._handleServiceCallException(e)
 
