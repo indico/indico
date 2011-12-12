@@ -73,12 +73,15 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
 
          _checkErrorState: function() {
 
-             var value = this.get();
+             var value = this.get(true);
+             var validDate = value !== "" ? !!Util.parseJSDateTime(value, IndicoDateTimeFormats.Default) : null;
 
-             if (this.mandatory ? !value : value === undefined || !Util.parseJSDateTime(value, IndicoDateTimeFormats.Server)) {
+             if (validDate) {
+                 return null;
+             } else if (validDate == false){
                  return $T('Date is invalid');
              } else {
-                 return null;
+                 return this.mandatory ? $T('No date specified') : null;
              }
          }
      },
