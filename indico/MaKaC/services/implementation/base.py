@@ -29,6 +29,7 @@ from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
+from MaKaC.common.utils import parseDateTime
 
 from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag, TimingError
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
@@ -412,7 +413,7 @@ class DateTimeModificationBase( TextModificationBase ):
     """
     def _handleSet(self):
         try:
-            naiveDate = parseDateTime(self._value,'%d/%m/%Y %H:%M')
+            naiveDate = parseDateTime(self._value)
         except ValueError:
             raise ServiceError("ERR-E2",
                                "Date/time is not in the correct format")
