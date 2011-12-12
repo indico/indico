@@ -779,7 +779,7 @@ var showLinkMenu = function(element, chatroom){
             var menuItems = {};
 
             each(links.get(chatroom.id).custom, function(linkType){
-                menuItems['Using ' + linkType.name] = linkType.link;
+                menuItems['using' + linkType.name] = {action: linkType.link, display: $T('Using ') + linkType.name};
             });
             joinMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList', true, false, null, null, true);
             var pos = element.getAbsolutePosition();
@@ -846,7 +846,7 @@ var showLogOptions = function(element, chatroom){
 
             var form = createBaseForm();
 
-            menuItems[$T('See logs')] = new LogPopup($T('Select the dates to retrieve the logs'),
+            menuItems["seeLogs"] = {action: new LogPopup($T('Select the dates to retrieve the logs'),
                                                  form.content,
                                                  function(value){
                                                     if (value){
@@ -858,7 +858,7 @@ var showLogOptions = function(element, chatroom){
                                                                           form.forevent.get(),
                                                                           form.ownrange.get());
                                                      }
-                                                 });
+                                                 }), display: $T('See logs')};
             var parameterManager = new IndicoUtil.parameterManager();
 
             var form2 = createBaseForm();
@@ -873,7 +873,7 @@ var showLogOptions = function(element, chatroom){
                                        materialName)
                                       );
             var requestOk = false;
-            menuItems[$T('Attach logs to event material')] = new LogPopup($T('Select the name that logs will have in the material section'),
+            menuItems["attachLogs"] = {action: new LogPopup($T('Select the name that logs will have in the material section'),
                                                                       materialContent,
                                                                       function(value){
                                                                           if(value){
@@ -910,7 +910,7 @@ var showLogOptions = function(element, chatroom){
                                                                                }
                                                                               else return false;
                                                                            }
-                                                                      });
+                                                                      }), display: $T('Attach logs to event material')};
             logsMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList', true);
             var pos = element.getAbsolutePosition();
             logsMenu.open(pos.x - 5, pos.y + element.dom.offsetHeight + 2);

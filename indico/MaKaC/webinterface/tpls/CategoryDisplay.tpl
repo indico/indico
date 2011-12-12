@@ -85,12 +85,12 @@ moreLink.observeClick(function(e) {
     }
 
     var menuItems = {};
-    menuItems["${ _("Today's events") }"] = "${ urlHandlers.UHCategoryOverview.getURL(categ) }";
-    menuItems["${ _("Week's events") }"] = "${ urlHandlers.UHCategoryOverview.getWeekOverviewUrl(categ) }";
+    menuItems["todayEvents"] = {action: "${ urlHandlers.UHCategoryOverview.getURL(categ) }", display: "${ _("Today's events") }"};
+    menuItems["weekEvents"] = {action: "${ urlHandlers.UHCategoryOverview.getWeekOverviewUrl(categ) }", display: "${ _("Week's events") }"};
     //menuItems["${ _("Month's events") }"] = "${ urlHandlers.UHCategoryOverview.getMonthOverviewUrl(categ) }";
-    menuItems['${ _("Calendar") }'] = "${ urlHandlers.UHCalendar.getURL([categ]) }";
-    menuItems['${ _("Category map") }'] = "${ urlHandlers.UHCategoryMap.getURL(categ) }";
-    menuItems['${ _("Category statistics") }'] = "${ urlHandlers.UHCategoryStatistics.getURL(categ) }";
+    menuItems["calendar"] = {action: "${ urlHandlers.UHCalendar.getURL([categ]) }", display: '${ _("Calendar") }'};
+    menuItems["categoryMap"] = {action: "${ urlHandlers.UHCategoryMap.getURL(categ) }", display: '${ _("Category map") }'};
+    menuItems["categoryStatistics"] = {action: "${ urlHandlers.UHCategoryStatistics.getURL(categ) }", display: '${ _("Category statistics") }'};
     moreMenu = new PopupMenu(menuItems, [moreLink], 'categoryDisplayPopupList');
     var pos = moreLink.getAbsolutePosition();
     moreMenu.open(pos.x - 5, pos.y + moreLink.dom.offsetHeight + 3);
@@ -113,9 +113,9 @@ createEventLink2.observeClick(function(e) {
     }
 
     var menuItems = {};
-    menuItems['${ _("Lecture") }'] = "${ urlLecture }";
-    menuItems['${ _("Meeting") }'] = "${ urlMeeting }";
-    menuItems['${ _("Conference") }'] = "${ urlConference }";
+    menuItems["lecture"] = {action: "${ urlLecture }", display: '${ _("Lecture") }'};
+    menuItems["meeting"] = {action: "${ urlMeeting }", display: '${ _("Meeting") }'};
+    menuItems["conference"] = {action: "${ urlConference }", display: '${ _("Conference") }' };
 
     createEventMenu2 = new PopupMenu(menuItems, [createEventLink2], 'categoryDisplayPopupList');
     var pos = createEventLink2.getAbsolutePosition();
@@ -138,8 +138,8 @@ manageLink.observeClick(function(e) {
     }
 
     var menuItems = {};
-    menuItems['${ _("Edit category") }'] = "${ urlHandlers.UHCategoryModification.getURL(categ) }";
-    menuItems['${ _("Add subcategory") }'] = "${ urlHandlers.UHCategoryCreation.getURL(categ) }";
+    menuItems["editCategory"] = {action: "${ urlHandlers.UHCategoryModification.getURL(categ) }", display: '${ _("Edit category") }'};
+    menuItems["addSubCategory"] = {action: "${ urlHandlers.UHCategoryCreation.getURL(categ) }", display: '${ _("Add subcategory") }' };
     manageMenu = new PopupMenu(menuItems, [manageLink], 'categoryDisplayPopupList');
     var pos = manageLink.getAbsolutePosition();
     manageMenu.open(pos.x - 5, pos.y + manageLink.dom.offsetHeight + 2);

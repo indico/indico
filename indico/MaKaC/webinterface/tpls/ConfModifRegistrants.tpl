@@ -268,8 +268,8 @@ function createMenu(pdfLink) {
 
     // build a dictionary that represents the menu
     var menuItems = {};
-    menuItems['Table Style'] = function () {submitForm("pdf.table");};
-    menuItems['Book Style'] = function () {submitForm("pdf.book");};
+    menuItems['tableStyle'] = {action: function () {submitForm("pdf.table");}, display: '${_("Table Style")}'};
+    menuItems['bookStyle'] = {action: function () {submitForm("pdf.book");}, display: '${_("Book Style")}' };
 
     pdfMenu = new PopupMenu(menuItems, [pdfLink], null);
     var pos = pdfLink.getAbsolutePosition();

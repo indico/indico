@@ -26,37 +26,37 @@
         var ${menuName} = new PopupMenu({
         % if 'modifyLink' in info:
             % if getItemType(item) == 'Conference':
-                'Edit event': '${info["modifyLink"]}',
+                'editEvent': {action: '${info["modifyLink"]}', display: $T('Edit event')},
             % elif getItemType(item) == 'SubContribution':
-                'Edit subcontribution': '${info["modifyLink"]}',
+                'editSubcontribution': {action: '${info["modifyLink"]}', display: $T('Edit subcontribution') },
             % elif getItemType(item) == 'Contribution':
-                'Edit contribution': '${info["modifyLink"]}',
+                'editContribution': {action: '${info["modifyLink"]}', display:  $T('Edit contribution')},
             % elif getItemType(item) == 'Session':
-                'Edit session': function(){
-                    IndicoUI.Dialogs.__addSessionSlot("${info['slotId']}","${item.getSession().getId()}","${conf.getId()}")},
+                'editSession': {action: function(){
+                    IndicoUI.Dialogs.__addSessionSlot("${info['slotId']}","${item.getSession().getId()}","${conf.getId()}")}, display:  $T('Edit session')},
             % else:
-                 'Edit entry': '${info["modifyLink"]}',
+                 'editEntry': {action: '${info["modifyLink"]}', display: $T('Edit entry')},
             % endif
         % endif
 
         % if 'sessionTimetableLink' in info:
-            'Edit session timetable': '${info["sessionTimetableLink"]}',
+            'editSessionTimetable': {action: '${info["sessionTimetableLink"]}', display: $T('Edit session timetable')},
         % endif
 
         % if 'cloneLink' in info:
-            'Clone event': '${info["cloneLink"]}',
+            'cloneEvent': {action: '${info["cloneLink"]}', display: $T('Clone event')},
         % endif
 
         % if 'minutesLink' in info:
-            'Edit minutes': function(m) {
+            'editMinutes': {action: function(m) {
                 IndicoUI.Dialogs.writeMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
                 m.close();
-                return false;},
+                return false;}, display: $T('Edit minutes')},
         % endif
 
         <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>
         % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText():
-            'Delete minutes': function(m) {
+            'deleteMinutes': {action: function(m) {
                 var popupHandler = function(action){
                     if(action){
                         IndicoUI.Dialogs.deleteMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
@@ -65,11 +65,11 @@
 
                 };
                 (new ConfirmPopup($T('Delete minutes'),$T('Are you sure you want to delete this minutes?'),popupHandler, $T("Yes"), $T("No"))).open();
-                return false;},
+                return false;}, display: $T('Delete minutes')},
         % endif
 
         % if getItemType(item) == 'Conference':
-            'Compile minutes': function(m) {
+            'compileMinutes': {action: function(m) {
                 var popupHandler = function(action){
                     if(action){
                         IndicoUI.Dialogs.writeMinutes('${conf.getId()}','','','',true);
@@ -77,15 +77,15 @@
                     m.close();
                 };
                 (new ConfirmPopup($T('Compile minutes'),$T('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.'),popupHandler, $T("Yes"), $T("No"))).open();
-                return false;},
+                return false;}, display: $T('Compile minutes')},
         % endif
 
         % if 'materialLink' in info:
-            'Manage material': function(m) {
+            'manageMaterial': {action: function(m) {
                 IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
                     ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true);
                 m.close();
-                return false;}
+                return false;}, display: $T('Manage material')}
         % endif
         }, [$E("${menuName}")], null, false, ${dumps(alignRight)});
     </script>

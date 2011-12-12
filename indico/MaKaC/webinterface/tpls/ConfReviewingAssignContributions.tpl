@@ -299,9 +299,9 @@ var assignPerTrackMenus = function(role, place){
     assignMenu.observeClick(function(e) {
         var menuItems = {};
 
-        menuItems[$T('Track')] = function(){ fetchUsersPerAttribute(order, role, 'track'); };
-        menuItems[$T('Session')] = function(){ fetchUsersPerAttribute(order, role, 'session'); };
-        menuItems[$T('Type')] = function(){ fetchUsersPerAttribute(order, role, 'type'); };
+        menuItems["track"] = {action: function(){ fetchUsersPerAttribute(order, role, 'track'); }, display: $T('Track')};
+        menuItems["session"] = {action: function(){ fetchUsersPerAttribute(order, role, 'session'); }, display: $T('Session')};
+        menuItems["type"] = {action: function(){ fetchUsersPerAttribute(order, role, 'type'); }, display: $T('Type')};
 
         var menu = new PopupMenu(menuItems, [assignMenu], "popupList");
         var pos = assignMenu.getAbsolutePosition();
@@ -1342,7 +1342,7 @@ function fetchUsersPerAttribute(order, role, attribute) {
                                 var killProgress = IndicoUI.Dialogs.Util.progress()
                                 popup.close();
                                 killProgress();
-                                (new AlertPopup($T("Warning"), $T('There is no {0} defined.').format(attribute)).open();
+                                new AlertPopup($T("Warning"), $T('There is no {0} defined.').format(attribute)).open();
                             }
                             for (var i in result) {
                                 attributes.append(result[i]);

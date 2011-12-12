@@ -25,7 +25,7 @@ languageLink.observeClick(function(e) {
 
     // build a dictionary that represents the menu
     % for k,v in Languages:
-        menuItems['${ v }'] = function() {inputHidden.dom.value = '${ k }'; form.dom.submit()};
+        menuItems['${ v }'] = {action:function() {inputHidden.dom.value = '${ k }'; form.dom.submit()}, display:'${ v }'};
     % endfor
 
     languageMenu = new PopupMenu(menuItems, [languageLink], ${"'darkPopupList'" if dark else "null"}, true, true);

@@ -93,7 +93,7 @@
                         % for cr in chatrooms:
                         if (joinLink.dom.name == '${cr.getId()}') {
                             % for link in linksList:
-                                menuItems["Using ${link['name']}"] =" ${GeneralLinkGenerator(cr, link['structure']).generate()}";
+                                menuItems["using${link['name']}"] = {action: "${GeneralLinkGenerator(cr, link['structure']).generate()}", display: $T("Using ${link['name']}")};
                             % endfor
                             joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList', true, false, null, null,true);
                             var pos = joinLink.getAbsolutePosition();

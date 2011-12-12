@@ -83,11 +83,11 @@ type("PopupMenu", ["ChainedPopupWidget"],
         _processItem: function(pair) {
             var self = this;
             var value = pair.get();
-            var link = Html.a('fakeLink', pair.key);
+            var link = Html.a('fakeLink', value.display);
             link.setAttribute("id", pair.key);
 
-            if(typeof value == "string" ) {
-                link.setAttribute('href', value);
+            if(typeof value.action == "string" ) {
+                link.setAttribute('href', value.action);
                 if (self.linkToExternalWindow) {
                     link.setAttribute('target', '_blank');
                 }
@@ -98,7 +98,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
                 }
             }
             else {
-                link.observeClick((pair.get().PopupWidget || pair.get().ExclusivePopup)?
+                link.observeClick((value.action.PopupWidget || value.action.ExclusivePopup)?
                                   function(e) {
 
                                       if (self.selected) {
@@ -117,14 +117,14 @@ type("PopupMenu", ["ChainedPopupWidget"],
                                       });
 
                                       IndicoUtil.onclickHandlerRemove(self.handler);
-                                      var target = pair.get();
+                                      var target = pair.get().action;
                                       target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
 
                                       return false;
                                   }:
                                   function() {
                                       // assume it's a callback function
-                                      var ret = pair.get()(self);
+                                      var ret = pair.get().action(self);
                                       if ((self.closeOnClick && ret !== false) || ret === true) {
                                           self.close();
                                       }

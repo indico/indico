@@ -65,9 +65,9 @@ var createEventMenu = $E('createEventMenu');
 var eventPopupMenu;
 createEventMenu.observeClick(function(e) {
     var menuItems = {};
-    menuItems['${ _("Create lecture") }'] = "${ urlLecture }";
-    menuItems['${ _("Create meeting") }'] = "${ urlMeeting }";
-    menuItems['${ _("Create conference") }'] = "${ urlConference }";
+    menuItems["createLecture"] = {action: "${ urlLecture }" , display: '${ _("Create lecture") }'};
+    menuItems["createMeeting"] = {action: "${ urlMeeting }", display: '${ _("Create meeting") }'};
+    menuItems["createConference"] = {action: "${ urlConference }" , display: '${ _("Create conference") }'};
 
     //Create a new PopupMenu only if it has never been created before -> fix #679
     if(!eventPopupMenu){
@@ -78,9 +78,9 @@ createEventMenu.observeClick(function(e) {
     eventPopupMenu.open(pos.x, pos.y + 30);
 
     var infoItems = {}; //List used to print additional help on the menu (MUST use the same keys as menuItems)
-    infoItems['${ _("Create lecture") }'] = "${ _("A <strong>lecture</strong> is a simple event to annouce a talk.<br/><strong>Features</strong>: poster creation, participants management,...") }";
-    infoItems['${ _("Create meeting") }'] = "${ _("A <strong>meeting</strong> is an event that defines an agenda with many talks.<br/><strong>Features</strong>: timetable, minutes, poster creation, participants management,...") }";
-    infoItems['${ _("Create conference") }'] = "${ _("A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.<br/><strong>Features</strong>: call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...") }";
+    infoItems["createLecture"] = "${ _("A <strong>lecture</strong> is a simple event to annouce a talk.<br/><strong>Features</strong>: poster creation, participants management,...") }";
+    infoItems["createMeeting"] = "${ _("A <strong>meeting</strong> is an event that defines an agenda with many talks.<br/><strong>Features</strong>: timetable, minutes, poster creation, participants management,...") }";
+    infoItems["createConference"] = "${ _("A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.<br/><strong>Features</strong>: call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...") }";
     eventPopupMenu.drawInfoBubbles(infoItems);
 
     return false;
@@ -94,7 +94,7 @@ createEventMenu.observeClick(function(e) {
         var menuItems = {};
 
         % for item in adminItemList:
-        menuItems["${ item['text']}"] = "${ item['url'] }"
+        menuItems["${ item['id']}"] = {action: "${ item['url'] }", display: "${ item['text'] }"};
         % endfor
         //Create a new PopupMenu only if it has never been created before -> fix #679
         if(!administrationPopupMenu){
@@ -112,9 +112,9 @@ var helpPopupMenu;
 helpMenu.observeClick(function(e) {
     var menuItems = {};
 
-    menuItems['${ _("Indico help") }'] = "${ urlHandlers.UHConferenceHelp.getURL() }";
-    menuItems['${ _("About Indico") }'] = "${ urlHandlers.UHAbout.getURL() }";
-    menuItems['${ _("Contact") }'] = "${ urlHandlers.UHContact.getURL() }";
+    menuItems['indicoHelp'] = {action: "${ urlHandlers.UHConferenceHelp.getURL() }", display: '${ _("Indico help") }'};
+    menuItems['aboutIndico'] = {action: "${ urlHandlers.UHAbout.getURL() }", display: '${ _("About Indico") }'};
+    menuItems['contactIndico'] = {action: "${ urlHandlers.UHContact.getURL() }", display: '${ _("Contact") }'};
 
     //Create a new PopupMenu only if it has never been created before-> fix #679
     if(!helpPopupMenu){

@@ -27,9 +27,11 @@
                         ${materialMenuName}.open(elem.getAbsolutePosition().x, elem.getAbsolutePosition().y + elem.dom.offsetHeight);
                     }
                 );
-                var ${materialMenuName} = new PopupMenu({
-                    ${', '.join(["'%s' : '%s'" % (f['name'], f['url']) for f in filesWithType])}
-                }, [$E("${materialMenuName}")], 'materialMenuPopupList', false, false);
+                var menuItems = {};
+                % for f in filesWithType:
+                    menuItems["${f['name']}"] = {action: "${f['url']}", display: "${f['name']}"}
+                % endfor
+                var ${materialMenuName} = new PopupMenu(menuItems, [$E("${materialMenuName}")], 'materialMenuPopupList', false, false);
             </script>
         % endif
     % endfor

@@ -16,12 +16,18 @@ var videoServiceInfo = {};
 <div class="meetingEventBody">
     <div style="position: absolute; right: 50px; top: 3px;"><span class="fakeLink dropDownMenu" id="goToDayLink"><strong>Go to day</strong></span></div>
     <script type="text/javascript">
-        var goToDayMenuItems = $D(${dict((prettyDate(item.getAdjustedStartDate(timezone)),
-                                       '#%s' % getDate(item.getAdjustedStartDate(timezone))) for item in entries)| n,j});
+        var goToDayMenuDays = $D(${dict((prettyDate(item.getAdjustedStartDate(timezone)),
+                                       getDate(item.getAdjustedStartDate(timezone))) for item in entries)| n,j});
 
-        goToDayMenuItems.sort(function(val1, val2){
-           return SortCriteria.Default(goToDayMenuItems.get(val1), goToDayMenuItems.get(val2));
+        goToDayMenuDays.sort(function(val1, val2){
+           return SortCriteria.Default(goToDayMenuDays.get(val1), goToDayMenuDays.get(val2));
         });
+
+        var goToDayMenuItems = {};
+        for(item in goToDayMenuDays.getAll()){
+            goToDayMenuItems[goToDayMenuDays.get(item)] = {action:"#"+goToDayMenuDays.get(item) , display:item};
+        }
+
 
         var goToDayLink = $E('goToDayLink');
         var goToDayMenu = null;

@@ -784,15 +784,15 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
             var urlParams;
             if (self.eventData.entryType == 'Contribution') {
                 urlParams = '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
-                menuItems.PDF = Indico.Urls.ContribToPDF + urlParams;
-                menuItems.Calendar = Indico.Urls.ContribToiCal + urlParams;
-                menuItems.XML = Indico.Urls.ContribToXML + urlParams;
+                menuItems.PDF = {action: Indico.Urls.ContribToPDF + urlParams, display: $T('PDF')};
+                menuItems.Calendar = {action: Indico.Urls.ContribToiCal + urlParams, display: $T('Calendar')};
+                menuItems.XML = {action: Indico.Urls.ContribToXML + urlParams, display: $T('XML')};
             } else if (self.eventData.entryType == 'Session') {
                 urlParams = '?showSessions=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
-                menuItems["PDF timetable"] = Indico.Urls.ConfTimeTablePDF + urlParams;
+                menuItems["PDFtimetable"] = {action: Indico.Urls.ConfTimeTablePDF + urlParams, display:$T('PDF timetable')};
 
                 urlParams = '?sessionId=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
-                menuItems.Calendar = Indico.Urls.SessionToiCal + urlParams;
+                menuItems.Calendar = {action: Indico.Urls.SessionToiCal + urlParams, display: $T('Calendar')};
             }
 
             var exportMenu = new PopupMenu(menuItems, [exportLink], null, true, true);
@@ -1040,17 +1040,17 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
                 var menuItems = {};
 
-                menuItems[$T('Block timetable')] = function() {
+                menuItems["blockTimetable"] = { action: function() {
                     self.managementActions.switchToIntervalTimetable(self.eventData.id);
                     self.close();
-                };
-                menuItems[$T('Block properties')] = function() {
+                }, display: $T('Block timetable')};
+                menuItems["blockProperties"] = { action: function() {
                     self.managementActions.editSessionSlot(self.eventData);
                     self.close();
-                };
+                }, display: $T('Block properties')};
                 if (!self.managementActions.isSessionTimetable) {
-                    menuItems[$T('Session properties')] = self.managementActions.editEntry(self.eventData);
-                    menuItems[$T('Session protection')] = self.managementActions.editEntryProtection(self.eventData);
+                    menuItems["sessionProperties"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Session properties')};
+                    menuItems["sessionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Session protection')};
                 }
 
                 editLink.observeClick(function() {
@@ -1070,8 +1070,8 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             } else if (self.eventData.entryType == 'Contribution') {
                 editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
                 var menuItems = {};
-                menuItems[$T('Contribution properties')] = self.managementActions.editEntry(self.eventData);
-                menuItems[$T('Contribution protection')] = self.managementActions.editEntryProtection(self.eventData);
+                menuItems['contributionProperties'] = {action: self.managementActions.editEntry(self.eventData), display: $T('Contribution properties')};
+                menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Contribution protection')};
                 editLink.observeClick(function() {
                     var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
                     var pos = editLink.getAbsolutePosition();

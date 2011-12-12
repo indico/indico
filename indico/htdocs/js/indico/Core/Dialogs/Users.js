@@ -1380,11 +1380,17 @@ type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))]
                ]);
 
-            var buttons = Html.div({},
-                    Widget.link(command(curry(this.action, userData, function() {self.close();}), Html.input("button", {}, $T("Save")))),
-                    Widget.link(command(function() {self.close();}, Html.input("button", {}, $T("Cancel")))));
 
-             return this.ExclusivePopupWithButtons.prototype.draw.call(this, form, buttons);
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
+         },
+
+        _getButtons: function() {
+            var userData = this.userData;
+            var self = this;
+            return [
+                    [$T('Save'), command(curry(this.action, userData, function() {self.close();}))],
+                    [$T('Cancel'), function() { self.close();}]
+                   ];
          }
 
      },

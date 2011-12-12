@@ -68,7 +68,7 @@ each(joinLinkList, function(joinLink){
             var links = ${ Links };
             var crId = joinLink.dom.name;
             each(links[crId].custom, function(linkType){
-                menuItems['Using ' + linkType.name] = linkType.link;
+                menuItems['using' + linkType.name] = {action: linkType.link, display: $T('Using ') + linkType.name};
             });
             joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList', true, false, null, null,true);
             var pos = joinLink.getAbsolutePosition();
