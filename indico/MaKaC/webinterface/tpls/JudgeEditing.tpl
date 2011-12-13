@@ -104,7 +104,7 @@ var showWidgets = function(firstLoad) {
         % for c in ConfReview.getLayoutQuestions():
 
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
-            newDiv.append(Html.span(null,"${c.getText()}"));
+            newDiv.append(Html.span(null,${c.getText() | n,j}));
             newDiv.append(Html.br());
 
             if (firstLoad) {
