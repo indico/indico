@@ -74,7 +74,7 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
          _checkErrorState: function() {
 
              var value = this.get(true);
-             var validDate = value !== "" ? !!Util.parseJSDateTime(value, IndicoDateTimeFormats.Default) : null;
+             var validDate = value !== "" ? !!Util.parseJSDateTime(value, this.displayFormat) : null;
 
              if (validDate) {
                  return null;
