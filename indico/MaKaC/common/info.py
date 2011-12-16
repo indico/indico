@@ -543,7 +543,7 @@ class StyleManager(Persistent):
         return self._eventStylesheets.get(eventType, [])
 
     def isCorrectStyle(self, styleId):
-        if styleId not in self._styles:
+        if styleId not in self.getStyles():
             return False
 
         correctCSS = self.existsCSSFile(styleId) or not self.getCSSFilename(styleId)
@@ -633,13 +633,13 @@ class StyleManager(Persistent):
         return False
 
     def getCSSFilename( self, stylesheet ):
-        if stylesheet.strip() != "" and stylesheet in self._styles:
+        if stylesheet.strip() != "" and stylesheet in self.getStyles():
             return self._styles[stylesheet][2]
         return None
 
     def getXSLStyles(self):
         xslStyles = []
-        for style in self._styles:
+        for style in self.getStyles():
             if self._styles[style][1]!= None and self._styles[style][1].endswith(".xsl"):
                 xslStyles.append(style)
         return xslStyles
