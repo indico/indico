@@ -71,10 +71,15 @@ else:
             <%include file="MeetingFilter.tpl"/>
         % endif
 
+        % if showExportToICal:
+            <a id="exportIcal" href="#">${ _("iCal export") }</a>
+            <%include file="ConferenceICalExport.tpl"/>
+        % endif
+
         % if showMoreButton:
             <%include file="HeaderMoreMenu.tpl" args="viewoptions = viewoptions,
                 SelectedStyle = SelectedStyle, pdfURL=pdfURL,
-                showExportToICal=showExportToICal, showExportToPDF=showExportToPDF,
+                showExportToPDF=showExportToPDF,
                 showDLMaterial=showDLMaterial, showLayout=showLayout,
                 displayURL=displayURL"/>
         % endif

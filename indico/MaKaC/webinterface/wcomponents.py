@@ -73,6 +73,10 @@ from indico.core.index import Catalog
 
 import re
 
+from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+from indico.web.http_api.auth import APIKey
+from indico.web.http_api.util import generate_public_auth_request
+
 MIN_PRESENT_EVENTS = 6
 OPTIMAL_PRESENT_EVENTS = 10
 
@@ -386,11 +390,30 @@ class WHeader(WTemplated):
             if webcast.HelperWebcastManager.getWebcastManagerInstance().isManager(self._currentuser):
                 adminItemList.append({'id': 'webcastAdmin', 'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
 
-
         vars["adminItemList"] = adminItemList
 
-        return vars
+        if hasattr(self, "_conf"):
+            vars["icsIconURL"]=str(Config.getInstance().getSystemIconURL("ical_grey"))
+            apiMode = minfo.getAPIMode()
+            vars["apiMode"] = apiMode
+            vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+            vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
+            user  = self._aw.getUser()
+            apiKey = user.getAPIKey() if user else None
 
+            requestURLs = {}
+            urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics'%self._conf.getId(), {}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+            requestURLs["publicRequestTopURL"] = urls["publicRequestURL"]
+            requestURLs["authRequestTopURL"] =  urls["authRequestURL"]
+            urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics'%self._conf.getId(), {'detail': 'contributions'}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+            requestURLs["publicRequestAllURL"] = urls["publicRequestURL"]
+            requestURLs["authRequestAllURL"] =  urls["authRequestURL"]
+            vars["requestURLs"] = requestURLs
+            vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
+            vars["apiActive"] = apiKey != None
+            vars["userLogged"] = user != None
+            vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+        return vars
 
 class WStaticWebHeader( WTemplated ):
     """Templating web component for generating the HTML header for

@@ -42,6 +42,7 @@ from MaKaC.accessControl import AccessWrapper
 
 from MaKaC.i18n import _
 from MaKaC.common.contextManager import ContextManager
+import MaKaC.common.info as info
 
 """
 base module for asynchronous server requests
@@ -483,3 +484,18 @@ class TwoListModificationBase:
             self._handleSet()
 
         return self._value
+
+class ExportToICalBase:
+
+    def _checkParams(self):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        self._apiMode = minfo.getAPIMode()
+        user  = self._getUser()
+        if not user:
+            raise ServiceError("ERR-U0","User is not logged in!")
+        apiKey = user.getAPIKey()
+        if not apiKey:
+            raise ServiceError("ERR-U1","User has not an API key!")
+        elif apiKey.isBlocked():
+            raise ServiceError("ERR-U1","User has the API key blocked!")
+        self._apiKey = apiKey

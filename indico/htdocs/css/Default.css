@@ -7370,6 +7370,7 @@ div#social img#social_button:hover{
 
 .social_share_tooltip.ui-tooltip-dark .ui-tooltip-content{
     background: rgba(40,40,40,0.96);
+    border-color: #303030;
 }
 
 .social_share_tooltip .social_site img {
@@ -7811,4 +7812,51 @@ ul.buttonMenuPopupList li a:hover {
 .ui-resizable-resizing {
     opacity: 0.9;
     z-index: 1000;
+}
+
+.icalExportPopup {
+    max-width: 300px;
+    padding: 15px 5px 0 5px;
+}
+
+.icalExportPopup .exportIcalHeader {
+    font-weight: bold;
+    font-size :12px;
+    margin-bottom: 5px;
+}
+
+.icalExportPopup .iCalExportSection {
+    padding-bottom: 5px;
+}
+
+.icalExportPopup input[type=text] {
+    width: 100%;
+    cursor: text;
+    color: #000;
+}
+
+.icalExportPopup a {
+    font-size: 11px;
+}
+
+.icalExportPopup .icalSeparator {
+    margin-bottom: 5px;
+    border-bottom: 1px solid #454545;
+}
+
+.icalExportPopup .agreement {
+    padding: 5px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    vertical-align: middle;
+    text-align: justify;
+    background: rgba(0,0,0,0.15);
+
+}
+
+.icalExportPopup .note {
+    font-style: italic;
+    font-size: 11px;
+    text-align: right;
 }

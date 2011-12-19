@@ -19,6 +19,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
+import urllib, hmac, hashlib, time
+from indico.web.http_api.auth import APIKey
+from MaKaC.common.Configuration import Config
 
 """
 Utility functions
@@ -43,3 +46,48 @@ def get_query_parameter(queryParams, keys, default=None, integer=False):
 
 def remove_lists(data):
     return dict((k, v[0]) for (k, v) in data.iteritems() if v != None)
+
+def build_indico_request(path, params, api_key=None, secret_key=None, persistent=False):
+    items = params.items() if hasattr(params, 'items') else list(params)
+    if api_key:
+        items.append(('apikey', api_key))
+    if secret_key:
+        if not persistent:
+            items.append(('timestamp', str(int(time.time()))))
+        items = sorted(items, key=lambda x: x[0].lower())
+        url = '%s?%s' % (path, urllib.urlencode(items))
+        signature = hmac.new(secret_key, url, hashlib.sha1).hexdigest()
+        items.append(('signature', signature))
+    if not items:
+        return path
+    return '%s?%s' % (path, urllib.urlencode(items))
+
+def generate_public_auth_request(apiMode, apiKey, path, params= {}, persistent=False, https = True):
+    from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+
+    key = apiKey.getKey() if apiKey else None
+    secret_key = apiKey.getSignKey() if apiKey else None
+    if https:
+        baseURL = Config.getInstance().getBaseSecureURL()
+    else:
+        baseURL = Config.getInstance().getBaseURL()
+    publicRequestsURL = None
+    authRequestURL = None
+    if apiMode == API_MODE_KEY:
+        publicRequestsURL = build_indico_request(path, params)
+        authRequestURL = build_indico_request(path, params, key) if key else None
+    elif apiMode == API_MODE_ONLYKEY:
+        authRequestURL = build_indico_request(path, params, key) if key else None
+        params["onlypublic"] = "yes"
+        publicRequestsURL = build_indico_request(path, params, key) if key else None
+    elif apiMode == API_MODE_SIGNED:
+        publicRequestsURL = build_indico_request(path, params)
+        authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key and secret_key else None
+    elif apiMode == API_MODE_ONLYKEY_SIGNED:
+        publicRequestsURL = build_indico_request(path, params, key)  if key else None
+        authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key and secret_key else None
+    elif apiMode == API_MODE_ALL_SIGNED:
+        authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key else None
+        params["onlypublic"] = "yes"
+        publicRequestsURL = build_indico_request(path, params, key, secret_key, persistent)  if key else None
+    return {"publicRequestURL": (baseURL + publicRequestsURL) if publicRequestsURL else "", "authRequestURL": (baseURL + authRequestURL) if authRequestURL else ""}

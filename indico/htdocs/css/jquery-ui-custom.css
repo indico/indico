@@ -156,3 +156,11 @@
     font-size: 11px;
     padding: 2px;
 }
+
+.ui-tooltip-popup .ui-tooltip-content, .ui-tooltip-default .ui-tooltip-titlebar {
+    border: solid 1px #E2E2E2;
+    color: #454545;
+    background-color: white;
+    font-size: 10.5px;
+    padding: 5px 9px;
+}

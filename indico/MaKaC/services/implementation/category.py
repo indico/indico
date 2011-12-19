@@ -27,6 +27,8 @@ from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
 from MaKaC.services.implementation.base import TextModificationBase
+from MaKaC.services.implementation.base import ExportToICalBase
+
 import MaKaC.conference as conference
 from MaKaC.common.logger import Logger
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
@@ -35,7 +37,8 @@ from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvent
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import PrincipalHolder, Avatar, Group
 from indico.core.index import Catalog
-
+from indico.web.http_api.util import generate_public_auth_request
+import MaKaC.common.info as info
 
 class CategoryBase(object):
     """
@@ -243,7 +246,6 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._categ.revokeAccess(userToRemove)
 
-
 class CategoryContactInfoModification( CategoryTextModificationBase ):
     """
     Category contact email modification
@@ -252,8 +254,6 @@ class CategoryContactInfoModification( CategoryTextModificationBase ):
         self._categ.getAccessController().setContactInfo(self._value)
     def _handleGet(self):
         return self._categ.getAccessController().getContactInfo()
-
-
 
 class CategoryControlUserListBase(CategoryModifBase):
 
@@ -308,6 +308,21 @@ class CategoryRemoveControlUser(CategoryControlUserListBase):
             self._categ.revokeConferenceCreation(ph.getById(self._userId))
         return self._getControlUserList()
 
+class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
+
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        ExportToICalBase._checkParams(self)
+
+    def _getAnswer(self):
+        result = {}
+
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/categ/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        result["publicRequestURL"] = urls["publicRequestURL"]
+        result["authRequestURL"] =  urls["authRequestURL"]
+        return result
 
 methodMap = {
     "getCategoryList": GetCategoryList,
@@ -321,4 +336,5 @@ methodMap = {
     "protection.removeManager": CategoryRemoveControlUser,
     "protection.addExistingConfCreator": CategoryAddExistingControlUser,
     "protection.removeConfCreator": CategoryRemoveControlUser
+    "api.getExportURLs": CategoryExportURLs
     }

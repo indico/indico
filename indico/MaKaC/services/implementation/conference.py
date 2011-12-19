@@ -39,6 +39,7 @@ import MaKaC.conference as conference
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import HTMLModificationBase
 from MaKaC.services.implementation.base import DateTimeModificationBase
+from MaKaC.services.implementation.base import ExportToICalBase
 from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
 from MaKaC.webinterface.common import contribFilters
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -64,6 +65,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
+from indico.web.http_api.util import generate_public_auth_request
 
 
 class ConferenceBase:
@@ -1544,7 +1546,24 @@ class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
         self._conf.removeFromRegistrars(ph.getById(self._registrarId))
         return fossilize(self._conf.getRegistrarList())
 
+class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
 
+    def _checkParams(self):
+        ConferenceDisplayBase._checkParams(self)
+        ExportToICalBase._checkParams(self)
+
+    def _getAnswer(self):
+        result = {}
+
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        result["publicRequestTopURL"] = urls["publicRequestURL"]
+        result["authRequestTopURL"] =  urls["authRequestURL"]
+        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s.ics'%self._target.getId(), {'detail': "contribution"}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        result["publicRequestAllURL"] = urls["publicRequestURL"]
+        result["authRequestAllURL"] =  urls["authRequestURL"]
+        return result
 
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
@@ -1607,6 +1626,5 @@ methodMap = {
     "protection.removeManager": ConferenceProtectionRemoveManager,
     "protection.addExistingRegistrar": ConferenceProtectionAddExistingRegistrar,
     "protection.removeRegistrar": ConferenceProtectionRemoveRegistrar,
-    "participant.addExistingParticipant": ConferenceParticipantAddExisting,
-    "participant.addNewParticipant": ConferenceParticipantAddNew
+    "api.getExportURLs": ConferenceExportURLs
     }

@@ -36,8 +36,8 @@ from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 import MaKaC.common.indexes as indexes
-from MaKaC.common import pendingQueues
 from MaKaC.common.utils import validMail
+from indico.web.http_api.auth import APIKey
 
 class UserComparator(object):
 
@@ -470,6 +470,22 @@ class UserSetPersistentSignatures(LoggedOnlyService):
         ak.setPersistentAllowed(not ak.isPersistentAllowed())
         return ak.isPersistentAllowed()
 
+class UserCreateKeyAndEnablePersistentSignatures(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        self._target = self._avatar = self.getAW().getUser()
+        pm = ParameterManager(self._params)
+        self._enablePersistent = pm.extract("enablePersistent", bool, False, False)
+
+    def _getAnswer( self):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        ak = APIKey(self._avatar)
+        ak.create()
+        if minfo.isAPIPersistentAllowed() and self._enablePersistent:
+            ak.setPersistentAllowed(True)
+        return True
+
 methodMap = {
     "event.list": UserListEvents,
     "favorites.addUsers": UserAddToBasket,
@@ -490,6 +506,6 @@ methodMap = {
     "setDisplayTimezone": UserSetDisplayTimezone,
     "setPersonalData": UserSetPersonalData,
     "syncPersonalData": UserSyncPersonalData,
-    "togglePersistentSignatures": UserSetPersistentSignatures
-
+    "togglePersistentSignatures": UserSetPersistentSignatures,
+    "createKeyAndEnablePersistent": UserCreateKeyAndEnablePersistentSignatures
 }

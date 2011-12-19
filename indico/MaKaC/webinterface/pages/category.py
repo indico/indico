@@ -48,6 +48,9 @@ from MaKaC.common.TemplateExec import truncateTitle
 from indico.core.index import Catalog
 from MaKaC.common.fossilize import fossilize
 
+from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+from indico.web.http_api.auth import APIKey
+from indico.web.http_api.util import generate_public_auth_request
 
 class WPCategoryBase ( main.WPMainBase ):
 
@@ -134,6 +137,7 @@ class WCategoryDisplay(wcomponents.WTemplated):
         return wcomponents.WTemplated.getHTML( self, params )
 
     def getVars( self ):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars = wcomponents.WTemplated.getVars( self )
         vars["name"] = self._target.getName()
         vars["description"] = self._target.getDescription()
@@ -169,6 +173,26 @@ class WCategoryDisplay(wcomponents.WTemplated):
             vars["taskList"] = i18nformat("""<a href="%s"> _("Task List")</a>""")%urlHandlers.UHTaskList.getURL(self._target)
         else :
             vars["taskList"] = ""
+
+        # Export ICS
+        if self._target.conferences:
+
+            vars["icsIconURL"]=str(Config.getInstance().getSystemIconURL("ical_grey"))
+            apiMode = minfo.getAPIMode()
+            vars["apiMode"] = apiMode
+            vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+            vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
+            user  = self._aw.getUser()
+            apiKey = user.getAPIKey() if user else None
+            requestURLs = {}
+            urls = generate_public_auth_request(apiMode, apiKey, '/export/categ/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+            requestURLs["publicRequestURL"] = urls["publicRequestURL"]
+            requestURLs["authRequestURL"] =  urls["authRequestURL"]
+            vars["requestURLs"] = requestURLs
+            vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
+            vars["apiActive"] = apiKey != None
+            vars["userLogged"] = user != None
+            vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
 
         return vars
 

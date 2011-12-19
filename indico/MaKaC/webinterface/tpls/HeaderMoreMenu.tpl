@@ -1,7 +1,6 @@
-<%page args="viewoptions=None, SelectedStyle=None, pdfURL=None, showExportToICal=None, showExportToPDF=None, showDLMaterial=None, showLayout=None, displayURL=None"/>
+<%page args="viewoptions=None, SelectedStyle=None, pdfURL=None, showExportToPDF=None, showDLMaterial=None, showLayout=None, displayURL=None"/>
 
 <a><div id="moreMenu" class="dropDownMenuGrey" href="#">${ _("More") }</div><div class="leftCorner"></div></a>
-
 
 <form id="layoutForm" action="${ displayURL }" style="margin: 0px; display: inline">
     <input type="hidden" name="confId" value="${ confId }" />
@@ -27,10 +26,6 @@ moreMenu.observeClick(function(e) {
     var menuItems = {}
     var menu = new PopupMenu(menuItems, [moreMenu], ${"'darkPopupList'" if dark else "null"});
 
-    % if showExportToICal:
-    menuItems["exportIcal"] = {action: '${ urlHandlers.UHConferenceToiCal.getURL(self_._rh._conf, detailLevel = "top") }', display: "${ _('Export event to iCal') }"};
-    menuItems["exportTTIcal"] = {action: '${ urlHandlers.UHConferenceToiCal.getURL(self_._rh._conf, detailLevel = "contributions") }', display: "${ _('Export timetable to iCal') }"};
-    % endif
     % if showExportToPDF:
     menuItems["exportPDF"] = {action: '${ pdfURL }', display: "${ _('Export to PDF') }"};
     % endif
@@ -45,5 +40,8 @@ moreMenu.observeClick(function(e) {
     menu.open(pos.x - 8, pos.y + 20);
     return false;
 });
+
+
+
 
 </script>
