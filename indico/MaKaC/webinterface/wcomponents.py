@@ -6318,6 +6318,7 @@ class WRoomBookingBookingForm( WTemplated ):
         if room.canPrebook( user ) and not room.canBook( user ):
             bookingMessage = "PRE-Book"
         vars["bookingMessage"] = bookingMessage
+        vars["user"] = user
 
         if self._rh._formMode != FormMode.MODIF:
             bText = bookingMessage

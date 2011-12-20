@@ -264,6 +264,18 @@
                                                 </span>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> ${ _("Do not allow bookings before")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                                <input type="text" id="notAllowBookingAfter" name="notAllowBookingAfter" value="${ verbose( room.notAllowBookingAfter ) }" size="10"/>
+                                                <select name="notAllowBookingAfterType" id="notAllowBookingAfterType">
+                                                    <option value="days" ${"selected='selected'" if room.notAllowBookingAfterType == 'days' else ""}>${_("Days")}
+                                                    <option value="weeks" ${"selected='selected'" if room.notAllowBookingAfterType == 'weeks' else ""}>${_("Weeks")}
+                                                    <option value="months" ${"selected='selected'" if room.notAllowBookingAfterType == 'months' else ""}>${_("Months")}
+                                                </select>
+                                            </td>
+                                        </tr>
+
                                  </table>
                                 </td>
                               </tr>

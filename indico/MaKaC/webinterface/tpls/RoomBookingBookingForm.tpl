@@ -13,7 +13,9 @@
         var isValid = true;
         isValid = validate_period(bookingForm[0], true, ${allowPast}) && isValid;
         isValid = required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
-
+        % if not (user.isRBAdmin() or user.getId() == candResv.room.responsibleId) and candResv.room.notAllowBookingAfter > 0:
+            isValid = validate_allow(bookingForm[0], ${candResv.room.notAllowBookingAfter}, '${candResv.room.notAllowBookingAfterType}' ) && isValid;
+        % endif
         if (!Util.Validation.isEmailList($('#contactEmail').val())) {
             isValid = false;
             $('#contactEmail').addClass('invalid');
@@ -167,7 +169,7 @@
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("When")}</span></td>
                                 <td>
                                     <table width="100%">
-                                        <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates() "/>
+                                        <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(), notAllowBookingAfter = candResv.room.notAllowBookingAfter, notAllowBookingAfterType = candResv.room.notAllowBookingAfterType "/>
                                     </table>
                                 </td>
                             </tr>

@@ -265,3 +265,49 @@ function validate_period( f1, withRepeatability, allowPast, what )
     return isValid
 
 }
+
+function validate_allow( f1, allow, allowType )
+{
+    var isValid = true;
+    if ( allow != 0 )
+    {
+        // eDate
+        if ( !is_valid_date( $('#eDay').val(), $('#eMonth').val(), $('#eYear').val() ) )
+        {
+            f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid';
+            isValid = false;
+        }
+
+        var eDate = new Date( parseInt( $('#eYear').val(), 10 ), parseInt( $('#eMonth').val(), 10 ) - 1, parseInt( $('#eDay').val(), 10 ) );
+
+        if ( isValid )
+        {
+            var allowDate = new Date();
+            var allowDays = 0;
+            allowDate.setHours( 0, 0, 0, 0 );
+            switch(allowType){
+                case "days":
+                    allowDays = allow;
+                    break;
+                case "weeks":
+                    allowDays = allow * 7;
+                    break;
+                case "months":
+                    allowDays = allow * 30;
+                    break;
+                default:
+                    allowDays = allow;
+            }
+            allowDate.setDate( allowDate.getDate() + allow);
+            if ( eDate.valueOf() > allowDate.valueOf() )
+            {
+                f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid';
+                f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid';
+                isValid = false;
+            }
+        }
+    }
+
+    return isValid
+
+}

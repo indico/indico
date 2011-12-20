@@ -1,4 +1,4 @@
-<%page args="repeatability=None, form=None, unavailableDates=None"/>
+<%page args="repeatability=None, form=None, unavailableDates=None, notAllowBookingAfter=None, notAllowBookingAfterType=None,"/>
 <script type="text/javascript">
 
     // Comments the repeatition for user, to make it clear
@@ -63,6 +63,15 @@
                                             </td>
                                         </tr>
                                         % endif
+                                        % if notAllowBookingAfter:
+                                        <tr id="sdatesTR" >
+                                            <td class="subFieldWidth" align="right" valign="top" ><small>${ _("Time range restriction") }</small></td>
+                                            <td class="blacktext">
+                                            <span style="color:#881122">${ _("This room cannot be booked more than " + str(notAllowBookingAfter) + " " + notAllowBookingAfterType + " in advance.") }</span>
+                                            </td>
+                                        </tr>
+                                        % endif
+
                                         <tr id="sdatesTR" >
                                             <td class="subFieldWidth" align="right" ><small> ${ _("Start Date")}&nbsp;&nbsp;</small></td>
                                             <td class="blacktext">

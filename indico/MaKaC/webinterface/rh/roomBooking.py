@@ -41,7 +41,7 @@ from MaKaC.rb_room import RoomBase
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
-from MaKaC.rb_tools import intd, FormMode, doesPeriodsOverlap
+from MaKaC.rb_tools import intd, FormMode, doesPeriodsOverlap, dateExcessAllowed
 from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.plugins import PluginLoader
 from MaKaC import plugins
@@ -228,6 +228,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         session.setVar( "capacity", c.capacity )
         session.setVar( "division", c.division )
         session.setVar( "surfaceArea", c.surfaceArea )
+        session.setVar( "notAllowBookingAfter", c.notAllowBookingAfter)
+        session.setVar( "notAllowBookingAfterType", c.notAllowBookingAfterType)
         session.setVar( "comments", c.comments )
 
         session.setVar( "equipment", c.getEquipment() )
@@ -302,6 +304,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
 
         candRoom.telephone = ''      # str
         candRoom.surfaceArea = None
+        candRoom.notAllowBookingAfter = 0
+        candRoom.notAllowBookingAfterType = None
         candRoom.whereIsKey = ''
         candRoom.comments = ''
         candRoom.responsibleId = None
@@ -332,6 +336,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.capacity = intd( session.getVar( "capacity" ) )
         candRoom.division = session.getVar( "division" )
         candRoom.surfaceArea = intd( session.getVar( "surfaceArea" ) )
+        candRoom.notAllowBookingAfter = intd( session.getVar( "notAllowBookingAfter" ) )
+        candRoom.notAllowBookingAfterType = session.getVar( "notAllowBookingAfterType" )
         candRoom.comments = session.getVar( "comments" )
 
         candRoom.setEquipment( session.getVar( "equipment" ) )
@@ -375,6 +381,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.division = params.get( "division" )
         candRoom.surfaceArea = intd( params.get( "surfaceArea" ) )
         candRoom.comments = params.get( "comments" )
+        candRoom.notAllowBookingAfter = intd( params.get( "notAllowBookingAfter" ) )
+        candRoom.notAllowBookingAfterType = params.get( "notAllowBookingAfterType" )
         #TODO: change this in order to support many periods
         candRoom.clearNonBookableDates()
         if params.get("startDateNonBookablePeriod0", "") and params.get("endDateNonBookablePeriod0",""):
@@ -1418,6 +1426,18 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
             if (doesPeriodsOverlap(nbd.getStartDate(),nbd.getEndDate(),self._candResv.startDT,self._candResv.endDT)):
                 raise FormValuesError("You cannot book this room during the following periods due to maintenance reasons: %s"%("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
 
+        user = self._getUser()
+        if not (user.isRBAdmin() or user.getId() == self._candResv.room.responsibleId) and self._candResv.room.notAllowBookingAfter > 0:
+            days = 0
+            if self._candResv.room.notAllowBookingAfterType == "days":
+                days = self._candResv.room.notAllowBookingAfter
+            elif self._candResv.room.notAllowBookingAfterType == "weeks":
+                days = self._candResv.room.notAllowBookingAfter * 7
+            elif self._candResv.room.notAllowBookingAfterType == "months":
+                days = self._candResv.room.notAllowBookingAfter * 30
+            if dateExcessAllowed(self._candResv.endDT, days):
+                raise FormValuesError(_("You cannot book this room during the following periods due it excess the offset limit of booking %s %s.")%(self._candResv.room.notAllowBookingAfter, self._candResv.room.notAllowBookingAfterType))
+
         self._params = params
         self._clearSessionState()
 
@@ -1615,7 +1635,6 @@ class RHRoomBookingRoomForm( RHRoomBookingAdminBase ):
 
         # CREATE CANDIDATE OBJECT
         candRoom = None
-
         if self._formMode == FormMode.NEW:
             locationName = params.get("roomLocation", "")
             location = Location.parse(locationName)
@@ -1663,6 +1682,7 @@ class RHRoomBookingSaveRoom( RHRoomBookingAdminBase ):
             candRoom.saveSmallPhoto( params["smallPhotoPath"] )
 
     def _checkParams( self, params ):
+
         roomID = params.get( "roomID" )
         roomLocation = params.get( "roomLocation" )
 

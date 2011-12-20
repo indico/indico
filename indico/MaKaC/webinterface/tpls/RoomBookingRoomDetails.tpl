@@ -172,6 +172,13 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td align="right" valign="top"><small> ${ _("Bookings not allowed before")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                                ${ verbose( room.notAllowBookingAfter )}
+                                                ${verbose( room.notAllowBookingAfterType ) if room.notAllowBookingAfter else ""}
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td align="right" valign="top"><small>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
                                                 % if not room.isReservable:

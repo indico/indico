@@ -788,6 +788,8 @@ notificationToResponsible: #{self.resvNotificationToResponsible}
     whereIsKey = None     # str, typically telephone number
     comments = None       # str
     responsibleId = None  # str, responsible person id (avatar.id)
+    notAllowBookingAfter = 0 # time after bookings in this room cannot be done
+    notAllowBookingAfterType = None # time type after bookings in this room cannot be done (Days, Weeks, Months)
 
     #customAtts = {}      # Must behave like name-value dictionary of
                           # custom attributes. Must be put in derived classes.
