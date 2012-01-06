@@ -25,11 +25,11 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 class RHErrorReporting(RH):
     """Handles the reporting of errors to the Indico support.
-        
-        This handler is quite special as it has to handle the reporting of 
+
+        This handler is quite special as it has to handle the reporting of
         generic errors to the support of the application; any error can happen
-        which means that even the DB could not be avilable so it has to use 
-        the minimal system resources possible in order to always be able to 
+        which means that even the DB could not be avilable so it has to use
+        the minimal system resources possible in order to always be able to
         report errors.
     """
 
@@ -50,8 +50,8 @@ class RHErrorReporting(RH):
         body = ["-"*20, "User Comments\n", "%s\n\n"%self._comments, "-"*20, \
                 "Error details\n", self._msg, "-"*20 ]
         maildata = { "fromAddr": fromAddr, "toList": [toAddr], "subject": subject, "body": "\n".join( body ) }
-        GenericMailer.send(GenericNotification(maildata))
-        
+        GenericMailer.send(GenericNotification(maildata), skipQueue=True)
+
     def process( self, params ):
         self._checkParams( params )
         if self._sendIt:
@@ -61,4 +61,3 @@ class RHErrorReporting(RH):
         else:
             p = errors.WPReportError( self )
             return p.display( userEmail = self._userMail, msg = self._msg )
-        
