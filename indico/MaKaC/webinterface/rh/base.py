@@ -582,6 +582,7 @@ class RH(RequestHandlerBase):
                             GenericMailer.flushQueue(True) # send emails
                             self._deleteTempFiles()
                         except:
+                            Logger.get('mail').exception('Mail sending operation failed')
                             pass
                         break
                     except MaKaCError, e:
