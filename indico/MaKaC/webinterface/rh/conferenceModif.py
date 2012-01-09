@@ -2559,6 +2559,7 @@ class RHConfModifParticipantsSendEmail (RHConferenceModifBase):
         RHConferenceModifBase._checkParams( self, params )
         self._data = {}
         toList =[]
+        user = self._getUser()
         selectedList = self._normaliseListParam(self._getRequestParams().get("to",[]))
         for id in selectedList:
             participant=self._conf.getParticipation().getParticipantById(id)
@@ -2566,7 +2567,7 @@ class RHConfModifParticipantsSendEmail (RHConferenceModifBase):
                 toList.append(participant.getEmail())
         self._data["toList"] = toList
         self._data["ccList"] = self._normaliseListParam(params.get("cc",[]))
-        self._data["fromAddr"] = params.get("from","")
+        self._data["fromAddr"] = "%s <%s>" % (user.getStraightFullName(), user.getEmail())
         self._data["subject"] = params.get("subject","")
         self._data["body"] = params.get("body","")
         self._send = params.has_key("OK")
