@@ -25164,7 +25164,7 @@ msgstr "Exporter l'événement dans iCal"
 #: MaKaC/webinterface/tpls/HeaderMoreMenu.tpl:32
 #: indico/MaKaC/webinterface/tpls/HeaderMoreMenu.tpl:32
 msgid "Export timetable to iCal"
-msgstr "Exporter l'oraire dans iCal"
+msgstr "Exporter l'horaire dans iCal"
 
 #: MaKaC/webinterface/tpls/HeaderMoreMenu.tpl:35
 #: indico/MaKaC/webinterface/tpls/HeaderMoreMenu.tpl:35
