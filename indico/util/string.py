@@ -22,6 +22,18 @@
 String manipulation functions
 """
 
+import unicodedata
+
 
 def unicodeOrNone(string):
     return None if string == None else string.decode('utf-8')
+
+
+def remove_accents(text):
+    if not isinstance(text, unicode):
+        text = text.decode('utf8')
+    return ''.join((c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn'))
+
+
+def remove_non_alpha(text):
+    return ''.join(c for c in text if c.isalnum())
