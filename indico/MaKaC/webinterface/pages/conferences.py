@@ -1451,7 +1451,8 @@ class WConferenceTimeTable(wcomponents.WTemplated):
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         vars["ttdata"] = json.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(),
                                                                           tz, self._aw,
-                                                                          useAttrCache = True))
+                                                                          useAttrCache = True,
+                                                                          hideWeekends = True))
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz = tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
         vars['eventInfo'] = json.dumps(eventInfo)

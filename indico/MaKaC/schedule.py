@@ -1485,7 +1485,7 @@ class ScheduleToJson:
         return canBeDisplayed
 
     @staticmethod
-    def process(schedule, tz, aw, days = None, mgmtMode = False, useAttrCache = False):
+    def process(schedule, tz, aw, days = None, mgmtMode = False, useAttrCache = False, hideWeekends = False):
 
         scheduleDict={}
 
@@ -1507,6 +1507,11 @@ class ScheduleToJson:
                 # verify that start date is in dates
                 if day in dates:
                     scheduleDict[day][genId] = resultData
+        if hideWeekends:
+            for entry in scheduleDict.keys():
+                weekDay = datetime.strptime(entry, "%Y%m%d").weekday()
+                if scheduleDict[entry] == {} and (weekDay == 5 or weekDay == 6):
+                    del scheduleDict[entry]
 
         return scheduleDict
 
