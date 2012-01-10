@@ -20,6 +20,7 @@
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+@import url("IndicoMeeting.css");
 
 body {
     background: #424242;
@@ -30,20 +31,21 @@ body {
 }
 
 div.meetingEventHeader {
-	background: white url('../../../images/alicelogo.png') left top no-repeat;
-	background-position: 35px 25px;
-    border: 1px #AAA solid;
-    border-bottom: none;
-
-	margin: 0;
-
-	color: #333333;
-
-	padding-left: 200px;
+	background: #dedede url('../../../images/alicelogo.png') left top no-repeat;
+	background-position: 15px;
+	padding-left: 150px;
 }
 
-div.meetingEventSubHeader {
-    border: 1px solid #AAA;
+div.meetingEventHeader h1 {
+    color: #222;
+    text-shadow: none;
+    font-weight: bold;
+}
+
+div.meetingEventHeader .details {
+    padding-top: 0px;
+    color: #555 !important;
+    text-shadow: none;
 }
 
 div.meetingEventHeader a:link {
@@ -57,10 +59,6 @@ div.meetingEventHeader a:active {
 }
 div.meetingEventHeader a:hover {
    color: #E25300;
-}
-
-div.meetingEventHeader h1 {
-	color: #333333;
 }
 
 div.meetingEventHeader h2 {
