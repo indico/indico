@@ -1383,14 +1383,14 @@ class Abstract(Persistent):
                     abs._addTrackAcceptance(newta)
                     abs._addTrackJudgementToHistorical(newta)
 
-        for trj in self._trackRejections.values() :
+        for trj in self.getTrackRejections().values() :
             for newtrack in conference.getTrackList():
                 if newtrack.getTitle() == trj.getTrack().getTitle() :
                     newtrj = trj.clone(newtrack)
                     abs._addTrackRejection(newtrj)
                     abs._addTrackJudgementToHistorical(newtrj)
 
-        for trl in self._trackReallocations.values() :
+        for trl in self.getTrackReallocations().values() :
             for newtrack in conference.getTrackList():
                 if newtrack.getTitle() == trl.getTrack().getTitle() :
                     newtrl = trl.clone(newtrack)
@@ -2032,109 +2032,58 @@ class Abstract(Persistent):
     def _removeTrackAcceptance( self, track ):
         """
         """
-        try:
-            if self._trackAcceptances:
-                pass
-        except AttributeError, e:
-            self._trackAcceptances = OOBTree()
-
-        if self._trackAcceptances.has_key( track.getId() ):
-            del self._trackAcceptances[ track.getId() ]
+        if self.getTrackAcceptances().has_key( track.getId() ):
+            del self.getTrackAcceptances()[ track.getId() ]
 
     def _addTrackAcceptance( self, judgement ):
         """
         """
-        try:
-            if self._trackAcceptances:
-                pass
-        except AttributeError, e:
-            self._trackAcceptances = OOBTree()
-
         self._removeTrackRejection( judgement.getTrack() )
         self._removeTrackReallocation( judgement.getTrack() )
-        self._trackAcceptances[ judgement.getTrack().getId() ] = judgement
+        self.getTrackAcceptances()[ judgement.getTrack().getId() ] = judgement
         self._addTrackJudgementToHistorical(judgement)
 
     def _removeTrackRejection( self, track ):
         """
         """
-        try:
-            if self._trackRejections:
-                pass
-        except AttributeError, e:
-            self._trackRejections = OOBTree()
-
-        if self._trackRejections.has_key( track.getId() ):
-            del self._trackRejections[ track.getId() ]
+        if self.getTrackRejections().has_key( track.getId() ):
+            del self.getTrackRejections()[ track.getId() ]
 
     def _addTrackRejection( self, judgement ):
         """
         """
-        try:
-            if self._trackRejections:
-                pass
-        except AttributeError, e:
-            self._trackRejections = OOBTree()
-
         self._removeTrackAcceptance( judgement.getTrack() )
         self._removeTrackReallocation( judgement.getTrack() )
-        self._trackRejections[ judgement.getTrack().getId() ] = judgement
+        self.getTrackRejections()[ judgement.getTrack().getId() ] = judgement
         self._addTrackJudgementToHistorical(judgement)
 
     def _removeTrackReallocation( self, track ):
         """
         """
-        try:
-            if self._trackReallocations:
-                pass
-        except AttributeError, e:
-            self._trackReallocations = OOBTree()
-
-        if self._trackReallocations.has_key( track.getId() ):
-            del self._trackReallocations[ track.getId() ]
+        if self.getTrackReallocations().has_key( track.getId() ):
+            del self.getTrackReallocations()[ track.getId() ]
 
     def _addTrackReallocation( self, judgement ):
         """
         """
-        try:
-            if self._trackReallocations:
-                pass
-        except AttributeError, e:
-            self._trackReallocations = OOBTree()
-
         self._removeTrackAcceptance( judgement.getTrack() )
         self._removeTrackRejection( judgement.getTrack() )
-        self._trackReallocations[ judgement.getTrack().getId() ] = judgement
+        self.getTrackReallocations()[ judgement.getTrack().getId() ] = judgement
         self._addTrackJudgementToHistorical(judgement)
 
     def _clearTrackRejections( self ):
-        try:
-            if self._trackRejections:
-                pass
-        except AttributeError, e:
-            self._trackRejections = OOBTree()
-        while len(self._trackRejections.values())>0:
-            t = self._trackRejections.values()[0].getTrack()
+        while len(self.getTrackRejections().values())>0:
+            t = self.getTrackRejections().values()[0].getTrack()
             self._removeTrackRejection( t )
 
     def _clearTrackAcceptances( self ):
-        try:
-            if self._trackAcceptances:
-                pass
-        except AttributeError, e:
-            self._trackAcceptances = OOBTree()
-        while len(self._trackAcceptances.values())>0:
-            t = self._trackAcceptances.values()[0].getTrack()
+        while len(self.getTrackAcceptances().values())>0:
+            t = self.getTrackAcceptances().values()[0].getTrack()
             self._removeTrackAcceptance( t )
 
     def _clearTrackReallocations( self ):
-        try:
-            if self._trackReallocations:
-                pass
-        except AttributeError, e:
-            self._trackReallocations = OOBTree()
-        while len(self._trackReallocations.values())>0:
-            t = self._trackReallocations.values()[0].getTrack()
+        while len(self.getTrackReallocations().values())>0:
+            t = self.getTrackReallocations().values()[0].getTrack()
             self._removeTrackReallocation(t)
 
     def _removePreviousJud(self, responsible, track):
@@ -2232,88 +2181,72 @@ class Abstract(Persistent):
     def getTrackJudgement( self, track ):
         """
         """
-        try:
-            if self._trackAcceptances:
-                pass
-        except AttributeError, e:
-            self._trackAcceptances = OOBTree()
-        try:
-            if self._trackRejections:
-                pass
-        except AttributeError, e:
-            self._trackRejections = OOBTree()
-        try:
-            if self._trackReallocations:
-                pass
-        except AttributeError, e:
-            self._trackReallocations = OOBTree()
-
-        if self._trackAcceptances.has_key( track.getId() ):
-            return self._trackAcceptances[ track.getId() ]
-        elif self._trackRejections.has_key( track.getId() ):
-            return self._trackRejections[ track.getId() ]
-        elif self._trackReallocations.has_key( track.getId() ):
-            return self._trackReallocations[ track.getId() ]
+        if self.getTrackAcceptances().has_key( track.getId() ):
+            return self.getTrackAcceptances()[ track.getId() ]
+        elif self.getTrackRejections().has_key( track.getId() ):
+            return self.getTrackRejections()[ track.getId() ]
+        elif self.getTrackReallocations().has_key( track.getId() ):
+            return self.getTrackReallocations()[ track.getId() ]
         return None
 
-    def getTrackAcceptanceList( self ):
+    def getTrackAcceptances( self ):
         try:
             if self._trackAcceptances:
                 pass
         except AttributeError, e:
             self._trackAcceptances = OOBTree()
+        return self._trackAcceptances
+
+    def getTrackAcceptanceList( self ):
         res = []
-        for trackId in intersection( self._tracks, self._trackAcceptances ):
-            res.append( self._trackAcceptances[ trackId ] )
+        for trackId in intersection( self._tracks, self.getTrackAcceptances() ):
+            res.append( self.getTrackAcceptances()[ trackId ] )
         return res
 
     def getNumProposedToAccept( self ):
-        try:
-            if self._trackAcceptances:
-                pass
-        except AttributeError, e:
-            self._trackAcceptances = OOBTree()
-        return len( intersection( self._tracks, self._trackAcceptances ) )
+        return len( intersection( self._tracks, self.getTrackAcceptances() ) )
 
-    def getNumProposedToReject( self ):
+    def getTrackRejections( self ):
         try:
             if self._trackRejections:
                 pass
         except AttributeError, e:
             self._trackRejections = OOBTree()
-        return len( intersection( self._tracks, self._trackRejections ) )
+        return self._trackRejections
+
+    def getNumProposedToReject( self ):
+        return len( intersection( self._tracks, self.getTrackRejections() ) )
+
+    def getTrackReallocations( self ):
+        try:
+            if self._trackReallocations:
+                pass
+        except AttributeError, e:
+            self._trackReallocations = OOBTree()
+        return self._trackReallocations
+
+
+    def getNumProposedToReallocate( self ):
+        return len( intersection( self._tracks, self.getTrackReallocations() ) )
+
 
     def getNumJudgements( self ):
         """
+        Returns the number of tracks for which some proposal has been done.
+        For instance, let's suppose:
+           Track 1: 2 propose to accept, 3 propose to reject
+           Track 2: 1 propose to accept
+           Track 3: None
+        The result would be 2 (out of 3)
         """
-        try:
-            if self._trackAcceptances:
-                pass
-        except AttributeError, e:
-            self._trackAcceptances = OOBTree()
-        try:
-            if self._trackRejections:
-                pass
-        except AttributeError, e:
-            self._trackRejections = OOBTree()
-        try:
-            if self._trackReallocations:
-                pass
-        except AttributeError, e:
-            self._trackReallocations = OOBTree()
-        tmp1 = union( self._trackAcceptances, self._trackRejections )
-        judgements = union( tmp1, self._trackReallocations )
+        tmp1 = union( self.getTrackAcceptances(), self.getTrackRejections() )
+        judgements = union( tmp1, self.getTrackReallocations() )
         return len( intersection( self._tracks, judgements ) )
 
     def getReallocationTargetedList( self, track ):
-        try:
-            if self._trackReallocations:
-                pass
-        except AttributeError, e:
-            self._trackReallocations = OOBTree()
         #XXX: not optimal
         res = []
-        for r in self._trackReallocations.values():
+        for r in self.getTrackReallocations().values():
             if track in r.getProposedTrackList():
                 res.append( r )
         return res
@@ -2779,12 +2712,15 @@ class AbstractStatus( Persistent ):
     def _getStatusClass( self ):
         """
         """
-        numAccepts = self._abstract.getNumProposedToAccept()
-        numJudgements = self._abstract.getNumJudgements()
+        numAccepts = self._abstract.getNumProposedToAccept() # number of tracks that have at least one proposal to accept
+        numReallocate = self._abstract.getNumProposedToReallocate() # number of tracks that have at least one proposal to reallocate
+        numJudgements = self._abstract.getNumJudgements() # number of tracks that have at least one judgement
         if numJudgements>0:
-            numTracks = self._abstract.getNumTracks()
-            if numTracks == numJudgements:
-                if numAccepts == 1:
+            numTracks = self._abstract.getNumTracks() # number of tracks that this abstract has assigned
+            if numTracks == numJudgements: # Do we have judgements for all tracks?
+                if numReallocate == numTracks:
+                    s = AbstractStatusInConflict
+                elif numAccepts == 1:
                     s = AbstractStatusProposedToAccept
                 elif numAccepts == 0:
                     s = AbstractStatusProposedToReject
