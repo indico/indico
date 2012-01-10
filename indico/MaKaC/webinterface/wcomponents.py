@@ -750,19 +750,30 @@ class WEventFooter(WFooter):
 
     def getVars(self):
         v = WFooter.getVars(self)
+
+        cid = self._conf.getUrlTag().strip() or self._conf.getId()
+        location = self._conf.getLocation().getName() if self._conf.getLocation() else ''
+
+        if self._conf.getRoom() and self._conf.getRoom().getName():
+            location = "%s (%s)" % (self._conf.getRoom().getName(), location)
+
+        description = self._conf.getDescription()
+        if description:
+            description += '\n\n'
+        description += Config.getInstance().getShortEventURL() + cid
+
         v['gc_params'] = urllib.urlencode({
             'action': 'TEMPLATE',
             'text': self._conf.getTitle(),
             'dates': "%s/%s" % (self._gCalDateFormat(self._conf.getStartDate()),
                                 self._gCalDateFormat(self._conf.getEndDate())),
-            'details': self._conf.getDescription(),
-            'location': self._conf.getLocation().getName() if self._conf.getLocation() else '',
+            'details': description,
+            'location': location,
             'trp': False,
             'sprop': [str(urlHandlers.UHConferenceDisplay.getURL(self._conf)),
                       'name:indico']
             })
 
-        cid = self._conf.getUrlTag().strip() or self._conf.getId()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         app_data = minfo.getSocialAppConfig()
 
