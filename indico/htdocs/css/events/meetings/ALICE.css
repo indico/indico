@@ -48,6 +48,12 @@ div.meetingEventHeader .details {
     text-shadow: none;
 }
 
+div.meetingEventHeader .chairedBy {
+    display: block;
+    margin-bottom: 10px;
+    color: #555 !important;
+}
+
 div.meetingEventHeader a:link {
    color: #0b63a5;
 }
