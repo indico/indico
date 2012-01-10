@@ -202,6 +202,7 @@ class ServiceInformation(object):
                 pinSection['lines'] = [booking.getPin()]
             else:
                 pinSection['lines'] = [_('This Vidyo room is protected by a PIN')]
+            sections.append(pinSection)
 
         sections.append({
             "title" : _('Moderator'),
