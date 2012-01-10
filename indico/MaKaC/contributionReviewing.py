@@ -925,6 +925,14 @@ class ContributionReviewingNotification(GenericNotification):
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] You have been chosen as %s for the contribution "%s" (id: %s)"""
                         % (role, contribution.getTitle(), str(contribution.getId())))
+
+        if role == 'Referee':
+            urlh = urlHandlers.UHConfModifListContribToJudge
+        elif role == 'Layout Reviewer':
+            urlh = urlHandlers.UHConfModifListContribToJudgeAsEditor
+        elif role == 'Content Reviewer':
+            urlh = urlHandlers.UHConfModifListContribToJudgeAsReviewer
+
         self.setBody("""Dear Indico user,
 
         You have been chosen as %s of the contribution "%s" (id: %s) of the conference %s (id: %s).
@@ -934,7 +942,7 @@ class ContributionReviewingNotification(GenericNotification):
 
         Thank you for using our system.
         """ % ( role, contribution.getTitle(), str(contribution.getId()), conference.getTitle(),
-                str(conference.getId()), urlHandlers.UHContributionModifReviewing.getURL(contribution)
+                str(conference.getId()), urlh.getURL(contribution)
         ))
 
 class ContributionReviewingRemoveNotification(GenericNotification):

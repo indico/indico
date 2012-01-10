@@ -1310,7 +1310,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                         var killProgress = IndicoUI.Dialogs.Util.progress()
                                         popup.close();
                                         killProgress();
-                                        (new AlertPopup($T("Warning"),'There is no '+attribute+' define.')).open();
+                                        (new AlertPopup($T("Warning"),'There is no '+attribute+' defined.')).open();
                                     }
                                     for (i in result) {
                                     attributes.append(result[i]);
