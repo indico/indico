@@ -2003,6 +2003,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             self._saveResvCandidateToSession( self._resv )
             url = urlHandlers.UHRoomBookingBookingForm.getURL( self._resv.room )
             self._redirect( url ) # Redirect to booking details
+
         for notification in emailsToBeSent:
             GenericMailer.send(notification)
 

@@ -37,10 +37,12 @@ class GenericMailer:
         # enqueue emails if we have a rh and do not skip queuing, otherwise send immediately
         rh = ContextManager.get('currentRH', None)
         mailData = cls._prepare(notification)
-        if skipQueue or not rh:
-            cls._send(mailData)
-        else:
-            ContextManager.setdefault('emailQueue', []).append(mailData)
+
+        if mailData:
+            if skipQueue or not rh:
+                cls._send(mailData)
+            else:
+                ContextManager.setdefault('emailQueue', []).append(mailData)
 
     @classmethod
     def flushQueue(cls, send):
@@ -65,11 +67,12 @@ class GenericMailer:
                 notification.getCCList().remove(cc)
 
         to=", ".join(notification.getToList())
-        if not to:
-            return
         cc=""
         if len(notification.getCCList())>0:
             cc="Cc: %s\r\n"%", ".join(notification.getCCList())
+        if not to and not cc:
+            return
+
         try:
             ct=notification.getContentType()
         except:
