@@ -93,7 +93,7 @@ var videoServiceLaunchInfo = {};
                         % for line in section.get('lines', []):
                         <div style="display:inline">${line}</div>
                         % endfor
-                        % if section['title'] == _("Moderator") and conf.canModify(self_._rh._aw) and booking.getOwner()["id"] != self_._rh._getUser().getId():
+                        % if section['title'] == _("Moderator") and self_._rh._getUser() and conf.canModify(self_._rh._aw) and booking.getOwner()["id"] != self_._rh._getUser().getId():
                         <div style="display:inline; vertical-align:bottom"><a href="#" style="font-size:12px" onClick= "makeMeModerator(this,${conf.getId()},${booking.getId()}, successMakeEventModerator)">${_("Make me moderator")}</a></div>
                         % endif
                         % for caption, href in section.get('linkLines', []):
