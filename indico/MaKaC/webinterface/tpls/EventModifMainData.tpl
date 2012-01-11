@@ -48,11 +48,6 @@ additionalInfo = confObj.getContactInfo()
     <td class="blacktext" style="width:100%">
         <span id="inPlaceEditTitle">${title }</span>
     </td>
-    <td rowspan="${numRows}" style="vertical-align: bottom;">
-        <form action=${ dataModificationURL } method="post">
-            <input type="submit" class="btn" value="modify"/>
-        </form>
-    </td>
 </tr>
 <tr>
     <td class="dataCaptionTD">
@@ -169,6 +164,14 @@ additionalInfo = confObj.getContactInfo()
     % endif
 </tr>
 
+<tr>
+    <td></td>
+    <td style="vertical-align: bottom;text-align:right">
+        <form action=${ dataModificationURL } method="post">
+            <input type="submit" class="btn" value="${_('Edit all')}"/>
+        </form>
+    </td>
+</tr>
 
 <tr>
     <td colspan="3" class="horizontalLine">
