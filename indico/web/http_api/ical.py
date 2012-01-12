@@ -136,7 +136,6 @@ class ICalSerializer(Serializer):
         cal = ical.Calendar()
         cal.set('version', '2.0')
         cal.set('prodid', '-//CERN//INDICO//EN')
-
         now = datetime.datetime.utcnow()
         for fossil in results:
             if fossil['_fossil'] == 'conferenceMetadata':

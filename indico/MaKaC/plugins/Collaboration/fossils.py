@@ -29,6 +29,7 @@
 from MaKaC.common.fossilize import IFossil
 from MaKaC.fossils.conference import IConferenceFossil
 from MaKaC.common.Conversion import Conversion
+from MaKaC.plugins import Collaboration
 
 
 class ISpeakerWrapperBaseFossil(IFossil):
@@ -236,3 +237,39 @@ class IQueryResultFossil(IFossil):
 
     def getNPages(self):
         pass
+
+""" MetadataFossil created for use with iCal serialisation of Collaboration /
+    VideoService events.
+"""
+class ICollaborationMetadataFossil(IFossil):
+
+    def getStartDateAsString(self):
+        pass
+
+    def getAcceptRejectStatus(self):
+        pass
+    getAcceptRejectStatus.produce = lambda s: 'Pending' if s.getAcceptRejectStatus() is None else 'Accepted'
+    getAcceptRejectStatus.name = 'status'
+
+    def getStartDate(self):
+        pass
+
+    def getEndDate(self):
+        pass
+
+    def _getTitle(self):
+        pass
+
+    _getTitle.produce = lambda s: Collaboration.collaborationTools.CollaborationTools.getBookingTitle(s.getLinkObject() if s.hasSessionOrContributionLink() else s._conf)
+    _getTitle.name = 'title'
+
+    def getType(self):
+        pass
+
+    def getUniqueId(self):
+        pass
+
+    def getURL(self):
+        pass
+    getURL.produce = lambda s: Collaboration.collaborationTools.CollaborationTools.getConferenceOrContributionURL(s)
+    getURL.name = 'url'

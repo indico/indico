@@ -27,10 +27,10 @@ from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink
-from MaKaC.plugins.Collaboration.pages import WElectronicAgreement
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
+from MaKaC.plugins.Collaboration.fossils import ICollaborationMetadataFossil
 
 
 globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook', 'VideoEventHook']
@@ -48,8 +48,7 @@ class CollaborationAPIHook(HTTPAPIHook):
         return RCCollaborationAdmin.hasRights(user=aw.getUser())
 
     def _getParams(self):
-        # import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
-        
+
         super(CollaborationAPIHook, self)._getParams()
         self._indicoID = get_query_parameter(self._queryParams, ['iid', 'indicoID'])
         self._cdsID = get_query_parameter(self._queryParams, ['cid', 'cdsID'])
@@ -104,77 +103,6 @@ class CollaborationExportHook(HTTPAPIHook):
                     }
                 }
 
-""" Container for utilitarian tools for use with the Collaboration export API
-"""
-class CollaborationAPIUtils():
-
-    """ The CSBooking object which can be passed through to the fossil
-        may be linked to a Contribution, in the case of WebcastRequest etc,
-        therefore the URL may be more specific than the event in this instance.
-    """
-    @staticmethod
-    def getConferenceOrContributionURL(event):
-        from MaKaC.conference import Conference, Contribution
-        from MaKaC.webinterface.urlHandlers import UHConferenceDisplay, UHContributionDisplay
-        url = ""
-
-        # Webcast and Recording Request specific:
-        if hasattr(event, '_conf'):
-            event = event._conf
-
-        if isinstance(event, Conference):
-            url = UHConferenceDisplay.getURL(event)
-        elif isinstance(event, Contribution):
-            url = UHContributionDisplay(event)
-
-        return url
-
-    @staticmethod
-    def getBookingTitle(booking):
-        title = ""
-        if hasattr(booking, 'getTitle'):
-            title = booking.getTitle()
-        elif hasattr(booking, '_getTitle'):
-            title = booking._getTitle()
-        elif hasattr(booking, '_conf'):
-            title = booking._conf.getTitle()
-
-        return title if title is not None else 'No title defined.'
-
-""" MetadataFossil created for use with iCal serialisation of Collaboration /
-    VideoService events.
-"""
-class ICollaborationMetadataFossil(IFossil):
-
-    def getStartDateAsString(self):
-        pass
-
-    def getAcceptRejectStatus(self):
-        pass
-    getAcceptRejectStatus.produce = lambda s: 'Pending' if s is None else 'Accepted'
-    getAcceptRejectStatus.name = 'status'
-
-    def getStartDate(self):
-        pass
-
-    def getEndDate(self):
-        pass
-
-    def _getTitle(self):
-        pass
-    _getTitle.produce = lambda s: CollaborationAPIUtils.getBookingTitle(s._conf)
-    _getTitle.name = 'title'
-
-    def getType(self):
-        pass
-
-    def getUniqueId(self):
-        pass
-
-    def getURL(self):
-        pass
-    getURL.produce = lambda s: CollaborationAPIUtils.getConferenceOrContributionURL(s)
-    getURL.name = 'url'
 
 """ This has been defined as a separate hook to CollaborationExportHook et al
     due to the different input expected for both. It would be beneficial to
@@ -240,7 +168,7 @@ class VideoEventFetcher(DataFetcher):
         self._alarm = alarm
 
         for id in idList:
-            tempBookings = idx.getBookings(self.ID_TO_IDX[id], "conferenceStartDate", 
+            tempBookings = idx.getBookings(self.ID_TO_IDX[id], "conferenceStartDate",
                                            self._orderBy, self._fromDT, self._toDT,
                                            'UTC', False, None, None, False, dateFormat)
             bookings.extend(tempBookings.getResults())
@@ -274,8 +202,12 @@ class VideoEventFetcher(DataFetcher):
                             yield bk
                         else: # contributions is the list of all to be exported now
                             for contrib in contributions:
-                                bk.setStartDate(contrib.getStartDate())
-                                bk.setEndDate(contrib.getEndDate())
+                                if contrib.isScheduled():
+                                    bk.setStartDate(contrib.getStartDate())
+                                    bk.setEndDate(contrib.getEndDate())
+                                else:
+                                    bk.setStartDate(bk._conf.getStartDate())
+                                    bk.setEndDate(bk._conf.getEndDate())
                                 yield bk
 
                         continue

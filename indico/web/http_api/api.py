@@ -520,7 +520,6 @@ class CategoryEventFetcher(DataFetcher):
 
         return self._process(_iterate_objs(idlist))
 
-
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)
 Serializer.register('ics', ICalSerializer)

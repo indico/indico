@@ -6951,6 +6951,9 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
             self.title=""
         return self.title
 
+    def getFullTitle( self ):
+        return self.getSession().getTitle() + (": " + self.getTitle() if self.getTitle() else "")
+
     def getName(self):
         return "slot %s"%self.getId()
 

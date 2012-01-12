@@ -33,6 +33,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.plugins.Collaboration.Vidyo.pages import ServiceInformation
+from MaKaC.conference import Contribution, Session
 
 class CSBooking(CSBookingBase):
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
@@ -273,11 +274,14 @@ class CSBooking(CSBookingBase):
             linkObject = self.getLinkObject()
             if linkObject is None:
                 return _("Removed %s")%_("contribution") if self.isLinkedToContribution() else _("session")
-            if self.isLinkedToContribution():
+            if self.isLinkedToContribution() and isinstance(linkObject, Contribution):
                 title = linkObject.getTitle()
-            else:
+                linkVideoText = title + " (" + self._linkVideoType + ")"
+            elif self.isLinkedToSession() and isinstance(linkObject, Session):
                 title = linkObject.getSession().getTitle() + (" - " + linkObject.getTitle() if linkObject.getTitle() else "")
-            linkVideoText = title + " (" + self._linkVideoType + ")"
+                linkVideoText = title + " (" + self._linkVideoType + ")"
+            else:
+                linkVideoText = _("Link removed")
         else:
             linkVideoText = _("Whole event")
 

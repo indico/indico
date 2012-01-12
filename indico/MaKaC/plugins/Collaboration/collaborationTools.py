@@ -352,6 +352,41 @@ class CollaborationTools(object):
 
         return requestType
 
+    """ The CSBooking object which can be passed through to the fossil
+        may be linked to a Contribution, in the case of WebcastRequest etc,
+        therefore the URL may be more specific than the event in this instance.
+    """
+
+    @classmethod
+    def getConferenceOrContributionURL(cls, event):
+        from MaKaC.webinterface.urlHandlers import UHConferenceDisplay, UHContributionDisplay
+        url = ""
+
+        # Webcast and Recording Request specific:
+        if hasattr(event, '_conf'):
+            event = event._conf
+
+        if isinstance(event, Conference):
+            url = UHConferenceDisplay.getURL(event)
+        elif isinstance(event, Contribution):
+            url = UHContributionDisplay(event)
+
+        return url
+
+    @classmethod
+    def getBookingTitle(cls, booking):
+        title = ""
+        if hasattr(booking, 'getFullTitle'):
+            title = booking.getFullTitle()
+        elif hasattr(booking, 'getTitle'):
+            title = booking.getTitle()
+        elif hasattr(booking, '_getTitle'):
+            title = booking._getTitle()
+        elif hasattr(booking, '_conf'):
+            title = booking._conf.getTitle()
+
+        return title if title is not None else 'No title defined.'
+
 class MailTools(object):
 
     @classmethod
