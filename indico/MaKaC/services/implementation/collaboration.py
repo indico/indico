@@ -302,18 +302,27 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
                     minKey = self._params['fromTitle'].strip()
                 if self._params['toTitle']:
                     maxKey = self._params['toTitle'].strip()
+
+                """ For relative dates, create a diff timedelta for resetting to 
+                    00:00 at the start of range and 23:59 at the end.
+                """
                 if self._params['fromDays']:
                     try:
                         fromDays = int(self._params['fromDays'])
                     except ValueError, e:
                         raise CollaborationException(_("Parameter 'fromDays' is not an integer"), inner = e)
-                    minKey = nowutc() - timedelta(days = fromDays)
+                    now = nowutc()
+                    diff = timedelta(hours = now.hour, minutes = now.minute, seconds = now.second)
+                    minKey = now - diff - timedelta(days = fromDays)
                 if self._params['toDays']:
                     try:
                         toDays = int(self._params['toDays'])
                     except ValueError, e:
                         raise CollaborationException(_("Parameter 'toDays' is not an integer"), inner = e)
-                    maxKey = nowutc() + timedelta(days = toDays)
+                    now = nowutc()
+                    diff = timedelta(days = 1) - \
+                           timedelta(hours = now.hour, minutes = now.minute, seconds = (now.second + 1))
+                    maxKey = now + diff + timedelta(days = toDays)
 
                 self._minKey = minKey
                 self._maxKey = maxKey
