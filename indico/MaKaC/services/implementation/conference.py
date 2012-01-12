@@ -901,7 +901,7 @@ class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
         # Check if there is already a user with the same email
         for person in self._userList:
             if self._isEmailAlreadyUsed(person["email"]):
-                raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another chairperson or the user is already added to the list. Chairperson(s) not added.") % person["email"])
+                raise ServiceAccessError(_("A user with the email address %s is already in the Chairpersons list. Chairperson(s) not added.") % person["email"])
 
     def _newChair(self, av):
         chair = ConferenceChair()
@@ -946,7 +946,7 @@ class ConferenceAddNewChairPerson(ConferenceChairPersonBase):
         self._conf.addChair(chair)
         #If the chairperson needs to be given management rights
         if self._userData.get("manager", None):
-            avl = AvatarHolder().match({"email": self._userData.get("email", "")})
+            avl = AvatarHolder().match({"email": self._userData.get("email", "")}, exact=True, forceWithoutExtAuth=True)
             if avl:
                 av = avl[0]
                 self._conf.grantModification(av)
@@ -1069,7 +1069,7 @@ class ConferenceParticipantAddNew(ConferenceAddParticipantBase):
 
     def _getAnswer(self):
         eventManager = self._getUser()
-        av = AvatarHolder().match({"email": self._userData["email"].strip()}, exact=1, forceWithoutExtAuth=False)
+        av = AvatarHolder().match({"email": self._userData["email"].strip()}, exact=1, forceWithoutExtAuth=True)
         if av != []:
             participant = Participant(self._conf, av[0])
         else:

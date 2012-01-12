@@ -64,6 +64,9 @@ class IAvatarFossil(IAvatarMinimalFossil):
 
 class IAvatarAllDetailsFossil(IAvatarFossil):
 
+    def getSecondaryEmails( self ):
+        """ Avatar secondary emails """
+
     def getAddress( self ):
         """ Avatar address """
 

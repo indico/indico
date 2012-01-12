@@ -48,7 +48,7 @@ ${ Colors }
               <td style="width: 80%"><ul id="inPlaceConveners" class="UIPeopleList"></ul></td>
               <td nowrap valign="top" style="width: 20%; text-align:right;">
                   <span id="inPlaceConvenersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                      <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="convenerManager.addManagementMenu();">${ _("Add convener")}</a>
+                      <a class="dropDownMenu fakeLink" onclick="convenerManager.addManagementMenu();">${ _("Add convener")}</a>
                   </span>
               </td>
           </tr>

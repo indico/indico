@@ -218,7 +218,7 @@ class SessionChairListBase(SessionModifBase):
             sessionChairFossil = fossilize(sessionChair)
             if isinstance(sessionChair, Avatar):
                 isConvener = False
-                if self._session.isConvenerByEmail(sessionChair.getEmail()):
+                if self._session.hasConvenerByEmail(sessionChair.getEmail()):
                     isConvener = True
                 sessionChairFossil['isConvener'] = isConvener
             result.append(sessionChairFossil)
@@ -477,7 +477,8 @@ class SessionGrantRights(SessionModifyConvenerRights):
 class SessionRevokeRights(SessionModifyConvenerRights):
 
     def _getAnswer(self):
-        av = AvatarHolder().match({"email": self._convener.getEmail()})
+
+        av = AvatarHolder().match({"email": self._convener.getEmail()}, exact=1, forceWithoutExtAuth=True)
         if self._kindOfRights == "management":
             if not av:
                 self._session.getAccessController().revokeModificationEmail(self._convener.getEmail())

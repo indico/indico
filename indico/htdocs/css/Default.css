@@ -7292,6 +7292,7 @@ span.num_events {
 .roleSmall {
     font-weight: bold;
     padding-left: 5px;
+    color: #888;
 }
 
 ul.UIAuthorList li .authorMove {

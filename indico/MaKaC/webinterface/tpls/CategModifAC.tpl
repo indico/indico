@@ -12,7 +12,7 @@ ${ confCreationControlFrame }
 var methodsMod = {'addExisting': 'category.protection.addExistingConfCreator',
                     'remove': 'category.protection.removeManager'};
 
-var paramsMod = {categoryId: '${ categoryId }', kindOfList: 'modification'};
+var paramsMod = {categId: '${ categoryId }', kindOfList: 'modification'};
 
 var modificationControlManager = new ListOfUsersManager(null,
 		methodsMod, paramsMod, $E('inPlaceManagers'), "manager", "UIPerson", true, {}, {title: false, affiliation: false, email:true},

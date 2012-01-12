@@ -170,6 +170,12 @@ type("AuthorsManager", [], {
         return this.coAuthors;
     },
 
+    getAllAuthors: function() {
+        var l = $L(this.prAuthors.usersList);
+        l.appendMany(this.coAuthors.usersList);
+        return l;
+    },
+
     updatePositions: function() {
         // Before update anything, save the previous values
         this.prevPrAuthors = this.prAuthors.getUsersList();
@@ -222,11 +228,11 @@ type("AuthorsManager", [], {
             // search the author in co authors list
             author = this.getAuthorById(authorId, this.coAuthors.getUsersList());
             if (tableType == 'pr') { // Trying to move a co-author to primary authors list
-                return !this.prAuthors.isAlreadyInList(author['email']);
+                return !this.prAuthors.isAlreadyInList(author['email'], false);
             }
         } else { // Author is a primary author
             if (tableType == 'co') { // Trying to move primary author to co-authors list
-                return !this.coAuthors.isAlreadyInList(author['email']);
+                return !this.coAuthors.isAlreadyInList(author['email'], false);
             }
         }
         return true;
@@ -278,14 +284,14 @@ type("AuthorListManager", [], {
                                                     onlyOne, showToggleFavouriteButtons,
                     function(userList) {
                         for (var i=0; i<userList.length; i++) {
-                            if (!self.isAlreadyInList(userList[i]['email'])) {
+                            if (!self.isAlreadyInList(userList[i]['email'], true)) {
                                 userList[i]['id'] = self.authorsManager.getNewId();
                                 userList[i]['isSpeaker'] = false;
                                 self.usersList.append(userList[i]);
                             } else {
                                 var popup = new AlertPopup($T('Add author'),
                                                 $T('The email address (') + userList[i]['email'] +
-                                                $T(') of a user you are trying to add is already used by another participant or the user is already added to the list.'));
+                                                $T(') of a user you are trying to add is already used by another author. An author can be added only once and only in one list.'));
                                 popup.open();
                             }
                         }
@@ -311,7 +317,7 @@ type("AuthorListManager", [], {
                                        'isSpeaker': any(newData.get('isSpeaker'), false)
                                       };
                     if (newUserPopup.parameterManager.check()) {
-                        if (!self.isAlreadyInList(newUserData['email'])) {
+                        if (!self.isAlreadyInList(newUserData['email'], true)) {
                             newUserPopup.close();
                             self.usersList.append(newUserData);
                             self._updateUserList();
@@ -326,10 +332,14 @@ type("AuthorListManager", [], {
         newUserPopup.open();
     },
 
-    isAlreadyInList: function(email) {
+    isAlreadyInList: function(email, checkAll) {
         // It checks if there is any user with the same email
-        for (var i=0; i<this.usersList.length.get(); i++) {
-            if (email && email == this.usersList.item(i)['email']) {
+        var uList = this.usersList;
+        if (checkAll) {
+            uList = this.authorsManager.getAllAuthors()
+        }
+        for (var i=0; i<uList.length.get(); i++) {
+            if (email && email == uList.item(i)['email']) {
                 return true;
             }
         }

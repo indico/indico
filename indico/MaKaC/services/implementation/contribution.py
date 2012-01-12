@@ -211,10 +211,9 @@ class ContributionParticipantsBase(ContributionModifBase):
         self._kindOfList = self._pm.extract("kindOfList", pType=str, allowEmpty=False)
 
     def _isEmailAlreadyUsed(self, email):
-        if self._kindOfList == "prAuthor":
-            participantList = self._contribution.getPrimaryAuthorList()
-        elif self._kindOfList == "coAuthor":
-            participantList = self._contribution.getCoAuthorList()
+        participantList = []
+        if self._kindOfList in ("prAuthor", "coAuthor"):
+            participantList = self._contribution.getPrimaryAuthorList() + self._contribution.getCoAuthorList()
         elif self._kindOfList == "speaker":
             participantList = self._contribution.getSpeakerList()
 
@@ -261,7 +260,10 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
         # Check if there is already a user with the same email
         for user in self._userList:
             if self._isEmailAlreadyUsed(user["email"]):
-                raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another participant or the user is already added to the list. Participant(s) not added.") % user["email"])
+                if self._kindOfList == "speaker":
+                    raise ServiceAccessError(_("The email address %s (belonging to a user you are adding) is already used by another speaker in the current speaker list. Speaker(s) not added.") % user["email"])
+                else:
+                    raise ServiceAccessError(_("The email address %s (belonging to a user you are adding) is already used by another author in the list of primary authors or co-authors. Author(s) not added.") % user["email"])
 
     def _newParticipant(self, a):
         part = conference.ContributionParticipation()
@@ -282,9 +284,13 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
 
     def _getAnswer(self):
         for user in self._userList:
-            ah = AvatarHolder()
-            av = ah.getById(user["id"])
-            self._newParticipant(av)
+            if user["_type"] == "Avatar": # new speaker
+                ah = AvatarHolder()
+                av = ah.getById(user["id"])
+                self._newParticipant(av)
+            elif user["_type"] == "ContributionParticipation": # adding existing author to speaker
+                self._contribution.addSpeaker(self._contribution.getAuthorById(user["id"]))
+
         if self._kindOfList == "prAuthor":
             return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
         elif self._kindOfList == "coAuthor":
@@ -342,11 +348,11 @@ class ContributionRemoveParticipant(ContributionParticipantsUserBase):
 
     def _getAnswer(self):
         if self._kindOfList == "prAuthor":
-            self._contribution.removePrimaryAuthor(self._participant)
+            self._contribution.removePrimaryAuthor(self._participant, removeSpeaker=0)
             #return [self._getParticipantsList(self._contribution.getPrimaryAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
             return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
         elif self._kindOfList == "coAuthor":
-            self._contribution.removeCoAuthor(self._participant)
+            self._contribution.removeCoAuthor(self._participant, removeSpeaker=0)
             #return [self._getParticipantsList(self._contribution.getCoAuthorList()), self._getParticipantsList(self._contribution.getSpeakerList())]
             return self._getParticipantsList(self._contribution.getCoAuthorList())
         elif self._kindOfList == "speaker":
@@ -373,10 +379,9 @@ class ContributionEditParticipantData(ContributionParticipantsBase):
         #self._eventType = self._pm.extract("eventType", pType=str, allowEmpty=False)
 
     def _isEmailAlreadyUsed(self):
-        if self._kindOfList == "prAuthor":
-            participantList = self._contribution.getPrimaryAuthorList()
-        elif self._kindOfList == "coAuthor":
-            participantList = self._contribution.getCoAuthorList()
+        participantList = []
+        if self._kindOfList in ("prAuthor", "coAuthor"):
+            participantList = self._contribution.getPrimaryAuthorList() + self._contribution.getCoAuthorList()
         elif self._kindOfList == "speaker":
             participantList = self._contribution.getSpeakerList()
         for auth in participantList:
@@ -447,7 +452,7 @@ class ContributionChangeSubmissionRights(ContributionParticipantsUserBase):
         if self._action == "grant":
             self._contribution.grantSubmission(self._participant)
         elif self._action == "remove":
-            av = AvatarHolder().match({"email": self._participant.getEmail()})
+            av = AvatarHolder().match({"email": self._participant.getEmail()}, exact=True, forceWithoutExtAuth=True)
             if not av:
                 self._contribution.revokeSubmissionEmail(self._participant.getEmail())
             else:
@@ -459,31 +464,64 @@ class ContributionChangeSubmissionRights(ContributionParticipantsUserBase):
         else:
             return self._getParticipantsList(self._contribution.getSpeakerList())
 
-
-class ContributionAddAuthorAsPresenter(ContributionParticipantsBase):
-
-    def _checkParams(self):
-        ContributionParticipantsBase._checkParams(self)
-        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
-
-    def _getAnswer(self):
-        for author in self._userList:
-            self._contribution.addSpeaker(self._contribution.getAuthorById(author["id"]))
-        return self._getParticipantsList(self._contribution.getSpeakerList())
-
-
 class ContributionUpdateAuthorList(ContributionModifBase):
 
     def _checkParams(self):
         ContributionModifBase._checkParams(self)
-        self._prList= self._pm.extract("prList", pType=list, allowEmpty=False)
-        self._coList= self._pm.extract("coList", pType=list, allowEmpty=False)
+        self._from= self._pm.extract("from", pType=str, allowEmpty=False)
+        self._to= self._pm.extract("to", pType=str, allowEmpty=False)
+        self._item = self._pm.extract("item", pType=str, allowEmpty=False)
+        self._index = self._pm.extract("index", pType=int, allowEmpty=False)
+
 
     def _getAnswer(self):
-        self._contribution.newAuthorsList(self._prList, self._coList)
+
+        getAuthor = {'inPlacePrimaryAuthors': self._contribution.getPrimaryAuthorById,
+                   'inPlaceCoAuthors': self._contribution.getCoAuthorById,
+                   'inPlaceSpeakers': self._contribution.getSpeakerById}
+        addAuthor = {'inPlacePrimaryAuthors': self._contribution.addPrimaryAuthor,
+                   'inPlaceCoAuthors': self._contribution.addCoAuthor,
+                   'inPlaceSpeakers': self._contribution.addSpeaker}
+        remAuthor = {'inPlacePrimaryAuthors': self._contribution.removePrimaryAuthor,
+                   'inPlaceCoAuthors': self._contribution.removeCoAuthor}
+
+        author = getAuthor[self._from](self._item)
+
+        if self._to != 'inPlaceSpeakers' and self._from != 'inPlaceSpeakers':
+            remAuthor[self._from](author, removeSpeaker=0)
+
+        addAuthor[self._to](author, index=self._index)
+# IF we want to update all the lists (to update the possible repeated authors (e.g. in speakers list)
+#        if self._contribution.getConference().getType() == "conference":
+#            return [self._getParticipantsList(self._contribution.getPrimaryAuthorList()),
+#                    self._getParticipantsList(self._contribution.getCoAuthorList()),
+#                    self._getParticipantsList(self._contribution.getSpeakerList())]
+#        else:
+#            return self._getParticipantsList(self._contribution.getSpeakerList())
         return True
 
 
+class ContributionReorderAuthorList(ContributionModifBase):
+
+    def _checkParams(self):
+        ContributionModifBase._checkParams(self)
+        self._list= self._pm.extract("list", pType=str, allowEmpty=False)
+        self._item = self._pm.extract("item", pType=str, allowEmpty=False)
+        self._index = self._pm.extract("index", pType=int, allowEmpty=False)
+
+
+    def _getAnswer(self):
+        changePos = {'inPlacePrimaryAuthors': self._contribution.changePosPrimaryAuthor,
+                   'inPlaceCoAuthors': self._contribution.changePosCoAuthor,
+                   'inPlaceSpeakers': self._contribution.changePosSpeaker}
+        getAuthor = {'inPlacePrimaryAuthors': self._contribution.getPrimaryAuthorById,
+                   'inPlaceCoAuthors': self._contribution.getCoAuthorById,
+                   'inPlaceSpeakers': self._contribution.getSpeakerById}
+
+        author = getAuthor[self._list](self._item)
+        changePos[self._list](author, self._index)
+
+        return True
 
 class SubContributionParticipantsBase(ContributionModifBase):
 
@@ -749,9 +787,9 @@ class ContributionSumissionControlRemoveAsAuthor(ContributionSumissionControlMod
         participant = self._getParticipantByEmail(av.getEmail())
 
         if self._kindOfList == "prAuthor":
-            self._contribution.removePrimaryAuthor(participant)
+            self._contribution.removePrimaryAuthor(participant, removeSpeaker=0)
         elif self._kindOfList == "coAuthor":
-            self._contribution.removeCoAuthor(participant)
+            self._contribution.removeCoAuthor(participant, removeSpeaker=0)
         elif self._kindOfList == "speaker":
             self._contribution.removeSpeaker(participant)
         return self._getSubmittersList()
@@ -810,8 +848,8 @@ methodMap = {
     "participants.removeParticipant": ContributionRemoveParticipant,
     "participants.sendEmailData": ContributionSendEmailData,
     "participants.changeSubmissionRights": ContributionChangeSubmissionRights,
-    "participants.addAuthorAsPresenter": ContributionAddAuthorAsPresenter,
     "participants.updateAuthorList": ContributionUpdateAuthorList,
+    "participants.reorderAuthorList": ContributionReorderAuthorList,
 
     "participants.subContribution.addNewParticipant": SubContributionAddNewParticipant,
     "participants.subContribution.addExistingParticipant": SubContributionAddExistingParticipant,

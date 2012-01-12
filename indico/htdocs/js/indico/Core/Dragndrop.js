@@ -13,11 +13,16 @@ $.widget('ui.tablesorter', {
         noDropTargetClass: 'no-drop-target', // the class for invalid drop targets (set on srrtable containers)
         canDrop: null, // function(sortable, element) to check if <element> can be dropped on <sortable>
         onDropFail: null, // called when trying to drop an element on a nodroptarget sortable
-        onUpdate: null // called when an element has been dropped
+        // Use either onUpdate or onReceive+onReorder together.
+        onUpdate: null, // called when an element has been dropped
+        onReceive: null, // called when an element has been dropped
+        onReorder: null // called when an element has been dropped inside the same sortable
     },
 
     _create: function() {
+        console.log(this.options.helper);
         var self = this;
+        var index = null; //original position of element. Used when dropping on copy mode.
         $(self.options.sortables, self.element).sortable({
             // interconnect all sortable tables
             connectWith: self.options.sortables,
@@ -27,8 +32,13 @@ $.widget('ui.tablesorter', {
             handle: self.options.handle,
             // which elements are actually sortable
             items: self.options.sortableElements,
+            opacity: self.options.opacity,
+            helper: self.options.helper,
+            // if set to true, the item will be reverted to its new DOM position
+            revert: self.options.revert,
             // triggered when sorting starts (i.e. when the user starts dragging)
             start: function(e, ui) {
+                index = ui.item.index();
                 if(self.options.placeholderHTML) {
                     ui.placeholder.html(self.options.placeholderHTML);
                 }
@@ -54,13 +64,40 @@ $.widget('ui.tablesorter', {
                 if(!$(this).closest('.' + self.options.dropTargetClass).length) {
                     $(ui.sender).sortable('cancel');
                     if($.isFunction(self.options.onDropFail)) {
+                        $('.copy').remove();
                         self.options.onDropFail.call(self.element);
+                    }
+                }else {
+                    $('.copy').removeClass('copy');
+                    if($.isFunction(self.options.onReceive)) {
+                        self.options.onReceive.call(this, ui);
                     }
                 }
             },
             update: function(e, ui) {
                 if($.isFunction(self.options.onUpdate)) {
                     self.options.onUpdate.call(self.element);
+                }
+            },
+            beforeStop: function(e, ui) {
+                if (ui.item.parent().get(0) == this) {
+                    if($.isFunction(self.options.onReorder)) {
+                        self.options.onReorder.call(this, ui);
+                    }
+                }
+
+            },
+            over: function(e, ui) {
+                /** 2 modes:
+                 *      * mode-copy: (default) the element is dropped in another sortable and kept in the origin.
+                 *      * mode-move: the element is moved from the origin to the target.
+                 */
+                $('.copy').remove();
+                var modeCopy = eval($(this).data('modeCopy'));
+                if (ui.sender.get(0) != this && $.inArray(ui.sender.attr('id'), modeCopy) != -1) {
+                    var clonedItem = ui.item.clone();
+                    clonedItem.addClass("copy").attr('style', '').insertAfter(ui.sender.find(self.options.sortableElements+":eq("+index+")")).fadeIn("slow");
+                    clonedItem.data('user', ui.item.data('user'));
                 }
             }
         });

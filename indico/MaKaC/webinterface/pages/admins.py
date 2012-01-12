@@ -1949,6 +1949,7 @@ class WUserMerge(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        vars['prinId'] = self.prin.getId() if self.prin else ""
         return vars
 
 

@@ -24,6 +24,17 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         );
     },
 
+    removeAuthorById: function(authorId) {
+        for (var i=0; i<this.usersList.length.get(); i++) {
+            var item = this.usersList.item(i);
+            if (authorId == item.id) {
+                this.usersList.remove(item);
+                break;
+            }
+        }
+        return;
+    },
+
     _personName: function(user) {
         var content = this.ListOfUsersManager.prototype._personName.call(this, user);
         if (!user.showSubmitterCB) {
@@ -34,7 +45,6 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
 
     _drawUserList: function() {
         var self = this;
-
         var container = $(this.inPlaceListElem.dom).html('');
 
         this.usersList.each(function(val, idx) {
@@ -47,58 +57,24 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                     row.append(comp);
                 }
             });
-            if (self.kindOfUser == "prAuthor" || self.kindOfUser == "coAuthor") {
-                var spanClass = 'authorMove';
-                row.attr('id', 'author_' + user.id);
-            } else {
-                var spanClass = 'nameLink';
-            }
+            var spanClass = 'authorMove';
             row.append($('<span class=' + spanClass + ' />').append(
                 self._personName(user)));
+            row.data('user', user);
 
             container.append(row);
         });
         this._checkEmptyList();
     },
 
-    canDropElement: function(elemId, list) {
-        var authorId = elemId.split('_')[1];
-        var author = this.getAuthorById(authorId);
-        if (author) {
-            for (var i=0; i<list.length.get(); i++) {
-                if (author.email == list.item(i).email) {
-            	    return false;
-                }
+    canDrop: function(authorEmail) {
+        var list = this.getUsersList();
+        for (var i=0; i<list.length.get(); i++) {
+            if (authorEmail == list.item(i).email) {
+        	    return false;
             }
         }
         return true;
-    },
-
-    getAuthorById: function(authorId) {
-        for (var i=0; i<this.usersList.length.get(); i++) {
-            if (authorId == this.usersList.item(i).id) {
-                return this.usersList.item(i);
-            }
-        }
-        return null;
-    },
-
-    updateDraggableList: function(complementaryList) {
-        var newList = $L();
-        for(var i=0; i<this.inPlaceListElem.dom.children.length; i++) {
-            var elemId = this.inPlaceListElem.dom.children[i].id.split('_')[1];
-            var author = this.getAuthorById(elemId)
-            if (author) {
-                newList.append(author);
-            } else {
-            	// the author is in the other list
-                author = complementaryList.getAuthorById(elemId);
-                if (author) {
-                    newList.append(author);
-                }
-            }
-        }
-        return newList;
     },
 
     _getParamsChangeSubmissionRights: function(userId, action) {
@@ -136,31 +112,29 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         };
 
         var menu = new PopupMenu(menuItems, [$E(element)], "popupList");
-        var pos = $(element).position();
-        menu.open(pos.left - 25, pos.top + 20);
+        var pos = $(element).offset();
+        menu.open(pos.left, pos.top + 20);
     },
 
     addManagementMenu: function(){
         var self = this;
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
-
+            var suggestedAuthors = true;
             if (self.kindOfUser == 'speaker' && self.eventType == "conference") {
-                menuItems[$T('Add from authors')] = function() {
-                    self._addFromAuthorsList();
-                };
+                suggestedAuthors = self._getAuthorsList();
             }
 
             menuItems[$T('Add existing')] = function() {
-                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, true, false, true);
+                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, suggestedAuthors, false, true);
             };
             menuItems[$T('Add new')] = function() {
                 self._addNonExistingUser();
             };
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
-            var pos = self.inPlaceMenu.getAbsolutePosition();
-            menu.open(pos.x + 40, pos.y + 20);
+            var pos = $(self.inPlaceMenu.dom).offset();
+            menu.open(pos.left, pos.top + 20);
         });
     },
 
@@ -183,19 +157,6 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         );
     },
 
-    _addFromAuthorsList: function() {
-        var self = this;
-        // Create the popup to add suggested users
-        var initialList = this._getAuthorsList();
-        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
-        //          showToggleFavouriteButtons, chooseProcess)
-        var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
-                initialList, false, false,
-                function(userList) {self._manageUserList(self.methods["addAuthorAsPresenter"], self._getAddExistingParams(userList));}
-        );
-        chooseUsersPopup.execute();
-    },
-
     _getAuthorsList: function() {
         return primaryAuthorManager.getUsersList().allItems().concat(coAuthorManager.getUsersList().allItems());
     }
@@ -211,8 +172,7 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                         'remove': 'contribution.participants.removeParticipant',
                         'edit': 'contribution.participants.editParticipantData',
                         'sendEmail': 'contribution.participants.sendEmailData',
-                        'changeSubmission': 'contribution.participants.changeSubmissionRights',
-                        'addAuthorAsPresenter': 'contribution.participants.addAuthorAsPresenter'};
+                        'changeSubmission': 'contribution.participants.changeSubmissionRights'};
 
         this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, elementClass, false,
                 {submission: true, management: false, coordination: false},
@@ -232,13 +192,14 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
         var self = this;
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
+            var suggestedAuthors = true;
 
             if (self.eventType == "conference") {
-                menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+                suggestedAuthors = self.authorsList;
             }
 
             menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
-                                                                               true, true, false, true); };
+                                                                               true, suggestedAuthors, false, true); };
             menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
@@ -246,21 +207,6 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
             menu.open(pos.x, pos.y + 20);
             return false;
         });
-    },
-
-    _addFromAuthorsList: function() {
-        var self = this;
-        if (this.authorsList.length == 0) {
-            // Show warning popup
-            var popup = new AlertPopup($T('Warning'), $T('There are no authors available to add as presenters.'));
-            popup.open();
-        } else {
-            var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
-                    this.authorsList, false, false,
-                    function(userList) {self._manageUserList(self.methods["addAuthorAsPresenter"], self._getAddExistingParams(userList));}
-            );
-            chooseUsersPopup.execute();
-        }
     }
 
 },
@@ -294,13 +240,14 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
         var self = this;
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
+            var suggestedAuthors = true;
 
             if (self.eventType == "conference") {
-                menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+                suggestedAuthors = self.authorsList;
             }
 
             menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
-                                                                               true, true, false, true); };
+                                                                               true, suggestedAuthors, false, true); };
             menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
@@ -308,32 +255,6 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
             menu.open(pos.x, pos.y + 20);
             return false;
         });
-    },
-
-    _addFromAuthorsList: function() {
-        var self = this;
-        if (this.authorsList.length == 0) {
-            // Show warning popup
-            var popup = new AlertPopup($T('Warning'), $T('There are no authors available to add as presenters.'));
-            popup.open();
-        } else {
-            var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
-                this.authorsList, false, false,
-                function(userList) {
-                    for (var i=0; i<userList.length; i++) {
-                        if (!self._isAlreadyInList(userList[i]['email'])) {
-                            self.usersList.append(userList[i]);
-                        } else {
-                            var popup = new AlertPopup($T('Add ')+self.userCaption,
-                                    $T('The email address (') + userList[i]['email'] +
-                                    $T(') of a user you are trying to add is already used by another participant or the user is already added to the list.'));
-                            popup.open();
-                        }
-                    }
-                    self._drawUserList();
-                });
-            chooseUsersPopup.execute();
-        }
     },
 
     _checkEmptyList: function() {

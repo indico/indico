@@ -104,10 +104,12 @@
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
+                % endif
                 <tr>
                     <td width="100%" colspan="3">
                         <div id="sortspace" width="100%">
                             <table width="100%">
+                                % if eventType == "conference":
                                 <tr>
                                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Primary authors")}</span></td>
                                     <td colspan="2">
@@ -115,12 +117,12 @@
                                             <tr>
                                                 <td style="width: 79%">
                                                     <div data-id="prAuthorsDiv" class="sortblock" style="width:100%">
-                                                        <ul id="inPlacePrimaryAuthors" class="UIAuthorList"></ul>
+                                                        <ul id="inPlacePrimaryAuthors" class="UIAuthorList" data-mode-copy="['inPlaceSpeakers']"></ul>
                                                     </div>
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                                     <span id="inPlacePrimaryAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                                        <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="primaryAuthorManager.addManagementMenu();">${ _("Add primary author")}</a>
+                                                        <a class="dropDownMenu fakeLink"  onclick="primaryAuthorManager.addManagementMenu();">${ _("Add primary author")}</a>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -137,12 +139,12 @@
                                             <tr>
                                                 <td style="width: 79%">
                                                     <div data-id="coAuthorsDiv" class="sortblock" style="width:100%">
-                                                        <ul id="inPlaceCoAuthors" class="UIAuthorList"></ul>
+                                                        <ul id="inPlaceCoAuthors" class="UIAuthorList"  data-mode-copy="['inPlaceSpeakers']"></ul>
                                                     </div>
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                                     <span id="inPlaceCoAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                                        <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="coAuthorManager.addManagementMenu();">${ _("Add co-author")}</a>
+                                                        <a class="dropDownMenu fakeLink"  onclick="coAuthorManager.addManagementMenu();">${ _("Add co-author")}</a>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -152,83 +154,30 @@
                                 <tr>
                                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                                 </tr>
+                                % endif
+                                <tr>
+                                    <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Presenters") if eventType == "conference" else  _("Speakers")}</span></td>
+                                    <td bgcolor="white" class="blacktext" colspan="2">
+                                        <table width="100%">
+                                            <tr>
+                                                <td style="width: 79%">
+                                                    <div data-id="prAuthorsDiv" class="sortblock" style="width:100%">
+                                                        <ul id="inPlaceSpeakers" class="UIAuthorList"  data-mode-copy="['inPlacePrimaryAuthors', 'inPlaceCoAuthors']"></ul>
+                                                    </div>
+                                                </td>
+                                                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
+                                                    <span id="inPlaceSpeakersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                                                        <a class="dropDownMenu fakeLink" onclick="speakerManager.addManagementMenu();">${ _("Add presenter") if eventType == "conference" else  _("Add speakers")}</a>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </td>
                 </tr>
-                % endif
-                <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Presenters") if eventType == "conference" else  _("Speakers")}</span></td>
-                    <td bgcolor="white" class="blacktext" colspan="2">
-                        <table width="100%">
-                            <tr>
-                                <td style="width: 79%">
-                                    <div data-id="prAuthorsDiv" class="sortblock" style="width:100%">
-                                        <ul id="inPlaceSpeakers" class="UIPeopleList"></ul>
-                                    </div>
-                                </td>
-                                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
-                                    <span id="inPlaceSpeakersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                        <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="speakerManager.addManagementMenu();">${ _("Add presenter") if eventType == "conference" else  _("Add speakers")}</a>
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-
-                <!-- <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Primary authors")}</span></td>
-                    <td colspan="2">
-                        <table width="100%">
-                            <tr>
-                                <td style="width: 79%"><ul id="inPlacePrimaryAuthors" class="UIPeopleList"></ul></td>
-                                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
-                                    <span id="inPlacePrimaryAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                        <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="primaryAuthorManager.addManagementMenu();">${ _("Add primary author")}</a>
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3" class="horizontalLine">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Co-authors")}</span></td>
-                    <td colspan="2">
-                        <table width="100%">
-                            <tr>
-                                <td style="width: 79%"><ul id="inPlaceCoAuthors" class="UIPeopleList"></ul></td>
-                                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
-                                    <span id="inPlaceCoAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                        <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="coAuthorManager.addManagementMenu();">${ _("Add co-author")}</a>
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3" class="horizontalLine">&nbsp;</td>
-                </tr>
-                endif
-                <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Presenters") if eventType == "conference" else  _("Speakers")}</span></td>
-                    <td bgcolor="white" class="blacktext" colspan="2">
-                        <table width="100%">
-                            <tr>
-                                <td style="width: 79%"><ul id="inPlaceSpeakers" class="UIPeopleList"></ul></td>
-                                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
-                                    <span id="inPlaceSpeakersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                        <a class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="speakerManager.addManagementMenu();">${ _("Add presenter") if eventType == "conference" else  _("Add speakers")}</a>
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr> -->
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
@@ -280,62 +229,58 @@ var confId = '${ self_._rh._target.getConference().getId() }';
     var primaryAuthorManager = new ParticipantsListManager(confId,
         {confId: confId, contribId: '${ id }', kindOfList: "prAuthor"}, $E('inPlacePrimaryAuthors'), $E('inPlacePrimaryAuthorsMenu'),
         "prAuthor", "primary author", "conference", "UIAuthorMove", ${primaryAuthors | n,j});
+    $('#inPlacePrimaryAuthors').data('manager', primaryAuthorManager);
 
     var coAuthorManager = new ParticipantsListManager(confId,
         {confId: confId, contribId: '${ id }', kindOfList: "coAuthor"}, $E('inPlaceCoAuthors'), $E('inPlaceCoAuthorsMenu'),
         "coAuthor", "co-author", "conference", "UIAuthorMove", ${coAuthors | n,j});
+    $('#inPlaceCoAuthors').data('manager', coAuthorManager);
 
+% endif:
     var speakerManager = new ParticipantsListManager(confId,
         {confId: confId, contribId: '${ id }', kindOfList: "speaker"}, $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'),
-        "speaker", "presenter", "conference", "UIPerson", ${speakers | n,j});
-
-    // To allow change elements between lists and reload the others list when an action is executed
-    //primaryAuthorManager.setComplementariesList(coAuthorManager, speakerManager);
-    //coAuthorManager.setComplementariesList(primaryAuthorManager, speakerManager);
-    //speakerManager.setComplementariesList(primaryAuthorManager, coAuthorManager);
-
-% else:
-    var speakerManager = new ParticipantsListManager(confId,
-        {confId: confId, contribId: '${ id }', kindOfList: "speaker"}, $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'),
-        "speaker", "speaker", "meeting", "UIPerson", ${speakers | n,j});
-
-% endif
-
+        "speaker", "speaker", "${eventType}", "UIAuthorMove", ${speakers | n,j});
+    $('#inPlaceSpeakers').data('manager', speakerManager);
 
 //Drag and drop for the authors
 $('#sortspace').tablesorter({
 
     onDropFail: function() {
-        var popup = new AlertPopup($T('Warning'), $T('You cannot move the user to this list because there is already a user with the same email address.'));
+        var popup = new AlertPopup($T('Warning'), $T('You cannot move the user to this list because there is already an author with the same email address.'));
         popup.open();
     },
 
     canDrop: function(sortable, element) {
         if (sortable.attr('id') == 'inPlacePrimaryAuthors') {
-            return coAuthorManager.canDropElement(element.attr('id'), primaryAuthorManager.getUsersList());
+            return primaryAuthorManager.canDrop(element.data('user').email) && (!element.parent('#inPlaceSpeakers').length || coAuthorManager.canDrop(element.data('user').email));
         } else if (sortable.attr('id') == 'inPlaceCoAuthors') {
-            return primaryAuthorManager.canDropElement(element.attr('id'), coAuthorManager.getUsersList());
+            return coAuthorManager.canDrop(element.data('user').email) && (!element.parent('#inPlaceSpeakers').length || primaryAuthorManager.canDrop(element.data('user').email));
+        } else if (sortable.attr('id') == 'inPlaceSpeakers') {
+            return speakerManager.canDrop(element.data('user').email);
         }
         return false;
     },
 
-    onUpdate: function() {
-        // get new lists
-        var newPrList = primaryAuthorManager.updateDraggableList(coAuthorManager);
-        var newCoList = coAuthorManager.updateDraggableList(primaryAuthorManager);
-        // set new lists
-        primaryAuthorManager.setUsersList(newPrList);
-        coAuthorManager.setUsersList(newCoList);
-        // send request
+    onReceive: function(ui) {
+        var self = this;
         indicoRequest(
                 'contribution.participants.updateAuthorList',
                 {confId: confId, contribId: '${ id }',
-                 prList: primaryAuthorManager.getUsersList(),
-                 coList: coAuthorManager.getUsersList()},
+                 from: ui.sender.attr('id'),
+                 to: $(this).attr('id'),
+                 item: ui.item.data('user').id,
+                 index: ui.item.index()},
                 function(result, error) {
                     if (!error) {
+                        if ($(self).attr('id') != 'inPlaceSpeakers' && ui.sender.attr('id') != 'inPlaceSpeakers') {
+                            ui.sender.data('manager').removeAuthorById(ui.item.data('user').id);
+                        }
+                        $(self).data('manager').usersList.insert(ui.item.data('user'), ui.item.index());
+                        // we need to redraw in order to update the observers (menu more, edit, delete)
+                        // otherwise the copy (in case of copying from authors to speakers) will not work
                         primaryAuthorManager.drawUserList();
                         coAuthorManager.drawUserList();
+                        speakerManager.drawUserList();
                     } else {
                         IndicoUtil.errorReport(error);
                     }
@@ -343,7 +288,24 @@ $('#sortspace').tablesorter({
         );
         return;
     },
-
+    onReorder: function(ui) {
+        var self = this;
+        indicoRequest(
+                'contribution.participants.reorderAuthorList',
+                {confId: confId, contribId: '${ id }',
+                 list: $(self).attr('id'),
+                 item: ui.item.data('user').id,
+                 index: ui.item.index()},
+                function(result, error) {
+                    if (!error) {
+                        // Nothing to do
+                    } else {
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+        );
+        return;
+    },
     sortables: '.sortblock ul', // relative to element
     sortableElements: '> li', // relative to sortable
     handle: '.authorMove', // relative to sortable element - the handle to start sorting

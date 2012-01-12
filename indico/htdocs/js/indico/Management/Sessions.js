@@ -47,8 +47,9 @@ type("SessionControlManager", ["ListOfUsersManager"], {
                 menu.close();
             };
         }
+
         var menu = new PopupMenu(menuItems, [$E(element)], "popupList");
-        var pos = $(element).position();
+        var pos = $(element).offset();
         menu.open(pos.left, pos.top + 20);
     }
 
@@ -125,7 +126,7 @@ type("SessionConvenerManager", ["ListOfUsersManager"], {
         }
 
         var menu = new PopupMenu(menuItems, [$E(element)], "popupList");
-        var pos = $(element).position();
+        var pos = $(element).offset();
         menu.open(pos.left, pos.top + 20);
     }
 

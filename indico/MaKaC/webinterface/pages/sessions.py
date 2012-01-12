@@ -1868,7 +1868,7 @@ class WSessionModifAC(wcomponents.WTemplated):
             sessionChairFossil = fossilize(sessionChair)
             if isinstance(sessionChair, Avatar):
                 isConvener = False
-                if self._session.isConvenerByEmail(sessionChair.getEmail()):
+                if self._session.hasConvenerByEmail(sessionChair.getEmail()):
                     isConvener = True
                 sessionChairFossil['isConvener'] = isConvener
             result.append(sessionChairFossil)

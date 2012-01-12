@@ -1294,7 +1294,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                         $T(' submission rights.'))];
             }
             if (this.grantManagement) {
-                grantManagement = [$T('Give management rights.'), $B(Html.checkbox({}), userData.accessor('manager'))];
+                grantManagement = [$T('Give management rights'), $B(Html.checkbox({}), userData.accessor('manager'))];
                 warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
                            $T('he or she will be sent an email asking to create an account.'), Html.br(),
                            $T(' After the account creation the user will automatically be'), Html.br(),
@@ -1302,7 +1302,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             }
 
             if (this.grantCoordination) {
-                grantCoordination = [$T('Give coordination rights.'), $B(Html.checkbox({}), userData.accessor('coordinator'))];
+                grantCoordination = [$T('Give coordination rights'), $B(Html.checkbox({}), userData.accessor('coordinator'))];
                 warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
                            $T('he or she will be sent an email asking to create an account.'), Html.br(),
                            $T(' After the account creation the user will automatically be'), Html.br(),
@@ -1320,10 +1320,10 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                [$T('First Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('firstName'))],
                [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],
-               [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', this.allowEmptyEmail), userData.accessor('email'))],
-               [$T('Address'), $B(Html.textarea(), userData.accessor('address'))],
-               [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))],
-               [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('fax'))],
+               [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'email', this.allowEmptyEmail), userData.accessor('email'))],
+               [$T('Address'), $B(Html.textarea({style:{width:'300px'}}), userData.accessor('address'))],
+               [$T('Telephone'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('phone'))],
+               [$T('Fax'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('fax'))],
                grantSubmission, grantManagement, grantCoordination, warning]);
 
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);

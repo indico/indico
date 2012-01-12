@@ -292,8 +292,8 @@ type("ListOfUsersManager", [], {
                 };
 
                 var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
-                var pos = self.inPlaceMenu.getAbsolutePosition();
-                menu.open(pos.x + 20, pos.y + 20);
+                var pos = $(self.inPlaceMenu.dom).offset();
+                menu.open(pos.left, pos.top + 15);
                 //return false;
             });
         }

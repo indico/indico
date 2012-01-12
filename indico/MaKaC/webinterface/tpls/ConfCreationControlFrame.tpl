@@ -44,7 +44,7 @@
 var methodsCC = {'addExisting': 'category.protection.addExistingConfCreator',
                     'remove': 'category.protection.removeConfCreator'};
 
-var paramsCC = {categoryId: '${ categoryId }', kindOfList: 'confCreation'};
+var paramsCC = {categId: '${ categoryId }', kindOfList: 'confCreation'};
 
 var modificationControlManagerCC = new ListOfUsersManager(null,
 		methodsCC, paramsCC, $E('inPlaceConfCreators'), "user", "UIPerson", true, {}, {title: false, affiliation: false, email:true},

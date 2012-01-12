@@ -38,6 +38,11 @@
               <td id="prinEmail" width="100%" valign="top" class="blacktext"></td>
             </tr>
             <tr>
+              <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Secondary emails")}</span></td>
+              <td>&nbsp;</td>
+              <td id="prinSecondaryEmails" width="100%" valign="top" class="blacktext"></td>
+            </tr>
+            <tr>
               <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Address")}</span></td>
               <td>&nbsp;</td>
               <td width="100%" valign="top" class="blacktext"><pre id="prinAddress"></pre></td>
@@ -93,6 +98,11 @@
               <td id="toMergeEmail" width="100%" valign="top" class="blacktext"></td>
             </tr>
             <tr>
+              <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Secondary emails")}</span></td>
+              <td>&nbsp;</td>
+              <td id="toMergeSecondaryEmails" width="100%" valign="top" class="blacktext"></td>
+            </tr>
+            <tr>
               <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Address")}</span></td>
               <td>&nbsp;</td>
               <td width="100%" valign="top" class="blacktext"><pre id="toMergeAddress"></pre></td>
@@ -135,8 +145,8 @@
 <script>
 
 // clean Ids each time the page is reloaded
-$E('prinId').set('');
-$E('toMergeId').set('');
+//$E('prinId').set('');
+//$E('toMergeId').set('');
 
 function selectUser(kindOfUser) {
     // show the select user popup
@@ -167,6 +177,7 @@ function updateUserData(kindOfUser, user) {
                         $E('prinFirstName').set(result['firstName']);
                         $E('prinAffiliation').set(result['affiliation']);
                         $E('prinEmail').set(result['email']);
+                        $E('prinSecondaryEmails').set(result['secondaryEmails'].join(', '))
                         $E('prinAddress').set(result['address']);
                         $E('prinPhone').set(result['telephone']);
                         $E('prinFax').set(result['fax']);
@@ -192,6 +203,7 @@ function updateUserData(kindOfUser, user) {
                         $E('toMergeFirstName').set(result['firstName']);
                         $E('toMergeAffiliation').set(result['affiliation']);
                         $E('toMergeEmail').set(result['email']);
+                        $E('toMergeSecondaryEmails').set(result['secondaryEmails'].join(', '));
                         $E('toMergeAddress').set(result['address']);
                         $E('toMergePhone').set(result['telephone']);
                         $E('toMergeFax').set(result['fax']);
@@ -230,5 +242,12 @@ function checkIds(form) {
         return true;
     }
 }
+
+IndicoUI.executeOnLoad(function(){
+    var pId = "${prinId}";
+    if (pId!="") {
+        updateUserData("principal", {'id':pId});
+    }
+});
 
 </script>

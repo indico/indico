@@ -6568,7 +6568,7 @@ class Session(CommonObjectBase, Locatable):
                     ret = True
         return ret
 
-    def isConvenerByEmail(self, email):
+    def hasConvenerByEmail(self, email):
         for convener in self.getConvenerList():
             if email == convener.getEmail():
                 return True
@@ -8406,7 +8406,7 @@ class Contribution(CommonObjectBase, Locatable):
         del self._authors[ part.getId() ]
         part.delete()
 
-    def addPrimaryAuthor( self, part ):
+    def addPrimaryAuthor( self, part, index = None ):
         """
         """
         try:
@@ -8415,7 +8415,10 @@ class Contribution(CommonObjectBase, Locatable):
         except AttributeError:
             self._primaryAuthors = []
         self._addAuthor( part )
-        self._primaryAuthors.append( part )
+        if index is not None:
+            self._primaryAuthors.insert(index, part)
+        else:
+            self._primaryAuthors.append( part )
         if self.getConference() is not None:
             self.getConference().indexAuthor(part)
         self.notifyModification()
@@ -8483,6 +8486,20 @@ class Contribution(CommonObjectBase, Locatable):
             if speaker.getEmail() == email:
                 return True
         return False
+
+    def changePosPrimaryAuthor(self,part,index):
+        """
+        """
+        try:
+            if self._primaryAuthors:
+                pass
+        except AttributeError:
+            self._primaryAuthors=[]
+        if not part in self._primaryAuthors:
+            return
+        self._primaryAuthors.remove(part)
+        self._primaryAuthors.insert(index,part)
+        self.notifyModification()
 
     def upPrimaryAuthor(self,part):
         """
@@ -8564,12 +8581,26 @@ class Contribution(CommonObjectBase, Locatable):
                 return author
         return None
 
-    def setPrimaryAuthorList(self, list):
-        self._primaryAuthors = list
+    def setPrimaryAuthorList(self, l):
+        self._primaryAuthors = l
         self.notifyModification()
 
-    def setCoAuthorList(self, list):
-        self._coAuthors = list
+    def setCoAuthorList(self, l):
+        self._coAuthors = l
+        self.notifyModification()
+
+    def changePosCoAuthor(self, part, index):
+        """
+        """
+        try:
+            if self._coAuthors:
+                pass
+        except AttributeError:
+            self._coAuthors=[]
+        if not part in self._coAuthors:
+            return
+        self._coAuthors.remove(part)
+        self._coAuthors.insert(index,part)
         self.notifyModification()
 
 
@@ -8638,7 +8669,7 @@ class Contribution(CommonObjectBase, Locatable):
         """
         return self.getPrimaryAuthorList() + self.getCoAuthorList()
 
-    def addCoAuthor( self, part ):
+    def addCoAuthor( self, part, index=None ):
         """
         """
         try:
@@ -8647,7 +8678,10 @@ class Contribution(CommonObjectBase, Locatable):
         except AttributeError:
             self._coAuthors = []
         self._addAuthor( part )
-        self._coAuthors.append( part )
+        if index is not None:
+            self._coAuthors.insert(index, part)
+        else:
+            self._coAuthors.append( part )
         if self.getConference() is not None:
             self.getConference().indexAuthor(part)
         self.notifyModification()
@@ -8680,16 +8714,6 @@ class Contribution(CommonObjectBase, Locatable):
         if isPendingSubmitter:
             self.getConference().getPendingQueuesMgr().addPendingSubmitter(ca, False)
 
-    def isCoAuthor( self, part ):
-        """
-        """
-        try:
-            if self._primaryAuthors:
-                pass
-        except AttributeError:
-            self._primaryAuthors = []
-        return part in self._coAuthors
-
     def getCoAuthorList( self ):
         """
         """
@@ -8700,7 +8724,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._coAuthors = []
         return self._coAuthors
 
-    def getAuthorById( self, id ):
+    def getAuthorById( self, authorId ):
         """
         """
         try:
@@ -8708,7 +8732,7 @@ class Contribution(CommonObjectBase, Locatable):
                 pass
         except AttributeError:
             self._authors = OOBTree()
-        return self._authors.get( id.strip(), None )
+        return self._authors.get( authorId.strip(), None )
 
     def isAuthor( self, part ):
         """
@@ -8720,7 +8744,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._authors = OOBTree()
         return self._authors.has_key( part.getId() )
 
-    def getSpeakerById( self, id ):
+    def getSpeakerById( self, authorId ):
         """
         """
         try:
@@ -8729,11 +8753,25 @@ class Contribution(CommonObjectBase, Locatable):
         except AttributeError:
             self._speakers = []
         for spk in self._speakers:
-            if spk.getId() == id:
+            if spk.getId() == authorId:
                 return spk
         return None
 
-    def addSpeaker( self, part ):
+    def changePosSpeaker(self,part,index):
+        """
+        """
+        try:
+            if self._speakers:
+                pass
+        except AttributeError:
+            self._speakers = []
+        if not part in self._speakers:
+            return
+        self._speakers.remove(part)
+        self._speakers.insert(index,part)
+        self.notifyModification()
+
+    def addSpeaker( self, part, index=None ):
         """
         Adds a speaker (ContributionParticipation object) to the contribution
         forcing it to be one of the authors of the contribution
@@ -8745,7 +8783,10 @@ class Contribution(CommonObjectBase, Locatable):
             self._speakers = []
         if not self.isAuthor( part ):
             raise MaKaCError( _("The Specified speaker is not the Author"), _("Contribution"))
-        self._speakers.append( part )
+        if index is not None:
+            self._speakers.insert(index, part)
+        else:
+            self._speakers.append( part )
         if self.getConference() is not None:
             self.getConference().indexSpeaker(part)
         self.notifyModification()
