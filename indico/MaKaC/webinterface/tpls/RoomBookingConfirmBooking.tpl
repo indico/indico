@@ -43,11 +43,10 @@
                                 </ul>
                                 % if rejectOthers:
                                     <p>Those PRE-Bookings will be automatically rejected. For recurring bookings, only the conflicting days will be rejected.</p>
-                                    <strong>Are you sure</strong> you want to <strong>book it anyway</strong>?
                                 % else:
                                     <p>It is probable that yours will be rejected in their favour.</p>
-                                    <strong>Are you sure</strong> you want to <strong>book it anyway</strong>?
                                 % endif
+                                    <strong>Are you sure</strong> you want to <strong>book it anyway</strong>?
                                 </td>
                                </tr>
 

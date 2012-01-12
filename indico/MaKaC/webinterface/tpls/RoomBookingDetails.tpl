@@ -417,6 +417,19 @@
                                 </td>
                             </tr>
                             % endif
+                            % if (reservation.room.isOwnedBy( user ) or user.isRBAdmin()) and not reservation.isConfirmed and collisions:
+                                <tr><td>&nbsp;</td></tr>
+                                <!-- Occurrences -->
+                                <tr>
+                                    <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> ${ _("Conflicts at the same time")}</span></td>
+                                    <td>
+                                        % for col in collisions:
+                                            <strong>${"PRE-" if not col.withReservation.isConfirmed else ""}Booking: </strong>${ col.withReservation.bookedForName }, ${ verbose_dt(col.withReservation.startDT) } - ${ verbose_dt(col.withReservation.endDT) }
+                                            (<a href="${ urlHandlers.UHRoomBookingBookingDetails.getURL(col.withReservation) }" target="_blank">more info</a>)<br/>
+                                        % endfor
+                                    </td>
+                                </tr>
+                            % endif
                         </table>
 
                         </td>

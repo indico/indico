@@ -6242,6 +6242,7 @@ class WRoomBookingDetails( WTemplated ):
         vars=WTemplated.getVars( self )
         vars["standalone"] = self._standalone
         vars["reservation"] = self._resv
+        vars["collisions"] = self._rh._collisions
         vars["config"] = Config.getInstance()
         #vars["smallPhotoUH"] = urlHandlers.UHSendRoomPhoto
         #vars["roomPhotoUH"] = urlHandlers.UHSendRoomPhoto

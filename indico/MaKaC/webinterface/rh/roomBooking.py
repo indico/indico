@@ -1216,6 +1216,15 @@ class RHRoomBookingBookingDetails( RHRoomBookingBase ):
         self._description = self._websession.getVar( "description" )
         self._afterDeletionFailed = self._websession.getVar( "deletionFailed" )
 
+        self._collisions = []
+        if not self._resv.isConfirmed:
+
+            isConfirmed = self._resv.isConfirmed
+            self._resv.isConfirmed = None
+            # find pre-booking collisions
+            self._collisions = self._resv.getCollisions(sansID=self._resv.id)
+            self._resv.isConfirmed = isConfirmed
+
         self._clearSessionState()
 
     def _businessLogic( self ):
