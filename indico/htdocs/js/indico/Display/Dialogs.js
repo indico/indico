@@ -10,17 +10,16 @@ type("ApplyForParticipationPopup", ["ServiceDialogWithButtons"], {
         }
     },
 
-    _drawButtons: function(){
+    _getButtons: function(){
         var self = this;
-        var saveButton = Html.input('button', {style: {marginRight: pixels(3)}}, $T('Ok'));
-        var cancelButton = Html.input('button', {style: {marginLeft: pixels(3)}}, $T('Cancel'));
-        saveButton.observeClick(function(){
-            self._save();
-        });
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-       return Html.div({}, saveButton, cancelButton);
+        return [
+            [$T('OK'), function() {
+                self._save();
+            }, true],
+            [$T('Cancel'), function(){
+                self.close();
+            }]
+        ]
     },
 
     _drawUserEditable: function() {
@@ -63,7 +62,7 @@ type("ApplyForParticipationPopup", ["ServiceDialogWithButtons"], {
         else{
             tabWidget = self._drawUserNotEditable();
         }
-        return this.ServiceDialogWithButtons.prototype.draw.call(this, tabWidget, this._drawButtons());
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, tabWidget);
     }
 },
 
@@ -82,15 +81,16 @@ type("ApplyForParticipationPopup", ["ServiceDialogWithButtons"], {
 
 type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
 
-    _drawButtons: function(){
+    _getButtons: function(){
         var self = this;
-        var sendButton = Html.input('button', null, $T("Send"));
-        sendButton.observeClick(function(){
-            self.sendFunction();
-        });
-        var cancelButton = Widget.button(command(function() {self.close();}, $T("Cancel")));
-        var buttonDiv = Html.div({style:{textAlign:"center"}}, sendButton, cancelButton)
-        return buttonDiv;
+        return [
+            [$T('Send'), function() {
+                self.sendFunction();
+            }],
+            [$T('Cancel'), function(){
+                self.close();
+            }]
+        ]
     },
 
     _drawRTWidget: function(){
@@ -134,8 +134,7 @@ type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(
                 self,
-                self._drawWidget(),
-                self._drawButtons()
+                self._drawWidget()
                 );
     }
 },

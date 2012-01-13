@@ -1,4 +1,5 @@
 <% from MaKaC.common.timezoneUtils import nowutc %>
+
 <form action="${ participantsAction }" method="post" name="participantsForm" id="participantsForm">
 
 <table width="100%" cellspacing="0" align="center" border="0">
@@ -14,17 +15,38 @@
             <table>
                 <tr >
                     <td valign="bottom" align="left">
-                        <ul class="buttons">
-                            <li class="button left" id="addParticipant"><div class="arrow">${_("Add")}</div>
-                            % if nowutc() < self_._conf.getStartDate() :
-                                <li class="button middle" id="inviteUsers">${ _("Invite")}
-                            % endif
-                                <li class="button middle" id="removeParticipants">${_("Remove")}
-                            % if nowutc() > self_._conf.getStartDate() :
-                                 <li class="button middle" id="attendance"><div class="arrow">${_("Manage attendance")}</div>
-                            % endif
-                            <li class="button right" id="sendEmail" >${_("Email")}
+                        <ul class="buttons" class="ui-list-menu">
+                          <li class="button left arrow" id="addParticipant">
+                              <a href="#">${_("Add")}</a>
+                              <ul>
+                                <li><a href="#" id="add_existing_user">${_("Existing user")}</a></li>
+                                <li><a href="#" id="add_new_user">${_("New user")}</a></li>
+                              </ul>
+                          </li>
+                          % if nowutc() < self_._conf.getStartDate() :
+                          <li class="button middle">
+                              <a href="#" id="invite_users">${_("Invite")}</a>
+                          </li>
+                          % endif
+                          <li class="button middle">
+                            <a href="#" id="remove_users">${_("Remove")}</a>
+                          </li>
+                          % if nowutc() > self_._conf.getStartDate():
+                            <li class="button middle arrow">
+                              <a href="#">${_("Manage attendance")}</a>
+                              <ul>
+                                <li><a href="#" id="set_present">${_("Set as present")}</a></li>
+                                <li><a href="#" id="set_absent">${_("Set as absent")}</a></li>
+                                <li><a href="#" id="excuse_absence">${_("Excuse absence")}</a></li>
+                              </ul>
+
+                            </li>
+                          % endif
+                          <li class="button right">
+                            <a href="#" id="send_email">${_("Email")}</a>
+                          </li>
                         </ul>
+
                     </td>
                     <td align="left" valign="middle"> Export to: </td>
                     <td align="left" valign="middle">
@@ -212,15 +234,6 @@ IndicoUI.executeOnLoad(function(){
         return success;
     }};
 
-    var addNew = function(){
-        var onSuccess = function(result){
-            $(result).insertAfter($("#headParticipants")).effect("highlight", {}, 3000);
-            actionParticipantRows();
-            checkNumberParticipants();
-        };
-        new ApplyForParticipationPopup("${self_._conf.getId()}","event.participation.addParticipant",  $T("Add participant"), {}, onSuccess, true);
-        return false;
-    };
 
     var searchUsers = function(title, handler) {
         var chooseUsersPopup = new ChooseUsersPopup(title, true, ${self_._conf.getId()}, true,
@@ -257,7 +270,12 @@ IndicoUI.executeOnLoad(function(){
             $("input:checkbox:checked").each(function() {
                 participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=nameParticipant]").children("[id^=participantEdit]").text();
             });
-            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, method, participantsChecked, "${currentUser.getStraightFullName()}" ,null, null, legends, deselectAll);
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, 
+                                                   method, participantsChecked, "${currentUser.getStraightFullName()}",
+                                                   null, null, legends, function() {
+                                                       alert($T('E-mail sent!'));
+                                                       deselectAll();
+                                                   });
             popup.open();
         }
         return false;
@@ -271,23 +289,22 @@ IndicoUI.executeOnLoad(function(){
         return false;
     };
 
-    $("#addParticipant").click(function(){
+    $('.buttons').dropdown();
 
-        if (addParticipantMenu != null && addParticipantMenu.isOpen()) {
-            addParticipantMenu.close();
-            addParticipantMenu = null;
-            return false;
-        }
+    $('#add_existing_user').bind('menu_select', function() {
+        var peopleAddedHandler = function(peopleList){
+            searchParticipants("event.participation.addParticipants", peopleList);
+        };
+        return searchUsers("Add User(s)", peopleAddedHandler);
+    });
 
-        var menuItems = {};
-        menuItems['${_("Existing user")}'] = function () {
-            var peopleAddedHandler = function(peopleList){
-                searchParticipants("event.participation.addParticipants", peopleList);
-            };
-            return searchUsers("Add User(s)", peopleAddedHandler);};
-        menuItems['${_("New user")}'] = function () {return addNew();};
-        addParticipantMenu = new PopupMenu(menuItems, [$E(this)], "buttonMenuPopupList");
-        addParticipantMenu.open(this.offsetLeft, this.offsetTop + this.offsetHeight , null, null, false, true);
+    $('#add_new_user').bind('menu_select', function() {
+        var onSuccess = function(result){
+            $(result).insertAfter($("#headParticipants")).effect("highlight", {}, 3000);
+            actionParticipantRows();
+            checkNumberParticipants();
+        };
+        new ApplyForParticipationPopup("${self_._conf.getId()}","event.participation.addParticipant",  $T("Add participant"), {}, onSuccess, true);
         return false;
     });
 
@@ -306,27 +323,24 @@ IndicoUI.executeOnLoad(function(){
         };
         return searchUsers("Invite Participant(s)", inviteHandler);
     });
-    $("#removeParticipants").click(function(){return removeParticipants();});
-    $("#sendEmail").click(function(){
+    $("#remove_users").bind('menu_select',
+                                  function(){
+                                      return removeParticipants();
+                                  });
+    $("#send_email").bind('menu_select', function(){
         return composeEmail("event.participation.emailParticipants");
     });
 
-    $("#attendance").click(function(){
+    $("#set_present").bind('menu_select', function () {
+        return manageAttendance('event.participation.markPresent', 'presence','present');
+    });
 
-        if (attendanceMenu != null && attendanceMenu.isOpen()) {
-            attendanceMenu.close();
-            attendanceMenu = null;
-            return false;
-        }
+    $("#set_absent").bind('menu_select', function () {
+        return manageAttendance('event.participation.markAbsence', 'presence','absent');
+    });
 
-        var menuItems = {};
-        menuItems['${_("Set as present")}'] = function () {return manageAttendance('event.participation.markPresent', 'presence','${_("present")}');};
-        menuItems['${_("Set as absent")}'] = function () {return manageAttendance('event.participation.markAbsence', 'presence', '${_("absent")}');};
-        menuItems['${_("Excuse absence")}'] = function () {return manageAttendance('event.participation.excuseAbsence', 'status', '${_("excused")}');};
-
-        attendanceMenu = new PopupMenu(menuItems, [$E(this)], "buttonMenuPopupList");
-        attendanceMenu.open(this.offsetLeft, this.offsetTop + this.offsetHeight , null, null, false, true);
-        return false;
+    $("#excuse_absence").bind('menu_select', function () {
+        return manageAttendance('event.participation.excuseAbsence', 'status','excused');
     });
 
     $("[name=excel]").click(function(){
