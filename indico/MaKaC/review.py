@@ -1985,6 +1985,7 @@ class Abstract(Persistent):
         contrib=AcceptedContribution(self)
         if session != None:
             contrib.setSession(session)
+            contrib.setDuration(dur=session.getContribDuration())
         self.getCurrentStatus().setContribution( contrib )
         self._setContribution( contrib )
 
