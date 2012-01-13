@@ -15,8 +15,8 @@
             <table>
                 <tr >
                     <td valign="bottom" align="left">
-                        <ul class="buttons" class="ui-list-menu">
-                          <li class="button left arrow" id="addParticipant">
+                        <ul id="button-menu" class="ui-list-menu">
+                          <li class="left arrow" id="addParticipant">
                               <a href="#">${_("Add")}</a>
                               <ul>
                                 <li><a href="#" id="add_existing_user">${_("Existing user")}</a></li>
@@ -24,11 +24,11 @@
                               </ul>
                           </li>
                           % if nowutc() < self_._conf.getStartDate() :
-                          <li class="button middle">
+                          <li class="middle">
                               <a href="#" id="invite_users">${_("Invite")}</a>
                           </li>
                           % endif
-                          <li class="button middle">
+                          <li class="middle">
                             <a href="#" id="remove_users">${_("Remove")}</a>
                           </li>
                           % if nowutc() > self_._conf.getStartDate():
@@ -42,14 +42,14 @@
 
                             </li>
                           % endif
-                          <li class="button right">
+                          <li class="right">
                             <a href="#" id="send_email">${_("Email")}</a>
                           </li>
                         </ul>
 
                     </td>
-                    <td align="left" valign="middle"> Export to: </td>
-                    <td align="left" valign="middle">
+                    <td style="margin-left: 10px;">Export to: </td>
+                    <td>
                         <input border="0" type="image" src=${excelIconURL} name="excel" style="margin-top:3px;">
                     </td>
                 </tr>
@@ -289,7 +289,7 @@ IndicoUI.executeOnLoad(function(){
         return false;
     };
 
-    $('.buttons').dropdown();
+    $('#button-menu').dropdown();
 
     $('#add_existing_user').bind('menu_select', function() {
         var peopleAddedHandler = function(peopleList){
@@ -308,7 +308,7 @@ IndicoUI.executeOnLoad(function(){
         return false;
     });
 
-    $("#inviteUsers").click(function(){
+    $("#invite_users").bind('menu_select', function(){
         var inviteHandler = function(peopleList){
             var text = 'Dear {name}, event manager of {confTitle} would like to invite you to take part in this event, ' +
             'which will take place on ${conf.getAdjustedStartDate()}. Further information on this event are available at {url}' +

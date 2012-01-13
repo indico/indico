@@ -353,7 +353,7 @@ class Participation(Persistent):
         self._conference.getLogHandler().logAction(logData,"participants",eventManager)
         participant.setStatusInvited()
         if participant.getAvatar() is not None:
-            if not participant.getAvatar().getEmail() or participant.getAvatar().getEmail() == "":
+            if not participant.getAvatar().getEmail():
                 return False
         else :
             if not participant.getEmail() or participant.getEmail() == "":

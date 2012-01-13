@@ -7381,8 +7381,8 @@ ul.buttonMenuPopupList li a:hover {
 
 .ui-list-menu li > a {
     display: block;
-    float: left;
     padding: 7px 12px;
+    text-align: left;
 }
 
 .ui-list-menu li.selected {
@@ -7455,7 +7455,7 @@ ul.buttonMenuPopupList li a:hover {
 }
 
 
-li.left {
+.ui-list-menu li.left {
     -webkit-border-top-right-radius: 0;
     -moz-border-radius-topright: 0;
     border-top-right-radius: 0;
@@ -7465,7 +7465,7 @@ li.left {
     margin: 0;
 }
 
-li.middle {
+.ui-list-menu li.middle {
     border-radius: 0;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
@@ -7474,8 +7474,11 @@ li.middle {
     border-left: solid 1px rgba(255, 255, 255, 0);
 }
 
-li.middle:hover, li.right:hover { border-left: solid 1px #999 }
-li.right {
+.ui-list-menu li.middle:hover, .ui-list-menu li.right:hover {
+    border-left: solid 1px #999
+}
+
+.ui-list-menu li.right {
     -webkit-border-top-left-radius: 0;
     -moz-border-radius-topleft: 0;
     border-top-left-radius: 0;
