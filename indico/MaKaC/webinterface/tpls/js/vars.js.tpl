@@ -115,6 +115,8 @@ var Indico = {
         SessionModification: "${ urlHandlers.UHSessionModification.getURL() }",
         ContributionModification: "${ urlHandlers.UHContributionModification.getURL() }",
         BreakModification: "${ urlHandlers.UHConfModifyBreak.getURL() }",
+        SessionProtection: "${ urlHandlers.UHSessionModifAC.getURL() }",
+        ContributionProtection: "${ urlHandlers.UHContribModifAC.getURL() }",
 
         Reschedule: "${ urlHandlers.UHConfModifReschedule.getURL() }",
         SlotCalc: "${ urlHandlers.UHSessionModSlotCalc.getURL() }",

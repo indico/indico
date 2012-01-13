@@ -139,6 +139,7 @@ type("TimetableManagementActions", [], {
 
         return url;
     },
+
     /*
      * Edit start and end date. date format has to be dd/mm/yy mm:hh
      */
@@ -659,7 +660,28 @@ type("TimetableManagementActions", [], {
                 self.timetable._updateEntry(entry, entry.id);
             }
         });
-    }
+    },
+
+    /*
+     * Edit the session protection
+     */
+
+    editEntryProtection: function(eventData) {
+        var url;
+        url = Indico.Urls.SessionProtection + '?confId=' + eventData.conferenceId + '&sessionId=' + eventData.sessionId;
+        if (eventData.entryType == 'Contribution') {
+            // Get the id by taking the id string after the c character
+            var contribId = eventData.id.substring(eventData.id.indexOf('c')+1);
+
+            url = Indico.Urls.ContributionProtection + '?confId=' + eventData.conferenceId + '&contribId=' + contribId;
+            if (exists(eventData.sessionId)) {
+                url = url + '&sessionId=' + eventData.sessionId;
+            }
+        } else if (eventData.entryType == 'Session') {
+            url = Indico.Urls.SessionProtection + '?confId=' + eventData.conferenceId + '&sessionId=' + eventData.sessionId;
+        }
+        return url;
+    },
 },
      function(timetable, eventInfo, isSessionTimetable) {
          this.timetable = timetable;

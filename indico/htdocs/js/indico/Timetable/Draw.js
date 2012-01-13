@@ -1040,6 +1040,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 };
                 if (!self.managementActions.isSessionTimetable) {
                     menuItems[$T('Session properties')] = self.managementActions.editEntry(self.eventData);
+                    menuItems[$T('Session protection')] = self.managementActions.editEntryProtection(self.eventData);
                 }
 
                 editLink.observeClick(function() {
@@ -1057,11 +1058,15 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 menu.insert(" | ");
 
             } else if (self.eventData.entryType == 'Contribution') {
-                editLink = Html.a({
-                    className: 'fakeLink',
-                    style: {fontWeight: 'bold'},
-                    href: self.managementActions.editEntry(self.eventData)
-                }, $T("Edit"));
+                editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
+                var menuItems = {};
+                menuItems[$T('Contribution properties')] = self.managementActions.editEntry(self.eventData);
+                menuItems[$T('Contribution protection')] = self.managementActions.editEntryProtection(self.eventData);
+                editLink.observeClick(function() {
+                    var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
+                    var pos = editLink.getAbsolutePosition();
+                    menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
+                });
             } else {
                 // event is a Break
 
