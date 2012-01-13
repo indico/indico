@@ -475,7 +475,7 @@ var dateBookingTemplate = function(booking, viewBy) {
         time = booking.creationDate.time.substring(0,5);
     } else if (viewBy === "modificationDate") {
         time = booking.modificationDate.time.substring(0,5);
-    } else if (viewBy === "startDate") {
+    } else if (viewBy === "startDate" || viewBy === "conferenceStartDate") {
         time = booking.bookingParams.startDate.substring(11,16);
     }
 
@@ -541,7 +541,7 @@ var updateResults = function() {
         $E('nBookings').set(nBookings);
         for (var i = 0; i < bookings.length; i++) {
             group = bookings[i];
-            if (queryParams.viewBy == 'conferenceTitle' || queryParams.viewBy == 'conferenceStartDate') {
+            if (queryParams.viewBy == 'conferenceTitle') {
                 $E('results').append(confTitleGroupTemplate(group, i == 0))
             } else {
                 $E('results').append(dateGroupTemplate(group, i == 0, queryParams.viewBy))

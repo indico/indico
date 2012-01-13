@@ -66,7 +66,8 @@ class CollaborationIndex(Persistent):
                 if viewBy == "conferenceTitle":
                     items, nBookings = index.getBookingsByConfTitle(minKey, maxKey, conferenceId, categoryId)
                 elif viewBy == "conferenceStartDate":
-                    items, nBookings = index.getBookingsByConfDate(minKey, maxKey, conferenceId, categoryId)
+                    items, nBookings = index.getBookingsByConfDate(minKey, maxKey, conferenceId,
+                                                                   categoryId, viewBy, tz, dateFormat)
                 else:
                     items, nBookings = index.getBookingsByDate(viewBy, minKey, maxKey, tz, conferenceId, categoryId, dateFormat)
 
@@ -212,7 +213,9 @@ class BookingsIndex(Persistent):
                                      conferenceId = None, categoryId = None):
         return self._confTitleIndex.getBookings(fromTitle, toTitle, conferenceId, categoryId)
 
-    def getBookingsByConfDate(self, fromDate = None, toDate = None, conferenceId = None, categoryId = None):
+    def getBookingsByConfDate(self, fromDate = None, toDate = None,
+                              conferenceId = None, categoryId = None,
+                              viewBy = None, tz = None, dateFormat = None):
         if fromDate:
             minKey = str(datetimeToUnixTimeInt(fromDate))
         else:
@@ -221,7 +224,12 @@ class BookingsIndex(Persistent):
             maxKey = str(datetimeToUnixTimeInt(toDate)) + 'a' # because '_' < 'a' is True
         else:
             maxKey = None
-        return self._conferenceStartDateIndex.getBookings(minKey, maxKey, conferenceId, categoryId)
+
+        if viewBy == "conferenceStartDate": # Special case, for Video Services Overview
+            return self._conferenceStartDateIndex._getBookingsByStartDate(minKey, maxKey, conferenceId,
+                                                                          categoryId, tz, dateFormat)
+        else:
+            return self._conferenceStartDateIndex.getBookings(minKey, maxKey, conferenceId, categoryId)
 
     def dump(self):
         return {"creationDate": self._creationDateIndex.dump(),
@@ -316,7 +324,6 @@ class BookingDateIndex(Persistent):
 
     def _getBookingsBetweenTimestamps(self, fromDate, toDate,
                                       tz = 'UTC', conferenceId = None, categoryId = None, dateFormat = None):
-
         bookings = []
         nBookings = 0
 
@@ -416,7 +423,6 @@ class BookingConferenceIndex(Persistent):
                                             (booking.getConference().getId(), booking.getId(), self.getName(), str(bookingKey)))
 
     def getBookings(self, fromTitle = None, toTitle = None, conferenceId = None, categoryId = None):
-
         if fromTitle:
             fromTitle = fromTitle.lower()
         if toTitle:
@@ -445,9 +451,56 @@ class BookingConferenceIndex(Persistent):
 
         return result, nBookings
 
+    """ Differs from getBookings by returning a list of bookings grouped by
+        the conference start date.
+    """
+    def _getBookingsByStartDate(self, fromTitle = None, toTitle = None,
+                                conferenceId = None, categoryId = None,
+                                tz = None, dateFormat = None):
+        if fromTitle:
+            fromTitle = fromTitle.lower()
+        if toTitle:
+            toTitle = toTitle.lower()
+
+        bookings = []
+        nBookings = 0
+        date = None
+        bookingsForDate = None
+
+        for timestamp, conf in self._tree.iteritems(fromTitle, toTitle):
+            ts = float(timestamp.split('_')[0])
+            currentDate = unixTimeToDatetime(ts, tz).date()
+            s = conf[1] # the set of bookings associated with the event.
+
+            if date != currentDate:
+                if date is not None and bookingsForDate:
+                    bookings.append((datetime.strftime(date, dateFormat),
+                                     bookingsForDate))
+                    nBookings += len(bookingsForDate)
+                date = currentDate
+                bookingsForDate = []
+
+            if conferenceId:
+                for booking in s:
+                    if booking.getConference().getId() == conferenceId:
+                        bookingsForDate.append(booking)
+            elif categoryId:
+                cc = CategoryChecker(categoryId)
+                for booking in s:
+                    if cc.check(booking.getConference()):
+                        bookingsForDate.append(booking)
+            else:
+                bookingsForDate.extend(s)
+
+        if date is not None and bookingsForDate:
+            bookings.append((datetime.strftime(date, dateFormat),
+                             bookingsForDate))
+            nBookings += len(bookingsForDate)
+
+        return bookings, nBookings
+
     def dump(self):
         return [(k, [_bookingToDump(b) for b in s[1]]) for k, s in self._tree.iteritems()]
-
 
 class CategoryChecker(object):
     """ Tries to check if a conference belongs to a category (recursively),

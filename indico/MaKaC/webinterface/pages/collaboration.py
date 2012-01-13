@@ -86,7 +86,6 @@ class WAdminCollaboration(wcomponents.WTemplated):
         indexes = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue()
         vars["Indexes"] = indexes
         vars["IndexInformation"] = fossilize(dict([(i.getName(), i) for i in indexes]), IIndexInformationFossil)
-
         vars["InitialIndex"] = self._queryParams["indexName"]
         vars["InitialViewBy"] = self._queryParams["viewBy"]
         vars["InitialOrderBy"] = self._queryParams["orderBy"]
