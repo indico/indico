@@ -10,9 +10,14 @@
     % if not conferenceStarted:
         <tr id="headPanel" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);" class="follow-scroll">
             <td valign="bottom" width="100%" align="left" style="padding-top:5px;" colspan="9">
-                <ul class="buttons" style="margin-top:0px;">
-                        <li class="button left" id="accept" >${ _("Accept")}
-                        <li class="button right" id="reject"><div class="arrow">${ _("Reject")}</div>
+                <ul style="margin-top:0px;" id="button-menu">
+                  <li class="left"><a href="#" id="accept">${ _("Accept")}</a></li>
+                  <li class="right arrow" id="reject"><a href="#">${ _("Reject")}</a>
+                    <ul>
+                      <li><a href="#" id="reject_with_mail">${ _("With email notification")}</a></li>
+                      <li><a href="#" id="reject_no_mail">${ _("No email notification")}</a></li>
+                    </ul>
+                  </li>
                 </ul>
             </td>
         </tr>
@@ -54,6 +59,11 @@
 </table>
 
 <script type="text/javascript">
+
+$(function() {
+    $("#button-menu").dropdown();
+});
+
 var actionPendingRows = function(){
     $("input:checkbox[id^=checkPending]").click(function(){
         if(this.checked){
@@ -173,24 +183,16 @@ IndicoUI.executeOnLoad(function(){
         $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
     });
 
-    $('#accept').click(function(){
+    $('#accept').bind('menu_select', function(){
        actionUsers("event.participation.acceptPending")
     });
 
-    $("#reject").click(function(){
-        if (rejectMenu != null && rejectMenu.isOpen()) {
-            rejectMenu.close();
-            rejectMenu = null;
-            return false;
-        }
+    $('#reject_with_mail').bind('menu_select', function(){
+        return composeEmail();
+    });
 
-        var menuItems = {};
-        menuItems['With email notification'] = function () {return composeEmail();};
-        menuItems['Without email notification'] = function () {return actionUsers("event.participation.rejectPending");};
-
-        rejectMenu = new PopupMenu(menuItems, [$E(this)], "buttonMenuPopupList");
-        rejectMenu.open($(this).offset().left, $(this).offset().top + this.offsetHeight , null, null, false, true);
-        return false;
+    $('#reject_no_mail').bind('menu_select', function(){
+        return actionUsers("event.participation.rejectPending");
     });
 
     $(window).scroll(function(){

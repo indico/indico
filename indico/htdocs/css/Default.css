@@ -7301,7 +7301,7 @@ ul.UIAuthorList li .authorMove {
 
 ul.UIAuthorList li.UIAuthorMove {
     background: white url("../images/drag.png") left top no-repeat;
-
+}
 .arrow {
     background: #ECECEC;
     background-image: url("../images/menu_arrow_black.png") !important;

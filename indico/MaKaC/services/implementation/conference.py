@@ -59,7 +59,6 @@ from MaKaC.i18n import _
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, Warning, \
         ResultWithWarning, TimingNoReportError, NoReportError
 from MaKaC.fossils.contribution import IContributionFossil
-from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.modules.scheduler import tasks
@@ -1142,7 +1141,7 @@ class ConferenceRejectPendingParticipants(ConferenceParticipantBase, ConferenceP
         emailSubject = pm.extract("subject", pType=str, allowEmpty=True)
         emailBody = pm.extract("body", pType=str, allowEmpty=True)
         data = {}
-        data["fromAddr"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
+        data["fromAddr"] = Config.getInstance().getNoReplyEmail()
         if emailSubject and emailBody:
             if emailBody.find('{name}') == -1:
                 raise NoReportError(_("{name} tag has to be specified."))
