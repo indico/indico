@@ -5896,7 +5896,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                 ed = sd + timedelta( 30 )
 
         # set the calendar dates as calculated
-        calendarStartDT = datetime( sd.year, sd.month, sd.day, 0, 0, 1 )
+        calendarStartDT = datetime( sd.year, sd.month, sd.day, 0, 0, 0 )
         calendarEndDT = datetime( ed.year, ed.month, ed.day, 23, 59 )
 
         from MaKaC.rb_tools import formatDate
