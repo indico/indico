@@ -51,6 +51,7 @@ from MaKaC.rb_location import Location, CrossLocationQueries
 from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
+from MaKaC.webinterface.common.tools import escape_html
 
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
@@ -62,7 +63,7 @@ class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
     def _checkParams( self, params, mustExist = 1 ):
         if "categId" in params:
-            params["categId"] = str(params["categId"])
+            params["categId"] = escape_html(str(params["categId"]))
         l = locators.CategoryWebLocator( params, mustExist )
         self._target = l.getObject()
 

@@ -101,6 +101,7 @@ import zope.interface
 from indico.modules.scheduler import Client, tasks
 from indico.util.date_time import utc_timestamp
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
+from MaKaC.webinterface.common.tools import escape_html
 
 
 class CoreObject(Persistent):
@@ -4954,7 +4955,7 @@ class ConferenceHolder( ObjectHolder ):
         elif quiet:
             return None
         else:
-            raise NoReportError( _("The specified event with id \"%s\" does not exist or has been deleted.") % str(id) )
+            raise NoReportError( _("The specified event with id \"%s\" does not exist or has been deleted.") % escape_html(str(id)) )
 
 class ConfSectionsMgr:
 
