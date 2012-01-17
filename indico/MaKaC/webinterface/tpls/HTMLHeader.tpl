@@ -20,6 +20,10 @@
         <meta property="fb:app_id" content="${social['facebook']['appId']}"/>
 % endif
 
+% if analyticsActive and analyticsCodeLocation == "head":
+        ${analyticsCode}
+% endif
+
         <script type="text/javascript">
                 var TextRoot = "${ baseurl }/js/indico/i18n/";
                 var ScriptRoot = "${ baseurl }/js/";
@@ -68,3 +72,6 @@
     </head>
     <body>
         ${ page._getWarningMessage() }
+    % if analyticsActive and analyticsCodeLocation == "body":
+        ${analyticsCode}
+    % endif

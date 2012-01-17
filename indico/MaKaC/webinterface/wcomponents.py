@@ -259,6 +259,11 @@ class WHTMLHeader(WTemplated):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        vars["analyticsActive"] = minfo.isAnalyticsActive()
+        vars["analyticsCode"] = minfo.getAnalyticsCode()
+        vars["analyticsCodeLocation"] = minfo.getAnalyticsCodeLocation()
+
 
         if DBMgr.getInstance().isConnected():
             vars['stylesheet'] = Config.getInstance().getCssStylesheetName()

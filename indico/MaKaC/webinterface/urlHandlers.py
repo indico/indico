@@ -3099,6 +3099,12 @@ class UHAdminAPIOptionsSet( URLHandler ):
 class UHAdminAPIKeys( URLHandler ):
     _relativeURL = "adminServices.py/apiKeys"
 
+class UHAnalytics( URLHandler ):
+    _relativeURL = "adminServices.py/analytics"
+
+class UHSaveAnalytics( URLHandler ):
+    _relativeURL = "adminServices.py/saveAnalytics"
+
 class UHBadgeTemplates( URLHandler ):
     _relativeURL = "badgeTemplates.py"
 

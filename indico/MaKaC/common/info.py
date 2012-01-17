@@ -87,6 +87,9 @@ class MaKaCInfo(Persistent):
         self._apiMode = False
         self._apiCacheTTL = 600
         self._apiSignatureTTL = 600
+        self._analyticsActive = False
+        self._analyticsCode = ""
+        self._analyticsCodeLocation = "head"
 
         # Event display style manager
         self._styleMgr = StyleManager()
@@ -434,7 +437,36 @@ class MaKaCInfo(Persistent):
     def setAPISignatureTTL(self, v):
         self._apiSignatureTTL = v
 
+    def isAnalyticsActive(self):
+        if hasattr(self, '_analyticsActive'):
+            return self._analyticsActive
+        else:
+            self._analyticsActive = False
+            return False
 
+    def setAnalyticsActive(self, v):
+        self._analyticsActive = v
+
+    def getAnalyticsCode(self):
+        if hasattr(self, '_analyticsCode'):
+            return self._analyticsCode
+        else:
+            self._analyticsCode = ""
+            return ""
+
+    def setAnalyticsCode(self, v):
+        self._analyticsCode = v
+
+
+    def getAnalyticsCodeLocation(self):
+        if hasattr(self, '_analyticsCodeLocation'):
+            return self._analyticsCodeLocation
+        else:
+            self._analyticsCodeLocation = ""
+            return ""
+
+    def setAnalyticsCodeLocation(self, v):
+        self._analyticsCodeLocation = v
 
 class HelperMaKaCInfo:
     """Helper class used for getting and instance of MaKaCInfo.

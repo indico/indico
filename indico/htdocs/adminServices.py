@@ -99,6 +99,11 @@ def apiOptions(req, **params):
 def apiOptionsSet(req, **params):
     return api.RHAdminAPIOptionsSet(req).process(params)
 
-
 def apiKeys(req, **params):
     return api.RHAdminAPIKeys(req).process(params)
+
+def analytics(req, **params):
+    return services.RHAnalytics(req).process(params)
+
+def saveAnalytics(req, **params):
+    return services.RHSaveAnalytics(req).process(params)
