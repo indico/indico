@@ -4578,21 +4578,19 @@ ul.CAIndexList {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    padding-top: 10px;
     padding-bottom: 5px;
 }
 
 ul.CAIndexList li {
     display: inline;
     position: relative;
-    padding-right: 15px;
-    padding-left: 15px;
-    border-right: 1px solid #AAAAAA;
+    padding-right: 10px;
+    padding-left: 10px;
 }
 
 ul.CAIndexList a {
     font-family: Verdana;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -4627,10 +4625,67 @@ div.CADiv {
     -moz-border-radius-topright:10px;
     border-bottom:1px solid #AAAAAA;
     border-right:1px solid #AAAAAA;
+    line-height: 1.8em;
+}
+
+div.CADiv span.CAFormattingSpan {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+div.CADiv div.CALeftPane span.CAFormattingSpan {
+    width: 70px;
+}
+
+div.CADiv div.CARightPane span.CAFormattingSpan {
+    width: 170px;
 }
 
 div.CADiv span.pluginNames {
     font-style: italic;
+}
+
+div.CADiv div.CAPaneHeader {
+    font-weight: bold;
+    display: inline-block;
+    width: 100%;
+    border-bottom: 1px solid #CCCCCC;
+    margin-bottom: 5px;
+}
+
+div.CADiv div.CATopBanner {
+    width: 100%;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+div.CADiv div.CABottomBanner {
+    display: block;
+    width: 100%;
+    border-top: 1px solid #CCCCCC;
+    padding-top: 10px;
+    clear: both;
+}
+
+div.CADiv div.CABottomBanner div#CAStaticURLContent {
+    position: relative;
+    left: 20px;
+}
+
+div.CADiv div.CALeftPane {
+    width: 60%;
+    height: auto;
+    display: inline-block;
+    padding: 10px 0px 10px 0px;
+    border-right: 1px solid #CCCCCC;
+    float: left;
+}
+
+div.CADiv div.CARightPane {
+    width: auto;
+    height: auto;
+    display: inline-block;
+    padding: 10px 0px 10px 10px;
+    float:left;
 }
 
 div.CAShowOnlyPendingDiv {
@@ -4648,12 +4703,6 @@ div.CAShowOnlyPendingDiv label {
     font-weight: normal;
 }
 
-div.CAFilterByCategoryDiv{
-    padding-right: 10px;
-    border-right: 1px solid #AAAAAA;
-    margin-right: 10px;
-    display: inline;
-}
 
 div.CAResultsDiv {
     padding-top: 20px;
@@ -4666,10 +4715,6 @@ div.CAResultsPerPageDiv {
 span.CAMinMaxKeySuggestion {
     color: orange;
     font-size: 10px;
-}
-
-span.CAViewBySpan {
-    font-weight: bold;
 }
 
 div.CADiv a {
@@ -4691,21 +4736,13 @@ a.CAViewByUnselected {
     color: #4C6A83;
 }
 
-div.CAViewByDiv {
-    display: inline;
+div.CASortByDiv {
+    display: inline-block;
+    width: 100%;
 }
 
-div.CAViewByDiv a {
+div.CASortByDiv a {
     padding-left: 8px;
-}
-
-div.CAOrderByDiv a {
-    padding-left: 8px;
-}
-
-div.CAOrderByDiv {
-    display: inline;
-    float: right;
 }
 
 div.CAInfoDiv {
@@ -4717,9 +4754,27 @@ div.CAInfoDiv div.CATypesDiv {
     padding-top: 5px;
 }
 
-div.CAInfoDiv div.CAStaticURLDiv {
-    display: block;
+div.CABottomBanner div.CAStaticURLDiv {
+    text-align: right;
     padding-top: 5px;
+    float: right;
+}
+
+div.CABottomBanner div.CAStaticURLDiv div#CAStatucURLContentContainer {
+    display: none;
+    clear: both;
+}
+
+div#CAStaticURLContent {
+    display: block;
+    text-align: right;
+    width: auto;
+    padding: 8px;
+}
+
+div#CAStaticURLContent input {
+    display: block;
+    width: 250px;
 }
 
 a.CAStaticURLSwitch {
