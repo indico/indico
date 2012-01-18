@@ -34,12 +34,14 @@ The Video Services Overview page lets you query the index of all
 bookings / requests that have been performed on any of the Video
 Services Systems.
 
-This page is divided into two main parts: the top part that you can
-interact with to get query results, and a bottom part where you get
-the results.
+This page is divided into two main parts: the top part is where you may
+interact with the system, through a series of filters,
+to get query results. The bottom part where the results of your request are
+displayed.
 
-The top part is in turn divided into three sections: a list of
-indexes, a *filtering* section, and a *View By* section.
+The top area acts as the main filter for refining the results of your
+request; you may choose from a selection of indexes, restrictions and
+preference in how the results are displayed.
 
 |image03|
 
@@ -63,10 +65,10 @@ At the top, you can select one of the indexes (**zone 1** in figure
   will see the “All Videoconference” index, which groups CERNMCU bookings, 
   EVO bookings and Vidyo bookings.
 
-If you hover the mouse over the name of an index, it will show what
-kind of bookings are included in it.
+If you hover the mouse over the name of an index, it will show which
+bookings types are included in it.
 
-Click on one of the index names to get results from that index.
+You can click on one of the index names to get results from that index.
 
 ---------------------
 The filtering section
@@ -82,11 +84,11 @@ Restrict to pending requests only
 
 Some plug-ins can have a “pending” state. In particular,
 *Recording Request* and *Webcast Request* have the concept of
-“pending” requests, which means requests that have been submitted
+“pending” requests, this means requests that have been submitted
 to our responsibles, but have not yet been accepted or rejected.
 
-Checking the *Show only pending* option will filter the results so
-that only pending requests are shown.
+Checking the *Show only pending* option will filter the results such
+that only pending requests are shown in the results area.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Restrict by category id
@@ -106,11 +108,11 @@ the view to only bookings and requests associated this event.
 Results per page
 ~~~~~~~~~~~~~~~~
 
-If there are many results, they will be paginated, as shown in the
+If there are many results they will be paginated, as shown in the
 screenshot. You can change the amount of results per page. Bookings
 are usually grouped (per date or per event, depending on the type
 of view). This number will change the number of *groups* that
-appear in each page.
+appear on each page.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Restrict results to an interval
@@ -149,7 +151,7 @@ Filtering by dates
 ##################
 
 If you have selected
-*View By: Event Start Date,* or *View By: Creation Date,*or*View By: Modification Date,*or*View By: Start Date*
+*View By: Event Start Date,* or *View By: Creation Date, *or* View By: Modification Date, *or* View By: Start Date*
 in the *View By* section, you can filter by date. The filtering
 section looks like this:
 
@@ -177,9 +179,11 @@ There are two choices for filtering by date:
   weeks, I would enter 0 in the *From \*\*\* days ago* box, and 14 in
   the *to \*\*\* days in the future* box.
 
-In both cases, if what you enter is not in the correct format
+In either case, if what you have entered isn't in the correct format
 (dates in the first case, integers in the second case) the related
-fields will be highlighted in red.
+fields will be highlighted in red. Furthermore, the range selected will be
+from the time 00:00 on the beginning of the interval to 23:59 at the
+end of the interval.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Refresh / Apply Filter button
@@ -187,7 +191,7 @@ Refresh / Apply Filter button
 
 Every time that a value of one of the filtering fields is changed,
 the results do not update automatically. You need to press the
-*Apply Filter* button for the changes to take place.
+*Apply Filter* button in order for the changes to propagate the results area.
 
 If you want to update the results without changing the filtering
 criteria, press the same button (its text should read *Refresh*).
@@ -197,11 +201,8 @@ The View By section
 -------------------
 
 Under the *filtering* section appears the *View By* section
-(**zone 3** in figure 3).
-
-|image06|
-
-Figure 6. The View By section
+(**zone 2** in figure 3) where you can alter the order in which the results
+are displayed.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Choose how to view the results
@@ -212,8 +213,8 @@ Here you can choose if you want to view your results ordered by:
 - Event title: the results will be grouped by the event they belong
   to, and will be ordered by the name of that event, alphabetically.
 
-- Event start date: the results will be grouped by the event they
-  belong to, and will be ordered by the start date of that event.
+- Event start date: the results will be grouped by the date they occur,
+  and will be ordered by the title of events.
 
 - Creation date: the results will be ordered by the date they were
   created. They will also be grouped by day (taking into account your
@@ -253,18 +254,18 @@ On the right, you can choose the order of the results:
 - Ascending
 
   + For the *view by event title* option, the results will be shown in
-    reverse alphabetical order.
+    reverse-alphabetical order.
 
   + For the other date-related *view by* options, they will be shown in
-    reverse chronological order, the oldest dates first and the most
+    reverse-chronological order, the oldest dates first and the most
     recent dates later.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Kinds of bookings / requests shown
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The second line of this section informs you which kind of bookings
-are displayed depending on your *View By* option. This is relevant,
+Next to the Refresh button there is a message which informs you which kind
+of bookings are displayed depending on your *View By* option. This is relevant,
 in the case of *View By Start Date*, because requests
 (RecordingRequest, WebcastRequest) do not have a start date.
 
@@ -272,14 +273,14 @@ in the case of *View By Start Date*, because requests
 Static URL for the result
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This option will prove very useful if you often perform similar
-queries.
+This option will prove very useful if you perform similar
+queries often.
 
-Click on *Static URL for this result* and a new line will appear:
+Hover over the *Static URL for this result* link and a popup appear:
 
-|image07|   
+|image06|   
 
-Figure 7. Static URL for a result and Go to URL link.
+Figure 6. Static URL for a result and Go to URL link.
 
 You can copy the URL in the text box or bookmark it. The parameters
 of your query, such as which index is being queried, are encoded in
@@ -292,7 +293,7 @@ The results section
 -------------------
 
 In the bottom half of the page, you will be able to see the results
-of your query (**zone 4** in figure 3).
+of your query (**zone 3** in figure 3).
 
 In case there are no results, *No results found* will appear.
 
@@ -378,7 +379,5 @@ If the results are grouped by date
 .. |image03| image:: images/fig3.png 
 .. |image04| image:: images/index_html_m7d810dd9.png
 .. |image05| image:: images/index_html_136982eb.png
-.. |image06| image:: images/index_html_m22629ac6.png
-.. |image07| image:: images/index_html_m38e22d3d.png  
-
+.. |image06| image:: images/index_html_m38e22d3d.png
 
