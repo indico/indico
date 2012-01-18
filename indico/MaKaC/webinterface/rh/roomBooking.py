@@ -837,6 +837,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         page = roomBooking_wp.WPRoomBookingMapOfRoomsWidget(self, self._aspects, self._buildings, self._defaultLocation, self._forVideoConference, self._roomID)
 
         params = self._getRequestParams()
+        params["lang"] = self._aw.getSession().getLang()
         entry = self._cache.loadObject('', params)
         if entry:
             html = entry.getContent()
