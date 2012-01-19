@@ -1531,7 +1531,7 @@ class RHConfModifListings( RHConferenceModifBase ):
                 p = wf.getConfModifListings(self, self._conf)
             return p.display()
 
-class RHConfDeletion( RHConferenceModifBase ):
+class RHConfDeletion( RoomBookingDBMixin, RHConferenceModifBase ):
     _uh = urlHandlers.UHConfDeletion
 
     def _checkParams( self, params ):

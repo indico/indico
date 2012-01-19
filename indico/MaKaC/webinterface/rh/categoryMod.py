@@ -32,7 +32,8 @@ import MaKaC.conference as conference
 import MaKaC.user as user
 import MaKaC.domain as domain
 from MaKaC.common.general import *
-from MaKaC.webinterface.rh.base import RHModificationBaseProtected
+from MaKaC.webinterface.rh.base import RHModificationBaseProtected,\
+    RoomBookingDBMixin
 from MaKaC.errors import MaKaCError,NoReportError,FormValuesError
 #import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.conference as conference
@@ -537,7 +538,7 @@ class _ActionConferenceReallocation:
             self._categ.moveConference(conf, self._target)
 
 
-class RHCategoryActionConferences( RHCategModifBase ):
+class RHCategoryActionConferences( RoomBookingDBMixin, RHCategModifBase ):
     _uh = urlHandlers.UHCategoryActionConferences
 
     def _checkParams( self, params ):
@@ -666,7 +667,7 @@ class RHCategorySetNotifyCreation( RHCategModifBase ):
         self._target.setNotifyCreationList(params.get("notifyCreationList",""))
         self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
 
-class RHCategoryDeletion( RHCategModifBase ):
+class RHCategoryDeletion( RoomBookingDBMixin, RHCategModifBase ):
     _uh = urlHandlers.UHCategoryDeletion
 
     def _checkParams( self, params ):

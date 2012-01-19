@@ -39,7 +39,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
-from MaKaC.rb_location import CrossLocationQueries
+from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from indico.util.i18n import L_
 
 
@@ -2740,6 +2740,12 @@ class Conference(CommonObjectBase, Locatable):
                 self.removeAlarm(alarm)
 
         self.removeAllEvaluations()
+
+        #Delete the RoomBooking associated reservations
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.getRoomBookingModuleActive() and CrossLocationDB.isConnected():
+            for resv in self.getRoomBookingList():
+                resv.remove()
 
         #For each conference we have a list of managers. If we delete the conference but we don't delete
         #the link in every manager to the conference then, when the manager goes to his "My profile" he
