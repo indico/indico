@@ -3317,8 +3317,8 @@ class WPConferenceModifParticipantBase( WPConferenceModifBase ):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._tabParticipantsSetup = self._tabCtrl.newTab( "participantsetup", _("Setup"), urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
-        self._tabParticipantsList = self._tabCtrl.newTab( "participantsList", _("Participants"), urlHandlers.UHConfModifParticipantsList.getURL( self._conf ) )
+        self._tabParticipantsSetup = self._tabCtrl.newTab( "participantsetup", _("Setup"), urlHandlers.UHConfModifParticipantsSetup.getURL( self._conf ) )
+        self._tabParticipantsList = self._tabCtrl.newTab( "participantsList", _("Participants"), urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
         self._tabStatistics = self._tabCtrl.newTab("statistics", _("Statistics"), urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
         if self._conf.getParticipation().getPendingParticipantList() and nowutc() < self._conf.getStartDate():
             self._tabParticipantsPendingList = self._tabCtrl.newTab( "pendingList", _("Pending"), urlHandlers.UHConfModifParticipantsPending.getURL( self._conf ) )

@@ -1597,8 +1597,8 @@ class UHRemoveCSS( URLHandler ):
 class UHSavePic( URLHandler ):
     _relativeURL = "confModifDisplay.py/savePic"
 
-class UHConfModifParticipantsList( URLHandler ):
-    _relativeURL = "confModifParticipants.py/list"
+class UHConfModifParticipantsSetup( URLHandler ):
+    _relativeURL = "confModifParticipants.py/setup"
 
 class UHConfModifParticipantsPending( URLHandler ):
     _relativeURL = "confModifParticipants.py/pendingParticipants"

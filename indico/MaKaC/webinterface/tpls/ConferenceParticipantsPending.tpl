@@ -129,10 +129,8 @@ IndicoUI.executeOnLoad(function(){
     };
 
     var pendingHandler = function(){
-        $('input:checkbox:checked[id^=checkPending]').parents('tr[id^=pending]').hide("highlight", {color:"#881122"}, 1500, function(){
-            $(this).remove();
-            checkNumberPending();
-            });
+        $('input:checkbox:checked[id^=checkPending]').parents('tr[id^=pending]').remove();
+        checkNumberPending();
     };
 
     var actionUsers = function(method){
@@ -141,6 +139,7 @@ IndicoUI.executeOnLoad(function(){
             $('input:checkbox:checked').each(function() {
                    arrayChecked.push($(this).val());
             });
+
         var killProgress = IndicoUI.Dialogs.Util.progress("Processing...");
         jsonRpc(Indico.Urls.JsonRpcService, method,
                 { confId: '${self_._conf.getId()}',
@@ -167,7 +166,7 @@ IndicoUI.executeOnLoad(function(){
                         'your request to attend the \'{confTitle}\' has been declined by the event manager.<br/>';
             var legends = {'confTitle':$T('field containing the conference title. (This field is mandatory)'),
                            'name':$T('field containing the full name of the participant.(This field is mandatory)')};
-            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, 'event.participation.rejectPending', participantsChecked, '${currentUser.getStraightFullName()}' ,subject, body, legends, pendingHandler);
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, 'event.participation.rejectPendingWithEmail', participantsChecked, '${currentUser.getStraightFullName()}' ,subject, body, legends, pendingHandler);
             popup.open();
         }
         return false;

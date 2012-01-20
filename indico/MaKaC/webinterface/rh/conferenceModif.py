@@ -1707,16 +1707,16 @@ class RHConfModifParticipants( RHConferenceModifBase ):
         if self._conf.isClosed():
             return conferences.WPConferenceModificationClosed( self, self._target ).display()
         else:
-            return conferences.WPConfModifParticipantsSetup( self, self._target ).display()
+            return conferences.WPConfModifParticipants( self, self._target ).display()
 
-class RHConfModifParticipantsList(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsList
+class RHConfModifParticipantsSetup(RHConferenceModifBase):
+    _uh = urlHandlers.UHConfModifParticipantsSetup
 
     def _process( self ):
         if self._conf.isClosed():
             return conferences.WPConferenceModificationClosed( self, self._target ).display()
         else:
-            return conferences.WPConfModifParticipants( self, self._target ).display()
+            return conferences.WPConfModifParticipantsSetup( self, self._target ).display()
 
 class RHConfModifParticipantsPending(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifParticipantsPending

@@ -25,8 +25,8 @@ from MaKaC.webinterface.rh import conferenceDisplay
 def index( req, **params ):
     return conferenceModif.RHConfModifParticipants( req ).process( params )
 
-def list ( req, **params ):
-    return conferenceModif.RHConfModifParticipantsList( req ).process( params )
+def setup ( req, **params ):
+    return conferenceModif.RHConfModifParticipantsSetup( req ).process( params )
 
 def pendingParticipants( req, **params ):
     return conferenceModif.RHConfModifParticipantsPending( req ).process( params )

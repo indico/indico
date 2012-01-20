@@ -21,13 +21,11 @@
                               <ul>
                                 <li><a href="#" id="add_existing_user">${_("Existing user")}</a></li>
                                 <li><a href="#" id="add_new_user">${_("New user")}</a></li>
+                                % if nowutc() < self_._conf.getStartDate() :
+                                    <li><a href="#" id="invite_users">${_("Invite")}</a></li>
+                                % endif
                               </ul>
                           </li>
-                          % if nowutc() < self_._conf.getStartDate() :
-                          <li class="middle">
-                              <a href="#" id="invite_users">${_("Invite")}</a>
-                          </li>
-                          % endif
                           <li class="middle">
                             <a href="#" id="remove_users">${_("Remove")}</a>
                           </li>
@@ -208,33 +206,6 @@ IndicoUI.executeOnLoad(function(){
                 });
     };
 
-    var actionUsers = function(method){
-        var arrayChecked=[];
-        if (atLeastOneParticipantSelected()){
-            $("input:checkbox:checked").each(function() {
-                   arrayChecked.push($(this).val());
-            });
-        var killProgress = IndicoUI.Dialogs.Util.progress("Processing...");
-        var success = false;
-        jsonRpc(Indico.Urls.JsonRpcService, method,
-                { confId: "${self_._conf.getId()}",
-                  userIds: arrayChecked },
-                function(result, error){
-                    killProgress();
-                    if (exists(error)) {
-                        IndicoUtil.errorReport(error);
-                    } else if(result.infoWarning){
-                        (new WarningPopup($T("Warning"),result.infoWarning)).open();
-                    } else if(result.emailed){
-                        success = true;
-                        (new WarningPopup($T("Done"),result.emailed)).open();
-                    }
-                    success = true;
-                });
-        return success;
-    }};
-
-
     var searchUsers = function(title, handler) {
         var chooseUsersPopup = new ChooseUsersPopup(title, true, ${self_._conf.getId()}, true,
                 true, null, false, false, handler);
@@ -257,7 +228,8 @@ IndicoUI.executeOnLoad(function(){
                         if (exists(error)) {
                             IndicoUtil.errorReport(error);
                         } else {
-                            $("input:checkbox:checked").parents("tr[id^=participant]").hide("highlight", {color:"#881122"}, 1500, function(){$(this).remove();checkNumberParticipants();});
+                            $("input:checkbox:checked").parents("tr[id^=participant]").remove();
+                            checkNumberParticipants();
                         }
                     });
             }
@@ -270,10 +242,10 @@ IndicoUI.executeOnLoad(function(){
             $("input:checkbox:checked").each(function() {
                 participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=nameParticipant]").children("[id^=participantEdit]").text();
             });
-            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, 
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()},
                                                    method, participantsChecked, "${currentUser.getStraightFullName()}",
                                                    null, null, legends, function() {
-                                                       alert($T('E-mail sent!'));
+                                                       (new AlertPopup($T("E-mail sent"), $T('An e-mail has been sent to ') +_.values(participantsChecked).join(", ") + ".")).open();
                                                        deselectAll();
                                                    });
             popup.open();
@@ -282,9 +254,24 @@ IndicoUI.executeOnLoad(function(){
     };
 
     var manageAttendance = function(method, target, type){
-        if(actionUsers(method) == true) {
-            $('input:checkbox:checked[id^=checkParticipant]').parent().siblings("td[id^="+target+"]").text(type);
-            $('input:checkbox:checked[id^=checkParticipant]').parents('tr[id^=participant]').effect("highlight", {}, 1500, deselectAll());
+        var arrayChecked=[];
+        if (atLeastOneParticipantSelected()){
+            $("input:checkbox:checked").each(function() {
+                   arrayChecked.push($(this).val());
+            });
+        var killProgress = IndicoUI.Dialogs.Util.progress("Processing...");
+        jsonRpc(Indico.Urls.JsonRpcService, method,
+                { confId: "${self_._conf.getId()}",
+                  userIds: arrayChecked },
+                function(result, error){
+                    killProgress();
+                    if (exists(error)) {
+                        IndicoUtil.errorReport(error);
+                    } else {
+                        $('input:checkbox:checked[id^=checkParticipant]').parent().siblings("td[id^="+target+"]").text(type);
+                        $('input:checkbox:checked[id^=checkParticipant]').parents('tr[id^=participant]').effect("highlight", {}, 1500, deselectAll());
+                    }
+                });
         }
         return false;
     };
@@ -300,7 +287,7 @@ IndicoUI.executeOnLoad(function(){
 
     $('#add_new_user').bind('menu_select', function() {
         var onSuccess = function(result){
-            $(result).insertAfter($("#headParticipants")).effect("highlight", {}, 3000);
+            $(result).insertAfter($("#headParticipants")).filter("tr[id^=participant]").effect("highlight",{},3000)
             actionParticipantRows();
             checkNumberParticipants();
         };
