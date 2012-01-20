@@ -798,6 +798,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
     def _process(self):
         params = self._getRequestParams()
+        params["lang"] = self._aw.getSession().getLang()
         html = self._cache.get(params)
         if not html:
             self._businessLogic()
@@ -1994,6 +1995,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             self._saveResvCandidateToSession( self._resv )
             url = urlHandlers.UHRoomBookingBookingForm.getURL( self._resv.room )
             self._redirect( url ) # Redirect to booking details
+
         for notification in emailsToBeSent:
             GenericMailer.send(notification)
 

@@ -191,9 +191,10 @@ class BistateBatchUploaderAgent(PushSyncAgent):
                     logger.warning('%s (%s) seems to have been deleted meanwhile!' % \
                                    (record, recId))
             # TODO: Replace with MetadataGenerationException or similar?
-            except:
+            except AttributeError:
                 if logger:
-                    logger.exception("Problem generating metadata for %s (deleted=%s)!" % (recId, deleted))
+                    logger.exception("Problem generating metadata for %s (deleted=%s)!" % (record, deleted))
+
         xg.closeTag("collection")
 
         return xg.getXml()

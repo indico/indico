@@ -178,7 +178,7 @@ class WUpcomingEvents(wcomponents.WTemplated):
         elif dateTime.date().year == now.date().year:
             return formatDateTime(dateTime, format="d MMM")
         else:
-            return formatDateTime(dateTime, format="d MMM YYYY")
+            return formatDateTime(dateTime, format="d MMM yyyy")
 
     def _getUpcomingEvents(self):
         # Just convert UTC to display timezone

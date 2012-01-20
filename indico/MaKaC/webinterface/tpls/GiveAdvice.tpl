@@ -81,7 +81,7 @@ var showWidgets = function(firstLoad) {
                         }, ${ ConfReview.getStatusesDictionary() },
                         "${ Advice.getJudgement() }", observer);
 
-    var initialValue = '${ Advice.getComments() }';
+    var initialValue = ${ Advice.getComments() | n,j};
     if (initialValue == '') {
         initialValue = 'No comments';
     }

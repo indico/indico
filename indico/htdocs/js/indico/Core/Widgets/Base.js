@@ -1383,6 +1383,7 @@ type("ErrorAware", [],
              } else {
                  this._setErrorState(text);
                  this._inError = true;
+                 this._currentErrorState = text;
              }
              return this._stopErrorList;
          },
@@ -1398,8 +1399,9 @@ type("ErrorAware", [],
                  // if we're already in error state,
                  // no need to do anything
 
-                 if (!this._inError) {
+                 if (!this._inError || this._currentErrorState != errorState) {
                      // otherwise, we have to set it
+                     this.setError(null);
                      this.setError(errorState);
                  }
                  return errorState;

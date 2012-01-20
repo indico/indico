@@ -21,7 +21,7 @@
 from xml.sax.saxutils import quoteattr, escape
 
 class CurrencyRegistry:
-    _items = ["","CHF","EUR","USD", "GBP"]
+    _items = ["","CHF","EUR","USD", "GBP", "CZK"]
 
     def getList( self ):
         return self._items
