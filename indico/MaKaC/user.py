@@ -474,7 +474,7 @@ class GroupHolder(ObjectHolder):
             response = conn.getresponse()
             data = response.read()
             conn.close()
-        except Exception, e:
+        except Exception:
             raise MaKaCError( _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
         doc = parseString(data)
         for elem in doc.getElementsByTagName("string"):
@@ -483,7 +483,9 @@ class GroupHolder(ObjectHolder):
                 gr = CERNGroup()
                 gr.setId(name)
                 gr.setName(name)
-                gr.setDescription( i18nformat("""_("Mapping of the Nice group") %s""")%name+"<br><br>\nMembers list: https://websvc02.cern.ch/WinServices/Services/GroupManager/GroupManager.aspx")
+                gr.setDescription("Mapping of the Nice group %s<br><br>\n"
+                                  "Members list: https://websvc02.cern.ch/WinServices/Services/GroupManager/GroupManager.aspx" %
+                                  name)
                 self.add(gr)
 
 
