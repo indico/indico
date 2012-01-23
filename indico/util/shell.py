@@ -1,7 +1,9 @@
 import sys, getopt, logging, argparse, urlparse, re
 from IPython.Shell import IPShellEmbed
-from wsgiref.simple_server import make_server
+from wsgiref.simple_server import make_server, WSGIServer, WSGIRequestHandler
 from wsgiref.util import shift_path_info
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from SocketServer import ThreadingMixIn
 
 from indico.web.wsgi.indico_wsgi_handler import application
 
@@ -29,6 +31,9 @@ def add(namespace, element, name=None, doc=None):
         print
 
 
+class ThreadedWSGIServer(ThreadingMixIn, WSGIServer):
+     pass
+
 def refServer(host='localhost', port=8000):
     """
     Run an Indico WSGI ref server instance
@@ -53,7 +58,9 @@ def refServer(host='localhost', port=8000):
             yield 'Not found'
 
     print "Serving on port %d..." % port
-    httpd = make_server(host, port, fake_app)
+    httpd = make_server(host, port, fake_app,
+                        server_class=ThreadedWSGIServer,
+                        handler_class=WSGIRequestHandler)
     # Serve until process is killed
     httpd.serve_forever()
 

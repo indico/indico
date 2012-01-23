@@ -130,7 +130,7 @@ class DBMgr:
         return self._getConnObject()
 
     def isConnected( self ):
-        return self._conn.conn != None
+        return hasattr(self._conn, 'conn') and self._conn.conn != None
 
     def getDBConnCache(self):
         conn = self._getConnObject()
