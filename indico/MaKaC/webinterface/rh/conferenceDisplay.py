@@ -774,11 +774,14 @@ class RHTimeTableCustomizePDF(RHConferenceTimeTable):
         self._view = params.get("view", "standard")
 
     def _process(self):
-        # TODO: why not construct p this way only if wf == None?
-        p=conferences.WPTimeTableCustomizePDF(self, self._target)
+        if self._target.getType() =="simple_event":
+            raise NoReportError(_("Lectures have no timetable therefore one cannot generate a timetable PDF."))
+
         wf = self.getWebFactory()
         if wf != None:
             p=wf.getTimeTableCustomizePDF(self, self._target, self._view)
+        else:
+            p=conferences.WPTimeTableCustomizePDF(self, self._target)
         return p.display(**self._getRequestParams())
 
 
