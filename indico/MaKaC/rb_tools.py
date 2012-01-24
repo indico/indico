@@ -117,7 +117,7 @@ def qbeMatch( example, candidate, special, **kwargs ):
                 # Exact match
                 areEqual = ( candAttrVal == exAttrVal )
             elif attrType == 'str':
-                areEqual = ( candAttrVal.lower().find( exAttrVal.lower() ) != -1 )
+                areEqual = candAttrVal.lower() == exAttrVal.lower()
             else:
                 raise attrType + ": " + str( candAttrVal ) + " - can not compare"
 
