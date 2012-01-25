@@ -1120,11 +1120,8 @@ type("TimetableListWidget",["ListWidget"],
              */
             _insertFromTimetable: function(){
                 var self = this;
-                if( !this.timetable )
-                    var timetableData = timetable.getData();
-                else
-                    var timetableData = window.timetable.getData();
-                each(timetable.sortedKeys, function(day){
+                var timetableData = this.timetable.getData();
+                each(this.timetable.sortedKeys, function(day){
                     self.set(day, $O(timetableData[day]));
                 });
             },
@@ -1146,6 +1143,7 @@ type("TimetableListWidget",["ListWidget"],
          * @param displayBreaks If true breaks will be displayed in the list. If false breaks are hidden.
          */
         function(timetable, listStyle, dayStyle, eventStyle, observeSelection, displayBreaks){
+            this.timetable = timetable;
             this.displayBreaks = displayBreaks;
             this.observeSelection = observeSelection;
             var self = this;

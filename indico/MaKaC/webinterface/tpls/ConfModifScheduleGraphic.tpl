@@ -15,13 +15,12 @@ var eventInfo = ${ eventInfo };
 
 //Variables used to resize the timetable.
 var widthOffset = 300;
-var historyBroker = new BrowserHistoryBroker();
-var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, document.body.clientWidth - widthOffset,$E('timetableDiv'), false, historyBroker, false, ${ customLinks });
 
-IndicoUI.executeOnLoad(function(){
+$(function() {
+    var historyBroker = new BrowserHistoryBroker();
+    var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, document.body.clientWidth - widthOffset,$E('timetableDiv'), false, historyBroker, false, ${ customLinks });
 
-  $E('timetableDiv').set(timetable.draw());
-  timetable.postDraw();
-
+    $E('timetableDiv').set(timetable.draw());
+    timetable.postDraw();
 });
 </script>

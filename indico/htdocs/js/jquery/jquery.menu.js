@@ -76,7 +76,7 @@ $(function() {
                 $this = $(this);
                 if ($this.siblings('ul').length) {
                     $this.data('expandable', true);
-                    $this.parent().addClass('expandable');
+                    $this.parent().addClass('arrow');
                 }
                 $this.siblings('ul').hide();
                 $this.parent().addClass('');

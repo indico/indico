@@ -455,7 +455,6 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
         var content = this.intervalTimeTable.draw();
         this.canvas.html(content[0]);
         this.intervalTimeTable.postDraw();
-        $(this.menu.dom).hide();
 
         $('body').trigger('timetable_switch_interval', this.intervalTimeTable);
 
@@ -472,11 +471,15 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
         var dfr = $.Deferred();
         this.enable();
         this.setSelectedTab(day || this.currentDay);
-        $(this.menu.dom).show();
         this._generateContent(this.getSelectedPanel());
         this.timetableDrawer.redraw();
-        $('body').trigger('timetable_switch_toplevel', this);
 
+        // Refresh header (menu, etc...)
+        var header = this._getHeader();
+        this.header.replaceWith(header);
+        this.header = header;
+
+        $('body').trigger('timetable_switch_toplevel', this);
         window.location = '#' + day;
 
         dfr.resolve();
@@ -865,7 +868,6 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
     },
 
     _createAddMenu: function(elem) {
-
         var self = this;
         var menuItems = {};
         var ul = $('<ul/>').appendTo(elem);
@@ -905,7 +907,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.infoBox = Html.div({className: 'timetableInfoBox'});
 
         this.addMenuLink = this.contextInfo.isPoster ?
-            $('<a href="#"/>').text($T('Add poster')).bind('menu_select', function() {
+            $('<a href="#"/>').text($T('Add poster')).live('menu_select', function() {
                 self.managementActions.addContribution();
             }) : $('<a href="#"/>').text($T('Add new'));
 
@@ -941,7 +943,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
 
-        this.menu = $('<ul/>').append(
+        this.menu = $('<ul class="button-menu"/>').append(
             this.addMenuLink);
 
         if (this.isSessionTimetable) {
@@ -961,7 +963,10 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
                                                                                   title:"Add one hour"}))
         var tt_status_info = $('<div id="tt_status_info" class="tt_tmp_button"/>');
 
-        this.menu.children('a').wrap('<li/>');
+        this.menu.children('a').wrap('<li>');
+        this.menu.children('li').addClass('middle');
+        this.menu.children('li:first-child').removeClass('middle').addClass('left');
+        this.menu.children('li:last-child').removeClass('middle').addClass('right');
 
         if (!this.contextInfo.isPoster) {
             this._createAddMenu(this.addMenuLink.parent());
@@ -1486,7 +1491,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
     getTTMenu: function() {
         var self = this;
         var goBackLink = $('<a class="go_back tt_tmp_button" href="#"/>').text($T('Up to timetable')).
-            prepend('<span class="arrow">▲</span>').
+            prepend('<span class="arrow_up">▲</span>').
             click(function() {
                 self.parentTimetable.switchToTopLevel();
                 self._hideWarnings();
