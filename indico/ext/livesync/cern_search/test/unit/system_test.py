@@ -76,11 +76,14 @@ class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             rid = recNode.xpath(
                 './marc:datafield[@tag="970"]/marc:subfield/text()',
                 namespaces=ns)[0]
+            deleted = recNode.xpath('./marc:datafield[@tag="980"]/marc:subfield/text()',
+                                    namespaces=ns)[0] == 'DELETED'
             title = recNode.xpath(
                 './marc:datafield[@tag="245"]/marc:subfield/text()',
-                namespaces=ns)[0]
+                namespaces=ns)
+            title = title[0] if title else None
 
-            self.server.recordSet[rid] = {'title': title}
+            self.server.recordSet[rid] = {'title': title, 'deleted': deleted}
 
         self.wfile.write('')
 

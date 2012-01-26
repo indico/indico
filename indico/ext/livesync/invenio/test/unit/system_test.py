@@ -79,9 +79,14 @@ class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 namespaces=ns)[0]
             title = recNode.xpath(
                 './marc:datafield[@tag="245"]/marc:subfield/text()',
-                namespaces=ns)[0]
+                namespaces=ns)
 
-            self.server.recordSet[rid] = {'title': title}
+            deleted = recNode.xpath('./marc:datafield[@tag="980"]/marc:subfield/text()',
+                                    namespaces=ns)[0] == 'DELETED'
+
+            title = title[0] if title else None
+
+            self.server.recordSet[rid] = {'title': title, 'deleted': deleted}
 
         self.wfile.write('[INFO] blablablabla uploaded_file.xml')
 

@@ -181,15 +181,18 @@ class BistateBatchUploaderAgent(PushSyncAgent):
         for record, recId, operation in records:
             deleted = operation & STATUS_DELETED
             try:
-                if record.getOwner() or recId:
-                    # caching is disabled because ACL changes do not trigger
-                    # notifyModification, and consequently can be classified as a hit
-                    # even if they were changed
-                    # TODO: change overrideCache to False when this problem is solved
-                    di.toMarc(recId if deleted else record, overrideCache=True, deleted=deleted)
+                if deleted:
+                    di.toMarc(recId, overrideCache=True, deleted=True)
                 else:
-                    logger.warning('%s (%s) seems to have been deleted meanwhile!' % \
-                                   (record, recId))
+                    if record.getOwner():
+                        # caching is disabled because ACL changes do not trigger
+                        # notifyModification, and consequently can be classified as a hit
+                        # even if they were changed
+                        # TODO: change overrideCache to False when this problem is solved
+                        di.toMarc(record, overrideCache=True, deleted=False)
+                    else:
+                        logger.warning('%s (%s) is marked as non-deleted and has no owner' % \
+                                       (record, recId))
             # TODO: Replace with MetadataGenerationException or similar?
             except AttributeError:
                 if logger:
