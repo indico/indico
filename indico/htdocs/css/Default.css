@@ -5074,6 +5074,7 @@ div.bottomTip {
     display: none;
     text-align: center;
     padding: 10px;
+    background: #eee;
     background: rgba(255,255,255,0.7);
     position: fixed;
     bottom: 15px;
@@ -5082,9 +5083,12 @@ div.bottomTip {
 }
 
 div.bottomTip .circle{
+    float: left;
+    background: transparent url(../images/circle.png) scroll no-repeat;
+    width: 20px;
+    height: 20px;
     font-size: 20px;
     color: #666;
-    margin-right: 5px;
     vertical-align: middle;
 }
 
@@ -5874,13 +5878,17 @@ div.timetableManagementInfoArea ul li{
 
 #tt_menu.scrolling {
     position: fixed;
-    padding: 10px 0 10px 0;
+    padding: 10px 10px 10px 0;
     top: 0px;
     z-index: 1;
-    background: #fafafa;
+    background: #f0f0f0;
+    background: rgba(250, 250, 250, 0.95);
     box-shadow: 0 0 11px 2px #eee;
     border-radius: 0 0 10px 10px;
-    opacity: 0.95;
+}
+
+.ui-resizable-handle {
+    z-index: 0 !important;
 }
 
 #tt_menu .go_back .arrow_up {

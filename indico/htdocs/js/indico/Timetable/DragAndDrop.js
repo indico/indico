@@ -543,7 +543,7 @@ type("DroppableBlockMixin", [],
 
                          if (!$('#tt_bottom_move').length) {
                              $('<div class="bottomTip" id="tt_bottom_move"/>').
-                                 html('<span class="circle">𐌏</span>' + $T('Drop to move block inside session')).appendTo('body').fadeIn();
+                                 html('<div class="circle"></div>' + $T('Drop to move block inside session')).appendTo('body').fadeIn();
                          } else {
                              $('#tt_bottom_move').stop(true).fadeTo(500, 1);
                          }
