@@ -2247,6 +2247,10 @@ class Conference(CommonObjectBase, Locatable):
         """
         Returns list of bookings for this conference.
         """
+        from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
+
+        if not DALManager.isConnected():
+            return []
 
         resvs = []
         for resvGuid in self.getRoomBookingGuids():

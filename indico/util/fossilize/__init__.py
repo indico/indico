@@ -28,6 +28,7 @@ Some of the features are:
  * Built-in inheritance support;
 """
 
+import logging
 import inspect
 import re
 import zope.interface
@@ -289,7 +290,12 @@ class Fossilizable(object):
                 else:
                     attr = getattr(obj, method)
                     if callable(attr):
-                        methodResult = attr()
+                        try:
+                            methodResult = attr()
+                        except:
+                            logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s'" %
+                                                                        (obj, interfaceArg))
+                            raise
                     else:
                         methodResult = attr
                         isAttribute = True
@@ -316,7 +322,13 @@ class Fossilizable(object):
                 converterArgs = dict((name, kwargs[name])
                                      for name in converterArgNames
                                      if name in kwargs)
-                methodResult = convertFunction(methodResult, **converterArgs)
+                try:
+                    methodResult = convertFunction(methodResult, **converterArgs)
+                except:
+                    logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s' (%s)" %
+                                                                (obj, interfaceArg, method))
+                    raise
+
 
             # Re-name the attribute produced by the method
             if 'name' in tags:

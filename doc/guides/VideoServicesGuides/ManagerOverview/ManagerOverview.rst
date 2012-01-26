@@ -14,14 +14,14 @@ In Indico's Menu Bar, you should see a Video Services Overview
 button:
 
 |image01|
-  
+
 Figure 1. Video Services Overview button
 
 Or, a Video Services Overview menu entry in your Administration
 menu (if you are also an Indico administrator):
 
-|image02|  
-   
+|image02|
+
 Figure 2. Administration menu
 
 Click on it to access the Video Services Overview page.
@@ -62,7 +62,7 @@ At the top, you can select one of the indexes (**zone 1** in figure
 
 - “Combined” indexes: some plug-ins may want to appear into an
   additional index, with other plug-ins. In the screenshot above, you
-  will see the “All Videoconference” index, which groups CERNMCU bookings, 
+  will see the “All Videoconference” index, which groups CERNMCU bookings,
   EVO bookings and Vidyo bookings.
 
 If you hover the mouse over the name of an index, it will show which
@@ -157,7 +157,7 @@ section looks like this:
 
 |image05|
 
-Figure 5. Filtering section, when *View By: Event Start Date, Creation Date, Modification Date,* 
+Figure 5. Filtering section, when *View By: Event Start Date, Creation Date, Modification Date,*
 or *Start Date* are selected
 
 There are two choices for filtering by date:
@@ -174,7 +174,7 @@ There are two choices for filtering by date:
 - Filter between two dates relative to the present. Enter an
   *amount of days* in the *from \*\*\* days ago* and
   *to \*\*\* days in the future* boxes.
-  
+
   For example, to see all the bookings and requests of the next two
   weeks, I would enter 0 in the *From \*\*\* days ago* box, and 14 in
   the *to \*\*\* days in the future* box.
@@ -278,7 +278,7 @@ queries often.
 
 Hover over the *Static URL for this result* link and a popup appear:
 
-|image06|   
+|image06|
 
 Figure 6. Static URL for a result and Go to URL link.
 
@@ -376,8 +376,7 @@ If the results are grouped by date
 
 .. |image01| image:: images/index_html_7339cfff.png
 .. |image02| image:: images/index_html_10323a5a.png
-.. |image03| image:: images/fig3.png 
+.. |image03| image:: images/fig3.png
 .. |image04| image:: images/index_html_m7d810dd9.png
 .. |image05| image:: images/index_html_136982eb.png
 .. |image06| image:: images/index_html_m38e22d3d.png
-
