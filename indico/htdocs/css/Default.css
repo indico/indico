@@ -7640,12 +7640,15 @@ ul.buttonMenuPopupList li a:hover {
     border-radius: 5px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
-    font-weight: bold;
     -webkit-transition: border-color .218s;
     -moz-transition: border .218s;
     -o-transition: border-color .218s;
     transition: border-color .218s;
 
+}
+
+.ui-list-menu-level-0 > li > a {
+    font-weight: bold;
 }
 
 .ui-list-menu-level-0 > li:last-child {
@@ -7658,14 +7661,14 @@ ul.buttonMenuPopupList li a:hover {
     min-width: 150px;
 }
 
-.ui-list-menu-level-1 li {
+.ui-list-menu-level-1 > li {
     font-weight: normal;
     float: none;
     display: block;
     overflow: auto;
 }
 
-.ui-list-menu-level-1 li:hover {
+.ui-list-menu-level-1 > li:hover {
     padding-left: -1px;
     border: 1px solid #ddd !important;
     border-width: 0 0 1px 0 !important;
