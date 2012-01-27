@@ -4203,7 +4203,7 @@ class Conference(CommonObjectBase, Locatable):
         return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)
 
     def getDefaultStyle( self ):
-        return self.getDisplayMgr(self).getDefaultStyle()
+        return self.getDisplayMgr().getDefaultStyle()
 
     def clone( self, startDate, options, eventManager=None, userPerformingClone = None ):
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)
