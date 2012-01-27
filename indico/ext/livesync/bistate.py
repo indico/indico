@@ -193,13 +193,10 @@ class BistateBatchUploaderAgent(PushSyncAgent):
                     else:
                         logger.warning('%s (%s) is marked as non-deleted and has no owner' % \
                                        (record, recId))
-            # TODO: Replace with MetadataGenerationException or similar?
-            except AttributeError:
-                if logger:
-                    logger.exception("Problem generating metadata for %s (deleted=%s)!" % (record, deleted))
             except:
-                logger.error("Problem generating metadata for %s (%s)" % (record, recId))
-                raise
+                if logger:
+                    logger.exception("Something went wrong while processing '%s' (recId=%s) (owner=%s)! Possible metadata errors." %
+                                     (record, recId, record.getOwner()))
 
         xg.closeTag("collection")
 
