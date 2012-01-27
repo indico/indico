@@ -197,6 +197,9 @@ class BistateBatchUploaderAgent(PushSyncAgent):
             except AttributeError:
                 if logger:
                     logger.exception("Problem generating metadata for %s (deleted=%s)!" % (record, deleted))
+            except:
+                logger.error("Problem generating metadata for %s (%s)" % (record, recId))
+                raise
 
         xg.closeTag("collection")
 
