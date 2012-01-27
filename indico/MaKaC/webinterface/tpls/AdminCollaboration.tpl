@@ -30,7 +30,7 @@
             <a class="CAViewByLink" id="conferenceStartDateViewBy" onclick="viewByObs('conferenceStartDate')">${ _("Event Start Date")}</a>
             <a class="CAViewByLink" id="creationDateViewBy" onclick="viewByObs('creationDate')">${ _("Creation Date")}</a>
             <a class="CAViewByLink" id="modificationDateViewBy" onclick="viewByObs('modificationDate')">${ _("Modification Date")}</a>
-            <a class="CAViewByLink" id="startDateViewBy" onclick="viewByObs('startDate')">${ _("Start Date")}</a>
+            <a class="CAViewByLink" id="startDateViewBy" onclick="viewByObs('startDate')">${ _("Booking Start Date")}</a>
         </div>
         <div class="CASortByDiv">
             <span class="CAFormattingSpan">${ _("Order:")} </span>

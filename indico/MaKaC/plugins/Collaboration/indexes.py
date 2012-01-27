@@ -51,6 +51,8 @@ class CollaborationIndex(Persistent):
                     tz = 'UTC', onlyPending = False, conferenceId = None, categoryId = None,
                     pickle = False, dateFormat = None, page = None, resultsPerPage = None):
 
+        # TODO: Use iterators instead of lists
+
         if onlyPending:
             indexName += "_pending"
 
@@ -59,15 +61,15 @@ class CollaborationIndex(Persistent):
         try:
             index = self.getIndex(indexName)
             totalInIndex = index.getCount()
-
-            if categoryId and not CategoryManager().hasKey(categoryId) or conferenceId and not ConferenceHolder().hasKey(conferenceId):
+            if categoryId and not CategoryManager().hasKey(categoryId) or conferenceId and \
+                   not ConferenceHolder().hasKey(conferenceId):
                 finalResult = QueryResult([], 0, 0, totalInIndex, 0)
             else:
                 if viewBy == "conferenceTitle":
                     items, nBookings = index.getBookingsByConfTitle(minKey, maxKey, conferenceId, categoryId)
                 elif viewBy == "conferenceStartDate":
                     items, nBookings = index.getBookingsByConfDate(minKey, maxKey, conferenceId,
-                                                                   categoryId, viewBy, tz, dateFormat)
+                                                                   categoryId, tz, dateFormat)
                 else:
                     items, nBookings = index.getBookingsByDate(viewBy, minKey, maxKey, tz, conferenceId, categoryId, dateFormat)
 
@@ -215,7 +217,7 @@ class BookingsIndex(Persistent):
 
     def getBookingsByConfDate(self, fromDate = None, toDate = None,
                               conferenceId = None, categoryId = None,
-                              viewBy = None, tz = None, dateFormat = None):
+                              tz = None, dateFormat = None):
         if fromDate:
             minKey = str(datetimeToUnixTimeInt(fromDate))
         else:
@@ -225,11 +227,8 @@ class BookingsIndex(Persistent):
         else:
             maxKey = None
 
-        if viewBy == "conferenceStartDate": # Special case, for Video Services Overview
-            return self._conferenceStartDateIndex._getBookingsByStartDate(minKey, maxKey, conferenceId,
-                                                                          categoryId, tz, dateFormat)
-        else:
-            return self._conferenceStartDateIndex.getBookings(minKey, maxKey, conferenceId, categoryId)
+        return self._conferenceStartDateIndex._getBookingsGroupedByStartDate(minKey, maxKey, conferenceId,
+                                                                             categoryId, tz, dateFormat)
 
     def dump(self):
         return {"creationDate": self._creationDateIndex.dump(),
@@ -451,12 +450,14 @@ class BookingConferenceIndex(Persistent):
 
         return result, nBookings
 
-    """ Differs from getBookings by returning a list of bookings grouped by
+    def _getBookingsGroupedByStartDate(self, fromTitle = None, toTitle = None,
+                                       conferenceId = None, categoryId = None,
+                                       tz = None, dateFormat = None):
+        """
+        Differs from getBookings by returning a list of bookings grouped by
         the conference start date.
-    """
-    def _getBookingsByStartDate(self, fromTitle = None, toTitle = None,
-                                conferenceId = None, categoryId = None,
-                                tz = None, dateFormat = None):
+        """
+
         if fromTitle:
             fromTitle = fromTitle.lower()
         if toTitle:
@@ -464,36 +465,38 @@ class BookingConferenceIndex(Persistent):
 
         bookings = []
         nBookings = 0
-        date = None
+        currentDate = None
         bookingsForDate = None
 
-        for timestamp, conf in self._tree.iteritems(fromTitle, toTitle):
+        for timestamp, pair in self._tree.iteritems(fromTitle, toTitle):
             ts = float(timestamp.split('_')[0])
-            currentDate = unixTimeToDatetime(ts, tz).date()
-            s = conf[1] # the set of bookings associated with the event.
+            tsDate = unixTimeToDatetime(ts, tz).date()
+            __, bset = pair  # the set of bookings associated with the event.
 
-            if date != currentDate:
-                if date is not None and bookingsForDate:
-                    bookings.append((datetime.strftime(date, dateFormat),
+            if currentDate != tsDate:
+                # if we're already at the next timestamp, apped what we have
+                if currentDate is not None and bookingsForDate:
+                    bookings.append((datetime.strftime(currentDate, dateFormat),
                                      bookingsForDate))
                     nBookings += len(bookingsForDate)
-                date = currentDate
+                currentDate = tsDate
                 bookingsForDate = []
 
+            # check filtering criteria
             if conferenceId:
-                for booking in s:
+                for booking in bset:
                     if booking.getConference().getId() == conferenceId:
                         bookingsForDate.append(booking)
             elif categoryId:
                 cc = CategoryChecker(categoryId)
-                for booking in s:
+                for booking in bset:
                     if cc.check(booking.getConference()):
                         bookingsForDate.append(booking)
             else:
-                bookingsForDate.extend(s)
+                bookingsForDate.extend(bset)
 
-        if date is not None and bookingsForDate:
-            bookings.append((datetime.strftime(date, dateFormat),
+        if currentDate is not None and bookingsForDate:
+            bookings.append((datetime.strftime(currentDate, dateFormat),
                              bookingsForDate))
             nBookings += len(bookingsForDate)
 
