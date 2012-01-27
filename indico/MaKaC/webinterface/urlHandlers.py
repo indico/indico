@@ -728,6 +728,12 @@ class UHConfCFAMakeTracksMandatory( URLHandler ):
 class UHConfCFAAllowAttachFiles( URLHandler ):
     _relativeURL = "confModifCFA.py/switchAttachFiles"
 
+class UHConfCFAShowSelectAsSpeaker( URLHandler ):
+    _relativeURL = "confModifCFA.py/switchShowSelectSpeaker"
+
+class UHConfCFASelectSpeakerMandatory( URLHandler ):
+    _relativeURL = "confModifCFA.py/switchSelectSpeakerMandatory"
+
 class UHCFAManagementAddType( URLHandler ):
     _relativeURL = "confModifCFA.py/addType"
 

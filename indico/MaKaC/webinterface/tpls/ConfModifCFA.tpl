@@ -68,9 +68,16 @@
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Misc. Options")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
-            <a href="${ multipleUrl }"><img src="${ multipleIcon }" border="0"> ${ _("Allow multiple tracks selection") }</a>
-            <br/><a href="${ mandatoryUrl }"><img src="${ mandatoryIcon }" border="0"> ${ _("Make track selection mandatory") }</a>
-            <br/><a href="${ attachUrl }"><img src="${ attachIcon }" border="0"> ${ _("Allow to attach files") }</a>
+            <a href="${ multipleUrl }"><img src="${ iconEnabled if multipleTracks else iconDisabled }" border="0"> ${ _("Allow multiple tracks selection") }</a>
+            <br/><a href="${ mandatoryUrl }"><img src="${ iconEnabled if areTracksMandatory else iconDisabled }" border="0"> ${ _("Make track selection mandatory") }</a>
+            <br/><a href="${ attachUrl }"><img src="${ iconEnabled if canAttachFiles else iconDisabled }" border="0"> ${ _("Allow to attach files") }</a>
+            <br/><a href="${ showSpeakerUrl }"><img src="${ iconEnabled if showSelectAsSpeaker else iconDisabled }" border="0"> ${ _("Allow to choose the presenter(s) of the abstracts") }</a>
+            <% makeMandSpk = _("Make mandatory the selection of at least one author as presenter") %>
+            % if showSelectAsSpeaker:
+                <br/><a href="${ speakerMandatoryUrl }"><img src="${ iconEnabled if isSelectSpeakerMandatory else iconDisabled }" border="0"> ${makeMandSpk}</a>
+            % else:
+                <br/><img src="${ iconDisabled }" border="0"> <span id="makePresenterMandatory" style="color:#777"> ${makeMandSpk}</span>
+            % endif
         </td>
     </tr>
     </tr>
@@ -97,4 +104,8 @@
     </tr>
 </table>
 <br>
-
+<script type="text/javascript">
+IndicoUI.executeOnLoad(function(){
+    $('#makePresenterMandatory').qtip({content: "${_('This option is automatically disabled when the option \'Allow to choose the presenter(s) of the abstracts\' is also disabled')}", position: {my: 'top middle', at: 'bottom middle'}});
+});
+</script>

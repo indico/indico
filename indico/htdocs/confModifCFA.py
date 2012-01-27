@@ -85,3 +85,9 @@ def makeTracksMandatory(req, **params):
 
 def switchAttachFiles(req, **params):
     return conferenceModif.RHConfModifCFASwitchAttachFiles(req).process(params)
+
+def switchShowSelectSpeaker(req, **params):
+    return conferenceModif.RHConfModifCFASwitchShowSelectAsSpeaker(req).process(params)
+
+def switchSelectSpeakerMandatory(req, **params):
+    return conferenceModif.RHConfModifCFASwitchSelectSpeakerMandatory(req).process(params)

@@ -4679,23 +4679,22 @@ class WConfModifCFA( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         abMgr = self._conf.getAbstractMgr()
-        iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
-        iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
+
+        vars["iconDisabled"] = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
+        vars["iconEnabled"] = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
+
+        vars["multipleTracks"] = abMgr.getMultipleTracks()
+        vars["areTracksMandatory"] = abMgr.areTracksMandatory()
+        vars["canAttachFiles"] = abMgr.canAttachFiles()
+        vars["showSelectAsSpeaker"] = abMgr.showSelectAsSpeaker()
+        vars["isSelectSpeakerMandatory"] = abMgr.isSelectSpeakerMandatory()
+
         vars["multipleUrl"] = urlHandlers.UHConfCFASwitchMultipleTracks.getURL(self._conf)
-        if abMgr.getMultipleTracks():
-            vars["multipleIcon"] = iconEnabled
-        else:
-            vars["multipleIcon"] = iconDisabled
         vars["mandatoryUrl"] = urlHandlers.UHConfCFAMakeTracksMandatory.getURL(self._conf)
-        if abMgr.areTracksMandatory():
-            vars["mandatoryIcon"] = iconEnabled
-        else:
-            vars["mandatoryIcon"] = iconDisabled
-        if abMgr.canAttachFiles():
-            vars["attachIcon"] = iconEnabled
-        else:
-            vars["attachIcon"] = iconDisabled
         vars["attachUrl"] = urlHandlers.UHConfCFAAllowAttachFiles.getURL(self._conf)
+        vars["showSpeakerUrl"] = urlHandlers.UHConfCFAShowSelectAsSpeaker.getURL(self._conf)
+        vars["speakerMandatoryUrl"] = urlHandlers.UHConfCFASelectSpeakerMandatory.getURL(self._conf)
+
         vars["setStatusURL"]=urlHandlers.UHConfCFAChangeStatus.getURL(self._conf)
         vars["dataModificationURL"]=urlHandlers.UHCFADataModification.getURL(self._conf)
         vars["addTypeURL"]=urlHandlers.UHCFAManagementAddType.getURL(self._conf)

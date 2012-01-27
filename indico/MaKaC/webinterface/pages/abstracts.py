@@ -472,6 +472,8 @@ class WAbstractDataModification( wcomponents.WTemplated ):
         vars["mandatoryFieldList"] = self._mandatoryFieldList
         vars["attachedFilesAllowed"] = cfaMgr.canAttachFiles()
         vars["errorList"] = vars.get("errors", [])
+        vars["showSelectAsSpeaker"] = cfaMgr.showSelectAsSpeaker()
+        vars["isSelectSpeakerMandatory"] = cfaMgr.isSelectSpeakerMandatory()
         #TODO: In case of error we will lose the attached files, we should keep them somehow
         vars["attachments"] = fossilize(vars.get("attachments", []), ILocalFileAbstractMaterialFossil)
         return vars

@@ -3383,6 +3383,18 @@ class RHConfModifCFASwitchAttachFiles( RHConfModifCFABase ):
         self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
 
 
+class RHConfModifCFASwitchShowSelectAsSpeaker( RHConfModifCFABase ):
+
+    def _process( self ):
+        self._conf.getAbstractMgr().setShowSelectAsSpeaker(not self._conf.getAbstractMgr().showSelectAsSpeaker())
+        self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
+
+class RHConfModifCFASwitchSelectSpeakerMandatory( RHConfModifCFABase ):
+
+    def _process( self ):
+        self._conf.getAbstractMgr().setSelectSpeakerMandatory(not self._conf.getAbstractMgr().isSelectSpeakerMandatory())
+        self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
+
 class RHCFAAddType( RHConfModifCFABase ):
 
     def _checkParams( self, params ):

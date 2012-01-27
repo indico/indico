@@ -698,6 +698,8 @@ class AbstractMgr(Persistent):
         self._multipleTracks = True
         self._tracksMandatory = False
         self._attachFiles = False
+        self._showSelectAsSpeaker= True
+        self._selectSpeakerMandatory= True
 
     def getMultipleTracks( self ):
         try:
@@ -728,6 +730,26 @@ class AbstractMgr(Persistent):
 
     def setTracksMandatory( self, tracksMandatory = False ):
         self._tracksMandatory = tracksMandatory
+
+    def showSelectAsSpeaker(self):
+        try:
+            return self._showSelectAsSpeaker
+        except:
+            self._showSelectAsSpeaker= True
+            return self._showSelectAsSpeaker
+
+    def setShowSelectAsSpeaker(self, showSelectAsSpeaker):
+        self._showSelectAsSpeaker = showSelectAsSpeaker
+
+    def isSelectSpeakerMandatory(self):
+        try:
+            return self._selectSpeakerMandatory
+        except:
+            self._selectSpeakerMandatory= True
+            return self._selectSpeakerMandatory
+
+    def setSelectSpeakerMandatory(self, selectSpeakerMandatory):
+        self._selectSpeakerMandatory = selectSpeakerMandatory
 
     def getAbstractFieldsMgr(self):
         try:
