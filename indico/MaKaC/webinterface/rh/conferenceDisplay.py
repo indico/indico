@@ -446,6 +446,18 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
         return warningText + p.display(**params)
 
 
+class RHRelativeEvent(RHConferenceBaseDisplay):
+    def __init__(self, req, which):
+        RHConferenceBaseDisplay.__init__(self, req)
+        self._which = which
+
+    def _process(self):
+        evt = self._conf.getOwner().getRelativeEvent(self._which, conf=self._conf)
+        if evt:
+            self._redirect(urlHandlers.UHConferenceDisplay.getURL(evt))
+        else:
+            return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
+
 class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
     """this class is for the conference type objects only
     it is an alternative to the standard TimeTable view"""

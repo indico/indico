@@ -244,6 +244,12 @@ class UHConferencePerformCreation( URLHandler ):
 class UHConferenceDisplay( URLHandler ):
     _relativeURL = "conferenceDisplay.py"
 
+class UHNextEvent(URLHandler):
+    _relativeURL = "conferenceDisplay.py/next"
+
+class UHPreviousEvent(URLHandler):
+    _relativeURL = "conferenceDisplay.py/prev"
+
 class UHConferenceOverview( URLHandler ):
     _relativeURL = "conferenceDisplay.py"
 
