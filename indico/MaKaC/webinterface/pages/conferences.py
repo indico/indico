@@ -1075,7 +1075,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
         if (conf.getType() in ("meeting", "simple_event")
                 and conf.getParticipation().isAllowedForApplying()
-                and conf.getStartDate() > nowutc()):
+                and conf.getStartDate() > nowutc()
+                and not conf.getParticipation().isFull()):
             vars['registrationOpen'] = True
         evaluation = conf.getEvaluation()
         if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions() > 0:
@@ -3385,6 +3386,7 @@ class WConferenceParticipantsSetup(wcomponents.WTemplated):
         vars["addedInfo"] = self._conf.getParticipation().isAddedInfo()
         vars["allowForApply"] = self._conf.getParticipation().isAllowedForApplying()
         vars["autopAccept"] = self._conf.getParticipation().autoAccept()
+        vars["numMaxParticipants"] = self._conf.getParticipation().getNumMaxParticipants()
         return vars
 
 class WPConfModifParticipantsSetup( WPConferenceModifParticipantBase ):

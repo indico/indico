@@ -5,14 +5,14 @@
 <tbody>
 % if conf.getDescription():
 <tr id="eventDescription">
-    <td class="leftCol">Description</td>
+    <td class="leftCol">${_("Description")}</td>
     <td>${common.renderDescription(conf.getDescription())}</td>
 </tr>
 % endif
 
 % if participants:
 <tr id="eventParticipants">
-    <td class="leftCol">Participants</td>
+    <td class="leftCol">${_("Participants")}</td>
     <td id="eventListParticipants">${participants}</td>
 </tr>
 % endif
@@ -21,17 +21,17 @@
 <tr id="webCastRow"">
     <td class="leftCol">
     % if webcastOnAirURL:
-        Live Webcast
+        ${_("Live Webcast")}
     % elif forthcomingWebcast:
-        Webcast
+        ${_("Webcast")}
     % endif
     </td>
     <td>
     % if webcastOnAirURL:
-         <a href="${webcastOnAirURL}" target="_blank"><strong>View the live webcast</strong></a>
+         <a href="${webcastOnAirURL}" target="_blank"><strong>${_("View the live webcast")}</strong></a>
     % elif forthcomingWebcast:
-         Please note that this event will be available <em>live</em> via the
-         <a href="${forthcomingWebcastURL}" target="_blank"><strong>Webcast Service</strong>.</a>
+         ${_("Please note that this event will be available <em>live</em> via the")}
+         <a href="${forthcomingWebcastURL}" target="_blank"><strong>${_("Webcast Service")}</strong>.</a>
     % endif
     </td>
 </tr>
@@ -39,7 +39,7 @@
 
 % if len(materials) > 0:
 <tr id="materialList">
-    <td class="leftCol">Material</td>
+    <td class="leftCol">${_("Material")}</td>
     <td>
         <div class="materialList clearfix">
         % for material in materials:
@@ -63,7 +63,7 @@
 
 % if len(lectures) > 0:
 <tr id="lectureLinks">
-    <td class="leftCol">Other occasions</td>
+    <td class="leftCol">${_("Other occasions")}</td>
     <td>
     % for lecture in lectures:
         <a href="materialDisplay.py?materialId=${lecture.getId()}&confId=${conf.getId()}">\
@@ -75,24 +75,24 @@
 
 % if registrationOpen:
 <tr>
-    <td class="leftCol">Registration</td>
+    <td class="leftCol">${_("Registration")}</td>
     <td>
-        Want to participate?
-        <span class="fakeLink" id="applyLink">Apply here</span>
+        ${_("Want to participate?")}
+        <span class="fakeLink" id="applyLink">${_("Apply here")}</span>
     </td>
 </tr>
 % endif
 
 % if evaluationLink:
 <tr>
-    <td class="leftCol">Evaluation</td>
-    <td><a href="${evaluationLink}">Evaluate this event</a></td>
+    <td class="leftCol">${_("Evaluation")}</td>
+    <td><a href="${evaluationLink}">${_("Evaluate this event")}</a></td>
 </tr>
 % endif
 
 % if conf.getOrgText():
 <tr>
-    <td class="leftCol">Organised by</td>
+    <td class="leftCol">${_("Organised by")}</td>
     <td>${conf.getOrgText()}</td>
 </tr>
 % endif

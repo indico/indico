@@ -821,6 +821,25 @@ class ConferenceParticipantsAutoAccept(ConferenceModifBase):
         participation.setAutoAccept(not participation.autoAccept(), self._getUser())
         return True
 
+class ConferenceParticipantsSetNumMaxParticipants( ConferenceTextModificationBase ):
+    """
+    Conference num max participants modification
+    """
+    def _handleSet(self):
+        numMaxPart = self._value
+        if (self._value ==""):
+            raise ServiceError("ERR-E2", _("The value of the maximum numbers of participants cannot be empty."))
+        try:
+            numMaxPart = int(self._value)
+        except ValueError:
+            raise ServiceError("ERR-E3", _("The value of the maximum numbers of participants has to be a positive number."))
+
+        self._target.getParticipation().setNumMaxParticipants(int(numMaxPart))
+
+
+    def _handleGet(self):
+        return self._target.getParticipation().getNumMaxParticipants()
+
 class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditParticipantBase):
 
     def _checkParams(self):
@@ -831,14 +850,18 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
         if self._conf.getStartDate() < timezoneUtils.nowutc() :
             raise NoReportError(_("""This event began on %s, you cannot apply for
                                          participation after the event began."""%self._conf.getStartDate()), title=_("Event started"))
+        participation = self._conf.getParticipation()
 
-        if not self._conf.getParticipation().isAllowedForApplying() :
+        if not participation.isAllowedForApplying() :
             raise NoReportError( _("""Participation in this event is restricted to persons invited.
                                            If you insist on taking part in this event, please contact the event manager."""), title=_("Application restricted"))
+        if participation.getNumMaxParticipants() > 0 and len(participation.getParticipantList()) >= participation.getNumMaxParticipants():
+            raise NoReportError( _("""You cannot apply for participation in this event because the maximum numbers of participants has been reached.
+                                           If you insist on taking part in this event, please contact the event manager."""), title=_("Maximum number of participants reached"))
+
         result = {}
         user = self._getUser()
         pending = self._generateParticipant(user)
-        participation = self._conf.getParticipation()
         if participation.alreadyParticipating(pending) != 0:
             raise NoReportError(_("The participant can not be added to the meeting because there is already a participant with the email address '%s'."
                                 % pending.getEmail()),title=_('Already registered participant'))
@@ -1557,6 +1580,7 @@ methodMap = {
     "participation.addedInfo": ConferenceParticipantsAddedInfo,
     "participation.allowForApply": ConferenceParticipantsAllowForApplying,
     "participation.autopAccept": ConferenceParticipantsAutoAccept,
+    "participation.setNumMaxParticipants": ConferenceParticipantsSetNumMaxParticipants,
     "participation.applyParticipant": ConferenceApplyParticipant,
     "participation.addParticipant": ConferenceAddParticipant,
     "participation.editParticipant": ConferenceEditParticipant,

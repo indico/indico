@@ -49,6 +49,7 @@ class Participation(Persistent):
         self._declinedIdGenerator = 0
         self._dateNegotiation = None
         self._displayParticipantList = True
+        self._numMaxParticipants = 0
 
     def clone(self, conference, options, eventManager=None):
         newParticipation = conference.getParticipation()
@@ -135,6 +136,26 @@ class Participation(Persistent):
         self._conference.getLogHandler().logAction(logData, "participants", responsibleUser)
         self.notifyModification()
 
+    def getNumMaxParticipants(self):
+        try:
+            return self._numMaxParticipants
+        except AttributeError :
+            self._numMaxParticipants = 0
+            return False
+
+    def setNumMaxParticipants(self, value, responsibleUser = None):
+        self._numMaxParticipants = value
+        logData = {
+            "subject": "Num max of participants.",
+            "value": str(value)
+        }
+        self._conference.getLogHandler().logAction(logData, "participants", responsibleUser)
+        self.notifyModification()
+
+    def isFull(self):
+        if self.getNumMaxParticipants() != 0:
+            return len(self.getParticipantList()) >= self.getNumMaxParticipants()
+        return False
 
     def alreadyParticipating(self, participant):
         if participant is None :
