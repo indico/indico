@@ -83,16 +83,19 @@
                  <% checked = '' %>
             % endif
             <input type="checkbox" id="pendingCB" name="pendingCB" onchange="updateFilterButton()" ${checked }/>
-            <br />
         </div>
-        <span class="CAFormattingSpan">${ _("Restrict to category id:")}</span>
-        <input type="text" size="5" id="categoryId" name="categoryId" onkeypress="updateFilterButton()" value="${ InitialCategoryId }"/>
-        <br />
-        <span class="CAFormattingSpan">${ _("Restrict to conference id:")}</span>
-        <input type="text" size="5" id="conferenceId" name="conferenceId" onkeyup="confIdObs()" onkeypress="updateFilterButton()" value="${ InitialConferenceId }"/>
-        <br />
-        <span class="CAFormattingSpan">${ _("Results per page:")}</span>
-        <input type="text" id="resultsPerPage" name="resultsPerPage" size="5" onkeypress="updateFilterButton()" value="${ InitialResultsPerPage }"/>
+        <div>
+          <span class="CAFormattingSpan">${ _("Restrict to category id:")}</span>
+          <input type="text" size="5" id="categoryId" name="categoryId" onkeypress="updateFilterButton()" value="${ InitialCategoryId }"/>
+        </div>
+        <div>
+          <span class="CAFormattingSpan">${ _("Restrict to conference id:")}</span>
+         <input type="" name="" value="" type="text" size="5" id="conferenceId" name="conferenceId" onkeyup="confIdObs()" onkeypress="updateFilterButton()" value="${ InitialConferenceId }"/>
+        </div>
+        <div>
+          <span class="CAFormattingSpan">${ _("Results per page:")}</span>
+          <input type="text" id="resultsPerPage" name="resultsPerPage" size="5" onkeypress="updateFilterButton()" value="${ InitialResultsPerPage }"/>
+        </div>
     </div>
 
     <div class="CABottomBanner">
@@ -100,13 +103,10 @@
             <span class="fakeLink" id="CAStaticURLLink">
                 ${ _("Static URL for this result")}
             </span>
-            <br />
             <div id="CAStatucURLContentContainer">
                 <div id="CAStaticURLContent">
-                    <input type="text" id="staticURL" name="staticURL" />
-                    <br />
-                    ${ _("You can use this link for bookmarks.")}<br />
-                    <a id="staticURLLink" href="${ BaseURL }">${ _("Go to URL")}</a>
+                    <div>${ _("You can use this link for bookmarks:")}</div>
+                    <input readonly="readonly" type="text" id="staticURL" name="staticURL" />
                 </div>
             </div>
         </div>

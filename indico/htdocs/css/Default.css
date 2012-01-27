@@ -4773,6 +4773,10 @@ div#CAStaticURLContent {
 }
 
 div#CAStaticURLContent input {
+    margin-top: 2px;
+}
+
+div#CAStaticURLContent input {
     display: block;
     width: 250px;
 }
