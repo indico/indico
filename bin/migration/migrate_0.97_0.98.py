@@ -123,6 +123,17 @@ def _fixDefaultStyle(conf, cdmr):
         confDM.setDefaultStyle('standard')
 
 
+@since('0.97', always=True)
+def pluginReload(dbi, withRBDB, prevVersion):
+    """
+    Reloading all plugins
+    """
+    PluginsHolder().reloadAllPlugins()
+    dbi.commit()
+    if withRBDB:
+        DALManager.commit()
+
+
 @since('0.98b2')
 def pluginMigration(dbi, withRBDB, prevVersion):
     """
