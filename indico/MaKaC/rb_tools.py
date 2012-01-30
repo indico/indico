@@ -310,7 +310,7 @@ def formatDateTime(date):
     # Convert the date to the Indico "de facto" standard
     return date.strftime("%a %d/%m/%Y %H:%M")
 
-def dateExcessAllowed(date, days):
+def dateAdvanceAllowed(date, days):
     from MaKaC.common.timezoneUtils import nowutc, dayDifference, naive2local
     import MaKaC.common.info as info
     tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()

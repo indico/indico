@@ -172,10 +172,9 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Bookings not allowed before")}&nbsp;&nbsp;</small></td>
+                                            <td align="right" valign="top"><small> ${ _("Maximum advance time for bookings")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                                ${ verbose( room.notAllowBookingAfter )}
-                                                ${verbose( room.notAllowBookingAfterType ) if room.notAllowBookingAfter else ""}
+                                                ${ (_("%s days") % room.maxAdvanceDays) if room.maxAdvanceDays else _("Not set")}
                                             </td>
                                         </tr>
                                         <tr>
