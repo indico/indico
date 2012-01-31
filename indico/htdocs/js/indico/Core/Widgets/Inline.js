@@ -1573,7 +1573,7 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
                     value = dummy.text();
 
                     // now transform double line breaks into paragraphs
-                    value = '<p>' + value.replace('\n\n', '</p><p>') + '</p>';
+                    value = '<p>' + value.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br/>') + '</p>';
                     return Html.unescaped.span({}, value);
                 } else {
                     return;
