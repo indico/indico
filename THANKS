@@ -13,7 +13,7 @@ Other software and pieces of code:
 
 CKEditor is used for the online creation of web pages. CKEditor is
 distributed under the GPL, LGPL and MPL open source licenses.
-<http://ckeditor.com/>
+<http://ckeditor.com/>.
 
 The DHTML / JavaScript Calendar is used by Indico and it is available
 under the terms of the GNU Lesser General Public License version 2.1 or
@@ -26,6 +26,33 @@ This routine is allowed to be put under any license Open Source (GPL, BSD, LGPL,
 or any Propriety License. Effectively this routine is in public domain.
 
 HTMLParser/SimpleHtmlParser is a JS library that allows to parse HTML. It has been written
-originally by Erik Arvidsson and extended by John Resig. The original license is GPLv2.
+originally by Erik Arvidsson and extended by John Resig. The original license is GPLv2 or later.
+Compatibility of GPLv3 with this library.
+
+jQuery is a fast and concise JavaScript Library that simplifies HTML document traversing,
+event handling, animating, and Ajax interactions for rapid web development.
+Dual licensed under the MIT or GPL Version 2 licenses.
+<http://jquery.org/>
+
+jQuery UI is the jQuery visual controls. Dual licensed under the MIT or GPL Version 2 licenses.
+<http://jqueryui.com/>
+
+jQuery Colorbox is a a full featured, light-weight, customizable lightbox based on jQuery 1.3+.
+Licensed under the MIT license.
+<http://jacklmoore.com/colorbox/>
+
+jQuery Form Plugin for jQuery. Dual licensed under the MIT and GPL licenses.
+Compatibility of GPLv3 with this library.
+<http://malsup.com/jquery/form/>
+
+qTip2 - Pretty powerful tooltips based on jQuery. Dual licensed under MIT or GPLv2 licenses.
+<http://craigsworks.com/projects/qtip2/>
+
+Underscore is a utility-belt library for JavaScript that provides a lot of the functional programming support
+that you would expect in Prototype.js (or Ruby), but without extending any of the built-in JavaScript objects. Underscore is freely distributable under the MIT license.
+http://documentcloud.github.com/underscore/>
+
+Prototype is a Javascript framework that aims to ease development of dynamics web applications. It is freely distributable under the terms of an MIT-style license.
+<http://prototypejs.org>
 
 See also the AUTHORS and ChangeLog files.
