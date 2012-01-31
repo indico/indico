@@ -1214,12 +1214,10 @@ class RHRoomBookingBookingDetails( RHRoomBookingBase ):
 
         self._collisions = []
         if not self._resv.isConfirmed:
-
-            isConfirmed = self._resv.isConfirmed
             self._resv.isConfirmed = None
             # find pre-booking collisions
             self._collisions = self._resv.getCollisions(sansID=self._resv.id)
-            self._resv.isConfirmed = isConfirmed
+            self._resv.isConfirmed = False
 
         self._clearSessionState()
 
