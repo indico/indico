@@ -1570,7 +1570,7 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
                 if (value) {
                     // start by escaping the input
                     var dummy = $('<span/>').text(value);
-                    value = dummy.text();
+                    value = dummy.html();
 
                     // now transform double line breaks into paragraphs
                     value = '<p>' + value.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br/>') + '</p>';

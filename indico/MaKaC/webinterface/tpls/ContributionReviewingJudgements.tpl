@@ -105,7 +105,7 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Comments")}:</span></td>
             <td>
-                <div id="inPlaceEditComments"></div>
+                <div id="inPlaceEditComments">${Review.getRefereeJudgement().getComments() | h, html_breaks}</div>
             </td>
         </tr>
         <tr>
@@ -152,7 +152,7 @@ var showWidgets = function(firstLoad) {
                         current: 'refereeJudgement'
                         }, ${ ConfReview.getStatusesDictionary() }, "${FinalJudge}", observer);
 
-    var initialValue = '${ Review.getRefereeJudgement().getComments() }';
+    var initialValue = ${ Review.getRefereeJudgement().getComments() | n,j};
     if (initialValue == '') {
         initialValue = 'No comments';
     }
@@ -204,22 +204,6 @@ var showWidgets = function(firstLoad) {
 }
 
 var showValues = function() {
-    indicoRequest('reviewing.contribution.changeComments',
-            {
-                conference: '${ Contribution.getConference().getId() }',
-                contribution: '${ Contribution.getId() }',
-                current: 'refereeJudgement'
-            },
-            function(result, error){
-                if (!error) {
-                    if(result.length == 0){
-                        $E('inPlaceEditComments').set($T('No comments given.'));
-                    } else {
-                        $E('inPlaceEditComments').set(result)
-                    }
-                }
-            }
-        )
     indicoRequest('reviewing.contribution.changeJudgement',
             {
                 conference: '${ Contribution.getConference().getId() }',
