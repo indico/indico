@@ -133,4 +133,4 @@ class ICalSerializer(Serializer):
             if mapper:
                 cal.add_component(mapper(fossil, now))
 
-        return str(cal)
+        return cal.to_ical()
