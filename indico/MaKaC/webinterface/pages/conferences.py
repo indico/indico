@@ -4688,12 +4688,14 @@ class WConfModifCFA( wcomponents.WTemplated ):
         vars["canAttachFiles"] = abMgr.canAttachFiles()
         vars["showSelectAsSpeaker"] = abMgr.showSelectAsSpeaker()
         vars["isSelectSpeakerMandatory"] = abMgr.isSelectSpeakerMandatory()
+        vars["showAttachedFilesContribList"] = abMgr.showAttachedFilesContribList()
 
         vars["multipleUrl"] = urlHandlers.UHConfCFASwitchMultipleTracks.getURL(self._conf)
         vars["mandatoryUrl"] = urlHandlers.UHConfCFAMakeTracksMandatory.getURL(self._conf)
         vars["attachUrl"] = urlHandlers.UHConfCFAAllowAttachFiles.getURL(self._conf)
         vars["showSpeakerUrl"] = urlHandlers.UHConfCFAShowSelectAsSpeaker.getURL(self._conf)
         vars["speakerMandatoryUrl"] = urlHandlers.UHConfCFASelectSpeakerMandatory.getURL(self._conf)
+        vars["showAttachedFilesUrl"] = urlHandlers.UHConfCFAAttachedFilesContribList.getURL(self._conf)
 
         vars["setStatusURL"]=urlHandlers.UHConfCFAChangeStatus.getURL(self._conf)
         vars["dataModificationURL"]=urlHandlers.UHCFADataModification.getURL(self._conf)
@@ -7517,6 +7519,11 @@ class WConfContributionList ( wcomponents.WTemplated ):
                 url = urlHandlers.UHMaterialDisplay.getURL(contrib.getPaper())
                 mat.append("<a href=%s>%s</a>" % ( quoteattr(str(url)),self._getMaterialIcon(Config.getInstance().getSystemIconURL( "paper" ), "Paper")))
         material = "".join(mat)
+        abst = []
+        if self._conf.getAbstractMgr().showAttachedFilesContribList() and isinstance(contrib, conference.AcceptedContribution) and len(contrib.getAbstract().getAttachments()) > 0:
+            for file in contrib.getAbstract().getAttachments().values():
+                abst.append("""<div style="padding-bottom:3px;"><a href="%s">%s</a></div>""" % (str(urlHandlers.UHAbstractAttachmentFileAccess.getURL(file)), file.getFileName()))
+        abstracts = "".join(abst)
         html = """
             <tr>
                 <td valign="top" nowrap><input type="checkbox" name="contributions" value=%s></td>
@@ -7528,11 +7535,12 @@ class WConfContributionList ( wcomponents.WTemplated ):
                 <td class="abstractDataCell">%s</td>
                 %s
                 <td class="abstractDataCell">%s</td>
+                <td class="abstractDataCell">%s</td>
             </tr>
                 """%(contrib.getId(), self.htmlText( contrib.getId() ),
                     sdate or "&nbsp;", typeHTML,
                     title or "&nbsp;", speaker or "&nbsp;",
-                    session or "&nbsp;", trackHTML, material or "&nbsp;" )
+                    session or "&nbsp;", trackHTML, material or "&nbsp;", abstracts or "&nbsp;" )
         return html
 
     def _getContribMinHTML( self, contrib ):
@@ -7545,6 +7553,11 @@ class WConfContributionList ( wcomponents.WTemplated ):
             if contrib.getPaper().canView(self._aw):
                 mat.append(self._getMaterialIcon(Config.getInstance().getSystemIconURL( "paper" ), _("Paper")))
         material = "".join(mat)
+        abst = []
+        if self._conf.getAbstractMgr().showAttachedFilesContribList() and isinstance(contrib, conference.AcceptedContribution) and len(contrib.getAbstract().getAttachments()) > 0:
+            for file in contrib.getAbstract().getAttachments().values():
+                abst.append("""<div style="padding-bottom:3px;"><a href="%s">%s</a></div>""" % (str(urlHandlers.UHAbstractAttachmentFileAccess.getURL(file)), file.getFileName()))
+        abstracts = "".join(abst)
         trackHTML = typeHTML = ""
         if self._displayTrackFilter:
             trackHTML = """
@@ -7563,8 +7576,9 @@ class WConfContributionList ( wcomponents.WTemplated ):
                 <td class="abstractDataCell">%s</td>
                 %s
                 <td class="abstractDataCell">%s</td>
+                <td class="abstractDataCell">%s</td>
             </tr>
-                """%(self.htmlText( contrib.getId() ), "&nbsp;", "&nbsp;", typeHTML, title or "&nbsp;", "&nbsp;", "&nbsp;", trackHTML,  material or "&nbsp;" )
+                """%(self.htmlText( contrib.getId() ), "&nbsp;", "&nbsp;", typeHTML, title or "&nbsp;", "&nbsp;", "&nbsp;", trackHTML,  material or "&nbsp;", abstracts or "&nbsp;"  )
         return html
 
     def _getTypeFilterItemList( self ):
@@ -7782,6 +7796,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
 
         vars["contribSelectionAction"]=quoteattr(str(urlHandlers.UHContributionListAction.getURL(self._conf)))
         vars["contributionsPDFURL"]=quoteattr(str(urlHandlers.UHContributionListToPDF.getURL(self._conf)))
+        vars["showAttachedFiles"] = self._conf.getAbstractMgr().showAttachedFilesContribList()
 
         return vars
 

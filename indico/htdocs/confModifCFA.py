@@ -91,3 +91,6 @@ def switchShowSelectSpeaker(req, **params):
 
 def switchSelectSpeakerMandatory(req, **params):
     return conferenceModif.RHConfModifCFASwitchSelectSpeakerMandatory(req).process(params)
+
+def switchShowAttachedFiles(req, **params):
+    return conferenceModif.RHConfModifCFASwitchShowAttachedFilesContribList(req).process(params)

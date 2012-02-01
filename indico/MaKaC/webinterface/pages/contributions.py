@@ -39,7 +39,8 @@ from indico.util.i18n import i18nformat
 from MaKaC import user
 from pytz import timezone
 import MaKaC.common.timezoneUtils as timezoneUtils
-
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
 class WPContributionBase( WPMainBase, WPConferenceBase ):
 
@@ -305,7 +306,10 @@ class WContributionDisplayBase(wcomponents.WTemplated):
             vars["hideInfo"] = True
         else:
             vars["hideInfo"] = False
+        vars["showAttachedFiles"] = self._contrib.getConference().getAbstractMgr().showAttachedFilesContribList() and isinstance(self._contrib, conference.AcceptedContribution) and len(self._contrib.getAbstract().getAttachments()) > 0
+        vars["abstractAttachments"] = fossilize(self._contrib.getAbstract().getAttachments().values(), ILocalFileAbstractMaterialFossil) if isinstance(self._contrib, conference.AcceptedContribution) else []
         return vars
+
 
 
 class WContributionDisplayFull(WContributionDisplayBase):

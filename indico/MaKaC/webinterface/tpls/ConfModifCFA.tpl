@@ -78,6 +78,7 @@
             % else:
                 <br/><img src="${ iconDisabled }" border="0"> <span id="makePresenterMandatory" style="color:#777"> ${makeMandSpk}</span>
             % endif
+            <br/><a href="${ showAttachedFilesUrl }" id="showAttachedFiles" data-active="${'yes' if showAttachedFilesContribList else 'no'}"><img src="${ iconEnabled if showAttachedFilesContribList else iconDisabled }" border="0"> ${ _("Show files attached to abstracts in the contribution list") }</a>
         </td>
     </tr>
     </tr>
@@ -107,5 +108,12 @@
 <script type="text/javascript">
 IndicoUI.executeOnLoad(function(){
     $('#makePresenterMandatory').qtip({content: "${_('This option is automatically disabled when the option \'Allow to choose the presenter(s) of the abstracts\' is also disabled')}", position: {my: 'top middle', at: 'bottom middle'}});
+    $('#showAttachedFiles').click(function(){
+        if(this.dataset.active=='no'){
+            return confirm($T("Please, note that if you enable this option the files (attached to the abstracts) will be public and accessible by everybody. Are you sure to continue?"));
+        }
+        return true;
+
+    })
 });
 </script>

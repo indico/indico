@@ -734,6 +734,9 @@ class UHConfCFAShowSelectAsSpeaker( URLHandler ):
 class UHConfCFASelectSpeakerMandatory( URLHandler ):
     _relativeURL = "confModifCFA.py/switchSelectSpeakerMandatory"
 
+class UHConfCFAAttachedFilesContribList( URLHandler ):
+    _relativeURL = "confModifCFA.py/switchShowAttachedFiles"
+
 class UHCFAManagementAddType( URLHandler ):
     _relativeURL = "confModifCFA.py/addType"
 

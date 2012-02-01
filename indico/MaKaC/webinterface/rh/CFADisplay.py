@@ -509,8 +509,9 @@ class RHAbstractRecovery( RHAbstractModificationBase ):
 class RHGetAttachedFile(RHFileAccess):
 
     def _checkProtection( self ):
-        # Same protection as the abstract
-        temptarget=self._target
-        self._target = self._target.getOwner()
-        RHFileAccess._checkProtection( self )
-        self._target = temptarget
+        if not self._conf.getAbstractMgr().showAttachedFilesContribList():
+            # Same protection as the abstract
+            temptarget=self._target
+            self._target = self._target.getOwner()
+            RHFileAccess._checkProtection( self )
+            self._target = temptarget
