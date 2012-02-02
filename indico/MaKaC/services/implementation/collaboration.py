@@ -303,7 +303,7 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
                 if self._params['toTitle']:
                     maxKey = self._params['toTitle'].strip()
 
-                """ For relative dates, create a diff timedelta for resetting to 
+                """ For relative dates, create a diff timedelta for resetting to
                     00:00 at the start of range and 23:59 at the end.
                 """
                 if self._params['fromDays']:
@@ -357,7 +357,8 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
                               pickle = True,
                               dateFormat='%a %d %b %Y',
                               page = self._page,
-                              resultsPerPage = self._resultsPerPage)
+                              resultsPerPage = self._resultsPerPage,
+                              grouped=True)
 
 class CollaborationCustomPluginService(CollaborationBase):
     """ Class to support plugin-defined services.

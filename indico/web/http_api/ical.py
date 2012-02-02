@@ -29,7 +29,9 @@ from indico.util.metadata.serializer import Serializer
 from MaKaC.rb_reservation import RepeatabilityEnum
 from MaKaC.rb_tools import weekNumber
 
+
 WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
+
 
 class vRecur(ical.vRecur):
     """Fix vRecur so the frequency comes first"""
@@ -45,88 +47,77 @@ class vRecur(ical.vRecur):
             vals = ','.join([typ(val).ical() for val in vals])
             result.append('%s=%s' % (key, vals))
         return ';'.join(result)
+
 ical.cal.types_factory['recur'] = vRecur
+
+
+@staticmethod
+def serialize_conference(fossil, now):
+    event = ical.Event()
+    event.set('uid', 'indico-event-%s@cern.ch' % fossil['id'])
+    event.set('dtstamp', now)
+    event.set('dtstart', fossil['startDate'])
+    event.set('dtend', fossil['endDate'])
+    event.set('url', fossil['url'])
+    event['summary'] = fossil['title']
+    loc = fossil['location'] or ''
+    if fossil['room']:
+        loc += ' ' + fossil['room']
+    event['location'] = loc
+    if fossil['description']:
+        event['description'] = fossil['description'] + '\n' + fossil['url']
+    else:
+        event['description'] = fossil['url']
+    return event
+
+
+@staticmethod
+def serialize_repeatability(startDT, endDT, repType):
+    intervals = { RepeatabilityEnum.onceAWeek: 1, RepeatabilityEnum.onceEvery2Weeks: 2, RepeatabilityEnum.onceEvery3Weeks: 3 }
+    recur = ical.vRecur()
+    recur['until'] = endDT
+    if repType == RepeatabilityEnum.daily:
+        recur['freq'] = 'daily'
+    elif repType in intervals.keys():
+        recur['freq'] = 'weekly'
+        recur['interval'] = intervals[repType]
+    elif repType == RepeatabilityEnum.onceAMonth:
+        recur['freq'] = 'monthly'
+        recur['byday'] = str(weekNumber(startDT)) + WEEK_DAYS[startDT.weekday()]
+    return recur
+
+
+def serialize_reservation(fossil, now):
+    event = ical.Event()
+    event.set('uid', 'indico-resv-%s@cern.ch' % fossil['id'])
+    event.set('dtstamp', now)
+    event.set('dtstart', fossil['startDT'])
+    event.set('dtend', datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].time()))
+    event.set('url', fossil['bookingUrl'])
+    event.set('summary', fossil['reason'])
+    event['location'] = fossil['location'] + ': ' + fossil['room']['fullName']
+    event['description'] = fossil['reason'] + '\n' + fossil['bookingUrl']
+    rrule = None
+    if fossil['repeatability'] is not None:
+        rrule = serialize_repeatability(fossil['startDT'], fossil['endDT'], RepeatabilityEnum.shortname2rep[fossil['repeatability']])
+    if rrule:
+        event.set('rrule', rrule)
+    return event
+
 
 class ICalSerializer(Serializer):
 
     schemaless = False
     _mime = 'text/calendar'
 
-    def _serialize_conference(self, fossil, now):
-        event = ical.Event()
-        event.set('uid', 'indico-event-%s@cern.ch' % fossil['id'])
-        event.set('dtstamp', now)
-        event.set('dtstart', fossil['startDate'])
-        event.set('dtend', fossil['endDate'])
-        event.set('url', fossil['url'])
-        event['summary'] = fossil['title']
-        loc = fossil['location'] or ''
-        if fossil['room']:
-            loc += ' ' + fossil['room']
-        event['location'] = loc
-        if fossil['description']:
-            event['description'] = fossil['description'] + '\n' + fossil['url']
-        else:
-            event['description'] = fossil['url']
-        return event
+    _mappers = {
+        'conferenceMetadata': serialize_conference,
+        'reservationMetadata': serialize_reservation
+    }
 
-    def _serialize_repeatability(self, startDT, endDT, repType):
-        intervals = { RepeatabilityEnum.onceAWeek: 1, RepeatabilityEnum.onceEvery2Weeks: 2, RepeatabilityEnum.onceEvery3Weeks: 3 }
-        recur = ical.vRecur()
-        recur['until'] = endDT
-        if repType == RepeatabilityEnum.daily:
-            recur['freq'] = 'daily'
-        elif repType in intervals.keys():
-            recur['freq'] = 'weekly'
-            recur['interval'] = intervals[repType]
-        elif repType == RepeatabilityEnum.onceAMonth:
-            recur['freq'] = 'monthly'
-            recur['byday'] = str(weekNumber(startDT)) + WEEK_DAYS[startDT.weekday()]
-        return recur
-
-    def _serialize_reservation(self, fossil, now):
-        event = ical.Event()
-        event.set('uid', 'indico-resv-%s@cern.ch' % fossil['id'])
-        event.set('dtstamp', now)
-        event.set('dtstart', fossil['startDT'])
-        event.set('dtend', datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].time()))
-        event.set('url', fossil['bookingUrl'])
-        event.set('summary', fossil['reason'])
-        event['location'] = fossil['location'] + ': ' + fossil['room']['fullName']
-        event['description'] = fossil['reason'] + '\n' + fossil['bookingUrl']
-        rrule = None
-        if fossil['repeatability'] is not None:
-            rrule = self._serialize_repeatability(fossil['startDT'], fossil['endDT'], RepeatabilityEnum.shortname2rep[fossil['repeatability']])
-        if rrule:
-            event.set('rrule', rrule)
-        return event
-
-    def _serialize_collaboration(self, fossil, now):
-        event = ical.Event()
-        url = str(fossil['url'])
-        event.set('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
-        event.set('dtstamp', now)
-        event.set('dtstart', fossil['startDate'])
-        event.set('dtend', fossil['endDate'])
-        event.set('url', url)
-        event.set('categories', "VideoService - " + fossil['type'])
-        event['summary'] = "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title']
-        event['description'] = url
-
-        # If there is an alarm required, add a subcomponent to the Event
-        if fossil.has_key('alarm'):
-            event.add_component(self._serialize_collaboration_alarm(fossil, now))
-
-        return event
-
-    def _serialize_collaboration_alarm(self, fossil, now):
-        alarm = ical.Alarm()
-        trigger = "-PT" + str(fossil['alarm']) + "M" #iCalendar spec for pre-event trigger
-        alarm['trigger'] = trigger
-        alarm['action'] = 'DISPLAY'
-        alarm['summary'] = "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title']
-        alarm['description'] = str(fossil['url'])
-        return alarm
+    @classmethod
+    def register_mapper(cls, fossil, func):
+        cls._mappers[fossil] = func
 
     def __call__(self, fossils):
         results = fossils['results']
@@ -138,11 +129,8 @@ class ICalSerializer(Serializer):
         cal.set('prodid', '-//CERN//INDICO//EN')
         now = datetime.datetime.utcnow()
         for fossil in results:
-            if fossil['_fossil'] == 'conferenceMetadata':
-                cal.add_component(self._serialize_conference(fossil, now))
-            elif fossil['_fossil'] == 'reservationMetadata':
-                cal.add_component(self._serialize_reservation(fossil, now))
-            elif fossil['_fossil'] == 'collaborationMetadata':
-                cal.add_component(self._serialize_collaboration(fossil, now))
+            mapper = ICalSerializer.mappers.get(fossil['_fossil'])
+            if mapper:
+                cal.add_component(mapper(fossil, now))
 
         return str(cal)

@@ -48,8 +48,9 @@ class CollaborationIndex(Persistent):
             return index
 
     def getBookings(self, indexName, viewBy, orderBy, minKey, maxKey,
-                    tz = 'UTC', onlyPending = False, conferenceId = None, categoryId = None,
-                    pickle = False, dateFormat = None, page = None, resultsPerPage = None):
+                    tz = 'UTC', onlyPending=False, conferenceId=None, categoryId=None,
+                    pickle=False, dateFormat=None, page=None, resultsPerPage=None,
+                    grouped=False):
 
         # TODO: Use iterators instead of lists
 
@@ -69,7 +70,7 @@ class CollaborationIndex(Persistent):
                     items, nBookings = index.getBookingsByConfTitle(minKey, maxKey, conferenceId, categoryId)
                 elif viewBy == "conferenceStartDate":
                     items, nBookings = index.getBookingsByConfDate(minKey, maxKey, conferenceId,
-                                                                   categoryId, tz, dateFormat)
+                                                                   categoryId, tz, dateFormat, grouped=grouped)
                 else:
                     items, nBookings = index.getBookingsByDate(viewBy, minKey, maxKey, tz, conferenceId, categoryId, dateFormat)
 
@@ -217,7 +218,7 @@ class BookingsIndex(Persistent):
 
     def getBookingsByConfDate(self, fromDate = None, toDate = None,
                               conferenceId = None, categoryId = None,
-                              tz = None, dateFormat = None):
+                              tz = None, dateFormat = None, grouped=True):
         if fromDate:
             minKey = str(datetimeToUnixTimeInt(fromDate))
         else:
@@ -227,8 +228,11 @@ class BookingsIndex(Persistent):
         else:
             maxKey = None
 
-        return self._conferenceStartDateIndex._getBookingsGroupedByStartDate(minKey, maxKey, conferenceId,
-                                                                             categoryId, tz, dateFormat)
+            if grouped:
+                return self._conferenceStartDateIndex._getBookingsGroupedByStartDate(minKey, maxKey, conferenceId,
+                                                                                     categoryId, tz, dateFormat)
+            else:
+                return self._conferenceStartDateIndex.getBookings(minKey, maxKey, conferenceId, dateFormat)
 
     def dump(self):
         return {"creationDate": self._creationDateIndex.dump(),

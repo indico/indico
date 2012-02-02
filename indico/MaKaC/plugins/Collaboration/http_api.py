@@ -18,12 +18,16 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import icalendar as ical
+
 from indico.web.http_api import HTTPAPIHook, DataFetcher
+from indico.web.http_api.ical import ICalSerializer
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.fossilize import fossilize, IFossil
 from indico.util.fossilize.conversion import Conversion
+
 from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink
@@ -34,6 +38,40 @@ from MaKaC.plugins.Collaboration.fossils import ICollaborationMetadataFossil
 
 
 globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook', 'VideoEventHook']
+
+
+def serialize_collaboration_alarm(fossil, now):
+    alarm = ical.Alarm()
+    trigger = "-PT" + str(fossil['alarm']) + "M"  # iCalendar spec for pre-event trigger
+    alarm.set('trigger', trigger)
+    alarm.set('action', 'DISPLAY')
+    alarm.set('summary', "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title'].decode('utf-8'))
+    alarm.set('description', str(fossil['url']))
+    return alarm
+
+
+def serialize_collaboration(fossil, now):
+    event = ical.Event()
+    url = str(fossil['url'])
+    event.set('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
+    event.set('dtstamp', now)
+    event.set('dtstart', fossil['startDate'])
+    event.set('dtend', fossil['endDate'])
+    event.set('url', url)
+    event.set('categories', "VideoService - " + fossil['type'])
+    event.set('summary', "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title'].decode('utf-8'))
+    event.set('description', url)
+
+    # If there is an alarm required, add a subcomponent to the Event
+    if fossil.has_key('alarm'):
+        event.add_component(serialize_collaboration_alarm(fossil, now))
+
+    return event
+
+
+# the iCal serializer needs some extra info on how to display things
+ICalSerializer.register_mapper('collaborationMetadata', serialize_collaboration)
+
 
 class CollaborationAPIHook(HTTPAPIHook):
     PREFIX = 'api'
@@ -104,11 +142,13 @@ class CollaborationExportHook(HTTPAPIHook):
                 }
 
 
-""" This has been defined as a separate hook to CollaborationExportHook et al
+class VideoEventHook(HTTPAPIHook):
+    """
+    This has been defined as a separate hook to CollaborationExportHook et al
     due to the different input expected for both. It would be beneficial to
     find a way to amalgamate the two at a later date.
-"""
-class VideoEventHook(HTTPAPIHook):
+    """
+
     TYPES = ('video', )
     RE = r'(?P<idlist>\w+(?:-\w+)*)'
     DEFAULT_DETAIL = 'all'
@@ -224,4 +264,3 @@ class VideoEventFetcher(DataFetcher):
 
         for booking in self._process(_iter_bookings(bookings), filter, iface):
             yield booking
-
