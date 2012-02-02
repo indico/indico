@@ -245,7 +245,7 @@ def handler(req, **params):
                 req.headers_out['Content-Type'] = 'text/plain'
             else:
                 req.headers_out['Content-Type'] = serializer.getMIMEType()
-
+            print resultFossil
             return serializer(resultFossil)
         except:
             logger.exception('Serialization error in request %s?%s' % (path, query))

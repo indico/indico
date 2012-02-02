@@ -379,6 +379,7 @@ class DataFetcher(object):
         return fossil
 
     def _process(self, iterator, filter=None, iface=None):
+        print 'process'
         if iface is None:
             iface = self.DETAIL_INTERFACES.get(self._detail)
             if iface is None:
@@ -510,6 +511,7 @@ class CategoryEventFetcher(DataFetcher):
         return self._process(iters, filter)
 
     def event(self, idlist):
+        print 'event'
         ch = ConferenceHolder()
 
         def _iterate_objs(objIds):

@@ -25,11 +25,10 @@ from MaKaC.conference import ConferenceHolder
 from MaKaC.review import AbstractStatusSubmitted
 
 """
-Propose  to be accepted the abstracts with status submitted of a track
+Change all submitted abstracts to "propose to be accepted" status
 """
 
 DBMgr.getInstance().startRequest()
-error = False
 
 confId = '149557'
 trackId = '3'
@@ -45,8 +44,4 @@ for abstract in track.getAbstractList():
     if isinstance(abstract.getCurrentStatus(), AbstractStatusSubmitted):
         abstract.proposeToAccept(user, track, contribType)
 
-if not error:
-    DBMgr.getInstance().endRequest()
-    print "No error. The change are saved"
-else:
-    print "There were errors. The changes was not saved"
+DBMgr.getInstance().endRequest()

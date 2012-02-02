@@ -465,12 +465,13 @@ class UserSetPersistentSignatures(LoggedOnlyService):
         ak = self._avatar.getAPIKey()
         if ak and ak.isBlocked():
             raise ServiceAccessError((_("The API Key is blocked")))
-    def _getAnswer( self):
+
+    def _getAnswer(self):
         ak = self._avatar.getAPIKey()
         ak.setPersistentAllowed(not ak.isPersistentAllowed())
         return ak.isPersistentAllowed()
 
-class UserCreateKeyAndEnablePersistentSignatures(LoggedOnlyService):
+class UserCreateKeyEnablePersistent(LoggedOnlyService):
 
     def _checkParams(self):
         LoggedOnlyService._checkParams(self)
@@ -507,5 +508,5 @@ methodMap = {
     "setPersonalData": UserSetPersonalData,
     "syncPersonalData": UserSyncPersonalData,
     "togglePersistentSignatures": UserSetPersistentSignatures,
-    "createKeyAndEnablePersistent": UserCreateKeyAndEnablePersistentSignatures
+    "createKeyAndEnablePersistent": UserCreateKeyEnablePersistent
 }

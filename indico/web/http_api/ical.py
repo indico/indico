@@ -51,27 +51,25 @@ class vRecur(ical.vRecur):
 ical.cal.types_factory['recur'] = vRecur
 
 
-@staticmethod
-def serialize_conference(fossil, now):
+def serialize_event(self, fossil, now, id_prefix="indico-event"):
     event = ical.Event()
-    event.set('uid', 'indico-event-%s@cern.ch' % fossil['id'])
+    event.set('uid', '%s-%s@cern.ch' % (id_prefix, fossil['id']))
     event.set('dtstamp', now)
     event.set('dtstart', fossil['startDate'])
     event.set('dtend', fossil['endDate'])
     event.set('url', fossil['url'])
-    event['summary'] = fossil['title']
-    loc = fossil['location'] or ''
+    event.set('summary', fossil['title'].decode('utf-8'))
+    loc = fossil['location'].decode('utf-8') or ''
     if fossil['room']:
-        loc += ' ' + fossil['room']
-    event['location'] = loc
+        loc += ' ' + fossil['room'].decode('utf-8')
+    event.set('location', loc)
     if fossil['description']:
-        event['description'] = fossil['description'] + '\n' + fossil['url']
+        event.set('description', fossil['description'].decode('utf-8') + '\n' + fossil['url'])
     else:
-        event['description'] = fossil['url']
+        event.set('description', fossil['url'])
     return event
 
 
-@staticmethod
 def serialize_repeatability(startDT, endDT, repType):
     intervals = { RepeatabilityEnum.onceAWeek: 1, RepeatabilityEnum.onceEvery2Weeks: 2, RepeatabilityEnum.onceEvery3Weeks: 3 }
     recur = ical.vRecur()
@@ -95,8 +93,8 @@ def serialize_reservation(fossil, now):
     event.set('dtend', datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].time()))
     event.set('url', fossil['bookingUrl'])
     event.set('summary', fossil['reason'])
-    event['location'] = fossil['location'] + ': ' + fossil['room']['fullName']
-    event['description'] = fossil['reason'] + '\n' + fossil['bookingUrl']
+    event.set('location', fossil['location'].decode('utf-8') + ': ' + fossil['room']['fullName'].decode('utf-8'))
+    event.set('description', fossil['reason'].decode('utf-8') + '\n' + fossil['bookingUrl'])
     rrule = None
     if fossil['repeatability'] is not None:
         rrule = serialize_repeatability(fossil['startDT'], fossil['endDT'], RepeatabilityEnum.shortname2rep[fossil['repeatability']])
@@ -105,14 +103,22 @@ def serialize_reservation(fossil, now):
     return event
 
 
+def serialize_contribs(fossil, now):
+    for sfossil in fossil['contributions']:
+        if sfossil['startDate']:
+            sfossil['id'] = "%s-%s" % (fossil['id'], sfossil['id'])
+            cal.add_component(serialize_event(sfossil, now, id_prefix="indico-contribution"))
+
+
 class ICalSerializer(Serializer):
 
     schemaless = False
     _mime = 'text/calendar'
 
     _mappers = {
-        'conferenceMetadata': serialize_conference,
-        'reservationMetadata': serialize_reservation
+        'conferenceMetadata': serialize_event,
+        'reservationMetadata': serialize_reservation,
+        'conferenceMetadataWithContribs': serialize_contribs
     }
 
     @classmethod

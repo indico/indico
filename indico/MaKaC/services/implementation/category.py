@@ -335,6 +335,6 @@ methodMap = {
     "protection.changeContactInfo": CategoryContactInfoModification,
     "protection.removeManager": CategoryRemoveControlUser,
     "protection.addExistingConfCreator": CategoryAddExistingControlUser,
-    "protection.removeConfCreator": CategoryRemoveControlUser
+    "protection.removeConfCreator": CategoryRemoveControlUser,
     "api.getExportURLs": CategoryExportURLs
     }

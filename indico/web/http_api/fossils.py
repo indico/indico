@@ -258,6 +258,11 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
         pass
     getType.convert = lambda t: t and t.getName()
 
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHContributionDisplay)
+    getLocator.name = 'url'
+
 
 class ISubContributionMetadataFossil(IFossil):
 
