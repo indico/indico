@@ -228,11 +228,11 @@ class BookingsIndex(Persistent):
         else:
             maxKey = None
 
-            if grouped:
-                return self._conferenceStartDateIndex._getBookingsGroupedByStartDate(minKey, maxKey, conferenceId,
+        if grouped:
+            return self._conferenceStartDateIndex._getBookingsGroupedByStartDate(minKey, maxKey, conferenceId,
                                                                                      categoryId, tz, dateFormat)
-            else:
-                return self._conferenceStartDateIndex.getBookings(minKey, maxKey, conferenceId, dateFormat)
+        else:
+            return self._conferenceStartDateIndex.getBookings(minKey, maxKey, conferenceId, categoryId)
 
     def dump(self):
         return {"creationDate": self._creationDateIndex.dump(),

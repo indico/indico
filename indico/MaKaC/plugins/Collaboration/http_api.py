@@ -40,17 +40,17 @@ from MaKaC.plugins.Collaboration.fossils import ICollaborationMetadataFossil
 globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook', 'VideoEventHook']
 
 
-def serialize_collaboration_alarm(fossil, now):
+def serialize_collaboration_alarm(cal, fossil, now):
     alarm = ical.Alarm()
     trigger = "-PT" + str(fossil['alarm']) + "M"  # iCalendar spec for pre-event trigger
     alarm.set('trigger', trigger)
     alarm.set('action', 'DISPLAY')
     alarm.set('summary', "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title'].decode('utf-8'))
     alarm.set('description', str(fossil['url']))
-    return alarm
+    cal.add_component(alarm)
 
 
-def serialize_collaboration(fossil, now):
+def serialize_collaboration(cal, fossil, now):
     event = ical.Event()
     url = str(fossil['url'])
     event.set('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
@@ -65,8 +65,7 @@ def serialize_collaboration(fossil, now):
     # If there is an alarm required, add a subcomponent to the Event
     if fossil.has_key('alarm'):
         event.add_component(serialize_collaboration_alarm(fossil, now))
-
-    return event
+    cal.add_component(event)
 
 
 # the iCal serializer needs some extra info on how to display things
@@ -159,6 +158,7 @@ class VideoEventHook(HTTPAPIHook):
         'mcu': 50000,
         'evo': 50000
     }
+    GUEST_ALLOWED = False
 
     def _getParams(self):
         super(VideoEventHook, self)._getParams()

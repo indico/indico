@@ -51,7 +51,7 @@ class vRecur(ical.vRecur):
 ical.cal.types_factory['recur'] = vRecur
 
 
-def serialize_event(self, fossil, now, id_prefix="indico-event"):
+def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event = ical.Event()
     event.set('uid', '%s-%s@cern.ch' % (id_prefix, fossil['id']))
     event.set('dtstamp', now)
@@ -67,7 +67,7 @@ def serialize_event(self, fossil, now, id_prefix="indico-event"):
         event.set('description', fossil['description'].decode('utf-8') + '\n' + fossil['url'])
     else:
         event.set('description', fossil['url'])
-    return event
+    cal.add_component(event)
 
 
 def serialize_repeatability(startDT, endDT, repType):
@@ -85,7 +85,7 @@ def serialize_repeatability(startDT, endDT, repType):
     return recur
 
 
-def serialize_reservation(fossil, now):
+def serialize_reservation(cal, fossil, now):
     event = ical.Event()
     event.set('uid', 'indico-resv-%s@cern.ch' % fossil['id'])
     event.set('dtstamp', now)
@@ -100,14 +100,14 @@ def serialize_reservation(fossil, now):
         rrule = serialize_repeatability(fossil['startDT'], fossil['endDT'], RepeatabilityEnum.shortname2rep[fossil['repeatability']])
     if rrule:
         event.set('rrule', rrule)
-    return event
+    cal.add_component(event)
 
 
-def serialize_contribs(fossil, now):
+def serialize_contribs(cal, fossil, now):
     for sfossil in fossil['contributions']:
         if sfossil['startDate']:
             sfossil['id'] = "%s-%s" % (fossil['id'], sfossil['id'])
-            cal.add_component(serialize_event(sfossil, now, id_prefix="indico-contribution"))
+            serialize_event(cal, sfossil, now, id_prefix="indico-contribution")
 
 
 class ICalSerializer(Serializer):
@@ -135,8 +135,8 @@ class ICalSerializer(Serializer):
         cal.set('prodid', '-//CERN//INDICO//EN')
         now = datetime.datetime.utcnow()
         for fossil in results:
-            mapper = ICalSerializer.mappers.get(fossil['_fossil'])
+            mapper = ICalSerializer._mappers.get(fossil['_fossil'])
             if mapper:
-                cal.add_component(mapper(fossil, now))
+                mapper(cal, fossil, now)
 
         return cal.to_ical()

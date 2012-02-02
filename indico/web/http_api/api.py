@@ -194,6 +194,7 @@ class HTTPAPIHook(object):
 
     def __call__(self, aw, req):
         """Perform the actual exporting"""
+        print 'HERE', self.GUEST_ALLOWED
         if self.HTTP_POST != (req.method == 'POST'):
             raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), apache.HTTP_METHOD_NOT_ALLOWED)
         self._getParams()
@@ -379,7 +380,6 @@ class DataFetcher(object):
         return fossil
 
     def _process(self, iterator, filter=None, iface=None):
-        print 'process'
         if iface is None:
             iface = self.DETAIL_INTERFACES.get(self._detail)
             if iface is None:
