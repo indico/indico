@@ -72,7 +72,7 @@ else:
         % endif
 
         % if showExportToICal:
-            <a id="exportIcal" href="#">${ _("iCal export") }</a>
+            <a id="exportIcal${self_._conf.getUniqueId()}" href="#" class="exportIcal" data-id="${self_._conf.getUniqueId()}">${ _("iCal export") }</a>
             <%include file="ConferenceICalExport.tpl"/>
         % endif
 

@@ -183,6 +183,7 @@ class WCategoryDisplay(wcomponents.WTemplated):
             vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
             vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
             user  = self._aw.getUser()
+            vars["currentUser"]= user
             apiKey = user.getAPIKey() if user else None
             requestURLs = {}
             urls = generate_public_auth_request(apiMode, apiKey, '/export/categ/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())

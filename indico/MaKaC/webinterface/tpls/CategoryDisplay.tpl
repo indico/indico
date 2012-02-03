@@ -11,7 +11,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
             <li><a href="${ urlHandlers.UHCategoryDisplay.getURL(categ.owner) }">${ _("Go to parent category") }</a>|</li>
         % endif
             % if categ.conferences:
-                <li><a id="exportIcal" href="#" class="fakelink">${ _("iCal export")}</a>|</li>
+                <li><a id="exportIcal${categ.getUniqueId()}" href="#" class="fakelink exportIcal" data-id="${categ.getUniqueId()}">${ _("iCal export")}</a>|</li>
                 <%include file="CategoryICalExport.tpl"/>
             % endif
         <li><a id="moreLink" class="dropDownMenu" href="#">${ _("View") }</a></li>
