@@ -5986,11 +5986,12 @@ ul.authorList {
 
 div.UnscheduledContribListDiv {
     margin-bottom: 10px;
-    height:200px;
-    width: 300px;
+    height:300px;
+    width: 400px;
     border: 1px solid #CCCCCC;
     overflow: auto;
     margin-top: 10px;
+    margin-right: 35px;
 }
 
 ul.UnscheduledContribList {

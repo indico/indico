@@ -199,6 +199,23 @@ type("SelectableListWidget", ["ListWidget"],
                 }
             });
             this.selectedList.clear();
+
+            if (exists(self.selectedObserver)) {
+                self.selectedObserver(self.selectedList);
+            }
+        },
+
+        selectAll: function() {
+            var self = this;
+            each(self.domList, function(listItem) {
+                listItem.dom.className = self.selectedCssClass;
+            });
+            each(self, function(value, key) {
+                self.selectedList.set(key, value);
+            });
+            if (exists(self.selectedObserver)) {
+                self.selectedObserver(self.selectedList);
+            }
         },
 
         /**
