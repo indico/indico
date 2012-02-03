@@ -21,11 +21,11 @@
 </div>
 
 <div id="publicLinkWrapper"  class="iCalExportSection" style="display:none">
-    <div class="exportIcalHeader">${_('Link for public events only:')}</div>
+    <div class="exportIcalHeader">${_('Link for public information only:')}</div>
 </div>
 
-<div id="authLinkWrapper" class="iCalExportSection">
-    <div class="exportIcalHeader">${_('Link for all public and private events:')}</div>
+<div id="authLinkWrapper" class="iCalExportSection" style="display:none">
+    <div class="exportIcalHeader">${_('Link for all public and protected information:')}</div>
 </div>
 
 

@@ -14,7 +14,7 @@
          </a>
     </div>
 
-    <div id="iCalSeparator" class="icalSeparator"></div>
+    <div id="iCalSeparator" class="icalSeparator" style="display:none"></div>
 
     <%include file="ICalExportCommon.tpl"/>
     <div style="display:none">

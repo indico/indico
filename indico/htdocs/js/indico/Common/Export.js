@@ -68,24 +68,24 @@ type("ExportIcalInterface", [], {
             if(publicLink) $('#publicLinkWrapper').append($("#publicLink")).show();
             self._showAuthLink();
         }else{
-            $('#authLinkWrapper').append($("#agreementPersistentSignatures"));
+            $('#authLinkWrapper').append($("#agreementPersistentSignatures")).show();
         }
     },
 
     _postAcceptAgreements: function(targetAgreement){
-        $('#authLinkWrapper').append($("#authLink"));
+        $('#authLinkWrapper').append($("#authLink")).show();
         $('#extraInformation').insertAfter('#authLinkWrapper');
         $(targetAgreement).hide();
     },
 
     _showAuthLink: function(){
-        $('#authLinkWrapper').append($("#authLink"));
+        $('#authLinkWrapper').append($("#authLink")).show();
         $('#extraInformation').insertAfter('#authLinkWrapper');
     },
 
     _showAgreement: function(agreementTarget){
         $('#extraInformation').insertAfter('#publicLinkWrapper');
-        $('#authLinkWrapper').append($(agreementTarget));
+        $('#authLinkWrapper').append($(agreementTarget)).show();
     },
 
     getAgreementMethod: function(){
@@ -161,6 +161,7 @@ type("ExportIcalInterface", [], {
                 } else{
                     self._showAgreement('#agreementApiKey');
                 }
+                $('#iCalSeparator').show();
             }
             break;
         case 1://API_MODE_ONLYKEY
@@ -169,8 +170,9 @@ type("ExportIcalInterface", [], {
                     $('#publicLinkWrapper').append($("#publicLink")).show();
                     self._showAuthLink();
                 } else{
-                    $('#authLinkWrapper').append($("#agreementApiKey"));
+                    $('#authLinkWrapper').append($("#agreementApiKey")).show();
                 }
+                $('#iCalSeparator').show();
             }
             break;
         case 2://API_MODE_SIGNED
@@ -181,14 +183,14 @@ type("ExportIcalInterface", [], {
                 } else{
                     self._showAgreement('#agreementApiKey');
                     if(self.persistentAllowed){
-                        $('#authLinkWrapper').append($("#agreementPersistentSignatures"));
+                        $('#authLinkWrapper').append($("#agreementPersistentSignatures")).show();
                     }
                 }
             }
             else {
                 $('#extraInformation').insertAfter('#publicLinkWrapper');
             }
-
+            $('#iCalSeparator').show();
             break;
         case 3://API_MODE_ONLYKEY_SIGNED
             if(self.userLogged){
@@ -198,9 +200,10 @@ type("ExportIcalInterface", [], {
                 } else{
                     $('#publicLinkWrapper').append($("#agreementApiKey")).show();
                     if(self.persistentAllowed){
-                        $('#authLinkWrapper').append($("#agreementPersistentSignatures"));
+                        $('#authLinkWrapper').append($("#agreementPersistentSignatures")).show();
                     }
                 }
+                $('#iCalSeparator').show();
             }
             break;
         case 4://API_MODE_ALL_SIGNED
@@ -213,7 +216,9 @@ type("ExportIcalInterface", [], {
                         $('#authLinkWrapper').append($("#agreementPersistentSignatures"));
                     }
                 }
-            }            break;
+                $('#iCalSeparator').show();
+            }
+            break;
     };
 
 });
