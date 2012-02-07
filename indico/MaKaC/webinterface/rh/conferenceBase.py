@@ -209,6 +209,8 @@ class RHSubmitMaterialBase(object):
             with open(fileName, 'wb') as f:
                 shutil.copyfileobj(fd, f)
             self._tempFiles[fd] = fileName
+            # queue file for deletion at end of request
+            self._tempFilesToDelete.append(fileName)
         return self._tempFiles[fd]
 
     def _checkProtection(self):
@@ -262,7 +264,6 @@ class RHSubmitMaterialBase(object):
                     else:
                         fDict["filePath"] = self._saveFileToTemp(fileUpload.file)
                         fDict["size"] = os.path.getsize(fDict["filePath"])
-                        self._tempFilesToDelete.append(fDict["filePath"])
 
                     self._setErrorList(fDict)
                     self._files.append(fDict)
