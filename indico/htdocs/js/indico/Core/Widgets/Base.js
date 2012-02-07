@@ -199,10 +199,6 @@ type("SelectableListWidget", ["ListWidget"],
                 }
             });
             this.selectedList.clear();
-
-            if (exists(self.selectedObserver)) {
-                self.selectedObserver(self.selectedList);
-            }
         },
 
         selectAll: function() {

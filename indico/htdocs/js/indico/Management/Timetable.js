@@ -20,6 +20,10 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
 
             selectNone.observeClick(function(){
                 self.clearSelection();
+
+                if (exists(self.selectedObserver)) {
+                    self.selectedObserver(self.selectedList);
+                }
             });
 
             return [selectBar, this.SelectableListWidget.prototype.draw.call(this)];
