@@ -308,10 +308,7 @@ class DataFetcher(object):
         if rel == 'abs':
             return tz.localize(value) if not value.tzinfo else value
         elif rel == 'ctx' and type(value) == timedelta:
-            if ctx == 'from':
-                value = nowutc() + value
-            else:
-                value = aux + value
+            value = nowutc() + value
 
         # from here on, 'value' has to be a datetime
         if ctx == 'from':
