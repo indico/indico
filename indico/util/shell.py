@@ -1,5 +1,5 @@
 import sys, getopt, logging, argparse, urlparse, re
-from IPython.Shell import IPShellEmbed
+
 from wsgiref.simple_server import make_server, WSGIServer, WSGIRequestHandler
 from wsgiref.util import shift_path_info
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
@@ -17,6 +17,15 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
 
+try:
+    from IPython.frontend.terminal.embed import InteractiveShellEmbed
+    from IPython.config.loader import Config as IPConfig
+    OLD_IPYTHON = False
+except ImportError:
+    # IPython <0.12
+    from IPython.Shell import IPShellEmbed
+    OLD_IPYTHON = True
+
 
 def add(namespace, element, name=None, doc=None):
 
@@ -33,6 +42,7 @@ def add(namespace, element, name=None, doc=None):
 
 class ThreadedWSGIServer(ThreadingMixIn, WSGIServer):
      pass
+
 
 def refServer(host='localhost', port=8000):
     """
@@ -111,10 +121,17 @@ def main():
 
         namespace = setupNamespace(dbi)
 
-        ipshell = IPShellEmbed(remainingArgs,
-                               banner='Indico Shell',
-                               exit_msg='Good luck',
-                               user_ns=namespace)
+        if OLD_IPYTHON:
+            ipshell = IPShellEmbed(remainingArgs,
+                                   banner='Indico Shell',
+                                   exit_msg='Good luck',
+                                   user_ns=namespace)
+        else:
+            config = IPConfig()
+            ipshell = InteractiveShellEmbed(config=config,
+                                            banner1='Indico Shell',
+                                            exit_msg='Good luck',
+                                            user_ns=namespace)
 
         ipshell()
 
