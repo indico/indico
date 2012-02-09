@@ -29,9 +29,8 @@ import pytz
 import re
 import types
 import urllib
-from zope.interface import Interface, implements
 from ZODB.POSException import ConflictError
-from datetime import datetime, timedelta, date, time
+from datetime import datetime, timedelta, time
 
 # indico imports
 from indico.util.date_time import nowutc
@@ -45,21 +44,22 @@ from indico.web.http_api.atom import AtomSerializer
 from indico.web.http_api.fossils import IConferenceMetadataFossil,\
     IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil,\
     IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil,\
-    ICategoryProtectedMetadataFossil
+    ICategoryProtectedMetadataFossil, ISessionMetadataFossil, ISessionMetadataWithContributionsFossil,\
+    ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil,\
+    IContributionMetadataWithSubContribsFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
 
 # indico legacy imports
 from MaKaC.common.db import DBMgr
 from MaKaC.conference import CategoryManager
-from MaKaC.common.db import DBMgr
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.rb_tools import Period, datespan
 
-from indico.web.http_api.util import get_query_parameter, remove_lists
+from indico.web.http_api.util import get_query_parameter
 
 utc = pytz.timezone('UTC')
 MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
@@ -517,6 +517,90 @@ class CategoryEventFetcher(DataFetcher):
         def _iterate_objs(objIds):
             for objId in objIds:
                 obj = ch.getById(objId, True)
+                if obj is not None:
+                    yield obj
+
+        return self._process(_iterate_objs(idlist))
+
+class SessionContribHook(HTTPAPIHook):
+    DEFAULT_DETAIL = 'contributions'
+    MAX_RECORDS = {
+        'contributions': 500,
+        'subcontributions': 500,
+    }
+
+    def _getParams(self):
+        super(SessionContribHook, self)._getParams()
+        self._idList = self._pathParams['idlist'].split('-')
+        self._eventId = self._pathParams['event']
+
+    @classmethod
+    def _matchPath(cls, path):
+        if not hasattr(cls, '_RE'):
+            cls._RE = re.compile(r'/' + cls.PREFIX + '/event/' + cls.RE + r'\.(\w+)$')
+        return cls._RE.match(path)
+
+    def export_session(self, aw):
+        expInt = SessionFetcher(aw, self)
+        return expInt.session(self._idList)
+
+    def export_contribution(self, aw):
+        expInt = ContributionFetcher(aw, self)
+        return expInt.contribution(self._idList)
+
+class SessionContribFetcher(DataFetcher):
+
+    def __init__(self, aw, hook):
+        super(SessionContribFetcher, self).__init__(aw, hook)
+        self._eventId = hook._eventId
+
+@HTTPAPIHook.register
+class SessionHook(SessionContribHook):
+    RE = r'(?P<event>[\w\s]+)/session/(?P<idlist>\w+(?:-\w+)*)'
+
+    def _getParams(self):
+        super(SessionHook, self)._getParams()
+        self._type = 'session'
+
+class SessionFetcher(SessionContribFetcher):
+    DETAIL_INTERFACES = {
+        'contributions': ISessionMetadataWithContributionsFossil,
+        'subcontributions': ISessionMetadataWithSubContribsFossil,
+    }
+
+    def session(self, idlist):
+        ch = ConferenceHolder()
+        event = ch.getById(self._eventId)
+
+        def _iterate_objs(objIds):
+            for objId in objIds:
+                obj = event.getSessionById(objId)
+                if obj is not None:
+                    yield obj
+
+        return self._process(_iterate_objs(idlist))
+
+@HTTPAPIHook.register
+class ContributionHook(SessionContribHook):
+    RE = r'(?P<event>[\w\s]+)/contribution/(?P<idlist>\w+(?:-\w+)*)'
+
+    def _getParams(self):
+        super(ContributionHook, self)._getParams()
+        self._type = 'contribution'
+
+class ContributionFetcher(SessionContribFetcher):
+    DETAIL_INTERFACES = {
+        'contributions': IContributionMetadataFossil,
+        'subcontributions': IContributionMetadataWithSubContribsFossil,
+    }
+
+    def contribution(self, idlist):
+        ch = ConferenceHolder()
+        event = ch.getById(self._eventId)
+
+        def _iterate_objs(objIds):
+            for objId in objIds:
+                obj = event.getContributionById(objId)
                 if obj is not None:
                     yield obj
 

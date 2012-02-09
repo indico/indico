@@ -21,6 +21,8 @@
 import urllib
 from xml.sax.saxutils import quoteattr
 from datetime import datetime
+from pytz import timezone
+
 import MaKaC.conference as conference
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.linking as linking
@@ -35,14 +37,16 @@ from MaKaC.common import Config
 from MaKaC.common.utils import isStringHTML, formatDateTime
 from MaKaC.common import info
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
 from MaKaC import user
-from pytz import timezone
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import Avatar, AvatarHolder
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
+
+from indico.util.i18n import i18nformat
+from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+from indico.web.http_api.util import generate_public_auth_request
 
 class WPContributionBase( WPMainBase, WPConferenceBase ):
 
@@ -310,6 +314,26 @@ class WContributionDisplayBase(wcomponents.WTemplated):
             vars["hideInfo"] = False
         vars["showAttachedFiles"] = self._contrib.getConference().getAbstractMgr().showAttachedFilesContribList() and isinstance(self._contrib, conference.AcceptedContribution) and len(self._contrib.getAbstract().getAttachments()) > 0
         vars["abstractAttachments"] = fossilize(self._contrib.getAbstract().getAttachments().values(), ILocalFileAbstractMaterialFossil) if isinstance(self._contrib, conference.AcceptedContribution) else []
+
+        if self._contrib:
+            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+            vars["currentUser"] = self._aw.getUser()
+            vars["icsIconURL"]=str(Config.getInstance().getSystemIconURL("ical_grey"))
+            apiMode = minfo.getAPIMode()
+            vars["apiMode"] = apiMode
+            vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+            vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
+            apiKey = self._aw.getUser().getAPIKey() if self._aw.getUser() else None
+            requestURLs = {}
+            urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s/contribution/%s.ics'%(self._contrib.getConference().getId(), self._contrib.getId()), {}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+            requestURLs["publicRequestURL"] = urls["publicRequestURL"]
+            requestURLs["authRequestURL"] =  urls["authRequestURL"]
+            vars["requestURLs"] = requestURLs
+            vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
+            vars["apiActive"] = apiKey != None
+            vars["userLogged"] = self._aw.getUser() != None
+            vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+
         return vars
 
 
@@ -355,7 +379,10 @@ class WPContributionDisplay( WPContributionDefaultDisplayBase ):
             actionURL=urlHandlers.UHContribToXML.getURL(self._contrib))
         ical=wcomponents.WTBItem( _("get ICal of this contribution"),
             icon=Config.getInstance().getSystemIconURL("ical"),
-            actionURL=urlHandlers.UHContribToiCal.getURL(self._contrib))
+            actionURL="#",
+            className="exportIcal",
+            id=self._contrib.getUniqueId(),
+            elementId="exportIcal%s"%self._contrib.getUniqueId())
         self._toolBar.addItem(edit)
         self._toolBar.addItem(pdf)
         self._toolBar.addItem(xml)
@@ -1176,3 +1203,32 @@ class WPContributionReportNumberEdit(WPContributionModifBase):
     def _getTabContent( self, params):
         wc=wcomponents.WModifReportNumberEdit(self._target, self._reportNumberSystem, "contribution")
         return wc.getHTML()
+
+class WContributionICalExport(wcomponents.WTemplated):
+
+    def __init__(self, contrib, user):
+        self._contrib = contrib
+        self._user = user
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        vars["Contribution"] = self._contrib
+        if self._contrib:
+            vars["currentUser"] = self._user
+            vars["icsIconURL"]=str(Config.getInstance().getSystemIconURL("ical_grey"))
+            apiMode = minfo.getAPIMode()
+            vars["apiMode"] = apiMode
+            vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+            vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
+            apiKey = self._user.getAPIKey() if self._user else None
+            requestURLs = {}
+            urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s/contribution/%s.ics'%(self._contrib.getConference().getId(), self._contrib.getId()), {}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+            requestURLs["publicRequestURL"] = urls["publicRequestURL"]
+            requestURLs["authRequestURL"] =  urls["authRequestURL"]
+            vars["requestURLs"] = requestURLs
+            vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
+            vars["apiActive"] = apiKey != None
+            vars["userLogged"] = self._user != None
+            vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+        return vars

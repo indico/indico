@@ -21,6 +21,7 @@ from MaKaC.services.implementation import session as sessionServices
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common.utils import getHierarchicalId, formatTime, formatDateTime, parseDate
 from MaKaC.common.contextManager import ContextManager
+import MaKaC.common.info as info
 from MaKaC.errors import TimingError
 from MaKaC.fossils.schedule import ILinkedTimeSchEntryMgmtFossil, IBreakTimeSchEntryMgmtFossil, \
         IContribSchEntryMgmtFossil
@@ -31,6 +32,9 @@ from MaKaC.common import timezoneUtils
 from MaKaC.common.Conversion import Conversion
 from MaKaC.schedule import BreakTimeSchEntry
 from MaKaC.conference import SessionSlot, Material, Link
+from MaKaC.webinterface.pages.sessions import WSessionICalExport
+from MaKaC.webinterface.pages.contributions import WContributionICalExport
+from indico.web.http_api.util import generate_public_auth_request
 
 import time, datetime, pytz, copy
 
@@ -1274,6 +1278,67 @@ class SessionSlotEditRoomLocation(EditRoomLocationBase, sessionServices.SessionS
         return result
 
 
+class SessionGetExportPopup(conferenceServices.ConferenceDisplayBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceDisplayBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        sessionId = pm.extract("sessionId", str, False, "")
+        self._session = self._conf.getSessionById(sessionId)
+
+    def _getAnswer(self):
+        return WSessionICalExport( self._session, self._getUser() ).getHTML().replace("\n","")
+
+class SessionExportURLs(conferenceServices.ConferenceDisplayBase, base.ExportToICalBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceDisplayBase._checkParams(self)
+        base.ExportToICalBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._sessionId = pm.extract("sessionId", str, False, "")
+
+    def _getAnswer(self):
+        result = {}
+
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s/session/%s.ics'%(self._target.getId(), self._sessionId), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        result["publicRequestURL"] = urls["publicRequestURL"]
+        result["authRequestURL"] =  urls["authRequestURL"]
+
+        return result
+
+
+class ContributionGetExportPopup(conferenceServices.ConferenceDisplayBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceDisplayBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        contribId = pm.extract("contribId", str, False, "")
+        self._contribution = self._conf.getContributionById(contribId)
+
+    def _getAnswer(self):
+        return WContributionICalExport( self._contribution, self._getUser() ).getHTML().replace("\n","")
+
+class ContributionExportURLs(conferenceServices.ConferenceDisplayBase, base.ExportToICalBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceDisplayBase._checkParams(self)
+        base.ExportToICalBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._contribId = pm.extract("contribId", str, False, "")
+
+    def _getAnswer(self):
+        result = {}
+
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s/contribution/%s.ics'%(self._target.getId(), self._contribId), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        result["publicRequestURL"] = urls["publicRequestURL"]
+        result["authRequestURL"] =  urls["authRequestURL"]
+
+        return result
+
 methodMap = {
     "get": ConferenceGetSchedule,
 
@@ -1327,5 +1392,10 @@ methodMap = {
 
     "event.editRoomLocation": EventEditRoomLocation,
     "session.editRoomLocation": SessionEditRoomLocation,
-    "slot.editRoomLocation": SessionSlotEditRoomLocation
+    "slot.editRoomLocation": SessionSlotEditRoomLocation,
+
+    "api.getSessionExportPopup": SessionGetExportPopup,
+    "api.getSessionExportURLs": SessionExportURLs,
+    "api.getContribExportPopup": ContributionGetExportPopup,
+    "api.getContribExportURLs": ContributionExportURLs
 }

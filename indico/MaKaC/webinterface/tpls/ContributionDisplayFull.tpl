@@ -183,7 +183,7 @@
     </td>
 </tr>
 </table>
-
+<%include file="ContributionICalExport.tpl"/>
 <script type="text/javascript">
 /**
  * Builds the 'link' to show and hide the reviewing history.

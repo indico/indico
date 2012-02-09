@@ -2881,6 +2881,9 @@ class WTBItem:
         self.actionURL = args.get("actionURL", "")
         self.enabled = args.get("enabled", 1)
         self.subItems = []
+        self.id = args.get("id", "")
+        self.elementId = args.get("elementId", "")
+        self.className = args.get("className", "")
 
     def getCaption(self):
         return self.caption
@@ -2938,6 +2941,15 @@ class WTBItem:
         self.owner = owner
         for item in self.getItemList():
             item.setOwner( self.owner )
+
+    def getId(self):
+        return self.id
+
+    def getElementId(self):
+        return self.elementId
+
+    def getClassName(self):
+        return self.className
 
 
 class WTBSeparator(WTBItem):
@@ -4828,32 +4840,15 @@ class WConfModMoveContribsToSessionConfirmation(WTemplated):
         return vars
 
 
-class WConfTBDrawer:
+class WConfTBDrawer(WTemplated):
 
     def __init__(self,tb):
         self._tb=tb
 
-    def getHTML(self):
-        if self._tb is None:
-            return ""
-        res=[]
-        for item in self._tb.getItemList():
-            if not item.isEnabled():
-                continue
-            res.append("""
-                    <td align="right" nowrap><a href=%s><img src=%s alt=%s></a></td>
-                        """%(quoteattr(str(item.getActionURL())),
-                            quoteattr(str(item.getIcon())),
-                            quoteattr(item.getCaption())))
-        if res != []:
-            return """
-                <table cellpadding="0" cellspacing="1">
-                    <tr>
-                        %s
-                    </tr>
-                </table>
-                    """%("".join(res))
-        return ""
+    def getVars(self):
+        vars=WTemplated.getVars(self)
+        vars["items"] = [item for item in self._tb.getItemList() if item.isEnabled()]
+        return vars
 
 class WErrorMessage :
 

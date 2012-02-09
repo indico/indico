@@ -122,6 +122,10 @@ class IBreakTimeSchEntryMgmtFossil(IBreakTimeSchEntryFossil):
 
 class IContribSchEntryFossil(ISchEntryFossil):
 
+    def getUniqueId(self):
+        """ Unique Id """
+    getUniqueId.produce = lambda s: s.getOwner().getUniqueId()
+
     def getEntryType(self):
         """ Entry Type """
     getEntryType.produce = lambda s: "Contribution"
@@ -282,6 +286,9 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
         """ Inherited Room """
     getInheritRoom.produce = lambda x: x.getOwner().getOwnRoom() is None
 
+    def getUniqueId(self):
+        """ Unique Id """
+    getUniqueId.produce = lambda s: s.getOwner().getSession().getUniqueId()
 
 class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
 
