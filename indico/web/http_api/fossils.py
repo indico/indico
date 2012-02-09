@@ -291,6 +291,7 @@ class IConferenceMetadataWithContribsFossil(_IncludeMaterialFossil, IConferenceM
         pass
     getContributionList.result = IContributionMetadataFossil
     getContributionList.name = 'contributions'
+    getContributionList.filterBy = 'access'
 
 
 class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
@@ -299,6 +300,7 @@ class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferen
         pass
     getContributionList.result = IContributionMetadataWithSubContribsFossil
     getContributionList.name = 'contributions'
+    getContributionList.filterBy = 'access'
 
 
 class ISessionMetadataFossil(ISessionFossil):
@@ -307,6 +309,7 @@ class ISessionMetadataFossil(ISessionFossil):
         pass
     getContributionList.result = IContributionMetadataWithSubContribsFossil
     getContributionList.name = 'contributions'
+    getContributionList.filterBy = 'access'
 
 
 class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
@@ -315,8 +318,10 @@ class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceM
         pass
     getSessionList.result = ISessionMetadataFossil
     getSessionList.name = 'sessions'
+    getSessionList.filterBy = 'access'
 
     def getContributionListWithoutSessions(self):
         pass
     getContributionListWithoutSessions.result = IContributionMetadataWithSubContribsFossil
     getContributionListWithoutSessions.name = 'contributions'
+    getContributionListWithoutSessions.filterBy = 'access'

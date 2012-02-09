@@ -255,6 +255,9 @@ class DataFetcher(object):
     def getAllowedFormats(cls):
         return Serializer.getAllFormats()
 
+    def _userAccessFilter(self, obj):
+        return obj.canAccess(self._aw)
+
     @classmethod
     def _parseDateTime(cls, dateTime, allowNegativeOffset):
         """
@@ -380,7 +383,8 @@ class DataFetcher(object):
             if iface is None:
                 raise HTTPAPIError('Invalid detail level: %s' % self._detail, apache.HTTP_BAD_REQUEST)
         for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
-            yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ), iface)
+            yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
+                                                   filters={'access': self._userAccessFilter}), iface)
 
 
 @HTTPAPIHook.register
@@ -481,7 +485,6 @@ class CategoryEventFetcher(DataFetcher):
             fossil['occurrences'] = fossilize(itertools.ifilter(
                 lambda x: x.startDT >= startDT and x.endDT <= endDT, self._eventDaysIterator(obj)),
                                              {Period: IPeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
-
         return fossil
 
     def category(self, idlist):

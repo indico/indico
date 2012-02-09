@@ -32,6 +32,7 @@ import inspect
 import re
 import zope.interface
 from types import NoneType
+from itertools import ifilter
 
 
 def fossilizes(*classList):
@@ -201,7 +202,7 @@ class Fossilizable(object):
 
 
     @classmethod
-    def fossilizeIterable(cls, target, interface, useAttrCache = False, **kwargs):
+    def fossilizeIterable(cls, target, interface, useAttrCache=False, filterBy=None, **kwargs):
         """
         Fossilizes an object, be it a 'direct' fossilizable
         object, or an iterable (dict, list, set);
@@ -220,12 +221,15 @@ class Fossilizable(object):
                                                **kwargs)
                 return container
             elif hasattr(target, '__iter__'):
+                if filterBy:
+                    iterator = ifilter(filterBy, target)
+                else:
+                    iterator = iter(target)
                 # we turn sets and tuples into lists since JSON does not
                 # have sets / tuples
                 return list(fossilize(elem,
                                       interface,
-                                      useAttrCache,
-                                      **kwargs) for elem in target)
+                                      useAttrCache, **kwargs) for elem in iterator)
             # If the object is a wrapper for an iterable, by default we fossilize
             # the iterable the object is wrapping. This behaviour is included in
             # order to let objects like legacy PersistentLists to be fossilized
@@ -301,13 +305,25 @@ class Fossilizable(object):
                         cls.__fossilAttrsCache[obj._p_oid] = {}
                     cls.__fossilAttrsCache[obj._p_oid][method] = methodResult
 
+            if 'filterBy' in tags:
+                if 'filters' not in kwargs:
+                    raise Exception('No filters defined!')
+                filterName = interface[method].getTaggedValue('filterBy')
+
+                if filterName in kwargs['filters']:
+                    filterBy = kwargs['filters'][filterName]
+                else:
+                    raise Exception("No filter '%s' defined!" % filterName)
+            else:
+                filterBy = None
+
             # Result conversion
             if 'result' in tags:
                 targetInterface = interface[method].getTaggedValue('result')
                 #targetInterface = globals()[targetInterfaceName]
 
                 methodResult = Fossilizable.fossilizeIterable(
-                    methodResult, targetInterface, **kwargs)
+                    methodResult, targetInterface, filterBy=filterBy, **kwargs)
 
             # Conversion function
             if 'convert' in tags:

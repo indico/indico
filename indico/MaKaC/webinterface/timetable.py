@@ -428,9 +428,6 @@ class Day(object):
             # for slot in self.getSlotList():
                 # slot.mapEntry( entry )
 
-        # import rpdb2
-        # rpdb2.start_embedded_debugger("xxxx")
-
          # to be MUCH optimised
         for entry in l:
             if entry.inDay(self.getDate()):
