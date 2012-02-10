@@ -5727,9 +5727,6 @@ class Session(CommonObjectBase, Locatable):
             ses.addLocation(self.getOwnLocation().clone())
         if self.getOwnRoom() is not None:
             ses.setRoom(self.getOwnRoom().clone())
-        for conv in self.getConvenerList():
-            ses.addConvener(conv.clone())
-        ses.setConvenerText(self.getConvenerText())
         ses.setColor(self.getColor())
         ses.setTextColor(self.getTextColor())
         ses.setTextColorToLinks(self.isTextColorToLinks())

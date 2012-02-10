@@ -688,27 +688,11 @@ class WSessionModifMain(wcomponents.WTemplated):
         self._session = session
         self._mfr = mfRegistry
 
-    def _getConvenersHTML(self):
-        res=[]
-        for conv in self._session.getConvenerList():
-            url=urlHandlers.UHSessionModConvenerEdit.getURL(conv)
-            res.append("""
-                <input type="checkbox" name="selConv" value=%s> <a href=%s>%s</a>
-                """%(quoteattr(str(conv.getId())),\
-                    quoteattr(str(url)), \
-                    self.htmlText(conv.getFullName())))
-        return "<br>".join(res)
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["addMaterialURL"]=urlHandlers.UHSessionAddMaterial.getURL(self._session)
         vars["removeMaterialsURL"]=urlHandlers.UHSessionRemoveMaterials.getURL()
 
-        newConvenerURL = urlHandlers.UHSessionDataModificationNewConvenerCreate.getURL(self._session)
-        vars["newConvenerURL"] = newConvenerURL
-        searchConvenerURL = urlHandlers.UHSessionDataModificationNewConvenerSearch.getURL(self._session)
-        vars["searchConvenerURL"] = searchConvenerURL
-        vars["remConvenersURL"]=quoteattr(str(urlHandlers.UHSessionModConvenersRem.getURL(self._session)))
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHSessionDataModification.getURL(self._session)))
         vars["code"]=self.htmlText(self._session.getCode())
         vars["title"]=self._session.getTitle()
@@ -727,10 +711,8 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["place"]+="<i>Room:</i> %s"%self.htmlText(room.getName())
         vars["startDate"],vars["endDate"],vars["duration"]="","",""
         if self._session.getAdjustedStartDate() is not None:
-            tz = self._session.getTimezone()
             vars["startDate"]=self.htmlText(self._session.getAdjustedStartDate().strftime("%A %d %B %Y %H:%M"))
             vars["endDate"]=self.htmlText(self._session.getAdjustedEndDate().strftime("%A %d %B %Y %H:%M"))
-        vars["conveners"]=self._getConvenersHTML()
         vars["bgcolor"] = self._session.getColor()
         vars["textcolor"] = self._session.getTextColor()
         vars["entryDuration"]=self.htmlText((datetime(1900,1,1)+self._session.getContribDuration()).strftime("%Hh%M'"))

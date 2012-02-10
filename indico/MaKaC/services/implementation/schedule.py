@@ -254,20 +254,6 @@ class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionService
 
 class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.ConferenceModifBase, LocationSetter):
 
-    def __addConveners(self, session):
-
-        for convenerValues in self._conveners:
-
-            convener = conference.SessionChair()
-            DictPickler.update(convener, convenerValues)
-
-            session.addConvener(convener)
-            if convenerValues.get('email','').strip() != '':
-                session._addCoordinatorEmail(convenerValues['email'])
-            if convenerValues.has_key("submission") and \
-                convenerValues['submission'] :
-                session.grantModification(convener)
-
     def __addConveners2Slot(self, slot):
         for convenerValues in self._conveners:
             convener = conference.SlotChair()
@@ -328,7 +314,6 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         slot.setDuration(dur=dur)
         session.addSlot(slot)
 
-        self.__addConveners(session)
         self.__addConveners2Slot(slot)
         self._setLocationInfo(session)
 
