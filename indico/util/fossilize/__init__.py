@@ -207,7 +207,6 @@ class Fossilizable(object):
         Fossilizes an object, be it a 'direct' fossilizable
         object, or an iterable (dict, list, set);
         """
-
         if isinstance(target, Fossilizable):
             return target.fossilize(interface, useAttrCache, **kwargs)
         else:
@@ -250,10 +249,10 @@ class Fossilizable(object):
 
     def fossilize(self, interfaceArg=None, useAttrCache=False, **kwargs):
         return self.fossilize_obj(self, interfaceArg=interfaceArg, useAttrCache=useAttrCache,
-                           **kwargs)
+                                  **kwargs)
 
     @classmethod
-    def fossilize_obj(cls, obj, interfaceArg=None, useAttrCache=False, **kwargs):
+    def fossilize_obj(cls, obj, interfaceArg=None, useAttrCache=False, mapClassType={}, **kwargs):
         """
         Fossilizes the object, using the fossil provided by `interface`.
 
@@ -323,7 +322,7 @@ class Fossilizable(object):
                 #targetInterface = globals()[targetInterfaceName]
 
                 methodResult = Fossilizable.fossilizeIterable(
-                    methodResult, targetInterface, filterBy=filterBy, **kwargs)
+                    methodResult, targetInterface, filterBy=filterBy, mapClassType=mapClassType, **kwargs)
 
             # Conversion function
             if 'convert' in tags:
@@ -368,7 +367,7 @@ class Fossilizable(object):
             raise InvalidFossilException('"_type" or "_fossil"'
                                          ' cannot be a fossil attribute  name')
         else:
-            result["_type"] = obj.__class__.__name__
+            result["_type"] = mapClassType.get(obj.__class__.__name__, obj.__class__.__name__)
             if fossilName:  #we check that it's not an empty string
                 result["_fossil"] = fossilName
             else:
