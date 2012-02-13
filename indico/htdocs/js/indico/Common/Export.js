@@ -233,9 +233,11 @@ type("ExportIcalInterface", [], {
 
 });
 
-var createExportPopup = function(elementId, exportId, eventType){
 
-    $("#"+elementId).qtip({
+var exportPopups= {};
+
+$(function() {
+    $(".exportIcal").qtip({
 
         style: {
             width: '300px',
@@ -248,16 +250,16 @@ var createExportPopup = function(elementId, exportId, eventType){
         },
         position: {
             my: 'top center',
-            at: 'bottom center',
+            at: 'bottom center'
         },
-        content: $('#icalExportPopup'+exportId),
-        show: {
-            event: eventType,
-            effect: function() {
-                $(this).show('slide', {direction: 'up'});
+        content: function(api){
+            return $('#icalExportPopup'+this[0].getAttribute("data-id"));
             },
-            target: $("#"+elementId),
-            ready: true
+        show: {
+            event: "click",
+            effect: function() {
+                $(this).fadeIn(300);
+            }
         },
         hide: {
             event: 'unfocus click',
@@ -265,17 +267,7 @@ var createExportPopup = function(elementId, exportId, eventType){
             effect: function() {
                 $(this).fadeOut(300);
             }
-        },
-    });
-
-};
-
-var exportPopups= {};
-
-$(function() {
-
-    $('body').delegate('.exportIcal','click',function(e){
-        createExportPopup(this.id, this.dataset.id ,e.type);
+        }
     });
 
     $('body').delegate('.apiURL','click',function(e){
@@ -283,28 +275,28 @@ $(function() {
     });
 
     $('body').delegate('.agreementButtonPersistent','click',function(e){
-        $('#progressPersistentSignatures'+this.dataset.id).html($(progressIndicator(true, false).dom));
-        exportPopups[this.dataset.id].enablePersistentSignatures();
+        $('#progressPersistentSignatures'+this.getAttribute('data-id')).html($(progressIndicator(true, false).dom));
+        exportPopups[this.getAttribute('data-id')].enablePersistentSignatures();
     });
 
     $('body').delegate('.agreementButtonKey','click',function(e){
-        exportPopups[this.dataset.id].createKey(false, '#progressPersistentKey'+this.dataset.id);
+        exportPopups[this.getAttribute('data-id')].createKey(false, '#progressPersistentKey'+this.getAttribute('data-id'));
     });
 
     $('body').delegate('.agreeCheckBoxKey','click',function(e){
         if(this.checked){
-            $('#agreementButtonKey'+this.dataset.id).removeAttr("disabled");
+            $('#agreementButtonKey'+this.getAttribute('data-id')).removeAttr("disabled");
         }else{
-            $('#agreementButtonKey'+this.dataset.id).attr("disabled","disabled");
+            $('#agreementButtonKey'+this.getAttribute('data-id')).attr("disabled","disabled");
         }
     });
 
     $('body').delegate('.agreeCheckBoxPersistent','click',function(e){
         if(this.checked){
-            $('#agreementButtonPersistent'+this.dataset.id).removeAttr("disabled");
-            $('#agreeCheckBoxKey'+this.dataset.id)[0].checked = true;
+            $('#agreementButtonPersistent'+this.getAttribute('data-id')).removeAttr("disabled");
+            $('#agreeCheckBoxKey'+this.getAttribute('data-id'))[0].checked = true;
         }else{
-            $('#agreementButtonPersistent'+this.dataset.id).attr("disabled","disabled");
+            $('#agreementButtonPersistent'+this.getAttribute('data-id')).attr("disabled","disabled");
         }
     });
 });
