@@ -77,7 +77,7 @@ from MaKaC.plugins.base import OldObservable
 from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
-from MaKaC.conference import Minutes
+from MaKaC.conference import Minutes, Session, Contribution
 from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.plugins.helpers import DBHelpers
@@ -1042,10 +1042,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             vars['category'] = ''
 
         timezoneUtil = DisplayTZ(accessWrapper, conf)
-        timezone = timezoneUtil.getDisplayTZ()
-        vars['startDate'] = conf.getAdjustedStartDate(timezone)
-        vars['endDate'] = conf.getAdjustedEndDate(timezone)
-        vars['timezone'] = timezone
+        tz = timezoneUtil.getDisplayTZ()
+        vars['startDate'] = conf.getAdjustedStartDate(tz)
+        vars['endDate'] = conf.getAdjustedEndDate(tz)
+        vars['timezone'] = tz
 
         if conf.getParticipation().displayParticipantList() :
             vars['participants']  = conf.getParticipation().getPresentParticipantListText()
@@ -1086,8 +1086,23 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
         vars['entries'] = []
         confSchedule = conf.getSchedule()
-        entrylist = confSchedule.getEntries()
+        showSession = self._params.get("showSession","")
+        detailLevel = self._params.get("detailLevel", "contribution")
+        showDate = self._params.get("showDate", "all")
+        # Filter by day
+        if showDate == "all":
+            entrylist = confSchedule.getEntries()
+        else:
+            entrylist = confSchedule.getEntriesOnDay(timezone(tz).localize(stringToDate(showDate)))
+        # Check entries filters and access rights
         for entry in entrylist:
+            sessionCand = entry.getOwner().getOwner()
+            # Filter by session
+            if isinstance(sessionCand, Session) and (showSession != "all" and sessionCand.getId() != showSession):
+                continue
+            # Hide/Show contributions
+            if isinstance(entry.getOwner(), Contribution) and detailLevel != "contribution":
+                continue
             if entry.getOwner().canView(accessWrapper):
                 if type(entry) is schedule.BreakTimeSchEntry:
                     newItem = entry
