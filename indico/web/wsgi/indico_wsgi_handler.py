@@ -354,8 +354,9 @@ class SimulatedModPythonRequest(object):
                 if not self.__write_error:
                     self.__write(self.__buffer)
             except IOError, err:
-                if "failed to write data" in str(err) \
-                       or "client connection closed" in str(err):
+                if "failed to write data" in str(err):
+                    self.__write_error = True
+                elif "client connection closed" in str(err):
                     registerException()
                     # do not over-report error
                     self.__write_error = True
@@ -456,8 +457,9 @@ class SimulatedModPythonRequest(object):
                         self.__write(chunk[:the_len])
                         break
         except IOError, err:
-            if "failed to write data" in str(err) or \
-                   "client connection closed" in str(err):
+            if "failed to write data" in str(err):
+                pass
+            elif "client connection closed" in str(err):
                 registerException()
             else:
                 raise
