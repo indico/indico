@@ -61,17 +61,17 @@ Request Signing
 To sign a request, you need the following:
 
 * The requested path, e.g. */export/categ/123.json*
-* Any additional params, e.g. *nocache=yes&limit=10*
+* Any additional params, e.g. *limit=10*
 * The current UNIX timestamp
 * You *API key* and *secret key*
 
-1) Add your API key to the params (*nocache=yes&limit=10&ak=your-api-key*)
-2) Add the current timestamp to the params (*nocache=yes&limit=10&ak=your-api-key&timestamp=1234567890*)
-3) Sort the query string params (*ak=your-api-key&limit=10&nocache=yes&timestamp=1234567890*)
-4) Merge path and the sorted query string to a single string (*/export/categ/123.json?ak=your-api-key&limit=10&nocache=yes&timestamp=1234567890*)
+1) Add your API key to the params (*limit=10&ak=your-api-key*)
+2) Add the current timestamp to the params (*limit=10&ak=your-api-key&timestamp=1234567890*)
+3) Sort the query string params (*ak=your-api-key&limit=10&timestamp=1234567890*)
+4) Merge path and the sorted query string to a single string (*/export/categ/123.json?ak=your-api-key&limit=10&timestamp=1234567890*)
 5) Create a HMAC-SHA1 signature of this string using your *secret key* as
    the key.
-6) Append the hex-encoded signature to your query string: *?ak=your-api-key&limit=10&nocache=yes&timestamp=1234567890&signature=your-signature*
+6) Append the hex-encoded signature to your query string: *?ak=your-api-key&limit=10&timestamp=1234567890&signature=your-signature*
 
 Note that a signed request might be valid only for a few seconds or
 minutes, so you **need** to sign it right before sending it and not store
@@ -118,7 +118,6 @@ A simple example in Python::
         SECRET_KEY = '00000000-0000-0000-0000-000000000000'
         PATH = '/export/categ/1337.json'
         PARAMS = {
-            'nocache': 'yes',
             'limit': 123
         }
         print build_indico_request(PATH, PARAMS, API_KEY, SECRET_KEY)
@@ -160,7 +159,6 @@ A simple example in PHP::
         $SECRET_KEY = '00000000-0000-0000-0000-000000000000';
         $PATH = '/export/categ/1337.json';
         $PARAMS = array(
-            'nocache' => 'yes',
             'limit' => 123
         );
         echo build_indico_request($PATH, $PARAMS, $API_KEY, $SECRET_KEY) . "\n";
