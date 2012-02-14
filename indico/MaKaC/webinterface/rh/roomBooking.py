@@ -1212,7 +1212,8 @@ class RHRoomBookingBookingDetails( RHRoomBookingBase ):
         locator = locators.WebLocator()
         locator.setRoomBooking( params )
         self._resv = self._target = locator.getObject()
-
+        if not self._resv:
+            raise NoReportError("""The specified booking with id "%s" does not exist or has been deleted""" % params["resvID"])
         self._afterActionSucceeded = self._websession.getVar( "actionSucceeded" )
         self._title = self._websession.getVar( "title" )
         self._description = self._websession.getVar( "description" )
