@@ -34,6 +34,8 @@ class InvenioSEA(base.SearchEngineAdapter):
         Currently used at CERN.
     """
 
+    _protocol = 'https'
+
     def getRequestAddress(self):
         return Config.getInstance().getIndicoSearchServer() + "/search"
 

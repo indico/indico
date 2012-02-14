@@ -94,7 +94,7 @@ class SearchResult(object):
             return target.canView(user)
         else:
             Logger.get('search').warning("referenced element %s does not exist!" % self.getCompoundId())
-            
+
             return False
 
     def getConference(self):
@@ -105,7 +105,7 @@ class SearchResult(object):
 
     @classmethod
     def create(cls, id, title, location, startDate, materials, authors, description):
-        
+
         regexp = r'^INDICO\.(\w+)(\.(\w+)(\.(\w)+)?)?$'
 
         m = re.match(regexp, str(id))
@@ -147,12 +147,12 @@ class ContributionEntry(SearchResult):
 
         if not conference:
             return None
-        
+
         return conference.getContributionById(self.getId())
 
 
 class SubContributionEntry(SearchResult):
-    
+
     def __init__(self, id, title, location, startDate, materials, authors, description, parent, conference):
         SearchResult.__init__(self, id, title, location, startDate, materials, authors, description)
 
@@ -188,7 +188,7 @@ class SubContributionEntry(SearchResult):
 
         if not contribution:
             return None
-                
+
         return contribution.getSubContributionById(self.getId())
 
 class ConferenceEntry(SearchResult):
@@ -207,16 +207,18 @@ class ConferenceEntry(SearchResult):
 
     def getTarget(self):
         return self.getConference()
-    
 
-class SearchEngineAdapter:        
+
+class SearchEngineAdapter(object):
     """
         The basic search engine adapter.
         It should be overloaded by the specific SEA class for
         the required search engine.
         See invenioSEA.py for an example.
     """
-    
+
+    _protocol = 'http'
+
     def getRequestAddress(self):
         """
             To be overloaded...
@@ -230,21 +232,21 @@ class SearchEngineAdapter:
             @return: the number of search hits
         """
         pass
-    
+
     def getAllowedParams(self):
         """
             @return: the parameters which the search engine accepts
         """
         return globals()['_SearchEngineAdapter__allowedParams']
-    
+
     def addParameters(self, params):
         """
             To be overloaded. Adds parameters to the already existing
             ones (at the end of parameter translation).
-            
+
             @param params: the already translated request parameters
             @type params: dictionary
-            
+
             @return: the parameters, with the added parameter(s)
         """
         pass
@@ -254,7 +256,7 @@ class SearchEngineAdapter:
         pass
 
     def _fetchResults(self, service, parameters):
-        url = 'http://'+self.getRequestAddress()+'?'+urlencode(parameters)
+        url = self._protocol + '://'+self.getRequestAddress()+'?'+urlencode(parameters)
 
         req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
         document = urllib2.urlopen(req)
@@ -279,7 +281,7 @@ class SearchEngineAdapter:
                         values.append(kwargs[field])
                     else:
                         values.append('')
-            
+
                 retArgs = transFunction(self, *values)
 
                 if type(outArg) is tuple :
@@ -299,18 +301,18 @@ class SearchEngineAdapter:
         return self.addParameters(finalArgs)
 
 
-    
+
     def process(self,**kwargs):
         """
             Do not overload this unless you know what you're doing.
             The main processing cycle. Translates the search request parameters
             from the web interface to those of the target search engine.
-            
-            @param kwargs: Input parameters            
-            
+
+            @param kwargs: Input parameters
+
         """
 
-        Logger.get('search.SEA').debug('Translating parameters...')        
+        Logger.get('search.SEA').debug('Translating parameters...')
         finalArgs = self.translateParameters(kwargs)
 
         Logger.get('search.SEA').debug('Fetching results...')
@@ -326,14 +328,14 @@ class SearchEngineAdapter:
 
 def SEATranslator(origFields, fieldType, output):
     """
-        Decorator, for easy addition of translation functions to the table.        
+        Decorator, for easy addition of translation functions to the table.
     """
-    
+
     def factory(method):
         ttable = globals()['_SearchEngineAdapter__translationTable']
         allowedParams = globals()['_SearchEngineAdapter__allowedParams']
-        
-        if not ttable.has_key(output):        
+
+        if not ttable.has_key(output):
             ttable[output] = []
 
         ttable[output].append((origFields,method));
@@ -342,7 +344,5 @@ def SEATranslator(origFields, fieldType, output):
             allowedParams.extend(origFields)
         else:
             allowedParams.append(origFields)
-        
+
     return factory
-    
-        
