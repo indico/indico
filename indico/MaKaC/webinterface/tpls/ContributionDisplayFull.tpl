@@ -55,6 +55,17 @@
                 % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
             ${ additionalFields }
                 % endif
+        % if showAttachedFiles:
+            <tr>
+                <td align="right" valign="top"
+                    class="displayField"><b>${ _("Abstract files")}:</b></td>
+                <td>
+                % for file in abstractAttachments:
+                    <div style="padding-bottom:3px;"><a href=${ file["url"] }>${ file["file"]["fileName"] }</a></div>
+                % endfor
+                </td>
+            </tr>
+        % endif
         <tr>
           <td align="right" valign="top" class="displayField"><b>${ _("Id")}:</b></td>
               <td>${ id }</td>

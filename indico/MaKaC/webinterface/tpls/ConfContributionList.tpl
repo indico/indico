@@ -64,6 +64,10 @@
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ sessionImg }<a href=${ sessionSortingURL }> ${ _("Session")}</a> </td>
                     ${ trackHeader }
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> ${ _("Files")}</td>
+                    % if showAttachedFiles:
+                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> ${ _("Abstracts")}</td>
+                    % endif
+
                 </tr>
                 <form action=${ contribSelectionAction } method="post" target="_blank">
                 ${ contributions }

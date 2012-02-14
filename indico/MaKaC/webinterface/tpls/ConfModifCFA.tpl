@@ -78,9 +78,17 @@
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Misc. Options")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
-            <a href="${ multipleUrl }"><img src="${ multipleIcon }" border="0"> ${ _("Allow multiple tracks selection") }</a>
-            <br/><a href="${ mandatoryUrl }"><img src="${ mandatoryIcon }" border="0"> ${ _("Make track selection mandatory") }</a>
-            <br/><a href="${ attachUrl }"><img src="${ attachIcon }" border="0"> ${ _("Allow to attach files") }</a>
+            <a href="${ multipleUrl }"><img src="${ iconEnabled if multipleTracks else iconDisabled }" border="0"> ${ _("Allow multiple tracks selection") }</a>
+            <br/><a href="${ mandatoryUrl }"><img src="${ iconEnabled if areTracksMandatory else iconDisabled }" border="0"> ${ _("Make track selection mandatory") }</a>
+            <br/><a href="${ attachUrl }"><img src="${ iconEnabled if canAttachFiles else iconDisabled }" border="0"> ${ _("Allow to attach files") }</a>
+            <br/><a href="${ showSpeakerUrl }"><img src="${ iconEnabled if showSelectAsSpeaker else iconDisabled }" border="0"> ${ _("Allow to choose the presenter(s) of the abstracts") }</a>
+            <% makeMandSpk = _("Make mandatory the selection of at least one author as presenter") %>
+            % if showSelectAsSpeaker:
+                <br/><a href="${ speakerMandatoryUrl }"><img src="${ iconEnabled if isSelectSpeakerMandatory else iconDisabled }" border="0"> ${makeMandSpk}</a>
+            % else:
+                <br/><img src="${ iconDisabled }" border="0"> <span id="makePresenterMandatory" style="color:#777"> ${makeMandSpk}</span>
+            % endif
+            <br/><a href="${ showAttachedFilesUrl }" id="showAttachedFiles" data-active="${'yes' if showAttachedFilesContribList else 'no'}"><img src="${ iconEnabled if showAttachedFilesContribList else iconDisabled }" border="0"> ${ _("Show files attached to abstracts in the contribution list") }</a>
         </td>
     </tr>
     </tr>
@@ -107,12 +115,21 @@
     </tr>
 </table>
 <br>
-
-<script>
+<script type="text/javascript">
 
 var lateSubmissionAuthUsers = new ListOfUsersManager('${ confId }',
     {'addExisting': 'abstracts.lateSubmission.addExistingLateAuthUser', 'remove': 'abstracts.lateSubmission.removeLateAuthUser'},
     {'confId': '${ confId }'}, $E('inPlaceUsers'), "user", "UIPerson", false, {}, {title: false, affiliation: false, email:true},
     {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ lateAuthUsers | n,j});
 
+IndicoUI.executeOnLoad(function(){
+    $('#makePresenterMandatory').qtip({content: "${_('This option is automatically disabled when the option \'Allow to choose the presenter(s) of the abstracts\' is also disabled')}", position: {my: 'top middle', at: 'bottom middle'}});
+    $('#showAttachedFiles').click(function(){
+        if(this.dataset.active=='no'){
+            return confirm($T("Please, note that if you enable this option the files (attached to the abstracts) will be public and accessible by everybody. Are you sure to continue?"));
+        }
+        return true;
+
+    })
+});
 </script>

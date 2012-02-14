@@ -284,11 +284,11 @@ function onsubmitManagementActions() {
 }
 
 function onsubmitDisplayActions() {
-    if (checkFields() && hasPresenter()) {
+    if (checkFields() && ((hasPresenter() && ${jsonEncode(showSelectAsSpeaker)} && ${jsonEncode(isSelectSpeakerMandatory)}) || ${jsonEncode(not showSelectAsSpeaker)} || ( ${jsonEncode(showSelectAsSpeaker)} && ${jsonEncode(not isSelectSpeakerMandatory)} ))) {
         setAuthorsParam();
         return true;
     } else {
-        if (authorsManager.getPrAuthors().getUsersList().length.get() != 0 && !hasPresenter()) {
+        if (authorsManager.getPrAuthors().getUsersList().length.get() != 0 && !hasPresenter() && ${jsonEncode(showSelectAsSpeaker)} && ${jsonEncode(isSelectSpeakerMandatory)} ) {
             var popup = new AlertPopup($T('Submitting an abstract'), $T('You have to select at least one author as presenter.'));
             popup.open();
         }
@@ -309,7 +309,7 @@ var initialPrAuthors = ${ jsonEncode(prAuthors) };
 var initialCoAuthors = ${ jsonEncode(coAuthors) };
 
 // manage both lists of authors.
-var authorsManager = new AuthorsManager(initialPrAuthors, initialCoAuthors);
+var authorsManager = new AuthorsManager(initialPrAuthors, initialCoAuthors, ${jsonEncode(showSelectAsSpeaker)});
 
 function setAuthorsParam() {
     var usersList = authorsManager.getPrAuthors().getUsersList();

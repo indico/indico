@@ -40,24 +40,6 @@ ${ Colors }
 <tr>
   <td colspan="3" class="horizontalLine">&nbsp;</td>
 </tr>
-<tr>
-  <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Default conveners")}</span></td>
-  <td colspan="2">
-      <table width="100%">
-          <tr>
-              <td style="width: 80%"><ul id="inPlaceConveners" class="UIPeopleList"></ul></td>
-              <td nowrap valign="top" style="width: 20%; text-align:right;">
-                  <span id="inPlaceConvenersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                      <a class="dropDownMenu fakeLink" onclick="convenerManager.addManagementMenu();">${ _("Add convener")}</a>
-                  </span>
-              </td>
-          </tr>
-       </table>
-   </td>
-</tr>
-<tr>
-  <td colspan="3" class="horizontalLine">&nbsp;</td>
-</tr>
 </table>
 
 <script>

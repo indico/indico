@@ -21,28 +21,12 @@
         </tr>
         <!-- <Date and time> -->
         <tr>
-            <td rowspan="2" nowrap class="titleCellTD"><span class="titleCellFormat">Dates</span><br></td>
-            <td class="contentCellTD">
-                ${ _("The lecture will take place in")}
-                <select id="nbDates"  name="nbDates" onChange="javascript:nbDatesChanged();">
-                    <option value="1"> 1 </option>
-                    <option value="2"> 2 </option>
-                    <option value="3"> 3 </option>
-                    <option value="4"> 4 </option>
-                    <option value="5"> 5 </option>
-                    <option value="6"> 6 </option>
-                    <option value="7"> 7 </option>
-                    <option value="8"> 8 </option>
-                    <option value="9"> 9 </option>
-                </select>
-                ${ _("date(s)")}
-            </td>
-        </tr>
-        <tr>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Date(s)")}</span><br></td>
             <td class="contentCellTD">
                 <div id="datesContainer">
                     <!-- Filled through DOM manipulation   -->
                 </div>
+                <input type="hidden" id="nbDates" name="nbDates" value="1">
             </td>
         </tr>
         <!-- </Date and time> -->
@@ -67,7 +51,7 @@
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td class="contentCellTD" style="font-style: italic; padding-top: 10px;"><span id="advancedOptionsText" class="fakeLink" onclick="showAdvancedOptions()">&nbsp;</span></td>
+            <td class="contentCellTD" style="font-style: italic; padding-top: 10px;"><span id="advancedOptionsText" class="fakeLink">&nbsp;</span></td>
         </tr>
 
         <tr id="advancedOptions" style="display:none"><td colspan="2">
@@ -114,19 +98,6 @@
 <%include file="EventCreationJS.tpl"/>
 
 <script  type="text/javascript">
-
-    var advOptSwitch = true;
-    function showAdvancedOptions() {
-        if (advOptSwitch) {
-            $E("advancedOptions").dom.style.display = "none";
-            $E("advancedOptionsText").set('${ _("Show advanced options...")}');
-        }else {
-            $E("advancedOptions").dom.style.display = "";
-            $E("advancedOptionsText").set('${ _("Hide advanced options...")}');
-        }
-        advOptSwitch = !advOptSwitch;
-    }
-
     //---- chairperson management
 
     var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
@@ -158,24 +129,24 @@
     IndicoUI.executeOnLoad(function()
     {
 
-        nbDatesChanged();
+        initializeDatesContainer();
 
         showAdvancedOptions();
 
         if ("${categ["id"]}" != ""){
-            $E("buttonCategChooser").set("${ _("Change...")}");
+            $E("buttonCategChooser").set($T('Change...'));
         }
 
         protectionChooserExecOnLoad("${categ["id"]}", "${protection}");
 
         injectValuesInForm($E('eventCreationForm'),function() {
-                if (!verifyDates()) {
-                    var popup = new ErrorPopup("Invalid dates", ["${ _("Dates have an invalid format: dd/mm/yyyy hh:mm")}"], "");
+                if (!verifyLectureDates()) {
+                    var popup = new ErrorPopup("Invalid dates", [$T('Dates have an invalid format: dd/mm/yyyy hh:mm')], "");
                     popup.open();
                     return false
                 }
                 if ($E("createCategId").get() == "") {
-                    var popup = new ErrorPopup("${ _("Missing mandatory data")}", ["${ _("Please, choose a category (step 1)")}"], "");
+                    var popup = new ErrorPopup($T('Missing mandatory data'), [$T('Please, choose a category (step 1)')], "");
                     popup.open();
                     return false;
                 }
@@ -188,7 +159,7 @@
                 return false;
         });
 
-        verifyDates();
+        verifyLectureDates();
 
 
     var editor = new ParsedRichTextWidget(500, 200,"", "rich", "IndicoMinimal");

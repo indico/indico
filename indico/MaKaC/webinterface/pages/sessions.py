@@ -689,15 +689,6 @@ class WSessionModifMain(wcomponents.WTemplated):
         self._session = session
         self._mfr = mfRegistry
 
-    def _getConvenerList(self):
-        result = []
-        for convener in self._session.getConvenerList():
-            convFossil = fossilize(convener)
-            convFossil["isManager"] = convener.isSessionManager()
-            convFossil["isCoordinator"] = convener.isSessionCoordinator()
-            result.append(convFossil)
-        return result
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["addMaterialURL"]=urlHandlers.UHSessionAddMaterial.getURL(self._session)
@@ -721,7 +712,6 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["place"]+="<i>Room:</i> %s"%self.htmlText(room.getName())
         vars["startDate"],vars["endDate"],vars["duration"]="","",""
         if self._session.getAdjustedStartDate() is not None:
-            tz = self._session.getTimezone()
             vars["startDate"]=self.htmlText(self._session.getAdjustedStartDate().strftime("%A %d %B %Y %H:%M"))
             vars["endDate"]=self.htmlText(self._session.getAdjustedEndDate().strftime("%A %d %B %Y %H:%M"))
         vars["bgcolor"] = self._session.getColor()

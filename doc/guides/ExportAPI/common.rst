@@ -24,5 +24,6 @@ detail      d      Specify the detail level (values depend on the exported
 order       o      Sort the results. Must be one of *id*, *start*, *end*,
                    *title*.
 descending  c      Sort the results in descending order when set to *yes*.
-tz          `-`    Use the given timezone when returning time information.
+tz          `-`    Assume given timezone (default UTC) for specified dates.
+                   Example: ``Europe/Lisbon``.
 ==========  =====  =======================================================

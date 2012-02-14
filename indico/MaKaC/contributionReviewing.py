@@ -1055,48 +1055,76 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
             if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
                 self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been widthdrawn by the layout reviewer"""
                             % (contribution.getTitle(), str(contribution.getId())))
-                self.setBody("""Dear Indico user,
+                self.setBody("""Dear Author,
 
-        The judgement for your contribution "%s" (id: %s) has been widthdrawn by the assigned layout reviewer.
+        The assigned layout reviewer has reviewed your paper
+
+        "%s" (id: %s)
+
+        submitted for
+
+        "%s"
+
         The judgement was: %s
 
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement())
+        Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
+        """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
         )
             else:
                 self.setSubject("""[Indico] The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn"""
                             % (contribution.getTitle(), str(contribution.getId())))
-                self.setBody("""Dear Indico user,
+                self.setBody("""Dear Author,
 
-        The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn.
+        The assigned layout reviewer has reviewed your paper
+
+        "%s" (id: %s)
+
+        submitted for
+
+        "%s"
+
         The judgement was: %s
 
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement())
+        Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
+        """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
         )
 
         elif isinstance(judgement, ReviewerJudgement):
             self.setSubject("""[Indico] The judgement for the content of your contribution "%s" (id: %s) has been widthdrawn"""
                             % (contribution.getTitle(), str(contribution.getId())))
-            self.setBody("""Dear Indico user,
+            self.setBody("""Dear Author,
 
-        The judgement for the content of your contribution "%s" (id: %s) has been widthdrawn.
+        The assigned content reviewer has reviewed your paper
+
+        "%s" (id: %s)
+
+        submitted for
+
+        "%s"
+
         The judgement was: %s
 
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement())
+        Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
+        """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
         )
 
         elif isinstance(judgement, RefereeJudgement):
             self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been widthdrawn by the referee"""
                             % (contribution.getTitle(), str(contribution.getId())))
-            self.setBody("""Dear Indico user,
+            self.setBody("""Dear Author,
 
-        The judgement for your contribution "%s" (id: %s) has been widthdrawn by the assigned referee.
+        The assigned referee has reviewed your paper
+
+        "%s" (id: %s)
+
+        submitted for
+
+        "%s"
+
         The judgement was: %s
 
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement())
+        Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
+        """  % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
         )
 
 class MaterialsSubmittedNotification(GenericNotification):

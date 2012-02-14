@@ -1,7 +1,13 @@
 <%
 owner = conf.getOwnerList()[0]
 
-prev, next, first, last = owner.getNeighborEvents(conf)
+first = owner.getRelativeEvent('first')
+last = owner.getRelativeEvent('last')
+
+if first == conf:
+   first = None
+if last == conf:
+   last = None
 
 # If printURL is set then show the print button
 if printURL is not UNDEFINED:
@@ -36,22 +42,16 @@ else:
         %if first != None:
             <a id="firstEventButton" href="${ urlHandlers.UHConferenceDisplay.getURL(first) }"
                style="background-image: url(${ systemIcon('first_arrow') })"></a>
-        % endif
-
-        %if prev != None:
-            <a id="previousEventButton" href="${ urlHandlers.UHConferenceDisplay.getURL(prev) }"
+            <a id="previousEventButton" href="${ urlHandlers.UHPreviousEvent.getURL(conf) }"
                style="background-image: url(${ systemIcon('left_arrow') })"></a>
         % endif
 
         <a id="upToCategoryButton" href="${ categurl }"
            style="background-image: url(${ systemIcon('upCategory') })"></a>
 
-        %if next != None:
-            <a id="nextEventButton" href="${ urlHandlers.UHConferenceDisplay.getURL(next) }"
-               style="background-image: url(${ systemIcon('right_arrow') })"></a>
-        % endif
-
         %if last != None:
+            <a id="nextEventButton" href="${ urlHandlers.UHNextEvent.getURL(conf) }"
+               style="background-image: url(${ systemIcon('right_arrow') })"></a>
             <a id="lastEventButton" href="${ urlHandlers.UHConferenceDisplay.getURL(last) }"
                style="background-image: url(${ systemIcon('last_arrow') })"></a>
         % endif

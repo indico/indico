@@ -241,7 +241,8 @@ type("AuthorsManager", [], {
 
 },
 
-function(initialPrAuthors, initialCoAuthors) {
+function(initialPrAuthors, initialCoAuthors, showSpeaker) {
+    this.showSpeaker = any(showSpeaker, false);
 	this.root = 'author_';
     this.counter = -1;
     this.prAuthors = new AuthorListManager($E('inPlacePrAuthors'),
@@ -474,31 +475,34 @@ type("AuthorListManager", [], {
             tr.append(td);
 
             // append second tr to allow to add as presenter
-            tr = Html.tr();
-            tbody.append(tr);
-            if (this.usersList.item(i)['isSpeaker']) {
-                var isSpeaker = true;
-                var divClassName = 'divSelected';
-            } else {
-                var isSpeaker = false;
-                var divClassName = 'divNotSelected';
-            }
-            td = Html.td({colspan:'1'});
-            tr.append(td);
-            div = Html.div({id: this.presenterDiv + this.usersList.item(i)['id'], className: divClassName});
-            td.append(div);
-            checkbox = Html.checkbox({id: this.cb + this.usersList.item(i)['id']}, isSpeaker);
-            checkbox.observeClick(function(event) {
-                if (event.target) { // Firefox
-                    var cbId = event.target.id.split('_')[1] + '_' + event.target.id.split('_')[2];
-                } else { // IE
-                    var cbId = event.srcElement.id.split('_')[1] + '_' + event.srcElement.id.split('_')[2];
+            if(this.authorsManager.showSpeaker){
+                tr = Html.tr();
+                tbody.append(tr);
+                if (this.usersList.item(i)['isSpeaker']) {
+                    var isSpeaker = true;
+                    var divClassName = 'divSelected';
+                } else {
+                    var isSpeaker = false;
+                    var divClassName = 'divNotSelected';
                 }
-                self._switchPresenter(cbId);
-            });
-            span = Html.span({}, $T('This author will be also a '), Html.span({style:{fontWeight:'bold'}}, $T('presenter')));
-            div.append(checkbox);
-            div.append(span);
+                td = Html.td({colspan:'1'});
+                tr.append(td);
+                div = Html.div({id: this.presenterDiv + this.usersList.item(i)['id'], className: divClassName});
+                td.append(div);
+
+                    checkbox = Html.checkbox({id: this.cb + this.usersList.item(i)['id']}, isSpeaker);
+                    checkbox.observeClick(function(event) {
+                        if (event.target) { // Firefox
+                            var cbId = event.target.id.split('_')[1] + '_' + event.target.id.split('_')[2];
+                        } else { // IE
+                            var cbId = event.srcElement.id.split('_')[1] + '_' + event.srcElement.id.split('_')[2];
+                        }
+                        self._switchPresenter(cbId);
+                    });
+                    span = Html.span({}, $T('This author will be also a '), Html.span({style:{fontWeight:'bold'}}, $T('presenter')));
+                    div.append(checkbox);
+                    div.append(span);
+            }
             this.inPlaceListElem.append(mainLi);
         }
         if (this.userCaption == 'primary author') {

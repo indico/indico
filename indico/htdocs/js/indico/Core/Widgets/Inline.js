@@ -1568,12 +1568,16 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
 
             _handleDisplayMode: function(value) {
                 if (value) {
-                    this.comments = Html.span({}, value);
-                    return this.comments;
+                    // start by escaping the input
+                    var dummy = $('<span/>').text(value);
+                    value = dummy.html();
+
+                    // now transform double line breaks into paragraphs
+                    value = '<p>' + value.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br/>') + '</p>';
+                    return Html.unescaped.span({}, value);
                 } else {
                     return;
                 }
-
             },
 
             _getNewValue: function() {

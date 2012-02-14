@@ -19,10 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Responsible: Piotr Wlodarek
-"""
-
-"""
 Small functions and classes widely used in Room Booking Module.
 """
 
@@ -98,14 +94,14 @@ def qbeMatch( example, candidate, special, **kwargs ):
 
     for attrName in dir( example ):
         # Skip methods, private attributes and Nones
-        if attrName[0] == '_' or attrName in ['avaibleVC', 'vcList', 'needsAVCSetup', 'verboseEquipment']:
+        if attrName[0] == '_' or attrName in ['avaibleVC', 'vcList', 'needsAVCSetup', 'verboseEquipment',
+                                              'resvStartNotification', 'resvEndNotification']:
             continue
 
-        attrType = eval( 'example.' + attrName + '.__class__.__name__' )
-        if attrType in ['instancemethod', 'staticmethod', 'function' ]:
-            continue
-        exAttrVal = eval( 'example.' + attrName )
-        if exAttrVal == None:
+        exAttrVal = getattr(example, attrName)
+        attrType = exAttrVal.__class__.__name__
+
+        if attrType in ('instancemethod', 'staticmethod', 'function') or exAttrVal == None:
             continue
 
         candAttrVal = eval( 'candidate.' + attrName )
@@ -121,7 +117,7 @@ def qbeMatch( example, candidate, special, **kwargs ):
                 # Exact match
                 areEqual = ( candAttrVal == exAttrVal )
             elif attrType == 'str':
-                areEqual = ( candAttrVal.lower().find( exAttrVal.lower() ) != -1 )
+                areEqual = candAttrVal.lower() == exAttrVal.lower()
             else:
                 raise attrType + ": " + str( candAttrVal ) + " - can not compare"
 

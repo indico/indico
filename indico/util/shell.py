@@ -1,13 +1,5 @@
 import sys, getopt, logging, argparse, urlparse, re
 
-# check for ipython support
-try:
-    from IPython.Shell import IPShellEmbed
-    HAS_IPYTHON = True
-except ImportError:
-    import code
-    HAS_IPYTHON = False
-
 from wsgiref.simple_server import make_server, WSGIServer, WSGIRequestHandler
 from wsgiref.util import shift_path_info
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
@@ -27,6 +19,19 @@ from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
 
+try:
+    HAS_IPYTHON = True
+    from IPython.frontend.terminal.embed import InteractiveShellEmbed
+    from IPython.config.loader import Config as IPConfig
+    OLD_IPYTHON = False
+except ImportError:
+    try:
+        # IPython <0.12
+        from IPython.Shell import IPShellEmbed
+        OLD_IPYTHON = True
+    except ImportError:
+        import code
+        HAS_IPYTHON = False
 
 SHELL_BANNER = '\nindico %s\n' % MaKaC.__version__
 
@@ -46,6 +51,7 @@ def add(namespace, element, name=None, doc=None):
 
 class ThreadedWSGIServer(ThreadingMixIn, WSGIServer):
      pass
+
 
 def refServer(host='localhost', port=8000):
     """
@@ -127,10 +133,17 @@ def main():
         namespace = setupNamespace(dbi)
 
         if HAS_IPYTHON:
-            ipshell = IPShellEmbed(remainingArgs,
+            if OLD_IPYTHON:
+                ipshell = IPShellEmbed(remainingArgs,
                                    banner=SHELL_BANNER,
                                    exit_msg='Good luck',
                                    user_ns=namespace)
+            else:
+                config = IPConfig()
+                ipshell = InteractiveShellEmbed(config=config,
+                                            banner1=SHELL_BANNER,
+                                            exit_msg='Good luck',
+                                            user_ns=namespace)
 
             ipshell()
         else:

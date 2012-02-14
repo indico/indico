@@ -7,6 +7,28 @@ function nullRoomInfo(info) {
 
 type("UnscheduledContributionList", ["SelectableListWidget"],
      {
+        draw: function() {
+            var self = this;
+
+            var selectAll = Html.span('fakeLink', $T('All'));
+            var selectNone = Html.span('fakeLink', $T('None'));
+            var selectBar = Html.div({style: {textAlign:'right', margin: pixels(3)}}, $T('Select: '), selectAll, ', ', selectNone);
+
+            selectAll.observeClick(function(){
+                self.selectAll();
+            });
+
+            selectNone.observeClick(function(){
+                self.clearSelection();
+
+                if (exists(self.selectedObserver)) {
+                    self.selectedObserver(self.selectedList);
+                }
+            });
+
+            return [selectBar, this.SelectableListWidget.prototype.draw.call(this)];
+        },
+
          _drawItem: function(pair) {
              var self = this;
              var elem = pair.get(); // elem is a WatchObject

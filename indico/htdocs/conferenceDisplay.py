@@ -59,3 +59,9 @@ def matPkg( req, **params ):
 
 def performMatPkg( req, **params ):
     return conferenceDisplay.RHFullMaterialPackagePerform( req ).process( params )
+
+def next(req, **params):
+    return conferenceDisplay.RHRelativeEvent(req, 'next').process(params)
+
+def prev(req, **params):
+    return conferenceDisplay.RHRelativeEvent(req, 'prev').process(params)

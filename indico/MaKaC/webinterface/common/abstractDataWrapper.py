@@ -253,7 +253,7 @@ class AbstractData(object):
         if not self.origin == "management":
             if not self._prAuthorsListParam:
                 errors.append( _("No primary author has been specified. You must define at least one primary author") )
-            if not self._checkSpeaker():
+            if not self._checkSpeaker() and self._absMgr.showSelectAsSpeaker() and self._absMgr.isSelectSpeakerMandatory():
                 errors.append( _("At least one presenter must be specified") )
         if not self.tracks and self._absMgr.areTracksMandatory():
             # check if there are tracks, otherwise the user cannot select at least one

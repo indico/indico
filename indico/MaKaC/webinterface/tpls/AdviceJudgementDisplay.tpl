@@ -15,7 +15,7 @@
                         <span class="titleCellFormat" style="font-size: 12px;">${ _("Comments:")}</span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        ${ advice.getComments() }
+                        ${ advice.getComments() | h, html_breaks}
                     </td>
                 </tr>
                 % endif

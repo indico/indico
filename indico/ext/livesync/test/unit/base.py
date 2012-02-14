@@ -69,46 +69,52 @@ class _TUpload(object):
 
     _requires = ['db.DummyUser', LiveSync_Feature, 'util.RequestEnvironment']
 
-    @contextlib.contextmanager
-    def _generateTestResult(self):
-
+    def setUp(self):
+        super(_TUpload, self).setUp()
         global FAKE_SERVICE_PORT
 
         self._recordSet = dict()
+        self._fakeServer = self._server('', FAKE_SERVICE_PORT, self._recordSet)
 
-        fakeInvenio = self._server('', FAKE_SERVICE_PORT, self._recordSet)
+        self._fakeServer.start()
 
         agent = self._agent('test1', 'test1', 'test',
                             0, url = 'http://localhost:%s' % \
                             FAKE_SERVICE_PORT)
 
+
         with self._context('database', 'request'):
             self._sm.registerNewAgent(agent)
             agent.preActivate(0)
             agent.setActive(True)
+
+    def tearDown(self):
+        super(_TUpload, self).tearDown()
+
+        global FAKE_SERVICE_PORT
+        self._fakeServer.shutdown()
+        self._fakeServer.join()
+
+        # can't reuse the same port, as the OS won't have it free
+        FAKE_SERVICE_PORT += 1
+
+    @contextlib.contextmanager
+    def _generateTestResult(self):
+        with self._context('database', 'request'):
             # execute code
             yield
-
-        fakeInvenio.start()
 
         # params won't be used
         task = LiveSyncUpdateTask(dateutil.rrule.MINUTELY)
 
         time.sleep(3)
 
-        try:
-            with self._context('database'):
-                task.run()
-        finally:
-            fakeInvenio.shutdown()
-            fakeInvenio.join()
-
-            # can't reuse the same port, as the OS won't have it free
-            FAKE_SERVICE_PORT += 1
+        with self._context('database'):
+            task.run()
 
     def testSmallUpload(self):
         """
-        Tests uploading multiple records (small)
+        Test uploading multiple records (small)
         """
         with self._generateTestResult():
             conf1 = self._home.newConference(self._dummy)
@@ -119,13 +125,13 @@ class _TUpload(object):
         self.assertEqual(
             self._recordSet,
             {
-                'INDICO.0': {'title': 'Test Conference 1'},
-                'INDICO.1': {'title': 'Test Conference 2'}
+                'INDICO.0': {'title': 'Test Conference 1', 'deleted': False},
+                'INDICO.1': {'title': 'Test Conference 2', 'deleted': False}
                 })
 
     def testLargeUpload(self):
         """
-        Tests uploading multiple records (large)
+        Test uploading multiple records (large)
         """
         with self._generateTestResult():
             for nconf in range(0, 100):
@@ -135,5 +141,33 @@ class _TUpload(object):
         self.assertEqual(
             self._recordSet,
             dict(('INDICO.%s' % nconf,
-                  {'title': 'Test Conference %s' % nconf}) \
+                  {'title': 'Test Conference %s' % nconf, 'deleted': False}) \
                  for nconf in range(0, 100)))
+
+    def testDelete(self):
+        """
+        Tests deleting records
+        """
+        with self._generateTestResult():
+            conf1 = self._home.newConference(self._dummy)
+            conf1.setTitle('Test Conference 1')
+            conf2 = self._home.newConference(self._dummy)
+            conf2.setTitle('Test Conference 2')
+            self._home.removeConference(conf1, delete=True)
+
+        self.assertEqual(
+            self._recordSet,
+            {
+                'INDICO.0': {'title': None, 'deleted': True},
+                'INDICO.1': {'title': 'Test Conference 2', 'deleted': False}
+                })
+
+        with self._generateTestResult():
+            self._home.removeConference(conf2, delete=True)
+
+        self.assertEqual(
+            self._recordSet,
+            {
+                'INDICO.0': {'title': None, 'deleted': True},
+                'INDICO.1': {'title': None, 'deleted': True}
+                })

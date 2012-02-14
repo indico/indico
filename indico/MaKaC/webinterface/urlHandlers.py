@@ -244,6 +244,12 @@ class UHConferencePerformCreation( URLHandler ):
 class UHConferenceDisplay( URLHandler ):
     _relativeURL = "conferenceDisplay.py"
 
+class UHNextEvent(URLHandler):
+    _relativeURL = "conferenceDisplay.py/next"
+
+class UHPreviousEvent(URLHandler):
+    _relativeURL = "conferenceDisplay.py/prev"
+
 class UHConferenceOverview( URLHandler ):
     _relativeURL = "conferenceDisplay.py"
 
@@ -700,6 +706,15 @@ class UHConfCFAMakeTracksMandatory( URLHandler ):
 
 class UHConfCFAAllowAttachFiles( URLHandler ):
     _relativeURL = "confModifCFA.py/switchAttachFiles"
+
+class UHConfCFAShowSelectAsSpeaker( URLHandler ):
+    _relativeURL = "confModifCFA.py/switchShowSelectSpeaker"
+
+class UHConfCFASelectSpeakerMandatory( URLHandler ):
+    _relativeURL = "confModifCFA.py/switchSelectSpeakerMandatory"
+
+class UHConfCFAAttachedFilesContribList( URLHandler ):
+    _relativeURL = "confModifCFA.py/switchShowAttachedFiles"
 
 class UHCFAManagementAddType( URLHandler ):
     _relativeURL = "confModifCFA.py/addType"

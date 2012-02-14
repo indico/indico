@@ -54,7 +54,7 @@
         <%include file="EventLocationInfo.tpl" args="modifying=False, showParent=False, conf=False"/>
         <tr>
             <td>&nbsp;</td>
-            <td class="contentCellTD" style="font-style: italic; padding-top: 10px;"><span id="advancedOptionsText" class="fakeLink" onclick="showAdvancedOptions()">&nbsp;</span></td>
+            <td class="contentCellTD" style="font-style: italic; padding-top: 10px;"><span id="advancedOptionsText" class="fakeLink">&nbsp;</span></td>
         </tr>
 
         <tr id="advancedOptions" style="display:none"><td colspan="2">
@@ -123,18 +123,6 @@
 <%include file="EventCreationJS.tpl"/>
 
 <script type="text/javascript">
-
-    var advOptSwitch = true;
-    function showAdvancedOptions() {
-        if (advOptSwitch) {
-            $E("advancedOptions").dom.style.display = "none";
-            $E("advancedOptionsText").set('${ _("Show advanced options...")}');
-        }else {
-            $E("advancedOptions").dom.style.display = "";
-            $E("advancedOptionsText").set('${ _("Hide advanced options...")}');
-        }
-        advOptSwitch = !advOptSwitch;
-    }
 
     //---- chairperson management
 
@@ -211,12 +199,12 @@
 
         injectValuesInForm($E('conferenceCreationForm'), function() {
                 if (!verifyDates()) {
-                    var popup = new ErrorPopup("Invalid dates", ["${ _("Dates have an invalid format: dd/mm/yyyy hh:mm")}"], "");
+                    var popup = new ErrorPopup("Invalid dates", [$T('Dates have an invalid format: dd/mm/yyyy hh:mm')], "");
                     popup.open();
                     return false
                 }
                 if ($E("createCategId").get() == "") {
-                    var popup = new ErrorPopup("${ _("Missing mandatory data")}", ["${ _("Please, choose a category (step 1)")}"], "");
+                    var popup = new ErrorPopup($T('Missing mandatory data'), [$T('Please, choose a category (step 1)')], "");
                     popup.open();
                     return false;
                 }

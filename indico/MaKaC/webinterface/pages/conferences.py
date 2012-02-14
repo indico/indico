@@ -77,7 +77,7 @@ from MaKaC.plugins.base import OldObservable
 from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
-from MaKaC.conference import Minutes
+from MaKaC.conference import Minutes, Session, Contribution
 from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.plugins.helpers import DBHelpers
@@ -1042,10 +1042,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             vars['category'] = ''
 
         timezoneUtil = DisplayTZ(accessWrapper, conf)
-        timezone = timezoneUtil.getDisplayTZ()
-        vars['startDate'] = conf.getAdjustedStartDate(timezone)
-        vars['endDate'] = conf.getAdjustedEndDate(timezone)
-        vars['timezone'] = timezone
+        tz = timezoneUtil.getDisplayTZ()
+        vars['startDate'] = conf.getAdjustedStartDate(tz)
+        vars['endDate'] = conf.getAdjustedEndDate(tz)
+        vars['timezone'] = tz
 
         if conf.getParticipation().displayParticipantList() :
             vars['participants']  = conf.getParticipation().getPresentParticipantListText()
@@ -1087,8 +1087,23 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
         vars['entries'] = []
         confSchedule = conf.getSchedule()
-        entrylist = confSchedule.getEntries()
+        showSession = self._params.get("showSession","")
+        detailLevel = self._params.get("detailLevel", "contribution")
+        showDate = self._params.get("showDate", "all")
+        # Filter by day
+        if showDate == "all":
+            entrylist = confSchedule.getEntries()
+        else:
+            entrylist = confSchedule.getEntriesOnDay(timezone(tz).localize(stringToDate(showDate)))
+        # Check entries filters and access rights
         for entry in entrylist:
+            sessionCand = entry.getOwner().getOwner()
+            # Filter by session
+            if isinstance(sessionCand, Session) and (showSession != "all" and sessionCand.getId() != showSession):
+                continue
+            # Hide/Show contributions
+            if isinstance(entry.getOwner(), Contribution) and detailLevel != "contribution":
+                continue
             if entry.getOwner().canView(accessWrapper):
                 if type(entry) is schedule.BreakTimeSchEntry:
                     newItem = entry
@@ -4490,23 +4505,24 @@ class WConfModifCFA( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         abMgr = self._conf.getAbstractMgr()
-        iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
-        iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
+
+        vars["iconDisabled"] = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
+        vars["iconEnabled"] = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
+
+        vars["multipleTracks"] = abMgr.getMultipleTracks()
+        vars["areTracksMandatory"] = abMgr.areTracksMandatory()
+        vars["canAttachFiles"] = abMgr.canAttachFiles()
+        vars["showSelectAsSpeaker"] = abMgr.showSelectAsSpeaker()
+        vars["isSelectSpeakerMandatory"] = abMgr.isSelectSpeakerMandatory()
+        vars["showAttachedFilesContribList"] = abMgr.showAttachedFilesContribList()
+
         vars["multipleUrl"] = urlHandlers.UHConfCFASwitchMultipleTracks.getURL(self._conf)
-        if abMgr.getMultipleTracks():
-            vars["multipleIcon"] = iconEnabled
-        else:
-            vars["multipleIcon"] = iconDisabled
         vars["mandatoryUrl"] = urlHandlers.UHConfCFAMakeTracksMandatory.getURL(self._conf)
-        if abMgr.areTracksMandatory():
-            vars["mandatoryIcon"] = iconEnabled
-        else:
-            vars["mandatoryIcon"] = iconDisabled
-        if abMgr.canAttachFiles():
-            vars["attachIcon"] = iconEnabled
-        else:
-            vars["attachIcon"] = iconDisabled
         vars["attachUrl"] = urlHandlers.UHConfCFAAllowAttachFiles.getURL(self._conf)
+        vars["showSpeakerUrl"] = urlHandlers.UHConfCFAShowSelectAsSpeaker.getURL(self._conf)
+        vars["speakerMandatoryUrl"] = urlHandlers.UHConfCFASelectSpeakerMandatory.getURL(self._conf)
+        vars["showAttachedFilesUrl"] = urlHandlers.UHConfCFAAttachedFilesContribList.getURL(self._conf)
+
         vars["setStatusURL"]=urlHandlers.UHConfCFAChangeStatus.getURL(self._conf)
         vars["dataModificationURL"]=urlHandlers.UHCFADataModification.getURL(self._conf)
         vars["addTypeURL"]=urlHandlers.UHCFAManagementAddType.getURL(self._conf)
@@ -7294,6 +7310,11 @@ class WConfContributionList ( wcomponents.WTemplated ):
                 url = urlHandlers.UHMaterialDisplay.getURL(contrib.getPaper())
                 mat.append("<a href=%s>%s</a>" % ( quoteattr(str(url)),self._getMaterialIcon(Config.getInstance().getSystemIconURL( "paper" ), "Paper")))
         material = "".join(mat)
+        abst = []
+        if self._conf.getAbstractMgr().showAttachedFilesContribList() and isinstance(contrib, conference.AcceptedContribution) and len(contrib.getAbstract().getAttachments()) > 0:
+            for file in contrib.getAbstract().getAttachments().values():
+                abst.append("""<div style="padding-bottom:3px;"><a href="%s">%s</a></div>""" % (str(urlHandlers.UHAbstractAttachmentFileAccess.getURL(file)), file.getFileName()))
+        abstracts = "".join(abst)
         html = """
             <tr>
                 <td valign="top" nowrap><input type="checkbox" name="contributions" value=%s></td>
@@ -7305,11 +7326,12 @@ class WConfContributionList ( wcomponents.WTemplated ):
                 <td class="abstractDataCell">%s</td>
                 %s
                 <td class="abstractDataCell">%s</td>
+                <td class="abstractDataCell">%s</td>
             </tr>
                 """%(contrib.getId(), self.htmlText( contrib.getId() ),
                     sdate or "&nbsp;", typeHTML,
                     title or "&nbsp;", speaker or "&nbsp;",
-                    session or "&nbsp;", trackHTML, material or "&nbsp;" )
+                    session or "&nbsp;", trackHTML, material or "&nbsp;", abstracts or "&nbsp;" )
         return html
 
     def _getContribMinHTML( self, contrib ):
@@ -7322,6 +7344,11 @@ class WConfContributionList ( wcomponents.WTemplated ):
             if contrib.getPaper().canView(self._aw):
                 mat.append(self._getMaterialIcon(Config.getInstance().getSystemIconURL( "paper" ), _("Paper")))
         material = "".join(mat)
+        abst = []
+        if self._conf.getAbstractMgr().showAttachedFilesContribList() and isinstance(contrib, conference.AcceptedContribution) and len(contrib.getAbstract().getAttachments()) > 0:
+            for file in contrib.getAbstract().getAttachments().values():
+                abst.append("""<div style="padding-bottom:3px;"><a href="%s">%s</a></div>""" % (str(urlHandlers.UHAbstractAttachmentFileAccess.getURL(file)), file.getFileName()))
+        abstracts = "".join(abst)
         trackHTML = typeHTML = ""
         if self._displayTrackFilter:
             trackHTML = """
@@ -7340,8 +7367,9 @@ class WConfContributionList ( wcomponents.WTemplated ):
                 <td class="abstractDataCell">%s</td>
                 %s
                 <td class="abstractDataCell">%s</td>
+                <td class="abstractDataCell">%s</td>
             </tr>
-                """%(self.htmlText( contrib.getId() ), "&nbsp;", "&nbsp;", typeHTML, title or "&nbsp;", "&nbsp;", "&nbsp;", trackHTML,  material or "&nbsp;" )
+                """%(self.htmlText( contrib.getId() ), "&nbsp;", "&nbsp;", typeHTML, title or "&nbsp;", "&nbsp;", "&nbsp;", trackHTML,  material or "&nbsp;", abstracts or "&nbsp;"  )
         return html
 
     def _getTypeFilterItemList( self ):
@@ -7559,6 +7587,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
 
         vars["contribSelectionAction"]=quoteattr(str(urlHandlers.UHContributionListAction.getURL(self._conf)))
         vars["contributionsPDFURL"]=quoteattr(str(urlHandlers.UHContributionListToPDF.getURL(self._conf)))
+        vars["showAttachedFiles"] = self._conf.getAbstractMgr().showAttachedFilesContribList()
 
         return vars
 

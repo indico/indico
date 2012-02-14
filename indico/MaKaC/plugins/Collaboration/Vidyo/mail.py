@@ -551,11 +551,10 @@ class VidyoRoomDeletedOwnerNotification(VidyoOwnerNotificationBase):
 
         self.setBody("""Dear %s%s,<br />
 <br />
-We are sorry to inform you that you are the Vidyo room with name "%s" in the event <a href="%s">%s</a>,
-of which you were the owner, has been deleted by a manager of the event.<br />
+Please note that the Vidyo room named "%s" associated with the Indico event <a href="%s">%s</a>, of which you were the owner, has been deleted by a manager of this event.<br />
 <br />
-Thank you for using our system.<br />
-""" %
+Thank you for using Vidyo and Indico<br />
+"""%
                      (self._getOwnerTitleText(),
                       owner.getStraightFullName(),
                       booking.getBookingParamByName("roomName"),

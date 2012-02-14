@@ -118,14 +118,17 @@ class ObjectChangeListener(Component):
         Adds a provided object to the temporary index.
         Actions: ['moved','deleted',..]
         """
+
         cm_set = ContextManager.get('indico.ext.livesync:actions').setdefault(
             obj, set([]))
 
         # the context may not be initialized
         if cm_set != None:
             cm_set |= set(actions)
-        ContextManager.get('indico.ext.livesync:ids').setdefault(
-            obj, uniqueId(obj))
+        uid = uniqueId(obj)
+        if uid is not None and uid != '':
+            ContextManager.get('indico.ext.livesync:ids').setdefault(
+                obj, uid)
 
     def _protectionChanged(self, obj, oldValue, newValue):
         """

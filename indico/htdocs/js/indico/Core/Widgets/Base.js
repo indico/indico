@@ -201,6 +201,19 @@ type("SelectableListWidget", ["ListWidget"],
             this.selectedList.clear();
         },
 
+        selectAll: function() {
+            var self = this;
+            each(self.domList, function(listItem) {
+                listItem.dom.className = self.selectedCssClass;
+            });
+            each(self, function(value, key) {
+                self.selectedList.set(key, value);
+            });
+            if (exists(self.selectedObserver)) {
+                self.selectedObserver(self.selectedList);
+            }
+        },
+
         /**
          * We cannot call this function "clear" because
          * WatchObject's "clear" is defined in the WatchObject constructor

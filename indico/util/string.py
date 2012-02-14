@@ -37,3 +37,6 @@ def remove_accents(text):
 
 def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
+
+def html_line_breaks(text):
+    return '<p>' + text.replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'

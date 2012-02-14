@@ -93,7 +93,7 @@ class CERNSearchRecordUploader(RecordUploader):
         # get a batch
 
         self._logger.info('Generating metadata')
-        data = self._agent._getMetadata(batch)
+        data = self._agent._getMetadata(batch, logger=self._logger)
         self._logger.info('Metadata ready ')
 
         postData = {

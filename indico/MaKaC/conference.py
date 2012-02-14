@@ -1191,29 +1191,29 @@ class Category(CommonObjectBase):
                 res.extend(subcateg.getAllConferenceList())
         return res
 
-    def getNeighborEvents(self, conf):
-
-        index = Catalog.getIdx('categ_conf_sd').getCategory(conf.getOwner().getId())
-        first, last = list(index[index.minKey()])[0], list(index[index.maxKey()])[-1]
-
-        categIter = index.itervalues()
-
-        prev = None
-        for c in categIter:
-            if c == conf:
-                break
-            prev = c
-
-        nextEvt = next(categIter, None)
-
-        # if the event is already the first or the last, don't confuse
-        # users by showing the respective arrow
-        if first == conf:
-            first = None
-        if last == conf:
-            last = None
-
-        return prev, nextEvt, first, last
+    def getRelativeEvent(self, which, conf=None):
+        index = Catalog.getIdx('categ_conf_sd').getCategory(self.getId())
+        if which == 'first':
+            return list(index[index.minKey()])[0]
+        elif which == 'last':
+            return list(index[index.maxKey()])[-1]
+        elif which in ('next', 'prev'):
+            categIter = index.itervalues()
+            if conf:
+                prev = None
+                for c in categIter:
+                    if c == conf:
+                        break
+                    prev = c
+                nextEvt = next(categIter, None)
+                if which == 'next':
+                    return nextEvt
+                else:
+                    return prev
+            else:
+                raise AttributeError("'conf' parameter missing")
+        else:
+            raise AttributeError("Unknown argument value: '%s'" % which)
 
     def _setNumConferences(self):
         self._numConferences = 0
@@ -1222,7 +1222,6 @@ class Category(CommonObjectBase):
         else:
             for sc in self.getSubCategoryList():
                 self._incNumConfs(sc.getNumConferences())
-
 
     def getNumConferences( self ):
         """returns the total number of conferences contained in the current
@@ -5789,9 +5788,6 @@ class Session(CommonObjectBase, Locatable):
             ses.addLocation(self.getOwnLocation().clone())
         if self.getOwnRoom() is not None:
             ses.setRoom(self.getOwnRoom().clone())
-        for conv in self.getConvenerList():
-            ses.addConvener(conv.clone())
-        ses.setConvenerText(self.getConvenerText())
         ses.setColor(self.getColor())
         ses.setTextColor(self.getTextColor())
         ses.setTextColorToLinks(self.isTextColorToLinks())

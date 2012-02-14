@@ -35,7 +35,8 @@ from indico.util.i18n import ngettext
 
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
-FILTER_IMPORTS = ['from indico.util.json import dumps as j']
+FILTER_IMPORTS = ['from indico.util.json import dumps as j',
+                  'from indico.util.string import html_line_breaks as html_breaks']
 
 
 def _define_lookup():

@@ -22,6 +22,7 @@ import time, logging
 
 from indico.modules.scheduler import SchedulerModule, base, TaskDelayed
 from MaKaC.common import DBMgr
+from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.RoomBooking.default.dalManager import DBConnection, DALManager
 from MaKaC.common.info import HelperMaKaCInfo
 
@@ -94,6 +95,7 @@ class _Worker(object):
             try:
                 if i > 0:
                     self._dbi.abort()
+                    GenericMailer.flushQueue(False)
                     # restore logger
                     self._task.plugLogger(self._logger)
 
@@ -127,6 +129,8 @@ class _Worker(object):
                     # so that if the error is caused by concurrency we don't make
                     # the problem worse by hammering the server.
                     base.TimeSource.get().sleep(nextRunIn)
+
+        GenericMailer.flushQueue(True)
 
         self._logger.info('Ended on: %s' % self._task.endedOn)
 

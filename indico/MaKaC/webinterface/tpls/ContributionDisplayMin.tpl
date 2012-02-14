@@ -19,6 +19,17 @@
                             <tr>
                                 <td align="left" colspan="3">
                                     <table width="95%" align="center" valign="top" border="0">
+                                        % if showAttachedFiles:
+                                            <tr>
+                                                <td align="right" valign="top"
+                                                    class="displayField"><b>${ _("Abstract files")}:</b></td>
+                                                <td>
+                                                % for file in abstractAttachments:
+                                                    <div style="padding-bottom:3px;"><a href=${ file["url"] }>${ file["file"]["fileName"] }</a></div>
+                                                % endfor
+                                                </td>
+                                            </tr>
+                                        % endif
                                         <tr>
                                             <td align="right" valign="top"
                                                 class="displayField"><b>${ _("Id")}:</b></td>

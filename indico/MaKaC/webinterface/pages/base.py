@@ -54,10 +54,11 @@ class WPBase(OldObservable):
             return ['js/%s/pack/%s.js.pack' % (module, packageName)]
 
     def _includeJQuery(self):
+        # TODO: rename this to _includeJSLibs or something similar
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
         files = ['underscore', 'jquery', 'jquery-ui', 'jquery.form', 'jquery.custom',
                  'jquery.daterange', 'jquery.qtip', 'jquery.dttbutton', 'jquery.colorbox',
-                 'jquery.menu']
+                 'jquery.menu', 'date']
         if info.isDebugActive():
             # We can't use Loader.js as jQuery is included before any indico js
             return ['js/jquery/%s.js' % f for f in files]
