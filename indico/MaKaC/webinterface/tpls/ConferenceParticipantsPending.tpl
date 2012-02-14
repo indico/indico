@@ -6,19 +6,24 @@
             </div>
         </td>
     </tr>
-    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
     % if not conferenceStarted:
         <tr id="headPanel" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);" class="follow-scroll">
             <td valign="bottom" width="100%" align="left" style="padding-top:5px;" colspan="9">
-                <ul style="margin-top:0px;" id="button-menu">
-                  <li class="left"><a href="#" id="accept">${ _("Accept")}</a></li>
-                  <li class="right arrow" id="reject"><a href="#">${ _("Reject")}</a>
-                    <ul>
-                      <li><a href="#" id="reject_with_mail">${ _("With email notification")}</a></li>
-                      <li><a href="#" id="reject_no_mail">${ _("No email notification")}</a></li>
-                    </ul>
-                  </li>
-                </ul>
+                <table>
+                    <tr>
+                        <td valign="bottom" align="left">
+                            <ul style="margin-top:0px;" id="button-menu">
+                              <li class="left"><a href="#" id="accept">${ _("Accept")}</a></li>
+                              <li class="right arrow" id="reject"><a href="#">${ _("Reject")}</a>
+                                <ul>
+                                  <li><a href="#" id="reject_with_mail">${ _("With email notification")}</a></li>
+                                  <li><a href="#" id="reject_no_mail">${ _("No email notification")}</a></li>
+                                </ul>
+                              </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
         <tr id="selectBar" style="display:none">
