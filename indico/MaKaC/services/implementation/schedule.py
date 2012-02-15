@@ -1298,15 +1298,9 @@ class SessionExportURLs(conferenceServices.ConferenceDisplayBase, base.ExportToI
         self._sessionId = pm.extract("sessionId", str, False, "")
 
     def _getAnswer(self):
-        result = {}
-
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
-        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s/session/%s.ics'%(self._target.getId(), self._sessionId), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
-        result["publicRequestURL"] = urls["publicRequestURL"]
-        result["authRequestURL"] =  urls["authRequestURL"]
-
-        return result
+        return generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s/session/%s.ics'%(self._target.getId(), self._sessionId), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
 
 
 class ContributionGetExportPopup(conferenceServices.ConferenceDisplayBase):

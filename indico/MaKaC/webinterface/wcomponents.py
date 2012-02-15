@@ -392,27 +392,6 @@ class WHeader(WTemplated):
 
         vars["adminItemList"] = adminItemList
 
-        if hasattr(self, "_conf"):
-            vars["icsIconURL"]=str(Config.getInstance().getSystemIconURL("ical_grey"))
-            apiMode = minfo.getAPIMode()
-            vars["apiMode"] = apiMode
-            vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
-            vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
-            user  = self._aw.getUser()
-            apiKey = user.getAPIKey() if user else None
-
-            requestURLs = {}
-            urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics'%self._conf.getId(), {}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
-            requestURLs["publicRequestTopURL"] = urls["publicRequestURL"]
-            requestURLs["authRequestTopURL"] =  urls["authRequestURL"]
-            urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics'%self._conf.getId(), {'detail': 'contributions'}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
-            requestURLs["publicRequestAllURL"] = urls["publicRequestURL"]
-            requestURLs["authRequestAllURL"] =  urls["authRequestURL"]
-            vars["requestURLs"] = requestURLs
-            vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
-            vars["apiActive"] = apiKey != None
-            vars["userLogged"] = user != None
-            vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
         return vars
 
 class WStaticWebHeader( WTemplated ):
@@ -441,7 +420,7 @@ class WRoomBookingHeader( WHeader ):
     """
     pass
 
-class WConferenceHeader( WHeader ):
+class WConferenceHeader(WHeader):
     """Templating web component for generating the HTML header for
         the conferences' web interface.
     """
@@ -492,7 +471,40 @@ class WConferenceHeader( WHeader ):
         if self._conf.canKeyModify(self._aw):
             vars["usingModifKey"]=True
         vars["displayNavigationBar"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False).getDisplayNavigationBar()
+
+        # This is basically the same WICalExportBase, but we need some extra
+        # logic in order to have the detailed URLs
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        apiMode = minfo.getAPIMode()
+
+        vars["icsIconURL"] = str(Config.getInstance().getSystemIconURL("ical_grey"))
+        vars["apiMode"] = apiMode
+        vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+        vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
+        user  = self._aw.getUser()
+        apiKey = user.getAPIKey() if user else None
+
+        topURLs = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics' % \
+            self._conf.getId(), {}, minfo.isAPIPersistentAllowed() and \
+            (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+        urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics' % \
+            self._conf.getId(), {'detail': 'contributions'}, minfo.isAPIPersistentAllowed() and \
+            (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+
+        vars["requestURLs"] = {
+            'publicRequestTopURL': topURLs["publicRequestURL"],
+            'authRequestTopURL':  topURLs["authRequestURL"],
+            'publicRequestAllURL': urls["publicRequestURL"],
+            'authRequestAllURL':  urls["authRequestURL"]
+        }
+
+        vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
+        vars["apiActive"] = apiKey != None
+        vars["userLogged"] = user != None
+        vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+
         return vars
+
 
 class WMenuConferenceHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for

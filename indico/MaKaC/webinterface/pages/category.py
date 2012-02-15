@@ -33,6 +33,7 @@ from MaKaC.conference import CategoryManager
 from MaKaC.common.Configuration import Config
 import MaKaC.webinterface.wcalendar as wcalendar
 import MaKaC.webinterface.linking as linking
+from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.common.cache import CategoryCache
@@ -113,7 +114,7 @@ class WPCategoryDisplayBase( WPCategoryBase ):
 #        p["subArea"] = self._getSiteArea()
 #        return wc.getHTML(p)
 
-class WCategoryDisplay(wcomponents.WTemplated):
+class WCategoryDisplay(WICalExportBase):
 
     def __init__( self, target, wfReg ):
         self._target = target
@@ -176,24 +177,7 @@ class WCategoryDisplay(wcomponents.WTemplated):
 
         # Export ICS
         if self._target.conferences:
-
-            vars["icsIconURL"]=str(Config.getInstance().getSystemIconURL("ical_grey"))
-            apiMode = minfo.getAPIMode()
-            vars["apiMode"] = apiMode
-            vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
-            vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
-            user  = self._aw.getUser()
-            vars["currentUser"]= user
-            apiKey = user.getAPIKey() if user else None
-            requestURLs = {}
-            urls = generate_public_auth_request(apiMode, apiKey, '/export/categ/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
-            requestURLs["publicRequestURL"] = urls["publicRequestURL"]
-            requestURLs["authRequestURL"] =  urls["authRequestURL"]
-            vars["requestURLs"] = requestURLs
-            vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
-            vars["apiActive"] = apiKey != None
-            vars["userLogged"] = user != None
-            vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+            vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId()))
 
         return vars
 

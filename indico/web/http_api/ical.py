@@ -109,8 +109,10 @@ def serialize_contribs(cal, fossil, now):
             sfossil['id'] = "%s-%s" % (fossil['id'], sfossil['id'])
             serialize_event(cal, sfossil, now, id_prefix="indico-contribution")
 
+
 def serialize_contrib(cal, fossil, now):
     serialize_event(cal, fossil, now, id_prefix="indico-contribution")
+
 
 class ICalSerializer(Serializer):
 

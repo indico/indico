@@ -29,6 +29,7 @@ import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WContributionCreation, WPModScheduleNewContribBase, WPConferenceModifBase
+from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.common import Config, info
 import MaKaC.webinterface.timetable as timetable
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
@@ -48,8 +49,7 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.user import Avatar
-from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.http_api.util import generate_public_auth_request
+
 
 class WPSessionBase( WPConferenceBase ):
 
@@ -2642,7 +2642,7 @@ class WSessionModEditDates(wcomponents.WTemplated):
         vars["adjustSlots"]=""
         return vars
 
-class WSessionICalExport(wcomponents.WTemplated):
+class WSessionICalExport(WICalExportBase):
 
     def __init__(self, session, user):
         self._session = session
@@ -2650,23 +2650,8 @@ class WSessionICalExport(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["session"] = self._session
-        if self._session:
-            vars["currentUser"] = self._user
-            vars["icsIconURL"]=str(Config.getInstance().getSystemIconURL("ical_grey"))
-            apiMode = minfo.getAPIMode()
-            vars["apiMode"] = apiMode
-            vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
-            vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
-            apiKey = self._user.getAPIKey() if self._user else None
-            requestURLs = {}
-            urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s/session/%s.ics'%(self._session.getConference().getId(), self._session.getId()), {}, minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
-            requestURLs["publicRequestURL"] = urls["publicRequestURL"]
-            requestURLs["authRequestURL"] =  urls["authRequestURL"]
-            vars["requestURLs"] = requestURLs
-            vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
-            vars["apiActive"] = apiKey != None
-            vars["userLogged"] = self._user != None
-            vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+
+        vars.update(self._getIcalExportParams(self._user, '/export/event/%s/session/%s.ics' % \
+                                              (self._session.getConference().getId(), self._session.getId())))
         return vars

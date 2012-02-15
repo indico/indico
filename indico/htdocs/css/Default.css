@@ -7826,6 +7826,7 @@ ul.buttonMenuPopupList li a:hover {
 }
 
 .icalExportPopup .iCalExportSection {
+    margin-bottom: 5px;
     padding-bottom: 5px;
 }
 
@@ -7842,7 +7843,7 @@ ul.buttonMenuPopupList li a:hover {
 
 .icalExportPopup .icalSeparator {
     margin-bottom: 5px;
-    border-bottom: 1px solid #454545;
+    border-bottom: 1px solid #ddd;
 }
 
 .icalExportPopup .agreement {
@@ -7860,4 +7861,5 @@ ul.buttonMenuPopupList li a:hover {
     font-style: italic;
     font-size: 11px;
     text-align: right;
+    margin-bottom: 5px;
 }
