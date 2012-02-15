@@ -5982,6 +5982,7 @@ div.timetableManagementInfoArea ul li{
 .ui-list-menu li > a {
     display: block;
     padding: 5px 5px;
+    white-space: nowrap;
 }
 
 .ui-list-menu li.selected {

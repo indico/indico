@@ -160,7 +160,7 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
                 Html.td({width:"85%"}, Html.span({}, self.from))
         );
 
-        return Html.table({width:"95%"}, fromField);
+        return Html.table({width:"688px"}, fromField);
     },
 
     _drawToAddress: function(){
@@ -170,7 +170,7 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
                 Html.td({width:"85%"}, _.values(self.toParticipants).join('; '))
         );
 
-        return Html.table({width:"95%"}, toField);
+        return Html.table({width:"688px"}, toField);
     },
 
     _drawSubject: function(){
@@ -179,7 +179,7 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
                 Html.td({width:"15%"}, Html.span({}, $T("Subject:"))),
                 Html.td({width:"85%"}, $B(Html.edit({style: {width: '100%'}}), self.subject.accessor()))
         );
-        return Html.table({width:"95%"}, subjectField);
+        return Html.table({width:"688px"}, subjectField);
     },
 
     _drawExtras: function(){

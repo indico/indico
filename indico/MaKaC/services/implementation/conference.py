@@ -48,6 +48,7 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 from MaKaC.participant import Participant
+from MaKaC.common.Configuration import Config
 
 import datetime
 from pytz import timezone
