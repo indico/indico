@@ -3337,7 +3337,7 @@ class WPConferenceModifParticipantBase( WPConferenceModifBase ):
         self._tabParticipantsList = self._tabCtrl.newTab( "participantsList", _("Participants"), urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
         self._tabStatistics = self._tabCtrl.newTab("statistics", _("Statistics"), urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
         if self._conf.getParticipation().getPendingParticipantList() and nowutc() < self._conf.getStartDate():
-            self._tabParticipantsPendingList = self._tabCtrl.newTab( "pendingList", _("Pending"), urlHandlers.UHConfModifParticipantsPending.getURL( self._conf ) )
+            self._tabParticipantsPendingList = self._tabCtrl.newTab( "pendingList", _("Pending"), urlHandlers.UHConfModifParticipantsPending.getURL( self._conf ), className="pendingTab" )
         if self._conf.getParticipation().getDeclinedParticipantList():
             self._tabParticipantsDeclinedList = self._tabCtrl.newTab( "declinedList", _("Declined"), urlHandlers.UHConfModifParticipantsDeclined.getURL( self._conf ) )
 

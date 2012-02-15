@@ -3453,8 +3453,8 @@ class TabControl:
             self._default = tab
             self._active = tab
 
-    def newTab( self, id, caption, url, hidden=False ):
-        tab = Tab( self, id, caption, url, hidden=hidden )
+    def newTab( self, id, caption, url, hidden=False, className="" ):
+        tab = Tab( self, id, caption, url, hidden=hidden, className=className )
         self._addTab( tab )
         return tab
 
@@ -3502,7 +3502,7 @@ class TabControl:
 
 class Tab:
 
-    def __init__( self, owner, id, caption, URL, hidden = False ):
+    def __init__( self, owner, id, caption, URL, hidden = False, className="" ):
         self._owner = owner
         self._id = id.strip()
         self._caption = caption.strip()
@@ -3510,6 +3510,7 @@ class Tab:
         self._enabled = True
         self._subtabControl=None
         self._hidden = hidden
+        self._className = className
 
     def getId( self ):
         return self._id
@@ -3567,6 +3568,8 @@ class Tab:
     def hasChildren(self):
         return self._subtabControl is not None
 
+    def getClassName(self):
+        return self._className
 
 #class WTrackModifSubTrack( WTemplated ):
 #
@@ -3660,7 +3663,7 @@ class WTabControl(WTemplated):
         for tab in self._tabCtrl.getTabList():
             if not tab.isEnabled() or tab.isHidden():
                 continue
-            tabs.append((tab.getCaption(), tab.getURL(), tab.isActive()))
+            tabs.append((tab.getCaption(), tab.getURL(), tab.isActive(), tab.getClassName()))
         return tabs
 
     def _getActiveTabId(self):
