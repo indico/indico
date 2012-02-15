@@ -6243,7 +6243,7 @@ class Session(CommonObjectBase, Locatable):
         return flag or self.conference.canKeyAccess( aw )
 
     def grantModification( self, sb, sendEmail=True ):
-        if isinstance(sb, SessionChair):
+        if isinstance(sb, SessionChair) or isinstance(sb, SlotChair):
             ah = AvatarHolder()
             results=ah.match({"email":sb.getEmail()}, exact=1)
             r=None
