@@ -173,3 +173,10 @@
     font-size: 10.5px;
     padding: 5px 9px;
 }
+.ui-tooltip-balloon .ui-tooltip-content, .ui-tooltip-default .ui-tooltip-titlebar {
+    border: solid 1px #C0C0C0;
+    background-color: #FFED92;
+    font-size: 13px;
+    padding: 5px 6px 12px;
+    width: 120px;
+}
