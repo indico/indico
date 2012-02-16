@@ -41,10 +41,3 @@ ${ Colors }
   <td colspan="3" class="horizontalLine">&nbsp;</td>
 </tr>
 </table>
-
-<script>
-
-var convenerManager = new SessionConvenerManager('${ confId }', {confId: '${ confId }', sessionId: '${ sessionId }'}, $E('inPlaceConveners'), $E('inPlaceConvenersMenu'),
-        "convener", ${ conveners | n,j});
-
-</script>
