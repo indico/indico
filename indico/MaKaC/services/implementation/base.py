@@ -115,12 +115,16 @@ class ParameterManager(object):
                 # both strings and objects are accepted
                 if type(value) == str:
                     naiveDate = datetime.strptime(value, '%Y/%m/%d %H:%M')
-                else:
+                elif value:
                     naiveDate = datetime.strptime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
+                elif not allowEmpty:
+                    raise EmptyParameterException(paramName)
+                else:
+                    naiveDate = None
             except ValueError:
                 raise DateTimeParameterException(paramName, value)
 
-            if self._timezone:
+            if self._timezone and naiveDate:
                 value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
             else:
                 value = naiveDate

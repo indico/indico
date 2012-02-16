@@ -1063,9 +1063,10 @@ class MoveEntryBase(ScheduleOperation):
         self._schEntryId = pManager.extract("scheduleEntryId", pType=int, allowEmpty=False)
         self._sessionId = pManager.extract("sessionId", pType=str, allowEmpty=True, defaultValue=None)
         self._sessionSlotId = pManager.extract("sessionSlotId", pType=str, allowEmpty=True, defaultValue=None)
-        self._keepTime = pManager.extract("keepTime", pType=bool, allowEmpty=True, defaultValue=False)
+        self._newTime = pManager.extract("newTime", pType=datetime.datetime, allowEmpty=True, defaultValue=None)
 
     def _performOperation(self):
+        utc = pytz.timezone('UTC')
         if (self._sessionId != None and self._sessionSlotId != None):
             self._schEntry = self._conf.getSessionById(self._sessionId).getSlotById(self._sessionSlotId).getSchedule().getEntryById(self._schEntryId)
         else:
@@ -1102,9 +1103,11 @@ class MoveEntryBase(ScheduleOperation):
                             self._schEntry.setStartDate(slot.getStartDate())
                             self._schEntry.setDuration(dur=slot.getDuration())
                         else:
-                            if self._keepTime:
-                                self._schEntry.setStartDate(oldDate)
+                            if self._newTime:
+                                self._schEntry.setStartDate(self._newTime.astimezone(utc))
                             else:
+                                # if we have no clear indication of where we should place this,
+                                # put it after everything else
                                 self._schEntry.setStartDate(slot.getSchedule().calculateEndDate())
                             #self._schEntry.setDuration(dur=session.getContribDuration())
                         # add it to new container
@@ -1126,14 +1129,12 @@ class MoveEntryBase(ScheduleOperation):
                 # the target date/time
                 parsedDate = parseDate(sessionSlotId, format="%Y%m%d")
 
-                # oldDate is in UTC
-                adjustedOldDate = oldDate.astimezone(pytz.timezone(owner.getTimezone()))
-
-                # newStartDate will result in a naive date (but relative to the evt's timezone)
-                newStartDate = datetime.datetime.combine(parsedDate, adjustedOldDate.time())
-                newStartDate = pytz.timezone(owner.getTimezone()).localize(newStartDate)
-                # convert to UTC for storage
-                newStartDate = newStartDate.astimezone(pytz.timezone('UTC'))
+                if self._newTime:
+                    newStartDate = self._newTime.astimezone(utc)
+                else:
+                    owner_tz = pytz.timezone(owner.getTimezone())
+                    newStartDate = owner_tz.localize(datetime.datetime.combine(parsedDate,
+                                                                               oldDate.astimezone(owner_tz).time())).astimezone(utc)
 
                 self._schEntry.getSchedule().removeEntry(self._schEntry)
 
@@ -1366,7 +1367,7 @@ methodMap = {
     "session.editSlotById": SessionScheduleEditSessionSlotById,
     "session.deleteSlot": SessionScheduleDeleteSessionSlot,
     "session.changeColors": SessionScheduleChangeSessionColors,
-    "session.modifyStartEndDate": SessionScheduleModifyStartEndDate,
+   "session.modifyStartEndDate": SessionScheduleModifyStartEndDate,
 
 
     "session.getUnscheduledContributions": SessionGetUnscheduledContributions,

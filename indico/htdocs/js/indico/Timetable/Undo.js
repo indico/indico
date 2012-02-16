@@ -59,8 +59,9 @@ function undo_action() {
         var oldBlock = data.eventData.sessionId ?
             (data.eventData.sessionId + ":" + data.eventData.sessionSlotId) :
             "conf:" + ordinalStartDate;
+        var oldStartDate = Util.formatDateTime(data.eventData.startDate, IndicoDateTimeFormats.Server);
         dfr = management.moveToSession(data.entry, oldBlock,
-                                       null, true);
+                                       null, oldStartDate);
     }
     return dfr.done(function() {
         highlight_undo(data.eventData.id);

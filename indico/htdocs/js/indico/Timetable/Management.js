@@ -212,7 +212,7 @@ type("TimetableManagementActions", [], {
 
     /* Takes care of moving a contribution/timeblock to another session/timetable.
      * This goes for both "drag and drop" as well as the regular "MoveEntry Dialog clicking"*/
-    moveToSession: function(eventData, value, undo, keep_time) {
+    moveToSession: function(eventData, value, undo, newTime) {
         var self = this;
 
         // if nothing has been selected yet
@@ -230,7 +230,7 @@ type("TimetableManagementActions", [], {
             scheduleEntryId : eventData.scheduleEntryId,
             sessionId : eventData.sessionId,
             sessionSlotId : eventData.sessionSlotId,
-            keepTime: keep_time || false
+            newTime: newTime
         }, function(result, error) {
 
             if (!undo) {
@@ -243,7 +243,7 @@ type("TimetableManagementActions", [], {
             } else {
                 if (undo) {
                     self.timetable.enableUndo(undo, {'eventData': eventData,
-                                           'entry': result.entry}, null);
+                                                     'entry': result.entry}, null);
                 }
                 // change json and repaint timetable
                 self.timetable._updateMovedEntry(result, result.old.id).done(function() {
@@ -584,7 +584,7 @@ type("TimetableManagementActions", [], {
             this,
             this.timetable,
             eventData,
-            timetable.currentDay);
+            this.timetable.currentDay);
         moveEntryDiag.open();
     },
 

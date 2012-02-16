@@ -509,7 +509,7 @@ type("DroppableBlockMixin", [],
                      removeBottomMove();
 
                      self._withNoEvents(function() {
-                         self.managementActions.moveToSession(blockEventData, chosenValue, 'drop', true);
+                         self.managementActions.moveToSession(blockEventData, chosenValue, 'drop');
                      });
                      return;
                  },
