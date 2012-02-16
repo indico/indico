@@ -2092,6 +2092,10 @@ ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
     line-height: normal;
 }
 
+ul.UIPeopleList li.listMessage:hover, ul.UISuggestedPeopleList li.listMessage:hover
+{
+    background-color: transparent !important;
+}
 ul.UIPeopleList li .nameLink, ul.UIAuthorList li .nameLink {
     padding: 0px 0px 4px 30px;
 }
@@ -2109,7 +2113,7 @@ ul.UIPeopleList li:hover > .foundUserEmail, ul.UISuggestedPeopleList li:hover > 
 }
 
 ul.UIPeopleList li.selectedUser {
-    background-color: #CDEB8B;
+    background-color: #CDEB8B !important;
 }
 
 ul.UIPeopleList li.unselectedUser {
@@ -2147,7 +2151,7 @@ td.searchUsersGroupsPanel {
 
 td.suggestedUsersPanel {
     width: 250px;
-    background-color: #F8F8F8;
+    background-color: #FCFCFC;
     border-left: 1px dotted #CCCCCC;
 }
 
@@ -5267,8 +5271,9 @@ span.sessionRenameEntry, span.sessionRenameValue {
 
 div.exclusivePopup {
     background-color: white;
-    display: inline;
+    display: block;
     min-width: 250px;
+    padding: 0.5em 1em;
 }
 
 div.exclusivePopupTopBg {

@@ -612,7 +612,6 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             });
             var returnedDom = this.searchPanel.draw();
             container.append(returnedDom);
-            container.setStyle("paddingTop", pixels(0));
         } else {
             this.searchPanel = new UserSearchPanel(this.onlyOne, function(selectedList){
                 self.__selectionObserver("searchUsers", selectedList);
@@ -723,7 +722,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         }
 
         mainContent = Html.table({cellpadding: 0, cellPadding: 0, cellspacing: 0, cellSpacing: 0}, Html.tbody({}, mainContent));
-        return this.ExclusivePopupWithButtons.prototype.draw.call(this, mainContent);
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, mainContent,{padding: '0px'});
 
     },
 

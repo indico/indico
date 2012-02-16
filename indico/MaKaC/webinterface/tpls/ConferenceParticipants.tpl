@@ -19,7 +19,7 @@
                           <li class="left arrow" id="addParticipant">
                               <a href="#">${_("Add")}</a>
                               <ul>
-                                <li><a href="#" id="add_existing_user">${_("Existing user")}</a></li>
+                                <li><a href="#" id="add_existing_user">${_("Indico User")}</a></li>
                                 <li><a href="#" id="add_new_user">${_("New user")}</a></li>
                                 % if nowutc() < self_._conf.getStartDate() :
                                     <li><a href="#" id="invite_users">${_("Invite")}</a></li>
@@ -154,8 +154,8 @@ var checkNumberParticipants = function(){
 var legends = {'confTitle':$T('field containing the conference title.'),
         'name':$T('field containing the full name of the participant.'),
         'url':$T('field containing the url of the event.'),
-        'urlRefusal':$T('field containing the url of the refusal to attend to the meeting.'),
-        'urlInvitation':$T('field containing the url of the invitation to attend to the meeting.')};
+        'urlRefusal':$T('field containing the direct url to refuse attendance.'),
+        'urlInvitation':$T('field containing the direct url for the meeting invitation.')};
 
 IndicoUI.executeOnLoad(function(){
     var addParticipantMenu = null;
@@ -292,21 +292,21 @@ IndicoUI.executeOnLoad(function(){
             actionParticipantRows();
             checkNumberParticipants();
         };
-        new ApplyForParticipationPopup("${self_._conf.getId()}","event.participation.addParticipant",  $T("Add participant"), {}, onSuccess, true);
+        new ApplyForParticipationPopup("${self_._conf.getId()}","event.participation.addParticipant",  $T("Add Participant"), {}, onSuccess, true);
         return false;
     });
 
     $("#invite_users").bind('menu_select', function(){
         var inviteHandler = function(peopleList){
-            var text = 'Dear {name}, event manager of {confTitle} would like to invite you to take part in this event, ' +
-            'which will take place on ${conf.getAdjustedStartDate()}. Further information on this event are available at {url}' +
+            var text = 'Dear {name}, The event manager of {confTitle} would like to invite you to take part in the event, ' +
+            'which will take place on ${conf.getAdjustedStartDate()}. Further information about this event is available at {url}' +
             '<br/><br/>' +
-            'You are kindly requested to accept or decline your participation in this event by clicking on the link below :<br/>' +
+            'You are kindly requested to either accept or decline your participation in this event by clicking on the relevant link below :<br/>' +
             '{urlInvitation}' +
             'Looking forward to meeting you at {confTitle} <br/>' +
-            'Best regards';
+            'Kindest regards';
             var subject = "Invitation to ${conf.getTitle()}";
-            var popup = new ParticipantsInvitePopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, "event.participation.inviteParticipants", peopleList, "${currentUser.getFullName()}" ,subject, text, legends, successAddParticipantsHandler);
+            var popup = new ParticipantsInvitePopup($T("Send an Email to Selected Participants"),"${conf.getTitle()}", ${conf.getId()}, "event.participation.inviteParticipants", peopleList, "${currentUser.getFullName()}" ,subject, text, legends, successAddParticipantsHandler);
             popup.open();
         };
         return searchUsers("Invite Participant(s)", inviteHandler);

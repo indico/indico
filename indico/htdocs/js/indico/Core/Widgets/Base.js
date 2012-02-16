@@ -566,6 +566,14 @@ type("JTabWidget", ["IWidget"], {
             },
             hide: {
                 event: 'unfocus'
+            },
+            style: {
+                classes: 'ui-tooltip-rounded ui-tooltip-balloon',
+                tip: {
+                    corner: true,
+                    width: 20,
+                    height: 15
+                }
             }
         }).qtip('show');
     },

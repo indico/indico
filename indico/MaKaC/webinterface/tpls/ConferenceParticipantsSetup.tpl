@@ -6,7 +6,7 @@
     </td>
 </tr>
 <tr>
-    <td style="padding-right:15px">${ _("When an event manager adds a participant, email notification will be sent to the participant.")}</td>
+    <td style="padding-right:15px">${ _(" When a participant is added, an email notification will be sent to him.")}</td>
     <td>
         <div id="inPlaceEditAddedInfo"></div>
     </td>
@@ -31,7 +31,7 @@
     </td>
 </tr>
 <tr>
-    <td style="padding-right:15px">${ _("Max No. of participants.")}</td>
+    <td style="padding-right:15px">${ _("Maximum number of participants.")}</td>
     <td class="blacktext">
         <div id="inPlaceEditNumMaxParticipants"></div>
     </td>
