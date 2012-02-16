@@ -191,7 +191,7 @@ type("ProgressDialog",["ExclusivePopup"],
                  this,
                  $('<div class="loadingPopup"/>').append($('<div class="text"/>').html(this.text)),
                  {background: '#424242', border: 'none', padding: '20px', overflow: 'visible'},
-                 {background: '#424242', border: 'none', padding: '1px', overflow: 'auto'}
+                 {background: '#424242', border: 'none', padding: '1px', overflow: 'auto', display:"inline"}
              );
          }
      },
