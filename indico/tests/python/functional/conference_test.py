@@ -41,7 +41,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.go("/confModifContribList.py?confId=0")
         self.click(css="td > form > input.btn")
         self.type(id="addContributionFocusField", text="treter")
-        self.click(xpath="//input[@value='Add Existing']")
+        self.click(xpath="//input[@value='Add Indico User']")
         self.type(id="userSearchFocusField", text="fake")
 
         self.click(css="div.searchUsersButtonDiv > input[type=button]")

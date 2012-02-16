@@ -1579,7 +1579,7 @@ msgid "Fax"
 msgstr "Fax"
 
 #: indico/htdocs/js/indico/Management/Users.js:1451
-msgid "Add Existing"
+msgid "Add Indico User"
 msgstr "Ajouter existant"
 
 #: indico/htdocs/js/indico/Management/Users.js:1455

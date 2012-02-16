@@ -10901,7 +10901,7 @@ msgstr ""
 #: MaKaC/webinterface/pages/conferences_flymake.py:4098
 #: indico/MaKaC/webinterface/pages/conferences_flymake.py:4098
 msgid ""
-"<input type=\"submit\" class=\"btn\" value=\"_(\"Add existing "
+"<input type=\"submit\" class=\"btn\" value=\"_(\"Add Indico User "
 "particitant\")\" />"
 msgstr ""
 

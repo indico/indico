@@ -331,7 +331,7 @@ all the tabs of the Video Services section (Collaboration,
 Recording Request, etc., and the Managers tab too) and perform any
 operation that you can perform there.
 
-In order to add someone, you can either click on *Add Existing*
+In order to add someone, you can either click on *Add Indico User*
 which will bring a standard user search pop-up dialogue, or click
 *Add from favourites* which will bring up your favourite
 users.

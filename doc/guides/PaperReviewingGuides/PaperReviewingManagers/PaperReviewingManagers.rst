@@ -118,7 +118,7 @@ accessing the ``Team`` tab.
         |image16|
     
  From the ``Assign managers of paper reviewing`` area,
- click on the button ``Add Existing`` to search for the user.
+ click on the button ``Add Indico User`` to search for the user.
     
                  |image15|
 

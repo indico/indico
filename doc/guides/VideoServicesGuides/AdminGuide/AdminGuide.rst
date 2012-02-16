@@ -186,7 +186,7 @@ appear in the page will be different:
   Figure 8. Example of a list of users option
 
 
-  Use the *Add Existing* button to search for an Indico user in the
+  Use the *Add Indico User* button to search for an Indico user in the
   Database and add it to the list. You can also use the *Add from
   favourites* button to add a user from your personal favourites. If
   you want to remove a user from the list, use the |image0| button.
