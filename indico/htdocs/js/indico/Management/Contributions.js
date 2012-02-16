@@ -95,21 +95,21 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         var menuItems = {};
 
         if (user.showSubmitterCB) {
-            menuItems[$T('Grant submission rights')] = function() {
+            menuItems["grantSubmissionRights"] = {action: function() {
                 self._manageAllConectedUserList(self.methods["changeSubmission"], self._getParamsChangeSubmissionRights(user.id, "grant"));
                 menu.close();
-            };
+            }, display: $T('Grant submission rights')};
         } else {
-            menuItems[$T('Remove submission rights')] = function() {
+            menuItems["removeSubmissionRights"] = {action: function() {
             	self._manageAllConectedUserList(self.methods["changeSubmission"], self._getParamsChangeSubmissionRights(user.id, "remove"));
                 menu.close();
-            };
+            }, display: $T('Remove submission rights') };
         }
 
-        menuItems[$T('Send an email')] = function() {
+        menuItems["sendEmail"] = {action: function() {
             self._sendEmail(user.id);
             menu.close();
-        };
+        }, display: $T('Send an email')};
 
         var menu = new PopupMenu(menuItems, [$E(element)], "popupList");
         var pos = $(element).offset();
@@ -125,12 +125,12 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                 suggestedAuthors = self._getAuthorsList();
             }
 
-            menuItems[$T('Add existing')] = function() {
+            menuItems["searchUser"] = {action: function() {
                 self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, suggestedAuthors, false, true);
-            };
-            menuItems[$T('Add new')] = function() {
+            }, display: $T('Add Indico User')};
+            menuItems["addNew"] = {action: function() {
                 self._addNonExistingUser();
-            };
+            }, display: $T('Add new')} ;
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
             var pos = $(self.inPlaceMenu.dom).offset();
@@ -198,9 +198,9 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
                 suggestedAuthors = self.authorsList;
             }
 
-            menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
-                                                                               true, suggestedAuthors, false, true); };
-            menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
+            menuItems["searchUser"] = {action: function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
+                                                                               true, suggestedAuthors, false, true); }, display: $T('Add Indico User')};
+            menuItems["addNew"] = function(){ self._addNonExistingUser(); display: $T('Add New')};
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
             var pos = self.inPlaceMenu.getAbsolutePosition();
@@ -246,9 +246,9 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
                 suggestedAuthors = self.authorsList;
             }
 
-            menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
-                                                                               true, suggestedAuthors, false, true); };
-            menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
+            menuItems["searchUser"] = {action: function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
+                                                                               true, suggestedAuthors, false, true); }, display: $T('Add Indico User')};
+            menuItems["addNew"] = {action: function(){ self._addNonExistingUser(); }, display: $T('Add New')};
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
             var pos = self.inPlaceMenu.getAbsolutePosition();
@@ -336,44 +336,44 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
 
         if (this.eventType == "conference") {
             if (!user.isPrAuthor) {
-                menuItems[$T('Add as primary author')] = function() {
+                menuItems["addAsPrimaryAuthor"] = {action: function() {
                     self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user.id, "prAuthor"), false);
                     menu.close();
-                };
+                }, display: $T('Add as primary author')};
             } else {
-                menuItems[$T('Remove as primary author')] = function() {
+                menuItems["removeAsPrimaryAuthor"] = {action: function() {
                     self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user.id, "prAuthor"), false);
                     menu.close();
-                };
+                }, display: $T('Remove as primary author')};
             }
 
             if (!user.isCoAuthor) {
-                menuItems[$T('Add as co-author')] = function() {
+                menuItems["addAsCoAuthor"] = {action: function() {
                     self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user.id, "coAuthor"), false);
                     menu.close();
-                };
+                }, display: $T('Add as co-author')};
             } else {
-                menuItems[$T('Remove as co-author')] = function() {
+                menuItems["removeAsCoAuthor"] = {action: function() {
                     self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user.id, "coAuthor"), false);
                     menu.close();
-                };
+                }, display: $T('Remove as co-author')};
             }
         }
 
         if (!user.isSpeaker) {
-            menuItems[$T('Add as ') + self.speakerCaption] = function() {
+            menuItems["addAsAuthor"] = {action: function() {
                 self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user.id, "speaker"), false);
                 menu.close();
-            };
+            }, display: $T('Add as ') + self.speakerCaption};
         } else {
-            menuItems[$T('Remove as ') + self.speakerCaption] = function() {
+            menuItems["removeAsAuthor"] = {action: function() {
                 self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user.id, "speaker"), false);
                 menu.close();
-            };
+            }, display: $T('Remove as ') + self.speakerCaption };
         }
 
         var menu = new PopupMenu(menuItems, [$E(element)], "popupList");
-        var pos = $(element).position();
+        var pos = $(element).offset();
         menu.open(pos.left - 25, pos.top + 20);
     }
 

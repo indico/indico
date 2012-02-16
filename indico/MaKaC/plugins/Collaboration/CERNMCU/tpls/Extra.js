@@ -376,7 +376,7 @@ type("ParticipantListField", ["IWidget"],
             var self = this;
 
             var addNewPersonButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add New Participant'));
-            var addExistingPersonButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add Existing User') );
+            var addExistingPersonButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add Indico User') );
             var addNewRoomButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add New Room'));
 
             addNewPersonButton.observeClick(function(){
@@ -416,7 +416,7 @@ type("ParticipantListField", ["IWidget"],
                         openNewPopup();
                     }
                 }
-                var popup = new ChooseUsersPopup($T("Add existing person"), true, null, false, true, null, false, true, handler);
+                var popup = new ChooseUsersPopup($T("Add Indico User"), true, null, false, true, null, false, true, handler);
                 popup.execute();
             });
 

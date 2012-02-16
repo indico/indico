@@ -287,7 +287,7 @@ type("ListOfUsersManager", [], {
                         action: function() {
                             self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false, true, true, false, true);
                         },
-                        display: $T('Add existing')
+                        display: $T('Add Indico User')
                     },
                     'add_new': {
                         action: function() {

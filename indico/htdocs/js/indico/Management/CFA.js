@@ -264,9 +264,9 @@ type("AuthorListManager", [], {
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
 
-            menuItems[$T('searchUser')] = {action: function(){ self._addExistingUser($T("Add author"), true, this.confId, false,
+            menuItems["searchUser"] = {action: function(){ self._addExistingUser($T("Add author"), true, this.confId, false,
                     true, true, false, true); }, display: $T('Search User')};
-            menuItems[$T('defineNew')] = {action: function(){ self._addNonExistingUser(); }, display: $T('Define New')};
+            menuItems["defineNew"] = {action: function(){ self._addNonExistingUser(); }, display: $T('Define New')};
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList");
             var pos = self.inPlaceMenu.getAbsolutePosition();

@@ -1531,7 +1531,7 @@ type("UserListField", ["IWidget"], {
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
 
-            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Existing'));
+            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Indico User'));
 
             var title = "";
             if (this.includeFavourites || exists(this.suggestedUsers)) {
