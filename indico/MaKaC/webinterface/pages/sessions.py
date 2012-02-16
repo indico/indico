@@ -728,7 +728,6 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["Rowspan"]=4
         vars["confId"] = self._session.getConference().getId()
         vars["sessionId"] = self._session.getId()
-        vars["conveners"] = self._getConvenerList()
         return vars
 
 
