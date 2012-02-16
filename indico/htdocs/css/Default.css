@@ -5158,15 +5158,15 @@ div.bottomTip .circle{
 div.ui-state-hightlight {
 }
 
-div.ui-draggable {
+div.ui-draggable.timetableBlock {
    /* border: 3px solid #9F883B;*/
 }
 
-div.ui-draggable:hover {
+div.ui-draggable.timetableBlock:hover {
     cursor: move;
 }
 
-div.ui-draggable-dragging {
+div.ui-draggable-dragging.timetableBlock {
     z-index: 9000;
     opacity: 0.5;
 }

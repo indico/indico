@@ -75,7 +75,7 @@ type("TimeDisplacementManager", [],
          release: function(startHour, startMinute, endHour, endMinute,
                            eventData, ui, undo_caption) {
 
-             // 
+             //
 
              var self = this;
 
@@ -438,8 +438,9 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                      });
                  },
                  tolerance: 'touch',
+                 accept: '.ui-draggable.timetableBlock',
                  over: function(event, ui) {
-                     $('.ui-draggable').live(
+                     $('.ui-draggable.timetableBlock').live(
                          thisDragSpaceName,
                          function(event, ui)
                          {
@@ -456,7 +457,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                          });
                  },
                  out: function(event, ui) {
-                     $('.ui-draggable').die(thisDragSpaceName);
+                     $('.ui-draggable.timetableBlock').die(thisDragSpaceName);
                  }
              });
        },
