@@ -18,13 +18,7 @@
 
 .ui-dialog {
     width: auto !important;
-}
-
-.ui-dialog-titlebar {
-    border-bottom: 1px solid #CCCCCC !important;
-    border-radius: 0px !important;
-    font-weight: normal;
-    font-size: 17px;
+    padding: 0px;
 }
 
 .ui-dialog .ui-dialog-buttonpane {
@@ -32,6 +26,8 @@
     border-style: solid none none;
     margin: 0px;
     padding: 0.3em 1em 0.5em 0.4em !important;
+    background: #FCFCFC;
+
 }
 
 .ui-dialog-content {
@@ -84,8 +80,16 @@
 
 .ui-widget-header {
     border: none;
-    background: #FCFCFC !important;
+    background: none !important;
     color: inherit !important;
+}
+
+.ui-dialog-titlebar {
+    border-bottom: 1px solid #CCCCCC !important;
+    border-radius: 0px !important;
+    font-weight: normal;
+    font-size: 17px;
+    background-color: #FCFCFC !important;
 }
 
 .ui-tabs a {
