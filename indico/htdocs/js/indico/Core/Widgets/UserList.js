@@ -282,13 +282,19 @@ type("ListOfUsersManager", [], {
         var self = this;
         if (this.inPlaceMenu) {
             this.inPlaceMenu.observeClick(function(e) {
-                var menuItems = {};
-
-                menuItems[$T('Add existing')] = function() {
-                    self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false, true, true, false, true);
-                };
-                menuItems[$T('Add new')] = function() {
-                    self._addNonExistingUser();
+                var menuItems = {
+                    'add_existing': {
+                        action: function() {
+                            self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false, true, true, false, true);
+                        },
+                        display: $T('Add existing')
+                    },
+                    'add_new': {
+                        action: function() {
+                            self._addNonExistingUser();
+                        },
+                        display: $T('Add new')
+                    }
                 };
 
                 var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
