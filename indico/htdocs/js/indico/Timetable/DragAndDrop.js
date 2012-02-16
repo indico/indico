@@ -409,7 +409,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
              }
 
              // Keyboard Key "Shift" pressed > listener for shifting while dragging blocks
-             $(window).keydown(function(e) {
+             $(document).keydown(function(e) {
                  // if Shift is currently pressed
                  if(e.keyCode == '16') {
                      $(window).data('shiftIsPressed', true);
