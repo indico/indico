@@ -243,7 +243,9 @@ class EditChatroom( XMPPChatroomService ):
 
             #edit the chat room in indico
             ContextManager.setdefault('mailHelper', MailHelper())
-            self._notify('editChatroom', {'oldTitle': oldRoom.getTitle(), 'newRoom':self._room})
+            self._notify('editChatroom', {'oldTitle': oldRoom.getTitle(),
+                                          'newRoom': self._room,
+                                          'userId': self._user.getId()})
         except ServiceError, e:
             Logger.get('ext.im').error("Exception while editing: %s" %e)
             raise ServiceError( message=_('Problem while accessing the database: %s' %e))
@@ -352,10 +354,23 @@ class GetRoomsByUser( ServiceBase ):
 
     def _checkParams(self):
         self._user = self._params['usr']
+        self._limit = self._params['limit']
+        self._offset = self._params['offset']
+        self._excl = self._params['excl'] if self._params.has_key('excl') else None
 
     def _getAnswer( self ):
-        return fossilize(DBHelpers().getRoomsByUser(self._user))
+        return fossilize(DBHelpers().getRoomsByUser(self._user, self._offset,
+                                                    self._limit, self._excl))
 
+
+class GetNumberOfRoomsByUser( ServiceBase ):
+
+    def _checkParams(self):
+        self._user = self._params['usr']
+        self._excl = self._params['excl'] if self._params.has_key('excl') else None
+
+    def _getAnswer(self):
+        return fossilize(DBHelpers().getNumberOfRoomsByUser(self._user, self._excl))
 
 
 class AddConference2Room( ServiceBase, Observable ):
@@ -492,6 +507,7 @@ methodMap = {
     "XMPP.deleteRoom": DeleteChatroom,
     "XMPP.getRoomPreferences": GetRoomPreferences,
     "XMPP.getRoomsByUser": GetRoomsByUser,
+    "XMPP.getNumberOfRoomsByUser": GetNumberOfRoomsByUser,
     "XMPP.addConference2Room": AddConference2Room,
     "XMPP.attachLogs": AddLogs2Material
 }

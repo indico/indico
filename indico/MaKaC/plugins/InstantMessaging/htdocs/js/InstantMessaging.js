@@ -31,92 +31,125 @@ var highlightChatroom = function(chatroom) {
  *
  * @param {Boolean} onlyOne If true, only 1 item can be selected at a time.
  */
-type ("ExistingChatroomsList", ["SelectableListWidget"],
+type ("ExistingChatroomsList", ["SelectableDynamicListWidget"],
     {
         _drawItem: function(pair) {
             var self = this;
             var elem = pair.get(); // elem is a WatchObject
             var selected = false;
             var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
-            var item = Html.div({},  elem.get('title') );
+            var item = Html.div({}, elem.get('title'));
 
             return item;
         },
 
         getList: function() {
             return this.getSelectedList();
-        }
+        },
 
+        /**
+         * Prepare the items for the format required later by the form.
+         */
+        _prepareItems: function(itemsRaw) {
+            var items = {};
+
+            each(itemsRaw, function(item) {
+                items[item.title + item.id] = item;
+            });
+
+            return items;
+        },
+
+        _setItems: function(itemsRaw) {
+            var self = this;
+            var items = self._prepareItems(itemsRaw);
+            var ks = keys(items);
+
+            for (k in ks) {
+                this.set(k, $O(items[ks[k]]));
+            }
+        },
+
+        _performCall: function(args) {
+            var self = this;
+
+            indicoRequest(self.APIMethod, args, function(result, error) {
+                if (!error) {
+                    self.tmpBuffer = result;
+
+                    if (self.tmpBuffer.length < self.getInterval()) {
+                        self._setComplete();
+                    }
+
+                    if (self._hasAjaxPending()) {
+                        self.ajaxPending.resolve();
+                    }
+                } else {
+                    IndicoUtil.errorReport(error);
+                }
+            });
+
+            return self.tmpBuffer;
+        }
     },
 
     /**
      * Constructor for FoundPeopleList
      */
-    function(chatrooms, observer) {
+    function(observer, conf) {
         var self = this;
         this.selected = new WatchList();
 
-        this.SelectableListWidget(observer, false, 'chatList');
+        var SDLWidgetParams = {
+                method: 'XMPP.getRoomsByUser',
+                args: {
+                    usr: user,
+                    limit: 10, // interval to load by.
+                    excl: conf
+                }
+        };
 
-        // Sort by name and add to the list
-        var items = {};
-        each(chatrooms, function(item) {
-            items[item.title + item.id] = item;
-        });
-        var ks = keys(items);
-        ks.sort();
+        this.SelectableDynamicListWidget(observer, false, 'chatList', null,
+                                         null, null, SDLWidgetParams);
 
-        for (k in ks) {
-            this.set(k, $O(items[ks[k]]));
-        }
+        self.loadInterval();
     }
 );
 
 
-
-
 type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
-         {
+        {
+            numChatrooms: 0,
+
              _preload: [
                  function(hook) {
                      var self = this;
-                      self.chatrooms = [];
-                     var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching information..."));
-                     indicoRequest(
-                        'XMPP.getRoomsByUser',
-                        {
-                            usr: user
-                        },
-                        function(result,error) {
-                            if (!error) {
-                                killProgress();
-                                //we don't want to display the chat rooms that are already in the conference
-                                if(result.length>0){
-                                    self.chatrooms = filter(result,function(chatroom){
-                                                         var notExists = true;
-                                                         each(chatroom.conferences, function(conf){
-                                                             if(conf == self.conf){
-                                                                 notExists = false;
-                                                             }
-                                                         });
-                                                         return notExists;
-                                                     });
-                                }
-                                self._processDialogState();
-                                hook.set(true);
-                            } else {
-                                killProgress();
-                                IndicoUtil.errorReport(error);
-                            }
-                        }
-                    );
+                     var killProgress = IndicoUI.Dialogs.Util.progress(
+                             $T("Fetching information..."));
+                     var requestParams = {
+                             usr: user,
+                             excl: self.conf
+                     };
+
+                     indicoRequest('XMPP.getNumberOfRoomsByUser', requestParams,
+                         function(result, error) {
+                             if (! error) {
+                                 killProgress();
+                                 self.numChatrooms = result;
+                                 self._processDialogState();
+                                 hook.set(true);
+                             } else {
+                                 killProgress();
+                                 IndicoUtil.errorReport(error);
+                             }
+                     });
                  }
              ],
 
              _processDialogState: function() {
                  var self = this;
 
-                 if (this.chatrooms.length === 0) {
+                 if (self.numChatrooms === 0) {
                      // draw instead the creation dialog
                      var dialog = createObject(
                          ChatroomPopup,
@@ -189,9 +222,9 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              draw: function() {
                  var self = this;
 
-                 this.chatroomList = new ExistingChatroomsList(self.chatrooms, function(selectedList) {
+                 this.chatroomList = new ExistingChatroomsList(function(selectedList) {
                      self.existingSelectionObserver(selectedList);
-                 });
+                 }, self.conf);
                  var content = Html.div({},
                          $T("You may choose to:"),
                          Html.ul({},
@@ -204,8 +237,9 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                                  }, $T("Create a new chat room")))),
                              Html.li({},
                                  $T("Re-use one (or more) created by you"),
-                                 Html.div("chatListDiv",
-                                 this.chatroomList.draw()))));
+                                 Html.div({id: 'chatListDiv', class: 'chatListDiv'},
+                                 this.chatroomList.draw())
+                                 )));
 
                  this.saveButton = self.buttons.eq(0);
                  this.saveButton.disabledButtonWithTooltip({
@@ -228,6 +262,7 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                  ];
              }
          },
+
          function(conferenceId) {
              var self = this;
 

@@ -339,7 +339,7 @@ def categoryDateIndexWithoutVisibility(dbi, withRBDB, prevVersion):
         newIdx.buildIndex(dbi)
 
 
-@since('0.98.2', always=True)
+@since('0.98b', always=True)
 def catalogMigration(dbi, withRBDB, prevVersion):
     """
     Initializing/updating index catalog
@@ -496,6 +496,88 @@ def collaborationRequestIndexCreate(dbi, withRBDB, prevVersion):
     ci = IndexesHolder().getById('collaboration')
     ci.indexAll(index_names=['All Requests'], dbi=dbi)
     dbi.commit()
+
+
+@since('0.98.1')
+def migrateChatroomIndexes(verbose=False):
+    """ The structure of the indexes is such that for each one self._data
+        is a BTree and each node is referenced by the IndexBy___ designation,
+        where ___ is the ID in question. Each node is then a TreeSet of
+        ChatRoom or XMPPChatRoom objects originally orderded by ID, we need
+        this to be ordered by title for effective searching / querying.
+        The __cmp__ method has been altered to accommodate this new format,
+        take each subnode, iterate through saving the current objects, clear the
+        index and reinsert them - they will now be in the correct order.
+    """
+
+    buffer = {}
+    error = {'index' : None, 'point' : None}
+    dbi = DBMgr.getInstance()
+    dbi.startRequest()
+    idc = [IndexByUser(), IndexByConf(), IndexByCRName(), IndexByID()]
+
+    def _node_to_buffer(accum, node):
+        if not buffer.has_key(accum):
+            buffer[accum] = []
+        for leaf in node:
+            buffer[accum].append(leaf)
+
+    def _buffer_to_idx(idx):
+        for accum in buffer.keys():
+            for room in buffer.get(accum):
+                idx.index(room)
+
+    def _print_idx_entries(idx):
+        if verbose:
+            for i in idx._data.keys():
+                print "  -", str(i), ":", str(idx._data[i])
+
+    try:
+        for idx in idc:
+            error['index'] = str(idx)
+
+            if verbose:
+                print " Starting index: " + str(idx)
+
+            if isinstance(idx, IndexByID):
+                """ This index is a OOBTree of int chatroom ID : Chatroom
+                    and, therefore, does not need to be re-indexed.
+                """
+                continue
+
+            error['point'] = "Backing Up / Reading Error"
+            _print_idx_entries(idx)
+
+            for accum in idx._data.keys():
+                node = idx._data.get(accum)
+                _node_to_buffer(accum, node)
+
+            idx._data.clear()
+            error['point'] = "Reinsertion Error"
+
+            # Specific handling as IndexByUser & IndexByConf have different
+            # arguements for tree insertion.
+            if isinstance(idx, IndexByUser) or isinstance(idx, IndexByConf):
+                for accum in buffer.keys():
+                    for room in buffer.get(accum):
+                        idx.index(str(accum), room)
+            else:
+                _buffer_to_idx(idx)
+
+            if verbose:
+                print " Finished index: " + str(idx)
+
+            _print_idx_entries(idx)
+            buffer = {}
+
+        dbi.endRequest()
+
+        print "All indexes have now been re-indexed and committed to the DB."
+
+    except:
+        dbi.abort()
+        print console.colored("Process failed, ended abruptly, changes not committed.", 'red')
+        print "Path to error:", error
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),

@@ -4800,6 +4800,10 @@ ul.CAIndexList a.CAIndexSelected  {
     color: #B38B1F;
 }
 
+.CAIndexUnselected {
+    color: #4C6A83;
+}
+
 .CALastIndex {
     border-right: 0px;
 }
@@ -8067,6 +8071,10 @@ ul.buttonMenuPopupList li a:hover {
     margin-bottom: 5px;
 }
 
+div#sdlw-actions {
+    padding: 10px 0px 10px 5px;
+}
+
 .savedText {
     margin-left: 10px;
     color: #118822;
@@ -8376,6 +8384,12 @@ div.domain_control ul {
     list-style-type: none;
     padding: 0 0 0 10px;
 }
+
+div.sdlw-complete {
+    font-style: italic;
+    color: #666666;
+}
+
 .redWarningPopup {
     background-color: #F2DEDE;
     border-color: #EED3D7;

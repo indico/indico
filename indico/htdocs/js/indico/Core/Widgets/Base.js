@@ -250,10 +250,8 @@ type("SelectableListWidget", ["ListWidget"],
             this.ListWidget.prototype.setMessage.call(this, message);
         },
 
-        draw: function() {
-            var self = this;
-
-            var returnedDom = $B(self.domList, self,
+        getReturnedDOM: function(self) {
+            var dom = $B(self.domList, self,
 
                 function(pair) {
 
@@ -297,6 +295,13 @@ type("SelectableListWidget", ["ListWidget"],
                 this.domList.append(Html.li('listMessage', this.message));
             }
 
+            return dom;
+        },
+
+        draw: function() {
+            var self = this;
+            var returnedDom = self.getReturnedDOM(self);
+
             return this.IWidget.prototype.draw.call(this, returnedDom);
         },
         _drawItem: function(pair) {
@@ -320,6 +325,218 @@ type("SelectableListWidget", ["ListWidget"],
             this.unselectedCssClass = "unselectedListItem";
         }
         this.ListWidget(listCssClass, mouseoverObserver);
+    }
+);
+
+/**
+ * Extension to SelectableListWidget to provide lazy-loading-esque functionality,
+ * by requesting an Indico API method (and its args) to be passed as an arguement
+ * which allows the contents of this list to be extended by an interval (set
+ * either at instantiation or during execution via setInteval(int). For situations
+ * whereby it is anticipated that a lot of data may be returned to do so
+ * gradually.
+ */
+type("SelectableDynamicListWidget", ["SelectableListWidget"],
+    {
+        interval: null,
+        offset: 0,
+        itemsBuffer: [],
+        tmpBuffer: null,
+        APIMethod: null,
+        APIArgs: null,
+        ajaxPending: null,
+        complete: false,
+        progress: null,
+
+        draw: function() {
+            var self = this;
+            var returnedDom = self.getReturnedDOM(self);
+
+            return [this.SelectableListWidget.prototype.draw.call(this, returnedDom),
+                    self.getListActions()];
+        },
+
+        /**
+         * Sets internal flag to denote that all records have been retrieved,
+         * do not try to perform any more server calls.
+         */
+        _setComplete: function() {
+            var self = this;
+            self.complete = true;
+        },
+
+        /**
+         * Returns boolean if all records retrieved.
+         */
+        _isComplete: function() {
+            return this.complete;
+        },
+
+        /**
+         * To be implemented as per requirement, for progress indicators etc.
+         */
+        _waitHandler: function() {
+            var self = this;
+            return true;
+        },
+
+        /**
+         * Append another subset of values of size k = this.interval to the
+         * existing buffer of results.
+         */
+        loadInterval: function() {
+            var self = this;
+            var args = self.APIArgs;
+
+            if (self._isComplete()) {
+                return true;
+            }
+
+            self._waitHandler();
+            args.limit = self.interval;
+            args.offset = self.offset;
+
+            self.ajaxPending = $.Deferred();
+            self._performCall(args);
+
+            $.when(self.ajaxPending).done(function() {
+                self.itemsBuffer = self.itemsBuffer.concat(self.tmpBuffer);
+                self._updateDraw();
+            });
+
+            return true;
+        },
+
+        /**
+         * Clears the internal buffer and retrieves all the records associated
+         * to the API query. May take some time to complete.
+         */
+        loadAll: function() {
+            var self = this;
+            var args = self.APIArgs;
+
+            if (self._isComplete()) {
+                return true;
+            }
+
+            self._waitHandler();
+            args.limit = null;
+            args.offset = self.offset;
+
+            self.ajaxPending = $.Deferred();
+            self._performCall(args);
+
+            $.when(self.ajaxPending).done(function() {
+                self.itemsBuffer = self.itemsBuffer.concat(self.tmpBuffer);
+                self.clearList();
+                self._setComplete();
+                self._updateDraw();
+            });
+
+            return true;
+        },
+
+        /**
+         * Returns true if this implementation has an active waiting object.
+         */
+        _hasAjaxPending: function() {
+            return (self.ajaxPending !== null);
+        },
+
+        /**
+         * Set the parent object's items based on this item buffer and draw
+         * the result.
+         */
+        _updateDraw: function() {
+            var self = this;
+            self.tmpBuffer = null;
+            self.ajaxPending = null;
+            self.offset += self.getInterval();
+            self._setItems(self.itemsBuffer);
+            return self.draw();
+        },
+
+        /**
+         * Returns 'Load More' and 'Load All' links with observers
+         * as entries.
+         */
+        getListActions: function() {
+            var self = this;
+            var noMoreEntries = Html.span({id: 'sdlw-complete'}, $T('No more to load'));
+
+            if (self._isComplete()) {
+                $('div#sdlw-actions').html(noMoreEntries.get());
+                $('div#sdlw-actions').attr('class', 'sdlw-complete');
+                return;
+            }
+
+            var loadMore = Html.span({
+                className: 'fakeLink'},
+                $T("Load " + self.getInterval() + " more"));
+            var loadAll = Html.span({
+                className: 'fakeLink'},
+                $T("Load all"));
+
+            loadMore.observeClick(function(evt) {
+                self.loadInterval();
+            });
+
+            loadAll.observeClick(function(evt) {
+                self.loadAll();
+            });
+
+            return Html.div({id: 'sdlw-actions'}, loadMore, ' - ', loadAll, self.progress);
+        },
+
+        /**
+         * Sets the interval at runtime, whether or not already set at object
+         * instantiation.
+         */
+        setInterval: function(interval) {
+            this.interval = interval;
+        },
+
+        /**
+         * Returns integer value of iteration for stepping through results.
+         */
+        getInterval: function() {
+            return this.interval;
+        },
+
+        /**
+         * To be overloaded - propagate structures accordingly
+         */
+        _performCall: function(args) {
+            var errorMsg = "_performCall not overloaded in subclass.";
+            IndicoUtil.errorReport(errorMsg);
+            return false;
+        },
+
+        /**
+         * To be overloaded - inheriting object to iterate data and apply set()
+         * to each.
+         */
+        _setItems: function(items) {
+            var errorMsg = "_setItems not overloaded in subclass.";
+            IndicoUtil.errorReport(errorMsg);
+            return false;
+        }
+    },
+
+    function (selectedObserver, onlyOne, listCssClass, selectedCssClass,
+              unselectedCssClass, mouseoverObserver, SDLParams) {
+
+        var self = this;
+        var defaultInterval = 15;
+
+        self.APIMethod = SDLParams.method;
+        self.APIArgs = SDLParams.args;
+        self.interval = (self.APIArgs.limit === undefined)
+                        ? defaultInterval
+                        : self.APIArgs.limit;
+
+        self.SelectableListWidget(selectedObserver, onlyOne, listCssClass,
+                selectedCssClass, unselectedCssClass, mouseoverObserver);
     }
 );
 

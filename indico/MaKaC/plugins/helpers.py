@@ -64,14 +64,54 @@ class DBHelpers:
         return index[id]
 
     @classmethod
-    def getRoomsByUser(cls, user):
+    def _filterIndexExclusion(self, idx, exclude, func=None):
+        """ Filters out all matching exclude items from index idx, may specify
+            specific matching function, func, for filter if required.
+        """
+        if func is not None:
+            return filter(idx, func(exclude))
+
+        return filter(lambda c: exclude not in c.getConferences().keys(), idx)
+
+    @classmethod
+    def getRoomsByUser(cls, user, offset=0, limit=None, exclude=None):
         """ Will return the chat rooms created by the requested user """
         userID = str(user['id'])
         index = IndexByUser().get()
 
         if not index.has_key(userID):
             return []
-        return index[userID]
+
+        idx = index[userID].values()
+
+        if exclude is not None:
+            idx = DBHelpers()._filterIndexExclusion(idx, exclude)
+
+        if offset >= len(idx): # If we have gone over the boundaries
+            return []
+
+        limit = limit if limit is not None else (len(index[userID]) - 1)
+        limit += offset
+
+        return list(idx[offset:limit])
+
+    @classmethod
+    def getNumberOfRoomsByUser(cls, user, exclude=None):
+        """ Will return the number of rooms that the user has in this index,
+            can exclude a conference if passed through by exclude param.
+        """
+        userID = str(user['id'])
+        index = IndexByUser().get()
+
+        if not index.has_key(userID):
+            return 0
+
+        idx = index[userID].values()
+
+        if exclude is not None:
+            idx = DBHelpers()._filterIndexExclusion(idx, exclude)
+
+        return len(idx)
 
     @classmethod
     def roomsToShow(cls, conf):

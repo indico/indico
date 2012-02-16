@@ -196,12 +196,19 @@ class ChatroomStorage(Component):
     def editChatroom(self, obj, params):
         oldTitle = params['oldTitle']
         newRoom = params['newRoom']
+        userId = params['userId']
+
         #we have an index by the chat room name. If, while editing, someone changes the chat room name, we'll have to update the index
         if oldTitle != newRoom.getTitle():
             #the title has been changed. Get rid of the old index and substitute it for the new one
             crNameIndex = IndexByCRName()
             crNameIndex.unindex(newRoom, oldTitle)
             crNameIndex.index(newRoom)
+
+            # For dynamic loading this needs to be in alphabetical order,
+            # therefore reindex on change.
+            userIndex = IndexByUser()
+            userIndex.reindex(userId, newRoom, oldTitle)
 
     @classmethod
     def deleteChatroom(cls, obj, params):

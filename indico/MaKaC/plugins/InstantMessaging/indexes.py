@@ -63,7 +63,6 @@ class IMIndex(Persistent):
     def unindex(self, element):
         pass
 
-
 class CounterIndex(IMIndex):
     """ This index just takes the count of the next index that shall be given to a new chat room """
 
@@ -93,7 +92,7 @@ class IndexByConf(IMIndex):
 
 
 class IndexByUser(IMIndex):
-    """ Index by user ID. We use a OOTreeSet to store the chat rooms"""
+    """ Index by user ID. We use a OOBTree to store the chat rooms """
 
     def __init__(self):
         IMIndex.__init__(self, 'indexByUser')
@@ -103,14 +102,26 @@ class IndexByUser(IMIndex):
 
         # self.get is equivalent to root['IndexByUser']
         if not self.get().has_key(userId):
-            self.get()[userId] = OOTreeSet()
+            self.get()[userId] = OOBTree()
 
-        self.get()[userId].insert(element)
+        self.get()[userId].insert(element.getTitle().lower(), element)
 
     def unindex(self, userId, element):
-        self.get()[userId].remove(element)
-
+        key = element if isinstance(element, str) else element.getTitle()
+        self.get()[userId].pop(key)
         self._indexCheckDelete(userId)
+
+    def reindex(self, userId, element, oldKey=None):
+        """ oldKey will be the key in which the previous
+            is stored, therefore use that to remove if title has been
+            replaced.
+        """
+        if oldKey is not None:
+            self.unindex(userId, oldKey)
+        else:
+            self.unindex(userId, element)
+
+        self.index(userId, element)
 
 
 class IndexByCRName(IMIndex):

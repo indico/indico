@@ -48,9 +48,12 @@ class Chatroom(Persistent, Fossilizable):
         #in the conference, since no indexes have been created yet
         self._id = None
 
-    def __cmp__( self, obj ):
-        """ Needed to make internal comparisons in the OOTreeSet. Otherwise we may get some KeyErrors when trying to delete chat rooms"""
-        return cmp( self._id, obj.getId() )
+    def __cmp__(self, obj):
+        """ Needed to make internal comparisons in the OOTreeSet or OOBTree.
+            Otherwise we may get some KeyErrors when trying to delete chat rooms.
+            Ordered by title on insertion to speed up query slicing.
+        """
+        return cmp(self.getTitle().lower(), obj.getTitle().lower())
 
     def setValues(self, values):
         self._name = values['title']
