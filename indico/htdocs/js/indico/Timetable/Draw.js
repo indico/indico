@@ -746,9 +746,11 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
 
     _getExportPopup: function(method, params){
         var self = this;
+        var killProgress = IndicoUI.Dialogs.Util.progress();
         jsonRpc(Indico.Urls.JsonRpcService, method,
                 params,
                 function(result, error){
+                    killProgress();
                     if (exists(error)) {
                         IndicoUtil.errorReport(error);
                     } else {

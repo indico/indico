@@ -300,7 +300,8 @@ class WContributionDisplayBase(WICalExportBase):
         vars["submitBtn"]=self._getSubmitButtonHTML()
         vars["submitURL"]=quoteattr('FIXME')
         vars["modifIcon"] = self._getModifIconHTML()
-        vars["Contribution"] = self._contrib
+        vars["Contribution"] = vars["target"] = self._contrib
+        vars["urlICSFile"] =  urlHandlers.UHContribToiCal.getURL(self._contrib)
         import contributionReviewing
         vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
         vars["reviewingStuffDisplay"]= contributionReviewing.WContributionReviewingDisplay(self._contrib).getHTML({"ShowReviewingTeam" : False})
@@ -1199,7 +1200,8 @@ class WContributionICalExport(WICalExportBase):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["Contribution"] = self._contrib
+        vars["target"] = vars["Contribution"] = self._contrib
+        vars["urlICSFile"] =  urlHandlers.UHContribToiCal.getURL(self._contrib)
         vars.update(self._getIcalExportParams(self._user, '/export/event/%s/contribution/%s.ics' % \
                                               (self._contrib.getConference().getId(), self._contrib.getId())))
 

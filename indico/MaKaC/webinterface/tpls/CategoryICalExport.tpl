@@ -1,21 +1,6 @@
-<div id="icalExportPopup${categ.getUniqueId()}" style="display:none" class="icalExportPopup">
-
-    <div class="iCalExportSection">
-         <a href="${ urlHandlers.UHCategoryToiCal.getURL(categ) }">
-            <img src="${icsIconURL}" border="0" style="vertical-align: middle">
-             ${_("Download ICS file")}
-        </a>
-    </div>
-
-    <div id="iCalSeparator${categ.getUniqueId()}" class="icalSeparator" style="display:none"></div>
-    <%include file="ICalExportCommon.tpl" args="id=categ.getUniqueId()"/>
-    <div style="display:none">
-        <div id="extraInformation${categ.getUniqueId()}">
-            <div class="note">Please use <strong>CTRL + C</strong> to copy this URL</div>
-        </div>
-    </div>
-
-</div>
+<%inherit file="ICalExportBase.tpl"/>
+<%block name="downloadText">${_('Download current category:')}</%block>
+<%block name="script">
 <script type="text/javascript">
 
 var setURLs = function(urls){
@@ -28,4 +13,5 @@ var setURLs = function(urls){
 exportPopups["${categ.getUniqueId()}"] = new ExportIcalInterface(${apiMode}, ${persistentUserEnabled | n,j}, ${persistentAllowed | n,j}, ${apiActive | n,j}, ${userLogged | n,j}, setURLs, 'category.api.getExportURLs', {categId:"${categ.getId()}"}, ${requestURLs | n,j}, "${categ.getUniqueId()}");
 
 </script>
+</%block>
 

@@ -165,7 +165,7 @@ class _NoWithdrawnFilterCriteria(filters.FilterCriteria):
         self._fields={"no_withdrawn":_NoWitdhdrawFF()}
 
 
-class WSessionDisplayBase(wcomponents.WTemplated):
+class WSessionDisplayBase(WICalExportBase):
 
     def __init__(self,aw,session,activeTab="time_table",sortingCrit=None):
         self._aw=aw
@@ -518,7 +518,10 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                     self._sortingCrit.getField() is not None:
                 url.addParam("sortBy",self._sortingCrit.getField().getId())
         vars["PDFURL"]=quoteattr(str(url))
-
+        vars["target"] = vars["session"] = self._session
+        vars["urlICSFile"] = urlHandlers.UHSessionToiCal.getURL(self._session)
+        vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/session/%s.ics' % \
+                                              (self._session.getConference().getId(), self._session.getId())))
         return vars
 
 
@@ -571,7 +574,10 @@ class WPSessionDisplay( WPSessionDefaultDisplayBase ):
             actionURL=url)
         ical=wcomponents.WTBItem( _("get ICal of this session"),
             icon=Config.getInstance().getSystemIconURL("ical"),
-            actionURL=urlHandlers.UHSessionToiCal.getURL(self._session))
+            actionURL="#",
+            className="exportIcal",
+            id=self._session.getUniqueId(),
+            elementId="exportIcal%s"%self._session.getUniqueId())
         self._toolBar.addItem(edit)
         self._toolBar.addItem(pdf)
         self._toolBar.addItem(ical)
@@ -2649,7 +2655,8 @@ class WSessionICalExport(WICalExportBase):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["session"] = self._session
+        vars["target"] = vars["session"] = self._session
+        vars["urlICSFile"] =  urlHandlers.UHSessionToiCal.getURL(self._session)
 
         vars.update(self._getIcalExportParams(self._user, '/export/event/%s/session/%s.ics' % \
                                               (self._session.getConference().getId(), self._session.getId())))

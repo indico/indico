@@ -138,12 +138,12 @@ class WCategoryDisplay(WICalExportBase):
         return wcomponents.WTemplated.getHTML( self, params )
 
     def getVars( self ):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars = wcomponents.WTemplated.getVars( self )
         vars["name"] = self._target.getName()
         vars["description"] = self._target.getDescription()
         vars["img"] = self._target.getIconURL()
-        vars["categ"] = self._target;
+        vars["categ"] = vars["target"] = self._target;
+        vars["urlICSFile"] = urlHandlers.UHCategoryToiCal.getURL(self._target)
         subcats = self._target.subcategories
 
         confs = self._target.conferences
