@@ -295,8 +295,12 @@ $(function() {
         if(this.checked){
             $('#agreementButtonPersistent'+this.getAttribute('data-id')).removeAttr("disabled");
             $('#agreeCheckBoxKey'+this.getAttribute('data-id'))[0].checked = true;
+            $('#agreeCheckBoxKey'+this.getAttribute('data-id')).attr("disabled","disabled");
+            $('#agreementButtonKey'+this.getAttribute('data-id')).attr("disabled","disabled");
         }else{
             $('#agreementButtonPersistent'+this.getAttribute('data-id')).attr("disabled","disabled");
+            $('#agreeCheckBoxKey'+this.getAttribute('data-id')).removeAttr("disabled");
+            $('#agreeCheckBoxKey'+this.getAttribute('data-id'))[0].checked = false;
         }
     });
 });
