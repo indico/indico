@@ -2957,6 +2957,7 @@ div.sessionBar .cornerRestricted {
     color: #C73C3C;
     font-weight: bold;
 }
+
 /* Breadcrumb styles */
 
 .path {
@@ -8054,7 +8055,7 @@ ul.buttonMenuPopupList li a:hover {
 }
 
 .icalExportPopup .agreement {
-    padding: 5px;Ssearch
+    padding: 5px;
     border-radius: 8px;
     margin-bottom: 5px;
     margin-top: 5px;
@@ -8397,4 +8398,9 @@ div.sdlw-complete {
     border-radius: 4px 4px 4px 4px;
     margin-bottom: 18px;
     padding: 8px 35px 8px 14px;
+}
+
+span#sdlw-progress {
+    padding-left: 10px;
+    display: inline-block;
 }

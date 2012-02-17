@@ -346,7 +346,6 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
         APIArgs: null,
         ajaxPending: null,
         complete: false,
-        progress: null,
 
         draw: function() {
             var self = this;
@@ -377,7 +376,7 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
          */
         _waitHandler: function() {
             var self = this;
-            return true;
+            self.progress.dom.style.display = 'inline';
         },
 
         /**
@@ -453,6 +452,7 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
             self.ajaxPending = null;
             self.offset += self.getInterval();
             self._setItems(self.itemsBuffer);
+            self.progress.dom.style.display = 'none';
             return self.draw();
         },
 
@@ -470,6 +470,7 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
                 return;
             }
 
+            var progressSpan = Html.span({id: 'sdlw-progress'}, self.progress);
             var loadMore = Html.span({
                 className: 'fakeLink'},
                 $T("Load " + self.getInterval() + " more"));
@@ -485,7 +486,7 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
                 self.loadAll();
             });
 
-            return Html.div({id: 'sdlw-actions'}, loadMore, ' - ', loadAll, self.progress);
+            return Html.div({id: 'sdlw-actions'}, loadMore, ' - ', loadAll, progressSpan);
         },
 
         /**
@@ -529,6 +530,7 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
         var self = this;
         var defaultInterval = 15;
 
+        self.progress = progressIndicator(true);
         self.APIMethod = SDLParams.method;
         self.APIArgs = SDLParams.args;
         self.interval = (self.APIArgs.limit === undefined)
