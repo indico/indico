@@ -49,5 +49,6 @@ class WICalExportBase(wcomponents.WTemplated):
             'persistentUserEnabled': apiKey.isPersistentAllowed() if apiKey else False,
             'apiActive': apiKey != None,
             'userLogged': user != None,
-            'apiPersistentEnableAgreement': minfo.getAPIPersistentEnableAgreement()
+            'apiKeyUserAgreement': minfo.getAPIKeyUserAgreement(),
+            'apiPersistentUserAgreement': minfo.getAPIPersistentUserAgreement()
         }

@@ -25,6 +25,11 @@ from BTrees import OOBTree
 from db import DBMgr
 from Configuration import Config
 
+DEFAULT_PERSISTENT_ENABLE_AGREEMENT = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
+DEFAULT_PERSISTENT_DISABLE_AGREEMENT = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
+DEFAULT_API_USER_AGREEMENT = """In order to enable an iCal export link, your account needs to have a key created. This key enables other applications to access data from within Indico even when you are neither using nor logged into the Indico system yourself with the link provided. Once created, you can manage your key at any time by going to 'My Profile' and looking under the tab entitled 'HTTP API'. Further information about HTTP API keys can be found in the Indico documentation."""
+DEFAULT_PERSISTENT_USER_AGREEMENT = """In conjunction with a having a key associated with your account, to have the possibility of exporting private event information necessitates the creation of a persistent key.  This new key is also associated with your account and whilst it is active the data which can be obtained through using this key can be obtained by anyone in possession of the link provided. Due to this reason, it is extremely important that you keep links generated with this key private and for your use only. If you think someone else may have acquired access to a link using this key in the future, you must immediately remove it from 'My Profile' under the 'HTTP API' tab and generate a new key before regenerating iCalendar links."""
+
 #from MaKaC.common.logger import Logger
 
 #the singleton pattern should be applied to this class to ensure that it is
@@ -94,8 +99,10 @@ class MaKaCInfo(Persistent):
         # Event display style manager
         self._styleMgr = StyleManager()
 
-        self._apiPersistentEnableAgreement = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
-        self._apiPersistentDisableAgreement = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
+        self._apiPersistentEnableAgreement = DEFAULT_PERSISTENT_ENABLE_AGREEMENT
+        self._apiPersistentDisableAgreement = DEFAULT_PERSISTENT_DISABLE_AGREEMENT
+        self._apiKeyUserAgreement = DEFAULT_API_USER_AGREEMENT
+        self._apiPersistentUserAgreement = DEFAULT_PERSISTENT_USER_AGREEMENT
 
 
     def getStyleManager( self ):
@@ -474,19 +481,36 @@ class MaKaCInfo(Persistent):
 
     def getAPIPersistentEnableAgreement(self):
         if not hasattr(self, '_apiPersistentEnableAgreement'):
-            self._apiPersistentEnableAgreement = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
+            self._apiPersistentEnableAgreement = DEFAULT_PERSISTENT_ENABLE_AGREEMENT
         return self._apiPersistentEnableAgreement
 
     def getAPIPersistentDisableAgreement(self):
         if not hasattr(self, '_apiPersistentDisableAgreement'):
-            self._apiPersistentDisableAgreement = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
+            self._apiPersistentDisableAgreement = DEFAULT_PERSISTENT_DISABLE_AGREEMENT
         return self._apiPersistentDisableAgreement
+
+    def getAPIKeyUserAgreement(self):
+        if not hasattr(self, '_apiKeyUserAgreement'):
+            self._apiKeyUserAgreement = DEFAULT_API_USER_AGREEMENT
+        return self._apiKeyUserAgreement
+
+    def getAPIPersistentUserAgreement(self):
+        if not hasattr(self, '_apiPersistentUserAgreement'):
+            self._apiPersistentUserAgreement = DEFAULT_PERSISTENT_USER_AGREEMENT
+        return self._apiPersistentUserAgreement
 
     def setAPIPersistentEnableAgreement(self, v):
         self._apiPersistentEnableAgreement = v
 
     def setAPIPersistentDisableAgreement(self, v):
         self._apiPersistentDisableAgreement = v
+
+    def setAPIKeyUserAgreement(self, v):
+        self._apiKeyUserAgreement = v
+
+    def setAPIPersistentUserAgreement(self, v):
+        self._apiPersistentUserAgreement = v
+
 
 class HelperMaKaCInfo:
     """Helper class used for getting and instance of MaKaCInfo.

@@ -501,7 +501,8 @@ class WConferenceHeader(WHeader):
         vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
         vars["apiActive"] = apiKey != None
         vars["userLogged"] = user != None
-        vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
+        vars['apiKeyUserAgreement'] = minfo.getAPIKeyUserAgreement()
+        vars['apiPersistentUserAgreement'] = minfo.getAPIPersistentUserAgreement()
 
         return vars
 

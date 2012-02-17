@@ -76,6 +76,8 @@ class WAdminAPIOptions(WTemplated):
         vars['apiSignatureTTL'] = minfo.getAPISignatureTTL()
         vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
         vars['apiPersistentDisableAgreement'] = minfo.getAPIPersistentDisableAgreement()
+        vars['apiKeyUserAgreement'] = minfo.getAPIKeyUserAgreement()
+        vars['apiPersistentUserAgreement'] = minfo.getAPIPersistentUserAgreement()
         return vars
 
 

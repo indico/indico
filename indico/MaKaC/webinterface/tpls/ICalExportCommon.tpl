@@ -2,7 +2,7 @@
 <div id="exportICalDialogs" style="display:none">
     <div id="agreementApiKey${id}">
         <div id="agreementApiKeyText" class="agreement">
-            ${_("""You need to create an HTTP API key in order to retrieve the information from the HTTP API. You can do so by accepting the agreement below or from <a href="%s" target="_blank">My Profile</a>, where you can also manage it.""") % (urlHandlers.UHUserAPI.getURL(currentUser))}
+            <div>${apiKeyUserAgreement}</div>
         </div>
         <input type="checkbox" id="agreeCheckBoxKey${id}" data-id="${id}" class="agreeCheckBoxKey"> ${("I read the agreement.")}
         <input id="agreementButtonKey${id}" data-id="${id}" type="submit" value="Agree" disabled="disabled" class="agreementButtonKey"/>
@@ -10,7 +10,7 @@
     </div>
     <div id="agreementPersistentSignatures${id}">
         <div id="agreementPersistentSignaturesText" class="agreement">
-            <div>${apiPersistentEnableAgreement}</div>
+            <div>${apiPersistentUserAgreement}</div>
         </div>
         <input type="checkbox" id="agreeCheckBoxPersistent${id}" data-id="${id}" class="agreeCheckBoxPersistent"> ${("I read the agreement.")}
         <input id="agreementButtonPersistent${id}" data-id="${id}" type="submit" value="Agree" disabled="disabled" class="agreementButtonPersistent"/>

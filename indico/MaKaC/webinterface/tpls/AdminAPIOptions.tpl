@@ -33,6 +33,18 @@
             </td>
         </tr>
         <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("HTTP API User Agreement") }</span></td>
+            <td class="blacktext">
+                <textarea name="apiKeyUserAgreement" cols="60" rows="5" id="apiKeyUserAgreement">${apiKeyUserAgreement}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Persistent signatures User agreement") }</span></td>
+            <td class="blacktext">
+                <textarea name="apiPersistentUserAgreement" cols="60" rows="5" id="apiPersistentUserAgreement">${apiPersistentUserAgreement}</textarea>
+            </td>
+        </tr>
+        <tr>
             <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("API mode")}</span></td>
             <td class="blacktext">
                 <select name="apiMode">
