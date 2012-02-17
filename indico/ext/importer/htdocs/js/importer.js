@@ -492,7 +492,7 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
                                 time += duration;
                             });
                             var successCallback = function(result){
-                                self.timetable._updateMovedEntry(result, result.id);
+                                self.timetable._updateEntry(result, result.id);
                             };
                             var finalCallback = function(){
                                 if(self.successFunction)
