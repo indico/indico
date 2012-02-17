@@ -74,9 +74,10 @@
         $('#nbDates').val(currentOccurrences);
         // use last date + 1 day
         if(num > 1) {
-            var date = Date.parse(dateFieldList[num - 2].get());
+            var format = 'dd/MM/yyyy HH:mm';
+            var date = Date.parseExact(dateFieldList[num - 2].get(), format);
             date.add({days: 1});
-            dateFieldList[num - 1].set(date.toString('dd/MM/yyyy HH:mm'));
+            dateFieldList[num - 1].set(date.toString(format));
             verifyLectureDates();
         }
     }
