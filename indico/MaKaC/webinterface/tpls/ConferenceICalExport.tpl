@@ -14,7 +14,7 @@
          </a>
     </div>
 
-    <div id="iCalSeparator" class="icalSeparator" style="display:none"></div>
+    <div id="iCalSeparator${self_._conf.getUniqueId()}" class="icalSeparator" style="display:none"></div>
 
     <%include file="ICalExportCommon.tpl" args="id=self_._conf.getUniqueId()"/>
     <div style="display:none">

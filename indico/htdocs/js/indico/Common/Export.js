@@ -27,8 +27,8 @@ type("ExportIcalInterface", [], {
 
                             case 2:
                                 if(self.apiActive){
-                                    $('#agreementApiKey').hide();
-                                    if(self.persistentUserEnabled && self.persistentAllowed || !self.persistentAllowed){
+                                    $('#agreementApiKey'+self.id).hide();
+                                    if(self.persistentUserEnabled && self.persistentAllowed){
                                         self._postAcceptAgreements('#agreementPersistentSignatures'+self.id);
                                     }
                                 }
@@ -37,7 +37,7 @@ type("ExportIcalInterface", [], {
                             case 3:
                                 if(self.apiActive){
                                     $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
-                                    if(self.persistentUserEnabled && self.persistentAllowed || !self.persistentAllowed){
+                                    if(self.persistentUserEnabled && self.persistentAllowed){
                                         self._postAcceptAgreements('#agreementPersistentSignatures'+self.id);
                                     }
                                     else {
@@ -51,7 +51,7 @@ type("ExportIcalInterface", [], {
                             case 4:
                                 if(self.apiActive){
                                     $('#agreementApiKey'+self.id).hide();
-                                    if(self.persistentUserEnabled && self.persistentAllowed || !self.persistentAllowed){
+                                    if(self.persistentUserEnabled && self.persistentAllowed){
                                         $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
                                         self._postAcceptAgreements('#agreementPersistentSignatures'+self.id);
                                     }
@@ -64,11 +64,14 @@ type("ExportIcalInterface", [], {
 
     _checkPersistentEnabled: function(publicLink){
         var self = this;
-        if(self.persistentUserEnabled && self.persistentAllowed || !self.persistentAllowed ){
-            if(publicLink) $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
-            self._showAuthLink();
-        }else{
-            $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id)).show();
+        if(self.persistentAllowed){
+            if(self.persistentUserEnabled){
+                if(publicLink) $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
+                self._showAuthLink();
+            }else{
+                $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id)).show();
+            }
+            $('#iCalSeparator'+self.id).show();
         }
     },
 
@@ -169,11 +172,9 @@ type("ExportIcalInterface", [], {
             if(self.userLogged){
                 if(self.apiActive){
                     self._checkPersistentEnabled(false);
-                } else{
+                } else if(self.persistentAllowed){
                     self._showAgreement('#agreementApiKey'+self.id);
-                    if(self.persistentAllowed){
-                        $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id)).show();
-                    }
+                    $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id)).show();
                 }
             }
             else {
@@ -199,19 +200,15 @@ type("ExportIcalInterface", [], {
             if(self.userLogged){
                 if(self.apiActive){
                     self._checkPersistentEnabled(true);
-                } else{
-                    $('#authLinkWrapper'+self.id).append($("#agreementApiKey"+self.id));
-                    if(self.persistentAllowed){
-                        $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id));
-                    }
+                } else if(self.persistentAllowed){
+                    $('#authLinkWrapper'+self.id).append($("#agreementApiKey"+self.id)).show();
+                    $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id));
+                    $('#iCalSeparator'+self.id).show();
                 }
-                $('#iCalSeparator'+self.id).show();
             }
             break;
-    };
-
+        };
     }
-
 
 }, function(apiMode, persistentUserEnabled, persistentAllowed, apiActive, userLogged, setURLsFunction, getURLsMethod, getURLsParams, requestURLs, id){
 

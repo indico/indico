@@ -7,7 +7,7 @@
         </a>
     </div>
 
-
+    <div id="iCalSeparator${categ.getUniqueId()}" class="icalSeparator" style="display:none"></div>
     <%include file="ICalExportCommon.tpl" args="id=categ.getUniqueId()"/>
     <div style="display:none">
         <div id="extraInformation${categ.getUniqueId()}">
