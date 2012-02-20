@@ -303,7 +303,7 @@ var assignPerTrackMenus = function(role, place){
         menuItems["session"] = {action: function(){ fetchUsersPerAttribute(order, role, 'session'); }, display: $T('Session')};
         menuItems["type"] = {action: function(){ fetchUsersPerAttribute(order, role, 'type'); }, display: $T('Type')};
 
-        var menu = new PopupMenu(menuItems, [assignMenu], "popupList");
+        var menu = new PopupMenu(menuItems, [assignMenu], "popupList", true);
         var pos = assignMenu.getAbsolutePosition();
         menu.open(pos.x, pos.y + 20);
         return false;
