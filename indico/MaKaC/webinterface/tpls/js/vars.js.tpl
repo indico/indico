@@ -17,12 +17,13 @@ if rbActive:
 
     for name in locationNames:
         locationList[name] = name;
+
+    if Location.getDefaultLocation():
+        defaultLocation = Location.getDefaultLocation().friendlyName
+    else:
+        defaultLocation = ""
 else:
     locationList = None
-
-if Location.getDefaultLocation():
-    defaultLocation = Location.getDefaultLocation().friendlyName
-else:
     defaultLocation = ""
 %>
 

@@ -3,6 +3,7 @@ import os, datetime, time, hashlib
 from indico.web.wsgi import webinterface_handler_config as apache
 
 from MaKaC.common import Config
+from MaKaC.common.logger import Logger
 from MaKaC.errors import MaKaCError
 
 from MaKaC.webinterface import urlHandlers
@@ -88,6 +89,7 @@ class RHTemplateContentJS(base.RH):
             self._setHeaders()
 
         except Exception, e:
+            Logger.get('vars_js').exception('Problem generating vars.js')
             return 'indicoError: %s' % e
 
         return self._htmlData

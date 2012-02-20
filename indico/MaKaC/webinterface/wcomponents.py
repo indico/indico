@@ -6568,6 +6568,14 @@ class WRoomBookingAdmin( WTemplated ):
         vars["Location"] = Location
         return vars
 
+    def getHTML(self, params=None):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.getRoomBookingModuleActive():
+            return WTemplated.getHTML(self, params)
+        else:
+            return _("The Room Booking module is disabled")
+
+
 
 class WRoomBookingAdminLocation( WTemplated ):
 
