@@ -707,6 +707,9 @@ class UHConfCFAMakeTracksMandatory( URLHandler ):
 class UHConfCFAAllowAttachFiles( URLHandler ):
     _relativeURL = "confModifCFA.py/switchAttachFiles"
 
+class UHAbstractAttachmentFileAccess(URLHandler):
+    _relativeURL = "abstractDisplay.py/getAttachedFile"
+
 class UHConfCFAShowSelectAsSpeaker( URLHandler ):
     _relativeURL = "confModifCFA.py/switchShowSelectSpeaker"
 
