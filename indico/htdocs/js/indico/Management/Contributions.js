@@ -200,7 +200,7 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
 
             menuItems["searchUser"] = {action: function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
                                                                                true, suggestedAuthors, false, true); }, display: $T('Add Indico User')};
-            menuItems["addNew"] = function(){ self._addNonExistingUser(); display: $T('Add New')};
+            menuItems["addNew"] =  {action: function(){ self._addNonExistingUser();}, display: $T('Add New')};
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
             var pos = self.inPlaceMenu.getAbsolutePosition();

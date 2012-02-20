@@ -181,7 +181,7 @@ class RHConferenceCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
 
 #-------------------------------------------------------------------------------------
 
-class RHConferencePerformCreation( RHConferenceCreationBase ):
+class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
     _uh = urlHandlers.UHConferencePerformCreation
 
     def _checkParams( self, params ):

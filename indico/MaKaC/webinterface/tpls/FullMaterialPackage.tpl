@@ -102,7 +102,6 @@ function deselectAll()
         <tr>
             <td>
                 <input type="submit" class="btn" value="${ _("get package")}" name="ok">
-                <input type="submit" class="btn" value="${ _("back")}" name="cancel">
             </td>
         </tr>
     </table>
