@@ -268,7 +268,7 @@ type("AuthorListManager", [], {
                     true, true, false, true); }, display: $T('Search User')};
             menuItems["defineNew"] = {action: function(){ self._addNonExistingUser(); }, display: $T('Define New')};
 
-            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList");
+            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
             var pos = self.inPlaceMenu.getAbsolutePosition();
             menu.open(pos.x, pos.y + 20);
             return false;
