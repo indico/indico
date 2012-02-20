@@ -471,9 +471,14 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
             print console.colored("->", 'green', attrs=['bold']), \
                   task.__doc__.replace('\n', '').strip(),
             print console.colored("(%s)" % version, 'yellow')
+            print "\nConnecting to DB...",
             dbi.startRequest()
+            print "DONE!\n"
             if withRBDB:
+                print "\nConnecting to RB DB...",
                 DALManager.connect()
+                print "DONE!\n"
+            sys.exit()
 
             task(dbi, withRBDB, prevVersion)
 
