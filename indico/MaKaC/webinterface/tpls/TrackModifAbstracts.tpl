@@ -92,7 +92,7 @@
                                 <td nowrap><input type="submit" class="btn" name="PART" value="${ _("Participant list")}"></td>
                                 <td valign="bottom" align="left" nowrap>${ _("Export to:") }</td>
                                 <td valign="bottom" align="left" nowrap>
-                                    <input type="image" name="PDF" src=${ pdfIconURL} border="0" value="${ _("PDF of selected")}">
+                                    <input type="image" id="PDF" name="PDF" src=${ pdfIconURL} border="0" value="${ _("PDF of selected")}">
                                 </td>
                             </tr>
                         </table>

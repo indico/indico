@@ -541,7 +541,7 @@ class RHAbstractsActions:
         self._req = req
 
     def _checkParams( self, params ):
-        self._pdf = params.get("PDF", None)
+        self._pdf = params.get("PDF.x", None)
         self._mail = params.get("mail", None)
         self._participant = params.get("PART", None)
         self._tplPreview = params.get("tplPreview", None)
