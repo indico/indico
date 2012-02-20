@@ -1261,6 +1261,8 @@ class IndexesHolder( ObjectHolder ):
                 Idx[str(id)] = CategoryIndex()
             elif id=="categoryDate":
                 Idx[str(id)] = CategoryDayIndex()
+            elif id=="categoryDateAll":
+                Idx[str(id)] = CategoryDayIndex()
             elif id=="categoryName":
                 Idx[str(id)] = TextIndex()
             elif id=="pendingSubmitters":
