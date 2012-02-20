@@ -29,6 +29,7 @@ import re
 import shutil
 import string
 import sys
+import itertools
 from distutils.sysconfig import get_python_lib, get_python_version
 from distutils.cmd import Command
 from distutils.command import bdist
@@ -47,7 +48,9 @@ except ImportError:
     BABEL_PRESENT = False
 
 
-EXTRA_RESOURCES_URL = "http://indico-software.org/wiki/Admin/Installation/IndicoExtras"
+DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras",
+                   "https://github.com/collective/icalendar/tarball/6f899869d462a23d0ebd3f54fb237e8670242bc4#egg=icalendar-3.0"]
+
 
 if sys.platform == 'linux2':
     import pwd
@@ -193,61 +196,19 @@ class jsbuild(Command):
         from MaKaC.consoleScripts.installBase import jsCompress
         jsCompress()
 
-class fetchdeps:
-    def run(self):
-        print "Checking if dependencies need to be installed..."
 
-        wset = pkg_resources.working_set
-
-        wset.resolve(map(pkg_resources.Requirement.parse,
-                         filter(lambda x: x != None, _getInstallRequires())),
-                     installer=self._installMissing)
-
-        print "Done!"
-
-
-    def _installMissing(self, dist):
-        env = pkg_resources.Environment()
-        print dist, EXTRA_RESOURCES_URL
-        easy_install.main(["-f", EXTRA_RESOURCES_URL, "-U", str(dist)])
-        env.scan()
-
-        if env[str(dist)]:
-            return env[str(dist)][0]
-        else:
-            return None
-
-
-class fetchdeps_indico(fetchdeps, Command):
-    description = "fetch all the dependencies needed to run Indico"
-    user_options = []
-    boolean_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-
-class develop_indico(Command):
+class develop_indico(develop.develop):
     description = "prepares the current directory for Indico development"
-    user_options = [('www-uid=', None, "Set user for cache/log/db (typically apache user)"),
+    user_options = develop.develop.user_options + [('www-uid=', None, "Set user for cache/log/db (typically apache user)"),
                     ('www-gid=', None, "Set group for cache/log/db (typically apache group)")]
-    boolean_options = []
 
     www_uid = None
     www_gid = None
 
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
     def run(self):
 
-        fetchdeps().run()
+        # dependencies, links, etc...
+        develop.develop.run(self)
 
         local = 'etc/indico.conf'
         if os.path.exists(local):
@@ -589,7 +550,6 @@ if __name__ == '__main__':
                 'bdist': _bdist_indico(dataFiles),
                 'bdist_egg': _bdist_egg_indico(dataFiles),
                 'jsbuild': jsbuild,
-                'fetchdeps': fetchdeps_indico,
                 'develop_config': develop_indico,
                 'test': test_indico,
                 'egg_filename': egg_filename
@@ -666,9 +626,7 @@ if __name__ == '__main__':
           namespace_packages = ['indico', 'indico.ext'],
           install_requires = _getInstallRequires(),
           data_files = dataFiles,
-          dependency_links = [
-                              EXTRA_RESOURCES_URL
-                              ]
+          dependency_links = DEPENDENCY_URLS
           )
 
     #delete the temp folder used for logging
