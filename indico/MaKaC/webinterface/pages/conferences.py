@@ -3558,8 +3558,7 @@ class WPConfModifParticipantsInvitationBase(WPConferenceDisplayBase):
                              "confId": self._conf.getId(),\
                              "currentView": "static",\
                              "type": WebFactory.getId(),\
-                             "dark": True,\
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "dark": True } )
 
 #---------------------------------------------------------------------------
 
