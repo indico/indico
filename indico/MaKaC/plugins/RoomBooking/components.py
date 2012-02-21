@@ -50,28 +50,3 @@ class CatalogIndexProvider(Component):
 
     def catalogIndexProvider(self, obj):
         return [('user_room', RoomManagerIndex)]
-
-
-class ReservationStartEndNotificationListener(Component):
-    implements(IReservationListener)
-
-    def reservationCreated(self, resv):
-        if getRoomBookingOption('notificationEnabled'):
-            resv.getStartEndNotification().resvCreated()
-
-    def reservationUpdated(self, resv):
-        if getRoomBookingOption('notificationEnabled'):
-            resv.getStartEndNotification().resvUpdated()
-
-    def reservationDeleted(self, resv):
-        pass
-
-
-class ReservationStartEndEmailListener(Component):
-    implements(IReservationStartStopListener)
-
-    def reservationStarted(self, obj, resv):
-        sendReservationStartStopNotification(resv, 'start')
-
-    def reservationFinished(self, obj, resv):
-        sendReservationStartStopNotification(resv, 'end')
