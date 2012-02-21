@@ -425,7 +425,7 @@
                                     <td>
                                         % for col in collisions:
                                             <strong>${"PRE-" if not col.withReservation.isConfirmed else ""}Booking: </strong>${ col.withReservation.bookedForName }, ${ verbose_dt(col.withReservation.startDT) } - ${ verbose_dt(col.withReservation.endDT) }
-                                            (<a href="${ urlHandlers.UHRoomBookingBookingDetails.getURL(col.withReservation) }" target="_blank">more info</a>)<br/>
+                                            (<a href="${ urlHandlers.UHRoomBookingBookingDetails.getURL(col.withReservation) }" target="_blank">${ _("show this booking") }</a>)<br/>
                                         % endfor
                                     </td>
                                 </tr>
