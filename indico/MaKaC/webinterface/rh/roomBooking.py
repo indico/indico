@@ -1432,7 +1432,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
         user = self._getUser()
         days = self._candResv.room.maxAdvanceDays
         if not (user.isRBAdmin() or user.getId() == self._candResv.room.responsibleId) and days > 0:
-            if dateAdvanceAllowed(self._candResv.endDT, ):
+            if dateAdvanceAllowed(self._candResv.endDT, days):
                 raise FormValuesError(_("You cannot book this room more than %s days in advance.") %  days)
 
         self._params = params
