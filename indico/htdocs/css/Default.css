@@ -3415,7 +3415,6 @@ ul.listCompact {
 
 div.accessProtection {
     padding: 10px;
-    font-size: 16px;
 }
 
 span.eventProtectionRadioEntry {
@@ -3427,6 +3426,10 @@ span.eventProtectionRadioEntry {
 span.eventProtectionRadioEntry label, span.categProtectionRadioEntry label {
     font-weight: normal;
     padding-left: 5px;
+}
+
+span.eventProtectionRadioEntry label{
+    font-size: 16px;
 }
 
 span.protectionRadioInfo {
