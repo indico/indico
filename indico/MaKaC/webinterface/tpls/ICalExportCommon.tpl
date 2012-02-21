@@ -4,16 +4,16 @@
         <div id="agreementApiKeyText" class="agreement">
             <div>${apiKeyUserAgreement}</div>
         </div>
-        <input type="checkbox" id="agreeCheckBoxKey${id}" data-id="${id}" class="agreeCheckBoxKey"> ${("I read the agreement.")}
-        <input id="agreementButtonKey${id}" data-id="${id}" type="submit" value="Agree" disabled="disabled" class="agreementButtonKey"/>
+        <input type="checkbox" id="agreeCheckBoxKey${id}" data-id="${id}" class="agreeCheckBoxKey"> ${("I have read and understood the above.")}<br/>
+        <input id="agreementButtonKey${id}" data-id="${id}" type="submit" value="Aceept & Create" disabled="disabled" class="agreementButtonKey"/>
         <div style="display:inline;" id="progressPersistentKey${id}" data-id="${id}"></div>
     </div>
     <div id="agreementPersistentSignatures${id}">
         <div id="agreementPersistentSignaturesText" class="agreement">
             <div>${apiPersistentUserAgreement}</div>
         </div>
-        <input type="checkbox" id="agreeCheckBoxPersistent${id}" data-id="${id}" class="agreeCheckBoxPersistent"> ${("I read the agreement.")}
-        <input id="agreementButtonPersistent${id}" data-id="${id}" type="submit" value="Agree" disabled="disabled" class="agreementButtonPersistent"/>
+        <input type="checkbox" id="agreeCheckBoxPersistent${id}" data-id="${id}" class="agreeCheckBoxPersistent"> ${("I have read and understood the above.")}<br/>
+        <input id="agreementButtonPersistent${id}" data-id="${id}" type="submit" value="Aceept & Create" disabled="disabled" class="agreementButtonPersistent"/>
         <div style="display:inline;" id="progressPersistentSignatures${id}" data-id="${id}"></div>
     </div>
     <input id="publicLink${id}" type="text" class="apiURL" readonly/>
