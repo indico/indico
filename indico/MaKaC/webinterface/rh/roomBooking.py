@@ -882,7 +882,9 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
         for eq in self._equipment:
             r.insertEquipment( eq )
 
-        if self._availability == "Don't care":
+        if self._onlyMy:
+            rooms = self._ownedBy.getRooms()
+        elif self._availability == "Don't care":
             rooms = CrossLocationQueries.getRooms( location = self._roomLocation, freeText = self._freeSearch, ownedBy = self._ownedBy, roomExample = r, pendingBlockings = self._includePendingBlockings )
             # Special care for capacity (20% => greater than)
             if len ( rooms ) == 0:

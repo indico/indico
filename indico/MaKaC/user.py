@@ -1368,12 +1368,11 @@ class Avatar(Persistent, Fossilizable):
         Returns list of rooms (RoomBase derived objects) this
         user is responsible for.
         """
-        from MaKaC.rb_location import CrossLocationQueries
-        from MaKaC.rb_room import RoomBase
+        from MaKaC.plugins.RoomBooking.default.room import Room
+        from MaKaC.rb_location import RoomGUID
 
-        myRooms = CrossLocationQueries.getRooms( reallyAllFast = True )
-        myRooms = [ room for room in myRooms if room.isOwnedBy( self ) and room.isActive ]
-        return myRooms
+        roomList = [ RoomGUID.parse( str(rg) ).getRoom() for rg in Room.getUsersRooms(self).keys() ]
+        return [room for room in roomList if room.isActive]
 
     def getReservations(self):
         """

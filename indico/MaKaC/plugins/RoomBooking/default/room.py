@@ -169,6 +169,10 @@ class Room( Persistent, RoomBase, Fossilizable ):
     def isAvatarResponsibleForRooms(cls, avatar):
         return Catalog.getIdx('user_room').get(avatar.getId()) is not None
 
+    @classmethod
+    def getUsersRooms(cls, avatar):
+        return Catalog.getIdx('user_room').get(avatar.getId())
+
     # Typical actions
     @staticmethod
     def getRooms( *args, **kwargs ):
