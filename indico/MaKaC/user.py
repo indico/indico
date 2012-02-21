@@ -1371,7 +1371,7 @@ class Avatar(Persistent, Fossilizable):
         from MaKaC.plugins.RoomBooking.default.room import Room
         from MaKaC.rb_location import RoomGUID
 
-        roomList = [ RoomGUID.parse( str(rg) ).getRoom() for rg in Room.getUsersRooms(self).keys() ]
+        roomList = [ RoomGUID.parse( str(rg) ).getRoom() for rg in Room.getUserRooms(self).keys() ]
         return [room for room in roomList if room.isActive]
 
     def getReservations(self):

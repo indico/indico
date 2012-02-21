@@ -85,13 +85,10 @@ class RHConfModifReviewingAccess(RHConferenceModifBase):
         self._isReviewingStaff = RCReviewingStaff.hasRights(self)
         self._isEditor = RCEditor.hasRights(self)
         self._isReviewer = RCReviewer.hasRights(self)
-#
-#    def _checkProtection(self):
-#        if not self._isReviewingStaff:
-#            if self._getUser() == None:
-#                self._checkSessionUser()
-#            else:
-#                RHConferenceModifBase._checkProtection(self)
+
+    def _checkProtection(self):
+        if not self._isReviewingStaff:
+            RHConferenceModifBase._checkProtection(self)
 
     def _process( self ):
 

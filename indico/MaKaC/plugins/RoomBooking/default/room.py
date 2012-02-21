@@ -170,7 +170,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
         return Catalog.getIdx('user_room').get(avatar.getId()) is not None
 
     @classmethod
-    def getUsersRooms(cls, avatar):
+    def getUserRooms(cls, avatar):
         return Catalog.getIdx('user_room').get(avatar.getId())
 
     # Typical actions
