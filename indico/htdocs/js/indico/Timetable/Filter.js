@@ -200,11 +200,10 @@ type("TimeTableFilter", ["IWidget"], {
 
         this.div.append(content);
 
-        this.height = this.div.dom.offsetHeight;
+        this.height = $(self.div.dom).height();
 
         // Hide it by default
-        this.setPos(-this.height);
-        this.div.dom.style.visibility = 'visible';
+        this.div.dom.style.display = 'none';
     },
     setUpFilterMenu: function (link, menu)
     {
@@ -221,42 +220,16 @@ type("TimeTableFilter", ["IWidget"], {
             menu.open(pos.x - 30, self.height);
         });
     },
-    move: function(direction, limit, curState, xPos, i) {
-        var self = this;
-
-        if (!exists(curState) || !exists(xPos) || !exists(i)) {
-            var xPos = self.curXPos;
-            var i = 0;
-            var curState = self.state;
-        }
-
-        // If the button state has changed stop the animation
-        if (curState != self.state)
-            return;
-
-        xPos = xPos + (++i * direction);
-        if (direction*xPos >= (direction*limit)) {
-            self.setPos(limit);
-            return;
-        }
-        self.setPos(xPos);
-
-        setTimeout(function() { self.move(direction, limit, curState, xPos, i); }, 20);
-    },
     show: function(show) {
         this.state.set(!this.state.get());
         if (show)
-            this.move(1, 0);
+            $(this.div.dom).show("slide", { direction: "down" }, 200);
         else
-            this.move(-1, -this.height);
+            $(this.div.dom).hide("slide", { direction: "down" }, 200);
     },
     toggle: function() {
         this.show(!this.state.get())
     },
-    setPos: function(pos) {
-        this.curXPos = pos;
-        this.div.dom.style.bottom = pixels(pos);
-    }
     },
     function(timetableDrawer, closeHandler) {
         var self = this;
@@ -266,7 +239,7 @@ type("TimeTableFilter", ["IWidget"], {
 
         this.state = new WatchValue(false);
 
-        this.div = Html.div({className: 'timetableFilter', style: {visibility: "hidden"}});
+        this.div = Html.div({className: 'timetableFilter', style: {display: "none"}});
         $E(document.body).append(this.div);
     }
 );
