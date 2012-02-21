@@ -64,21 +64,32 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
         else:
             return minutes.getText()
 
+    def _addMinutes(self, minutes, entry):
+        if entry.getMinutes():
+            minText = entry.getMinutes().getText()
+            minutes.append([entry.getTitle(),minText])
+
+    def _getSessionMinutes(self, minutes, session):
+        self._addMinutes(minutes, session)
+        for contrib in session.getContributionList():
+            self._getContributionMinutes(minutes, contrib)
+
+    def _getContributionMinutes(self, minutes, contrib):
+        self._addMinutes(minutes, contrib)
+        for subContrib in contrib.getSubContributionList():
+            self._addMinutes(minutes, subContrib)
+
     def _getCompiledMinutes( self ):
         minutes = []
-        isHTML = False
+        entrylist = self._target.getSchedule().getEntries()
         cList = self._target.getContributionList()
         cList.sort(sortContributionByDate)
-        for c in cList:
-            if c.getMinutes():
-                minText = c.getMinutes().getText()
-                minutes.append([c.getTitle(),minText])
-                if isStringHTML(minText):
-                    isHTML = True
-        if isHTML:
-            lb = "<br>"
-        else:
-            lb = "\n"
+        for c in entrylist:
+            if isinstance(c.getOwner(), conference.SessionSlot):
+                self._getSessionMinutes(minutes, c.getOwner().getSession())
+            elif isinstance(c.getOwner(), conference.Contribution):
+                self._getContributionMinutes(minutes, c.getOwner())
+        lb = "<br/>"
         text = "%s (%s)%s" % (self._target.getTitle(), self._target.getStartDate().strftime("%d %b %Y"), lb)
         part = self._target.getParticipation().getPresentParticipantListText()
         if part != "":

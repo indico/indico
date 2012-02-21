@@ -116,7 +116,7 @@ ${pluginDetails}
             if (result.listParticipants){
                 if( $("#eventParticipants").length==0){
                     var trParticipants=$(Html.tr({id:"eventParticipants"},
-                            Html.td({class:"leftCol"},$T("Participants")),
+                            Html.td({className:"leftCol"},$T("Participants")),
                             Html.td({id:"eventListParticipants"},"")).dom);
                     if ($("#eventDescription").length==0){
                         $("#eventDetails").prepend(trParticipants);
