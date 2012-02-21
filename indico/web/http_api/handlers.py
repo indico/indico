@@ -170,6 +170,9 @@ def handler(req, **params):
             cache_key = normalizeQuery(path, query, remove=('ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache'))
         else:
             cache_key = normalizeQuery(path, query, remove=('signature', 'timestamp', 'nc', 'nocache'))
+            if signature:
+                # in case the request was signed, store the result under a different key
+                cache_key = 'signed_' + cache_key
 
         obj = None
         addToCache = True
