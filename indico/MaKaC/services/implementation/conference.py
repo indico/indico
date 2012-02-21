@@ -971,7 +971,7 @@ class ConferenceAddParticipants(ConferenceParticipantBase, ConferenceParticipant
 
         for user in self._userList:
             ph = PrincipalHolder()
-            selected = ph.getById(int(user['id']))
+            selected = ph.getById(user['id'])
             if isinstance(selected, Avatar) :
                 self._addParticipant(self._generateParticipant(selected), participation)
             elif isinstance(selected, Group) :
