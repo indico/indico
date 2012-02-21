@@ -19,7 +19,7 @@
                           <li class="left arrow" id="addParticipant">
                               <a href="#">${_("Add")}</a>
                               <ul>
-                                <li><a href="#" id="add_existing_user">${_("Indico User")}</a></li>
+                                <li><a href="#" id="add_existing_user">${_("Indico User / Group")}</a></li>
                                 <li><a href="#" id="add_new_user">${_("New user")}</a></li>
                                 % if nowutc() < self_._conf.getStartDate() :
                                     <li><a href="#" id="invite_users">${_("Invite")}</a></li>
