@@ -37,7 +37,7 @@ from indico.util import i18n
 
 
 import pkg_resources
-from setuptools.command import develop, install, sdist, bdist_egg, easy_install
+from setuptools.command import develop, install, sdist, bdist_egg, easy_install, test
 from setuptools import setup, find_packages, findall
 
 
@@ -51,6 +51,7 @@ except ImportError:
 DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras",
                    "https://github.com/collective/icalendar/tarball/6f899869d462a23d0ebd3f54fb237e8670242bc4#egg=icalendar-3.0"]
 
+DEVELOP_REQUIRES = ['pojson', 'termcolor']
 
 if sys.platform == 'linux2':
     import pwd
@@ -206,9 +207,12 @@ class develop_indico(develop.develop):
     www_gid = None
 
     def run(self):
-
         # dependencies, links, etc...
         develop.develop.run(self)
+
+        env = pkg_resources.Environment()
+        easy_install.main(DEVELOP_REQUIRES)
+        env.scan()
 
         local = 'etc/indico.conf'
         if os.path.exists(local):
@@ -280,13 +284,13 @@ Please specify the directory where you'd like it to be placed.
             fdata = re.sub('\/opt\/indico\/%s'%dir[0], d, fdata)
         open(filePath, 'w').write(fdata)
 
-class test_indico(Command):
+class test_indico(test.test):
     """
     Test command for Indico
     """
 
     description = "Test Suite Framework"
-    user_options = [('specify=', None, "Use nosetests style (file.class:testcase)"),
+    user_options = test.test.user_options + [('specify=', None, "Use nosetests style (file.class:testcase)"),
                     ('coverage', None, "Output coverage report in html"),
                     ('unit', None, "Run only Unit tests"),
                     ('functional', None, "Run only Functional tests"),
@@ -327,27 +331,16 @@ class test_indico(Command):
     log = False
     xml = False
 
-    def initialize_options(self):
-        pass
+    def _wrap(self, func, *params):
+        def wrapped():
+            self.res = func(*params)
+        self.with_project_on_sys_path(wrapped)
+        return self.res
 
     def finalize_options(self):
-        pass
-
-    def run(self):
-
-        if not self.checkTestPackages():
-            print "Please install those missing packages before launching the tests again"
-            sys.exit(-1)
-
-        #missing jars will be downloaded automatically
-        if not self.checkTestJars():
-            print "Some jars could not be downloaded. Please download the missing jars manually"
-            sys.exit(-1)
-
-        from indico.tests import TestManager, TEST_RUNNERS
         testsToRun = []
 
-        allTests = TEST_RUNNERS.keys()
+        allTests = ['unit', 'functional']
 
         for testType in allTests:
             if getattr(self, testType):
@@ -358,7 +351,21 @@ class test_indico(Command):
 
         if testsToRun == []:
             testsToRun = allTests
+        self.testsToRun = testsToRun
 
+    def run(self):
+
+        if self.distribution.install_requires:
+            self.distribution.fetch_build_eggs(self.distribution.install_requires)
+        if self.distribution.tests_require:
+            self.distribution.fetch_build_eggs(self.distribution.tests_require)
+
+        from indico.tests import TestManager
+
+        #missing jars will be downloaded automatically
+        if not self._wrap(self.checkTestJars):
+            print "Some jars could not be downloaded. Please download the missing jars manually"
+            sys.exit(-1)
 
         options = {'silent': self.silent,
                    'killself': self.killself,
@@ -376,28 +383,9 @@ class test_indico(Command):
         options = dict((k,v) for (k,v) in options.iteritems() if v)
 
         manager = TestManager()
-
-        result = manager.main(testsToRun, options)
+        result = self._wrap(manager.main, self.testsToRun, options)
 
         sys.exit(result)
-
-    def checkTestPackages(self):
-        packagesList = ['figleaf',
-                        'nose>=0.11',
-                        'rednose',
-                        'selenium',
-                        'twill']
-        validPackages = True
-
-        for package in packagesList:
-            try:
-                pkg_resources.require(package)
-            except pkg_resources.DistributionNotFound:
-                print """
-%s not found! Please install it.
-i.e. try 'easy_install %s'""" % (package, package)
-                validPackages = False
-        return validPackages
 
     def checkTestJars(self):
         """
@@ -625,6 +613,7 @@ if __name__ == '__main__':
           include_package_data=True,
           namespace_packages = ['indico', 'indico.ext'],
           install_requires = _getInstallRequires(),
+          tests_require = ['nose', 'rednose', 'twill', 'selenium', 'figleaf'],
           data_files = dataFiles,
           dependency_links = DEPENDENCY_URLS
           )
