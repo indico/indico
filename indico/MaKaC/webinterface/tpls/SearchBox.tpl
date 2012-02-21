@@ -5,11 +5,11 @@
         <div class="yellowButton searchButton">
             <input style="background-color: transparent;" class="button" type="submit" value="${ _('Search')}" onclick="javascript: return verifyForm();" id="searchSubmit"/>
         </div>
-    <div style="background: white; padding: 2px;">
-      <div id="yoo" class="${ moreOptionsClass }" onclick="javascript:return expandMenu(this);"></div>
-      <input style="background-color: transparent; margin-top: -1px;" type="text" id="searchText" name="p" />
-        </div>
+        <div style="background: white; padding: 2px;">
+        <div id="yoo" class="${ moreOptionsClass }" onclick="javascript:return expandMenu(this);"></div>
+        <input style="background-color: transparent; margin-top: -1px;" type="text" id="searchText" name="p" />
     </div>
+</div>
 
     <div id="extraOptions">
         <div id="advancedOptionsLabel">${ _("Advanced options")}</div>
@@ -81,6 +81,13 @@ function expandMenu(domElem)
     return false;
 }
 
+function hideCategory()
+{
+    $('#searchCategId').attr('value', 0);
+    $('#cross1').fadeOut();
+    $("#inCategory1").fadeOut();
+}
+
 function resetForm()
 {
     // reset all the fields, except the phrase
@@ -117,5 +124,13 @@ IndicoUI.executeOnLoad(function(){
   $E('searchText').replaceWith(
          intelligentSearchBox.draw()
      );
+
+  var box = $('<div id="cross1" class="searchCategoryCross" onclick="hideCategory()">x</div>'+
+          '<div id="inCategory1" class="searchCategory">in ${categName}</div>');
+  if ($('#searchCategId').attr('value')!=0){
+      $('#yoo').after(box);
+  }
+
 });
+
 </script>

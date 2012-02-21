@@ -26,6 +26,7 @@ class WPSearchCategory(WPSearch, WPCategoryDisplayBase):
     def _setParams(self, params):
         params['confId'] = None
         params['categId'] = self._target.getId()
+        params['categName'] = self._target.getTitle()
 
     def _getNavigationDrawer(self):
         if self._target.isRoot() and self._target.isRoot():

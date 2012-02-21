@@ -31,6 +31,7 @@ import urllib
 from operator import attrgetter
 from MaKaC.common.db import DBMgr
 import MaKaC.conference as conference
+from MaKaC.conference import CategoryManager
 import MaKaC.user as user
 import MaKaC.schedule as schedule
 import MaKaC.common.info as info
@@ -6587,14 +6588,6 @@ class WRoomBookingAdmin( WTemplated ):
         vars["Location"] = Location
         return vars
 
-    def getHTML(self, params=None):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            return WTemplated.getHTML(self, params)
-        else:
-            return _("The Room Booking module is disabled")
-
-
 
 class WRoomBookingAdminLocation( WTemplated ):
 
@@ -6715,6 +6708,7 @@ class WCategorySearchBox(WBaseSearchBox):
     def getVars(self):
         vars = WBaseSearchBox.getVars( self )
         vars["categId"] = self._categId
+        vars["categName"] = CategoryManager().getById(self._categId).getTitle()
         vars['moreOptionsClass'] = self._moreOptionsClass
         return vars
 

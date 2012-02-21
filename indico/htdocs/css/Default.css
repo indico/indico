@@ -2246,7 +2246,7 @@ div#UISearchBox .searchButton
 
 div#UISearchBox #searchControls
 {
-    width: 250px;
+    width: 350px;
     border: 1px solid #888;
     height: 21px;
     overflow: hidden;
@@ -2262,7 +2262,7 @@ div#UISearchBox #searchControls input
 
 div#UISearchBox #searchText
 {
-    width: 130px;
+    width: 160px;
 }
 
 div#UISearchBox #extraOptions
@@ -2307,6 +2307,75 @@ div#UISearchBox #advancedOptionsLabel {
     border-bottom: 1px solid #AAAAAA;
 }
 
+div#UISearch
+{
+    position:relative;
+    border: none;
+    font-size: 13px;
+    z-index: 1;
+}
+
+div#UISearch .searchButton
+{
+    float:right;
+    border-left: 1px solid #888;
+    width: auto;
+}
+
+div#UISearch #searchText
+{
+    width: 130px;
+}
+
+div#UISearch #searchControls
+{
+    width: 350px;
+    border: 1px solid #888;
+    height: 21px;
+    overflow: hidden;
+    background-color: white;
+}
+
+div#UISearch #searchControls input
+{
+    border: 0;
+    color: black;
+    font-weight: normal;
+}
+
+.searchCategory
+{
+    background-color: #9AA0FE;
+    border-radius: 2px;
+    font-weight:normal;
+    color: #FFFFFF;
+    vertical-align: middle;
+    margin-right: -2px;
+    padding-right: 5px;
+    padding-left:5px;
+    height: 17px;
+    float: right;
+    cursor: pointer;
+    max-width: 75px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.searchCategoryCross
+{
+    background-color: #9AA0FE;
+    font-weight: bold;
+    border-radius: 2px;
+    color: #FFFFFF;
+    vertical-align: middle;
+    margin-right: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 17px;
+    float: right;
+    cursor: pointer;
+}
 
 .arrowExpandIcon
 {

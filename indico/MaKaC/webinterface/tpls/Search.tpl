@@ -32,18 +32,24 @@ ${ _("Warning: since you are not logged in, only results from public events will
 <form method="GET" action="${ urlHandlers.UHSearch.getURL() }" style="width: 400px;">
 
 % if categId:
-  <input type="hidden" name="categId" value="${ categId }"/>
+  <input type="hidden" id="categId" name="categId" value="${ categId }"/>
 % endif
 % if confId:
   <input type="hidden" name="confId" value="${ confId }"/>
 % endif
 
 
-
-<div>
-  <input style="width: 300px; height:20px; font-size:17px; vertical-align: middle;" type="text" name="p" value="${ p }" />
-  <input type="submit" value="${ _('Search')}" style="vertical-align: middle;"/>
+<div id="UISearch">
+    <div id="searchControls">
+        <div class="yellowButton searchButton" id="searchButton2">
+            <input style="background-color: transparent;" class="button" type="submit" value="${ _('Search')}" onclick="javascript: return verifyForm();" id="searchSubmit"/>
+        </div>
+        <div style="background: white; padding: 2px;">
+            <input style="background-color: transparent; margin-top: -1px;" type="text" id="searchText2" name="p" value="${ p }"/>
+        </div>
+    </div>
 </div>
+
 <div style="padding-top: 4px;"><span id="advancedOptionsText"><span class='fakeLink' onclick='toogleAdvancedOptions()'>${_("Show advanced options") }</span></span></div>
 <div id="advancedOptions" style="overflow: hidden; visibility: hidden;">
     <table style="text-align: right;">
@@ -174,6 +180,13 @@ function toogleAdvancedOptions() {
     advancedOptionsSwitch = !advancedOptionsSwitch;
 }
 
+function hideCategory2()
+{
+    $('#categId').attr('value', 0);
+    $('#cross2').fadeOut();
+    $('#inCategory2').fadeOut();
+}
+
 IndicoUI.executeOnLoad(function(){
 
 % if len(eventResults) > 0 or len(contribResults) > 0:
@@ -199,6 +212,13 @@ $E('endDatePlace').set(endDate);
 
 startDate.set('${ startDate }');
 endDate.set('${ endDate }');
+
+var box = $('<div id="cross2" class="searchCategoryCross" onclick="hideCategory2()">x</div>'+
+        '<div id="inCategory2" class="searchCategory">in ${categName}</div>');
+if ($('#categId').attr('value')!=0){
+$('#searchText2').before(box);
+}
+
 });
 
 </script>
