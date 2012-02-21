@@ -380,7 +380,7 @@ def runRoomDayIndexInit(dbi, withRBDB, prevVersion):
             resv._addToRoomDayReservationsIndex()
             if i % 1000 == 0:
                 DALManager.commit()
-    DALManager.commit()
+        DALManager.commit()
 
 @since('0.98-rc2')
 def runReservationNotificationMigration(dbi, withRBDB, prevVersion):
@@ -463,6 +463,14 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
 
     dbi = DBMgr.getInstance()
 
+    print "Probing DB connection...",
+
+    # probe DB connection
+    dbi.startRequest()
+    dbi.endRequest(False)
+
+    print "DONE!\n"
+
     # go from older to newer version and execute corresponding tasks
     for version, task, always in MIGRATION_TASKS:
         if specified and task.__name__ not in specified:
@@ -471,14 +479,9 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
             print console.colored("->", 'green', attrs=['bold']), \
                   task.__doc__.replace('\n', '').strip(),
             print console.colored("(%s)" % version, 'yellow')
-            print "\nConnecting to DB...",
             dbi.startRequest()
-            print "DONE!\n"
             if withRBDB:
-                print "\nConnecting to RB DB...",
                 DALManager.connect()
-                print "DONE!\n"
-            sys.exit()
 
             task(dbi, withRBDB, prevVersion)
 
