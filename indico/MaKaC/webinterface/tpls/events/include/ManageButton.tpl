@@ -68,7 +68,7 @@
                 return false;}, display: $T('Delete minutes')},
         % endif
 
-        % if getItemType(item) == 'Conference':
+        % if getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture":
             'compileMinutes': {action: function(m) {
                 var popupHandler = function(action){
                     if(action){
