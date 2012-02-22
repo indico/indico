@@ -1151,11 +1151,6 @@ class ConferenceRejectWithEmailPendingParticipants(ConferenceParticipantBase, Co
         emailBody = pm.extract("body", pType=str, allowEmpty=True)
         data = {}
         data["fromAddr"] = Config.getInstance().getNoReplyEmail()
-        if emailSubject and emailBody:
-            if emailBody.find('{name}') == -1:
-                raise NoReportError(_("{name} tag has to be specified."))
-            elif emailBody.find('{confTitle}') == -1:
-                raise NoReportError(_("{confTitle} tag has to be specified."))
         data["subject"] =  emailSubject
         data["body"] =  emailBody
         for id in self._userList:
