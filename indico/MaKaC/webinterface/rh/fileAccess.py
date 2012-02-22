@@ -25,7 +25,7 @@ from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.pages import files
 from MaKaC.common import Config
-from MaKaC.errors import MaKaCError, NotFoundError, AccessError
+from MaKaC.errors import NotFoundError, AccessError
 
 from email.Utils import formatdate
 from MaKaC.conference import Reviewing
@@ -49,7 +49,8 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
                 selfcopy._target.canUserSubmit(self.getAW().getUser()) or \
                 self._target.canModify( self.getAW() )):
                 raise AccessError()
-        RHDisplayBaseProtected._checkProtection( self )
+        else:
+            RHDisplayBaseProtected._checkProtection( self )
 
     def _process( self ):
 

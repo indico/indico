@@ -7,14 +7,15 @@ from MaKaC.services.implementation.base import \
      ParameterManager, ProtectedModificationService, ProtectedDisplayService
 
 import MaKaC.webinterface.locators as locators
-from MaKaC.errors import ModificationError, MaKaCError
+from MaKaC.errors import ModificationError
 
 import MaKaC.conference as conference
 from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import IMaterialFossil, IMaterialMinimalFossil,\
+from MaKaC.fossils.conference import IMaterialFossil,\
         ILinkFossil, ILocalFileFossil, ILocalFileExtendedFossil
 from MaKaC.common.PickleJar import DictPickler
+from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 
 
 class UserListChange(object):
@@ -206,6 +207,10 @@ class GetReviewingMaterial(GetMaterialClassesBase):
     """
     Base class for obtaining a listing of reviewing material classes
     """
+
+    def _checkProtection(self):
+        if not RCContributionPaperReviewingStaff.hasRights(self):
+            GetMaterialClassesBase._checkProtection(self)
 
     def _getAnswer(self):
         """
