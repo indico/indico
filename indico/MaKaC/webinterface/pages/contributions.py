@@ -387,7 +387,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         self._contrib = self._target = contribution
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
         self._isPRM = RCPaperReviewManager.hasRights(rh)
-        self._canModify = self._conf.canModify(rh.getAW())
+        self._canModify = self._contrib.canModify(rh.getAW()) or (self._contrib.getSession() and self._contrib.getSession().canCoordinate(rh.getAW(), "modifContribs"))
 
     def _getEnabledControls(self):
         return False

@@ -124,7 +124,7 @@ class SessionSlotDisplayBase(ProtectedDisplayService, SessionSlotBase):
         ProtectedDisplayService._checkParams(self)
 
 
-class SessionSlotModifBase(SessionSlotBase, SessionModifBase):
+class SessionSlotModifBase(SessionModifBase, SessionSlotBase):
 
     def _checkParams( self ):
         SessionSlotBase._checkParams(self)
