@@ -94,7 +94,7 @@ class WPElectronicAgreementForm(WPSimpleEventDisplay):
                    ['Collaboration/Style.css']
 
     def getJSFiles(self):
-        return WPSimpleEventDisplay.getJSFiles(self) + self._includeJSPackage('Collaboration')
+        return WPSimpleEventDisplay.getJSFiles(self) + self._includeJSPackage("Display") + self._includeJSPackage('Collaboration')
 
     def _getBody(self, params):
         wc = WElectronicAgreementForm.forModule(Collaboration, self._conf, self.authKey)
@@ -110,7 +110,7 @@ class WPElectronicAgreementFormConference(WPConferenceDefaultDisplayBase):
                    ['Collaboration/Style.css']
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Collaboration')
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage("Display") + self._includeJSPackage('Collaboration')
 
     def _getBody( self, params ):
         wc = WElectronicAgreementForm.forModule(Collaboration, self._conf, self.authKey)
