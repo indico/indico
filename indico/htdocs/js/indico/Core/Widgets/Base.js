@@ -497,7 +497,7 @@ type("JTabWidget", ["IWidget"], {
             var nav = $('.ui-tabs-nav:first', self.widget);
             if(!$.browser.msie) {
                 var origIdx = idx;
-                while(idx > 0) {
+                while(idx >= 0) {
                     self.scrollToTab(idx - 1); // try scrolling left 1 tab
                     if(nav.find(' > li').eq(origIdx).is(':hidden')) { // if our tab is now hidden, scroll one tab forward again and stop
                         self.scrollToTab(idx);
