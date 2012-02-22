@@ -156,7 +156,7 @@ class TestManager(object):
         # set defaults
         config.reset({
             'BaseURL': 'http://localhost:8000',
-            'BaseSecureURL': 'http://localhost:8000',
+            'BaseSecureURL': '',
             'UseXSendFile': False,
             'AuthenticatorList': ['Local'],
             'SmtpServer': ('localhost', 58025),
