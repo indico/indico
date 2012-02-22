@@ -172,6 +172,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
     @classmethod
     def getUserRooms(cls, avatar):
         return Catalog.getIdx('user_room').get(avatar.getId())
+        #return rooms if rooms else OOSet()
 
     # Typical actions
     @staticmethod
