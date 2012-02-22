@@ -8,12 +8,13 @@ URL Format
 The SERVICE_ID may be a single collaboration type or many separated by `-`. 
 At present, the only TYPE compatible with the Video Services export is `ics` / iCalendar.
 
-As the query is signed by your secret API key, the query need not be timestamped and signed 
-separately. Instead, each booking is given its own unique identifier and, therefore, the 
+As the query is signed with a signature generated using secret API key, the query need not be timestamped.
+Instead, each booking is given its own unique identifier and, therefore, the
 generated query URL may be fed as a persistent calendar for importing in your application 
-of choice. The link will only expire once your account has been closed or if TTL is required by 
-your server administrator. In which case, the query string should be constructed with your API 
-key and signed in the usual manner.
+of choice. The link will only expire once your account has been closed, if TTL is required by
+your server administrator or your API key is deleted.
+
+If TTL is required by your server administrator, requests should be both timestamped and signed.
 
 Parameters
 ----------
@@ -53,30 +54,30 @@ refer to common examples for usage scenarios.
 Common Examples
 ---------------
 
-all bookings
+All Bookings
 ~~~~~~~~~~~~
 
 To obtain all bookings in the past 7 days for all collaboration plugins registered:
 
-https://indico.server/export/video/all.ics?ak=SECRET_API_KEY&from=-70000&to=now
+https://indico.server/export/video/all.ics?ak=API_KEY&from=-70000&to=now&signature=SIGNATURE
 
 To obtain the same output, but with alarms set to display 20 minutes prior to each event:
 
-https://indico.server/export/video/all.ics?ak=SECRET_API_KEY&alarms=20&from=-70000&to=now
+https://indico.server/export/video/all.ics?ak=API_KEY&alarms=20&from=-70000&to=now&signature=SIGNATURE
 
-individual plugin bookings
+Individual Plugin Bookings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To obtain bookings from a specific plugin, in this example Vidyo, from a set date range and with alarms 30
 minutes prior to the booking:
 
-https://indico.server/export/video/vidyo.ics?ak=SECRET_API_KEY&alarms=30&from=2011-08-01&to=2011-12-01
+https://indico.server/export/video/vidyo.ics?ak=API_KEY&alarms=30&from=2011-08-01&to=2011-12-01&signature=SIGNATURE
 
-multiple plugin bookings
+Multiple Plugin Bookings
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 We may also reference more than one plugin's bookings, to request all EVO and CERNMCU bookings over a 
 specified date range with no alarms:
 
-https://indico.server/export/video/evo-mcu.ics?ak=SECRET_API_KEY&from=2011-09-01&to=2011-09-08
+https://indico.server/export/video/evo-mcu.ics?ak=API_KEY&from=2011-09-01&to=2011-09-08&signature=SIGNATURE
 
