@@ -757,14 +757,10 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
 
                         var popup = new ExclusivePopup($T('Export to Calendar'), null, true, true);
 
-                        popup.postDraw = function() {
+                        popup.draw = function() {
+                            this.ExclusivePopup.prototype.draw.call(this, result);
                             exportPopups[self.eventData.uniqueId].showContent();
                             exportPopups[self.eventData.uniqueId].showPopup();
-                            this.ExclusivePopup.prototype.postDraw.call(this);
-                        };
-
-                        popup.draw = function() {
-                            return this.ExclusivePopup.prototype.draw.call(this, result);
                         };
                         popup.open();
                     }
