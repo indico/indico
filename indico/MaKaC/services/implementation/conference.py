@@ -896,16 +896,17 @@ class ConferenceAddParticipant(ConferenceModifBase, ConferenceAddEditParticipant
         av = AvatarHolder().match({"email": self._email.strip()}, exact=1, forceWithoutExtAuth=False)
         participation = self._conf.getParticipation()
         if av != None and av != []:
-            participant = self._generateParticipant(av)
+            participant = self._generateParticipant(av[0])
         else:
             participant = self._generateParticipant()
-        if not participation.addParticipant(participant, eventManager) :
-            if participation.alreadyParticipating(participant) != 0 :
-                raise NoReportError(_("The participant can not be added to the meeting because there is already a participant with the email address '%s'."
+        if participation.alreadyParticipating(participant) != 0 :
+            raise NoReportError(_("The participant can not be added to the meeting because there is already a participant with the email address '%s'."
                                 % participant.getEmail()),title=_('Already registered participant'))
-            elif participation.alreadyPending(participant)!=0:
-                raise NoReportError(_("The participant can not be added to the meeting because there is already a pending participant with the email address '%s'."
+        elif participation.alreadyPending(participant)!=0:
+            raise NoReportError(_("The participant can not be added to the meeting because there is already a pending participant with the email address '%s'."
                                 % participant.getEmail()),title=_('Already pending participant'))
+        else:
+            participation.addParticipant(participant, eventManager)
         return conferences.WConferenceParticipant(self._conf,participant).getHTML().replace("\n","")
 
 class ConferenceEditParticipant(ConferenceModifBase, ConferenceAddEditParticipantBase):
@@ -951,12 +952,12 @@ class ConferenceEditPending(ConferenceModifBase, ConferenceAddEditParticipantBas
 class ConferenceAddParticipants(ConferenceParticipantBase, ConferenceParticipantListBase):
 
     def _addParticipant(self, participant, participation):
-        if not participation.addParticipant(participant, self._getUser()) :
-            if participation.alreadyParticipating(participant) != 0 :
-                self._usersParticipant.append(participant.getEmail())
-            elif participation.alreadyPending(participant)!=0:
-                self._usersPending.append(participant.getEmail())
+        if participation.alreadyParticipating(participant) != 0 :
+            self._usersParticipant.append(participant.getEmail())
+        elif participation.alreadyPending(participant)!=0:
+            self._usersPending.append(participant.getEmail())
         else:
+            participation.addParticipant(participant, self._getUser())
             self._added.append(conferences.WConferenceParticipant(self._conf,participant).getHTML())
 
     def _getAnswer(self):
@@ -999,13 +1000,14 @@ class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticip
         self._emailBody = pm.extract("body", pType=str, allowEmpty=False)
 
     def _inviteParticipant(self, participant, participation):
-        if not participation.inviteParticipant(participant, self._getUser()) :
-            if participation.alreadyParticipating(participant) != 0 :
-                self._usersParticipant.append(participant.getEmail())
-            elif participation.alreadyPending(participant)!=0:
-                self._usersPending.append(participant.getEmail())
+        if participation.alreadyParticipating(participant) != 0 :
+            self._usersParticipant.append(participant.getEmail())
+            return False
+        elif participation.alreadyPending(participant)!=0:
+            self._usersPending.append(participant.getEmail())
             return False
         else:
+            participation.inviteParticipant(participant, self._getUser())
             self._added.append(conferences.WConferenceParticipant(self._conf,participant).getHTML())
             return True
 
@@ -1440,40 +1442,6 @@ class ConferenceParticipantAddExisting(ConferenceAddParticipantBase):
             elif self._action == "invite":
                 self._conf.getParticipation().inviteParticipant(participant, eventManager)
         return fossilize(self._conf.getParticipation().getParticipantList())
-
-
-class ConferenceParticipantAddNew(ConferenceAddParticipantBase):
-
-    def _checkParams(self):
-        ConferenceAddParticipantBase._checkParams(self)
-        self._userData = self._pm.extract("userData", pType=dict, allowEmpty=False)
-        # check the email, used already or empty
-        email = self._userData.get("email", "")
-        if email == "":
-            raise ServiceAccessError(_("Participant has not been added because the email address was missing."))
-        elif self._isEmailAlreadyUsed(email):
-            raise ServiceAccessError(_("The participant identified by email '%s' is already in the participants' list.") % email)
-        if self._userData.get("familyName", "") == "":
-            raise ServiceAccessError(_("Participant has not been added because family name was missing."))
-
-    def _getAnswer(self):
-        eventManager = self._getUser()
-        av = AvatarHolder().match({"email": self._userData["email"].strip()}, exact=1, forceWithoutExtAuth=True)
-        if av != []:
-            participant = Participant(self._conf, av[0])
-        else:
-            participant = Participant(self._conf)
-            participant.setTitle(self._userData.get("title", ""))
-            participant.setFamilyName(self._userData.get("familyName", ""))
-            participant.setFirstName(self._userData.get("firstName", ""))
-            participant.setEmail(self._userData.get("email", ""))
-            participant.setAffiliation(self._userData.get("affiliation", ""))
-            participant.setAddress(self._userData.get("address",""))
-            participant.setTelephone(self._userData.get("phone",""))
-            participant.setFax(self._userData.get("fax",""))
-        self._conf.getParticipation().addParticipant(participant, eventManager)
-        return fossilize(self._conf.getParticipation().getParticipantList())
-
 
 class ConferenceManagerListBase(ConferenceModifBase):
 
