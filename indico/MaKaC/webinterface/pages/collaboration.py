@@ -50,7 +50,8 @@ class WPAdminCollaboration(WPMainBase):
         self._buildExtraJS()
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Collaboration')
+        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Display') \
+            + self._includeJSPackage('Collaboration')
 
     def _getHeader(self):
         wc = wcomponents.WHeader(self._getAW())
