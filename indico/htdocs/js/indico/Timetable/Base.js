@@ -683,12 +683,12 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
                                    OWNER_START_DATE_EXTENDED: {
                                        SessionSlot : $T('The <strong>starting time</strong> of the session interval <strong>')  + title + $T('</strong> was moved from '),
                                        Session: $T('The <strong>starting time</strong> of the session interval <strong>')  + title  + $T('</strong> was moved from '),
-                                       Conference: $T('The <strong>starting time</strong> of the <strong>Conference</strong> was moved from ')
+                                       Conference: $T('The <strong>starting time</strong> of the <strong>Event</strong> was moved from ')
                                    },
                                    OWNER_END_DATE_EXTENDED: {
                                        SessionSlot : $T('The <strong>ending time</strong> of the session interval <strong>') + title + $T('</strong> was moved from '),
                                        Session: $T('The <strong>ending time</strong> of the session interval <strong>') + title + $T('</strong> was moved from '),
-                                       Conference: $T('The <strong>ending time</strong> of the <strong>Conference</strong> was moved from ')
+                                       Conference: $T('The <strong>ending time</strong> of the <strong>Event</strong> was moved from ')
                                    },
                                    ENTRIES_MOVED: {
                                        SessionSlot: $T('The contents of the interval <strong>') + title + $T('</strong> were moved from ')
