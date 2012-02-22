@@ -22,8 +22,7 @@
 }
 
 .ui-dialog .ui-dialog-buttonpane {
-    border-color: #CCCCCC -moz-use-text-color -moz-use-text-color;
-    border-style: solid none none;
+    border-top: 1px solid #CCCCCC;
     margin: 0px;
     padding: 0.3em 1em 0.5em 0.4em !important;
     background: #FCFCFC;
