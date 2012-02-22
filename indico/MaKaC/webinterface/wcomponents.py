@@ -472,10 +472,19 @@ class WConferenceHeader(WHeader):
 #            vars["confModif"] = ""
 
         # Default values to avoid NameError while executing the template
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        styles = styleMgr.getExistingStylesForEventType("conference")
+
         vars["viewoptions"] = []
+        viewoptions = []
+        if len(styles) != 0:
+            styles.sort(key=styleMgr.getStyleName)
+            for styleId in styles:
+                viewoptions.append({"id": styleId, "name": styleMgr.getStyleName(styleId) })
+        vars["viewoptions"] = viewoptions
         vars["SelectedStyle"] = ""
         vars["pdfURL"] = ""
-        vars["displayURL"] = ""
+        vars["displayURL"] = str(urlHandlers.UHConferenceOtherViews.getURL())
 
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = False
@@ -483,7 +492,7 @@ class WConferenceHeader(WHeader):
         vars["showExportToICal"] = True
         vars["showExportToPDF"] = False
         vars["showDLMaterial"] = True
-        vars["showLayout"] = False
+        vars["showLayout"] = True
 
         vars["usingModifKey"]=False
         if self._conf.canKeyModify(self._aw):
