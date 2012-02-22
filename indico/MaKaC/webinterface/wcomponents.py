@@ -5746,10 +5746,11 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
 
 class WRoomBookingRoomList( WTemplated ):
 
-    def __init__( self, rh, standalone = False ):
+    def __init__( self, rh, standalone = False, onlyMy = False ):
         self._rh = rh
         self._standalone = standalone
         self._title = None
+        self._onlyMy = onlyMy
         try: self._title = self._rh._title;
         except: pass
 
@@ -5761,6 +5762,10 @@ class WRoomBookingRoomList( WTemplated ):
         #vars["roomPhotoUH"] = urlHandlers.UHSendRoomPhoto
         vars["standalone"] = self._standalone
         vars["title"] = self._title
+        if self._onlyMy:
+            vars["noResultsMsg"] = _("You are not the owner of any room.")
+        else :
+            vars["noResultsMsg"] = _("There are no rooms with this search criteria.")
 
         if self._standalone:
             vars["detailsUH"] = urlHandlers.UHRoomBookingRoomDetails

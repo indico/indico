@@ -301,7 +301,7 @@ class WPRoomBookingRoomList( WPRoomBookingBase ):
 
 
     def _getBody( self, params ):
-        wc = wcomponents.WRoomBookingRoomList( self._rh, standalone = True )
+        wc = wcomponents.WRoomBookingRoomList( self._rh, standalone = True, onlyMy = self._onlyMy )
         return wc.getHTML( params )
 
 class WPRoomBookingBookingList( WPRoomBookingBase ):

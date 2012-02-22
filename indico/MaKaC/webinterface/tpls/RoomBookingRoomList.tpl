@@ -26,7 +26,7 @@
                             % endif
                             </span><br /><br />
 
-
+% if rooms:
 <table width="100%" class="filesTab">
 <tr>
 <td>
@@ -97,6 +97,10 @@
 </td>
 </tr>
 </table>
+% else:
+<span class="actionFailed">${noResultsMsg}</span>
+% endif
+
 
                         </td>
                     </tr>
