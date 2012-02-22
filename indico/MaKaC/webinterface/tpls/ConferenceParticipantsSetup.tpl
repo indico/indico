@@ -6,34 +6,34 @@
     </td>
 </tr>
 <tr>
-    <td style="padding-right:15px">${ _(" When a participant is added, an email notification will be sent to him.")}</td>
+    <td style="padding-right:15px">${ _(" When a participant is added, an email notification will be sent to him")}</td>
     <td>
         <div id="inPlaceEditAddedInfo"></div>
     </td>
 </tr>
 
 <tr>
-    <td style="padding-right:15px">${ _("The list of participants is displayed on the event page.")}</td>
+    <td style="padding-right:15px">${ _("The list of participants is displayed on the event page")}</td>
     <td class="blacktext">
         <div id="inPlaceEditDisplay"></div>
     </td>
 </tr>
 <tr>
-    <td style="padding-right:15px">${ _("Users may apply to participate in this event.")}</td>
+    <td style="padding-right:15px">${ _("Users may apply to participate in this event")}</td>
     <td class="blacktext">
         <div id="inPlaceEditAllowForApply"></div>
     </td>
 </tr>
 <tr>
-    <td style="padding-right:15px">${ _("Participation requests must be approved by the event managers (you).")}</td>
+    <td style="padding-right:15px">${ _("Participation requests must be approved by the event managers (you)")}</td>
     <td class="blacktext">
         <div id="inPlaceEditAutoAccept"></div>
     </td>
 </tr>
 <tr>
-    <td style="padding-right:15px">${ _("Maximum number of participants.")}</td>
+    <td style="padding-right:15px">${ _("Maximum number of participants (0 means unlimited)")}</td>
     <td class="blacktext">
-        <div id="inPlaceEditNumMaxParticipants"></div>
+        <div id="inPlaceEditNumMaxParticipants" style="display:inline;"></div>
     </td>
 </tr>
 </table>
@@ -49,7 +49,7 @@ IndicoUI.executeOnLoad(function(){
     $("#inPlaceEditAutoAccept").append($(new RemoteSwitchButton(${"false" if autoAccept else "true"},
             Html.img({src:imageSrc("enabledSection.png")}), Html.img({src:imageSrc("disabledSection.png")}), "event.participation.autopAccept", "event.participation.autopAccept",{confId:${confId}}).draw().dom));
     $("#inPlaceEditNumMaxParticipants").append(new InputEditWidget('event.participation.setNumMaxParticipants',
-            {confId:${confId}}, ${ jsonEncode(numMaxParticipants) }, 0, false, null, function(value){return IndicoUtil.isInteger(value);}, '${_("The value set is not a positive number")}', '${_("Please insert a positive number or 0 for unlimited")}',
+            {confId:${confId}}, ${ jsonEncode(numMaxParticipants) }, false, null, function(value){return IndicoUtil.isInteger(value);}, '${_("The value set is not a positive number")}', '${_("Please insert a positive number or 0 for unlimited")}',
             null).draw().dom);
 
    });

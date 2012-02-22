@@ -607,19 +607,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
 
                 this.barsDiv = Html.div({}, this.drawBars("name"));
 
-                if (this.rejectAllLink) {
-                    var rejectAllDiv = Html.div({className:"fakeLink", style:{width:pixels(820), textAlign:"center"}},
-                            $T("Reject ALL Conflicting PRE-Bookings"));
-                    rejectAllDiv.observeClick( function(){
-                        new ConfirmPopup($T("Reject ALL Conflicting PRE-Bookings"),
-                                        Html.div({},$T('Are you sure you want to REJECT ALL conflicting PRE-bookings?')),
-                                        function(value) {
-                                            if(value)
-                                                window.location = self.rejectAllLink;
-                                        }).open();
-                    });
-                }
-                return Html.div({}, header, this.barsDiv, rejectAllDiv);
+                return Html.div({}, header, this.barsDiv);
             },
 
             /**
@@ -652,7 +640,20 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                         }
                     })
                     content = Html.div({});
-                    return Html.div({style:{clear:'both', marginTop: pixels(45)}},
+                    var rejectAllDiv = null;
+                    if (this.rejectAllLink) {
+                        rejectAllDiv = Html.div({className:"fakeLink", style:{width:pixels(820), textAlign:"center", paddingBottom:pixels(10)}},
+                                $T("Reject ALL Conflicting PRE-Bookings"));
+                        rejectAllDiv.observeClick( function(){
+                            new ConfirmPopup($T("Reject ALL Conflicting PRE-Bookings"),
+                                            Html.div({},$T('Are you sure you want to REJECT ALL conflicting PRE-bookings?')),
+                                            function(value) {
+                                                if(value)
+                                                    window.location = self.rejectAllLink;
+                                            }).open();
+                        });
+                    }
+                    return Html.div({style:{clear:'both', marginTop: pixels(45)}},rejectAllDiv,
                             Html.div({style:{background:"#F5F5F5", width:pixels(820), textAlign:'center', padding: pixels(10)}},toggleSummary, arrowDown), content);
                 }
             }

@@ -5763,9 +5763,9 @@ class WRoomBookingRoomList( WTemplated ):
         vars["standalone"] = self._standalone
         vars["title"] = self._title
         if self._onlyMy:
-            vars["noResultsMsg"] = _("You are not the owner of any room.")
+            vars["noResultsMsg"] = _("You are not the owner of any room")
         else :
-            vars["noResultsMsg"] = _("There are no rooms with this search criteria.")
+            vars["noResultsMsg"] = _("There are no rooms with this search criteria")
 
         if self._standalone:
             vars["detailsUH"] = urlHandlers.UHRoomBookingRoomDetails

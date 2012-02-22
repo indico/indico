@@ -169,8 +169,8 @@ IndicoUI.executeOnLoad(function(){
             var subject = 'Your application for attendance in \'${conf.getTitle()}\' declined';
             var body = 'Dear {name},<br/><br/>' +
                         'your request to attend the \'{confTitle}\' has been declined by the event manager.<br/>';
-            var legends = {'confTitle':$T('field containing the conference title. (This field is mandatory)'),
-                           'name':$T('field containing the full name of the participant.(This field is mandatory)')};
+            var legends = {'confTitle':$T('field containing the conference title.'),
+                           'name':$T('field containing the full name of the participant.')};
             var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, 'event.participation.rejectPendingWithEmail', participantsChecked, '${currentUser.getStraightFullName()}' ,subject, body, legends, pendingHandler);
             popup.open();
         }
