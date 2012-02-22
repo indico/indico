@@ -493,7 +493,9 @@ var dateBookingTemplate = function(booking, viewBy) {
     } else if (viewBy === "modificationDate") {
         time = booking.modificationDate.time.substring(0,5);
     } else if (viewBy === "startDate" || viewBy === "conferenceStartDate") {
-        time = Util.parseDateTime(booking.bookingParams.startDate, IndicoDateTimeFormats.Default).time.substring(0, 5);
+        time = (booking.bookingParams.startDate.length === 0)
+               ? '' : Util.parseDateTime(booking.bookingParams.startDate,
+                       IndicoDateTimeFormats.Default).time.substring(0, 5);
     }
 
     var cell = Html.td('ACBookingFirstCell ACBookingTime', time);

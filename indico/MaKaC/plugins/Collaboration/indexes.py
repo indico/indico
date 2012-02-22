@@ -58,7 +58,6 @@ class CollaborationIndex(Persistent):
             indexName += "_pending"
 
         reverse = orderBy == "descending"
-
         try:
             index = self.getIndex(indexName)
             totalInIndex = index.getCount()
