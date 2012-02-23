@@ -64,7 +64,7 @@ def serialize_collaboration(cal, fossil, now):
 
     # If there is an alarm required, add a subcomponent to the Event
     if fossil.has_key('alarm'):
-        event.add_component(serialize_collaboration_alarm(fossil, now))
+        event.add_component(serialize_collaboration_alarm(cal, fossil, now))
     cal.add_component(event)
 
 
