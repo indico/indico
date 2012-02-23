@@ -236,23 +236,26 @@ class CSBookingManager(Persistent, Observer):
 
             booking: The existing booking to be added.
         """
+        booking.setId( self._getNewBookingId())
         self._bookings[booking.getId()] = booking
         self._bookingsByType.setdefault(booking.getType(),[]).append(booking.getId())
         if booking.isHidden():
             self.getHiddenBookings().add(booking.getId())
         self._indexBooking(booking)
         self._notifyModification()
+
+        # the unique id can be diferent for the new conference
+        booking.setLinkType({booking.getLinkType():ContextManager.get('clone.unique_id_map').get(booking.getLinkId(),"")})
         if booking.hasSessionOrContributionLink():
-            # the unique id can be diferent for the new conference
-            booking.setLinkType({booking.getLinkType():ContextManager.get('clone.unique_id_map').get(booking.getLinkId(),"")})
-            bp=booking.getBookingParams()
             linkObject = booking.getLinkObject()
+            bp=booking.getBookingParams()
             if isinstance(linkObject, Contribution):
                 bp["videoLinkContribution"] = linkObject.getId()
             else: #session
                 bp["videoLinkSession"] = linkObject.getId()
             booking.setBookingParams(bp)
-            self.addVideoService(booking.getLinkId(), booking)
+
+        self.addVideoService(booking.getLinkId(), booking)
 
     def createBooking(self, bookingType, bookingParams = {}):
         """ Adds a new booking to the list of bookings.
@@ -1483,8 +1486,6 @@ class CSBookingBase(Persistent, Fossilizable):
             object is associated with, completely agnostic of the link type.
             Returns None if no association (default) found.
         """
-        if not self.hasSessionOrContributionLink():
-            return None
 
         return self._linkVideoId
 

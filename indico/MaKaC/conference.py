@@ -4241,6 +4241,7 @@ class Conference(CommonObjectBase, Locatable):
         conf.setReportNumberHolder(self.getReportNumberHolder().clone(self))
         for ch in self.getChairList():
             conf.addChair(ch.clone())
+        ContextManager.setdefault("clone.unique_id_map", {})[self.getUniqueId()] = conf.getUniqueId()
         # Display Manager
         from MaKaC.webinterface import displayMgr
         selfDispMgr=displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)

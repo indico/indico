@@ -35,7 +35,7 @@ class VidyoContributor(Component):
     def addCheckBox2CloneConf(cls, obj, list):
         """ we show the clone checkbox if:
             * The Vidyo Plugin is active.
-            * There are vydio services in the event created by the user who wants to clone
+            * There are vidyo services in the event created by the user who wants to clone
         """
         #list of creators of the chat rooms
         if PluginsWrapper('Collaboration', 'Vidyo').isActive() and len(obj._conf.getCSBookingManager().getBookingList(filterByType="Vidyo")) !=0:
@@ -45,7 +45,7 @@ class VidyoContributor(Component):
     def fillCloneDict(self, obj, params):
         options = params['options']
         paramNames = params['paramNames']
-        options['vydio'] = 'cloneVidyo' in paramNames
+        options['vidyo'] = 'cloneVidyo' in paramNames
 
     @classmethod
     def cloneEvent(cls, confToClone, params):
@@ -53,7 +53,7 @@ class VidyoContributor(Component):
         conf = params['conf']
         options = params['options']
 
-        if options.get("vydio", True):
+        if options.get("vidyo", True):
             for vs in confToClone.getCSBookingManager().getBookingList(filterByType="Vidyo"):
                 # Do not cloning the booking when were are NOT cloning the timetable (optionas has sessions and contribs)
                 # and the booking is linked to a contrib/session
