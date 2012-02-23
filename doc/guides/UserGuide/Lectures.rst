@@ -113,11 +113,9 @@ For more information, see :ref:`video_guide`.
 Participants
 ~~~~~~~~~~~~
 
-You can view here a list of all the participants. You can add or remove
+You can view here a list of all the participants. One can add or remove
 participants (as a manager), mark as present/absent, ask for excuse, send
-email etc. You can also export the list of participants to Excel by clicking
-on *Export to Excel* on the right. You can also choose whether to display
-or not the list of participants in the event page.
+email, export the list of participants to Excel, among other options.
 
 For more info see `Meeting participants <Meetings.html#participants>`_.
 
