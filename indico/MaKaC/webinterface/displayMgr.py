@@ -264,10 +264,7 @@ class Menu(Persistent):
         newMenu._linkGenerator = self._linkGenerator.clone()
         newList = []
         for link in self.getLinkList():
-            # TODO: remove this, as it is just a workaround caused by a previous
-            # version in which removed links were not properly destroyed
-            if hasattr(link, '_URL') or isinstance(link, Spacer) or  isinstance(link, PageLink):
-                newList.append(link.clone(newMenu))
+            newList.append(link.clone(newMenu))
         if len(newList) != 0:
             newMenu._listLink = newList
 
