@@ -624,13 +624,20 @@ class SessionSlotScheduleModifyStartEndDate(ModifyStartEndDate, sessionServices.
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ModifyStartEndDate._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._isSessionTimetable = pm.extract("sessionTimetable", pType=bool, allowEmpty=True)
 
 
     def _performOperation(self):
 
         result = ModifyStartEndDate._performOperation(self)
 
-        fossilizedDataSlotSchEntry = self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+        if self._isSessionTimetable:
+            schEntry = self._slot.getSessionSchEntry()
+        else:
+            schEntry = self._slot.getConfSchEntry()
+
+        fossilizedDataSlotSchEntry = schEntry.fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
                                                tz=self._conf.getTimezone())
