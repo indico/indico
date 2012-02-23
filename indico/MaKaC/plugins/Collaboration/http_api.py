@@ -46,7 +46,8 @@ def serialize_collaboration_alarm(fossil, now):
     trigger = timedelta(minutes=-int(fossil['alarm']))
     alarm.set('trigger', trigger)
     alarm.set('action', 'DISPLAY')
-    alarm.set('summary', "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title'].decode('utf-8'))
+    alarm.set('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
+                                                                 fossil['status']) + fossil['title'].decode('utf-8'))
     alarm.set('description', str(fossil['url']))
 
     return alarm
@@ -61,7 +62,8 @@ def serialize_collaboration(cal, fossil, now):
     event.set('dtend', fossil['endDate'])
     event.set('url', url)
     event.set('categories', "VideoService - " + fossil['type'])
-    event.set('summary', "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title'].decode('utf-8'))
+    event.set('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
+                                                                 fossil['status']) + fossil['title'].decode('utf-8'))
     event.set('description', url)
 
     # If there is an alarm required, add a subcomponent to the Event
@@ -72,6 +74,41 @@ def serialize_collaboration(cal, fossil, now):
 
 # the iCal serializer needs some extra info on how to display things
 ICalSerializer.register_mapper('collaborationMetadata', serialize_collaboration)
+
+
+class VideoExportUtilities():
+
+    SERVICE_MAP = {
+        'CERNMCU': 'MCU',
+        'WebcastRequest': 'W',
+        'RecordingRequest': 'R'
+    }
+    STATUS_MAP = {
+        'Accepted': 'A',
+        'Rejected': 'R',
+        'Pending': 'P'
+    }
+
+    @staticmethod
+    def getCondensedPrefix(service, status):
+        """ Condense down the summary lines based on the above dictionaries
+            for easier reading in calendar applications.
+        """
+        prefix = ""
+
+        if VideoExportUtilities.SERVICE_MAP.has_key(service):
+            prefix += VideoExportUtilities.SERVICE_MAP.get(service)
+        else:
+            prefix += service
+
+        prefix += '-'
+
+        if VideoExportUtilities.STATUS_MAP.has_key(status):
+            prefix += VideoExportUtilities.STATUS_MAP.get(status)
+        else:
+            prefix += status
+
+        return (prefix + ": ")
 
 
 class CollaborationAPIHook(HTTPAPIHook):
