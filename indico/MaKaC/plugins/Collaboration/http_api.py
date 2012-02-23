@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import icalendar as ical
+from datetime import timedelta
 
 from indico.web.http_api import HTTPAPIHook, DataFetcher
 from indico.web.http_api.ical import ICalSerializer
@@ -40,14 +41,15 @@ from MaKaC.plugins.Collaboration.fossils import ICollaborationMetadataFossil
 globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook', 'VideoEventHook']
 
 
-def serialize_collaboration_alarm(cal, fossil, now):
+def serialize_collaboration_alarm(fossil, now):
     alarm = ical.Alarm()
-    trigger = "-PT" + str(fossil['alarm']) + "M"  # iCalendar spec for pre-event trigger
+    trigger = timedelta(minutes=-int(fossil['alarm']))
     alarm.set('trigger', trigger)
     alarm.set('action', 'DISPLAY')
     alarm.set('summary', "[" + fossil['type'] + "] " + fossil['status'] + " - " + fossil['title'].decode('utf-8'))
     alarm.set('description', str(fossil['url']))
-    cal.add_component(alarm)
+
+    return alarm
 
 
 def serialize_collaboration(cal, fossil, now):
@@ -64,7 +66,7 @@ def serialize_collaboration(cal, fossil, now):
 
     # If there is an alarm required, add a subcomponent to the Event
     if fossil.has_key('alarm'):
-        event.add_component(serialize_collaboration_alarm(cal, fossil, now))
+        event.add_component(serialize_collaboration_alarm(fossil, now))
     cal.add_component(event)
 
 
