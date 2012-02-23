@@ -930,9 +930,11 @@ class CategoryDateIndex(Persistent):
         for conf in categ.getConferenceList():
             self.unindexConf(conf)
 
-    def indexCateg(self, categ):
+    def indexCateg(self, categ, dbi=None, counter=0):
         for subcat in categ.getSubCategoryList():
-            self.indexCateg(subcat)
+            self.indexCateg(subcat, dbi=dbi, counter=counter+1)
+            if dbi and counter < 2:
+                dbi.commit()
         for conf in categ.getConferenceList():
             self.indexConf(conf)
 
@@ -992,10 +994,10 @@ class CategoryDateIndexLtd(CategoryDateIndex):
         if conf.getFullVisibility() > level:
             self._indexConf("0",conf)
 
-    def buildIndex(self):
+    def buildIndex(self, dbi=None):
         self._idxCategItem = OOBTree()
         from MaKaC.conference import CategoryManager
-        self.indexCateg(CategoryManager().getById('0'))
+        self.indexCateg(CategoryManager().getById('0'), dbi=dbi)
 
 class CategoryDayIndex(CategoryDateIndex):
 
@@ -1025,10 +1027,10 @@ class CategoryDayIndex(CategoryDateIndex):
         if not self._useVisibility or conf.getFullVisibility() > level:
             self._indexConf("0",conf)
 
-    def buildIndex(self):
+    def buildIndex(self, dbi):
         self._idxCategItem = OOBTree()
         from MaKaC.conference import CategoryManager
-        self.indexCateg(CategoryManager().getById('0'))
+        self.indexCateg(CategoryManager().getById('0'), dbi=dbi)
 
     def getObjectsInDays(self, categid, sDate, eDate):
         if self._idxCategItem.has_key(categid):

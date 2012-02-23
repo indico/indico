@@ -331,13 +331,13 @@ If you still want to regenerate it, please, do it manually using """ \
 @since('0.98.1')
 def categoryDateIndexWithoutVisibility(dbi, withRBDB, prevVersion):
     """
-    Create category date index without visiblity.
+    Create category date index without visibility.
     """
     IndexesHolder()._getIdx()['categoryDate']._useVisibility = True
     if 'categoryDateAll' not in IndexesHolder()._getIdx():
         newIdx = CategoryDayIndex(visibility=False)
-        newIdx.buildIndex()
         IndexesHolder()._getIdx()['categoryDateAll'] = newIdx
+        newIdx.buildIndex(dbi)
 
 
 @since('0.98b', always=True)
