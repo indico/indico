@@ -1504,9 +1504,9 @@ class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
 
     def _process( self ):
         for ses in self._target.getSessionList():
-            conveners = ses.getConvenerList()
-            for convener in conveners:
-                ses.grantModification(convener,False)
+            for slot in ses.getSlotList():
+                for convener in slot.getConvenerList():
+                    ses.grantModification(convener,False)
         self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
 
 class RHConfModifTools( RHConferenceModifBase ):

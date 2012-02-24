@@ -35,6 +35,18 @@ class RoomReservationEndTask(OneShotTask, Observable):
         if not resv:
             self.getLogger().info('Reservation %r does not exist anymore, not triggering end notification' % self.resvGUID)
             return
+        elif self._resv.isCancelled:
+            self.getLogger().info('Reservation %s is cancelled, no email will be sent' % resv.guid)
+            return
+        elif self._resv.isRejected:
+            self.getLogger().info('Reservation %s is rejected, no email will be sent' % resv.guid)
+            return
+        elif not self._resv.isConfirmed:
+            self.getLogger().info('Reservation %s is not confirmed, no email will be sent' % resv.guid)
+            return
+        elif resv.dayIsExcluded(self.resvOccurrence.startDT.date()):
+            self.getLogger().info('Occurrence %s is excluded (rejected or cancelled)' % self.resvOccurrence)
+            return
         resv.getStartEndNotification().sendEndNotification(self.resvOccurrence)
 
 

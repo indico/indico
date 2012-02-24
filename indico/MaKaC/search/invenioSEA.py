@@ -34,6 +34,8 @@ class InvenioSEA(base.SearchEngineAdapter):
         Currently used at CERN.
     """
 
+    _protocol = 'https'
+
     def getRequestAddress(self):
         return Config.getInstance().getIndicoSearchServer() + "/search"
 
@@ -193,6 +195,13 @@ class InvenioSEA(base.SearchEngineAdapter):
     ##
     ## '@SEATranslator(sourceField, type, targetField)'
 
+    @SEATranslator ('f',[],'p')
+    def translateFieldAuthor(self, field):
+        if field == "author":
+            return "author:"
+        else:
+            return ""
+
     @SEATranslator ('p', 'text', 'p')
     def translatePhrase(self, phrase):
         return phrase + ' ' + self._marcQuery
@@ -217,7 +226,10 @@ class InvenioSEA(base.SearchEngineAdapter):
 
     @SEATranslator ('f',[],'f')
     def translateField(self, field):
-        return field
+        if field == "author":
+            return ""
+        else:
+            return field
 
     @SEATranslator ('collections',[], 'c')
     def translateCollection(self, collection):

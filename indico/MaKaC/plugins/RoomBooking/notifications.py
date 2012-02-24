@@ -122,6 +122,19 @@ class ReservationStartEndNotification(Persistent, Observable):
         return timedelta(days=getRoomBookingOption('notificationBefore'))
 
     def sendStartNotification(self, logger):
+        if self._resv.isCancelled:
+            if DEBUG:
+                print 'Reservation %s is cancelled, no email will be sent' % self._resv.guid
+            return
+        elif self._resv.isRejected:
+            if DEBUG:
+                print 'Reservation %s is rejected, no email will be sent' % self._resv.guid
+            return
+        elif not self._resv.isConfirmed:
+            if DEBUG:
+                print 'Reservation %s is not confirmed, no email will be sent' % self._resv.guid
+            return
+
         # If we want to notify 2 days before, we need to go back 3 days since the
         # chosen day will *not* be checked by getNextRepeating()
         delta = self._daysBefore - timedelta(days=1)
@@ -158,6 +171,10 @@ class ReservationStartEndNotification(Persistent, Observable):
         elif DEBUG:
             print 'Sending notification for occurrence: %s' % occurrence
 
+        if self._resv.dayIsExcluded(occurrence.startDT.date()):
+            if DEBUG:
+                print 'Occurrence %s is excluded (rejected or cancelled)' % occurrence
+            return
         self._notificationsSent.add(occurrence)
         self._p_changed = 1
         if self._resv.room.resvStartNotification:
