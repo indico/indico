@@ -62,14 +62,22 @@ type("ExportIcalInterface", [], {
                 });
     },
 
-    _checkPersistentEnabled: function(publicLink){
+    _showPrivatePanel: function(question){
         var self = this;
         if(self.persistentAllowed){
             if(self.persistentUserEnabled){
-                if(publicLink) $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
                 self._showAuthLink();
             }else{
-                $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id)).show();
+                question = question || $T("Would you like to export private information to your calendar?");
+                var privateInfo = $("<span class='fakeLink'>"+question+"</span>");
+
+                $('#authLinkWrapper'+self.id).append(privateInfo).show();
+
+                privateInfo.click(function(){
+                    privateInfo.hide();
+                    $('#exportIcalHeader'+self.id).show();
+                    $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id)).show();
+                });
             }
             $('#iCalSeparator'+self.id).show();
         }
@@ -82,6 +90,7 @@ type("ExportIcalInterface", [], {
     },
 
     _showAuthLink: function(){
+        $('#exportIcalHeader'+this.id).show();
         $('#authLinkWrapper'+this.id).append($("#authLink"+this.id)).show();
         $('#extraInformation'+this.id).insertAfter('#authLinkWrapper'+this.id);
     },
@@ -145,65 +154,58 @@ type("ExportIcalInterface", [], {
         var self = this;
         self.setURLsFunction(self.requestURLs);
         switch(self.apiMode){
-        case 0://API_MODE_KEY
+        case 0://Public:nothing; Private:API_KEY
             $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
             if(self.userLogged){
                 if (self.apiActive){
                     self._showAuthLink();
                 } else{
+                    $('#exportIcalHeader'+self.id).show();
                     self._showAgreement('#agreementApiKey'+self.id);
                 }
                 $('#iCalSeparator'+self.id).show();
             }
             break;
-        case 1://API_MODE_ONLYKEY
+        case 1://Public:API_KEY; Private:API_KEY
             if(self.userLogged){
                 if (self.apiActive){
                     $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
                     self._showAuthLink();
                 } else{
+                    $('#exportIcalHeader'+self.id).show();
                     $('#authLinkWrapper'+self.id).append($("#agreementApiKey"+self.id)).show();
                 }
                 $('#iCalSeparator'+self.id).show();
             }
             break;
-        case 2://API_MODE_SIGNED
+        case 2://Public:nothing; Private:SIGNED
             $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
             if(self.userLogged){
-                if(self.apiActive){
-                    self._checkPersistentEnabled(false);
-                } else if(self.persistentAllowed){
-                    self._showAgreement('#agreementApiKey'+self.id);
-                    $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id)).show();
-                }
+                self._showPrivatePanel();
             }
             else {
                 $('#extraInformation'+self.id).insertAfter('#publicLinkWrapper'+self.id);
             }
             $('#iCalSeparator'+self.id).show();
             break;
-        case 3://API_MODE_ONLYKEY_SIGNED
+        case 3://Public:API_KEY; Private:SIGNED
             if(self.userLogged){
                 if(self.apiActive){
                     $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
-                    self._checkPersistentEnabled(false);
                 } else{
                     $('#publicLinkWrapper'+self.id).append($("#agreementApiKey"+self.id)).show();
-                    if(self.persistentAllowed){
-                        $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id)).show();
-                    }
                 }
+                self._showPrivatePanel();
                 $('#iCalSeparator'+self.id).show();
             }
             break;
-        case 4://API_MODE_ALL_SIGNED
+        case 4://ALL_SIGNED
             if(self.userLogged){
-                if(self.apiActive){
-                    self._checkPersistentEnabled(true);
-                } else if(self.persistentAllowed){
-                    $('#authLinkWrapper'+self.id).append($("#agreementApiKey"+self.id)).show();
-                    $('#authLinkWrapper'+self.id).append($("#agreementPersistentSignatures"+self.id));
-                    $('#iCalSeparator'+self.id).show();
+                if(self.persistentAllowed){
+                    if(self.persistentUserEnabled){
+                        $('#publicLinkWrapper'+self.id).append($("#publicLink"+self.id)).show();
+                    }
+                    self._showPrivatePanel($T("Would you like to create a persistent URL for use with your calendaring application?"));
                 }
             }
             break;
@@ -237,7 +239,7 @@ $(function() {
     $(".exportIcal").qtip({
 
         style: {
-            width: '300px',
+            width: '350px',
             classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
             tip: {
                 corner: true,

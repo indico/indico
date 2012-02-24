@@ -21,13 +21,12 @@
 </div>
 
 <div id="publicLinkWrapper${id}"  class="iCalExportSection" style="display:none">
-    <div class="exportIcalHeader">${_('Link for public information only:')}</div>
+    <div class="exportIcalHeader">${_('Permanent link for public information only:')}</div>
 </div>
 
 <div id="authLinkWrapper${id}" class="iCalExportSection" style="display:none">
-    <div class="exportIcalHeader">${_('Link for all public and protected information:')}</div>
+    <div id="exportIcalHeader${id}" class="exportIcalHeader" style="display:none">${_('Permanent link for all public and protected information:')}</div>
 </div>
-
 
 
 
