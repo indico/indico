@@ -248,7 +248,7 @@ class ICollaborationMetadataFossil(IFossil):
 
     def getAcceptRejectStatus(self):
         pass
-    getAcceptRejectStatus.produce = lambda s: 'Pending' if s.getAcceptRejectStatus() is None else 'Accepted'
+    getAcceptRejectStatus.produce = lambda s: Collaboration.collaborationTools.CollaborationTools.getBookingShortStatus(s)
     getAcceptRejectStatus.name = 'status'
 
     def getStartDate(self):
@@ -260,7 +260,7 @@ class ICollaborationMetadataFossil(IFossil):
     def _getTitle(self):
         pass
 
-    _getTitle.produce = lambda s: Collaboration.collaborationTools.CollaborationTools.getBookingTitle(s.getLinkObject() if s.hasSessionOrContributionLink() else s._conf)
+    _getTitle.produce = lambda s: Collaboration.collaborationTools.CollaborationTools.getBookingTitle(s.getLinkObject() if s.hasSessionOrContributionLink() else s)
     _getTitle.name = 'title'
 
     def getType(self):

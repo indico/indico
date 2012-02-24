@@ -83,11 +83,6 @@ class VideoExportUtilities():
         'WebcastRequest': 'W',
         'RecordingRequest': 'R'
     }
-    STATUS_MAP = {
-        'Accepted': 'A',
-        'Rejected': 'R',
-        'Pending': 'P'
-    }
 
     @staticmethod
     def getCondensedPrefix(service, status):
@@ -101,12 +96,8 @@ class VideoExportUtilities():
         else:
             prefix += service
 
-        prefix += '-'
-
-        if VideoExportUtilities.STATUS_MAP.has_key(status):
-            prefix += VideoExportUtilities.STATUS_MAP.get(status)
-        else:
-            prefix += status
+        if status:
+            prefix += '-' + status
 
         return (prefix + ": ")
 
@@ -241,20 +232,18 @@ class VideoEventFetcher(DataFetcher):
         return fossil
 
     def video(self, idList, alarm = None):
+
         idx = IndexesHolder().getById('collaboration');
         bookings = []
         dateFormat = '%d/%m/%Y'
         self._alarm = alarm
 
-        for id in idList:
-            tempBookings = idx.getBookings(self.ID_TO_IDX[id], "conferenceStartDate",
+        for vsid in idList:
+            tempBookings = idx.getBookings(self.ID_TO_IDX[vsid], "conferenceStartDate",
                                            self._orderBy, self._fromDT, self._toDT,
                                            'UTC', False, None, None, False, dateFormat)
             bookings.extend(tempBookings.getResults())
 
-        """ Iterate the bookings and yield the results for fossilization, the form
-            by this point should be objs[i] = tuple('arranger', [CSBooking Objects]).
-        """
         def _iter_bookings(objs):
             for obj in objs:
                 for bk in obj[1]:
@@ -279,19 +268,21 @@ class VideoEventFetcher(DataFetcher):
                             bk.setStartDate(bk._conf.getStartDate())
                             bk.setEndDate(bk._conf.getEndDate())
                             yield bk
-                        else: # contributions is the list of all to be exported now
+                        else: # Contributions is the list of all to be exported now
                             for contrib in contributions:
+                                # Wrap the CSBooking object for export
+                                bkw = CSBookingContributionWrapper(bk, contrib)
+
                                 if contrib.isScheduled():
-                                    bk.setStartDate(contrib.getStartDate())
-                                    bk.setEndDate(contrib.getEndDate())
+                                    bkw.setStartDate(contrib.getStartDate())
+                                    bkw.setEndDate(contrib.getEndDate())
                                 else:
-                                    bk.setStartDate(bk._conf.getStartDate())
-                                    bk.setEndDate(bk._conf.getEndDate())
-                                yield bk
+                                    bkw.setStartDate(bk._conf.getStartDate())
+                                    bkw.setEndDate(bk._conf.getEndDate())
 
-                        continue
-
-                    yield bk
+                                yield bkw
+                    else:
+                        yield bk
 
         """ Simple filter, as this method can return None for Pending and True
             for accepted, both are valid booking statuses for exporting.
@@ -303,3 +294,55 @@ class VideoEventFetcher(DataFetcher):
 
         for booking in self._process(_iter_bookings(bookings), filter, iface):
             yield booking
+
+
+class CSBookingContributionWrapper():
+    """ This wrapper is required in order to export each contribution through
+        the iCal interface, giving each object its own unique address and
+        allows for the construction of iCal specific unique identifiers.
+    """
+
+    _orig = None
+    _contrib = None
+    _startDate = None
+    _endDate = None
+
+    def __init__(self, booking, contrib):
+        self._orig = booking
+        self._contrib = contrib
+
+    def __getattr__(self, name):
+        """ Checks for overridden method in this class, if not present then
+            delegates to original CSBooking object.
+        """
+
+        if name in self.__dict__:
+            return getattr(self, name)
+
+        return getattr(self._orig, name)
+
+    def _getShortTypeSuffix(self):
+        type = self._orig.getType()
+        return type.lower()[0:2]
+
+    def getUniqueId(self):
+        """ Each contribution will need a unique UID for each iCal event,
+            as RecordingRequests and WebcastRequests would share the same
+            UID per contribution, append a suffix denoting the type.
+        """
+        return self._contrib.getUniqueId() + self._getShortTypeSuffix()
+
+    def getTitle(self):
+        return self._orig._conf.getTitle() + ' - ' + self._contrib.getTitle()
+
+    def setStartDate(self, date):
+        self._startDate = date
+
+    def getStartDate(self):
+        return self._startDate
+
+    def setEndDate(self, date):
+        self._endDate = date
+
+    def getEndDate(self):
+        return self._endDate

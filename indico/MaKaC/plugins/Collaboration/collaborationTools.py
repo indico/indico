@@ -387,6 +387,16 @@ class CollaborationTools(object):
 
         return title if title is not None else 'No title defined.'
 
+    @classmethod
+    def getBookingShortStatus(cls, booking):
+        if booking.hasAcceptReject():
+            if booking.getAcceptRejectStatus() is None:
+                return 'P'
+            else:
+                return 'A'
+        else:
+            return ''
+
 class MailTools(object):
 
     @classmethod
