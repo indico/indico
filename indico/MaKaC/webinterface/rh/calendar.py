@@ -30,6 +30,8 @@ from datetime import datetime
 from pytz import timezone
 from MaKaC.errors import AccessError
 
+from dateutil.relativedelta import relativedelta
+
 
 class RHCalendar(base.RHProtected):
     _uh = urlHandlers.UHCalendar
@@ -68,7 +70,7 @@ class RHCalendar(base.RHProtected):
         tz = DisplayTZ(self._aw).getDisplayTZ()
         months = params.get("months", 3)
         columns = params.get("columns",3)
-        month = int( params.get("month", nowutc().astimezone(timezone(tz)).month) )
+        month = int( params.get("month", (nowutc()-relativedelta(months=1)).astimezone(timezone(tz)).month) )
         year = int( params.get("year", nowutc().astimezone(timezone(tz)).year) )
         sdate = timezone(tz).localize(datetime( year, month, 1 ))
         self._cal = wcalendar.MonthCalendar( self._aw, \
