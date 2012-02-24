@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>9. Protection System &mdash; Indico v0.98 documentation</title>
+    <title>9. Protection System &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../index.html" />
     <link rel="up" title="Indico’s User Guide" href="index.html" />
     <link rel="next" title="Indico’s Quick Start Guides" href="../QuickStartGuides/index.html" />
     <link rel="prev" title="8. Event Evaluation" href="Evaluation.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" accesskey="U">Indico&#8217;s User Guide</a> &raquo;</li> 
       </ul>
@@ -134,7 +140,7 @@ Making a category which belongs to the category <em>Home</em> inheriting
 will make the category public by default.</p>
 <p>Here is a graph that illustrates the inheriting example.</p>
 <blockquote>
-<img alt="image211" src="../_images/inheriting.png" /></blockquote>
+<div><img alt="image211" src="../_images/inheriting.png" /></div></blockquote>
 <p>In this graph, we see how Category C transmets its access protection to
 Conference C (which is included in it), i.e. how Conference C inherits
 its access protection from its parent category, Category C.</p>
@@ -163,40 +169,40 @@ the parent&#8217;s access protection changes.</p>
         <div class="sphinxsidebarwrapper">
    <img src="../_static/indico_logo.png" width="200px"/> 
 
-            <h3><a href="../index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">9. Protection System</a><ul>
-<li><a class="reference external" href="#introduction">9.1. Introduction</a></li>
-<li><a class="reference external" href="#basic-concepts">9.2. Basic Concepts</a><ul>
-<li><a class="reference external" href="#inheritance-graphic">9.2.1. Inheritance Graphic</a></li>
-<li><a class="reference external" href="#protection-types">9.2.2. Protection Types</a></li>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">9. Protection System</a><ul>
+<li><a class="reference internal" href="#introduction">9.1. Introduction</a></li>
+<li><a class="reference internal" href="#basic-concepts">9.2. Basic Concepts</a><ul>
+<li><a class="reference internal" href="#inheritance-graphic">9.2.1. Inheritance Graphic</a></li>
+<li><a class="reference internal" href="#protection-types">9.2.2. Protection Types</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#access-control">9.3. Access Control Policy</a></li>
-<li><a class="reference external" href="#id2">9.4. Domain Control Policy</a></li>
+<li><a class="reference internal" href="#access-control">9.3. Access Control Policy</a></li>
+<li><a class="reference internal" href="#id2">9.4. Domain Control Policy</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="Evaluation.html"
-                                  title="previous chapter">8. Event Evaluation</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="../QuickStartGuides/index.html"
-                                  title="next chapter">Indico&#8217;s Quick Start Guides</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Evaluation.html"
+                        title="previous chapter">8. Event Evaluation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../QuickStartGuides/index.html"
+                        title="next chapter">Indico&#8217;s Quick Start Guides</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -215,14 +221,14 @@ the parent&#8217;s access protection changes.</p>
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" >Indico&#8217;s User Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>2.1. Introduction &mdash; Indico v0.98 documentation</title>
+    <title>2.1. Introduction &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../../index.html" />
     <link rel="up" title="2. Manager Overview" href="index.html" />
     <link rel="next" title="3. How to manage video services" href="../EventManager/index.html" />
     <link rel="prev" title="2. Manager Overview" href="index.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="../index.html" >Video Services&#8217; Guides</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">2. Manager Overview</a> &raquo;</li> 
@@ -76,11 +82,13 @@ menu (if you are also an Indico administrator):</p>
 <p>The Video Services Overview page lets you query the index of all
 bookings / requests that have been performed on any of the Video
 Services Systems.</p>
-<p>This page is divided into two main parts: the top part that you can
-interact with to get query results, and a bottom part where you get
-the results.</p>
-<p>The top part is in turn divided into three sections: a list of
-indexes, a <em>filtering</em> section, and a <em>View By</em> section.</p>
+<p>This page is divided into two main parts: the top part is where you may
+interact with the system, through a series of filters,
+to get query results. The bottom part where the results of your request are
+displayed.</p>
+<p>The top area acts as the main filter for refining the results of your
+request; you may choose from a selection of indexes, restrictions and
+preference in how the results are displayed.</p>
 <p><img alt="image03" src="../../_images/fig31.png" /></p>
 <p>Figure 3. Video Services Overview page.</p>
 <div class="section" id="the-different-indexes">
@@ -97,9 +105,9 @@ additional index, with other plug-ins. In the screenshot above, you
 will see the “All Videoconference” index, which groups CERNMCU bookings,
 EVO bookings and Vidyo bookings.</li>
 </ul>
-<p>If you hover the mouse over the name of an index, it will show what
-kind of bookings are included in it.</p>
-<p>Click on one of the index names to get results from that index.</p>
+<p>If you hover the mouse over the name of an index, it will show which
+bookings types are included in it.</p>
+<p>You can click on one of the index names to get results from that index.</p>
 </div>
 <div class="section" id="the-filtering-section">
 <h2>2.2.2. The filtering section<a class="headerlink" href="#the-filtering-section" title="Permalink to this headline">¶</a></h2>
@@ -109,10 +117,10 @@ results (<strong>zone 2</strong> in figure 3).</p>
 <h3>2.2.2.1. Restrict to pending requests only<a class="headerlink" href="#restrict-to-pending-requests-only" title="Permalink to this headline">¶</a></h3>
 <p>Some plug-ins can have a “pending” state. In particular,
 <em>Recording Request</em> and <em>Webcast Request</em> have the concept of
-“pending” requests, which means requests that have been submitted
+“pending” requests, this means requests that have been submitted
 to our responsibles, but have not yet been accepted or rejected.</p>
-<p>Checking the <em>Show only pending</em> option will filter the results so
-that only pending requests are shown.</p>
+<p>Checking the <em>Show only pending</em> option will filter the results such
+that only pending requests are shown in the results area.</p>
 </div>
 <div class="section" id="restrict-by-category-id">
 <h3>2.2.2.2. Restrict by category id<a class="headerlink" href="#restrict-by-category-id" title="Permalink to this headline">¶</a></h3>
@@ -126,11 +134,11 @@ the view to only bookings and requests associated this event.</p>
 </div>
 <div class="section" id="results-per-page">
 <h3>2.2.2.4. Results per page<a class="headerlink" href="#results-per-page" title="Permalink to this headline">¶</a></h3>
-<p>If there are many results, they will be paginated, as shown in the
+<p>If there are many results they will be paginated, as shown in the
 screenshot. You can change the amount of results per page. Bookings
 are usually grouped (per date or per event, depending on the type
 of view). This number will change the number of <em>groups</em> that
-appear in each page.</p>
+appear on each page.</p>
 </div>
 <div class="section" id="restrict-results-to-an-interval">
 <h3>2.2.2.5. Restrict results to an interval<a class="headerlink" href="#restrict-results-to-an-interval" title="Permalink to this headline">¶</a></h3>
@@ -159,7 +167,7 @@ title lies alphabetically after “ATLAS”.</p>
 <div class="section" id="filtering-by-dates">
 <h4>2.2.2.5.2. Filtering by dates<a class="headerlink" href="#filtering-by-dates" title="Permalink to this headline">¶</a></h4>
 <p>If you have selected
-<em>View By: Event Start Date,</em> or <em>View By: Creation Date,*or*View By: Modification Date,*or*View By: Start Date</em>
+<em>View By: Event Start Date,</em> or <em>View By: Creation Date, *or</em> View By: Modification Date, <em>or</em> View By: Start Date*
 in the <em>View By</em> section, you can filter by date. The filtering
 section looks like this:</p>
 <p><img alt="image05" src="../../_images/index_html_136982eb.png" /></p>
@@ -183,16 +191,18 @@ weeks, I would enter 0 in the <em>From *** days ago</em> box, and 14 in
 the <em>to *** days in the future</em> box.</p>
 </li>
 </ul>
-<p>In both cases, if what you enter is not in the correct format
+<p>In either case, if what you have entered isn&#8217;t in the correct format
 (dates in the first case, integers in the second case) the related
-fields will be highlighted in red.</p>
+fields will be highlighted in red. Furthermore, the range selected will be
+from the time 00:00 on the beginning of the interval to 23:59 at the
+end of the interval.</p>
 </div>
 </div>
 <div class="section" id="refresh-apply-filter-button">
 <h3>2.2.2.6. Refresh / Apply Filter button<a class="headerlink" href="#refresh-apply-filter-button" title="Permalink to this headline">¶</a></h3>
 <p>Every time that a value of one of the filtering fields is changed,
 the results do not update automatically. You need to press the
-<em>Apply Filter</em> button for the changes to take place.</p>
+<em>Apply Filter</em> button in order for the changes to propagate the results area.</p>
 <p>If you want to update the results without changing the filtering
 criteria, press the same button (its text should read <em>Refresh</em>).</p>
 </div>
@@ -200,17 +210,16 @@ criteria, press the same button (its text should read <em>Refresh</em>).</p>
 <div class="section" id="the-view-by-section">
 <h2>2.2.3. The View By section<a class="headerlink" href="#the-view-by-section" title="Permalink to this headline">¶</a></h2>
 <p>Under the <em>filtering</em> section appears the <em>View By</em> section
-(<strong>zone 3</strong> in figure 3).</p>
-<p><img alt="image06" src="../../_images/index_html_m22629ac6.png" /></p>
-<p>Figure 6. The View By section</p>
+(<strong>zone 2</strong> in figure 3) where you can alter the order in which the results
+are displayed.</p>
 <div class="section" id="choose-how-to-view-the-results">
 <h3>2.2.3.1. Choose how to view the results<a class="headerlink" href="#choose-how-to-view-the-results" title="Permalink to this headline">¶</a></h3>
 <p>Here you can choose if you want to view your results ordered by:</p>
 <ul class="simple">
 <li>Event title: the results will be grouped by the event they belong
 to, and will be ordered by the name of that event, alphabetically.</li>
-<li>Event start date: the results will be grouped by the event they
-belong to, and will be ordered by the start date of that event.</li>
+<li>Event start date: the results will be grouped by the date they occur,
+and will be ordered by the title of events.</li>
 <li>Creation date: the results will be ordered by the date they were
 created. They will also be grouped by day (taking into account your
 personal timezone). For bookings, this means the moment that they
@@ -242,9 +251,9 @@ dates later.</li>
 </li>
 <li>Ascending<ul>
 <li>For the <em>view by event title</em> option, the results will be shown in
-reverse alphabetical order.</li>
+reverse-alphabetical order.</li>
 <li>For the other date-related <em>view by</em> options, they will be shown in
-reverse chronological order, the oldest dates first and the most
+reverse-chronological order, the oldest dates first and the most
 recent dates later.</li>
 </ul>
 </li>
@@ -252,18 +261,18 @@ recent dates later.</li>
 </div>
 <div class="section" id="kinds-of-bookings-requests-shown">
 <h3>2.2.3.3. Kinds of bookings / requests shown<a class="headerlink" href="#kinds-of-bookings-requests-shown" title="Permalink to this headline">¶</a></h3>
-<p>The second line of this section informs you which kind of bookings
-are displayed depending on your <em>View By</em> option. This is relevant,
+<p>Next to the Refresh button there is a message which informs you which kind
+of bookings are displayed depending on your <em>View By</em> option. This is relevant,
 in the case of <em>View By Start Date</em>, because requests
 (RecordingRequest, WebcastRequest) do not have a start date.</p>
 </div>
 <div class="section" id="static-url-for-the-result">
 <h3>2.2.3.4. Static URL for the result<a class="headerlink" href="#static-url-for-the-result" title="Permalink to this headline">¶</a></h3>
-<p>This option will prove very useful if you often perform similar
-queries.</p>
-<p>Click on <em>Static URL for this result</em> and a new line will appear:</p>
-<p><img alt="image07" src="../../_images/index_html_m38e22d3d.png" /></p>
-<p>Figure 7. Static URL for a result and Go to URL link.</p>
+<p>This option will prove very useful if you perform similar
+queries often.</p>
+<p>Hover over the <em>Static URL for this result</em> link and a popup appear:</p>
+<p><img alt="image06" src="../../_images/index_html_m38e22d3d.png" /></p>
+<p>Figure 6. Static URL for a result and Go to URL link.</p>
 <p>You can copy the URL in the text box or bookmark it. The parameters
 of your query, such as which index is being queried, are encoded in
 the URL and so you will not need to enter them again.</p>
@@ -273,7 +282,7 @@ the URL and so you will not need to enter them again.</p>
 <div class="section" id="the-results-section">
 <h2>2.2.4. The results section<a class="headerlink" href="#the-results-section" title="Permalink to this headline">¶</a></h2>
 <p>In the bottom half of the page, you will be able to see the results
-of your query (<strong>zone 4</strong> in figure 3).</p>
+of your query (<strong>zone 3</strong> in figure 3).</p>
 <p>In case there are no results, <em>No results found</em> will appear.</p>
 <p>If there are results, from top to bottom you will see the following
 results:</p>
@@ -361,55 +370,55 @@ the Video Services display page of the conference.</p>
         <div class="sphinxsidebarwrapper">
    <img src="../../_static/indico_logo.png" width="200px"/> 
 
-            <h3><a href="../../index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">2.1. Introduction</a></li>
-<li><a class="reference external" href="#the-video-services-overview-page">2.2. The Video Services Overview page</a><ul>
-<li><a class="reference external" href="#the-different-indexes">2.2.1. The different indexes</a></li>
-<li><a class="reference external" href="#the-filtering-section">2.2.2. The filtering section</a><ul>
-<li><a class="reference external" href="#restrict-to-pending-requests-only">2.2.2.1. Restrict to pending requests only</a></li>
-<li><a class="reference external" href="#restrict-by-category-id">2.2.2.2. Restrict by category id</a></li>
-<li><a class="reference external" href="#restrict-by-conference-id">2.2.2.3. Restrict by conference id</a></li>
-<li><a class="reference external" href="#results-per-page">2.2.2.4. Results per page</a></li>
-<li><a class="reference external" href="#restrict-results-to-an-interval">2.2.2.5. Restrict results to an interval</a><ul>
-<li><a class="reference external" href="#filtering-by-event-title">2.2.2.5.1. Filtering by event title</a></li>
-<li><a class="reference external" href="#filtering-by-dates">2.2.2.5.2. Filtering by dates</a></li>
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2.1. Introduction</a></li>
+<li><a class="reference internal" href="#the-video-services-overview-page">2.2. The Video Services Overview page</a><ul>
+<li><a class="reference internal" href="#the-different-indexes">2.2.1. The different indexes</a></li>
+<li><a class="reference internal" href="#the-filtering-section">2.2.2. The filtering section</a><ul>
+<li><a class="reference internal" href="#restrict-to-pending-requests-only">2.2.2.1. Restrict to pending requests only</a></li>
+<li><a class="reference internal" href="#restrict-by-category-id">2.2.2.2. Restrict by category id</a></li>
+<li><a class="reference internal" href="#restrict-by-conference-id">2.2.2.3. Restrict by conference id</a></li>
+<li><a class="reference internal" href="#results-per-page">2.2.2.4. Results per page</a></li>
+<li><a class="reference internal" href="#restrict-results-to-an-interval">2.2.2.5. Restrict results to an interval</a><ul>
+<li><a class="reference internal" href="#filtering-by-event-title">2.2.2.5.1. Filtering by event title</a></li>
+<li><a class="reference internal" href="#filtering-by-dates">2.2.2.5.2. Filtering by dates</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#refresh-apply-filter-button">2.2.2.6. Refresh / Apply Filter button</a></li>
+<li><a class="reference internal" href="#refresh-apply-filter-button">2.2.2.6. Refresh / Apply Filter button</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#the-view-by-section">2.2.3. The View By section</a><ul>
-<li><a class="reference external" href="#choose-how-to-view-the-results">2.2.3.1. Choose how to view the results</a></li>
-<li><a class="reference external" href="#choose-how-to-order-the-results">2.2.3.2. Choose how to order the results</a></li>
-<li><a class="reference external" href="#kinds-of-bookings-requests-shown">2.2.3.3. Kinds of bookings / requests shown</a></li>
-<li><a class="reference external" href="#static-url-for-the-result">2.2.3.4. Static URL for the result</a></li>
+<li><a class="reference internal" href="#the-view-by-section">2.2.3. The View By section</a><ul>
+<li><a class="reference internal" href="#choose-how-to-view-the-results">2.2.3.1. Choose how to view the results</a></li>
+<li><a class="reference internal" href="#choose-how-to-order-the-results">2.2.3.2. Choose how to order the results</a></li>
+<li><a class="reference internal" href="#kinds-of-bookings-requests-shown">2.2.3.3. Kinds of bookings / requests shown</a></li>
+<li><a class="reference internal" href="#static-url-for-the-result">2.2.3.4. Static URL for the result</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#the-results-section">2.2.4. The results section</a></li>
+<li><a class="reference internal" href="#the-results-section">2.2.4. The results section</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="index.html"
-                                  title="previous chapter">2. Manager Overview</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="../EventManager/index.html"
-                                  title="next chapter">3. How to manage video services</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">2. Manager Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../EventManager/index.html"
+                        title="next chapter">3. How to manage video services</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -428,15 +437,15 @@ the Video Services display page of the conference.</p>
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="../index.html" >Video Services&#8217; Guides</a> &raquo;</li>
           <li><a href="index.html" >2. Manager Overview</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

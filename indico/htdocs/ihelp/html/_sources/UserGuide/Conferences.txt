@@ -827,7 +827,7 @@ Reviewing
 
 * **Settings**: You can add questions you wish abstracts reviewers to answer, the number of answers per question and the scale for each answer (e.g. 1 to 10). There is also a preview of the question box on the left
 
-* **Team**: This is where you assign reviewers to each track. Click on *Add Existing*, a search box will appear. Search for the user(s) you wish to add, select them and click on *Add*
+* **Team**: This is where you assign reviewers to each track. Click on *Add Indico User*, a search box will appear. Search for the user(s) you wish to add, select them and click on *Add*
 
 * **Notification Template**:
 

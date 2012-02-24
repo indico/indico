@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>6. Exporting Indico Data &mdash; Indico v0.98 documentation</title>
+    <title>6. Exporting Indico Data &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../index.html" />
     <link rel="up" title="Indico’s User Guide" href="index.html" />
     <link rel="next" title="7. Conference Room Booking" href="RoomBooking.html" />
     <link rel="prev" title="5. Users and Groups" href="UsersGroups.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" accesskey="U">Indico&#8217;s User Guide</a> &raquo;</li> 
       </ul>
@@ -108,7 +114,7 @@ and in the &#8220;XSL link&#8221; part, add this URL:
 <p>Indico has an export API which allows you to
 export categories, events, rooms and room bookings in various formats such
 as JSON, XML, iCal and Atom. For details no how to use this API, see
-<a class="reference external" href="../ExportAPI/index.html"><em>Indico&#8217;s HTTP Export API</em></a>.</p>
+<a class="reference internal" href="../ExportAPI/index.html"><em>Indico&#8217;s HTTP Export API</em></a>.</p>
 <hr class="docutils" />
 </div>
 </div>
@@ -121,36 +127,36 @@ as JSON, XML, iCal and Atom. For details no how to use this API, see
         <div class="sphinxsidebarwrapper">
    <img src="../_static/indico_logo.png" width="200px"/> 
 
-            <h3><a href="../index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">6. Exporting Indico Data</a><ul>
-<li><a class="reference external" href="#to-personal-scheduler-tools-outlook-ical-korganizer">6.1. To Personal Scheduler Tools (Outlook, iCal, korganizer...)</a></li>
-<li><a class="reference external" href="#rss-feeds">6.2. RSS feeds</a></li>
-<li><a class="reference external" href="#sharepoint">6.3. Sharepoint</a></li>
-<li><a class="reference external" href="#using-the-http-export-api">6.4. Using the HTTP Export API</a></li>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">6. Exporting Indico Data</a><ul>
+<li><a class="reference internal" href="#to-personal-scheduler-tools-outlook-ical-korganizer">6.1. To Personal Scheduler Tools (Outlook, iCal, korganizer...)</a></li>
+<li><a class="reference internal" href="#rss-feeds">6.2. RSS feeds</a></li>
+<li><a class="reference internal" href="#sharepoint">6.3. Sharepoint</a></li>
+<li><a class="reference internal" href="#using-the-http-export-api">6.4. Using the HTTP Export API</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="UsersGroups.html"
-                                  title="previous chapter">5. Users and Groups</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="RoomBooking.html"
-                                  title="next chapter">7. Conference Room Booking</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="UsersGroups.html"
+                        title="previous chapter">5. Users and Groups</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="RoomBooking.html"
+                        title="next chapter">7. Conference Room Booking</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -169,14 +175,14 @@ as JSON, XML, iCal and Atom. For details no how to use this API, see
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" >Indico&#8217;s User Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

@@ -145,41 +145,60 @@ Similar to lectures; see :ref:`video_services` for lectures
 Participants
 ~~~~~~~~~~~~
 
-You can view here a list of all the participants. You can add or remove
-participants (as a manager), mark as present/absent, ask for excuse, send
-email etc. You can also export the list of participants to Excel by clicking
-on Export to Excel on the right. You can also choose whether to display or
-not the list of participants in the event page.
+You can access the participation module from the option Participants in the menu on the left.
+
+The module is divided in different tabs (more detailed in the following subsections):
+
+* Setup: configuration of the participation module.
+* Participants: it shows the list of participants. Managers can perform several actions on the list, such as adding new participants, removing, inviting, etc.
+* Statistics: it shows the number of participants that have attended, declined participation, pending, etc.
+* Pending: list of all the users that have applied for participation and awaiting the approval or refusal.
+* Declined: list of the participants that have been declined for the event.
+
+Setup
+^^^^^
+
+In this tab you can setup the participation module. The options that you can enable/disable by clicking in the red/green
+squares are the listed below.
+
+* If a participant is added by the event managers, an email notification will be sent to him.
+* Show the list of participants in the event page-
+* Allow the users to participate in this event by showing a link in the event page.
+* Approve the participation request by the event managers.
+* Setup the maximum numbers of participants where 0 means unlimited.
 
 |image153|
 
-You can also choose whether to send email notification to a participant
-when you add him, if you allow users to apply to this event and if the
-participation requests must be approved by the event manager (you) or not.
+-----------------
 
-**N.B.**: If you cannot modify these options, it means that your meeting is in the past.
+Participant list
+^^^^^^^^^^^^^^^^
 
-The list of participants can be built in the three following ways:
+In this tab, one can view the list of all the participants. You can add or remove
+participants (as a manager), mark as present/absent, ask for excuse, send
+email etc. You can also export the list of participants to Excel by clicking
+on the Excel icon on the button bar.
 
-------------------
+The event manager can add participants in the two following ways:
+
+-----------------
 
 Manager adds participants
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'''''''''''''''''''''''''
 
-In this case, you must select the option
-: Users **may not apply** to participate in this event, as seen below.
-To add someone, click on *Search database* if the participant is in your
-Indico database; if not, click on *Define new*.
+In order to add participants, click on
+
+* *Add* >*Indico User / Group* if the participant or the e-group exists in Indico database;
+* Otherwise, click on *Add->New user*.
 
 |image154|
 
 -----------------
 
 Manager invites participants
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'''''''''''''''''''''''''''''''
 
-To do so, click on *Invite participant*
-to the right of *Define new*. The participant(s) invited will receive an
+To do so, click on *Add* > *Invite*. The participant(s) invited will receive an
 email informing them they have been invited to an event. This email will
 contain a link they will have to use to accept/reject the invitation.
 
@@ -193,15 +212,10 @@ They will then need to click on *Accept* or *Reject*.
 
 ------------------
 
-Users apply for participation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Pending list
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can choose to accept  all participation requests or you can choose
-to approve each request individually. In the picture below you can see
-where how to let users apply for participation and where to choose whether
-participation requests are auto-confirmed or not.
-
-|image156|
+As explained in `Setup <#setup>`_ you can setup the approval to be made by the event managers.
 
 Users will be able to apply from the event page, by clicking on *Apply here*.
 
@@ -211,17 +225,27 @@ A window will appear:
 
 |image158|
 
-To apply, you will need to click on *Submit*
+To apply, you will need to click on *Ok*
 
 If the manager chooses to approve the requests for participation, he will
-see a message appear when users apply:
+see the tab *Pending* highlighted:
 
 |image160|
 
-To accept or reject a request, he will need to click on *See pending participants*
+To accept or reject a request, he will need to click on the tab
 and the following window will appear, where he can manage the requests.
+When you reject an application you can choose whether to send an email or not.
 
 |image161|
+
+--------------
+
+Declined list
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This tab shows the list of the participants that applied for participation and their applications were declined.
+
+|image156|
 
 --------------
 
@@ -548,7 +572,7 @@ The Parellel style:
 .. |image150| image:: UserGuidePics/a3.png
 .. |image151| image:: UserGuidePics/a4.png
 .. |image152| image:: UserGuidePics/a5.png
-.. |image153| image:: UserGuidePics/particip.png
+.. |image153| image:: UserGuidePics/particip1.png
 .. |image154| image:: UserGuidePics/particip2.png
 .. |image155| image:: UserGuidePics/particip3.png
 .. |image156| image:: UserGuidePics/particip4.png

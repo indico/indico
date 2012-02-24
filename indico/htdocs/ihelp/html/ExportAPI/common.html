@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>2. Common Parameters &mdash; Indico v0.98 documentation</title>
+    <title>2. Common Parameters &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../index.html" />
     <link rel="up" title="Indico’s HTTP Export API" href="index.html" />
     <link rel="next" title="3. Exportable Elements" href="exporters/index.html" />
     <link rel="prev" title="1. Accessing the API" href="access.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" accesskey="U">Indico&#8217;s HTTP Export API</a> &raquo;</li> 
       </ul>
@@ -63,13 +69,13 @@ is requested. If a parameter has a shorter form, it&#8217;s given in parentheses
 <col width="79%" />
 </colgroup>
 <thead valign="bottom">
-<tr><th class="head">Param</th>
+<tr class="row-odd"><th class="head">Param</th>
 <th class="head">Short</th>
 <th class="head">Description</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td>from/to</td>
+<tr class="row-even"><td>from/to</td>
 <td>f/t</td>
 <td><dl class="first last docutils">
 <dt>Accepted formats:</dt>
@@ -82,45 +88,42 @@ is requested. If a parameter has a shorter form, it&#8217;s given in parentheses
 </dl>
 </td>
 </tr>
-<tr><td>nocache</td>
-<td>nc</td>
-<td>Do not return cached results (the results are written
-to the cache though).</td>
-</tr>
-<tr><td>pretty</td>
+<tr class="row-odd"><td>pretty</td>
 <td>p</td>
 <td>Pretty-print the output. When exporting as JSON it will
 include whitespace to make the json more human-readable.</td>
 </tr>
-<tr><td>onlypublic</td>
+<tr class="row-even"><td>onlypublic</td>
 <td>op</td>
 <td>Only return results visible to unauthenticated users
 when set to <em>yes</em>.</td>
 </tr>
-<tr><td>limit</td>
+<tr class="row-odd"><td>limit</td>
 <td>n</td>
 <td>Return no more than the X results.</td>
 </tr>
-<tr><td>offset</td>
+<tr class="row-even"><td>offset</td>
 <td>O</td>
 <td>Skip the first X results.</td>
 </tr>
-<tr><td>detail</td>
+<tr class="row-odd"><td>detail</td>
 <td>d</td>
 <td>Specify the detail level (values depend on the exported
 element)</td>
 </tr>
-<tr><td>order</td>
+<tr class="row-even"><td>order</td>
 <td>o</td>
-<td>Sort the results. Must be one of <em>id</em>, <em>end</em>, <em>title</em>.</td>
+<td>Sort the results. Must be one of <em>id</em>, <em>start</em>, <em>end</em>,
+<em>title</em>.</td>
 </tr>
-<tr><td>descending</td>
+<tr class="row-odd"><td>descending</td>
 <td>c</td>
 <td>Sort the results in descending order when set to <em>yes</em>.</td>
 </tr>
-<tr><td>tz</td>
+<tr class="row-even"><td>tz</td>
 <td><cite>-</cite></td>
-<td>Use the given timezone when returning time information.</td>
+<td>Assume given timezone (default UTC) for specified dates.
+Example: <tt class="docutils literal"><span class="pre">Europe/Lisbon</span></tt>.</td>
 </tr>
 </tbody>
 </table>
@@ -134,25 +137,25 @@ element)</td>
         <div class="sphinxsidebarwrapper">
    <img src="../_static/indico_logo.png" width="200px"/> 
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="access.html"
-                                  title="previous chapter">1. Accessing the API</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="exporters/index.html"
-                                  title="next chapter">3. Exportable Elements</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="access.html"
+                        title="previous chapter">1. Accessing the API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="exporters/index.html"
+                        title="next chapter">3. Exportable Elements</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -171,14 +174,14 @@ element)</td>
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" >Indico&#8217;s HTTP Export API</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

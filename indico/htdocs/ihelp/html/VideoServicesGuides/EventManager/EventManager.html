@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>3.1. Introduction &mdash; Indico v0.98 documentation</title>
+    <title>3.1. Introduction &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../../index.html" />
     <link rel="up" title="3. How to manage video services" href="index.html" />
     <link rel="next" title="4. How to join a video service" href="../UserGuide/index.html" />
     <link rel="prev" title="3. How to manage video services" href="index.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="../index.html" >Video Services&#8217; Guides</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">3. How to manage video services</a> &raquo;</li> 
@@ -298,7 +304,7 @@ not Event Managers themselves.</p>
 all the tabs of the Video Services section (Collaboration,
 Recording Request, etc., and the Managers tab too) and perform any
 operation that you can perform there.</p>
-<p>In order to add someone, you can either click on <em>Add Existing</em>
+<p>In order to add someone, you can either click on <em>Add Indico User</em>
 which will bring a standard user search pop-up dialogue, or click
 <em>Add from favourites</em> which will bring up your favourite
 users.</p>
@@ -1032,7 +1038,8 @@ then click on <em>Create</em>. Vidyo has a different concept than EVO. In EVO yo
 <ul class="simple">
 <li><em>Room name</em> : this is the name the room in Vidyo will have</li>
 <li><em>Description</em> : this is the description of room</li>
-<li><em>Owner</em> : this is the person who will own the room. The owner will be the room responsible and the meeting moderator</li>
+<li><em>Event linking</em> : one can link a vidyo booking to the event (default), a session or a contribution. The event can be linked to several vidyo rooms, however the sessions and contributions can be linked only to one vidyo room</li>
+<li><em>Moderator</em> : The moderator will be the room responsible and will own the rights to moderate the vidyo room</li>
 <li><em>PIN</em> : this is the code to protect the room</li>
 </ul>
 <p>In the <em>Advanced tab</em>, there are three options:</p>
@@ -1065,7 +1072,7 @@ information of your booking:</p>
 <ul class="simple">
 <li><em>Room name</em> :this is the name of the room</li>
 <li><em>Extension</em> : this is the numeric extension of the room, that gives another possibility of joining it. If one is logged in the Vidyo portal, one can join a room by entering the extension in the field &#8220;Select from list or Enter name to call&#8221;</li>
-<li><em>Room owner</em> : this is the owner of the room, which has moderator rights.</li>
+<li><em>Room moderator</em> : this is the owner of the room, which has moderation rights.</li>
 <li><em>PIN</em> : this is the code to protect the room</li>
 <li><em>Description</em>: this is the description of the room</li>
 <li><em>Auto-join URL</em> : this is the URL that you can give to other people
@@ -1077,6 +1084,7 @@ PIN if an access PIN was set up.</li>
 <li><em>Created on</em> : this shows when the booking was created.</li>
 <li><em>Last modified on</em> : this shows the last time that the
 booking information was modified.</li>
+<li><em>Linked to</em> : this is the link of the vidyo room: it can be the event, a session or a contribution.</li>
 </ul>
 <p>Also, in case of problems, there will be information in red in the
 details. More on that in section
@@ -1091,11 +1099,11 @@ of the booking, in case you need to perform a correction or a
 change. Your changes will change the booking in Vidyo too.</p>
 <p>6. <img alt="image15" src="../../_images/html_25c4d730.png" /> button (<em>remove</em> ). Press this to delete your booking.
 You will be asked for confirmation.</p>
-<p>7. <img alt="image17" src="../../_images/html_5dda0430.png" /> button (<em>start videoconference</em> ). Press this button
+<p>7. <img alt="figure80" src="../../_images/fig80.png" /> button (<em>start desktop</em> ). Press this button
 to launch the Vidyo client and have your PC join the videoconference
-automatically. The button will be disabled (<img alt="image18" src="../../_images/html_56abc877.png" /> ) if you
-cannot join the videoconference yet, or if the videoconference
-already took place.</p>
+automatically.</p>
+<p>8. <img alt="figure81" src="../../_images/fig81.png" /> button (<em>connect room</em> ). Press this button
+to launch the Vidyo client in the conferences/session/contribution physical room. In order to have this button enabled the room has to be a capable Vidyo room.</p>
 </div>
 <div class="section" id="problems-when-creating-or-modifying-a-vidyo-booking">
 <h3>3.4.3.3. Problems when creating or modifying a Vidyo booking<a class="headerlink" href="#problems-when-creating-or-modifying-a-vidyo-booking" title="Permalink to this headline">¶</a></h3>
@@ -1110,6 +1118,7 @@ highlighted in red.</p>
 highlighted in red.</li>
 <li><em>You left the meeting description empty</em> . The <em>Description</em> field
 will be highlighted in red.</li>
+<li><em>You choose a link type that does not have items</em>. The &#8220;Linked to&#8221; select field will be highlighted in red.</li>
 </ul>
 <p>Problems when you come to the Collaboration tab or when you
 update the status:</p>
@@ -1552,8 +1561,8 @@ In the legend you can see some tags that can be inserted, none of them are manda
 <ol class="arabic">
 <li><p class="first">Upload the form needed, the link can be found in the introduction text on this same page.</p>
 <blockquote>
-<p><img alt="figure78" src="../../_images/fig78.png" /></p>
-</blockquote>
+<div><p><img alt="figure78" src="../../_images/fig78.png" /></p>
+</div></blockquote>
 </li>
 <li><p class="first">Contact the speaker and ask him to sign the paper.</p>
 </li>
@@ -1561,8 +1570,8 @@ In the legend you can see some tags that can be inserted, none of them are manda
 </li>
 <li><p class="first">Upload the pdf scan through this page, by clicking to the <em>Upload</em> link. A popup will appear asking you to provide the file.</p>
 <blockquote>
-<p><img alt="figure79" src="../../_images/fig79.png" /></p>
-</blockquote>
+<div><p><img alt="figure79" src="../../_images/fig79.png" /></p>
+</div></blockquote>
 </li>
 </ol>
 <p>Once the file submited, the page will refresh and a pdf icon will appear. Clicking on this icon will show you the pdf that you have just uploaded.</p>
@@ -1578,100 +1587,100 @@ In the legend you can see some tags that can be inserted, none of them are manda
         <div class="sphinxsidebarwrapper">
    <img src="../../_static/indico_logo.png" width="200px"/> 
 
-            <h3><a href="../../index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">3.1. Introduction</a></li>
-<li><a class="reference external" href="#the-video-services-section">3.2. The Video Services section</a></li>
-<li><a class="reference external" href="#video-services-system-types">3.3. Video Services system types</a><ul>
-<li><a class="reference external" href="#booking-systems">3.3.1. Booking systems</a><ul>
-<li><a class="reference external" href="#creating-a-booking">3.3.1.1. Creating a booking</a></li>
-<li><a class="reference external" href="#list-of-bookings">3.3.1.2. List of bookings</a></li>
-<li><a class="reference external" href="#event-display">3.3.1.3. Event display</a></li>
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.1. Introduction</a></li>
+<li><a class="reference internal" href="#the-video-services-section">3.2. The Video Services section</a></li>
+<li><a class="reference internal" href="#video-services-system-types">3.3. Video Services system types</a><ul>
+<li><a class="reference internal" href="#booking-systems">3.3.1. Booking systems</a><ul>
+<li><a class="reference internal" href="#creating-a-booking">3.3.1.1. Creating a booking</a></li>
+<li><a class="reference internal" href="#list-of-bookings">3.3.1.2. List of bookings</a></li>
+<li><a class="reference internal" href="#event-display">3.3.1.3. Event display</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#request-systems">3.3.2. Request systems</a></li>
-<li><a class="reference external" href="#the-managers-tab">3.3.3. The Managers tab</a></li>
+<li><a class="reference internal" href="#request-systems">3.3.2. Request systems</a></li>
+<li><a class="reference internal" href="#the-managers-tab">3.3.3. The Managers tab</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#details-about-individual-systems">3.4. Details about individual systems</a><ul>
-<li><a class="reference external" href="#the-evo-system">3.4.1. The EVO system</a><ul>
-<li><a class="reference external" href="#creating-an-evo-booking">3.4.1.1. Creating an EVO booking</a></li>
-<li><a class="reference external" href="#after-creating-an-evo-booking">3.4.1.2. After creating an EVO booking</a></li>
-<li><a class="reference external" href="#problems-when-creating-or-modifying-a-booking">3.4.1.3. Problems when creating or modifying a booking</a></li>
-<li><a class="reference external" href="#event-display-page">3.4.1.4. Event display page</a></li>
-<li><a class="reference external" href="#starting-an-evo-videoconference">3.4.1.5. Starting an EVO videoconference</a></li>
+<li><a class="reference internal" href="#details-about-individual-systems">3.4. Details about individual systems</a><ul>
+<li><a class="reference internal" href="#the-evo-system">3.4.1. The EVO system</a><ul>
+<li><a class="reference internal" href="#creating-an-evo-booking">3.4.1.1. Creating an EVO booking</a></li>
+<li><a class="reference internal" href="#after-creating-an-evo-booking">3.4.1.2. After creating an EVO booking</a></li>
+<li><a class="reference internal" href="#problems-when-creating-or-modifying-a-booking">3.4.1.3. Problems when creating or modifying a booking</a></li>
+<li><a class="reference internal" href="#event-display-page">3.4.1.4. Event display page</a></li>
+<li><a class="reference internal" href="#starting-an-evo-videoconference">3.4.1.5. Starting an EVO videoconference</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#the-cernmcu-system">3.4.2. The CERNMCU system</a><ul>
-<li><a class="reference external" href="#creating-a-cernmcu-booking">3.4.2.1. Creating a CERNMCU booking</a></li>
-<li><a class="reference external" href="#managing-the-remote-participants">3.4.2.2. Managing the remote participants</a><ul>
-<li><a class="reference external" href="#adding-existing-rooms">3.4.2.2.1. Adding existing rooms</a></li>
-<li><a class="reference external" href="#adding-a-new-room">3.4.2.2.2. Adding a new room</a></li>
-<li><a class="reference external" href="#adding-existing-users">3.4.2.2.3. Adding existing users</a></li>
-<li><a class="reference external" href="#adding-a-new-person">3.4.2.2.4. Adding a new person</a></li>
-<li><a class="reference external" href="#editing-or-removing-participants">3.4.2.2.5. Editing or removing participants</a></li>
-<li><a class="reference external" href="#effect-of-changing-the-participants-of-an-ongoing-conference">3.4.2.2.6. Effect of changing the participants of an ongoing conference</a></li>
-<li><a class="reference external" href="#after-creating-a-cernmcu-booking">3.4.2.2.7. After creating a CERNMCU booking</a></li>
+<li><a class="reference internal" href="#the-cernmcu-system">3.4.2. The CERNMCU system</a><ul>
+<li><a class="reference internal" href="#creating-a-cernmcu-booking">3.4.2.1. Creating a CERNMCU booking</a></li>
+<li><a class="reference internal" href="#managing-the-remote-participants">3.4.2.2. Managing the remote participants</a><ul>
+<li><a class="reference internal" href="#adding-existing-rooms">3.4.2.2.1. Adding existing rooms</a></li>
+<li><a class="reference internal" href="#adding-a-new-room">3.4.2.2.2. Adding a new room</a></li>
+<li><a class="reference internal" href="#adding-existing-users">3.4.2.2.3. Adding existing users</a></li>
+<li><a class="reference internal" href="#adding-a-new-person">3.4.2.2.4. Adding a new person</a></li>
+<li><a class="reference internal" href="#editing-or-removing-participants">3.4.2.2.5. Editing or removing participants</a></li>
+<li><a class="reference internal" href="#effect-of-changing-the-participants-of-an-ongoing-conference">3.4.2.2.6. Effect of changing the participants of an ongoing conference</a></li>
+<li><a class="reference internal" href="#after-creating-a-cernmcu-booking">3.4.2.2.7. After creating a CERNMCU booking</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#problems-when-creating-modifying-a-booking">3.4.2.3. Problems when creating / modifying a booking:</a></li>
-<li><a class="reference external" href="#id2">3.4.2.4. Event display page</a></li>
-<li><a class="reference external" href="#starting-a-cernmcu-videoconference">3.4.2.5. Starting a CERNMCU videoconference</a></li>
+<li><a class="reference internal" href="#problems-when-creating-modifying-a-booking">3.4.2.3. Problems when creating / modifying a booking:</a></li>
+<li><a class="reference internal" href="#id2">3.4.2.4. Event display page</a></li>
+<li><a class="reference internal" href="#starting-a-cernmcu-videoconference">3.4.2.5. Starting a CERNMCU videoconference</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#the-vidyo-system">3.4.3. The Vidyo system</a><ul>
-<li><a class="reference external" href="#creating-a-vidyo-booking">3.4.3.1. Creating a Vidyo booking</a></li>
-<li><a class="reference external" href="#after-creating-a-vidyo-booking">3.4.3.2. After creating a Vidyo booking</a></li>
-<li><a class="reference external" href="#problems-when-creating-or-modifying-a-vidyo-booking">3.4.3.3. Problems when creating or modifying a Vidyo booking</a></li>
-<li><a class="reference external" href="#id3">3.4.3.4. Event display page</a></li>
-<li><a class="reference external" href="#starting-a-vidyo-videoconference">3.4.3.5. Starting a Vidyo videoconference</a></li>
+<li><a class="reference internal" href="#the-vidyo-system">3.4.3. The Vidyo system</a><ul>
+<li><a class="reference internal" href="#creating-a-vidyo-booking">3.4.3.1. Creating a Vidyo booking</a></li>
+<li><a class="reference internal" href="#after-creating-a-vidyo-booking">3.4.3.2. After creating a Vidyo booking</a></li>
+<li><a class="reference internal" href="#problems-when-creating-or-modifying-a-vidyo-booking">3.4.3.3. Problems when creating or modifying a Vidyo booking</a></li>
+<li><a class="reference internal" href="#id3">3.4.3.4. Event display page</a></li>
+<li><a class="reference internal" href="#starting-a-vidyo-videoconference">3.4.3.5. Starting a Vidyo videoconference</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#the-recording-request-system">3.4.4. The Recording Request system</a><ul>
-<li><a class="reference external" href="#filling-in-a-recording-request">3.4.4.1. Filling in a Recording Request</a></li>
-<li><a class="reference external" href="#sending-a-recording-request">3.4.4.2. Sending a Recording Request</a></li>
-<li><a class="reference external" href="#modifying-a-recording-request">3.4.4.3. Modifying a Recording Request</a></li>
-<li><a class="reference external" href="#withdrawing-a-recording-request">3.4.4.4. Withdrawing a Recording Request</a></li>
-<li><a class="reference external" href="#result-of-the-request">3.4.4.5. Result of the request</a></li>
+<li><a class="reference internal" href="#the-recording-request-system">3.4.4. The Recording Request system</a><ul>
+<li><a class="reference internal" href="#filling-in-a-recording-request">3.4.4.1. Filling in a Recording Request</a></li>
+<li><a class="reference internal" href="#sending-a-recording-request">3.4.4.2. Sending a Recording Request</a></li>
+<li><a class="reference internal" href="#modifying-a-recording-request">3.4.4.3. Modifying a Recording Request</a></li>
+<li><a class="reference internal" href="#withdrawing-a-recording-request">3.4.4.4. Withdrawing a Recording Request</a></li>
+<li><a class="reference internal" href="#result-of-the-request">3.4.4.5. Result of the request</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#the-webcast-request-system">3.4.5. The Webcast Request system</a><ul>
-<li><a class="reference external" href="#filling-in-a-webcast-request">3.4.5.1. Filling in a Webcast Request</a></li>
-<li><a class="reference external" href="#sending-a-webcast-request">3.4.5.2. Sending a Webcast Request</a></li>
-<li><a class="reference external" href="#modifying-a-webcast-request">3.4.5.3. Modifying a Webcast Request</a></li>
-<li><a class="reference external" href="#withdrawing-a-webcast-request">3.4.5.4. Withdrawing a Webcast Request</a></li>
-<li><a class="reference external" href="#id5">3.4.5.5. Result of the request</a></li>
+<li><a class="reference internal" href="#the-webcast-request-system">3.4.5. The Webcast Request system</a><ul>
+<li><a class="reference internal" href="#filling-in-a-webcast-request">3.4.5.1. Filling in a Webcast Request</a></li>
+<li><a class="reference internal" href="#sending-a-webcast-request">3.4.5.2. Sending a Webcast Request</a></li>
+<li><a class="reference internal" href="#modifying-a-webcast-request">3.4.5.3. Modifying a Webcast Request</a></li>
+<li><a class="reference internal" href="#withdrawing-a-webcast-request">3.4.5.4. Withdrawing a Webcast Request</a></li>
+<li><a class="reference internal" href="#id5">3.4.5.5. Result of the request</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#the-electronic-agreement-system">3.4.6. The Electronic Agreement system</a><ul>
-<li><a class="reference external" href="#list-of-speakers">3.4.6.1. List of speakers</a></li>
-<li><a class="reference external" href="#send-email-to-speakers">3.4.6.2. Send Email to Speakers</a></li>
-<li><a class="reference external" href="#upload-the-paper-agreement">3.4.6.3. Upload the Paper Agreement</a></li>
+<li><a class="reference internal" href="#the-electronic-agreement-system">3.4.6. The Electronic Agreement system</a><ul>
+<li><a class="reference internal" href="#list-of-speakers">3.4.6.1. List of speakers</a></li>
+<li><a class="reference internal" href="#send-email-to-speakers">3.4.6.2. Send Email to Speakers</a></li>
+<li><a class="reference internal" href="#upload-the-paper-agreement">3.4.6.3. Upload the Paper Agreement</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="index.html"
-                                  title="previous chapter">3. How to manage video services</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="../UserGuide/index.html"
-                                  title="next chapter">4. How to join a video service</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">3. How to manage video services</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../UserGuide/index.html"
+                        title="next chapter">4. How to join a video service</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1690,15 +1699,15 @@ In the legend you can see some tags that can be inserted, none of them are manda
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="../index.html" >Video Services&#8217; Guides</a> &raquo;</li>
           <li><a href="index.html" >3. How to manage video services</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

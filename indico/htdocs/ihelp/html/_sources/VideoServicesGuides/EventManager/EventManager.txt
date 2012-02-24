@@ -331,7 +331,7 @@ all the tabs of the Video Services section (Collaboration,
 Recording Request, etc., and the Managers tab too) and perform any
 operation that you can perform there.
 
-In order to add someone, you can either click on *Add Existing*
+In order to add someone, you can either click on *Add Indico User*
 which will bring a standard user search pop-up dialogue, or click
 *Add from favourites* which will bring up your favourite
 users.
@@ -1279,7 +1279,9 @@ In the *Basic* tab, you should fill in the following fields:
 
 - *Description* : this is the description of room
 
-- *Owner* : this is the person who will own the room. The owner will be the room responsible and the meeting moderator
+- *Event linking* : one can link a vidyo booking to the event (default), a session or a contribution. The event can be linked to several vidyo rooms, however the sessions and contributions can be linked only to one vidyo room
+
+- *Moderator* : The moderator will be the room responsible and will own the rights to moderate the vidyo room
 
 - *PIN* : this is the code to protect the room
 
@@ -1324,7 +1326,7 @@ The details given are:
 
 - *Extension* : this is the numeric extension of the room, that gives another possibility of joining it. If one is logged in the Vidyo portal, one can join a room by entering the extension in the field "Select from list or Enter name to call"
 
-- *Room owner* : this is the owner of the room, which has moderator rights.
+- *Room moderator* : this is the owner of the room, which has moderation rights.
 
 - *PIN* : this is the code to protect the room
 
@@ -1343,6 +1345,8 @@ The details given are:
 - *Last modified on* : this shows the last time that the
   booking information was modified.
 
+- *Linked to* : this is the link of the vidyo room: it can be the event, a session or a contribution.
+
 Also, in case of problems, there will be information in red in the
 details. More on that in section
 `Problems when creating or modifying Vidyo bookings <#problems-when-creating-or-modifying-a-vidyo-booking>`_
@@ -1360,11 +1364,12 @@ change. Your changes will change the booking in Vidyo too.
 6. |image15| button (*remove* ). Press this to delete your booking.
 You will be asked for confirmation.
 
-7. |image17| button (*start videoconference* ). Press this button
+7. |figure80| button (*start desktop* ). Press this button
 to launch the Vidyo client and have your PC join the videoconference
-automatically. The button will be disabled (|image18| ) if you
-cannot join the videoconference yet, or if the videoconference
-already took place.
+automatically.
+
+8. |figure81| button (*connect room* ). Press this button
+to launch the Vidyo client in the conferences/session/contribution physical room. In order to have this button enabled the room has to be a capable Vidyo room.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Problems when creating or modifying a Vidyo booking
@@ -1385,6 +1390,8 @@ Situations where this can happen:
 
 - *You left the meeting description empty* . The *Description* field
   will be highlighted in red.
+
+- *You choose a link type that does not have items*. The "Linked to" select field will be highlighted in red.
 
 Problems when you come to the Collaboration tab or when you
 update the status:
@@ -2035,3 +2042,5 @@ Once the file submited, the page will refresh and a pdf icon will appear. Clicki
 .. |figure77| image:: images/fig77.png
 .. |figure78| image:: images/fig78.png
 .. |figure79| image:: images/fig79.png
+.. |figure80| image:: images/fig80.png
+.. |figure81| image:: images/fig81.png

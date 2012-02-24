@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7. Conference Room Booking &mdash; Indico v0.98 documentation</title>
+    <title>7. Conference Room Booking &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../index.html" />
     <link rel="up" title="Indico’s User Guide" href="index.html" />
     <link rel="next" title="8. Event Evaluation" href="Evaluation.html" />
     <link rel="prev" title="6. Exporting Indico Data" href="Export.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" accesskey="U">Indico&#8217;s User Guide</a> &raquo;</li> 
       </ul>
@@ -415,58 +421,58 @@ explicit permission to override the permission or own the rooms.</p>
         <div class="sphinxsidebarwrapper">
    <img src="../_static/indico_logo.png" width="200px"/> 
 
-            <h3><a href="../index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">7. Conference Room Booking</a><ul>
-<li><a class="reference external" href="#introduction">7.1. Introduction</a></li>
-<li><a class="reference external" href="#the-tutorial">7.2. The Tutorial</a><ul>
-<li><a class="reference external" href="#getting-into-room-booking-module">7.2.1. Getting into Room Booking Module</a></li>
-<li><a class="reference external" href="#the-first-page">7.2.2. The First Page</a></li>
-<li><a class="reference external" href="#the-most-important-tip">7.2.3. The Most Important Tip</a></li>
-<li><a class="reference external" href="#room-names">7.2.4. Room Names</a></li>
-<li><a class="reference external" href="#three-kinds-of-room">7.2.5. Three Kinds of Room</a></li>
-<li><a class="reference external" href="#six-types-of-booking">7.2.6. Six Types of Booking</a></li>
-<li><a class="reference external" href="#booking-a-room">7.2.7. Booking a Room</a></li>
-<li><a class="reference external" href="#view-your-booking">7.2.8. View your Booking</a></li>
-<li><a class="reference external" href="#blocking-a-room">7.2.9. Blocking a Room</a></li>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7. Conference Room Booking</a><ul>
+<li><a class="reference internal" href="#introduction">7.1. Introduction</a></li>
+<li><a class="reference internal" href="#the-tutorial">7.2. The Tutorial</a><ul>
+<li><a class="reference internal" href="#getting-into-room-booking-module">7.2.1. Getting into Room Booking Module</a></li>
+<li><a class="reference internal" href="#the-first-page">7.2.2. The First Page</a></li>
+<li><a class="reference internal" href="#the-most-important-tip">7.2.3. The Most Important Tip</a></li>
+<li><a class="reference internal" href="#room-names">7.2.4. Room Names</a></li>
+<li><a class="reference internal" href="#three-kinds-of-room">7.2.5. Three Kinds of Room</a></li>
+<li><a class="reference internal" href="#six-types-of-booking">7.2.6. Six Types of Booking</a></li>
+<li><a class="reference internal" href="#booking-a-room">7.2.7. Booking a Room</a></li>
+<li><a class="reference internal" href="#view-your-booking">7.2.8. View your Booking</a></li>
+<li><a class="reference internal" href="#blocking-a-room">7.2.9. Blocking a Room</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#core-features-and-constraints">7.3. Core Features and Constraints</a><ul>
-<li><a class="reference external" href="#id1">7.3.1. Introduction</a></li>
-<li><a class="reference external" href="#core-features">7.3.2. Core Features</a><ul>
-<li><a class="reference external" href="#general">7.3.2.1. General</a></li>
-<li><a class="reference external" href="#user">7.3.2.2. User</a></li>
-<li><a class="reference external" href="#room-manager">7.3.2.3. Room Manager</a></li>
-<li><a class="reference external" href="#indico-administrator">7.3.2.4. Indico Administrator</a></li>
+<li><a class="reference internal" href="#core-features-and-constraints">7.3. Core Features and Constraints</a><ul>
+<li><a class="reference internal" href="#id1">7.3.1. Introduction</a></li>
+<li><a class="reference internal" href="#core-features">7.3.2. Core Features</a><ul>
+<li><a class="reference internal" href="#general">7.3.2.1. General</a></li>
+<li><a class="reference internal" href="#user">7.3.2.2. User</a></li>
+<li><a class="reference internal" href="#room-manager">7.3.2.3. Room Manager</a></li>
+<li><a class="reference internal" href="#indico-administrator">7.3.2.4. Indico Administrator</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#constraints">7.3.3. Constraints</a></li>
+<li><a class="reference internal" href="#constraints">7.3.3. Constraints</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#dictionary">7.4. Dictionary</a></li>
+<li><a class="reference internal" href="#dictionary">7.4. Dictionary</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="Export.html"
-                                  title="previous chapter">6. Exporting Indico Data</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="Evaluation.html"
-                                  title="next chapter">8. Event Evaluation</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Export.html"
+                        title="previous chapter">6. Exporting Indico Data</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Evaluation.html"
+                        title="next chapter">8. Event Evaluation</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -485,14 +491,14 @@ explicit permission to override the permission or own the rooms.</p>
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" >Indico&#8217;s User Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

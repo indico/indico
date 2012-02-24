@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>3. How to manage video services &mdash; Indico v0.98 documentation</title>
+    <title>3. How to manage video services &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../../index.html" />
     <link rel="up" title="Video Services’ Guides" href="../index.html" />
     <link rel="next" title="3.1. Introduction" href="EventManager.html" />
     <link rel="prev" title="2.1. Introduction" href="../ManagerOverview/ManagerOverview.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="../index.html" accesskey="U">Video Services&#8217; Guides</a> &raquo;</li> 
       </ul>
@@ -55,25 +61,27 @@
   <div class="section" id="how-to-manage-video-services">
 <h1>3. How to manage video services<a class="headerlink" href="#how-to-manage-video-services" title="Permalink to this headline">¶</a></h1>
 <p>Contents:</p>
+<div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference external" href="EventManager.html">3.1. Introduction</a></li>
-<li class="toctree-l1"><a class="reference external" href="EventManager.html#the-video-services-section">3.2. The Video Services section</a></li>
-<li class="toctree-l1"><a class="reference external" href="EventManager.html#video-services-system-types">3.3. Video Services system types</a><ul>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#booking-systems">3.3.1. Booking systems</a></li>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#request-systems">3.3.2. Request systems</a></li>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#the-managers-tab">3.3.3. The Managers tab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EventManager.html">3.1. Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EventManager.html#the-video-services-section">3.2. The Video Services section</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EventManager.html#video-services-system-types">3.3. Video Services system types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#booking-systems">3.3.1. Booking systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#request-systems">3.3.2. Request systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#the-managers-tab">3.3.3. The Managers tab</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="EventManager.html#details-about-individual-systems">3.4. Details about individual systems</a><ul>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#the-evo-system">3.4.1. The EVO system</a></li>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#the-cernmcu-system">3.4.2. The CERNMCU system</a></li>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#the-vidyo-system">3.4.3. The Vidyo system</a></li>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#the-recording-request-system">3.4.4. The Recording Request system</a></li>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#the-webcast-request-system">3.4.5. The Webcast Request system</a></li>
-<li class="toctree-l2"><a class="reference external" href="EventManager.html#the-electronic-agreement-system">3.4.6. The Electronic Agreement system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EventManager.html#details-about-individual-systems">3.4. Details about individual systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#the-evo-system">3.4.1. The EVO system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#the-cernmcu-system">3.4.2. The CERNMCU system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#the-vidyo-system">3.4.3. The Vidyo system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#the-recording-request-system">3.4.4. The Recording Request system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#the-webcast-request-system">3.4.5. The Webcast Request system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EventManager.html#the-electronic-agreement-system">3.4.6. The Electronic Agreement system</a></li>
 </ul>
 </li>
 </ul>
+</div>
 </div>
 
 
@@ -84,25 +92,25 @@
         <div class="sphinxsidebarwrapper">
    <img src="../../_static/indico_logo.png" width="200px"/> 
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="../ManagerOverview/ManagerOverview.html"
-                                  title="previous chapter">2.1. Introduction</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="EventManager.html"
-                                  title="next chapter">3.1. Introduction</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../ManagerOverview/ManagerOverview.html"
+                        title="previous chapter">2.1. Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="EventManager.html"
+                        title="next chapter">3.1. Introduction</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -121,14 +129,14 @@
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="../index.html" >Video Services&#8217; Guides</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

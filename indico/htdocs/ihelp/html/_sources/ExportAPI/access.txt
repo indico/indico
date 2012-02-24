@@ -61,23 +61,28 @@ Request Signing
 To sign a request, you need the following:
 
 * The requested path, e.g. */export/categ/123.json*
-* Any additional params, e.g. *nocache=yes&limit=10*
+* Any additional params, e.g. *limit=10*
 * The current UNIX timestamp
 * You *API key* and *secret key*
 
-1) Add your API key to the params (*nocache=yes&limit=10&ak=your-api-key*)
-2) Add the current timestamp to the params (*nocache=yes&limit=10&ak=your-api-key&timestamp=1234567890*)
-3) Sort the query string params (*ak=your-api-key&limit=10&nocache=yes&timestamp=1234567890*)
-4) Merge path and the sorted query string to a single string (*/export/categ/123.json?ak=your-api-key&limit=10&nocache=yes&timestamp=1234567890*)
+1) Add your API key to the params (*limit=10&ak=your-api-key*)
+2) Add the current timestamp to the params (*limit=10&ak=your-api-key&timestamp=1234567890*)
+3) Sort the query string params (*ak=your-api-key&limit=10&timestamp=1234567890*)
+4) Merge path and the sorted query string to a single string (*/export/categ/123.json?ak=your-api-key&limit=10&timestamp=1234567890*)
 5) Create a HMAC-SHA1 signature of this string using your *secret key* as
    the key.
-6) Append the hex-encoded signature to your query string: *?ak=your-api-key&limit=10&nocache=yes&timestamp=1234567890&signature=your-signature*
+6) Append the hex-encoded signature to your query string: *?ak=your-api-key&limit=10&timestamp=1234567890&signature=your-signature*
 
 Note that a signed request might be valid only for a few seconds or
 minutes, so you **need** to sign it right before sending it and not store
 the generated URL as it is likely to expire soon.
 
 You can find example code for Python and PHP in the following sections.
+
+If persistent signatures are enabled, you can also omit the timestamp.
+In this case the URL is valid forever. When using this feature, please
+make sure to use these URLs only where necessary - use timestamped
+URLs whenever possible.
 
 Request Signing for Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -90,14 +95,15 @@ A simple example in Python::
     import time
 
 
-    def build_indico_request(path, params, api_key=None, secret_key=None, only_public=False):
+    def build_indico_request(path, params, api_key=None, secret_key=None, only_public=False, persistent=False):
         items = params.items() if hasattr(params, 'items') else list(params)
         if api_key:
             items.append(('apikey', api_key))
         if only_public:
             items.append(('onlypublic', 'yes'))
         if secret_key:
-            items.append(('timestamp', str(int(time.time()))))
+            if not persistent:
+                items.append(('timestamp', str(int(time.time()))))
             items = sorted(items, key=lambda x: x[0].lower())
             url = '%s?%s' % (path, urllib.urlencode(items))
             signature = hmac.new(secret_key, url, hashlib.sha1).hexdigest()
@@ -112,7 +118,6 @@ A simple example in Python::
         SECRET_KEY = '00000000-0000-0000-0000-000000000000'
         PATH = '/export/categ/1337.json'
         PARAMS = {
-            'nocache': 'yes',
             'limit': 123
         }
         print build_indico_request(PATH, PARAMS, API_KEY, SECRET_KEY)
@@ -124,7 +129,7 @@ A simple example in PHP::
 
     <?php
 
-    function build_indico_request($path, $params, $api_key = null, $secret_key = null, $only_public = false) {
+    function build_indico_request($path, $params, $api_key = null, $secret_key = null, $only_public = false, $persistent = false) {
         if($api_key) {
             $params['apikey'] = $api_key;
         }
@@ -134,7 +139,9 @@ A simple example in PHP::
         }
 
         if($secret_key) {
-            $params['timestamp'] = time();
+            if(!$persistent) {
+                $params['timestamp'] = time();
+            }
             uksort($params, 'strcasecmp');
             $url = $path . '?' . http_build_query($params);
             $params['signature'] = hash_hmac('sha1', $url, $secret_key);
@@ -152,7 +159,6 @@ A simple example in PHP::
         $SECRET_KEY = '00000000-0000-0000-0000-000000000000';
         $PATH = '/export/categ/1337.json';
         $PARAMS = array(
-            'nocache' => 'yes',
             'limit' => 123
         );
         echo build_indico_request($PATH, $PARAMS, $API_KEY, $SECRET_KEY) . "\n";

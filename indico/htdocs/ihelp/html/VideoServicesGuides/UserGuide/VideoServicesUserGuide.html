@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>4.1. Introduction &mdash; Indico v0.98 documentation</title>
+    <title>4.1. Introduction &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../../index.html" />
     <link rel="up" title="4. How to join a video service" href="index.html" />
     <link rel="next" title="Chat Guides" href="../../Chat/index.html" />
     <link rel="prev" title="4. How to join a video service" href="index.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="../index.html" >Video Services&#8217; Guides</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">4. How to join a video service</a> &raquo;</li> 
@@ -74,7 +80,7 @@ that event will look as shown in the next figure. You will notice there is a
 <p><img alt="image01" src="../../_images/image01.png" /></p>
 <p>This Video Services section has a list of videoconferences that have been booked
 for this event. If the last line reads something similar to: &#8220;<em>There are 2 more
-scheduled bookings. **Show**</em>&#8220;, then you can click on <em>Show</em> to display all of
+scheduled bookings. **Show**</em>&#8221;, then you can click on <em>Show</em> to display all of
 them:</p>
 <p><img alt="image02" src="../../_images/image02.png" /></p>
 <p>If you want to hide them to save visual space, click on <em>Hide additional
@@ -188,15 +194,23 @@ can contact <a class="reference external" href="mailto:videoconference-support&#
 H.323 device. To use it in your PC,  you need the Vidyo client installed and a
 webcam and audio device connected (please go to <a class="reference external" href="http://it-multimedia.web.cern.ch/it-multimedia/collaborative/recommendations.php">recommendations page</a>
 for videoconferencing PC hardware).</p>
-<p>An ongoing Vidyo videoconference associated to an Indico event will appear like
+<p>The ongoing Vidyo videoconferences associated to an Indico event (or sessions or contributions) will appear like
 this:</p>
+<p><img alt="image16" src="../../_images/image16.png" /></p>
+<p>The information related to the Vidyo videoconferences associated to the event will be shown:</p>
 <p><img alt="image12" src="../../_images/image12.png" /></p>
+<p>If you are not the moderator of the Vidyo videoconference associated and you are manager of the event, the link <em>Make me moderator</em> will be shown:</p>
+<p><img alt="image17" src="../../_images/image17.png" /></p>
 <p>If the Vidyo meeting is not yet ongoing, the <em>Join Now!</em> button will not be
 shown.</p>
 <p>To launch an ongoing Vidyo videoconference associated with an Indico event, just
 click on the <em>Join Now!</em> link:</p>
 <p><img alt="image13" src="../../_images/image13.png" /></p>
-<p>This will connect you to the Vidyo Portal where you will be asked for your
+<p>In the case of sessions and contributions a popup will appear when the mouse passes over the &#8220;Join Vidyo&#8221; link:</p>
+<p><img alt="image18" src="../../_images/image18.png" /></p>
+<p>The popup will also show the information related to the room and, if you are manager of the event and you are not the moderator a link <em>Make me moderator</em> will appear.</p>
+<p><img alt="image19" src="../../_images/image19.png" /></p>
+<p>These links will connect you to the Vidyo Portal where you will be asked for your
 account name and password. For information about registration, please go to
 <a class="reference external" href="http://cern.ch/vidyo-service/">http://cern.ch/vidyo-service/</a>. If you are not yet registered in the system,
 you can also choose a Guest name:</p>
@@ -215,35 +229,35 @@ video and audio from/to the meeting.</p>
         <div class="sphinxsidebarwrapper">
    <img src="../../_static/indico_logo.png" width="200px"/> 
 
-            <h3><a href="../../index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">4.1. Introduction</a></li>
-<li><a class="reference external" href="#videoconferences-in-events-of-type-meeting-and-lecture">4.2. Videoconferences in events of type &#8220;meeting&#8221; and &#8220;lecture&#8221;</a></li>
-<li><a class="reference external" href="#videoconferences-in-events-of-type-conference">4.3. Videoconferences in events of type &#8220;conference&#8221;</a></li>
-<li><a class="reference external" href="#the-evo-system">4.4. The EVO system</a></li>
-<li><a class="reference external" href="#the-mcu-system">4.5. The MCU system</a></li>
-<li><a class="reference external" href="#the-vidyo-system">4.6. The Vidyo system</a></li>
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4.1. Introduction</a></li>
+<li><a class="reference internal" href="#videoconferences-in-events-of-type-meeting-and-lecture">4.2. Videoconferences in events of type &#8220;meeting&#8221; and &#8220;lecture&#8221;</a></li>
+<li><a class="reference internal" href="#videoconferences-in-events-of-type-conference">4.3. Videoconferences in events of type &#8220;conference&#8221;</a></li>
+<li><a class="reference internal" href="#the-evo-system">4.4. The EVO system</a></li>
+<li><a class="reference internal" href="#the-mcu-system">4.5. The MCU system</a></li>
+<li><a class="reference internal" href="#the-vidyo-system">4.6. The Vidyo system</a></li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="index.html"
-                                  title="previous chapter">4. How to join a video service</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="../../Chat/index.html"
-                                  title="next chapter">Chat Guides</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">4. How to join a video service</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../Chat/index.html"
+                        title="next chapter">Chat Guides</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -262,15 +276,15 @@ video and audio from/to the meeting.</p>
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="../index.html" >Video Services&#8217; Guides</a> &raquo;</li>
           <li><a href="index.html" >4. How to join a video service</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

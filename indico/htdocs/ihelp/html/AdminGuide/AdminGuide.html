@@ -1,25 +1,31 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>1. Starting with Indico &mdash; Indico v0.98 documentation</title>
+    <title>1. Starting with Indico &mdash; Indico 0.98 documentation</title>
+    
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
         VERSION:     '0.98',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Indico v0.98 documentation" href="../index.html" />
+    <link rel="top" title="Indico 0.98 documentation" href="../index.html" />
     <link rel="up" title="Indico’s Admin Guide" href="index.html" />
     <link rel="next" title="Indico’s HTTP Export API" href="../ExportAPI/index.html" />
     <link rel="prev" title="Indico’s Admin Guide" href="index.html" />
@@ -41,7 +47,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" accesskey="U">Indico&#8217;s Admin Guide</a> &raquo;</li> 
       </ul>
@@ -269,54 +275,54 @@ websessions as well as packing of the database.</p>
         <div class="sphinxsidebarwrapper">
    <img src="../_static/indico_logo.png" width="200px"/> 
 
-            <h3><a href="../index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">1. Starting with Indico</a><ul>
-<li><a class="reference external" href="#creating-an-administration-account">1.1. Creating an Administration Account</a></li>
-<li><a class="reference external" href="#accounts-created-by-a-user">1.2. Accounts Created by a User</a><ul>
-<li><a class="reference external" href="#activating-a-user-created-account">1.2.1. Activating a User Created Account</a></li>
-<li><a class="reference external" href="#retrieving-a-forgotten-password">1.2.2. Retrieving a Forgotten Password</a></li>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Starting with Indico</a><ul>
+<li><a class="reference internal" href="#creating-an-administration-account">1.1. Creating an Administration Account</a></li>
+<li><a class="reference internal" href="#accounts-created-by-a-user">1.2. Accounts Created by a User</a><ul>
+<li><a class="reference internal" href="#activating-a-user-created-account">1.2.1. Activating a User Created Account</a></li>
+<li><a class="reference internal" href="#retrieving-a-forgotten-password">1.2.2. Retrieving a Forgotten Password</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference external" href="#id1">2. Administration Area</a><ul>
-<li><a class="reference external" href="#general-settings">2.1. General settings</a></li>
-<li><a class="reference external" href="#users">2.2. Users</a><ul>
-<li><a class="reference external" href="#manually-creating-a-user">2.2.1. Manually Creating a User</a></li>
-<li><a class="reference external" href="#searching-for-users">2.2.2. Searching for Users</a></li>
-<li><a class="reference external" href="#manually-activating-an-account">2.2.3. Manually Activating an Account</a></li>
-<li><a class="reference external" href="#modifying-a-user-s-account">2.2.4. Modifying a User&#8217;s Account</a></li>
-<li><a class="reference external" href="#creating-additional-logins-for-a-user">2.2.5. Creating Additional Logins for a User</a></li>
-<li><a class="reference external" href="#deleting-additional-logins">2.2.6. Deleting Additional Logins</a></li>
+<li><a class="reference internal" href="#id1">2. Administration Area</a><ul>
+<li><a class="reference internal" href="#general-settings">2.1. General settings</a></li>
+<li><a class="reference internal" href="#users">2.2. Users</a><ul>
+<li><a class="reference internal" href="#manually-creating-a-user">2.2.1. Manually Creating a User</a></li>
+<li><a class="reference internal" href="#searching-for-users">2.2.2. Searching for Users</a></li>
+<li><a class="reference internal" href="#manually-activating-an-account">2.2.3. Manually Activating an Account</a></li>
+<li><a class="reference internal" href="#modifying-a-user-s-account">2.2.4. Modifying a User&#8217;s Account</a></li>
+<li><a class="reference internal" href="#creating-additional-logins-for-a-user">2.2.5. Creating Additional Logins for a User</a></li>
+<li><a class="reference internal" href="#deleting-additional-logins">2.2.6. Deleting Additional Logins</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#groups">2.3. Groups</a></li>
-<li><a class="reference external" href="#ip-domains">2.4. IP Domains</a></li>
-<li><a class="reference external" href="#maintenance">2.5. Maintenance</a></li>
+<li><a class="reference internal" href="#groups">2.3. Groups</a></li>
+<li><a class="reference internal" href="#ip-domains">2.4. IP Domains</a></li>
+<li><a class="reference internal" href="#maintenance">2.5. Maintenance</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="index.html"
-                                  title="previous chapter">Indico&#8217;s Admin Guide</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="../ExportAPI/index.html"
-                                  title="next chapter">Indico&#8217;s HTTP Export API</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="../search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Indico&#8217;s Admin Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../ExportAPI/index.html"
+                        title="next chapter">Indico&#8217;s HTTP Export API</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -335,14 +341,14 @@ websessions as well as packing of the database.</p>
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
-        <li><a href="../index.html">Indico v0.98 documentation</a> &raquo;</li>
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
 
           <li><a href="index.html" >Indico&#8217;s Admin Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>
