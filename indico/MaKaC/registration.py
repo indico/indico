@@ -3394,6 +3394,8 @@ class AccommodationType(Persistent):
         return self._currentNoPlaces
 
     def hasAvailablePlaces(self):
+        if self.getPlacesLimit() == 0: #zero means no limit
+            return True
         if self.getCurrentNoPlaces() >= self.getPlacesLimit():
             return False
         return True

@@ -1956,12 +1956,13 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                 if alreadyPaid and (atype.isBillable() or (currentAccoType and currentAccoType.isBillable())):
                     disabled = ' disabled="disabled"'
                 placesLeft = ""
-                if atype.getPlacesLimit() <= 0 or atype.hasAvailablePlaces():
-                    placesLeft = " <span style='color:green; font-style:italic;'>[%s place(s) left]</span>"%atype.getNoPlacesLeft()
-                else:
+
+                if not atype.hasAvailablePlaces():
                     placesLeft = " <span style='color:red;'>(no places left)</span>"
                     if currentAccoType != atype and not disabled:
                         disabled = ' disabled="disabled"'
+                elif atype.getPlacesLimit() > 0:
+                    placesLeft = " <span style='color:green; font-style:italic;'>[%s place(s) left]</span>"%atype.getNoPlacesLeft()
                 priceCol = ""
                 if atype.isBillable():
                     priceCol = """<td align="right">%s %s per night</td>""" % (atype.getPrice(), self._conf.getRegistrationForm().getCurrency())
