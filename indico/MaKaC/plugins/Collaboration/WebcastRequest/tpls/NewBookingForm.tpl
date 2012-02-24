@@ -165,19 +165,20 @@
                 </ul>
             </div>
         </div>
-        <div class="WRFormSubsection">
-            <span class="WRQuestion">${_("Please select the audience of the webcast:")}</span>
-            <div>
-                <select name="audience">
-                    <option value="">${_("Public")}</option>
-                    % for audience in Audiences:
-                        <option value=${ quoteattr(audience['name']) }>${ audience['name'] }</option>
-                    % endfor
-                </select>
-            </div>
-        </div>
     </div>
 % endif
+
+    <div class="WRFormSubsection">
+        <span class="WRQuestion">${_("Please select the audience of the webcast:")}</span>
+        <div>
+            <select name="audience">
+                <option value="">${_("Public")}</option>
+                % for audience in Audiences:
+                    <option value=${ quoteattr(audience['name']) }>${ audience['name'] }</option>
+                % endfor
+            </select>
+        </div>
+    </div>
 
     <!-- SECTION 2: Extra comments -->
     <div class="WRFormSection">
