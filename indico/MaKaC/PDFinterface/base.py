@@ -33,6 +33,7 @@ from reportlab.platypus.frames import Frame
 from reportlab.lib.pagesizes import landscape, A4, LETTER, A0, A1, A2, A3, A5
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.fonts import addMapping
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
 
@@ -153,18 +154,34 @@ def setTTFonts():
         pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(dir, 'LiberationSerif-Bold.ttf')))
         pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(dir,'LiberationSerif-Italic.ttf')))
         pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(dir, 'LiberationSerif-BoldItalic.ttf')))
+        addMapping('Times-Roman', 0, 0, 'Times-Roman')
+        addMapping('Times-Roman', 1, 0, 'Times-Bold')
+        addMapping('Times-Roman', 0, 1, 'Times-Italic')
+        addMapping('Times-Roman', 1, 1, 'Times-Bold-Italic')
         pdfmetrics.registerFont(TTFont('Sans', os.path.join(dir,'LiberationSans-Regular.ttf')))
         pdfmetrics.registerFont(TTFont('Sans-Bold', os.path.join(dir, 'LiberationSans-Bold.ttf')))
         pdfmetrics.registerFont(TTFont('Sans-Italic', os.path.join(dir,'LiberationSans-Italic.ttf')))
         pdfmetrics.registerFont(TTFont('Sans-Bold-Italic', os.path.join(dir, 'LiberationSans-BoldItalic.ttf')))
+        addMapping('Sans', 0, 0, 'Sans')
+        addMapping('Sans', 1, 0, 'Sans-Bold')
+        addMapping('Sans', 0, 1, 'Sans-Italic')
+        addMapping('Sans', 1, 1, 'Sans-Bold-Italic')
         pdfmetrics.registerFont(TTFont('Courier', os.path.join(dir, 'LiberationMono-Regular.ttf')))
         pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(dir, 'LiberationMono-Bold.ttf')))
         pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(dir, 'LiberationMono-Italic.ttf')))
         pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(dir, 'LiberationMono-BoldItalic.ttf')))
+        addMapping('Courier', 0, 0, 'Courier')
+        addMapping('Courier', 1, 0, 'Courier-Bold')
+        addMapping('Courier', 0, 1, 'Courier-Italic')
+        addMapping('Courier', 1, 1, 'Courier-Bold-Italic')
         pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(dir, 'LinLibertine_Re-4.4.1.ttf')))
         pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(dir, 'LinLibertine_Bd-4.1.0.ttf')))
         pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(dir, 'LinLibertine_It-4.0.6.ttf')))
         pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(dir, 'LinLibertine_BI-4.0.5.ttf')))
+        addMapping('LinuxLibertine', 0, 0, 'LinuxLibertine')
+        addMapping('LinuxLibertine', 1, 0, 'LinuxLibertine-Bold')
+        addMapping('LinuxLibertine', 0, 1, 'LinuxLibertine-Italic')
+        addMapping('LinuxLibertine', 1, 1, 'LinuxLibertine-Bold-Italic')
         pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(dir, 'kochi-mincho-subst.ttf')))
         pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(dir, 'kochi-gothic-subst.ttf')))
         #pdfmetrics.registerFont(TTFont('Uming-CN', os.path.join(dir, 'uming.ttc')))
