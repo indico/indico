@@ -375,14 +375,18 @@ class CollaborationTools(object):
 
     @classmethod
     def getBookingTitle(cls, booking):
-        title = ""
-        if hasattr(booking, 'getFullTitle'):
-            title = booking.getFullTitle()
-        elif hasattr(booking, 'getTitle'):
-            title = booking.getTitle()
-        elif hasattr(booking, '_getTitle'):
-            title = booking._getTitle()
-        elif hasattr(booking, '_conf'):
+        title = None
+        parsingAttrs = ['getFullTitle', 'getTitle', '_getTitle']
+
+        for funcName in parsingAttrs:
+            if hasattr(booking, funcName):
+                func = getattr(booking, funcName)
+                title = func()
+
+                if title is not None:
+                    break
+
+        if title is None and hasattr(booking, '_conf'):
             title = booking._conf.getTitle()
 
         return title if title is not None else 'No title defined.'

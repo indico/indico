@@ -269,16 +269,12 @@ class VideoEventFetcher(DataFetcher):
                             bk.setEndDate(bk._conf.getEndDate())
                             yield bk
                         else: # Contributions is the list of all to be exported now
+                            contributions = filter(lambda c: c.isScheduled(), contributions)
                             for contrib in contributions:
                                 # Wrap the CSBooking object for export
                                 bkw = CSBookingContributionWrapper(bk, contrib)
-
-                                if contrib.isScheduled():
-                                    bkw.setStartDate(contrib.getStartDate())
-                                    bkw.setEndDate(contrib.getEndDate())
-                                else:
-                                    bkw.setStartDate(bk._conf.getStartDate())
-                                    bkw.setEndDate(bk._conf.getEndDate())
+                                bkw.setStartDate(contrib.getStartDate())
+                                bkw.setEndDate(contrib.getEndDate())
 
                                 yield bkw
                     else:
@@ -287,12 +283,12 @@ class VideoEventFetcher(DataFetcher):
         """ Simple filter, as this method can return None for Pending and True
             for accepted, both are valid booking statuses for exporting.
         """
-        def filter(obj):
+        def _filter(obj):
             return obj.getAcceptRejectStatus() is not False
 
         iface = self.DETAIL_INTERFACES.get('all')
 
-        for booking in self._process(_iter_bookings(bookings), filter, iface):
+        for booking in self._process(_iter_bookings(bookings), _filter, iface):
             yield booking
 
 
