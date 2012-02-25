@@ -505,6 +505,8 @@ class RHConferenceGetLogo(RHConferenceBaseDisplay):
 
     def _process(self):
         logo=self._target.getLogo()
+        if not logo:
+            raise MaKaCError(_("This event does not have a logo"))
         self._req.headers_out["Content-Length"]="%s"%logo.getSize()
         cfg=Config.getInstance()
         mimetype=cfg.getFileTypeMimeType(logo.getFileType())
