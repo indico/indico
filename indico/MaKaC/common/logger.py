@@ -14,7 +14,7 @@ class ExtraIndicoFilter(logging.Filter):
 
 class IndicoMailFormatter(logging.Formatter):
     def format(self, record):
-        s = super(IndicoMailFormatter, self).format(record)
+        s = logging.Formatter.format(self, record)
         return s + self._getRequestInfo()
 
     def _getRequestInfo(self):
@@ -217,6 +217,7 @@ class Logger:
 
     @classmethod
     def initialize(cls):
+        import pydevd;pydevd.settrace()
         # Lists of filters for each handler
         filters = {'indico' : [logging.Filter('indico')],
                    'other'  : [ExtraIndicoFilter()],
