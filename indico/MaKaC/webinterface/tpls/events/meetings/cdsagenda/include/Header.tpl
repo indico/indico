@@ -176,8 +176,3 @@
     </td>
 </tr>
 </table>
-
-<script>
-$('#applyLink').click(function(){new ApplyForParticipationPopup('${conf.getId()}','event.participation.applyParticipant',
-                    $T('Apply for participation'), userData, onSuccess, allowEdit);});
-</script>

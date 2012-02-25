@@ -107,41 +107,4 @@ ${pluginDetails}
 % endif
 </tbody>
 </table>
-<script type="text/javascript">
-    IndicoUI.executeOnLoad(function(){
-        var onSuccess = function(result){
-            if(result.msg){
-                (new AlertPopup($T("Success"),result.msg)).open();
-            }
-            if (result.listParticipants){
-                if( $("#eventParticipants").length==0){
-                    var trParticipants=$(Html.tr({id:"eventParticipants"},
-                            Html.td({className:"leftCol"},$T("Participants")),
-                            Html.td({id:"eventListParticipants"},"")).dom);
-                    if ($("#eventDescription").length==0){
-                        $("#eventDetails").prepend(trParticipants);
-                    }else{
-                        $("#eventDescription").after(trParticipants);
-                    }
-                }
-                $("#eventListParticipants").text(result.listParticipants).effect("highlight",{},3000);
-            }
-        };
-        var userData = {};
-        var allowEdit = true;
-        % if currentUser:
-            allowEdit = false;
-            userData["id"] = '${currentUser.getId()}';
-            userData["title"] = '${currentUser.getTitle()}';
-            userData["surName"] = '${currentUser.getFamilyName()}';
-            userData["name"] = '${currentUser.getName()}';
-            userData["email"] = '${currentUser.getEmail()}';
-            userData["address"] = '${currentUser.getAddress()}';
-            userData["affiliation"] = '${currentUser.getAffiliation()}';
-            userData["phone"] = '${currentUser.getTelephone()}';
-            userData["fax"] = '${currentUser.getFax()}';
-        % endif
-            $('#applyLink').click(function(){new ApplyForParticipationPopup('${conf.getId()}','event.participation.applyParticipant',
-                    $T('Apply for participation'), userData, onSuccess, allowEdit);});
-    });
-</script>
+<%include file="ApplyParticipation.tpl"/>

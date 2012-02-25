@@ -7,6 +7,8 @@
     checkOwnerLocation = True
 %>
 
+<%include file="../../include/ApplyParticipation.tpl" />
+
 <table class="eventWrapper" cellpadding="0">
 <tr>
   <td>
