@@ -99,10 +99,10 @@
         % if registrationOpen:
         <tr>
           <td valign="top" align="right" class="headerTitle">
-                Want to participate:
+                ${_("Want to participate")}
           </td>
           <td style="font-size:x-small;font-style:italic;">
-            <a href="${urlHandlers.UHConfParticipantsNewPending.getURL(conf)}">Apply here</a>
+            <span class="fakeLink" id="applyLink">${_("Apply here")}</span> 
           </td>
         </tr>
         % endif
@@ -177,3 +177,7 @@
 </tr>
 </table>
 
+<script>
+$('#applyLink').click(function(){new ApplyForParticipationPopup('${conf.getId()}','event.participation.applyParticipant',
+                    $T('Apply for participation'), userData, onSuccess, allowEdit);});
+</script>
