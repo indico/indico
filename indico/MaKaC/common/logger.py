@@ -217,7 +217,6 @@ class Logger:
 
     @classmethod
     def initialize(cls):
-        import pydevd;pydevd.settrace()
         # Lists of filters for each handler
         filters = {'indico' : [logging.Filter('indico')],
                    'other'  : [ExtraIndicoFilter()],
