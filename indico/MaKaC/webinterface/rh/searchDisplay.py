@@ -93,7 +93,7 @@ class RHSearchBase:
             # first page, start with 0
             return 0, None
         elif page in obj:
-            Logger.get("search").debug("hit! %s %s", (obj[page], obj))
+            Logger.get("search").debug("hit! %s %s" % (obj[page], obj))
             # cache hit!
             return obj[page], obj
         else:
@@ -103,17 +103,11 @@ class RHSearchBase:
             return 0, None
 
     def _cacheNextStartingRecord(self, queryHash, page, record, obj):
-        if obj:
-            data = obj.getContent()
-        else:
-            data = {}
-
+        data = obj or {}
         data[self._page+1] = record + 1
 
         Logger.get("search").debug("set page: %s" % data)
-
         GenericCache('Search').set((self._sessionHash, queryHash), data, 12*3600)
-
 
     def _loadBatchOfRecords(self, user, collection, number, start):
 
