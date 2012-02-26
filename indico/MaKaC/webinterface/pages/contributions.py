@@ -315,8 +315,8 @@ class WContributionDisplayBase(WICalExportBase):
             vars["hideInfo"] = True
         else:
             vars["hideInfo"] = False
-        vars["showAttachedFiles"] = self._contrib.getConference().getAbstractMgr().showAttachedFilesContribList() and isinstance(self._contrib, conference.AcceptedContribution) and len(self._contrib.getAbstract().getAttachments()) > 0
-        vars["abstractAttachments"] = fossilize(self._contrib.getAbstract().getAttachments().values(), ILocalFileAbstractMaterialFossil) if isinstance(self._contrib, conference.AcceptedContribution) else []
+        vars["showAttachedFiles"] = self._contrib.getConference().getAbstractMgr().showAttachedFilesContribList() and isinstance(self._contrib, conference.AcceptedContribution) and self._contrib.getAbstract() and len(self._contrib.getAbstract().getAttachments()) > 0
+        vars["abstractAttachments"] = fossilize(self._contrib.getAbstract().getAttachments().values(), ILocalFileAbstractMaterialFossil) if isinstance(self._contrib, conference.AcceptedContribution) and self._contrib.getAbstract() else []
 
         vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/contribution/%s.ics' % \
                                               (self._contrib.getConference().getId(), self._contrib.getId())))
