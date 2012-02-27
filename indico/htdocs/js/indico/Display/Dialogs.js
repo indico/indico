@@ -33,7 +33,7 @@ type("ApplyForParticipationPopup", ["ServiceDialogWithButtons"], {
                  [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', false), self.userData.accessor('email'))],
                  [$T('Address'), $B(Html.textarea({style: {width: '200px'}}), self.userData.accessor('address'))],
                  [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), self.userData.accessor('phone'))],
-                 [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), self.userData.accessor('fax'))],
+                 [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), self.userData.accessor('fax'))]
              ]);
     },
 
