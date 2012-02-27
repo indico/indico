@@ -386,8 +386,6 @@ class outputGenerator(Observable):
 
         if conf.getParticipation().displayParticipantList() :
             out.writeTag("participants",conf.getParticipation().getPresentParticipantListText())
-        if (conf.getType() == "meeting" or conf.getType() == "simple_event") and conf.getParticipation().isAllowedForApplying() and conf.getStartDate() > nowutc():
-            out.writeTag("apply",urlHandlers.UHConfParticipantsNewPending.getURL(conf))
 
         evaluation = conf.getEvaluation()
         if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions()>0 :
