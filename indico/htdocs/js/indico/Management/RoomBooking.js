@@ -50,8 +50,8 @@ type("RoomBookingWidget", ["IWidget"],
                  {},
                  $T('Inherit from parent {0}: ').format(this.parentName),
                  Html.span({},
-                           this.parentInfo.get('room') + " (" +
-                           this.parentInfo.get('location') + ")")):'';
+                           any(this.parentInfo.get('room'), $T('No room defined')) + " (" +
+                           any(this.parentInfo.get('location'), $T('No location defined')) + ")")):'';
 
                  return Html.div(
                          'roomWidget',

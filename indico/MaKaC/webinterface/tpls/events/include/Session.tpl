@@ -41,7 +41,7 @@
         % if getLocationInfo(item) != getLocationInfo(item.getConference()):
             <tr>
                 <td class="leftCol">Location:</td>
-                <td>${common.renderLocation(item, parent=item.getOwner())}</td>
+                <td>${common.renderLocation(item, parent=item.getConference())}</td>
             </tr>
         % endif
 

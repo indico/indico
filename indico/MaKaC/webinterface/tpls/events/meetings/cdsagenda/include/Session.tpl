@@ -60,7 +60,7 @@
         Location:
       </td>
       <td class="headerInfo" >
-        ${common.renderLocation(item, parent=item.getOwner())}
+        ${common.renderLocation(item, parent=item.getConference())}
       </td>
     </tr>
     % endif
