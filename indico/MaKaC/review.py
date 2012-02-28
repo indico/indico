@@ -1489,18 +1489,19 @@ class Abstract(Persistent):
         cfg = Config.getInstance()
         from MaKaC.conference import LocalFile
         for fileUploaded in files:
-            # create a temp file
-            tempPath = cfg.getUploadedFilesTempDir()
-            tempFileName = tempfile.mkstemp(suffix="IndicoAbstract.tmp", dir=tempPath)[1]
-            f = open(tempFileName, "wb")
-            f.write(fileUploaded.file.read() )
-            f.close()
-            file = LocalFile()
-            file.setFileName(fileUploaded.filename)
-            file.setFilePath(tempFileName)
-            file.setOwner(self)
-            file.setId(self._getAttachmentsCounter())
-            self.__addFile(file)
+            if fileUploaded.filename:
+                # create a temp file
+                tempPath = cfg.getUploadedFilesTempDir()
+                tempFileName = tempfile.mkstemp(suffix="IndicoAbstract.tmp", dir=tempPath)[1]
+                f = open(tempFileName, "wb")
+                f.write(fileUploaded.file.read() )
+                f.close()
+                file = LocalFile()
+                file.setFileName(fileUploaded.filename)
+                file.setFilePath(tempFileName)
+                file.setOwner(self)
+                file.setId(self._getAttachmentsCounter())
+                self.__addFile(file)
 
     def deleteFilesNotInList(self, keys):
         """This method is used in order to delete all the files that are not present (by id) in the
