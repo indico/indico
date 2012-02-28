@@ -115,19 +115,10 @@ ${ _("Warning: since you are not logged in, only results from public events will
 <%include file="SearchNavigationForm.tpl" args="target = 'Contributions', direction='Prev'"/>
 
 % if p != '':
-<h3 style="float:right">Hits: ${ numHits }</h3>
+<h3 style="float:right;margin:0px;">Hits: ${ numHits }</h3>
 % endif
 
-<div id="container">
-
-<ul id="tabList">
-% if len(eventResults) > 0:
-<li><a href="#events">Events</a></li>
-% endif
-% if len(contribResults) > 0:
-  <li><a href="#contribs">Contributions</a></li>
-% endif
-</ul>
+<div id="container" style="clear:both;">
 
 % if len(eventResults) > 0:
 <div id="events">
@@ -189,13 +180,14 @@ IndicoUI.executeOnLoad(function(){
     var tabList = [];
 
 % if len(eventResults) > 0:
-    tabList.push(['Events', $E('events')]);
+    tabList.push([$T('Events'), $E('events')]);
 % endif
 % if len(contribResults) > 0:
-    tabList.push(['Contributions', $E('contribs')]);
+    tabList.push([$T('Contributions'), $E('contribs')]);
 % endif
     var tabCtrl = new JTabWidget(tabList);
     $E('container').set(tabCtrl.draw());
+    $('#container>div').css({"display":"table", "width":"100%"});
 
 % endif
 
