@@ -95,7 +95,7 @@ def qbeMatch( example, candidate, special, **kwargs ):
     for attrName in dir( example ):
         # Skip methods, private attributes and Nones
         if attrName[0] == '_' or attrName in ['avaibleVC', 'vcList', 'needsAVCSetup', 'verboseEquipment',
-                                              'resvStartNotification', 'resvEndNotification']:
+                                              'resvStartNotification', 'resvEndNotification', 'maxAdvanceDays']:
             continue
 
         exAttrVal = getattr(example, attrName)
@@ -104,7 +104,7 @@ def qbeMatch( example, candidate, special, **kwargs ):
         if attrType in ('instancemethod', 'staticmethod', 'function') or exAttrVal == None:
             continue
 
-        candAttrVal = eval( 'candidate.' + attrName )
+        candAttrVal = getattr(candidate, attrName)
         if candAttrVal == None           and attrName not in ['repeatability', 'weekDay', 'weekNumber']: # Ugly hack :/
             return False # because exAttrVal != None
 
