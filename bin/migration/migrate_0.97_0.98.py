@@ -38,7 +38,7 @@ from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayInd
 from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
-from MaKaC.conference import ConferenceHolder, CategoryManager, Conference
+from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
@@ -454,6 +454,40 @@ def pluginOptionsRoomGUIDs(dbi, withRBDB, prevVersion):
             if room:
                 newValue.append(str(room.guid))
         opt.setValue(newValue)
+
+@since('0.98.1')
+def slotLocationMigration(dbi, withRBDB, prevVersion):
+    """
+    Add missing location info to slots of a session that contains location or room
+    """
+
+    ch = ConferenceHolder()
+    i = 0
+
+    for (level, obj) in console.conferenceHolderIterator(ch, deepness='event'):
+        for session in obj.getSessionList():
+            for slot in session.getSlotList():
+                sessionLoc = session.getLocation()
+                sessionRoom = session.getRoom()
+                if (sessionRoom is not None or sessionLoc is not None) and \
+                    (slot.getRoom() is None and slot.getLocation() is None):
+                    print >>f, 'modified conf %s, session %s, slot %s'%(obj.getId(), session.getId(), slot.getId())
+                    if sessionLoc:
+                        loc = CustomLocation()
+                        slot.setLocation(loc)
+                        loc.setName(sessionLoc.getName())
+                        loc.setAddress(sessionLoc.getAddress())
+                    if sessionRoom:
+                        r = CustomRoom()
+                        slot.setRoom(r)
+                        r.setName(sessionRoom.getName())
+                        if sessionLoc and withRBDB:
+                            r.retrieveFullName(sessionLoc.getName())
+        if i%1000 == 999:
+            dbi.commit()
+        i+=1
+    dbi.commit()
+
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
