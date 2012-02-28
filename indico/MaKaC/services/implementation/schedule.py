@@ -320,7 +320,6 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         session.addSlot(slot)
 
         self.__addConveners2Slot(slot)
-        self._setLocationInfo(session)
         self._setLocationInfo(slot)
 
         logInfo = session.getLogInfo()
@@ -741,9 +740,6 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
 
         self. _addConveners(self._slot)
         self._setLocationInfo(self._slot)
-        if self._slot.getSession().getOwnLocation() and self._slot.getSession().getOwnRoom():
-            # Update session location unless it inherits
-            self._setLocationInfo(self._session)
         self._setSessionTitle(self._slot)
 
         self._addToSchedule()
@@ -1256,8 +1252,6 @@ class SessionEditRoomLocation(EditRoomLocationBase, sessionServices.SessionModif
 
     def _performOperation(self):
         result = EditRoomLocationBase._performOperation(self)
-        if self._session.getOwnLocation() and self._session.getOwnRoom():
-            self._setLocationInfo(self._session)
 
         pickledDataSlotSchEntry = fossilize(self._slot.getConfSchEntry(), tz=self._conf.getTimezone())
         pickledDataSession = fossilize(self._session, tz=self._conf.getTimezone())
@@ -1275,9 +1269,6 @@ class SessionSlotEditRoomLocation(EditRoomLocationBase, sessionServices.SessionS
 
     def _performOperation(self):
         result = EditRoomLocationBase._performOperation(self)
-        if self._session.getOwnLocation() and self._session.getOwnRoom():
-            # Update session location unless it inherits
-            self._setLocationInfo(self._session)
         pickledDataSlotSchEntry = fossilize(self._slot.getConfSchEntry(), tz=self._conf.getTimezone())
         pickledDataSession = fossilize(self._session, tz=self._conf.getTimezone())
         result.update({'slotEntry': pickledDataSlotSchEntry,
