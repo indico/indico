@@ -1143,6 +1143,7 @@ class RHInternalPageDisplay(RHConferenceBaseDisplay):
     _uh=urlHandlers.UHInternalPageDisplay
 
     def _checkParams(self,params):
+        self._page = None
         RHConferenceBaseDisplay._checkParams(self,params)
         if params.has_key("pageId"):
             pageId=params.get("pageId")
