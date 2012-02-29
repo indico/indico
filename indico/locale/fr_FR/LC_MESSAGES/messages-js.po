@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 0.98-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-02-29 13:24+0100\n"
+"POT-Creation-Date: 2012-02-29 14:25+0100\n"
 "PO-Revision-Date: 2011-07-06 17:18+0100\n"
 "Last-Translator: \n"
 "Language-Team: fr_FR <LL@li.org>\n"
@@ -171,32 +171,44 @@ msgid "Last modification:"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:481
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:522
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:481
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:522
 msgid "Event Display"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:508
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:508
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:510
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:510
 msgid "In event: "
 msgstr ""
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:518
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:518
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
 #, fuzzy
 msgid "Change"
 msgstr "changés."
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:551
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:551
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:553
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:553
 msgid "No results found"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:612
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:612
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:614
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:614
 msgid "Please input number higher than 0"
 msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:83
+#: indico/MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:83
+#, fuzzy
+msgid "Saved"
+msgstr "Sauvegarder"
+
+#: MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:96
+#: indico/MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:96
+#, fuzzy
+msgid "Done"
+msgstr "Aucun"
 
 #: MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:409
 #: MaKaC/webinterface/tpls/ConfModifPosterDesign.tpl:504
@@ -686,8 +698,13 @@ msgstr "Cacher Historique"
 msgid "Hide general info"
 msgstr "Montrer informations générales"
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:81
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:81
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:39
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:39
+msgid "Domain removed"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:63
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:63
 msgid "Domain added"
 msgstr ""
 
@@ -858,19 +875,19 @@ msgstr ""
 msgid "One cannot merge a user with him/herself."
 msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:114
-#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:114
+#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:5
+#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:5
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:713
 msgid "Success"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:119
-#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:119
+#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:10
+#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:10
 msgid "Participants"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:145
-#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:145
+#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:39
+#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:39
 msgid "Apply for participation"
 msgstr ""
 
@@ -1261,6 +1278,16 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1985
 msgid "The reason will be displayed to the administrators."
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/Export.js:71
+msgid "Would you like to export private information to your calendar?"
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/Export.js:208
+msgid ""
+"Would you like to create a persistent URL for use with your calendaring "
+"application?"
 msgstr ""
 
 #: indico/htdocs/js/indico/Common/IntelligentSearchBox.js:65
@@ -1871,9 +1898,9 @@ msgid ") is already used by another participant. Please modify email field value
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:509
-#: indico/htdocs/js/indico/Timetable/Draw.js:1071
-#: indico/htdocs/js/indico/Timetable/Draw.js:1102
-#: indico/htdocs/js/indico/Timetable/Draw.js:1118
+#: indico/htdocs/js/indico/Timetable/Draw.js:1067
+#: indico/htdocs/js/indico/Timetable/Draw.js:1098
+#: indico/htdocs/js/indico/Timetable/Draw.js:1114
 msgid "Edit"
 msgstr "Éditer "
 
@@ -1929,7 +1956,7 @@ msgstr "Ajouter Session"
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:379
 #: indico/htdocs/js/indico/Management/Timetable.js:356
 #: indico/htdocs/js/indico/Management/Timetable.js:776
-#: indico/htdocs/js/indico/Timetable/Draw.js:1212
+#: indico/htdocs/js/indico/Timetable/Draw.js:1208
 #, fuzzy
 msgid "event"
 msgstr "Événements"
@@ -2370,40 +2397,6 @@ msgstr ""
 msgid "Speaker"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/Participants.js:6
-msgid "Add participant(s)"
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:31
-msgid "Define new"
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:72
-#: indico/htdocs/js/indico/Management/Participants.js:73
-#, fuzzy
-msgid "Select all "
-msgstr "sélectionner dans la liste"
-
-#: indico/htdocs/js/indico/Management/Participants.js:81
-#: indico/htdocs/js/indico/Management/Participants.js:82
-msgid "Deselect all "
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:87
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:636
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1027
-msgid "Name"
-msgstr "Nom"
-
-#: indico/htdocs/js/indico/Management/Participants.js:89
-msgid " Status"
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:91
-#, fuzzy
-msgid " Presence"
-msgstr "Présentateur (s)"
-
 #: indico/htdocs/js/indico/Management/Registration.js:13
 msgid "Remove attachment"
 msgstr ""
@@ -2417,6 +2410,16 @@ msgstr ""
 #, fuzzy
 msgid "Inherit from parent {0}: "
 msgstr "Hériter d'un parent:"
+
+#: indico/htdocs/js/indico/Management/RoomBooking.js:53
+#, fuzzy
+msgid "No room defined"
+msgstr "(aucune compétence définie)"
+
+#: indico/htdocs/js/indico/Management/RoomBooking.js:54
+#, fuzzy
+msgid "No location defined"
+msgstr "(aucune compétence définie)"
 
 #: indico/htdocs/js/indico/Management/RoomBooking.js:60
 #: indico/htdocs/js/indico/Management/RoomBooking.js:412
@@ -2500,8 +2503,8 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:358
 #: indico/htdocs/js/indico/Management/Timetable.js:777
 #: indico/htdocs/js/indico/Management/Timetable.js:778
-#: indico/htdocs/js/indico/Timetable/Draw.js:1213
-#: indico/htdocs/js/indico/Timetable/Draw.js:1214
+#: indico/htdocs/js/indico/Timetable/Draw.js:1209
+#: indico/htdocs/js/indico/Timetable/Draw.js:1210
 #, fuzzy
 msgid "contribution"
 msgstr "Contribution"
@@ -2510,8 +2513,8 @@ msgstr "Contribution"
 #: indico/htdocs/js/indico/Management/Timetable.js:360
 #: indico/htdocs/js/indico/Management/Timetable.js:779
 #: indico/htdocs/js/indico/Management/Timetable.js:780
-#: indico/htdocs/js/indico/Timetable/Draw.js:1215
-#: indico/htdocs/js/indico/Timetable/Draw.js:1216
+#: indico/htdocs/js/indico/Timetable/Draw.js:1211
+#: indico/htdocs/js/indico/Timetable/Draw.js:1212
 #, fuzzy
 msgid "session"
 msgstr "Session"
@@ -3050,6 +3053,11 @@ msgstr "Télécharger l'article"
 msgid "Upload Material"
 msgstr "Télécharger le matériel"
 
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:636
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1027
+msgid "Name"
+msgstr "Nom"
+
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:638
 msgid "File"
 msgstr "Fichier "
@@ -3255,37 +3263,37 @@ msgstr "Date "
 msgid "Hours "
 msgstr "Heures"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:612
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:614
-msgid "Reject ALL Conflicting PRE-Bookings"
-msgstr "Rejeter TOUTES les pré-réservations en conflit "
-
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:615
-msgid "Are you sure you want to REJECT ALL conflicting PRE-bookings?"
-msgstr "Êtes-vous sûr de vouloir rejeter TOUTES les pré-réservations en conflit?"
-
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:635
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:644
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:623
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:632
 msgid "Display room booking summary "
 msgstr "Afficher résumé des réservations des salles"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:650
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:638
 msgid "Hide room booking summary"
 msgstr "Cacher résumé des réservations des salles "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:687
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:646
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:648
+msgid "Reject ALL Conflicting PRE-Bookings"
+msgstr "Rejeter TOUTES les pré-réservations en conflit "
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:649
+msgid "Are you sure you want to REJECT ALL conflicting PRE-bookings?"
+msgstr "Êtes-vous sûr de vouloir rejeter TOUTES les pré-réservations en conflit?"
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:688
 msgid "previous"
 msgstr "précédent "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:688
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:689
 msgid "next"
 msgstr "suivant "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:689
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:690
 msgid "change period"
 msgstr "changer la période "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:702
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:703
 msgid "Choose Period"
 msgstr "choisir la période "
 
@@ -3316,7 +3324,7 @@ msgid "Switching to normal mode..."
 msgstr "Retourner au mode normal..."
 
 #: indico/htdocs/js/indico/Timetable/Base.js:339
-#: indico/htdocs/js/indico/Timetable/Draw.js:814
+#: indico/htdocs/js/indico/Timetable/Draw.js:810
 msgid "PDF"
 msgstr "PDF "
 
@@ -3361,9 +3369,10 @@ msgid "</strong> was moved from "
 msgstr "</strong> a été déplacé de "
 
 #: indico/htdocs/js/indico/Timetable/Base.js:686
+#, fuzzy
 msgid ""
-"The <strong>starting time</strong> of the <strong>Conference</strong> was"
-" moved from "
+"The <strong>starting time</strong> of the <strong>Event</strong> was "
+"moved from "
 msgstr ""
 "Le <strong>temps de départ</strong> de la <strong>Conférence</strong> a "
 "été déplacé de "
@@ -3374,9 +3383,10 @@ msgid "The <strong>ending time</strong> of the session interval <strong>"
 msgstr "Le <strong>temps de fin</strong> de l'intervalle de la session "
 
 #: indico/htdocs/js/indico/Timetable/Base.js:691
+#, fuzzy
 msgid ""
-"The <strong>ending time</strong> of the <strong>Conference</strong> was "
-"moved from "
+"The <strong>ending time</strong> of the <strong>Event</strong> was moved "
+"from "
 msgstr ""
 "Le  <strong>temps de fin</strong> de la <strong>Conférence</strong> a été"
 " déplacé de "
@@ -3479,61 +3489,61 @@ msgstr "Organisateur "
 msgid "Export to Calendar"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:818
-#: indico/htdocs/js/indico/Timetable/Draw.js:826
+#: indico/htdocs/js/indico/Timetable/Draw.js:814
+#: indico/htdocs/js/indico/Timetable/Draw.js:822
 #, fuzzy
 msgid "Calendar"
 msgstr "Standard"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:819
+#: indico/htdocs/js/indico/Timetable/Draw.js:815
 msgid "XML"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:822
+#: indico/htdocs/js/indico/Timetable/Draw.js:818
 #, fuzzy
 msgid "PDF timetable"
 msgstr "Bloquer l'emploi du temps "
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1049
+#: indico/htdocs/js/indico/Timetable/Draw.js:1045
 msgid "Shift later entries"
 msgstr "Décaler les entrées postérieures"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1077
+#: indico/htdocs/js/indico/Timetable/Draw.js:1073
 msgid "Block timetable"
 msgstr "Bloquer l'emploi du temps "
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1081
+#: indico/htdocs/js/indico/Timetable/Draw.js:1077
 msgid "Block properties"
 msgstr "Bloquer les propriétés"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1083
+#: indico/htdocs/js/indico/Timetable/Draw.js:1079
 msgid "Session properties"
 msgstr "Propriétés de la session"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1084
+#: indico/htdocs/js/indico/Timetable/Draw.js:1080
 #, fuzzy
 msgid "Session protection"
 msgstr "Propriétés de la session"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1093
+#: indico/htdocs/js/indico/Timetable/Draw.js:1089
 msgid "Add block"
 msgstr "Ajouter un blocage "
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1104
+#: indico/htdocs/js/indico/Timetable/Draw.js:1100
 #, fuzzy
 msgid "Contribution properties"
 msgstr "Propriétés de la session"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1105
+#: indico/htdocs/js/indico/Timetable/Draw.js:1101
 #, fuzzy
 msgid "Contribution protection"
 msgstr "Contribution"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1132
+#: indico/htdocs/js/indico/Timetable/Draw.js:1128
 msgid "Move"
 msgstr "Déplacer"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1170
+#: indico/htdocs/js/indico/Timetable/Draw.js:1166
 msgid "This session is empty..."
 msgstr "Cette session est vide..."
 
@@ -3582,4 +3592,22 @@ msgstr "Choisir la date de début"
 #: indico/htdocs/js/indico/jquery/defaults.js:5
 msgid "Choose the end date"
 msgstr "Choisir la date de fin"
+
+#~ msgid "Add participant(s)"
+#~ msgstr ""
+
+#~ msgid "Define new"
+#~ msgstr ""
+
+#~ msgid "Select all "
+#~ msgstr "sélectionner dans la liste"
+
+#~ msgid "Deselect all "
+#~ msgstr ""
+
+#~ msgid " Status"
+#~ msgstr ""
+
+#~ msgid " Presence"
+#~ msgstr "Présentateur (s)"
 

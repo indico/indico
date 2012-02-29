@@ -29,7 +29,7 @@ $(':checkbox:not(:checked)').live('change', function(){
             $('.domainEnable').html(${_('<B style="color:#B02B2C;">Domain control is disabled.</B><br>To enable it, choose at least one of the domains below:')|n,j});
         }
         $(domain).attr('style','margin-left:10px; color:#128F33;');
-        $(domain).text("saved");
+        $(domain).text('${_("saved")}');
         setTimeout(function(){
             $(domain).text("");
         }, 1000);
@@ -53,7 +53,7 @@ $(':checkbox:checked').live('change', function(){
             $('.domainEnable').html(${_('<B style="color:#128F33;">Domain control is enabled.</B>')|n,j});
         }
         $(domain).attr('style','margin-left:10px; color:#128F33;');
-        $(domain).text("saved");
+        $(domain).text('${_("saved")}');
         setTimeout(function(){
             $(domain).text("");
         }, 1000);

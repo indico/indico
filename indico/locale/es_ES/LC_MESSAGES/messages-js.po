@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 0.98-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-02-29 13:24+0100\n"
+"POT-Creation-Date: 2012-02-29 14:25+0100\n"
 "PO-Revision-Date: 2011-07-06 16:16+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es_ES <LL@li.org>\n"
@@ -164,30 +164,40 @@ msgid "Last modification:"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:481
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:522
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:481
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:522
 msgid "Event Display"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:508
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:508
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:510
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:510
 msgid "In event: "
 msgstr ""
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:518
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:518
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
 msgid "Change"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:551
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:551
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:553
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:553
 msgid "No results found"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:612
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:612
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:614
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:614
 msgid "Please input number higher than 0"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:83
+#: indico/MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:83
+msgid "Saved"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:96
+#: indico/MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:96
+msgid "Done"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:409
@@ -647,8 +657,13 @@ msgstr ""
 msgid "Hide general info"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:81
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:81
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:39
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:39
+msgid "Domain removed"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:63
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:63
 msgid "Domain added"
 msgstr ""
 
@@ -810,19 +825,19 @@ msgstr ""
 msgid "One cannot merge a user with him/herself."
 msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:114
-#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:114
+#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:5
+#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:5
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:713
 msgid "Success"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:119
-#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:119
+#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:10
+#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:10
 msgid "Participants"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:145
-#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:145
+#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:39
+#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:39
 msgid "Apply for participation"
 msgstr ""
 
@@ -1199,6 +1214,16 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1985
 msgid "The reason will be displayed to the administrators."
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/Export.js:71
+msgid "Would you like to export private information to your calendar?"
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/Export.js:208
+msgid ""
+"Would you like to create a persistent URL for use with your calendaring "
+"application?"
 msgstr ""
 
 #: indico/htdocs/js/indico/Common/IntelligentSearchBox.js:65
@@ -1785,9 +1810,9 @@ msgid ") is already used by another participant. Please modify email field value
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:509
-#: indico/htdocs/js/indico/Timetable/Draw.js:1071
-#: indico/htdocs/js/indico/Timetable/Draw.js:1102
-#: indico/htdocs/js/indico/Timetable/Draw.js:1118
+#: indico/htdocs/js/indico/Timetable/Draw.js:1067
+#: indico/htdocs/js/indico/Timetable/Draw.js:1098
+#: indico/htdocs/js/indico/Timetable/Draw.js:1114
 msgid "Edit"
 msgstr ""
 
@@ -1840,7 +1865,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:379
 #: indico/htdocs/js/indico/Management/Timetable.js:356
 #: indico/htdocs/js/indico/Management/Timetable.js:776
-#: indico/htdocs/js/indico/Timetable/Draw.js:1212
+#: indico/htdocs/js/indico/Timetable/Draw.js:1208
 msgid "event"
 msgstr ""
 
@@ -2262,38 +2287,6 @@ msgstr ""
 msgid "Speaker"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/Participants.js:6
-msgid "Add participant(s)"
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:31
-msgid "Define new"
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:72
-#: indico/htdocs/js/indico/Management/Participants.js:73
-msgid "Select all "
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:81
-#: indico/htdocs/js/indico/Management/Participants.js:82
-msgid "Deselect all "
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:87
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:636
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1027
-msgid "Name"
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:89
-msgid " Status"
-msgstr ""
-
-#: indico/htdocs/js/indico/Management/Participants.js:91
-msgid " Presence"
-msgstr ""
-
 #: indico/htdocs/js/indico/Management/Registration.js:13
 msgid "Remove attachment"
 msgstr ""
@@ -2305,6 +2298,14 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/RoomBooking.js:51
 #: indico/htdocs/js/indico/Management/RoomBooking.js:399
 msgid "Inherit from parent {0}: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBooking.js:53
+msgid "No room defined"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBooking.js:54
+msgid "No location defined"
 msgstr ""
 
 #: indico/htdocs/js/indico/Management/RoomBooking.js:60
@@ -2385,8 +2386,8 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:358
 #: indico/htdocs/js/indico/Management/Timetable.js:777
 #: indico/htdocs/js/indico/Management/Timetable.js:778
-#: indico/htdocs/js/indico/Timetable/Draw.js:1213
-#: indico/htdocs/js/indico/Timetable/Draw.js:1214
+#: indico/htdocs/js/indico/Timetable/Draw.js:1209
+#: indico/htdocs/js/indico/Timetable/Draw.js:1210
 msgid "contribution"
 msgstr ""
 
@@ -2394,8 +2395,8 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:360
 #: indico/htdocs/js/indico/Management/Timetable.js:779
 #: indico/htdocs/js/indico/Management/Timetable.js:780
-#: indico/htdocs/js/indico/Timetable/Draw.js:1215
-#: indico/htdocs/js/indico/Timetable/Draw.js:1216
+#: indico/htdocs/js/indico/Timetable/Draw.js:1211
+#: indico/htdocs/js/indico/Timetable/Draw.js:1212
 msgid "session"
 msgstr ""
 
@@ -2905,6 +2906,11 @@ msgstr ""
 msgid "Upload Material"
 msgstr ""
 
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:636
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1027
+msgid "Name"
+msgstr ""
+
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:638
 msgid "File"
 msgstr ""
@@ -3101,37 +3107,37 @@ msgstr ""
 msgid "Hours "
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:612
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:614
-msgid "Reject ALL Conflicting PRE-Bookings"
-msgstr ""
-
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:615
-msgid "Are you sure you want to REJECT ALL conflicting PRE-bookings?"
-msgstr ""
-
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:635
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:644
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:623
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:632
 msgid "Display room booking summary "
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:650
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:638
 msgid "Hide room booking summary"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:687
-msgid "previous"
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:646
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:648
+msgid "Reject ALL Conflicting PRE-Bookings"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:649
+msgid "Are you sure you want to REJECT ALL conflicting PRE-bookings?"
 msgstr ""
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:688
-msgid "next"
+msgid "previous"
 msgstr ""
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:689
+msgid "next"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:690
 msgid "change period"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:702
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:703
 msgid "Choose Period"
 msgstr ""
 
@@ -3162,7 +3168,7 @@ msgid "Switching to normal mode..."
 msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/Base.js:339
-#: indico/htdocs/js/indico/Timetable/Draw.js:814
+#: indico/htdocs/js/indico/Timetable/Draw.js:810
 msgid "PDF"
 msgstr ""
 
@@ -3204,8 +3210,8 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/Base.js:686
 msgid ""
-"The <strong>starting time</strong> of the <strong>Conference</strong> was"
-" moved from "
+"The <strong>starting time</strong> of the <strong>Event</strong> was "
+"moved from "
 msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/Base.js:689
@@ -3215,8 +3221,8 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/Base.js:691
 msgid ""
-"The <strong>ending time</strong> of the <strong>Conference</strong> was "
-"moved from "
+"The <strong>ending time</strong> of the <strong>Event</strong> was moved "
+"from "
 msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/Base.js:694
@@ -3313,56 +3319,56 @@ msgstr ""
 msgid "Export to Calendar"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:818
-#: indico/htdocs/js/indico/Timetable/Draw.js:826
+#: indico/htdocs/js/indico/Timetable/Draw.js:814
+#: indico/htdocs/js/indico/Timetable/Draw.js:822
 msgid "Calendar"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:819
+#: indico/htdocs/js/indico/Timetable/Draw.js:815
 msgid "XML"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:822
+#: indico/htdocs/js/indico/Timetable/Draw.js:818
 msgid "PDF timetable"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1049
+#: indico/htdocs/js/indico/Timetable/Draw.js:1045
 msgid "Shift later entries"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1077
+#: indico/htdocs/js/indico/Timetable/Draw.js:1073
 msgid "Block timetable"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1081
+#: indico/htdocs/js/indico/Timetable/Draw.js:1077
 msgid "Block properties"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1083
+#: indico/htdocs/js/indico/Timetable/Draw.js:1079
 msgid "Session properties"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1084
+#: indico/htdocs/js/indico/Timetable/Draw.js:1080
 msgid "Session protection"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1093
+#: indico/htdocs/js/indico/Timetable/Draw.js:1089
 msgid "Add block"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1104
+#: indico/htdocs/js/indico/Timetable/Draw.js:1100
 msgid "Contribution properties"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1105
+#: indico/htdocs/js/indico/Timetable/Draw.js:1101
 msgid "Contribution protection"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1132
+#: indico/htdocs/js/indico/Timetable/Draw.js:1128
 msgid "Move"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1170
+#: indico/htdocs/js/indico/Timetable/Draw.js:1166
 msgid "This session is empty..."
 msgstr ""
 
@@ -3410,4 +3416,32 @@ msgstr ""
 #: indico/htdocs/js/indico/jquery/defaults.js:5
 msgid "Choose the end date"
 msgstr ""
+
+#~ msgid "Add participant(s)"
+#~ msgstr ""
+
+#~ msgid "Define new"
+#~ msgstr ""
+
+#~ msgid "Select all "
+#~ msgstr ""
+
+#~ msgid "Deselect all "
+#~ msgstr ""
+
+#~ msgid " Status"
+#~ msgstr ""
+
+#~ msgid " Presence"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <strong>starting time</strong> of the "
+#~ "<strong>Conference</strong> was moved from "
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <strong>ending time</strong> of the "
+#~ "<strong>Conference</strong> was moved from "
+#~ msgstr ""
 
