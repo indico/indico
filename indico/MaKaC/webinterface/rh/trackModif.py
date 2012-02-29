@@ -336,6 +336,8 @@ class RHTrackAbstractBase( RHTrackAbstractsBase ):
         if absId == "":
             raise MaKaCError( _("Abstract identifier not specified"))
         self._abstract = self._track.getAbstractById( absId )
+        if self._abstract == None:
+            raise MaKaCError( _("The abstract with id %s does not belong to the track with id %s")%(absId, self._track.getId()))
 
 
 class RHTrackAbstract( RHTrackAbstractBase ):

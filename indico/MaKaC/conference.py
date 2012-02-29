@@ -11950,7 +11950,7 @@ class Track(CoreObject):
                 pass
         except AttributeError:
             self._abstracts = OOBTree()
-        return self._abstracts[ str(id).strip() ]
+        return self._abstracts.get(str(id).strip())
 
     def hasAbstract( self, abstract ):
         """
