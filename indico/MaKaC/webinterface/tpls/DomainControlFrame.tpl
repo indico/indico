@@ -1,38 +1,77 @@
 <table class="groupTable">
 <tr>
-  <td colspan="2"><div class="groupTitle">${ _("Domain control")}</div></td>
+  <td colspan="2"><div class="groupTitle">${ _("Domain control ")}<span id="domainControl"></span></div></td>
 </tr>
 <tr>
   <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Allowed domains")}<br><font size="-2">(${ _("if no domain is selected<br>no control is applied")})</font></span></td>
   <td class="blacktext">
-    <form action="${ removeURL }" method="POST">
     ${ locator }
-    <table width="100%">
-    <tr>
-      <td width="80%">
+    <table width="auto">
         ${ domains }
-      </td>
-      <td width="20%" align="right" valign="bottom">
-        <table>
-        <tr>
-          <td>
-            <input type="submit" class="btn" value="${ _("remove")}">
-          </td>
-          <td>
-            <select name="addDomain">
-            <option>${ _("Select")}:
-            ${ domainsToAdd }
-            </select>
-          </td>
-          <td>
-            <input type="submit" class="btn" value="<- ${ _("add")}<" onClick="if (this.form.addDomain.value=='${ _("Select")}:') { return false; } else { this.form.action='${ addURL }'; }">
-          </td>
-        </tr>
-        </table>
-      </td>
-    </tr>
     </table>
-    </form>
   </td>
 </tr>
 </table>
+<script type="text/javascript">
+IndicoUI.executeOnLoad(function(){
+    if ($(':checkbox:checked').length==0){
+        $('#domainControl').text(${ _("(disabled)")|n,j});
+        $('#domainControl').attr('style','color: #B02B2C;');
+    }
+    else{
+        $('#domainControl').text(${ _("(enabled)")|n,j});
+        $('#domainControl').attr('style','color: #128F33;');
+    }
+});
+var checkId = null;
+$(':checkbox:not(:checked)').live('change', function(){
+    checkId = $(this).val();
+    indicoRequest('event.protection.toggleDomains', {
+        confId: ${conference.getId()},
+        domainId: $(this).val(),
+        add: false
+    },
+    function(result, error) {
+        var domain = '#domain'+checkId;
+        if ($(':checkbox:checked').length==0){
+            $('#domainControl').text(${ _("(disabled)")|n,j});
+            $('#domainControl').attr('style','color: #B02B2C;');
+        }
+        $(domain).attr('style','margin-left:10px; color:#B02B2C;');
+        $(domain).text("saved");
+        setTimeout(function(){
+            $(domain).text("");
+        }, 1000);
+        if(error) {
+            IndicoUtil.errorReport(error);
+        } else{
+            (new AlertPopup($T('Domain removed'))).open();
+        }
+    });
+});
+$(':checkbox:checked').live('change', function(){
+    checkId = $(this).val();
+    indicoRequest('event.protection.toggleDomains', {
+        confId: ${conference.getId()},
+        domainId: $(this).val(),
+        add: true
+    },
+    function(result, error) {
+        var domain = '#domain'+checkId;
+        if ($(':checkbox:checked').length!=0){
+            $('#domainControl').text(${ _("(enabled)")|n,j});
+            $('#domainControl').attr('style','color: #128F33;');
+        }
+        $(domain).attr('style','margin-left:10px; color:#B02B2C;');
+        $(domain).text("saved");
+        setTimeout(function(){
+            $(domain).text("");
+        }, 1000);
+        if(error) {
+            IndicoUtil.errorReport(error);
+        } else{
+            (new AlertPopup($T('Domain added'))).open();
+        }
+    });
+});
+</script>

@@ -50,6 +50,7 @@ from MaKaC.common.contextManager import ContextManager
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 from MaKaC.participant import Participant
 from MaKaC.common.Configuration import Config
+import MaKaC.domain as domain
 
 import datetime
 from pytz import timezone
@@ -1211,6 +1212,21 @@ class ConferenceProtectionRemoveUser(ConferenceModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._conf.revokeAccess(userToRemove)
 
+class ConferenceProtectionToggleDomains(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._domainId = pm.extract("domainId", pType=str)
+        self._add = pm.extract("add", pType=bool)
+
+    def _getAnswer(self):
+        dh = domain.DomainHolder()
+        if self._add :
+            self._target.requireDomain( dh.getById( self._domainId ) )
+        elif not self._add :
+            self._target.freeDomain( dh.getById( self._domainId ) )
+
 class ConferenceProtectionSetAccessKey(ConferenceModifBase):
 
     def _checkParams(self):
@@ -1589,6 +1605,7 @@ methodMap = {
     "protection.getAllowedUsersList": ConferenceProtectionUserList,
     "protection.addAllowedUsers": ConferenceProtectionAddUsers,
     "protection.removeAllowedUser": ConferenceProtectionRemoveUser,
+    "protection.toggleDomains": ConferenceProtectionToggleDomains,
     "protection.setAccessKey": ConferenceProtectionSetAccessKey,
     "protection.setModifKey": ConferenceProtectionSetModifKey,
     "protection.changeContactInfo": ConferenceContactInfoModification,

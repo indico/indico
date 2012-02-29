@@ -32,7 +32,7 @@
             <script type="text/javascript">
                 $E('setModifKey').dom.onsubmit = function(e) {
                     var modifKey = $E('modifKey').dom.value;
-                    if(modifKey && !confirm('${_("Please note that it is more secure to make the event private instead of using a modification key.")}')) {
+                    if(modifKey && !confirm(${_("Please note that it is more secure to make the event private instead of using a modification key.")|n,j})) {
                         return false;
                     }
 

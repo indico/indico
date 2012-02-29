@@ -2278,17 +2278,16 @@ class WDomainControlFrame(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         l = []
-        for dom in self._target.getDomainList():
-            l.append("""<input type="checkbox" name="selectedDomain" value="%s"> %s"""%(dom.getId(), dom.getName()))
-        vars["domains"] = "<br>".join(l)
-        l = []
         for dom in domain.DomainHolder().getList():
             if dom not in self._target.getDomainList():
-                l.append("""<option value="%s">%s</option>"""%(dom.getId(), dom.getName()))
-        vars["domainsToAdd"] = "".join(l)
+                l.append("""<tr><td><input type="checkbox" name="selectedDomain" value="%s"> %s</td><td><span id="domain%s"></span></td></tr>"""%(dom.getId(), dom.getName(), dom.getId()))
+            else:
+                l.append("""<tr><td><input type="checkbox" name="selectedDomain" value="%s" checked> %s</td><td><span id="domain%s"></span></td></tr>"""%(dom.getId(), dom.getName(), dom.getId()))
+        vars["domains"] = "".join(l)
         vars["removeURL"] = self._removeURL
         vars["addURL"] = self._addURL
         vars["locator"] = self._target.getLocator().getWebForm()
+        vars["conference"] = self._target
         return vars
 
 
