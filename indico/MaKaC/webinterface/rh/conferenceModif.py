@@ -3914,6 +3914,8 @@ class RHConfSavePic( RHConferenceModifBase ):
 
 
     def _process( self ):
+        if self._fileName == "":
+            return json.dumps({'status': "ERROR", 'info': {'message':_("No file has been attached")}})
         f = conference.LocalFile()
         f.setFileName( self._fileName )
         f.setFilePath( self._filePath )
