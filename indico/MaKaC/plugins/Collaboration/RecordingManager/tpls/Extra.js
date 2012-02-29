@@ -117,7 +117,7 @@ function RMtalkSelect(IndicoID) {
         ButtonCreateCDSRecord.disabledButtonWithTooltip('enable');
     }
     else {
-        ButtonCreateCDSRecord..disabledButtonWithTooltip('disable');
+        ButtonCreateCDSRecord.disabledButtonWithTooltip('disable');
     }
 
     // Enable ButtonCreateIndicoLink only if talk has been selected and CDS record already exists.
