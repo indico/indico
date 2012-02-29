@@ -24,8 +24,8 @@ var videoServiceInfo = {};
         });
 
         var goToDayMenuItems = {};
-        for(item in goToDayMenuDays.getAll()){
-            goToDayMenuItems[goToDayMenuDays.get(item)] = {action:"#"+goToDayMenuDays.get(item) , display:item};
+        for(day in goToDayMenuDays.getAll()){
+            goToDayMenuItems[goToDayMenuDays.get(day)] = {action:"#"+goToDayMenuDays.get(day) , display:day};
         }
 
 
