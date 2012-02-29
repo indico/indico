@@ -1,25 +1,21 @@
-# Translations template for indico.
-# Copyright (C) 2012 ORGANIZATION
+# French (France) translations for indico.
+# Copyright (C) 2011 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# 
-# Translators:
-# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
-#   <thomas.baron@cern.ch>, 2011, 2012.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico\n"
+"Project-Id-Version: indico 0.98-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-03-16 15:58+0100\n"
-"PO-Revision-Date: 2012-03-21 21:29+0000\n"
-"Last-Translator: tbaron <thomas.baron@cern.ch>\n"
-"Language-Team: French (France) <project-indico-administrators@cern.ch>\n"
+"POT-Creation-Date: 2012-02-28 13:35+0100\n"
+"PO-Revision-Date: 2011-07-06 17:18+0100\n"
+"Last-Translator: \n"
+"Language-Team: fr_FR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
-"Language: fr_FR\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
 #: MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:152
 #: indico/MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:152
@@ -27,17 +23,17 @@ msgstr ""
 msgid ""
 "field containing the url of the electronic agreement. (This field is "
 "mandatory)"
-msgstr "champ contenant l'URL de l'accord électronique. (Ce champ est obligatoire)"
+msgstr ""
 
 #: MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:153
 #: indico/MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:153
 msgid "field containing the talk title. (This field is mandatory)"
-msgstr "champ contenant le titre de la présentation. (Ce champ est obligatoire)"
+msgstr ""
 
 #: MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:154
 #: indico/MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:154
 msgid "field containing the full name of the speaker."
-msgstr "champ contenant le nom complet du présentateur."
+msgstr ""
 
 #: MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:158
 #: MaKaC/plugins/Collaboration/tpls/ElectronicAgreementForm.tpl:13
@@ -83,40 +79,43 @@ msgstr "Avertissement"
 
 #: MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:158
 #: indico/MaKaC/plugins/Collaboration/tpls/ElectronicAgreement.tpl:158
+#, fuzzy
 msgid "No entry selected! Please select at least one."
-msgstr "Aucune entrée sélectionnée! Veuillez en sélectionner au moins une."
+msgstr "Aucun résumé sélectionné! Veuillez en sélectionner au moins un."
 
 #: MaKaC/plugins/Collaboration/tpls/ElectronicAgreementForm.tpl:13
 #: indico/MaKaC/plugins/Collaboration/tpls/ElectronicAgreementForm.tpl:13
+#, fuzzy
 msgid "No choice selected! Please select one."
-msgstr "Aucun choix sélectionné! Veuillez en sélectionner au moins un."
+msgstr "Aucun résumé sélectionné! Veuillez en sélectionner au moins un."
 
 #: MaKaC/plugins/InstantMessaging/tpls/ConferenceInstantMessaging.tpl:71
 #: indico/MaKaC/plugins/InstantMessaging/tpls/ConferenceInstantMessaging.tpl:71
 msgid "Using "
-msgstr "Utilisant "
+msgstr ""
 
 #: MaKaC/plugins/InstantMessaging/tpls/EventDetailBanner.tpl:96
 #: indico/MaKaC/plugins/InstantMessaging/tpls/EventDetailBanner.tpl:96
 msgid "Using ${link['name']}"
-msgstr "Utilisant ${link['name']}"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/AbstractDataModification.tpl:453
 #: indico/MaKaC/webinterface/tpls/AbstractDataModification.tpl:453
 msgid ""
-"You cannot move the author to this list because there is already an author "
-"with the same email address."
-msgstr "Vous ne pouvez pas bouger cet auteur dans cette liste car elle contient déjà un auteur avec la même adresse email."
+"You cannot move the author to this list because there is already an "
+"author with the same email address."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/AbstractManagment.tpl:224
 #: indico/MaKaC/webinterface/tpls/AbstractManagment.tpl:224
 msgid "Abstract "
-msgstr "Résumé "
+msgstr ""
 
 #: MaKaC/webinterface/tpls/AbstractManagment.tpl:237
 #: indico/MaKaC/webinterface/tpls/AbstractManagment.tpl:237
+#, fuzzy
 msgid "Change submitter"
-msgstr "Modifier les droits de soumission"
+msgstr "changer la période "
 
 #: MaKaC/webinterface/tpls/Abstracts.tpl:297
 #: MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:195
@@ -135,81 +134,76 @@ msgstr "Cette opération peut prendre quelques minutes..."
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:174
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:174
 msgid "Plugins in this index:"
-msgstr "Plugins dans cet index:"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:182
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:182
+#, fuzzy
 msgid "No index selected"
-msgstr "Aucun index sélectionné"
+msgstr "Ajouter la sélection"
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:182
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:182
+#, fuzzy
 msgid "Please select an index name"
-msgstr "Sélectionnez un index"
+msgstr "Veuillez  sélectionner au moins un article"
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:300
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:300
+#, fuzzy
 msgid "Apply Filter"
-msgstr "Appliquer le filtre"
+msgstr "Fichier local"
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:341
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:341
+#, fuzzy
 msgid "Refresh"
-msgstr "Rafraichir"
+msgstr "Rafraîchir maintenant"
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:354
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:354
 msgid "Retrieving the data..."
-msgstr "Récupérer les données"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:469
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:469
 msgid "Last modification:"
-msgstr "Dernière modification:"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:481
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:522
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:481
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:522
-msgid "Event Display"
-msgstr "Affichage de l'évènement"
-
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:510
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:510
-msgid "In event: "
-msgstr "Dans l'évènement: "
-
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:481
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:520
+msgid "Event Display"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:508
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:508
+msgid "In event: "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:518
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:518
+#, fuzzy
 msgid "Change"
-msgstr "Changer"
+msgstr "changés."
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:553
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:553
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:551
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:551
 msgid "No results found"
-msgstr "Aucun résultat"
+msgstr ""
 
-#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:614
-#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:614
+#: MaKaC/webinterface/tpls/AdminCollaboration.tpl:612
+#: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:612
 msgid "Please input number higher than 0"
-msgstr "Entrez un nombre supérieur à 0"
-
-#: MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:85
-#: indico/MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:85
-msgid "Saved"
-msgstr "Sauvegardé"
-
-#: MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:98
-#: indico/MaKaC/webinterface/tpls/ConfModAbstractBook.tpl:98
-msgid "Done"
-msgstr "Effectué"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:409
 #: MaKaC/webinterface/tpls/ConfModifPosterDesign.tpl:504
 #: indico/MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:409
 #: indico/MaKaC/webinterface/tpls/ConfModifPosterDesign.tpl:504
 msgid "An error occurred."
-msgstr "Une erreur est survenue."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:172
 #: indico/MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:172
@@ -226,19 +220,23 @@ msgstr "Veuillez sélectionner un type de réservation dans la liste."
 #: indico/MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:184
 #: indico/MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:187
 msgid ""
-"Select a <strong>booking type</strong> from the drop-down list and press the"
-" \"Create\" button."
-msgstr "Selectionner un <strong>type de réservation</strong> dans la liste déroulante et cliquer le bouton \"Créer\"."
+"Select a <strong>booking type</strong> from the drop-down list and press "
+"the \"Create\" button."
+msgstr ""
+"Selectionner un <strong>type de réservation</strong> dans la liste "
+"déroulante et cliquer le bouton \"Créer\"."
 
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:269
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:269
+#, fuzzy
 msgid "Deleting the contributions..."
-msgstr "En train d'effacer les présentations..."
+msgstr "Supprime l'entrée..."
 
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:288
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:288
+#, fuzzy
 msgid "No contribution selected! Please select at least one."
-msgstr "Aucune présentation sélectionnée! Sélectionnez-en au moins une."
+msgstr "Aucun résumé sélectionné! Veuillez en sélectionner au moins un."
 
 #: MaKaC/webinterface/tpls/ConfModifRegistrantMiscInfoModify.tpl:18
 #: MaKaC/webinterface/tpls/ConfRegistrationFormDisplay.tpl:18
@@ -247,7 +245,9 @@ msgstr "Aucune présentation sélectionnée! Sélectionnez-en au moins une."
 #: indico/MaKaC/webinterface/tpls/ConfRegistrationFormDisplay.tpl:18
 #: indico/MaKaC/webinterface/tpls/ConfRegistrationFormModify.tpl:18
 msgid "The form contains some errors. Please, correct them and submit again."
-msgstr "Ce formulaire contient quelques erreurs. Veuillez les corriger et puis le soumettre à nouveau."
+msgstr ""
+"Ce formulaire contient quelques erreurs. Veuillez les corriger et puis le"
+" soumettre à nouveau."
 
 #: MaKaC/webinterface/tpls/ConfModificationReviewingFrame.tpl:78
 #: indico/MaKaC/webinterface/tpls/ConfModificationReviewingFrame.tpl:78
@@ -331,17 +331,23 @@ msgstr "Pas de critique du contenu"
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:723
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:723
+#, fuzzy
 msgid ""
 "None of the contributions you checked have a Referee. You can only add a "
 "layout reviewer or a content reviewer if the contribution has a referee."
-msgstr "Aucune des présentations sélectionnées n'a de juge. Vous ne pouvez ajouter de réviseur de contenu ou de réviseur de mise en page que si la présentation a un juge."
+msgstr ""
+"Vous ne pouvez ajouter un critique de format ou de contenu que si la "
+"contribution a un arbitre. "
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:730
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:730
+#, fuzzy
 msgid ""
 "Some of the contributions you checked have a Referee. You can only add a "
 "layout reviewer or a content reviewer if the contribution has a referee."
-msgstr "Certaines des présentations sélectionnées ont un juge. Vous ne pouvez ajouter de réviseur de contenu ou de réviseur de mise en page que si la présentation a un juge."
+msgstr ""
+"Vous ne pouvez ajouter un critique de format ou de contenu que si la "
+"contribution a un arbitre. "
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:733
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:733
@@ -366,13 +372,17 @@ msgstr "Certaines des contributions que vous avez cochées n'ont pas d'arbitre."
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:754
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:754
 msgid ""
-"You can only add an editor or a reviewer if the contribution has a referee."
-msgstr "Vous ne pouvez ajouter un éditeur ou un critique que si la contribution a un arbitre."
+"You can only add an editor or a reviewer if the contribution has a "
+"referee."
+msgstr ""
+"Vous ne pouvez ajouter un éditeur ou un critique que si la contribution a"
+" un arbitre."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:755
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:755
+#, fuzzy
 msgid "Do you want to add that {0} only to the contributions with a referee?"
-msgstr "Voulez-vous ajouter ce {0} uniquement aux présentations ayant un juge?"
+msgstr "Voulez-vous ajouter cela seulement aux contributions ayant un arbitre?"
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:791
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:791
@@ -395,9 +405,11 @@ msgstr "OK"
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:825
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:825
 msgid ""
-"The Content Reviewers will be removed only from the contributions that have "
-"one."
-msgstr "Le critique du contenu sera seulement supprimé des contributions qui en ont un."
+"The Content Reviewers will be removed only from the contributions that "
+"have one."
+msgstr ""
+"Le critique du contenu sera seulement supprimé des contributions qui en "
+"ont un."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:850
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:850
@@ -419,21 +431,27 @@ msgstr "Vous devez designer un nouvel arbitre. "
 msgid ""
 "Please note that layout and content have already been assigned for "
 "this/these contributions."
-msgstr "Veuillez noter qu'un format et contenu ont déjà été assignés à cette/ces contribution(s)."
+msgstr ""
+"Veuillez noter qu'un format et contenu ont déjà été assignés à cette/ces "
+"contribution(s)."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:919
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:919
 msgid ""
-"Please note that a content reviewer has already been assigned for this/these"
-" contributions."
-msgstr "Veuillez noter qu'un critique du contenu a déjà été designé pour cette/ces contribution(s)."
+"Please note that a content reviewer has already been assigned for "
+"this/these contributions."
+msgstr ""
+"Veuillez noter qu'un critique du contenu a déjà été designé pour "
+"cette/ces contribution(s)."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:923
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:923
 msgid ""
-"Please note that a layout reviewer has already been assigned for this/these "
-"contributions."
-msgstr "Veuillez noter qu'un critique du format a déjà été designé pour cette/ces contribution(s)."
+"Please note that a layout reviewer has already been assigned for "
+"this/these contributions."
+msgstr ""
+"Veuillez noter qu'un critique du format a déjà été designé pour cette/ces"
+" contribution(s)."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1131
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1131
@@ -490,7 +508,9 @@ msgstr "Non"
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1197
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1456
 msgid "in the reviewing team yet. Please, assign them from the 'Team' tab."
-msgstr "encore dans l'équipe critique. Veuillez les désigner à partir de l'onglet 'Équipe'."
+msgstr ""
+"encore dans l'équipe critique. Veuillez les désigner à partir de l'onglet"
+" 'Équipe'."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1206
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1479
@@ -505,9 +525,9 @@ msgstr "encore dans l'équipe critique. Veuillez les désigner à partir de l'on
 #: indico/htdocs/js/indico/Core/Dialogs/Popup.js:529
 #: indico/htdocs/js/indico/Core/Dialogs/Popup.js:578
 #: indico/htdocs/js/indico/Core/Dialogs/PopupWidgets.js:12
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:737
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1341
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1393
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:736
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1339
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1391
 #: indico/htdocs/js/indico/Display/Dialogs.js:19
 #: indico/htdocs/js/indico/Display/Dialogs.js:90
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:88
@@ -544,16 +564,20 @@ msgstr "(compétences:"
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1250
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1250
 msgid ""
-"The Reviewer you choose will be removed only from the contribution that is "
-"assigned to him/her."
-msgstr "Le critique que vous choisissez sera supprimé de la contribution qui lui est affectée seulement."
+"The Reviewer you choose will be removed only from the contribution that "
+"is assigned to him/her."
+msgstr ""
+"Le critique que vous choisissez sera supprimé de la contribution qui lui "
+"est affectée seulement."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1252
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1252
 msgid ""
-"The Reviewer you choose will be removed only from the contributions that are"
-" assigned to him/her."
-msgstr "Le critique que vous choisissez sera supprimé des contributions qui lui sont affectées seulement."
+"The Reviewer you choose will be removed only from the contributions that "
+"are assigned to him/her."
+msgstr ""
+"Le critique que vous choisissez sera supprimé des contributions qui lui "
+"sont affectées seulement."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1285
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1288
@@ -572,7 +596,7 @@ msgstr "un critique du contenu:"
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1345
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1345
 msgid "There is no {0} defined."
-msgstr "Aucun {0} défini."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1432
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1432
@@ -581,8 +605,9 @@ msgstr "Vous devez sélectionner au moins un attribut."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1436
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1436
+#, fuzzy
 msgid "You must select exactly one user."
-msgstr "Vous devez sélectionner exactement un utilisateur."
+msgstr "Vous devez sélectionner au moins un utilisateur."
 
 #: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1476
 #: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1476
@@ -598,7 +623,7 @@ msgstr "Assigner"
 #: indico/MaKaC/webinterface/tpls/MeetingCreation.tpl:193
 #: indico/MaKaC/webinterface/tpls/SimpleEventCreation.tpl:144
 msgid "Dates have an invalid format: dd/mm/yyyy hh:mm"
-msgstr "Format de dates invalide: jj/mm/aaaa hh:mm"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/ConferenceCreation.tpl:207
 #: MaKaC/webinterface/tpls/MeetingCreation.tpl:198
@@ -606,8 +631,9 @@ msgstr "Format de dates invalide: jj/mm/aaaa hh:mm"
 #: indico/MaKaC/webinterface/tpls/ConferenceCreation.tpl:207
 #: indico/MaKaC/webinterface/tpls/MeetingCreation.tpl:198
 #: indico/MaKaC/webinterface/tpls/SimpleEventCreation.tpl:149
+#, fuzzy
 msgid "Missing mandatory data"
-msgstr "Données obligatoires manquantes"
+msgstr "Cacher Historique"
 
 #: MaKaC/webinterface/tpls/ConferenceCreation.tpl:207
 #: MaKaC/webinterface/tpls/MeetingCreation.tpl:198
@@ -616,7 +642,7 @@ msgstr "Données obligatoires manquantes"
 #: indico/MaKaC/webinterface/tpls/MeetingCreation.tpl:198
 #: indico/MaKaC/webinterface/tpls/SimpleEventCreation.tpl:149
 msgid "Please, choose a category (step 1)"
-msgstr "Sélectionnez une catégorie (étape 1)"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/ConferenceDataModification.tpl:167
 #: indico/MaKaC/webinterface/tpls/ConferenceDataModification.tpl:167
@@ -631,19 +657,19 @@ msgstr "annuler"
 #: MaKaC/webinterface/tpls/ConferenceParticipant.tpl:35
 #: indico/MaKaC/webinterface/tpls/ConferenceParticipant.tpl:35
 msgid "Edit participant"
-msgstr "Editer un participant"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/ConferenceParticipantPending.tpl:40
 #: indico/MaKaC/webinterface/tpls/ConferenceParticipantPending.tpl:40
 msgid "Edit pending participant"
-msgstr "Editer un participant en attente"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/ContribModifMain.tpl:249
 #: indico/MaKaC/webinterface/tpls/ContribModifMain.tpl:249
 msgid ""
 "You cannot move the user to this list because there is already an author "
 "with the same email address."
-msgstr "Vous ne pouvez transférer cet utilisateur dans cette liste car elle contient déjà un auteur avec la même adresse email."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/ContributionDisplayFull.tpl:196
 #: indico/MaKaC/webinterface/tpls/ContributionDisplayFull.tpl:196
@@ -660,31 +686,38 @@ msgstr "Cacher Historique"
 msgid "Hide general info"
 msgstr "Montrer informations générales"
 
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:62
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:62
+msgid "Domain added"
+msgstr ""
+
 #: MaKaC/webinterface/tpls/EventCreationJS.tpl:20
 #: indico/MaKaC/webinterface/tpls/EventCreationJS.tpl:20
 msgid "Show advanced options..."
-msgstr "Montrer les options avancées..."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/EventCreationJS.tpl:23
 #: indico/MaKaC/webinterface/tpls/EventCreationJS.tpl:23
 msgid "Hide advanced options..."
-msgstr "Cacher les options avancées..."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/EventCreationJS.tpl:62
 #: indico/MaKaC/webinterface/tpls/EventCreationJS.tpl:62
+#, fuzzy
 msgid "duration (in minutes):"
-msgstr "durée (minutes)"
+msgstr "Durée(min):"
 
 #: MaKaC/webinterface/tpls/EventCreationJS.tpl:66
 #: indico/MaKaC/webinterface/tpls/EventCreationJS.tpl:66
 #: indico/htdocs/js/indico/Management/CFA.js:619
+#, fuzzy
 msgid "Remove"
-msgstr "Supprimer"
+msgstr "plus"
 
 #: MaKaC/webinterface/tpls/EventCreationJS.tpl:113
 #: indico/MaKaC/webinterface/tpls/EventCreationJS.tpl:113
 msgid "Add another occurrence for the lecture"
-msgstr "Ajouter une nouvelle occurence pour ce séminaire"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/RoomBookingBlockingsForMyRooms.tpl:77
 #: indico/MaKaC/webinterface/tpls/RoomBookingBlockingsForMyRooms.tpl:77
@@ -694,145 +727,152 @@ msgstr "En cours de traitement..."
 #: MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:53
 #: indico/MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:53
 msgid "Select a user"
-msgstr "Sélectionnez un utilisateur"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/SimpleEventCreation.tpl:137
 #: indico/MaKaC/webinterface/tpls/SimpleEventCreation.tpl:137
+#, fuzzy
 msgid "Change..."
-msgstr "Modifier..."
+msgstr "changés."
 
 #: MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:156
 #: indico/MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:156
+#, fuzzy
 msgid "Hide filters"
 msgstr "Cacher les filtres"
 
 #: MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:161
 #: indico/MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:161
+#, fuzzy
 msgid "Show filters"
 msgstr "Montrer les filtres"
 
 #: MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:163
 #: indico/MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:163
+#, fuzzy
 msgid "Apply filters"
-msgstr "Appliquer les filtres"
+msgstr "Fichier local"
 
 #: MaKaC/webinterface/tpls/UserAPI.tpl:123
 #: indico/MaKaC/webinterface/tpls/UserAPI.tpl:123
 msgid "${apiPersistentDisableAgreement}"
-msgstr "${apiPersistentDisableAgreement}"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserAPI.tpl:124
 #: indico/MaKaC/webinterface/tpls/UserAPI.tpl:124
 msgid "${apiPersistentEnableAgreement}"
-msgstr "${apiPersistentEnableAgreement}"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserAPI.tpl:135
 #: indico/MaKaC/webinterface/tpls/UserAPI.tpl:135
+#, fuzzy
 msgid "Disable"
-msgstr "Désactiver"
+msgstr "Desactivé"
 
 #: MaKaC/webinterface/tpls/UserAPI.tpl:135
 #: indico/MaKaC/webinterface/tpls/UserAPI.tpl:135
+#, fuzzy
 msgid "Enable"
-msgstr "Activer"
+msgstr "Activé"
 
 #: MaKaC/webinterface/tpls/UserAPI.tpl:135
 #: indico/MaKaC/webinterface/tpls/UserAPI.tpl:135
 msgid " persistent signatures"
-msgstr " signatures persistantes"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserDetails.tpl:120
 #: indico/MaKaC/webinterface/tpls/UserDetails.tpl:120
 msgid "This field is currently synchronized with the {0} database."
-msgstr "Ce champ est actuellement synchronisé avec la base de donnée {0}."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserDetails.tpl:121
 #: indico/MaKaC/webinterface/tpls/UserDetails.tpl:121
 msgid ""
-"You changed this field manually. To synchronize it with the {0} database, "
-"click this icon."
-msgstr "Ce champ a été modifié manuellement. Pour le synchroniser avec la base de donnée {0}, cliquez sur cette icone."
+"You changed this field manually. To synchronize it with the {0} database,"
+" click this icon."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserDetails.tpl:152
 #: indico/MaKaC/webinterface/tpls/UserDetails.tpl:152
 msgid ""
-"Synchronization has been re-enabled for this field. To update the data with "
-"the {0} database, you need to log out and then login again."
-msgstr "Le synchronisation a été ré-activée pour ce champ. Pour mettre à jour les données avec la base de données {0}, vous devez vous déconnecter et vous reconnecter."
+"Synchronization has been re-enabled for this field. To update the data "
+"with the {0} database, you need to log out and then login again."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserDetails.tpl:199
 #: indico/MaKaC/webinterface/tpls/UserDetails.tpl:199
 msgid ""
-"This field is currently synchronized with the {0} database. If you change "
-"it, synchronization will be disabled."
-msgstr "Ce champ est actuellement synchronisé avec la base de donnée {0}. Si vous le modifiez, la synchronisation sera désactivée."
+"This field is currently synchronized with the {0} database. If you change"
+" it, synchronization will be disabled."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserDetails.tpl:225
 #: indico/MaKaC/webinterface/tpls/UserDetails.tpl:225
 #: indico/htdocs/js/indico/Legacy/Util.js:587
 msgid "Invalid e-mail address"
-msgstr "Adresse électronique incorrecte"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserDetails.tpl:244
 #: indico/MaKaC/webinterface/tpls/UserDetails.tpl:244
 #: indico/htdocs/js/indico/Legacy/Util.js:590
 msgid "List contains invalid e-mail address or invalid separator"
-msgstr "La liste contient des adresses électroniques incorrectes ou un caractère de séparation incorrect."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserDetails.tpl:245
 #: indico/MaKaC/webinterface/tpls/UserDetails.tpl:245
 msgid ""
-"You can specify more than one email address separated by commas, semicolons "
-"or whitespaces."
-msgstr "Plusieurs adresses email peuvent etre specifiees, et doivent alors etre separees"
+"You can specify more than one email address separated by commas, "
+"semicolons or whitespaces."
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserMerge.tpl:154
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:154
 msgid "principal user"
-msgstr "utilisateur principal"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserMerge.tpl:156
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:156
 msgid "user to merge"
-msgstr "utilisateur à fusionner"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserMerge.tpl:157
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:157
+#, fuzzy
 msgid "Select "
-msgstr "Sélectionnez "
+msgstr "secondes restantes "
 
 #: MaKaC/webinterface/tpls/UserMerge.tpl:234
 #: MaKaC/webinterface/tpls/UserMerge.tpl:238
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:234
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:238
 msgid "Merging users"
-msgstr "En train de fusionner les utilisateurs"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserMerge.tpl:234
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:234
 msgid "Please select both users to merge before performing the action."
-msgstr "Sélectionnez les utilsateurs à fusionner avant de réaliser cette action"
+msgstr ""
 
 #: MaKaC/webinterface/tpls/UserMerge.tpl:238
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:238
 msgid "One cannot merge a user with him/herself."
-msgstr "Un utilisateur ne peut être fusionné avec lui-même."
+msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:5
-#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:5
+#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:114
+#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:114
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:713
 msgid "Success"
-msgstr "Succès"
+msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:10
-#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:10
+#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:119
+#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:119
 msgid "Participants"
-msgstr "Participants"
+msgstr ""
 
-#: MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:39
-#: indico/MaKaC/webinterface/tpls/events/include/ApplyParticipation.tpl:39
+#: MaKaC/webinterface/tpls/events/include/EventDetails.tpl:145
+#: indico/MaKaC/webinterface/tpls/events/include/EventDetails.tpl:145
 msgid "Apply for participation"
-msgstr "S'inscrire pour participer"
+msgstr ""
 
 #: indico/ext/livesync/tpls/PluginAgentManagement.tpl:54
 msgid "Agent activation"
@@ -846,7 +886,9 @@ msgstr "Activer"
 msgid ""
 "Are you sure you want to activate this agent? Please make sure that the "
 "export process finished successfully"
-msgstr "Êtes-vous sûrs de vouloir activer cet agent? Veuillez vous assurer que le processus d'exportation s'est terminé avec succès"
+msgstr ""
+"Êtes-vous sûrs de vouloir activer cet agent? Veuillez vous assurer que le"
+" processus d'exportation s'est terminé avec succès"
 
 #: indico/htdocs/js/indico/Admin/Scheduler.js:5
 msgid "Executing Operation..."
@@ -921,7 +963,7 @@ msgid "History"
 msgstr "Historique"
 
 #: indico/htdocs/js/indico/Admin/Upcoming.js:101
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:733
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:732
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:85
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:321
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:540
@@ -934,31 +976,37 @@ msgstr "Ajouter"
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:389
 msgid "Connect "
-msgstr "Connecter "
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:401
 msgid "Start desktop"
-msgstr "Démarrer le client desktop"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:713
+#, fuzzy
 msgid "The room "
-msgstr "La salle "
+msgstr "autre"
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:713
 msgid " has been conected to the Vidyo room."
-msgstr " a été connectée à la salle Vidyo."
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:974
 msgid ""
 "Tags in the <tag> form are not allowed. Please remove any '<' and '>' "
 "characters."
-msgstr "Les étiquettes de la forme <étiquette> ne sont pas autorisées. Veuillez suppriemr tout caractère '<' et '>'."
+msgstr ""
+"Les étiquettes de la forme <étiquette> ne sont pas autorisées. Veuillez "
+"suppriemr tout caractère '<' et '>'."
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1008
+#, fuzzy
 msgid ""
 "This option ensures that if a manager changes the event's dates,this "
 "booking's dates change accordingly."
-msgstr "Cette option assure que si un organisateur change les dates de l'évènement, les dates de la réservation seront aussi changées."
+msgstr ""
+"Cette option s'assure que si un manager change la date de l'événement, "
+"les dates de cette réservation seront changées en conséquence. "
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1034
 #: indico/htdocs/js/indico/Management/Timetable.js:554
@@ -976,8 +1024,8 @@ msgstr "Avancé"
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1042
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1617
 #: indico/htdocs/js/indico/Core/Dialogs/Popup.js:570
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1336
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1392
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1334
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1390
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:321
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:733
 #: indico/htdocs/js/indico/Legacy/Widgets.js:322
@@ -995,25 +1043,28 @@ msgstr "Enregistrement de votre réservation..."
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1238
 msgid "User has not permissions"
-msgstr "L'utilisateur n'a pas les permissions"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1239
 msgid ""
 "You do not have enough permissions to   bookings. If you think that you "
 "should have permissions please contact "
-msgstr "Vous n'avez pas assez de privilèges pour ces réservations. Si vous pensez avoir droit à ces privilèges, contactez "
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1254
+#, fuzzy
 msgid "create"
-msgstr "créer"
+msgstr "Créer"
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1279
+#, fuzzy
 msgid "edit"
-msgstr "éditer"
+msgstr "(éditer)"
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1303
+#, fuzzy
 msgid "delete"
-msgstr "supprimer"
+msgstr "Ajouter la sélection"
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1309
 msgid "Removing your booking..."
@@ -1030,16 +1081,6 @@ msgstr "Êtes-vous sûrs de supprimer cette"
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1345
 msgid " booking?"
 msgstr "réservation?"
-
-#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1345
-msgid "Please be aware that by deleting this "
-msgstr "Veuillez noter qu'en supprimant cette "
-
-#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1345
-msgid ""
-" booking, all bookings which are cloned from it will also be deleted as a "
-"result."
-msgstr " réservation, toutes les réservations qui ont été ré-utilisées par clonage seront aussi supprimées."
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1465
 msgid "Sending your request..."
@@ -1068,7 +1109,6 @@ msgstr "Retirement de votre requête..."
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1593
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:1023
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:1084
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:510
 msgid "Show"
 msgstr "Montrer"
 
@@ -1080,19 +1120,19 @@ msgstr "Cacher"
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1649
 msgid "Input Error"
-msgstr "Erreur d'entrée"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1649
 msgid "Invalid Email Address Format"
-msgstr "Format d'adresse email invalide"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1660
 msgid "Email Address of "
-msgstr "Adresse email de "
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1681
 msgid "Edit Email Address"
-msgstr "Editer l'adresse email"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1691
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:597
@@ -1106,129 +1146,122 @@ msgstr "Télécharge..."
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1707
 msgid "Please upload the Paper Agreement here."
-msgstr "Téléchargez l'accord scanné ici."
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1756
 msgid "Upload the Paper Agreement"
-msgstr "Téléchargez l'accord scanné"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1765
 #: indico/htdocs/js/indico/Display/Dialogs.js:87
 msgid "Send"
-msgstr "Envoyer"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1766
+#, fuzzy
 msgid "Sending..."
-msgstr "Envoi..."
+msgstr "Chargement..."
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1782
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1784
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1852
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1854
 msgid "Email Format Error"
-msgstr "Erreur de format d'email"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1782
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1852
 msgid ""
-"The {url} field is missing in your email. This is a mandatory field thus, "
-"this email cannot be sent."
-msgstr "Le champ {url} n'apparait pas dans votre email. Ce champ est obligatoire, l'email ne peut donc être envoyé."
+"The {url} field is missing in your email. This is a mandatory field thus,"
+" this email cannot be sent."
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1784
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1854
 msgid ""
-"The {talkTitle} field is missing in your email. This is a mandatory field "
-"thus, this email cannot be sent."
-msgstr "Le champ {talkTitle} n'apparait pas dans votre email. Ce champ est obligatoire, l'email ne peut donc être envoyé."
+"The {talkTitle} field is missing in your email. This is a mandatory field"
+" thus, this email cannot be sent."
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1788
 msgid "Email sent successfully!"
-msgstr "Email envoyé avec succès!"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1789
 msgid "The email has been sent to:"
-msgstr "Cet email a été envoyé à:"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1813
 #: indico/htdocs/js/indico/Display/Dialogs.js:159
+#, fuzzy
 msgid "From:"
-msgstr "De: "
+msgstr "de"
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1857
 msgid "Email sent successfully !"
-msgstr "Email envoyé avec succés !"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1858
 msgid "The Electronic Agreement email has been sent to:"
-msgstr "Le email pour accord électronique a été envoyé à:"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1868
 msgid "Send Email to Speakers"
-msgstr "Envoyer l'email aux présentateurs"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1875
+#, fuzzy
 msgid "Confirmation"
-msgstr "Confirmation"
+msgstr "Information"
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1890
 msgid "Cannot become moderator"
-msgstr "Impossible de devenir modérateur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1900
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1919
 msgid "Moderator"
-msgstr "Modérateur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1920
 msgid "Make me moderator"
-msgstr "Faites de moi un modérateur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1929
 msgid "Accepting Electronic Agreement..."
-msgstr "Accord électronique en cours d'acceptation..."
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1939
 msgid "The acceptance of the agreement has been successfully recorded."
-msgstr "La signature de l'accord a été enregistrée avec succès."
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1949
 msgid "Reason for rejection"
-msgstr "Raison du refus"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1955
 msgid "No reason specified"
-msgstr "Aucune raison spécifiée"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1957
 msgid "Rejecting Electronic Agreement..."
-msgstr "Accord électronique en cours de refus..."
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1969
 msgid "The rejection of the agreement has been successfully recorded."
-msgstr "Le refus de l'accord a été enregistré avec succès."
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1976
 msgid "Cancel Rejection"
-msgstr "Annuler le refus"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1983
 msgid "Please write the reason of your rejection (short):"
-msgstr "Raison du refus (courte):"
+msgstr ""
 
 #: indico/htdocs/js/indico/Collaboration/Collaboration.js:1985
 msgid "The reason will be displayed to the administrators."
-msgstr "La raison sera indiquée aux organisateurs"
-
-#: indico/htdocs/js/indico/Common/Export.js:71
-msgid "Would you like to export private information to your calendar?"
-msgstr "Voulez-vous exporter des données protégées vers votre calendrier?"
-
-#: indico/htdocs/js/indico/Common/Export.js:208
-msgid ""
-"Would you like to create a persistent URL for use with your calendaring "
-"application?"
-msgstr "Voulez-vous créer un URL persistant pour utiliser dans votre application de gestion de calendrier?"
+msgstr ""
 
 #: indico/htdocs/js/indico/Common/IntelligentSearchBox.js:65
 msgid "Some category suggestions..."
@@ -1268,15 +1301,20 @@ msgstr "Appliquer"
 
 #: indico/htdocs/js/indico/Core/Data.js:255
 msgid "(currently <strong>restricted</strong> to some users, but can change)"
-msgstr "(actuellement <strong>restreint<strong> à certains usagers, mais ceci peut changer)"
+msgstr ""
+"(actuellement <strong>restreint<strong> à certains usagers, mais ceci "
+"peut changer)"
 
 #: indico/htdocs/js/indico/Core/Data.js:256
 msgid "(currently <strong>open</strong> to everyone, but can change)"
-msgstr "(actuellement <strong>ouvert</strong> à tout le monde, mais ceci peut changer)"
+msgstr ""
+"(actuellement <strong>ouvert</strong> à tout le monde, mais ceci peut "
+"changer)"
 
 #: indico/htdocs/js/indico/Core/Login.js:3
+#, fuzzy
 msgid "Select user to log in as"
-msgstr "Sélectionnez l'utilisateur sous lequel se connecter"
+msgstr "sélectionner dans la liste"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Base.js:107
 msgid "Unable to send your error report: "
@@ -1292,13 +1330,16 @@ msgstr "Votre rapport n'a pû être envoyé à l'adresse mentionnée."
 
 #: indico/htdocs/js/indico/Core/Dialogs/Base.js:132
 msgid ""
-"An error has occurred while processing your request. We advise you to submit"
-" an error report, by clicking \"Send report\"."
-msgstr "Une erreur a eu lieu durant le traitement de votre requête. Nous vous conseillons de soumettre un rapport d'erreur, en cliquant sur \"Envoyer le rapport\"."
+"An error has occurred while processing your request. We advise you to "
+"submit an error report, by clicking \"Send report\"."
+msgstr ""
+"Une erreur a eu lieu durant le traitement de votre requête. Nous vous "
+"conseillons de soumettre un rapport d'erreur, en cliquant sur \"Envoyer "
+"le rapport\"."
 
 #: indico/htdocs/js/indico/Core/Dialogs/Base.js:135
 msgid "Your e-mail: "
-msgstr "Votre email: "
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Base.js:145
 msgid "Send report"
@@ -1322,8 +1363,8 @@ msgid "Don't Save"
 msgstr "Ne pas sauvegarder"
 
 #: indico/htdocs/js/indico/Core/Dialogs/PopupWidgets.js:9
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:733
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:912
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:732
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:910
 msgid "Choose"
 msgstr "Choisir"
 
@@ -1339,56 +1380,56 @@ msgstr "La gamme de données sélectionnée est invalide. "
 msgid "Search"
 msgstr "Rechercher"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:248
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:247
 msgid "Family name"
 msgstr "Nom de famille"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:249
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:248
 msgid "First name"
 msgstr "Prénom"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:250
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:249
 msgid "E-mail"
 msgstr "E-mail"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:251
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:250
 msgid "Organisation"
 msgstr "Organisation"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:252
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:251
 msgid "Exact Match"
 msgstr "Correspondance exacte"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:278
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:365
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:277
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:364
 msgid "No results for this search..."
 msgstr "Aucun résultat pour cette recherche..."
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:339
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:338
 msgid "Group name"
 msgstr "Nom de goupe"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:454
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:453
 msgid "Users"
 msgstr "Usagers "
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:454
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:453
 msgid "Groups"
 msgstr "Groupes"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:505
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:504
 msgid "Suggested users"
 msgstr "Usagers suggérés"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:508
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:507
 msgid "There are no suggested users for you at the moment. Why not add some "
 msgstr "Il n'y a aucun usager suggéré pour l'instant. Pourquoi ne pas en ajouter"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:509
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:508
 msgid "favourites"
 msgstr "favoris"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:588
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:587
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:17
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:240
 #: indico/htdocs/js/indico/Management/Timetable.js:77
@@ -1398,75 +1439,78 @@ msgstr "favoris"
 msgid "Loading dialog..."
 msgstr "Chargement du dialogue..."
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:708
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:707
 msgid "Please select at least one item"
 msgstr "Veuillez  sélectionner au moins un article"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1291
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1289
 #: indico/htdocs/js/indico/Management/Contributions.js:101
+#, fuzzy
 msgid "Grant submission rights"
-msgstr "Donner les droits de soumission"
+msgstr "droits de soumission"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1292
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1299
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1307
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1313
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1290
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1297
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1305
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1311
+#, fuzzy
 msgid "Note:"
-msgstr "Note:"
+msgstr "autre"
+
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1290
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1297
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1305
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1311
+msgid " If this person does not already have an Indico account, "
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1291
+msgid "he or she will be sent an email asking to register as a user."
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1292
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1299
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1307
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1313
-msgid " If this person does not already have an Indico account, "
-msgstr " Si cette personne n'a pas de compte Indico, "
+msgid " After the registration the user will automatically be given"
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1293
-msgid "he or she will be sent an email asking to register as a user."
-msgstr "elle recevra un email lui demandant de s'enregistrer."
-
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1294
-msgid " After the registration the user will automatically be given"
-msgstr " Après enregistrement l'utilisateur recevra automatiquement"
-
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1295
+#, fuzzy
 msgid " submission rights."
-msgstr " les droits de soumisssion."
+msgstr "droits de soumission"
+
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1296
+msgid "Give management rights"
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1298
-msgid "Give management rights"
-msgstr "Donner les droits de gestion"
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1306
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1312
+msgid "he or she will be sent an email asking to create an account."
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1299
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1307
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1313
+msgid " After the account creation the user will automatically be"
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1300
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1308
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1314
-msgid "he or she will be sent an email asking to create an account."
-msgstr "elle recevra un email lui demandant de créer un compte."
-
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1301
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1309
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1315
-msgid " After the account creation the user will automatically be"
-msgstr " Après création du compte, la personne recevra automatiquement"
-
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1302
 msgid " given management rights."
-msgstr " les droits de gestion."
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1306
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1304
 msgid "Give coordination rights"
-msgstr "Donner les droits de coordination"
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1310
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1308
 msgid " given coordination rights."
-msgstr " les droits de coordination"
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1316
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1314
 msgid " given the rights."
-msgstr " les droits"
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1320
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1376
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1318
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1374
 #: indico/htdocs/js/indico/Display/Dialogs.js:29
 #: indico/htdocs/js/indico/Display/Dialogs.js:44
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:197
@@ -1477,143 +1521,145 @@ msgstr " les droits"
 msgid "Title"
 msgstr "Titre"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1320
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1376
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1318
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1374
 #: indico/htdocs/js/indico/Display/Dialogs.js:29
 msgid "Mr."
 msgstr "Mr."
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1320
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1376
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1318
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1374
 #: indico/htdocs/js/indico/Display/Dialogs.js:29
 msgid "Mrs."
 msgstr "Mme."
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1320
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1376
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1318
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1374
 #: indico/htdocs/js/indico/Display/Dialogs.js:29
 msgid "Ms."
 msgstr "Melle."
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1320
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1376
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1318
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1374
 #: indico/htdocs/js/indico/Display/Dialogs.js:29
 msgid "Dr."
 msgstr "Dr."
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1320
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1376
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1318
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1374
 #: indico/htdocs/js/indico/Display/Dialogs.js:29
 msgid "Prof."
 msgstr "Prof. "
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1321
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1377
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1319
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1375
 #: indico/htdocs/js/indico/Display/Dialogs.js:30
 msgid "Family Name"
 msgstr "Nom de Famille"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1322
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1378
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1320
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1376
 #: indico/htdocs/js/indico/Display/Dialogs.js:31
 #: indico/htdocs/js/indico/Display/Dialogs.js:46
 msgid "First Name"
 msgstr "Prénom "
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1323
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1379
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1321
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1377
 #: indico/htdocs/js/indico/Display/Dialogs.js:32
 #: indico/htdocs/js/indico/Display/Dialogs.js:49
 msgid "Affiliation"
 msgstr "Affiliation"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1324
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1380
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1322
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1378
 #: indico/htdocs/js/indico/Display/Dialogs.js:33
 #: indico/htdocs/js/indico/Display/Dialogs.js:47
 msgid "Email"
 msgstr "E-mail"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1325
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1323
 #: indico/htdocs/js/indico/Display/Dialogs.js:34
 #: indico/htdocs/js/indico/Display/Dialogs.js:48
 #: indico/htdocs/js/indico/Management/RoomBooking.js:71
 msgid "Address"
 msgstr "Adresse "
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1326
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1381
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1324
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1379
 #: indico/htdocs/js/indico/Display/Dialogs.js:35
 #: indico/htdocs/js/indico/Display/Dialogs.js:50
 msgid "Telephone"
 msgstr "Téléphone"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1327
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1325
 #: indico/htdocs/js/indico/Display/Dialogs.js:36
 #: indico/htdocs/js/indico/Display/Dialogs.js:51
 msgid "Fax"
 msgstr "Fax"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1536
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:294
-#: indico/htdocs/js/indico/Management/Contributions.js:134
-#: indico/htdocs/js/indico/Management/Contributions.js:206
-#: indico/htdocs/js/indico/Management/Contributions.js:254
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1534
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:290
+#: indico/htdocs/js/indico/Management/Contributions.js:130
+#: indico/htdocs/js/indico/Management/Contributions.js:202
+#: indico/htdocs/js/indico/Management/Contributions.js:250
 msgid "Add Indico User"
-msgstr "Ajouter un utilisateur Indico"
+msgstr "Ajouter existant"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1540
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1538
 msgid "Add Users and Groups"
 msgstr "Ajouter Usagers et Groupes"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1540
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1538
 msgid "Add Users"
 msgstr "Ajouter Usagers"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1542
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1540
 msgid "Search Users and Groups"
 msgstr "Rechercher Usagers et Groupes"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1542
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1540
 msgid "Search Users"
 msgstr "Rechercher Usagers"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1586
-#: indico/htdocs/js/indico/Management/Contributions.js:207
-#: indico/htdocs/js/indico/Management/Contributions.js:255
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1584
+#: indico/htdocs/js/indico/Management/Contributions.js:203
+#: indico/htdocs/js/indico/Management/Contributions.js:251
 msgid "Add New"
 msgstr "Ajouter Nouveau"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1594
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1592
 msgid "New user"
 msgstr "Nouveau usager"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1618
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1616
 msgid "Grant all these users with privileges: "
 msgstr "Accorder à tous ces usagers les privilèges suivants:"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1716
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1714
 msgid "Remove from your list of favorite users"
 msgstr "Retirer de votre liste d'usagers favoris"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1723
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1721
 msgid "Add to your list of favorite users"
 msgstr "Ajouter à votre liste d'usagers favoris"
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1730
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:1728
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:176
 msgid "Communicating with server"
 msgstr "En communication avec un serveur"
 
 #: indico/htdocs/js/indico/Core/Widgets/Base.js:430
 #: indico/htdocs/js/indico/Core/Widgets/Base.js:434
+#, fuzzy
 msgid "Previous tab"
-msgstr "Onglet précédent"
+msgstr "précédent "
 
 #: indico/htdocs/js/indico/Core/Widgets/Base.js:443
 #: indico/htdocs/js/indico/Core/Widgets/Base.js:447
+#, fuzzy
 msgid "Next tab"
-msgstr "Onglet suivant"
+msgstr "suivant "
 
 #: indico/htdocs/js/indico/Core/Widgets/DateTime.js:82
 msgid "Date is invalid"
@@ -1621,7 +1667,7 @@ msgstr "Les données sont invalides"
 
 #: indico/htdocs/js/indico/Core/Widgets/DateTime.js:84
 msgid "No date specified"
-msgstr "Aucune date spécifiée"
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/DateTime.js:172
 msgid "Start date should be before end date"
@@ -1644,8 +1690,9 @@ msgid "Duration(min):"
 msgstr "Durée(min):"
 
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:542
+#, fuzzy
 msgid "No options"
-msgstr "Pas d'option"
+msgstr "Options du filtre "
 
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:710
 msgid "Add a different one"
@@ -1682,12 +1729,13 @@ msgstr "(renommer la Session)"
 
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:1704
 #: indico/htdocs/js/indico/Legacy/Util.js:605
+#, fuzzy
 msgid "Field is mandatory"
-msgstr "Le champ est obligatoire"
+msgstr "Cacher Historique"
 
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:1733
 msgid "There is not any short url yet. Click \"edit\" to setup."
-msgstr "Ps d'URL court. Cliquez sur \"éditer\" pour le configurer"
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/Menu.js:569
 msgid "Color"
@@ -1717,10 +1765,14 @@ msgstr "Avertissement!"
 
 #: indico/htdocs/js/indico/Core/Widgets/RichText.js:436
 msgid ""
-"Your data contains some potentially harmful , which cannot be stored in the "
-"database. Use the automatic Indico cleaner or clean the text manually (see "
-"the list of forbidden elements that you are using "
-msgstr "Vos données contiennent des éléments potentiellement nocifs, qui ne peuvent être stockées dans la base de données. Utilisez le nettoyeur automatique Indigo ou nettoyez manuellement (voir la liste d'éléments interdits que vous utilisez"
+"Your data contains some potentially harmful , which cannot be stored in "
+"the database. Use the automatic Indico cleaner or clean the text manually"
+" (see the list of forbidden elements that you are using "
+msgstr ""
+"Vos données contiennent des éléments potentiellement nocifs, qui ne "
+"peuvent être stockées dans la base de données. Utilisez le nettoyeur "
+"automatique Indigo ou nettoyez manuellement (voir la liste d'éléments "
+"interdits que vous utilisez"
 
 #: indico/htdocs/js/indico/Core/Widgets/RichText.js:450
 msgid "Format of your data is invalid. Please check the syntax."
@@ -1728,7 +1780,7 @@ msgstr "Le format de vos données est inavalide. Veuillez vérifier la syntaxe. 
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:71
 msgid "Non-registered user"
-msgstr "Utilisateur sans compte"
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:104
 #: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:244
@@ -1736,130 +1788,137 @@ msgid "More"
 msgstr "Plus"
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:123
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:524
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:520
+#, fuzzy
 msgid "Remove "
-msgstr "Enlever "
+msgstr "plus"
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:124
 msgid "Remove this "
-msgstr "Enlever ce "
+msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:124
+#, fuzzy
 msgid " from the list"
-msgstr " de la liste"
+msgstr "sélectionner dans la liste"
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:137
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:172
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:500
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:496
+#, fuzzy
 msgid "Edit "
-msgstr "Editer "
+msgstr "(éditer)"
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:138
+#, fuzzy
 msgid "Edit this "
-msgstr "Editer ce "
+msgstr "Éditer Matériel"
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:158
-#: indico/htdocs/js/indico/Timetable/Draw.js:549
+#: indico/htdocs/js/indico/Timetable/Draw.js:546
 msgid "Move up"
 msgstr "Déplacer vers le haut"
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:161
-#: indico/htdocs/js/indico/Timetable/Draw.js:550
+#: indico/htdocs/js/indico/Timetable/Draw.js:547
 msgid "Move down"
 msgstr "Déplacer vers le bas "
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:172
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:500
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:496
 msgid " data"
-msgstr " données"
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:250
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:292
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:451
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:484
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:246
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:288
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:447
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:480
 #: indico/htdocs/js/indico/Management/AbstractReviewing.js:471
-#: indico/htdocs/js/indico/Management/Contributions.js:133
-#: indico/htdocs/js/indico/Management/Contributions.js:205
-#: indico/htdocs/js/indico/Management/Contributions.js:253
+#: indico/htdocs/js/indico/Management/Contributions.js:129
+#: indico/htdocs/js/indico/Management/Contributions.js:201
+#: indico/htdocs/js/indico/Management/Contributions.js:249
 msgid "Add "
 msgstr "Ajouter"
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:300
-#: indico/htdocs/js/indico/Management/Contributions.js:137
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:296
+#: indico/htdocs/js/indico/Management/Contributions.js:133
 #: indico/htdocs/js/indico/Timetable/Base.js:912
+#, fuzzy
 msgid "Add new"
-msgstr "Ajouter un nouveau"
+msgstr "Ajouter Nouveau"
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:316
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:466
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:312
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:462
 msgid "New "
-msgstr "Nouveau "
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:452
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:485
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:448
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:481
 #: indico/htdocs/js/indico/Management/CFA.js:294
 #: indico/htdocs/js/indico/Management/CFA.js:327
 msgid "The email address ("
-msgstr "L'adresse email ("
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:453
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:449
 msgid ""
-") of a user you are trying to add is already used by another participant or "
-"the user is already added to the list."
-msgstr ") d'un utilisateur que vous tentez d'ajouter est déjà utilisée par un des participants."
+") of a user you are trying to add is already used by another participant "
+"or the user is already added to the list."
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:486
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:482
 #: indico/htdocs/js/indico/Management/CFA.js:328
-msgid ""
-") is already used by another participant. Please modify email field value."
-msgstr ") est déjà utilisée pour un autre participant. Modifiez l'email."
+msgid ") is already used by another participant. Please modify email field value."
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:513
-#: indico/htdocs/js/indico/Timetable/Draw.js:1070
-#: indico/htdocs/js/indico/Timetable/Draw.js:1101
-#: indico/htdocs/js/indico/Timetable/Draw.js:1117
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:509
+#: indico/htdocs/js/indico/Timetable/Draw.js:1071
+#: indico/htdocs/js/indico/Timetable/Draw.js:1102
+#: indico/htdocs/js/indico/Timetable/Draw.js:1118
 msgid "Edit"
 msgstr "Éditer "
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:513
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:509
 #: indico/htdocs/js/indico/Management/CFA.js:368
 msgid "The user you are trying to edit does not exist."
-msgstr "L'utilisateur que vous voulez modifier n'existe pas."
+msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/UserList.js:524
+#: indico/htdocs/js/indico/Core/Widgets/UserList.js:520
 #: indico/htdocs/js/indico/Management/CFA.js:388
 msgid "The user you are trying to remove does not exist."
-msgstr "L'utilisateur que vous voulez supprimer n'existe pas."
+msgstr ""
 
 #: indico/htdocs/js/indico/Display/Dialogs.js:45
+#, fuzzy
 msgid "Last Name"
-msgstr "Nom de famille"
+msgstr "Prénom"
 
 #: indico/htdocs/js/indico/Display/Dialogs.js:128
 #: indico/htdocs/js/indico/Display/Dialogs.js:196
 msgid "Legend:"
-msgstr "Légende:"
+msgstr ""
 
 #: indico/htdocs/js/indico/Display/Dialogs.js:169
 #: indico/htdocs/js/indico/Display/Dialogs.js:242
+#, fuzzy
 msgid "To:"
-msgstr "A:"
+msgstr "à"
 
 #: indico/htdocs/js/indico/Display/Dialogs.js:179
 msgid "Subject:"
-msgstr "Sujet:"
+msgstr ""
 
 #: indico/htdocs/js/indico/Display/Dialogs.js:189
 msgid "field containing the conference title."
-msgstr "champ contenant le titre de la conférence."
+msgstr ""
 
 #: indico/htdocs/js/indico/Display/Dialogs.js:190
 msgid "field containing the full name of the participant."
-msgstr "champ contenant le nom complet du participant."
+msgstr ""
 
 #: indico/htdocs/js/indico/Display/Dialogs.js:207
+#, fuzzy
 msgid "Sending email..."
-msgstr "Envoi de l'email..."
+msgstr "Chargement du dialogue..."
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:74
 msgid "Add Session"
@@ -1870,9 +1929,10 @@ msgstr "Ajouter Session"
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:379
 #: indico/htdocs/js/indico/Management/Timetable.js:356
 #: indico/htdocs/js/indico/Management/Timetable.js:776
-#: indico/htdocs/js/indico/Timetable/Draw.js:1211
+#: indico/htdocs/js/indico/Timetable/Draw.js:1212
+#, fuzzy
 msgid "event"
-msgstr "évènement"
+msgstr "Événements"
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:108
 msgid "Standard"
@@ -1924,11 +1984,11 @@ msgstr "Type de session"
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:311
 msgid "Edit session block"
-msgstr "Modifier la plage horaire"
+msgstr "Modifier la session en bloc"
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:311
 msgid "Add session block"
-msgstr "Ajouter une plage horaire"
+msgstr "Ajouter une session en bloc"
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:449
 msgid "Timezone"
@@ -1966,7 +2026,9 @@ msgstr "Confirmer"
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:718
 msgid "You have modified your text since you last saved."
-msgstr "Vous avez modifié votre texte depuis la dernière fois que vous l'avez sauvegardé."
+msgstr ""
+"Vous avez modifié votre texte depuis la dernière fois que vous l'avez "
+"sauvegardé."
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:719
 msgid "Do you want to save your changes?"
@@ -1980,57 +2042,57 @@ msgstr "Fermer "
 
 #: indico/htdocs/js/indico/Legacy/Util.js:481
 msgid "The value must be at least "
-msgstr "La valeur doit être au moins "
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:482
 msgid "The value must be at maximum "
-msgstr "La valeur doit être au maximum "
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:550
 msgid "At least one must be selected"
-msgstr "Au moins un doit être sélectionné"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:555
 msgid "Please enable the checkbox"
-msgstr "Activez la case à cocher"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:560
 #: indico/htdocs/js/indico/Legacy/Util.js:565
 msgid "Please choose an option"
-msgstr "Choisissez une option"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:569
 #: indico/htdocs/js/indico/Legacy/Util.js:574
 msgid "Field must be a number"
-msgstr "Le champ doit être un nombre"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:581
 msgid "Field must be a positive number"
-msgstr "Le champ doit être un nombre positif"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:584
 msgid "Date format is not valid. It should be dd/mm/yyyy hh:mm"
-msgstr "Format de date invalide. Le format correct est jj/mm/aaaa hh:mm"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:593
 msgid "Invalid URL"
-msgstr "URL invalide"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:596
 msgid ""
 "That doesn't seem like a valid IP Address. Example of valid IP Address: "
 "132.156.31.38"
-msgstr "Ceci n'est pas une adresse IP. Une adresse IP valide est par exemple 132.156.31.38"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:599
 msgid "Time format is not valid. It should be hh:mm"
-msgstr "Format d'horaire invalide. Le format correct est hh:mm"
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:602
 msgid ""
 "The short URL contains invalid characters. The allowed characters are "
 "alphanumeric, _, - and ."
-msgstr "L'URL court contient des caractères invalides. les caractères autorisés sont alphanumeriques, _, - et ."
+msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Widgets.js:26
 msgid "Location: "
@@ -2080,21 +2142,13 @@ msgstr "Mise à jour..."
 msgid ""
 "developer error: kind of radioButtonField is not correct, should be "
 "'vertical', 'horizontal1', 'horizontal2'"
-msgstr "erreur de développement: sorte de radioButtonField incorrect, devrait être "
+msgstr ""
+"erreur de développement: sorte de radioButtonField incorrect, devrait "
+"être "
 
 #: indico/htdocs/js/indico/Legacy/Widgets.js:633
 msgid "Error loading initial values"
 msgstr "Erreur durant le chargement des valeurs initiales "
-
-#: indico/htdocs/js/indico/Legacy/validation.js:293
-#: indico/htdocs/js/indico/Legacy/validation.js:294
-msgid "This room cannot be booked more than "
-msgstr "Cette salle ne peut être réservée plus de "
-
-#: indico/htdocs/js/indico/Legacy/validation.js:293
-#: indico/htdocs/js/indico/Legacy/validation.js:294
-msgid " days in advance"
-msgstr " jours à l'avance"
 
 #: indico/htdocs/js/indico/Management/AbstractReviewing.js:539
 msgid "Please answer all questions."
@@ -2103,226 +2157,266 @@ msgstr "Veuillez répondre à toutes les questions."
 #: indico/htdocs/js/indico/Management/CFA.js:8
 #: indico/htdocs/js/indico/Management/CFA.js:85
 msgid "Over the limit"
-msgstr "Au-dessus de la limite"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:10
+#, fuzzy
 msgid " words left"
-msgstr " mots restants"
+msgstr "secondes restantes "
 
 #: indico/htdocs/js/indico/Management/CFA.js:52
 #: indico/htdocs/js/indico/Management/CFA.js:54
 msgid "Maximum number of words has been exceeded in "
-msgstr "Le nombre maximum de mots a été dépassé dans "
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:52
+#, fuzzy
 msgid " word."
-msgstr " mot."
+msgstr "Mots clé"
 
 #: indico/htdocs/js/indico/Management/CFA.js:54
+#, fuzzy
 msgid " words."
-msgstr " mots."
+msgstr "Mots clé"
 
 #: indico/htdocs/js/indico/Management/CFA.js:87
+#, fuzzy
 msgid " chars left"
-msgstr " caractères restants"
+msgstr "secondes restantes "
 
 #: indico/htdocs/js/indico/Management/CFA.js:128
 #: indico/htdocs/js/indico/Management/CFA.js:130
 msgid "Maximum number of characters has been exceeded in "
-msgstr "Le nombre maximum de caractères a été dépassé dans "
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:128
 msgid " character."
-msgstr " caractère."
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:130
 msgid " characters."
-msgstr " caractères."
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:267
 #: indico/htdocs/js/indico/Management/CFA.js:293
 #: indico/htdocs/js/indico/Management/CFA.js:326
 msgid "Add author"
-msgstr "Ajouter un auteur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:268
+#, fuzzy
 msgid "Search User"
-msgstr "Rechercher un utilisateur"
+msgstr "Rechercher Usagers"
 
 #: indico/htdocs/js/indico/Management/CFA.js:269
 msgid "Define New"
-msgstr "Définir un nouveau"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:295
 msgid ""
 ") of a user you are trying to add is already used by another author. An "
 "author can be added only once and only in one list."
-msgstr ") d'un utilisateur que vous essayez d'ajouter est déjà utilisé par un autre auteur. Un auteur ne peut apparaitre qu'une seule fois et dans une seule liste."
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:308
 msgid "New author"
-msgstr "Nouvel auteur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:356
 msgid "Edit author data"
-msgstr "Editer les données de l'auteur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:368
 #: indico/htdocs/js/indico/Management/CFA.js:439
 msgid "Edit author"
-msgstr "Editer l'auteur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:388
 #: indico/htdocs/js/indico/Management/CFA.js:460
 msgid "Remove author"
-msgstr "Supprimer l'auteur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:440
 msgid "Edit this author"
-msgstr "Editer cet auteur"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:461
+#, fuzzy
 msgid "Remove this author from the list"
-msgstr "Supprimer cet auteur de la liste"
+msgstr "Retirer ce statut de la liste"
 
 #: indico/htdocs/js/indico/Management/CFA.js:502
 msgid "This author will be also a "
-msgstr "Cet auteur sera aussi un "
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:502
-#: indico/htdocs/js/indico/Management/Contributions.js:389
+#: indico/htdocs/js/indico/Management/Contributions.js:385
+#, fuzzy
 msgid "presenter"
-msgstr "présentateur"
+msgstr "Présentateur (s)"
 
 #: indico/htdocs/js/indico/Management/CFA.js:606
 msgid "Attach another file"
-msgstr "Ajouter un autre fichier"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:640
 msgid ""
-"You cannot attach this file because it exceeds the maximum size allowed per "
-"file. ("
-msgstr "Impossible d'attacher ce fichier car il excède la taille maximum autorisée ("
+"You cannot attach this file because it exceeds the maximum size allowed "
+"per file. ("
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:644
 msgid "The maximum size allowed in total ("
-msgstr "La taille totale maximum autorisée ("
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:644
-msgid ""
-"has been exceeded. Please remove some file before submitting the abstract."
-msgstr "a été dépassée. Supprimez certains fichiers avant de soumettre votre résumé."
+msgid "has been exceeded. Please remove some file before submitting the abstract."
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:669
+#, fuzzy
 msgid "Attach a file"
-msgstr "Attacher un fichier"
+msgstr "Fichier local"
 
 #: indico/htdocs/js/indico/Management/CFA.js:715
 msgid "Other files you want to attach"
-msgstr "Autres fichier à attacher"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:735
+#, fuzzy
 msgid "Remove material"
-msgstr "Supprimer le document"
+msgstr "Télécharger le matériel"
 
 #: indico/htdocs/js/indico/Management/CFA.js:736
 msgid "Remove this attached material"
-msgstr "Supprimer ce document attaché"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/Contributions.js:106
+#, fuzzy
 msgid "Remove submission rights"
-msgstr "Supprimer les droits de soumission"
+msgstr "droits de soumission"
 
 #: indico/htdocs/js/indico/Management/Contributions.js:112
 msgid "Send an email"
-msgstr "Envoyer un email"
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:151
+#: indico/htdocs/js/indico/Management/Contributions.js:147
 msgid "Impossible to send an email"
-msgstr "Impossible d'envoyer un email"
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:151
+#: indico/htdocs/js/indico/Management/Contributions.js:147
 msgid ""
-"The email of this author is empty, please complete a correct email address "
-"before sending the email."
-msgstr "L'adresse email de cet auteur est vide, ajoutez son adresse email avant d'envoyer ce mail."
+"The email of this author is empty, please complete a correct email "
+"address before sending the email."
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:295
+#: indico/htdocs/js/indico/Management/Contributions.js:291
 msgid "Add submitter"
-msgstr "Donner des droits de soumission"
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:311
+#: indico/htdocs/js/indico/Management/Contributions.js:307
 msgid "Primary author"
-msgstr "Auteur principal"
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:316
+#: indico/htdocs/js/indico/Management/Contributions.js:312
+#, fuzzy
 msgid ", Co-author"
-msgstr ", Co-auteur"
+msgstr "Co-auteur(s)"
 
-#: indico/htdocs/js/indico/Management/Contributions.js:318
+#: indico/htdocs/js/indico/Management/Contributions.js:314
+#, fuzzy
 msgid "Co-author"
-msgstr "Co-auteur"
+msgstr "Co-auteur(s)"
 
-#: indico/htdocs/js/indico/Management/Contributions.js:323
+#: indico/htdocs/js/indico/Management/Contributions.js:319
 msgid ", "
-msgstr ", "
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:346
+#: indico/htdocs/js/indico/Management/Contributions.js:342
 msgid "Add as primary author"
-msgstr "Ajouter comme auteur principal"
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:351
+#: indico/htdocs/js/indico/Management/Contributions.js:347
 msgid "Remove as primary author"
-msgstr "Enlever comme auteur principal"
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:358
+#: indico/htdocs/js/indico/Management/Contributions.js:354
 msgid "Add as co-author"
-msgstr "Ajouter comme co-auteur"
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:363
+#: indico/htdocs/js/indico/Management/Contributions.js:359
 msgid "Remove as co-author"
-msgstr "Enlever comme co-auteur"
+msgstr ""
 
-#: indico/htdocs/js/indico/Management/Contributions.js:371
+#: indico/htdocs/js/indico/Management/Contributions.js:367
+#, fuzzy
 msgid "Add as "
-msgstr "Ajouter comme "
+msgstr "et"
 
-#: indico/htdocs/js/indico/Management/Contributions.js:376
+#: indico/htdocs/js/indico/Management/Contributions.js:372
 msgid "Remove as "
-msgstr "Enlever comme "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Contributions.js:386
+#, fuzzy
+msgid "Presenter"
+msgstr "Présentateur (s)"
+
+#: indico/htdocs/js/indico/Management/Contributions.js:389
+msgid "speaker"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/Contributions.js:390
-msgid "Presenter"
-msgstr "Présentateur"
-
-#: indico/htdocs/js/indico/Management/Contributions.js:393
-msgid "speaker"
-msgstr "présentateur"
-
-#: indico/htdocs/js/indico/Management/Contributions.js:394
 msgid "Speaker"
-msgstr "Présentateur"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Participants.js:6
+msgid "Add participant(s)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Participants.js:31
+msgid "Define new"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Participants.js:72
+#: indico/htdocs/js/indico/Management/Participants.js:73
+#, fuzzy
+msgid "Select all "
+msgstr "sélectionner dans la liste"
+
+#: indico/htdocs/js/indico/Management/Participants.js:81
+#: indico/htdocs/js/indico/Management/Participants.js:82
+msgid "Deselect all "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Participants.js:87
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:636
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1027
+msgid "Name"
+msgstr "Nom"
+
+#: indico/htdocs/js/indico/Management/Participants.js:89
+msgid " Status"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Participants.js:91
+#, fuzzy
+msgid " Presence"
+msgstr "Présentateur (s)"
 
 #: indico/htdocs/js/indico/Management/Registration.js:13
 msgid "Remove attachment"
-msgstr "Supprimer fichier attaché"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/Registration.js:14
 msgid "Remove this attachment"
-msgstr "Supprimer ce fichier attaché"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/RoomBooking.js:51
 #: indico/htdocs/js/indico/Management/RoomBooking.js:399
+#, fuzzy
 msgid "Inherit from parent {0}: "
-msgstr "Hérite du parent {0}: "
-
-#: indico/htdocs/js/indico/Management/RoomBooking.js:53
-msgid "No room defined"
-msgstr "Aucune salle définie"
-
-#: indico/htdocs/js/indico/Management/RoomBooking.js:54
-msgid "No location defined"
-msgstr "Aucun lieu défini"
+msgstr "Hériter d'un parent:"
 
 #: indico/htdocs/js/indico/Management/RoomBooking.js:60
 #: indico/htdocs/js/indico/Management/RoomBooking.js:412
@@ -2339,7 +2433,7 @@ msgstr "Salle"
 
 #: indico/htdocs/js/indico/Management/RoomBooking.js:482
 msgid "Add Room"
-msgstr "Ajouter une salle"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:45
 msgid "Default on start-up"
@@ -2358,20 +2452,22 @@ msgid "New map aspect"
 msgstr "Nouvel aspect de la carte"
 
 #: indico/htdocs/js/indico/Management/Sessions.js:43
+#, fuzzy
 msgid "Add as convener"
-msgstr "Ajouter comme président"
+msgstr "Organisateur "
 
 #: indico/htdocs/js/indico/Management/Sessions.js:48
 msgid "Remove as convener"
-msgstr "Enlever comme président"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/Timetable.js:13
 msgid "All"
-msgstr "Tous"
+msgstr ""
 
 #: indico/htdocs/js/indico/Management/Timetable.js:15
+#, fuzzy
 msgid "Select: "
-msgstr "Sélectionnez: "
+msgstr "Ajouter la sélection"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:114
 #: indico/htdocs/js/indico/Management/Timetable.js:626
@@ -2396,25 +2492,29 @@ msgstr "Choisir un (ou plusieurs) non programmé"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:191
 msgid "To add an unscheduled contribution, please select at least one"
-msgstr "Pour ajouter une contribution non programmée, veuilleuz en sélectionner au moins une"
+msgstr ""
+"Pour ajouter une contribution non programmée, veuilleuz en sélectionner "
+"au moins une"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:357
 #: indico/htdocs/js/indico/Management/Timetable.js:358
 #: indico/htdocs/js/indico/Management/Timetable.js:777
 #: indico/htdocs/js/indico/Management/Timetable.js:778
-#: indico/htdocs/js/indico/Timetable/Draw.js:1212
 #: indico/htdocs/js/indico/Timetable/Draw.js:1213
+#: indico/htdocs/js/indico/Timetable/Draw.js:1214
+#, fuzzy
 msgid "contribution"
-msgstr "présentation"
+msgstr "Contribution"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:359
 #: indico/htdocs/js/indico/Management/Timetable.js:360
 #: indico/htdocs/js/indico/Management/Timetable.js:779
 #: indico/htdocs/js/indico/Management/Timetable.js:780
-#: indico/htdocs/js/indico/Timetable/Draw.js:1214
 #: indico/htdocs/js/indico/Timetable/Draw.js:1215
+#: indico/htdocs/js/indico/Timetable/Draw.js:1216
+#, fuzzy
 msgid "session"
-msgstr "session"
+msgstr "Session"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:368
 #: indico/htdocs/js/indico/Management/Timetable.js:480
@@ -2531,9 +2631,11 @@ msgstr "La première entrée commencera lorsque l'interval commencera ("
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1276
 msgid ""
-"and the other entries will follow consecutively after it. The durations of "
-"the entries will not change. "
-msgstr "et d'autres entrées suivront consécutivement. Les durées de ces entrées ne changeront pas. "
+"and the other entries will follow consecutively after it. The durations "
+"of the entries will not change. "
+msgstr ""
+"et d'autres entrées suivront consécutivement. Les durées de ces entrées "
+"ne changeront pas. "
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1285
 msgid "Adjust duration of all entries"
@@ -2557,10 +2659,13 @@ msgstr "l'interval"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1291
 msgid ""
-" to fill the gaps between them, so that their starting time don't change. If"
-" a time gap is specified, the duration will be extended up to the value of "
-"this time gap before the starting time of the next entry. "
-msgstr "pour remplir les vides entre eux, de sorte que leur temps de départ ne change pas. Si un vide est spécifié, la durée sera étendue à la valeur de cet interval de temps avant le temps de départ de l'entrée suivante."
+" to fill the gaps between them, so that their starting time don't change."
+" If a time gap is specified, the duration will be extended up to the "
+"value of this time gap before the starting time of the next entry. "
+msgstr ""
+"pour remplir les vides entre eux, de sorte que leur temps de départ ne "
+"change pas. Si un vide est spécifié, la durée sera étendue à la valeur de"
+" cet interval de temps avant le temps de départ de l'entrée suivante."
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1356
 msgid "Step 2: Choose time gap between entries"
@@ -2572,9 +2677,11 @@ msgstr "Étape 3: Choisir d'adapter les sessions à leur contenu"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1388
 msgid ""
-"This changes the start and end times of the session blocks occuring on  in "
-"order to fit their respective content "
-msgstr "Ceci change les horaires de début et de fin des plages horaires survenant afin de les ajuster a leur contenu"
+"This changes the start and end times of the session blocks occuring on  "
+"in order to fit their respective content "
+msgstr ""
+"Ceci change la date de début et fin du blocage de la session survenant "
+"afin d'agencer leur contenu respectif"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1389
 msgid "before"
@@ -2670,8 +2777,9 @@ msgid "Please review your choice"
 msgstr "Veuillez revoir vos choix"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1570
+#, fuzzy
 msgid "Please select the rescheduling type"
-msgstr "Sélectionnez le type de replanification"
+msgstr "Veuillez choisir le type de la reprogrammation"
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1596
 msgid "Reschedule Entries"
@@ -2727,7 +2835,9 @@ msgstr "Accès interdit"
 
 #: indico/htdocs/js/indico/Management/eventCreation.js:112
 msgid "You do not have sufficient permissions to access that category"
-msgstr "Vous n'avez pas les autorisations suffisantes pour accéder à cette catégorie"
+msgstr ""
+"Vous n'avez pas les autorisations suffisantes pour accéder à cette "
+"catégorie"
 
 #: indico/htdocs/js/indico/Management/eventCreation.js:136
 msgid " subcategories)"
@@ -2739,7 +2849,9 @@ msgstr "Créaction interdite"
 
 #: indico/htdocs/js/indico/Management/eventCreation.js:169
 msgid "You do not have permissions to create events in that category"
-msgstr "Vous n'avez pas la permission de créer des événements dans cette catégorie "
+msgstr ""
+"Vous n'avez pas la permission de créer des événements dans cette "
+"catégorie "
 
 #: indico/htdocs/js/indico/Management/eventCreation.js:238
 msgid "Go to parent category"
@@ -2750,8 +2862,9 @@ msgid "Category chooser:"
 msgstr "Choisir catégorie:"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:29
+#, fuzzy
 msgid "Same as for the parent"
-msgstr "Comme pour le parent"
+msgstr "Même que pour la Session parente"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:37
 msgid "Same as for the parent Subcontribution"
@@ -2774,8 +2887,9 @@ msgid "Same as for the parent Category"
 msgstr "Même que pour la Catégorie parente"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:60
+#, fuzzy
 msgid "Create Resource"
-msgstr "Créer une ressource"
+msgstr "Éditer ressource "
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:96
 msgid "more"
@@ -2792,33 +2906,40 @@ msgstr "URL"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:140
 msgid "Example: http://www.example.com/YourPDFFile.pdf"
-msgstr "Exemple: http://www.example.com/YourPDFFile.pdf"
+msgstr "Exemple: "
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:205
+#, fuzzy
 msgid "Inherit from parent Subcontribution"
-msgstr "Hérite de la présentation mère"
+msgstr "Même que pour la Sous-contribution parente"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:207
+#, fuzzy
 msgid "Inherit from parent Contribution"
-msgstr "Hérite de la présentation mère"
+msgstr "Hériter d'un parent:"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:209
+#, fuzzy
 msgid "Inherit from parent Session"
-msgstr "Hérite de la session mère"
+msgstr "Hériter d'un parent:"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:211
+#, fuzzy
 msgid "Inherit from parent Conference"
-msgstr "Hérite de l'évènement père"
+msgstr "Hériter d'un parent:"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:213
+#, fuzzy
 msgid "Inherit from parent Category"
-msgstr "Hérite de la catégorie mère"
+msgstr "Hériter d'un parent:"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:241
 msgid ""
-"Please enter a name for the material type and then select who will be able "
-"to access this material type."
-msgstr "Veuillez entrer un nom pour le type du matériel et ensuite sélectionner qui y aura accès. "
+"Please enter a name for the material type and then select who will be "
+"able to access this material type."
+msgstr ""
+"Veuillez entrer un nom pour le type du matériel et ensuite sélectionner "
+"qui y aura accès. "
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:249
 msgid "You're adding a resource to the existing material type"
@@ -2829,16 +2950,19 @@ msgid "Please specify who will be able to access it:"
 msgstr "Veuillez spécifier qui y a ura accès:"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:262
+#, fuzzy
 msgid "Inherit from parent material type "
-msgstr "Hérite du type de document père"
+msgstr "Pareil que pour le type matériel parent "
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:263
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:276
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:787
 msgid ""
-"Private: Can only be viewed by you and users/groups chosen by you from the "
-"list of users"
-msgstr "Privé: Ne peut être visualisé que par vous et d'autres usagers/groupes choisis par vous dans la liste des usagers"
+"Private: Can only be viewed by you and users/groups chosen by you from "
+"the list of users"
+msgstr ""
+"Privé: Ne peut être visualisé que par vous et d'autres usagers/groupes "
+"choisis par vous dans la liste des usagers"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:264
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:277
@@ -2884,14 +3008,18 @@ msgstr "'Afficher le nom' sera utilisé au lieu du nom original"
 msgid ""
 "The link for this material will <strong>visible</strong> from the event "
 "page, to everyone"
-msgstr "Le lien pour ces documents sera <strong>visible</strong> la page de l'événement, pour tout le monde "
+msgstr ""
+"Le lien pour ces documents sera <strong>visible</strong> la page de "
+"l'événement, pour tout le monde "
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:508
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:901
 msgid ""
-"The link will be <strong>invisible</strong> by default - only people who can"
-" access the material will be able to see it"
-msgstr "Le lien sera <strong>invisible</strong> par défaut - seuls ceux qui ont accès au matériel seront en mesure de le voir"
+"The link will be <strong>invisible</strong> by default - only people who "
+"can access the material will be able to see it"
+msgstr ""
+"Le lien sera <strong>invisible</strong> par défaut - seuls ceux qui ont "
+"accès au matériel seront en mesure de le voir"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:529
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:908
@@ -2922,18 +3050,14 @@ msgstr "Télécharger l'article"
 msgid "Upload Material"
 msgstr "Télécharger le matériel"
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:636
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1027
-msgid "Name"
-msgstr "Nom"
-
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:638
 msgid "File"
 msgstr "Fichier "
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:783
+#, fuzzy
 msgid "Please select who will be able to access "
-msgstr "Sélectionnez qui sera autorisé à accéder "
+msgstr "Veuillez spécifier qui y a ura accès:"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:831
 msgid "Information"
@@ -2941,23 +3065,27 @@ msgstr "Information"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:930
 msgid ""
-"This is a default material type and its name cannot be changed. You should "
-"create a new type instead."
-msgstr "Ceci est le type de document par défaut et son nom ne peut être changé. Créez plutot un nouveau type."
+"This is a default material type and its name cannot be changed. You "
+"should create a new type instead."
+msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:939
+#, fuzzy
 msgid "'Title' will be used instead of the original name"
-msgstr "'Titre' sera utilisé à la place du nom original"
+msgstr "'Afficher le nom' sera utilisé au lieu du nom original"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:1029
+#, fuzzy
 msgid "'Name' will be used instead of the url"
-msgstr "'Nom' sera utilisé à la place de l'URL"
+msgstr "'Afficher le nom' sera utilisé au lieu du nom original"
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:1126
 msgid ""
 "Modifying this material is currently not possible because it has been "
 "already submitted."
-msgstr "La modification de ce matériel n'est actuellement pas possible car il a déjà été soumis. "
+msgstr ""
+"La modification de ce matériel n'est actuellement pas possible car il a "
+"déjà été soumis. "
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:1131
 msgid "Mark as main resource."
@@ -3013,29 +3141,29 @@ msgstr "Réserver"
 msgid "Details"
 msgstr "Détails"
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:528
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:529
 msgid "Search criteria"
 msgstr "Critères de recherche "
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:539
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:540
 #: indico/htdocs/js/indico/Timetable/Base.js:173
 #: indico/htdocs/js/indico/Timetable/Base.js:358
 msgid "Filter"
 msgstr "Filtre "
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:544
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:545
 msgid "Reset"
 msgstr "Réinitialiser "
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:831
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:832
 msgid "Total"
 msgstr "Total"
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:832
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:833
 msgid "room(s)"
 msgstr "salle(s)"
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:833
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:834
 msgid "building(s)"
 msgstr "bâtiment(s)"
 
@@ -3065,7 +3193,9 @@ msgstr "Pré-réservations concurrentes "
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:280
 msgid "Too large time span. Please issue a more specific query."
-msgstr "Laps de tmps trop important. Veuillez spécifier une requête plus spécifique. "
+msgstr ""
+"Laps de tmps trop important. Veuillez spécifier une requête plus "
+"spécifique. "
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:284
 msgid "Too many results. Searching period was shortened."
@@ -3073,7 +3203,9 @@ msgstr "Trop de résultats. Période de recherche a été raccourcie. "
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:382
 msgid "This room cannot be booked for this date due to maintenance reasons"
-msgstr "Cette salle ne peut être réservée à cette date pour raison de travaux d'entretien. "
+msgstr ""
+"Cette salle ne peut être réservée à cette date pour raison de travaux "
+"d'entretien. "
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:411
 msgid "Availability for "
@@ -3087,73 +3219,73 @@ msgstr "(afficher un aperçu de 3 mois)"
 msgid "No bookings were made "
 msgstr "Aucune réservation n'a été faite"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:516
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:512
 msgid "Reject"
 msgstr "Rejeter"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:519
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:515
 msgid "Rejecting a booking"
 msgstr "Rejeter une réservation"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:521
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:517
 msgid "Are you sure you want to REJECT the booking for ?"
 msgstr "Êtes-vous sûr de vouloir REJETER la réservation pour ?"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:522
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:518
 msgid "If so, please give a reason:"
 msgstr "Si oui, veuillez donner une raison:"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:570
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:566
 msgid "Room "
 msgstr "Salle "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:577
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:573
 msgid "For whom "
 msgstr "Pour qui"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:584
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:580
 msgid "Reason "
 msgstr "Raison"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:591
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:587
 msgid "Date "
 msgstr "Date "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:598
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:594
 msgid "Hours "
 msgstr "Heures"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:627
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:636
-msgid "Display room booking summary "
-msgstr "Afficher résumé des réservations des salles"
-
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:642
-msgid "Hide room booking summary"
-msgstr "Cacher résumé des réservations des salles "
-
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:650
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:652
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:612
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:614
 msgid "Reject ALL Conflicting PRE-Bookings"
 msgstr "Rejeter TOUTES les pré-réservations en conflit "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:653
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:615
 msgid "Are you sure you want to REJECT ALL conflicting PRE-bookings?"
 msgstr "Êtes-vous sûr de vouloir rejeter TOUTES les pré-réservations en conflit?"
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:692
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:635
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:644
+msgid "Display room booking summary "
+msgstr "Afficher résumé des réservations des salles"
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:650
+msgid "Hide room booking summary"
+msgstr "Cacher résumé des réservations des salles "
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:687
 msgid "previous"
 msgstr "précédent "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:693
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:688
 msgid "next"
 msgstr "suivant "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:694
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:689
 msgid "change period"
 msgstr "changer la période "
 
-#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:707
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:702
 msgid "Choose Period"
 msgstr "choisir la période "
 
@@ -3184,7 +3316,7 @@ msgid "Switching to normal mode..."
 msgstr "Retourner au mode normal..."
 
 #: indico/htdocs/js/indico/Timetable/Base.js:339
-#: indico/htdocs/js/indico/Timetable/Draw.js:813
+#: indico/htdocs/js/indico/Timetable/Draw.js:814
 msgid "PDF"
 msgstr "PDF "
 
@@ -3210,12 +3342,16 @@ msgstr "Vous êtes en train de visualiser les contenus de l'interval:"
 
 #: indico/htdocs/js/indico/Timetable/Base.js:674
 msgid "Your changes triggered the automatic modification of some settings:"
-msgstr "Les changements effectués ont déclenché la modification automatique de certains paramètres:"
+msgstr ""
+"Les changements effectués ont déclenché la modification automatique de "
+"certains paramètres:"
 
 #: indico/htdocs/js/indico/Timetable/Base.js:684
 #: indico/htdocs/js/indico/Timetable/Base.js:685
 msgid "The <strong>starting time</strong> of the session interval <strong>"
-msgstr " Le <strong>temps de départ</strong> de l'intervalle de la session <strong>"
+msgstr ""
+" Le <strong>temps de départ</strong> de l'intervalle de la session "
+"<strong>"
 
 #: indico/htdocs/js/indico/Timetable/Base.js:684
 #: indico/htdocs/js/indico/Timetable/Base.js:685
@@ -3226,9 +3362,11 @@ msgstr "</strong> a été déplacé de "
 
 #: indico/htdocs/js/indico/Timetable/Base.js:686
 msgid ""
-"The <strong>starting time</strong> of the <strong>Event</strong> was moved "
-"from "
-msgstr "L'<strong>heure de début</strong> de l'<strong>évènement</strong> a été modifiée de "
+"The <strong>starting time</strong> of the <strong>Conference</strong> was"
+" moved from "
+msgstr ""
+"Le <strong>temps de départ</strong> de la <strong>Conférence</strong> a "
+"été déplacé de "
 
 #: indico/htdocs/js/indico/Timetable/Base.js:689
 #: indico/htdocs/js/indico/Timetable/Base.js:690
@@ -3237,9 +3375,11 @@ msgstr "Le <strong>temps de fin</strong> de l'intervalle de la session "
 
 #: indico/htdocs/js/indico/Timetable/Base.js:691
 msgid ""
-"The <strong>ending time</strong> of the <strong>Event</strong> was moved "
-"from "
-msgstr "L'<strong>heure de fin</strong> de l'<strong>évènement</strong> a été modifiée de "
+"The <strong>ending time</strong> of the <strong>Conference</strong> was "
+"moved from "
+msgstr ""
+"Le  <strong>temps de fin</strong> de la <strong>Conférence</strong> a été"
+" déplacé de "
 
 #: indico/htdocs/js/indico/Timetable/Base.js:694
 msgid "The contents of the interval <strong>"
@@ -3262,8 +3402,9 @@ msgid "Break"
 msgstr "Pause "
 
 #: indico/htdocs/js/indico/Timetable/Base.js:910
+#, fuzzy
 msgid "Add poster"
-msgstr "Ajouter un poster"
+msgstr "Ajouter Usagers"
 
 #: indico/htdocs/js/indico/Timetable/Base.js:921
 msgid "Fit to content"
@@ -3271,120 +3412,128 @@ msgstr "Ajuster au contenu"
 
 #: indico/htdocs/js/indico/Timetable/Base.js:927
 msgid "Add new block"
-msgstr "Ajouter une nouvelle plage horaire"
+msgstr "Ajouter nouveau bloc "
 
 #: indico/htdocs/js/indico/Timetable/Base.js:1012
+#, fuzzy
 msgid "Session legend"
-msgstr "Légende de la session"
+msgstr "Type de session"
 
 #: indico/htdocs/js/indico/Timetable/Base.js:1046
 msgid "see more..."
-msgstr "voir plus..."
+msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/Base.js:1051
+#, fuzzy
 msgid "less..."
-msgstr "moins..."
+msgstr "En cours de traitement..."
 
 #: indico/htdocs/js/indico/Timetable/Base.js:1493
+#, fuzzy
 msgid "Up to timetable"
-msgstr "Retour au programme"
+msgstr "Bloquer l'emploi du temps "
 
 #: indico/htdocs/js/indico/Timetable/DragAndDrop.js:32
 msgid "move to resize"
-msgstr "déplacer pour redimensionner"
+msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/DragAndDrop.js:408
 msgid ""
-"<span class=\"key light\">Shift</span> is currently pressed. Changes will be"
-" applied to blocks after."
-msgstr "<span class=\"key light\">Shift</span> est enfoncée. Les changements seront appliqués à toutes les entrées suivantes."
+"<span class=\"key light\">Shift</span> is currently pressed. Changes will"
+" be applied to blocks after."
+msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/DragAndDrop.js:547
 msgid "Drop to move block inside session"
-msgstr "Relacher pour transférer le bloc dans la session"
+msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:170
+#: indico/htdocs/js/indico/Timetable/Draw.js:167
 msgid " et al."
 msgstr "et al."
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:257
+#: indico/htdocs/js/indico/Timetable/Draw.js:254
 msgid "This poster session has "
 msgstr "Cette session affiche a"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:257
+#: indico/htdocs/js/indico/Timetable/Draw.js:254
 msgid " contribution(s)."
 msgstr "contribution(s)"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:258
+#: indico/htdocs/js/indico/Timetable/Draw.js:255
 msgid "Please click for more information."
 msgstr "Veuillez cliquer pour plus d'informations. "
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:656
+#: indico/htdocs/js/indico/Timetable/Draw.js:653
 msgid "inside"
 msgstr "à l'intérieur "
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:711
+#: indico/htdocs/js/indico/Timetable/Draw.js:708
 msgid "Conveners"
 msgstr "Organisateurs"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:712
+#: indico/htdocs/js/indico/Timetable/Draw.js:709
 msgid "Convener"
 msgstr "Organisateur "
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:761
+#: indico/htdocs/js/indico/Timetable/Draw.js:758
 msgid "Export to Calendar"
-msgstr "Exporter vers calendrier"
-
-#: indico/htdocs/js/indico/Timetable/Draw.js:817
-#: indico/htdocs/js/indico/Timetable/Draw.js:825
-msgid "Calendar"
-msgstr "Calendrier"
+msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/Draw.js:818
+#: indico/htdocs/js/indico/Timetable/Draw.js:826
+#, fuzzy
+msgid "Calendar"
+msgstr "Standard"
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:819
 msgid "XML"
-msgstr "XML"
+msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:821
+#: indico/htdocs/js/indico/Timetable/Draw.js:822
+#, fuzzy
 msgid "PDF timetable"
-msgstr "Programme en PDF"
+msgstr "Bloquer l'emploi du temps "
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1048
+#: indico/htdocs/js/indico/Timetable/Draw.js:1049
 msgid "Shift later entries"
 msgstr "Décaler les entrées postérieures"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1076
+#: indico/htdocs/js/indico/Timetable/Draw.js:1077
 msgid "Block timetable"
-msgstr "Contenu de la plage horaire"
+msgstr "Bloquer l'emploi du temps "
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1080
+#: indico/htdocs/js/indico/Timetable/Draw.js:1081
 msgid "Block properties"
-msgstr "Propriétés de la plage horaire"
+msgstr "Bloquer les propriétés"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1082
+#: indico/htdocs/js/indico/Timetable/Draw.js:1083
 msgid "Session properties"
 msgstr "Propriétés de la session"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1083
+#: indico/htdocs/js/indico/Timetable/Draw.js:1084
+#, fuzzy
 msgid "Session protection"
-msgstr "Protection de la session"
+msgstr "Propriétés de la session"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1092
+#: indico/htdocs/js/indico/Timetable/Draw.js:1093
 msgid "Add block"
-msgstr "Ajouter une plage horaire"
-
-#: indico/htdocs/js/indico/Timetable/Draw.js:1103
-msgid "Contribution properties"
-msgstr "Propriétés de la présentation"
+msgstr "Ajouter un blocage "
 
 #: indico/htdocs/js/indico/Timetable/Draw.js:1104
-msgid "Contribution protection"
-msgstr "Protection de la présentation"
+#, fuzzy
+msgid "Contribution properties"
+msgstr "Propriétés de la session"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1131
+#: indico/htdocs/js/indico/Timetable/Draw.js:1105
+#, fuzzy
+msgid "Contribution protection"
+msgstr "Contribution"
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1132
 msgid "Move"
 msgstr "Déplacer"
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1169
+#: indico/htdocs/js/indico/Timetable/Draw.js:1170
 msgid "This session is empty..."
 msgstr "Cette session est vide..."
 
@@ -3418,12 +3567,13 @@ msgstr "Supprime l'entrée..."
 
 #: indico/htdocs/js/indico/Timetable/Management.js:176
 #: indico/htdocs/js/indico/Timetable/Management.js:224
+#, fuzzy
 msgid "saving..."
-msgstr "sauvegarde..."
+msgstr "Sauvegarde..."
 
 #: indico/htdocs/js/indico/Timetable/Undo.js:5
 msgid "Undo last operation"
-msgstr "Annuler la dernière opération"
+msgstr ""
 
 #: indico/htdocs/js/indico/jquery/defaults.js:5
 msgid "Choose the start date"
@@ -3432,3 +3582,4 @@ msgstr "Choisir la date de début"
 #: indico/htdocs/js/indico/jquery/defaults.js:5
 msgid "Choose the end date"
 msgstr "Choisir la date de fin"
+
