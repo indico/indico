@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.98-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-02-28 13:35+0100\n"
+"POT-Creation-Date: 2012-02-29 13:23+0100\n"
 "PO-Revision-Date: 2011-07-11 10:15+0200\n"
 "Last-Translator: Anamaria Costache\n"
 "Language-Team: French\n"
@@ -9140,13 +9140,13 @@ msgid "Tasks"
 msgstr "Tâches"
 
 #: MaKaC/webinterface/pages/category.py:1499
-#: MaKaC/webinterface/tpls/Search.tpl:222
-#: MaKaC/webinterface/tpls/Search.tpl:228
+#: MaKaC/webinterface/tpls/Search.tpl:221
+#: MaKaC/webinterface/tpls/Search.tpl:227
 #: MaKaC/webinterface/tpls/SearchBox.tpl:128
 #: MaKaC/webinterface/tpls/SearchBox.tpl:134
 #: indico/MaKaC/webinterface/pages/category.py:1499
-#: indico/MaKaC/webinterface/tpls/Search.tpl:222
-#: indico/MaKaC/webinterface/tpls/Search.tpl:228
+#: indico/MaKaC/webinterface/tpls/Search.tpl:221
+#: indico/MaKaC/webinterface/tpls/Search.tpl:227
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:128
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:134
 msgid "Everywhere"
@@ -22604,29 +22604,26 @@ msgstr ""
 msgid "Domain control "
 msgstr "Controle d'accès par domaine IP "
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
-msgid "Allowed domains"
-msgstr "Domaines autorisés"
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:23
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:43
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:69
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:23
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:43
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:69
+msgid "Domain control is disabled."
+msgstr "Le controle d'accès par domaine IP est desactivé."
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
-msgid "if no domain is selected<br>no control is applied"
-msgstr "si aucun domaine n'est sélectionné<br>aucun contrôle ne sera exercé"
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:25
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:45
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:25
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:45
+msgid "To enable it, choose at least one of the domains below:"
+msgstr "Pour l'activer, choississez au moins un domaine ci-dessous:"
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:22
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:38
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:22
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:38
-msgid "(disabled)"
-msgstr "(desactivé)"
-
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:26
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:56
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:26
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:56
-msgid "(enabled)"
-msgstr "(activé)"
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:28
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:28
+msgid "Domain control is enabled."
+msgstr "Le controle d'accès par domaine IP est activé."
 
 #: MaKaC/webinterface/tpls/DomainCreation.tpl:4
 #: MaKaC/webinterface/tpls/DomainDataModification.tpl:5
@@ -26212,22 +26209,22 @@ msgstr "Trier les ordres"
 msgid "Hide advanced options"
 msgstr "Cacher les options avancées"
 
-#: MaKaC/webinterface/tpls/Search.tpl:221
-#: MaKaC/webinterface/tpls/Search.tpl:227
+#: MaKaC/webinterface/tpls/Search.tpl:220
+#: MaKaC/webinterface/tpls/Search.tpl:226
 #: MaKaC/webinterface/tpls/SearchBox.tpl:127
 #: MaKaC/webinterface/tpls/SearchBox.tpl:133
-#: indico/MaKaC/webinterface/tpls/Search.tpl:221
-#: indico/MaKaC/webinterface/tpls/Search.tpl:227
+#: indico/MaKaC/webinterface/tpls/Search.tpl:220
+#: indico/MaKaC/webinterface/tpls/Search.tpl:226
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:127
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:133
 #, python-format
 msgid "in %s"
 msgstr "dans %s"
 
-#: MaKaC/webinterface/tpls/Search.tpl:317
-#: MaKaC/webinterface/tpls/SearchBox.tpl:224
-#: indico/MaKaC/webinterface/tpls/Search.tpl:317
-#: indico/MaKaC/webinterface/tpls/SearchBox.tpl:224
+#: MaKaC/webinterface/tpls/Search.tpl:339
+#: MaKaC/webinterface/tpls/SearchBox.tpl:245
+#: indico/MaKaC/webinterface/tpls/Search.tpl:339
+#: indico/MaKaC/webinterface/tpls/SearchBox.tpl:245
 #, python-format
 msgid "Click to search inside %s."
 msgstr "Clickez pour rechercher dans %s."
@@ -27721,9 +27718,15 @@ msgstr "La page à laquelle vous tentez d'acceder n'existe pas"
 msgid "%s"
 msgstr "%s"
 
-#~ msgid "Domain control (disabled)"
-#~ msgstr "Controle d'accès par domaine IP (inactif)"
+#~ msgid "Allowed domains"
+#~ msgstr "Domaines autorisés"
 
-#~ msgid "Domain control (enabled)"
-#~ msgstr "Controle d'accès par domaine IP (actif)"
+#~ msgid "if no domain is selected<br>no control is applied"
+#~ msgstr "si aucun domaine n'est sélectionné<br>aucun contrôle ne sera exercé"
+
+#~ msgid "(disabled)"
+#~ msgstr "(desactivé)"
+
+#~ msgid "(enabled)"
+#~ msgstr "(activé)"
 

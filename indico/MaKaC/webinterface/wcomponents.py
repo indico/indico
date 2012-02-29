@@ -2280,9 +2280,9 @@ class WDomainControlFrame(WTemplated):
         l = []
         for dom in domain.DomainHolder().getList():
             if dom not in self._target.getDomainList():
-                l.append("""<tr><td><input type="checkbox" name="selectedDomain" value="%s"> %s</td><td><span id="domain%s"></span></td></tr>"""%(dom.getId(), dom.getName(), dom.getId()))
+                l.append("""<li><div><input type="checkbox" name="selectedDomain" value="%s"> %s</input><span id="domain%s"></span></div></li>"""%(dom.getId(), dom.getName(), dom.getId()))
             else:
-                l.append("""<tr><td><input type="checkbox" name="selectedDomain" value="%s" checked> %s</td><td><span id="domain%s"></span></td></tr>"""%(dom.getId(), dom.getName(), dom.getId()))
+                l.append("""<li><div><input type="checkbox" name="selectedDomain" value="%s" checked> %s</input><span id="domain%s"></span></div></li>"""%(dom.getId(), dom.getName(), dom.getId()))
         vars["domains"] = "".join(l)
         vars["removeURL"] = self._removeURL
         vars["addURL"] = self._addURL

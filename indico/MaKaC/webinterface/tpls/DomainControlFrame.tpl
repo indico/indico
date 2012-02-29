@@ -1,26 +1,18 @@
 <table class="groupTable">
 <tr>
-  <td colspan="2"><div class="groupTitle">${ _("Domain control ")}<span id="domainControl"></span></div></td>
-</tr>
-<tr>
-  <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Allowed domains")}<br><font size="-2">(${ _("if no domain is selected<br>no control is applied")})</font></span></td>
-  <td class="blacktext">
-    ${ locator }
-    <table width="auto">
-        ${ domains }
-    </table>
-  </td>
+  <td colspan="2"><div class="groupTitle">${ _("Domain control ")}</div></td>
 </tr>
 </table>
+<div>${ locator }</div>
+<div class="domainEnable"></div>
+<div><ul style='list-style-type:none;'>${domains}</ul></div>
 <script type="text/javascript">
 IndicoUI.executeOnLoad(function(){
     if ($(':checkbox:checked').length==0){
-        $('#domainControl').text(${ _("(disabled)")|n,j});
-        $('#domainControl').attr('style','color: #B02B2C;');
+        $('.domainEnable').html(${_('<B style="color:#B02B2C;">Domain control is disabled.</B><br>To enable it, choose at least one of the domains below:')|n,j});
     }
     else{
-        $('#domainControl').text(${ _("(enabled)")|n,j});
-        $('#domainControl').attr('style','color: #128F33;');
+        $('.domainEnable').html(${_('<B style="color:#128F33;">Domain control is enabled.</B>')|n,j});
     }
 });
 var checkId = null;
@@ -34,10 +26,9 @@ $(':checkbox:not(:checked)').live('change', function(){
     function(result, error) {
         var domain = '#domain'+checkId;
         if ($(':checkbox:checked').length==0){
-            $('#domainControl').text(${ _("(disabled)")|n,j});
-            $('#domainControl').attr('style','color: #B02B2C;');
+            $('.domainEnable').html(${_('<B style="color:#B02B2C;">Domain control is disabled.</B><br>To enable it, choose at least one of the domains below:')|n,j});
         }
-        $(domain).attr('style','margin-left:10px; color:#B02B2C;');
+        $(domain).attr('style','margin-left:10px; color:#128F33;');
         $(domain).text("saved");
         setTimeout(function(){
             $(domain).text("");
@@ -59,10 +50,9 @@ $(':checkbox:checked').live('change', function(){
     function(result, error) {
         var domain = '#domain'+checkId;
         if ($(':checkbox:checked').length!=0){
-            $('#domainControl').text(${ _("(enabled)")|n,j});
-            $('#domainControl').attr('style','color: #128F33;');
+            $('.domainEnable').html(${_('<B style="color:#128F33;">Domain control is enabled.</B>')|n,j});
         }
-        $(domain).attr('style','margin-left:10px; color:#B02B2C;');
+        $(domain).attr('style','margin-left:10px; color:#128F33;');
         $(domain).text("saved");
         setTimeout(function(){
             $(domain).text("");

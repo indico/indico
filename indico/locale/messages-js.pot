@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 0.98.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-02-28 13:35+0100\n"
+"POT-Creation-Date: 2012-02-29 13:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -645,8 +645,8 @@ msgstr ""
 msgid "Hide general info"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:62
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:62
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:81
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:81
 msgid "Domain added"
 msgstr ""
 

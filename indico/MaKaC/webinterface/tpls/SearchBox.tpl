@@ -139,8 +139,7 @@ IndicoUI.executeOnLoad(function(){
       $('#cross').fadeOut('fast');
 
        $('#searchTag').animate({
-          width: $('#noCategorySearch').width(),
-          opacity: 0.6
+          width: $('#noCategorySearch').width()
       }, 500);
 
 
@@ -158,8 +157,7 @@ var animDone=false;
                   $('#noCategorySearch').fadeOut('fast');
 
 	                  $('#searchTag').animate({
-	                      width: $('#categorySearch').width(),
-	                      opacity: 1
+	                      width: $('#categorySearch').width()
 	                  },500,'linear',
 	                  function(){animDone=true;});
 
@@ -182,8 +180,7 @@ var animDone=false;
               $('#searchTag').attr('class', 'inCategory');
               $('#searchCategId').attr('value', ${categId});
               $('#searchTag').animate(
-                  {width: $('#categorySearch').width()+$('#cross').width()+6,
-                  opacity: 1},
+                  {width: $('#categorySearch').width()+$('#cross').width()+6},
                   500,
                   'swing',
                   function(){
@@ -229,8 +226,7 @@ var animDone=false;
           if($('#searchTag').attr('class')=='inCategoryOver' && animDone==true){
           animDone=false;
           $('#searchTag').animate(
-                  {width: $('#categorySearch').width()+$('#cross').width()+6,
-                   opacity: 1},
+                  {width: $('#categorySearch').width()+$('#cross').width()+6},
                    500,
                    'swing',
                    function(){

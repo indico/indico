@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 0.98.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-02-28 13:35+0100\n"
+"POT-Creation-Date: 2012-02-29 13:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8307,12 +8307,12 @@ msgstr ""
 msgid "Tasks"
 msgstr ""
 
-#: MaKaC/webinterface/pages/category.py:1499 MaKaC/webinterface/tpls/Search.tpl:222
-#: MaKaC/webinterface/tpls/Search.tpl:228 MaKaC/webinterface/tpls/SearchBox.tpl:128
+#: MaKaC/webinterface/pages/category.py:1499 MaKaC/webinterface/tpls/Search.tpl:221
+#: MaKaC/webinterface/tpls/Search.tpl:227 MaKaC/webinterface/tpls/SearchBox.tpl:128
 #: MaKaC/webinterface/tpls/SearchBox.tpl:134
 #: indico/MaKaC/webinterface/pages/category.py:1499
-#: indico/MaKaC/webinterface/tpls/Search.tpl:222
-#: indico/MaKaC/webinterface/tpls/Search.tpl:228
+#: indico/MaKaC/webinterface/tpls/Search.tpl:221
+#: indico/MaKaC/webinterface/tpls/Search.tpl:227
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:128
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:134
 msgid "Everywhere"
@@ -21183,28 +21183,25 @@ msgstr ""
 msgid "Domain control "
 msgstr ""
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
-msgid "Allowed domains"
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:23
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:43
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:69
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:23
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:43
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:69
+msgid "Domain control is disabled."
 msgstr ""
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:6
-msgid "if no domain is selected<br>no control is applied"
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:25
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:45
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:25
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:45
+msgid "To enable it, choose at least one of the domains below:"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:22
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:38
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:22
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:38
-msgid "(disabled)"
-msgstr ""
-
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:26
-#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:56
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:26
-#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:56
-msgid "(enabled)"
+#: MaKaC/webinterface/tpls/DomainControlFrame.tpl:28
+#: indico/MaKaC/webinterface/tpls/DomainControlFrame.tpl:28
+msgid "Domain control is enabled."
 msgstr ""
 
 #: MaKaC/webinterface/tpls/DomainCreation.tpl:4
@@ -24515,20 +24512,20 @@ msgstr ""
 msgid "Hide advanced options"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/Search.tpl:221 MaKaC/webinterface/tpls/Search.tpl:227
+#: MaKaC/webinterface/tpls/Search.tpl:220 MaKaC/webinterface/tpls/Search.tpl:226
 #: MaKaC/webinterface/tpls/SearchBox.tpl:127
 #: MaKaC/webinterface/tpls/SearchBox.tpl:133
-#: indico/MaKaC/webinterface/tpls/Search.tpl:221
-#: indico/MaKaC/webinterface/tpls/Search.tpl:227
+#: indico/MaKaC/webinterface/tpls/Search.tpl:220
+#: indico/MaKaC/webinterface/tpls/Search.tpl:226
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:127
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:133
 #, python-format
 msgid "in %s"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/Search.tpl:317 MaKaC/webinterface/tpls/SearchBox.tpl:224
-#: indico/MaKaC/webinterface/tpls/Search.tpl:317
-#: indico/MaKaC/webinterface/tpls/SearchBox.tpl:224
+#: MaKaC/webinterface/tpls/Search.tpl:339 MaKaC/webinterface/tpls/SearchBox.tpl:245
+#: indico/MaKaC/webinterface/tpls/Search.tpl:339
+#: indico/MaKaC/webinterface/tpls/SearchBox.tpl:245
 #, python-format
 msgid "Click to search inside %s."
 msgstr ""
