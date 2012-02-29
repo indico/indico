@@ -205,7 +205,6 @@ $E('endDatePlace').set(endDate);
 startDate.set('${ startDate }');
 endDate.set('${ endDate }');
 
-console.log(${categId});
 
 if ($('#categId').attr('value')!=0){
     $('#searchText2').before('<div id="searchTag2" class="inCategory2">'+
@@ -290,7 +289,7 @@ $('#categorySearch2').click(function() {
     if($('#searchTag2').attr('class')=='inCategoryOver2' && animDone2==true){
         animDone2=false;
         $('#searchTag2').animate(
-                {width: $('#searchTag2').width()+$('#cross2').width()+6,
+                {width: $('#categorySearch2').width()+$('#cross2').width()+6,
                  opacity: 1},
                  500,
                  'swing',
@@ -301,6 +300,29 @@ $('#categorySearch2').click(function() {
 
         $('#searchTag2').attr('class', 'inCategory2');
         $('#categId').attr('value', ${categId});
+    }
+});
+
+$('#noCategorySearch2').click(function() {
+    if (navigator.platform.indexOf("iPad")!=-1 ||
+        navigator.platform.indexOf("iPod")!=-1 ||
+        navigator.platform.indexOf("iPhone")!=-1 ||
+        navigator.userAgent.indexOf("Android")!=-1){
+        if (${categId}!=0){
+            $('#noCategorySearch2').fadeOut('fast');
+            $('#categorySearch2').fadeIn('fast');
+            $('#searchTag2').attr('class', 'inCategory');
+            $('#categId').attr('value', ${categId});
+            $('#searchTag2').animate(
+                {width: $('#categorySearch2').width()+$('#cross2').width()+6,
+                opacity: 1},
+                500,
+                'swing',
+                function(){
+                $('#cross2').fadeIn('fast');
+                }
+            );
+        }
     }
 });
 

@@ -2347,7 +2347,10 @@ div#UISearch #searchControls input
 
 div#searchTag, div#searchTag2
 {
+    max-width:112px;
     border-radius: 2px;
+    -webkit-border-radius:2px;
+    -moz-border-radius:2px;
     display:table-cell;
     line-height: 15px;
     height: 15px;
@@ -2359,6 +2362,8 @@ div#searchTag, div#searchTag2
     float:right;
     color:#FFF;
     user-select: none;
+    -ms-user-select:none;
+    -o-user-select: none;
     -webkit-user-select: none;
     -moz-user-select: -moz-none;
     font-size: 11px;
@@ -2382,26 +2387,26 @@ div#noCategorySearch, div#noCategorySearch2
 }
 .everywhere, .everywhere2
 {
-    background-color: #cdcdcd;
+    background-color: #5089B8;
     opacity: 0.4;
     cursor: default;
 
 }
 .inCategory, .inCategory2
 {
-    background-color: #CCC;
+    background-color: #5089B8;
     cursor: default;
 }
 .inCategoryOver, .inCategoryOver2
 {
-    background-color: #CCC;
+    background-color: #5089B8;
     box-shadow: 1px 1px 1px #888;
     cursor: pointer;
 }
 .cross, .cross2
 {
     font-weight:bold;
-    color:#666;
+    color:#111;
     float: right;
     cursor: pointer;
     font-size: 10px;

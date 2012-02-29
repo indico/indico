@@ -160,7 +160,8 @@ var animDone=false;
 	                  $('#searchTag').animate({
 	                      width: $('#categorySearch').width(),
 	                      opacity: 1
-	                  },500,'linear', function(){animDone=true;});
+	                  },500,'linear',
+	                  function(){animDone=true;});
 
                   $('#searchTag').attr('class', 'inCategoryOver');
                   $('#categorySearch').fadeIn('fast');
@@ -169,6 +170,30 @@ var animDone=false;
       }, 200);
 
   });
+
+  $('#noCategorySearch').click(function() {
+      if (navigator.platform.indexOf("iPad")!=-1 ||
+          navigator.platform.indexOf("iPod")!=-1 ||
+          navigator.platform.indexOf("iPhone")!=-1 ||
+          navigator.userAgent.indexOf("Android")!=-1){
+          if (${categId}!=0){
+              $('#noCategorySearch').fadeOut('fast');
+              $('#categorySearch').fadeIn('fast');
+              $('#searchTag').attr('class', 'inCategory');
+              $('#searchCategId').attr('value', ${categId});
+              $('#searchTag').animate(
+                  {width: $('#categorySearch').width()+$('#cross').width()+6,
+                  opacity: 1},
+                  500,
+                  'swing',
+                  function(){
+                  $('#cross').fadeIn('fast');
+                  }
+              );
+          }
+      }
+  });
+
 
   $('#noCategorySearch').mouseleave(function() {
       $('#noCategorySearch').removeClass('hasFocus');
@@ -200,23 +225,23 @@ var animDone=false;
       }, 200);
   });
 
-  $('#categorySearch').click(function() {
-      if($('#searchTag').attr('class')=='inCategoryOver' && animDone==true){
+  $('.inCategoryOver').live('click',function() {
+          if($('#searchTag').attr('class')=='inCategoryOver' && animDone==true){
           animDone=false;
           $('#searchTag').animate(
-                  {width: $('#searchTag').width()+$('#cross').width()+6,
+                  {width: $('#categorySearch').width()+$('#cross').width()+6,
                    opacity: 1},
                    500,
                    'swing',
                    function(){
                        $('#cross').fadeIn('fast');
+                       justClicked = false;
                        }
                    );
 
           $('#searchTag').attr('class', 'inCategory');
           $('#searchCategId').attr('value', ${categId});
-
-      }
+          }
   });
 
   $('.inCategoryOver').live('mouseover', function(event) {
