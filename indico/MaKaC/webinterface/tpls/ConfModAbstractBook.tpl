@@ -20,7 +20,7 @@
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Additional text")}</span></td>
         <td>
-            <div class="blacktext" id="inPlaceEditAdditionalText">${ text }</div>
+            <div class="blacktext" id="inPlaceEditAdditionalText">${ boaConfig.getText() }</div>
         </td>
     </tr>
     <tr>
@@ -38,7 +38,7 @@
             <br />
         </td>
         <td bgcolor="white" width="100%" class="blacktext">
-            % if showIds:
+            % if boaConfig.getShowIds():
                 <% icon = str(Config.getInstance().getSystemIconURL( "enabledSection" )) %>
             % else:
                 <% icon = str(Config.getInstance().getSystemIconURL( "disabledSection" )) %>
@@ -48,11 +48,55 @@
         </td>
     </tr>
 </table>
+<div class="groupTitle">${ _("Caching")}</div>
+
+<table style="width: 50%;">
+  <tr>
+    <td class="dataCaptionTD dataCaptionFormat">
+      ${_("Cache book of abstracts")}
+    </td>
+    <td>
+      <input type="checkbox" id="cacheToggle" ${'checked="checked"' if boaConfig.isCacheEnabled() else ''}/>
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><button id="cacheRefresh"">${_("Force cache refresh")}</button></td>
+  </tr>
+</table>
+
 <script type="text/javascript">
 
-<%  from MaKaC.common import info %>
-$E('inPlaceEditAdditionalText').set(new RichTextInlineEditWidget('abstract.abstractsbook.changeAdditionalText', ${ jsonEncode(dict(conference="%s"%conf.getId())) }, ${ jsonEncode(text) }, 300, 45, "${_('No additional text')}").draw());
-new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList|n,j}, '${sortBy}');
+$(function() {
+    <%  from MaKaC.common import info %>
+        $E('inPlaceEditAdditionalText').set(new RichTextInlineEditWidget('abstract.abstractsbook.changeAdditionalText', ${ jsonEncode(dict(conference="%s"%conf.getId())) }, ${ boaConfig.getText() | n,j }, 300, 45, "${_('No additional text')}").draw());
+    new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList|n,j}, '${sortBy}');
+
+    $('#cacheToggle').click(function(){
+        indicoRequest('abstract.abstractsbook.toggleCache',
+                      {conference: '${conf.getId()}'},
+                      function(result, error) {
+                          if (error) {
+                              IndicoUtil.errorReport(error);
+                          } else {
+                              $('.savedText').remove();
+                              $('#cacheToggle').after($('<span/>').text($T('Saved')).
+                                                      addClass('savedText').delay(1000).fadeOut('fast'));
+                          }
+                      });
+    });
+    $('#cacheRefresh').click(function() {
+        var self = this;
+        indicoRequest('abstract.abstractsbook.dirtyCache',
+                      {conference: '${conf.getId()}'},
+                      function(result, error) {
+                          if (error) {
+                              IndicoUtil.errorReport(error);
+                          } else {
+                              $('#cacheRefresh').after($('<span/>').text($T('Done')).
+                                                       addClass('savedText').delay(1000).fadeOut('fast'));
+                          }
+                      });
+    });
+});
 </script>
-
-

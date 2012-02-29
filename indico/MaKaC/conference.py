@@ -12260,6 +12260,7 @@ class BOAConfig(Persistent):
         self._showIds= False
         self._sortBy = "number"
         self._modificationDS = nowutc()
+        self._cache = False
 
     def getText(self):
         return self._text
@@ -12289,6 +12290,14 @@ class BOAConfig(Persistent):
     @staticmethod
     def getSortByTypes():
         return BOAConfig.sortByTypes
+
+    def isCacheEnabled(self):
+        if not hasattr(self, '_cache'):
+            self._cache = False
+        return self._cache
+
+    def setCache(self, value):
+        self._cache = value;
 
     def _notifyModification(self):
         self._modificationDS = nowutc()

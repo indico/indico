@@ -18,7 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.services.implementation.conference import ConferenceTextModificationBase
+
+from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceTextModificationBase
+
 
 class ConferenceAbstractsBookAdditionalText( ConferenceTextModificationBase ):
 
@@ -28,6 +30,7 @@ class ConferenceAbstractsBookAdditionalText( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._conf.getBOAConfig().getText()
 
+
 class ConferenceAbstractsBookSortBy( ConferenceTextModificationBase ):
 
     def _handleSet(self):
@@ -36,7 +39,30 @@ class ConferenceAbstractsBookSortBy( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._conf.getBOAConfig().getSortBy()
 
+
+class ConferenceAbstractsBookToggleCache (ConferenceModifBase):
+    """
+    Toggles the state of the BOA cache (enabled or not)
+    """
+
+    def _getAnswer(self):
+        state = self._conf.getBOAConfig().isCacheEnabled()
+        self._conf.getBOAConfig().setCache(not state)
+        return not state
+
+
+class ConferenceAbstractsBookDirtyCache (ConferenceModifBase):
+    """
+    Dirties the BOA cache (forces refresh next time)
+    """
+
+    def _getAnswer(self):
+        self._conf.getBOAConfig()._notifyModification()
+
+
 methodMap = {
-    "abstractsbook.changeAdditionalText":ConferenceAbstractsBookAdditionalText,
-    "abstractsbook.changeSortBy":ConferenceAbstractsBookSortBy
+    "abstractsbook.changeAdditionalText": ConferenceAbstractsBookAdditionalText,
+    "abstractsbook.changeSortBy": ConferenceAbstractsBookSortBy,
+    "abstractsbook.toggleCache": ConferenceAbstractsBookToggleCache,
+    "abstractsbook.dirtyCache": ConferenceAbstractsBookDirtyCache
     }
