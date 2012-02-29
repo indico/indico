@@ -73,11 +73,12 @@ class WAuthorDisplay(wcomponents.WTemplated):
         contribList = []
         for auth in authorList:
             contrib=auth.getContribution()
-            url=urlHandlers.UHContributionDisplay.getURL(contrib)
-            material = self._getMaterialHTML(contrib)
-            if material.strip()!="":
-                material = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( %s )"%material
-            contribList.append("""<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a>%s</p>"""%(quoteattr(str(url)),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()), material ))
+            if contrib is not None:
+                url=urlHandlers.UHContributionDisplay.getURL(contrib)
+                material = self._getMaterialHTML(contrib)
+                if material.strip()!="":
+                    material = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( %s )"%material
+                    contribList.append("""<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a>%s</p>"""%(quoteattr(str(url)),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()), material ))
         vars["contributions"] = "".join(contribList)
         vars["fullName"] = author.getFullName()
         vars["mailURL"]=urlHandlers.UHConferenceEmail.getURL(author)
