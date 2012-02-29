@@ -288,7 +288,7 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
 type("SubmissionControlListManager", ["ListOfUsersManager"], {
 
     addExistingUser: function() {
-        this._addExistingUser($T('Add submitter'), true, this.confId, true, true, null, false, true);
+        this._addExistingUser($T('Add submitter'), true, this.confId, this.allowGroups, true, null, false, true);
     },
 
     _getModifyAsAuthorParams: function(userId, kindOfList) {
@@ -395,7 +395,7 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
                         'addAsAuthor': 'contribution.protection.submissionControl.addAsAuthor',
                         'removeAsAuthor':'contribution.protection.submissionControl.removeAsAuthor'};
 
-        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "UIPerson", true, {},
+        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "UIPerson", false, {},
                 {title: false, affiliation: false, email:false},
                 {remove: true, edit: false, favorite: true, arrows: false, menu: true}, initialList);
     }
