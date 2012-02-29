@@ -114,6 +114,8 @@ class WebLocator:
             params["confId"] = params["confid"]
         if not ("confId" in params.keys()) and "conference" in params.keys():
             params["confId"] = params["conference"]
+        if isinstance(params.get("confId", ""), list):
+            params["confId"] = params["confId"][0]
         if not ("confId" in params.keys()) or \
            params["confId"] == None or \
                params["confId"].strip()=="":
