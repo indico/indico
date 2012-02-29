@@ -2246,7 +2246,7 @@ div#UISearchBox .searchButton
 
 div#UISearchBox #searchControls
 {
-    width: 350px;
+    width: auto;
     border: 1px solid #888;
     height: 21px;
     overflow: hidden;
@@ -2262,14 +2262,15 @@ div#UISearchBox #searchControls input
 
 div#UISearchBox #searchText
 {
-    width: 150px;
+    padding:3px;
+    width: auto;
 }
 
 div#UISearchBox #extraOptions
 {
     border: 1px solid #888888;
     border-top: none;
-    width: 250px;
+    width: auto;
     display: none;
     position: absolute;
     top: 23px;
@@ -2279,7 +2280,7 @@ div#UISearchBox #extraOptions
 
 
 div#UISearchBox #extraOptions table {
-    margin: 10px;
+    width:auto;
 }
 
 div#UISearchBox #extraOptions input {
@@ -2322,14 +2323,15 @@ div#UISearch .searchButton
     width: auto;
 }
 
-div#UISearch #searchText
+div#UISearch #searchText2
 {
-    width: 130px;
+    padding:3px;
+    width: auto;
 }
 
 div#UISearch #searchControls
 {
-    width: 350px;
+    width: auto;
     border: 1px solid #888;
     height: 21px;
     overflow: hidden;
@@ -2343,38 +2345,67 @@ div#UISearch #searchControls input
     font-weight: normal;
 }
 
-.searchCategory
+div#searchTag, div#searchTag2
 {
-    background-color: #9AA0FE;
     border-radius: 2px;
-    font-weight:normal;
-    color: #FFFFFF;
+    display:table-cell;
+    line-height: 15px;
+    height: 15px;
     vertical-align: middle;
-    margin-right: -2px;
-    padding-right: 5px;
-    padding-left:5px;
-    height: 17px;
-    float: right;
-    cursor: pointer;
-    max-width: 75px;
+    margin-top:3px;
+    margin-right:2px;
+    padding-right:4px;
+    padding-left:4px;
+    float:right;
+    color:#FFF;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: -moz-none;
+    font-size: 11px;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+
 }
 
-.searchCategoryCross
+div#categorySearch, div#categorySearch2
 {
-    background-color: #9AA0FE;
-    font-weight: bold;
-    border-radius: 2px;
-    color: #FFFFFF;
-    vertical-align: middle;
-    margin-right: 2px;
-    padding-left: 5px;
-    padding-right: 5px;
-    height: 17px;
+    max-width:100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    float:left;
+}
+div#noCategorySearch, div#noCategorySearch2
+{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+}
+.everywhere, .everywhere2
+{
+    background-color: #cdcdcd;
+    opacity: 0.4;
+    cursor: default;
+
+}
+.inCategory, .inCategory2
+{
+    background-color: #CCC;
+    cursor: default;
+}
+.inCategoryOver, .inCategoryOver2
+{
+    background-color: #CCC;
+    box-shadow: 1px 1px 1px #888;
+    cursor: pointer;
+}
+.cross, .cross2
+{
+    font-weight:bold;
+    color:#666;
     float: right;
     cursor: pointer;
+    font-size: 10px;
+    margin-left:4px;
 }
 
 .arrowExpandIcon

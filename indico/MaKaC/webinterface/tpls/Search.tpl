@@ -44,15 +44,13 @@ ${ _("Warning: since you are not logged in, only results from public events will
         <div class="yellowButton searchButton" id="searchButton2">
             <input style="background-color: transparent;" class="button" type="submit" value="${ _('Search')}" onclick="javascript: return verifyForm();" id="searchSubmit"/>
         </div>
-        <div style="background: white; padding: 2px;">
-            <input style="background-color: transparent; margin-top: -1px;" type="text" id="searchText2" name="p" value="${ p }"/>
-        </div>
+        <input style="background-color: transparent; margin-top: -1px;" type="text" id="searchText2" name="p" value="${ p }"/>
     </div>
 </div>
 
 <div style="padding-top: 4px;"><span id="advancedOptionsText"><span class='fakeLink' onclick='toogleAdvancedOptions()'>${_("Show advanced options") }</span></span></div>
 <div id="advancedOptions" style="overflow: hidden; visibility: hidden;">
-    <table style="text-align: right;">
+    <table style="text-align: right;" id="advancedOptionsTable">
       <tr>
         <td>${ _("Search in") }:</td>
         <td>
@@ -180,12 +178,6 @@ function toogleAdvancedOptions() {
     advancedOptionsSwitch = !advancedOptionsSwitch;
 }
 
-function hideCategory2()
-{
-    $('#categId').attr('value', 0);
-    $('#cross2').fadeOut();
-    $('#inCategory2').fadeOut();
-}
 
 IndicoUI.executeOnLoad(function(){
 
@@ -213,11 +205,131 @@ $E('endDatePlace').set(endDate);
 startDate.set('${ startDate }');
 endDate.set('${ endDate }');
 
-var box = $('<div id="cross2" class="searchCategoryCross" onclick="hideCategory2()">x</div>'+
-        '<div id="inCategory2" class="searchCategory">in ${categName}</div>');
+console.log(${categId});
+
 if ($('#categId').attr('value')!=0){
-$('#searchText2').before(box);
+    $('#searchText2').before('<div id="searchTag2" class="inCategory2">'+
+            '<div id="cross2" class="cross2">x</div>'+
+            '<div id="categorySearch2">${_("in %s") % categName}</div>'+
+            '<div id="noCategorySearch2" style="display: none;">${_("Everywhere")}</div></div>​');
 }
+else{
+    $('#searchText2').before('<div id="searchTag2" class="everywhere2">'+
+            '<div id="cross2" class="cross2" style="display: none;">x</div>'+
+            '<div id="categorySearch2" style="display: none;">${_("in %s") % categName}</div>'+
+            '<div id="noCategorySearch2">${_("Everywhere")}</div></div>​');
+}
+
+$('#cross2').click(function() {
+    $('#categorySearch2').fadeOut('fast');
+    $('#cross2').fadeOut('fast');
+
+     $('#searchTag2').animate({
+        width: $('#noCategorySearch2').width(),
+        opacity: 0.6
+    }, 500);
+
+
+    $('#categId').attr('value', 0);
+    $('#searchTag2').attr('class', 'everywhere2');
+    $('#noCategorySearch2').fadeIn('fast');
+
+});
+var animDone2=false;
+$('.everywhere2').live('mouseenter', function() {
+    $('#noCategorySearch2').addClass('hasFocus');
+    setTimeout(function(){
+        if ($('#noCategorySearch2').hasClass('hasFocus')){
+            if (${categId}!=0){
+                $('#noCategorySearch2').fadeOut('fast');
+
+                    $('#searchTag2').animate({
+                        width: $('#categorySearch2').width(),
+                        opacity: 1
+                    },500,'linear', function(){animDone2=true;});
+
+                $('#searchTag2').attr('class', 'inCategoryOver2');
+                $('#categorySearch2').fadeIn('fast');
+            }
+        }
+    }, 200);
+
+});
+
+$('#noCategorySearch2').mouseleave(function() {
+    $('#noCategorySearch2').removeClass('hasFocus');
+});
+
+$('#categorySearch2').mouseenter(function() {
+    $('#noCategorySearch2').removeClass('hasFocus');
+});
+
+$('.inCategoryOver2').live('mouseleave', function() {
+    $('#noCategorySearch2').removeClass('hasFocus');
+    animDone2=false;
+    setTimeout(function(){
+        if(!$('#noCategorySearch2').hasClass('hasFocus')){
+            if ($('#categId').attr('value')==0){
+                $('#categorySearch2').fadeOut('fast');
+                $('#cross2').fadeOut('fast');
+
+                $('#searchTag2').animate({
+                width: $('#noCategorySearch2').width(),
+                opacity: 0.6
+                },500);
+
+
+                $('#searchTag2').attr('class', 'everywhere2');
+                $('#noCategorySearch2').fadeIn('fast');
+            }
+        }
+    }, 200);
+});
+
+$('#categorySearch2').click(function() {
+    if($('#searchTag2').attr('class')=='inCategoryOver2' && animDone2==true){
+        animDone2=false;
+        $('#searchTag2').animate(
+                {width: $('#searchTag2').width()+$('#cross2').width()+6,
+                 opacity: 1},
+                 500,
+                 'swing',
+                 function(){
+                     $('#cross2').fadeIn('fast');
+                     }
+                 );
+
+        $('#searchTag2').attr('class', 'inCategory2');
+        $('#categId').attr('value', ${categId});
+    }
+});
+
+$('.inCategoryOver2').live('mouseover', function(event) {
+    $('.inCategoryOver2').qtip({
+        content:'${_("Click to search inside %s." % categName)}',
+        position:{
+            at: 'bottom center',
+            my: 'top center'
+        },
+        style: {
+            classes: 'ui-tooltip-shadow'
+        },
+        events: {
+            show: function(event, api) {
+               if($('#searchTag2').attr('class')!='inCategoryOver2') {
+                  try { event.preventDefault(); } catch(e) {}
+               }
+            }
+         },
+        show: {
+            event: event.type,
+            ready: true
+         }
+        }, event);
+});
+
+
+
 
 });
 

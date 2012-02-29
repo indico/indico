@@ -5,16 +5,14 @@
         <div class="yellowButton searchButton">
             <input style="background-color: transparent;" class="button" type="submit" value="${ _('Search')}" onclick="javascript: return verifyForm();" id="searchSubmit"/>
         </div>
-        <div style="background: white; padding: 2px;">
-        <div id="yoo" class="${ moreOptionsClass }" onclick="javascript:return expandMenu(this);"></div>
+        <div id="yoo" class="${ moreOptionsClass }" onclick="javascript:return expandMenu(this);" on></div>
         <input style="background-color: transparent; margin-top: -1px;" type="text" id="searchText" name="p" />
-    </div>
 </div>
 
     <div id="extraOptions">
         <div id="advancedOptionsLabel">${ _("Advanced options")}</div>
-        <table>
-            <tr>
+        <table id="extraOptionsTable">
+        <tr>
                 <td style="text-align: right;">${ _("Search in")}</td>
                 <td>
                     <select name="f">
@@ -81,12 +79,7 @@ function expandMenu(domElem)
     return false;
 }
 
-function hideCategory()
-{
-    $('#searchCategId').attr('value', 0);
-    $('#cross1').fadeOut();
-    $("#inCategory1").fadeOut();
-}
+
 
 function resetForm()
 {
@@ -108,6 +101,9 @@ function verifyForm()
         return true;
     }
 }
+
+
+
 var startDateBox = IndicoUI.Widgets.Generic.dateField(null, {name: 'startDate'});
 var endDateBox = IndicoUI.Widgets.Generic.dateField(null, {name: 'endDate'});
 
@@ -125,11 +121,127 @@ IndicoUI.executeOnLoad(function(){
          intelligentSearchBox.draw()
      );
 
-  var box = $('<div id="cross1" class="searchCategoryCross" onclick="hideCategory()">x</div>'+
-          '<div id="inCategory1" class="searchCategory">in ${categName}</div>');
   if ($('#searchCategId').attr('value')!=0){
-      $('#yoo').after(box);
+      $('#yoo').after('<div id="searchTag" class="inCategory">'+
+              '<div id="cross" class="cross">x</div>'+
+              '<div id="categorySearch">${_("in %s") % categName}</div>'+
+              '<div id="noCategorySearch" style="display: none;">${_("Everywhere")}</div></div>​');
   }
+  else{
+      $('#yoo').after('<div id="searchTag" class="everywhere">'+
+              '<div id="cross" class="cross" style="display: none;">x</div>'+
+              '<div id="categorySearch" style="display: none;">${_("in %s") % categName}</div>'+
+              '<div id="noCategorySearch">${_("Everywhere")}</div></div>​');
+  }
+
+  $('#cross').click(function() {
+      $('#categorySearch').fadeOut('fast');
+      $('#cross').fadeOut('fast');
+
+       $('#searchTag').animate({
+          width: $('#noCategorySearch').width(),
+          opacity: 0.6
+      }, 500);
+
+
+      $('#searchCategId').attr('value', 0);
+      $('#searchTag').attr('class', 'everywhere');
+      $('#noCategorySearch').fadeIn('fast');
+
+  });
+var animDone=false;
+  $('.everywhere').live('mouseenter', function() {
+      $('#noCategorySearch').addClass('hasFocus');
+      setTimeout(function(){
+          if ($('#noCategorySearch').hasClass('hasFocus')){
+              if (${categId}!=0){
+                  $('#noCategorySearch').fadeOut('fast');
+
+	                  $('#searchTag').animate({
+	                      width: $('#categorySearch').width(),
+	                      opacity: 1
+	                  },500,'linear', function(){animDone=true;});
+
+                  $('#searchTag').attr('class', 'inCategoryOver');
+                  $('#categorySearch').fadeIn('fast');
+              }
+          }
+      }, 200);
+
+  });
+
+  $('#noCategorySearch').mouseleave(function() {
+      $('#noCategorySearch').removeClass('hasFocus');
+  });
+
+  $('#categorySearch').mouseenter(function() {
+      $('#noCategorySearch').removeClass('hasFocus');
+  });
+
+  $('.inCategoryOver').live('mouseleave', function() {
+      $('#noCategorySearch').removeClass('hasFocus');
+      animDone=false;
+      setTimeout(function(){
+          if(!$('#noCategorySearch').hasClass('hasFocus')){
+              if ($('#searchCategId').attr('value')==0){
+                  $('#categorySearch').fadeOut('fast');
+                  $('#cross').fadeOut('fast');
+
+                  $('#searchTag').animate({
+                  width: $('#noCategorySearch').width(),
+                  opacity: 0.6
+                  },500);
+
+
+                  $('#searchTag').attr('class', 'everywhere');
+                  $('#noCategorySearch').fadeIn('fast');
+              }
+          }
+      }, 200);
+  });
+
+  $('#categorySearch').click(function() {
+      if($('#searchTag').attr('class')=='inCategoryOver' && animDone==true){
+          animDone=false;
+          $('#searchTag').animate(
+                  {width: $('#searchTag').width()+$('#cross').width()+6,
+                   opacity: 1},
+                   500,
+                   'swing',
+                   function(){
+                       $('#cross').fadeIn('fast');
+                       }
+                   );
+
+          $('#searchTag').attr('class', 'inCategory');
+          $('#searchCategId').attr('value', ${categId});
+
+      }
+  });
+
+  $('.inCategoryOver').live('mouseover', function(event) {
+      $('.inCategoryOver').qtip({
+          content: '${_("Click to search inside %s.") % categName}',
+          position:{
+              at: 'bottom center',
+              my: 'top center'
+          },
+          style: {
+              classes: 'ui-tooltip-shadow'
+          },
+          events: {
+              show: function(event, api) {
+                 if($('#searchTag').attr('class')!='inCategoryOver') {
+                    try { event.preventDefault(); } catch(e) {}
+                 }
+              }
+           },
+          show: {
+              event: event.type,
+              ready: true
+           }
+          }, event);
+  });
 
 });
 
