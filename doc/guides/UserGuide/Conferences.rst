@@ -419,6 +419,83 @@ You can choose to tick the option to fit all the sessions contained in the speci
 
 -------------
 
+Drag & Drop
+^^^^^^^^^^^
+
+You may also manipulate existing entries in the timetable by interacting with
+them directly using your mouse pointer, various functions are available to
+you whilst using this tool.
+
+Moving a Contribution, Break or Session
+'''''''''''''''''''''''''''''''''''''''
+
+By clicking on the desired contribution, break or session slot and dragging it around
+the timetable area, you will notice that the selected item moves with your
+pointer whilst showing where the new start time will be once the movement ends.
+
+|image151|
+
+*The proposed new start time of the item item is displayed to the left whilst
+dragging it.*
+
+Upon releasing the mouse button, the item dragged will have its start time
+(and, subsequently, its end time) altered to where it has since been positioned.
+
+*Note: The duration of the event is not modified in this operation.*
+
+Moving Multiple Contributions, Breaks or Sessions
+'''''''''''''''''''''''''''''''''''''''''''''''''
+
+Whilst performing a move of a contribution, break or session item, as denoted
+above, you may also hold the `SHIFT` key to modify all *following* contributions,
+breaks and sessions with the same difference applied to the item being dragged.
+
+For example, if you were to drag an contribution starting at 10:00 to start
+an hour earlier at 09:00 and the `SHIFT` key was held, the difference of one
+hour earlier would be applied to all (and *only*) contributions and sessions
+of the same day.
+
+Changing Contribution, Break or Session Duration
+''''''''''''''''''''''''''''''''''''''''''''''''
+
+Positioning your pointer at the lower edge of any contribution, break or session item
+will display the resizing cursor, clicking here and dragging the line in an
+upward or downward direction will alter the end time by decreasing or increasing
+the item's duration respectively.
+
+|image152|
+
+Moving a Contribution or Break into a Session
+'''''''''''''''''''''''''''''''''''''''''''''
+
+It is possible to move a contribution or a break into a session slot by simply dragging
+the contribution/break in question over the session slow into which it is desired
+to go.
+
+|image153|
+
+Once the contribution/break is over the session slot, the contribution's (break's) size
+will change to indicate that it may be moved into the session slot designated.
+Simply releasing the mouse button will commit the action and perform the move.
+
+Undo Action
+'''''''''''
+
+As all interactions performed via the drag and drop interface are instantly
+written to Indico, the facility exists to Undo any incorrect action simply
+by pressing the `Undo last operation` button which appears at the top of the
+timetable following any such action.
+
+|image154|
+
+Upon clicking this button, the previous action will be totally reversed and
+you may proceed to continue with the originally intended action.
+
+*Note: The undo function supports only the last operation applied, you cannot
+step through this session's interaction history with the button.*
+
+-------------
+
 Material Management
 ~~~~~~~~~~~~~~~~~~~
 
@@ -1909,3 +1986,7 @@ session. You may also make a PDF of the session.
 .. |image148| image:: UserGuidePics/contrew4.png
 .. |image149| image:: UserGuidePics/layrew1.png
 .. |image150| image:: UserGuidePics/absSubForm.PNG
+.. |image151| image:: UserGuidePics/tt_changetime.png
+.. |image152| image:: UserGuidePics/tt_changeend.png
+.. |image153| image:: UserGuidePics/tt_contribintosession.png
+.. |image154| image:: UserGuidePics/tt_undo.png
