@@ -122,13 +122,18 @@ class WAdminCollaboration(wcomponents.WTemplated):
                     fromDays = int(self._queryParams['fromDays'])
                 except ValueError, e:
                     raise CollaborationException(_("Parameter 'fromDays' is not an integer"), inner = e)
-                minKey = nowutc() - timedelta(days = fromDays)
+                now = nowutc()
+                diff = timedelta(hours = now.hour, minutes = now.minute, seconds = now.second)
+                minKey = now - diff - timedelta(days = fromDays)
             if self._queryParams['toDays']:
                 try:
                     toDays = int(self._queryParams['toDays'])
                 except ValueError, e:
                     raise CollaborationException(_("Parameter 'toDays' is not an integer"), inner = e)
-                maxKey = nowutc() + timedelta(days = toDays)
+                now = nowutc()
+                diff = timedelta(days = 1) - \
+                        timedelta(hours = now.hour, minutes = now.minute, seconds = (now.second + 1))
+                maxKey = now + diff + timedelta(days = toDays)
 
             if self._queryParams["conferenceId"]:
                 conferenceId = self._queryParams["conferenceId"]
@@ -153,7 +158,8 @@ class WAdminCollaboration(wcomponents.WTemplated):
                         pickle = True,
                         dateFormat = '%a %d %b %Y',
                         page = self._queryParams["page"],
-                        resultsPerPage = self._queryParams["resultsPerPage"])
+                        resultsPerPage = self._queryParams["resultsPerPage"],
+                        grouped= True)
 
             vars["InitialBookings"] = result["results"]
             vars["InitialNumberOfBookings"] = result["nBookings"]

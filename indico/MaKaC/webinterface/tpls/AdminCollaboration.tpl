@@ -618,5 +618,7 @@ IndicoUI.executeOnLoad(function(){
     if (bookings) {
         updateResults();
     }
+    $('body').delegate('#staticURL', 'click', function(e){
+        $(this).select();});
 });
 </script>
