@@ -80,7 +80,7 @@ from MaKaC.common import utils
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.plugins.base import Observable
-
+from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.rb_location import CrossLocationDB, Location, CrossLocationQueries
 
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
@@ -1724,7 +1724,7 @@ class RHConfModifParticipantsPending(RHConferenceModifBase):
     def _process( self ):
         if self._conf.isClosed():
             return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        elif self._target.getParticipation().getPendingParticipantList():
+        elif self._target.getParticipation().getPendingParticipantList() and nowutc() < self._target.getStartDate():
             return conferences.WPConfModifParticipantsPending( self, self._target ).display()
         else:
             return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
