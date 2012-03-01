@@ -91,7 +91,7 @@ type("ListOfUsersManager", [], {
 
         menu: function(user) {
             var self = this;
-            if (!user.pending && user._type != "Group") {
+            if (!user.pending && user._type != "Group" && user._type != "CERNGroup") {
                 var optionsMenuSpan = $('<span/>').css('float', 'right').hover(function() {
                     $(this).addClass('mouseover');
                 }, function() {

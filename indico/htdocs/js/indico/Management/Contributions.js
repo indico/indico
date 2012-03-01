@@ -395,7 +395,7 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
                         'addAsAuthor': 'contribution.protection.submissionControl.addAsAuthor',
                         'removeAsAuthor':'contribution.protection.submissionControl.removeAsAuthor'};
 
-        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "UIPerson", false, {},
+        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, "UIPerson", true, {},
                 {title: false, affiliation: false, email:false},
                 {remove: true, edit: false, favorite: true, arrows: false, menu: true}, initialList);
     }
