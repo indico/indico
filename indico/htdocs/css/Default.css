@@ -7871,3 +7871,8 @@ ul.buttonMenuPopupList li a:hover {
     text-align: right;
     margin-bottom: 5px;
 }
+
+.savedText {
+    margin-left: 10px;
+    color: #118822;
+}

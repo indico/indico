@@ -8085,9 +8085,8 @@ class WConfModAbstractBook(wcomponents.WTemplated):
         vars["sortByList"] = sortByList
         vars["modURL"]=quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
         vars["previewURL"]=quoteattr(str(urlHandlers.UHConfAbstractBook.getURL(self._conf)))
-        vars["text"]=boaConfig.getText()
         vars["sortBy"]=sortBy
-        vars["showIds"]=boaConfig.getShowIds()
+        vars["boaConfig"] = boaConfig
         vars["urlToogleShowIds"]=str(urlHandlers.UHConfModAbstractBookToogleShowIds.getURL(self._conf))
         vars["conf"]=self._conf
         vars["bookOfAbstractsActive"] = self._conf.getAbstractMgr().getCFAStatus()

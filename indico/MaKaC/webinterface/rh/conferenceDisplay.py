@@ -1005,7 +1005,8 @@ class RHAbstractBook(RHConferenceBaseDisplay):
         else:
             mtime = None
 
-        if mtime and mtime > boaConfig.lastChanged and not self._noCache:
+        if boaConfig.isCacheEnabled() and not self._noCache \
+                and mtime and mtime > boaConfig.lastChanged:
             with open(cacheFile, 'rb') as f:
                 data = f.read()
         else:
