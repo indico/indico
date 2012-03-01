@@ -174,7 +174,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
 
        this.foundPeopleListDiv = Html.div("UISearchPeopleListDiv", this.foundPeopleList.draw());
 
-       this.container = Html.div({}, this.searchForm, this.searchButtonDiv, this.foundPeopleListDiv);
+       this.container = Html.div({}, this.searchForm, this.searchButtonDiv, this.foundPeopleListDiv, this.extraDiv);
 
        return this.IWidget.prototype.draw.call(this, this.container);
    }
@@ -183,7 +183,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
     /**
      * Constructor for SimpleSearchPanel
      */
-    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver) {
+    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv) {
 
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
@@ -192,6 +192,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
 
         this.foundPeopleList = new FoundPeopleList(null, this.onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver);
         this.foundPeopleList.setMessage("Fill any of the upper fields and click search...");
+        this.extraDiv = any(extraDiv, Html.div({}));
 
         this.searchForm = null;
         this.searchButton = null;
@@ -304,8 +305,8 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
     /**
      * Constructor for UserSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver){
-        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver);
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv){
+        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv);
         if(exists(conferenceId)) {
             this.criteria.set("conferenceId", conferenceId);
         }
@@ -459,7 +460,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
     /**
      * Constructor for UserAndGroupsSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver){
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv){
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
         this.parentSelectionObserver = selectionObserver;
@@ -468,7 +469,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
 
         this.userPanel = new UserSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("users", selectedList);
-        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver);
+        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv);
         this.groupPanel = new GroupSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("groups", selectedList);
         }, showToggleFavouriteButtons);
@@ -609,7 +610,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            });
+            }, self.extraDiv);
             var returnedDom = this.searchPanel.draw();
             container.append(returnedDom);
         } else {
@@ -617,7 +618,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            });
+            }, self.extraDiv);
             var returnedDom = this.searchPanel.draw();
             container.append(returnedDom);
         }
@@ -761,7 +762,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
              conferenceId, enableGroups,
              includeFavourites, suggestedUsers,
              onlyOne, showToggleFavouriteButtons,
-             chooseProcess) {
+             chooseProcess, extraDiv) {
 
         var self = this;
 
@@ -775,6 +776,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         this.onlyOne = any(onlyOne, false);
         this.showToggleFavouriteButtons = any(showToggleFavouriteButtons, true);
         this.chooseProcess = chooseProcess;
+        this.extraDiv = extraDiv;
 
         // Other attributes that will be set in other methods, listed here for reference
         this.saveButton = null;

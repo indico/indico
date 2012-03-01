@@ -256,6 +256,7 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
 
     def _checkParams(self):
         ContributionParticipantsBase._checkParams(self)
+        self._submissionRights = self._pm.extract("presenter-grant-submission", pType=bool, allowEmpty=False)
         self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
         # Check if there is already a user with the same email
         for user in self._userList:
@@ -281,15 +282,19 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
             self._contribution.addCoAuthor(part)
         elif self._kindOfList == "speaker":
             self._contribution.newSpeaker(part)
+        return part
 
     def _getAnswer(self):
         for user in self._userList:
             if user["_type"] == "Avatar": # new speaker
                 ah = AvatarHolder()
                 av = ah.getById(user["id"])
-                self._newParticipant(av)
+                part = self._newParticipant(av)
             elif user["_type"] == "ContributionParticipation": # adding existing author to speaker
-                self._contribution.addSpeaker(self._contribution.getAuthorById(user["id"]))
+                part = self._contribution.getAuthorById(user["id"])
+                self._contribution.addSpeaker(part)
+            if self._submissionRights and part:
+                self._contribution.grantSubmission(part)
 
         if self._kindOfList == "prAuthor":
             return self._getParticipantsList(self._contribution.getPrimaryAuthorList())

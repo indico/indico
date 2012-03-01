@@ -24,14 +24,14 @@
 type("ListOfUsersManager", [], {
 
     _addExistingUser: function(title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
-                                showToggleFavouriteButtons) {
+                                showToggleFavouriteButtons, extraParams, extraDiv) {
         // Create the popup to add new users
         var self = this;
         // params: (title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
         //          showToggleFavouriteButtons, chooseProcess)
         var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers,
                                                     onlyOne, showToggleFavouriteButtons,
-                function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList));});
+                function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList, extraParams));}, extraDiv);
         chooseUsersPopup.execute();
     },
 
@@ -210,9 +210,13 @@ type("ListOfUsersManager", [], {
         return params;
     },
 
-    _getAddExistingParams: function(userList) {
+    _getAddExistingParams: function(userList, extraParams) {
         var params = this.userListParams;
         params['userList'] = userList;
+        extraParams = any(extraParams, {});
+        for(param in extraParams){
+            params[param] = extraParams[param]();
+        }
         return params;
     },
 

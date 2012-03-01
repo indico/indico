@@ -126,7 +126,11 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
             }
 
             menuItems["searchUser"] = {action: function() {
-                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, suggestedAuthors, false, true);
+                var privilegesDiv = Html.div({style:{marginTop: pixels(10)}});
+                var checkbox = Html.checkbox({style:{verticalAlign:"middle"}}, true);
+                checkbox.dom.id = "presenter-grant-submission";
+                privilegesDiv.append(Html.span({},checkbox, "Grant all the selected users with submission rights"));
+                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, suggestedAuthors, false, true, {"presenter-grant-submission": function(){return $("#presenter-grant-submission")[0].checked;}}, privilegesDiv);
             }, display: $T('Add Indico User')};
             menuItems["addNew"] = {action: function() {
                 self._addNonExistingUser();
