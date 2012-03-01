@@ -467,11 +467,10 @@ def slotLocationMigration(dbi, withRBDB, prevVersion):
     for (level, obj) in console.conferenceHolderIterator(ch, deepness='event'):
         for session in obj.getSessionList():
             for slot in session.getSlotList():
-                sessionLoc = session.getLocation()
-                sessionRoom = session.getRoom()
+                sessionLoc = session.getOwnLocation()
+                sessionRoom = session.getOwnRoom()
                 if (sessionRoom is not None or sessionLoc is not None) and \
-                    (slot.getRoom() is None and slot.getLocation() is None):
-                    print >>f, 'modified conf %s, session %s, slot %s'%(obj.getId(), session.getId(), slot.getId())
+                    (slot.getOwnRoom() is None and slot.getOwnLocation() is None):
                     if sessionLoc:
                         loc = CustomLocation()
                         slot.setLocation(loc)
