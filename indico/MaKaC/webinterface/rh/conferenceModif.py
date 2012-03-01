@@ -335,7 +335,7 @@ class RHConfDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
         return p.display(**pars)
 
 
-class RHConfPerformDataModif( RHConferenceModifBase ):
+class RHConfPerformDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
     _uh = urlHandlers.UHConfPerformDataModif
 
     def _checkParams( self, params ):
