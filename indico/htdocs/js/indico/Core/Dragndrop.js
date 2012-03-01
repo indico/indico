@@ -20,7 +20,6 @@ $.widget('ui.tablesorter', {
     },
 
     _create: function() {
-        console.log(this.options.helper);
         var self = this;
         var index = null; //original position of element. Used when dropping on copy mode.
         $(self.options.sortables, self.element).sortable({
