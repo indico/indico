@@ -190,6 +190,22 @@ class Conversion(object):
             return str(url)
         return _url
 
+    @classmethod
+    def visibility(cls, conf):
+        visibility = conf.getVisibility()
+        if visibility == 0:
+            id = ""
+            name = "Nowhere"
+        elif visibility == 999:
+            id = ""
+            name = "Everywhere"
+        else:
+            categ = conf.getOwnerPath()[conf.getVisibility()-1]
+            id = categ.getId()
+            name = categ.getTitle()
+        return {'id': id,
+                'name': name}
+
 #    @classmethod
 #    def resourceType(cls, obj):
 #

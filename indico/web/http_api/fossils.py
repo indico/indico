@@ -99,7 +99,6 @@ class IConferenceChairMetadataFossil(IFossil):
     def getAffiliation(self):
         pass
 
-
 class IConferenceMetadataFossil(IFossil):
 
     def getId(self):
@@ -151,6 +150,11 @@ class IConferenceMetadataFossil(IFossil):
     def getRoom(self):
         """ Room (inside location) """
     getRoom.convert = lambda r: r and r.getName()
+
+    def getVisibility(self):
+        pass
+    getVisibility.name = 'visibility'
+    getVisibility.produce = lambda x: Conversion.visibility(x)
 
 
 class IContributionParticipationMetadataFossil(IFossil):
