@@ -1990,8 +1990,10 @@ class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase, Observabl
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
         self._date = datetime.today()
-        self._cloneType = params["cloneType"]
-        if self._cloneType == "once" :
+        self._cloneType = params.get("cloneType", None)
+        if self._cloneType is None:
+            raise FormValuesError( _("""Please choose the inverval of cloning of this event"""))
+        elif self._cloneType == "once" :
             self._date = datetime( int(params["stdyo"]), \
                                 int(params["stdmo"]), \
                                 int(params["stddo"]), \
