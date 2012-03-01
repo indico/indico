@@ -391,6 +391,65 @@ of the option <em>Add new</em>.</p>
 <p>Step 3:  Choose to fit sessions to their content</p>
 <p>You can choose to tick the option to fit all the sessions contained in the specific day to their content. This will change the start and end times of the session blocks occurring on that specific day in order to fit their respective content <strong>before</strong> performing the rescheduling.</p>
 </div>
+<hr class="docutils" />
+<div class="section" id="drag-drop">
+<h4>2.4.2.7. Drag &amp; Drop<a class="headerlink" href="#drag-drop" title="Permalink to this headline">¶</a></h4>
+<p>You may also manipulate existing entries in the timetable by interacting with
+them directly using your mouse pointer, various functions are available to
+you whilst using this tool.</p>
+<div class="section" id="moving-a-contribution-break-or-session">
+<h5>2.4.2.7.1. Moving a Contribution, Break or Session<a class="headerlink" href="#moving-a-contribution-break-or-session" title="Permalink to this headline">¶</a></h5>
+<p>By clicking on the desired contribution, break or session slot and dragging it around
+the timetable area, you will notice that the selected item moves with your
+pointer whilst showing where the new start time will be once the movement ends.</p>
+<p><img alt="image151" src="../_images/tt_changetime.png" /></p>
+<p><em>The proposed new start time of the item item is displayed to the left whilst
+dragging it.</em></p>
+<p>Upon releasing the mouse button, the item dragged will have its start time
+(and, subsequently, its end time) altered to where it has since been positioned.</p>
+<p><em>Note: The duration of the event is not modified in this operation.</em></p>
+</div>
+<div class="section" id="moving-multiple-contributions-breaks-or-sessions">
+<h5>2.4.2.7.2. Moving Multiple Contributions, Breaks or Sessions<a class="headerlink" href="#moving-multiple-contributions-breaks-or-sessions" title="Permalink to this headline">¶</a></h5>
+<p>Whilst performing a move of a contribution, break or session item, as denoted
+above, you may also hold the <cite>SHIFT</cite> key to modify all <em>following</em> contributions,
+breaks and sessions with the same difference applied to the item being dragged.</p>
+<p>For example, if you were to drag an contribution starting at 10:00 to start
+an hour earlier at 09:00 and the <cite>SHIFT</cite> key was held, the difference of one
+hour earlier would be applied to all (and <em>only</em>) contributions and sessions
+of the same day.</p>
+</div>
+<div class="section" id="changing-contribution-break-or-session-duration">
+<h5>2.4.2.7.3. Changing Contribution, Break or Session Duration<a class="headerlink" href="#changing-contribution-break-or-session-duration" title="Permalink to this headline">¶</a></h5>
+<p>Positioning your pointer at the lower edge of any contribution, break or session item
+will display the resizing cursor, clicking here and dragging the line in an
+upward or downward direction will alter the end time by decreasing or increasing
+the item&#8217;s duration respectively.</p>
+<p><img alt="image152" src="../_images/tt_changeend.png" /></p>
+</div>
+<div class="section" id="moving-a-contribution-or-break-into-a-session">
+<h5>2.4.2.7.4. Moving a Contribution or Break into a Session<a class="headerlink" href="#moving-a-contribution-or-break-into-a-session" title="Permalink to this headline">¶</a></h5>
+<p>It is possible to move a contribution or a break into a session slot by simply dragging
+the contribution/break in question over the session slow into which it is desired
+to go.</p>
+<p><img alt="image153" src="../_images/tt_contribintosession.png" /></p>
+<p>Once the contribution/break is over the session slot, the contribution&#8217;s (break&#8217;s) size
+will change to indicate that it may be moved into the session slot designated.
+Simply releasing the mouse button will commit the action and perform the move.</p>
+</div>
+<div class="section" id="undo-action">
+<h5>2.4.2.7.5. Undo Action<a class="headerlink" href="#undo-action" title="Permalink to this headline">¶</a></h5>
+<p>As all interactions performed via the drag and drop interface are instantly
+written to Indico, the facility exists to Undo any incorrect action simply
+by pressing the <cite>Undo last operation</cite> button which appears at the top of the
+timetable following any such action.</p>
+<p><img alt="image154" src="../_images/tt_undo.png" /></p>
+<p>Upon clicking this button, the previous action will be totally reversed and
+you may proceed to continue with the originally intended action.</p>
+<p><em>Note: The undo function supports only the last operation applied, you cannot
+step through this session&#8217;s interaction history with the button.</em></p>
+</div>
+</div>
 </div>
 <hr class="docutils" />
 <div class="section" id="material-management">
@@ -1466,6 +1525,14 @@ session. You may also make a PDF of the session.</p>
 </li>
 <li><a class="reference internal" href="#room-booking">2.4.2.5. Room Booking</a></li>
 <li><a class="reference internal" href="#rescheduling">2.4.2.6. Rescheduling</a></li>
+<li><a class="reference internal" href="#drag-drop">2.4.2.7. Drag &amp; Drop</a><ul>
+<li><a class="reference internal" href="#moving-a-contribution-break-or-session">2.4.2.7.1. Moving a Contribution, Break or Session</a></li>
+<li><a class="reference internal" href="#moving-multiple-contributions-breaks-or-sessions">2.4.2.7.2. Moving Multiple Contributions, Breaks or Sessions</a></li>
+<li><a class="reference internal" href="#changing-contribution-break-or-session-duration">2.4.2.7.3. Changing Contribution, Break or Session Duration</a></li>
+<li><a class="reference internal" href="#moving-a-contribution-or-break-into-a-session">2.4.2.7.4. Moving a Contribution or Break into a Session</a></li>
+<li><a class="reference internal" href="#undo-action">2.4.2.7.5. Undo Action</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#material-management">2.4.3. Material Management</a></li>
