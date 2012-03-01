@@ -15,18 +15,6 @@
     % endif
     <tr>
         <td style="padding: 10px 0 0 15px;">
-            <table width="100%">
-                <tr>
-                    <td align="left"><pre>afasfasdf asd asdf asf asd</pre></td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-
-
-
-    <tr>
-        <td style="padding: 10px 0 0 15px;">
             <table align="left">
                 <tr>
                     <td align="left" colspan="2" class="subGroupTitleRegForm" style="padding-bottom:5px;">${ intro }</td>
