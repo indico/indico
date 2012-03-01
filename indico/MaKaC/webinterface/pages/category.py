@@ -177,7 +177,7 @@ class WCategoryDisplay(WICalExportBase):
 
         # Export ICS
         if self._target.conferences:
-            vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId()))
+            vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId(), {'from':"-7d"}))
 
         return vars
 

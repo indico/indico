@@ -31,12 +31,12 @@ from MaKaC.common import Config, info
 
 class WICalExportBase(wcomponents.WTemplated):
 
-    def _getIcalExportParams(self, user, url):
+    def _getIcalExportParams(self, user, url, params = {}):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         apiMode = minfo.getAPIMode()
         apiKey = user.getAPIKey() if user else None
 
-        urls = generate_public_auth_request(apiMode, apiKey, url, {},
+        urls = generate_public_auth_request(apiMode, apiKey, url, params,
             minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
 
         return {
