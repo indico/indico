@@ -1342,7 +1342,7 @@ var removeBooking = function(booking, conferenceId) {
     }};
 
     IndicoUI.Dialogs.Util.confirm($T("Remove booking"),
-            Html.div({style:{paddingTop:pixels(10), paddingBottom:pixels(10)}}, $T("Are you sure you want to remove that ") + booking.type + $T(" booking?")),
+            Html.div({style:{paddingTop:pixels(10), paddingBottom:pixels(10), width:pixels(400)}}, $T("Are you sure you want to remove that ") + booking.type + $T(" booking?"),Html.br(), Html.span({width:'100px'},$T("Please be aware that by deleting this ") + booking.type + $T(" booking, all bookings which are cloned from it will also be deleted as a result."))),
             confirmHandler);
 };
 
