@@ -311,18 +311,15 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
                         fromDays = int(self._params['fromDays'])
                     except ValueError, e:
                         raise CollaborationException(_("Parameter 'fromDays' is not an integer"), inner = e)
-                    now = nowutc()
-                    diff = timedelta(hours = now.hour, minutes = now.minute, seconds = now.second)
-                    minKey = now - diff - timedelta(days = fromDays)
+                    midnight = nowutc().replace(hour=0, minute=0, second=0)
+                    minKey = midnight - timedelta(days = fromDays)
                 if self._params['toDays']:
                     try:
                         toDays = int(self._params['toDays'])
                     except ValueError, e:
                         raise CollaborationException(_("Parameter 'toDays' is not an integer"), inner = e)
-                    now = nowutc()
-                    diff = timedelta(days = 1) - \
-                           timedelta(hours = now.hour, minutes = now.minute, seconds = (now.second + 1))
-                    maxKey = now + diff + timedelta(days = toDays)
+                    midnight_1 = nowutc().replace(hour=23, minute=59, second=59)
+                    maxKey = midnight_1 + timedelta(days = toDays)
 
                 self._minKey = minKey
                 self._maxKey = maxKey
