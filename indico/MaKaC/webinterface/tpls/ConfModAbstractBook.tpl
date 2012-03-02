@@ -52,7 +52,10 @@
 
 <table style="width: 50%;">
   <tr>
-    <td class="dataCaptionTD dataCaptionFormat">
+    <td colspan="2" style="padding-bottom:10px;">${_("It is recommended to enable the cache for the book of abstracts once you have the final version of it. This will enable users to download the book of abstracts faster.")}</td>
+  </tr>
+  <tr>
+    <td class="dataCaptionTD dataCaptionFormat" nowrap>
       ${_("Cache book of abstracts")}
     </td>
     <td>
@@ -60,8 +63,7 @@
     </td>
   </tr>
   <tr>
-    <td></td>
-    <td><button id="cacheRefresh"">${_("Force cache refresh")}</button></td>
+    <td colspan="2"><button id="cacheRefresh"">${_("Force cache refresh")}</button></td>
   </tr>
 </table>
 
