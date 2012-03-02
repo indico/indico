@@ -290,8 +290,8 @@ function validate_allow(allow)
             allowDate.setDate(allowDate.getDate() + allow);
             if (eDate.valueOf() > allowDate.valueOf())
             {
-                $('#edate').addClass('invalid');
-                $('#sdate').addClass('invalid');
+                IndicoUtil.markInvalidField($E('edate'),$T("This room cannot be booked more than ") + allow + $T(" days in advance"), false);
+                IndicoUtil.markInvalidField($E('sdate'),$T("This room cannot be booked more than ") + allow + $T(" days in advance"), false);
                 isValid = false;
             }
         }
