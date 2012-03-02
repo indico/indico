@@ -64,6 +64,12 @@ def serialize_collaboration(cal, fossil, now):
     event.set('categories', "VideoService - " + fossil['type'])
     event.set('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
                                                                  fossil['status']) + fossil['title'].decode('utf-8'))
+    loc = fossil.get('location', '')
+    if loc:
+        loc = loc.decode('utf-8')
+    if fossil.get('room',''):
+        loc += ': ' + fossil['room'].decode('utf-8')
+    event.set('location', loc)
     event.set('description', url)
 
     # If there is an alarm required, add a subcomponent to the Event

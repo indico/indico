@@ -269,6 +269,12 @@ class ICollaborationMetadataFossil(IFossil):
     def getUniqueId(self):
         pass
 
+    def getLocation(self):
+        pass
+
+    def getRoom(self):
+        pass
+
     def getURL(self):
         pass
     getURL.produce = lambda s: Collaboration.collaborationTools.CollaborationTools.getConferenceOrContributionURL(s)

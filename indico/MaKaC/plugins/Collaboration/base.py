@@ -1526,6 +1526,12 @@ class CSBookingBase(Persistent, Fossilizable):
 
         self._linkVideoType = self._linkVideoId = None
 
+    def getLocation(self):
+        return self._conf.getLocation().getName() if self._conf.getLocation() else ""
+
+    def getRoom(self):
+        return self._conf.getRoom().getName() if self._conf.getRoom() else ""
+
     def getBookingParams(self):
         """ Returns a dictionary with the booking params.
             This attribute will be available in Javascript with the "bookingParams"

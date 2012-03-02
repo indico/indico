@@ -158,6 +158,14 @@ class CSBooking(CSBookingBase):
         linkObject = self.getLinkObject()
         return linkObject.getRoom().getName() if linkObject and linkObject.getRoom() else ""
 
+    def getLocation(self):
+        linkObject = self.getLinkObject()
+        return linkObject.getLocation().getName() if linkObject and linkObject.getLocation() else ""
+
+    def getRoom(self):
+        linkObject = self.getLinkObject()
+        return linkObject.getRoom().getName() if linkObject and linkObject.getRoom() else ""
+
     def getEndDate(self):
         """ Returns the end date of the link object
         """
