@@ -104,6 +104,9 @@
 
     </div>
 
+    <% canReject = reservation.canReject( user ) %>
+    <% canCancel = reservation.canCancel( user ) %>
+
     <!-- END OF CONTEXT HELP DIVS -->
 
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -244,13 +247,13 @@
                                 <td>
                                     <form name="submits" action="" method="post">
                                         &nbsp;
-                                        % if reservation.canCancel( user )  and  not reservation.isCancelled and not reservation.isRejected:
+                                        % if canCancel  and  not reservation.isCancelled and not reservation.isRejected:
                                             <input type="button" class="btn" value="${ _("Cancel Booking")}" onclick="submit_cancel();return false;"/>
                                         % endif
-                                        % if reservation.canReject( user )  and  not reservation.isConfirmed and not reservation.isCancelled and not reservation.isRejected:
+                                        % if canReject  and  not reservation.isConfirmed and not reservation.isCancelled and not reservation.isRejected:
                                             <input type="button" class="btn" value="${ _("Accept")}" onclick="submit_accept();return false;"/>
                                         % endif
-                                        % if reservation.canReject( user )  and not reservation.isCancelled and not reservation.isRejected:
+                                        % if canReject  and not reservation.isCancelled and not reservation.isRejected:
                                             <input type="button" class="btn" value="${ _("Reject")}" onclick="submit_reject();return false;"/>
                                         % endif
                                         % if reservation.canModify( user ):
@@ -397,8 +400,6 @@
                                              </small>
                                             </td>
                                             <td align="left" class="blacktext">
-                                            <% canReject = reservation.canReject( user ) %>
-                                            <% canCancel = reservation.canCancel( user ) %>
 
                                             % for period in reservation.splitToPeriods():
                                                 ${ formatDate(period.startDT.date()) }

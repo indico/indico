@@ -6116,11 +6116,12 @@ def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmpty
         dayBars = dayBarsDic[day.date()]
         roomBarsDic = {}
         for bar in dayBars:
-            bar.canReject = bar.forReservation.id is not None and bar.forReservation.canReject(user)
-            if bar.forReservation.repeatability != None:
-                bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( bar.forReservation, formatDate(bar.startDT.date()) ))
-            else:
-                bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBooking.getURL( bar.forReservation ))
+#            bar.canReject = False
+#            bar.canReject = bar.forReservation.id is not None and bar.forReservation.canReject(user)
+#            if bar.forReservation.repeatability != None:
+#                bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( bar.forReservation, formatDate(bar.startDT.date()) ))
+#            else:
+#                bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBooking.getURL( bar.forReservation ))
             room = bar.forReservation.room
             if not roomBarsDic.has_key( room ):
                 roomBarsDic[room] = []

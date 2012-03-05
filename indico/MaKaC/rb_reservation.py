@@ -1233,7 +1233,7 @@ class ReservationBase( Fossilizable ):
         """ Responsible can reject """
         if user == None:
             return False
-        return self.room.isOwnedBy( user ) or user.isRBAdmin()
+        return user.isRBAdmin() or self.room.isOwnedBy( user )
 
     def canDelete( self, user ):
         """ Only admin can delete """

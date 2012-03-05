@@ -120,18 +120,18 @@ class IBarFossil(IFossil):
         """ Reservation out of which bar was created """
     forReservation.result = IReservationFossil
 
-    def getCanReject(self):
-        """
-            Indicates if the current user can reject the reservation.
-            This property is not stored in IReservationFossil because,
-            in contrary to Bar objects, Reservation objects are stored
-            in the database and this field has to recalculated for every
-            user, so it cannot be stored there.
-        """
-    getCanReject.produce = lambda s: 1 if s.canReject and not s.forReservation.isCancelled and not s.forReservation.isRejected else 0
-
-    def rejectURL(self):
-        """ URL to reject reservation webpage. Stored here for simillar reasons. """
+#    def getCanReject(self):
+#        """
+#            Indicates if the current user can reject the reservation.
+#            This property is not stored in IReservationFossil because,
+#            in contrary to Bar objects, Reservation objects are stored
+#            in the database and this field has to recalculated for every
+#            user, so it cannot be stored there.
+#        """
+#    getCanReject.produce = lambda s: 1 if s.canReject and not s.forReservation.isCancelled and not s.forReservation.isRejected else 0
+#
+#    def rejectURL(self):
+#        """ URL to reject reservation webpage. Stored here for simillar reasons. """
 
 class IRoomCalendarFossil( IRoomFossil ):
 

@@ -507,6 +507,10 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                 // Conflict, prebooking conflict and concurrent prebooking bars don't represent bookings.
                 // They're added to the calendar to highlight some events.
                 if( !(bar.type == 'barPreC' || bar.type == 'barConf' || bar.type == 'barPreConc') ) {
+                    var showBookingLink = Html.p({className:"fakeLink"}, $T("Show"));
+                    showBookingLink.observeClick(function(){
+                        window.open(bar.bookingUrl);
+                    });
                     var rejectionLink;
                     if (bar.canReject){
                         rejectionLink = Html.p({className:"fakeLink"},$T("Reject"));
@@ -534,7 +538,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                                     Html.p({style:{cssFloat:'left', width: pixels(350), height:'auto'}},bar.reason, Html.br(), bar.owner ),
                                     Html.p({style:{cssFloat:'left', width: pixels(90), height:pixels(40)}},bar.startDT.print("%d/%m/%Y")),
                                     Html.p({style:{cssFloat:'left', width: pixels(75), height:pixels(40)}},bar.startDT.print("%H:%M"), Html.br(), bar.endDT.print("%H:%M"))),
-                                Html.p({style:{cssFloat:'left', width: pixels(40), height:pixels(40)}},rejectionLink));
+                                Html.p({style:{cssFloat:'left', width: pixels(40), height:pixels(40)}},showBookingLink, rejectionLink));
                 } else
                     return null;
             },
