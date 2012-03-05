@@ -363,7 +363,11 @@ class AdminService(LoggedOnlyService):
 
         LoggedOnlyService._checkProtection(self)
 
-        if not self._getUser().isAdmin():
+        # If there are no administrators, allow to add one
+        # Otherwise, forbid access to users that are not admin
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        adminList = minfo.getAdminList()
+        if not self._getUser().isAdmin() and len( adminList.getList() ) !=0 :
             raise ServiceAccessError(_("Only administrators can perform this operation"))
 
 class TextModificationBase:
