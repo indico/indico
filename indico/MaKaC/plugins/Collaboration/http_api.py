@@ -70,7 +70,11 @@ def serialize_collaboration(cal, fossil, now):
     if fossil.get('room',''):
         loc += ': ' + fossil['room'].decode('utf-8')
     event.set('location', loc)
-    event.set('description', url)
+    description = "Event URL: " + url
+    audience = fossil.get("audience", None)
+    if audience:
+        description += " - Audience: " + audience
+    event.set('description', description)
 
     # If there is an alarm required, add a subcomponent to the Event
     if fossil.has_key('alarm'):

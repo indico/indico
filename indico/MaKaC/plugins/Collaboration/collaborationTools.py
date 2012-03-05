@@ -401,6 +401,16 @@ class CollaborationTools(object):
         else:
             return ''
 
+    @classmethod
+    def getAudience(cls, booking):
+        audience = None
+
+        if booking.getBookingParams().has_key("audience"):
+            audience = booking.getBookingParams().get("audience")
+            if audience == "":
+                audience = "Public"
+        return audience
+
 class MailTools(object):
 
     @classmethod

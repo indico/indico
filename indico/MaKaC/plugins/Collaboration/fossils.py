@@ -279,3 +279,8 @@ class ICollaborationMetadataFossil(IFossil):
         pass
     getURL.produce = lambda s: Collaboration.collaborationTools.CollaborationTools.getConferenceOrContributionURL(s)
     getURL.name = 'url'
+
+    def getAudience(self):
+        pass
+    getAudience.produce = lambda s: Collaboration.collaborationTools.CollaborationTools.getAudience(s)
+    getAudience.name = 'audience'
