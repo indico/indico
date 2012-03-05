@@ -145,6 +145,10 @@
                                         </tr>
                                         % endif
                                         <tr>
+                                            <td align="right" valign="top"><small> ${ _("Capacity")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">${ reservation.room.capacity }&nbsp;${_("people")}</td>
+                                        </tr>
+                                        <tr>
                                             <td align="right" valign="top"><small> ${ _("Room key")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">${ reservation.room.whereIsKey }${contextHelp('whereIsKeyHelp' )}</td>
                                         </tr>
