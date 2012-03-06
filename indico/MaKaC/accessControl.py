@@ -371,6 +371,14 @@ class _AdminList(Persistent):
         if user in self.__list:
             self.__list.remove( user )
             self._p_changed=1
+        else:
+            # TODO: this is just a workaround for users which id
+            # is "Nice:jbgl@cern.ch"
+            for u in self.__list:
+                if u.getEmail() in user.getEmails():
+                    self.__list.remove(u)
+                    self._p_changed=1
+                    break
 
     def isAdmin( self, user ):
         if user in self.__list:
