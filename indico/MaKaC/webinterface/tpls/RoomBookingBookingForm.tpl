@@ -133,7 +133,7 @@
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <form id="bookingForm" action="${bookingFormURL}#conflicts" method="post">
+    <form id="bookingForm" action="${bookingFormURL.getURL(conf)}#conflicts" method="post">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
         % if standalone:
