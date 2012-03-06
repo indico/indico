@@ -71,6 +71,9 @@ type("TimetableBlockBase", [],
 
              var button = Html.div('timetableBlockMaterial');
              button.observeClick(function(e) {
+
+                 e.stopPropagation();
+
                  self.materialMenuOpen = true;
 
                  self.closePopup();
