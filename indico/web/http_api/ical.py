@@ -106,10 +106,13 @@ def serialize_reservation(cal, fossil, now):
 
 
 def serialize_contribs(cal, fossil, now):
-    for sfossil in fossil['contributions']:
-        if sfossil['startDate']:
-            sfossil['id'] = "%s-%s" % (fossil['id'], sfossil['id'])
-            serialize_event(cal, sfossil, now, id_prefix="indico-contribution")
+    if len(fossil['contributions']) == 0:
+        serialize_event(cal, fossil, now)
+    else:
+        for sfossil in fossil['contributions']:
+            if sfossil['startDate']:
+                sfossil['id'] = "%s-%s" % (fossil['id'], sfossil['id'])
+                serialize_event(cal, sfossil, now, id_prefix="indico-contribution")
 
 
 def serialize_contrib(cal, fossil, now):
