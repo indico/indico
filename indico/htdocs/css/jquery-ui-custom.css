@@ -178,14 +178,14 @@
     font-size: 11px;
 }
 
-.ui-tooltip-popup .ui-tooltip-content, .ui-tooltip-default .ui-tooltip-titlebar {
+.ui-tooltip-popup .ui-tooltip-content {
     border: solid 1px #E2E2E2;
     color: #454545;
     background-color: white;
     font-size: 10.5px;
     padding: 5px 9px;
 }
-.ui-tooltip-balloon .ui-tooltip-content, .ui-tooltip-default .ui-tooltip-titlebar {
+.ui-tooltip-balloon .ui-tooltip-content {
     border: solid 1px #C0C0C0;
     background-color: #FFED92;
     font-size: 13px;
