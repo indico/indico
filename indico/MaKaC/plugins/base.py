@@ -1172,6 +1172,7 @@ class PluginOption(Persistent):
         'textarea': str,
         'list_multiline': list,
         'links': list,
+        'currency': list,
         'paymentmethods': list
 
     }
