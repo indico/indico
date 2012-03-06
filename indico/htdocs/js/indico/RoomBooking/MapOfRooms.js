@@ -214,8 +214,8 @@ type ("RoomMap", ["IWidget"],
                     bookingUrl += '&minuteEnd=' + parseInt(eTime[1], 10);
                 }
             }
-            var book = Html.a({href:bookingUrl, target:'_parent', className:'mapBookRoomLink'}, $T("Book"));
-            book.observeClick(function(e) {
+            var book = Html.a({href:bookingUrl, target:'_blank', className:'mapBookRoomLink'}, $T("Book"));
+            /*book.observeClick(function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 indicoRequest('user.canBook', {
@@ -238,21 +238,20 @@ type ("RoomMap", ["IWidget"],
                     }
                 });
                 return false;
-            });
+            });*/
 
             // "More" link - for room details
             var more = Html.a({href:"#", className:'mapRoomInfoLink'}, $T("More") + "...");
 
             // "Room details" link
-            var details = Html.a({href:room.detailsUrl, target:'_parent'}, $T("Details") + "...");
+            var details = Html.a({href:room.detailsUrl, target:'_blank'}, $T("Details") + "...");
             details = Html.span({className:'mapRoomDetailsLink'}, details);
 
             // room details elements
             var title = $('<div/>', {'class': 'mapRoomTooltipTitle'}).append(
                 $('<div/>').css('float', 'left').append(caption.dom),
                 $('<div/>').css({
-                    float: 'right',
-                    marginRight: '25px'
+                    float: 'right'
                 }).append(details.dom)
             );
             var help = $('<div/>').append(

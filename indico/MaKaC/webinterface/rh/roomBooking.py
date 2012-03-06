@@ -1310,7 +1310,7 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
                 raise FormValuesError( "You are not authorized to book this room." )
 
             if not self._candResv.room.canBook( self._getUser() ) and not self._candResv.room.canPrebook( self._getUser() ):
-                raise FormValuesError( "You are not authorized to book this room." )
+                raise NoReportError( "You are not authorized to book this room." )
 
             if self._formMode == FormMode.MODIF:
                 if not self._candResv.canModify( self.getAW() ):
