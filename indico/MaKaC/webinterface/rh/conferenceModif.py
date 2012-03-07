@@ -1763,7 +1763,7 @@ class RHConfModifParticipantsAction(RHConfModifParticipants):
             self._req.content_type = """%s"""%(mimetype)
             self._req.headers_out["Content-Disposition"] = 'inline; filename="%s\"'%filename
             return data
-        return self._redirect(RHConfModifParticipantsList._uh.getURL(self._conf))
+        return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
 
 class RHConfModifParticipantsStatistics(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifParticipantsStatistics
