@@ -203,13 +203,13 @@
                     <script type="text/javascript">
                         var addCurrencyText = $T('Add new currency');
                         var nocurrenciesMsg = $T('No currency created yet. Click in Add add currency if you want to do so!');
-                        var popupTitle = $T('Enter the currency full and the abreviation');
+                        var popupTitle = $T('Enter the currency full name and the abreviation');
                         var currencyNameLabel = $T('Currency name');
                         var currencyNameHeader = $T('Currency name');
                         var info = '';
                         var example = $T('Exemple: Euro and EUR');
 
-                        <!-- Edit currency --!>
+                        <!-- Edit currency popup--!>
                         var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
                         var currencyName = new AutocheckTextBox({name: 'name', id:"currencyName"}, errorLabel);
                         var currencyAbbreviation = Html.input("text", {});
@@ -219,6 +219,7 @@
                                               Html.div({},
                                 (info)),
                                  Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
+
                         function currenciesEditPopup(oldName,oldAbbreviation){
                             var EditPopup = new ConfirmPopupWithPM(popupTitle,
                                     div,
@@ -244,7 +245,7 @@
                                                                                         }
                                                                                         else{
                                                                                             killProgress();
-                                                                                            currenciesEditPopup.close();
+                                                                                            EditPopup.close();
                                                                                             IndicoUtil.errorReport(error);
                                                                                         }
                                                                                     }
@@ -259,7 +260,7 @@
                             EditPopup.open();
                         }
 
-
+                        <!-- End edit currency popup--!>
 
 
                         var renderCurrencyTable = function(table) {
@@ -293,7 +294,6 @@
                                         }, IndicoUI.Buttons.removeButton()));
 
                                         var editButton = Widget.link(command(function(){
-                                            console.log(currency.name);
                                             currenciesEditPopup(currency.name,currency.abbreviation);
 
                                         }, IndicoUI.Buttons.editButton()));

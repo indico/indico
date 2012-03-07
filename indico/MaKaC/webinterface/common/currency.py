@@ -27,7 +27,6 @@ class CurrencyRegistry:
     def getList( self ):
 
         ph = PluginsHolder()
-        import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
         if ph.hasPluginType("EPayment"):
             self._targetOption = ph.getPluginType("EPayment").getOption("customCurrency")
             currencies = self._targetOption.getValue()
