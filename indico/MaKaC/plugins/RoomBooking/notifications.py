@@ -31,7 +31,6 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 from MaKaC.plugins.RoomBooking.tasks import RoomReservationEndTask
 from MaKaC.webinterface import urlHandlers
-from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 from MaKaC.common.Configuration import Config
 from MaKaC.rb_tools import fromUTC, toUTC, Period
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
@@ -184,3 +183,4 @@ class ReservationStartEndNotification(Persistent, Observable):
 
     def sendEndNotification(self, occurrence):
         sendReservationStartStopNotification(self._resv, 'end', occurrence)
+

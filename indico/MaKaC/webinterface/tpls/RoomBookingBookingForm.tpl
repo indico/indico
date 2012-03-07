@@ -129,6 +129,9 @@
         <div id="iNeedAVCSupport" class="tip">
              ${ _("Check <b>if</b> you need AVC Support to help you with video-conferencing equipment.")}<br />
         </div>
+        <div id="iNeedAssistance" class="tip">
+             ${ _("Check <b>if</b> you need assistance to setup a room.")}<br />
+        </div>
         <%include file="CHBookingRepeatition.tpl"/>
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
@@ -249,6 +252,15 @@
                                                     <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} />
                                                     ${contextHelp('iNeedAVCSupport' )}
                                                 </td>
+                                            </tr>
+                                        % endif
+                                        % if rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance:
+                                            <tr>
+                                            <td align="right" class="subFieldWidth" valign="top"><small>${ _("Assistance")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                                <input id="needsAssistance" name="needsAssistance" type="checkbox" ${' checked="checked" ' if candResv.needsAssistance else ""} />
+                                                ${contextHelp('iNeedAssistance' )}
+                                            </td>
                                             </tr>
                                         % endif
                                     </table>

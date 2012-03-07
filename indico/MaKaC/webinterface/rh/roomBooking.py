@@ -220,6 +220,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         session.setVar( "resvStartNotificationBefore", c.resvStartNotificationBefore )
         session.setVar( "resvEndNotification", c.resvEndNotification )
         session.setVar( "resvNotificationToResponsible", c.resvNotificationToResponsible )
+        session.setVar( "resvNotificationAssistance", c.resvNotificationAssistance )
 
         session.setVar( "responsibleId", c.responsibleId )
         session.setVar( "whereIsKey", c.whereIsKey )
@@ -298,6 +299,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.resvStartNotificationBefore = None
         candRoom.resvEndNotification = False
         candRoom.resvNotificationToResponsible = False
+        candRoom.resvNotificationAssistance = False
         candRoom.photoId = None
         candRoom.externalId = None
 
@@ -326,6 +328,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.resvStartNotificationBefore = session.getVar("resvStartNotificationBefore")
         candRoom.resvEndNotification = bool( session.getVar( "resvEndNotification" ) )
         candRoom.resvNotificationToResponsible = bool( session.getVar( "resvNotificationToResponsible" ) )
+        candRoom.resvNotificationAssistance = bool( session.getVar( "resvNotificationAssistance" ) )
 
         candRoom.responsibleId = session.getVar( "responsibleId" )
         candRoom.whereIsKey = session.getVar( "whereIsKey" )
@@ -366,6 +369,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.resvStartNotificationBefore = intd(tmp) if tmp else None
         candRoom.resvEndNotification = bool( params.get( "resvEndNotification" ) )
         candRoom.resvNotificationToResponsible = bool(params.get('resvNotificationToResponsible'))
+        candRoom.resvNotificationAssistance = bool(params.get('resvNotificationAssistance'))
 
 
         candRoom.responsibleId = params.get( "responsibleId" )
@@ -424,6 +428,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         session.setVar( "reason", c.reason )
         session.setVar( "usesAVC", c.usesAVC )
         session.setVar( "needsAVCSupport", c.needsAVCSupport )
+        session.setVar( "needsAssistance", c.needsAssistance )
 
         if hasattr(self, '_skipConflicting'):
             if self._skipConflicting:
@@ -495,6 +500,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candResv.reason = session.getVar( "reason" )
         candResv.usesAVC = session.getVar( "usesAVC" )
         candResv.needsAVCSupport = session.getVar( "needsAVCSupport" )
+        candResv.needsAssistance = session.getVar( "needsAssistance" )
         self._skipConflicting = session.getVar( "skipConflicting" ) == "on"
 
         useVC = session.getVar('useVC')
@@ -528,6 +534,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candResv.reason = params["reason"]
         candResv.usesAVC = params.get( "usesAVC" ) == "on"
         candResv.needsAVCSupport = params.get( "needsAVCSupport" ) == "on"
+        candResv.needsAssistance = params.get( "needsAssistance" ) == "on"
         self._skipConflicting = params.get( "skipConflicting" ) == "on"
         d = {}
         for vc in candResv.room.getAvailableVC():
@@ -627,6 +634,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             candResv.usesAVC = False
         if candResv.needsAVCSupport == None:
             candResv.needsAVCSupport = False
+        if candResv.needsAssistance == None:
+            candResv.needsAssistance = False
 
         if not ws.getVar( "dontAssign" ) and not params.get("ignoreSession"):
             if ws.getVar( "defaultStartDT" ):
@@ -1050,6 +1059,12 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         else:
             resvEx.usesAVC = None
 
+        needsAssistance = params.get( "needsAssistance" )
+        if needsAssistance and len( needsAssistance.strip() ) > 0:
+            resvEx.needsAssistance = needsAssistance == 'on'
+        else:
+            resvEx.needsAssistance = None
+
         isHeavy = params.get( "isHeavy" )
         if isHeavy and len( isHeavy.strip() ) > 0:
             self._isHeavy = True
@@ -1120,6 +1135,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
             not self._resvEx.isCancelled and
             not self._resvEx.needsAVCSupport and
             not self._resvEx.usesAVC and
+            not self._resvEx.needsAssistance and
             self._resvEx.isConfirmed is None)
         self._cache = None
         self._updateCache = False
@@ -1297,6 +1313,7 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
 
         self._clearSessionState()
         self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
+        self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
 
 
     def _checkProtection( self ):

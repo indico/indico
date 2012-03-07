@@ -95,7 +95,7 @@ def qbeMatch( example, candidate, special, **kwargs ):
     for attrName in dir( example ):
         # Skip methods, private attributes and Nones
         if attrName[0] == '_' or attrName in ['avaibleVC', 'vcList', 'needsAVCSetup', 'verboseEquipment',
-                                              'resvStartNotification', 'resvEndNotification', 'maxAdvanceDays']:
+                                              'resvStartNotification', 'resvEndNotification', 'resvNotificationAssistance' 'maxAdvanceDays']:
             continue
 
         exAttrVal = getattr(example, attrName)

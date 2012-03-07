@@ -37,6 +37,7 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.conference import ConferenceHolder
 from indico.util.fossilize import Fossilizable, fossilizes
 from MaKaC.fossils.roomBooking import IReservationFossil
+from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 
 
 class RepeatabilityEnum( object ):
@@ -217,6 +218,21 @@ class ReservationBase( Fossilizable ):
                 addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
+
+        # ---- Email Assistance ----
+
+        if getRoomBookingOption('assistanceNotificationEmails') and self.needsAssistance and self.room.resvNotificationAssistance: # Inform only when assistance is needed
+            to = getRoomBookingOption('assistanceNotificationEmails')
+            if to:
+                subject = "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
+                wc = WTemplated( 'RoomBookingEmail_AssistanceAfterBookingInsertion' )
+                text = wc.getHTML( { 'reservation': self } )
+                fromAddr = Config.getInstance().getNoReplyEmail()
+                addrs = []
+                addrs += to
+                maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
+                emails.append(maildata)
+
         return emails
 
     def notifyAboutCancellation( self, date = None ):
@@ -284,6 +300,20 @@ class ReservationBase( Fossilizable ):
             if to:
                 subject = "[" + self.room.getFullName() + "] Booking Cancelled on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingCancellation' )
+                text = wc.getHTML( { 'reservation': self } )
+                fromAddr = Config.getInstance().getNoReplyEmail()
+                addrs = []
+                addrs += to
+                maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
+                emails.append(maildata)
+
+        # ---- Email Assistance ----
+
+        if getRoomBookingOption('assistanceNotificationEmails') and self.needsAssistance and self.room.resvNotificationAssistance: # Inform only when assistance is needed
+            to = getRoomBookingOption('assistanceNotificationEmails')
+            if to:
+                subject = "[" + self.room.getFullName() + "] Booking Cancelled on " + formatDateTime(self.startDT)
+                wc = WTemplated( 'RoomBookingEmail_AssistanceAfterBookingCancellation' )
                 text = wc.getHTML( { 'reservation': self } )
                 fromAddr = Config.getInstance().getNoReplyEmail()
                 addrs = []
@@ -411,6 +441,21 @@ class ReservationBase( Fossilizable ):
                 addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
+
+        # ---- Email Assistance ----
+
+        if getRoomBookingOption('assistanceNotificationEmails') and self.needsAssistance and self.room.resvNotificationAssistance: # Inform only when assistance is needed
+            to = getRoomBookingOption('assistanceNotificationEmails')
+            if to:
+                subject = "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
+                wc = WTemplated( 'RoomBookingEmail_AssistanceAfterBookingInsertion' )
+                text = wc.getHTML( { 'reservation': self } )
+                fromAddr = Config.getInstance().getNoReplyEmail()
+                addrs = []
+                addrs += to
+                maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
+                emails.append(maildata)
+
         return emails
 
     def notifyAboutUpdate( self ):
@@ -473,6 +518,20 @@ class ReservationBase( Fossilizable ):
             if to:
                 subject = "[" + self.room.getFullName() + "] Modified booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingModification' )
+                text = wc.getHTML( { 'reservation': self } )
+                fromAddr = Config.getInstance().getNoReplyEmail()
+                addrs = []
+                addrs += to
+                maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
+                emails.append(maildata)
+
+        # ---- Email Assistance ----
+
+        if getRoomBookingOption('assistanceNotificationEmails') and self.room.resvNotificationAssistance:
+            to = getRoomBookingOption('assistanceNotificationEmails')
+            if to:
+                subject = "[" + self.room.getFullName() + "] Modified Booking on " + formatDateTime(self.startDT)
+                wc = WTemplated( 'RoomBookingEmail_AssistanceAfterBookingModification' )
                 text = wc.getHTML( { 'reservation': self } )
                 fromAddr = Config.getInstance().getNoReplyEmail()
                 addrs = []
@@ -1579,6 +1638,9 @@ class ReservationBase( Fossilizable ):
     # Whether it uses Audio Visual Conferencing equipment
     usesAVC = None
     needsAVCSupport = None
+
+    # Whether it needs general assistance
+    needsAssistance = None
 
     # True if reservation requires repeating confirmations
     isHeavy = property( _isHeavy )

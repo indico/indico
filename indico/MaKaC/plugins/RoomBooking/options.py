@@ -47,6 +47,12 @@ globalOptions = [
         "defaultValue": [],
         "editable": True,
         "visible": True}),
+    ("assistanceNotificationEmails", {
+        "description": _("Email addresses which will receive requests for assistance with room setup"),
+        "type": list,
+        "defaultValue": [],
+        "editable": True,
+        "visible": True}),
     ("notificationEmailsToBookedFor", {
         "description": _("Should the emails listed in 'booked for' also receive notification emails"),
         "type" : bool,
