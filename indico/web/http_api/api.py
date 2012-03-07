@@ -458,12 +458,21 @@ class CategoryEventFetcher(DataFetcher):
     def _getCategoryPath(id, aw):
         path = []
         firstCat = cat = CategoryManager().getById(id)
+        visibility = cat.getVisibility()
         while cat:
             # the first category (containing the event) is always shown, others only with access
             iface = ICategoryMetadataFossil if firstCat or cat.canAccess(aw) else ICategoryProtectedMetadataFossil
             path.append(fossilize(cat, iface))
             cat = cat.getOwner()
+        if visibility > len(path):
+            visibilityName= _("Everywhere")
+        elif visibility == 0:
+            visibilityName = _("Nowhere")
+        else:
+            categId = path[visibility-1]["id"]
+            visibilityName = CategoryManager().getById(categId).getName()
         path.reverse()
+        path.append({"visibility": {"name": visibilityName}})
         return path
 
     @staticmethod

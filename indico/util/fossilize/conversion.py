@@ -193,14 +193,18 @@ class Conversion(object):
     @classmethod
     def visibility(cls, conf):
         visibility = conf.getVisibility()
+        path = conf.getOwnerPath()
         if visibility == 0:
             id = ""
             name = "Nowhere"
-        elif visibility == 999:
+        elif visibility > len(path):
             id = ""
             name = "Everywhere"
         else:
-            categ = conf.getOwnerPath()[conf.getVisibility()-1]
+            try:
+                categ = path[conf.getVisibility()-1]
+            except:
+                raise Exception(conf.getVisibility())
             id = categ.getId()
             name = categ.getTitle()
         return {'id': id,
