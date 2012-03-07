@@ -465,9 +465,9 @@ class CategoryEventFetcher(DataFetcher):
             path.append(fossilize(cat, iface))
             cat = cat.getOwner()
         if visibility > len(path):
-            visibilityName= _("Everywhere")
+            visibilityName= "Everywhere"
         elif visibility == 0:
-            visibilityName = _("Nowhere")
+            visibilityName = "Nowhere"
         else:
             categId = path[visibility-1]["id"]
             visibilityName = CategoryManager().getById(categId).getName()
