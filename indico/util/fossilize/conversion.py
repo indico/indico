@@ -201,10 +201,7 @@ class Conversion(object):
             id = ""
             name = "Everywhere"
         else:
-            try:
-                categ = path[conf.getVisibility()-1]
-            except:
-                raise Exception(conf.getVisibility())
+            categ = path[conf.getVisibility()-1]
             id = categ.getId()
             name = categ.getTitle()
         return {'id': id,
