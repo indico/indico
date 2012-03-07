@@ -179,6 +179,24 @@ class PluginOptionsRemoveCurrency ( PluginOptionsBase ):
         self._targetOption._notifyModification()
         return {'success': True, 'table': currencies}
 
+class PluginOptionsEditCurrency ( PluginOptionsBase ):
+
+    def _checkParams(self):
+        PluginOptionsBase._checkParams(self)
+        self._currencyName = self._params.get('name', None)
+        self._currencyAbbreviation = self._params.get('abbreviation', None)
+        self._currencyOldName = self._params.get('oldName', None)
+
+    def _getAnswer(self):
+        currencies = self._targetOption.getValue()
+        for currency in currencies:
+            if currency['name'] == self._currencyOldName:
+                currencies.remove(currency)
+                currencies.append({'name': self._currencyName, 'abbreviation': self._currencyAbbreviation})
+                self._targetOption.setValue(self._targetOption.getValue())
+                self._targetOption._notifyModification()
+        return {'success': True, 'table': currencies}
+
 methodMap = {
     "addUsers": PluginOptionsAddUsers,
     "removeUser": PluginOptionsRemoveUser,
@@ -188,4 +206,5 @@ methodMap = {
     "removeLink": PluginOptionsRemoveLink,
     "addCurrency": PluginOptionsAddCurrency,
     "removeCurrency": PluginOptionsRemoveCurrency,
+    "editCurrency": PluginOptionsEditCurrency,
 }

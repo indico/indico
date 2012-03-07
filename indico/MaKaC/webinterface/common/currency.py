@@ -18,21 +18,36 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from xml.sax.saxutils import quoteattr, escape
+from MaKaC.plugins import PluginsHolder
+from MaKaC.services.interface.rpc.common import ServiceError
 
 class CurrencyRegistry:
-    _items = ["","CHF","EUR","USD", "GBP", "CZK"]
 
+    @classmethod
     def getList( self ):
-        return self._items
-    getList=classmethod(getList)
 
+        ph = PluginsHolder()
+        import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
+        if ph.hasPluginType("EPayment"):
+            self._targetOption = ph.getPluginType("EPayment").getOption("customCurrency")
+            currencies = self._targetOption.getValue()
+            currenciesList = []
+            for currency in currencies:
+                currenciesList.append(currency["abbreviation"])
+            return currenciesList
+
+        else:
+            raise ServiceError('ERR-PLUG3', 'pluginType: ' + str("EPayment") + ' does not exist, is not visible or not active')
+
+        return [""]
+
+    @classmethod
     def getSelectItemsHTML( self, selCurrency="" ):
         l=[]
-        for title in self._items:
+        for title in self.getList():
             selected=""
             if title==selCurrency:
                 selected=" selected"
             l.append("""<option value=%s%s>%s</option>"""%(quoteattr(title),
                                         selected, escape(title)))
         return "".join(l)
-    getSelectItemsHTML=classmethod(getSelectItemsHTML)
