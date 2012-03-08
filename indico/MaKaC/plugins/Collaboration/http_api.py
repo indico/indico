@@ -36,6 +36,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.fossils import ICollaborationMetadataFossil
+from MaKaC.common.timezoneUtils import getAdjustedDate
 
 
 globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook', 'VideoEventHook']
@@ -58,8 +59,8 @@ def serialize_collaboration(cal, fossil, now):
     url = str(fossil['url'])
     event.set('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
     event.set('dtstamp', now)
-    event.set('dtstart', fossil['startDate'])
-    event.set('dtend', fossil['endDate'])
+    event.set('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
+    event.set('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
     event.set('url', url)
     event.set('categories', "VideoService - " + fossil['type'])
     event.set('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
@@ -73,7 +74,7 @@ def serialize_collaboration(cal, fossil, now):
     description = "Event URL: " + url
     audience = fossil.get("audience", None)
     if audience:
-        description += " - Audience: " + audience
+        description = "Audience: %s\n"% audience + description
     event.set('description', description)
 
     # If there is an alarm required, add a subcomponent to the Event

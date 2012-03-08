@@ -28,7 +28,7 @@ from indico.util.metadata.serializer import Serializer
 # legacy indico imports
 from MaKaC.rb_reservation import RepeatabilityEnum
 from MaKaC.rb_tools import weekNumber
-
+from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
 
 WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
 
@@ -55,8 +55,8 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event = ical.Event()
     event.set('uid', '%s-%s@cern.ch' % (id_prefix, fossil['id']))
     event.set('dtstamp', now)
-    event.set('dtstart', fossil['startDate'])
-    event.set('dtend', fossil['endDate'])
+    event.set('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
+    event.set('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
     event.set('url', fossil['url'])
     event.set('summary', fossil['title'].decode('utf-8'))
     loc = fossil['location'] or ''
@@ -91,8 +91,8 @@ def serialize_reservation(cal, fossil, now):
     event = ical.Event()
     event.set('uid', 'indico-resv-%s@cern.ch' % fossil['id'])
     event.set('dtstamp', now)
-    event.set('dtstart', fossil['startDT'])
-    event.set('dtend', datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].time()))
+    event.set('dtstart', getAdjustedDate(fossil['startDT'], None, "UTC"))
+    event.set('dtend', getAdjustedDate(datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].time()), None, "UTC"))
     event.set('url', fossil['bookingUrl'])
     event.set('summary', fossil['reason'])
     event.set('location', fossil['location'].decode('utf-8') + ': ' + fossil['room']['fullName'].decode('utf-8'))
@@ -144,7 +144,7 @@ class ICalSerializer(Serializer):
         cal = ical.Calendar()
         cal.set('version', '2.0')
         cal.set('prodid', '-//CERN//INDICO//EN')
-        now = datetime.datetime.utcnow()
+        now = nowutc()
         for fossil in results:
             mapper = ICalSerializer._mappers.get(fossil['_fossil'])
             if mapper:
