@@ -310,6 +310,9 @@ class SimulatedModPythonRequest(object):
     def get_wsgi_environ(self):
         return self.__environ
 
+    def get_user_agent(self):
+        return self.__environ["HTTP_USER_AGENT"]
+
     def get_post_form(self):
         post_form = self.__environ.get('wsgi.post_form')
         input = self.__environ['wsgi.input']

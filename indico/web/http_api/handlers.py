@@ -115,7 +115,9 @@ def buildAW(ak, req, onlyPublic=False):
     if ak and not onlyPublic:
         # If we have an authenticated request, require HTTPS
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        if not req.is_https() and minfo.isAPIHTTPSRequired():
+        # Dirty hack: Google calendar converts HTTP API requests from https to http
+        # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
+        if not req.is_https() and minfo.isAPIHTTPSRequired() and req.get_user_agent().find("Googlebot") == -1:
             raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
         aw.setUser(ak.getUser())
     return aw
