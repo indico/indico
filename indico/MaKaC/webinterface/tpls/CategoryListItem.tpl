@@ -15,7 +15,7 @@
         % if lItem.hasAnyProtection():
               <span class="protected">
                 % if lItem.getDomainList() != []:
-                    ${ "%s domain only"%(", ".join(map(lambda x: x.getName(), lItem.getDomainList()))) }
+                    ${ "(%s domain only)"%(", ".join(map(lambda x: x.getName(), lItem.getDomainList()))) }
                 % else:
                     ${ _("(protected)")}
                 % endif
