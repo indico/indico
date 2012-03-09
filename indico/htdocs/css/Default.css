@@ -7879,3 +7879,27 @@ ul.buttonMenuPopupList li a:hover {
     margin-left: 10px;
     color: #118822;
 }
+
+.settingsWidget{
+    font-size: 14px;
+    padding: 0 5px 5px;
+    min-width: 250px;
+}
+
+.settingsWidget a{
+    font-size: 14px !important;
+}
+
+.settingsWidget .settingsWidgetSection{
+    padding: 10px 0px 0px;
+    text-align:justify;
+}
+
+.settingsWidget .settingsWidgetHeader{
+    font-weight: bold;
+}
+
+.settingsWidget .settingsSeparator {
+    border-bottom: 1px solid #DDDDDD;
+    margin-bottom:5px;
+}

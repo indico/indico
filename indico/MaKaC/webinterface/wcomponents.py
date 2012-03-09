@@ -332,7 +332,7 @@ class WHeader(WTemplated):
         vars["imgLogo"] = imgLogo
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self._isFrontPage
-        vars["currentCategory"] = self.__currentCategory
+        vars["target"] = vars["currentCategory"] = self.__currentCategory
 
         if self._aw.getSession():
             selLang = self._aw.getSession().getLang()

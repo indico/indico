@@ -1042,6 +1042,12 @@ class Avatar(Persistent, Fossilizable):
             res = "%s%s."%(res, self.getName()[0].upper())
         return res
 
+    def getStraightAbrName(self):
+        name = ""
+        if self.getName() != "":
+            name = "%s. "%self.getName()[0].upper()
+        return "%s%s"%(name, self.getSurName())
+
     def addOrganisation(self, newOrg, reindex=False):
         if reindex:
             idx = indexes.IndexesHolder().getById('organisation')

@@ -14,10 +14,14 @@ else:
             <li>
                 <%include file="TimezoneSelector.tpl"/>
             </li>
-            <li id="languageSelector">
+            % if currentUser:
+                <%include file="SettingsWidget.tpl" args="Languages = Languages, IsHeader = False, dark=dark_"/>
+            % else:
                 <%include file="LanguageSelector.tpl" args="Languages = Languages, IsHeader = False, dark=dark_"/>
-            </li>
-            <%include file="LoginWidget.tpl"/>
+                <li class="loginHighlighted" style="border-right: none;">
+                    <a href="${ loginURL }"><strong style="color: white">${ _("Login")}</strong></a>
+                </li>
+            % endif
         </ul>
     </div>
 </div>

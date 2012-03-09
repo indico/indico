@@ -1,12 +1,11 @@
 <%page args="Languages=None, IsHeader=None, dark=None"/>
 
-
-            <form id="languageForm" method="post" action="${ urlHandlers.UHChangeLang.getURL() }" style="margin: 0px">
-                <input id="languageInputHidden" type="hidden" name="lang" value="${ SelectedLanguage.lower() }">
-            </form>
-
-<a id="languageSelectorLink" href="#" class="dropDownMenu" id="selectLanguageLink">${ SelectedLanguageName }</a>
-
+<li id="languageSelector">
+    <form id="languageForm" method="post" action="${ urlHandlers.UHChangeLang.getURL() }" style="margin: 0px">
+        <input id="languageInputHidden" type="hidden" name="lang" value="${ SelectedLanguage.lower() }">
+    </form>
+    <a id="languageSelectorLink" href="#" class="dropDownMenu" id="selectLanguageLink">${ SelectedLanguageName }</a>
+</li>
 
 <script type="text/javascript">
 var languageLink = $E('languageSelectorLink');
