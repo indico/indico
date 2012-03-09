@@ -1587,7 +1587,11 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
          },
 
          postDraw: function() {
-             each(this.blocks, function(block) { block.postDraw(); });
+             each(this.blocks, function(block) {
+                 if (exists(block.postDraw)) {
+                     block.postDraw();
+                 }
+                 });
          },
 
          flatten: function(data) {

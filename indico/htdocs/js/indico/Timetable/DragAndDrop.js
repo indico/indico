@@ -591,11 +591,14 @@ var activeTT;
 function switchTT(event, tt) {
     // set the current timetable as active, so that the button only acts on it
     activeTT = tt;
-    if (tt.getTimetableDrawer()._grid.first()[0] != 0) {
-        // we start at some other hour before midnight, show the button
-        $('#tt_hour_tip').fadeIn();
-    } else {
-            $('#tt_hour_tip').fadeOut();
+    var tdrawer = tt.getTimetableDrawer();
+    if (!tdrawer.isPoster) {
+        if (tdrawer._grid.first()[0] != 0) {
+            // we start at some other hour before midnight, show the button
+            $('#tt_hour_tip').fadeIn();
+        } else {
+                $('#tt_hour_tip').fadeOut();
+        }
     }
 }
 

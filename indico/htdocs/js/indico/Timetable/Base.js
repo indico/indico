@@ -907,7 +907,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.infoBox = Html.div({className: 'timetableInfoBox'});
 
         this.addMenuLink = this.contextInfo.isPoster ?
-            $('<a href="#"/>').text($T('Add poster')).live('menu_select', function() {
+            $('<a href="#"/>').text($T('Add poster')).bind('menu_select', function() {
                 self.managementActions.addContribution();
             }) : $('<a href="#"/>').text($T('Add new'));
 
