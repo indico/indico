@@ -51,6 +51,7 @@ class RHCategModifBase( RHModificationBaseProtected ):
             RHModificationBaseProtected._checkProtection(self)
             return
         else:
+            self._doProcess = False
             self._redirect(urlHandlers.UHCategoryDisplay.getURL(self._target))
 
     def _checkParams( self, params ):
