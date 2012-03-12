@@ -40,22 +40,7 @@ if lItem.getType() == "simple_event":
         <span class="date ${ happeningNowClass }">${ evtDate }<time itemprop="startDate" datetime="${ startDate.strftime("%Y-%m-%d") }" /></span><a href="${ conferenceDisplayURLGen(lItem)}" itemprop="url" ><span itemprop="summary">${ eventTitle }</span></a>
 
           <span class="protected">
-
-            % if lItem.hasAnyProtection():
-                % if not lItem.isProtected():
-                    <% d=[] %>
-                    % for domain in lItem.getDomainList():
-                        <% d.append(domain.getName()) %>
-                    % endfor
-                    % if d != []:
-                        ${ "%s domain only"%", ".join(d) }
-                    % else:
-                        ${ _("(protected by parent category)")}
-                    % endif
-                % else:
-                    ${ _("(protected)")}
-                % endif
-            % endif
+            ${getProtection(lItem)}
             % if creatDate > nowutc() - timedelta(weeks = 1):
                    <img src="${ systemIcon('new') }" style="vertical-align:middle" alt="New" title="${ _("This event is New")}" />
             % endif

@@ -12,15 +12,9 @@
                 '%s events', nconf) % format_number(nconf)}
          % endif
        </span>
-        % if lItem.hasAnyProtection():
-              <span class="protected">
-                % if lItem.getDomainList() != []:
-                    ${ "(%s domain only)"%(", ".join(map(lambda x: x.getName(), lItem.getDomainList()))) }
-                % else:
-                    ${ _("(protected)")}
-                % endif
-            </span>
-        % endif
+        <span class="protected">
+            ${getProtection(lItem)}
+        </span>
       </span>
 
 </li>

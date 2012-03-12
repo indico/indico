@@ -3328,6 +3328,7 @@ class WConferenceList(WTemplated):
         vars["categ"] = self._categ
 
         vars["showPastEvents"] = self._showPastEvents
+        vars["getProtection"] = lambda x: utils.getProtectionText(x)
 
         return vars
 
@@ -3347,6 +3348,7 @@ class WCategoryList(WTemplated):
         vars = WTemplated.getVars( self )
         vars["items"] = self._list
         vars["categ"] = self._categ;
+        vars["getProtection"] = lambda x: utils.getProtectionText(x)
 
         return vars
 
