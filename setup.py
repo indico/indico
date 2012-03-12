@@ -519,6 +519,7 @@ if __name__ == '__main__':
 
             [indico.ext_types]
 
+            statistics = indico.ext.statistics
             Collaboration = MaKaC.plugins.Collaboration
             InstantMessaging = MaKaC.plugins.InstantMessaging
             RoomBooking = MaKaC.plugins.RoomBooking
@@ -526,8 +527,9 @@ if __name__ == '__main__':
             livesync = indico.ext.livesync
             importer = indico.ext.importer
 
-
             [indico.ext]
+
+            statistics.piwik = indico.ext.statistics.piwik
 
             Collaboration.EVO = MaKaC.plugins.Collaboration.EVO
             Collaboration.Vidyo = MaKaC.plugins.Collaboration.Vidyo

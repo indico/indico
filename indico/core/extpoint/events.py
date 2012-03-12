@@ -212,3 +212,7 @@ class IEventDisplayContributor(IContributor):
         Returns the info that the plugins want to add after the header (where description is)
         """
 
+    def eventDetailFooter(self, obj, vars):
+        """
+        Returns the info that the plugins want to add into the footer.
+        """

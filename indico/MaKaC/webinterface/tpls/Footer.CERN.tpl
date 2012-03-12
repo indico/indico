@@ -21,6 +21,13 @@ else:
               <img src="${ systemIcon("cern_small" if shortURL else "cern_small_light") }" alt="${ _("Indico - Integrated Digital Conference")}" class="cern_logo" style="vertical-align: middle; margin-right: 12px;"/>
             </a>
             <div class="text" style="width: 200px">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></div>
+
+% if extraFooterContent:
+    % for extra in extraFooterContent:
+        <%include file="${extra['path']}" args="extargs=extra['args']"/>
+    % endfor
+% endif
+
 </%block>
 </div>
 % if Configuration.Config.getInstance().getWorkerName()!="":

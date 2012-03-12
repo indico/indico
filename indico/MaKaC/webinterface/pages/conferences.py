@@ -147,14 +147,15 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
     navigationEntry = None
 
     def _getFooter( self ):
-        """
-        """
         wc = wcomponents.WFooter()
         p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),
                 "subArea": self._getSiteArea()}
 
         cid = self._conf.getUrlTag().strip() or self._conf.getId()
         p["shortURL"] =  Config.getInstance().getShortEventURL() + cid
+
+        self._notify('eventDetailFooter', p)
+
         return wc.getHTML(p)
 
     def _getHeader( self ):

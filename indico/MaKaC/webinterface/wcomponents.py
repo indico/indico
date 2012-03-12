@@ -831,6 +831,9 @@ class WEventFooter(WFooter):
         v["shortURL"] = Config.getInstance().getShortEventURL() + cid
         v["app_data"] = app_data
         v["showSocial"] = app_data.get('active', False) and self._conf.getDisplayMgr().getShowSocialApps()
+
+        self._notify('eventDetailFooter', v)
+
         return v
 
 

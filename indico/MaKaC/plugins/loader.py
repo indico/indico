@@ -242,7 +242,6 @@ class PluginLoader(object):
         """
         Loads a possible plugin from a directory
         """
-
         # we attempt to import the module.
         try:
             pmodule = cls.importName(pModuleName)
