@@ -52,6 +52,7 @@ from MaKaC.common.fossilize import fossilize
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.auth import APIKey
 from indico.web.http_api.util import generate_public_auth_request
+from MaKaC.user import CERNGroup
 
 class WPCategoryBase ( main.WPMainBase ):
 
@@ -165,6 +166,9 @@ class WCategoryDisplay(WICalExportBase):
         for mgr in self._target.getManagerList():
             if isinstance(mgr, Avatar):
                 mgrs.append(mgr.getAbrName())
+            elif isinstance(mgr, CERNGroup):
+                mgrs.append(mgr.getName() + " (e-group)")
+
         vars["managers"]=""
         if mgrs != []:
             vars["managers"]= "; ".join(mgrs)
