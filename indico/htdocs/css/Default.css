@@ -2731,7 +2731,7 @@ div.sessionBar ul
 div.sessionBar li {
     display: inline;
     margin: 0;
-    padding: 4px 17px;
+    padding: 5px 17px;
     float: left;
     border-right: 1px solid #C7C7C7;
 }
@@ -5635,7 +5635,7 @@ td.timetablePopupContributionTitle{
 
 .timezonePopup {
     min-width: 300px;
-    padding: 15px 20px 0px 10px;
+    padding: 10px 5px 0;
 }
 
 .timezonePopup .tzHeader {
@@ -5647,7 +5647,7 @@ td.timetablePopupContributionTitle{
 }
 
 .timezonePopup select {
-    min-width: 310px;
+    min-width: 260px;
     margin: 5px 5px 5px 20px;
     border: 1px solid #AAA;
 }

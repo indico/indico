@@ -192,3 +192,12 @@
     padding: 5px 6px 12px;
     width: 120px;
 }
+
+.ui-tooltip-timezone {
+    min-width: 300px;
+}
+
+.ui-tooltip-timezone .ui-tooltip-content{
+    min-width: 300px;
+    font-size: 13px;
+}
