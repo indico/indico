@@ -1,7 +1,8 @@
 <a name="Pic"></a>
 <div class="groupItem">
     <div class="groupTitle"> ${ _("Picture Uploader")}</div>
-    <div class="groupItemContent">
+    <em>${_("This page allows you to upload pictures which you can later link to from any Indico page (e.g. Event Home Page). Indico will generate a URL for each picture.")}</em>
+    <div class="groupItemContent" style="padding-top:5px;">
         <div id="picsToolBar" class="picsToolBar"></div>
         <div id="picsContainer" class="picsContainer"></div>
     </div>
