@@ -29,7 +29,7 @@ import cgi
 import BaseHTTPServer
 from StringIO import StringIO
 from threading import Thread
-
+import sys
 
 # dependency imports
 from lxml import etree
@@ -51,7 +51,6 @@ class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.wfile.write('sorry, only POST is allowed')
 
     def do_POST(self):
-        global globalRecordSet
 
         contType, params = cgi.parse_header(
             self.headers.getheader('content-type'))
@@ -64,29 +63,33 @@ class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             varsDict = {}
 
-        xmlDoc = etree.parse(StringIO(varsDict['file'][0]))
+        try:
+            xmlDoc = etree.parse(StringIO(varsDict['file'][0]))
 
-        ns = {'marc': 'http://www.loc.gov/MARC21/slim'}
+            ns = {'marc': 'http://www.loc.gov/MARC21/slim'}
 
-        # get just the ids
-        records = xmlDoc.xpath('/marc:collection/marc:record',
-                        namespaces=ns)
+            # get just the ids
+            records = xmlDoc.xpath('/marc:collection/marc:record',
+                                   namespaces=ns)
 
-        # build a "record" from the XML
-        for recNode in records:
-            rid = recNode.xpath(
-                './marc:datafield[@tag="970"]/marc:subfield/text()',
-                namespaces=ns)[0]
-            title = recNode.xpath(
-                './marc:datafield[@tag="245"]/marc:subfield/text()',
-                namespaces=ns)
+            # build a "record" from the XML
+            for recNode in records:
+                rid = recNode.xpath(
+                    './marc:datafield[@tag="970"]/marc:subfield/text()',
+                    namespaces=ns)[0]
+                title = recNode.xpath(
+                    './marc:datafield[@tag="245"]/marc:subfield/text()',
+                    namespaces=ns)
 
-            deleted = recNode.xpath('./marc:datafield[@tag="980"]/marc:subfield/text()',
-                                    namespaces=ns)[0] == 'DELETED'
+                deleted = recNode.xpath('./marc:datafield[@tag="980"]/marc:subfield/text()',
+                                        namespaces=ns)[0] == 'DELETED'
 
-            title = title[0] if title else None
+                title = title[0] if title else None
 
-            self.server.recordSet[rid] = {'title': title, 'deleted': deleted}
+                self.server.recordSet[rid] = {'title': title, 'deleted': deleted}
+        except Exception, e:
+            self.server.recordSet = None
+            self.server.exception = sys.exc_info()
 
         self.wfile.write('[INFO] blablablabla uploaded_file.xml')
 
@@ -97,6 +100,7 @@ class FakeInvenio(Thread):
         super(FakeInvenio, self).__init__()
         self._server = BaseHTTPServer.HTTPServer((host, port), FakeHTTPHandler)
         self._server.recordSet = recordSet
+        self._server.exception = None
 
     def shutdown(self):
         self._server.shutdown()
@@ -108,6 +112,9 @@ class FakeInvenio(Thread):
             # always close the server
             self._server.server_close()
 
+    @property
+    def exception(self):
+        return self._server.exception
 
 class TestUpload(_TUpload, IndicoTestCase):
     _server = FakeInvenio

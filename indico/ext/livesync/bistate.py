@@ -108,7 +108,6 @@ class BistateRecordProcessor(object):
             ## if not obj.canAccess(AccessWrapper(access)):
             ##     # no access? jump over this one
             ##     continue
-
             for action in aw.getActions():
                 if action == 'deleted' and not isinstance(obj, conference.Category):
                     # if the record has been deleted, mark it as such
@@ -175,7 +174,6 @@ class BistateBatchUploaderAgent(PushSyncAgent):
         di.setPermissionsOf(self._access)
 
         xg.initXml()
-
         xg.openTag("collection", [["xmlns", "http://www.loc.gov/MARC21/slim"]])
 
         for record, recId, operation in records:
@@ -197,10 +195,22 @@ class BistateBatchUploaderAgent(PushSyncAgent):
                 if logger:
                     logger.exception("Something went wrong while processing '%s' (recId=%s) (owner=%s)! Possible metadata errors." %
                                      (record, recId, record.getOwner()))
+                    # avoid duplicate record
+                self._removeUnfinishedRecord(di._XMLGen)
 
         xg.closeTag("collection")
 
         return xg.getXml()
+
+    def _removeUnfinishedRecord(self, xg):
+        """
+        gets rid of a remaining '<record>' tag
+        """
+        # remove any line breaks, etc...
+        while not xg.xml[-1].strip():
+            xg.xml.pop()
+        # remove '<record>'
+        xg.xml.pop()
 
     def _generateRecords(self, data, lastTS, dbi=None):
         return BistateRecordProcessor.computeRecords(data, self._access, dbi=dbi)
