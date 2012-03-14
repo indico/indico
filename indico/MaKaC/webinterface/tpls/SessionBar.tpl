@@ -4,18 +4,26 @@ if dark is not UNDEFINED:
     dark_ = dark
 else:
     dark_ = False;
+
+protection = getProtection(target) if target else None
 %>
 
-
-<div class="sessionBar${" sessionBarDark" if dark_ == True else ""}">
-    <div class="corner"></div>
+<div id="sessionBar" class="ui-follow-scroll sessionBar${" sessionBarDark" if dark_ == True else ""}">
+    % if isFrontPage or not target or protection == "Public":
+        <div class="corner"></div>
+    % else:
+        <div class="corner corner${protection[0]}"></div>
+    % endif
     <div class="links">
         <ul>
+            % if target and not isFrontPage and protection[0] != "Public":
+                <%include file="ProtectionWidget.tpl" args="protection=protection"/>
+            % endif
             <li>
                 <%include file="TimezoneSelector.tpl"/>
             </li>
             % if currentUser:
-                <%include file="SettingsWidget.tpl" args="Languages = Languages, IsHeader = False, dark=dark_"/>
+                <%include file="SettingsWidget.tpl" args="Languages = Languages"/>
             % else:
                 <%include file="LanguageSelector.tpl" args="Languages = Languages, IsHeader = False, dark=dark_"/>
                 <li class="loginHighlighted" style="border-right: none;">

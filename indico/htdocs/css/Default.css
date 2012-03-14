@@ -2731,7 +2731,7 @@ div.sessionBar ul
 div.sessionBar li {
     display: inline;
     margin: 0;
-    padding: 5px 17px;
+    padding: 5px 17px 4px;
     float: left;
     border-right: 1px solid #C7C7C7;
 }
@@ -2770,6 +2770,56 @@ div.sessionBarDark .dropDownMenu {
     background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
 }
 
+div.sessionBar .protectionBar{
+    padding-right:10px;
+    padding-left:5px;
+    background: transparent url(../images/sprites.png) repeat-x scroll 0 0;
+    height: 16px;
+}
+
+div.sessionBar .protectionBarProtected{
+    background-position: 0 -240px;
+}
+
+div.sessionBar .protectionBarRestricted {
+    background-position: 0 -270px;
+}
+
+div.sessionBar .protectionBarProtected a{
+    color: #af9502 !important;
+}
+
+div.sessionBar .protectionBarProtected a:hover{
+    text-decoration: underline;
+}
+
+div.sessionBar .protectionBarRestricted a{
+    color: #FFFFFF !important;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+div.sessionBar .protectionBarRestricted a:hover{
+    text-decoration: underline;
+}
+
+div.sessionBar .cornerProtected{
+    background-position: -50px 0;
+}
+
+div.sessionBar .cornerRestricted {
+    background-position: -75px 0;
+}
+
+.protectionHighlightProtected{
+    color: #AF9502;
+    font-weight: bold;
+}
+
+.protectionHighlightRestricted{
+    color: #C73C3C;
+    font-weight: bold;
+}
 /* Breadcrumb styles */
 
 .path {
@@ -7886,11 +7936,11 @@ ul.buttonMenuPopupList li a:hover {
     min-width: 250px;
 }
 
-.settingsWidget a{
+.settingsWidget a, .protectionWidget a{
     font-size: 14px !important;
 }
 
-.settingsWidget .settingsWidgetSection{
+.settingsWidget .settingsWidgetSection, .protectionWidget .protectionWidgetSection{
     padding: 10px 0px 0px;
     text-align:justify;
 }
@@ -7902,4 +7952,10 @@ ul.buttonMenuPopupList li a:hover {
 .settingsWidget .settingsSeparator {
     border-bottom: 1px solid #DDDDDD;
     margin-bottom:5px;
+}
+
+.protectionWidget{
+    font-size: 14px;
+    padding: 0 5px 5px;
+    line-height: 17px;
 }

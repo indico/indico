@@ -264,7 +264,8 @@ class Config:
                  "facebook": "facebook.png",
                  "twitter": "twitter.png",
                  "gplus": "gplus.png",
-                 "gcal": "gcal.png"
+                 "gcal": "gcal.png",
+                 "shield": "shield.png"
     }
 
 

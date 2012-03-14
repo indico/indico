@@ -311,6 +311,18 @@ class WHeader(WTemplated):
         else:
             return timezone
 
+    """
+        Returns an array with the status (Public, Protected, Restricted) and extra info(domain list)
+    """
+    def _getProtection(self, target):
+        if not target.hasAnyProtection():
+            return ["Public", "Public"]
+        if target.isItselfProtected():
+            return ["Restricted", "Restricted"]
+        if target.getDomainList() != []:
+            return ["Protected", "%s domain only"%(", ".join(map(lambda x: x.getName(), target.getDomainList())))]
+        return self._getProtection(target.getOwner())
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         #urlHandlers.UHUserDetails.getURL(self._currentuser)
@@ -325,6 +337,7 @@ class WHeader(WTemplated):
         # *****************
 
         vars["currentUser"] = self._currentuser
+        vars["shieldIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("shield")))
 
         imgLogo=Configuration.Config.getInstance().getSystemIconURL( "logoIndico" )
         imgLogin=Configuration.Config.getInstance().getSystemIconURL( "login" )
@@ -391,6 +404,7 @@ class WHeader(WTemplated):
                 adminItemList.append({'id': 'webcastAdmin', 'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
 
         vars["adminItemList"] = adminItemList
+        vars["getProtection"] = lambda x: self._getProtection(x)
 
         return vars
 
@@ -3270,6 +3284,8 @@ class WConferenceListItem(WTemplated):
         vars["lItem"] = self._event
         vars["conferenceDisplayURLGen"] = urlHandlers.UHConferenceDisplay.getURL
         vars["aw"] = self._aw
+        vars["getProtection"] = lambda x: utils.getProtectionText(x)
+
         return vars
 
 class WEmptyCategory(WTemplated):
