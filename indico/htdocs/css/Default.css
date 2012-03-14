@@ -7959,3 +7959,11 @@ ul.buttonMenuPopupList li a:hover {
     padding: 0 5px 5px;
     line-height: 17px;
 }
+
+#sessionBar.scrolling {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 0 0 5px 5px;
+    z-index:999;
+}

@@ -18,6 +18,12 @@ protection = getProtection(target) if target else None
         <ul>
             % if target and not isFrontPage and protection[0] != "Public":
                 <%include file="ProtectionWidget.tpl" args="protection=protection"/>
+                <script type="text/javascript">
+                $.ui.sticky({
+                    sticky: nothing,
+                    normal: nothing
+                });
+                </script>
             % endif
             <li>
                 <%include file="TimezoneSelector.tpl"/>
