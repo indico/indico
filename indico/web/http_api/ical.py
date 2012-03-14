@@ -65,10 +65,18 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     if fossil['room']:
         loc += ' ' + fossil['room'].decode('utf-8')
     event.set('location', loc)
+    description = ""
+    if fossil.has_key("speakers"):
+        speakerList = []
+        for speaker in fossil["speakers"]:
+            speakerList.append("%s (%s)"%(speaker["fullName"], speaker["affiliation"]))
+        description += "Speakers: "+ (", ").join(speakerList) + "\n"
+
     if fossil['description']:
-        event.set('description', fossil['description'].decode('utf-8') + '\n' + fossil['url'])
+        description += "Description: " + fossil['description'].decode('utf-8') + '\nURL: ' + fossil['url']
     else:
-        event.set('description', fossil['url'])
+        description += "URL: " + fossil['url']
+    event.set('description', description)
     cal.add_component(event)
 
 
