@@ -1,12 +1,11 @@
-Dear Assistance Service,
+Dear Conference Rooms Service,
 
 
-A booking for the room ${ reservation.room.getFullName() } has been CANCELLED.
-
-Assistance for room setup in NOT needed.
+${currentUser.getStraightFullName()} has cancelled the following meeting. Support is NOT needed anymore.
 
 For:  ${ reservation.bookedForName }
 Reason: ${ reservation.reason }
+Room: ${ reservation.room.getFullName() }
 Dates: ${ formatDate(reservation.startDT.date()) } -- ${ formatDate(reservation.endDT.date()) }
 Hours: ${ reservation.startDT.strftime("%H:%M") } -- ${ reservation.endDT.strftime("%H:%M") }
 

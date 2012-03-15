@@ -48,7 +48,7 @@ globalOptions = [
         "editable": True,
         "visible": True}),
     ("assistanceNotificationEmails", {
-        "description": _("Email addresses which will receive requests for assistance with room setup"),
+        "description": _("Email to which the conference rooms technical support requests are sent"),
         "type": list,
         "defaultValue": [],
         "editable": True,

@@ -1,12 +1,11 @@
-Dear Assistance Service,
+Dear Conference Rooms Service,
 
 
-There is a new booking for ${ reservation.room.getFullName() }.
-
-User requested ASSISTANCE for room setup.
+${ currentUser.getStraightFullName()} requested ASSISTANCE for the meeting startup.
 
 For:  ${ reservation.bookedForName }
 Reason: ${ reservation.reason }
+Room:  ${ reservation.room.getFullName() }
 Dates: ${ formatDate(reservation.startDT.date()) } -- ${ formatDate(reservation.endDT.date()) }
 Hours: ${ reservation.startDT.strftime("%H:%M") } -- ${ reservation.endDT.strftime("%H:%M") }
 
