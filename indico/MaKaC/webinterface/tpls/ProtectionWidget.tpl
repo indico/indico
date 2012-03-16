@@ -1,11 +1,18 @@
 <%page args="protection=None"/>
 <div id="protectionWidget" style="display:none" class="protectionWidget">
     <div class="protectionWidgetSection">
-        <div>${_("The information here displayed is")}
-        <span class="protectionHighlight${protection[0]}">${protection[1].upper()}</span><br/></div>
-        <div style="padding-top:10px; text-align:justify">
-            ${_("""The elements on this page are no viewable by the general public. The <a href="https://security.web.cern.ch/" target="blank">CERN Security Policy</a> binds you to treat such data confidientially as denoted in the policy itself.""")}
-        </div>
+        % if protection[0] == "Protected":
+            ${_("The information on this web page is restricted for display on the %s") % protection[1]}
+        % else:
+            ${_("The information on this web page is restricted for display to named individuals or specific groups.")}
+        % endif
+    </div>
+    <div class="protectionWidgetSection">
+        % if protection[0] == "Protected":
+            ${protectionDisclaimerProtected}
+        % else:
+            ${protectionDisclaimerRestricted}
+        % endif
     </div>
     <div class="protectionWidgetSection">
         <div><a href="http://indico.cern.ch/ihelp/html/UserGuide/Protection.html" target="blank">${ _("Learn more about Indico and Security") }</a></div>
@@ -22,7 +29,7 @@
 $(".protectionBar").qtip({
 
     style: {
-        width: '200px',
+        width: '250px',
         classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
         tip: {
             corner: true,

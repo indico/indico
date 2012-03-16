@@ -120,6 +120,10 @@ class WPAdminsBase( WPMainBase ):
             urlHandlers.UHAdminsSystem.getURL())
         mainSection.addItem( self._systemMenuItem)
 
+        self._protectionMenuItem = wcomponents.SideMenuItem(_("Protection"),
+            urlHandlers.UHAdminsProtection.getURL())
+        mainSection.addItem( self._protectionMenuItem)
+
         self._sideMenu.addSection(mainSection)
 
 
@@ -2639,4 +2643,22 @@ class WAnalytics(wcomponents.WTemplated):
         vars["analyticsCode"] = minfo.getAnalyticsCode()
         vars["analyticsCodeLocation"] = minfo.getAnalyticsCodeLocation()
         vars["analyticsFormURL"] = urlHandlers.UHSaveAnalytics.getURL()
+        return vars
+
+class WPAdminProtection( WPAdminsBase ):
+
+    def _setActiveSideMenuItem(self):
+        self._protectionMenuItem.setActive()
+
+    def _getPageContent( self, params ):
+        wc = WAdminProtection()
+        return wc.getHTML()
+
+class WAdminProtection(wcomponents.WTemplated):
+
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars( self )
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        vars["protectionDisclaimerProtected"] = minfo.getProtectionDisclaimerProtected()
+        vars["protectionDisclaimerRestricted"] = minfo.getProtectionDisclaimerRestricted()
         return vars

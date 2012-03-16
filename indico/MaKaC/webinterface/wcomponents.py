@@ -316,11 +316,11 @@ class WHeader(WTemplated):
     """
     def _getProtection(self, target):
         if not target.hasAnyProtection():
-            return ["Public", "Public"]
+            return ["Public", _("Public")]
         if target.isItselfProtected():
-            return ["Restricted", "Restricted"]
+            return ["Restricted", _("Restricted")]
         if target.getDomainList() != []:
-            return ["Protected", "%s domain only"%(", ".join(map(lambda x: x.getName(), target.getDomainList())))]
+            return ["Protected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), target.getDomainList())))]
         return self._getProtection(target.getOwner())
 
     def getVars( self ):
@@ -388,7 +388,8 @@ class WHeader(WTemplated):
         # Check if room booking module is active
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars['roomBooking'] = minfo.getRoomBookingModuleActive()
-
+        vars['protectionDisclaimerProtected'] = minfo.getProtectionDisclaimerProtected()
+        vars['protectionDisclaimerRestricted'] = minfo.getProtectionDisclaimerRestricted()
         #Build a list of items for the administration menu
         adminList = AdminList.getInstance()
         adminItemList = []

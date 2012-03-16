@@ -8,7 +8,7 @@ else:
 protection = getProtection(target) if target else None
 %>
 
-<div id="sessionBar" class="ui-follow-scroll sessionBar${" sessionBarDark" if dark_ == True else ""}">
+<div id="sessionBar" class="${'ui-follow-scroll' if target and not isFrontPage and protection[0] != 'Public' else ''} sessionBar${" sessionBarDark" if dark_ == True else ""}">
     % if isFrontPage or not target or protection == "Public":
         <div class="corner"></div>
     % else:

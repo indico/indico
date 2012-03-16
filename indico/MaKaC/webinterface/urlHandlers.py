@@ -1952,6 +1952,9 @@ class UHAdminsSystem( URLHandler ):
 class UHAdminsSystemModif( URLHandler ):
     _relativeURL = "adminSystem.py/modify"
 
+class UHAdminsProtection( URLHandler ):
+    _relativeURL = "adminProtection.py"
+
 class UHMaterialModification( URLHandler ):
 
     @classmethod

@@ -29,6 +29,8 @@ DEFAULT_PERSISTENT_ENABLE_AGREEMENT = 'Enabling persistent signatures will allow
 DEFAULT_PERSISTENT_DISABLE_AGREEMENT = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
 DEFAULT_API_USER_AGREEMENT = """In order to enable an iCal export link, your account needs to have a key created. This key enables other applications to access data from within Indico even when you are neither using nor logged into the Indico system yourself with the link provided. Once created, you can manage your key at any time by going to 'My Profile' and looking under the tab entitled 'HTTP API'. Further information about HTTP API keys can be found in the Indico documentation."""
 DEFAULT_PERSISTENT_USER_AGREEMENT = """In conjunction with a having a key associated with your account, to have the possibility of exporting private event information necessitates the creation of a persistent key.  This new key is also associated with your account and whilst it is active the data which can be obtained through using this key can be obtained by anyone in possession of the link provided. Due to this reason, it is extremely important that you keep links generated with this key private and for your use only. If you think someone else may have acquired access to a link using this key in the future, you must immediately remove it from 'My Profile' under the 'HTTP API' tab and generate a new key before regenerating iCalendar links."""
+DEFAULT_PROTECTION_DISCLAINER_RESTRICTED = 'Circulation to people other than the intended audience is not authorized. You are obliged to treat the information with the appropriate level of confidentiality.'
+DEFAULT_PROTECTION_DISCLAINER_PROTECTED = 'As such, this information is intended for an internal audience only. You are obliged to treat the information with the appropriate level of confidentiality.'
 
 #from MaKaC.common.logger import Logger
 
@@ -103,6 +105,9 @@ class MaKaCInfo(Persistent):
         self._apiPersistentDisableAgreement = DEFAULT_PERSISTENT_DISABLE_AGREEMENT
         self._apiKeyUserAgreement = DEFAULT_API_USER_AGREEMENT
         self._apiPersistentUserAgreement = DEFAULT_PERSISTENT_USER_AGREEMENT
+
+        self._protectionDisclaimerRestricted = DEFAULT_PROTECTION_DISCLAINER_RESTRICTED
+        self._protectionDisclaimerProtected = DEFAULT_PROTECTION_DISCLAINER_PROTECTED
 
 
     def getStyleManager( self ):
@@ -510,6 +515,22 @@ class MaKaCInfo(Persistent):
 
     def setAPIPersistentUserAgreement(self, v):
         self._apiPersistentUserAgreement = v
+
+    def getProtectionDisclaimerProtected(self):
+        if not hasattr(self, '_protectionDisclaimerProtected'):
+            self._protectionDisclaimerProtected = DEFAULT_PROTECTION_DISCLAINER_PROTECTED
+        return self._protectionDisclaimerProtected
+
+    def setProtectionDisclaimerProtected(self, v):
+        self._protectionDisclaimerProtected = v
+
+    def getProtectionDisclaimerRestricted(self):
+        if not hasattr(self, '_protectionDisclaimerRestricted'):
+            self._protectionDisclaimerRestricted = DEFAULT_PROTECTION_DISCLAINER_RESTRICTED
+        return self._protectionDisclaimerRestricted
+
+    def setProtectionDisclaimerRestricted(self, v):
+        self._protectionDisclaimerRestricted = v
 
 
 class HelperMaKaCInfo:

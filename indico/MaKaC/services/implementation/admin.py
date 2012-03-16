@@ -17,7 +17,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.services.implementation.base import AdminService
+from MaKaC.services.implementation.base import AdminService, TextModificationBase
+
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.user import PrincipalHolder, AvatarHolder, GroupHolder
 import MaKaC.webcast as webcast
@@ -189,6 +190,31 @@ class MergeGetCompleteUserInfo(AdminService):
         userFossil["identityList"] = identityList
         return userFossil
 
+class EditProtectionDisclaimerProtected (TextModificationBase, AdminService):
+
+    def _handleSet(self):
+        if (self._value ==""):
+            raise ServiceError("ERR-E1",
+                               "The protected disclaimer cannot be empty")
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        minfo.setProtectionDisclaimerProtected(self._value)
+
+    def _handleGet(self):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        return minfo.getProtectionDisclaimerProtected()
+
+class EditProtectionDisclaimerRestricted (TextModificationBase, AdminService):
+
+    def _handleSet(self):
+        if (self._value ==""):
+            raise ServiceError("ERR-E1",
+                               "The restricted disclaimer cannot be empty")
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        minfo.setProtectionDisclaimerRestricted(self._value)
+
+    def _handleGet(self):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        return minfo.getProtectionDisclaimerRestricted()
 
 methodMap = {
     "services.addWebcastAdministrators": AddWebcastAdministrators,
@@ -202,5 +228,8 @@ methodMap = {
     "groups.addExistingMember": GroupAddExistingMember,
     "groups.removeMember": GroupRemoveMember,
 
-    "merge.getCompleteUserInfo": MergeGetCompleteUserInfo
+    "merge.getCompleteUserInfo": MergeGetCompleteUserInfo,
+
+    "protection.editProtectionDisclaimerProtected": EditProtectionDisclaimerProtected,
+    "protection.editProtectionDisclaimerRestricted": EditProtectionDisclaimerRestricted
 }
