@@ -319,6 +319,8 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
 
              var pxStep = Math.floor(TimetableDefaults.layouts.compact.values.pxPerHour*TimetableDefaults.resolution/60);
 
+             var endPoints = [];
+
              each(points, function(point) {
                  if (point[1] == 'end') {
                      block = self.getBlock(algData.blocks, point[0]);
@@ -349,6 +351,9 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                              block.unfinished = true;
                          }
 
+                         // save reference for all blocks that end here, will use it below
+                         endPoints.push(block);
+
                      } else {
                          // otherwise, it is ending just before it starts:
                          // this means that the duration is less than our "resolution"
@@ -357,6 +362,16 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                      }
                  }
              });
+
+             if (endPoints.length) {
+                 // now every block that ends at this point must have the same 'end"
+                 // since some of them may have been expanded ('diff' above), we need to set them all
+                 // to the max value
+                 var maxPx = _(endPoints).max(function(block){ return block.end; }).end;
+                 _(endPoints).each(function(block) {
+                     block.end = maxPx;
+                 });
+             }
 
              if (minutes % 60 === 0) {
                  algData.grid.push([startMin/60%24, algData.topPx]);
