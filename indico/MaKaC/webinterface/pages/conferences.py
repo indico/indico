@@ -7232,19 +7232,6 @@ class WConfContributionList ( wcomponents.WTemplated ):
         self._startContrib=int(sContrib)
         self._displayContribs=int(displayContribs)
         self._order = order
-        if len(self._conf.getTrackList()) > 0:
-            self._displayTrackFilter = True
-        else:
-            self._displayTrackFilter = False
-        if len(self._conf.getContribTypeList()) > 0:
-            self._displayTypeFilter = True
-        else:
-            self._displayTypeFilter = False
-
-    def _getMaterialIcon(self, iconURL, alt):
-        return """
-                <img src="%s" alt="%s" border="0">
-               """%(iconURL, alt)
 
     def _getURL( self ):
         #builds the URL to the contribution list page
@@ -7272,317 +7259,65 @@ class WConfContributionList ( wcomponents.WTemplated ):
         url.addParam("OK", "1")
         return url
 
-    def _getContribFullHTML( self, contrib ):
-        tzUtil = DisplayTZ(self._aw,self._conf)
-        tz = tzUtil.getDisplayTZ()
-        sdate = ""
-        if contrib.isScheduled():
-           sdate=contrib.getAdjustedStartDate(tz).strftime("%d-%b-%Y %H:%M" )
-           sdate = sdate
-        title = """<a href=%s>%s</a>"""%( quoteattr( str( urlHandlers.UHContributionDisplay.getURL( contrib ) ) ), self.htmlText( contrib.getTitle() ))
-        contribType = ""
-        if contrib.getType() is not None:
-            contribType = contrib.getType().getName()
-        l = []
-        for spk in contrib.getSpeakerList():
-            l.append( self.htmlText( spk.getFullName() ) )
-        speaker = "<br>".join( l )
-        session = ""
-        if contrib.getSession() is not None:
-            if contrib.getSession().getCode() != "no code":
-                session=self.htmlText(contrib.getSession().getCode())
-            else:
-                session=self.htmlText(contrib.getSession().getTitle())
-        track = ""
-        if contrib.getTrack() is not None:
-            track = self.htmlText( contrib.getTrack().getCode() )
-        trackHTML = typeHTML = ""
-        if self._displayTrackFilter:
-            trackHTML = """
-                <td class="abstractDataCell">%s</td>""" % (track or "&nbsp;")
-        if self._displayTypeFilter:
-            typeHTML = """
-                <td class="abstractDataCell">%s</td>""" % (contribType or "&nbsp;")
-        mat = []
-        if contrib.getSlides():
-            if contrib.getSlides().canView(self._aw):
-                url = urlHandlers.UHMaterialDisplay.getURL(contrib.getSlides())
-                mat.append("<a href=%s>%s</a>" % ( quoteattr(str(url)),self._getMaterialIcon(Config.getInstance().getSystemIconURL( "slides" ), "Slides")))
-        if contrib.getPaper():
-            if contrib.getPaper().canView(self._aw):
-                url = urlHandlers.UHMaterialDisplay.getURL(contrib.getPaper())
-                mat.append("<a href=%s>%s</a>" % ( quoteattr(str(url)),self._getMaterialIcon(Config.getInstance().getSystemIconURL( "paper" ), "Paper")))
-        material = "".join(mat)
-        abst = []
-        if self._conf.getAbstractMgr().showAttachedFilesContribList() and isinstance(contrib, conference.AcceptedContribution) and len(contrib.getAbstract().getAttachments()) > 0:
-            for file in contrib.getAbstract().getAttachments().values():
-                abst.append("""<div style="padding-bottom:3px;"><a href="%s">%s</a></div>""" % (str(urlHandlers.UHAbstractAttachmentFileAccess.getURL(file)), file.getFileName()))
-        abstracts = "".join(abst)
-        html = """
-            <tr>
-                <td valign="top" nowrap><input type="checkbox" name="contributions" value=%s></td>
-                <td class="abstractLeftDataCell">%s</td>
-                <td class="abstractDataCell">%s</td>
-                %s
-                <td class="abstractDataCell">%s</td>
-                <td class="abstractDataCell">%s</td>
-                <td class="abstractDataCell">%s</td>
-                %s
-                <td class="abstractDataCell">%s</td>
-                <td class="abstractDataCell">%s</td>
-            </tr>
-                """%(contrib.getId(), self.htmlText( contrib.getId() ),
-                    sdate or "&nbsp;", typeHTML,
-                    title or "&nbsp;", speaker or "&nbsp;",
-                    session or "&nbsp;", trackHTML, material or "&nbsp;", abstracts or "&nbsp;" )
-        return html
-
-    def _getContribMinHTML( self, contrib ):
-        title = """<a href=%s>%s</a>"""%( quoteattr( str( urlHandlers.UHContributionDisplay.getURL( contrib ) ) ), self.htmlText( contrib.getTitle() ))
-        mat = []
-        if contrib.getSlides():
-            if contrib.getSlides().canView(self._aw):
-                mat.append(self._getMaterialIcon(Config.getInstance().getSystemIconURL( "slides" ), _("Slides")))
-        if contrib.getPaper():
-            if contrib.getPaper().canView(self._aw):
-                mat.append(self._getMaterialIcon(Config.getInstance().getSystemIconURL( "paper" ), _("Paper")))
-        material = "".join(mat)
-        abst = []
-        if self._conf.getAbstractMgr().showAttachedFilesContribList() and isinstance(contrib, conference.AcceptedContribution) and len(contrib.getAbstract().getAttachments()) > 0:
-            for file in contrib.getAbstract().getAttachments().values():
-                abst.append("""<div style="padding-bottom:3px;"><a href="%s">%s</a></div>""" % (str(urlHandlers.UHAbstractAttachmentFileAccess.getURL(file)), file.getFileName()))
-        abstracts = "".join(abst)
-        trackHTML = typeHTML = ""
-        if self._displayTrackFilter:
-            trackHTML = """
-                <td class="abstractDataCell"></td>"""
-        if self._displayTypeFilter:
-            typeHTML = """
-                <td class="abstractDataCell"></td>"""
-        html = """
-            <tr>
-                <td><input type="checkbox" name="contributions" value=%s></td>
-                <td class="abstractLeftDataCell">%s</td>
-                <td class="abstractDataCell">%s</td>
-                %s
-                <td class="abstractDataCell">%s</td>
-                <td class="abstractDataCell">%s</td>
-                <td class="abstractDataCell">%s</td>
-                %s
-                <td class="abstractDataCell">%s</td>
-                <td class="abstractDataCell">%s</td>
-            </tr>
-                """%(self.htmlText( contrib.getId() ), "&nbsp;", "&nbsp;", typeHTML, title or "&nbsp;", "&nbsp;", "&nbsp;", trackHTML,  material or "&nbsp;", abstracts or "&nbsp;"  )
-        return html
-
-    def _getTypeFilterItemList( self ):
-        checked = ""
-        if self._filterCrit.getField("type").getShowNoValue():
-            checked = " checked"
-        l = [ i18nformat("""<input type="checkbox" name="typeShowNoValue"%s> --_("not specified")--""")%checked]
-        for type in self._conf.getContribTypeList():
-            checked = ""
-            if type.getId() in self._filterCrit.getField("type").getValues():
-                checked = " checked"
-            l.append( """<input type="checkbox" name="selTypes" value=%s%s> %s"""%(quoteattr(type.getId()), checked, self.htmlText(type.getName())) )
-        return l
-
-    def _getTrackFilterItemList( self ):
-        checked = ""
-        if self._filterCrit.getField("track").getShowNoValue():
-            checked = " checked"
-        l = [ i18nformat("""<input type="checkbox" name="trackShowNoValue"%s> --_("not specified")--""")%checked]
-        for t in self._conf.getTrackList():
-            checked = ""
-            if t.getId() in self._filterCrit.getField("track").getValues():
-                checked = " checked"
-            l.append( """<input type="checkbox" name="selTracks" value=%s%s> (%s) %s"""%(quoteattr(t.getId()), checked, self.htmlText(t.getCode()), self.htmlText(t.getTitle()) ) )
-        return l
-
-    def _getSessionFilterItemList( self ):
-        checked = ""
-        if self._filterCrit.getField("session").getShowNoValue():
-            checked = " checked"
-        l = [ i18nformat("""<input type="checkbox" name="sessionShowNoValue"%s> --_("not specified")--""")%checked]
-        for s in self._conf.getSessionListSorted():
-            checked = ""
-            if s.getCode() != "no code":
-                codeText = "(%s) " % self.htmlText(s.getCode())
-            else:
-                codeText = ""
-            if s.getId() in self._filterCrit.getField("session").getValues():
-                checked = " checked"
-            l.append( """<input type="checkbox" name="selSessions" value=%s%s>%s%s"""%(quoteattr(s.getId()), checked, codeText, self.htmlText(s.getTitle()) ) )
-        return l
+    def getOrderURL(self, currentSorting, num, invertedOrder, typeOrder):
+        url = self._getURL()
+        url.addParam("sortBy", typeOrder)
+        url.addParam("sc",(num-self._displayContribs))
+        if currentSorting == typeOrder:
+            url.addParam("order", invertedOrder)
+        return url
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["types"] = vars["tracks"] = ""
-        vars["typeFilterHeader"] = vars["trackFilterHeader"] = ""
-        if self._displayTypeFilter:
-            vars["typeFilterHeader"] = i18nformat("""<td align="center" class="titleCellFormat" style="padding-right:10px"> _("show contribution types")</td>""")
-            vars["types"] = """<td valign="top" style="border-right:1px solid #777777;">%s</td>""" % "<br>".join( self._getTypeFilterItemList() )
-        if self._displayTrackFilter:
-            vars["trackFilterHeader"] = i18nformat("""<td align="center" class="titleCellFormat"> _("show tracks")</td>""")
-            vars["tracks"] = """<td valign="top">%s</td>""" % "<br>".join( self._getTrackFilterItemList() )
-        vars["sessions"] = "<br>".join( self._getSessionFilterItemList() )
         l = []
         contribsToPrint = []
         f = filters.SimpleFilter( self._filterCrit, self._sortingCrit )
         contribList = f.apply( self._conf.getContributionList() )
-        num=1
-        self._endContrib=(self._startContrib+self._displayContribs)-1
+        num = 1
+        self._endContrib = (self._startContrib + self._displayContribs) - 1
+
         for contrib in contribList:
-            if num<self._startContrib:
-                num+=1
+            if num < self._startContrib:
+                num += 1
                 continue
-            elif num>self._endContrib:
+            elif num > self._endContrib:
                 break
             else:
-                num+=1
-            if contrib.canAccess( self._aw ):
-                l.append( self._getContribFullHTML( contrib ) )
-                contribsToPrint.append("""<input type="hidden" name="contributions" value="%s">"""%contrib.getId())
-            #elif contrib.canView( self._aw ):
-            else:
-                l.append( self._getContribMinHTML( contrib ) )
-                contribsToPrint.append("""<input type="hidden" name="contributions" value="%s">"""%contrib.getId())
+                num += 1
+            l.append(contrib)
+            contribsToPrint.append(contrib.getId())
+
         if self._order =="up":
             l.reverse()
-        vars["numContribs"]=len(contribList)
-        vars["contribSetIndex"]=_("showing")+" %s-%s "%(self._startContrib,self._endContrib)
-        if self._startContrib!=1:
-            iconURL=Config.getInstance().getSystemIconURL("arrow_previous")
+
+        vars["numContribs"] = len(contribList)
+        vars["contribSetIndex"]=""
+        vars["startContrib"] = self._startContrib
+        vars["endContrib"] = self._endContrib
+
+        if self._startContrib != 1:
             url=self._getURL()
             newSc=self._startContrib-self._displayContribs
             if newSc<1:
                 newSc=1
             url.addParam("sc",newSc)
             url.setSegment("contribs")
-            vars["contribSetIndex"]="""<a href=%s><img src=%s border="0" style="vertical-align:middle" alt=""></a>%s"""%(quoteattr(str(url)),quoteattr(str(iconURL)),vars["contribSetIndex"])
+            vars["previousContribsURL"]= url
         if self._endContrib<vars["numContribs"]:
-            iconURL=Config.getInstance().getSystemIconURL("arrow_next")
             url=self._getURL()
             url.setSegment("contribs")
             url.addParam("sc",num)
-            vars["contribSetIndex"]="""%s<a href=%s><img src=%s border="0" style="vertical-align:middle" alt=""></a>"""%(vars["contribSetIndex"],quoteattr(str(url)),quoteattr(str(iconURL)))
+            vars["nextContribsURL"] = url
 
-        vars["contributions"] = "".join(l)
-        vars["contribsToPrint"] = "\n".join(contribsToPrint)
+        vars["contributions"] = l
+        vars["contribsToPrint"] = contribsToPrint
 
-        vars["newContribURL"] = urlHandlers.UHConfAddContribution.getURL( self._conf )
+        currentSorting = self._sortingCrit.getField().getId() if self._sortingCrit.getField() else ""
+        vars["currentSorting"]= currentSorting
+        vars["sortingOrder"] = self._order
+        invertedOrder = "up" if self._order == "down" else ("down" if self._order == "up" else self._order)
 
-        sortingField = self._sortingCrit.getField()
-        vars["currentSorting"]=""
-
-        url=self._getURL()
-
-        url.addParam("sortBy","number")
-        vars["numberImg"]=""
-        url.addParam("sc",(num-self._displayContribs))
-        if sortingField and sortingField.getId() == "number":
-
-            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("number")">""")
-            if self._order == "down":
-                vars["numberImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["numberImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-
-        vars["numberSortingURL"]=quoteattr(str(url))
-        url = self._getURL()
-        url.addParam("sortBy", "date")
-        vars["dateImg"] = ""
-        url.addParam("sc",(num-self._displayContribs))
-        if sortingField and sortingField.getId() == "date":
-
-            vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("date")">""")
-            if self._order == "down":
-                vars["dateImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["dateImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["dateSortingURL"]=quoteattr(str(url))
-
-        if self._displayTypeFilter:
-            url = self._getURL()
-            url.addParam("sortBy", "type")
-            typeImg = ""
-            url.addParam("sc",(num-self._displayContribs))
-            if sortingField and sortingField.getId() == "type":
-                vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("type")">""")
-                if self._order == "down":
-                    typeImg="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                    url.addParam("order","up")
-                elif self._order == "up":
-                    typeImg="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                    url.addParam("order","down")
-            typeSortingURL = quoteattr( str( url ) )
-            vars["typeHeader"] = """<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> %s<a href=%s>Type</a></td>""" % (typeImg,typeSortingURL)
-        else:
-            vars["typeHeader"] = ""
-
-        url = self._getURL()
-        url.addParam("sortBy", "name")
-        vars["titleImg"] = ""
-        url.addParam("sc",(num-self._displayContribs))
-        if sortingField and sortingField.getId() == "name":
-            vars["currentSorting"]="""<input type="hidden" name="sortBy" value="name">"""
-            if self._order == "down":
-                vars["titleImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["titleImg"]="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["titleSortingURL"]=quoteattr(str(url))
-
-        url = self._getURL()
-        url.addParam("sortBy", "speaker")
-        vars["speakerImg"] = ""
-        url.addParam("sc",(num-self._displayContribs))
-        if sortingField and sortingField.getId() == "speaker":
-            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("speaker")">""")
-            if self._order == "down":
-                vars["speakerImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["speakerImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["speakerSortingURL"]=quoteattr( str( url ) )
-
-        url = self._getURL()
-        url.addParam("sortBy", "session")
-        vars["sessionImg"] = ""
-        url.addParam("sc",(num-self._displayContribs))
-        if sortingField and sortingField.getId() == "session":
-            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("session")">""")
-            if self._order == "down":
-                vars["sessionImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["sessionImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["sessionSortingURL"]=quoteattr( str( url ) )
-
-        if self._displayTrackFilter:
-            url = self._getURL()
-            url.addParam("sortBy", "track")
-            trackImg = ""
-            url.addParam("sc",(num-self._displayContribs))
-            if sortingField and sortingField.getId() == "track":
-                vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("track")">""")
-                if self._order == "down":
-                    trackImg="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                    url.addParam("order","up")
-                elif self._order == "up":
-                    trackImg="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                    url.addParam("order","down")
-            trackSortingURL = quoteattr( str( url ) )
-            vars["trackHeader"] = i18nformat("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> %s<a href=%s> _("Track")</a></td>""") % (trackImg,trackSortingURL)
-        else:
-            vars["trackHeader"] = ""
+        vars["getOrderURL"] = lambda type: quoteattr(str(self.getOrderURL(currentSorting, num, invertedOrder, type)))
 
         url = urlHandlers.UHContributionListFilter.getURL( self._conf )
         url.setSegment( "contributions" )
@@ -7591,6 +7326,10 @@ class WConfContributionList ( wcomponents.WTemplated ):
         vars["contribSelectionAction"]=quoteattr(str(urlHandlers.UHContributionListAction.getURL(self._conf)))
         vars["contributionsPDFURL"]=quoteattr(str(urlHandlers.UHContributionListToPDF.getURL(self._conf)))
         vars["showAttachedFiles"] = self._conf.getAbstractMgr().showAttachedFilesContribList()
+        vars["conf"] = self._conf
+        vars["accessWrapper"] = self._aw
+        vars["filterCriteria"] = self._filterCrit
+        vars["timezone"] = DisplayTZ(self._aw, self._conf).getDisplayTZ()
 
         return vars
 
