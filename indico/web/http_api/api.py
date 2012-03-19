@@ -58,6 +58,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.rb_tools import Period, datespan
+from MaKaC.schedule import ScheduleToJson
 from MaKaC.errors import NoReportError
 
 utc = pytz.timezone('UTC')
@@ -397,6 +398,25 @@ class IteratedDataFetcher(DataFetcher):
             yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
                                                    filters={'access': self._userAccessFilter}, mapClassType={'AcceptedContribution':'Contribution'}), iface)
 
+
+@HTTPAPIHook.register
+class EventTimeTableHook(HTTPAPIHook):
+    TYPES = ('timetable',)
+    RE = r'(?P<idlist>\w+(?:-\w+)*)'
+
+    def _getParams(self):
+        super(EventTimeTableHook, self)._getParams()
+        self._idList = self._pathParams['idlist'].split('-')
+
+
+    def export_timetable(self, aw):
+        ch = ConferenceHolder()
+        d = {}
+        for cid in self._idList:
+            conf = ch.getById(cid)
+            d[cid] = ScheduleToJson.process(conf.getSchedule(), self._tz.tzname(None),
+                                           None, days = None, mgmtMode = False)
+        return d
 
 @HTTPAPIHook.register
 class CategoryEventHook(HTTPAPIHook):
