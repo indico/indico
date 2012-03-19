@@ -148,9 +148,9 @@ class Notificator:
 class EmailNotificator(Notificator):
 
     def apply(self,registrant,params):
-        vars=self._getVars(registrant)
-        subj=params.get("subject","")%vars
-        b=params.get("body","")%vars
+        v=self._getVars(registrant)
+        subj=params.get("subject","").format(**v)
+        b=params.get("body","").format(**v)
         fa=params.get("from","")
         tl=params.get("to",[])
         cc = params.get("cc",[])
@@ -158,9 +158,9 @@ class EmailNotificator(Notificator):
 
     def notify(self,registrant,params):
         if params.has_key("conf"):
-            sm=GenericMailer.sendAndLog(self.apply(registrant,params),params["conf"])
+            GenericMailer.sendAndLog(self.apply(registrant,params),params["conf"])
         else:
-            sm=GenericMailer.send(self.apply(registrant,params))
+            GenericMailer.send(self.apply(registrant,params))
 
     def notifyAll(self,params):
         subj=params.get("subject","")
@@ -170,7 +170,7 @@ class EmailNotificator(Notificator):
         cc = params.get("cc",[])
         notification =  Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=cc)
         if params.has_key("conf"):
-            sm = GenericMailer.sendAndLog(notification, params["conf"])
+            GenericMailer.sendAndLog(notification, params["conf"])
         else:
-            sm = GenericMailer.send(notification)
+            GenericMailer.send(notification)
 

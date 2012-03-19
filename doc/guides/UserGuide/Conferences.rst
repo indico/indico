@@ -704,7 +704,7 @@ From this list you can perform several actions on the registrants, as for exampl
 
 * **Add new**: It will open the registration form `(see Registration Form) <#registration-form>`_.
 * **Remove**: It will remove the selected registrants.
-* **Email**: It will allow to send an email to the selected registrants. Indico will send one email per participant. Also, you can profit from the Available tags to make it personal; Indico will replace the tag with the real value of the registrant, e.g. %(registrant_family_name)s will be Smith.
+* **Email**: It will allow to send an email to the selected registrants. Indico will send one email per participant. Also, you can profit from the Available tags to make it personal; Indico will replace the tag with the real value of the registrant, e.g. {registrant_family_name} will be Smith.
 
 |image102|
 

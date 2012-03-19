@@ -4493,7 +4493,7 @@ div.actionButton {
    font-size: 19px;
    color: #4E4C46;
    letter-spacing: 1px;
-   padding: 3px;
+   padding: 0;
 }
 
 .CRLabstractLeftDataCell {
@@ -4552,9 +4552,12 @@ ul.CRLIndexList {
     display: block;
     list-style-type: none;
     margin: 0;
-    padding: 0;
+    padding: 3px;
     padding-top: 10px;
     padding-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+
 }
 
 ul.CRLIndexList li {
