@@ -12,8 +12,19 @@ do
   esac
 done
 
-for EXECUTABLE in python2.6 python2.7; do
+
+CLONE_DIR=`pwd`
+mkdir /tmp/indico-build
+pushd /tmp/indico-build
+git clone $CLONE_DIR indico
+cd indico
+
+for EXECUTABLE in python2.7; do
     $EXECUTABLE setup.py egg_info $DATEOPT bdist_egg
     EGG_NAME=dist/`$EXECUTABLE setup.py egg_filename | tail -n 1`.egg
-    md5sum $EGG_NAME | sh -c 'read a; echo ${a%% *}' > $EGG_NAME.md5
+    $EXECUTABLE setup.py egg_info $DATEOPT bdist_egg
+    md5 $EGG_NAME | sh -c 'read a; echo ${a%% *}' > $EGG_NAME.md5
 done
+
+popd
+
