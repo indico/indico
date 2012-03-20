@@ -424,7 +424,6 @@ class RecordUploader(object):
 
         # take operations and choose which records to send
         for record in iterator:
-
             if len(currentBatch) > (self._batchSize - 1):
                 self._uploadBatch(currentBatch)
                 currentBatch = []

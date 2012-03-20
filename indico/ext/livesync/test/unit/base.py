@@ -91,8 +91,8 @@ class _TUpload(object):
     def tearDown(self):
         super(_TUpload, self).tearDown()
 
-        global FAKE_SERVICE_PORT
         self._fakeServer.shutdown()
+        global FAKE_SERVICE_PORT
         self._fakeServer.join()
 
         # can't reuse the same port, as the OS won't have it free
@@ -111,6 +111,9 @@ class _TUpload(object):
 
         with self._context('database'):
             task.run()
+
+        if self._fakeServer.exception:
+            raise self._fakeServer.exception[1]
 
     def testSmallUpload(self):
         """
@@ -171,3 +174,22 @@ class _TUpload(object):
                 'INDICO.0': {'title': None, 'deleted': True},
                 'INDICO.1': {'title': None, 'deleted': True}
                 })
+
+    def testMetadataProblem(self):
+        """
+        Gracefully fail to generate metadata for one record
+        """
+        with self._generateTestResult():
+            categ = self._home.newSubCategory(1)
+            conf1 = categ.newConference(self._dummy)
+            conf1.setTitle('Test Conference 1')
+            contrib1 = conf1.newContribution()
+            conf2 = categ.newConference(self._dummy)
+            conf2.setTitle('Test Conference 2')
+            conf1._Conference__owners = []
+
+        from MaKaC.common.contextManager import ContextManager
+
+        self.assertEqual(
+            self._recordSet,
+            {'INDICO.1': {'title': 'Test Conference 2', 'deleted': False}})

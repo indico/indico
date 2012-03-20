@@ -755,7 +755,14 @@ class ConferenceParticipantBase:
             urlInvitation.addParam("participantId","%s"%participant.getId())
             urlRefusal = urlHandlers.UHConfParticipantsRefusal.getURL( self._conf )
             urlRefusal.addParam("participantId","%s"%participant.getId())
-            data["body"] = data["body"].format(name=participant.getEmail(), confTitle=self._conf.getTitle(), url=urlHandlers.UHConferenceDisplay.getURL( self._conf ), urlRefusal=urlRefusal, urlInvitation=urlInvitation)
+
+            mailEnv = dict(name=participant.getEmail(),
+                           confTitle=self._conf.getTitle(),
+                           url=urlHandlers.UHConferenceDisplay.getURL( self._conf ),
+                           urlRefusal=urlRefusal, urlInvitation=urlInvitation)
+
+            data["body"] = data["body"].format(**mailEnv)
+            data["subject"] = data["subject"].format(**mailEnv)
             GenericMailer.sendAndLog(GenericNotification(data),self._conf,"participants", self._getUser())
 
 class ConferenceAddEditParticipantBase(ConferenceParticipantBase):
