@@ -501,7 +501,6 @@ class Webcast(Persistent):
     def __init__( self, event, audience="" ):
         self._event = event
         self._id = event.getId()
-        self._startDate = event.getStartDate()
         self._audience = audience
 
     def getId( self ):
@@ -514,7 +513,7 @@ class Webcast(Persistent):
         return self._event.getTitle()
 
     def getStartDate( self ):
-        return self._startDate
+        return self._event.getStartDate()
 
     def getRoom(self):
         r = self._event.getRoom()

@@ -173,6 +173,8 @@ class CSBooking(CSBookingBase):
                 return RecordingRequestError('remove', e)
 
     def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
+        manager = self._conf.getCSBookingManager()
+        manager._changeConfStartDateInIndex(self, oldStartDate, newStartDate)
         if MailTools.needToSendEmails('RecordingRequest'):
             try:
                 notification = RequestRescheduledNotification(self)
