@@ -15845,7 +15845,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/CategoryReallocation.tpl:11
 msgid ""
 "Please, select the destination category where to move the ones mentioned "
-"above (use the '+' icon to navigate in the category tree)"
+"above (use the '+' icon to navigate in the category tree and click on the title of the destination category)"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/CategoryStatistics.tpl:9
@@ -20715,7 +20715,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/ConferenceReallocation.tpl:9
 msgid ""
 "Please, select the destination category where to move the conferences "
-"mentioned above (use the '+' icon to navigate in the category tree)"
+"mentioned above (use the '+' icon to navigate in the category tree and click on the title of the destination category)"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfigUpcomingEvents.tpl:4

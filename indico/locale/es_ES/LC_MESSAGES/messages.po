@@ -16816,11 +16816,11 @@ msgstr "Seleccionar categorías a ser movidas"
 #: indico/MaKaC/webinterface/tpls/CategoryReallocation.tpl:11
 msgid ""
 "Please, select the destination category where to move the ones mentioned "
-"above (use the '+' icon to navigate in the category tree)"
+"above (use the '+' icon to navigate in the category tree and click on the title of the destination category)"
 msgstr ""
 "Por favor, seleccione la categoría de destino donde mover los mencionados"
 " anteriormente (utilice el icono \"+\" para navegar por el árbol de "
-"categorías)"
+"categorías y clique el título de la categoría destino para seleccionarla)"
 
 #: MaKaC/webinterface/tpls/CategoryStatistics.tpl:9
 #: indico/MaKaC/webinterface/tpls/CategoryStatistics.tpl:9
@@ -21925,11 +21925,11 @@ msgstr "Conferencias seleccionadas para ser movidas"
 #: indico/MaKaC/webinterface/tpls/ConferenceReallocation.tpl:9
 msgid ""
 "Please, select the destination category where to move the conferences "
-"mentioned above (use the '+' icon to navigate in the category tree)"
+"mentioned above (use the '+' icon to navigate in the category tree and click on the title of the destination category)"
 msgstr ""
 "Por favor, seleccione la categoría de destino a la que desea mover las "
 "conferencias mencionadas arriba (use el icono '+'  para navegar en el "
-"árbol de categorías)"
+"árbol de categorías y clique el título de la categoría destino para seleccionarla)"
 
 #: MaKaC/webinterface/tpls/ConfigUpcomingEvents.tpl:4
 #: indico/MaKaC/webinterface/tpls/ConfigUpcomingEvents.tpl:4
