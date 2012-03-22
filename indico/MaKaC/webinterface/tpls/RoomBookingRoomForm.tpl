@@ -42,6 +42,9 @@
         <div id="resvNotificationToResponsibleCH" class="tip">
              ${ _("Send start/end notifications to the room responsible, too.") }
         </div>
+        <div id="resvNotificationAssistanceCH" class="tip">
+             ${ _("Send notifications asking for assistance with room setup") }
+        </div>
         <div id="whereIsKeyCH" class="tip">
              ${ _("How to obtain a key. Typically a phone number.")}
         </div>
@@ -162,6 +165,10 @@
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Confirmations")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><input type="checkbox" ${' checked="checked" ' if room.resvsNeedConfirmation else ""} id="resvsNeedConfirmation" name="resvsNeedConfirmation" /> ${contextHelp('resvsNeedConfirmationCH' )}</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> ${ _("Assistance")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvNotificationAssistance else ''} id="resvNotificationAssistance" name="resvNotificationAssistance" />${ contextHelp( 'resvNotificationAssistanceCH' ) }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Notification on booking start")}&nbsp;&nbsp;</small></td>

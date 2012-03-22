@@ -16,8 +16,8 @@ done
 CLONE_DIR=`pwd`
 mkdir /tmp/indico-build
 pushd /tmp/indico-build
-git clone $CLONE_DIR
-cd cds-indico
+git clone $CLONE_DIR indico
+cd indico
 
 for EXECUTABLE in python2.6 python2.7; do
     $EXECUTABLE setup.py egg_info $DATEOPT bdist_egg

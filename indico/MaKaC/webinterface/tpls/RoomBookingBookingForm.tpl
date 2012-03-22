@@ -251,6 +251,19 @@
                                                 </td>
                                             </tr>
                                         % endif
+                                        % if rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance:
+                                            <tr>
+                                            <td align="right" class="subFieldWidth" valign="top"><small>${ _("Assistance")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                                <table cellpadding=0 cellspacing=0>
+                                                <tr>
+                                                    <td style="vertical-align:top;"><input id="needsAssistance" name="needsAssistance" type="checkbox" ${' checked="checked" ' if candResv.needsAssistance else ""} /></td>
+                                                    <td style="width:100%;padding-left: 3px;">${_("Request technical assistance for the startup of your meeting. A technician will be present 10 to 15 mn before the event to help you start up the room equipment")}</td>
+                                                </tr>
+                                                </table>
+                                            </td>
+                                            </tr>
+                                        % endif
                                     </table>
                                 </td>
                             </tr>

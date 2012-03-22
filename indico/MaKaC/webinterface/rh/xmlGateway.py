@@ -710,6 +710,7 @@ class RHStatsRoomBooking( base.RoomBookingDBMixin, RHXMLHandlerBase ):
         resvex.usesAVC = True
         nbAVResvs = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
         resvex.needsAVCSupport = True
+        resvex.needsAssistance = False
         nbAVResvsWithSupport = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
 
         self._createIndicator(XG, "nbbookings", "total number of bookings for today", nbResvs)

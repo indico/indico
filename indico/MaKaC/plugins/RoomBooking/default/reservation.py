@@ -396,6 +396,10 @@ class Reservation( Persistent, ReservationBase, Observable ):
                     if not resvCandidate.needsAVCSupport == resvEx.needsAVCSupport:
                         continue
 
+                if resvEx.needsAssistance != None:
+                    if not resvCandidate.needsAssistance == resvEx.needsAssistance:
+                        continue
+
             # META-PROGRAMMING STYLE OF CHECKING ATTRIBUTES EQUALITY
             # ABANDONED DUE TO PERFORMANCE PROBLEMS
             # Are standard conditions met? (other attributes equality)

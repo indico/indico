@@ -3507,13 +3507,13 @@ class Conference(CommonObjectBase, Locatable):
     def removeContribution( self, contrib, callDelete=True ):
         if not self.contributions.has_key( contrib.getId() ):
             return
-        for sub in contrib.getSubmitterList():
+        for sub in contrib.getSubmitterList()[:]:
             self.removeContribSubmitter(contrib,sub)
-        for auth in contrib.getPrimaryAuthorList():
+        for auth in contrib.getPrimaryAuthorList()[:]:
             contrib.removePrimaryAuthor(auth)
-        for auth in contrib.getCoAuthorList():
+        for auth in contrib.getCoAuthorList()[:]:
             contrib.removeCoAuthor(auth)
-        for spk in contrib.getSpeakerList():
+        for spk in contrib.getSpeakerList()[:]:
             contrib.removeSpeaker(spk)
         del self.contributions[ contrib.getId() ]
         if callDelete:

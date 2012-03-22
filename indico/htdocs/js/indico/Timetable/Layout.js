@@ -577,7 +577,7 @@ type("RoomLayoutManager", ["CompactLayoutManager"],
             var roomNames = keys(this.roomsCols);
             var cols = roomNames.length;
             var borderPixels = 1; // this is because of the separators between the room names
-            return Html.div({style:{marginLeft:pixels(TimetableDefaults.leftMargin), paddingBottom:pixels(10), paddingTop:pixels(10)}},
+            return Html.div({style:{marginLeft:pixels(TimetableDefaults.leftMargin), paddingBottom:pixels(10), paddingTop:pixels(20)}},
                     translate(roomNames, function(key){
                         return Html.div({className: "headerRoomLayoutTimeTable",
                                          style:{width:pixels(Math.floor((width-TimetableDefaults.leftMargin)/cols)-borderPixels)}

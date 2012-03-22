@@ -6,7 +6,7 @@
         <td align="left" colspan="2" bgcolor="white" style="padding-bottom:10px">
              ${ _("Selected conferences to be moved")}:
             <ul>${ selectedItems }</ul>
-             ${ _("Please, select the destination category where to move the conferences mentioned above (use the '+' icon to navigate in the category tree)")}:<br>
+             ${ _("Please, select the destination category where to move the conferences mentioned above (use the '+' icon to navigate in the category tree) and click on the title of the destination category")}:<br>
                 ${ categTree }
         </td>
     </tr>

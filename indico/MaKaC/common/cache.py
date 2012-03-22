@@ -349,7 +349,7 @@ class FileCacheClient(object):
             filename = parts[0]
         else:
             namespace, filename = parts
-        dir = os.path.join(self._dir, namespace)
+        dir = os.path.join(self._dir, namespace, filename[:4], filename[:8])
         if mkdir and not os.path.exists(dir):
             os.makedirs(dir)
         return os.path.join(dir, filename)

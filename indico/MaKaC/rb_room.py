@@ -712,6 +712,7 @@ startNotification: #{self.resvStartNotification}
   endNotification: #{self.resvEndNotification}
 startNotificationBefore:   #{self.resvStartNotificationBefore}
 notificationToResponsible: #{self.resvNotificationToResponsible}
+notificationAssistance: #{self.resvNotificationAssistance}
 
              site: #{self.site}
          capacity: #{self.capacity}
@@ -782,6 +783,7 @@ notificationToResponsible: #{self.resvNotificationToResponsible}
     resvStartNotificationBefore = None # bool - whether to send notifications on booking start
     resvEndNotification = False # bool - whether to send notifications on booking end
     resvNotificationToResponsible = False # bool - whether to send notifications to the room responsible, too
+    resvNotificationAssistance = False # bool - whether to send notifications on assistance
 
     telephone = None      # str
     surfaceArea = None    # int, positive - in meters^2
