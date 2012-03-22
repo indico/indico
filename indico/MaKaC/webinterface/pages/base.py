@@ -25,6 +25,7 @@ from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+import os
 
 from MaKaC.plugins.base import OldObservable
 
@@ -49,29 +50,30 @@ class WPBase(OldObservable):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
         if info.isDebugActive():
-            return ['js/%s/%s/Loader.js' % (module, packageName)]
+            return ['js/%s/%s/Loader.js?%d' % (module, packageName, os.stat('%s/js/%s/%s/Loader.js'%(Config().getHtdocsDir(), module, packageName)).st_mtime )]
         else:
-            return ['js/%s/pack/%s.js.pack' % (module, packageName)]
+            return ['js/%s/pack/%s.js.pack?%d' % (module, packageName, os.stat('%s/js/%s/pack/%s.js.pack'%(Config().getHtdocsDir(),module, packageName)).st_mtime )]
 
     def _includeJQuery(self):
         # TODO: rename this to _includeJSLibs or something similar
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
+
         files = ['underscore', 'jquery', 'jquery-ui', 'jquery.form', 'jquery.custom',
                  'jquery.daterange', 'jquery.qtip', 'jquery.dttbutton', 'jquery.colorbox',
                  'jquery.menu', 'date']
         if info.isDebugActive():
             # We can't use Loader.js as jQuery is included before any indico js
-            return ['js/jquery/%s.js' % f for f in files]
+            return ['js/jquery/%s.js?%d' % (f, os.stat('%s/js/jquery/%s.js'%(Config().getHtdocsDir(), f)).st_mtime) for f in files]
         else:
-            return ['js/jquery/pack/jquery.js.pack']
+            return ['js/jquery/pack/jquery.js.pack?%d' % os.stat('%s/js/jquery/pack/jquery.js.pack'%Config().getHtdocsDir()).st_mtime]
 
     def _includeJSFile(self, path, filename):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
         if info.isDebugActive():
-            return ['%s/%s.js' % (path, filename)]
+            return ['%s/%s.js?%d' % (path, filename, os.stat('%s/%s/%s.js'%(Config().getHtdocsDir(), path, filename)).st_mtime)]
         else:
-            return ['%s/%s.js.pack' % (path, filename)]
+            return ['%s/%s.js.pack?%d' % (path, filename, os.stat('%s/%s/%s.js.pack'%(Config().getHtdocsDir(),path, filename)).st_mtime)]
 
     def _includePresentationFiles(self):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
