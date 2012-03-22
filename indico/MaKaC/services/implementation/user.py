@@ -454,17 +454,15 @@ class UserSyncPersonalData(UserPersonalDataBase):
             getattr(self._user, setter)(val)
         return dict(val=val)
 
-class UserSetPersistentSignatures(LoggedOnlyService):
+class UserSetPersistentSignatures(UserPersonalDataBase):
 
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        self._target = self._avatar = self.getAW().getUser()
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        ak = self._avatar.getAPIKey()
-        if ak and ak.isBlocked():
-            raise ServiceAccessError((_("The API Key is blocked")))
+        pm = ParameterManager(self._params)
+        userId = pm.extract("userId", str, False, "")
+        self._currentUser = self.getAW().getUser()
+        self._target = self._avatar = user.AvatarHolder().getById(userId)
+        if self._target == None:
+            raise ServiceAccessError((_("The user with does not exist")))
 
     def _getAnswer(self):
         ak = self._avatar.getAPIKey()

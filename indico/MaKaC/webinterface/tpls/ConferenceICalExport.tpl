@@ -29,7 +29,7 @@
         }
     }
 
-    exportPopups["${self_._conf.getUniqueId()}"] = new ExportIcalInterface(${apiMode}, ${persistentUserEnabled | n,j}, ${persistentAllowed | n,j}, ${apiActive | n,j}, ${userLogged | n,j}, setURLs, 'event.api.getExportURLs', {confId:"${self_._conf.getId()}"}, ${requestURLs | n,j}, "${self_._conf.getUniqueId()}");
+    exportPopups["${self_._conf.getUniqueId()}"] = new ExportIcalInterface(${apiMode}, ${persistentUserEnabled | n,j}, ${persistentAllowed | n,j}, ${apiActive | n,j}, ${userLogged | n,j}, setURLs, 'event.api.getExportURLs', {confId:"${self_._conf.getId()}"}, ${requestURLs | n,j}, "${self_._conf.getUniqueId()}", "${currentUser.getId() if currentUser else ''}");
 
     $("body").delegate('#detailExport${self_._conf.getUniqueId()}', "click", function(e) {
         setURLs(exportPopups["${self_._conf.getUniqueId()}"].getRequestURLs());

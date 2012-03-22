@@ -10,7 +10,7 @@
         $('#authLink${session.getUniqueId()}').attr('title', urls["authRequestURL"]);
     };
 
-    exportPopups["${session.getUniqueId()}"] = new ExportIcalInterface(${apiMode}, ${persistentUserEnabled | n,j}, ${persistentAllowed | n,j}, ${apiActive | n,j}, ${userLogged | n,j}, setURLs, 'schedule.api.getSessionExportURLs', {confId:"${session.getConference().getId()}", sessionId:"${session.getId()}"}, ${requestURLs | n,j}, "${session.getUniqueId()}");
+    exportPopups["${session.getUniqueId()}"] = new ExportIcalInterface(${apiMode}, ${persistentUserEnabled | n,j}, ${persistentAllowed | n,j}, ${apiActive | n,j}, ${userLogged | n,j}, setURLs, 'schedule.api.getSessionExportURLs', {confId:"${session.getConference().getId()}", sessionId:"${session.getId()}"}, ${requestURLs | n,j}, "${session.getUniqueId()}", "${currentUser.getId() if currentUser else ''}");
 
     </script>
 </%block>
