@@ -1,7 +1,7 @@
 Dear Conference Rooms Service,
 
 
-${ currentUser.getStraightFullName()} requested ASSISTANCE for the meeting startup.
+${ currentUser.getStraightFullName()} ${'has cancelled' if hasCancelled else 'requested'} ASSISTANCE for the meeting startup.
 
 For:  ${ reservation.bookedForName }
 Reason: ${ reservation.reason }

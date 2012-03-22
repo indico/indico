@@ -1,7 +1,7 @@
 # Translations template for indico.
 # Copyright (C) 2012 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# 
+#
 # Translators:
 # Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012.
 #   <thomas.baron@cern.ch>, 2011, 2012.
@@ -23341,7 +23341,7 @@ msgstr "J'utiliserai l'équipement de vidéo-conférence (merci de ne cocher que
 
 #: MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:247
 #: indico/MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:247
-msgid "I need assistance with this video-conf. system"
+msgid "Request assistance for the startup of the videoconference session. This support will most probably be done remotely"
 msgstr "J'ai besoin d'assistance avec ce système de video-conférence"
 
 #: MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:264

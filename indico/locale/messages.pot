@@ -23149,7 +23149,7 @@ msgstr ""
 
 #: MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:247
 #: indico/MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:247
-msgid "I need assistance with this video-conf. system"
+msgid "Request assistance for the startup of the videoconference session. This support will most probably be done remotely"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:264
