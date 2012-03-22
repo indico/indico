@@ -152,7 +152,7 @@ class TestIOIndex(unittest.TestCase):
     def testFwdIndex(self):
         objs = self._indexSomeElements()
         for i in range(0, 200):
-            self.assertIn(objs[i], self._idx._fwd_index[i/10])
+            self.assertTrue(objs[i] in self._idx._fwd_index[i/10])
 
     def testRevIndex(self):
         self._indexSomeElements()
