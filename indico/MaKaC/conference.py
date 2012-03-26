@@ -4691,6 +4691,7 @@ class Conference(CommonObjectBase, Locatable):
             self._modPay= epayment.EPayment(self)
         return self._modPay
 
+
     def getRegistrants(self):
         try:
             if self._registrants:

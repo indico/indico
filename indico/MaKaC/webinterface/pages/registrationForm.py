@@ -43,15 +43,23 @@ from MaKaC.registration import RadioGroupInput, TextareaInput
 # ----------------- MANAGEMENT AREA ---------------------------
 class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
 
+    def getJSFiles(self):
+        return conferences.WPConferenceModifBase.getJSFiles(self) + \
+               self._includeJSPackage('regform_edition')
+
+    def getCSSFiles(self):
+        return conferences.WPConferenceModifBase.getCSSFiles(self) + \
+                   ['js/indico/RegistrationForm/css/regForm.css']
+
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
         self._tabRegFormSetup = self._tabCtrl.newTab( "regformsetup", _("Setup"), \
                 urlHandlers.UHConfModifRegForm.getURL( self._conf ) )
+        self._tabRegistrationPreview = self._tabCtrl.newTab( "edit", _("Edit"), \
+                urlHandlers.UHConfModifRegistrationPreview.getURL( self._conf ) )
         self._tabRegistrants = self._tabCtrl.newTab( "registrants", _("Registrants"), \
                 urlHandlers.UHConfModifRegistrantList.getURL( self._conf ) )
-        self._tabRegistrationPreview = self._tabCtrl.newTab( "preview", _("Preview"), \
-                urlHandlers.UHConfModifRegistrationPreview.getURL( self._conf ) )
         self._tabEPay = self._tabCtrl.newTab( "epay", _("e-payment"), \
                 urlHandlers.UHConfModifEPayment.getURL( self._conf ) )
         self._tabETicket = self._tabCtrl.newTab("eticket", _("e-ticket"),
@@ -1381,7 +1389,12 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
 
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
+               self._includeJSPackage('Management') + \
+               self._includeJSPackage('regform_display')
+
+    def getCSSFiles(self):
+        return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+                   ['js/indico/RegistrationForm/css/regForm.css']
 
     def _getBody(self, params):
         wc = WConfRegistrationFormDisplay(self._conf, self._rh._getUser())
@@ -1428,6 +1441,7 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         for gs in regForm.getSortedForms():
             wcomp=self._getWComp(gs, pdFormValues)
             if gs.isEnabled():
+                html.append( """%s"""%wcomp.getHTML())
                 html.append( """
                             <tr>
                               <td align="left" style="padding-bottom:10px;">
@@ -1442,8 +1456,9 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         regForm = self._conf.getRegistrationForm()
         vars["body_title"] = self._getTitle()
         vars["title"] = regForm.getTitle()
+        vars["confId"] = self._conf.getId()
         vars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
-        vars["otherSections"]=self._getOtherSectionsHTML()
+        #vars["otherSections"]=self._getOtherSectionsHTML()
         return vars
 
 
@@ -1455,6 +1470,7 @@ class WConfRegistrationFormPreview(WConfRegistrationFormDisplay):
 
     def getHTML(self):
         return WConfRegistrationFormDisplay.getHTML(self)
+
 
 class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
 
@@ -2456,7 +2472,11 @@ class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
 
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
+               self._includeJSPackage('regform_display')
+
+    def getCSSFiles(self):
+        return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+                   ['js/indico/RegistrationForm/css/regForm.css']
 
     def _getBody(self, params):
         wc = WConfRegistrationFormModify(self._conf, self._rh._getUser())

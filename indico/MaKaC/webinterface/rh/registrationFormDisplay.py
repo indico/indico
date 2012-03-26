@@ -119,7 +119,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         sessions = sessionForm.getSessionsFromParams(params)
         params["sessions"] = sessions
         # ACCMMODATION
-        params["accommodationType"] = self._regForm.getAccommodationForm().getAccommodationTypeById(params.get("accommodationType", ""))
+        params["accommodationType"] = self._regForm.getAccommodationForm().getAccommodationTypeById(params.get("accommodation_type", ""))
         # SOCIAL EVENTS
         socialEventIds = self._normaliseListParam(params.get("socialEvents", []))
         se = []

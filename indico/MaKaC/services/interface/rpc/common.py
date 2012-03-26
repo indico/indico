@@ -21,7 +21,7 @@ import sys
 import traceback
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.fossils.error import ICausedErrorFossil, INoReportErrorFossil, IWarningFossil,\
-    IResultWithWarningFossil
+    IResultWithWarningFossil, IResultWithHighlightFossil
 
 class CausedError(Exception, Fossilizable):
 
@@ -140,4 +140,21 @@ class ResultWithWarning(Fossilizable):
         return self._warning
 
     def hasWarning(self):
+        return True
+
+class ResultWithHighlight(Fossilizable):
+
+    fossilizes(IResultWithHighlightFossil)
+
+    def __init__(self, result, highlight):
+        self._result = result
+        self._highlight = highlight
+
+    def getResult(self):
+        return self._result
+
+    def getHighlight(self):
+        return self._highlight
+
+    def hasHighlight(self):
         return True

@@ -715,5 +715,216 @@ extend(IndicoUI.Dialogs,
                                        new AlertPopup($T("Error"), error.message).open();
                                    }
                                });
-           }
-       });
+           },
+
+
+       /**
+        * Creates a dialog that allows adding or edition an field in registration form
+        * in registration form
+        */
+           regFormUpadField: function(field,method,args){
+               var parameterManager = new IndicoUtil.parameterManager();
+               var info = new WatchObject();
+               var killLoadProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
+               var isEdit = true;
+               IndicoUtil.waitLoad([], function(retVal) {
+                       killLoadProgress();
+                       var submitInfo = function() {
+                           args.userData = info.getAll();
+                           if (parameterManager.check()) {
+                               var killProgress = IndicoUI.Dialogs.Util.progress();
+                               indicoRequest("regForm.registrantionForm.UpdateField", args,
+                                     function(result, error){
+                                         killProgress();
+                                         if (error) {
+                                             IndicoUtil.errorReport(error);
+                                         } else {
+                                             section = $.parseJSON(result.section);
+                                             method(section);
+                                             popup.close();
+
+                                         }
+                                     });
+                               }
+                       };
+                       var popup = new ExclusivePopupWithButtons(isEdit ? $T('Change field') : $T('Create Field'), positive, true, false, true);
+                       popup.postDraw = function() {
+                           this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
+                       };
+
+                       popup._getButtons = function() {
+                           return [
+                               [isEdit ? $T('Save'):$T('Add'), function() {
+                                   submitInfo();
+                               }],
+                               [$T('Cancel'), function() {
+                                   popup.close();
+                               }]
+                           ];
+                       };
+
+                       popup.draw = function() {
+                           var self = this;
+                           var tabs = null;
+
+                           /******************************************************
+                            * This is the setup for the edition of sessions slots
+                            *******************************************************/
+                           if (isEdit){
+                               info.set('caption', field.caption);
+                               info.set('input', field.input);
+                               info.set('description', field.description);
+                               info.set('mandatory', field.mandatory);
+                               info.set('length', field.values.length);
+                               info.set('numberOfColumns', field.values.numberOfColumns);
+                               info.set('numberOfRows', field.values.numberOfRows);
+                               info.set('minValue', field.values.minValue);
+                               info.set('billable', field.billable);
+                               info.set('placesLimit', field.placesLimit);
+                               info.set('price', field.price);
+                           }/******************************************************/
+                           tabs = [[ $T("Basic"), self._drawMainTab(info)]];
+                           //tabs.push([$T("Basic"), self._drawMainTab(info)]);
+                           var tabWidget = new JTabWidget(tabs, 600, 400);
+                           tabWidget.draw();
+                           return this.ExclusivePopupWithButtons.prototype.draw.call(this, tabWidget.draw());
+                       };
+
+                       popup._buildTable = function(minValue, maxValue, warning) {
+
+                           var div = Html.div({style:{paddingLeft:'2px'}});
+                           var spanTitle = Html.span({className:'dataCaptionFormat'},"Scale for each answer: ")
+                           var structure = Html.table({},
+                                               Html.tbody({},
+                                                   Html.tr({},Html.td("supportEntry", "From :"),
+                                                       Html.td({}, minValue),
+                                                       Html.td("supportEntry", "To :"),
+                                                       Html.td({}, maxValue))));
+                           div.append(spanTitle);
+                           div.append(structure);
+                           if (warning) { // edit mode
+                               div.append(warning);
+                           }
+                           return div;
+                       },
+
+                       popup._buildAdditionalText = function(element, info, warning) {
+
+                           var div = Html.div({},Html.em({},element, info));
+
+                           return div;
+                       },
+
+                       popup._drawMainTab = function(info) {
+                           var self = this;
+
+                           dictMandatory = {};
+                           if (field.lock.indexOf("mandatory") > -1){
+                               dictMandatory = {disabled:"disabled"};
+                           }
+
+                           var content = [
+                                          [$T('Caption'), $B(parameterManager.add(Html.edit({ id: 'sessionTitle', size:50}), 'text', false), info.accessor('caption'))],
+                                          [$T('Description'), $B(Html.textarea({cols: 50, rows: 5}),  info.accessor('description'))],
+                                          [$T('Mandatory field'), $B(Html.input('checkbox', dictMandatory),  info.accessor('mandatory'))],
+                                         ];
+
+                           if (field.input == "yesno") {
+                               content.push([$T('Billable'), $B(Html.input('checkbox',{}),  info.accessor('billable'))]);
+                               content.push([$T('Price'), $B(parameterManager.add(Html.edit({size: 5}), 'int', false), info.accessor('price'))]);
+                               var el = $B(parameterManager.add(Html.edit({size: 5}), 'int', false), info.accessor('placesLimit'));
+                               content.push([$T('Places'), popup._buildAdditionalText(el, "(0 for unlimited)")]);
+                           } else if (field.input == "telephone") {
+                               content.push([$T('Size in chars'), $B(parameterManager.add(Html.edit({}), 'text', true), info.accessor('length'))]);
+                           } else if (field.input == "text") {
+                               content.push([$T('Size in chars'), $B(parameterManager.add(Html.edit({}), 'text', true), info.accessor('length'))]);
+                           } else if (field.input == "textarea") {
+                               content.push([$T('Number of columns'), $B(parameterManager.add(Html.edit({}), 'text', true), info.accessor('numberOfColumns'))]);
+                               content.push([$T('Number of rows'), $B(parameterManager.add(Html.edit({}), 'text', true), info.accessor('numberOfRows'))]);
+                           } else if (field.input == "number") {
+                               content.push([$T('Min. value'), $B(parameterManager.add(Html.edit({}), 'text', true), info.accessor('numberOfColumns'))]);
+                               content.push([$T('Row length'), $B(parameterManager.add(Html.edit({}), 'text', true), info.accessor('numberOfRows'))]);
+                               content.push([$T('Billable'), $B(Html.input('checkbox',{}),  info.accessor('billable'))]);
+                               content.push([$T('Price (multiplied with entered number)'), $B(parameterManager.add(Html.edit({}), 'text', true), info.accessor('price'))]);
+                           } else if (field.input == "label") {
+                               content.push([$T('Billable'), $B(Html.input('checkbox',{}),  info.accessor('billable'))]);
+                               content.push([$T('Price'), $B(parameterManager.add(Html.edit({}), 'text', true), info.accessor('price'))]);
+                           } else if (field.input == "checkbox") {
+                               content.push([$T('Billable'), $B(Html.input('checkbox',{}),  info.accessor('billable'))]);
+                               content.push([$T('Price'), $B(parameterManager.add(Html.edit({size: 5}), 'text', true), info.accessor('price'))]);
+                               var el = $B(parameterManager.add(Html.edit({size: 5}), 'int', false), info.accessor('placesLimit'));
+                               content.push([$T('Places'), popup._buildAdditionalText(el, "(0 for unlimited)")]);
+                           } else if (field.input == "date") {
+                               content.push([$T('Date format (TODO)'), $B(parameterManager.add(Html.edit({}), 'text', false), info.accessor('format'))]);
+                           } else if (field.input == "radio") {
+                               content.push([$T('radio!!(TODO)'), $B(parameterManager.add(Html.edit({}), 'text', false), info.accessor('format'))]);
+                           }
+
+                           return IndicoUtil.createFormFromMap(content);
+                       };
+
+                       popup.open();
+
+                   }).run();
+           },
+
+
+/**
+ * Creates a dialog that allows adding or edition an field in registration form
+ * in registration form
+ */
+    regFormUpdateField2: function(field,method,args){
+        var parameterManager = new IndicoUtil.parameterManager();
+        var info = new WatchObject();
+        var killLoadProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
+        var isEdit = true;
+        IndicoUtil.waitLoad([], function(retVal) {
+                killLoadProgress();
+                var submitInfo = function() {
+                    args.userData = info.getAll();
+                    if (parameterManager.check()) {
+                        var killProgress = IndicoUI.Dialogs.Util.progress();
+                        indicoRequest("regForm.registrantionForm.UpdateField", args,
+                              function(result, error){
+                                  killProgress();
+                                  if (error) {
+                                      IndicoUtil.errorReport(error);
+                                  } else {
+                                      section = $.parseJSON(result.section);
+                                      method(section);
+                                      popup.close();
+
+                                  }
+                              });
+                        }
+                };
+                var popup = new ExclusivePopupWithButtons(isEdit ? $T('Change field') : $T('Create Field'), positive, true, false, true);
+                popup.postDraw = function() {
+                    var dialogView = new RegFormFieldsEditView({el:$("#dialogBody")});
+                    dialogView.render();
+                    this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
+
+                };
+
+                popup._getButtons = function() {
+                    return [
+                        [isEdit ? $T('Save'):$T('Add'), function() {
+                            submitInfo();
+                        }],
+                        [$T('Cancel'), function() {
+                            popup.close();
+                        }]
+                    ];
+                };
+
+                popup.draw = function() {
+                    var self = this;
+                    var div = Html.div({id:"dialogBody"});
+                    return this.ExclusivePopupWithButtons.prototype.draw.call(this, div);
+                };
+
+                popup.open();
+
+            }).run();
+    },
+});

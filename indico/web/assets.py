@@ -173,6 +173,37 @@ indico_badges_css = Bundle('css/badges.css',
                            filters='cssmin', output='css/indico_badges_%(version)s.min.css')
 
 
+html5_cross_browser_compatibility = Bundle('js/html5/webshim/minified/extras/modernizr-custom.js',
+                                           'js/html5/webshim/minified/polyfiller.js',
+                                   filters='jsmin', output='html5_cross_browser_compatibility_%(version)s.min.js')
+
+indico_backbone = Bundle('js/backbone/backbone.js',
+                         'js/indico/Backbone/templateManager.js',
+                         filters='jsmin', output='indico_backbone_%(version)s.min.js')
+
+indico_regform_base = Bundle(indico_backbone,
+                             'js/indico/RegistrationForm/utils/vars.js',
+                             'js/indico/RegistrationForm/utils/baseModel.js',
+                             'js/indico/RegistrationForm/utils/miscellaneous.js',
+                             filters='jsmin', output='indico_regform_base_%(version)s.min.js')
+
+indico_regform_display = Bundle(html5_cross_browser_compatibility,
+                                indico_regform_base,
+                               'js/indico/RegistrationForm/models/regFormDisplayModels.js',
+                               'js/indico/RegistrationForm/views/regFormDisplayView.js',
+                               filters='jsmin', output='indico_regFormDisplay_%(version)s.min.js')
+
+indico_regform_edition = Bundle(indico_regform_display,
+                               'js/indico/RegistrationForm/views/editionTableView.js',
+                               'js/indico/RegistrationForm/models/regFormEditionModels.js',
+                               'js/indico/RegistrationForm/views/regFormEditionView.js',
+                               'js/indico/RegistrationForm/views/regFormFieldDialogEditView.js',
+                               'js/indico/RegistrationForm/views/regFormSectionDialogMgmtView.js',
+                               'js/indico/RegistrationForm/views/regFormSectionDialogCreateView.js',
+                               'js/indico/RegistrationForm/views/regFormSectionDialogEditView.js',
+                               filters='jsmin', output='indico_regFormEdition_%(version)s.min.js')
+
+
 class DebugLevelFilter(Filter):
     name = 'debug_level'
     max_debug_level = None
@@ -307,9 +338,14 @@ def register_all_js(env):
     env.register('indico_jquery', indico_jquery)
     env.register('indico_authors', indico_jquery_authors)
     env.register('indico_badges_js', indico_badges_js)
+    env.register('indico_regform_display', indico_regform_display)
+    env.register('indico_regform_edition', indico_regform_edition)
     env.register('base_js', base_js)
     env.register('ie_compatibility', ie_compatibility)
 
+indico_regform = Bundle('js/indico/RegistrationForm/css/regForm.css',
+                         filters=('cssmin'),
+                          output='indico_regform_%(version)s.min.css')
 
 def register_all_css(env, main_css_file):
 
@@ -332,3 +368,4 @@ def register_all_css(env, main_css_file):
     env.register('indico_badges_css', indico_badges_css)
     env.register('base_css', base_css)
     env.register('screen_sass', screen_sass)
+    env.register('regform_css',indico_regform)

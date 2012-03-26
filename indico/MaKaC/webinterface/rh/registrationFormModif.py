@@ -27,6 +27,10 @@ from datetime import datetime
 from MaKaC.common import utils
 from MaKaC.i18n import _
 
+# indico legacy imports
+from MaKaC.services.implementation.base import AdminService, ParameterManager, \
+     ServiceError
+
 class RHRegistrationFormModifBase( conferenceModif.RHConferenceModifBase ):
 
     def _checkProtection( self ):
@@ -275,7 +279,7 @@ class RHRegistrationFormModifAccommodationTypeRemove( RHRegistrationFormModifBas
 
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
-        self._accoTypeIds = self._normaliseListParam(params.get("accommodationType", []))
+        self._accoTypeIds = self._normaliseListParam(params.get("accommodation_type", []))
         self._confirm = params.has_key( "confirm" )
         self._cancel = params.has_key( "cancel" )
 
@@ -1140,3 +1144,4 @@ class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBa
         else:
             session.pop('tmpStatus', None)
         self._redirect("%s#statuses"%urlHandlers.UHConfModifRegForm.getURL(self._conf.getRegistrationForm()))
+

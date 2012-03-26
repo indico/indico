@@ -1,4 +1,7 @@
 <script>
+ /* load all polyfill features */
+  $.webshims.polyfill();
+
   var validators = [];
   var parameterManager = new IndicoUtil.parameterManager();
   var addParam = parameterManager.add;
@@ -29,6 +32,7 @@
       enableAll(f);
       return true;
   }
+
 </script>
 
 <form action=${ postURL } method="POST" onSubmit="return formSubmit(this);" enctype="multipart/form-data">

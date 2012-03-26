@@ -30,3 +30,4 @@ $.fn.qtip.defaults = $.extend(true, {}, $.fn.qtip.defaults, {
 $.extend($.colorbox.settings, {
     opacity: 0.6
 });
+

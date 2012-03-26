@@ -631,7 +631,7 @@ class RHRegistrantAccommodationPerformModify( RHRegistrantModifBase ):
                 self._departureDate = utils.stringToDate(self._departureDate)
                 if self._arrivalDate > self._departureDate:
                     raise FormValuesError("Arrival date has to be earlier than departure date")
-            self._accoType = self._regForm.getAccommodationForm().getAccommodationTypeById(params.get("accommodationType", ""))
+            self._accoType = self._regForm.getAccommodationForm().getAccommodationTypeById(params.get("accommodation_type", ""))
             if self._regForm.getAccommodationForm().getAccommodationTypesList() !=[] and self._accoType is None:
                 raise FormValuesError("It is mandatory to choose an accommodation in order to register")
 

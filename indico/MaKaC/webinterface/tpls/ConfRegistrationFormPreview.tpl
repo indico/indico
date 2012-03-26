@@ -1,31 +1,58 @@
-<form action="" method="POST">
+<div id="headPanel" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1); z-index: 100;" class="follow-scroll" style="z-index:1300;">
+            <table>
+                <tr >
+                    <td valign="bottom" align="left">
+                        <ul id="button-menu" class="ui-list-menu">
+                          <li class="left" >
+                              <a href="#" id="section_create">${ _("Create section")}</a>
+                          </li>
+                          <li class="middle" >
+                              <a href="#" id="sections_mgmt">${ _("Recover/Discard sections")}</a>
+                          </li>
+                          <li class="middle">
+                            <a href="#" id="collapse_all">${ _("Collapse All")}</a>
+                          </li>
+                          <li class="right">
+                            <a href="#" id="expand_all">${ _("Expand All")}</a>
+                          </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+    </div>
+    <div id="registrationForm" class="sortableForm"></div>
+    <div id="edit-popup"></div>
+    <div id="section-mgmt-popup" style="max-height : 500px;"></div>
+    <div id="section-create-popup"></div>
 
 <script type="text/javascript">
-  var validators = [];
-  var parameterManager = new IndicoUtil.parameterManager();
-  var addParam = parameterManager.add;
-</script>
+    $(document).ready(function(){
+        $.webshims.polyfill();
+        var confId = ${ confId };
+        var rfView = new RegFormEditionView({ el : $("div#registrationForm")});
+        var model = rfView.getModel();
+        var sectionsMgmt = new RegFormSectionsMgmtView ({el : $('#section-mgmt-popup'), model : model});
+        var sectionCreate = new RegFormSectionsCreateView ({el : $('#section-create-popup'), model : model});
 
-<table width="70%" align="center">
-    <tr><td>&nbsp;</td></tr>
-    <tr>
-        <td nowrap class="title"><center>${ title }</center></td>
-    </tr>
-    <tr>
-        <td colspan="2" align="left">
-            <br><b>${ _("""Please, note that fields marked with <font color="red">*</font> are mandatory""")}</b><br>
-        </td>
-    </tr>
-    <tr>
-        <td><br></td>
-    </tr>
-    ${ otherSections }
-    <tr>
-        <td><br></td>
-    </tr>
-    <tr>
-        <td align="center" style="border-top: 2px solid #777777;padding-top:10px"><input type="button" class="btn" value="${ _("register")}"></td>
-    </tr>
-</table>
-<br>
-</form>
+        // Create drop down menu
+        $('#button-menu').dropdown();
+        $(window).scroll(function(){
+            IndicoUI.Effect.followScroll();
+        });
+        // Menu function
+        $("#collapse_all").click(function(){
+            $("div.regFormSectionContent:visible").slideUp("slow");
+            $(".regFormButtonCollpase").button( "option", "icons", {primary:'ui-icon-triangle-1-w'} );
+        });
+        $("#expand_all").click(function(){
+            $("div.regFormSectionContent:hidden").slideDown("slow");
+            $(".regFormButtonCollpase").button( "option", "icons", {primary:'ui-icon-triangle-1-s'} );
+        });
+        $("#sections_mgmt").click(function(){
+            sectionsMgmt.show();
+        });
+        $("#section_create").click(function(){
+            sectionCreate.show();
+        });
+    });
+</script>

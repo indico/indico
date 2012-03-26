@@ -1,0 +1,624 @@
+textarea.form-ui-invalid,
+input[type="text"].form-ui-invalid,
+input[type="password"].form-ui-invalid,
+input[type="datetime"].form-ui-invalid,
+input[type="datetime-local"].form-ui-invalid,
+input[type="date"].form-ui-invalid,
+input[type="month"].form-ui-invalid,
+input[type="time"].form-ui-invalid,
+input[type="week"].form-ui-invalid,
+input[type="number"].form-ui-invalid,
+input[type="email"].form-ui-invalid,
+input[type="url"].form-ui-invalid,
+input[type="search"].form-ui-invalid,
+input[type="tel"].form-ui-invalid,
+input[type="color"].form-ui-invalid,
+select.form-ui-invalid,
+input[type="file"].form-ui-invalid,
+input[type="radio"].form-ui-invalid,
+input[type="checkbox"].form-ui-invalid {
+  border-color: #953b39;
+  outline: 0;
+  outline: thin dotted \9;
+  /* IE6-9 */
+  -webkit-box-shadow: inset 0 1px 1px #d59392, 0 0 8px #d59392;
+     -moz-box-shadow: inset 0 1px 1px #d59392, 0 0 8px #d59392;
+          box-shadow: inset 0 1px 1px #d59392, 0 0 8px #d59392;
+
+}
+
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="text"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+  padding: 4px;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+          border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+     -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+      -ms-transition: border linear 0.2s, box-shadow linear 0.2s;
+       -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+          transition: border linear 0.2s, box-shadow linear 0.2s;
+}
+
+.dateField > input[type="text"]{
+  padding: 0px;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {
+  border-color: rgba(82, 168, 236, 0.8);
+  outline: 0;
+  outline: thin dotted \9;
+  /* IE6-9 */
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  margin: 3px 0;
+  *margin-top: 0;
+  margin-right: 10px;
+  vertical-align: middle;
+  /* IE7 */
+
+  line-height: normal;
+  cursor: pointer;
+}
+
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+input[type="radio"],
+input[type="checkbox"] {
+  width: auto;
+}
+
+.uneditable-textarea {
+  width: auto;
+  height: auto;
+}
+
+select,
+input[type="file"] {
+  height: 25px;
+  /* In IE7, the height of the select element cannot be changed by height, only font-size */
+
+  *margin-top: 4px;
+  /* For IE7, add top margin to align select with labels */
+
+  line-height: 28px;
+}
+
+select {
+  //width: 220px;
+  border: 1px solid #bbb;
+}
+
+select[multiple],
+select[size] {
+  height: auto;
+}
+
+select:focus,
+input[type="file"]:focus,
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+.radio,
+.checkbox {
+  min-height: 18px;
+  padding-left: 18px;
+}
+
+.radio input[type="radio"],
+.checkbox input[type="checkbox"] {
+  float: left;
+  margin-left: -18px;
+}
+
+/************************************
+ * Registration form specific class
+ ***********************************/
+
+.ui-sortable {
+    cursor:move;
+}
+
+.regFormInfoMessage {
+    margin: 20px;
+    text-align: center;
+    padding: 15px;
+    color: #3A87AD;
+    background-color: #D9EDF7;
+    border-color: #BCE8F1;
+    border: 1px solid;
+    border-radius :5px;
+    font-size: 15px;
+    display: none;
+    text-align: center;
+    max-width: 90%;
+}
+
+.regFormAddFieldEntry:hover {
+    background-color:#ECEEFC;
+}
+
+.regFormAddFieldEntry {
+    margin: 8px;
+    padding: 8px;
+    border : 1px solid #CCC;
+    float : left;
+}
+
+.regFormAddFielIcon,  .regFormAddFielIcon img{
+    width : 48px;
+    height: 48px;
+    float : left;
+}
+
+.regFormAddFieldCloseBtn {
+    float: right;
+    position: relative;
+    top: -6px;
+    left: 9px;
+}
+.regFormAddFieldCloseBtn img{
+    height: 25px;
+    width: 25px;
+}
+
+.regFormInlineEdition {
+    border: dotted;
+    border-width: 1px;
+    background-color: white;
+}
+
+.regFormDialogTabContent {
+    margin-bottom: 30px;
+    margin-top: 20px;
+    min-width: 480px;
+}
+
+.regFormDialogEditionTable {
+    margin-right: 20px;
+}
+
+.regFormDialogEditLine {
+    clear : both;
+    margin-right : 30px;
+    margin-bottom: 15px;
+}
+
+.regFormDialogCaption {
+    margin-top: 3px;
+    width: 90px;
+    display: inline-block;
+    vertical-align: top;
+    white-space: normal;
+}
+
+.regFormDialogCaptionLine {
+    min-width: 180px;
+    display: block;
+    margin-bottom: 15px
+}
+
+.regFormEditLine{
+    padding-bottom : 7px;
+}
+
+.regFormSectionLeftSpacing1 {
+    padding-left : 15px;
+}
+.regFormPadding1 {
+    padding: 5px 0 5px 15px;
+}
+
+.regFormPadding2 {
+    padding: 10px 0 5px 15px;
+}
+/* Form Display CSS */
+
+.regFormSectionTitle, .regFormSectionTitleNoEvent {
+    font-family: "Times New Roman", Verdana, Arial;
+    font-size: 20px;
+    color: #0C4566;
+    padding: 3px 3px 3px 10px;
+    font-weight: bold;
+    margin: 0px;
+}
+.editableText {
+    cursor: text;
+}
+
+.regFormSection, .regFormSectionMgmt {
+    border: 1px solid #CCC;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    padding: 15px;
+    width:700px;
+    padding-bottom:25px;
+    margin-top:25px;
+}
+
+.regFormSectionNewSection {
+    width:625px;
+    font-family: "Times New Roman", Verdana, Arial;
+    font-size: 20px;
+    color: #0C4566;
+    padding: 10px;
+    font-weight: bold;
+    margin: 0px;
+}
+
+
+
+.regFormField{
+    width: 100%;
+    /* display: block; */
+}
+
+.regFormFieldDisabled {
+    width: 100%;
+    background : #EBEBEB;
+}
+
+.regFormFieldDisabled:hover {
+    background : #CCC;
+
+}
+
+/* Form Edition CSS */
+
+.editableItem:hover, .editableText:hover  {
+    background-color:#ECEEFC;
+}
+
+.regFormFloatRight{
+    align: right;
+    text-align: right;
+    overflow: 'visible';
+    background-color: #ECEEFC;
+}
+
+.regFormSectionMgmt {
+     margin:15px;
+     padding: 0px;
+}
+
+.regFormHeader {
+    margin-bottom: 15px;
+}
+
+.regFormHeaderMgmt {
+    padding: 15px;
+}
+input.regFormTitleInputMgmt {
+    width : 600px;
+    font-size: 20px;
+    color: rgb(12, 69, 102);
+    font-family: 'Times New Roman', Verdana, Arial;
+    font-style: normal;
+    font-weight: bold;
+}
+
+textarea.regFormDescriptionInputMgmt {
+    width : 600px;
+    font-size: 14px;
+    color: rgb(34, 34, 34);
+    font-family: 'Times New Roman', Verdana, Arial;
+    font-style: italic;
+    font-weight: normal;
+}
+
+
+.regFormSectionDescription, .regFormSectionDescriptionNoEvent {
+    font-family: "Times New Roman", Verdana, Arial;
+    font-size: 14px;
+    padding: 3px 3px 3px 10px;
+    margin: 0px;
+    font-style: italic;
+    clear: left;
+}
+
+.regFormSectionContent {
+    padding-left: 10px;
+}
+
+.regFormSectionTable, .regFormDoneTable {
+    border: 1px solid #CCC;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    padding: 15px;
+    width:70%;
+    padding-bottom:10px;
+    margin-top: 10px;
+}
+
+.regFormMandatoryInfo {
+    padding-bottom: 10px;
+    text-align: center;
+    color: #3B4145;
+    font-style: italic;
+}
+
+.regFormMandatoryField {
+    color: #812;
+}
+
+.regFormCaption {
+    width: 125px;
+    vertical-align: top;
+    padding-top : 6px;
+}
+
+.regFormSubGroupTitle {
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    font-weight: bold;
+}
+
+.regFormSectionEditDialog {
+    //width : 95% !important;
+    margin: 0 0;
+    postition: absolute;
+}
+
+/* CSS for the tabs */
+.regFormItalic {
+    font-style: italic;
+}
+
+.regFormDonePlacesNeeded {
+    font-style: italic;
+    padding-left: 5px;
+}
+
+.regFormButton {
+    background-color: #0C4566;
+    border-color: #FFFFFF;
+    font-weight: bold;
+    width: 100px;
+    color: #FFFFFF;
+    height: 30px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.regFormDoneData {
+    padding-left: 5px;
+}
+
+.regFormDoneCaption {
+    color: black;
+}
+
+.row {
+  margin-left: -20px;
+  *zoom: 1;
+}
+.row:before,
+.row:after {
+  display: table;
+  content: "";
+}
+.row:after {
+  clear: both;
+}
+[class*="span"] {
+  float: left;
+}
+.container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+  width: 940px;
+}
+.span12 {
+  width: 940px;
+}
+.span11 {
+  width: 860px;
+}
+.span10 {
+  width: 780px;
+}
+.span9 {
+  width: 700px;
+}
+.span8 {
+  width: 620px;
+}
+.span7 {
+  width: 540px;
+}
+.span6 {
+  width: 460px;
+}
+.span5 {
+  width: 380px;
+}
+.span4 {
+  width: 300px;
+}
+.span3 {
+  width: 220px;
+}
+.span2 {
+  width: 140px;
+}
+.span1 {
+  width: 60px;
+}
+=======
+/* CSS for the tabs */
+
+.tabbable {
+  *zoom: 1;
+
+}
+.tabbable:before,
+.tabbable:after {
+  display: table;
+  content: "";
+}
+.tabbable:after {
+  clear: both;
+}
+.tabs-left > .nav-tabs {
+  border-bottom: 0;
+}
+.tabs-left > .nav-tabs > li,
+.tabs-right > .nav-tabs > li {
+  float: none;
+}
+.tabs-left > .nav-tabs > li > a,
+.tabs-right > .nav-tabs > li > a {
+  min-width: 74px;
+  margin-right: 0;
+  margin-bottom: 3px;
+}
+.tabs-left > .nav-tabs {
+  float: left;
+  margin-right: 19px;
+  border-right: 1px solid #ddd;
+}
+.tabs-left > .nav-tabs > li > a {
+  margin-right: -1px;
+  -webkit-border-radius: 4px 0 0 4px;
+  -moz-border-radius: 4px 0 0 4px;
+  border-radius: 4px 0 0 4px;
+}
+.tabs-left > .nav-tabs > li > a:hover {
+  border-color: #eeeeee #dddddd #eeeeee #eeeeee;
+}
+.tabs-left > .nav-tabs .active > a,
+.tabs-left > .nav-tabs .active > a:hover {
+  border-color: #ddd transparent #ddd #ddd;
+  *border-right-color: #ffffff;
+}
+
+.nav {
+  margin-left: 0;
+  margin-bottom: 18px;
+  list-style: none;
+}
+.nav > li > a {
+  display: block;
+}
+.nav > li > a:hover {
+  text-decoration: none;
+  background-color: #eeeeee;
+}
+.nav > .pull-right {
+  float: right;
+}
+.nav .nav-header {
+  display: block;
+  padding: 3px 15px;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 18px;
+  color: #999999;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+
+}
+.nav li + .nav-header {
+  margin-top: 9px;
+}
+
+.nav-tabs > li,
+.nav-pills > li {
+  float: left;
+}
+.nav-tabs > li > a,
+.nav-pills > li > a {
+  padding-right: 12px;
+  padding-left: 12px;
+  margin-right: 2px;
+  line-height: 14px;
+}
+.nav-tabs {
+  border-bottom: 1px solid #ddd;
+}
+.nav-tabs > li {
+  margin-bottom: -1px;
+}
+.nav-tabs > li > a {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  line-height: 18px;
+  border: 1px solid transparent;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+}
+.nav-tabs > li > a:hover {
+  border-color: #eeeeee #eeeeee #dddddd;
+}
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover {
+  color: #555555;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-bottom-color: transparent;
+  cursor: default;
+}
+.tab-content {
+  overflow: auto;
+  float : left;
+}
+.tabs-below > .nav-tabs,
+.tabs-right > .nav-tabs,
+.tabs-left > .nav-tabs {
+  border-bottom: 0;
+}
+.tab-content > .tab-pane,
+.pill-content > .pill-pane {
+  display: none;
+}
+.tab-content > .active,
+.pill-content > .active {
+  display: block;
+}
