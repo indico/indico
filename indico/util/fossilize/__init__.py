@@ -94,6 +94,7 @@ class Fossilizable(object):
     __methodNameRE = re.compile('^get(\w+)|(has\w+)|(is\w+)$')
     __methodNameCache = {}
     __fossilNameCache = {}
+    __fossilInterfaceCache = {}
     __fossilAttrsCache = {} # Attribute Cache for Fossils with
                             # fields that are repeated
 
@@ -271,9 +272,18 @@ class Fossilizable(object):
 
         result = {}
 
-        for method in interface:
+        # cache method names for each interface
+        names = cls.__fossilInterfaceCache.get(interface)
+        if names is None:
+            names = interface.names(all=True)
+            cls.__fossilInterfaceCache[interface] = names
+        ###
 
-            tags = interface[method].getTaggedValueTags()
+        for methodName in names:
+
+            method = interface[methodName]
+
+            tags = method.getTaggedValueTags()
             isAttribute = False
 
             # In some cases it is better to use the attribute cache to
@@ -281,7 +291,7 @@ class Fossilizable(object):
             cacheUsed = False
             if useAttrCache:
                 try:
-                    methodResult = cls.__fossilAttrsCache[obj._p_oid][method]
+                    methodResult = cls.__fossilAttrsCache[obj._p_oid][methodName]
                     cacheUsed = True
                 except KeyError:
                     pass
@@ -289,9 +299,9 @@ class Fossilizable(object):
                 # Please use 'produce' as little as possible;
                 # there is almost always a more elegant and modular solution!
                 if 'produce' in tags:
-                    methodResult = interface[method].getTaggedValue('produce')(obj)
+                    methodResult = method.getTaggedValue('produce')(obj)
                 else:
-                    attr = getattr(obj, method)
+                    attr = getattr(obj, methodName)
                     if callable(attr):
                         try:
                             methodResult = attr()
@@ -304,16 +314,12 @@ class Fossilizable(object):
                         isAttribute = True
 
                 if hasattr(obj, "_p_oid"):
-                    try:
-                        cls.__fossilAttrsCache[obj._p_oid]
-                    except KeyError:
-                        cls.__fossilAttrsCache[obj._p_oid] = {}
-                    cls.__fossilAttrsCache[obj._p_oid][method] = methodResult
+                    cls.__fossilAttrsCache.setdefault(obj._p_oid, {})[methodName] = methodResult
 
             if 'filterBy' in tags:
                 if 'filters' not in kwargs:
                     raise Exception('No filters defined!')
-                filterName = interface[method].getTaggedValue('filterBy')
+                filterName = method.getTaggedValue('filterBy')
 
                 if filterName in kwargs['filters']:
                     filterBy = kwargs['filters'][filterName]
@@ -324,7 +330,7 @@ class Fossilizable(object):
 
             # Result conversion
             if 'result' in tags:
-                targetInterface = interface[method].getTaggedValue('result')
+                targetInterface = method.getTaggedValue('result')
                 #targetInterface = globals()[targetInterfaceName]
 
                 methodResult = Fossilizable.fossilizeIterable(
@@ -332,7 +338,7 @@ class Fossilizable(object):
 
             # Conversion function
             if 'convert' in tags:
-                convertFunction = interface[method].getTaggedValue('convert')
+                convertFunction = method.getTaggedValue('convert')
                 converterArgNames = inspect.getargspec(convertFunction)[0]
                 converterArgs = dict((name, kwargs[name])
                                      for name in converterArgNames
@@ -341,17 +347,17 @@ class Fossilizable(object):
                     methodResult = convertFunction(methodResult, **converterArgs)
                 except:
                     logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s' (%s)" %
-                                                                (obj, interfaceArg, method))
+                                                                (obj, interfaceArg, methodName))
                     raise
 
 
             # Re-name the attribute produced by the method
             if 'name' in tags:
-                attrName = interface[method].getTaggedValue('name')
+                attrName = method.getTaggedValue('name')
             elif isAttribute:
-                attrName = method
+                attrName = methodName
             else:
-                attrName = cls.__extractName(method)
+                attrName = cls.__extractName(methodName)
 
             # In case the name contains dots, each of the 'domains' but the
             # last one are translated into nested dictionnaries. For example,
@@ -366,11 +372,9 @@ class Fossilizable(object):
 
             while len(attrList) > 1:
                 attr = attrList.pop(0)
-                try:
-                    current = current[attr]
-                except KeyError:
+                if attr not in current:
                     current[attr] = {}
-                    current = current[attr]
+                current = current[attr]
 
             # For the last attribute level
             current[attrList[0]] = methodResult
