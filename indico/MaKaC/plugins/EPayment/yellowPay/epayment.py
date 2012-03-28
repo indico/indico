@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.epayment import BaseEPayMod, BaseTransaction
-import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.webinterface import urlHandlers
 
 
 from MaKaC.plugins.EPayment.yellowPay.webinterface import urlHandlers as localUrlHandlers

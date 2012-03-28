@@ -18,18 +18,19 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.pages.registrationForm as registrationForm
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.navigation as navigation
 import string
+
 from MaKaC import epayment
+from MaKaC.webinterface.pages import conferences
+from MaKaC.webinterface.pages import registrationForm
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface import navigation
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
 from MaKaC.common import Configuration
 from datetime import timedelta,datetime
 from MaKaC.webinterface.common.countries import CountryHolder
-import MaKaC.webinterface.pages.registrationForm as registrationForm
+from MaKaC.webinterface.pages import registrationForm
 from MaKaC.conference import Session
 from MaKaC.i18n import _
 from MaKaC.common import HelperMaKaCInfo
