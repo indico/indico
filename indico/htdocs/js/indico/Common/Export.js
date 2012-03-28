@@ -128,7 +128,7 @@ type("ExportIcalInterface", [], {
     enablePersistentSignatures: function() {
         var self = this;
         if(self.apiActive){
-            indicoRequest('user.togglePersistentSignatures', {},
+            indicoRequest('user.togglePersistentSignatures', {userId: self.userId},
                     function(result, error) {
                         if (error){
                             $('#progressPersistentSignatures').html('');
@@ -212,7 +212,7 @@ type("ExportIcalInterface", [], {
         };
     }
 
-}, function(apiMode, persistentUserEnabled, persistentAllowed, apiActive, userLogged, setURLsFunction, getURLsMethod, getURLsParams, requestURLs, id){
+}, function(apiMode, persistentUserEnabled, persistentAllowed, apiActive, userLogged, setURLsFunction, getURLsMethod, getURLsParams, requestURLs, id, userId){
 
     this.apiMode = any(apiMode, 0);
     this.persistentUserEnabled = any(persistentUserEnabled, false);
@@ -225,6 +225,7 @@ type("ExportIcalInterface", [], {
     this.requestURLs = any(requestURLs, {});
     this.id = any(id,"");
     this.agreementMethod = "";
+    this.userId = any(userId, "");
 
     var self = this;
 

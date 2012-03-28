@@ -488,7 +488,7 @@ class ReservationBase( Fossilizable ):
 
         return emails
 
-    def notifyAboutUpdate( self ):
+    def notifyAboutUpdate( self, attrsBefore ):
         """
         FINAL (not intented to be overriden)
         Notifies (e-mails) user and responsible about reservation update.
@@ -557,7 +557,7 @@ class ReservationBase( Fossilizable ):
 
         # ---- Email Assistance ----
 
-        if getRoomBookingOption('assistanceNotificationEmails') and self.room.resvNotificationAssistance:
+        if getRoomBookingOption('assistanceNotificationEmails') and self.room.resvNotificationAssistance and (attrsBefore.get('needsAssistance', False) or self.needsAssistance):
             to = getRoomBookingOption('assistanceNotificationEmails')
             if to:
                 rh = ContextManager.get('currentRH', None)
@@ -565,9 +565,11 @@ class ReservationBase( Fossilizable ):
                     user = rh._getUser()
                 else:
                     user = None
-                subject = "[Support Request Modification][" + self.room.getFullName() + "] Modified request for " + formatDateTime(self.startDT)
+                hasCancelled = attrsBefore.get('needsAssistance', False) and not self.needsAssistance
+                textHeader = "Cancelled" if hasCancelled else "Modification"
+                subject = "[Support Request "+textHeader+"][" + self.room.getFullName() + "] Modified request for " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_AssistanceAfterBookingModification' )
-                text = wc.getHTML( { 'reservation': self, 'currentUser': user } )
+                text = wc.getHTML( { 'reservation': self, 'currentUser': user, 'hasCancelled': hasCancelled } )
                 fromAddr = Config.getInstance().getNoReplyEmail()
                 addrs = []
                 addrs += to

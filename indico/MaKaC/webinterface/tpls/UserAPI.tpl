@@ -125,7 +125,7 @@
     $('#enablePersistentSignatures').click(function(e) {
         if(confirm(this.dataset.enabled == "1" ? disableText : enableText)){
             $E('progressPersistentSignatures').set(progressIndicator(true, false));
-            indicoRequest('user.togglePersistentSignatures', {},
+            indicoRequest('user.togglePersistentSignatures', {userId: '${avatar.getId()}'},
                 function(result, error) {
                     $E('progressPersistentSignatures').set('');
                     if (error){

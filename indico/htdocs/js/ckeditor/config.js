@@ -10,7 +10,7 @@ CKEDITOR.editorConfig = function( config )
     config.toolbar_IndicoFull =
     [
         ['Source','-','Preview','Templates'],
-        ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print', 'SpellChecker', 'Scayt'],
+        ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print'],
         ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
         ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
         ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],

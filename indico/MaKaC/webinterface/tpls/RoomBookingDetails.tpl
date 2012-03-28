@@ -225,10 +225,18 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Assistance")}&nbsp;&nbsp;</small></td>
+                                            <td align="right" valign="top" nowrap><small> ${ _("Video-conf Assistance")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
                                                 ${ verbose( reservation.needsAVCSupport, "no" ) }
                                                 ${contextHelp('iNeedAVCSupport' )}
+                                            </td>
+                                        </tr>
+                                        % endif
+                                        % if rh._isAssistenceEmailSetup and reservation.room.resvNotificationAssistance:
+                                        <tr>
+                                            <td align="right" valign="top" nowrap><small> ${ _("Startup Assistance")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                                ${ verbose( reservation.needsAssistance, "no" ) }
                                             </td>
                                         </tr>
                                         % endif

@@ -275,7 +275,7 @@ class VideoEventFetcher(DataFetcher):
                                 tempContrib = bk._conf.getContributionById(contribId)
                                 contributions.append(tempContrib)
 
-                        if len(contributions) == 0: # If we are here, no contributions but a request exists.
+                        if len(contributions) == 0 or self._detail == "event": # If we are here, no contributions but a request exists.
                             bk.setStartDate(bk._conf.getStartDate())
                             bk.setEndDate(bk._conf.getEndDate())
                             yield bk
@@ -309,14 +309,11 @@ class CSBookingContributionWrapper():
         allows for the construction of iCal specific unique identifiers.
     """
 
-    _orig = None
-    _contrib = None
-    _startDate = None
-    _endDate = None
-
     def __init__(self, booking, contrib):
         self._orig = booking
         self._contrib = contrib
+        self._startDate = None
+        self._endDate = None
 
     def __getattr__(self, name):
         """ Checks for overridden method in this class, if not present then
@@ -353,3 +350,9 @@ class CSBookingContributionWrapper():
 
     def getEndDate(self):
         return self._endDate
+
+    def getLocation(self):
+        return self._contrib.getLocation().getName() if self._contrib.getLocation() else ""
+
+    def getRoom(self):
+        return self._contrib.getRoom().getName() if self._contrib.getRoom() else ""

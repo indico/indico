@@ -1239,6 +1239,7 @@ class RHRoomBookingBookingDetails( RHRoomBookingBase ):
             self._resv.isConfirmed = False
 
         self._clearSessionState()
+        self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
 
     def _businessLogic( self ):
         pass
@@ -1530,7 +1531,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                         self._loadResvCandidateFromParams( self._orig_candResv, self._params )
                     self._orig_candResv.update()
                     self._orig_candResv.indexDayReservations()
-                    emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
+                    emailsToBeSent += self._orig_candResv.notifyAboutUpdate(self._resvAttrsBefore)
 
                     # Add entry to the log
                     info = []

@@ -243,26 +243,39 @@
                                                     <br><br>
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <td align="right" class="subFieldWidth" valign="top"><small><span style="color: Red;"> ${ _("I need assistance with this video-conf. system")}</span>&nbsp;&nbsp;</small></td>
-                                                <td align="left" class="blacktext">
-                                                    <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} />
-                                                    ${contextHelp('iNeedAVCSupport' )}
-                                                </td>
-                                            </tr>
                                         % endif
-                                        % if rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance:
-                                            <tr>
+                                        % if candResv.room.needsAVCSetup or (rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance):
+                                        <tr>
                                             <td align="right" class="subFieldWidth" valign="top"><small>${ _("Assistance")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">
-                                                <table cellpadding=0 cellspacing=0>
-                                                <tr>
-                                                    <td style="vertical-align:top;"><input id="needsAssistance" name="needsAssistance" type="checkbox" ${' checked="checked" ' if candResv.needsAssistance else ""} /></td>
-                                                    <td style="width:100%;padding-left: 3px;">${_("Request technical assistance for the startup of your meeting. A technician will be present 10 to 15 mn before the event to help you start up the room equipment")}</td>
-                                                </tr>
+                                            <td>
+                                                <table valign='top' cellpadding=0 cellspacing=0>
+                                                    % if candResv.room.needsAVCSetup:
+                                                    <tr>
+                                                        <td align="left" class="blacktext">
+                                                            <table cellpadding=0 cellspacing=0>
+                                                            <tr>
+                                                                <td style="vertical-align:top;"><input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} /></td>
+                                                                <td style="width:100%;padding-left: 3px;">${ _("Request assistance for the startup of the videoconference session. This support will most probably be done remotely")}</td>
+                                                            </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    % endif
+                                                    % if rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance:
+                                                    <tr>
+                                                        <td align="left" class="blacktext">
+                                                            <table cellpadding=0 cellspacing=0>
+                                                            <tr>
+                                                                <td style="vertical-align:top;"><input id="needsAssistance" name="needsAssistance" type="checkbox" ${' checked="checked" ' if candResv.needsAssistance else ""} /></td>
+                                                                <td style="width:100%;padding-left: 3px;">${_("Request assistance for the startup of your meeting. A technician will be physically present 10 to 15 mn before the event to help you start up the room equipment (microphone, projector, etc)")}</td>
+                                                            </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    % endif
                                                 </table>
                                             </td>
-                                            </tr>
+                                        </tr>
                                         % endif
                                     </table>
                                 </td>

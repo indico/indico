@@ -10,7 +10,7 @@ var setURLs = function(urls){
     $('#authLink${categ.getUniqueId()}').attr('title', urls["authRequestURL"]);
 };
 
-exportPopups["${categ.getUniqueId()}"] = new ExportIcalInterface(${apiMode}, ${persistentUserEnabled | n,j}, ${persistentAllowed | n,j}, ${apiActive | n,j}, ${userLogged | n,j}, setURLs, 'category.api.getExportURLs', {categId:"${categ.getId()}"}, ${requestURLs | n,j}, "${categ.getUniqueId()}");
+exportPopups["${categ.getUniqueId()}"] = new ExportIcalInterface(${apiMode}, ${persistentUserEnabled | n,j}, ${persistentAllowed | n,j}, ${apiActive | n,j}, ${userLogged | n,j}, setURLs, 'category.api.getExportURLs', {categId:"${categ.getId()}"}, ${requestURLs | n,j}, "${categ.getUniqueId()}", "${currentUser.getId() if currentUser else ''}");
 
 </script>
 </%block>
