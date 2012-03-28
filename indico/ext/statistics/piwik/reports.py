@@ -100,6 +100,9 @@ class PiwikReport(PiwikReportBase):
             self._contributions.append(('None', str(_('Conference: ') + self._conf.getTitle())))
 
             for ctrb in contributions:
+                if not ctrb.isScheduled():
+                    continue
+
                 ctrbTime = str(ctrb.getStartDate().hour) + ':' + str(ctrb.getStartDate().minute)
                 ctrbInfo = _('Contribution: ') + ctrb.getTitle() + ' (' + ctrbTime + ')'
                 value = (ctrb.getUniqueId(), ctrbInfo)

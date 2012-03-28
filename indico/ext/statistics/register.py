@@ -30,6 +30,7 @@ from indico.ext.statistics.util import getPluginType
 from indico.ext.statistics.db import updateDBStructure
 
 from MaKaC.common import DBMgr
+from MaKaC.plugins.base import PluginsHolder
 
 class StatisticsImplementationRegister(Persistent):
     """
@@ -168,3 +169,25 @@ class StatisticsImplementationRegister(Persistent):
                 return self._getRegister()[plugin]()
         else:
             return None
+
+
+class StatisticsConfig(object):
+    """
+    The current overall configuration of the plugin, wrapper around global
+    options in PluginsHolder / plugin administration.
+    """
+
+    _statsPlugin = PluginsHolder().getPluginType('statistics')
+
+    def getUpdateInterval(self):
+        """
+        Returns the interval for which cached values should live before
+        new data is requested from the server.
+        """
+        return self._statsPlugin.getOptions()['cacheTTL'].getValue()
+
+    def hasCacheEnabled(self):
+        """
+        True if the plugin is configured for cached reporting.
+        """
+        return self._statsPlugin.getOptions()['cacheEnabled'].getValue()

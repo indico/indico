@@ -17,15 +17,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-import sys
 import urllib2
 
 import indico.ext.statistics.base
 import indico.ext.statistics.base.implementation
 
 from indico.core.extpoint import Component
-from indico.ext.statistics.register import StatisticsImplementationRegister
+from indico.ext.statistics.register import StatisticsImplementationRegister, StatisticsConfig
 
+from MaKaC.common.cache import GenericCache
 from MaKaC.plugins.base import PluginsHolder
 
 class BaseStatisticsImplementation(Component):
@@ -252,13 +252,15 @@ class BaseStatisticsImplementation(Component):
 
         return self.getAPIPath(http, https, withScript) + self._pluginAPIQuery
 
-    def getConferenceReport(self, **kwargs):
+    @staticmethod
+    def getConferenceReport(**kwargs):
         """
         To be implemented in inheriting class.
         """
         return None
 
-    def getContributionReport(self, **kwargs):
+    @staticmethod
+    def getContributionReport(**kwargs):
         """
         To be implemented in inheriting class.
         """
@@ -326,6 +328,14 @@ class BaseStatisticsImplementation(Component):
         """
         self._pluginAPIToken = token
 
+    @staticmethod
+    def memoizeReport(function):
+        """
+        Decorator method for the get<reports> methods, see CachedReport for
+        details on how this works with GenericCache.
+        """
+        return CachedReport(function)
+
 class JSHookBase(object):
     """
     The base implementation of the hook object takes an instance of a
@@ -335,3 +345,45 @@ class JSHookBase(object):
     def __init__(self, instance):
         self.path = instance.getJSHookPath()
         self.url = instance.getAPIPath()
+
+class CachedReport(object):
+    """
+    This class acts as a wrapper for functions which return a report object,
+    by decorating the get<report> methods with the memonize function in the
+    BaseStatisticsReport object, the result is wrapped here and its age
+    is compared with the TTL if in the cache, either returning said item or
+    allowing the method to generate a new one.
+    """
+
+    _config = StatisticsConfig()
+
+    def __init__(self, function):
+        self._function = function
+        self._ttl = self._config.getUpdateInterval()
+
+        # Cache bucket per implementation
+        plugin = function.__module__.split('.')[3]
+        self._cache = GenericCache(plugin + 'StatisticsCache')
+
+    def __call__(self, *args):
+        """
+        Ascertain if live updating first, if so disregard and continue.
+        """
+        if not self._config.hasCacheEnabled():
+            return self._function(*args)
+
+        key = self._generateKey(args)
+        resource = self._cache.get(key, None)
+
+        if not resource:
+            result = self._function(*args)
+            self._cache.set(key, result, self._ttl)
+            return result
+        else:
+            return resource
+
+    def _generateKey(self, params):
+        """
+        Generates a unique key for caching against the params given.
+        """
+        return reduce(lambda x, y: str(x) + '-' + str(y), params)

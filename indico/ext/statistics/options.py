@@ -21,4 +21,14 @@ from MaKaC.i18n import _
 
 # @todo: Implement TTL for settings cache here
 globalOptions = [
+    ("cacheEnabled", {"description": _("Enable report caching"),
+                      "type": bool,
+                      "defaultValue": True,
+                      "editable": True,
+                      "visible": True}),
+    ("cacheTTL",     {"description": _("Report caching TTL (seconds)"),
+                      "type": int,
+                      "defaultValue": 3600,
+                      "editable": True,
+                      "visible": True})
 ]

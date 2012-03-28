@@ -19,8 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 import os
 import indico.ext.statistics.piwik
+
 from indico.ext.statistics.base.implementation import BaseStatisticsImplementation, JSHookBase
+
 from MaKaC.plugins.base import PluginsHolder
+
 
 def _joinSegmentString(segment, delim):
     """ Utility function whilst building the query objects, substitute's Python's
@@ -69,14 +72,18 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         """
         return self._getVarFromPluginStorage('serverSiteID')
 
-    def getConferenceReport(self, startDate, endDate, confId, contribId=None):
+    @staticmethod
+    @BaseStatisticsImplementation.memoizeReport
+    def getConferenceReport(startDate, endDate, confId, contribId=None):
         """ Returns the report object which satisifies the confId given. """
         from indico.ext.statistics.piwik.reports import PiwikReport
         return PiwikReport(startDate, endDate, confId, contribId).fossilize()
 
-    def getContributionReport(self, startDate, endDate, confId, contribId):
+    @staticmethod
+    def getContributionReport(startDate, endDate, confId, contribId):
         """ Returns the report object for the contribId given. """
-        return self.getConferenceReport(startDate, endDate, confId, contribId)
+        return PiwikStatisticsImplementation.getConferenceReport(startDate, endDate,
+                                                                 confId, contribId)
 
     def getJSHookObject(self, instantiate=False):
         """ Returns a reference to or an instance of the JSHook class. """

@@ -127,7 +127,7 @@ class WStatisticsView(wcomponents.WTemplated):
         """
         vars = wcomponents.WTemplated.getVars(self)
         rh = self._rh
-        plugin = self._register.getPluginByName(rh._activeTab)
+        plugin = self._register.getPluginByName(rh._activeTab, instantiate=False)
 
         if rh._contribId is not None:
             vars["report"] = plugin.getContributionReport(rh._startDate, rh._endDate,

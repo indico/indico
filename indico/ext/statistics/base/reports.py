@@ -134,6 +134,7 @@ class BaseStatisticsReport(Fossilizable, object):
         sources = self.getWidgetSources()
         sources[name] = source
 
+
 class BaseReportGenerator(object):
     """
     Acts as a wrapper around a query object allowing for the Report
@@ -177,3 +178,4 @@ class BaseReportGenerator(object):
     def getMethod(self):
         """ Returns the string method name associated with this object. """
         return self._method
+
