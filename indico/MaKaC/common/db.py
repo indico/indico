@@ -74,7 +74,7 @@ class DBMgr:
     """
     _instance = None
 
-    def __init__( self, hostname=None, port=None ):
+    def __init__( self, hostname=None, port=None, max_disconnect_poll=30 ):
         import Configuration # Please leave this import here, db.py is imported during installation process
         cfg = Configuration.Config.getInstance()
 
@@ -83,7 +83,8 @@ class DBMgr:
         if not port:
             port = cfg.getDBConnectionParams()[1]
 
-        self._storage=ClientStorage((hostname, port), username=cfg.getDBUserName(), password=cfg.getDBPassword(), realm=cfg.getDBRealm())
+        self._storage=ClientStorage((hostname, port), username=cfg.getDBUserName(), password=cfg.getDBPassword(), realm=cfg.getDBRealm(),
+                                    max_disconnect_poll=max_disconnect_poll)
         self._db=MaKaCDB(self._storage)
         self._conn = threading.local()
         self._conn.conn = None

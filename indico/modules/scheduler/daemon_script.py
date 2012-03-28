@@ -215,7 +215,7 @@ def _run(args):
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
-    dbi = DBMgr.getInstance()
+    dbi = DBMgr.getInstance(max_disconnect_poll=40)
     dbi.startRequest()
 
     info = HelperMaKaCInfo.getMaKaCInfoInstance()
