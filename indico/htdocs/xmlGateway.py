@@ -32,32 +32,11 @@ def signIn(req, **params):
 def signOut(req, **params):
     return xmlGateway.RHSignOut( req ).process( params )
 
-def addMaterialToConference(req, **params):
-    return xmlGateway.RHAddMaterialToConference( req ).process( params )
-
-def addMaterialToSession(req, **params):
-    return xmlGateway.RHAddMaterialToSession( req ).process( params )
-
-def addMaterialToContribution(req, **params):
-    return xmlGateway.RHAddMaterialToContribution( req ).process( params )
-
-def addMaterialToSubContribution(req, **params):
-    return xmlGateway.RHAddMaterialToSubContribution( req ).process( params )
-
-def createLecture( req, **params ):
-    return xmlGateway.RHCreateLecture( req ).process( params )
-
-def search( req, **params ):
-    return xmlGateway.RHSearch( req ).process( params )
-
 def getCategoryInfo( req, **params ):
     return xmlGateway.RHCategInfo( req ).process( params )
 
 def webcastOnAir( req, **params ):
     return xmlGateway.RHWebcastOnAir( req ).process( params )
-
-def webcastForthcomingEvents( req, **params ):
-    return xmlGateway.RHWebcastForthcomingEvents( req ).process( params )
 
 def getStatsRoomBooking( req, **params ):
     return xmlGateway.RHStatsRoomBooking( req ).process( params )
