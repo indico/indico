@@ -40,7 +40,10 @@ if lItem.getType() == "simple_event":
         <span class="date ${ happeningNowClass }">${ evtDate }<time itemprop="startDate" datetime="${ startDate.strftime("%Y-%m-%d") }" /></span><a href="${ conferenceDisplayURLGen(lItem)}" itemprop="url" ><span itemprop="summary">${ eventTitle }</span></a>
 
           <span class="protected">
-            ${getProtection(lItem)}
+            <% prot = getProtection(lItem) %>
+            % if prot != "":
+                (${prot})
+            % endif
             % if creatDate > nowutc() - timedelta(weeks = 1):
                    <img src="${ systemIcon('new') }" style="vertical-align:middle" alt="New" title="${ _("This event is New")}" />
             % endif

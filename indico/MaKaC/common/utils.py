@@ -720,11 +720,11 @@ def getLocationInfo(item, roomLink=True, fullName=False):
 def getProtectionText(target):
     if target.hasAnyProtection():
         if target.isItselfProtected():
-            return _("(protected)")
+            return _("protected")
         elif target.hasProtectedOwner():
-            return _("(protected by parent category)")
+            return _("protected by parent category")
         elif target.getDomainList() != []:
-            return _("(%s domain only)"%(", ".join(map(lambda x: x.getName(), target.getDomainList()))))
+            return _("%s domain only"%(", ".join(map(lambda x: x.getName(), target.getDomainList()))))
         else:
             return getProtectionText(target.getOwner())
     return ""

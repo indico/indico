@@ -8,15 +8,15 @@ else:
 protection = getProtection(target) if target else None
 %>
 
-<div id="sessionBar" class="${'ui-follow-scroll' if target and not isFrontPage and protection[0] != 'Public' else ''} sessionBar${" sessionBarDark" if dark_ == True else ""}">
-    % if isFrontPage or not target or protection == "Public":
+<div id="sessionBar" class="${'ui-follow-scroll' if target and protection[0] != 'Public' else ''} sessionBar${" sessionBarDark" if dark_ == True else ""}">
+    % if not target or protection == "Public":
         <div class="corner"></div>
     % else:
         <div class="corner corner${protection[0]}"></div>
     % endif
     <div class="links">
         <ul>
-            % if target and not isFrontPage and protection[0] != "Public":
+            % if target and protection[0] != "Public":
                 <%include file="ProtectionWidget.tpl" args="protection=protection"/>
                 <script type="text/javascript">
                 $.ui.sticky({

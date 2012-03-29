@@ -320,7 +320,7 @@ class WHeader(WTemplated):
         if target.isItselfProtected():
             return ["Restricted", _("Restricted")]
         if target.getDomainList() != []:
-            return ["Protected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), target.getDomainList())))]
+            return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), target.getDomainList())))]
         return self._getProtection(target.getOwner())
 
     def getVars( self ):

@@ -79,9 +79,9 @@ class WPBase(OldObservable):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
         if info.isDebugActive():
-            return ['js/presentation/Loader.js', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']
+            return ['%s?%d' % (f, os.stat('%s/%s'%(Config().getHtdocsDir(), f)).st_mtime) for f in ['js/presentation/Loader.js', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']]
         else:
-            return ['js/presentation/pack/Presentation.js.pack', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']
+            return ['%s?%d' % (f, os.stat('%s/%s'%(Config().getHtdocsDir(), f)).st_mtime) for f in ['js/presentation/pack/Presentation.js.pack', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']]
 
     def _getBaseURL( self ):
         if self._rh._req.is_https() and Config.getInstance().getBaseSecureURL():

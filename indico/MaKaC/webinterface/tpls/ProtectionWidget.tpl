@@ -1,14 +1,14 @@
 <%page args="protection=None"/>
 <div id="protectionWidget" style="display:none" class="protectionWidget">
     <div class="protectionWidgetSection">
-        % if protection[0] == "Protected":
+        % if protection[0] == "DomainProtected":
             ${_("The information on this web page is restricted for display on the %s") % protection[1]}
         % else:
             ${_("The information on this web page is restricted for display to named individuals or specific groups.")}
         % endif
     </div>
     <div class="protectionWidgetSection">
-        % if protection[0] == "Protected":
+        % if protection[0] == "DomainProtected":
             ${protectionDisclaimerProtected}
         % else:
             ${protectionDisclaimerRestricted}
@@ -29,7 +29,7 @@
 $(".protectionBar").qtip({
 
     style: {
-        width: '250px',
+        width: '280px',
         classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
         tip: {
             corner: true,

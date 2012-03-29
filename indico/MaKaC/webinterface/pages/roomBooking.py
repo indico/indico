@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import os
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -86,8 +87,8 @@ class WPRoomBookingBase( WPMainBase ):
         baseurl = self._getBaseURL()
         return """
         <!-- Our libs -->
-        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>
-        """ % (baseurl)
+        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js?%d"></script>
+        """ % (baseurl, os.stat(__file__).st_mtime)
 
     def _getSideMenu(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()

@@ -10331,9 +10331,9 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
         baseurl = self._getBaseURL()
         return """
         <!-- Our libs -->
-        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js"></script>
+        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js?%d"></script>
 
-        """ % (baseurl)
+        """ % (baseurl, os.stat(__file__).st_mtime)
 
     def _setActiveSideMenuItem(self):
         self._roomBookingMenuItem.setActive()

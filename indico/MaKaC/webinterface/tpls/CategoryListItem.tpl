@@ -13,7 +13,10 @@
          % endif
        </span>
         <span class="protected">
-            ${getProtection(lItem)}
+            <% prot = getProtection(lItem) %>
+            % if prot != "":
+                (${prot})
+            % endif
         </span>
       </span>
 

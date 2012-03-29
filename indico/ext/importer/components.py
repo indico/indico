@@ -19,10 +19,12 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import os
+import zope.interface
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import ITimetableContributor
 from MaKaC.plugins.base import Observable
-import zope.interface
+from MaKaC.common.Configuration import Config
 
 class ImporterContributor(Component, Observable):
     """
@@ -36,7 +38,7 @@ class ImporterContributor(Component, Observable):
         """
         Includes additional javascript file.
         """
-        params['paths'].append("importer/js/importer.js")
+        params['paths'].append("importer/js/importer.js?%d"%(os.stat(__file__).st_mtime))
 
     @classmethod
     def includeTimetableCSSFiles(cls, obj, params = {}):

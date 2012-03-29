@@ -2622,7 +2622,7 @@ div.pageHeaderMainPage {
 
 div.pageOverHeader
 {
-    background: #F6E8BD url(../images/sprites.png) repeat-x scroll 0 -210px;
+    background-color: #F6E8C3;
     border-bottom: 1px solid #A2905A;
     padding: 7px 10px;
     color: #2f2506;
@@ -2709,6 +2709,7 @@ div.sessionBar .links
 
 .loginHighlighted {
     background: transparent url(../images/sprites.png) repeat-x scroll 0 -150px;
+    height: 16px;
 }
 
 div.sessionBar .corner
@@ -2731,7 +2732,7 @@ div.sessionBar ul
 div.sessionBar li {
     display: inline;
     margin: 0;
-    padding: 5px 17px 4px;
+    padding: 4px 17px;
     float: left;
     border-right: 1px solid #C7C7C7;
 }
@@ -2777,7 +2778,7 @@ div.sessionBar .protectionBar{
     height: 16px;
 }
 
-div.sessionBar .protectionBarProtected{
+div.sessionBar .protectionBarDomainProtected{
     background-position: 0 -240px;
 }
 
@@ -2785,11 +2786,11 @@ div.sessionBar .protectionBarRestricted {
     background-position: 0 -270px;
 }
 
-div.sessionBar .protectionBarProtected a{
+div.sessionBar .protectionBarDomainProtected a{
     color: #af9502 !important;
 }
 
-div.sessionBar .protectionBarProtected a:hover{
+div.sessionBar .protectionBarDomainProtected a:hover{
     text-decoration: underline;
 }
 
@@ -2803,7 +2804,7 @@ div.sessionBar .protectionBarRestricted a:hover{
     text-decoration: underline;
 }
 
-div.sessionBar .cornerProtected{
+div.sessionBar .cornerDomainProtected{
     background-position: -50px 0;
 }
 
@@ -2811,7 +2812,7 @@ div.sessionBar .cornerRestricted {
     background-position: -75px 0;
 }
 
-.protectionHighlightProtected{
+.protectionHighlightDomainProtected{
     color: #AF9502;
     font-weight: bold;
 }
@@ -7937,7 +7938,7 @@ ul.buttonMenuPopupList li a:hover {
 }
 
 .settingsWidget a, .protectionWidget a{
-    font-size: 14px !important;
+    font-size: 12px !important;
 }
 
 .settingsWidget .settingsWidgetSection, .protectionWidget .protectionWidgetSection{
@@ -7955,7 +7956,7 @@ ul.buttonMenuPopupList li a:hover {
 }
 
 .protectionWidget{
-    font-size: 14px;
+    font-size: 12px;
     padding: 0 5px 5px;
     line-height: 17px;
 }
