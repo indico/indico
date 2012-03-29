@@ -3,7 +3,7 @@
 <%block name="downloadTextFile">  ${_("Event calendar file")}</%block>
 <%block name="extraDownload">
     <div class="iCalExportSection">
-         <a href='${ urlHandlers.UHConferenceToiCal.getURL(target, detailLevel = "contributions") }'>
+         <a href='${ urlHandlers.UHConferenceToiCal.getURL(target, detail = "contributions") }'>
             <img src="${icsIconURL}" border="0" style="vertical-align: middle">
              ${_("Detailed timetable calendar file")}
          </a>

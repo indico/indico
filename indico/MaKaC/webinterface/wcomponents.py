@@ -452,7 +452,7 @@ class WConferenceHeader(WHeader):
         vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
 
         vars["conf"] = vars["target"] = self._conf;
-        vars["urlICSFile"] = urlHandlers.UHConferenceToiCal.getURL(self._conf, detailLevel = "top")
+        vars["urlICSFile"] = urlHandlers.UHConferenceToiCal.getURL(self._conf, detail = "events")
 
         vars["imgLogo"] = Configuration.Config.getInstance().getSystemIconURL( "miniLogo" )
         vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])

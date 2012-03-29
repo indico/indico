@@ -50,27 +50,6 @@ class WebcastToiCal(ICALBase):
         text += self._printFooter()
         return text
 
-
-class CategoryToiCal(ICALBase):
-
-    def __init__(self, categ, req):
-        self._categ = categ
-        self._req = req
-
-    def getBody(self):
-        im = IndexesHolder()
-        calIdx = im.getIndex('categoryDate')
-
-        text = self._printHeader()
-        # get all visible events in category
-        confs = set(ACLfiltered(calIdx.iterateObjectsIn(self._categ.getId(), None, None), self._req.getHostIP(), self._req.getAW()))
-
-        for conf in confs:
-            text += ConferenceToiCal(conf).getCore()
-        text += self._printFooter()
-        return text
-
-
 class ConferenceToiCal(ICALBase):
 
     def __init__(self, conf):

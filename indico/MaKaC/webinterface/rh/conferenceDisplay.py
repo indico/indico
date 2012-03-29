@@ -45,7 +45,6 @@ from MaKaC.errors import MaKaCError, ModificationError, NoReportError, AccessErr
 from MaKaC.PDFinterface.conference import TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, ProgrammeToPDF, TimetablePDFFormat
 from xml.sax.saxutils import escape
 from MaKaC.participant import Participant
-from MaKaC.ICALinterface.conference import ConferenceToiCal
 from MaKaC.common.contribPacker import ConferencePacker, ZIPFileHandler
 import StringIO, zipfile
 from MaKaC.i18n import _
@@ -54,6 +53,10 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from indico.web.http_api.api import CategoryEventFetcher
+from indico.util.fossilize import fossilize
+from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.api import CategoryEventHook
 
 class RHConfSignIn( conferenceBase.RHConferenceBase ):
 
@@ -1077,16 +1080,17 @@ class RHConferenceToiCal(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
-        self._detailLevel = params.get("detailLevel","top")
+        self._detailLevel = params.get("detail","events")
 
     def _process( self ):
         filename = "%s - Event.ics"%cleanHTMLHeaderFilename(self._target.getTitle())
-        ical = ConferenceToiCal(self._target.getConference())
 
-        if self._detailLevel == "contributions":
-            data = ical.getDetailedBody()
-        else:
-            data = ical.getBody()
+        hook = CategoryEventHook({'detail':[self._detailLevel]}, 'event', {'idlist':self._conf.getId(), 'dformat': 'ics'})
+        res = hook(self.getAW(), self._req)
+        resultFossil = {'results': res[0]}
+
+        serializer = Serializer.create('ics')
+        data = serializer(resultFossil)
 
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()

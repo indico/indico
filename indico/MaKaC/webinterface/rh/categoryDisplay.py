@@ -43,7 +43,6 @@ from MaKaC.common.general import *
 import MaKaC.statistics as statistics
 from MaKaC.common.Configuration import Config
 import MaKaC.user as user
-from MaKaC.ICALinterface.conference import CategoryToiCal
 from MaKaC.RSSinterface.conference import CategoryToRSS
 import MaKaC.common.info as info
 from MaKaC.i18n import _
@@ -52,6 +51,8 @@ from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
+from indico.web.http_api.api import CategoryEventHook
+from indico.util.metadata.serializer import Serializer
 
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
@@ -557,9 +558,15 @@ class RHCategoryOpenService(base.RH):
 class RHCategoryToiCal(RHCategoryOpenService):
 
     def _processData( self ):
-        filename = "%s - Event.ics"%self._target.getName().replace("/","")
-        data = ""
-        data += CategoryToiCal(self._target, self).getBody()
+        filename = "%s - Categ.ics"%self._target.getName().replace("/","")
+
+        hook = CategoryEventHook({}, 'categ', {'idlist':self._target.getId(), 'dformat': 'ics'})
+        res = hook(self.getAW(), self._req)
+        resultFossil = {'results': res[0]}
+
+        serializer = Serializer.create('ics')
+        data = serializer(resultFossil)
+
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
