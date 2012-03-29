@@ -72,7 +72,6 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.go("/roomBooking.py/search4Rooms?forNewBooking=True")
         self.select(name="roomName", label="TestUniverseAssistence1:   1-1-1 - Room 1")
         self.click(css="span#bookButtonWrapper > input[type=button]")
-        self.click(css="span#bookButtonWrapper > input[type=button]")
         self.type(name="reason", text="Test reason")
         self.click(name="needsAssistance")
         self.click(id="saveBooking")

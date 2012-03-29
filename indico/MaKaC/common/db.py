@@ -192,7 +192,7 @@ class DBMgr:
         """
         if sync:
             self.sync()
-        yield
+        yield self.getDBConnection()
         self.commit()
 
     # ZODB version check

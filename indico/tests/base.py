@@ -168,6 +168,7 @@ class BaseTestRunner(IOMixin):
         # initialize allowed options
         self.options = OptionProxy(self._runnerOptions)
         self.options.configure(**kwargs)
+        self._logger = logging.getLogger('test')
 
     def _run(self):
         """
@@ -313,10 +314,12 @@ class FakeMailThread(Thread):
     def __init__(self, addr):
         super(FakeMailThread, self).__init__()
         self.addr = addr
+        self.server = None
 
     def run(self):
         self.server = FakeMailServer(self.addr, '')
         asyncore.loop()
 
     def close(self):
-        self.server.close()
+        if self.server:
+            self.server.close()

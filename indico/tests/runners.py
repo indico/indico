@@ -39,28 +39,30 @@ import time, urllib2
 # Test modules
 import figleaf
 import figleaf.annotate_html
-from selenium import selenium
+from selenium import webdriver
 import nose
 
 from indico.tests.config import TestConfig
 from indico.tests.base import BaseTestRunner, Option
 from indico.tests.util import openBrowser, relpathto
+from indico.tests import default_actions
+
 from indico.util.shell import refServer
 
 # legacy indico modules
-from MaKaC.common import Config
+from MaKaC.common import Config, DBMgr
 
 
 __all__ = [
     'UnitTestRunner',
     'FunctionalTestRunner',
-    'GridTestRunner',
     'PylintTestRunner',
     'JSLintTestRunner',
     'JSUnitTestRunner'
     ]
 
 JSTEST_CFG_FILE = "builtConf.conf"
+
 
 class CoverageBaseTestOption(Option):
     """
@@ -219,9 +221,8 @@ class FunctionalTestRunner(NoseTestRunner):
     _runnerOptions = {'silent': Option,
                       'record': Option,
                       'specify': Option,
-                      'threads': Option,
                       'repeat': Option,
-                      'xml': XMLOutputOption }
+                      'xml': XMLOutputOption}
 
 
     def __init__(self, **kwargs):
@@ -242,38 +243,45 @@ class FunctionalTestRunner(NoseTestRunner):
         """
         Run selenium over the existing test suite (or a specific test)
         """
+        test_config = TestConfig.getInstance()
 
-        self._runFakeWebServer()
+        if test_config.getRunMode() == 'grid':
+            browsers =  test_config.getGridBrowsers()
+        else:
+            browsers = [test_config.getStandaloneBrowser()]
 
-        try:
-            args = self._buildArgs()
+        args = self._buildArgs()
 
-            # Execute the tests
-            result = True
-            repeat = int(self.options.valueOf('repeat'))
-            threads = int(self.options.valueOf('threads'))
-            if repeat < 1:
-                repeat = 1
+        # Execute the tests
+        result = True
+        repeat = int(self.options.valueOf('repeat'))
+        if repeat < 1:
+            repeat = 1
 
-            for i in range(0, repeat):
-                if threads > 1:
-                    testResult = self._runParallel(args, threads)
-                else:
-                    testResult = nose.run(argv=args)
-                result = result and testResult
-                self._info("Test #%d: %s\n" % \
-                           (i + 1, testResult and 'OK' or 'Error'))
-
-        finally:
-            self._stopSeleniumServer()
+        for browser in browsers:
+            os.environ['INDICO_TEST_BROWSER'] = browser
+            testResult = nose.run(argv=args)
+            result = result and testResult
+            self._info("%s: %s\n" % \
+                       (browser, testResult and 'OK' or 'Error'))
 
         return result
 
     def _run(self):
-
+        self._runFakeWebServer()
         if self.options.valueOf('record'):
+            dbi = DBMgr.getInstance()
+
+            dbi.startRequest()
+            conn = dbi.getDBConnection()
+
+            default_actions.initialize_new_db(conn.root())
+            default_actions.create_dummy_user()
+            dbi.endRequest()
+
             raw_input("Press [ENTER] to finish recording... ")
             result = False
+
         else:
             result = self._runSeleniumCycle()
 
@@ -292,280 +300,6 @@ class FunctionalTestRunner(NoseTestRunner):
                 foldersArray.append(root)
 
         return foldersArray
-
-    def _startSeleniumServer(self):
-        """
-        starts the selenium server
-        """
-        started = True
-
-        self._info("Starting Selenium Server")
-
-        try:
-            #TODO: refactor this. Moving to config file?
-            fout = open('build/selenium.stdout.log','w')
-            ferr = open('build/selenium.stderr.log', 'w')
-
-            self.child = subprocess.Popen(["java", "-jar",
-                                      os.path.join(self.setupDir,
-                                                   'python',
-                                                   'functional',
-                                                   TestConfig.getInstance().
-                                                   getSeleniumFilename()),
-                                           '-log', 'build/selenium.log',
-                                           '-browserSideLog'],
-                                        stdout = fout,
-                                        stderr = ferr)
-
-        except OSError, e:
-            return ("[ERR] Could not start selenium server - command \"java\""
-                    " needs to be in your PATH. (%s)\n" % e)
-        except KeyError:
-            return "[ERR] Please specify a SeleniumFilename in tests.conf\n"
-
-        self._info("Starting Selenium RC")
-
-        sel = selenium("localhost", 4444, "*firefox", "http://www.cern.ch/")
-        for i in range(5):
-            try:
-                #testing if the selenium server has started
-                time.sleep(1)
-                sel.start()
-                sel.stop()
-
-                #server has started
-                break
-            except socket.error:
-                print 'Selenium has not started yet. Attempt #%s\n' % (i+1)
-                time.sleep(5)
-        else:
-            started = False
-
-        return started
-
-    def _stopSeleniumServer(self):
-        """
-        stops the selenium server
-        """
-        if self.child:
-            self.child.kill()
-
-    def _runParallel(self, args, numThreads):
-        self._info("Starting %s threads" % numThreads)
-
-        # launch all threads
-        threadInstances = {}
-        for i in range(0, int(numThreads)):
-            threadInstances[i] = FunctionalTestThreadRunner(args)
-            threadInstances[i].start()
-
-        # give it some time to start up
-        time.sleep(1)
-
-        # wait so that there are no more runner threads executing
-        while(len(list(thread for thread in threading.enumerate()
-                       if isinstance(thread, FunctionalTestThreadRunner))) > 0):
-            time.sleep(1)
-
-        # check the result
-        theResult = True
-        for tindex in threadInstances:
-            theResult = theResult and threadInstances[tindex].getThreadData()
-
-        return theResult
-
-class FunctionalTestThreadRunner(threading.Thread):
-    """
-    A thread for the parallel version of functional testing
-    """
-
-    def __init__(self, args):
-        threading.Thread.__init__(self)
-        self.result = None
-        self.args = args
-
-    def run(self):
-        self.result = nose.run(argv = self.args)
-
-    def getThreadData(self):
-        return self.result
-
-
-class GridEnvironmentRunner(threading.Thread):
-    """
-    Rspresents a specific grid environment (FF Linux, IE Windows, etc...)
-    """
-
-    def __init__(self, gridData, setupDir, resultEntry):
-        threading.Thread.__init__(self)
-        self.setupDir = setupDir
-        self.gridData = gridData
-        self.result = None
-        self.resultEntry = resultEntry
-
-    def run(self):
-
-        self.result = nose.run(argv=['nose', '--nologcapture', '--nocapture',
-                                     '--logging-clear-handlers', '-v',
-                                     os.path.join(self.setupDir, 'python',
-                                                  'functional')])
-
-        self.resultEntry['success'] = self.result
-
-    def stop(self):
-        """
-        Stop the GridEnvironmentRunner, by joining its thread
-        """
-
-        self.join()
-
-        if self.result:
-            return True
-        else:
-            return False
-
-    @classmethod
-    def getGridData(cls):
-        """
-        returns the data that is stored by the thread, if any
-        """
-
-        thread = threading.currentThread()
-
-        if hasattr(thread, 'gridData'):
-            return thread.gridData
-        else:
-            return None
-
-class GridTestRunner(BaseTestRunner):
-    """
-    Selenium Grid Tests
-    """
-
-    _runnerOptions = {'silent': Option,
-                      'parallel': Option,
-                      'specify': Option }
-
-    def __init__(self, **kwargs):
-
-        BaseTestRunner.__init__(self, **kwargs)
-
-        try:
-            testConf = TestConfig.getInstance()
-            self.hubEnv = testConf.getHubEnv()
-            self.configExists = True
-        except KeyError:
-            self.configExists = False
-
-        self.gridData = None
-        specifiedEnv = self.options.valueOf('specify')
-
-        if specifiedEnv:
-            self.hubEnv = [specifiedEnv]
-
-    def _runSerial(self, resultDict, testConf):
-        """
-        Run the tests one after the other
-        """
-
-        for envName in self.hubEnv:
-            envRunner = self._runEnv(envName, resultDict, testConf)
-            envRunner.stop()
-
-
-    def _runParallel(self, resultDict, testConf):
-        """
-        Run all the tests at the same time
-        """
-
-        # launch every environment
-        for envName in self.hubEnv:
-            self._runEnv(envName, resultDict, testConf)
-
-        # give it some time to start up
-        time.sleep(1)
-
-        # wait so that there are no more runner threads executing
-        while(len(list(thread for thread in threading.enumerate()
-                       if isinstance(thread, GridEnvironmentRunner))) > 0):
-            time.sleep(1)
-
-
-    def _runEnv(self, envName, resultDict, testConf):
-        """
-        Run a specific test environment, spawning a GridEnvironmentRunner
-        """
-        self._info("Starting env %s" % envName)
-
-        self.gridData = GridData(testConf.getHubURL(),
-                                 testConf.getHubPort(),
-                                 envName,
-                                 active = True)
-
-        resultEntry = resultDict[envName] = {}
-
-        envRunner = GridEnvironmentRunner(self.gridData, self.setupDir, resultEntry)
-        envRunner.start()
-
-        return envRunner
-
-
-    def _run(self):
-
-        resultDict = {}
-        result = True
-
-        if not self.configExists:
-            return "[ERR] Grid - Please specify hub configuration in tests.conf\n"
-
-        try:
-            testConf = TestConfig.getInstance()
-
-            # Ping server, just to know it is alive
-            urllib2.urlopen("http://%s:%s/heartbeat" % (testConf.getHubURL(),
-                                                        testConf.getHubPort()))
-
-            if self.options.valueOf('parallel'):
-                self._runParallel(resultDict, testConf)
-            else:
-                self._runSerial(resultDict, testConf)
-
-            for name, resultEntry in resultDict.iteritems():
-                if resultEntry['success']:
-                    resultStr = 'OK'
-                else:
-                    resultStr = 'FAIL'
-                    result = False
-                print "%s\t %s" % (name, resultStr)
-
-        except socket.error:
-            self._error("[ERR] Selenium Grid - Connection refused, check your "
-                        "hub's settings (%s:%s)" % \
-                        (testConf.getHubURL(), testConf.getHubPort()))
-            return False
-        except urllib2.URLError, e:
-            self._error("[ERR] Selenium Grid - Hub is probably down " \
-                        "(%s:%s) (%s)\n" % \
-                        (testConf.getHubURL(), testConf.getHubPort(), e))
-            return False
-        except Exception, e:
-            self._error(e)
-            return False
-
-        return result
-
-class GridData(object):
-    """
-    Provides informations for selenium grid, data are set from Class Grid
-    and are used by seleniumTestCase.py.
-    Because nosetest cannot forward the arguments to selenium grid.
-    """
-
-    def __init__(self, host, port, env, active = False):
-        self.active = active
-        self.host = host
-        self.port = port
-        self.env = env
 
 
 class HTMLOption(Option):
@@ -808,7 +542,6 @@ class JSUnitTestRunner(BaseTestRunner):
             #running tests
             jsTest = commands.getoutput(command)
 
-            print jsTest
 
             #delete built conf file
             os.unlink(JSTEST_CFG_FILE)

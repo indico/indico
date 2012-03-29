@@ -25,11 +25,13 @@ This module defines a base structure for Selenum test cases
 # Test libs
 from selenium import webdriver
 from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support.select import Select
 import unittest, time
 
 # Indico
 from indico.tests import BaseTestRunner
-from indico.tests.runners import GridEnvironmentRunner
+from indico.tests.config import TestConfig
 from indico.tests.python.unit.util import IndicoTestCase
 
 from MaKaC.common.db import DBMgr
@@ -37,22 +39,36 @@ from MaKaC.common.Configuration import Config
 from MaKaC.conference import ConferenceHolder
 from MaKaC.errors import MaKaCError
 
+import os
+
 
 def setUpModule():
     global webd
+    config = TestConfig.getInstance()
+    browser = os.environ['INDICO_TEST_BROWSER']
 
-    gridData = GridEnvironmentRunner.getGridData()
-    webd = webdriver.Firefox();
+    if config.getRunMode() == 'grid':
+        capabilities = {
+            'firefox': DesiredCapabilities.FIREFOX,
+            'chrome': DesiredCapabilities.FIREFOX,
+            'ie': DesiredCapabilities.INTERNETEXPLORER,
+            'ipad': DesiredCapabilities.IPAD,
+            'iphone': DesiredCapabilities.IPHONE,
+            'android': DesiredCapabilities.ANDROID,
+            'htmlunit': DesiredCapabilities.HTMLUNITWITHJS
+            }
+        cap = capabilities[browser]
+
+        webd = webdriver.Remote('http://{0}:{1}/wd/hub'.format(config.getHubURL(), config.getHubPort()),
+                                desired_capabilities=cap)
+    else:
+        drivers = {
+            'firefox': webdriver.Firefox,
+            'chrome': webdriver.Chrome
+            }
+
+        webd = drivers[browser]();
     webd.implicitly_wait(15)
-
-#    if gridData:
-#        webd = selenium(gridData.host,
-#                       gridData.port,
-#                       gridData.env,
-#                       self.getRootUrl())
-#    else:
-#        webd = selenium("localhost", 4444, "*firefox",
-#                        Config.getInstance().getBaseURL())
 
 
 def name_or_id_target(f):
@@ -155,10 +171,7 @@ class SeleniumTestCase(IndicoTestCase):
     @classmethod
     @name_or_id_target
     def select(cls, elem, label=''):
-        elem.click()
-        for el in elem.find_elements_by_tag_name('option'):
-            if str(el.text) == str(label):
-                el.click()
+        Select(elem).select_by_visible_text(label)
 
 class LoggedInSeleniumTestCase(SeleniumTestCase):
 

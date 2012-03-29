@@ -308,7 +308,7 @@ class CategoryManager( ObjectHolder ):
         root = DBMgr.getInstance().getDBConnection().root()
         if not root.has_key("rootCategory"):
             r = Category()
-            r.setName( _("Home"))
+            r.setName("Home")
             self.add( r )
             root["rootCategory"] = r
         return root["rootCategory"]
@@ -4964,13 +4964,12 @@ class ConfSectionsMgr:
 
     def __init__(self):
         self._sections = {
-            "cfa": _("Call for abstracts"),
-            #comment the following line to make the Paper Reviewing module not appear
-            "paperReviewing" : _("Paper Reviewing"),
-            "evaluation": _("Evaluation Form"),
-            "videoconference": _("Videoconference"), # only for meetings
-            "collaboration": _("Collaboration"), # only for meetings
-            "regForm": _("Registration Form")
+            "cfa": "Call for abstracts",
+            "paperReviewing" : "Paper Reviewing",
+            "evaluation": "Evaluation Form",
+            "videoconference": "Videoconference", # only for meetings
+            "collaboration": "Collaboration", # only for meetings
+            "regForm": "Registration Form"
         }
 
     def hasSection(self, s):
@@ -5216,9 +5215,9 @@ class SlotChair(ConferenceParticipation):
 class SessionCoordinatorRights:
 
     def __init__(self):
-        self._rights = {"modifContribs": _("Modify the contributions"), \
-                "unrestrictedSessionTT": _("Unrestricted session timetable management")
-                }
+        self._rights = {"modifContribs": "Modify the contributions",
+                        "unrestrictedSessionTT": "Unrestricted session timetable management"
+                        }
 
     def hasRight(self, r):
         return self._rights.has_key(r)
@@ -5702,7 +5701,7 @@ class Session(CommonObjectBase, Locatable):
             will set to a default value.
         """
 
-        self.setTitle( sessionData.get("title", _("NO TITLE ASSIGNED")) )
+        self.setTitle( sessionData.get("title", "NO TITLE ASSIGNED") )
         self.setDescription( sessionData.get("description", "") )
         code = sessionData.get("code", "")
         if code.strip() == "":
@@ -6786,7 +6785,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
             oldDuration=copy.copy(self.getDuration())
             i=self.getConfSchEntry().getSchedule().getEntries().index(self.getConfSchEntry())+1
             entriesList = self.getConfSchEntry().getSchedule().getEntries()[i:]
-        self.title=data.get("title", _("NO TITLE ASSIGNED"))
+        self.title=data.get("title", "NO TITLE ASSIGNED")
         # Do we move all entries in the slot
         move = int(data.get("move",0))
 
@@ -10657,7 +10656,7 @@ class Material(CommonObjectBase):
             the given dictionary doesn't contain any of the keys the value
             will set to a default value.
         """
-        self.setTitle( params.get( "title", _("NO TITLE ASSIGNED") ) )
+        self.setTitle(params.get("title", "NO TITLE ASSIGNED"))
         self.setDescription( params.get( "description", "" ) )
         self.notifyModification()
 

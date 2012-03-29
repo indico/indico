@@ -37,19 +37,28 @@ JSUnitFilename     = "JsTestDriver-1.2.2.jar"
 JSCoverageURL      = "http://js-test-driver.googlecode.com/files/coverage-1.2.2.jar"
 JSCoverageFilename = "coverage-1.2.2.jar"
 
-SeleniumURL        = "http://selenium.googlecode.com/files/selenium-remote-control-1.0.3.zip"
-SeleniumInZipPath  = "selenium-server-1.0.3/selenium-server.jar"
-SeleniumZipname    = "selenium-remote-control-1.0.3.zip"
-SeleniumFilename   = "selenium-server.jar"
+#------------------------------------------------------------------------------
+# Functional Tests
+#------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
-# Selenium Grid
-#------------------------------------------------------------------------------
-HubURL         = "macuds04.cern.ch"
+# Don't change this unless you have to use a grid
+WebServerHost = 'localhost'
+
+# If the default is not desirable, you can customize the port number
+WebServerPort = 8000
+
+
+# use 'grid' for selenium grid, 'local' for standalone
+RunMode = 'local'
+StandaloneBrowser = 'firefox'
+
+# Grid
+
+HubURL         = "indicotest1.cern.ch"
 HubPort        = 4444
-HubEnv         = ['Safari on OS X',
-                  'Firefox on Linux',
-                  'IE on Windows']
+GridBrowsers   = ['firefox',
+                  'safari',
+                  'chrome']
 
 #------------------------------------------------------------------------------
 # Plugins

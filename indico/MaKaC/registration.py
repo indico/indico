@@ -59,7 +59,7 @@ class RegistrationForm(Persistent):
         self._conf = conf
         if groupData is None:
             self.activated = False
-            self.title =  _("Registration Form")
+            self.title = "Registration Form"
             self.announcement = ""
             self.usersLimit = 0
             self.contactInfo = ""
@@ -499,7 +499,7 @@ class RegistrationForm(Persistent):
             id = str(self._getGeneralSectionGenerator().newCount())
         gsf.setId( id )
         if not preserveTitle:
-            gsf.setTitle(  _("Miscellaneous information %s")%gsf.getId())
+            gsf.setTitle("Miscellaneous information %s" % gsf.getId())
         self.generalSectionForms[gsf.getId()]=gsf
         self.addToSortedForms(gsf, pos)
         self.notifyModification()
@@ -3274,7 +3274,7 @@ class FurtherInformationForm(BaseForm):
 
     def __init__(self, data=None):
         BaseForm.__init__(self)
-        self._title = _("Further information")
+        self._title = "Further information"
         self._content = ""
         if data is not None:
             self._title = data.get("title", self._title)
@@ -3290,7 +3290,7 @@ class FurtherInformationForm(BaseForm):
         return self._id
 
     def setValues(self, data):
-        self.setTitle(data.get("title", _("Further Information")))
+        self.setTitle(data.get("title", "Further Information"))
         self.setContent(data.get("content", ""))
 
     def getValues(self):
@@ -3496,7 +3496,7 @@ class AccommodationForm(BaseForm):
         BaseForm.__init__(self)
         self._accoTypeGenerator = Counter()
         self._regForm = regForm
-        self._title = _("Accommodation")
+        self._title = "Accommodation"
         self._description = ""
         self._currency = "CHF"
         self._accommodationTypes = PersistentMapping()
@@ -3575,15 +3575,15 @@ class AccommodationForm(BaseForm):
     def _setDefaultAccommodationTypes(self):
         a = AccommodationType(self._regForm)
         a.setId("cern")
-        a.setCaption( _("CERN Hostel"))
+        a.setCaption("CERN Hostel")
         self._accommodationTypes[a.getId()] = a
         a = AccommodationType(self._regForm)
         a.setId("own-accommodation")
-        a.setCaption( _("I will arrange my own accommodation"))
+        a.setCaption("I will arrange my own accommodation")
         self._accommodationTypes[a.getId()] = a
         a = AccommodationType(self._regForm)
         a.setId("geneva-hotel")
-        a.setCaption( _("I prefer to book a room in a Geneva hotel"))
+        a.setCaption("I prefer to book a room in a Geneva hotel")
         self._accommodationTypes[a.getId()] = a
 
     def setValues(self, data):
@@ -3677,8 +3677,8 @@ class ReasonParticipationForm(BaseForm):
 
     def __init__(self, data=None):
         BaseForm.__init__(self)
-        self._title = _("Reason for participation")
-        self._description = _("Please, let us know why you are interested to participate in our event:")
+        self._title = "Reason for participation"
+        self._description = "Please, let us know why you are interested to participate in our event:"
         if data is not None:
             self._title = data.get("title", self._title)
             self._description = data.get("description",self._description)
@@ -3693,7 +3693,7 @@ class ReasonParticipationForm(BaseForm):
         return self._id
 
     def setValues(self, data):
-        self.setTitle(data.get("title", _("Reason for participation")))
+        self.setTitle(data.get("title", "Reason for participation"))
         self.setDescription(data.get("description", ""))
 
     def getValues(self):
@@ -4187,7 +4187,7 @@ class SocialEventForm(BaseForm):
         BaseForm.__init__(self)
         self._socialEventItemGenerator = Counter()
         self._regForm = regForm
-        self._title = _("Social Events")
+        self._title = "Social Events"
         self._description = ""
         self._introSentence=self._getDefaultIntroValue()
         self._selectionType="multiple"
@@ -4206,7 +4206,7 @@ class SocialEventForm(BaseForm):
         return self._id
 
     def setValues(self, data):
-        self.setTitle(data.get("title", _("Sessions")))
+        self.setTitle(data.get("title", "Sessions"))
         self.setDescription(data.get("description", ""))
         self.setIntroSentence(data.get("intro", ""))
         self.setSelectionType(data.get("selectionType","multiple"))

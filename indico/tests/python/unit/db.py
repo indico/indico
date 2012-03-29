@@ -26,14 +26,12 @@ from ZODB.POSException import ConflictError
 
 # legacy imports
 from MaKaC.common.db import DBMgr
-from MaKaC.conference import CategoryManager, DefaultConference
 
-from MaKaC import user
-from MaKaC.authentication import AuthenticatorMgr
-from MaKaC.common import HelperMaKaCInfo
 
 # indico imports
 from indico.tests.python.unit.util import IndicoTestFeature
+from indico.tests import default_actions
+
 
 class TestMemStorage(MappingStorage.MappingStorage,
                      ConflictResolution.ConflictResolvingStorage):
@@ -81,21 +79,7 @@ class Database_Feature(IndicoTestFeature):
         while retries:
             try:
                 with obj._context('database', sync=True) as conn:
-                    r = conn.root()
-
-                    # Reset everything
-                    for e in r.keys():
-                        del r[e]
-
-                    # initialize db root
-                    cm = CategoryManager()
-                    cm.getRoot()
-
-                    obj._home = cm.getById('0')
-
-                    # set debug mode on
-                    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-                    minfo.setDebugActive(True)
+                    obj._home = default_actions.initialize_new_db(conn.root())
                 break
             except ConflictError:
                 retries -= 1
@@ -135,37 +119,4 @@ class DummyUser_Feature(IndicoTestFeature):
         super(DummyUser_Feature, self).start(obj)
 
         with obj._context('database', sync=True):
-
-            #filling info to new user
-            avatar = user.Avatar()
-
-            avatar.setName("fake")
-            avatar.setSurName("fake")
-            avatar.setOrganisation("fake")
-            avatar.setLang("en_GB")
-            avatar.setEmail("fake@fake.fake")
-
-            #registering user
-            ah = user.AvatarHolder()
-            ah.add(avatar)
-
-            #setting up the login info
-            li = user.LoginInfo("dummyuser", "dummyuser")
-            ih = AuthenticatorMgr()
-            userid = ih.createIdentity(li, avatar, "Local")
-            ih.add(userid)
-
-            #activate the account
-            avatar.activateAccount()
-
-            #since the DB is empty, we have to add dummy user as admin
-            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-
-            al = minfo.getAdminList()
-            al.grant(avatar)
-
-            obj._dummy = avatar
-
-            dc = DefaultConference()
-
-            HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(dc)
+            obj._dummy = default_actions.create_dummy_user()

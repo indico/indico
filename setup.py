@@ -362,11 +362,6 @@ class test_indico(test.test):
 
         from indico.tests import TestManager
 
-        #missing jars will be downloaded automatically
-        if not self._wrap(self.checkTestJars):
-            print "Some jars could not be downloaded. Please download the missing jars manually"
-            sys.exit(-1)
-
         options = {'silent': self.silent,
                    'killself': self.killself,
                    'html': self.html,
@@ -386,56 +381,6 @@ class test_indico(test.test):
         result = self._wrap(manager.main, self.testsToRun, options)
 
         sys.exit(result)
-
-    def checkTestJars(self):
-        """
-        check if needed jars are here, if not,
-        dowload them and unzip the file if necessary
-        """
-
-        from indico.tests import TestConfig
-
-        jarsList = {}
-        currentFilePath = os.path.dirname(__file__)
-        testModPath = os.path.join(currentFilePath, 'indico', 'tests')
-
-        try:
-            jarsList['jsunit'] = {'path':     os.path.join(testModPath,
-                                                           'javascript',
-                                                           'unit'),
-                                  'url':      TestConfig.getInstance().getJSUnitURL(),
-                                  'filename': TestConfig.getInstance().getJSUnitFilename()}
-
-            jarsList['jscoverage'] = {'path':     os.path.join(testModPath,
-                                                               'javascript',
-                                                               'unit',
-                                                               'plugins'),
-                                      'url':      TestConfig.getInstance().getJSCoverageURL(),
-                                      'filename': TestConfig.getInstance().getJSCoverageFilename()}
-
-            jarsList['selenium'] = {'path':      os.path.join(testModPath,
-                                                              'python',
-                                                              'functional'),
-                                    'url':       TestConfig.getInstance().getSeleniumURL(),
-                                    'filename':  TestConfig.getInstance().getSeleniumFilename()}
-        except KeyError, key:
-            print "[ERR] Please specify a value for %s in tests.conf" % key
-            sys.exit(1)
-
-        validJars = True
-
-        for name in jarsList:
-            jar = jarsList[name]
-            #check if jar is already here
-            if not os.path.exists(os.path.join(jar['path'], jar['filename'])):
-                print "Downloading %s to %s..." % (jar['url'], jar['path'])
-                try:
-                    self.download(jar['url'], jar['path'])
-                except IOError, e:
-                    validJars = validJars and False
-                    print 'Could not download %s from %s (%s)' % (jar['filename'], jar['url'], e)
-
-        return validJars
 
     def download(self, url, path):
         """Copy the contents of a file from a given URL

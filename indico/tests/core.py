@@ -42,12 +42,12 @@ from indico.tests.runners import *
 # Indico legacy
 from MaKaC.common.Configuration import Config
 
+
 TEST_RUNNERS = {'unit': UnitTestRunner,
                 'functional': FunctionalTestRunner,
                 'pylint': PylintTestRunner,
                 'jsunit': JSUnitTestRunner,
-                'jslint': JSLintTestRunner,
-                'grid': GridTestRunner}
+                'jslint': JSLintTestRunner}
 
 
 class TestManager(object):
@@ -142,6 +142,7 @@ class TestManager(object):
         Sets a fake configuration for the current process, using a temporary directory
         """
         config = Config.getInstance()
+        test_config = TestConfig.getInstance()
 
         temp = tempfile.mkdtemp(prefix="indico_")
         self._info('Using %s as temporary dir' % temp)
@@ -155,7 +156,8 @@ class TestManager(object):
 
         # set defaults
         config.reset({
-            'BaseURL': 'http://localhost:8000',
+            'BaseURL': 'http://{0}:{1}'.format(test_config.getWebServerHost(),
+                                               test_config.getWebServerPort()),
             'BaseSecureURL': '',
             'UseXSendFile': False,
             'AuthenticatorList': ['Local'],
