@@ -5,12 +5,14 @@ import ConfigParser
 from MaKaC.common.Configuration import Config
 from MaKaC.common.contextManager import ContextManager
 
+
 class ExtraIndicoFilter(logging.Filter):
 
     def filter(self, record):
         if record.name.split('.')[0] == 'indico':
             return 0
         return 1
+
 
 class IndicoMailFormatter(logging.Formatter):
     def format(self, record):
@@ -29,7 +31,26 @@ class IndicoMailFormatter(logging.Formatter):
         info.append('Referer: %s' % rh._req.headers_in.get('Referer', 'n/a'))
         return '\n\n%s' % '\n'.join(info)
 
+
 class LoggerUtils:
+
+    @classmethod
+    def _bootstrap_cp(cls, cp, defaultArgs):
+        """
+        Creates a very basic logging config for cases in which
+        logging.conf does not yet exist
+        """
+        if not cp.has_section('loggers'):
+            cp.add_section('loggers')
+            cp.add_section('logger_root')
+            cp.add_section('handlers')
+            cp.set('loggers', 'keys', 'root')
+            cp.set('logger_root', 'handlers', ','.join(defaultArgs))
+            cp.set('handlers', 'keys', ','.join(defaultArgs))
+            for handler_name in defaultArgs:
+                section_name = 'handler_' + handler_name
+                cp.add_section(section_name)
+                cp.set(section_name, 'formatter', 'defaultFormatter')
 
     @classmethod
     def configFromFile(cls, fname, defaultArgs, filters):
@@ -37,25 +58,31 @@ class LoggerUtils:
         Read the logging configuration from the logging.conf file.
         Fetch default values if the logging.conf file is not set.
         """
-
-        if not os.path.exists(fname):
-            return
-
         cp = ConfigParser.ConfigParser()
-        cp.read(fname)
+        parsed_files = cp.read(fname)
 
-        formatters = logging.config._create_formatters(cp)
+        if cp.has_section('formatters'):
+            formatters = logging.config._create_formatters(cp)
+        else:
+            formatters = {}
 
         # Really ugly.. but logging fails to import MaKaC.common.logger.IndicoMailFormatter
         # when using it in the class= option...
         if 'mailFormatter' in formatters:
-            f = formatters['mailFormatter']
-            formatters['mailFormatter'] = IndicoMailFormatter(f._fmt, f.datefmt)
+            f = formatters.get('mailFormatter')
+            if f:
+                formatters['mailFormatter'] = IndicoMailFormatter(f._fmt, f.datefmt)
+
+        # if there is a problem with the config file, set some sane defaults
+        if not parsed_files:
+            formatters['defaultFormatter'] = logging.Formatter("%(asctime)s %(name)-16s: %(levelname)-8s %(message)s")
+            cls._bootstrap_cp(cp, defaultArgs)
 
         logging._acquireLock()
         try:
             logging._handlers.clear()
             del logging._handlerList[:]
+
             handlers = cls._install_handlers(cp, defaultArgs, formatters, filters)
             logging.config._install_loggers(cp, handlers, False)
 
@@ -71,28 +98,29 @@ class LoggerUtils:
         indico.conf file
         """
         hlist = cp.get("handlers", "keys")
-        if not len(hlist):
-            return {}
         hlist = hlist.split(",")
         handlers = {}
         fixups = [] #for inter-handler references
 
         for hand in hlist:
             sectname = "handler_%s" % hand.strip()
-            klass = cp.get(sectname, "class")
             opts = cp.options(sectname)
+            if "class" in opts:
+                klass = cp.get(sectname, "class")
+            else:
+                klass = defaultArgs[hand.strip()][0]
             if "formatter" in opts:
                 fmt = cp.get(sectname, "formatter")
             else:
                 fmt = ""
             klass = eval(klass, vars(logging))
-            if "args" in opts :
+            if "args" in opts:
                 # if the args are not present in the file,
                 # take default values
                 args = cp.get(sectname, "args")
             else :
                 try:
-                    args = defaultArgs[hand.strip()]
+                    args = defaultArgs[hand.strip()][1]
                 except KeyError:
                     continue
             args = eval(args, vars(logging))
@@ -133,19 +161,19 @@ class Logger:
                    'smtp'   : [logging.Filter('indico')]}
 
         config = Config.getInstance()
+
         logConfFilepath = os.path.join(config.getConfigurationDir(), "logging.conf")
 
-        configDir = config.getLogDir()
         smtpServer = config.getSmtpServer()
         serverName = config.getWorkerName()
         if not serverName:
             serverName = config.getHostNameURL()
 
         # Default arguments for the handlers, taken mostly for the configuration
-        defaultArgs = { 'indico' : "('%s', 'a')" % os.path.join(configDir, 'indico.log'),
-                        'other'  : "('%s', 'a')" % os.path.join(configDir, 'other.log'),
-                        'smtp'   : "(\"%s\", 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
-                        % (smtpServer[0], serverName, config.getSupportEmail(), serverName)
+        defaultArgs = { 'indico' : ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log')),
+                        'other'  : ("FileHandler", "('%s', 'a')" % cls._log_path('other.log')),
+                        'smtp'   : ("handlers.SMTPHandler", "(\"%s\", 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
+                        % (smtpServer[0], serverName, config.getSupportEmail(), serverName))
                     }
 
         cls.handlers = LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
@@ -172,6 +200,18 @@ class Logger:
     @classmethod
     def get(cls, module=None):
         return logging.getLogger('indico' if module == None else 'indico.' + module)
+
+    @classmethod
+    def _log_path(cls, fname):
+        config = Config.getInstance()
+        configDir = config.getLogDir()
+        fpath = os.path.join(configDir, fname)
+
+        if not os.access(os.path.dirname(fpath), os.W_OK):
+            # if the file in the config is not accessible, use a "local" one
+            fpath = os.path.join(os.getcwd(), '.indico.log')
+
+        return fpath
 
 
 Logger.initialize()
