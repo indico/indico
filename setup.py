@@ -272,7 +272,7 @@ Please specify the directory where you'd like it to be placed.
 %s
         ''' % _databaseText('etc')
 
-        if sys.platform == "linux2":
+        if sys.platform in ["linux2", "darwin"]:
             # create symlink to legacy MaKaC dir
             # this is so that the ".egg-link" created by the "develop" command works
             os.symlink('indico/MaKaC','MaKaC')
