@@ -35,18 +35,6 @@ from indico.web.rh import RHHtdocs
 # legacy indico imports
 from MaKaC.common import Config
 
-
-# Path update
-
-DIR_HTDOCS = Config.getInstance().getHtdocsDir()
-PATH = [os.path.join(DIR_HTDOCS, '../'), \
-        DIR_HTDOCS]
-for p in PATH:
-    if p not in sys.path:
-        sys.path.append(p)
-
-###
-
 from wsgiref.util import FileWrapper, guess_scheme
 
 from indico.web.wsgi.webinterface_handler_config import \
@@ -59,6 +47,22 @@ from indico.web.wsgi.indico_wsgi_url_parser import is_mp_legacy_publisher_path
 
 # Legacy imports
 from MaKaC.plugins.base import RHMapMemory
+
+
+DIR_HTDOCS = None
+
+def initialize_htdocs():
+    global DIR_HTDOCS
+
+    if not DIR_HTDOCS:
+        DIR_HTDOCS = Config.getInstance().getHtdocsDir()
+        print 'h:', DIR_HTDOCS
+
+        for p in [os.path.join(DIR_HTDOCS, '../'), DIR_HTDOCS]:
+            if p not in sys.path:
+                sys.path.append(p)
+    return DIR_HTDOCS
+
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.
@@ -167,8 +171,9 @@ def is_static_path(path):
     @return: True if path corresponds to an existing file under DIR_HTDOCS.
     @rtype: bool
     """
-    path = os.path.abspath(DIR_HTDOCS + path)
-    if path.startswith(DIR_HTDOCS) and os.path.isfile(path):
+    htdocs_dir = initialize_htdocs()
+    path = os.path.abspath(htdocs_dir + path)
+    if path.startswith(htdocs_dir) and os.path.isfile(path):
         return path
     return None
 

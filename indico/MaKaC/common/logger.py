@@ -172,8 +172,8 @@ class Logger:
         # Default arguments for the handlers, taken mostly for the configuration
         defaultArgs = { 'indico' : ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log')),
                         'other'  : ("FileHandler", "('%s', 'a')" % cls._log_path('other.log')),
-                        'smtp'   : ("handlers.SMTPHandler", "(\"%s\", 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
-                        % (smtpServer[0], serverName, config.getSupportEmail(), serverName))
+                        'smtp'   : ("handlers.SMTPHandler", "(%s, 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
+                        % (smtpServer, serverName, config.getSupportEmail(), serverName))
                     }
 
         cls.handlers = LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
