@@ -137,6 +137,7 @@ class ICalSerializer(Serializer):
         'reservationMetadata': serialize_reservation,
         'conferenceMetadataWithContribs': serialize_contribs,
         'sessionMetadata': serialize_contribs,
+        'sessionMetadataWithContributions': serialize_contribs,
         'contributionMetadata': serialize_contrib
     }
 

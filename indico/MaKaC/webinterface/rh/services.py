@@ -21,19 +21,14 @@
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.general import *
-from MaKaC.common import Config
 from MaKaC.common import utils
 from MaKaC.common import info
-import MaKaC.user as user
 import MaKaC.webcast as webcast
 from MaKaC.errors import WebcastAdminError
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.pages import admins as adminPages
 from MaKaC.webinterface.rh.base import RHProtected
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.webinterface.pages import conferences
 from MaKaC.errors import MaKaCError
-from MaKaC.ICALinterface.conference import WebcastToiCal
 
 class RHServicesBase(admins.RHAdminBase):
     pass
@@ -68,30 +63,6 @@ class RHWebcast( RHWebcastBase ):
     def _process( self ):
         p = adminPages.WPWebcast(self)
         return p.display()
-
-class RHWebcastICal( RHWebcastBase ):
-    """ ICal export of all webcasted events
-    the link is public so all webcasted events are supposed
-    to be public """
-    _uh = urlHandlers.UHWebcast
-
-    def _checkProtection( self ):
-        self._wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-
-    def _checkParams( self, params ):
-        admins.RHAdminBase._checkParams( self, params )
-        self._params = params
-
-    def _process( self ):
-        filename = "Webcast - Event.ics"
-        data = ""
-        data += WebcastToiCal(self._wm).getBody()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ICAL" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
 
 class RHWebcastArchive( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastArchive

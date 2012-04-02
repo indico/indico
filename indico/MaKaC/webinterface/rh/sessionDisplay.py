@@ -28,6 +28,8 @@ from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from MaKaC.errors import ModificationError
 from MaKaC.ICALinterface.conference import SessionToiCal
 from MaKaC.common import Config
+from indico.web.http_api.api import SessionHook
+from indico.util.metadata.serializer import Serializer
 
 
 class RHSessionDisplayBase( RHSessionBase, RHDisplayBaseProtected ):
@@ -61,9 +63,15 @@ class RHSessionDisplay( RoomBookingDBMixin, RHSessionDisplayBase ):
 class RHSessionToiCal(RHSessionDisplay):
 
     def _process( self ):
-        filename = "%s - Session.ics"%self._session.getTitle()
-        ical = SessionToiCal(self._session.getConference(), self._session)
-        data = ical.getBody()
+        filename = "%s-Session.ics"%self._session.getTitle()
+
+        hook = SessionHook({}, 'session', {'event': self._conf.getId(), 'idlist':self._session.getId(), 'dformat': 'ics'})
+        res = hook(self.getAW(), self._req)
+        resultFossil = {'results': res[0]}
+
+        serializer = Serializer.create('ics')
+        data = serializer(resultFossil)
+
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )

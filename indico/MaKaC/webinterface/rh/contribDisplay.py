@@ -21,20 +21,20 @@
 import os.path
 import sys
 
-import MaKaC.conference as conference
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
     RoomBookingDBMixin
-from MaKaC.webinterface.rh.conferenceBase import RHContributionBase, RHSubmitMaterialBase
+from MaKaC.webinterface.rh.conferenceBase import RHContributionBase
 from MaKaC.PDFinterface.conference import ContribToPDF
-from MaKaC.ICALinterface.conference import ContribToiCal
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common import Config
 from MaKaC.errors import MaKaCError, ModificationError
 import MaKaC.common.timezoneUtils as timezoneUtils
 import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
+from indico.web.http_api.api import ContributionHook
+from indico.util.metadata.serializer import Serializer
 
 
 class RHContributionDisplayBase( RHContributionBase, RHDisplayBaseProtected ):
@@ -117,9 +117,15 @@ class RHContributionToPDF(RHContributionDisplay):
 class RHContributionToiCal(RHContributionDisplay):
 
     def _process( self ):
-        filename = "%s - Contribution.ics"%self._target.getTitle()
-        ical = ContribToiCal(self._target.getConference(), self._target)
-        data = ical.getBody()
+        filename = "%s-Contribution.ics"%self._target.getTitle()
+
+        hook = ContributionHook({}, 'contribution', {'event': self._conf.getId(), 'idlist':self._contrib.getId(), 'dformat': 'ics'})
+        res = hook(self.getAW(), self._req)
+        resultFossil = {'results': res[0]}
+
+        serializer = Serializer.create('ics')
+        data = serializer(resultFossil)
+
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )

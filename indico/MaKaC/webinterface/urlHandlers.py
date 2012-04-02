@@ -3027,9 +3027,6 @@ class UHRecording( URLHandler ):
 class UHWebcast( URLHandler ):
     _relativeURL = "adminServices.py/webcast"
 
-class UHWebcastICal( URLHandler ):
-    _relativeURL = "adminServices.py/webcastICal"
-
 class UHWebcastArchive( URLHandler ):
     _relativeURL = "adminServices.py/webcastArchive"
 

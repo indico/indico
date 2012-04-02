@@ -327,6 +327,7 @@ class ISessionMetadataWithContributionsFossil(ISessionFossil):
         pass
     getContributionList.result = IContributionMetadataFossil
     getContributionList.name = 'contributions'
+    getContributionList.filterBy = 'access'
 
 class ISessionMetadataWithSubContribsFossil(ISessionFossil):
 
@@ -334,6 +335,7 @@ class ISessionMetadataWithSubContribsFossil(ISessionFossil):
         pass
     getContributionList.result = IContributionMetadataWithSubContribsFossil
     getContributionList.name = 'subcontributions'
+    getContributionList.filterBy = 'access'
 
 class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 

@@ -24,9 +24,6 @@ import MaKaC.webinterface.rh.api as api
 def webcast(req, **params):
     return services.RHWebcast(req).process(params)
 
-def webcastICal(req, **params):
-    return services.RHWebcastICal(req).process(params)
-
 def webcastArchive(req, **params):
     return services.RHWebcastArchive(req).process(params)
 

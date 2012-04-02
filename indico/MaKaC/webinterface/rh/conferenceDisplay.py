@@ -1083,7 +1083,7 @@ class RHConferenceToiCal(RHConferenceBaseDisplay):
         self._detailLevel = params.get("detail","events")
 
     def _process( self ):
-        filename = "%s - Event.ics"%cleanHTMLHeaderFilename(self._target.getTitle())
+        filename = "%s-Event.ics"%cleanHTMLHeaderFilename(self._target.getTitle())
 
         hook = CategoryEventHook({'detail':[self._detailLevel]}, 'event', {'idlist':self._conf.getId(), 'dformat': 'ics'})
         res = hook(self.getAW(), self._req)

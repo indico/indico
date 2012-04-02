@@ -538,7 +538,7 @@ class RHCategoryGetIcon(RHCategDisplayBase):
 class RHCategoryToiCal(RHCategDisplayBase):
 
     def _process( self ):
-        filename = "%s - Categ.ics"%self._target.getName().replace("/","")
+        filename = "%s-Categ.ics"%self._target.getName().replace("/","")
 
         hook = CategoryEventHook({}, 'categ', {'idlist':self._target.getId(), 'dformat': 'ics'})
         res = hook(self.getAW(), self._req)
