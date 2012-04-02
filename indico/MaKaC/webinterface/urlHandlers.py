@@ -3620,6 +3620,9 @@ class UHCategoryToiCal( URLHandler ):
 class UHCategoryToRSS( URLHandler ):
     _relativeURL = "categoryDisplay.py/rss"
 
+class UHCategoryToAtom( URLHandler ):
+    _relativeURL = "categoryDisplay.py/atom"
+
 class UHCategOverviewToRSS( URLHandler ):
     _relativeURL = "categOverview.py/rss"
 

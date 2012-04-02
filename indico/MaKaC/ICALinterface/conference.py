@@ -21,9 +21,7 @@
 from xml.sax.saxutils import quoteattr, escape
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.ICALinterface.base import ICALBase
-from MaKaC.RSSinterface.conference import ACLfiltered
 from MaKaC.common.utils import encodeUnicode
-from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface.common.tools import strip_ml_tags
 
 

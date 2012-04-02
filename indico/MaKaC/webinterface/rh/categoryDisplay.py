@@ -43,16 +43,15 @@ from MaKaC.common.general import *
 import MaKaC.statistics as statistics
 from MaKaC.common.Configuration import Config
 import MaKaC.user as user
-from MaKaC.RSSinterface.conference import CategoryToRSS
 import MaKaC.common.info as info
 from MaKaC.i18n import _
-from MaKaC.rb_location import Location, CrossLocationQueries
 from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 from indico.web.http_api.api import CategoryEventHook
 from indico.util.metadata.serializer import Serializer
+from indico.web.wsgi import webinterface_handler_config as apache
 
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
@@ -506,7 +505,6 @@ class UtilsConference:
         curType = c.getType()
         newType = confData.get("eventType","")
         if newType != "" and newType != curType:
-            import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
             wr = webFactoryRegistry.WebFactoryRegistry()
             factory = wr.getFactoryById(newType)
             wr.registerFactory(c,factory)
@@ -537,27 +535,9 @@ class RHCategoryGetIcon(RHCategDisplayBase):
         self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%icon.getFileName()
         return self._target.getIcon().readBin()
 
-class RHCategoryOpenService(base.RH):
+class RHCategoryToiCal(RHCategDisplayBase):
 
-    def _checkProtection(self):
-        pass
-
-    def _checkParams( self, params ):
-        l = locators.CategoryWebLocator( params )
-        self._target = l.getObject()
-
-    def _process(self):
-        # throw an error if the category was not found
-        if self._target == None:
-            from indico.web.wsgi import webinterface_handler_config as apache
-            self._req.status = apache.HTTP_NOT_FOUND
-            return "Specified category does not exist!"
-
-        return self._processData()
-
-class RHCategoryToiCal(RHCategoryOpenService):
-
-    def _processData( self ):
+    def _process( self ):
         filename = "%s - Categ.ics"%self._target.getName().replace("/","")
 
         hook = CategoryEventHook({}, 'categ', {'idlist':self._target.getId(), 'dformat': 'ics'})
@@ -574,25 +554,32 @@ class RHCategoryToiCal(RHCategoryOpenService):
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
+class RHCategoryToRSS(RHCategDisplayBase):
 
-class RHCategoryToRSS(RHCategoryOpenService):
-
-    def _getRSS( self, tz ):
-        return CategoryToRSS(self._target, self, tz=tz).getBody()
-
-    def _processData( self ):
-        data = ""
-        tz = DisplayTZ(self._aw).getDisplayTZ()
-        data += self._getRSS(tz)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "RSS" )
-        self._req.content_type = """%s"""%(mimetype)
-        return data
+    def _process (self):
+        self._redirect(urlHandlers.UHCategoryToAtom.getURL(self._target), status=apache.HTTP_MOVED_PERMANENTLY)
 
 class RHTodayCategoryToRSS(RHCategoryToRSS):
 
-    def _getRSS( self, tz ):
-        return CategoryToRSS(self._target, self, date=nowutc().astimezone(timezone(tz)), tz=tz).getBody()
+    def _process( self ):
+        self._redirect(urlHandlers.UHCategoryToAtom.getURL(self._target), status=apache.HTTP_MOVED_PERMANENTLY)
+
+class RHCategoryToAtom(RHCategDisplayBase):
+    _uh = urlHandlers.UHCategoryToAtom
+
+    def _process( self ):
+
+        hook = CategoryEventHook({'from': ['today']}, 'categ', {'idlist':self._target.getId(), 'dformat': 'atom'})
+        res = hook(self.getAW(), self._req)
+        resultFossil = {'results': res[0], 'url': str(self._uh.getURL(self._target))}
+
+        serializer = Serializer.create('atom')
+        data = serializer(resultFossil)
+
+        cfg = Config.getInstance()
+        mimetype = cfg.getFileTypeMimeType( "ATOM" )
+        self._req.content_type = """%s"""%(mimetype)
+        return data
 
 
 def sortByStartDate(conf1,conf2):

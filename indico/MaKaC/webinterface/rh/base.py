@@ -297,7 +297,7 @@ class RH(RequestHandlerBase):
             self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
             self._req.headers_out["Pragma"] = "no-cache"
 
-    def _redirect( self, targetURL, noCache=False ):
+    def _redirect( self, targetURL, noCache=False, status=apache.HTTP_SEE_OTHER ):
         """Utility for redirecting the client web browser to the specified
             URL.
             Params:
@@ -313,7 +313,7 @@ class RH(RequestHandlerBase):
         if noCache:
             self._disableCaching()
         try:
-            self._req.status = apache.HTTP_SEE_OTHER
+            self._req.status = status
         except NameError:
             pass
 

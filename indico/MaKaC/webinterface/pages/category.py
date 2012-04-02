@@ -197,10 +197,10 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
 
     def _getHeadContent( self ):
         # add RSS feed
-        url = urlHandlers.UHCategoryToRSS.getURL(self._target)
+        url = urlHandlers.UHCategoryToAtom.getURL(self._target)
 
         return WPCategoryDisplayBase._getHeadContent( self ) + \
-        i18nformat("""<link rel="alternate" type="application/rss+xml" title= _("Indico RSS Feed") href="%s">""") % url
+        i18nformat("""<link rel="alternate" type="application/atom+xml" title= _("Indico Atom Feed") href="%s">""") % url
 
     def _getBody( self, params ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()

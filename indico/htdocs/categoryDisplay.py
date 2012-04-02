@@ -32,3 +32,6 @@ def ical(req, **params):
 
 def rss(req, **params):
     return categoryDisplay.RHCategoryToRSS( req ).process( params )
+
+def atom(req, **params):
+    return categoryDisplay.RHCategoryToAtom( req ).process( params )

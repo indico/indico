@@ -70,5 +70,6 @@ FileTypes = {"DOC":  ["Ms Word","application/msword","word_big.png"],
              "JPG":  ["JPEG Image","image/jpeg",""],
              "PNG":  ["PNG Image","image/png",""],
              "GIF":  ["GIF Image","image/gif",""],
-             "TIFF":  ["TIFF Image","image/gif",""]
+             "TIFF":  ["TIFF Image","image/gif",""],
+             "ATOM": ['Atom', "application/atom+xml", ""]
              }
