@@ -199,6 +199,16 @@ class jsbuild(Command):
 
 
 class develop_indico(develop.develop):
+    def run(self):
+        develop.develop.run(self)
+
+        # create symlink to legacy MaKaC dir
+        # this is so that the ".egg-link" created by the "develop" command works
+        if sys.platform in ["linux2", "darwin"] and not os.path.exists('MaKaC'):
+            os.symlink('indico/MaKaC','MaKaC')
+
+
+class develop_config(develop_indico):
     description = "prepares the current directory for Indico development"
     user_options = develop.develop.user_options + [('www-uid=', None, "Set user for cache/log/db (typically apache user)"),
                     ('www-gid=', None, "Set group for cache/log/db (typically apache group)")]
@@ -208,7 +218,7 @@ class develop_indico(develop.develop):
 
     def run(self):
         # dependencies, links, etc...
-        develop.develop.run(self)
+        develop_indico.run(self)
 
         env = pkg_resources.Environment()
         easy_install.main(DEVELOP_REQUIRES)
@@ -271,11 +281,6 @@ Please specify the directory where you'd like it to be placed.
         print '''
 %s
         ''' % _databaseText('etc')
-
-        if sys.platform in ["linux2", "darwin"]:
-            # create symlink to legacy MaKaC dir
-            # this is so that the ".egg-link" created by the "develop" command works
-            os.symlink('indico/MaKaC','MaKaC')
 
     def _update_conf_dir_paths(self, filePath, dirs):
         fdata = open(filePath).read()
@@ -483,7 +488,8 @@ if __name__ == '__main__':
                 'bdist': _bdist_indico(dataFiles),
                 'bdist_egg': _bdist_egg_indico(dataFiles),
                 'jsbuild': jsbuild,
-                'develop_config': develop_indico,
+                'develop_config': develop_config,
+                'develop': develop_indico,
                 'test': test_indico,
                 'egg_filename': egg_filename
                 }
