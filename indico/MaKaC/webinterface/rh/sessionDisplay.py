@@ -23,10 +23,8 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.general import *
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
     RoomBookingDBMixin
-from MaKaC.webinterface.rh.conferenceBase import RHSessionBase, RHSubmitMaterialBase
+from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.common.contribFilters import SortingCriteria
-from MaKaC.errors import ModificationError
-from MaKaC.ICALinterface.conference import SessionToiCal
 from MaKaC.common import Config
 from indico.web.http_api.api import SessionHook
 from indico.util.metadata.serializer import Serializer
