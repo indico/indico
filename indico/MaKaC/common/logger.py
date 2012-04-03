@@ -128,6 +128,8 @@ class LoggerUtils:
             if "level" in opts:
                 level = cp.get(sectname, "level")
                 h.setLevel(logging._levelNames[level])
+            else:
+                h.setLevel(logging._levelNames[defaultArgs[hand.strip()][2]])
             if len(fmt):
                 h.setFormatter(formatters[fmt])
             if filters and hand.strip() in filters:
@@ -170,10 +172,10 @@ class Logger:
             serverName = config.getHostNameURL()
 
         # Default arguments for the handlers, taken mostly for the configuration
-        defaultArgs = { 'indico' : ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log')),
-                        'other'  : ("FileHandler", "('%s', 'a')" % cls._log_path('other.log')),
+        defaultArgs = { 'indico' : ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log'), 'DEBUG'),
+                        'other'  : ("FileHandler", "('%s', 'a')" % cls._log_path('other.log'), 'DEBUG'),
                         'smtp'   : ("handlers.SMTPHandler", "(%s, 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
-                        % (smtpServer, serverName, config.getSupportEmail(), serverName))
+                        % (smtpServer, serverName, config.getSupportEmail(), serverName), "ERROR")
                     }
 
         cls.handlers = LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
