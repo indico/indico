@@ -24,6 +24,7 @@ import MaKaC.user as user
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
 from MaKaC.common import info
+from MaKaC.common.logger import Logger
 
 import time
 from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
@@ -139,15 +140,9 @@ class UserRemoveFromBasket(LoggedOnlyService):
         self._target = self.getAW().getUser()
 
     def _getAnswer( self):
-
         for obj in self._userData:
-            self._obj = user.AvatarHolder().getById(obj['id'])
-
-            if (self._obj == None):
-                raise ServiceError("ERR-U0","User does not exist!")
-
-            #we do not care if the user is already out of the favourites
-            self._target.getPersonalInfo().getBasket().deleteElement(self._obj)
+            if not self._target.getPersonalInfo().getBasket().deleteUser(obj['id']):
+                raise ServiceError("ERR-U0","Element '%s' not found in favorites!" % obj['id'])
 
 
 class UserListBasket(ServiceBase):
