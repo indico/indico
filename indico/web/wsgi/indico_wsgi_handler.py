@@ -56,7 +56,6 @@ def initialize_htdocs():
 
     if not DIR_HTDOCS:
         DIR_HTDOCS = Config.getInstance().getHtdocsDir()
-        print 'h:', DIR_HTDOCS
 
         for p in [os.path.join(DIR_HTDOCS, '../'), DIR_HTDOCS]:
             if p not in sys.path:

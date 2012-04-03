@@ -25,50 +25,65 @@ import os
 from MaKaC.common import Config
 from MaKaC.services import handler
 
+from indico.util.caching import cached_property
 from indico.web.http_api import handlers as export_handlers
 
-DIR_HTDOCS = Config.getInstance().getHtdocsDir()
+
 DIR_SERVICES = os.path.dirname(handler.__file__)
 DIR_MODULES = os.path.dirname(export_handlers.__file__)
 
-"""
-urlMapping stores the modules and handlers for every page we want,
-in the form (hash, tuple)
-@hash: matching directory
-@tuple[0]: module, a pair in the form "(containingDir, file)"
-@tuple[1]: handler
-@tuple[2]: preprocessing function (if there's no function, '')
-@tuple[3]: parameters for the preprocessing function (dictionary)
 
-Add pages that need url parsing here.
-"""
-urlMapping = {'':   ((DIR_HTDOCS, 'index.py'), 'index', '', None), \
-    'services':     ((DIR_SERVICES, 'handler.py'), 'handler', '', None), \
-    'event':        ((DIR_HTDOCS, 'events.py'), 'index', 'genericRewrite', \
-                        {'queryReplacement': 'tag'}), \
-    'categ':        ((DIR_HTDOCS, 'categoryDisplay.py'), 'index', 'genericRewrite', \
-                        {'queryReplacement': 'categId'}),
-    'export':       ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None),
-    'api':          ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None)
-}
+class ServerConfig(object):
+
+    @cached_property
+    def url_mappings(self):
+        """
+        url_mappings returns the modules and handlers for every page we want,
+        in the form (hash, tuple)
+        @hash: matching directory
+        @tuple[0]: module, a pair in the form "(containingDir, file)"
+        @tuple[1]: handler
+        @tuple[2]: preprocessing function (if there's no function, '')
+        @tuple[3]: parameters for the preprocessing function (dictionary)
+
+        Add pages that need url parsing here.
+        """
+        return {'': ((self.htdocs_dir, 'index.py'), 'index', '', None), \
+                    'services':     ((DIR_SERVICES, 'handler.py'), 'handler', '', None), \
+                    'event':        ((self.htdocs_dir, 'events.py'), 'index', 'genericRewrite', \
+                                         {'queryReplacement': 'tag'}), \
+                    'categ':        ((self.htdocs_dir, 'categoryDisplay.py'), 'index', 'genericRewrite', \
+                                         {'queryReplacement': 'categId'}),
+                'export':       ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None),
+                'api':          ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None)
+                }
+
+    @cached_property
+    def htdocs_dir(self):
+        return Config.getInstance().getHtdocsDir()
+
+
+SERVER_CONFIG = ServerConfig()
+
 
 def is_static_path(path):
     """
-    Returns True if path corresponds to an existing file under DIR_HTDOCS.
+    Returns True if path corresponds to an existing file under htdocs_dir.
     @param path: the path.
     @type path: string
-    @return: True if path corresponds to an existing file under DIR_HTDOCS.
+    @return: True if path corresponds to an existing file under htdocs_dir.
     @rtype: bool
     """
-    path = os.path.abspath(DIR_HTDOCS + path)
-    if path.startswith(DIR_HTDOCS) and os.path.isfile(path):
+    path = os.path.abspath(SERVER_CONFIG.htdocs_dir + path)
+    if path.startswith(SERVER_CONFIG.htdocs_dir) and os.path.isfile(path):
         return path
     return None
+
 
 def is_mp_legacy_publisher_path(req):
     """
     Finds the corresponding module and handler for the path given.
-    Checks path corresponds to an existing Python file under DIR_HTDOCS.
+    Checks path corresponds to an existing Python file under htdocs_dir.
     @param path: the path.
     @type path: string
     @return: the path of the module to load and the function to call there.
@@ -79,9 +94,11 @@ def is_mp_legacy_publisher_path(req):
     if len(path) > 1:
         startingDir = path[1]
 
+    mappings = SERVER_CONFIG.url_mappings
+
     # First, we try to assign an existing redirection
-    if urlMapping.has_key(startingDir):
-        module, handler, function, params = urlMapping[startingDir]
+    if startingDir in mappings:
+        module, handler, function, params = mappings[startingDir]
         if callable(getattr(WSGIRedirection, function, None)):
             rwPage = WSGIRedirection(req, module, handler, startingDir)
             getattr(rwPage, function)(params)
@@ -90,7 +107,7 @@ def is_mp_legacy_publisher_path(req):
     # Else, we try to find the called module
     for index, component in enumerate(path):
         if component.endswith('.py'):
-            possible_module = os.path.abspath(DIR_HTDOCS + os.path.sep + \
+            possible_module = os.path.abspath(SERVER_CONFIG.htdocs_dir + os.path.sep + \
                                               os.path.sep.join(path[:index + 1]))
             possible_handler = '/'.join(path[index + 1:]).strip()
             if not possible_handler:
@@ -101,6 +118,7 @@ def is_mp_legacy_publisher_path(req):
     # If all fails, then we will load a static resource
     else:
         return None, None
+
 
 class WSGIRedirection(object):
     """

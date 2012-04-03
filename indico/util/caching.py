@@ -18,10 +18,12 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from functools import wraps
 from indico.util.contextManager import ContextManager
 
 
 def request_cached(f):
+    @wraps(f)
     def _wrapper(*args, **kwargs):
         # if there are kwargs, skip caching
         if kwargs:
