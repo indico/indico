@@ -314,12 +314,14 @@ class FakeMailThread(Thread):
     def __init__(self, addr):
         super(FakeMailThread, self).__init__()
         self.addr = addr
-        self.server = None
+        self.server = FakeMailServer(self.addr, '')
 
     def run(self):
-        self.server = FakeMailServer(self.addr, '')
         asyncore.loop()
 
     def close(self):
         if self.server:
             self.server.close()
+
+    def get_addr(self):
+        return self.server.socket.getsockname()

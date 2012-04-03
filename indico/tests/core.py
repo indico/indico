@@ -107,8 +107,11 @@ class TestManager(object):
 
         TestManager._title("Starting test framework\n")
 
-        self._setFakeConfig()
-        self._startSMTPServer()
+        # the SMTP server will choose a free port
+        smtpAddr = self._startSMTPServer()
+        self._setFakeConfig({
+                "SmtpServer": smtpAddr
+                })
         self._startManageDB()
 
         try:
@@ -137,7 +140,7 @@ class TestManager(object):
         else:
             return -1
 
-    def _setFakeConfig(self):
+    def _setFakeConfig(self, custom):
         """
         Sets a fake configuration for the current process, using a temporary directory
         """
@@ -154,8 +157,8 @@ class TestManager(object):
         htdocsDir = indicoDist.get_resource_filename('indico', 'indico/htdocs')
         etcDir = indicoDist.get_resource_filename('indico', 'etc')
 
-        # set defaults
-        config.reset({
+        # minimal defaults
+        defaults = {
             'BaseURL': 'http://{0}:{1}'.format(test_config.getWebServerHost(),
                                                test_config.getWebServerPort()),
             'BaseSecureURL': '',
@@ -170,7 +173,12 @@ class TestManager(object):
             'ArchiveDir': os.path.join(temp, 'archive'),
             'UploadedFilesTempDir': os.path.join(temp, 'tmp'),
             'ConfigurationDir': etcDir
-            })
+            }
+
+        defaults.update(custom)
+
+        # set defaults
+        config.reset(defaults)
 
         Config.setInstance(config)
         self._cfg = config
@@ -248,8 +256,11 @@ class TestManager(object):
 
     @classmethod
     def _startSMTPServer(cls):
-        cls._smtpd = FakeMailThread(('localhost', 58025))
+        cls._smtpd = FakeMailThread(('localhost', 0))
         cls._smtpd.start()
+        addr = cls._smtpd.get_addr()
+        cls._info("Started fake SMTP server at %s:%s" % addr)
+        return addr
 
     @classmethod
     def _stopSMTPServer(cls):
