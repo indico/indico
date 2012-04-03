@@ -158,6 +158,8 @@ class XMLOutputOption(Option):
     def use_xml_output(self, obj, fname, args):
 
         if self.value:
+            if not os.path.exists('build'):
+                os.makedirs('build')
             args += ['--with-xunit', '--xunit-file=build/%s-results.xml' % fname]
         else:
             args += ['-v']
