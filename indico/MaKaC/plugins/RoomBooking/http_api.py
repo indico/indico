@@ -366,8 +366,9 @@ def getResvStateFilter(queryParams):
     repeating = get_query_parameter(queryParams, ['rec', 'recurring', 'rep', 'repeating'])
     avc = get_query_parameter(queryParams, ['avc'])
     avcSupport = get_query_parameter(queryParams, ['avcs', 'avcsupport'])
+    startupSupport = get_query_parameter(queryParams, ['sts', 'startupsupport'])
     bookedFor = get_query_parameter(queryParams, ['bf', 'bookedfor'])
-    if not any((cancelled, rejected, confirmed != -1, archival, repeating, avc, avcSupport, bookedFor)):
+    if not any((cancelled, rejected, confirmed != -1, archival, repeating, avc, avcSupport, startupSupport, bookedFor)):
         return None
     if cancelled is not None:
         cancelled = (cancelled == 'yes')
@@ -386,6 +387,8 @@ def getResvStateFilter(queryParams):
         avc = (avc == 'yes')
     if avcSupport is not None:
         avcSupport = (avcSupport == 'yes')
+    if startupSupport is not None:
+        startupSupport = (startupSupport == 'yes')
     def _filter(obj):
         if cancelled is not None and obj.isCancelled != cancelled:
             return False
@@ -400,6 +403,8 @@ def getResvStateFilter(queryParams):
         if avc is not None and obj.usesAVC != avc:
             return False
         if avcSupport is not None and obj.needsAVCSupport != avcSupport:
+            return False
+        if startupSupport is not None and obj.needsAssistance != startupSupport:
             return False
         if bookedFor and not fnmatch.fnmatch(obj.bookedForName.lower(), bookedFor.lower()):
             return False
