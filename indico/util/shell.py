@@ -53,35 +53,40 @@ class ThreadedWSGIServer(ThreadingMixIn, WSGIServer):
      pass
 
 
-def refServer(host='localhost', port=8000):
-    """
-    Run an Indico WSGI ref server instance
-    Very simple dispatching app
-    """
+class RefServer(object):
 
-    config = Config.getInstance()
+    def __init__(self, host='localhost', port=8000):
+        """
+        Run an Indico WSGI ref server instance
+        Very simple dispatching app
+        """
 
-    baseURL = config.getBaseURL()
-    path = urlparse.urlparse(baseURL)[2].rstrip('/')
+        config = Config.getInstance()
 
-    def fake_app(environ, start_response):
-        rpath = environ['PATH_INFO']
-        m = re.match(r'^%s(.*)$' % path, rpath)
-        if m:
-            environ['PATH_INFO'] = m.group(1)
-            environ['SCRIPT_NAME'] = path
-            for msg in application(environ, start_response):
-                yield msg
-        else:
-            start_response("404 NOT FOUND", [])
-            yield 'Not found'
+        baseURL = config.getBaseURL()
+        path = urlparse.urlparse(baseURL)[2].rstrip('/')
 
-    print "Serving on port %d..." % port
-    httpd = make_server(host, port, fake_app,
-                        server_class=ThreadedWSGIServer,
-                        handler_class=WSGIRequestHandler)
-    # Serve until process is killed
-    httpd.serve_forever()
+        def fake_app(environ, start_response):
+            rpath = environ['PATH_INFO']
+            m = re.match(r'^%s(.*)$' % path, rpath)
+            if m:
+                environ['PATH_INFO'] = m.group(1)
+                environ['SCRIPT_NAME'] = path
+                for msg in application(environ, start_response):
+                    yield msg
+            else:
+                start_response("404 NOT FOUND", [])
+                yield 'Not found'
+
+        self.httpd = make_server(host, port, fake_app,
+                                 server_class=ThreadedWSGIServer,
+                                 handler_class=WSGIRequestHandler)
+        self.addr = self.httpd.socket.getsockname()
+
+    def run(self):
+        print "Serving at %s:%s..." % self.addr
+        # Serve until process is killed
+        self.httpd.serve_forever()
 
 
 def setupNamespace(dbi):
@@ -125,7 +130,8 @@ def main():
 
     if 'web_server' in args and args.web_server:
         config = Config.getInstance()
-        refServer(config.getHostNameURL(), int(config.getPortURL()))
+        refserver = RefServer(config.getHostNameURL(), int(config.getPortURL()))
+        refserver.run()
     else:
         dbi = DBMgr.getInstance()
         dbi.startRequest()

@@ -44,9 +44,8 @@ JSCoverageFilename = "coverage-1.2.2.jar"
 # Don't change this unless you have to use a grid
 WebServerHost = 'localhost'
 
-# If the default is not desirable, you can customize the port number
-WebServerPort = 8000
-
+# 0 means that an available free port will be used
+WebServerPort = 0
 
 # use 'grid' for selenium grid, 'local' for standalone
 RunMode = 'local'

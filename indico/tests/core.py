@@ -27,6 +27,7 @@ to the outside world.
 
 # System modules
 import os, sys, shutil, signal, commands, tempfile, pkg_resources
+import threading
 
 # Database
 import transaction
@@ -35,6 +36,7 @@ from MaKaC.common.db import DBMgr
 # Indico
 import indico
 from indico.util.console import colored
+from indico.util.shell import RefServer
 from indico.tests.config import TestConfig
 from indico.tests.base import TestOptionException, FakeMailThread
 from indico.tests.runners import *
@@ -95,6 +97,18 @@ class TestManager(object):
         """
         print colored("-- " + str(message), 'grey')
 
+    def _runFakeWebServer(self):
+        """
+        Spawn a new refserver-based thread using the test db
+        """
+        config = TestConfig.getInstance()
+        refserver = RefServer(config.getWebServerHost(), int(config.getWebServerPort()))
+
+        t = threading.Thread(target=refserver.run)
+        t.setDaemon(True)
+        t.start()
+        return refserver.addr
+
     def main(self, testsToRun, options):
         """
         Runs the main test cycle, iterating over all the TestRunners available
@@ -109,9 +123,17 @@ class TestManager(object):
 
         # the SMTP server will choose a free port
         smtpAddr = self._startSMTPServer()
+        if 'functional' in testsToRun:
+            serverAddr = self._runFakeWebServer()
+            baseURL = "http://{0}:{1}/indico".format(*serverAddr)
+        else:
+            baseURL = "http://localhost:8000/indico"
+
         self._setFakeConfig({
-                "SmtpServer": smtpAddr
+                "SmtpServer": smtpAddr,
+                "BaseURL": baseURL
                 })
+
         self._startManageDB()
 
         try:
@@ -159,8 +181,7 @@ class TestManager(object):
 
         # minimal defaults
         defaults = {
-            'BaseURL': 'http://{0}:{1}'.format(test_config.getWebServerHost(),
-                                               test_config.getWebServerPort()),
+            'BaseURL': 'http://localhost:8000/indico',
             'BaseSecureURL': '',
             'UseXSendFile': False,
             'AuthenticatorList': ['Local'],

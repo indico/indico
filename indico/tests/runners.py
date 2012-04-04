@@ -47,8 +47,6 @@ from indico.tests.base import BaseTestRunner, Option
 from indico.tests.util import openBrowser, relpathto
 from indico.tests import default_actions
 
-from indico.util.shell import refServer
-
 # legacy indico modules
 from MaKaC.common import Config, DBMgr
 
@@ -232,16 +230,6 @@ class FunctionalTestRunner(NoseTestRunner):
         BaseTestRunner.__init__(self, **kwargs)
         self.child = None
 
-    def _runFakeWebServer(self):
-        """
-        Spawn a new refserver-based thread using the test db
-        """
-        config = Config.getInstance()
-        t = threading.Thread(target=refServer, args=(config.getHostNameURL(),
-                                                     int(config.getPortURL())))
-        t.setDaemon(True)
-        t.start()
-
     def _runSeleniumCycle(self):
         """
         Run selenium over the existing test suite (or a specific test)
@@ -272,7 +260,6 @@ class FunctionalTestRunner(NoseTestRunner):
         return result
 
     def _run(self):
-        self._runFakeWebServer()
         if self.options.valueOf('record'):
             dbi = DBMgr.getInstance()
 
