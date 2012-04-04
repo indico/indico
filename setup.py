@@ -305,13 +305,11 @@ class test_indico(test.test):
                     ('jscoverage', None, "Output coverage report in html for js"),
                     ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
                     ('log=', None, "Log to console, using specified level"),
+                    ('browser=', None, "Browser to use for functional tests"),
                     ('grid', None, "Use Selenium Grid"),
                     ('xml', None, "XML output"),
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
-                    ('parallel', None, "Parallel test execution using Selenium Grid (for --functional)"),
-                    ('threads=', None, "Parallel test execution with several threads (for --functional)"),
-                    ('repeat=', None, "Number of repetitions (for --functional)"),
                     ('silent', None, "Don't output anything in the console, just generate the report"),
                     ('killself', None, "Kill this script right after the tests finished without waiting for db shutdown.")]
     boolean_options = []
@@ -320,6 +318,7 @@ class test_indico(test.test):
     coverage = False
     unit = False
     functional = False
+    browser = None
     pylint = False
     jsunit = False
     jslint = False
@@ -330,9 +329,6 @@ class test_indico(test.test):
     killself = False
     html = False
     record = False
-    parallel = False
-    threads = False
-    repeat = False
     log = False
     xml = False
 
@@ -370,12 +366,10 @@ class test_indico(test.test):
         options = {'silent': self.silent,
                    'killself': self.killself,
                    'html': self.html,
+                   'browser': self.browser,
                    'specify': self.specify,
                    'coverage': self.coverage,
                    'record': self.record,
-                   'parallel': self.parallel,
-                   'threads': self.threads,
-                   'repeat': self.repeat,
                    'log': self.log,
                    'xml':self.xml}
 

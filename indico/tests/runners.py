@@ -222,6 +222,7 @@ class FunctionalTestRunner(NoseTestRunner):
     _defaultPath = os.path.join('python', 'functional')
     _runnerOptions = {'silent': Option,
                       'record': Option,
+                      'browser': Option,
                       'specify': Option,
                       'repeat': Option,
                       'xml': XMLOutputOption}
@@ -250,7 +251,8 @@ class FunctionalTestRunner(NoseTestRunner):
         if test_config.getRunMode() == 'grid':
             browsers =  test_config.getGridBrowsers()
         else:
-            browsers = [test_config.getStandaloneBrowser()]
+            browser = self.options.valueOf('browser')
+            browsers = [browser] if browser else [test_config.getStandaloneBrowser()]
 
         args = self._buildArgs()
 
