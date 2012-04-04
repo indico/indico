@@ -48,40 +48,44 @@ class WPBase(OldObservable):
 
     def _includeJSPackage(self, packageName, module = 'indico', path=None):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
+        config = Config.getInstance()
 
         if info.isDebugActive():
-            return ['js/%s/%s/Loader.js?%d' % (module, packageName, os.stat('%s/js/%s/%s/Loader.js'%(Config().getHtdocsDir(), module, packageName)).st_mtime )]
+            return ['js/%s/%s/Loader.js?%d' % (module, packageName, os.stat('%s/js/%s/%s/Loader.js'%(config.getHtdocsDir(), module, packageName)).st_mtime )]
         else:
-            return ['js/%s/pack/%s.js.pack?%d' % (module, packageName, os.stat('%s/js/%s/pack/%s.js.pack'%(Config().getHtdocsDir(),module, packageName)).st_mtime )]
+            return ['js/%s/pack/%s.js.pack?%d' % (module, packageName, os.stat('%s/js/%s/pack/%s.js.pack'%(config.getHtdocsDir(),module, packageName)).st_mtime )]
 
     def _includeJQuery(self):
         # TODO: rename this to _includeJSLibs or something similar
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
+        config = Config.getInstance()
 
         files = ['underscore', 'jquery', 'jquery-ui', 'jquery.form', 'jquery.custom',
                  'jquery.daterange', 'jquery.qtip', 'jquery.dttbutton', 'jquery.colorbox',
                  'jquery.menu', 'date']
         if info.isDebugActive():
             # We can't use Loader.js as jQuery is included before any indico js
-            return ['js/jquery/%s.js?%d' % (f, os.stat('%s/js/jquery/%s.js'%(Config().getHtdocsDir(), f)).st_mtime) for f in files]
+            return ['js/jquery/%s.js?%d' % (f, os.stat('%s/js/jquery/%s.js' % (config.getHtdocsDir(), f)).st_mtime) for f in files]
         else:
-            return ['js/jquery/pack/jquery.js.pack?%d' % os.stat('%s/js/jquery/pack/jquery.js.pack'%Config().getHtdocsDir()).st_mtime]
+            return ['js/jquery/pack/jquery.js.pack?%d' % os.stat('%s/js/jquery/pack/jquery.js.pack' % config.getHtdocsDir()).st_mtime]
 
     def _includeJSFile(self, path, filename):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
+        config = Config.getInstance()
 
         if info.isDebugActive():
-            return ['%s/%s.js?%d' % (path, filename, os.stat('%s/%s/%s.js'%(Config().getHtdocsDir(), path, filename)).st_mtime)]
+            return ['%s/%s.js?%d' % (path, filename, os.stat('%s/%s/%s.js' % (config.getHtdocsDir(), path, filename)).st_mtime)]
         else:
-            return ['%s/%s.js.pack?%d' % (path, filename, os.stat('%s/%s/%s.js.pack'%(Config().getHtdocsDir(),path, filename)).st_mtime)]
+            return ['%s/%s.js.pack?%d' % (path, filename, os.stat('%s/%s/%s.js.pack' % (config.getHtdocsDir(),path, filename)).st_mtime)]
 
     def _includePresentationFiles(self):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
+        config = Config.getInstance()
 
         if info.isDebugActive():
-            return ['%s?%d' % (f, os.stat('%s/%s'%(Config().getHtdocsDir(), f)).st_mtime) for f in ['js/presentation/Loader.js', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']]
+            return ['%s?%d' % (f, os.stat('%s/%s' % (config.getHtdocsDir(), f)).st_mtime) for f in ['js/presentation/Loader.js', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']]
         else:
-            return ['%s?%d' % (f, os.stat('%s/%s'%(Config().getHtdocsDir(), f)).st_mtime) for f in ['js/presentation/pack/Presentation.js.pack', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']]
+            return ['%s?%d' % (f, os.stat('%s/%s' % (config.getHtdocsDir(), f)).st_mtime) for f in ['js/presentation/pack/Presentation.js.pack', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']]
 
     def _getBaseURL( self ):
         if self._rh._req.is_https() and Config.getInstance().getBaseSecureURL():
