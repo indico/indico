@@ -87,6 +87,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         # end
 
         self.go("/index.py")
+        self.click(css="li#userSettings a")
         self.click(ltext="Logout")
         self.click(ltext="Login")
         self.type(name="login", text="fake-1")

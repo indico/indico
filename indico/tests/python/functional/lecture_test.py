@@ -111,7 +111,7 @@ class LectureBase(object):
         self.click(css="#inPlaceEditDefaultStyle > div > div > span > div > a")
         self.click(css="button")
         self.click(css="#inPlaceEditVisibility > div > div > span > div > a")
-        self.select(css="select", label="Nowhere")
+        self.select(css="#inPlaceEditVisibility select", label="Nowhere")
         self.click(css="button")
         self.click(css="#inPlaceEditType > div > div > span > div > a")
         self.click(css="button")
