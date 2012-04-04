@@ -100,6 +100,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.click(ltext="PRE-book")
         self.type(name="reason", text="Lecture")
         self.click(id="saveBooking")
+        self.click(css="li#userSettings a")
         self.click(ltext="Logout")
         self.click(css="strong")
         self.type(name="login", text="dummyuser")
