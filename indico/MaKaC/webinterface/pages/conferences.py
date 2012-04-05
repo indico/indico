@@ -1467,11 +1467,18 @@ class WConferenceTimeTable(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        vars["ttdata"] = json.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(),
+        sf = schedule.ScheduleToJson.process(self._conf.getSchedule(),
                                                                           tz, self._aw,
                                                                           useAttrCache = True,
-                                                                          hideWeekends = True))
-        eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz = tz)
+                                                                          hideWeekends = True)
+        # TODO: Move to beginning of file when proved useful
+        try:
+            import cjson
+            jsonf = cjson.encode
+        except ImportError:
+            jsonf = json.dumps
+        vars["ttdata"] = jsonf(sf)
+        eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz=tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
         vars['eventInfo'] = json.dumps(eventInfo)
         vars['timetableLayout'] = vars.get('ttLyt','')

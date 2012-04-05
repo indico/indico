@@ -28,7 +28,7 @@ import pytz
 class Conversion(object):
 
     @classmethod
-    def datetime(cls, dt, tz=None):
+    def datetime(cls, dt, tz=None, convert=False):
         if dt:
             if tz:
                 if isinstance(tz, basestring):
@@ -36,7 +36,10 @@ class Conversion(object):
                 date = dt.astimezone(tz)
             else:
                 date = dt
-            return date
+            if convert:
+                return {'date': str(date.date()), 'time': str(date.time()), 'tz': str(date.tzinfo)}
+            else:
+                return date
         else:
             return None
 
