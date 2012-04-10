@@ -818,32 +818,22 @@ class RHContributionList( RHConferenceBaseDisplay ):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
-        # Sorting
-        self._sortingCrit=contribFilters.SortingCriteria( [params.get( "sortBy", "number").strip()] )
-        self._order = params.get("order","down")
+
         # Filtering
-        filterUsed = params.has_key( "OK" ) # this variable is true when the
-                                            # filter has been used
+        filterUsed = params.get("filter","no") == "yes"
+        self._filterText =  params.get("filterText","")
         filter = {"hide_withdrawn": True}
-        ltypes = []
+        ltypes = ltracks = lsessions = []
         if not filterUsed:
             for type in self._conf.getContribTypeList():
                 ltypes.append( type.getId() )
-        else:
-            for id in self._normaliseListParam( params.get("selTypes", []) ):
-                ltypes.append(id)
-        filter["type"] = ltypes
-
-        ltracks = []
-        if not filterUsed:
             for track in self._conf.getTrackList():
                 ltracks.append( track.getId() )
-        filter["track"] = self._normaliseListParam( params.get("selTracks", ltracks) )
-
-        lsessions = []
-        if not filterUsed:
             for session in self._conf.getSessionList():
                 lsessions.append( session.getId() )
+
+        filter["type"] = self._normaliseListParam( params.get("selTypes", ltypes) )
+        filter["track"] = self._normaliseListParam( params.get("selTracks", ltracks) )
         filter["session"] = self._normaliseListParam( params.get("selSessions", lsessions) )
 
         self._filterCrit=ContributionsFilterCrit(self._conf,filter)
@@ -858,13 +848,11 @@ class RHContributionList( RHConferenceBaseDisplay ):
         self._filterCrit.getField("type").setShowNoValue( typeShowNoValue )
         self._filterCrit.getField("track").setShowNoValue( trackShowNoValue )
         self._filterCrit.getField("session").setShowNoValue( sessionShowNoValue )
-        self._sc=params.get("sc",1)
-        self._nc=params.get("nc",20)
 
 
     def _process( self ):
         p = conferences.WPContributionList( self, self._target )
-        return p.display(sortingCrit = self._sortingCrit, filterCrit = self._filterCrit, sc=self._sc, nc=self._nc, order=self._order)
+        return p.display(filterCrit = self._filterCrit, filterText=self._filterText)
 
 
 class RHAuthorIndex(RHConferenceBaseDisplay):
@@ -941,26 +929,13 @@ class RHConfMyStuffMyTracks(RHConferenceBaseDisplay,base.RHProtected):
             p = conferences.WPConfMyStuffMyTracks(self, self._target)
             return p.display()
 
-
-class RHContribsActions:
-    """
-    class to select the action to do with the selected abstracts
-    """
-    def __init__(self, req):
-        self._req = req
-
-    def process(self, params):
-        if params.has_key("PDF"):
-            return RHContributionListToPDF(self._req).process(params)
-        return "no action to do"
-
 class RHContributionListToPDF(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
-        self._contribIds = self._normaliseListParam( params.get("contributions", []) )
+        contribIds = self._normaliseListParam( params.get("contributions", []) )
         self._contribs = []
-        for id in self._contribIds:
+        for id in contribIds:
             contrib = self._conf.getContributionById(id)
             if contrib.canAccess(self.getAW()):
                 self._contribs.append(contrib)

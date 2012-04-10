@@ -7471,10 +7471,18 @@ class ContributionParticipation(Persistent, Fossilizable):
         return self._fax
 
     def getDirectFullName( self ):
-        res = "%s %s"%( self.getFirstName(), self.getFamilyName().upper() )
-        res=res.strip()
+        res = self.getDirectFullNameNoTitle()
         if self.getTitle() != "":
             res = "%s %s"%( self.getTitle(), res )
+        return res
+
+    def getDirectFullNameNoTitle( self ):
+        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
+        if self.getFirstName() != "":
+            if res.strip() != "":
+                res = "%s %s"%( self.getFirstName(), res )
+            else:
+                res = self.getFirstName()
         return res
 
     def getFullName( self ):

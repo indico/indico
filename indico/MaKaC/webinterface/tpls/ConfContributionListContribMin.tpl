@@ -1,41 +1,25 @@
 <%page args="contrib=None"/>
+    <div class="contributionListContribItem" data-id="${contrib.getId()}" data-session="${contrib.getSession().getId() if contrib.getSession() else '-1'}"
+            data-track="${contrib.getTrack().getId() if contrib.getTrack() else '-1'}" data-type="${contrib.getType().getId() if contrib.getType() else '-1'}">
+        <div>
+            <a href="${str( urlHandlers.UHContributionDisplay.getURL( contrib ))}" style="font-size:14px">${contrib.getTitle()}</a>
+        </div>
+        <div class="contributionListContribHeader">
+            % if contrib.getType() != None:
+                <span style="font-weight:bold">${("Type")}: </span>${contrib.getType().getName()}
+            % endif
+            % if contrib.getSession() != None:
+                <span style="font-weight:bold">${("Session")}: </span>
+                <a class="lightGreyLink" href="${str(urlHandlers.UHSessionDisplay.getURL( contrib.getSession() ))}">${contrib.getSession().getTitle()}</a>
+                <div style="background-color: ${contrib.getSession().getColor()};" class="sessionSquare"></div>
+            % endif
+            % if contrib.getTrack() != None:
+                <span style="font-weight:bold">${("Track")}: </span>${contrib.getTrack().getTitle()}
+            % endif
+        </div>
+        <%block name="description" args="contrib=None">
+        </%block>
 
-<tr>
-    <td>
-        <input type="checkbox" name="contributions" value="contrib.getId()">
-    </td>
-    <td class="abstractDataCell"></td>
-    <td class="abstractDataCell"></td>
-    % if len(conf.getContribTypeList()) > 0:
-        <td class="abstractDataCell"></td>
-    % endif
-    <td class="abstractDataCell">
-        <a href="${str( urlHandlers.UHContributionDisplay.getURL( contrib ))}">${contrib.getTitle()}</a>
-    </td>
-    <td class="abstractDataCell"></td>
-    <td class="abstractDataCell"></td>
-    % if len(conf.getTrackList()) > 0:
-        <td class="abstractDataCell"></td>
-    % endif
-    <td class="abstractDataCell">
-        % if contrib.getSlides():
-            % if contrib.getSlides().canView(accessWrapper):
-                <img src="${Config.getInstance().getSystemIconURL('slides')}" alt="${_('Slides')}" border="0"/>
-            % endif
-        % endif
-        % if contrib.getPaper():
-            % if contrib.getPaper().canView(accessWrapper):
-                <img src="${Config.getInstance().getSystemIconURL('paper')}" alt="${_('Paper')}" border="0"/>
-            % endif
-        % endif
-    </td>
-    <td class="abstractDataCell">
-        % if conf.getAbstractMgr().showAttachedFilesContribList() and isinstance(contrib, conference.AcceptedContribution) and len(contrib.getAbstract().getAttachments()) > 0:
-            % for file in contrib.getAbstract().getAttachments().values():
-                <div style="padding-bottom:3px;">
-                    <a href="${str(urlHandlers.UHAbstractAttachmentFileAccess.getURL(file))}">${file.getFileName()}</a>
-                </div>
-            % endfor
-        % endif
-    </td>
-</tr>
+        <%block name="footer" args="contrib=None">
+        </%block>
+    </div>

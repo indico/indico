@@ -62,7 +62,7 @@ class WPBase(OldObservable):
 
         files = ['underscore', 'jquery', 'jquery-ui', 'jquery.form', 'jquery.custom',
                  'jquery.daterange', 'jquery.qtip', 'jquery.dttbutton', 'jquery.colorbox',
-                 'jquery.menu', 'date']
+                 'jquery.menu', 'date', 'jquery.multiselect']
         if info.isDebugActive():
             # We can't use Loader.js as jQuery is included before any indico js
             return ['js/jquery/%s.js?%d' % (f, os.stat('%s/js/jquery/%s.js' % (config.getHtdocsDir(), f)).st_mtime) for f in files]

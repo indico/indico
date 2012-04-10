@@ -103,4 +103,11 @@
         }
     }));
 
+    // Extension of selector 'contains' in order to allow no case sensitive
+    $.extend($.expr[':'], {
+        'contains': function (elem, i, match, array) {
+            return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+        }
+    });
+
 })(jQuery);

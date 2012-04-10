@@ -4581,13 +4581,11 @@ div.CRLDiv {
     margin-top: 10px;
     margin-bottom: 10px;
     color: #444;
-    border: 1px solid #AAA;
+    border: 1px solid #DADADA;
     -moz-border-radius-bottomleft:10px;
     -moz-border-radius-bottomright:10px;
     -moz-border-radius-topleft:10px;
     -moz-border-radius-topright:10px;
-    border-bottom:1px solid #AAAAAA;
-    border-right:1px solid #AAAAAA;
 }
 
 
@@ -7967,4 +7965,58 @@ ul.buttonMenuPopupList li a:hover {
     right: 0;
     padding: 0 0 5px 5px;
     z-index:999;
+
+.contributionListFiltersContainer {
+    border-bottom: 1px solid #EBEBEB;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.contributionListFilteredText {
+    color: #888;
+    padding-top: 5px;
+    font-size:12px
+}
+
+.contributionListContribItem {
+    border-bottom: 1px solid #EBEBEB;
+    padding-bottom: 7px;
+    margin-top: 7px;
+}
+
+.contributionListContribDescription {
+    text-align:justify;
+    padding-top: 7px;
+    line-height: 1.3em;
+    color: #AAA;
+}
+
+.contributionListContribSpeakers {
+    text-align:right;
+    font-size:12px;
+    color:#888;
+}
+
+a.lightGreyLink{
+    color: #888;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+a.lightGreyLink:hover {
+    text-decoration: underline;
+}
+
+.contributionListContribHeader, .contributionHeader {
+    line-height:17px;
+    color:#888;
+    font-size: 12px;
+}
+
+.sessionSquare {
+    vertical-align: middle;
+    border: 1px solid #EAEAEA;
+    display: inline-block;
+    height: 12px;
+    width: 12px;
 }

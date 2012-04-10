@@ -1,73 +1,229 @@
-<tr>
-    <td>
-        <form action=${ filterPostURL } method="POST">
-            % if sortingField:
-               <input type="hidden" name="sortBy" value='${_(sortingField)}'>
-            % endif
-            <div class="CRLDiv">
-            <table width="100%" align="center" border="0">
-                <tr>
-                    <td>
-                        <table width="100%">
-                            <tr>
-                                <td>
-                                    <table align="center" cellspacing="10" width="100%">
-                                        <tr>
-                                            <td class="titleCellFormat" style="padding-right: 10px; border-bottom: 1px solid #888;">
-                                                ${_("Types")}
-                                            </td>
-                                            <td class="titleCellFormat" style="padding-right: 10px; border-bottom: 1px solid #888;">
-                                                ${ _("Sessions")}
-                                            </td>
-                                            <td class="titleCellFormat" style="padding-right: 10px; border-bottom: 1px solid #888;">
-                                                ${_("Tracks")}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            % if len(conf.getContribTypeList()) > 0:
-                                                <td valign="top">
-                                                    <input type="checkbox" name="typeShowNoValue" ${"checked" if filterCriteria.getField("type").getShowNoValue() else ""}>--${_("not specified")}--<br/>
-                                                    % for type in conf.getContribTypeList():
-                                                        <input type="checkbox" name="selTypes" value="${type.getId()}" ${"checked" if  type.getId() in filterCriteria.getField("type").getValues() else ""}>
-                                                            ${type.getName()}
-                                                        <br>
-                                                    % endfor
-                                                </td>
-                                            % endif
 
-                                            % if len(conf.getSessionListSorted()) > 0:
-                                                <td valign="top">
-                                                    <input type="checkbox" name="sessionShowNoValue" ${"checked" if filterCriteria.getField("session").getShowNoValue() else ""}>--${_("not specified")}--<br/>
-                                                    % for session in conf.getSessionListSorted():
-                                                        <input type="checkbox" name="selSessions" value="${session.getId()}" ${"checked" if  session.getId() in filterCriteria.getField("session").getValues() else ""}>
-                                                            ${"(" + session.getCode() + ")" if session.getCode()!="no code" else ""}${session.getTitle()}
-                                                        <br>
-                                                    % endfor
-                                                </td>
-                                            % endif
+<div id="staticURLContainer" style="display:none">
+    <div id="staticURLContent">
+        <div>${ _("You can use this link for bookmarks:")}</div>
+        <input readonly="readonly" type="text" id="staticURL" size="25" name="staticURL" />
+    </div>
+</div>
 
-                                            % if len(conf.getTrackList()) > 0:
-                                                <td valign="top">
-                                                    <input type="checkbox" name="trackShowNoValue" ${"checked" if filterCriteria.getField("track").getShowNoValue() else ""}>--${_("not specified")}--<br/>
-                                                    % for track in conf.getTrackList():
-                                                        <input type="checkbox" name="selTracks" value="${track.getId()}" ${"checked" if  type.getId() in filterCriteria.getField("track").getValues() else ""}>
-                                                            ${"(" + track.getCode() + ")" if track.getCode() else ""}${track.getTitle()}
-                                                        <br>
-                                                    % endfor
-                                                </td>
-                                            % endif
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="center" style="padding: 5px; display: block">
-                                    <input type="submit" class="btn" name="OK" value="${ _("apply")}"/>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table></div>
-        </form></td>
-</tr>
+<form action="${str(urlHandlers.UHContributionListToPDF.getURL(conf))}" id="formContrib" method="post" target="_blank">
+</form>
+
+<div class="contributionListFiltersContainer">
+    <div>
+        <input type="text" id="filterContribs" value="${filterText}" placeholder="Search in contributions">
+        <div id="resetFiltersContainer" style="display:none"><a class="fakeLink" style="color: #881122" id="resetFilters">${_("Reset filters")}</a> |</div>
+        <a class="fakeLink" id="showFilters">${_("More filters")}</a> |
+        <a class="fakeLink" id="staticURLLink">${ _("Static URL for this result")}</a> |
+        <a class="fakeLink" id="exportPDF">${ _("Export to PDF")}</a>
+    </div>
+    <div id="filterContent" class="CRLDiv" style="display:none">
+        % if len(conf.getContribTypeList()) > 0:
+            <select id="contribTypeSelector" name="contribTypeSelector" multiple="multiple">
+                <option value="-1" ${'selected="selected"' if filterCriteria.getField("type").getShowNoValue() else ""}>--${_("not specified")}--</option>
+                % for type in conf.getContribTypeList():
+                ${"selected='selected'" if  type.getId() in filterCriteria.getField("type").getValues() else ""}>
+                    <option value="${type.getId()}" ${'selected="selected"' if type.getId() in filterCriteria.getField("type").getValues() else ""}>
+                        ${type.getName()}
+                    </option>
+                % endfor
+            </select>
+
+        % endif
+
+        % if len(conf.getSessionListSorted()) > 0:
+            <select id="sessionSelector" name="sessionSelector" multiple="multiple">
+                <option value="-1" ${'selected="selected"' if filterCriteria.getField("session").getShowNoValue() else ""}>--${_("not specified")}--</option>
+                % for session in conf.getSessionListSorted():
+                    <option value="${session.getId()}" ${'selected="selected"' if session.getId() in filterCriteria.getField("session").getValues() else ""}>
+                        ${session.getCode()}
+                    </option>
+                % endfor
+            </select>
+
+        % endif
+
+        % if len(conf.getTrackList()) > 0:
+            <select id="trackSelector" name="trackSelector" multiple="multiple">
+                <option value="-1" ${'selected="selected"' if filterCriteria.getField("track").getShowNoValue() else ""}>--${_("not specified")}--</option>
+                % for track in conf.getTrackList():
+                    <option value="${track.getId()}" ${'selected="selected"' if track.getId() in filterCriteria.getField("track").getValues() else ""}>
+                        ${track.getTitle()}
+                    </option>
+                % endfor
+            </select>
+
+        % endif
+    </div>
+    <div class="contributionListFilteredText">
+        ${_("Displaying ")}<span style="font-weight:bold;" id="numberFiltered">${len(contributions)}</span>
+        <span id="numberFilteredText">${ _("contribution") if len(contributions) == 1 else _("contributions")}</span>
+        ${_("out of")}
+        <span style="font-weight:bold;">${len(contributions)}</span>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+var verifyFilters = function(){
+    $(".contributionListContribItem").hide();
+    var selector= [];
+    var term = $("#filterContribs").attr('value');
+    var items = $(".contributionListContribItem:contains('"+ term +"')");
+    $("#contribTypeSelector").multiselect("getChecked").each(function(index) {
+        selector.push("[data-type="+ this.value +"]");
+    });
+    items = items.filter(selector.join(', '));
+    selector = [];
+    $("#sessionSelector").multiselect("getChecked").each(function(index) {
+        selector.push("[data-session="+ this.value +"]");
+    });
+    items = items.filter(selector.join(', '));
+    selector =[];
+    $("#trackSelector").multiselect("getChecked").each(function(index) {
+        selector.push("[data-track="+ this.value +"]");
+    });
+    items = items.filter(selector.join(', '));
+    items.show();
+    $("#numberFiltered").text(items.length);
+    if(items.length == 1) {
+        $("#numberFilteredText").text($T("contribution"));
+    } else {
+        $("#numberFilteredText").text($T("contributions"));
+    }
+    updateStaticURL();
+    return (items.length !=  $(".contributionListContribItem").length);
+};
+
+var verifyFiltersAndReset = function(){
+    if(verifyFilters()){
+        $("#resetFiltersContainer").css("display", "inline");
+    } else {
+        $("#resetFiltersContainer").hide();
+    }
+};
+
+var checkQueryParam = function(place, noSpecified, queryText){
+    var query = "";
+    place.multiselect("getChecked").each(function(index) {
+        if(this.value == -1){
+            query += "&" + noSpecified +"=1";
+        } else {
+            query += "&"+ queryText + "=" + this.value;
+        }
+    });
+    return query;
+};
+
+var updateStaticURL = function() {
+    var url = '${ urlHandlers.UHContributionList.getURL(conf) }';
+    var query = checkQueryParam($("#contribTypeSelector"), "typeShowNoValue", "selTypes")
+            + checkQueryParam($("#sessionSelector"), "sessionShowNoValue", "selSessions")
+            + checkQueryParam($("#trackSelector"), "trackShowNoValue", "selTracks");
+    if (query !=""){
+        query = "&filter=yes" + query;
+    }
+    var term = $("#filterContribs").attr('value');
+    if(term != ""){
+        query += "&filterText=" + term;
+    }
+    url += query;
+    $('#staticURL').attr('value', url);
+};
+
+var createMultiselect = function(place, kind){
+    place.multiselect({
+        selectedText: function(numChecked, numTotal, checkedItems){
+            return numChecked + " "+ kind + " selected";
+         },
+        noneSelectedText: "Select " + kind,
+        checkAllText: "All",
+        uncheckAllText: "None",
+        checkAll: function(e){verifyFiltersAndReset();},
+        uncheckAll: function(e){verifyFiltersAndReset();},
+        click: function(e){verifyFiltersAndReset();},
+        classes: 'ui-multiselect-widget'
+      });
+};
+
+IndicoUI.executeOnLoad(function(){
+    createMultiselect($("#contribTypeSelector"), "contribution types");
+    createMultiselect($("#sessionSelector"), "sessions");
+    createMultiselect($("#trackSelector"), "tracks");
+
+    $("#showFilters").click(function(){
+        if($("#filterContent").is(':hidden')){
+            $("#showFilters").text('Hide filters');
+            $("#filterContent").show("blind");
+        } else {
+            $("#showFilters").text('More filters');
+            $("#filterContent").hide("blind");
+        }
+    });
+
+    $("#resetFilters").click(function(){
+        $("#filterContribs").attr("value","");
+        $("#contribTypeSelector, #sessionSelector , #trackSelector").multiselect("checkAll");
+        verifyFilters();
+        $("#resetFiltersContainer").hide();
+    });
+
+    $("#filterContribs").keyup(function(){
+        verifyFiltersAndReset();
+    });
+
+    $("#formContrib").submit(
+        function(){
+            if($("div.contributionListContribItem:visible").length > 0){
+                $("div.contributionListContribItem:visible").each(function(){
+                    $('<input />').attr('type', 'hidden')
+                    .attr('name', "contributions")
+                    .attr('value', $(this).data("id"))
+                    .appendTo('#formContrib');
+                });
+                return true;
+            } else{
+                new WarningPopup($T("Warning"), $T("No contribution displayed!")).open();
+                return false;
+            }
+    });
+    $("#exportPDF").click(function(){
+        $("#formContrib").submit();
+    });
+
+    $('#staticURLLink').qtip({
+        content: {
+            text: function() { return $('#staticURLContainer').html(); }
+        },
+        position: {
+            my: 'bottom middle',
+            at: 'top right'
+        },
+        show: {
+            event: 'click'
+        },
+        hide: {
+            event: 'unfocus',
+            fixed: true,
+            effect: function() {
+                $(this).fadeOut(300);
+            }
+        },
+        style: {
+            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
+        }
+    },{
+        beforeRender: updateStaticURL()
+    });
+
+    $('body').delegate('#staticURL', 'click', function(e){
+        $(this).select();});
+
+    if(verifyFilters()){
+        $("#showFilters").text('Hide filters');
+        $("#filterContent").show("blind");
+        $("#resetFiltersContainer").css("display", "inline");
+    }
+
+ });
+</script>

@@ -2784,12 +2784,6 @@ class UHConfModifReschedule( URLHandler ):
 class UHContributionList( URLHandler ):
     _relativeURL = "contributionListDisplay.py"
 
-class UHContributionListFilter( URLHandler ):
-    _relativeURL = "contributionListDisplay.py/filter"
-
-class UHContributionListAction( URLHandler ):
-    _relativeURL = "contributionListDisplay.py/contributionsAction"
-
 class UHContributionListToPDF( URLHandler ):
     _relativeURL = "contributionListDisplay.py/contributionsToPDF"
 

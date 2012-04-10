@@ -7214,7 +7214,7 @@ class WPContributionList( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEContributionList
 
     def _getBody( self, params ):
-        wc = WConfContributionList( self._getAW(), self._conf, params["sortingCrit"], params["filterCrit"],  params.get("order","down"),params.get("sc",1), params.get("nc",20) )
+        wc = WConfContributionList( self._getAW(), self._conf, params["filterCrit"], params.get("filterText",""))
         return wc.getHTML()
 
     def _defineSectionMenu( self ):
@@ -7222,115 +7222,26 @@ class WPContributionList( WPConferenceDefaultDisplayBase ):
         self._sectionMenu.setCurrentItem(self._contribListOpt)
 
 
+
 class WConfContributionList ( wcomponents.WTemplated ):
 
-    def __init__(self,aw,conf,sortingCrit,filterCrit,order,sContrib=1,displayContribs=20):
+    def __init__(self, aw, conf, filterCrit, filterText):
         self._aw = aw
         self._conf = conf
-        self._sortingCrit = sortingCrit
         self._filterCrit = filterCrit
-        self._startContrib=int(sContrib)
-        self._displayContribs=int(displayContribs)
-        self._order = order
-
-    def _getURL( self ):
-        #builds the URL to the contribution list page
-        #   preserving the current filter and sorting status
-        url = urlHandlers.UHContributionList.getURL( self._conf )
-        if self._filterCrit.getField( "type" ):
-            l=[]
-            for t in self._filterCrit.getField( "type" ).getValues():
-                if t!="":
-                    l.append(t)
-            url.addParam( "selTypes", l )
-            if self._filterCrit.getField( "type" ).getShowNoValue():
-                url.addParam( "typeShowNoValue", "1" )
-        if self._filterCrit.getField( "track" ):
-            url.addParam( "selTracks", self._filterCrit.getField( "track" ).getValues() )
-            if self._filterCrit.getField( "track" ).getShowNoValue():
-                url.addParam("trackShowNoValue", "1")
-        if self._filterCrit.getField( "session" ):
-            url.addParam( "selSessions", self._filterCrit.getField( "session" ).getValues() )
-            if self._filterCrit.getField( "session" ).getShowNoValue():
-                url.addParam("sessionShowNoValue", "1")
-        if self._sortingCrit.getField():
-            url.addParam( "sortBy", self._sortingCrit.getField().getId() )
-            url.addParam("order",self._order)
-        url.addParam("OK", "1")
-        return url
-
-    def getOrderURL(self, currentSorting, num, invertedOrder, typeOrder):
-        url = self._getURL()
-        url.addParam("sortBy", typeOrder)
-        url.addParam("sc",(num-self._displayContribs))
-        if currentSorting == typeOrder:
-            url.addParam("order", invertedOrder)
-        return url
+        self._filterText = filterText
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        l = []
-        contribsToPrint = []
-        f = filters.SimpleFilter( self._filterCrit, self._sortingCrit )
-        contribList = f.apply( self._conf.getContributionList() )
-        num = 1
-        self._endContrib = (self._startContrib + self._displayContribs) - 1
 
-        for contrib in contribList:
-            if num < self._startContrib:
-                num += 1
-                continue
-            elif num > self._endContrib:
-                break
-            else:
-                num += 1
-            l.append(contrib)
-            contribsToPrint.append(contrib.getId())
-
-        if self._order =="up":
-            l.reverse()
-
-        vars["numContribs"] = len(contribList)
-        vars["contribSetIndex"]=""
-        vars["startContrib"] = self._startContrib
-        vars["endContrib"] = self._endContrib
-
-        if self._startContrib != 1:
-            url=self._getURL()
-            newSc=self._startContrib-self._displayContribs
-            if newSc<1:
-                newSc=1
-            url.addParam("sc",newSc)
-            url.setSegment("contribs")
-            vars["previousContribsURL"]= url
-        if self._endContrib<vars["numContribs"]:
-            url=self._getURL()
-            url.setSegment("contribs")
-            url.addParam("sc",num)
-            vars["nextContribsURL"] = url
-
-        vars["contributions"] = l
-        vars["contribsToPrint"] = contribsToPrint
-
-        currentSorting = self._sortingCrit.getField().getId() if self._sortingCrit.getField() else ""
-        vars["currentSorting"]= currentSorting
-        vars["sortingOrder"] = self._order
-        invertedOrder = "up" if self._order == "down" else ("down" if self._order == "up" else self._order)
-
-        vars["getOrderURL"] = lambda type: quoteattr(str(self.getOrderURL(currentSorting, num, invertedOrder, type)))
-
-        url = urlHandlers.UHContributionListFilter.getURL( self._conf )
-        url.setSegment( "contributions" )
-        vars["filterPostURL"] = quoteattr( str( url ) )
-
-        vars["contribSelectionAction"]=quoteattr(str(urlHandlers.UHContributionListAction.getURL(self._conf)))
-        vars["contributionsPDFURL"]=quoteattr(str(urlHandlers.UHContributionListToPDF.getURL(self._conf)))
+        vars["contributions"] = self._conf.getContributionListSortedById()
         vars["showAttachedFiles"] = self._conf.getAbstractMgr().showAttachedFilesContribList()
         vars["conf"] = self._conf
         vars["accessWrapper"] = self._aw
         vars["filterCriteria"] = self._filterCrit
-        vars["timezone"] = DisplayTZ(self._aw, self._conf).getDisplayTZ()
-
+        vars["filterText"] = self._filterText
+        vars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
+        vars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._conf).getDisplayTZ()))
         return vars
 
 
