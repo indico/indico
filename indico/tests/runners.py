@@ -221,6 +221,8 @@ class FunctionalTestRunner(NoseTestRunner):
     _runnerOptions = {'silent': Option,
                       'record': Option,
                       'browser': Option,
+                      'mode': Option,
+                      'server_url': Option,
                       'specify': Option,
                       'repeat': Option,
                       'xml': XMLOutputOption}
@@ -236,11 +238,15 @@ class FunctionalTestRunner(NoseTestRunner):
         """
         test_config = TestConfig.getInstance()
 
-        if test_config.getRunMode() == 'grid':
-            browsers =  test_config.getGridBrowsers()
+        mode = self.options.valueOf('mode', test_config.getRunMode())
+
+        browser = self.options.valueOf('browser')
+        if browser:
+            browsers = [browser]
+        elif mode == 'local':
+            browsers = [test_config.getStandaloneBrowser()]
         else:
-            browser = self.options.valueOf('browser')
-            browsers = [browser] if browser else [test_config.getStandaloneBrowser()]
+            browsers = test_config.getGridBrowsers()
 
         args = self._buildArgs()
 
@@ -249,6 +255,9 @@ class FunctionalTestRunner(NoseTestRunner):
         repeat = int(self.options.valueOf('repeat'))
         if repeat < 1:
             repeat = 1
+
+        os.environ['INDICO_TEST_MODE'] = mode
+        os.environ['INDICO_TEST_URL'] = self.options.valueOf('server_url')
 
         for browser in browsers:
             os.environ['INDICO_TEST_BROWSER'] = browser

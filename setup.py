@@ -306,7 +306,8 @@ class test_indico(test.test):
                     ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
                     ('log=', None, "Log to console, using specified level"),
                     ('browser=', None, "Browser to use for functional tests"),
-                    ('grid', None, "Use Selenium Grid"),
+                    ('mode=', None, "Mode to use for functional tests"),
+                    ('server-url=', None, "Server URL to use for functional tests"),
                     ('xml', None, "XML output"),
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
@@ -324,8 +325,9 @@ class test_indico(test.test):
     jslint = False
     jscoverage = False
     jsspecify = None
-    grid = None
     silent = False
+    mode = None
+    server_url = None
     killself = False
     html = False
     record = False
@@ -367,9 +369,11 @@ class test_indico(test.test):
                    'killself': self.killself,
                    'html': self.html,
                    'browser': self.browser,
+                   'mode': self.mode,
                    'specify': self.specify,
                    'coverage': self.coverage,
                    'record': self.record,
+                   'server_url': self.server_url,
                    'log': self.log,
                    'xml':self.xml}
 

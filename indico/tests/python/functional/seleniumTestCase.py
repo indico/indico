@@ -46,8 +46,10 @@ def setUpModule():
     global webd
     config = TestConfig.getInstance()
     browser = os.environ['INDICO_TEST_BROWSER']
+    mode = os.environ['INDICO_TEST_MODE']
+    server_url = os.environ.get('INDICO_TEST_URL')
 
-    if config.getRunMode() == 'grid':
+    if mode == 'remote':
         capabilities = {
             'firefox': DesiredCapabilities.FIREFOX,
             'chrome': DesiredCapabilities.FIREFOX,
@@ -58,9 +60,7 @@ def setUpModule():
             'htmlunit': DesiredCapabilities.HTMLUNITWITHJS
             }
         cap = capabilities[browser]
-
-        webd = webdriver.Remote('http://{0}:{1}/wd/hub'.format(config.getHubURL(), config.getHubPort()),
-                                desired_capabilities=cap)
+        webd = webdriver.Remote(server_url, desired_capabilities=cap)
     else:
         drivers = {
             'firefox': webdriver.Firefox,

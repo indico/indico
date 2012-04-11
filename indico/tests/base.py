@@ -111,14 +111,14 @@ class OptionProxy(object):
                                           optName)
 
 
-    def valueOf(self, optName):
+    def valueOf(self, optName, default=None):
         """
         Returns the direct value of an option
         """
         if optName in self._options:
             return self._options[optName].value
         else:
-            return None
+            return default
 
 
 class Option(IOMixin):
