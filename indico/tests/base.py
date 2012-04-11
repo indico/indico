@@ -103,7 +103,7 @@ class OptionProxy(object):
             if optName in kwargs:
                 self._options[optName] = optClass(kwargs[optName])
             else:
-                self._options[optName] = optClass(False)
+                self._options[optName] = optClass(None)
 
         for optName in kwargs:
             if optName not in self._optionTable:

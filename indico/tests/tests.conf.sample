@@ -50,11 +50,6 @@ WebServerPort = 0
 # use 'grid' for selenium grid, 'local' for standalone
 RunMode = 'local'
 StandaloneBrowser = 'firefox'
-
-# Grid
-
-HubURL         = "indicotest1.cern.ch"
-HubPort        = 4444
 GridBrowsers   = ['firefox',
                   'safari',
                   'chrome']

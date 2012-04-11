@@ -224,7 +224,6 @@ class FunctionalTestRunner(NoseTestRunner):
                       'mode': Option,
                       'server_url': Option,
                       'specify': Option,
-                      'repeat': Option,
                       'xml': XMLOutputOption}
 
 
@@ -252,12 +251,9 @@ class FunctionalTestRunner(NoseTestRunner):
 
         # Execute the tests
         result = True
-        repeat = int(self.options.valueOf('repeat'))
-        if repeat < 1:
-            repeat = 1
 
-        os.environ['INDICO_TEST_MODE'] = mode
-        os.environ['INDICO_TEST_URL'] = self.options.valueOf('server_url')
+        os.environ['INDICO_TEST_MODE'] = mode or ''
+        os.environ['INDICO_TEST_URL'] = self.options.valueOf('server_url') or ''
 
         for browser in browsers:
             os.environ['INDICO_TEST_BROWSER'] = browser
