@@ -45,14 +45,16 @@ class TestZEOServer(Process):
     """
     def __init__(self, port, fd, hostname="localhost"):
         Process.__init__(self)
-        self.options = ZEOOptions()
-        self.options.realize(['-f', fd, '-a', '%s:%d' % (hostname, port)])
-        self.server = SilentZEOServer(self.options)
+        self.addr = (hostname, port)
+        self.fd = fd
 
     def run(self):
         """
         Actually starts the server
         """
+        options = ZEOOptions()
+        options.realize(['-f', self.fd, '-a', '%s:%d' % self.addr])
+        self.server = SilentZEOServer(options)
         self.server.main()
 
     def shutdown(self, killself=False):

@@ -64,7 +64,8 @@ def setUpModule():
     else:
         drivers = {
             'firefox': webdriver.Firefox,
-            'chrome': webdriver.Chrome
+            'chrome': webdriver.Chrome,
+            'ie': webdriver.Ie
             }
 
         webd = drivers[browser]();

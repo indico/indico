@@ -213,7 +213,7 @@ class Logger:
             # if the file in the config is not accessible, use a "local" one
             fpath = os.path.join(os.getcwd(), '.indico.log')
 
-        return fpath
+        return fpath.replace('\\', '\\\\')
 
 
 Logger.initialize()
