@@ -27,7 +27,7 @@ type("ChainedPopupWidget", ["PopupWidget"],
              this.PopupWidget.prototype.open.call(this, x, y);
 
              // define a handler for onclick events
-             this.handler = function(event) {
+             $('body').on('click.chained_menu', function(event) {
                  if (self.clickTriggersClose($E(eventTarget(event)))) {
                      // if the click should be followeb by a
                      // closing action (out of the chain)
@@ -40,9 +40,7 @@ type("ChainedPopupWidget", ["PopupWidget"],
                          }
                      });
                  }
-             };
-
-             IndicoUtil.onclickHandlerAdd(this.handler);
+             });
          },
 
          postDraw: function () {
@@ -67,7 +65,7 @@ type("ChainedPopupWidget", ["PopupWidget"],
          close: function() {
              // close() cleans up the onclick handler too
              this.active = false;
-             IndicoUtil.onclickHandlerRemove(this.handler);
+             $('body').off('click.chained_menu');
              this.PopupWidget.prototype.close.call(this);
          }
      },

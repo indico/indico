@@ -190,7 +190,7 @@ additionalInfo = confObj.getContactInfo()
                 </td>
                 <td nowrap valign="top">
                     <span id="addNewChairSpan" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                        <a id="addNewChairLink" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="chairPersonsManager.addManagementMenu();">${ _("Add chairperson") if eventType == "conference" or eventType == "meeting" else  _("Add speaker")}</a>
+                        <a id="addNewChairLink" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Add chairperson") if eventType == "conference" or eventType == "meeting" else  _("Add speaker")}</a>
                     </span>
                 </td>
             </tr>
