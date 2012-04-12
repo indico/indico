@@ -72,23 +72,26 @@ def setUpModule():
     webd.implicitly_wait(15)
 
 
+def elem_get(**kwargs):
+    elem = None
+    if 'id' in kwargs:
+        elem = webd.find_element_by_id(kwargs['id'])
+    elif 'xpath' in kwargs:
+        elem = webd.find_element_by_xpath(kwargs['xpath'])
+    elif 'name' in kwargs:
+        elem = webd.find_element_by_name(kwargs['name'])
+    elif 'css' in kwargs:
+        elem = webd.find_element_by_css_selector(kwargs['css'])
+    elif 'ltext' in kwargs:
+        elem = webd.find_element_by_link_text(kwargs['ltext'])
+    return elem
+
+
 def name_or_id_target(f):
     def _wrapper(*args, **kwargs):
-        if 'id' in kwargs:
-            elem = webd.find_element_by_id(kwargs['id'])
-            del kwargs['id']
-        elif 'xpath' in kwargs:
-            elem = webd.find_element_by_xpath(kwargs['xpath'])
-            del kwargs['xpath']
-        elif 'name' in kwargs:
-            elem = webd.find_element_by_name(kwargs['name'])
-            del kwargs['name']
-        elif 'css' in kwargs:
-            elem = webd.find_element_by_css_selector(kwargs['css'])
-            del kwargs['css']
-        elif 'ltext' in kwargs:
-            elem = webd.find_element_by_link_text(kwargs['ltext'])
-            del kwargs['ltext']
+        elem = elem_get(**kwargs)
+        for selector in ['css', 'ltext', 'name', 'xpath', 'id']:
+            kwargs.pop(selector, None)
         return f(*(list(args) + [elem]), **kwargs)
     return _wrapper
 
@@ -173,6 +176,16 @@ class SeleniumTestCase(IndicoTestCase):
     @name_or_id_target
     def select(cls, elem, label=''):
         Select(elem).select_by_visible_text(label)
+
+    @classmethod
+    @name_or_id_target
+    def wait_remove(cls, timeout=5, **kwargs):
+        while timeout:
+            elem = elem_get(**kwargs)
+            if not elem:
+                break
+            time.sleep(1)
+            timeout -= 1
 
 class LoggedInSeleniumTestCase(SeleniumTestCase):
 

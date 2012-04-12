@@ -36,6 +36,10 @@ class MeetingBase(LectureBase):
         self.click(ltext="Contribution")
         self.type(id="addContributionFocusField", text="Contrib 1")
         self.click(css="button.ui-button")
+
+        # wait for overlay to go away
+        self.wait_remove(css='.ui-widget-overlay')
+
         self.click(ltext="Add new")
         self.click(ltext="Break")
         self.type(id="breakTitle", text="coffe break")
@@ -46,6 +50,10 @@ class MeetingBase(LectureBase):
         self.click(ltext="Create a new session")
         self.type(id="sessionTitle", text="Session 2")
         self.click(css="button.ui-button")
+
+        # wait for overlay to go away
+        self.wait_remove(css='.ui-widget-overlay')
+
         self.click(ltext="Reschedule")
         self.click(id="startTimeRescheduleRB")
         self.type(xpath="//div[2]/input", text="10")
