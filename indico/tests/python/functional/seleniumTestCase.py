@@ -22,8 +22,11 @@
 This module defines a base structure for Selenum test cases
 """
 
+from functools import wraps
+
 # Test libs
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.select import Select
@@ -104,30 +107,6 @@ class SeleniumTestCase(IndicoTestCase):
     _requires = ['db.DummyUser']
 
     @classmethod
-    def waitForAjax(cls, sel, timeout=5000):
-        """
-        Wait that all the AJAX calls finish
-        """
-        time.sleep(1)
-        sel.wait_for_condition("selenium.browserbot.getCurrentWindow()"
-                               ".activeWebRequests == 0", timeout)
-
-    @classmethod
-    def waitForElement(cls, sel, elem, timeout=5000):
-        """
-        Wait for a given element to show up
-        """
-        sel.wait_for_condition("selenium.isElementPresent(\"%s\")" % elem, timeout)
-
-    @classmethod
-    def waitPageLoad(cls, sel, timeout=30000):
-        """
-        Wait for a page to load (give it some time to load the JS too)
-        """
-        sel.wait_for_page_to_load(timeout)
-        time.sleep(2)
-
-    @classmethod
     def go(cls, rel_url):
         webd.get("%s%s" % (Config.getInstance().getBaseURL(), rel_url))
 
@@ -144,7 +123,6 @@ class SeleniumTestCase(IndicoTestCase):
             try:
                 unittest.TestCase.failUnless(cls, func(*args))
             except AssertionError, e:
-                print "left %d" % triesLeft
                 exception = e
                 triesLeft -= 1
                 time.sleep(1)
@@ -173,19 +151,70 @@ class SeleniumTestCase(IndicoTestCase):
         return elem
 
     @classmethod
+    def execute(cls, code):
+        return webd.execute_script(code)
+
+    @classmethod
+    def jquery(cls, selector):
+        return cls.execute("var elem = $('%s'); return elem?elem[0]:null;" % selector)
+
+    @classmethod
+    def wait_for_jquery(cls, timeout=5):
+        while timeout:
+            active = webd.execute_script('return jQuery.active')
+            if active == 0:
+                return
+            time.sleep(1)
+            timeout -= 1
+        raise Exception('timeout')
+
+    @classmethod
     @name_or_id_target
     def select(cls, elem, label=''):
         Select(elem).select_by_visible_text(label)
 
     @classmethod
-    @name_or_id_target
-    def wait_remove(cls, timeout=5, **kwargs):
+    def wait(cls, timeout=5, **kwargs):
+        """
+        Wait for a given element to show up
+        """
         while timeout:
-            elem = elem_get(**kwargs)
-            if not elem:
-                break
+            try:
+                return elem_get(**kwargs)
+            except NoSuchElementException:
+                pass
             time.sleep(1)
             timeout -= 1
+        raise Exception('timeout')
+
+    @classmethod
+    def retry(cls, max_retries=2):
+        def _retry(f):
+            @wraps(f)
+            def _wrapper():
+                i = 0
+                for i in range(0, max_retries):
+                    try:
+                        return f()
+                    except:
+                        time.sleep(1)
+                raise Exception("'max_retries' exceeded")
+            return _wrapper
+        return _retry
+
+    @classmethod
+    def wait_remove(cls, css, timeout=5):
+        ts = time.time()
+        while True:
+            if not cls.jquery(css):
+                return
+
+            time.sleep(1)
+
+            if time.time() - ts > timeout:
+                break
+
+        raise Exception('timeout')
 
 class LoggedInSeleniumTestCase(SeleniumTestCase):
 

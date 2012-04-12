@@ -41,6 +41,8 @@ class LectureBase(object):
         ed.clear()
         ed.send_keys("12/07/2011 18:00")
         self.click(css="button")
+        self.wait_for_jquery()
+
 
     def test_tools(self):
         self.go("/confModifTools.py?confId=0")
@@ -132,6 +134,10 @@ class LectureBase(object):
         self.click(css="input[type=\"button\"]")
         self.click(id="_GID1_existingAv0")
         self.click(xpath="//button[@type='button']")
+
+        # wait for overlay to go away
+        self.wait_remove(css='.ui-widget-overlay')
+
         self.click(ltext="Add")
         self.click(id="add_new_user")
         self.type(id="_GID3", text="Ficticio")
@@ -145,9 +151,16 @@ class LectureBase(object):
         self.click(id="remove_users")
         self.click(id="checkParticipant1")
         self.click(id="send_email")
-        self.click(css="input[type=\"text\"]")
         self.type(css="input[type=\"text\"]", text="test")
         self.click(css="button.ui-button")
+
+        @self.retry()
+        def _retry():
+            title = self.wait(css='.ui-dialog-title')
+            self.assertTrue('E-mail sent' in title.text)
+
+        _retry()
+
         self.click(css="button.ui-button")
         self.click(id="checkParticipant1")
         self.click(ltext="Manage attendance")
