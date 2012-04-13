@@ -190,6 +190,7 @@ class ConferenceTypeModification( ConferenceTextModificationBase ):
 
             dispMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target)
             dispMgr.setDefaultStyle(styleMgr.getDefaultStyleForEventType(newType))
+            self._target._notify('infoChanged')
 
     def _handleGet(self):
         return self._target.getType()
