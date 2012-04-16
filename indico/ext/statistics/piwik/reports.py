@@ -18,10 +18,13 @@
 
 import datetime
 
-from indico.util.fossilize import IFossil, fossilizes, Fossilizable
+from indico.util.fossilize import fossilizes
 from indico.ext.statistics.base.reports import BaseStatisticsReport, BaseReportGenerator, IReportFossil
 import indico.ext.statistics.piwik.queries as pq
+
+from MaKaC.i18n import _
 from MaKaC.conference import ConferenceHolder
+
 
 class IPiwikReportFossil(IReportFossil):
 
@@ -37,19 +40,21 @@ class IPiwikReportFossil(IReportFossil):
         pass
     getConferenceId.name = 'confId'
 
+
 class PiwikReportBase(BaseStatisticsReport):
 
     def __init__(self):
         BaseStatisticsReport.__init__(self)
-        self._reportSetters = {'images' : 'setImageSource',
-                               'widgets' : 'setWidgetSource',
-                               'values' : 'setValueSource'}
+        self._reportSetters = {'images': 'setImageSource',
+                               'widgets': 'setWidgetSource',
+                               'values': 'setValueSource'}
+
 
 class PiwikReport(PiwikReportBase):
 
     fossilizes(IPiwikReportFossil)
 
-    def __init__(self, startDate, endDate, confId, contribId = None):
+    def __init__(self, startDate, endDate, confId, contribId=None):
         """
         Builds the map of generators to fill this object's variables before
         fossilization.
@@ -65,24 +70,24 @@ class PiwikReport(PiwikReportBase):
         self._checkDatesSanity()
         self._contributions = []
 
-        params = {'startDate' : self._startDate,
-                  'endDate' : self._endDate,
-                  'confId' : confId}
+        params = {'startDate': self._startDate,
+                  'endDate': self._endDate,
+                  'confId': confId}
 
         if contribId:
             params['contribId'] = contribId
 
         # This report only has need for images and values, not for widgets.
         self._reportGenerators = {
-            'images' : {'visitsDay' : report(pq.PiwikQueryGraphConferenceVisits, params),
-                        'visitsOS' : report(pq.PiwikQueryGraphConferenceDevices, params),
-                        'visitsCountry' : report(pq.PiwikQueryGraphConferenceCountries, params)},
+            'images': {'visitsDay': report(pq.PiwikQueryGraphConferenceVisits, params),
+                    'visitsOS': report(pq.PiwikQueryGraphConferenceDevices, params),
+                    'visitsCountry': report(pq.PiwikQueryGraphConferenceCountries, params)},
 
-            'values' : {'visits' : report(pq.PiwikQueryMetricConferenceVisits, params),
-                        'uniqueVisits' : report(pq.PiwikQueryMetricConferenceUniqueVisits, params),
-                        'visitLength' : report(pq.PiwikQueryMetricConferenceVisitLength, params),
-                        'referrers' : report(pq.PiwikQueryMetricConferenceReferrers, params),
-                        'peakDate' : report(pq.PiwikQueryMetricConferencePeakDateAndVisitors, params)}
+            'values': {'visits': report(pq.PiwikQueryMetricConferenceVisits, params),
+                    'uniqueVisits': report(pq.PiwikQueryMetricConferenceUniqueVisits, params),
+                    'visitLength': report(pq.PiwikQueryMetricConferenceVisitLength, params),
+                    'referrers': report(pq.PiwikQueryMetricConferenceReferrers, params),
+                    'peakDate': report(pq.PiwikQueryMetricConferencePeakDateAndVisitors, params)}
              }
 
         self._buildReports()

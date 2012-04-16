@@ -19,6 +19,7 @@ import datetime
 
 from indico.util.fossilize import IFossil, fossilizes, Fossilizable
 
+
 class IReportFossil(IFossil):
     """
     The design of this fossil, and any which inherit from it, is that there
@@ -46,6 +47,7 @@ class IReportFossil(IFossil):
 
     def getDateGenerated(self):
         pass
+
 
 class BaseStatisticsReport(Fossilizable, object):
 
@@ -178,4 +180,3 @@ class BaseReportGenerator(object):
     def getMethod(self):
         """ Returns the string method name associated with this object. """
         return self._method
-

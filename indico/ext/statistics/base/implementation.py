@@ -23,10 +23,12 @@ import indico.ext.statistics.base
 import indico.ext.statistics.base.implementation
 
 from indico.core.extpoint import Component
-from indico.ext.statistics.register import StatisticsImplementationRegister, StatisticsConfig
+from indico.ext.statistics.register import StatisticsConfig
 
+from MaKaC.i18n import _
 from MaKaC.common.cache import GenericCache
 from MaKaC.plugins.base import PluginsHolder
+
 
 class BaseStatisticsImplementation(Component):
     """
@@ -42,19 +44,19 @@ class BaseStatisticsImplementation(Component):
     QUERY_KEY_NAME = ''
 
     PLUGIN_HOOKFILE = 'JSHook.tpl'
-    _pluginName = 'Base'
+    _name = 'Base'
 
     def __init__(self):
-        self._pluginFSPath = None
-        self._pluginAPIPath = None
-        self._pluginAPIToken = None
-        self._pluginAPIParams = {}
-        self._pluginAPIRequiredParams = []
-        self._pluginAPIQuery = None
-        self._pluginParamsChanged = False
-        self._pluginImplementationPackage = indico.ext.statistics.base
+        self._FSPath = None
+        self._APIPath = None
+        self._APIToken = None
+        self._APIParams = {}
+        self._APIRequiredParams = []
+        self._APIQuery = None
+        self._paramsChanged = False
+        self._implementationPackage = indico.ext.statistics.base
 
-        super(BaseStatisticsImplementation, self).__init__()
+        Component.__init__(self)
         self._buildPluginPath()
         self._buildAPIPath()
 
@@ -71,15 +73,15 @@ class BaseStatisticsImplementation(Component):
         path = self._getSavedAPIPath()
 
         if path is None:
-            return # @todo: handle this
+            return
         if not path.endswith('/'):
             path += '/'
         if path.startswith('http'):
             path = path.split('//')[1]
 
-        self._pluginAPIPath = path
+        self._APIPath = path
 
-    def _buildAPIQuery(self, params=None, sorted=False):
+    def _buildAPIQuery(self, params=None):
         """
         Builds the entire API query, gives an opportunity to pass through
         futher params which will then be added to the internal dict.
@@ -91,9 +93,9 @@ class BaseStatisticsImplementation(Component):
         if params is not None:
             self.setAPIParams(params)
 
-        self._pluginAPIQuery = self._buildAPIQueryStructure(sorted)
+        self._APIQuery = self._buildAPIQueryStructure()
 
-    def _buildAPIQueryStructure(self, sorted=False):
+    def _buildAPIQueryStructure(self):
         """
         This method is to be overloading in the implementation to return
         the specific format required by the tracking system being used.
@@ -105,9 +107,6 @@ class BaseStatisticsImplementation(Component):
 
         if self._hasAPIToken():
             params[self.QUERY_KEY_NAME] = self.getAPIToken()
-
-        if sorted: # This is broken, fix it.
-            params.sort()
 
         for paramKey in params:
             value = ""
@@ -125,14 +124,14 @@ class BaseStatisticsImplementation(Component):
         """
         True if some API Parameters have been reset.
         """
-        return (len(self._pluginAPIParams) > 0)
+        return (len(self._APIParams) > 0)
 
     def _hasAPIToken(self):
         """
         True if an API token (authentication) has been set in this
         implementation / instantiation.
         """
-        return self._pluginAPIToken is not None
+        return self._APIToken is not None
 
     def _hasAllRequiredParams(self):
         """
@@ -140,11 +139,11 @@ class BaseStatisticsImplementation(Component):
         if all are satisfied.
         """
 
-        if len(self._pluginAPIRequiredParams) == 0:
+        if len(self._APIRequiredParams) == 0:
             return True
 
-        for param in self._pluginAPIRequiredParams:
-            if param not in self._pluginAPIParams:
+        for param in self._APIRequiredParams:
+            if param not in self._APIParams:
                 return False
 
         return True
@@ -154,14 +153,14 @@ class BaseStatisticsImplementation(Component):
         If query parameters have been altered since the last query
         generation, return True.
         """
-        return self._pluginParamsChanged
+        return self._paramsChanged
 
     def _getMissingRequiredAPIParams(self):
         """
         Returns a list of order U\A difference between the required params
         and those provided.
         """
-        required = set(self._pluginAPIRequiredParams)
+        required = set(self._APIRequiredParams)
         given = set(self.getAPIParams())
 
         return list(required.difference(given))
@@ -179,8 +178,8 @@ class BaseStatisticsImplementation(Component):
         Returns the raw results from the API to be handled elsewhere before
         being passed through to the report.
         """
-        timeout = 10 # Timeout in seconds to end the call
-        response = urllib2.urlopen(url = self.getAPIQuery(), timeout=timeout)
+        timeout = 10  # Timeout in seconds to end the call
+        response = urllib2.urlopen(url=self.getAPIQuery(), timeout=timeout)
 
         if not response:
             raise Exception('The remote server for %s did not respond.'
@@ -194,7 +193,7 @@ class BaseStatisticsImplementation(Component):
         """
         Clears the internal params buffer.
         """
-        self._pluginAPIParams = {}
+        self._APIParams = {}
 
     def isActive(self):
         """
@@ -216,7 +215,7 @@ class BaseStatisticsImplementation(Component):
         designate HTTP or HTTPS prefix, or neither.
         If both defined, HTTPS takes priority.
         """
-        path = self._pluginAPIPath;
+        path = self._APIPath
 
         if withScript:
             path += self.QUERY_SCRIPT + "?"
@@ -232,7 +231,7 @@ class BaseStatisticsImplementation(Component):
         """
         Returns the API authorisation token for this implementation.
         """
-        return self._pluginAPIToken
+        return self._APIToken
 
     def getAPIQuery(self, onlyQuery=False, http=False, https=False, withScript=False):
         """
@@ -248,9 +247,9 @@ class BaseStatisticsImplementation(Component):
         self._buildAPIQuery()
 
         if onlyQuery:
-            return self._pluginAPIQuery
+            return self._APIQuery
 
-        return self.getAPIPath(http, https, withScript) + self._pluginAPIQuery
+        return self.getAPIPath(http, https, withScript) + self._APIQuery
 
     @staticmethod
     def getConferenceReport(**kwargs):
@@ -280,27 +279,27 @@ class BaseStatisticsImplementation(Component):
         Returns the expected path for the JSHook file.
         """
 
-        return self._pluginFSPath + '/tpls/' + self.PLUGIN_HOOKFILE
+        return self._FSPath + '/tpls/' + self.PLUGIN_HOOKFILE
 
     def getAPIParams(self):
         """
         Returns the dictionary of API parameters currently in this
         implementation.
         """
-        return self._pluginAPIParams
+        return self._APIParams
 
     def getImplementationPackage(self):
         """
         Returns a reference to the package which contains this implementation
         to avoid the use of introspection / reflection later.
         """
-        return self._pluginImplementationPackage
+        return self._implementationPackage
 
     def getName(self):
         """
         Returns the name of this implementation.
         """
-        return self._pluginName
+        return self._name
 
     def getQueryResult(self):
         """
@@ -320,13 +319,13 @@ class BaseStatisticsImplementation(Component):
             else:
                 self.getAPIParams()[paramKey] = params.get(paramKey)
 
-        self._pluginParamsChanged = True
+        self._paramsChanged = True
 
     def setAPIToken(self, token):
         """
         Sets the API token of this instance.
         """
-        self._pluginAPIToken = token
+        self._APIToken = token
 
     @staticmethod
     def memoizeReport(function):
@@ -335,6 +334,7 @@ class BaseStatisticsImplementation(Component):
         details on how this works with GenericCache.
         """
         return CachedReport(function)
+
 
 class JSHookBase(object):
     """
@@ -345,6 +345,7 @@ class JSHookBase(object):
     def __init__(self, instance):
         self.path = instance.getJSHookPath()
         self.url = instance.getAPIPath()
+
 
 class CachedReport(object):
     """
@@ -359,7 +360,6 @@ class CachedReport(object):
 
     def __init__(self, function):
         self._function = function
-        self._ttl = self._config.getUpdateInterval()
 
         # Cache bucket per implementation
         plugin = function.__module__.split('.')[3]
@@ -369,6 +369,8 @@ class CachedReport(object):
         """
         Ascertain if live updating first, if so disregard and continue.
         """
+
+        ttl = self._config.getUpdateInterval()
         if not self._config.hasCacheEnabled():
             return self._function(*args)
 
@@ -377,7 +379,7 @@ class CachedReport(object):
 
         if not resource:
             result = self._function(*args)
-            self._cache.set(key, result, self._ttl)
+            self._cache.set(key, result, ttl)
             return result
         else:
             return resource

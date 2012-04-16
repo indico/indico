@@ -23,5 +23,3 @@ __metadata__ = {
     'type': 'statistics',
     'description': 'Enables Piwik integration.'
     }
-
-from indico.ext.statistics.piwik.implementation import PiwikStatisticsImplementation

@@ -1,22 +1,20 @@
 <%page args="hook"/>
 <script type="text/javascript">
-var pkBaseURL = (("https:" == document.location.protocol) ? "https://" : "http://")
-pkBaseURL += '${ hook.url }';
-
-document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-
-var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+var _paq = _paq || [];
+(function(){
+    var u=(("https:" == document.location.protocol) ? "https://" : "http://");
+    u += '${ hook.url }';
+    _paq.push(['setSiteId', ${ hook.siteId }]);
 % if hook.hasConfId:
-piwikTracker.setCustomVariable(1, '${ hook.varConference }', '${ hook.confId }', 'page');
+    _paq.push(['setCustomVariable', '1', '${ hook.varConference }', '${ hook.confId }', 'page']);
 % endif
 % if hook.hasContribId:
-piwikTracker.setCustomVariable(2, '${ hook.varContribution }', '${ hook.contribId }', 'page');
+    _paq.push(['setCustomVariable', '2', '${ hook.varContribution }', '${ hook.contribId }', 'page']);
 % endif
-piwikTracker.trackPageView();
-piwikTracker.enableLinkTracking();
-}
-catch( err ) {}
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; 
+    g.type='text/javascript'; g.defer=true; g.async=true; g.src=u+'piwik.js';
+s.parentNode.insertBefore(g,s); })();
 </script>

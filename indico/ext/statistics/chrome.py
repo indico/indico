@@ -26,7 +26,7 @@ import indico.ext.statistics
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import INavigationContributor, IEventDisplayContributor
 from indico.core.extpoint.plugins import IPluginSettingsContributor
-from indico.ext.statistics.register import StatisticsImplementationRegister
+from indico.ext.statistics.register import StatisticsRegister
 from indico.web.rh import RHHtdocs
 
 from MaKaC.i18n import _
@@ -37,6 +37,7 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.webinterface.urlHandlers import URLHandler
 from MaKaC.webinterface import wcomponents
 
+
 class StatisticsSMContributor(Component):
 
     zope.interface.implements(INavigationContributor)
@@ -46,6 +47,7 @@ class StatisticsSMContributor(Component):
         if obj._conf.canModify(obj._rh._aw):
             params['Statistics'] = wcomponents.SideMenuItem(_('Statistics'),
                 UHConfModifStatistics.getURL(obj._conf))
+
 
 class StatisticsEFContributor(Component):
 
@@ -61,7 +63,7 @@ class StatisticsEFContributor(Component):
         if not stats.isActive():
             return False
 
-        register = StatisticsImplementationRegister.getInstance()
+        register = StatisticsRegister()
         key = 'extraFooterContent'
         extension = {}
         tracking = {}
@@ -78,6 +80,7 @@ class StatisticsEFContributor(Component):
         else:
             vars[key].append(extension)
 
+
 class UHConfModifStatistics(URLHandler):
 
     _relativeURL = "statistics"
@@ -86,7 +89,7 @@ class UHConfModifStatistics(URLHandler):
 class RHStatisticsView(RHConferenceModifBase):
 
     _url = r"^/statistics/?$"
-    _register = StatisticsImplementationRegister.getInstance()
+    _register = StatisticsRegister()
 
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("statistics"):
@@ -108,10 +111,12 @@ class RHStatisticsView(RHConferenceModifBase):
     def _process(self):
         return WPStatisticsView(self, WStatisticsView).display()
 
+
 class RHStatisticsHtdocs(RHHtdocs):
 
     _url = r"^/statistics/(?P<filepath>.*)$"
     _local_path = os.path.join(indico.ext.statistics.__path__[0], 'htdocs')
+
 
 class WStatisticsView(wcomponents.WTemplated):
 
@@ -140,6 +145,7 @@ class WStatisticsView(wcomponents.WTemplated):
 
         return vars
 
+
 class PluginSettingsContributor(Component):
 
     zope.interface.implements(IPluginSettingsContributor)
@@ -151,6 +157,7 @@ class PluginSettingsContributor(Component):
         if ptype == 'statistics' and plugin == None:
             return WPluginSettings.forModule(indico.ext.statistics).getHTML()
 
+
 class WPluginSettings(wcomponents.WTemplated):
 
     def getVars(self):
@@ -160,12 +167,13 @@ class WPluginSettings(wcomponents.WTemplated):
         """
         return wcomponents.WTemplated.getVars(self)
 
+
 class WPStatisticsView(WPConferenceModifBase):
 
     def __init__(self, rh, templateClass):
         self._rh = rh
         self._conf = self._rh._conf
-        self._register = StatisticsImplementationRegister.getInstance()
+        self._register = StatisticsRegister()
         self._plugins = self._register.getAllPlugins()
         self._templateClass = templateClass
         self._extraJS = []
@@ -203,5 +211,5 @@ class WPStatisticsView(WPConferenceModifBase):
                 ['statistics/js/statistics.js']
 
     def _setActiveSideMenuItem(self):
-        if self._pluginsDictMenuItem.has_key('Statistics'):
+        if 'Statistics' in self._pluginsDictMenuItem:
             self._pluginsDictMenuItem['Statistics'].setActive(True)

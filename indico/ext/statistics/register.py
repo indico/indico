@@ -19,20 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
-import zope.interface
 
-from persistent import Persistent
-from persistent.mapping import PersistentMapping
-
-import indico.ext.statistics as plugbase
-
-from indico.ext.statistics.util import getPluginType
-from indico.ext.statistics.db import updateDBStructure
-
-from MaKaC.common import DBMgr
 from MaKaC.plugins.base import PluginsHolder
 
-class StatisticsImplementationRegister(Persistent):
+
+class StatisticsRegister():
     """
     This register acts as both a wrapper against the legacy PluginsHolder
     and a quick-access object for injecting tracking codes etc into the
@@ -40,25 +31,17 @@ class StatisticsImplementationRegister(Persistent):
     """
 
     def __init__(self):
-        super(StatisticsImplementationRegister, self).__init__()
-        self._registeredImplementations = PersistentMapping()
+        self._registeredImplementations = {}
         self._buildRegister()
-
-    def __len__(self):
-        return len(self._getRegister())
 
     def _buildRegister(self):
         """
         Static mapping attributes for plugin implementations in register.
-        Far less expensive than previous on-instantiate-register pattern.
+        Append lines to add further implementations.
         """
-        implementations = self._getRegister()
+        from indico.ext.statistics.piwik.implementation import PiwikStatisticsImplementation
 
-        if implementations:
-            return
-
-        # Append lines to add further implementations.
-        implementations['Piwik'] = plugbase.piwik.implementation.PiwikStatisticsImplementation
+        self._registeredImplementations['Piwik'] = PiwikStatisticsImplementation
 
     def _getPluginOSPath(self):
         """
@@ -77,24 +60,6 @@ class StatisticsImplementationRegister(Persistent):
         """
         self.clearAll()
         self._buildRegister()
-
-    def clearAll(self):
-        """
-        This will kill all registrations, not fatal as they all announce
-        their creation to the register upon instantiation anyway.
-        """
-        self._registeredImplementations = PersistentMapping()
-
-    @staticmethod
-    def getInstance():
-        storage = getPluginType().getStorage()
-        storage_name = 'statistics_register'
-
-        if not storage_name in storage:
-            root = DBMgr.getInstance().getDBConnection()
-            updateDBStructure(root, storage_name, StatisticsImplementationRegister)
-
-        return storage[storage_name]
 
     def getAllPlugins(self, instantiate=True):
         """
@@ -177,17 +142,18 @@ class StatisticsConfig(object):
     options in PluginsHolder / plugin administration.
     """
 
-    _statsPlugin = PluginsHolder().getPluginType('statistics')
 
     def getUpdateInterval(self):
         """
         Returns the interval for which cached values should live before
         new data is requested from the server.
         """
-        return self._statsPlugin.getOptions()['cacheTTL'].getValue()
+        statsPlugin = PluginsHolder().getPluginType('statistics')
+        return statsPlugin.getOptions()['cacheTTL'].getValue()
 
     def hasCacheEnabled(self):
         """
         True if the plugin is configured for cached reporting.
         """
-        return self._statsPlugin.getOptions()['cacheEnabled'].getValue()
+        statsPlugin = PluginsHolder().getPluginType('statistics')
+        return statsPlugin.getOptions()['cacheEnabled'].getValue()

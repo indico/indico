@@ -26,104 +26,123 @@ from MaKaC.plugins.base import PluginsHolder
 
 
 def _joinSegmentString(segment, delim):
-    """ Utility function whilst building the query objects, substitute's Python's
-        list implementation's lack of .join()
+    """
+    Utility function whilst building the query objects, substitute's Python's
+    list implementation's lack of .join()
     """
     return reduce(lambda x, y: str(x) + delim + str(y), segment)
+
 
 class PiwikStatisticsImplementation(BaseStatisticsImplementation):
 
     QUERY_SCRIPT = 'piwik.php'
     QUERY_KEY_NAME = 'token_auth'
 
-    _pluginName = 'Piwik'
+    _name = 'Piwik'
 
     def __init__(self):
-        super(PiwikStatisticsImplementation, self).__init__()
-        self._pluginImplementationPackage = indico.ext.statistics.piwik
+        BaseStatisticsImplementation.__init__(self)
+        self._implementationPackage = indico.ext.statistics.piwik
 
         self.setAPIToken(self._getSavedAPIToken())
         self.setAPISiteID(self._getSavedAPISiteID())
 
     def _buildPluginPath(self):
-        """ Local, absolute location of plugin. """
-        self._pluginFSPath = os.path.join(indico.ext.statistics.piwik.__path__)[0]
+        """
+        Local, absolute location of plugin.
+        """
+        self._FSPath = os.path.join(indico.ext.statistics.piwik.__path__)[0]
 
-    def _getVarFromPluginStorage(self, varName):
-        """ Retrieves varName from the options of the plugin. """
+    @staticmethod
+    def getVarFromPluginStorage(varName):
+        """
+        Retrieves varName from the options of the plugin.
+        """
         piwik = PluginsHolder().getPluginType('statistics').getPlugin('piwik')
         return piwik.getOptions()[varName].getValue()
 
     def _getSavedAPIPath(self):
-        """ Returns the String saved in the plugin configuration for the
-            Piwik server URL.
         """
-        return self._getVarFromPluginStorage('serverUrl')
+        Returns the String saved in the plugin configuration for the
+        Piwik server URL.
+        """
+        return PiwikStatisticsImplementation.getVarFromPluginStorage('serverUrl')
 
     def _getSavedAPIToken(self):
-        """ Returns the String saved in the plugin configuration for the
-            Piwik token auth.
         """
-        return self._getVarFromPluginStorage('serverTok')
+        Returns the String saved in the plugin configuration for the
+        Piwik token auth.
+        """
+        return PiwikStatisticsImplementation.getVarFromPluginStorage('serverTok')
 
     def _getSavedAPISiteID(self):
-        """ Returns the String saved in the plugin configuration for the
-            Piwik ID Site
         """
-        return self._getVarFromPluginStorage('serverSiteID')
+        Returns the String saved in the plugin configuration for the
+        Piwik ID Site
+        """
+        return PiwikStatisticsImplementation.getVarFromPluginStorage('serverSiteID')
 
     @staticmethod
     @BaseStatisticsImplementation.memoizeReport
     def getConferenceReport(startDate, endDate, confId, contribId=None):
-        """ Returns the report object which satisifies the confId given. """
+        """
+        Returns the report object which satisifies the confId given.
+        """
         from indico.ext.statistics.piwik.reports import PiwikReport
         return PiwikReport(startDate, endDate, confId, contribId).fossilize()
 
     @staticmethod
     def getContributionReport(startDate, endDate, confId, contribId):
-        """ Returns the report object for the contribId given. """
+        """
+        Returns the report object for the contribId given.
+        """
         return PiwikStatisticsImplementation.getConferenceReport(startDate, endDate,
                                                                  confId, contribId)
 
     def getJSHookObject(self, instantiate=False):
-        """ Returns a reference to or an instance of the JSHook class. """
-
+        """
+        Returns a reference to or an instance of the JSHook class.
+        """
         reference = indico.ext.statistics.piwik.implementation.JSHook
 
         return reference() if instantiate else reference
 
     def setAPISiteID(self, id):
-        """ Piwik identifies sites by their 'idSite' attribute. """
-        self.setAPIParams({'idSite' : id})
+        """
+        Piwik identifies sites by their 'idSite' attribute.
+        """
+        self.setAPIParams({'idSite': id})
 
     def setAPIAction(self, action):
-        self.setAPIParams({'action' : action})
+        self.setAPIParams({'action': action})
 
     def setAPIInnerAction(self, action):
-        self.setAPIParams({'apiAction' : action})
+        self.setAPIParams({'apiAction': action})
 
     def setAPIMethod(self, method):
-        self.setAPIParams({'method' : method});
+        self.setAPIParams({'method': method})
 
     def setAPIModule(self, module):
-        self.setAPIParams({'module' : module})
+        self.setAPIParams({'module': module})
 
     def setAPIInnerModule(self, module):
-        self.setAPIParams({'apiModule' : module})
+        self.setAPIParams({'apiModule': module})
 
     def setAPIFormat(self, format='JSON'):
-        self.setAPIParams({'format' : format})
+        self.setAPIParams({'format': format})
 
     def setAPIPeriod(self, period='day'):
-        self.setAPIParams({'period' : period})
+        self.setAPIParams({'period': period})
 
     def setAPIDate(self, date=['last7']):
         newDate = date[0] if len(date) == 1 else _joinSegmentString(date, ',')
 
-        self.setAPIParams({'date' : newDate})
+        self.setAPIParams({'date': newDate})
 
     def setAPISegmentation(self, segmentation):
-        """ segmentation = {'key' : ('equality', 'value')} """
+        """
+        segmentation = {'key': ('equality', 'value')}
+        """
 
         for segmentName in segmentation.keys():
             segmentValue = segmentation.get(segmentName)[1]
@@ -137,13 +156,14 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
 
             segmentBuild = segmentName + equality + value
 
-            if segmentBuild not in self._pluginAPISegmentation:
-                self._pluginAPISegmentation.append(segmentBuild)
+            if segmentBuild not in self._APISegmentation:
+                self._APISegmentation.append(segmentBuild)
 
-        segmentation = _joinSegmentString(self._pluginAPISegmentation,
+        segmentation = _joinSegmentString(self._APISegmentation,
                                           self.QUERY_BREAK)
 
-        self.setAPIParams({'segment' : segmentation})
+        self.setAPIParams({'segment': segmentation})
+
 
 class JSHook(JSHookBase):
 
@@ -156,7 +176,11 @@ class JSHook(JSHookBase):
         self._buildVars(extra)
 
     def _buildVars(self, item):
-        """ Builds the references to Conferences & Contributions. """
+        """
+        Builds the references to Conferences & Contributions.
+        """
+
+        self.siteId = PiwikStatisticsImplementation.getVarFromPluginStorage('serverSiteID')
 
         if hasattr(item, '_conf'):
             self.hasConfId = True

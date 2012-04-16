@@ -17,14 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-import urllib2
 import base64
 import json
-import datetime
 
 from MaKaC.i18n import _
 
 from indico.ext.statistics.piwik.implementation import PiwikStatisticsImplementation
+
 
 class PiwikQueryBase(PiwikStatisticsImplementation):
     """
@@ -33,12 +32,12 @@ class PiwikQueryBase(PiwikStatisticsImplementation):
     API.
     """
 
-    QUERY_SCRIPT = 'index.php' # Different script target for queries than tracking.
+    QUERY_SCRIPT = 'index.php'  # Different script target for queries than tracking.
 
     def __init__(self):
         super(PiwikQueryBase, self).__init__()
-        self._pluginAPIRequiredParams = ['date', 'period', 'idSite']
-        self._pluginAPISegmentation = []
+        self._APIRequiredParams = ['date', 'period', 'idSite']
+        self._APISegmentation = []
         self.setAPIDate()
         self.setAPIPeriod()
         self._buildType()
@@ -58,16 +57,17 @@ class PiwikQueryBase(PiwikStatisticsImplementation):
         """
         return super(PiwikQueryBase, self).getAPIQuery(https=True, withScript=True)
 
+
 class PiwikQueryConferenceBase(PiwikQueryBase):
     """
     To handle all confId / contribId with dates instead of repeated code
     in multiple constructors.
     """
 
-    def __init__(self, startDate, endDate, confId, contribId = None):
+    def __init__(self, startDate, endDate, confId, contribId=None):
         PiwikQueryBase.__init__(self)
-        segmentation = {'customVariablePageName1' : ('==', 'Conference'),
-                        'customVariablePageValue1' : ('==', confId)}
+        segmentation = {'customVariablePageName1': ('==', 'Conference'),
+                        'customVariablePageValue1': ('==', confId)}
 
         # If there is a contribution defined for this request, further filter.
         if contribId:
@@ -89,8 +89,8 @@ class PiwikQueryWidgetConferenceBase(PiwikQueryConferenceBase):
     """
 
     def _buildType(self):
-        otherParams = {'widget' : '1',
-                       'disableLink' : '1'}
+        otherParams = {'widget': '1',
+                       'disableLink': '1'}
         self.setAPIModule('Widgetize')
         self.setAPIAction('iframe')
         self.setAPIParams(otherParams)
@@ -100,10 +100,10 @@ class PiwikQueryWidgetConferenceBase(PiwikQueryConferenceBase):
         return self.getAPIQuery()
 
     def setAPIModuleToWidgetize(self, module):
-        self.setAPIParams({'moduleToWidgetize' : module})
+        self.setAPIParams({'moduleToWidgetize': module})
 
     def setAPIActionToWidgetize(self, action):
-        self.setAPIParams({'actionToWidgetize' : action})
+        self.setAPIParams({'actionToWidgetize': action})
 
 
 class PiwikQueryWidgetConferenceWorldMap(PiwikQueryWidgetConferenceBase):
@@ -121,7 +121,9 @@ class PiwikQueryWidgetConferenceStats(PiwikQueryWidgetConferenceBase):
         self.setAPIModuleToWidgetize('VisitFrequency')
         self.setAPIActionToWidgetize('getSparklines')
 
+
 """ Classes for returning PNG static Graph images from the API. """
+
 
 class PiwikQueryGraphConferenceBase(PiwikQueryConferenceBase):
     """
@@ -146,20 +148,20 @@ class PiwikQueryGraphConferenceBase(PiwikQueryConferenceBase):
         return b64ImgPrefix + b64ImgCode
 
     def setAPIGraphType(self, graph='verticalBar'):
-        self.setAPIParams({'graphType' : graph})
+        self.setAPIParams({'graphType': graph})
 
     def setAPIGraphDimensions(self, width=None, height=None):
         if height:
-            self.setAPIParams({'height' : height})
+            self.setAPIParams({'height': height})
         if width:
-            self.setAPIParams({'width' : width})
+            self.setAPIParams({'width': width})
 
     def setAPIGraphAliasing(self, aliasing):
         """
         Aliasing should be 1 or 0 for True & False respectively, if
         enabled Graphs will be prettier but more expensive.
         """
-        self.setAPIParams({'aliasedGraph' : str(aliasing)})
+        self.setAPIParams({'aliasedGraph': str(aliasing)})
 
 
 class PiwikQueryGraphConferenceVisits(PiwikQueryGraphConferenceBase):
@@ -186,6 +188,7 @@ class PiwikQueryGraphConferenceDevices(PiwikQueryGraphConferenceBase):
         self.setAPIGraphDimensions(320, 260)
         self.setAPIPeriod('range')
 
+
 class PiwikQueryGraphConferenceCountries(PiwikQueryGraphConferenceBase):
 
     def _buildType(self):
@@ -196,9 +199,11 @@ class PiwikQueryGraphConferenceCountries(PiwikQueryGraphConferenceBase):
         self.setAPIGraphDimensions(490, 260)
         self.setAPIPeriod('range')
 
+
 """
 Classes for returning individual metrics (string or int values) from theAPI.
 """
+
 
 class PiwikQueryMetricConferenceBase(PiwikQueryConferenceBase):
 
@@ -221,7 +226,7 @@ class PiwikQueryMetricConferenceBase(PiwikQueryConferenceBase):
         """
         seconds = int(seconds)
         minutes = seconds / 60
-        ti = {'h' : 0, 'm' : 0, 's' : 0}
+        ti = {'h': 0, 'm': 0, 's': 0}
 
         ti['s'] = seconds % 60
         ti['m'] = minutes % 60
@@ -236,10 +241,11 @@ class PiwikQueryMetricConferenceBase(PiwikQueryConferenceBase):
         """
         return self._getJSONValueSum(self._performCall())
 
+
 class PiwikQueryMetricConferenceUniqueVisits(PiwikQueryMetricConferenceBase):
 
     def _buildType(self):
-        PiwikQueryMetricConferenceBase._buildType(self) # can this be deleted?
+        PiwikQueryMetricConferenceBase._buildType(self)
         self.setAPIMethod('VisitsSummary.getUniqueVisitors')
 
 
@@ -296,7 +302,7 @@ class PiwikQueryMetricConferencePeakDateAndVisitors(PiwikQueryMetricConferenceBa
         self.setAPIPeriod('day')
 
     def getQueryResult(self):
-        """ 
+        """
         This algorithm is a bit dumb as it assumes no two dates can be
         tied for the most hits. Could do with some more mining to ascertain
         which was the busiest overall, considering uniquevistors &
@@ -310,6 +316,6 @@ class PiwikQueryMetricConferencePeakDateAndVisitors(PiwikQueryMetricConferenceBa
         for date in jData.keys():
             if jData.get(date) > val:
                 val = jData.get(date)
-                winner = {'date' : date, 'users' : jData.get(date)}
+                winner = {'date': date, 'users': jData.get(date)}
 
-        return winner if winner else {'date' : _('No Data'), 'users' : '0'}
+        return winner if winner else {'date': _('No Data'), 'users': '0'}
