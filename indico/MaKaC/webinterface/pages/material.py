@@ -35,20 +35,20 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 
 class WPMaterialBase( WPConferenceModifBase, WPCategoryBase ):
-    
+
     def __init__( self, rh, material ):
         self._material = self._target = material
         if self._material.getConference()!=None:
             WPConferenceModifBase.__init__( self, rh, self._material.getConference() )
         else:
             WPCategoryBase.__init__(self,rh,self._material.getCategory())
-            
+
     def _getFooter( self ):
         """
         """
-        
+
         wc = wcomponents.WFooter()
-        
+
         if self._conf != None:
             p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),
                  "subArea": self._getSiteArea() }
@@ -56,158 +56,104 @@ class WPMaterialBase( WPConferenceModifBase, WPCategoryBase ):
         else:
             return wc.getHTML()
 
-        
+
 class WPMaterialDisplayBase( WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self, rh, material):
         self._material = self._target =material
         WPConferenceDefaultDisplayBase.__init__( self, rh, self._material.getConference() )
         self._navigationTarget = self._material
 
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+               self._includeJSPackage('MaterialEditor')
+
     def _applyDecoration( self, body ):
         return WPConferenceDefaultDisplayBase._applyDecoration( self, body )
 
-    
-    def _defineToolBar(self):
-        edit=wcomponents.WTBItem( _("manage this contribution"),
-            icon=Config.getInstance().getSystemIconURL("modify"),
-            actionURL=urlHandlers.UHMaterialModification.getURL(self._material),
-            enabled=self._target.canModify(self._getAW()))
-        self._toolBar.addItem(edit)
-    
     def _getBody( self, params ):
-        
+
         wc = WMaterialDisplay( self._getAW(), self._material )
         pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
-        return wc.getHTML( pars )        
+        return wc.getHTML( pars )
 
 
 class WPMaterialCatDisplayBase(WPCategoryDisplayBase, WPMaterialDisplayBase ):
     def __init__(self, rh, material):
         self._material = self._target =material
-        
-        
+
+
         WPCategoryDisplayBase.__init__(self,rh,self._material.getCategory())
         self._navigationTarget = self._material
 
     def _applyDecoration( self, body ):
-        
+
         return WPCategoryDisplayBase._applyDecoration( self, body )
-    
+
     def _getBody( self, params ):
-        
+
         wc = WMaterialDisplay( self._getAW(), self._material )
         pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
         return wc.getHTML( pars )
-    
-    
+
+
 class WPMaterialConfDisplayBase(WPMaterialDisplayBase, WPConferenceDefaultDisplayBase ):
-    
+
     def __init__(self,rh,material):
         self._material = self._target =material
-        
+
         WPConferenceDefaultDisplayBase.__init__(self,rh,self._material.getConference())
-        
+
         self._navigationTarget = self._material
-    
+
     def _applyDecoration( self, body ):
-       
-       return WPConferenceDefaultDisplayBase._applyDecoration( self, body )
-       
-        
-        
+
+        return WPConferenceDefaultDisplayBase._applyDecoration( self, body )
+
+
+
 class WMaterialDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, aw, material):
         self._material=material
-        self._aw=aw 
+        self._aw=aw
 
-    def _getSubmitButtonHTML(self):
-        res=""
-        if isinstance(self._material.getOwner(), conference.Contribution):
-            contrib=self._material.getOwner()
+    def _canSubmitResource(self, material):
+        if isinstance(material.getOwner(), conference.Contribution):
+            contrib=material.getOwner()
             status=contrib.getCurrentStatus()
             if not isinstance(status,conference.ContribStatusWithdrawn) and \
                                 contrib.canUserSubmit(self._aw.getUser()):
-                res= i18nformat("""<input type="submit" class="btn" value='_("submit resource")'>""")
-        return res
+                return True
+        return False
+
+    def _getURL(self, resource):
+        url = resource.getURL()
+        if url.find(".wmv") != -1:
+            url = urlHandlers.UHVideoWmvAccess().getURL(resource)
+        elif url.find(".flv") != -1 or url.find(".f4v") != -1 or url.find("rtmp://") != -1:
+            url = urlHandlers.UHVideoFlashAccess().getURL(resource)
+        return url
 
     def getVars( self ):
-        vars=wcomponents.WTemplated.getVars( self )
-        contrib=None
-        mf=None
-        if isinstance(self._material.getOwner(),conference.Conference):
-            mf=ConfMFRegistry().get(self._material)
-        elif isinstance(self._material.getOwner(),conference.Session):
-            mf=SessionMFRegistry().get(self._material)
-        elif isinstance(self._material.getOwner(),conference.Contribution):
-            mf=ContribMFRegistry().get(self._material)
-            contrib=self._material.getOwner()
-        elif isinstance(self._material.getOwner(),conference.SubContribution):
-            mf=ContribMFRegistry().get(self._material)
-        if mf is None:
-            vars["icon"]=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
-            vars["title"]=self.htmlText(self._material.getTitle())
-        else:
-            vars["icon"]=quoteattr(str(mf.getIconURL()))
-            vars["title"]=self.htmlText(self._material.getTitle())
-        vars["description"]=self.htmlText(self._material.getDescription())
-        rl = []
-        if self._material.getResourceList()==[] or not self._material.canView(self._aw):
-            vars["resources"]=""
-        else:
-            for res in self._material.getResourceList():
-                if res.isProtected():
-                    protection = """&nbsp;<img src=%s style="vertical-align: middle; border: 0;">""" % Config.getInstance().getSystemIconURL("protected")
-                else:
-                    protection = ""
-                if type(res) is conference.Link:
-                    url = res.getURL()
-                    if url.find(".wmv") != -1:
-                        url = urlHandlers.UHVideoWmvAccess().getURL(res)
-                    elif url.find(".flv") != -1 or url.find(".f4v") != -1 or url.find("rtmp://") != -1:
-                        url = urlHandlers.UHVideoFlashAccess().getURL(res)
-                    if res.getName() != "" and res.getName() != res.getURL():
-                        title = """<b><a href="%s">%s</a></b>""" % (url, res.getName())
-                    else:
-                        title = """<small><a href="%s">%s</a></small>""" % (url, res.getURL())
-                    rl.append("""<tr><td align="right">[LINK]</td><td width="100%%" align="left">%s%s</td></tr>"""%(title, protection))
-                else:
-                    iconURL = Config.getInstance().getFileTypeIconURL( res.getFileType() )
-                    iconHTML = """<img src="%s" alt="">"""%Config.getInstance().getSystemIconURL("bigfile")
-                    if iconURL != "":
-                        iconHTML = """<img src="%s" alt="">"""%iconURL
-                    if res.getName() != res.getFileName():
-                        rl.append("""
-                        <tr>
-                            <td align="right"> %s</td>
-                            <td align="left"><b>%s</b> <small>(<a href="%s">%s</a> %s - %s)</small>%s</td></tr>
-                        """%(iconHTML,res.getName(),
-                                    vars["fileAccessURLGen"](res),
-                                    res.getFileName(),strfFileSize(res.getSize()), res.getCreationDate().strftime("%d.%m.%Y %H:%M:%S"),protection))
-                    else:
-                        rl.append("""
-                        <tr>
-                            <td align="right"> %s</td>
-                            <td align="left"><b><a href="%s">%s</a></b> <small>( %s - %s)</small>%s</td></tr>
-                        """%(iconHTML,vars["fileAccessURLGen"](res),
-                                    res.getFileName(),strfFileSize(res.getSize()), res.getCreationDate().strftime("%d.%m.%Y %H:%M:%S"),protection))
-           
-            vars["resources"] = i18nformat("""<td align="right" valign="top" class="displayField" nowrap><b> _("Resources"):</b></td>
-                        <td>%s</td>""")%"".join(rl)
-        vars["submitURL"]=quoteattr(str(urlHandlers.UHMaterialDisplaySubmitResource.getURL(self._material)))
-        vars["submitBtn"]=self._getSubmitButtonHTML()
+        vars = wcomponents.WTemplated.getVars( self )
+
+        vars["canSubmitResource"] = self._canSubmitResource(self._material)
+        vars["material"] = self._material
+        vars["accessWrapper"] = self._aw
+        vars["getURL"] = lambda resource : self._getURL(resource)
+        vars["uploadAction"] = 'Indico.Urls.UploadAction.contribution'
         return vars
 
 
 class WPMaterialModifBase( WPMaterialBase ):
-    
+
     def _getNavigationDrawer(self):
         if self._conf is None:
             target = self._material.getCategory()
         else:
             target = self._conf.getOwner()
-            
+
         pars = {"target": target, "isModif": True}
         return wcomponents.WNavigationDrawer( pars )
 
@@ -246,7 +192,7 @@ class WPMaterialModifBase( WPMaterialBase ):
 
 
 class WMaterialModifMain( wcomponents.WTemplated ):
-    
+
     def __init__( self, mat ):
         self._material = mat
 
@@ -273,7 +219,7 @@ class WMaterialModifMain( wcomponents.WTemplated ):
                 vars["mainResource"] = """<b>%s</b> (%s)</li>"""%(mr.getName(), mr.getURL())
         vars["selectMainResourceURL"] = quoteattr(str(urlHandlers.UHMaterialMainResourceSelect.getURL( self._material ) ) )
         return vars
- 
+
 
 class WPMaterialModification( WPMaterialModifBase ):
 
@@ -293,7 +239,7 @@ class WPMaterialModification( WPMaterialModifBase ):
 
 
 class WMaterialDataModification(wcomponents.WMaterialDataModificationBase):
-    
+
     def getVars( self ):
         vars = wcomponents.WMaterialDataModificationBase.getVars( self )
         vars["locator"] = self._material.getLocator().getWebForm()
@@ -304,7 +250,7 @@ class WMaterialDataModification(wcomponents.WMaterialDataModificationBase):
 
 
 class WPMaterialDataModification( WPMaterialModification ):
-    
+
     def _getTabContent( self, params ):
         wc = WMaterialDataModification( self._material )
         pars = { "postURL": urlHandlers.UHMaterialPerformModifyData.getURL() }
@@ -312,7 +258,7 @@ class WPMaterialDataModification( WPMaterialModification ):
 
 
 class WLinkSubmission(wcomponents.WTemplated):
-    
+
     def __init__(self, material):
         self.__material = material
 
@@ -337,7 +283,7 @@ class WLinkSubmission(wcomponents.WTemplated):
 
 
 class WPMaterialLinkCreation( WPMaterialModification ):
-    
+
     def _getTabContent( self, params ):
         comp = WLinkSubmission( self._material )
         pars = { "postURL": urlHandlers.UHMaterialPerformLinkCreation.getURL() }
@@ -345,7 +291,7 @@ class WPMaterialLinkCreation( WPMaterialModification ):
 
 
 class WFileSubmission(wcomponents.WTemplated):
-    
+
     def __init__(self, material):
         self.__material = material
 
@@ -374,7 +320,7 @@ class WFileSubmission(wcomponents.WTemplated):
 
 
 class WPMaterialFileCreation( WPMaterialModification ):
-    
+
     def _getTabContent( self, params ):
         comp = WFileSubmission( self._material )
         pars = { "postURL": urlHandlers.UHMaterialPerformFileCreation.getURL() }
@@ -382,7 +328,7 @@ class WPMaterialFileCreation( WPMaterialModification ):
 
 
 class WMaterialModifAC( wcomponents.WTemplated ):
-    
+
     def __init__( self, mat ):
         self.__target = self.__material = mat
 
@@ -409,7 +355,7 @@ class WMaterialModifAC( wcomponents.WTemplated ):
         if self.__material.isHidden():
             vars["visibility"] = _("HIDDEN")
             oppVisibility = _("VISIBLE")
-        #Privacy of the current target can only be changed if the target 
+        #Privacy of the current target can only be changed if the target
         #   owner is not protected
         vars["changeVisibility"] = i18nformat("""( _("make it") <input type="submit" class="btn" name="visibility" value="%s">)""")%oppVisibility
         vars["locator"] = self.__material.getLocator().getWebForm()
@@ -444,7 +390,7 @@ class WPMaterialModifAC( WPMaterialModifBase ):
 
 
 class WPMaterialSelectAllowed( WPMaterialModifAC ):
-    
+
     def _getTabContent( self, params ):
         searchExt = params.get("searchExt","")
         if searchExt != "":
@@ -478,7 +424,7 @@ class WPMaterialSelectAllowed( WPMaterialModifAC ):
 #
 #    def __init__( self, mat ):
 #        self._material = mat
-#    
+#
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
 #        vars["title"] = self._material.getTitle()
@@ -491,23 +437,23 @@ class WPMaterialSelectAllowed( WPMaterialModifAC ):
 #            elif res.__class__ is conference.Link:
 #                l.append( """<li><input type="checkbox" name="removeResources" value="%s"><b><a href="%s">%s</a></b> (%s)</li>"""%(res.getId(), vars["modifyLinkURLGen"](res), res.getName(), res.getURL()))
 #        vars["resources"] = "<ol>%s</ol>"%"".join( l )
-#        
+#
 #        return vars
 
 
 #class WPMaterialDisplayDataModification( WPMaterialDisplayModification ):
-#    
+#
 #    def _getBody( self, params ):
 #        wc = WMaterialDisplayDataModification( self._material )
 #        pars = { "postURL": urlHandlers.UHMaterialDisplayPerformDataModification.getURL(self._material) }
 #        return wc.getHTML( pars )
 
 #class WMaterialDisplayDataModificationBase(wcomponents.WTemplated):
-#    
+#
 #    def __init__( self, material ):
 #        self._material = material
 #        self._owner = material.getOwner()
-#   
+#
 #    def _getTypesSelectItems( self, default = "misc" ):
 #        definedTypes = ["misc"]
 #        l = []
@@ -519,7 +465,7 @@ class WPMaterialSelectAllowed( WPMaterialModifAC ):
 #        return "".join( l )
 
 #class WMaterialDisplayDataModification(WMaterialDisplayDataModificationBase):
-#    
+#
 #    def getVars( self ):
 #        vars = WMaterialDisplayDataModificationBase.getVars( self )
 #        vars["title"] = self._material.getTitle()
@@ -529,14 +475,14 @@ class WPMaterialSelectAllowed( WPMaterialModifAC ):
 
 
 #class WPMaterialDisplayLinkCreation( WPMaterialDisplayModification ):
-#    
+#
 #    def _getBody( self, params ):
 #        comp = WMaterialDisplayLinkSubmission( self._material )
 #        pars = { "postURL": urlHandlers.UHMaterialDisplayPerformLinkCreation.getURL() }
 #        return comp.getHTML( pars )
 
 #class WMaterialDisplayLinkSubmission(wcomponents.WTemplated):
-#    
+#
 #    def __init__(self, material):
 #        self._material = material
 #
@@ -552,14 +498,14 @@ class WPMaterialSelectAllowed( WPMaterialModifAC ):
 #        return str
 
 #class WPMaterialDisplayFileCreation( WPMaterialDisplayModification ):
-#    
+#
 #    def _getBody( self, params ):
 #        comp = WMaterialDisplayFileSubmission( self._material )
 #        pars = { "postURL": urlHandlers.UHMaterialDisplayPerformFileCreation.getURL() }
 #        return comp.getHTML( pars )
 
 #class WMaterialDisplayFileSubmission(wcomponents.WTemplated):
-#    
+#
 #    def __init__(self, material):
 #        self._material = material
 #
@@ -575,14 +521,14 @@ class WPMaterialSelectAllowed( WPMaterialModifAC ):
 #        return str
 
 class WPMaterialMainResourceSelect( WPMaterialModification ):
-    
+
     def _getTabContent( self, params ):
         wc = WMaterialMainResourceSelect( self._material )
         pars = { "postURL": urlHandlers.UHMaterialMainResourcePerformSelect.getURL(self._material) }
         return wc.getHTML( pars )
 
 class WMaterialMainResourceSelect(wcomponents.WTemplated):
-    
+
     def __init__(self, material):
         self._material = material
 
@@ -608,11 +554,11 @@ class WMaterialMainResourceSelect(wcomponents.WTemplated):
         return vars
 
 class WPMaterialDisplayRemoveResourceConfirm( WPMaterialDisplayBase ):
-    
+
     def __init__(self,rh, conf, res):
         WPMaterialDisplayBase.__init__(self,rh,conf)
         self._res=res
-    
+
     def _getBody(self,params):
         wc=wcomponents.WDisplayConfirmation()
         msg= i18nformat(""" _("Are you sure you want to delete the following resource?")<br>
@@ -623,7 +569,7 @@ class WPMaterialDisplayRemoveResourceConfirm( WPMaterialDisplayBase ):
 
 
 class WMaterialDisplaySubmitResource(wcomponents.WTemplated):
-    
+
     def __init__(self,material):
         self._material=material
         self._contrib=material.getOwner()
@@ -667,7 +613,7 @@ class WPMaterialDisplaySubmitResource(WPMaterialDisplayBase):
 
     def __init__(self,rh,material):
         WPMaterialDisplayBase.__init__(self,rh,material)
-    
+
     def _getBody(self,params):
         wc=WMaterialDisplaySubmitResource(self._material)
         return wc.getHTML(params)

@@ -29,25 +29,21 @@ import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.materialFactories as materialFactories
-import MaKaC.webinterface.timetable as timetable
 from MaKaC.webinterface.pages.metadata import WICalExportBase
-from MaKaC.webinterface.pages.conferences import WPConfModifScheduleGraphic, WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.common import Config
 from MaKaC.common.utils import isStringHTML, formatDateTime
 from MaKaC.common import info
 from MaKaC.i18n import _
-from MaKaC import user
-import MaKaC.common.timezoneUtils as timezoneUtils
+from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import Avatar, AvatarHolder
-from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
 from indico.util.i18n import i18nformat
-from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.http_api.util import generate_public_auth_request
+from indico.util.date_time import format_time, format_date, format_datetime
+from indico.util import json
 
 
 class WPContributionBase( WPMainBase, WPConferenceBase ):
@@ -77,251 +73,79 @@ class WContributionDisplayBase(WICalExportBase):
         self._contrib = contrib
         self._hideFull = hideFull
 
-    def _getHTMLRow( self, title, body):
-        if body.strip() == "":
-            return ""
-        str = """
-                <tr>
-                    <td align="right" valign="top" class="displayField" nowrap><b>%s:</b></td>
-                    <td width="100%%" valign="top">%s</td>
-                </tr>"""%(title, body)
-        return str
+    def _getAuthorURL(self, author):
+        authURL=urlHandlers.UHContribAuthorDisplay.getURL(self._contrib)
+        authURL.addParam("authorId", author.getId())
+        return authURL
 
-    def _getAdditionalFieldsHTML(self):
-        html=""
-        afm = self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr()
-        for f in afm.getActiveFields():
-            id = f.getId()
-            caption = f.getName()
-            html+=self._getHTMLRow(caption, self.htmlText(self._contrib.getField(id)))
-        return html
-
-    def _getSubContributionItem(self, sc, modifURL):
-        modifyItem = ""
-        url = urlHandlers.UHSubContributionDisplay.getURL(sc)
-        if sc.canModify( self._aw ):
-            modifyItem = i18nformat("""
-                          <a href="%s"><img src="%s" border="0" alt='_("Jump to the modification interface")'></a>
-                         """)%(modifURL, Config.getInstance().getSystemIconURL( "modify" ) )
-        return """
-                <tr>
-                <td valign="middle">
-                            %s<b>&nbsp;<a href=%s>%s</a></b>
-                        </td>
-                </tr>
-               """%(modifyItem, quoteattr(str(url)), sc.getTitle())
-
-    def _getWithdrawnNoticeHTML(self):
-        res=""
-        if isinstance(self._contrib.getCurrentStatus(),conference.ContribStatusWithdrawn):
-            res= i18nformat("""
-                <tr>
-                    <td colspan="2" align="center"><b>--_("WITHDRAWN")--</b></td>
-                </tr>
-                """)
-        return res
-
-    def _getSubmitButtonHTML(self):
-        res=""
-        status=self._contrib.getCurrentStatus()
-        if not isinstance(status,conference.ContribStatusWithdrawn) and \
-                            self._contrib.canUserSubmit(self._aw.getUser()):
-            res= i18nformat("""<input type="submit" class="btn" value="_("manage material")">""")
-        return res
-
-    def _getModifIconHTML(self):
-        res=""
-        if self._contrib.canModify(self._aw):
-            res="""<a href="%s"><img src="%s" border="0" alt="Jump to the modification interface"></a>""" % (urlHandlers.UHContributionModification.getURL(self._contrib), Config.getInstance().getSystemIconURL( "modify" ))
-        return res
-
-    def _getSubmitIconHTML(self):
-        res=""
-        if self._contrib.canUserSubmit(self._aw.getUser()):
-            res="""<a href="%s"><img src="%s" border="0" alt="Upload files"></a>""" % ('FIXME', Config.getInstance().getSystemIconURL( "submit" ))
-        return res
-
-    def _getMaterialHTML(self):
-        lm=[]
-        paper=self._contrib.getPaper()
-        if paper is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="paper"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(paper))),
-                quoteattr(str(materialFactories.PaperFactory().getIconURL())),
-                self.htmlText(materialFactories.PaperFactory().getTitle())) )
-        slides=self._contrib.getSlides()
-        if slides is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="slide"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(slides))),
-                quoteattr(str(materialFactories.SlidesFactory().getIconURL())),
-                self.htmlText(materialFactories.SlidesFactory().getTitle())))
-        poster=self._contrib.getPoster()
-        if poster is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="poster"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(poster))),
-                quoteattr(str(materialFactories.PosterFactory().getIconURL())),
-                self.htmlText(materialFactories.PosterFactory().getTitle())))
-        video=self._contrib.getVideo()
-        if video is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="video"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(video))),
-                quoteattr(str(materialFactories.VideoFactory().getIconURL())),
-                self.htmlText(materialFactories.VideoFactory().getTitle())))
-        iconURL=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
-        minutes=self._contrib.getMinutes()
-        if minutes is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="minutes"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(minutes))),
-                quoteattr(str(materialFactories.MinutesFactory().getIconURL())),
-                self.htmlText(materialFactories.MinutesFactory().getTitle())))
-        iconURL=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
-        for material in self._contrib.getMaterialList():
-            url=urlHandlers.UHMaterialDisplay.getURL(material)
-            lm.append("""<a href=%s><img src=%s border="0" alt=""> %s</a>"""%(
-                quoteattr(str(url)),iconURL,self.htmlText(material.getTitle())))
-        return self._getHTMLRow("Material","<br>".join(lm))
-
-    def _getReviewingMaterialsHTML(self):
-        rm=[]
-        reviewing=self._contrib.getReviewing()
-        if reviewing is not None:
-            rm.append("""<a href=%s><img src=%s border="0" alt="reviewing"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(reviewing))),
-                quoteattr(str(materialFactories.ReviewingFactory().getIconURL())),
-                self.htmlText(materialFactories.ReviewingFactory().getTitle())) )
-        return self._getHTMLRow("Reviewing Material","<br>".join(rm))
+    def _getStatusReviewing(self):
+        from MaKaC.paperReviewing import ConferencePaperReview as CPR
+        versioning = self._contrib.getReviewManager().getVersioning()
+        review = self._contrib.getReviewManager().getLastReview()
+        if self._contrib.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
+            if review.getEditorJudgement().isSubmitted(): # editor has accepted or rejected
+                return review.getEditorJudgement().getJudgement()
+            elif review.isAuthorSubmitted():
+                return "Submitted"
+            elif len(versioning) > 1: # there was a judgement 'To be corrected' or custom status
+                return versioning[-2].getEditorJudgement().getJudgement()
+        elif self._contrib.getConference().getConfPaperReview().getChoice() in [CPR.CONTENT_REVIEWING, CPR.CONTENT_AND_LAYOUT_REVIEWING]:
+            if review.getRefereeJudgement().isSubmitted(): # referee has accepted or rejected
+                return review.getRefereeJudgement().getJudgement()
+            elif review.isAuthorSubmitted():
+                return "Submitted"
+            elif len(versioning) > 1: # there was a judgement 'To be corrected' or custom status
+                return versioning[-2].getRefereeJudgement().getJudgement()
+        if review.isAuthorSubmitted():
+            return "Submitted"
+        return None
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["contribXML"]=quoteattr(str(urlHandlers.UHContribToXML.getURL(self._contrib)))
-        vars["contribPDF"]=quoteattr(str(urlHandlers.UHContribToPDF.getURL(self._contrib)))
-        vars["contribiCal"]=quoteattr(str(urlHandlers.UHContribToiCal.getURL(self._contrib)))
-        vars["xmlIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("xml")))
-        vars["printIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
-        vars["icalIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("ical")))
 
-        vars["title"] = self.htmlText(self._contrib.getTitle())
-        if isStringHTML(self._contrib.getDescription()):
-            vars["description"] = self._contrib.getDescription()
-        else:
-            vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._contrib.getDescription()
-        vars["additionalFields"] = self._getAdditionalFieldsHTML()
-        vars["id"]=self.htmlText(self._contrib.getId())
-        vars["startDate"] = i18nformat("""--_("not yet scheduled")--""")
-        vars["startTime"] = ""
-        if self._contrib.isScheduled():
-            tzUtil = timezoneUtils.DisplayTZ(self._aw,self._contrib.getOwner())
-            tz = tzUtil.getDisplayTZ()
-            sDate = self._contrib.getStartDate().astimezone(timezone(tz))
-            vars["startDate"]=self.htmlText(sDate.strftime("%d-%b-%Y"))
-            vars["startTime"]=self.htmlText(sDate.strftime("%H:%M") + " (" + tz + ")")
-        vars["location"]=""
-        loc=self._contrib.getLocation()
-        if loc is not None:
-            vars["location"]="<i>%s</i>"%(self.htmlText(loc.getName()))
-            if loc.getAddress() is not None and loc.getAddress()!="":
-                vars["location"]="%s <pre>%s</pre>"%(vars["location"],loc.getAddress())
-        room=self._contrib.getRoom()
-        if room is not None:
-            roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= i18nformat("""%s<br><small> _("Room"):</small> %s""")%(\
-                vars["location"],roomLink)
-            if self._contrib.getBoardNumber()!="":
-                vars["location"]= i18nformat("""%s - _("board #"): %s""")%(vars["location"],self._contrib.getBoardNumber())
-        else:
-            if self._contrib.getBoardNumber()!="":
-                vars["location"]= i18nformat("""%s <br> _("board #"): %s""")%(vars["location"],self._contrib.getBoardNumber())
-
-        vars["location"]=self._getHTMLRow( _("Place"),vars["location"])
-
-        authIndex = self._contrib.getConference().getAuthorIndex()
-
-        l=[]
-        for speaker in self._contrib.getSpeakerList():
-            l.append(self.htmlText(speaker.getFullName()))
-        vars["speakers"]=self._getHTMLRow( _("Presenters"),"<br>".join(l))
-
-        pal = []
-        for pa in self._contrib.getPrimaryAuthorList():
-            authURL=urlHandlers.UHContribAuthorDisplay.getURL(self._contrib)
-            authURL.addParam("authorId", pa.getId())
-            authCaption="<a href=%s>%s</a>"%(quoteattr(str(authURL)), self.htmlText(pa.getFullName()))
-            if pa.getAffiliation()!="":
-                authCaption="%s (%s)"%(authCaption,self.htmlText(pa.getAffiliation()))
-            pal.append(authCaption)
-        vars["primaryAuthors"]=self._getHTMLRow( _("Primary Authors"),"<br>".join(pal))
-        cal = []
-        for ca in self._contrib.getCoAuthorList():
-            authCaption="%s"%ca.getFullName()
-            if ca.getAffiliation()!="":
-                authCaption="%s (%s)"%(authCaption,ca.getAffiliation())
-            cal.append(self.htmlText(authCaption))
-        vars["coAuthors"]=self._getHTMLRow( _("Co-Authors"),"<br>".join(cal))
-        vars["contribType"]=""
-        if self._contrib.getType() != None:
-            vars["contribType"]=self._getHTMLRow( _("Contribution type"),self.htmlText(self._contrib.getType().getName()))
-
-        #TODO: fuse this two lines into one, so that they are not both executed...
-        #but the 1st line generates a lot of HTML in Python...
-        vars["material"]=self._getMaterialHTML()
-        vars["revmaterial"]=self._getReviewingMaterialsHTML()
-
-        vars["MaterialList"] = wcomponents.WShowExistingMaterial(self._contrib, showTitle=False).getHTML()
-        vars["ReviewingMatList"] = wcomponents.WShowExistingReviewingMaterial(self._contrib, False, True).getHTML()
-
-        vars["duration"]=""
-        if self._contrib.getDuration() is not None:
-            vars["duration"]=(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%M'")
-            if (datetime(1900,1,1)+self._contrib.getDuration()).hour>0:
-                vars["duration"]=(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%Hh%M'")
-        vars["inSession"]=""
-        if self._contrib.getSession() is not None:
-            url=urlHandlers.UHSessionDisplay.getURL(self._contrib.getSession())
-            sessionCaption="%s"%self._contrib.getSession().getTitle()
-            vars["inSession"]="""<a href=%s>%s</a>"""%(\
-                quoteattr(str(url)),self.htmlText(sessionCaption))
-        vars["inSession"]=self._getHTMLRow( _("Included in session"),vars["inSession"])
-        vars["inTrack"]=""
-        if self._contrib.getTrack():
-            trackCaption=self._contrib.getTrack().getTitle()
-            vars["inTrack"]="""%s"""%(self.htmlText(trackCaption))
-        vars["inTrack"]=self._getHTMLRow( _("Included in track"),vars["inTrack"])
-        scl = []
-        for sc in self._contrib.getSubContributionList():
-            url=urlHandlers.UHSubContributionModification.getURL(sc)
-            scl.append(self._getSubContributionItem(sc,url))
-        vars["subConts"]=""
-        if scl:
-            scl.insert(0,"""<table align="left" valign="top" width="100%%" border="0" cellpadding="3" cellspacing="3">""")
-            scl.append("</table>")
-            vars["subConts"]=self._getHTMLRow( _("Sub-contributions"),"".join(scl))
-        vars["withdrawnNotice"] = self._getWithdrawnNoticeHTML()
         vars["isWithdrawn"] = isinstance(self._contrib.getCurrentStatus(),conference.ContribStatusWithdrawn)
-        vars["submitBtn"]=self._getSubmitButtonHTML()
-        vars["submitURL"]=quoteattr('FIXME')
-        vars["modifIcon"] = self._getModifIconHTML()
         vars["Contribution"] = vars["target"] = self._contrib
         vars["urlICSFile"] =  urlHandlers.UHContribToiCal.getURL(self._contrib)
-        import contributionReviewing
-        vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
-        vars["reviewingStuffDisplay"]= contributionReviewing.WContributionReviewingDisplay(self._contrib).getHTML({"ShowReviewingTeam" : False})
-        vars["reviewingHistoryStuffDisplay"]= contributionReviewing.WContributionReviewingHistory(self._contrib).getHTML({"ShowReviewingTeam" : False})
-        if self._contrib.getSession():
-            vars["sessionType"] = self._contrib.getSession().getScheduleType()
-        else:
-            vars["sessionType"] = 'none'
 
-        if self._hideFull == 1:
-            vars["hideInfo"] = True
-        else:
-            vars["hideInfo"] = False
         vars["showAttachedFiles"] = self._contrib.getConference().getAbstractMgr().showAttachedFilesContribList() and isinstance(self._contrib, conference.AcceptedContribution) and self._contrib.getAbstract() and len(self._contrib.getAbstract().getAttachments()) > 0
         vars["abstractAttachments"] = fossilize(self._contrib.getAbstract().getAttachments().values(), ILocalFileAbstractMaterialFossil) if isinstance(self._contrib, conference.AcceptedContribution) and self._contrib.getAbstract() else []
 
         vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/contribution/%s.ics' % \
                                               (self._contrib.getConference().getId(), self._contrib.getId())))
 
+        vars["getAuthorURL"] = lambda auth: self._getAuthorURL(auth)
+        vars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
+        vars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._contrib.getConference()).getDisplayTZ()))
+        vars["accessWrapper"] = self._aw
+        statusReviewing = self._getStatusReviewing()
+        vars["statusReviewing"] = statusReviewing
+        vars["showSubmit"] = statusReviewing not in ["Accept", "Reject", "Submitted"]
+        vars["showMaterial"] = statusReviewing is not None
+        vars["showHistory"] = statusReviewing is not None
+        vars["reviewingActive"] = self._contrib.getConference() and self._contrib.getConference().hasEnabledSection('paperReviewing') and self._contrib.getConference().getConfPaperReview().hasReviewing() \
+                                    and not isinstance(self._contrib.getCurrentStatus(),conference.ContribStatusWithdrawn) \
+                                    and (self._contrib.canUserSubmit(self._aw.getUser()) or self._contrib.canModify(self._aw))
+        if statusReviewing == "Submitted":
+            vars["statusText"] = _("Awaiting review")
+            vars["statusClass"] = "contributionReviewingStatusPending"
+        elif statusReviewing == "Accept":
+            vars["statusText"] = _("ACCEPTED")
+            vars["statusClass"] = "contributionReviewingStatusAccepted"
+        elif statusReviewing == "Reject":
+            vars["statusText"] = _("REJECTED")
+            vars["statusClass"] = "contributionReviewingStatusRejected"
+        elif statusReviewing == "To be corrected":
+            vars["statusText"] = _("To be corrected")
+            vars["statusClass"] = "contributionReviewingStatusCorrected"
+        elif statusReviewing is not None:
+            vars["statusText"] = statusReviewing
+            vars["statusClass"] = "contributionReviewingStatusCorrected"
+        else:
+            vars["statusText"] = _("Paper not yet submitted")
+            vars["statusClass"] = "contributionReviewingStatusCorrected"
+        vars["prefixUpload"] = "Re-" if  statusReviewing not in ["Accept", "Reject", None] else ""
         return vars
+
 
 
 
@@ -352,28 +176,6 @@ class WContributionDisplay:
 
 class WPContributionDisplay( WPContributionDefaultDisplayBase ):
     navigationEntry = navigation.NEContributionDisplay
-
-    def _defineToolBar(self):
-        edit=wcomponents.WTBItem( _("manage this contribution"),
-            icon=Config.getInstance().getSystemIconURL("modify"),
-            actionURL=urlHandlers.UHContributionModification.getURL(self._contrib),
-            enabled=self._target.canModify(self._getAW()))
-        pdf=wcomponents.WTBItem( _("get PDF of this contribution"),
-            icon=Config.getInstance().getSystemIconURL("pdf"),
-            actionURL=urlHandlers.UHContribToPDF.getURL(self._contrib))
-        xml=wcomponents.WTBItem( _("get XML of this contribution"),
-            icon=Config.getInstance().getSystemIconURL("xml"),
-            actionURL=urlHandlers.UHContribToXML.getURL(self._contrib))
-        ical=wcomponents.WTBItem( _("get ICal of this contribution"),
-            icon=Config.getInstance().getSystemIconURL("ical"),
-            actionURL="#",
-            className="exportIcal",
-            id=self._contrib.getUniqueId(),
-            elementId="exportIcal%s"%self._contrib.getUniqueId())
-        self._toolBar.addItem(edit)
-        self._toolBar.addItem(pdf)
-        self._toolBar.addItem(xml)
-        self._toolBar.addItem(ical)
 
     def _getBody( self, params ):
         wc=WContributionDisplay( self._getAW(), self._contrib, self._hideFull )

@@ -14,6 +14,8 @@ from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
+import MaKaC.webinterface.wcomponents as wcomponents
 
 class ContributionBase(object):
 
@@ -838,6 +840,10 @@ class ContributionRemoveManager(ContributionManagerListBase):
         return self._getManagersList()
 
 
+class ContributionReviewHistory(ContributionDisplayBase):
+
+    def _getAnswer(self):
+        return contributionReviewing.WContributionReviewingHistory(self._contribution).getHTML({"ShowReviewingTeam" : False})
 
 methodMap = {
     "addSubContribution": ContributionAddSubContribution,
@@ -868,5 +874,6 @@ methodMap = {
     "protection.submissionControl.removeAsAuthor": ContributionSumissionControlRemoveAsAuthor,
 
     "protection.addExistingManager": ContributionAddExistingManager,
-    "protection.removeManager": ContributionRemoveManager
+    "protection.removeManager": ContributionRemoveManager,
+    "review.getReviewHistory": ContributionReviewHistory
 }

@@ -1,224 +1,179 @@
-<% import MaKaC.webinterface.urlHandlers as urlHandlers %>
-<% from MaKaC.paperReviewing import ConferencePaperReview as CPR %>
+<%inherit file="ContributionDisplayMin.tpl"/>
 
-<table width="100%" align="center">
-  <tr>
-    <td>
-      <table align="center" width="95%" border="0" style="border: 1px solid #777777;">
-        <tr>
-          <td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td>
-            <table align="center" width="95%" border="0">
-              ${ withdrawnNotice }
-              <tr>
-                <td align="center">${ modifIcon }<font size="+1" color="black"><b>${ title }</b></font></td>
-              </tr>
-              <tr>
-                <td width="100%">&nbsp;</td>
-              </tr>
-              % if not self_._rh._target.getConference().getAbstractMgr().isActive() or not self_._rh._target.getConference().hasEnabledSection("cfa") or not self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-              <tr>
-                 <td>
-                  <table align="center">
-                    <tr>
-                      <td>${ description }</td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td width="100%">&nbsp;<td>
-              </tr>
-              % endif
-    <tr>
-      <td>
-            <table align="center" width="95%">
-                <tr>
-                <td colspan="2">
-                % if hideInfo:
-                    <% display = '' %>
-                % else:
-                    <% display = 'none' %>
-                % endif
-                <div align="center" style="display:${display}">
-                    <span id="hideContributionFull" class="collaborationDisplayMoreInfo" onclick="showGeneralInfo();">${ _("Show general info")}</span>
-                </div>
-                % if hideInfo:
-                    <% display = 'none' %>
-                % else:
-                    <% display = '' %>
-                % endif
-                <div id="showContributionFull" style="display:${display}">
-                <table align="center" width="95%">
-                % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-            ${ additionalFields }
-                % endif
-        % if showAttachedFiles:
-            <tr>
-                <td align="right" valign="top"
-                    class="displayField"><b>${ _("Abstract files")}:</b></td>
-                <td>
-                % for file in abstractAttachments:
-                    <div style="padding-bottom:3px;"><a href=${ file["url"] }>${ file["file"]["fileName"] }</a></div>
-                % endfor
-                </td>
-            </tr>
+<%block name="speakers">
+    <div class="contributionSpeakerList">
+        <% speakers = [] %>
+        % for speaker in Contribution.getSpeakerList():
+            <% speakers.append(speaker.getDirectFullName()) %>
+        % endfor
+        % if speakers:
+            ${("Presented by")} <span style="font-weight: bold">${", ".join(speakers)} </span>
         % endif
-        <tr>
-          <td align="right" valign="top" class="displayField"><b>${ _("Id")}:</b></td>
-              <td>${ id }</td>
-            </tr>
-        ${ location }
-            <tr>
-                <td align="right" valign="top" class="displayField"><b>${ _("Starting date")}:</b></td>
-            <td width="100%">
-                <table cellspacing="0" cellpadding="0" align="left">
-                <tr>
-                    <td align="right">${ startDate }</td>
-                <td>&nbsp;&nbsp;${ startTime }</td>
-                </tr>
-                </table>
-            </td>
-            </tr>
-            <tr>
-                <td align="right" valign="top" class="displayField"><b>${ _("Duration")}:</b></td>
-                <td width="100%">${ duration }</td>
-            </tr>
-                    ${ contribType }
-                    ${ primaryAuthors }
-                    ${ coAuthors }
-                    ${ speakers }
-                    % if (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn:
-                        <td class="displayField" nowrap="" align="right" valign="top">
-                            <b>${_("Material")}:</b>
-                            % if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() :
-                                ${inlineContextHelp(_('Here you should add the general materials for your contribution. They will not be subject of reviewing.'))}
-                            % endif
-                        </td>
-                        <td width="100%" valign="top" style="padding-top:5px;">
-                            ${MaterialList}
-                        </td>
-                    % else:
-                        ${ material }
-                    % endif
-                    ${ inSession }
-                    ${ inTrack }
-                    ${ subConts }
-                </table>
+        % if Contribution.isScheduled():
+            ${("on")}
+            <span style="font-weight: bold">${formatDate(Contribution.getStartDate())}</span>
+            <span style="font-weight: bold">${formatTime(Contribution.getStartDate())}</span>
+            ${_("-")}
+            <span style="font-weight: bold">${formatTime(Contribution.getEndDate())}</span>
+        % endif
+    </div>
+</%block>
+
+<%block name="board">
+    % if Contribution.getBoardNumber()!= "":
+        <div><span style="font-weight:bold">${("Board")} #: </span>${Contribution.getBoardNumber()}</div>
+    % endif
+</%block>
+
+<%block name="detail">
+    % if not self_._rh._target.getConference().getAbstractMgr().isActive() or not self_._rh._target.getConference().hasEnabledSection("cfa") or not self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
+    <div class="contributionSection">
+        <h2 class="contributionSectionTitle">Description</h2>
+        <div class="contributionSectionContent">${Contribution.getDescription()}</div>
+    </div>
+    % else:
+        % for f in Contribution.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
+            % if Contribution.getField(f.getId()):
+            <div class="contributionSection">
+                <h2 class="contributionSectionTitle">${f.getName()}</h2>
+                <div class="contributionSectionContent">${Contribution.getField(f.getId())}
                 </div>
-                </td>
-                </tr>
+            </div>
+            % endif
+        % endfor
+    % endif
+</%block>
 
-                    % if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() and not isWithdrawn:
-                        % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw):
-                        <tr><td align="right" valign="top" class="displayField" nowrap>
-                                <b>${_("Reviewing material")}:</b>
-                                ${inlineContextHelp(_('Here you should add the materials for reviewing. They will be judged by the reviewing team.'))}
-                            </td>
-                            <td>
-                                ${ReviewingMatList}
-                            </td>
-                        </tr>
-                            % if Contribution.getReviewManager().getLastReview().isAuthorSubmitted():
-                                    <tr>
-                                    <td align="right" valign="top" class="displayField" nowrap>
-                                        <b>${_("Reviewing status")}:</b>
-                                    </td>
-                                    <td style="border-left:5px solid #FFFFFF;">
-                                        ${ "<br>".join(Contribution.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True)) }
-                                    </td>
-                                </tr>
-                                % if  Contribution.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
-                                    % if not Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():
-                                        <% display = 'table' %>
-                                    % else:
-                                        <% display = 'none' %>
-                                    % endif
-                                % endif
-                                % if Contribution.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING:
-                                    % if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()):
-                                        <% display = 'table' %>
-                                    % else:
-                                        <% display = 'none' %>
-                                    % endif
-                                % endif
-                                % if  Contribution.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING:
-                                    % if Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():
-                                        <% display = 'none' %>
-                                    % else:
-                                        <% display = 'table' %>
-                                    % endif
-                                % endif
-                          % else:
-                            <tr>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                          % endif
-                      % if len(Contribution.getReviewManager().getVersioning()) > 1:
-                      <tr>
-                              <td align="right" valign="top" class="displayField" nowrap>
-                                    <b>${_("Reviewing history")}:</b>
-                              </td>
-                              <td width="100%" valing="top"><div id="showHideHistory" style="display:inline"></div></td>
-                   </tr>
-                   <tr>
-                       <td id="HistoryTable" align="center" width="100%" colspan="2">
-                           ${ reviewingHistoryStuffDisplay }
-                       </td>
-               </tr>
+<%block name="paperReview">
+    % if reviewingActive:
+    <div class="contributionReviewingSection" style="border-bottom:1px solid #eaeaea; padding-bottom:5px;">
+        <h2 class="contributionSectionTitle">${_("Call for papers")}</h2>
+            <div>
+                <div class="contributionReviewingStatus ${statusClass}">${statusText}</div>
+                % if showSubmit:
+                    <span class="fakeLink" id="revSubmit">${prefixUpload}Upload paper</span><br/>
+                % endif
+                <div style="white-space: nowrap">
+                % if showHistory and len(Contribution.getReviewManager().getVersioning()) > 1:
+                    <span class="fakeLink" id="revHistory">${_("History")}</span>
+                % endif
+                % if showHistory and len(Contribution.getReviewManager().getVersioning()) > 1 and showMaterial:
+                 |
+                % endif
+                % if showMaterial:
+                    <span class="fakeLink" id="revMaterial">${_("View Paper")}</span>
+                % endif
+                </div>
+            </div>
+        </div>
+    % endif
+</%block>
 
-              % endif
-              % endif
-              % endif
-              </table>
-                 </td>
-              </tr>
-              </table>
-           </td>
-        </tr>
-        </table>
-    </td>
-</tr>
-</table>
-<%include file="ContributionICalExport.tpl"/>
+<%block name="place">
+    <% import MaKaC.webinterface.linking as linking %>
+    <% location = Contribution.getLocation() %>
+    <% room = Contribution.getRoom() %>
+    % if location or room:
+    <div class="contributionRightPanelSection">
+        <h2 class="contributionSectionTitle">${_("Place")}</h2>
+        <div>
+        % if location:
+            <div><span style="font-weight:bold">${_("Location")}: </span>${location.getName()}</div>
+            % if location.getAddress() is not None and location.getAddress()!="":
+            <div><span style="font-weight:bold">${_("Address")}: </span>${location.getAddress()}</div>
+            % endif
+        % endif
+        % if room:
+            <div><span style="font-weight:bold">${_("Room")}: </span>${linking.RoomLinker().getHTMLLink(room,location)}</div>
+        % endif
+        </div>
+    </div>
+    % endif
+</%block>
+
+<%block name="authors">
+    % if Contribution.getPrimaryAuthorList():
+        <div class="contributionRightPanelSection">
+            <h2 class="contributionSectionTitle">${_("Primary authors")}</h2>
+            <ul>
+            % for pa in Contribution.getPrimaryAuthorList()[:4]:
+                <li><a href="${getAuthorURL(pa)}">${pa.getDirectFullNameNoTitle()}</a>
+                    <span style="font-size:10px">${pa.getAffiliation()}</span>
+            % endfor
+            </ul>
+            <a class="fakeLink" id="moreAuthors">${_("More")}</a>
+        </div>
+    % endif
+    % if Contribution.getCoAuthorList():
+        <div class="contributionRightPanelSection">
+            <h2 class="contributionSectionTitle">${_("Co-authors")}</h2>
+            <ul>
+            % for ca in Contribution.getCoAuthorList()[:4]:
+                <li><a href="${getAuthorURL(ca)}">${ca.getDirectFullNameNoTitle()}</a>
+                    <span style="font-size:10px">${ca.getAffiliation()}</span>
+            % endfor
+            </ul>
+            <a class="fakeLink" id="moreCoAuthors">${_("More")}</a>
+        </div>
+    % endif
+</%block>
+
+<%block name="scripts">
 <script type="text/javascript">
-/**
- * Builds the 'link' to show and hide the reviewing history.
- */
-var buildShowHideHistory = function() {
-    var option = new Chooser({
-        showHistory: command(function(){
-            $E('HistoryTable').dom.style.display = '';
-            option.set('hideHistory');
-        }, $T('Show History')),
-        hideHistory: command(function(){
-            $E('HistoryTable').dom.style.display = 'none';
-            option.set('showHistory');
-        }, $T('Hide History'))
+    var args = {
+        conference: '${ Contribution.getConference().getId() }',
+        confId: '${ Contribution.getConference().getId() }',
+        contribution: '${ Contribution.getId() }',
+        contribId: '${ Contribution.getId() }',
+        parentProtected: ${ jsBoolean(Contribution.getAccessController().isProtected()) }
+    };
+    $("#moreAuthors").click(function(){
+        var popupAuthors = new AuthorsPopup($T("Primary authors"), ${fossilize(Contribution.getPrimaryAuthorList())}, '${Contribution.getConference().getId()}', '${Contribution.getId()}', '${Contribution.getSession().getId()}', function() {self.popupAllowClose = true; return true;});
+        popupAuthors.open();
     });
-    option.set('showHistory');
 
-    $E('showHideHistory').set(Widget.link(option));
-}
+    $("#moreCoAuthors").click(function(){
+        var popupCoAuthors = new AuthorsPopup($T("Co authors"), ${fossilize(Contribution.getCoAuthorList())}, '${Contribution.getConference().getId()}', '${Contribution.getId()}', '${Contribution.getSession().getId()}', function() {self.popupAllowClose = true; return true;});
+        popupCoAuthors.open();
+    });
 
-% if len(Contribution.getReviewManager().getVersioning()) > 1:
-buildShowHideHistory();
-$E('HistoryTable').dom.style.display = 'none';
-% endif
+    $("#revSubmit").click(function(){
+        var popupSubmit = new SubmitPopup($T("Paper selection and submission"), args, '${urlHandlers.UHContributionSubmitForRewiewing.getURL(Contribution)}');
+        popupSubmit.open();
+    });
 
-function showGeneralInfo() {
-    if ($E('hideContributionFull').dom.innerHTML == 'Hide general info') {
-        $E('showContributionFull').dom.style.display = 'none';
-        $E('hideContributionFull').dom.innerHTML = 'Show general info';
-    } else {
-        if ($E('hideContributionFull').dom.innerHTML == 'Show general info') {
-            $E('showContributionFull').dom.style.display = '';
-            $E('hideContributionFull').dom.innerHTML = $T('Hide general info');
-        }
-    }
-}
+    $("#revMaterial").click(function(){
+        var killProgress = IndicoUI.Dialogs.Util.progress();
+        jsonRpc(Indico.Urls.JsonRpcService, "material.reviewing.list", args,
+                function(result, error){
+                    killProgress();
+                    if (exists(error)) {
+                        IndicoUtil.errorReport(error);
+                    } else {
+                        var popupMaterial = new UploadedPaperPopup($T("Submitted paper"), result.reviewing.resources);
+                        popupMaterial.open();
+                    }
+        });
+    });
+
+    $("#revHistory").click(function(){
+        var killProgress = IndicoUI.Dialogs.Util.progress();
+            jsonRpc(Indico.Urls.JsonRpcService, "contribution.review.getReviewHistory",
+                    {confId: '${Contribution.getConference().getId()}',
+                     contribId: '${Contribution.getId()}'},
+                    function(result, error){
+                        killProgress();
+                        if (exists(error)) {
+                            IndicoUtil.errorReport(error);
+                        } else {
+                            var popup = new ExclusivePopup($T('Review History'), null, true, true);
+                            popup.draw = function() {
+                                this.ExclusivePopup.prototype.draw.call(this, result, {maxWidth:pixels(600)});
+                            };
+                            popup.open();
+                        }
+            });
+        });
 
 </script>
+</%block>

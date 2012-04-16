@@ -223,24 +223,6 @@ class WGiveAdvice(wcomponents.WTemplated):
 
         return vars
 
-class WContributionReviewingDisplay(wcomponents.WTemplated):
-    """
-    """
-
-    def __init__(self, contribution):
-        self._contribution = contribution
-
-    def getHTML(self, params):
-        return wcomponents.WTemplated.getHTML(self, params)
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["Editing"] = self._contribution.getReviewManager().getLastReview().getEditorJudgement()
-        vars["AdviceList"] = self._contribution.getReviewManager().getLastReview().getSubmittedReviewerJudgement()
-        vars["Review"] = self._contribution.getReviewManager().getLastReview()
-        vars["ConferenceChoice"] = self._contribution.getConference().getConfPaperReview().getChoice()
-        return vars
-
 class WPContributionReviewingHistory(WPContributionModifBase):
 
     def _setActiveTab( self ):

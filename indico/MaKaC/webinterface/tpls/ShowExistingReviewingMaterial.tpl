@@ -1,7 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
 <% from MaKaC.paperReviewing import ConferencePaperReview as CPR %>
-
 <div id="showStep1" class="groupTitleSmallPaper"><span>${ _("Step 1 - Upload paper") }</span></div>
 ${ existingMaterialsTitle }
 <div id="reviewingMaterialListPlace"><!-- DOM-filled materials list --></div>
@@ -70,7 +69,7 @@ var args = {
         % endif
     % endif
 
-var mlist = new ReviewingMaterialListWidget(args, [["reviewing", "Reviewing"]], uploadAction,null, null, visibility, $E("SendBtn"));
+var mlist = new ReviewingMaterialListWidget(args, [["reviewing", "Reviewing"]], uploadAction,null, null, visibility, $("#SendBtn"));
 
 $E('reviewingMaterialListPlace').set(mlist.draw());
 

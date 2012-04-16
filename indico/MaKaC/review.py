@@ -2834,6 +2834,9 @@ class AbstractStatus( Persistent ):
         """
         raise MaKaCError( _("Only merged abstracts can be unmerged"))
 
+    def getComments(self):
+        return ""
+
 
 
 class AbstractStatusSubmitted( AbstractStatus ):

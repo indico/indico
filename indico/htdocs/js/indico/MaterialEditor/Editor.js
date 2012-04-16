@@ -1553,7 +1553,6 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
             self.set(key, obj);
         });
 
-
         var link = Widget.link(command(function(){
                     IndicoUI.Dialogs.Material.add(self.args,
                                                   self,
@@ -1564,23 +1563,30 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
                 }, $T("Upload paper")));
         return Html.div(
             {},
-            Html.div({style:{textAlign: 'left', visibility: self.visibility}}, link),
-            Html.div({style:{overflow: 'auto', width: self.width, height: self.height}},
+            Html.div({style:{textAlign: 'left', visibility: self.visibility, marginBottom: pixels(10)}}, link),
+            Html.div({style:{overflow: 'auto', width: self.width, height: self.height, border:"1px solid #EAEAEA"}}, this.noMaterialText,
                      this.ListWidget.prototype.draw.call(this))
         );
     }
 },
-     function(args, types, uploadAction, width, height, visibility, sendToReviewButton) {
+     function(args, types, uploadAction, width, height, visibility, sendToReviewButton, textHasMaterials) {
          var self = this;
          this.MaterialListWidget(args, types, uploadAction, width, height, false, 'material.reviewing.list');
          this.visibility = visibility;
          this.sendToReviewButton = sendToReviewButton;
+         this.textHasMaterials = textHasMaterials;
+         this.noMaterialText = Html.div({style: {textAlign:"center", padding: pixels(5)}}, $T("There are no paper uploaded."));
 
          this.observe(function(){
                 if (self.isEmpty()) {
-                    self.sendToReviewButton.dom.disabled = true;
+                    self.sendToReviewButton.disabledButtonWithTooltip('disable');
+                    self.textHasMaterials.hide();
+                    $(self.noMaterialText.dom).show();
+
                 }else {
-                    self.sendToReviewButton.dom.disabled = false;
+                    self.sendToReviewButton.disabledButtonWithTooltip('enable');
+                    self.textHasMaterials.show();
+                    $(self.noMaterialText.dom).hide();
                 }
             });
      }

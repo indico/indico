@@ -7980,8 +7980,8 @@ ul.buttonMenuPopupList li a:hover {
 
 .contributionListContribItem {
     border-bottom: 1px solid #EBEBEB;
-    padding-bottom: 7px;
-    margin-top: 7px;
+    padding-bottom: 5px;
+    margin-top: 5px;
 }
 
 .contributionListContribDescription {
@@ -8019,4 +8019,150 @@ a.lightGreyLink:hover {
     display: inline-block;
     height: 12px;
     width: 12px;
+}
+
+.contributionButtonBar{
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+.contributionTitle {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 24px;
+    border-bottom: 1px solid #EAEAEA;
+    margin-bottom: 10px;
+    padding-bottom: 3px;
+    margin-top: 0;
+}
+
+.contributionMainContent {
+    float:left;
+    width:500px;
+}
+.contributionRightPanel {
+    float:right;
+    width: 200px;
+    min-height: 500px;
+    padding-left:10px;
+    border-left: 1px solid #EAEAEA;
+}
+.contributionRightPanelSection {
+    border-bottom: 1px solid #EAEAEA;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+}
+
+.contributionRightPanelSection ul{
+    list-style: none inside none;
+    margin: 0px;
+    padding: 0;
+}
+
+.contributionRightPanelSection li{
+    margin-bottom: 3px;
+}
+
+.contributionRightPanelSection ul.subList{
+    list-style: none inside none;
+    margin: 0px;
+    padding: 5px 15px;
+}
+.contributionRightPanelSection a{
+    font-size: 11px;
+    word-wrap: break-word;
+}
+
+.contributionRightPanelSection a.titleWithLink{
+    font-size: 12px;
+    font-weight: bold;
+    color: #666;
+}
+
+.contributionRightPanelSection a.titleWithLink:hover{
+    text-decoration: underline;
+}
+
+.contributionInformation {
+    border-bottom: 1px solid #EAEAEA;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+}
+
+.contributionDetail {}
+.contributionSection {
+    margin-bottom: 10px;
+}
+.contributionSectionTitle {
+    color: #444;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+.contributionSectionContent {
+    font-size: 12px;
+    line-height: 1.5em;
+    text-align:justify;
+    color: #444;
+    margin-right: 5px;
+}
+
+.contributionSpeakerList {
+    margin-bottom:3px;
+    color:#666666;
+}
+
+.contributionReviewingSection {
+    margin-bottom: 5px;
+    border-radius: 5px;
+    color: #888;
+}
+
+.contributionReviewingStatus {
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 5px;
+    display: inline-block;
+    color: white;
+    font-weight: bold;
+}
+
+.contributionReviewingStatusRejected {
+    background: none repeat scroll 0 0 #B93725; /*#881122;*/
+}
+
+.contributionReviewingStatusAccepted {
+    background: none repeat scroll 0 0 #9AC33A;
+}
+
+.contributionReviewingStatusPending {
+    background: none repeat scroll 0 0 #A4CCC9;
+}
+
+.contributionReviewingStatusCorrected {
+    background: none repeat scroll 0 0 #D8B81A;
+}
+
+.contributionReviewingStatusNotSubmitted {
+    background: none repeat scroll 0 0 #BCB8A3;
+}
+
+.contributionReviewingSection input{
+    background: none repeat scroll 0 0 #CDEB8B;
+    border: 1px solid #666;
+    border-radius: 5px 5px 5px 5px;
+}
+
+.contributionReviewingSection a{
+    color: white;
+    font-size : 11px;
+}
+
+.contributionReviewingSection a:hover{
+    text-decoration: underline;
+    color: white;
 }

@@ -9994,6 +9994,21 @@ class SubContribParticipation(Persistent, Fossilizable):
             res = "%s%s."%(res, self.getFirstName()[0].upper())
         return res
 
+    def getDirectFullName( self ):
+        res = self.getDirectFullNameNoTitle()
+        if self.getTitle() != "":
+            res = "%s %s"%( self.getTitle(), res )
+        return res
+
+    def getDirectFullNameNoTitle( self ):
+        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
+        if self.getFirstName() != "":
+            if res.strip() != "":
+                res = "%s %s"%( self.getFirstName(), res )
+            else:
+                res = self.getFirstName()
+        return res
+
 class SubContribution(CommonObjectBase, Locatable):
     """
     """
