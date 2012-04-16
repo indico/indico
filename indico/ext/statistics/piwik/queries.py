@@ -310,12 +310,9 @@ class PiwikQueryMetricConferencePeakDateAndVisitors(PiwikQueryMetricConferenceBa
         """
         data = self._performCall()
         jData = json.loads(data)
-        winner = {}
-        val = 0
 
-        for date in jData.keys():
-            if jData.get(date) > val:
-                val = jData.get(date)
-                winner = {'date': date, 'users': jData.get(date)}
-
-        return winner if winner else {'date': _('No Data'), 'users': '0'}
+        if len(jData) > 0:
+            date, value = max(jData.iteritems(), key=lambda e: e[1])
+            return {'date': date, 'users': value}
+        else:
+            return {'date': _('No Data'), 'users': 0}

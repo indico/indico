@@ -15,9 +15,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-import datetime
-
 from indico.util.fossilize import IFossil, fossilizes, Fossilizable
+
+from MaKaC.common.timezoneUtils import nowutc, utc2server
 
 
 class IReportFossil(IFossil):
@@ -76,13 +76,9 @@ class BaseStatisticsReport(Fossilizable, object):
         the set command on the report object.
         """
 
-        for resultType in self._reportGenerators.keys():
-            generators = self._reportGenerators.get(resultType)
-
-            for resultName in generators.keys():
-                gen = generators.get(resultName)
+        for resultType, generators in self._reportGenerators.iteritems():
+            for resultName, gen in generators.iteritems():
                 setMethod = self._reportSetters.get(resultType)
-
                 setFunc = getattr(self, setMethod)
 
                 if setFunc is None:
@@ -90,7 +86,7 @@ class BaseStatisticsReport(Fossilizable, object):
 
                 setFunc(resultName, gen.getResult())
 
-        self._reportGenerated = datetime.datetime.utcnow()
+        self._reportGenerated = utc2server(nowutc(), naive=False)
 
     def getDateGenerated(self):
         return self._reportGenerated

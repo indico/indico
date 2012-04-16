@@ -1,4 +1,4 @@
-<% 
+<%
     # We set these up here to pass to JS also
     strModifQuery = _('Modify Query')
     strHideQuery = _('Hide Modify Query')
@@ -174,7 +174,7 @@
     </div>
 
     <div id="statsGenerated">
-        ${_('This report was generated at: ') + str(report['dateGenerated'])}
+        ${_('This report was generated at: %s') % formatDateTime(report['dateGenerated'], format='long')}
     </div>
 
     <div id="statsInfoHidden">

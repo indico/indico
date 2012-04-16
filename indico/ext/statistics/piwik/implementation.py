@@ -25,14 +25,6 @@ from indico.ext.statistics.base.implementation import BaseStatisticsImplementati
 from MaKaC.plugins.base import PluginsHolder
 
 
-def _joinSegmentString(segment, delim):
-    """
-    Utility function whilst building the query objects, substitute's Python's
-    list implementation's lack of .join()
-    """
-    return reduce(lambda x, y: str(x) + delim + str(y), segment)
-
-
 class PiwikStatisticsImplementation(BaseStatisticsImplementation):
 
     QUERY_SCRIPT = 'piwik.php'
@@ -135,7 +127,7 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         self.setAPIParams({'period': period})
 
     def setAPIDate(self, date=['last7']):
-        newDate = date[0] if len(date) == 1 else _joinSegmentString(date, ',')
+        newDate = date[0] if len(date) == 1 else ','.join(date)
 
         self.setAPIParams({'date': newDate})
 
@@ -144,13 +136,9 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         segmentation = {'key': ('equality', 'value')}
         """
 
-        for segmentName in segmentation.keys():
-            segmentValue = segmentation.get(segmentName)[1]
-            equality = segmentation.get(segmentName)[0]
-            value = ''
-
+        for segmentName, (equality, segmentValue) in segmentation.iteritems():
             if isinstance(segmentValue, list):
-                value = _joinSegmentString(segmentValue, ',')
+                value = ','.join(segmentValue)
             else:
                 value = str(segmentValue)
 
@@ -159,8 +147,7 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
             if segmentBuild not in self._APISegmentation:
                 self._APISegmentation.append(segmentBuild)
 
-        segmentation = _joinSegmentString(self._APISegmentation,
-                                          self.QUERY_BREAK)
+        segmentation = self.QUERY_BREAK.join(self._APISegmentation)
 
         self.setAPIParams({'segment': segmentation})
 

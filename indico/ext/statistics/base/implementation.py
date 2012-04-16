@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 import urllib2
+import urlparse
 
 import indico.ext.statistics.base
 import indico.ext.statistics.base.implementation
@@ -76,10 +77,9 @@ class BaseStatisticsImplementation(Component):
             return
         if not path.endswith('/'):
             path += '/'
-        if path.startswith('http'):
-            path = path.split('//')[1]
 
-        self._APIPath = path
+        parsed = urlparse.urlparse(path)
+        self._APIPath = parsed.netloc + parsed.path
 
     def _buildAPIQuery(self, params=None):
         """
@@ -312,12 +312,12 @@ class BaseStatisticsImplementation(Component):
         Internal mechanism for storing parameters for the query using
         a dictionary (params) of key=value.
         """
-        for paramKey in params.keys():
+        for key, value in params.iteritems():
 
-            if params.get(paramKey) is None:
-                del self.getAPIParams()[paramKey]
+            if value is None:
+                del self._APIParams[key]
             else:
-                self.getAPIParams()[paramKey] = params.get(paramKey)
+                self._APIParams[key] = value
 
         self._paramsChanged = True
 

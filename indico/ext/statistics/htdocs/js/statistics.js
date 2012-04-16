@@ -24,13 +24,7 @@ $(function() {
             params['contribId'] = updateContrib;
         }
 
-        var uri = '';
-
-        $.each(params, function(key, value) {
-            uri += key + '=' + value + '&';
-        });
-
-        return uri;
+        return $.param(params);
     };
 
     $('#updateQuery').click(function() {
