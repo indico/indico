@@ -616,7 +616,9 @@ class RoomBase( object ):
     def _getGuid( self ):
         if self.id == None or self.locationName == None:
             return None
-        return RoomGUID( Location.parse( self.locationName ), self.id )
+        if Location.parse( self.locationName ):
+            return RoomGUID( Location.parse( self.locationName ), self.id )
+        return None
 
     def _getName( self ):
         if self._name != None and len( self._name.strip() ) > 0:
