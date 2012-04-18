@@ -29,36 +29,5 @@ if DEVELOPMENT:
 def index(req, **params):
     return materialDisplay.RHMaterialDisplay( req ).process( params )
 
-def removeResource(req, **params):
-    return materialDisplay.RHMaterialDisplayRemoveResource( req ).process( params )
-
-def submitResource(req, **params):
-    return materialDisplay.RHMaterialDisplaySubmitResource( req ).process( params )
-
 def accessKey(req, **params):
     return materialDisplay.RHMaterialDisplayStoreAccessKey( req ).process( params )
-
-#def materialModification(req, **params):
-#   return materialDisplay.RHMaterialDisplayModification( req ).process( params )
-
-#def dataModification(req, **params):
-#    return materialDisplay.RHMaterialDisplayDataModification( req ).process( params )
-
-#def performDataModification(req, **params):
-#    return materialDisplay.RHMaterialDisplayPerformDataModification( req ).process( params )
-
-#def linkCreation(req, **params):
-#    return materialDisplay.RHMaterialDisplayLinkCreation( req ).process( params )
-
-#def performLinkCreation(req, **params):
-#    return materialDisplay.RHMaterialDisplayPerformLinkCreation( req ).process( params )
-
-#def fileCreation(req, **params):
-#    return materialDisplay.RHMaterialDisplayFileCreation( req ).process( params )
-
-#def performFileCreation(req, **params):
-#    return materialDisplay.RHMaterialDisplayPerformFileCreation( req ).process( params )
-
-#def removeResources(req, **params):
-#    return materialDisplay.RHMaterialDisplayRemoveResources( req ).process( params )
-

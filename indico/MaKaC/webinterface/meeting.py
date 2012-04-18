@@ -134,10 +134,6 @@ class WebFactory(WebFactory):
         return WPMMaterialDisplay(rh, material)
     getMaterialDisplay = staticmethod(getMaterialDisplay)
 
-    def getMaterialDisplayRemoveResourceConfirm(rh, conf, res):
-        return WPMMaterialDisplayRemoveResourceConfirm(rh, conf, res)
-    getMaterialDisplayRemoveResourceConfirm = staticmethod(getMaterialDisplayRemoveResourceConfirm)
-
 ############# Subcontribution Display##########################################
 
     def getSubContributionDisplay(rh, subcontrib):
@@ -673,16 +669,6 @@ class WPMMaterialDisplay( WPMMaterialDisplayBase):
         wc = WMMaterialDisplay( self._getAW(), self._material, self._modif )
         pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
         return wc.getHTML( pars )
-
-class WPMMaterialDisplayRemoveResourceConfirm(WPMMaterialDisplayBase, material.WPMaterialDisplayRemoveResourceConfirm):
-    navigationEntry=navigation.NEMeetingMaterialDisplay
-
-    def __init__(self,rh,conf,res):
-        WPMMaterialDisplayBase.__init__(self,rh,res.getOwner())
-        self._res=res
-
-    def _getBody(self,params):
-        return material.WPMaterialDisplayRemoveResourceConfirm._getBody(self, params)
 
 #################Conference Modification#############################
 

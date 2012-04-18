@@ -142,7 +142,17 @@ class WMaterialDisplay(wcomponents.WTemplated):
         vars["material"] = self._material
         vars["accessWrapper"] = self._aw
         vars["getURL"] = lambda resource : self._getURL(resource)
-        vars["uploadAction"] = 'Indico.Urls.UploadAction.contribution'
+        if self._material.getSubContribution():
+            vars["uploadAction"] = 'Indico.Urls.UploadAction.subcontribution'
+        elif self._material.getContribution():
+            vars["uploadAction"] = 'Indico.Urls.UploadAction.contribution'
+        elif self._material.getSession():
+            vars["uploadAction"] = 'Indico.Urls.UploadAction.session'
+        elif self._material.getConference():
+            vars["uploadAction"] = 'Indico.Urls.UploadAction.conference'
+        else:
+            vars["uploadAction"] = 'Indico.Urls.UploadAction.category'
+
         return vars
 
 
@@ -401,125 +411,6 @@ class WPMaterialSelectAllowed( WPMaterialModifAC ):
         params["addURL"] = urlHandlers.UHMaterialAddAllowed.getURL()
         return wc.getHTML( params )
 
-
-#class WPMaterialDisplayModification( WPMaterialDisplayBase ):
-#    navigationEntry = navigation.NEMaterialDisplayModification
-#
-#    def __init__(self, rh, material):
-#        WPMaterialDisplayBase.__init__( self, rh, material )
-#        self._navigationTarget = self._material
-#
-#    def _getBody( self, params ):
-#        wc = WMaterialDisplayModification( self._material )
-#        pars = { \
-#"modifyFileURLGen": urlHandlers.UHFileDisplayModification.getURL, \
-#"modifyLinkURLGen": urlHandlers.UHLinkDisplayModification.getURL, \
-#"dataModificationURL": urlHandlers.UHMaterialDisplayDataModification.getURL( self._material ), \
-#"removeResourcesURL": urlHandlers.UHMaterialDisplayRemoveResources.getURL(self._material), \
-#"linkFilesURL": urlHandlers.UHMaterialDisplayLinkCreation.getURL( self._material ), \
-#"addFilesURL": urlHandlers.UHMaterialDisplayFileCreation.getURL( self._material ) }
-#        return wc.getHTML( pars )
-
-#class WMaterialDisplayModification( wcomponents.WTemplated ):
-#
-#    def __init__( self, mat ):
-#        self._material = mat
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        vars["title"] = self._material.getTitle()
-#        vars["description"] = self._material.getDescription()
-#        vars["type"] = self._material.getType()
-#        l = []
-#        for res in self._material.getResourceList():
-#            if res.__class__ is conference.LocalFile:
-#                l.append( """<li><input type="checkbox" name="removeResources" value="%s"><small>[%s]</small> <b><a href="%s">%s</a></b> (%s) - <small>%s bytes</small></li>"""%(res.getId(), res.getFileType(), vars["modifyFileURLGen"](res), res.getName(), res.getFileName(), strfFileSize( res.getSize() )))
-#            elif res.__class__ is conference.Link:
-#                l.append( """<li><input type="checkbox" name="removeResources" value="%s"><b><a href="%s">%s</a></b> (%s)</li>"""%(res.getId(), vars["modifyLinkURLGen"](res), res.getName(), res.getURL()))
-#        vars["resources"] = "<ol>%s</ol>"%"".join( l )
-#
-#        return vars
-
-
-#class WPMaterialDisplayDataModification( WPMaterialDisplayModification ):
-#
-#    def _getBody( self, params ):
-#        wc = WMaterialDisplayDataModification( self._material )
-#        pars = { "postURL": urlHandlers.UHMaterialDisplayPerformDataModification.getURL(self._material) }
-#        return wc.getHTML( pars )
-
-#class WMaterialDisplayDataModificationBase(wcomponents.WTemplated):
-#
-#    def __init__( self, material ):
-#        self._material = material
-#        self._owner = material.getOwner()
-#
-#    def _getTypesSelectItems( self, default = "misc" ):
-#        definedTypes = ["misc"]
-#        l = []
-#        for type in definedTypes:
-#            default = ""
-#            if type == default:
-#                default = "default"
-#            l.append("""<option value="%s" %s>%s</option>"""%( type, default, type ))
-#        return "".join( l )
-
-#class WMaterialDisplayDataModification(WMaterialDisplayDataModificationBase):
-#
-#    def getVars( self ):
-#        vars = WMaterialDisplayDataModificationBase.getVars( self )
-#        vars["title"] = self._material.getTitle()
-#        vars["description"] = self._material.getDescription()
-#        vars["types"] = self._getTypesSelectItems( self._material.getType() )
-#        return vars
-
-
-#class WPMaterialDisplayLinkCreation( WPMaterialDisplayModification ):
-#
-#    def _getBody( self, params ):
-#        comp = WMaterialDisplayLinkSubmission( self._material )
-#        pars = { "postURL": urlHandlers.UHMaterialDisplayPerformLinkCreation.getURL() }
-#        return comp.getHTML( pars )
-
-#class WMaterialDisplayLinkSubmission(wcomponents.WTemplated):
-#
-#    def __init__(self, material):
-#        self._material = material
-#
-#    def getHTML( self, params ):
-#        str = """
-#            <form action="%s" method="POST" enctype="multipart/form-data">
-#                %s
-#                %s
-#            </form>
-#              """%(params["postURL"], \
-#                   self._material.getLocator().getWebForm(),\
-#                   wcomponents.WTemplated.getHTML( self, params ) )
-#        return str
-
-#class WPMaterialDisplayFileCreation( WPMaterialDisplayModification ):
-#
-#    def _getBody( self, params ):
-#        comp = WMaterialDisplayFileSubmission( self._material )
-#        pars = { "postURL": urlHandlers.UHMaterialDisplayPerformFileCreation.getURL() }
-#        return comp.getHTML( pars )
-
-#class WMaterialDisplayFileSubmission(wcomponents.WTemplated):
-#
-#    def __init__(self, material):
-#        self._material = material
-#
-#    def getHTML( self, params ):
-#        str = """
-#            <form action="%s" method="POST" enctype="multipart/form-data">
-#                %s
-#                %s
-#            </form>
-#              """%(params["postURL"], \
-#                   self._material.getLocator().getWebForm(),\
-#                   wcomponents.WTemplated.getHTML( self, params ) )
-#        return str
-
 class WPMaterialMainResourceSelect( WPMaterialModification ):
 
     def _getTabContent( self, params ):
@@ -552,68 +443,3 @@ class WMaterialMainResourceSelect(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["resources"] = self._getResources()
         return vars
-
-class WPMaterialDisplayRemoveResourceConfirm( WPMaterialDisplayBase ):
-
-    def __init__(self,rh, conf, res):
-        WPMaterialDisplayBase.__init__(self,rh,conf)
-        self._res=res
-
-    def _getBody(self,params):
-        wc=wcomponents.WDisplayConfirmation()
-        msg= i18nformat(""" _("Are you sure you want to delete the following resource?")<br>
-            <b><i>%s</i></b>
-        <br>""")%self._res.getFileName()
-        url=urlHandlers.UHMaterialDisplayRemoveResource.getURL(self._res)
-        return wc.getHTML(msg,url,{})
-
-
-class WMaterialDisplaySubmitResource(wcomponents.WTemplated):
-
-    def __init__(self,material):
-        self._material=material
-        self._contrib=material.getOwner()
-
-    def _getErrorHTML(self,errorList):
-        if len(errorList)==0:
-            return ""
-        return """
-            <tr>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td colspan="2" align="center">
-                    <table bgcolor="red">
-                        <tr>
-                            <td bgcolor="white">
-                                <font color="red">%s</font>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-            </tr>
-                """%("<br>".join(errorList))
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHMaterialDisplaySubmitResource.getURL(self._material)))
-        vars["contribId"]=self.htmlText(self._contrib.getId())
-        vars["contribTitle"]=self.htmlText(self._contrib.getTitle())
-        vars["matType"]=self._material.getId()
-        vars["description"]=self.htmlText(vars.get("description",""))
-        vars["errors"]=self._getErrorHTML(vars.get("errorList",[]))
-        return vars
-
-
-class WPMaterialDisplaySubmitResource(WPMaterialDisplayBase):
-    navigationEntry=navigation.NEMaterialDisplay
-
-    def __init__(self,rh,material):
-        WPMaterialDisplayBase.__init__(self,rh,material)
-
-    def _getBody(self,params):
-        wc=WMaterialDisplaySubmitResource(self._material)
-        return wc.getHTML(params)

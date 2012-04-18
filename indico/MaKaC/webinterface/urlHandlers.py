@@ -793,12 +793,6 @@ class UHAbstractDisplayPerformAddMaterial( URLHandler ):
 class UHAbstractDisplayRemoveMaterials( URLHandler ):
     _relativeURL = "abstractDisplay.py/removeMaterials"
 
-class UHMaterialDisplayRemoveResource( URLHandler ):
-    _relativeURL = "materialDisplay.py/removeResource"
-
-class UHMaterialDisplaySubmitResource( URLHandler ):
-    _relativeURL = "materialDisplay.py/submitResource"
-
 class UHAbstractDisplayPDF( URLHandler ):
     _relativeURL = "abstractDisplay.py/pdf"
 

@@ -169,6 +169,7 @@ class Config:
                  "subfile": "subfile.png",
                  "file": "file.png",
                  "bigfile": "bigfile.png",
+                 "smallfile": "file_small.png",
                  "clock": "clock.png",
                  "existingfile": "existingfile.png",
                  "subsection": "disabledSubSection.png",
