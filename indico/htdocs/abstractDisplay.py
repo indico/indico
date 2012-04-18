@@ -24,13 +24,8 @@ import MaKaC.webinterface.rh.CFADisplay as CFADisplay
 def index(req, **params):
     return CFADisplay.RHAbstractDisplay( req ).process( params )
 
-
 def pdf(req, **params):
     return CFADisplay.RHAbstractDisplayPDF( req ).process( params )
-
-
-def abstractsPdf(req, **params):
-    return CFADisplay.RHAbstractsDisplayPDF( req ).process( params )
 
 def getAttachedFile(req,**params):
     return CFADisplay.RHGetAttachedFile(req).process(params)

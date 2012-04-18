@@ -796,10 +796,6 @@ class UHAbstractDisplayRemoveMaterials( URLHandler ):
 class UHAbstractDisplayPDF( URLHandler ):
     _relativeURL = "abstractDisplay.py/pdf"
 
-class UHAbstractsDisplayPDF( URLHandler ):
-    _relativeURL = "abstractDisplay.py/abstractsPdf"
-
-
 class UHAbstractConfManagerDisplayPDF( URLHandler ):
     _relativeURL = "abstractManagment.py/abstractToPDF"
 
@@ -839,6 +835,8 @@ class UHAbstractstrackManagerDisplayPDF( URLHandler ):
 class UHUserAbstracts( URLHandler ):
     _relativeURL = "userAbstracts.py"
 
+class UHUserAbstractsPDF( URLHandler ):
+    _relativeURL = "userAbstracts.py/pdf"
 
 class UHAbstractModify( URLHandler ):
     _relativeURL = "abstractModify.py"

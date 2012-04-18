@@ -7965,6 +7965,7 @@ ul.buttonMenuPopupList li a:hover {
     right: 0;
     padding: 0 0 5px 5px;
     z-index:999;
+}
 
 .contributionListFiltersContainer {
     border-bottom: 1px solid #EBEBEB;
@@ -7978,7 +7979,7 @@ ul.buttonMenuPopupList li a:hover {
     font-size:12px
 }
 
-.contributionListContribItem {
+.contributionListContribItem, .abstractListAbstractItem {
     border-bottom: 1px solid #EBEBEB;
     padding-bottom: 5px;
     margin-top: 5px;
@@ -8007,7 +8008,7 @@ a.lightGreyLink:hover {
     text-decoration: underline;
 }
 
-.contributionListContribHeader, .contributionHeader, .subContributionHeader {
+.contributionListContribHeader, .contributionHeader, .subContributionHeader, .abstractHeader {
     line-height:17px;
     color:#888;
     font-size: 12px;
@@ -8021,12 +8022,12 @@ a.lightGreyLink:hover {
     width: 12px;
 }
 
-.contributionButtonBar, .subContributionButtonBar, .materialButtonBar{
+.contributionButtonBar, .subContributionButtonBar, .materialButtonBar, .abstractButtonBar{
     text-align: right;
     margin-bottom: 5px;
 }
 
-.contributionTitle, .subContributionTitle, .materialTitle {
+.contributionTitle, .subContributionTitle, .materialTitle, .abstractTitle {
     font-size: 18px;
     font-weight: bold;
     line-height: 24px;
@@ -8036,18 +8037,18 @@ a.lightGreyLink:hover {
     margin-top: 0;
 }
 
-.contributionMainContent, .subContributionMainContent, .materialMainContent {
+.contributionMainContent, .subContributionMainContent, .materialMainContent, .abstractMainContent{
     float:left;
     width:500px;
 }
-.contributionRightPanel, .subContributionRightPanel {
+.contributionRightPanel, .subContributionRightPanel, .materialRightPanel, .abstractRightPanel{
     float:right;
     width: 200px;
     min-height: 500px;
     padding-left:10px;
     border-left: 1px solid #EAEAEA;
 }
-.contributionRightPanelSection, .subContributionRightPanelSection {
+.contributionRightPanelSection, .subContributionRightPanelSection, .abstractRightPanelSection{
     border-bottom: 1px solid #EAEAEA;
     font-size: 11px;
     color: #888;
@@ -8055,13 +8056,13 @@ a.lightGreyLink:hover {
     padding-bottom: 5px;
 }
 
-.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .materialSection ul {
+.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul{
     list-style: none inside none;
     margin: 0px;
     padding: 0px;
 }
 
-.contributionRightPanelSection li, .subContributionRightPanelSection li{
+.contributionRightPanelSection li, .subContributionRightPanelSection li, .materialSection li, .abstractRightPanelSection li{
     margin-bottom: 3px;
 }
 
@@ -8071,7 +8072,7 @@ ul.subList{
     padding: 5px 15px;
 }
 
-.contributionRightPanelSection a, .subContributionRightPanelSection a{
+.contributionRightPanelSection a, .subContributionRightPanelSection a, .abstractRightPanelSection a{
     font-size: 11px;
     word-wrap: break-word;
 }
@@ -8086,25 +8087,25 @@ a.titleWithLink:hover{
     text-decoration: underline;
 }
 
-.contributionInformation, .subContributionInformation {
+.contributionInformation, .subContributionInformation, .abstractInformation {
     border-bottom: 1px solid #EAEAEA;
     margin-bottom: 15px;
     padding-bottom: 10px;
 }
 
-.contributionDetail, .subContributionDetail, .materialDetail {}
+.contributionDetail, .subContributionDetail, .materialDetail, .abstractDetail {}
 
-.contributionSection, .subContributionSection, .materialSection {
+.contributionSection, .subContributionSection, .materialSection, .abstractSection {
     margin-bottom: 10px;
 }
-.contributionSectionTitle, .subContributionSectionTitle {
+.contributionSectionTitle, .subContributionSectionTitle, .abstractSectionTitle {
     color: #444;
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 5px;
     margin-top: 0;
 }
-.contributionSectionContent, .subContributionSectionContent, .materialSectionContent {
+.contributionSectionContent, .subContributionSectionContent, .materialSectionContent, .abstractSectionContent {
     font-size: 12px;
     line-height: 1.5em;
     text-align:justify;
@@ -8112,18 +8113,20 @@ a.titleWithLink:hover{
     margin-right: 5px;
 }
 
-.contributionSpeakerList,  .subContributionSpeakerList{
+.contributionSpeakerList,  .subContributionSpeakerList, .abstractSubmitter{
     margin-bottom:3px;
     color:#666666;
 }
 
-.contributionReviewingSection {
+.contributionReviewingSection, .abstractStatusSection {
     margin-bottom: 5px;
     border-radius: 5px;
     color: #888;
+    border-bottom:1px solid #eaeaea;
+    padding-bottom:5px;
 }
 
-.contributionReviewingStatus {
+.contributionReviewingStatus, .abstractStatus {
     border-radius: 5px;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -8133,23 +8136,23 @@ a.titleWithLink:hover{
     font-weight: bold;
 }
 
-.contributionReviewingStatusRejected {
-    background: none repeat scroll 0 0 #B93725; /*#881122;*/
+.contributionReviewingStatusRejected, .abstractStatusRejected, .abstractStatusDuplicated, .abstractStatusWithdrawn {
+    background: none repeat scroll 0 0 #B93725;
 }
 
-.contributionReviewingStatusAccepted {
+.contributionReviewingStatusAccepted, .abstractStatusAccepted {
     background: none repeat scroll 0 0 #9AC33A;
 }
 
-.contributionReviewingStatusPending {
+.contributionReviewingStatusPending, .abstractStatusUnderReview {
     background: none repeat scroll 0 0 #A4CCC9;
 }
 
-.contributionReviewingStatusCorrected {
+.contributionReviewingStatusCorrected, .abstractStatusMerged {
     background: none repeat scroll 0 0 #D8B81A;
 }
 
-.contributionReviewingStatusNotSubmitted {
+.contributionReviewingStatusNotSubmitted, .abstractStatusSubmitted {
     background: none repeat scroll 0 0 #BCB8A3;
 }
 

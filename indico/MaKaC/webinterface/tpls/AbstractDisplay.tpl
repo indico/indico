@@ -1,191 +1,138 @@
+<% import MaKaC.webinterface.urlHandlers as urlHandlers %>
+<% from MaKaC.paperReviewing import ConferencePaperReview as CPR %>
+<% from MaKaC.review import AbstractStatusWithdrawn %>
 
-<table width="100%" align="center">
-    <tr>
-        <td align="center">
-            <table align="center">
-                <tr>
-                    <form action=${ modifyURL } method="POST">
-                    <td>
-                        <input type="submit" class="btn" value="${ _("modify")}" ${ btnModifyDisabled }>
-                    </td>
-                    </form>
-                    <form action=${ withdrawURL } method="POST">
-                    <td>
-                        <input type="submit" class="btn" value="${ _("withdraw")}" ${ btnWithdrawDisabled }>
-                    </td>
-                    </form>
-                    ${ btnRecover }
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <table width="95%" style="border:1px solid #777777;" cellspacing="1" align="center">
-             <tr>
-                    <td bgcolor="white">
-                        <table width="90%" align="center">
-                            <tr>
-                                <td align="center">
-                                    <font size="+1" color="black"><b>${ title }</b></font>
-                                </td>
-                            </tr>
-                <tr><td>&nbsp;</td></tr>
-                            <tr>
-                                <td><br></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <table width="90%" align="center">
-                                        <tr>
-                                            <td>
-                                                <table width="100%" cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField"><b> ${ _("Abstract ID")} :</b></td>
-                                                        <td width="100%">${ abstractId }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-           ${ additionalFields }
-                                        <tr>
-                                            <td>
-                                                <table width="100%" cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Attached files")} :</b></td>
-                                                        <td width="100%">
-                                                        % if len(attachments) == 0:
-                                                            <span>--none--</span>
-                                                        % else:
-                                                            % for file in attachments:
-                                                                <div style="padding-bottom:3px;"><a href=${ file["url"] }>${ file["file"]["fileName"] }</a></div>
-                                                            % endfor
-                                                        % endif
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <table width="100%" cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Primary authors")} :</b></td>
-                                                        <td width="100%">${ primary_authors }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <table width="100%" cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Co-Authors")} :</b></td>
-                                                        <td width="100%">${ authors }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><table width="100%" cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Presenters")} :</b></td>
-                                                        <td width="100%">${ speakers }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <table width="100%" cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Track classification")} :</b></td>
-                                                        <td width="100%">${ tracks }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        ${ contribType }
-                                        <tr>
-                                            <td>
-                                                <table cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Submitted by")} :</b></td>
-                                                        <td>${ submitter }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <table width="100%" cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Submitted on")} :</b></td>
-                                                        <td width="100%">${ submissionDate }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <table width="100%" cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Last modified on")} :</b></td>
-                                                        <td width="100%">${ modificationDate }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <table>
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Status")} :</b></td>
-                                                        <td>${ status }</td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <table cellspacing="0">
-                                                    <tr>
-                                                        <td nowrap class="displayField" valign="top"><b> ${ _("Comments")} :</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td width="30"></td>
-                                                        <td><pre>${ comments }</pre></td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td align="center">
-            <table align="center">
-                <tr>
-                    <form action=${ modifyURL } method="POST">
-                    <td>
-                        <input type="submit" class="btn" value="${ _("modify")}" ${ btnModifyDisabled }>
-                    </td>
-                    </form>
-                    <form action=${ withdrawURL } method="POST">
-                    <td>
-                        <input type="submit" class="btn" value="${ _("withdraw")}" ${ btnWithdrawDisabled }>
-                    </td>
-                    </form>
-                    ${ btnRecover }
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-<br>
+<div id="buttonBar" class="abstractButtonBar">
+    % if abstract.canModify(accessWrapper):
+        % if not modifyDisabled:
+            <a href="${modifyURL}" style="font-weight:bold" >${_("Edit")}</a> |
+        % endif
+        % if isinstance(abstract.getCurrentStatus(), AbstractStatusWithdrawn):
+            <a href="${recoverURL}">${_("Recover")}</a> |
+        % elif not withdrawDisabled:
+            <a href="${withdrawURL}" ">${_("Withdraw")}</a> |
+        % endif
+    % endif
+    <a href="${str(urlHandlers.UHAbstractDisplayPDF.getURL(abstract))}" target="_blank">${_("PDF")}</a>
+</div>
+<h1 class="abstractTitle">
+    ${abstract.getTitle()}
+</h1>
+<div>
+    <div class="abstractMainContent">
+        <div class="abstractInformation">
+            <div class="abstractSubmitter">
+                ${("Submitted by")} <span style="font-weight: bold">${abstract.getSubmitter().getStraightFullName()} </span>
+                ${_("on")}
+                <span style="font-weight: bold">${formatDate(abstract.getSubmissionDate())}</span>
+                ${_("at")}
+                <span style="font-weight: bold">${formatTime(abstract.getSubmissionDate())}</span>
+            </div>
+            <div class="abstractHeader">
+                <div>
+                    <span style="font-weight:bold">${("Id")}:</span>
+                    ${abstract.getId()}
+                </div>
+                <div>
+                    <span style="font-weight: bold">${_("Last modification")}:</span>
+                    ${formatDate(abstract.getModificationDate())} ${formatTime(abstract.getModificationDate())}
+                </div>
+                % if contribType:
+                <div>
+                    <span style="font-weight:bold">${("Contribution type")}:</span>
+                    ${contribType.getName()}
+                </div>
+                % endif
+                % if False:
+                <div>
+                    <span style="font-weight:bold">${("Track classification")}:</span>
+                    ${",".join([t.getTitle() for t in tracks])}
+                </div>
+                % endif
+            </div>
+        </div>
+        <div class="abstractDetail">
+            % for f in abstract.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
+                    % if abstract.getField(f.getId()):
+                    <div class="abstractSection">
+                        <h2 class="abstractSectionTitle">${f.getName()}</h2>
+                        <div class="abstractSectionContent">${abstract.getField(f.getId())}
+                        </div>
+                    </div>
+                    % endif
+            % endfor
+            % if abstract.getComments():
+                <div class="abstractSection">
+                    <h2 class="abstractSectionTitle">${_("Comments")}</h2>
+                    <div class="abstractSectionContent">${abstract.getComments()}</div>
+                </div>
+            % endif
+        </div>
+    </div>
+
+    <div class="abstractRightPanel">
+
+        <div class="abstractStatusSection" style="border-bottom:1px solid #eaeaea; padding-bottom:5px;">
+            <h2 class="abstractSectionTitle">${_("Abstract status")}</h2>
+            <div>
+                <div class="abstractStatus ${statusClass}">${statusText}</div>
+            </div>
+        </div>
+        % if abstract.getPrimaryAuthorList():
+            <div class="abstractRightPanelSection">
+                <h2 class="abstractSectionTitle">${_("Primary authors")}</h2>
+                <ul>
+                % for pa in abstract.getPrimaryAuthorList():
+                    <li>${pa.getStraightFullName()}
+                        (${pa.getAffiliation()})
+                % endfor
+                </ul>
+            </div>
+        % endif
+        % if abstract.getCoAuthorList():
+            <div class="abstractRightPanelSection">
+                <h2 class="abstractSectionTitle">${_("Co-authors")}</h2>
+                <ul>
+                % for ca in abstract.getCoAuthorList():
+                    <li>${ca.getStraightFullName()}
+                        (${ca.getAffiliation()})
+                % endfor
+                </ul>
+            </div>
+        % endif
+        % if abstract.getSpeakerList():
+            <div class="abstractRightPanelSection">
+                <h2 class="abstractSectionTitle">${_("Presenters")}</h2>
+                <ul>
+                % for sp in abstract.getSpeakerList():
+                    <li>${sp.getStraightFullName()}
+                        (${sp.getAffiliation()})
+                % endfor
+                </ul>
+            </div>
+        % endif
+        % if len(attachments) != 0:
+            <div class="abstractRightPanelSection">
+                <h2 class="abstractSectionTitle">${_("Attached files")}</h2>
+                <ul>
+                    % for file in attachments:
+                        <li><a href="${file['url']}">${ file["file"]["fileName"] }</a>
+                    % endfor
+                </ul>
+            </div>
+        % endif
+    </div>
+</div>
+<script type="text/javascript">
+% if statusComments:
+    $(".abstractStatus").qtip({
+        content: " ${statusComments}",
+        position :{
+            at: "bottom middle",
+            my: "top middle"
+        }
+    });
+% endif
+
+
+</script>

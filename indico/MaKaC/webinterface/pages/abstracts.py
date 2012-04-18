@@ -20,6 +20,7 @@
 
 from xml.sax.saxutils import quoteattr
 import urllib
+from pytz import timezone
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -28,9 +29,9 @@ import MaKaC.review as review
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase, WPConferenceModifAbstractBase
 from MaKaC.common import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.date_time import format_time, format_date, format_datetime
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
 from MaKaC.common import Configuration
 from MaKaC.common.fossilize import fossilize
@@ -151,57 +152,36 @@ class WUserAbstracts( wcomponents.WTemplated ):
         self._aw = aw
         self._conf = conf
 
+    def _getAbstractStatus(self, abstract):
+        status = abstract.getCurrentStatus()
+        if isinstance( status, review.AbstractStatusAccepted ):
+            statusLabel = _("Accepted")
+            if status.getType() is not None and status.getType()!="":
+                return "%s as %s"%(statusLabel, status.getType().getName())
+        elif isinstance( status, review.AbstractStatusRejected ):
+            return _("Rejected")
+        elif isinstance( status, review.AbstractStatusWithdrawn ):
+            return _("Withdrawn")
+        elif isinstance(status,review.AbstractStatusDuplicated):
+            return _("Duplicated")
+        elif isinstance(status,review.AbstractStatusMerged):
+            return _("Merged")
+        elif isinstance(status, (review.AbstractStatusProposedToAccept, review.AbstractStatusProposedToReject)):
+            return _("UnderReview")
+        return _("Submitted")
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         cfaMgr = self._conf.getAbstractMgr()
 
-        tzUtil = DisplayTZ(self._aw,self._conf)
-        tz = tzUtil.getDisplayTZ()
+        abstracts = cfaMgr.getAbstractListForAvatar( self._aw.getUser() )
+        abstracts += cfaMgr.getAbstractListForAuthorEmail(self._aw.getUser().getEmail())
 
-        l = cfaMgr.getAbstractListForAvatar( self._aw.getUser() )
-        l += cfaMgr.getAbstractListForAuthorEmail(self._aw.getUser().getEmail())
-
-        l = sorted(set(l), key=lambda i:int(i.getId()))
-
-        if not l:
-            vars["abstracts"] = i18nformat("""<tr>
-                                        <td align="center" colspan="4" bgcolor="white">
-                                            <br>
-                                            --_("No submitted abstract found within this conference")--
-                                        </td>
-                                    </tr>
-                                    """)
-        else:
-            res = []
-            for abstract in l:
-                status = abstract.getCurrentStatus()
-                statusLabel = _("SUBMITTED")
-                if isinstance( status, review.AbstractStatusAccepted ):
-                    statusLabel = _("ACCEPTED")
-                    if status.getType() is not None and status.getType()!="":
-                        statusLabel="%s as %s"%(statusLabel,status.getType().getName())
-                elif isinstance( status, review.AbstractStatusRejected ):
-                    statusLabel = _("REJECTED")
-                elif isinstance( status, review.AbstractStatusWithdrawn ):
-                    statusLabel = _("WITHDRAWN")
-                elif isinstance(status,review.AbstractStatusDuplicated):
-                    statusLabel = _("DUPLICATED")
-                elif isinstance(status,review.AbstractStatusMerged):
-                    statusLabel = _("MERGED")
-                res.append("""
-                <tr>
-                    <td class="abstractLeftDataCell">%s</td>
-                    <td class="abstractDataCell"><input type="checkbox" name="abstracts" value=%s><a href=%s>%s</a></td>
-                    <td class="abstractDataCell" nowrap>%s</td>
-                    <td class="abstractDataCell">%s</td>
-                </tr>"""%( \
-        abstract.getId(), \
-        quoteattr(abstract.getId()), \
-        quoteattr(str(urlHandlers.UHAbstractDisplay.getURL(abstract))), \
-        self.htmlText( abstract.getTitle() ), statusLabel, \
-        getAdjustedDate(abstract.getModificationDate(),tz=tz).strftime("%Y-%m-%d %H:%M")))
-            vars["abstracts"] = "".join(res)
-        vars["abstractsPDFURL"]=quoteattr(str(urlHandlers.UHAbstractsDisplayPDF.getURL(self._conf)))
+        vars["abstracts"] = sorted(set(abstracts), key=lambda i:int(i.getId()))
+        vars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
+        vars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._conf).getDisplayTZ()))
+        vars["getAbstractStatus"] = lambda abstract: self._getAbstractStatus(abstract)
+        vars["conf"] = self._conf
         return vars
 
 
@@ -270,142 +250,65 @@ class WAbstractDisplay( wcomponents.WTemplated ):
         self._abstract = abstract
         self._aw = aw
 
-    def _getAuthorHTML( self, author ):
-        res = "%s, %s"%(author.getSurName().upper(), author.getFirstName())
-        if author.getAffiliation() != "":
-            res = "%s (%s)"%(res, author.getAffiliation())
-        return self.htmlText( res )
-
-    def _getAdditionalFieldsHTML(self):
-        html=""
-        afm = self._abstract.getConference().getAbstractMgr().getAbstractFieldsMgr()
-        for f in afm.getActiveFields():
-            id = f.getId()
-            caption = f.getName()
-            html+="""
-                                        <tr>
-                                            <td>
-                                                <table width="100%%" cellspacing="0">
-                                                    <tr>
-                                                        <td class="displayField" valign="top" width="1%%" nowrap><b>%s:</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td valign="top"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                """%(caption, self.htmlText(self._abstract.getField(id)) )
-        return html
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
         tzUtil = DisplayTZ(self._aw, self._abstract.getConference())
         tz = tzUtil.getDisplayTZ()
 
-        vars["title"] = self.htmlText( self._abstract.getTitle() )
-        vars["additionalFields"] = self._getAdditionalFieldsHTML()
-        vars["primary_authors"] = i18nformat("""--_("none")--""")
-        vars["authors"] = i18nformat("""--_("none")--""")
-        primary = []
-        for author in self._abstract.getPrimaryAuthorList():
-            primary.append( self._getAuthorHTML( author ) )
-        authors = []
-        for author in self._abstract.getCoAuthorList():
-            authors.append( self._getAuthorHTML( author ) )
-        if primary:
-            vars["primary_authors"] = "<br>".join( primary )
-        if authors:
-            vars["authors"] = "<br>".join( authors )
-        vars["speakers"] = i18nformat("""--_("none")--""")
-        speakers = []
-        for spk in self._abstract.getSpeakerList():
-            speakers.append( "%s"%self.htmlText( spk.getFullName() ) )
-        if speakers:
-            vars["speakers"] = "<br>".join( speakers )
-        vars["tracks"] = i18nformat("""--_("none")--""")
-        vars["contribType"] = i18nformat("""--_("none")--""")
         status=self._abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
-            vars["contribType"]= i18nformat("""--_("none")--""")
-            if status.getType() is not None:
-                vars["contribType"]=self.htmlText(status.getType().getName())
-            vars["tracks"]=""
-            if status.getTrack() is not None:
-                vars["tracks"]=self.htmlText(status.getTrack().getTitle())
+            vars["contribType"]= status.getType()
+            vars["tracks"]= status.getTrack()
         else:
-            tracks = []
-            for track in self._abstract.getTrackListSorted():
-                tracks.append( self.htmlText( track.getTitle() ) )
-            if tracks:
-                vars["tracks"] = ", ".join( tracks )
-            if self._abstract.getContribType() is not None and \
-                    self._abstract.getContribType()!="":
-                vars["contribType"]=self.htmlText(self._abstract.getContribType().getName())
-        if self._abstract.getConference().getContribTypeList() != []:
-            vars["contribType"]= i18nformat("""
-                                <tr>
-                                    <td>
-                                        <table width="100%%" cellspacing="0">
-                                            <tr>
-                                                <td nowrap class="displayField" valign="top"><b> _("Contribution type"):</b></td>
-                                                <td width="100%%">%s</td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                        </tr>
-                                """%vars["contribType"])
-        else:
-            vars["contribType"]=""
-        vars["submitter"] = "%s"%self.htmlText( self._abstract.getSubmitter().getFullName() )
-        vars["submissionDate"] = getAdjustedDate(self._abstract.getSubmissionDate(),tz=tz).strftime("%d %B %Y %H:%M")
-        vars["modificationDate"] = getAdjustedDate(self._abstract.getModificationDate(),tz=tz).strftime("%d %B %Y %H:%M")
-        vars["modifyURL"] = quoteattr( str( urlHandlers.UHAbstractModify.getURL( self._abstract ) ) )
-        vars["withdrawURL"] = quoteattr( str( urlHandlers.UHAbstractWithdraw.getURL( self._abstract ) ) )
-        vars["status"] = _("SUBMITTED")
-        vars["btnWithdrawDisabled"] = ""
-        vars["btnModifyDisabled"] = ""
-        vars["btnRecover"] = ""
-        vars["btnManageMaterialDisabled"] = "disabled"
-        if not isinstance( status, review.AbstractStatusSubmitted ):
-            vars["btnModifyDisabled"] = "disabled"
-        if isinstance( status, review.AbstractStatusAccepted ):
-            vars["status"] = _("ACCEPTED")
-            vars["btnWithdrawDisabled"] = "disabled"
-            vars["btnModifyDisabled"] = "disabled"
-            vars["btnManageMaterialDisabled"] = ""
-        elif isinstance( status, review.AbstractStatusRejected ):
-            vars["status"] = _("REJECTED")
-            vars["btnModifyDisabled"] = "disabled"
-            vars["btnWithdrawDisabled"] = "disabled"
-        elif isinstance( status, review.AbstractStatusWithdrawn ):
-            vars["status"] = i18nformat(""" _("WITHDRAWN") <font size="-1">by %s _("on") %s</font>""")%(self.htmlText(status.getResponsible().getFullName()),getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M"))
-            if status.getComments().strip() != "":
-                vars["status"] = """%s<br><i>%s</i>"""%(vars["status"],self.htmlText(status.getComments()))
-            vars["btnWithdrawDisabled"] = "disabled"
-            vars["btnRecover"] = i18nformat("""<form action=%s method="POST">
-                                        <td>
-                                            <input type="submit" class="btn" value="_("recover")">
-                                        </td>
-                                    </form>
-                                """)%( quoteattr( str( urlHandlers.UHAbstractRecovery.getURL( self._abstract ) ) ))
-        elif isinstance(status,review.AbstractStatusDuplicated):
-            vars["status"] = _("DUPLICATED")
-            vars["btnModifyDisabled"]="disabled"
-            vars["btnWithdrawDisabled"]="disabled"
-            vars["btnManageMaterialDisabled"] = "disabled"
-        elif isinstance(status,review.AbstractStatusMerged):
-            target=status.getTargetAbstract()
-            vars["status"] = i18nformat(""" _("MERGED") into %s-%s""")%(self.htmlText(target.getId()),self.htmlText(target.getTitle()))
-            vars["btnModifyDisabled"]="disabled"
-            vars["btnWithdrawDisabled"]="disabled"
-            vars["btnManageMaterialDisabled"] = "disabled"
-        elif isinstance(status, review.AbstractStatusProposedToAccept) or isinstance(status, review.AbstractStatusProposedToReject):
-            vars["status"] = "UNDER REVIEW"
-        vars["comments"] = self.htmlText( self._abstract.getComments() )
-        vars["abstractId"] = self._abstract.getId()
+            vars["tracks"] = self._abstract.getTrackListSorted()
+            vars["contribType"]=self._abstract.getContribType()
+        vars["modifyURL"] = str(urlHandlers.UHAbstractModify.getURL(self._abstract))
+        vars["withdrawURL"] = str(urlHandlers.UHAbstractWithdraw.getURL(self._abstract))
+        vars["recoverURL"] = str(urlHandlers.UHAbstractRecovery.getURL(self._abstract))
+
         vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
+        vars["abstract"] = self._abstract
+
+        vars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
+        vars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(tz))
+
+        vars["modifyDisabled"] = isinstance( status, (review.AbstractStatusSubmitted, review.AbstractStatusAccepted,
+                                                      review.AbstractStatusRejected, review.AbstractStatusDuplicated, review.AbstractStatusMerged ) )
+        vars["withdrawDisabled"] = isinstance( status, (review.AbstractStatusAccepted, review.AbstractStatusRejected,
+                                                        review.AbstractStatusWithdrawn, review.AbstractStatusDuplicated, review.AbstractStatusMerged ) )
+        status = self._abstract.getCurrentStatus()
+        if isinstance( status, review.AbstractStatusAccepted ):
+            vars["statusText"] = _("ACCEPTED ")
+            if status.getType() is not None and status.getType()!="":
+                vars["statusText"] += "as %s"% status.getType().getName()
+            vars["statusClass"] = "abstractStatusAccepted"
+            vars["statusComments"] = ""
+        elif isinstance( status, review.AbstractStatusRejected ):
+            vars["statusText"] = _("REJECTED")
+            vars["statusClass"] = "abstractStatusRejected"
+            vars["statusComments"] = ""
+        elif isinstance( status, review.AbstractStatusWithdrawn ):
+            vars["statusText"] = _("Withdrawn")
+            vars["statusClass"] = "abstractStatusWithdrawn"
+            vars["statusComments"] = i18nformat("""_("Withdrawn") by %s _("on") %s %s""")%(self.htmlText(status.getResponsible().getFullName()),format_date(status.getDate(), "d MMM yyyy"), format_time(status.getDate(), format="short", timezone=timezone(tz)))
+        elif isinstance(status,review.AbstractStatusDuplicated):
+            vars["statusText"] = _("Duplicated")
+            vars["statusClass"] = "abstractStatusDuplicated"
+            vars["statusComments"] = ""
+        elif isinstance(status,review.AbstractStatusMerged):
+            vars["statusText"] = _("Merged")
+            vars["statusClass"] = "abstractStatusMerged"
+            vars["statusComments"] = i18nformat("""_("Merged") into %s-%s""")%(self.htmlText(self._abstract.getId()),self.htmlText(self._abstract.getTitle()))
+        elif isinstance(status, (review.AbstractStatusProposedToAccept, review.AbstractStatusProposedToReject)):
+            vars["statusText"] = _("Under Review")
+            vars["statusClass"] = "abstractStatusUnderReview"
+            vars["statusComments"] = ""
+        else:
+            vars["statusText"] = _("Submitted")
+            vars["statusClass"] = "abstractStatusSubmitted"
+            vars["statusComments"] = ""
+        vars["accessWrapper"] = self._aw
         return vars
 
 
@@ -415,13 +318,6 @@ class WPAbstractDisplay( WPAbstractDisplayBase ):
     def _getBody( self, params ):
         wc = WAbstractDisplay( self._getAW(), self._abstract )
         return wc.getHTML()
-
-    def _defineToolBar(self):
-        pdf=wcomponents.WTBItem( _("get PDF of the programme"),
-            icon = Config.getInstance().getSystemIconURL("pdf"),
-            actionURL=urlHandlers.UHAbstractDisplayPDF.getURL(self._abstract))
-        self._toolBar.addItem(pdf)
-
 
 class WAbstractDataModification( wcomponents.WTemplated ):
 

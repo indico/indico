@@ -46,7 +46,7 @@
 
 <%block name="paperReview">
     % if reviewingActive:
-    <div class="contributionReviewingSection" style="border-bottom:1px solid #eaeaea; padding-bottom:5px;">
+    <div class="contributionReviewingSection">
         <h2 class="contributionSectionTitle">${_("Call for papers")}</h2>
             <div>
                 <div class="contributionReviewingStatus ${statusClass}">${statusText}</div>

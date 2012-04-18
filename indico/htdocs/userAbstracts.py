@@ -26,3 +26,5 @@ from MaKaC.webinterface.rh import CFADisplay
 def index(req, **params):
     return CFADisplay.RHUserAbstracts( req ).process( params )
 
+def pdf(req, **params):
+    return CFADisplay.RHUserAbstractsPDF( req ).process( params )

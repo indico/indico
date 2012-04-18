@@ -395,22 +395,23 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         return data
 
 
-class RHAbstractsDisplayPDF(RHConferenceBaseDisplay):
+class RHUserAbstractsPDF(RHConferenceBaseDisplay):
 
     def _checkProtection( self ):
         RHConferenceBaseDisplay._checkProtection(self)
         if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
 
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        self._abstractIds = normaliseListParam( params.get("abstracts", []) )
-
     def _process( self ):
         tz = timezoneUtils.DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        filename = "Abstracts.pdf"
+        cfaMgr = self._conf.getAbstractMgr()
+        abstracts = cfaMgr.getAbstractListForAvatar( self._aw.getUser() )
+        abstracts += cfaMgr.getAbstractListForAuthorEmail(self._aw.getUser().getEmail())
+        self._abstractIds = [abstract.getId() for abstract in abstracts]
         if not self._abstractIds:
             return _("No abstract to print")
+
+        filename = "Abstracts.pdf"
         pdf = AbstractsToPDF(self._conf, self._abstractIds,tz=tz)
         data = pdf.getPDFBin()
         self._req.set_content_length(len(data))
