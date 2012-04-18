@@ -8007,7 +8007,7 @@ a.lightGreyLink:hover {
     text-decoration: underline;
 }
 
-.contributionListContribHeader, .contributionHeader {
+.contributionListContribHeader, .contributionHeader, .subContributionHeader {
     line-height:17px;
     color:#888;
     font-size: 12px;
@@ -8021,12 +8021,12 @@ a.lightGreyLink:hover {
     width: 12px;
 }
 
-.contributionButtonBar{
+.contributionButtonBar, .subContributionButtonBar{
     text-align: right;
     margin-bottom: 5px;
 }
 
-.contributionTitle {
+.contributionTitle, .subContributionTitle {
     font-size: 18px;
     font-weight: bold;
     line-height: 24px;
@@ -8036,18 +8036,18 @@ a.lightGreyLink:hover {
     margin-top: 0;
 }
 
-.contributionMainContent {
+.contributionMainContent, .subContributionMainContent {
     float:left;
     width:500px;
 }
-.contributionRightPanel {
+.contributionRightPanel, .subContributionRightPanel {
     float:right;
     width: 200px;
     min-height: 500px;
     padding-left:10px;
     border-left: 1px solid #EAEAEA;
 }
-.contributionRightPanelSection {
+.contributionRightPanelSection, .subContributionRightPanelSection {
     border-bottom: 1px solid #EAEAEA;
     font-size: 11px;
     color: #888;
@@ -8055,54 +8055,55 @@ a.lightGreyLink:hover {
     padding-bottom: 5px;
 }
 
-.contributionRightPanelSection ul{
+.contributionRightPanelSection ul, .subContributionRightPanelSection ul {
     list-style: none inside none;
     margin: 0px;
     padding: 0;
 }
 
-.contributionRightPanelSection li{
+.contributionRightPanelSection li, .subContributionRightPanelSection li{
     margin-bottom: 3px;
 }
 
-.contributionRightPanelSection ul.subList{
+ul.subList{
     list-style: none inside none;
     margin: 0px;
     padding: 5px 15px;
 }
-.contributionRightPanelSection a{
+.contributionRightPanelSection a, .subContributionRightPanelSection a{
     font-size: 11px;
     word-wrap: break-word;
 }
 
-.contributionRightPanelSection a.titleWithLink{
+a.titleWithLink{
     font-size: 12px;
     font-weight: bold;
     color: #666;
 }
 
-.contributionRightPanelSection a.titleWithLink:hover{
+a.titleWithLink:hover{
     text-decoration: underline;
 }
 
-.contributionInformation {
+.contributionInformation, .subContributionInformation {
     border-bottom: 1px solid #EAEAEA;
     margin-bottom: 15px;
     padding-bottom: 10px;
 }
 
-.contributionDetail {}
-.contributionSection {
+.contributionDetail, .subContributionDetail {}
+
+.contributionSection, .subContributionSection {
     margin-bottom: 10px;
 }
-.contributionSectionTitle {
+.contributionSectionTitle, .subContributionSectionTitle {
     color: #444;
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 5px;
     margin-top: 0;
 }
-.contributionSectionContent {
+.contributionSectionContent, .subContributionSectionContent {
     font-size: 12px;
     line-height: 1.5em;
     text-align:justify;
@@ -8110,7 +8111,7 @@ a.lightGreyLink:hover {
     margin-right: 5px;
 }
 
-.contributionSpeakerList {
+.contributionSpeakerList,  .subContributionSpeakerList{
     margin-bottom:3px;
     color:#666666;
 }

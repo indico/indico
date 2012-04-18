@@ -72,86 +72,11 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
         self._aw = aw
         self._subContrib = subContrib
 
-    def _getHTMLRow( self, title, body):
-        if body.strip() == "":
-            return ""
-        str = """
-                <tr>
-                    <td align="right" valign="top" class="displayField" nowrap><b>%s:</b></td>
-                    <td width="100%%">%s</td>
-                </tr>"""%(title, body)
-        return str
-
-    def _getMaterialHTML(self):
-        lm=[]
-        paper=self._subContrib.getPaper()
-        if paper is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="paper"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(paper))),
-                quoteattr(str(materialFactories.PaperFactory().getIconURL())),
-                self.htmlText(materialFactories.PaperFactory().getTitle())))
-        slides=self._subContrib.getSlides()
-        if slides is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="slide"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(slides))),
-                quoteattr(str(materialFactories.SlidesFactory().getIconURL())),
-                self.htmlText(materialFactories.SlidesFactory().getTitle())))
-        poster=self._subContrib.getPoster()
-        if poster is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="poster"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(poster))),
-                quoteattr(str(materialFactories.PosterFactory().getIconURL())),
-                self.htmlText(materialFactories.PosterFactory().getTitle())))
-        video=self._subContrib.getVideo()
-        if video is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="video"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(video))),
-                quoteattr(str(materialFactories.VideoFactory().getIconURL())),
-                self.htmlText(materialFactories.VideoFactory().getTitle())))
-        iconURL=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
-        minutes=self._subContrib.getMinutes()
-        if minutes is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="minutes"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(minutes))),
-                quoteattr(str(materialFactories.MinutesFactory().getIconURL())),
-                self.htmlText(materialFactories.MinutesFactory().getTitle())))
-        iconURL=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
-        for material in self._subContrib.getMaterialList():
-            url=urlHandlers.UHMaterialDisplay.getURL(material)
-            lm.append("""<a href=%s><img src=%s border="0" alt=""> %s</a>"""%(
-                quoteattr(str(url)),iconURL,self.htmlText(material.getTitle())))
-        return self._getHTMLRow("Material","<br>".join(lm))
-
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["title"] = self.htmlText(self._subContrib.getTitle())
-        vars["description"]=self._subContrib.getDescription()
-        vars["id"]= self.htmlText(self._subContrib.getId())
         vars["duration"] =(datetime(1900,1,1)+self._subContrib.getDuration()).strftime("%H:%M")
-        vars["location"]="blah"
-        loc=self._subContrib.getLocation()
-        if loc is not None:
-            vars["location"]="<i>%s</i>"%(self.htmlText(loc.getName()))
-            if loc.getAddress() is not None and loc.getAddress()!="":
-                vars["location"]="%s <pre>%s</pre>"%(vars["location"],loc.getAddress())
-        room=self._subContrib.getRoom()
-        if room is not None:
-            roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= i18nformat("""%s<br><small> _("Room"):</small> %s""")%(\
-                vars["location"],roomLink)
-        vars["location"]=self._getHTMLRow( _("Place"),vars["location"])
-        vars["material"]=self._getMaterialHTML()
-        vars["inContrib"]=""
-        if self._subContrib.getParent() is not None:
-            url=urlHandlers.UHContributionDisplay.getURL(self._subContrib.getParent())
-            ContribCaption="%s"%self._subContrib.getParent().getTitle()
-            vars["inContrib"]="""<a href=%s>%s</a>"""%(\
-                quoteattr(str(url)),self.htmlText(ContribCaption))
-        vars["inContrib"]=self._getHTMLRow( _("Included in contribution"),vars["inContrib"])
-        l=[]
-        for speaker in self._subContrib.getSpeakerList():
-            l.append(self.htmlText(speaker.getFullName()))
-        vars["speakers"]=self._getHTMLRow( _("Presenters"),"<br>".join(l))
+        vars["SubContrib"] = self._subContrib
+        vars["accessWrapper"] = self._aw
         return vars
 
 class WSubContributionDisplayFull(WSubContributionDisplayBase):
@@ -176,12 +101,6 @@ class WSubContributionDisplay:
 
 class WPSubContributionDisplay(WPSubContributionDefaultDisplayBase):
     navigationEntry=navigation.NESubContributionDisplay
-    def _defineToolBar(self):
-        edit=wcomponents.WTBItem( _("manage this contribution"),
-            icon=Config.getInstance().getSystemIconURL("modify"),
-            actionURL=urlHandlers.UHSubContributionModification.getURL(self._subContrib),
-            enabled=self._target.canModify(self._getAW()))
-        self._toolBar.addItem(edit)
 
     def _getBody(self, params):
         wc=WSubContributionDisplay(self._getAW(),self._subContrib)
