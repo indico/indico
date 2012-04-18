@@ -724,8 +724,9 @@ class RH(RequestHandlerBase):
 
     def _deleteTempFiles( self ):
         if len(self._tempFilesToDelete) > 0:
-            for file in self._tempFilesToDelete:
-                os.remove(file)
+            for f in self._tempFilesToDelete:
+                if f is not None:
+                    os.remove(f)
 
     def _startRequestSpecific2RH( self ):
         """

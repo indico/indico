@@ -571,8 +571,8 @@ class ConfDisplayMenu:
 
             for sublink in sublinkList:
                 target = ""
-                if isinstance(link, displayMgr.ExternLink):
-                    target=""" target="%s" """%link.getDisplayTarget()
+                if isinstance(sublink, displayMgr.ExternLink):
+                    target=""" target="%s" """%sublink.getDisplayTarget()
                 if self._menu.isCurrentItem(sublink):
                     html.append("""<li id="menuLink_%s" class="subMenuConfSelected" nowrap><a href="%s"%s>\
                             %s</a></li>\n"""\

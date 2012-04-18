@@ -96,6 +96,10 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
              var self = this;
              this.error.userMail = email.get();
 
+             if (!$.isArray(this.error.inner)) {
+                 this.error.inner = [this.error.inner];
+             }
+
              // make sure the HTML sanitization filter won't ruin everything
              _(this.error.inner).each(function(line, i) {
                  self.error.inner[i] = Util.HTMLEscape(line);

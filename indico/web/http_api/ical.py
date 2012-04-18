@@ -100,7 +100,7 @@ def serialize_reservation(cal, fossil, now):
     event.set('uid', 'indico-resv-%s@cern.ch' % fossil['id'])
     event.set('dtstamp', now)
     event.set('dtstart', getAdjustedDate(fossil['startDT'], None, "UTC"))
-    event.set('dtend', getAdjustedDate(datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].time()), None, "UTC"))
+    event.set('dtend', getAdjustedDate(datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].timetz()), None, "UTC"))
     event.set('url', fossil['bookingUrl'])
     event.set('summary', fossil['reason'])
     event.set('location', fossil['location'].decode('utf-8') + ': ' + fossil['room']['fullName'].decode('utf-8'))

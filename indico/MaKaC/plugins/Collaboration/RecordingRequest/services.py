@@ -23,7 +23,7 @@ from MaKaC.plugins.Collaboration.RecordingRequest.common import getTalks
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 
-class RRTalksService(CollaborationPluginServiceBase):
+class RecordingAbleTalksService(CollaborationPluginServiceBase):
 
     def _getAnswer(self):
         talks = getTalks(self._conf, sort = True)

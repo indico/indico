@@ -2024,7 +2024,7 @@ class PersonalBasket(Persistent):
         self._userGroups = {}
         self._p_changed = 1
 
-    def __findAdequateDict(self, element):
+    def __findDict(self, element):
 
         if (type(element) == MaKaC.conference.Conference):
             return self._events
@@ -2040,15 +2040,15 @@ class PersonalBasket(Persistent):
             raise Exception( _("Unknown Element Type"))
 
     def addElement(self, element):
-        dict = self.__findAdequateDict(element)
+        dict = self.__findDict(element)
         if (not dict.has_key(element.getId())):
             dict[element.getId()] = element;
             self._p_changed = 1
             return True
         return False
 
-    def deleteElement(self, element):
-        res = self.__findAdequateDict(element).pop(element.getId(),None)
+    def deleteElement(self, element=None):
+        res = self.__findDict(element).pop(element.getId(), None)
 
         if res == None:
             return False
@@ -2056,8 +2056,13 @@ class PersonalBasket(Persistent):
         self._p_changed = 1
         return True
 
+    def deleteUser(self, user_id):
+        res = self._users.pop(user_id, None)
+        self._p_changed = 1
+        return res is not None
+
     def hasElement(self, element):
-        return self.__findAdequateDict(element).has_key(element.getId())
+        return element.getId() in self.__findDict(element)
 
     def hasUserId(self, id):
         return self._users.has_key(id)
