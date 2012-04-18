@@ -273,6 +273,7 @@ class WHTMLHeader(WTemplated):
             vars['stylesheet'] = Config.getInstance().getCssStylesheetName()
         else:
             vars['stylesheet'] = 'Default.css'
+        vars['timestamp'] = "%d"%os.stat(__file__).st_mtime
         return vars
 
 

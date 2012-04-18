@@ -6,13 +6,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
         <link rel="shortcut icon" type="image/x-icon" href="${ systemIcon('addressBarIcon') }">
-        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/calendar-blue.css" >
-        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui.css">
-        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery.qtip.css">
-        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery.colorbox.css">
-        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui-custom.css">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/calendar-blue.css?${ timestamp }" >
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui.css?${ timestamp }">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery.qtip.css?${ timestamp }">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery.colorbox.css?${ timestamp }">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui-custom.css?${ timestamp }">
 
-        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/${ stylesheet }">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/${ stylesheet }?${ timestamp }">
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 

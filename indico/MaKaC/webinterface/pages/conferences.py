@@ -415,13 +415,14 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
         dmgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         path = self._getBaseURL()
+        timestamp = os.stat('%s/css/Conf_Basic.css'%(Config.getInstance().getHtdocsDir())).st_mtime
         printCSS = """
-        <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
-            """ % path
+        <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css?%d" >
+            """ % (path, timestamp)
         confCSS = dmgr.getStyleManager().getCSS()
 
         if confCSS:
-            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
+            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s?%d">"""%(confCSS.getURL(), timestamp)
 
         return printCSS
 
@@ -852,14 +853,7 @@ class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
         return wc.getHTML( pars )
 
     def _getHeadContent( self ):
-        #This is used for fetching the css file for conference page
-        path = self._getBaseURL()
-        printCSS = """
-        <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
-            """ % path
-        confCSS = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager().getCSS()
-        if confCSS:
-            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
+        printCSS = WPConferenceDefaultDisplayBase._getHeadContent(self)
         confMetadata = WConfMetadata(self._conf).getHTML()
         return printCSS + confMetadata
 
@@ -1234,19 +1228,20 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         htdocs = Config.getInstance().getHtdocsDir()
         baseurl = self._getBaseURL()
         # First include the default Indico stylesheet
-        styleText = """<link rel="stylesheet" href="%s/css/%s">\n""" % \
-            (baseurl, Config.getInstance().getCssStylesheetName())
+        timestamp = os.stat(__file__).st_mtime
+        styleText = """<link rel="stylesheet" href="%s/css/%s?%d">\n""" % \
+            (baseurl, Config.getInstance().getCssStylesheetName(), timestamp)
         # Then the common event display stylesheet
         if os.path.exists("%s/css/events/common.css" % htdocs):
-            styleText += """        <link rel="stylesheet" href="%s/css/events/common.css">\n""" % baseurl
+            styleText += """        <link rel="stylesheet" href="%s/css/events/common.css?%d">\n""" % (baseurl, timestamp)
         if self._type == "simple_event":
             lectureStyle = styleMgr.getDefaultStyleForEventType("simple_event")
             cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(lectureStyle))
-            styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
+            styleText += """        <link rel="stylesheet" href="%s?%d">\n""" % (cssPath, timestamp)
         # And finally the specific display stylesheet
         if styleMgr.existsCSSFile(self._view):
             cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
-            styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
+            styleText += """        <link rel="stylesheet" href="%s?%d">\n""" % (cssPath, timestamp)
 
         confMetadata = WConfMetadata(self._conf).getHTML()
 
@@ -1514,10 +1509,11 @@ class WPConferenceTimeTable( WPConferenceDefaultDisplayBase ):
     def _getHeadContent( self ):
         headContent=WPConferenceDefaultDisplayBase._getHeadContent(self)
         baseurl = self._getBaseURL()
+        timestamp = os.stat(__file__).st_mtime
         return """
                  %s
-                 <link rel="stylesheet" type="text/css" href="%s/css/timetable.css">
-                """ % ( headContent, baseurl)
+                 <link rel="stylesheet" type="text/css" href="%s/css/timetable.css?%d">
+                """ % ( headContent, baseurl, timestamp)
 
 #class WMeetingTimeTable(WConferenceTimeTable):
 #
@@ -11082,9 +11078,10 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
 
     def _getHeadContent( self ):
         path = self._getBaseURL()
+        timestamp = os.stat(__file__).st_mtime
         printCSS = """
-        <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css" >
-            """ % path
+        <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css?%d" >
+            """ % (path, timestamp)
 
         if self._selectedCSS:
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s" >"""%self._selectedCSS.getURL()
