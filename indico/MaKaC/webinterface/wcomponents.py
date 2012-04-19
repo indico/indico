@@ -459,29 +459,12 @@ class WConferenceHeader(WHeader):
         vars["imgLogo"] = Configuration.Config.getInstance().getSystemIconURL( "miniLogo" )
         vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
 
-        #moved here from WHeader in order to be able to use DisplayTZ with self._conf (in some pages WHeader has no self._conf).
-        #TODO: Is this needed?
-        #vars["Timezones"] = Config.getInstance().getTimezoneList()
-
-
-#        if self._conf.getModifKey() != '':
-#            url = urlHandlers.UHConfEnterModifKey.getURL(self._conf)
-#            url.addParam("redirectURL",urlHandlers.UHConferenceDisplay.getURL(self._conf))
-#            vars["confModif"] = """<a href=%s><img src=%s valign="middle"></a>"""%(quoteattr(str(url)), quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "modify" ))))
-#        else:
-#            vars["confModif"] = ""
-
         # Default values to avoid NameError while executing the template
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         styles = styleMgr.getExistingStylesForEventType("conference")
 
-        vars["viewoptions"] = []
-        viewoptions = []
-        if len(styles) != 0:
-            styles.sort(key=styleMgr.getStyleName)
-            for styleId in styles:
-                viewoptions.append({"id": styleId, "name": styleMgr.getStyleName(styleId) })
-        vars["viewoptions"] = viewoptions
+        vars["viewoptions"] = list({"id": sid, "name": styleMgr.getStyleName(sid)} \
+                                       for sid in sorted(styles, key=styleMgr.getStyleName))
         vars["SelectedStyle"] = ""
         vars["pdfURL"] = ""
         vars["displayURL"] = str(urlHandlers.UHConferenceOtherViews.getURL())
