@@ -1212,6 +1212,7 @@ class ConferenceProtectionRemoveUser(ConferenceModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._conf.revokeAccess(userToRemove)
 
+
 class ConferenceProtectionToggleDomains(ConferenceModifBase):
 
     def _checkParams(self):
@@ -1222,10 +1223,12 @@ class ConferenceProtectionToggleDomains(ConferenceModifBase):
 
     def _getAnswer(self):
         dh = domain.DomainHolder()
-        if self._add :
-            self._target.requireDomain( dh.getById( self._domainId ) )
-        elif not self._add :
-            self._target.freeDomain( dh.getById( self._domainId ) )
+        d = dh.getById(self._domainId)
+        if self._add:
+            self._target.requireDomain(d)
+        elif not self._add:
+            self._target.freeDomain(d)
+
 
 class ConferenceProtectionSetAccessKey(ConferenceModifBase):
 

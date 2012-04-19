@@ -4,64 +4,67 @@
 </tr>
 </table>
 <div>${ locator }</div>
-<div class="domainEnable"></div>
-<div><ul style='list-style-type:none;'>${domains}</ul></div>
+<div class="domain_control">
+  <div id="message"></div>
+  <ul>
+  % for dom, state in domains:
+    <li>
+      <input type="checkbox" name="selectedDomain" value="${dom.getId()}" ${'checked="checked"' if state else ''}>
+        ${dom.getName()}
+      </input>
+    </li>
+  % endfor
+  </ul>
+</div>
 <script type="text/javascript">
-IndicoUI.executeOnLoad(function(){
-    if ($(':checkbox:checked').length==0){
-        $('.domainEnable').html(${_('<B style="color:#B02B2C;">Domain control is disabled.</B><br>To enable it, choose at least one of the domains below:')|n,j});
+function smooth_slide(el, text) {
+    el.slideUp(function() {
+        $(this).html(text)
+    }).slideDown();
+}
+
+function refresh_state() {
+    var el = $('.domain_control #message');
+
+    var new_state = $(':checkbox:checked').length > 0;
+
+    if (new_state == el.data('enabled')) {
+        return;
+    } else if (new_state){
+        el.data('enabled', true);
+        smooth_slide(el, $T('<span class="protPrivate strong">Access restricted</span><p>Only users in the networks selected below will be able to access this event.</p>'));
+    } else{
+        el.data('enabled', false);
+        smooth_slide(el, $T('<span class="protPublic strong">Accessible from everywhere</span><p>To restrict access to this event only to certain IP addresses, choose at least one of the networks below.</p>'));
     }
-    else{
-        $('.domainEnable').html(${_('<B style="color:#128F33;">Domain control is enabled.</B>')|n,j});
-    }
+}
+
+$(function(){
+    refresh_state();
 });
-var checkId = null;
-$(':checkbox:not(:checked)').live('change', function(){
-    checkId = $(this).val();
-    indicoRequest('event.protection.toggleDomains', {
-        confId: ${conference.getId()},
-        domainId: $(this).val(),
-        add: false
-    },
-    function(result, error) {
-        var domain = '#domain'+checkId;
-        if ($(':checkbox:checked').length==0){
-            $('.domainEnable').html(${_('<B style="color:#B02B2C;">Domain control is disabled.</B><br>To enable it, choose at least one of the domains below:')|n,j});
-        }
-        $(domain).attr('style','margin-left:10px; color:#128F33;');
-        $(domain).text('${_("saved")}');
-        setTimeout(function(){
-            $(domain).text("");
-        }, 1000);
-        if(error) {
-            IndicoUtil.errorReport(error);
-        } else{
-            (new AlertPopup($T('Domain removed'))).open();
-        }
-    });
-});
-$(':checkbox:checked').live('change', function(){
-    checkId = $(this).val();
-    indicoRequest('event.protection.toggleDomains', {
-        confId: ${conference.getId()},
-        domainId: $(this).val(),
-        add: true
-    },
-    function(result, error) {
-        var domain = '#domain'+checkId;
-        if ($(':checkbox:checked').length!=0){
-            $('.domainEnable').html(${_('<B style="color:#128F33;">Domain control is enabled.</B>')|n,j});
-        }
-        $(domain).attr('style','margin-left:10px; color:#128F33;');
-        $(domain).text('${_("saved")}');
-        setTimeout(function(){
-            $(domain).text("");
-        }, 1000);
-        if(error) {
-            IndicoUtil.errorReport(error);
-        } else{
-            (new AlertPopup($T('Domain added'))).open();
-        }
-    });
-});
+
+$('input:checkbox').live('change', function(){
+    $this = $(this);
+    indicoRequest('event.protection.toggleDomains',
+                  {
+                      confId: ${conference.getId()},
+                      domainId: $this.val(),
+                      add: $this.is(':checked')
+                  },
+                  function(result, error) {
+                      if(error) {
+                          IndicoUtil.errorReport(error);
+                      } else{
+                          // only create indicator if there is not already one
+                          if (!$('.savedText', $this.closest('li')).length) {
+                              var saved = $('<span class="savedText">saved</span>');
+                              $this.closest('li').append(saved);   
+                              saved.delay(1000).fadeOut('slow', function() {
+                                  $(this).remove();
+                              });
+                          }
+                          refresh_state();
+                      }
+                  });
+                 });
 </script>

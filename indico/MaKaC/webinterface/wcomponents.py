@@ -2267,28 +2267,24 @@ class WConfProtectionToolsFrame(WTemplated):
 
 class WDomainControlFrame(WTemplated):
 
-    def __init__( self, target ):
+    def __init__(self, target):
         self._target = target
 
     def getHTML(self, addURL, removeURL):
         self._addURL = addURL
         self._removeURL = removeURL
-        return WTemplated.getHTML( self )
+        return WTemplated.getHTML(self)
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        l = []
-        for dom in domain.DomainHolder().getList():
-            if dom not in self._target.getDomainList():
-                l.append("""<li><div><input type="checkbox" name="selectedDomain" value="%s"> %s</input><span id="domain%s"></span></div></li>"""%(dom.getId(), dom.getName(), dom.getId()))
-            else:
-                l.append("""<li><div><input type="checkbox" name="selectedDomain" value="%s" checked> %s</input><span id="domain%s"></span></div></li>"""%(dom.getId(), dom.getName(), dom.getId()))
-        vars["domains"] = "".join(l)
-        vars["removeURL"] = self._removeURL
-        vars["addURL"] = self._addURL
-        vars["locator"] = self._target.getLocator().getWebForm()
-        vars["conference"] = self._target
-        return vars
+    def getVars(self):
+        tpl_vars = WTemplated.getVars(self)
+        doms = {(dom, dom in self._target.getDomainList()) for dom in domain.DomainHolder().getList()}
+
+        tpl_vars["domains"] = doms
+        tpl_vars["removeURL"] = self._removeURL
+        tpl_vars["addURL"] = self._addURL
+        tpl_vars["locator"] = self._target.getLocator().getWebForm()
+        tpl_vars["conference"] = self._target
+        return tpl_vars
 
 
 class WMaterialDataModificationBase(WTemplated):

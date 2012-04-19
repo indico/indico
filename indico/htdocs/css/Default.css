@@ -1619,9 +1619,6 @@ table.notificationEdit td.notifRight {
     color:black;
     white-space:nowrap;
 }
-.domainEnable{
-    height:25px;
-}
 
 /* Edit one question */
 table.evalEditMain {
@@ -8087,6 +8084,14 @@ ul.buttonMenuPopupList li a:hover {
     margin-bottom: 15px;
 }
 
+div.domain_control .strong {
+    font-weight: bold;
+}
+
+div.domain_control p {
+    font-style: italic;
+}
+
 .contributionListFilteredText {
     color: #888;
     padding-top: 5px;
@@ -8332,4 +8337,9 @@ ul.resourceDetail {
     padding: 5px;
     margin-top: 5px;
     border-radius: 5px;
+}
+
+div.domain_control ul {
+    list-style-type: none;
+    padding: 0 0 0 10px;
 }
