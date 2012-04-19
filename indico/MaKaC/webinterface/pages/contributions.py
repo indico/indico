@@ -142,7 +142,7 @@ class WContributionDisplayBase(WICalExportBase):
             vars["statusClass"] = "contributionReviewingStatusCorrected"
         else:
             vars["statusText"] = _("Paper not yet submitted")
-            vars["statusClass"] = "contributionReviewingStatusCorrected"
+            vars["statusClass"] = "contributionReviewingStatusNotSubmitted"
         vars["prefixUpload"] = "Re-" if  statusReviewing not in ["Accept", "Reject", None] else ""
         return vars
 

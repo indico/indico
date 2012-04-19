@@ -5218,29 +5218,19 @@ class WShowExistingMaterial(WTemplated):
 
 class WShowExistingReviewingMaterial(WTemplated):
 
-    def __init__(self,target,showTitle=True, showSendButton=False):
-        self._target=target
-        self._showTitle=showTitle
-        self._showSendButton = showSendButton
+    def __init__(self, target):
+        self._target = target
 
 
     def getVars(self):
-        vars=WTemplated.getVars(self)
+        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
 
-        if self._showTitle:
-            vars["existingMaterialsTitle"] = """ <div class="groupTitle" id="title">%s</div>""" % _("Existing Reviewing material")
-        else:
-            vars["existingMaterialsTitle"] = " "
-        vars["materialModifHandler"] = vars.get("materialModifHandler", None)
-        vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)
-        vars["resourcesFileModifHandler"] = vars.get("resourcesFileModifHandler", None)
-        vars["resourcesFileProtectHandler"] = vars.get("resourcesFileProtectHandler", None)
-        vars["resourcesLinkModifHandler"] = vars.get("resourcesLinkModifHandler", None)
-        vars["resourcesLinkProtectHandler"] = vars.get("resourcesLinkProtectHandler", None)
-        # This var shows you if you are requesting the template from the contribution display (True)
-        # or from the paper reviewing tab in the contribution (False), as consequence you will have (or not)
-        # the "send" button
-        vars["showSendButton"] = self._showSendButton
+        vars = WTemplated.getVars(self)
+        reviewManager = self._target.getReviewManager()
+        vars["Contribution"] = self._target
+        vars["CanModify"] = (self._target.canModify(self._rh._aw) or RCPaperReviewManager.hasRights(self._rh) \
+                            or reviewManager.isReferee(self._rh._getUser()) or reviewManager.isEditor(self._rh._getUser())) \
+                            and (self._target.getReviewing().getReviewingState() == 3 if self._target.getReviewing() else False)
 
         return vars
 

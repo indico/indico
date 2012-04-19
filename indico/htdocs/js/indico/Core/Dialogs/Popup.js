@@ -750,7 +750,7 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
     },
 
     postDraw: function(){
-        var mlist = new ReviewingMaterialListWidget(this.args, [["reviewing", "Reviewing"]], Indico.Urls.UploadAction.contribution , null, null, "visible", this.buttons.eq(0), $("#submitWarningText"));
+        var mlist = new ReviewingMaterialListWidget(this.args, [["reviewing", "Reviewing"]], Indico.Urls.UploadAction.contribution , null, null, true, this.buttons.eq(0), $("#submitWarningText"));
 
         $("#reviewingMaterialListPlace1").html(mlist.draw().dom);
 

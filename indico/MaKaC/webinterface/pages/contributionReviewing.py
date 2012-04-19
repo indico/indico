@@ -119,8 +119,7 @@ class WPContributionModifReviewingMaterials( WPContributionModifBase ):
 
 
     def _getTabContent( self, pars ):
-        showSendButton = False
-        wc=wcomponents.WShowExistingReviewingMaterial(self._target, False, showSendButton)
+        wc=wcomponents.WShowExistingReviewingMaterial(self._target)
         return wc.getHTML( pars )
 
 class WContributionReviewingJudgements(wcomponents.WTemplated):
