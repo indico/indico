@@ -1809,11 +1809,13 @@ class AvatarHolder( ObjectHolder ):
         email = idxs.getById( 'email' )
         name = idxs.getById( 'name' )
         surName = idxs.getById( 'surName' )
+        status_index = idxs.getById( 'status' )
 
         org.unindexUser(merged)
         email.unindexUser(merged)
         name.unindexUser(merged)
         surName.unindexUser(merged)
+        status_index.unindexUser(merged)
 
         # add merged email and logins to prin and merge users
         for mail in merged.getEmails():
