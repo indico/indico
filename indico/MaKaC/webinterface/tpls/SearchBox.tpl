@@ -66,8 +66,12 @@ function expandMenu(domElem)
     if(!exists(elem.dom.extraShown))
     {
         var controls = searchControls;
-
         $('#extraOptions').width($('#searchControls').width()).slideDown('fast');
+        $('#extraOptions').position({
+            of: $('#searchControls'),
+            my: 'right top',
+            at: 'right bottom'
+        });
         elem.dom.extraShown=true;
         resetForm();
     }
