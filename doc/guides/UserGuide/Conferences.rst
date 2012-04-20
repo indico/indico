@@ -302,7 +302,7 @@ once they have been added
 Here, you can also add contributions to your session. If you know the contribution’s
 ID, you can make use of the *Quick search* option; type in the ID, and
 then click on *seek it*.
-If not, you can search for it. You can search by author, or by any of
+Otherwise, you can search for it. You can search by author, or by any of
 the filtering criteria.  It is also possible to import a contribution,
 to get the PDF or author list of selected contributions. You can also
 remove contributions, by selecting them and then clicking on *remove selected*.
@@ -1670,7 +1670,7 @@ Contribution Display
 ^^^^^^^^^^^^^^^^^^^^
 
 In the Contribution Display you can see all the details of the
-contribution, including the description, the primary an corresponding authors, the session
+contribution, including the description, the primary and co-authors, the session
 (if any) it is included, the track, the contribution type,
 any material `(see Contribution Material Display) <#contribution-material-display>`_
 it has and any sub-contributions that belong to it. You can also

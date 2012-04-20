@@ -67,7 +67,7 @@ Referee area
 
         |image10|
 
- If not the files list will be disabled for editing, removing and adding.
+ Otherwise the file list will be disabled for editing, removing and adding.
 
         |image8|
 

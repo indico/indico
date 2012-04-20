@@ -52,7 +52,7 @@
             <div>
                 <div class="contributionReviewingStatus ${statusClass}">${statusText}</div>
                 % if showSubmit:
-                    <span class="fakeLink" id="revSubmit">${prefixUpload}Upload paper</span><br/>
+                    <div class="fakeLink" id="revSubmit" style="font-weight: bold; margin-bottom:3px;">${prefixUpload}Upload paper</div>
                 % endif
                 <div style="white-space: nowrap">
                 % if showHistory and len(Contribution.getReviewManager().getVersioning()) > 1:
@@ -167,9 +167,16 @@
                         if (exists(error)) {
                             IndicoUtil.errorReport(error);
                         } else {
-                            var popup = new ExclusivePopup($T('Review History'), null, true, true);
+                            var popup = new ExclusivePopupWithButtons($T('Review History'), null, false, false, true);
+                            popup._getButtons = function() {
+                                return [
+                                    [$T('Close'), function() {
+                                        popup.close();
+                                    }]
+                                ];
+                            };
                             popup.draw = function() {
-                                this.ExclusivePopup.prototype.draw.call(this, result, {minWidth: pixels(400), maxWidth:pixels(800), maxHeight:pixels(800)});
+                                this.ExclusivePopupWithButtons.prototype.draw.call(this, $("<div/>").css({'max-height':'600px', 'min-width':'450px', 'max-width':'800px'}).append(result), {});
                             };
                             popup.open();
                         }
