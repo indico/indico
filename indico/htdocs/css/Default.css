@@ -2241,13 +2241,17 @@ div#UISearchBox .searchButton
 {
     float:right;
     border-left: 1px solid #888;
-    width: auto;
+    width: 28px;
+    height: 21px;
+    background: #888 url('../images/search.png') 5px 3px no-repeat;
+    cursor: pointer;
 }
 
 div#UISearchBox #searchControls
 {
     width: auto;
     border: 1px solid #888;
+    border-radius: 6px;
     height: 21px;
     overflow: hidden;
     background-color: white;
@@ -2256,21 +2260,21 @@ div#UISearchBox #searchControls
 div#UISearchBox #searchControls input
 {
     border: 0;
-    color: black;
     font-weight: normal;
+    color: #333;
 }
 
 div#UISearchBox #searchText
 {
-    padding:3px;
+    min-width: 150px;Se
     width: auto;
 }
 
 div#UISearchBox #extraOptions
 {
     border: 1px solid #888888;
-    border-top: none;
-    width: auto;
+    border-radius: 6px;
+    min-width: 250px;
     display: none;
     position: absolute;
     top: 23px;
@@ -2286,7 +2290,7 @@ div#UISearchBox #extraOptions table {
 div#UISearchBox #extraOptions input {
     margin-left: 8px;
     font-size: 12px;
-    width: 119px;
+    width: 110px;
 }
 
 div#UISearchBox #extraOptions select {
@@ -2303,6 +2307,7 @@ div#UISearchBox #extraOptions td {
 div#UISearchBox #advancedOptionsLabel {
     text-align: center;
     padding: 5px;
+    border-radius: 6px 6px 0 0;
     background-color: #ECECEC;
     font-style: italic;
     border-bottom: 1px solid #AAAAAA;
@@ -2345,22 +2350,19 @@ div#UISearch #searchControls input
     font-weight: normal;
 }
 
-div#searchTag, div#searchTag2
+div.searchTag
 {
     max-width:112px;
-    border-radius: 2px;
-    -webkit-border-radius:2px;
-    -moz-border-radius:2px;
+    border-radius: 4px 0 0 4px;
+    -webkit-border-radius:4px 0 0 4px;
+    -moz-border-radius:4px 0 0 4px;
     display:table-cell;
-    line-height: 15px;
-    height: 15px;
+    line-height: 13px;
+    height: 13px;
     vertical-align: middle;
-    margin-top:3px;
-    margin-right:2px;
-    padding-right:4px;
-    padding-left:4px;
-    float:right;
-    color:#FFF;
+    margin: 1px 1px 1px 1px;
+    padding: 2px 5px;
+    float: left;
     user-select: none;
     -ms-user-select:none;
     -o-user-select: none;
@@ -2368,10 +2370,10 @@ div#searchTag, div#searchTag2
     -moz-user-select: -moz-none;
     font-size: 11px;
     overflow: hidden;
-
+    opacity: 0.6;
 }
 
-div#categorySearch, div#categorySearch2
+.searchTag .where
 {
     max-width:100px;
     white-space: nowrap;
@@ -2379,34 +2381,35 @@ div#categorySearch, div#categorySearch2
     text-overflow:ellipsis;
     float:left;
 }
-div#noCategorySearch, div#noCategorySearch2
+
+.everywhere
 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow:ellipsis;
-}
-.everywhere, .everywhere2
-{
-    background-color: #5089B8;
-    opacity: 0.4;
+    color: #fff !important;
+    border: 1px solid #566E89;
+    text-shadow: 0 1px 0 #666;
+    background-color: #aaa;
     cursor: default;
 
 }
-.inCategory, .inCategory2
+.inCategory
 {
-    background-color: #5089B8;
+    color: #fff;
+    border: 1px solid #566E89;
+    background-color: #8EA1B7;
+    text-shadow: 0 1px 0 #666;
     cursor: default;
 }
-.inCategoryOver, .inCategoryOver2
+.inCategoryOver
 {
-    background-color: #5089B8;
-    box-shadow: 1px 1px 1px #888;
+    color: #566E89;
+    border: 1px solid #566E89;
+    background-color: #8EA1B7;
     cursor: pointer;
 }
-.cross, .cross2
+.cross
 {
     font-weight:bold;
-    color:#111;
+    color: #566E89;
     float: right;
     cursor: pointer;
     font-size: 10px;
@@ -5268,21 +5271,21 @@ div.timetableContribution  {
 }
 
 .key {
-	display: inline;
-	min-width: 1em;
-	padding: .2em .3em;
-	text-align: center;
-	-moz-border-radius: .3em;
-	-webkit-border-radius: .3em;
-	border-radius: .3em;
-	border: none;
-	cursor: default;
-	background: rgb(250, 250, 250);
-	color:  rgb(50, 50, 50);
-	text-shadow: 0 0 2px rgb(255, 255, 255);
-	-moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
-	-webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
-	box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+        display: inline;
+        min-width: 1em;
+        padding: .2em .3em;
+        text-align: center;
+        -moz-border-radius: .3em;
+        -webkit-border-radius: .3em;
+        border-radius: .3em;
+        border: none;
+        cursor: default;
+        background: rgb(250, 250, 250);
+        color:  rgb(50, 50, 50);
+        text-shadow: 0 0 2px rgb(255, 255, 255);
+        -moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+        -webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+        box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
 }
 
 div.bottomTip {
@@ -8018,7 +8021,7 @@ ul.buttonMenuPopupList li a:hover {
 }
 
 .icalExportPopup .agreement {
-    padding: 5px;
+    padding: 5px;Ssearch
     border-radius: 8px;
     margin-bottom: 5px;
     margin-top: 5px;

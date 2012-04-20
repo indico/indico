@@ -58,7 +58,7 @@ $('input:checkbox').live('change', function(){
                           // only create indicator if there is not already one
                           if (!$('.savedText', $this.closest('li')).length) {
                               var saved = $('<span class="savedText">saved</span>');
-                              $this.closest('li').append(saved);   
+                              $this.closest('li').append(saved);
                               saved.delay(1000).fadeOut('slow', function() {
                                   $(this).remove();
                               });

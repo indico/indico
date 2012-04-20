@@ -306,7 +306,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
               * as soon as the return key is pressed in any of the textfields.
               * To make it even better, onclick is called before onkeyup,
               * which forces us to do the last two checks.
-              */
+y              */
 
              if (self.suggestionBox &&
                  !self.suggestionList.ancestorOf($E(eventTarget(event))) &&
@@ -319,3 +319,146 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
 
      }
     );
+
+
+$.widget('ui.search_tag', {
+    options: {
+        categ_title: 'Home',
+        everywhere: true,
+        categ_id: 0
+    },
+
+    _transition: function(title) {
+        var $tag = this.$tag;
+        var old_width = $tag.width()
+
+        $tag.width('').find('.where').html(title);
+        var new_width = $tag.width();
+
+        // store target width
+        $tag.fadeIn().width(old_width).data('target-width', new_width);
+
+        $tag.animate({
+            width: new_width
+        }, 200, 'linear', function(){
+            animDone = true;
+        });
+    },
+
+    _create: function() {
+        var self = this;
+
+        var tag_template = _.template('<div class="searchTag">' +
+                                      '<div class="cross">x</div>' +
+                                      '<div class="where"><%= categ_title %></div>' +
+                                      '</div>');
+
+        var $tag = this.$tag = $(tag_template({
+            categ_title: this.options.everywhere ? $T('Everywhere') : this.options.categ_title
+        }));
+
+        $(this.element).replaceWith($tag);
+        var $where = $('.where', $tag);
+
+        if (this.options.everywhere) {
+            $tag.addClass('everywhere');
+            $('.cross', this.$tag).hide();
+        } else {
+            $tag.addClass('inCategory');
+            $('.cross', this.$tag).show();
+        }
+
+        $('.cross', $tag).on('click', function() {
+            self.search_everywhere();
+        });
+
+        var $parent = $tag.parent();
+
+        $parent.on('mouseenter', '.searchTag.everywhere', function() {
+            self.show_categ();
+        });
+        $parent.on('mouseover', '.searchTag.everywhere', function() {
+            self.show_tip();
+        });
+        $parent.on('mouseleave', '.searchTag.everywhere', function() {
+            $where.removeClass('hasFocus');
+        });
+        $parent.on('click', '.searchTag.inCategoryOver', function() {
+            self.confirm_tip();
+        });
+        $parent.on('mouseleave', '.searchTag.inCategoryOver', function() {
+            self.back_to_everywhere();
+        });
+    },
+
+    confirm_tip: function() {
+        var $where = $('.where', this.$tag)
+        var $tag = this.$tag;
+
+        $tag.qtip('destroy');
+        $where.fadeOut('fast', function() {
+            $(this).fadeIn('fast');
+        });
+
+        this.$tag.addClass('inCategory').removeClass('everywhere').removeClass('inCategoryOver');
+        this.options.input.attr('value', this.options.categ_id);
+
+        // use target-width as searchTag may still be growing
+        $tag.animate({
+            width: $tag.data('target-width') + $('.cross', $tag).width() + 10
+        }, 200, 'swing', function(){
+            $('.cross', $tag).fadeIn('fast');
+        });
+    },
+
+    search_everywhere: function() {
+        $('.cross', this.$tag).hide();
+        this.$tag.addClass('everywhere').removeClass('inCategory');
+        this._transition($T('Everywhere'));
+        this.options.input.attr('value', 0);
+    },
+
+    show_categ: function() {
+        var $tag = this.$tag;
+        var $where = $('.where', $tag)
+        var self = this;
+        $where.addClass('hasFocus');
+        setTimeout(function(){
+            if ($where.hasClass('hasFocus')) {
+                self._transition(self.options.categ_title);
+                $tag.addClass('inCategoryOver');
+            }
+        }, 200);
+    },
+
+    show_tip: function() {
+        this.$tag.qtip({
+            content: 'Click to search inside ' + this.options.categ_title,
+            position:{
+                at: 'bottom center',
+                my: 'top center'
+            },
+            style: {
+                classes: 'ui-tooltip-shadow'
+            },
+            show: {
+                event: event.type,
+                ready: true
+            }
+        }, event);
+    },
+
+    back_to_everywhere: function() {
+        var $where = $('.where', this.$tag);
+        var self = this;
+
+        this.$tag.removeClass('inCategoryOver');
+        $where.removeClass('hasFocus');
+        setTimeout(function(){
+            if (!$where.hasClass('hasFocus')) {
+                self._transition($T('Everywhere'));
+                self.$tag.addClass('everywhere');
+            }
+        }, 200);
+    }
+});
