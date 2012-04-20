@@ -7935,22 +7935,22 @@ ul.buttonMenuPopupList li a:hover {
     color: #118822;
 }
 
-.settingsWidget{
+.settingsWidget {
     font-size: 14px;
     padding: 0 5px 5px;
     min-width: 250px;
 }
 
-.settingsWidget a, .protectionWidget a{
+.settingsWidget a, .protectionWidget a {
     font-size: 12px !important;
 }
 
-.settingsWidget .settingsWidgetSection, .protectionWidget .protectionWidgetSection{
+.settingsWidget .settingsWidgetSection, .protectionWidget .protectionWidgetSection {
     padding: 10px 0px 0px;
     text-align:justify;
 }
 
-.settingsWidget .settingsWidgetHeader{
+.settingsWidget .settingsWidgetHeader {
     font-weight: bold;
 }
 
@@ -8004,7 +8004,7 @@ ul.buttonMenuPopupList li a:hover {
     color:#888;
 }
 
-a.lightGreyLink{
+a.lightGreyLink {
     color: #888;
     text-decoration: none;
     font-size: 12px;
@@ -8028,7 +8028,7 @@ a.lightGreyLink:hover {
     width: 12px;
 }
 
-.contributionButtonBar, .subContributionButtonBar, .materialButtonBar, .abstractButtonBar{
+.contributionButtonBar, .subContributionButtonBar, .materialButtonBar, .abstractButtonBar {
     text-align: right;
     margin-bottom: 5px;
 }
@@ -8043,18 +8043,18 @@ a.lightGreyLink:hover {
     margin-top: 0;
 }
 
-.contributionMainContent, .subContributionMainContent, .materialMainContent, .abstractMainContent{
+.contributionMainContent, .subContributionMainContent, .materialMainContent, .abstractMainContent {
     float:left;
     width:500px;
 }
-.contributionRightPanel, .subContributionRightPanel, .materialRightPanel, .abstractRightPanel{
+.contributionRightPanel, .subContributionRightPanel, .materialRightPanel, .abstractRightPanel {
     float:right;
     width: 200px;
     min-height: 500px;
     padding-left:10px;
     border-left: 1px solid #EAEAEA;
 }
-.contributionRightPanelSection, .subContributionRightPanelSection, .abstractRightPanelSection{
+.contributionRightPanelSection, .subContributionRightPanelSection, .abstractRightPanelSection {
     border-bottom: 1px solid #EAEAEA;
     font-size: 11px;
     color: #888;
@@ -8062,13 +8062,13 @@ a.lightGreyLink:hover {
     padding-bottom: 5px;
 }
 
-.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul{
+.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul {
     list-style: none inside none;
     margin: 5px 0px 0px;
     padding: 0px;
 }
 
-.contributionRightPanelSection li, .subContributionRightPanelSection li, .materialSection li, .abstractRightPanelSection li{
+.contributionRightPanelSection li, .subContributionRightPanelSection li, .materialSection li, .abstractRightPanelSection li {
     margin-bottom: 3px;
 }
 
@@ -8078,7 +8078,7 @@ ul.subList{
     padding: 5px 15px;
 }
 
-.contributionRightPanelSection a, .subContributionRightPanelSection a, .abstractRightPanelSection a{
+.contributionRightPanelSection a, .subContributionRightPanelSection a, .abstractRightPanelSection a {
     font-size: 11px;
     word-wrap: break-word;
 }
@@ -8120,7 +8120,7 @@ a.titleWithLink:hover{
     margin-right: 5px;
 }
 
-.contributionSpeakerList,  .subContributionSpeakerList, .abstractSubmitter{
+.contributionSpeakerList,  .subContributionSpeakerList, .abstractSubmitter {
     margin-bottom:3px;
     color:#666666;
 }
@@ -8163,23 +8163,23 @@ a.titleWithLink:hover{
     background: none repeat scroll 0 0 #BCB8A3;
 }
 
-.contributionReviewingSection input{
+.contributionReviewingSection input {
     background: none repeat scroll 0 0 #CDEB8B;
     border: 1px solid #666;
     border-radius: 5px 5px 5px 5px;
 }
 
-.contributionReviewingSection a{
+.contributionReviewingSection a {
     color: white;
     font-size : 11px;
 }
 
-.contributionReviewingSection a:hover{
+.contributionReviewingSection a:hover {
     text-decoration: underline;
     color: white;
 }
 
-ul.resourceDetail{
+ul.resourceDetail {
     list-style:none;
     padding-left:25px;
     margin:0px;
@@ -8193,4 +8193,34 @@ ul.resourceDetail{
     float: right;
     font-size: 11px;
     font-style: italic;
+}
+
+.historyReviewHeader {
+    border-bottom: 1px solid #DDDDDD;
+    color: #444444;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+
+.historyReview {
+    border: 1px solid #DDDDDD;
+    border-radius: 10px 10px 10px 10px;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    padding: 10px;
+}
+
+.historyReviewJudgment{
+    display: block;
+    padding: 10px;
+    margin: 5px
+}
+
+.historyReviewJugmentComments {
+    background-color: #EAEAEA;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
 }

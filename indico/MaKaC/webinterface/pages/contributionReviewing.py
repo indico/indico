@@ -238,6 +238,26 @@ class WContributionReviewingHistory(wcomponents.WTemplated):
         self._contribution = contribution
         self._conf = contribution.getConference()
 
+    def _getStatusClass( self, judgement ):
+        if judgement == "Accept":
+            return "contributionReviewingStatusAccepted"
+        elif judgement == "Reject":
+            return "contributionReviewingStatusRejected"
+        elif judgement == "To be corrected":
+            return "contributionReviewingStatusCorrected"
+        else:
+            return "contributionReviewingStatusCorrected"
+
+    def _getStatusText( self, judgement ):
+        if judgement == "Accept":
+            return _("ACCEPTED")
+        elif judgement == "Reject":
+            return _("REJECTED")
+        elif judgement == "To be corrected":
+            return _("To be corrected")
+        else:
+            return judgement
+
     def getHTML( self, params ):
 
         return wcomponents.WTemplated.getHTML(self, params)
@@ -247,5 +267,7 @@ class WContributionReviewingHistory(wcomponents.WTemplated):
 
         vars["ConferenceChoice"] = self._conf.getConfPaperReview().getChoice()
         vars["Versioning"] = self._contribution.getReviewManager().getSortedVerioning()
+        vars["getStatusClass"] = lambda judgement: self._getStatusClass(judgement)
+        vars["getStatusText"] = lambda judgement: self._getStatusText(judgement)
 
         return vars
