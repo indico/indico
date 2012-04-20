@@ -169,7 +169,7 @@
                         } else {
                             var popup = new ExclusivePopup($T('Review History'), null, true, true);
                             popup.draw = function() {
-                                this.ExclusivePopup.prototype.draw.call(this, result, {maxWidth:pixels(800), maxHeight:pixels(800)});
+                                this.ExclusivePopup.prototype.draw.call(this, result, {minWidth: pixels(400), maxWidth:pixels(800), maxHeight:pixels(800)});
                             };
                             popup.open();
                         }

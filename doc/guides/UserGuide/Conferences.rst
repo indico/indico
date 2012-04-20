@@ -1621,7 +1621,7 @@ abstracts view. This shows all the details of the abstract.
 |image82|
 
 You can print the details of this abstract as a PDF using the
-icon in the top right corner.
+link in the top right corner.
 
 --------------
 
@@ -1655,12 +1655,13 @@ Contribution Area
 Contribution List in the menu takes you to all the contributions
 in the Conference. From here you can see a list of all or just
 certain types of contributions that you wish to see, e.g.
-only those contributions in a specific session.
+only those contributions in a specific session. You can also filter
+by a pattern to find in the title or description of the contribution.
 
 |image85|
 
 You can access the display of each contribution by clicking on
-its name. You can also create a PDF of either selected
+its name. You can also create a PDF of either displayed
 contributions or all of them.
 
 --------------
@@ -1669,17 +1670,18 @@ Contribution Display
 ^^^^^^^^^^^^^^^^^^^^
 
 In the Contribution Display you can see all the details of the
-contribution, including the description, the author, the session
-(if any) it is included, any material `(see Contribution Material Display) <#contribution-material-display>`_
+contribution, including the description, the primary an corresponding authors, the session
+(if any) it is included, the track, the contribution type,
+any material `(see Contribution Material Display) <#contribution-material-display>`_
 it has and any sub-contributions that belong to it. You can also
 access those details by clicking on their names. You can also print
-the contribution in PDF, XML, or iCal format by using the icons in
+the contribution in PDF, XML, or iCal format by using the links in
 the top right-hand corner.
 
 |image86|
 
 If you have modification rights, you will have the modification
-icon next to the print formats and you can access the Contribution
+link next to the print formats and you can access the Contribution
 Modification Area.
 
 --------------
@@ -1693,8 +1695,10 @@ Here, there is a section *Material* with all the resources attached.
 
 |image87|
 
-Click in *Add Material* in order to upload more, in the edit icon to modify,
-or in the red cross to remove it.
+Having the proper access, by clicking in *Edit files* is possible manage the material attached. It will open a popup, and by
+clicking in *Add Material* is possible to upload more, in the edit icon to modify, and in the red cross to remove it.
+
+|image155|
 
 --------------
 
@@ -1990,3 +1994,4 @@ session. You may also make a PDF of the session.
 .. |image152| image:: UserGuidePics/tt_changeend.png
 .. |image153| image:: UserGuidePics/tt_contribintosession.png
 .. |image154| image:: UserGuidePics/tt_undo.png
+.. |image155| image:: UserGuidePics/confd152.png
