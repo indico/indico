@@ -485,10 +485,11 @@ class RHUserRemoveIdentity( RHUserIdentityBase ):
 
     def _process( self ):
         am = AuthenticatorMgr()
-        for id in self._identityList:
-            identity = am.getIdentityById(id)
-            am.removeIdentity(identity)
-            self._avatar.removeIdentity(identity)
+        for i in self._identityList:
+            identity = am.getIdentityById(i)
+            if len(identity.getUser().getIdentityList()) > 1:
+                am.removeIdentity(identity)
+                self._avatar.removeIdentity(identity)
         self._redirect( urlHandlers.UHUserDetails.getURL( self._avatar ) )
 
 class RHCreateExternalUsers(RH):
