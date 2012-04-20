@@ -7,7 +7,7 @@
             <% speakers.append(speaker.getDirectFullName()) %>
         % endfor
         % if speakers:
-            ${("Presented by")} <span style="font-weight: bold">${", ".join(speakers)} </span>
+            ${_("Presented by")} <span style="font-weight: bold">${", ".join(speakers)} </span>
         % endif
     </div>
 </%block>

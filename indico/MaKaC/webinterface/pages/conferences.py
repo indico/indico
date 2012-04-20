@@ -7234,7 +7234,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
-        vars["contributions"] = self._conf.getContributionListSortedById()
+        vars["contributions"] = self._conf.getContributionListSortedById(includeWithdrawn=False)
         vars["showAttachedFiles"] = self._conf.getAbstractMgr().showAttachedFilesContribList()
         vars["conf"] = self._conf
         vars["accessWrapper"] = self._aw

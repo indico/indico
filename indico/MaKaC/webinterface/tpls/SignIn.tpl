@@ -96,7 +96,7 @@
             <td align="left"><img src="${ itemIcon }" alt="o" style="padding-right: 10px;"></td>
             <td align="left" width="100%">
                 <div style="color: #444">
-                    ${ ("Forgot your password?") } <span class="fakeLink" onclick="$E('forgotPasswordInfo').dom.style.display = ''; this.style.display = 'none';">${ ("Click here") }</span>
+                    ${ _("Forgot your password?") } <span class="fakeLink" onclick="$E('forgotPasswordInfo').dom.style.display = ''; this.style.display = 'none';">${ ("Click here") }</span>
                 </div>
             </td>
         </tr>
@@ -112,7 +112,7 @@
                 <div style="padding: 5px 0; color: #444;">
                       <% from MaKaC.common.Configuration import Config    %>
                       % if "Local" not in Config.getInstance().getAuthenticatorList():
-                           <em>${ ("If you <b>can't remember your password</b>, please click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ ("here") }</a></em>
+                           <em>${ _("If you <b>can't remember your password</b>, please click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ ("here") }</a></em>
                       % else:
                            <em>${ _("<b>Note:</b> this works only with Indico local accounts, not with CERN NICE/External accounts; for these click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ _("here") }</a></em>.
                       % endif

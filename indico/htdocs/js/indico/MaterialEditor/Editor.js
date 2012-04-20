@@ -1575,7 +1575,7 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
          this.visibility = visibility;
          this.sendToReviewButton = sendToReviewButton;
          this.textHasMaterials = textHasMaterials;
-         this.noMaterialText = Html.div({style: {textAlign:"center", padding: pixels(5)}}, $T("There are no paper uploaded."));
+         this.noMaterialText = Html.div({style: {textAlign:"center", padding: pixels(5)}}, $T("No paper uploaded"));
 
          this.observe(function(){
                 if (self.isEmpty()) {

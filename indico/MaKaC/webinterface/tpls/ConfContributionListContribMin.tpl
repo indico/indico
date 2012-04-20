@@ -6,15 +6,15 @@
         </div>
         <div class="contributionListContribHeader">
             % if contrib.getType() != None:
-                <span style="font-weight:bold">${("Type")}: </span>${contrib.getType().getName()}
+                <span style="font-weight:bold">${_("Type")}: </span>${contrib.getType().getName()}
             % endif
             % if contrib.getSession() != None:
-                <span style="font-weight:bold">${("Session")}: </span>
+                <span style="font-weight:bold">${_("Session")}: </span>
                 <a class="lightGreyLink" href="${str(urlHandlers.UHSessionDisplay.getURL( contrib.getSession() ))}">${contrib.getSession().getTitle()}</a>
                 <div style="background-color: ${contrib.getSession().getColor()};" class="sessionSquare"></div>
             % endif
             % if contrib.getTrack() != None:
-                <span style="font-weight:bold">${("Track")}: </span>${contrib.getTrack().getTitle()}
+                <span style="font-weight:bold">${_("Track")}: </span>${contrib.getTrack().getTitle()}
             % endif
         </div>
         <%block name="description" args="contrib=None">

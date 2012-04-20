@@ -22,17 +22,17 @@
             </%block>
             <div class="contributionHeader">
                 % if Contribution.getType() != None:
-                    <div><span style="font-weight:bold">${("Type")}: </span>${Contribution.getType().getName()}</div>
+                    <div><span style="font-weight:bold">${_("Type")}: </span>${Contribution.getType().getName()}</div>
                 % endif
-                % if Contribution.getSession() != None:
+                % if Contribution.getSession() is not None:
                     <div>
-                        <span style="font-weight:bold">${("Session")}: </span>
+                        <span style="font-weight:bold">${_("Session")}: </span>
                         <a class="lightGreyLink" href="${str(urlHandlers.UHSessionDisplay.getURL(Contribution.getSession()))}">${Contribution.getSession().getTitle()}</a>
                         <div style="background-color: ${Contribution.getSession().getColor()};" class="sessionSquare"></div>
                     </div>
                 % endif
                 % if Contribution.getTrack() != None:
-                    <div><span style="font-weight:bold">${("Track")}: </span>${Contribution.getTrack().getTitle()}</div>
+                    <div><span style="font-weight:bold">${_("Track")}: </span>${Contribution.getTrack().getTitle()}</div>
                 % endif
                 <%block name="board">
                 </%block>
@@ -76,10 +76,11 @@
                 </ul>
             </div>
         % endif
-        % if Contribution.getAllMaterialList():
+            <% canEditFiles = (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn %>
+            % if Contribution.getAllMaterialList() or canEditFiles:
             <div class="contributionRightPanelSection">
-                <h2 class="contributionSectionTitle">${_("Material")}</h2>
-               % if (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn:
+                <h2 class="contributionSectionTitle">${_("Files")}</h2>
+                % if canEditFiles:
                 <div style="float:right; line-height: 17px">
                     <a class="fakeLink" id="manageMaterial">Edit files</a>
                 </div>
@@ -101,12 +102,12 @@
                 % endfor
                 </ul>
             </div>
-        % endif
+            % endif
     </div>
 </div>
 <script type="text/javascript">
     $("#manageMaterial").click(function(){
-        IndicoUI.Dialogs.Material.editor('${Contribution.getConference().getId()}', '${Contribution.getSession().getId()}','${Contribution.getId()}','',
+        IndicoUI.Dialogs.Material.editor('${Contribution.getConference().getId()}', '${Contribution.getSession().getId() if Contribution.getSession() else ""}','${Contribution.getId()}','',
                 ${jsonEncode(Contribution.getAccessController().isProtected())}, ${jsonEncode(Contribution.getMaterialRegistry().getMaterialList(Contribution.getConference()))}, ${'Indico.Urls.UploadAction.contribution'}, true);
      });
 </script>

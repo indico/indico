@@ -14,9 +14,9 @@
             <a href="${str( urlHandlers.UHAbstractDisplay.getURL( abstract ))}" style="font-size:14px">${abstract.getTitle()} </a>
         </div>
         <div style="line-height:17px; font-size: 12px; color:#666666;">
-            <div style="display:inline"><span style="font-weight:bold">${("Id")}: </span>${abstract.getId()}</div>
-            <div style="display:inline"><span style="font-weight:bold">${("Status")}: </span>${getAbstractStatus(abstract)}</div>
-            <div style="display:inline"><span style="font-weight:bold">${("Last modified")}: </span>${formatDate(abstract.getModificationDate()) + " "+ formatTime(abstract.getModificationDate())}</div>
+            <div style="display:inline"><span style="font-weight:bold">${_("Id")}: </span>${abstract.getId()}</div>
+            <div style="display:inline"><span style="font-weight:bold">${_("Status")}: </span>${getAbstractStatus(abstract)}</div>
+            <div style="display:inline"><span style="font-weight:bold">${_("Last modified")}: </span>${formatDate(abstract.getModificationDate()) + " "+ formatTime(abstract.getModificationDate())}</div>
         </div>
     </div>
     % endfor

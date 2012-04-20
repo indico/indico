@@ -1,6 +1,6 @@
 <table align="center" width="95%">
 <tr>
-  <td class="formTitle">${ ("Conference Room Booking")}</td>
+  <td class="formTitle">${ _("Conference Room Booking")}</td>
 </tr>
 <tr>
   <td style="padding-left: 20px; padding-top: 20px;">

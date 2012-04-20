@@ -7,13 +7,14 @@
             <% speakers.append(speaker.getDirectFullName()) %>
         % endfor
         % if speakers:
-            ${("Presented by")} <span style="font-weight: bold">${", ".join(speakers)} </span>
+            ${_("Presented by")} <span style="font-weight: bold">${", ".join(speakers)} </span>
         % endif
         % if Contribution.isScheduled():
-            ${("on")}
+            ${_("on")}
             <span style="font-weight: bold">${formatDate(Contribution.getStartDate())}</span>
+            ${_("from")}
             <span style="font-weight: bold">${formatTime(Contribution.getStartDate())}</span>
-            ${_("-")}
+            ${_("to")}
             <span style="font-weight: bold">${formatTime(Contribution.getEndDate())}</span>
         % endif
     </div>
@@ -21,7 +22,7 @@
 
 <%block name="board">
     % if Contribution.getBoardNumber()!= "":
-        <div><span style="font-weight:bold">${("Board")} #: </span>${Contribution.getBoardNumber()}</div>
+        <div><span style="font-weight:bold">${_("Board")} #: </span>${Contribution.getBoardNumber()}</div>
     % endif
 </%block>
 
@@ -128,12 +129,12 @@
         parentProtected: ${ jsBoolean(Contribution.getAccessController().isProtected()) }
     };
     $("#moreAuthors").click(function(){
-        var popupAuthors = new AuthorsPopup($T("Primary authors"), ${fossilize(Contribution.getPrimaryAuthorList())}, '${Contribution.getConference().getId()}', '${Contribution.getId()}', '${Contribution.getSession().getId()}', function() {self.popupAllowClose = true; return true;});
+        var popupAuthors = new AuthorsPopup($T("Primary authors"), ${fossilize(Contribution.getPrimaryAuthorList())}, '${Contribution.getConference().getId()}', '${Contribution.getId()}', '${Contribution.getSession().getId() if Contribution.getSession() else ""}', function() {self.popupAllowClose = true; return true;});
         popupAuthors.open();
     });
 
     $("#moreCoAuthors").click(function(){
-        var popupCoAuthors = new AuthorsPopup($T("Co authors"), ${fossilize(Contribution.getCoAuthorList())}, '${Contribution.getConference().getId()}', '${Contribution.getId()}', '${Contribution.getSession().getId()}', function() {self.popupAllowClose = true; return true;});
+        var popupCoAuthors = new AuthorsPopup($T("Co authors"), ${fossilize(Contribution.getCoAuthorList())}, '${Contribution.getConference().getId()}', '${Contribution.getId()}', '${Contribution.getSession().getId() if Contribution.getSession() else ""}', function() {self.popupAllowClose = true; return true;});
         popupCoAuthors.open();
     });
 

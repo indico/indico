@@ -3562,10 +3562,12 @@ class Conference(CommonObjectBase, Locatable):
         """
         return [c for c in self.contributions.values() if not c.getSession()]
 
-    def getContributionListSortedById(self):
+    def getContributionListSortedById(self, includeWithdrawn=True):
         """Returns a list of the conference contribution objects, sorted by their id
         """
         contributions = self.contributions.values()
+        if not includeWithdrawn:
+            contributions = filter(lambda c: not isinstance(c.getCurrentStatus(), ContribStatusWithdrawn), contributions)
         contributions.sort(key = lambda c: c.getId())
         return contributions
 
@@ -7477,13 +7479,7 @@ class ContributionParticipation(Persistent, Fossilizable):
         return res
 
     def getDirectFullNameNoTitle( self ):
-        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
-        if self.getFirstName() != "":
-            if res.strip() != "":
-                res = "%s %s"%( self.getFirstName(), res )
-            else:
-                res = self.getFirstName()
-        return res
+        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper())).strip()
 
     def getFullName( self ):
         res = self.getFullNameNoTitle()
@@ -10001,13 +9997,7 @@ class SubContribParticipation(Persistent, Fossilizable):
         return res
 
     def getDirectFullNameNoTitle( self ):
-        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
-        if self.getFirstName() != "":
-            if res.strip() != "":
-                res = "%s %s"%( self.getFirstName(), res )
-            else:
-                res = self.getFirstName()
-        return res
+        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper())).strip()
 
 class SubContribution(CommonObjectBase, Locatable):
     """

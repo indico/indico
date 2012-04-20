@@ -167,7 +167,7 @@ class WUserAbstracts( wcomponents.WTemplated ):
         elif isinstance(status,review.AbstractStatusMerged):
             return _("Merged")
         elif isinstance(status, (review.AbstractStatusProposedToAccept, review.AbstractStatusProposedToReject)):
-            return _("UnderReview")
+            return _("Under Review")
         return _("Submitted")
 
     def getVars( self ):
@@ -299,7 +299,7 @@ class WAbstractDisplay( wcomponents.WTemplated ):
         elif isinstance(status,review.AbstractStatusMerged):
             vars["statusText"] = _("Merged")
             vars["statusClass"] = "abstractStatusMerged"
-            vars["statusComments"] = i18nformat("""_("Merged") into %s-%s""")%(self.htmlText(self._abstract.getId()),self.htmlText(self._abstract.getTitle()))
+            vars["statusComments"] = i18nformat("""_("Merged") into %s-%s""")%(self.htmlText(status.getTargetAbstract().getId()),self.htmlText(status.getTargetAbstract().getTitle()))
         elif isinstance(status, (review.AbstractStatusProposedToAccept, review.AbstractStatusProposedToReject)):
             vars["statusText"] = _("Under Review")
             vars["statusClass"] = "abstractStatusUnderReview"

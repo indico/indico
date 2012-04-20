@@ -2,7 +2,8 @@
 <div id="staticURLContainer" style="display:none">
     <div id="staticURLContent">
         <div>${ _("You can use this link for bookmarks:")}</div>
-        <input readonly="readonly" type="text" id="staticURL" size="25" name="staticURL" />
+        <input readonly="readonly" type="text" id="staticURL" size="31" name="staticURL" />
+        <div class="staticURLNote">${_('Please use <strong>CTRL + C</strong> to copy this URL')}</div>
     </div>
 </div>
 
@@ -11,7 +12,7 @@
 
 <div class="contributionListFiltersContainer">
     <div>
-        <input type="text" id="filterContribs" value="${filterText}" placeholder="Search in contributions">
+        <input type="text" id="filterContribs" value="${filterText}" placeholder=${ _("Search in contributions") }>
         <div id="resetFiltersContainer" style="display:none"><a class="fakeLink" style="color: #881122" id="resetFilters">${_("Reset filters")}</a> |</div>
         <a class="fakeLink" id="showFilters">${_("More filters")}</a> |
         <a class="fakeLink" id="staticURLLink">${ _("Static URL for this result")}</a> |
@@ -36,7 +37,7 @@
                 <option value="-1" ${'selected="selected"' if filterCriteria.getField("session").getShowNoValue() else ""}>--${_("not specified")}--</option>
                 % for session in conf.getSessionListSorted():
                     <option value="${session.getId()}" ${'selected="selected"' if session.getId() in filterCriteria.getField("session").getValues() else ""}>
-                        ${session.getCode()}
+                        ${session.getTitle()}
                     </option>
                 % endfor
             </select>
@@ -69,21 +70,32 @@ var verifyFilters = function(){
     $(".contributionListContribItem").hide();
     var selector= [];
     var term = $("#filterContribs").attr('value');
+
     var items = $(".contributionListContribItem:contains('"+ term +"')");
-    $("#contribTypeSelector").multiselect("getChecked").each(function(index) {
-        selector.push("[data-type="+ this.value +"]");
-    });
-    items = items.filter(selector.join(', '));
-    selector = [];
-    $("#sessionSelector").multiselect("getChecked").each(function(index) {
-        selector.push("[data-session="+ this.value +"]");
-    });
-    items = items.filter(selector.join(', '));
-    selector =[];
-    $("#trackSelector").multiselect("getChecked").each(function(index) {
-        selector.push("[data-track="+ this.value +"]");
-    });
-    items = items.filter(selector.join(', '));
+
+    % if len(conf.getContribTypeList()) > 0:
+        $("#contribTypeSelector").multiselect("getChecked").each(function(index) {
+            selector.push("[data-type="+ this.value +"]");
+        });
+        items = items.filter(selector.join(', '));
+    % endif
+
+    % if len(conf.getSessionListSorted()) > 0:
+        selector = [];
+        $("#sessionSelector").multiselect("getChecked").each(function(index) {
+            selector.push("[data-session="+ this.value +"]");
+        });
+        items = items.filter(selector.join(', '));
+    % endif
+
+    % if len(conf.getTrackList()) > 0:
+        selector =[];
+        $("#trackSelector").multiselect("getChecked").each(function(index) {
+            selector.push("[data-track="+ this.value +"]");
+        });
+        items = items.filter(selector.join(', '));
+    % endif
+
     items.show();
     $("#numberFiltered").text(items.length);
     if(items.length == 1) {
@@ -197,7 +209,7 @@ IndicoUI.executeOnLoad(function(){
         },
         position: {
             my: 'bottom middle',
-            at: 'top right'
+            at: 'top middle'
         },
         show: {
             event: 'click'
@@ -210,7 +222,8 @@ IndicoUI.executeOnLoad(function(){
             }
         },
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
+        	width: 'auto',
+            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-blue'
         }
     },{
         beforeRender: updateStaticURL()

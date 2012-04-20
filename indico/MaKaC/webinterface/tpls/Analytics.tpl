@@ -31,8 +31,8 @@
             <tr>
                   <td class="titleCellTD"><span class="titleCellFormat"> ${ _("Analytics Code Location")}</span></td>
                   <td class="blacktext" width="90%">
-                  <input type="radio" name="analyticsCodeLocation" value="head" ${"checked" if analyticsCodeLocation=="head" else ""}>${("Head")}
-                  <input type="radio" name="analyticsCodeLocation" value="body" ${"checked" if analyticsCodeLocation=="body" else ""}>${("Body")}
+                  <input type="radio" name="analyticsCodeLocation" value="head" ${"checked" if analyticsCodeLocation=="head" else ""}>${_("Head")}
+                  <input type="radio" name="analyticsCodeLocation" value="body" ${"checked" if analyticsCodeLocation=="body" else ""}>${_("Body")}
                   </td>
 
             </tr>

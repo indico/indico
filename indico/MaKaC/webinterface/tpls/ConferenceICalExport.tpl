@@ -10,7 +10,7 @@
     </div>
 </%block>
 <%block name="extraInfo">
-    <input type="checkbox" id="detailExport${target.getUniqueId()}"> ${("Detailed timetable")}
+    <input type="checkbox" id="detailExport${target.getUniqueId()}"> ${_("Detailed timetable")}
 </%block>
 
 <%block name="script">

@@ -22,7 +22,7 @@
     <div class="abstractMainContent">
         <div class="abstractInformation">
             <div class="abstractSubmitter">
-                ${("Submitted by")} <span style="font-weight: bold">${abstract.getSubmitter().getStraightFullName()} </span>
+                ${_("Submitted by")} <span style="font-weight: bold">${abstract.getSubmitter().getStraightFullName()} </span>
                 ${_("on")}
                 <span style="font-weight: bold">${formatDate(abstract.getSubmissionDate())}</span>
                 ${_("at")}
@@ -30,7 +30,7 @@
             </div>
             <div class="abstractHeader">
                 <div>
-                    <span style="font-weight:bold">${("Id")}:</span>
+                    <span style="font-weight:bold">${_("Id")}:</span>
                     ${abstract.getId()}
                 </div>
                 <div>
@@ -39,13 +39,13 @@
                 </div>
                 % if contribType:
                 <div>
-                    <span style="font-weight:bold">${("Contribution type")}:</span>
+                    <span style="font-weight:bold">${_("Contribution type")}:</span>
                     ${contribType.getName()}
                 </div>
                 % endif
                 % if False:
                 <div>
-                    <span style="font-weight:bold">${("Track classification")}:</span>
+                    <span style="font-weight:bold">${_("Track classification")}:</span>
                     ${",".join([t.getTitle() for t in tracks])}
                 </div>
                 % endif

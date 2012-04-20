@@ -7433,6 +7433,12 @@ div#social img#social_button:hover{
     border-color: #303030;
 }
 
+.social_share_tooltip.ui-tooltip-blue .ui-tooltip-content{
+    background: #E5F6FE;
+    border-color: #ADD9ED;
+    color: #5E99BD;
+}
+
 .social_share_tooltip .social_site img {
     display: inline-block;
     vertical-align: middle;
@@ -8058,7 +8064,7 @@ a.lightGreyLink:hover {
 
 .contributionRightPanelSection ul, .subContributionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul{
     list-style: none inside none;
-    margin: 0px;
+    margin: 5px 0px 0px;
     padding: 0px;
 }
 
@@ -8104,6 +8110,7 @@ a.titleWithLink:hover{
     font-weight: bold;
     margin-bottom: 5px;
     margin-top: 0;
+    display: inline;
 }
 .contributionSectionContent, .subContributionSectionContent, .materialSectionContent, .abstractSectionContent {
     font-size: 12px;
@@ -8179,4 +8186,11 @@ ul.resourceDetail{
     color:#888;
     font-size: 11px;
     line-height: 15px
+}
+
+.staticURLNote{
+    color: #999999;
+    float: right;
+    font-size: 11px;
+    font-style: italic;
 }
