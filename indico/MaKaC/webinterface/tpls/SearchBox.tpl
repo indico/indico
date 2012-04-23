@@ -100,8 +100,8 @@ function verifyForm()
 {
     var startDate = $('#startDate').val();
     var endDate = $('#endDate').val();
-    return Util.parseDateTime(startDate, IndicoDateTimeFormats.DefaultHourless) &&
-        Util.parseDateTime(endDate, IndicoDateTimeFormats.DefaultHourless);
+    return (!startDate || Util.parseDateTime(startDate, IndicoDateTimeFormats.DefaultHourless)) &&
+        (!endDate || Util.parseDateTime(endDate, IndicoDateTimeFormats.DefaultHourless));
 }
 
 
@@ -131,7 +131,9 @@ $(function() {
 
     $('#searchText').keypress(function(e) {
         if(e.which == 13){
-            $('form#searchBoxForm').submit();
+            if (verifyForm()) {
+                $('#searchBoxForm').submit();
+            }
         }
     });
 
