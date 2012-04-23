@@ -1605,14 +1605,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
         self._generalSection.addItem( self._reviewingMenuItem)
 
-        self._pluginsDictMenuItem = {}
-        self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
-        for element in self._pluginsDictMenuItem.values():
-            try:
-                self._generalSection.addItem( element)
-            except Exception, e:
-                Logger.get('Conference').error("Exception while trying to access the plugin elements of the side menu: %s" %str(e))
-
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed(self._rh.getAW().getUser()):
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
                 urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = self._rh.use_https()))
@@ -1629,6 +1621,14 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._evaluationMenuItem = wcomponents.SideMenuItem(_("Evaluation"),
             urlHandlers.UHConfModifEvaluation.getURL( self._conf ) )
         self._generalSection.addItem( self._evaluationMenuItem)
+
+        self._pluginsDictMenuItem = {}
+        self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
+        for element in self._pluginsDictMenuItem.values():
+            try:
+                self._generalSection.addItem( element)
+            except Exception, e:
+                Logger.get('Conference').error("Exception while trying to access the plugin elements of the side menu: %s" %str(e))
 
         self._sideMenu.addSection(self._generalSection)
 
