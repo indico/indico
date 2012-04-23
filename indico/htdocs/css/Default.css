@@ -2266,8 +2266,10 @@ div#UISearchBox #searchControls input
 
 div#UISearchBox #searchText
 {
-    min-width: 150px;Se
+    margin-left: 3px;
+    min-width: 150px;
     width: auto;
+    height: 19px;
 }
 
 div#UISearchBox #extraOptions
@@ -2414,6 +2416,7 @@ div.searchTag
     cursor: pointer;
     font-size: 10px;
     margin-left:4px;
+    line-height: 12px;
 }
 
 .arrowExpandIcon
@@ -6664,7 +6667,7 @@ div.fitInnerTimetableDialog {
 
 .suggestionBox {
     border: 1px solid #888888;
-    width: 250px;
+    width: 290px;
     overflow: hidden;
     background-color: white;
 }
