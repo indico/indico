@@ -226,10 +226,6 @@ class GetReviewingMaterial(GetMaterialClassesBase):
         if (rev != None and len(rev._Material__resources) != 0):
             reviewManager = self._target.getReviewManager()
             matList[rev.getId()] = rev.fossilize(IMaterialFossil)
-            matList[rev.getId()]["canReviewModify"] = (self._target.canModify(self.getAW()) \
-                                                       or self._target.getConference().getConfPaperReview().isPaperReviewManager(self.getAW().getUser()) \
-                                                       or reviewManager.isReferee(self._getUser()) or reviewManager.isEditor(self._getUser())) \
-                                                       and (rev.getReviewingState() == 3 if rev else False)
             matList[rev.getId()]["isUnderReview"] = rev.getReviewingState() == 2 and len(reviewManager.getVersioning()) > 1
         return matList
 

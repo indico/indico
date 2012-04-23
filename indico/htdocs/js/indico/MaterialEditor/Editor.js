@@ -1357,7 +1357,6 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
             }
         };
 
-        var reviewingState = material.get('reviewingState');
         var menu;
 
         menu = Html.span(
@@ -1379,7 +1378,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         );
 
         args.materialProtection = material.get('protection');
-        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types, self.showMainResources, material.get('canReviewModify'));
+        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types, self.showMainResources, self.canReviewModify);
 
         // check whenever a material gets empty (no resources) and delete it
         material.get('resources').observe(
@@ -1414,7 +1413,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
                 matWidgetDiv
             ];
-        } else if(material.get('reviewingState') > 2 || self.isUserSubmission){
+        } else if(material.get('reviewingState') > 2 || self.canReviewModify){
             item = [matWidgetDiv];
         } else {
             if(material.get('isUnderReview')){
@@ -1530,7 +1529,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
     }
 },
 
-     function(args, types, uploadAction, width, height, showMainResources, listMethod, isUserSubmission) {
+     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify) {
          var self = this;
          this.width = width;
          this.height = height;
@@ -1541,7 +1540,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          if (!exists(listMethod)) {
              listMethod = 'material.list';
          }
-         this.isUserSubmission = any(isUserSubmission, false);
+         this.canReviewModify = any(canReviewModify, false);
 
          this.RemoteWidget(listMethod, args);
          this.args.materialIdsList = $O();
@@ -1572,7 +1571,7 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
                                                   true);
                 }, $T("Upload paper")));
         var visibility = "hidden";
-        if(self.visible){
+        if(self.canReviewModify){
             visibility = "visible";
         }
         return Html.div(
@@ -1583,10 +1582,10 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
         );
     }
 },
-     function(args, types, uploadAction, width, height, visible, sendToReviewButton, textHasMaterials) {
+     function(args, types, uploadAction, width, height, canReviewModify, sendToReviewButton, textHasMaterials) {
          var self = this;
-         this.MaterialListWidget(args, types, uploadAction, width, height, false, 'material.reviewing.list', visible);
-         this.visible = visible;
+         this.MaterialListWidget(args, types, uploadAction, width, height, false, 'material.reviewing.list', canReviewModify);
+         this.canReviewModify = canReviewModify;
          this.sendToReviewButton = sendToReviewButton;
          this.textHasMaterials = textHasMaterials;
          this.noMaterialText = Html.div({style: {textAlign:"center", padding: pixels(5)}}, $T("No paper uploaded"));
