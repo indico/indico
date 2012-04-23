@@ -2260,7 +2260,7 @@ class WDomainControlFrame(WTemplated):
 
     def getVars(self):
         tpl_vars = WTemplated.getVars(self)
-        doms = {(dom, dom in self._target.getDomainList()) for dom in domain.DomainHolder().getList()}
+        doms = dict((dom, dom in self._target.getDomainList()) for dom in domain.DomainHolder().getList())
 
         tpl_vars["domains"] = doms
         tpl_vars["removeURL"] = self._removeURL
