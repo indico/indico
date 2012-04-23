@@ -70,17 +70,20 @@ class RCSessionCoordinator(object):
 class RCContributionPaperReviewingStaff(object):
 
     @staticmethod
-    def hasRights(request):
+    def hasRights(request, contribution = None, includingContentReviewer=True):
         """ Returns true if the user is a PRM, or a Referee / Editor / Reviewer of the target contribution
         """
         user = request.getAW().getUser()
         confPaperReview = request._target.getConference().getConfPaperReview()
         paperReviewChoice = confPaperReview.getChoice()
-        reviewManager = request._target.getReviewManager()
+        if contribution:
+            reviewManager = contribution.getReviewManager()
+        else:
+            reviewManager = request._target.getReviewManager()
         return (confPaperReview.isPaperReviewManager(user) or \
                (reviewManager.hasReferee() and reviewManager.isReferee(user)) or \
                ((paperReviewChoice == 3 or paperReviewChoice == 4) and reviewManager.hasEditor() and reviewManager.isEditor(user)) or \
-               ((paperReviewChoice == 2 or paperReviewChoice == 4) and request._target.getReviewManager().isReviewer(user)))
+               (includingContentReviewer and ((paperReviewChoice == 2 or paperReviewChoice == 4) and request._target.getReviewManager().isReviewer(user))))
 
 class RCContributionReferee(object):
     @staticmethod
@@ -609,7 +612,7 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRigh
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
             self._loggedIn = True
-        elif not (RCContributionPaperReviewingStaff.hasRights(self) and not self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
+        elif not (RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False) and self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
             RHSubmitMaterialBase._checkProtection(self)
         else:
             self._loggedIn = True

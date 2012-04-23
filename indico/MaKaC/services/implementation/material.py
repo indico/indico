@@ -102,9 +102,12 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
 
             reviewingState = self._material.getReviewingState()
 
-            if (reviewingState < 3 and
+            if (reviewingState < 3 and # it means the papers has not been submitted yet (or not reviewing material)
                 owner.canUserSubmit(self._aw.getUser())):
                 # Submitters have access
+                return
+            # status = 3 means the paper is under review (submitted but not reviewed)
+            elif RCContributionPaperReviewingStaff.hasRights(self, contribution = owner, includingContentReviewer=False) and reviewingState == 3:
                 return
             elif owner.getSession() and \
                      owner.getSession().canCoordinate(self._aw, "modifContribs"):
