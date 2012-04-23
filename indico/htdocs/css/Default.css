@@ -1265,10 +1265,14 @@ input.smallbtn {
 
 .yellowButton {
     background: white url(../images/sprites.png) repeat-x scroll 0 -90px;
-    padding: 2px;
 }
 
 .yellowButton input {
+    cursor: pointer;
+    font-weight: bold !important;
+    padding: 2px;
+    height: 21px;
+    font-size: 12px;
     background-color: transparent;
     border: 0;
     color: black;

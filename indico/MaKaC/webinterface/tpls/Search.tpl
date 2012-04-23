@@ -39,13 +39,9 @@ ${ _("Warning: since you are not logged in, only results from public events will
 % endif
 
 
-<div id="UISearch">
-    <div id="searchControls">
-        <div class="yellowButton searchButton" id="searchButton2">
-            <input style="background-color: transparent;" class="button" type="submit" value="${ _('Search')}" onclick="javascript: return verifyForm();" id="searchSubmit"/>
-        </div>
-        <input style="background-color: transparent; margin-top: -1px;" type="text" id="searchText2" name="p" value="${ p }"/>
-    </div>
+<div>
+  <input style="width: 300px; height:20px; font-size:17px; vertical-align: middle;" type="text" name="p" value="${ p }" />
+  <input type="submit" value="${ _('Search')}" style="vertical-align: middle;"/>
 </div>
 
 <div style="padding-top: 4px;"><span id="advancedOptionsText"><span class='fakeLink' onclick='toogleAdvancedOptions()'>${_("Show advanced options") }</span></span></div>
