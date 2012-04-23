@@ -328,21 +328,20 @@ $.widget('ui.search_tag', {
         categ_id: 0
     },
 
-    _transition: function(title) {
+    _transition: function(title, no_check) {
         var $tag = this.$tag;
         var old_width = $tag.width()
 
-        $tag.width('').find('.where').html(title);
+        $tag.fadeTo('fast', 0.3).width('').find('.where').html(title);
         var new_width = $tag.width();
 
         // store target width
-        $tag.fadeIn().width(old_width).data('target-width', new_width);
+        $tag.fadeTo('fast', 0.5).width(old_width).data('target-width', new_width);
 
         $tag.animate({
-            width: new_width
-        }, 200, 'linear', function(){
-            animDone = true;
-        });
+            width: ((new_width < old_width) && !no_check) ? old_width : new_width
+        }, 200, 'linear');
+
     },
 
     _create: function() {
@@ -359,6 +358,8 @@ $.widget('ui.search_tag', {
 
         $(this.element).replaceWith($tag);
         var $where = $('.where', $tag);
+
+        this.initial_width = this.$tag.width();
 
         if (this.options.everywhere) {
             $tag.addClass('everywhere');
@@ -414,7 +415,7 @@ $.widget('ui.search_tag', {
     search_everywhere: function() {
         $('.cross', this.$tag).hide();
         this.$tag.addClass('everywhere').removeClass('inCategory');
-        this._transition($T('Everywhere'));
+        this._transition($T('Everywhere'), true);
         this.options.input.attr('value', 0);
     },
 
@@ -433,7 +434,8 @@ $.widget('ui.search_tag', {
 
     show_tip: function() {
         this.$tag.qtip({
-            content: 'Click to search inside ' + this.options.categ_title,
+            content: format($T('Click to search inside <span class="label">{title}</span>'),
+                              {title: this.options.categ_title}),
             position:{
                 at: 'bottom center',
                 my: 'top center'
@@ -456,7 +458,7 @@ $.widget('ui.search_tag', {
         $where.removeClass('hasFocus');
         setTimeout(function(){
             if (!$where.hasClass('hasFocus')) {
-                self._transition($T('Everywhere'));
+                self._transition($T('Everywhere'), true);
                 self.$tag.addClass('everywhere');
             }
         }, 200);
