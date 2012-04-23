@@ -59,15 +59,19 @@ class PiwikReport(PiwikReportBase):
         Builds the map of generators to fill this object's variables before
         fossilization.
         """
+
         PiwikReportBase.__init__(self)
         report = BaseReportGenerator
 
         self._conf = ConferenceHolder().getById(confId)
         self._confId = confId
         self._contribId = contribId
-        self._startDate = startDate
-        self._endDate = endDate
-        self._checkDatesSanity()
+
+        # If there are missing dates for startDate or endDate, suitable values
+        # are determined and applied.
+        self._startDate = startDate or str(self._conf.getCreationDate().date())
+        self._endDate = endDate or str(datetime.date.today())
+
         self._contributions = []
 
         params = {'startDate': self._startDate,
@@ -114,20 +118,6 @@ class PiwikReport(PiwikReportBase):
                 self._contributions.append(value)
         else:
             self._contributions = False
-
-    def _checkDatesSanity(self):
-        """
-        If there are missing dates for startDate or endDate, suitable values
-        are determined and applied.
-        """
-        if self._startDate and self._endDate:
-            return
-
-        if not self._endDate:
-            self._endDate = datetime.date.today()
-        if not self._startDate:
-            start = self._conf.getCreationDate()
-            self._startDate = str(start.date())
 
     def _getContributions(self):
         return self._contributions

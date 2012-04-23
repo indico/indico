@@ -101,15 +101,11 @@ class RHStatisticsView(RHConferenceModifBase):
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
-
-        self._activeTab = params.get("tab", 'Piwik')
-        self._confId = params.get("confId", None)
-        self._contribId = params.get("contribId", None)
-        self._startDate = params.get("startDate", None)
-        self._endDate = params.get("endDate", None)
+        self._activeTab = params.pop("tab", 'Piwik')
+        self._params = params
 
     def _process(self):
-        return WPStatisticsView(self, WStatisticsView).display()
+        return WPStatisticsView(self, WStatisticsView, self._activeTab, self._params).display()
 
 
 class RHStatisticsHtdocs(RHHtdocs):
@@ -120,9 +116,13 @@ class RHStatisticsHtdocs(RHHtdocs):
 
 class WStatisticsView(wcomponents.WTemplated):
 
-    def __init__(self, register, rh):
+    def __init__(self, register, activeTab, params):
         self._register = register
-        self._rh = rh
+        self._confId = params.get('confId')
+        self._contribId = params.get('contribId')
+        self._startDate = params.get('startDate')
+        self._endDate = params.get('endDate')
+        self._activeTab = activeTab
 
     def getVars(self):
         """
@@ -131,15 +131,14 @@ class WStatisticsView(wcomponents.WTemplated):
         defined, the results of which are the data for the view.
         """
         vars = wcomponents.WTemplated.getVars(self)
-        rh = self._rh
-        plugin = self._register.getPluginByName(rh._activeTab, instantiate=False)
+        plugin = self._register.getPluginByName(self._activeTab, instantiate=False)
 
-        if rh._contribId is not None:
-            vars["report"] = plugin.getContributionReport(rh._startDate, rh._endDate,
-                                                          rh._confId, rh._contribId)
-        elif rh._confId is not None:
-            vars["report"] = plugin.getConferenceReport(rh._startDate, rh._endDate,
-                                                        rh._confId)
+        if self._contribId is not None:
+            vars["report"] = plugin.getContributionReport(self._startDate, self._endDate,
+                                                          self._confId, self._contribId)
+        elif self._confId is not None:
+            vars["report"] = plugin.getConferenceReport(self._startDate, self._endDate,
+                                                        self._confId)
         else:
             raise Exception(_('Cannot instantiate reports view without ID.'))
 
@@ -170,14 +169,15 @@ class WPluginSettings(wcomponents.WTemplated):
 
 class WPStatisticsView(WPConferenceModifBase):
 
-    def __init__(self, rh, templateClass):
+    def __init__(self, rh, templateClass, activeTab, params):
         self._rh = rh
         self._conf = self._rh._conf
         self._register = StatisticsRegister()
         self._plugins = self._register.getAllPlugins()
         self._templateClass = templateClass
         self._extraJS = []
-        self._activeTabName = rh._activeTab
+        self._activeTabName = activeTab
+        self._params = params
         self._tabs = []
         self._tabCtrl = wcomponents.TabControl()
 
@@ -200,7 +200,7 @@ class WPStatisticsView(WPConferenceModifBase):
 
         return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(
             self._templateClass.forModule(plugin.getImplementationPackage(),
-                                          self._register, self._rh).getHTML(params))
+                                          self._register, self._activeTabName, self._params).getHTML(params))
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + \
