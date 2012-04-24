@@ -2,6 +2,7 @@
     # We set these up here to pass to JS also
     strModifQuery = _('Modify Query')
     strHideQuery = _('Hide Modify Query')
+    strNoGraphData = _('No graph data was returned by the server, please alter the date range.')
 %>
 
 <div id="statsWidgetsWrapper">
@@ -69,7 +70,13 @@
                 </span>
             </div>
             <div class="statsWidgetContent">
+            % if report['images']['visitsDay'] != 'none':
                 <img src="${report['images']['visitsDay']}" alt="${_('Visitor hit rates.')}"/>
+            % else:
+                <div class="graphWarning">
+                    ${strNoGraphData}
+                </div>
+            % endif
             </div>
         </div>
     </div>
@@ -125,7 +132,13 @@
                 ${_('Visitors Geography')}
             </div>
             <div class="statsWidgetContent">
-                <img src="${report['images']['visitsCountry']}" alt="" />
+            % if report['images']['visitsCountry'] != 'none':
+                <img src="${report['images']['visitsCountry']}" alt="${_('Visitor Origins.')}"/>
+            % else:
+                <div class="graphWarning">
+                    ${strNoGraphData}
+                </div>
+            % endif
             </div>
         </div>
 
@@ -167,7 +180,13 @@
                 ${_('User Systems')}
             </div>
             <div class="statsWidgetContent" style="text-align:center;">
-                <img src="${report['images']['visitsOS']}" alt="" />
+            % if report['images']['visitsOS'] != 'none':
+                <img src="${report['images']['visitsOS']}" alt="${_('Visitor Systems.')}"/>
+            % else:
+                <div class="graphWarning">
+                    ${strNoGraphData}
+                </div>
+            % endif
             </div>
         </div>
 

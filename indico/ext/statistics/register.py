@@ -20,6 +20,7 @@
 
 import os
 
+from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
 
 
@@ -157,3 +158,14 @@ class StatisticsConfig(object):
         """
         statsPlugin = PluginsHolder().getPluginType('statistics')
         return statsPlugin.getOptions()['cacheEnabled'].getValue()
+
+    def getLogger(self, extraName=None):
+        """
+        Returns a Logger object for Statistics as a whole or per plugin.
+        """
+        logName = 'ext.statistics'
+
+        if extraName:
+            logName += '.' + extraName
+
+        return Logger.get(logName)

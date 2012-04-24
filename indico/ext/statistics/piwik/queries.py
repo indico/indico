@@ -22,7 +22,50 @@ import json
 
 from MaKaC.i18n import _
 
+from indico.ext.statistics.register import StatisticsConfig
 from indico.ext.statistics.piwik.implementation import PiwikStatisticsImplementation
+
+
+class PiwikQueryUtils():
+
+    @staticmethod
+    def getJSONFromRemoteServer(func, default={}, **kwargs):
+        """
+        Safely manage calls to the remote server by encapsulating JSON creation
+        from Piwik data.
+        """
+        try:
+            rawjson = func(kwargs)
+            return json.loads(rawjson)
+        except:
+            # Log the exception and return the default.
+            logger = StatisticsConfig().getLogger('PiwikQueryUtils')
+            logger.exception('Unable to load JSON from source %s' % str(rawjson))
+
+            return default
+
+    @staticmethod
+    def getJSONValueSum(data):
+        """
+        The parameter data should be a JSON object to be reduced.
+        """
+        return reduce(lambda x, y: int(x) + int(y), data.values())
+
+    @staticmethod
+    def stringifySeconds(seconds=0):
+        """
+        Takes time as a value of seconds and deduces the delta in human-readable
+        HHh MMm SSs format.
+        """
+        seconds = int(seconds)
+        minutes = seconds / 60
+        ti = {'h': 0, 'm': 0, 's': 0}
+
+        ti['s'] = seconds % 60
+        ti['m'] = minutes % 60
+        ti['h'] = minutes / 60
+
+        return "%dh %dm %ds" % (ti['h'], ti['m'], ti['s'])
 
 
 class PiwikQueryBase(PiwikStatisticsImplementation):
@@ -143,9 +186,14 @@ class PiwikQueryGraphConferenceBase(PiwikQueryConferenceBase):
         of a HTML img tag, thus obfuscating token.
         """
         b64ImgPrefix = 'data:image/png;base64,'
-        b64ImgCode = base64.b64encode(self._performCall())
+        PNGData = self._performCall(default='none')
 
-        return b64ImgPrefix + b64ImgCode
+        if PNGData != 'none':
+            b64ImgCode = base64.b64encode(PNGData)
+
+            return b64ImgPrefix + b64ImgCode
+        else:
+            return PNGData
 
     def setAPIGraphType(self, graph='verticalBar'):
         self.setAPIParams({'graphType': graph})
@@ -211,35 +259,15 @@ class PiwikQueryMetricConferenceBase(PiwikQueryConferenceBase):
         self.setAPIModule('API')
         self.setAPIFormat()
 
-    def _getJSONValueSum(self, data):
-        """
-        Assumes format of key: value to iterate and add all values
-        returned.
-        """
-        jsData = json.loads(data)
-        return reduce(lambda x, y: int(x) + int(y), jsData.values())
-
-    def _stringifySeconds(self, seconds=0):
-        """
-        Takes time as a value of seconds and deduces the delta in human-readable
-        HHh MMm SSs format.
-        """
-        seconds = int(seconds)
-        minutes = seconds / 60
-        ti = {'h': 0, 'm': 0, 's': 0}
-
-        ti['s'] = seconds % 60
-        ti['m'] = minutes % 60
-        ti['h'] = minutes / 60
-
-        return "%dh %dm %ds" % (ti['h'], ti['m'], ti['s'])
-
     def getQueryResult(self):
         """
         Returns the sum of all unique values, typical mode for child
-        classes assumed. Overload where required.
+        classes assumed. Overload where required, if no data is received,
+        returns the metric as 0.
         """
-        return self._getJSONValueSum(self._performCall())
+        queryResult = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
+
+        return PiwikQueryUtils.getJSONValueSum(queryResult) if queryResult else 0
 
 
 class PiwikQueryMetricConferenceUniqueVisits(PiwikQueryMetricConferenceBase):
@@ -266,10 +294,10 @@ class PiwikQueryMetricConferenceVisitLength(PiwikQueryMetricConferenceBase):
         """
         Returns a string of the time in hh:mm:ss
         """
-        data = self._performCall()
-        seconds = self._getJSONValueSum(data)
+        data = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
+        seconds = PiwikQueryUtils.getJSONValueSum(data) if data else 0
 
-        return self._stringifySeconds(seconds)
+        return PiwikQueryUtils.stringifySeconds(seconds)
 
 
 class PiwikQueryMetricConferenceReferrers(PiwikQueryMetricConferenceBase):
@@ -284,12 +312,11 @@ class PiwikQueryMetricConferenceReferrers(PiwikQueryMetricConferenceBase):
         API returns a list of referrers in the JSON format, unserialize and
         commit to a Python list of dictionaries before returning.
         """
-        rawjson = self._performCall()
-        jdata = json.loads(rawjson)
+        jdata = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
         referrers = list(jdata)
 
         for referrer in referrers:
-            referrer['sum_visit_length'] = self._stringifySeconds(referrer['sum_visit_length'])
+            referrer['sum_visit_length'] = PiwikQueryUtils.stringifySeconds(referrer['sum_visit_length'])
 
         return sorted(referrers, key=lambda r: r['nb_visits'], reverse=True)[0:10]
 
@@ -308,8 +335,7 @@ class PiwikQueryMetricConferencePeakDateAndVisitors(PiwikQueryMetricConferenceBa
         which was the busiest overall, considering uniquevistors &
         actions.
         """
-        data = self._performCall()
-        jData = json.loads(data)
+        jData = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
 
         if len(jData) > 0:
             date, value = max(jData.iteritems(), key=lambda e: e[1])

@@ -46,6 +46,7 @@ class BaseStatisticsImplementation(Component):
 
     PLUGIN_HOOKFILE = 'JSHook.tpl'
     _name = 'Base'
+    _config = StatisticsConfig()
 
     def __init__(self):
         self._FSPath = None
@@ -173,15 +174,22 @@ class BaseStatisticsImplementation(Component):
         """
         return None
 
-    def _performCall(self):
+    def _performCall(self, default=None):
         """
         Returns the raw results from the API to be handled elsewhere before
         being passed through to the report.
         """
         timeout = 10  # Timeout in seconds to end the call
-        response = urllib2.urlopen(url=self.getAPIQuery(), timeout=timeout)
 
-        if not response:
+        try:
+            response = urllib2.urlopen(url=self.getAPIQuery(), timeout=timeout)
+        except urllib2.URLError, e:
+            # In case of timeout, log the incident and return the default value.
+            logger = self.getLogger()
+            logger.exception('Unable to retrieve data, exception: %s' % str(e))
+
+            return default
+        except:
             raise Exception('The remote server for %s did not respond.'
                             % self.getName())
 
@@ -294,6 +302,12 @@ class BaseStatisticsImplementation(Component):
         to avoid the use of introspection / reflection later.
         """
         return self._implementationPackage
+
+    def getLogger(self):
+        """
+        Returns the logger for this implementation.
+        """
+        return self._config.getLogger(self.getName())
 
     def getName(self):
         """
