@@ -802,8 +802,13 @@ class WEventFooter(WFooter):
             location = "%s (%s)" % (self._conf.getRoom().getName(), location)
 
         description = self._conf.getDescription()
+
+        if len(description) > 1000:
+            description = description[:997] + "..."
+
         if description:
             description += '\n\n'
+
         description += Config.getInstance().getShortEventURL() + cid
 
         v['gc_params'] = urllib.urlencode({
