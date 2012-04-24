@@ -6,8 +6,11 @@
     <a href="${str(urlHandlers.UHContributionModification.getURL(Contribution))}" style="font-weight: bold" >${_("Edit")}</a> |
     % endif
     <a href="${str(urlHandlers.UHContribToPDF.getURL(Contribution))}" target="_blank">${_("PDF")}</a> |
-    <a href="${str(urlHandlers.UHContribToXML.getURL(Contribution))}"" target="_blank">${_("XML")}</a> |
+    <a href="${str(urlHandlers.UHContribToXML.getURL(Contribution))}"" target="_blank">${_("XML")}</a>
+    % if Contribution.isScheduled():
+    |
     <a id="exportIcal${Contribution.getUniqueId()}" class="fakeLink exportIcal" data-id="${Contribution.getUniqueId()}">${_("iCal")}</a>
+    % endif
     <%include file="ContributionICalExport.tpl"/>
 </div>
 
