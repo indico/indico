@@ -7,7 +7,7 @@
 <div class="domain_control">
   <div id="message"></div>
   <ul>
-  % for dom, state in domains:
+  % for dom, state in domains.iteritems():
     <li>
       <input type="checkbox" name="selectedDomain" value="${dom.getId()}" ${'checked="checked"' if state else ''}>
         ${dom.getName()}
