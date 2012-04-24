@@ -359,8 +359,8 @@ class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.Conf
         sessionSlot = self._schEntry.getOwner()
         session = sessionSlot.getSession()
 
-        logInfo = self._target.getLogInfo()
-        logInfo["subject"] = "Deleted session: %s"%self._target.getTitle()
+        logInfo = session.getLogInfo()
+        logInfo["subject"] = "Deleted session: %s"%session.getTitle()
         self._conf.getLogHandler().logAction(logInfo,"Timetable/Session",self._getUser())
 
         self._conf.removeSession(session)
