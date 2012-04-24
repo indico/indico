@@ -176,7 +176,7 @@
                                 ];
                             };
                             popup.draw = function() {
-                                this.ExclusivePopupWithButtons.prototype.draw.call(this, $("<div/>").css({'max-height':'600px', 'min-width':'450px', 'max-width':'800px'}).append(result), {});
+                                this.ExclusivePopupWithButtons.prototype.draw.call(this, $("<div/>").css({'max-height':'550px', 'min-width':'500px', 'max-width':'800px'}).append(result), {});
                             };
                             popup.open();
                         }
