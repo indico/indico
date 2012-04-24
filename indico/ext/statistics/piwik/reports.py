@@ -24,6 +24,7 @@ import indico.ext.statistics.piwik.queries as pq
 
 from MaKaC.i18n import _
 from MaKaC.conference import ConferenceHolder
+from MaKaC.common.timezoneUtils import nowutc
 
 
 class IPiwikReportFossil(IReportFossil):
@@ -53,6 +54,7 @@ class PiwikReportBase(BaseStatisticsReport):
 class PiwikReport(PiwikReportBase):
 
     fossilizes(IPiwikReportFossil)
+    _defaultReportInterval = 14
 
     def __init__(self, startDate, endDate, confId, contribId=None):
         """
@@ -66,12 +68,7 @@ class PiwikReport(PiwikReportBase):
         self._conf = ConferenceHolder().getById(confId)
         self._confId = confId
         self._contribId = contribId
-
-        # If there are missing dates for startDate or endDate, suitable values
-        # are determined and applied.
-        self._startDate = startDate or str(self._conf.getCreationDate().date())
-        self._endDate = endDate or str(datetime.date.today())
-
+        self._buildDateRange(startDate, endDate)
         self._contributions = []
 
         params = {'startDate': self._startDate,
@@ -96,6 +93,31 @@ class PiwikReport(PiwikReportBase):
 
         self._buildReports()
         self._buildConferenceContributions()
+
+    def _buildDateRange(self, startDate, endDate):
+        """
+        If the default values are passed through, computes the appropriate date
+        range based on whether today is before or after the conference end date.
+        If after, end of period is set as conference end date. Start date is then
+        calculated by the _defaultReportInterval difference.
+        """
+
+        def getStartDate():
+            interval = datetime.timedelta(days=self._defaultReportInterval)
+            adjustedStartDate = self._endDateTime - interval
+
+            return str(adjustedStartDate.date())
+
+        def getEndDate():
+            today = nowutc()
+            confEndDate = self._conf.getEndDate()
+
+            self._endDateTime = confEndDate if today > confEndDate else today
+
+            return str(self._endDateTime.date())
+
+        self._endDate = endDate if endDate else getEndDate()
+        self._startDate = startDate if startDate else getStartDate()
 
     def _buildConferenceContributions(self):
         """
