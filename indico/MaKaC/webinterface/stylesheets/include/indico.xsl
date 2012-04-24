@@ -92,9 +92,13 @@
       <xsl:for-each select="./session|./contribution|./break">
         <xsl:variable name="ids" select="./ID"/>
         <xsl:variable name="day" select="substring(./startDate,0,11)"/>
+        <xsl:variable name="previous_day" select="substring(preceding-sibling::*[./startDate][1]/startDate,0,11)" />
 
-        <xsl:if
-          test="count(preceding::session[position()=1 and substring(./startDate,0,11)=$day]) = 0 and count(preceding::contribution[position()=1 and substring(./startDate,0,11)=$day]) = 0 and count(preceding::break[position()=1 and substring(./startDate,0,11)=$day]) = 0">
+        <xsl:if test="$previous_day != $day">
+          <xsl:if test="$previous_day != ''">
+              <xsl:text disable-output-escaping="yes">&lt;/ul&gt;</xsl:text>
+              <xsl:text disable-output-escaping="yes">&lt;/li&gt;</xsl:text>
+          </xsl:if>
           <xsl:text disable-output-escaping="yes">&lt;li&gt;</xsl:text>
           <div style="width: 100%;">
             <a name="{$day}"/>
@@ -109,12 +113,9 @@
         <xsl:apply-templates select=".">
           <xsl:with-param name="minutes" select="$minutes"/>
         </xsl:apply-templates>
-        <xsl:if
-          test="count(following::session[position()=1 and substring(./startDate,0,11)=$day]) = 0 and count(following::contribution[position()=1 and substring(./startDate,0,11)=$day]) = 0 and count(following::break[position()=1 and substring(./startDate,0,11)=$day]) = 0">
-          <xsl:text disable-output-escaping="yes">&lt;/ul&gt;</xsl:text>
-          <xsl:text disable-output-escaping="yes">&lt;/li&gt;</xsl:text>
-        </xsl:if>
       </xsl:for-each>
+      <xsl:text disable-output-escaping="yes">&lt;/ul&gt;</xsl:text>
+      <xsl:text disable-output-escaping="yes">&lt;/li&gt;</xsl:text>
     </ul>
   </xsl:template>
 
