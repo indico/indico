@@ -202,27 +202,6 @@ def copyTreeSilently(source, target):
                 print e
 
 
-def jsCompress():
-    '''Packs and minifies javascript files'''
-
-    try:
-        pkg_resources.require('JSTools')
-    except pkg_resources.DistributionNotFound:
-        print """
-JSTools not found! JSTools is needed for JavaScript compression, if you're building Indico from source. Please install it.
-i.e. try 'easy_install jstools'"""
-        sys.exit(-1)
-
-    jsbuildPath = 'jsbuild'
-    os.chdir('./etc/js')
-    os.system('%s -o ../../indico/htdocs/js/jquery/pack jquery.cfg' % jsbuildPath)
-    os.system('%s -o ../../indico/htdocs/js/indico/pack indico.cfg' % jsbuildPath)
-    os.system('%s -o ../../indico/htdocs/js/presentation/pack presentation.cfg' % jsbuildPath )
-    os.system('%s -o ../../indico/MaKaC/plugins/InstantMessaging/htdocs/js instantmessaging.cfg ' % jsbuildPath )
-    os.system('%s -o ../../indico/ext/livesync/htdocs/js livesync.cfg' % jsbuildPath )
-    os.chdir('../..')
-
-
 def _checkModPythonIsInstalled():
     pass
 

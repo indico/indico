@@ -2,7 +2,6 @@
 argparse
 wsgiref
 Babel
-JSTools
 Mako
 MarkupSafe
 ZConfig
@@ -28,3 +27,7 @@ argh
 polib
 py
 pytest
+jsmin
+cssmin
+webassets
+python-cjson

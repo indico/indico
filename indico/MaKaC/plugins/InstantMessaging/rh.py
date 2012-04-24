@@ -35,6 +35,7 @@ import urllib2, os
 from indico.web.legacy import wrapUH
 from indico.web.rh import RHHtdocs
 
+
 class RHInstantMessagingHtdocs(RHHtdocs):
     """
     Static file handler for InstantMessaging plugin

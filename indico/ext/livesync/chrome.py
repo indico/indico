@@ -27,6 +27,7 @@ import os, datetime
 
 # 3rd party lib imports
 import zope.interface
+from webassets import Bundle, Environment
 
 # plugin imports
 from indico.ext.livesync import SyncManager
@@ -133,9 +134,14 @@ class WPLiveSyncAdmin(WPAdminPlugins):
         WPAdminPlugins.__init__(self, rh, 'livesync', '')
         self._templateClass = templateClass
 
+        self._plugin_asset_env = Environment(RHLiveSyncHtdocs._local_path, '/livesync')
+        self._plugin_asset_env.register('livesync', Bundle('js/livesync.js',
+                                                           filters='jsmin',
+                                                           output="InstantMessaging__%(version)s.min.js"))
+
     def getJSFiles(self):
         return WPAdminPlugins.getJSFiles(self) + \
-               self._includeJSFile('livesync/js', 'livesync')
+               self._plugin_asset_env['livesync'].urls()
 
     def getCSSFiles(self):
         return WPAdminPlugins.getCSSFiles(self) + \

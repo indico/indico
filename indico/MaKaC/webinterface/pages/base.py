@@ -18,6 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from webassets import Environment
+from indico.web import assets
+
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.Configuration import Config
@@ -39,57 +42,20 @@ class WPBase(OldObservable):
     _userData = []
 
     def __init__( self, rh ):
+        config = Config.getInstance()
         self._rh = rh
         self._locTZ = ""
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        self._asset_env = Environment(config.getHtdocsDir(), '/')
+        self._asset_env.debug = info.isDebugActive()
+
+        # register existing assets
+        assets.register_all_js(self._asset_env)
 
         #store page specific CSS and JS
         self._extraCSS = []
         self._extraJS = []
-
-    def _includeJSPackage(self, packageName, module = 'indico', path=None):
-        info = HelperMaKaCInfo().getMaKaCInfoInstance()
-
-        timestamp = os.stat(__file__).st_mtime
-
-        if info.isDebugActive():
-            return ['js/%s/%s/Loader.js?%d' % (module, packageName, timestamp)]
-        else:
-            return ['js/%s/pack/%s.js.pack?%d' % (module, packageName, timestamp)]
-
-    def _includeJQuery(self):
-        # TODO: rename this to _includeJSLibs or something similar
-        info = HelperMaKaCInfo().getMaKaCInfoInstance()
-
-        timestamp = os.stat(__file__).st_mtime
-
-        files = ['underscore', 'jquery', 'jquery-ui', 'jquery.form', 'jquery.custom',
-                 'jquery.daterange', 'jquery.qtip', 'jquery.dttbutton', 'jquery.colorbox',
-                 'jquery.menu', 'date', 'jquery.multiselect']
-        if info.isDebugActive():
-            # We can't use Loader.js as jQuery is included before any indico js
-            return ['js/jquery/%s.js?%d' % (f, timestamp) for f in files]
-        else:
-            return ['js/jquery/pack/jquery.js.pack?%d' % timestamp]
-
-    def _includeJSFile(self, path, filename):
-        info = HelperMaKaCInfo().getMaKaCInfoInstance()
-
-        timestamp = os.stat(__file__).st_mtime
-
-        if info.isDebugActive():
-            return ['%s/%s.js?%d' % (path, filename, timestamp)]
-        else:
-            return ['%s/%s.js.pack?%d' % (path, filename, timestamp)]
-
-    def _includePresentationFiles(self):
-        info = HelperMaKaCInfo().getMaKaCInfoInstance()
-
-        timestamp = os.stat(__file__).st_mtime
-
-        if info.isDebugActive():
-            return ['%s?%d' % (f, timestamp) for f in ['js/presentation/Loader.js', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']]
-        else:
-            return ['%s?%d' % (f, timestamp) for f in ['js/presentation/pack/Presentation.js.pack', 'js/indico/jquery/defaults.js', 'js/indico/jquery/global.js']]
 
     def _getBaseURL( self ):
         if self._rh._req.is_https() and Config.getInstance().getBaseSecureURL():
@@ -107,15 +73,14 @@ class WPBase(OldObservable):
     def getCSSFiles(self):
         return []
 
-    def getJSFiles(self):
-        return self._includeJQuery() + \
-               self._includePresentationFiles() + \
-               self._includeJSPackage('Core') + \
-               self._includeJSPackage('Legacy') + \
-               self._includeJSPackage('Common')
-
     def _getJavaScriptInclude(self, scriptPath):
         return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'
+
+    def getJSFiles(self):
+        return self._asset_env['base_js'].urls()
+
+    def _includeJSPackage(self, pkg_name):
+        return self._asset_env['indico_' + pkg_name.lower()].urls()
 
     def _getJavaScriptUserData(self):
         """

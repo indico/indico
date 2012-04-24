@@ -124,7 +124,7 @@ def _getInstallRequires():
     base =  ['ZODB3>=3.8', 'pytz', 'zope.index', 'zope.interface',
              'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil<2.0',
              'pypdf', 'mako>=0.4.1', 'babel', 'icalendar>=3.0', 'pyatom',
-             'simplejson', 'python-cjson']
+             'simplejson', 'python-cjson', 'webassets', 'jsmin', 'cssmin']
 
     #for Python older than 2.7
     if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
@@ -143,6 +143,7 @@ def _versionInit():
 
         return v
 
+
 ###  Commands ###########################################################
 class sdist_indico(sdist.sdist):
     user_options = sdist.sdist.user_options + \
@@ -150,20 +151,12 @@ class sdist_indico(sdist.sdist):
     version = 'dev'
 
     def run(self):
-        global x
         sdist.sdist.run(self)
-
-
-class jsdist_indico:
-    def jsCompress(self):
-        from MaKaC.consoleScripts.installBase import jsCompress
-        jsCompress()
 
 
 def _bdist_indico(dataFiles):
     class bdist_indico(bdist.bdist, jsdist_indico):
         def run(self):
-            self.jsCompress()
             compileAllLanguages(self)
             bdist.bdist.run(self)
 
@@ -174,28 +167,11 @@ def _bdist_indico(dataFiles):
 def _bdist_egg_indico(dataFiles):
     class bdist_egg_indico(bdist_egg.bdist_egg, jsdist_indico):
         def run(self):
-            self.jsCompress()
             compileAllLanguages(self)
             bdist_egg.bdist_egg.run(self)
 
     bdist_egg_indico.dataFiles = dataFiles
     return bdist_egg_indico
-
-
-class jsbuild(Command):
-    description = "minifies and packs javascript files"
-    user_options = []
-    boolean_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        from MaKaC.consoleScripts.installBase import jsCompress
-        jsCompress()
 
 
 class develop_indico(develop.develop):
@@ -485,7 +461,6 @@ if __name__ == '__main__':
     cmdclass = {'sdist': sdist_indico,
                 'bdist': _bdist_indico(dataFiles),
                 'bdist_egg': _bdist_egg_indico(dataFiles),
-                'jsbuild': jsbuild,
                 'develop_config': develop_config,
                 'develop': develop_indico,
                 'test': test_indico,

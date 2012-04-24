@@ -18,6 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from webassets import Environment
+from indico.web import assets
+
 from MaKaC.plugins import PluginsHolder, OldObservable
 
 import os,types,string
@@ -59,6 +62,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.common.TemplateExec as templateEngine
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.rb_tools import FormMode, overlap
+from MaKaC.common.info import HelperMaKaCInfo
 
 from lxml import etree
 
@@ -109,7 +113,18 @@ class WTemplated(OldObservable):
         self._rh = ContextManager.get('currentRH', None)
 
         cfg = Configuration.Config.getInstance()
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
+
         self._dir = cfg.getTPLDir()
+        self._asset_env = Environment(os.path.join(cfg.getHtdocsDir(), 'css'), 'css/')
+        self._asset_env.debug = info.isDebugActive()
+
+        if DBMgr.getInstance().isConnected():
+            css_file = cfg.getCssStylesheetName()
+        else:
+            css_file = 'Default.css'
+
+        assets.register_all_css(self._asset_env, css_file)
 
     def _getSpecificTPL(self, dir, tplId, extension="tpl"):
         """
@@ -255,27 +270,21 @@ class WTemplated(OldObservable):
         # Does nothing right now - it used to replace % with %% for the old-style templates
         return text
 
+
 class WHTMLHeader(WTemplated):
 
-
-
-    def __init__(self, tpl_name = None):
+    def __init__(self, tpl_name=None):
         WTemplated.__init__(self)
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
+    def getVars(self):
+        tvars = WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["analyticsActive"] = minfo.isAnalyticsActive()
-        vars["analyticsCode"] = minfo.getAnalyticsCode()
-        vars["analyticsCodeLocation"] = minfo.getAnalyticsCodeLocation()
-
-
-        if DBMgr.getInstance().isConnected():
-            vars['stylesheet'] = Config.getInstance().getCssStylesheetName()
-        else:
-            vars['stylesheet'] = 'Default.css'
-        vars['timestamp'] = "%d"%os.stat(__file__).st_mtime
-        return vars
+        tvars["analyticsActive"] = minfo.isAnalyticsActive()
+        tvars["analyticsCode"] = minfo.getAnalyticsCode()
+        tvars["analyticsCodeLocation"] = minfo.getAnalyticsCodeLocation()
+        tvars['timestamp'] = "%d" % os.stat(__file__).st_mtime
+        tvars['stylesheets'] = self._asset_env['base_css'].urls()
+        return tvars
 
 
 class WHeader(WTemplated):

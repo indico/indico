@@ -19,6 +19,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import os
+from webassets import Bundle, Environment
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.wcomponents import WTemplated
@@ -49,14 +51,16 @@ class WPConfModifChat(WPConferenceModifBase):
 
         self._tabCtrl = wcomponents.TabControl()
 
-    #TODO: with wsgi we want to specify another path instead of the usual one for .js files, so we'll have to make some modifications
-    #to make possible specifying absoulte paths
-    def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._includeJSPackage('Plugins')
+        plugin_htdocs = os.path.join(os.path.dirname(__file__), 'htdocs')
+
+        self._plugin_asset_env = Environment(plugin_htdocs, '/InstantMessaging')
+        self._plugin_asset_env.register('instant_messaging', Bundle('js/InstantMessaging.js',
+                                                                    filters='jsmin',
+                                                                    output="InstantMessaging_%(version)s.min.js"))
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
-               self._includeJSFile('InstantMessaging/js', 'InstantMessaging')
+               self._plugin_asset_env['instant_messaging'].urls()
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + \

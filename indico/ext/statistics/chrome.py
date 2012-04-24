@@ -170,6 +170,7 @@ class WPluginSettings(wcomponents.WTemplated):
 class WPStatisticsView(WPConferenceModifBase):
 
     def __init__(self, rh, templateClass, activeTab, params):
+        WPConferenceModifBase.__init__(self, rh, rh._conf)
         self._rh = rh
         self._conf = self._rh._conf
         self._register = StatisticsRegister()
