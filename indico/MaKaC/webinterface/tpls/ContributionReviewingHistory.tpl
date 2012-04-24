@@ -3,7 +3,7 @@
 <% from MaKaC.conference import Link %>
 
 % for review in Versioning:
-    % if review.getMaterials():
+    % if review.getMaterials() and (( ConferenceChoice == 4 and review.getRefereeJudgement().isSubmitted() ) or ( ConferenceChoice == 3 and review.getEditorJudgement().isSubmitted())):
     <div class="historyReview">
         <h1 class="historyReviewHeader">${ _("Review") } ${ review.getVersion() }</h1>
         <h2>${_("Files")}</h2>
