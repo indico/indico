@@ -88,6 +88,7 @@ div.statsWidgetTitle {
 
 div.statsWidgetContent {
     width: auto;
+    height: 100%;
     padding: 5px;
     word-wrap: break-word;
 }
@@ -104,4 +105,40 @@ div.statsTableDivider {
 div#statsGenerated {
     font-style: italic;
     font-size: 0.8em;
+}
+
+div#materialTree {
+    display: block;
+    width: 200px;
+    height: 90%;
+    overflow: auto;
+    float: left;
+    padding-top: 10px;
+}
+
+div#materialContainer {
+    display: block;
+    width: 510px;
+    float: left;
+    padding-left: 10px;
+    height: 90%;
+}
+
+/* jqTree Formatting */
+
+div#materialTree ul {
+    margin: 0px;
+    padding: 0 0 0px 20px;
+    line-height: 1.1em;
+}
+
+div#marginTree ul ul {
+    padding-left: 5px;
+}
+
+/* jqPlot Formatting */
+
+div#materialDownloadChart {
+    width: auto;
+    height: 250px;
 }

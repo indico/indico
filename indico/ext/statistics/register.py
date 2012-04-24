@@ -126,6 +126,21 @@ class StatisticsRegister():
 
         return hooks
 
+    def getAllPluginDownloadListeners(self):
+        """
+        Returns a list of all the plugins which have a listener for tracking
+        downloads.
+        """
+        listeners = []
+
+        for plugin in self.getAllPlugins(True):
+
+            if plugin.hasDownloadListener():
+                listeners.append(plugin)
+
+        return listeners
+
+
     def getAllPluginJSHookPaths(self):
         """
         Returns a list of all the paths to JSHook TPL files for registered
@@ -134,7 +149,9 @@ class StatisticsRegister():
         paths = []
 
         for plugin in self.getAllPlugins(True):
-            paths.append(plugin.getJSHookPath())
+
+            if plugin.hasJSHook():
+                paths.append(plugin.getJSHookPath())
 
         return paths
 

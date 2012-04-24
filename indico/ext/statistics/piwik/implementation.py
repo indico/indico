@@ -23,7 +23,8 @@ import indico.ext.statistics.piwik
 from indico.ext.statistics.base.implementation import BaseStatisticsImplementation, JSHookBase
 
 from MaKaC.plugins.base import PluginsHolder
-
+from MaKaC.i18n import _
+from MaKaC.webinterface.urlHandlers import UHFileAccess
 
 class PiwikStatisticsImplementation(BaseStatisticsImplementation):
 
@@ -35,6 +36,9 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
     def __init__(self):
         BaseStatisticsImplementation.__init__(self)
         self._implementationPackage = indico.ext.statistics.piwik
+        self._APISegmentation = []
+        self._setHasJSHook(True)
+        self._setHasDownloadListener(True)
 
         self.setAPIToken(self._getSavedAPIToken())
         self.setAPISiteID(self._getSavedAPISiteID())
@@ -99,6 +103,12 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
 
         return reference() if instantiate else reference
 
+    # @staticmethod
+    # @BaseStatisticsImplementation.memoizeReport
+    # def getMaterialReport(**kwargs):
+        
+    #     return True
+
     def setAPISiteID(self, id):
         """
         Piwik identifies sites by their 'idSite' attribute.
@@ -152,6 +162,21 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         self.setAPIParams({'segment': segmentation})
 
 
+    def trackDownload(self, request):
+        """
+        Wraps around the Piwik query object for tracking downloads, constructs
+        the name by which we want to log the download and the link.
+        """
+        from indico.ext.statistics.piwik.queries import PiwikQueryTrackDownload
+        tracker = PiwikQueryTrackDownload()
+        material = request._file
+
+        downloadLink = str(UHFileAccess().getURL(material))
+        downloadTitle = _('Download') + ' - ' + material.getFileName()
+
+        tracker.trackDownload(downloadLink, downloadTitle)
+
+
 class JSHook(JSHookBase):
 
     varConference = 'Conference'
@@ -166,7 +191,6 @@ class JSHook(JSHookBase):
         """
         Builds the references to Conferences & Contributions.
         """
-
         self.siteId = PiwikStatisticsImplementation.getVarFromPluginStorage('serverSiteID')
 
         if hasattr(item, '_conf'):

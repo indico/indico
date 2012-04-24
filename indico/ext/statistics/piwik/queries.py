@@ -19,8 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 import base64
 import json
+import urllib2
+import datetime
 
 from MaKaC.i18n import _
+from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 from indico.ext.statistics.register import StatisticsConfig
 from indico.ext.statistics.piwik.implementation import PiwikStatisticsImplementation
@@ -81,7 +84,22 @@ class PiwikQueryUtils():
 
 class PiwikQueryBase(PiwikStatisticsImplementation):
     """
-    Base class for all queries relating to Piwik installations, provides
+    For common methods shared between information recording and retrieval
+    with the API.
+    """
+
+    def getAPIQuery(self):
+        """
+        Overridden method call as we will use these queries to populate
+        pages with remote data, for most instances, therefore these values
+        will be required.
+        """
+        return super(PiwikQueryBase, self).getAPIQuery(https=True, withScript=True)
+
+
+class PiwikQueryRequestBase(PiwikQueryBase):
+    """
+    Base class for all request queries relating to Piwik installations, provides
     a series of methods which map against expected variables in the Piwik
     API.
     """
@@ -103,23 +121,89 @@ class PiwikQueryBase(PiwikStatisticsImplementation):
         """
         pass
 
-    def getAPIQuery(self):
+
+class PiwikQueryTrackBase(PiwikQueryBase):
+    """
+    Base class for all API calls which do not expect a return, that is such
+    requests as server-side tracking.
+    """
+
+    QUERY_SCRIPT = 'piwik.php'
+
+    def __init__(self):
+        PiwikStatisticsImplementation.__init__(self)
+        self.setAPIRecordMode()
+        self.setAPITime()
+
+    def _generateVisitorID(self, seed):
         """
-        Overridden method call as we will use these queries to populate
-        pages with remote data, for most instances, therefore these values
-        will be required.
+        Generates a unique visitor ID based on the seed string provided.
         """
-        return super(PiwikQueryBase, self).getAPIQuery(https=True, withScript=True)
+        return base64.b64encode(seed).lower()
+
+    def performCall(self):
+        """
+        Fires the call against the Piwik installation, by default simply calls
+        the _performCall method, to be overloaded with form-specific logic.
+        """
+        return self._performCall()
+
+    def setAPITime(self, time=None):
+        """
+        Sets the time variables of h, m & s in the tracking request, if a
+        specific time object is given, that is used, if not the current time
+        is used.
+        """
+
+        if not time or not isinstance(datetime.datetime, time):
+            time = datetime.datetime.now()
+
+        params = {'h' : time.hour, 'm' : time.minute, 's' : time.second}
+        self.setAPIParams(params)
+
+    def setAPIDownloadLink(self, downloadLink):
+        """
+        Sets the downloaded URL for tracking, also sets the URL of the tracking
+        to the same as per API recommendation.
+        """
+        self.setAPIParams({'download' : urllib2.quote(downloadLink)})
+        self.setAPIURL(downloadLink)
+
+    def setAPIURL(self, url):
+        self.setAPIParams({'url' : urllib2.quote(url)})
+
+    def setAPIVisitorID(self, visitorID):
+        self.setAPIParams({'_id' : self._generateVisitorID(visitorID)})
+
+    def setAPIRecordMode(self, mode=1):
+        """
+        This is an int boolean which forces the API into 'record' mode if flag
+        is set to 1.
+        """
+        self.setAPIParams({'rec' : mode})
+
+    def setAPIPageTitle(self, title):
+        """
+        Sets the 'title' of the page, which is to be tracked.
+        """
+        self.setAPIParams({'action_name' : urllib2.quote(title)})
+
+    def setAPISiteID(self, id):
+        """
+        For some reason, recording to piwik has 'idSite' in the format 'idsite',
+        overridden method to allow for this quirk.
+        """
+        self.setAPIParams({'idsite' : id})
 
 
-class PiwikQueryConferenceBase(PiwikQueryBase):
+class PiwikQueryConferenceBase(PiwikQueryRequestBase):
     """
     To handle all confId / contribId with dates instead of repeated code
     in multiple constructors.
     """
 
     def __init__(self, startDate, endDate, confId, contribId=None):
-        PiwikQueryBase.__init__(self)
+        PiwikQueryRequestBase.__init__(self)
         segmentation = {'customVariablePageName1': ('==', 'Conference'),
                         'customVariablePageValue1': ('==', confId)}
 
@@ -260,7 +344,7 @@ class PiwikQueryGraphConferenceCountries(PiwikQueryGraphConferenceBase):
 
 
 """
-Classes for returning individual metrics (string or int values) from theAPI.
+Classes for returning individual metrics (string or int values) from the API.
 """
 
 
@@ -368,6 +452,7 @@ class PiwikQueryMetricConferencePeakDateAndVisitors(PiwikQueryMetricConferenceBa
         which was the busiest overall, considering uniquevistors &
         actions.
         """
+
         jData = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
 
         if len(jData) > 0:
@@ -375,3 +460,125 @@ class PiwikQueryMetricConferencePeakDateAndVisitors(PiwikQueryMetricConferenceBa
             return {'date': date, 'users': value}
         else:
             return {'date': _('No Data'), 'users': 0}
+
+
+class PiwikQueryMetricDownload(PiwikQueryRequestBase):
+    """
+    This metric is agnostic of segmentation (though segmentation is possible)
+    as the query string used to download the files is unique, matching the
+    Conference and/or Contribution, therefore we can simply query Piwik based
+    on this string alone.
+    """
+
+    def __init__(self, url):
+        PiwikQueryRequestBase.__init__(self)
+        self.setAPIDownloadURL(url)
+        self._url = url
+
+    def _parseJSONForAPI(self, json):
+        """
+        Returns a simpler dictionary containing form:
+        {'date' : {'total_hits' : x, 'unique_hits' : y}}
+        """
+        cleanJSON = {}
+
+        for date in json.keys():
+            hits = json.get(date)
+
+            dayHits = {'total_hits' : 0,
+                       'unique_hits' : 0}
+
+            if hits:
+                # Piwik returns hits as a list of dictionaries, per date.
+                for metrics in hits:
+
+                    dayHits['total_hits'] += metrics['nb_hits']
+                    dayHits['unique_hits'] += metrics['nb_uniq_visitors']
+
+            cleanJSON[date] = dayHits
+
+        return cleanJSON
+
+    def _parseJSONForReduction(self, json):
+        """
+        Iterates through
+        """
+        pass
+
+    def setAPIDownloadURL(self, url):
+        """
+        Escapes and sets the download URL to match.
+        """
+        self.setAPIParams({'downloadUrl' : urllib2.quote(url)})
+
+    def _buildType(self):
+        self.setAPIModule('API')
+        self.setAPIFormat('JSON')
+        self.setAPIMethod('Actions.getDownload')
+
+    def getURL(self):
+        return self._url
+
+    def getQueryResult(self, returnAsJSON=False):
+        downloadJSON = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
+
+        if returnAsJSON:
+            return self._parseJSONForAPI(downloadJSON)
+
+        return downloadJSON
+
+
+class PiwikQueryMetricMultipleDownloads():
+    """
+    This class acts as a wrapped around multiple download requests as Piwik
+    only permits retrieval one at a time.
+    """
+
+    def __init__(self, urls):
+        self._resetDownloads()
+        self.setAPIDownloadURLs(urls)
+
+    def _hasDownloads(self):
+        return bool(self._downloads)
+
+    def _resetDownloads(self):
+        self._downloads = {}
+
+    def setDownloadURLs(self, urls, reset=False):
+        if not isinstance(list, urls):
+            raise Exception(_('This method must be passed a list of URLs.'))
+
+        if reset:
+            self._resetDownloads()
+
+        for url in urls:
+            self._downloads.append(PiwikQueryMetricDownload(url))
+
+    def getQueryResult(self, returnAsJson=False):
+        result = {}
+
+        for download in self._downloads:
+            result[download.getURL()] = download.getQueryResult(returnAsJson)
+
+
+class PiwikQueryTrackDownload(PiwikQueryTrackBase):
+
+    def __init__(self):
+        PiwikQueryTrackBase.__init__(self)
+        # See setAPISiteID in PiwikQueryTrackBase for reason it's 'idsite' here.
+        self._requiredParams = ['h', 'm', 's', 'idsite', 'download',
+                                'action_name']
+
+    def trackDownload(self, downloadLink, downloadTitle):
+        """
+        Tracks the download in Piwik with the link to track and the title
+        with which to track it. If either of which are not set, don't commit
+        as the data integrity would be jeapordised.
+        """
+        if not downloadLink or not downloadTitle:
+            return False
+
+        self.setAPIPageTitle(downloadTitle)
+        self.setAPIDownloadLink(downloadLink)
+
+        self.performCall()

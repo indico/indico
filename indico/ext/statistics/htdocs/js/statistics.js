@@ -43,4 +43,41 @@ $(function() {
             classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
         }
     });
+
+    /**
+     * Handle the updating of the Material Download info via
+     * JSON from the API.
+     */
+    var updateMaterialPane = function(uri) {
+        alert(uri);
+    };
+
+    /* jqTree Specifics */
+    $('#materialTree').tree({
+        data: materialTreeData,
+        onCanSelectNode: function(node) {
+            return (node.children.length == 0)
+        }
+    });
+
+    $('#materialTree').bind('tree.click', function(event) {
+        updateMaterialPane(event.node.id);
+    });
+
+    /* jqPlot Specifics */
+    var materialPlot = $.jqplot ('materialDownloadChart', materialPlotData, {
+        cursor: {
+            show: true,
+            zoom: true,
+            showTooltip: false
+        },
+        highlighter: {
+            show: true,
+            sizeAdjust: 5
+        },
+        grid: {
+            background: '#FFFFFF',
+            shadow: false
+        }
+    })
 });

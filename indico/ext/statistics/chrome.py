@@ -24,7 +24,7 @@ import zope.interface
 import indico.ext.statistics
 
 from indico.core.extpoint import Component
-from indico.core.extpoint.events import INavigationContributor, IEventDisplayContributor
+from indico.core.extpoint.events import INavigationContributor, IEventDisplayContributor, IMaterialDownloadListener
 from indico.core.extpoint.plugins import IPluginSettingsContributor
 from indico.ext.statistics.register import StatisticsRegister
 from indico.web.rh import RHHtdocs
@@ -39,6 +39,9 @@ from MaKaC.webinterface import wcomponents
 
 
 class StatisticsSMContributor(Component):
+    """
+    Adds the Statistics option to the side menu of Conference Modification.
+    """
 
     zope.interface.implements(INavigationContributor)
 
@@ -52,6 +55,9 @@ class StatisticsSMContributor(Component):
 
 
 class StatisticsEFContributor(Component):
+    """
+    Injects the JSHook objects of all implementations into the event footer.
+    """
 
     zope.interface.implements(IEventDisplayContributor)
 
@@ -81,6 +87,24 @@ class StatisticsEFContributor(Component):
             vars[key] = [extension]
         else:
             vars[key].append(extension)
+
+
+class StatisticsMaterialDownloadListener(Component):
+    """
+    Provides listener point for implementations to track material downloads.
+    """
+
+    zope.interface.implements(IMaterialDownloadListener)
+
+    @classmethod
+    def materialDownloaded(cls, obj):
+        register = StatisticsImplementationRegister.getInstance()
+        listeners = register.getAllPluginDownloadListeners()
+
+        for listener in listeners:
+            listener.trackDownload(obj)
+
+        return False
 
 
 class UHConfModifStatistics(URLHandler):
@@ -184,6 +208,19 @@ class WPStatisticsView(WPConferenceModifBase):
         self._tabs = []
         self._tabCtrl = wcomponents.TabControl()
 
+    def _addjqPlotPlugins(self, plugins, extraJS):
+        """
+        Util function to include jqPlot plugins easier.
+        """
+        if not isinstance(plugins, list):
+            plugins = list(plugins)
+
+        prefix = 'statistics/js/lib/jqPlot/plugins/jqplot.'
+        suffix = '.min.js'
+
+        for plugin in plugins:
+            extraJS.append(prefix + plugin + suffix)
+
     def _createTabCtrl(self):
         for plugin in self._plugins:
             self._tabs.append(self._tabCtrl.newTab(plugin.getName(),
@@ -206,12 +243,22 @@ class WPStatisticsView(WPConferenceModifBase):
                                           self._register, self._activeTabName, self._params).getHTML(params))
 
     def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + \
-                ['statistics/css/main.css']
+        extraCSS = ['statistics/css/main.css',
+                    'statistics/js/lib/jqTree/jqtree.css',
+                    'statistics/js/lib/jqPlot/jquery.jqplot.css']
+
+        return WPConferenceModifBase.getCSSFiles(self) + extraCSS
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + \
-                ['statistics/js/statistics.js']
+        extraJS = ['statistics/js/statistics.js',
+                    'statistics/js/lib/jqTree/tree.jquery.js',
+                    'statistics/js/lib/jqPlot/jquery.jqplot.min.js']
+
+        jqPlotPlugins = ['dateAxisRenderer', 'highlighter', 'cursor']
+
+        self._addjqPlotPlugins(jqPlotPlugins, extraJS)
+
+        return WPConferenceModifBase.getJSFiles(self) + extraJS
 
     def _setActiveSideMenuItem(self):
         if 'Statistics' in self._pluginsDictMenuItem:

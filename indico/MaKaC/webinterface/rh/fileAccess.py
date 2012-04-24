@@ -52,6 +52,7 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
             RHDisplayBaseProtected._checkProtection( self )
 
     def _process( self ):
+        self._notify('materialDownloaded')
 
         if isinstance(self._file, Link):
             self._redirect(self._file.getURL())

@@ -57,6 +57,8 @@ class BaseStatisticsImplementation(Component):
         self._APIQuery = None
         self._paramsChanged = False
         self._implementationPackage = indico.ext.statistics.base
+        self._hasJSHook = False
+        self._hasDownloadListener = False
 
         Component.__init__(self)
         self._buildPluginPath()
@@ -197,6 +199,12 @@ class BaseStatisticsImplementation(Component):
         response.close()
         return value
 
+    def _setHasJSHook(self, hasHook=True):
+        self._hasJSHook = hasHook
+
+    def _setHasDownloadListener(self, hasListener=True):
+        self._hasDownloadListener = hasListener
+
     def clearAPIParams(self):
         """
         Clears the internal params buffer.
@@ -317,9 +325,22 @@ class BaseStatisticsImplementation(Component):
 
     def getQueryResult(self):
         """
-        To be overloaded per implementation.
+        To be overridden per implementation.
         """
         pass
+
+    def hasJSHook(self):
+        """
+        Returns whether this implementation has a JSHook for tracking pageviews
+        etc.
+        """
+        return self._hasJSHook
+
+    def hasDownloadListener(self):
+        """
+        Returns whether this implementation has a download listener.
+        """
+        return self._hasDownloadListener
 
     def setAPIParams(self, params):
         """
@@ -340,6 +361,12 @@ class BaseStatisticsImplementation(Component):
         Sets the API token of this instance.
         """
         self._APIToken = token
+
+    def trackDownload(self, obj):
+        """
+        To be overridden by those plugins which have a download listener.
+        """
+        pass
 
     @staticmethod
     def memoizeReport(function):

@@ -192,6 +192,29 @@
 
     </div>
 
+    <div class="statsRow">
+
+        <!-- File Downloads -->
+        <div class="statsWidget full edge">
+            <div class="statsWidgetTitle">
+                ${_('Material Downloads')}
+            </div>
+            <div class="statsWidgetContent">
+                <div id="materialTree"></div>
+                <div id="materialContainer">
+                    <div id="materialHeader" class="statsTableDivider">
+                        ${_('Downloads for')}: <span id="materialTitle">Foo</span>
+                    </div>
+                    <div id="materialInfo">
+                        <div id='materialDownloadChart'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <div id="statsGenerated">
         ${_('This report was generated at: %s') % formatDateTime(report['dateGenerated'], format='long')}
     </div>
@@ -207,4 +230,27 @@
 <script type="text/javascript">
 var str_modif_query = '${strModifQuery}';
 var str_hide_query = '${strHideQuery}';
+
+/* Data for constructing the jqTree. */
+var materialTreeData = [
+    {
+    label: 'Conference',
+    children: [
+        {
+        label: 'Slides',
+            id: 'dsdkg&fdjshgf=f'},
+    { 
+        label: 'child2'}
+    ]},
+{
+    label: 'node2',
+    children: [
+        {
+        label: 'child3'}
+    ]}
+];
+
+/* Data for the jqPlot. */
+var materialPlotData = [[3,7,9,1,5,3,8,2,5]];
+
 </script>

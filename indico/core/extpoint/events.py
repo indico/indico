@@ -110,6 +110,16 @@ class IMetadataChangeListener(IListener):
         pass
 
 
+class IMaterialDownloadListener(IListener):
+
+    def materialDownloaded(self, obj):
+        """
+        Listens for material downloaded, to be handled by (for example) tracking
+        applications.
+        """
+        pass
+
+
 class ITimetableContributor(IContributor):
     """
     Encapsulates extension points concerning event timetable.
@@ -220,3 +230,4 @@ class IEventDisplayContributor(IContributor):
         """
         Returns the info that the plugins want to add into the footer.
         """
+
