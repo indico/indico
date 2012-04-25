@@ -1002,7 +1002,7 @@ class WContributionICalExport(WICalExportBase):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["target"] = vars["Contribution"] = self._contrib
+        vars["target"] = vars["Contribution"] = vars["item"] = self._contrib
         vars["urlICSFile"] =  urlHandlers.UHContribToiCal.getURL(self._contrib)
         vars.update(self._getIcalExportParams(self._user, '/export/event/%s/contribution/%s.ics' % \
                                               (self._contrib.getConference().getId(), self._contrib.getId())))

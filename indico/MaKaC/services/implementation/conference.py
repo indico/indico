@@ -1548,11 +1548,11 @@ class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
         urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
-        result["publicRequestTopURL"] = urls["publicRequestURL"]
-        result["authRequestTopURL"] =  urls["authRequestURL"]
+        result["publicRequestURL"] = urls["publicRequestURL"]
+        result["authRequestURL"] =  urls["authRequestURL"]
         urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s.ics'%self._target.getId(), {'detail': "contribution"}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
-        result["publicRequestAllURL"] = urls["publicRequestURL"]
-        result["authRequestAllURL"] =  urls["authRequestURL"]
+        result["publicRequestDetailedURL"] = urls["publicRequestURL"]
+        result["authRequestDetailedURL"] =  urls["authRequestURL"]
         return result
 
 methodMap = {

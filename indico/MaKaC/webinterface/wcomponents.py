@@ -502,10 +502,10 @@ class WConferenceHeader(WHeader):
             (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
 
         vars["requestURLs"] = {
-            'publicRequestTopURL': topURLs["publicRequestURL"],
-            'authRequestTopURL':  topURLs["authRequestURL"],
-            'publicRequestAllURL': urls["publicRequestURL"],
-            'authRequestAllURL':  urls["authRequestURL"]
+            'publicRequestURL': topURLs["publicRequestURL"],
+            'authRequestURL':  topURLs["authRequestURL"],
+            'publicRequestDetailedURL': urls["publicRequestURL"],
+            'authRequestDetailedURL':  urls["authRequestURL"]
         }
 
         vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False

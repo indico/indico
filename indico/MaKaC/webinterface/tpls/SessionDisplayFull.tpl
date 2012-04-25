@@ -43,4 +43,4 @@
         <td colspan="3">${ contribs }</td>
     </tr>
 </table>
-<%include file="SessionICalExport.tpl"/>
+<%include file="SessionICalExport.tpl" args="item=session"/>

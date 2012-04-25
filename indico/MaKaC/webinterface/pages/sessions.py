@@ -2655,7 +2655,7 @@ class WSessionICalExport(WICalExportBase):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["target"] = vars["session"] = self._session
+        vars["target"] = vars["session"] = vars["item"] = self._session
         vars["urlICSFile"] =  urlHandlers.UHSessionToiCal.getURL(self._session)
 
         vars.update(self._getIcalExportParams(self._user, '/export/event/%s/session/%s.ics' % \

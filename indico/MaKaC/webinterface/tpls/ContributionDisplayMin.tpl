@@ -11,7 +11,7 @@
     |
     <a id="exportIcal${Contribution.getUniqueId()}" class="fakeLink exportIcal" data-id="${Contribution.getUniqueId()}">${_("iCal")}</a>
     % endif
-    <%include file="ContributionICalExport.tpl"/>
+    <%include file="ContributionICalExport.tpl" args="item=Contribution"/>
 </div>
 
 <h1 class="contributionTitle">
