@@ -33,7 +33,12 @@ material.
 |image3|
 
 
-To submit material, click on *Add Material*. A popup will appear, from
+To submit material, click on *Edit Files*. A popup will appear, where the
+attached files can be seen.
+
+|image5|
+
+By clicking on *Add Material* link a new popup will appear from
 which you can choose the material type (slides, video etc.) and upload it.
 You also need to set the protection level, (see :ref:`access_control`), and
 you can add a description and display name. If you set the material to be private,
@@ -51,3 +56,4 @@ contribution details
 .. |image2| image:: QSPics/mycontslist.png
 .. |image3| image:: QSPics/submitcont.png
 .. |image4| image:: QSPics/submitmat.png
+.. |image5| image:: QSPics/submitmatlist.png

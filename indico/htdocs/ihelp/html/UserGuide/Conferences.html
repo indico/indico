@@ -304,7 +304,7 @@ once they have been added
 Here, you can also add contributions to your session. If you know the contribution’s
 ID, you can make use of the <em>Quick search</em> option; type in the ID, and
 then click on <em>seek it</em>.
-If not, you can search for it. You can search by author, or by any of
+Otherwise, you can search for it. You can search by author, or by any of
 the filtering criteria.  It is also possible to import a contribution,
 to get the PDF or author list of selected contributions. You can also
 remove contributions, by selecting them and then clicking on <em>remove selected</em>.</p>
@@ -613,7 +613,7 @@ for your conference.</p>
 <ul class="simple">
 <li><strong>Add new</strong>: It will open the registration form <a class="reference external" href="#registration-form">(see Registration Form)</a>.</li>
 <li><strong>Remove</strong>: It will remove the selected registrants.</li>
-<li><strong>Email</strong>: It will allow to send an email to the selected registrants. Indico will send one email per participant. Also, you can profit from the Available tags to make it personal; Indico will replace the tag with the real value of the registrant, e.g. %(registrant_family_name)s will be Smith.</li>
+<li><strong>Email</strong>: It will allow to send an email to the selected registrants. Indico will send one email per participant. Also, you can profit from the Available tags to make it personal; Indico will replace the tag with the real value of the registrant, e.g. {registrant_family_name} will be Smith.</li>
 </ul>
 <p><img alt="image102" src="../_images/confreg14.png" /></p>
 <ul class="simple">
@@ -1321,7 +1321,7 @@ the abstract name you will see the details of the abstract.</p>
 abstracts view. This shows all the details of the abstract.</p>
 <p><img alt="image82" src="../_images/confd11.png" /></p>
 <p>You can print the details of this abstract as a PDF using the
-icon in the top right corner.</p>
+link in the top right corner.</p>
 </div>
 </div>
 <hr class="docutils" />
@@ -1347,24 +1347,26 @@ details and the contribution(s) he has authored.</p>
 <p>Contribution List in the menu takes you to all the contributions
 in the Conference. From here you can see a list of all or just
 certain types of contributions that you wish to see, e.g.
-only those contributions in a specific session.</p>
+only those contributions in a specific session. You can also filter
+by a pattern to find in the title or description of the contribution.</p>
 <p><img alt="image85" src="../_images/confd14.png" /></p>
 <p>You can access the display of each contribution by clicking on
-its name. You can also create a PDF of either selected
+its name. You can also create a PDF of either displayed
 contributions or all of them.</p>
 <hr class="docutils" />
 <div class="section" id="contribution-display">
 <h4>2.5.5.1. Contribution Display<a class="headerlink" href="#contribution-display" title="Permalink to this headline">¶</a></h4>
 <p>In the Contribution Display you can see all the details of the
-contribution, including the description, the author, the session
-(if any) it is included, any material <a class="reference external" href="#contribution-material-display">(see Contribution Material Display)</a>
+contribution, including the description, the primary and co-authors, the session
+(if any) it is included, the track, the contribution type,
+any material <a class="reference external" href="#contribution-material-display">(see Contribution Material Display)</a>
 it has and any sub-contributions that belong to it. You can also
 access those details by clicking on their names. You can also print
-the contribution in PDF, XML, or iCal format by using the icons in
+the contribution in PDF, XML, or iCal format by using the links in
 the top right-hand corner.</p>
 <p><img alt="image86" src="../_images/confd15.png" /></p>
 <p>If you have modification rights, you will have the modification
-icon next to the print formats and you can access the Contribution
+link next to the print formats and you can access the Contribution
 Modification Area.</p>
 <hr class="docutils" />
 <div class="section" id="contribution-material-display">
@@ -1373,8 +1375,9 @@ Modification Area.</p>
 accessing the Contribution Display <a class="reference external" href="#contribution-display">(see Contribution Display)</a>.
 Here, there is a section <em>Material</em> with all the resources attached.</p>
 <p><img alt="image87" src="../_images/confd151.png" /></p>
-<p>Click in <em>Add Material</em> in order to upload more, in the edit icon to modify,
-or in the red cross to remove it.</p>
+<p>Having the proper access, by clicking in <em>Edit files</em> is possible manage the material attached. It will open a popup, and by
+clicking in <em>Add Material</em> is possible to upload more, in the edit icon to modify, and in the red cross to remove it.</p>
+<p><img alt="image155" src="../_images/confd152.png" /></p>
 </div>
 </div>
 </div>
@@ -1682,7 +1685,7 @@ session. You may also make a PDF of the session.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

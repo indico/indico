@@ -39,6 +39,7 @@ Layout reviewer area
  Otherwise the file list will be disabled for editing, removing and adding.
 
         |image5|
+
 ------------------------
 
 .. |image1| image:: PaperReviewingEditorsPics/editor1.png
