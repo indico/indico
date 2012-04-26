@@ -825,13 +825,18 @@ class Category(CommonObjectBase):
         return len(self.subcategories.values()) > 0
 
     def getVisibility ( self ):
-        # TODO: Check if this actually works
-        # since getOwner() can be None (root categ)
-        try:
-            return max(0,min(int(self._visibility), self.getOwner().getVisibility()+1))
-        except:
-            self._visibility = 999
-            return 999
+        """
+        Returns category visibility, considering that it can be
+        restricted by parent categories
+        """
+        owner = self.getOwner()
+        visibility = int(self._visibility)
+
+        # visibility can be restricted by parent categories
+        if owner:
+            return max(0, min(visibility, owner.getVisibility() + 1))
+        else:
+            return visibility
 
     def setVisibility( self, visibility=999 ):
         self._visibility = int(visibility)

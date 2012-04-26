@@ -504,6 +504,7 @@ class RH(RequestHandlerBase):
         if self._checkHttpsRedirect():
             return
 
+
         DBMgr.getInstance().startRequest()
         self._startRequestSpecific2RH()     # I.e. implemented by Room Booking request handlers
         textLog.append("%s : Database request started"%(datetime.now() - self._startTime))
