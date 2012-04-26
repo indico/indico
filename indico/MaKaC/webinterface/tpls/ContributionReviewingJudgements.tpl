@@ -64,7 +64,7 @@
                 % if len(AdviceList) > 0:
                     <table cellspacing="0" cellpadding="5" width="100%">
                     % for advice in AdviceList:
-                        <%include file="AdviceJudgementDisplay.tpl" args="advice = advice, ShowReviewer = True, format=format"/>
+                        <%include file="AdviceJudgementDisplay.tpl" args="Advice = advice, ShowReviewer = True, format=format"/>
                     % endfor
                     </table>
                 % else:
