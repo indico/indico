@@ -552,6 +552,7 @@ class RHCategoryToiCal(RHCategDisplayBase):
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+
         return data
 
 class RHCategoryToRSS(RHCategDisplayBase):
@@ -579,6 +580,7 @@ class RHCategoryToAtom(RHCategDisplayBase):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ATOM" )
         self._req.content_type = """%s"""%(mimetype)
+
         return data
 
 

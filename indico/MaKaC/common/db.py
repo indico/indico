@@ -35,6 +35,7 @@ import ZODB
 from MaKaC.consoleScripts.installBase import getIndicoInstallMode
 skip_imports = getIndicoInstallMode()
 
+
 if not skip_imports:
     from MaKaC.common.logger import Logger
 
@@ -109,7 +110,6 @@ class DBMgr:
 
     def _delConnObject(self):
         self._conn.conn = None
-
 
     def startRequest( self ):
         """Initialise the DB and starts a new transaction.
