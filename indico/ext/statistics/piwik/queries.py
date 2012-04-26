@@ -71,9 +71,10 @@ class PiwikQueryUtils():
         minutes = seconds / 60
         ti = {'h': 0, 'm': 0, 's': 0}
 
-        ti['s'] = seconds % 60
-        ti['m'] = minutes % 60
-        ti['h'] = minutes / 60
+        if seconds > 0:
+            ti['s'] = seconds % 60
+            ti['m'] = minutes % 60
+            ti['h'] = minutes / 60
 
         return "%dh %dm %ds" % (ti['h'], ti['m'], ti['s'])
 
@@ -277,7 +278,7 @@ class PiwikQueryMetricConferenceBase(PiwikQueryConferenceBase):
         """
         queryResult = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
 
-        return PiwikQueryUtils.getJSONValueSum(queryResult) if queryResult else 0
+        return int(PiwikQueryUtils.getJSONValueSum(queryResult)) if queryResult else 0
 
 
 class PiwikQueryMetricConferenceUniqueVisits(PiwikQueryMetricConferenceBase):
