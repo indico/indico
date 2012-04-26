@@ -52,6 +52,16 @@ class PiwikQueryUtils():
         return reduce(lambda x, y: int(x) + int(y), data.values())
 
     @staticmethod
+    def getJSONValueAverage(data):
+        """
+        The parameter should be a JSON object to be averaged. Returns integer
+        value of average.
+        """
+        total = PiwikQueryUtils.getJSONValueSum(data)
+
+        return total / len(data)
+
+    @staticmethod
     def stringifySeconds(seconds=0):
         """
         Takes time as a value of seconds and deduces the delta in human-readable
@@ -295,7 +305,7 @@ class PiwikQueryMetricConferenceVisitLength(PiwikQueryMetricConferenceBase):
         Returns a string of the time in hh:mm:ss
         """
         data = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
-        seconds = PiwikQueryUtils.getJSONValueSum(data) if data else 0
+        seconds = PiwikQueryUtils.getJSONValueAverage(data) if data else 0
 
         return PiwikQueryUtils.stringifySeconds(seconds)
 
