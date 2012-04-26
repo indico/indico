@@ -8241,6 +8241,7 @@ a.titleWithLink:hover{
     text-align:justify;
     color: #444;
     margin-right: 5px;
+    white-space: pre-wrap;
 }
 
 .contributionSpeakerList,  .subContributionSpeakerList, .abstractSubmitter {

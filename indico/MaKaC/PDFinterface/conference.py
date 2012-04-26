@@ -1545,7 +1545,7 @@ class TimeTablePlain(PDFWithTOC):
                 if sessionSlot.getTitle()!="":
                     sesCaption="%s: %s"%(sesCaption,sessionSlot.getTitle())
                 conv=[]
-                for c in sessionSlot.getConvenerList():
+                for c in sessionSlot.getOwnConvenerList():
                     if self._showSpeakerAffiliation and c.getAffiliation().strip() != "":
                         conv.append("%s (%s)"%(escape(c.getFullName()), escape(c.getAffiliation())))
                     else:
@@ -1858,13 +1858,13 @@ class SimplifiedTimeTablePlain(PDFBase):
                     title=e.getOwner().getTitle()
                 res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Session"):</b></font> %s""")%escape(title),self._styles["normal"]))
                 roomTime=""
-                if e.getRoom() is not None:
-                    roomTime="%s "%(escape(e.getRoom().getName()))
-                roomTime= i18nformat("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, e.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
-                        e.getAdjustedEndDate(self._tz).strftime("%H:%M"))
+                if sessionSlot.getRoom() is not None:
+                    roomTime="%s "%(escape(sessionSlot.getRoom().getName()))
+                roomTime= i18nformat("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, sessionSlot.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
+                        sessionSlot.getAdjustedEndDate(self._tz).strftime("%H:%M"))
                 res.append(Paragraph(roomTime,self._styles["normal"]))
                 chairs=[]
-                for c in e.getConvenerList():
+                for c in sessionSlot.getOwnConvenerList():
                     chairs.append("%s"%c.getFullName())
                 if chairs != []:
                     res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Chair/s"):</b></font> %s""")%("; ".join(chairs)),self._styles["normal"]))
@@ -1875,8 +1875,6 @@ class SimplifiedTimeTablePlain(PDFBase):
                 if not contrib.canView(self._aw):
                     continue
                 title=contrib.getTitle()
-                if title.strip()=="":
-                    title=e.getOwner().getTitle()
                 res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Contribution"):</b></font> %s""")%escape(title),self._styles["normal"]))
                 roomTime=""
                 if contrib.getRoom() is not None:
@@ -1892,8 +1890,6 @@ class SimplifiedTimeTablePlain(PDFBase):
                 res.append(Spacer(1,0.2*inch))
             elif self._ttPDFFormat.showBreaksAtConfLevel() and isinstance(entry,schedule.BreakTimeSchEntry):
                 title=entry.getTitle()
-                if title.strip()=="":
-                    title=e.getOwner().getTitle()
                 res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Break"):</b></font> %s""")%escape(title),self._styles["normal"]))
                 roomTime=""
                 if entry.getRoom() is not None:

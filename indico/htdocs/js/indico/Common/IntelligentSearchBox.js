@@ -378,8 +378,8 @@ $.widget('ui.search_tag', {
         $parent.on('mouseenter', '.searchTag.everywhere', function() {
             self.show_categ();
         });
-        $parent.on('mouseover', '.searchTag.everywhere', function() {
-            self.show_tip();
+        $parent.on('mouseover', '.searchTag.everywhere', function(event) {
+            self.show_tip(event);
         });
         $parent.on('mouseleave', '.searchTag.everywhere', function() {
             $where.removeClass('hasFocus');
@@ -432,7 +432,7 @@ $.widget('ui.search_tag', {
         }, 200);
     },
 
-    show_tip: function() {
+    show_tip: function(event) {
         this.$tag.qtip({
             content: format($T('Click to search inside <span class="label">{title}</span>'),
                               {title: this.options.categ_title}),

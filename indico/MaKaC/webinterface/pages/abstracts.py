@@ -273,8 +273,8 @@ class WAbstractDisplay( wcomponents.WTemplated ):
         vars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
         vars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(tz))
 
-        vars["modifyDisabled"] = isinstance( status, (review.AbstractStatusSubmitted, review.AbstractStatusAccepted,
-                                                      review.AbstractStatusRejected, review.AbstractStatusDuplicated, review.AbstractStatusMerged ) )
+        vars["modifyDisabled"] = isinstance(status, (review.AbstractStatusAccepted,
+                                                     review.AbstractStatusRejected, review.AbstractStatusDuplicated, review.AbstractStatusMerged))
         vars["withdrawDisabled"] = isinstance( status, (review.AbstractStatusAccepted, review.AbstractStatusRejected,
                                                         review.AbstractStatusWithdrawn, review.AbstractStatusDuplicated, review.AbstractStatusMerged ) )
         status = self._abstract.getCurrentStatus()

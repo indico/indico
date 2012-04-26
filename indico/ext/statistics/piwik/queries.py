@@ -52,6 +52,16 @@ class PiwikQueryUtils():
         return reduce(lambda x, y: int(x) + int(y), data.values())
 
     @staticmethod
+    def getJSONValueAverage(data):
+        """
+        The parameter should be a JSON object to be averaged. Returns integer
+        value of average.
+        """
+        total = PiwikQueryUtils.getJSONValueSum(data)
+
+        return total / len(data)
+
+    @staticmethod
     def stringifySeconds(seconds=0):
         """
         Takes time as a value of seconds and deduces the delta in human-readable
@@ -61,9 +71,10 @@ class PiwikQueryUtils():
         minutes = seconds / 60
         ti = {'h': 0, 'm': 0, 's': 0}
 
-        ti['s'] = seconds % 60
-        ti['m'] = minutes % 60
-        ti['h'] = minutes / 60
+        if seconds > 0:
+            ti['s'] = seconds % 60
+            ti['m'] = minutes % 60
+            ti['h'] = minutes / 60
 
         return "%dh %dm %ds" % (ti['h'], ti['m'], ti['s'])
 
@@ -267,7 +278,7 @@ class PiwikQueryMetricConferenceBase(PiwikQueryConferenceBase):
         """
         queryResult = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
 
-        return PiwikQueryUtils.getJSONValueSum(queryResult) if queryResult else 0
+        return int(PiwikQueryUtils.getJSONValueSum(queryResult)) if queryResult else 0
 
 
 class PiwikQueryMetricConferenceUniqueVisits(PiwikQueryMetricConferenceBase):
@@ -295,7 +306,7 @@ class PiwikQueryMetricConferenceVisitLength(PiwikQueryMetricConferenceBase):
         Returns a string of the time in hh:mm:ss
         """
         data = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
-        seconds = PiwikQueryUtils.getJSONValueSum(data) if data else 0
+        seconds = PiwikQueryUtils.getJSONValueAverage(data) if data else 0
 
         return PiwikQueryUtils.stringifySeconds(seconds)
 

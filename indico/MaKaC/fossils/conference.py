@@ -247,6 +247,9 @@ class ISessionFossil(IFossil):
     def getTitle(self):
         """ Session Title """
 
+    def getDescription(self):
+        """ Session Description """
+
     def getAllMaterialList(self):
         """ Session List of all material """
     getAllMaterialList.result = IMaterialFossil
@@ -263,6 +266,11 @@ class ISessionFossil(IFossil):
         """ Session Start Date """
     getAdjustedStartDate.convert = Conversion.datetime
     getAdjustedStartDate.name = "startDate"
+
+    def getAdjustedEndDate(self):
+        """ Session End Date """
+    getAdjustedEndDate.convert = Conversion.datetime
+    getAdjustedEndDate.name = "endDate"
 
     def getLocation(self):
         """ Session Location """
@@ -289,6 +297,10 @@ class ISessionFossil(IFossil):
     def getTextColor(self):
         """ Session Text Color """
 
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHSessionDisplay)
+    getLocator.name = 'url'
 
 class ISessionSlotFossil(IFossil):
 

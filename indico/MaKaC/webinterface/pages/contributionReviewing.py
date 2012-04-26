@@ -122,7 +122,29 @@ class WPContributionModifReviewingMaterials( WPContributionModifBase ):
         wc=wcomponents.WShowExistingReviewingMaterial(self._target)
         return wc.getHTML( pars )
 
-class WContributionReviewingJudgements(wcomponents.WTemplated):
+class WContributionReviewingBase(wcomponents.WTemplated):
+
+    def _getStatusClass( self, judgement ):
+        if judgement == "Accept":
+            return "contributionReviewingStatusAccepted"
+        elif judgement == "Reject":
+            return "contributionReviewingStatusRejected"
+        elif judgement == "To be corrected":
+            return "contributionReviewingStatusCorrected"
+        else:
+            return "contributionReviewingStatusCorrected"
+
+    def _getStatusText( self, judgement ):
+        if judgement == "Accept":
+            return _("ACCEPTED")
+        elif judgement == "Reject":
+            return _("REJECTED")
+        elif judgement == "To be corrected":
+            return _("To be corrected")
+        else:
+            return judgement
+
+class WContributionReviewingJudgements(WContributionReviewingBase):
 
     def __init__(self, conference, aw):
         self._conf = conference
@@ -151,6 +173,8 @@ class WContributionReviewingJudgements(wcomponents.WTemplated):
         vars["IsReferee"] = self.__target.getReviewManager().isReferee(self._rh._getUser())
         vars["Review"] = self.__target.getReviewManager().getLastReview()
         vars["TrackList"] = self._conf.getTrackList()
+        vars["getStatusClass"] = lambda judgement: self._getStatusClass(judgement)
+        vars["getStatusText"] = lambda judgement: self._getStatusText(judgement)
 
         return vars
 
@@ -232,31 +256,11 @@ class WPContributionReviewingHistory(WPContributionModifBase):
         wc = WContributionReviewingHistory(self._target)
         return wc.getHTML({"ShowReviewingTeam" : True})
 
-class WContributionReviewingHistory(wcomponents.WTemplated):
+class WContributionReviewingHistory(WContributionReviewingBase):
 
     def __init__(self, contribution):
         self._contribution = contribution
         self._conf = contribution.getConference()
-
-    def _getStatusClass( self, judgement ):
-        if judgement == "Accept":
-            return "contributionReviewingStatusAccepted"
-        elif judgement == "Reject":
-            return "contributionReviewingStatusRejected"
-        elif judgement == "To be corrected":
-            return "contributionReviewingStatusCorrected"
-        else:
-            return "contributionReviewingStatusCorrected"
-
-    def _getStatusText( self, judgement ):
-        if judgement == "Accept":
-            return _("ACCEPTED")
-        elif judgement == "Reject":
-            return _("REJECTED")
-        elif judgement == "To be corrected":
-            return _("To be corrected")
-        else:
-            return judgement
 
     def getHTML( self, params ):
 

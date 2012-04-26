@@ -22,12 +22,12 @@
                         ${_('View statistics between these dates')}:
                         <input type="text"
                                class="statsDates"
-                               id="startDate"
+                               id="statsFilterStartDate"
                                data-default="${report['startDate']}"
                                value="${report['startDate']}" />
                         ${_('to')}
                         <input type="text" class="statsDates"
-                               id="endDate"
+                               id="statsFilterEndDate"
                                data-default="${report['endDate']}"
                                value="${report['endDate']}" />
                         <input type="hidden" id="confId" value="${report['confId']}" />
