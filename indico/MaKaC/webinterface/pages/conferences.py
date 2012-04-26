@@ -415,7 +415,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
         dmgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         path = self._getBaseURL()
-        timestamp = os.stat('%s/css/Conf_Basic.css'%(Config.getInstance().getHtdocsDir())).st_mtime
+        timestamp = os.stat(__file__).st_mtime
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css?%d" >
             """ % (path, timestamp)
