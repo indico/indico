@@ -29,7 +29,7 @@ from MaKaC.webinterface.rh.conferenceBase import RHContributionBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common import Config
-from MaKaC.errors import MaKaCError, ModificationError
+from MaKaC.errors import MaKaCError, ModificationError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils
 import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
@@ -117,6 +117,10 @@ class RHContributionToPDF(RHContributionDisplay):
 class RHContributionToiCal(RHContributionDisplay):
 
     def _process( self ):
+
+        if not self._target.isScheduled():
+            raise NoReportError(_("You cannot export the contribution with id %s because it is not scheduled")%self._target.getId())
+
         filename = "%s-Contribution.ics"%self._target.getTitle()
 
         hook = ContributionHook({}, 'contribution', {'event': self._conf.getId(), 'idlist':self._contrib.getId(), 'dformat': 'ics'})
