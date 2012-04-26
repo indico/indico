@@ -422,7 +422,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         confCSS = dmgr.getStyleManager().getCSS()
 
         if confCSS:
-            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s?%d">"""%(confCSS.getURL(), timestamp)
+            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
 
         return printCSS
 
