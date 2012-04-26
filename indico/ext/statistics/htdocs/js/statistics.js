@@ -13,8 +13,8 @@ $(function() {
 
     var buildURI = function() {
         var params = {'confId' : $('#confId').val(),
-                      'startDate' : $('#startDate').val(),
-                      'endDate' : $('#endDate').val(),
+                      'startDate' : $('#statsFilterStartDate').val(),
+                      'endDate' : $('#statsFilterEndDate').val(),
                       'tab' : 'Piwik'
         };
 
