@@ -7181,6 +7181,9 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     def canView(self,aw):
         return self.getSession().canView(aw)
 
+    def isProtected(self):
+        return self.getSession().isProtected()
+
     def setScheduleType(self,id):
         id=str(id).strip().lower()
         currentId=SlotSchTypeFactory.getId(self.getSchedule())

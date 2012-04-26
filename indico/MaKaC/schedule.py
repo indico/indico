@@ -1478,10 +1478,11 @@ class ScheduleToJson:
             canBeDisplayed = True
         else: #contrib or session slot
             owner = obj.getOwner()
-            if owner.canAccess(aw):
+            if isinstance(owner, SessionSlot) and owner.canView(aw):
                 canBeDisplayed = True
-            elif isinstance(owner, SessionSlot) and owner.canView(aw):
+            elif not owner.isProtected() or owner.canAccess(aw): #isProtected avoids checking access if public
                 canBeDisplayed = True
+
         return canBeDisplayed
 
     @staticmethod
