@@ -172,11 +172,10 @@ class WAccessError( WTemplated ):
         vars["area"]= i18nformat(""" _("Authorisation") - """)
         vars["msg"] = _("The access to this page has been restricted by its owner and you are not authorised to view it")
         if isinstance(self._rh._target, list):
-            contactInfo = []
-            for item in self._rh._target:
-                contactInfo.append(item.getAccessController().getAnyContactInfo())
+            #only objects with Access Controler (e.g. we do not want to check this for RB reservertion target): Conferences, Contribs...
+            contactInfo = [item.getAccessController().getAnyContactInfo() for item in self._rh._target if item.has_key('getAccessController') ]
             vars["contactInfo"] = ";".join(contactInfo)
-        elif self._rh._target is not None:
+        elif self._rh._target is not None and self._rh._target.has_key('getAccessController'): #only objects with Access Controler (e.g. we do not want to check this for RB reservertion target): Conferences, Contribs...
             vars["contactInfo"] = self._rh._target.getAccessController().getAnyContactInfo()
         else:
             vars["contactInfo"] = ""
