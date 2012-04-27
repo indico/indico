@@ -66,12 +66,12 @@ indico_admin = Bundle('js/indico/Admin/News.js',
                       'js/indico/Admin/Upcoming.js',
                       filters='jsmin', output='indico_admin_%(version)s.min.js')
 
-indico_timetable = Bundle('js/indico/Timetable/Filter.js'
-                          'js/indico/Timetable/Layout.js'
-                          'js/indico/Timetable/Undo.js'
-                          'js/indico/Timetable/Base.js'
-                          'js/indico/Timetable/DragAndDrop.js'
-                          'js/indico/Timetable/Draw.js'
+indico_timetable = Bundle('js/indico/Timetable/Filter.js',
+                          'js/indico/Timetable/Layout.js',
+                          'js/indico/Timetable/Undo.js',
+                          'js/indico/Timetable/Base.js',
+                          'js/indico/Timetable/DragAndDrop.js',
+                          'js/indico/Timetable/Draw.js',
                           'js/indico/Timetable/Management.js',
                           filters='jsmin', output='indico_timetable_%(version)s.min.js')
 
