@@ -501,10 +501,10 @@ class ExportToICalBase(object):
         self._apiMode = minfo.getAPIMode()
         user = self._getUser()
         if not user:
-            raise ServiceError("ERR-U0", "User is not logged in!")
+            raise ServiceAccessError("User is not logged in!")
         apiKey = user.getAPIKey()
         if not apiKey:
-            raise ServiceError("ERR-U1", "User has no API key!")
+            raise ServiceAccessError("User has no API key!")
         elif apiKey.isBlocked():
-            raise ServiceError("ERR-U1", "This API key is blocked!")
+            raise ServiceAccessError("This API key is blocked!")
         self._apiKey = apiKey
