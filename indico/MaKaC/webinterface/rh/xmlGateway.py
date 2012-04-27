@@ -145,6 +145,36 @@ class RHWebcastOnAir( RHXMLHandlerBase ):
         self._req.content_type = "text/xml"
         return XG.getXml()
 
+class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
+
+    def _printWebcast(self, wc, XG):
+        XG.openTag("webcast")
+        XG.writeTag("title",wc.getTitle())
+        XG.writeTag("id",wc.getId())
+        XG.writeTag("startDate",wc.getStartDate())
+        XG.writeTag("room",wc.getRoom())
+        XG.closeTag("webcast")
+
+    def _process( self ):
+        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
+        XG = xmlGen.XMLGen()
+        XG.openTag("response")
+        XG.openTag("status")
+        XG.writeTag("value", "OK")
+        XG.writeTag("message", "Returning all forthcoming webcasts")
+        XG.closeTag("status")
+        XG.openTag("webcasts")
+        webcasts = wm.getForthcomingWebcasts()
+        webcasts.sort(webcast.sortWebcastByDate)
+        for wc in webcasts:
+            if not wc in wm.whatsOnAir():
+                if not wc.getEvent().isProtected():
+                    self._printWebcast(wc,XG)
+        XG.closeTag("webcasts")
+        XG.closeTag("response")
+        self._req.content_type = "text/xml"
+        return XG.getXml()
+
 class RHCategInfo( RHXMLHandlerBase ):
 
     def _checkParams( self, params ):
