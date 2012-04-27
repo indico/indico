@@ -155,7 +155,7 @@ class sdist_indico(sdist.sdist):
 
 
 def _bdist_indico(dataFiles):
-    class bdist_indico(bdist.bdist, jsdist_indico):
+    class bdist_indico(bdist.bdist):
         def run(self):
             compileAllLanguages(self)
             bdist.bdist.run(self)
@@ -165,7 +165,7 @@ def _bdist_indico(dataFiles):
 
 
 def _bdist_egg_indico(dataFiles):
-    class bdist_egg_indico(bdist_egg.bdist_egg, jsdist_indico):
+    class bdist_egg_indico(bdist_egg.bdist_egg):
         def run(self):
             compileAllLanguages(self)
             bdist_egg.bdist_egg.run(self)
