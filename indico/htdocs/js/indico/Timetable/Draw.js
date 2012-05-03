@@ -1557,7 +1557,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                  dayFiltered = this.flatten(dayFiltered);
              }
 
-             var dayData = this.layoutChooser.get().drawDay(dayFiltered, 'session', this.startTime, this.endTime);
+             var dayData = this.layoutChooser.get().drawDay(dayFiltered, 'session', this.startTime, this.endTime, this.managementMode);
              var height = dayData[0]+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
              this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 

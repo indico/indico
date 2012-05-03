@@ -215,7 +215,7 @@ type("TimetableLayoutManager", [],
 type("IncrementalLayoutManager", ["TimetableLayoutManager"],
      {
          name: 'incremental',
-         drawDay: function(data, detailLevel, startTime, endTime) {
+         drawDay: function(data, detailLevel, startTime, endTime, managementMode) {
              var self = this;
 
              this.eventData = data;
@@ -226,7 +226,7 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
 
              var ks = keys(checkpoints);
              ks.sort();
-
+             managementMode = any(managementMode, true);
              var startingHour, endingHour;
              if (ks.length > 1) {
                  startingHour = parseInt(ks[0].substring(0,2), 10);
@@ -264,10 +264,12 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
 
              var hEnd;
 
-             // add hour before start
-             if (startingHour > 0) {
-                 for (var min = 0; min < 60 ; min += TimetableDefaults.resolution) {
-                     self.processTimeBlock(startingHour - 1, startingHour, (startingHour - 1) * 60, min, algData);
+             if(managementMode){
+             //add hour before start if we are in management mode
+                 if (startingHour > 0) {
+                     for (var min = 0; min < 60 ; min += TimetableDefaults.resolution) {
+                         self.processTimeBlock(startingHour - 1, startingHour, (startingHour - 1) * 60, min, algData);
+                     }
                  }
              }
 
@@ -283,7 +285,7 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
 
              if ($L(ks).indexOf('nextday') !== null) {
                  self.processTimeBlock('nextday', 'nextday', (startingHour * 60 + minutes), minutes, algData);
-             } else if (endMin/60 < 25){
+             } else if (endMin/60 < 25 && managementMode){
                  // add last hour + 1 to the grid
                  // (only if the next hour is not after midnight)
                  algData.grid.push([(endMin/60) % 24, algData.topPx]);
