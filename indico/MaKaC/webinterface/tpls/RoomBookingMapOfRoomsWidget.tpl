@@ -67,7 +67,7 @@
             % if repeatability != None:
             <%     sel[repeatability] = 'selected="selected"' %>
             % endif
-                <option ${ sel[5] } value="None"> ${ _("Single day")}</option>
+                <option ${ sel[6] } value="None"> ${ _("Single reservation")}</option>
                 <option ${ sel[0] } value="0"> ${ _("Repeat daily")}</option>
                 <option ${ sel[1] } value="1"> ${ _("Repeat once a week")}</option>
                 <option ${ sel[2] } value="2"> ${ _("Repeat once every two weeks")}</option>

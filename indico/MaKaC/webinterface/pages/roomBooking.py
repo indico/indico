@@ -26,6 +26,7 @@ from MaKaC.rb_location import CrossLocationDB, Location
 from MaKaC.plugins.RoomBooking.default.room import Room
 import MaKaC.common.info as info
 
+
 #import MaKaC.common.info as info
 #import MaKaC.archives as archives
 
@@ -104,27 +105,20 @@ class WPRoomBookingBase( WPMainBase ):
                  or self._getAW().getUser().isAdmin() \
                  or self._getAW().getUser().isRBAdmin())
 
-        self._roomsOpt = wcomponents.SideMenuSection(_("View Rooms"), \
-                                        urlHandlers.UHRoomBookingSearch4Rooms.getURL() )
-        self._roomSearchOpt = wcomponents.SideMenuItem(_("Search rooms"),
-                                        urlHandlers.UHRoomBookingSearch4Rooms.getURL(),
+        self._roomsBookingOpt = wcomponents.SideMenuSection(currentPage = urlHandlers.UHRoomBookingBookRoom.getURL() )
+        self._bookRoomNewOpt = wcomponents.SideMenuItem(_("Book a Room"), \
+                                        urlHandlers.UHRoomBookingBookRoom.getURL(),
                                         enabled=True)
         self._roomMapOpt = wcomponents.SideMenuItem(_("Map of rooms"),
                                         urlHandlers.UHRoomBookingMapOfRooms.getURL(),
                                         enabled=True)
-        self._myRoomListOpt = wcomponents.SideMenuItem(_("My rooms"),
-                                        urlHandlers.UHRoomBookingRoomList.getURL( onlyMy = True ),
-                                        enabled=self._showResponsible)
-        self._bookingsOpt = wcomponents.SideMenuSection(_("View Bookings"), \
+        self._bookingListCalendarOpt = wcomponents.SideMenuItem(_("Calendar"),
+                                        urlHandlers.UHRoomBookingBookingList.getURL( today = True, allRooms = True ),
+                                        enabled=True)
+        self._bookingsOpt = wcomponents.SideMenuSection(_("View My Bookings"), \
                                         urlHandlers.UHRoomBookingSearch4Bookings.getURL())
         self._bookARoomOpt = wcomponents.SideMenuItem(_("Book a Room"), \
                                         urlHandlers.UHRoomBookingSearch4Rooms.getURL( forNewBooking = True ),
-                                        enabled=True)
-        self._bookingListSearchOpt = wcomponents.SideMenuItem(_("Search bookings"),
-                                        urlHandlers.UHRoomBookingSearch4Bookings.getURL(),
-                                        enabled=True)
-        self._bookingListCalendarOpt = wcomponents.SideMenuItem(_("Calendar"),
-                                        urlHandlers.UHRoomBookingBookingList.getURL( today = True, allRooms = True ),
                                         enabled=True)
         self._myBookingListOpt = wcomponents.SideMenuItem(_("My bookings"),
                                         urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True, autoCriteria = True ),
@@ -138,11 +132,22 @@ class WPRoomBookingBase( WPMainBase ):
         self._usersPrebookings = wcomponents.SideMenuItem(_("PRE-bookings in my rooms"),
                                         urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, onlyPrebookings = True, autoCriteria = True ),
                                         enabled=self._showResponsible)
-
+        self._bookingListSearchOpt = wcomponents.SideMenuItem(_("Search bookings"),
+                                        urlHandlers.UHRoomBookingSearch4Bookings.getURL(),
+                                        enabled=True)
         self._blockingsOpt = wcomponents.SideMenuSection(_("Room Blocking"))
         self._usersBlockings = wcomponents.SideMenuItem(_("Blockings for my rooms"),
                                         urlHandlers.UHRoomBookingBlockingsMyRooms.getURL( filterState='pending' ),
                                         enabled=self._showResponsible)
+        self._roomsOpt = wcomponents.SideMenuSection(_("View Rooms"), \
+                                        urlHandlers.UHRoomBookingSearch4Rooms.getURL() )
+        self._roomSearchOpt = wcomponents.SideMenuItem(_("Search rooms"),
+                                        urlHandlers.UHRoomBookingSearch4Rooms.getURL(),
+                                        enabled=True)
+        self._myRoomListOpt = wcomponents.SideMenuItem(_("My rooms"),
+                                        urlHandlers.UHRoomBookingRoomList.getURL( onlyMy = True ),
+                                        enabled=self._showResponsible)
+
         if self._showResponsible:
             self._myBlockingListOpt = wcomponents.SideMenuItem(_("My blockings"),
                                             urlHandlers.UHRoomBookingBlockingList.getURL( onlyMine = True, onlyRecent = True ),
@@ -162,23 +167,26 @@ class WPRoomBookingBase( WPMainBase ):
             self._adminOpt = wcomponents.SideMenuItem(_("Administration"), \
                                             urlHandlers.UHRoomBookingAdmin.getURL() )
 
-        self._leftMenu.addSection( self._roomsOpt )
-        self._roomsOpt.addItem( self._roomSearchOpt )
+        self._leftMenu.addSection( self._roomsBookingOpt )
+        self._roomsBookingOpt.addItem( self._bookRoomNewOpt )
         if Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable():
-            self._roomsOpt.addItem( self._roomMapOpt )
-        self._roomsOpt.addItem( self._myRoomListOpt )
+            self._roomsBookingOpt.addItem( self._roomMapOpt )
+        self._roomsBookingOpt.addItem( self._bookingListCalendarOpt )
+
         self._leftMenu.addSection( self._bookingsOpt )
         self._bookingsOpt.addItem( self._bookARoomOpt )
-        self._bookingsOpt.addItem( self._bookingListSearchOpt )
-        self._bookingsOpt.addItem( self._bookingListCalendarOpt )
         self._bookingsOpt.addItem( self._myBookingListOpt )
         self._bookingsOpt.addItem( self._myPreBookingListOpt )
         self._bookingsOpt.addItem( self._usersBookings )
         self._bookingsOpt.addItem( self._usersPrebookings )
+        self._bookingsOpt.addItem( self._bookingListSearchOpt )
         self._leftMenu.addSection( self._blockingsOpt )
         self._blockingsOpt.addItem( self._blockRooms )
         self._blockingsOpt.addItem( self._myBlockingListOpt )
         self._blockingsOpt.addItem( self._usersBlockings )
+        self._leftMenu.addSection( self._roomsOpt )
+        self._roomsOpt.addItem( self._roomSearchOpt )
+        self._roomsOpt.addItem( self._myRoomListOpt )
         if self._rh._getUser().isRBAdmin():
             self._leftMenu.addSection( self._adminSect )
             self._adminSect.addItem( self._adminOpt )
@@ -209,7 +217,7 @@ class WPRoomBookingSearch4Rooms( WPRoomBookingBase ):
 
     def _setCurrentMenuItem( self ):
         if self._forNewBooking:
-            self._bookARoomOpt.setActive(True)
+            self._bookRoomNewOpt.setActive(True)
         else:
             self._roomSearchOpt.setActive(True)
 
@@ -231,6 +239,22 @@ class WPRoomBookingSearch4Bookings( WPRoomBookingBase ):
 
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingSearch4Bookings( self._rh )
+        return wc.getHTML( params )
+
+class WPRoomBookingBookRoom( WPRoomBookingBase ):
+
+    def __init__( self, rh ):
+        self._rh = rh
+        WPRoomBookingBase.__init__( self, rh )
+
+    def _getTitle(self):
+        return WPRoomBookingBase._getTitle(self) + " - " + _("Book a Room")
+
+    def _setCurrentMenuItem( self ):
+        self._bookRoomNewOpt.setActive(True)
+
+    def _getBody( self, params ):
+        wc = wcomponents.WRoomBookingBookRoom( self._rh )
         return wc.getHTML( params )
 
 
@@ -340,7 +364,7 @@ class WPRoomBookingBookingList( WPRoomBookingBase ):
         elif self._rh._ofMyRooms:
             self._usersBookings.setActive(True)
         else:
-            self._bookingListSearchOpt.setActive(True)
+            self._bookRoomNewOpt.setActive(True)
 
     def _getBody( self, pars ):
         wc = wcomponents.WRoomBookingBookingList( self._rh )
@@ -389,7 +413,7 @@ class WPRoomBookingBookingDetails( WPRoomBookingBase ):
         WPRoomBookingBase.__init__( self, rh )
 
     def _setCurrentMenuItem( self ):
-        self._bookingListSearchOpt.setActive(True)
+        self._bookRoomNewOpt.setActive(True)
 
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingDetails( self._rh )
@@ -408,7 +432,7 @@ class WPRoomBookingBookingForm( WPRoomBookingBase ):
         WPRoomBookingBase.__init__( self, rh )
 
     def _setCurrentMenuItem( self ):
-        self._bookARoomOpt.setActive(True)
+        self._bookRoomNewOpt.setActive(True)
 
     def getJSFiles(self):
         return WPRoomBookingBase.getJSFiles(self) + \

@@ -1,0 +1,193 @@
+.ui-multiselect {
+    padding: 2px 0 2px 4px;
+    text-align: left
+}
+
+.ui-multiselect span.ui-icon {
+    float: right
+}
+
+.ui-multiselect-single .ui-multiselect-checkboxes input {
+    position: absolute !important;
+    top: auto !important;
+    left: -9999px;
+}
+
+.ui-multiselect-single .ui-multiselect-checkboxes label {
+    padding: 5px !important
+}
+
+.ui-multiselect-header {
+    margin-bottom: 3px;
+    padding-top: 5px;
+}
+
+.ui-multiselect-header ul {
+    font-size: 0.9em
+}
+
+.ui-multiselect-header ul li {
+    float: left;
+    padding: 0 10px 0 0
+}
+
+.ui-multiselect-header a {
+    text-decoration: none
+}
+
+.ui-multiselect-header a:hover {
+    text-decoration: underline
+}
+
+.ui-multiselect-header span.ui-icon {
+    float: left
+}
+
+.ui-multiselect-header li.ui-multiselect-close {
+    float: right;
+    text-align: right;
+    padding-right: 0
+}
+
+.ui-multiselect-menu {
+    display: none;
+    position: absolute;
+    z-index: 10000;
+    text-align: left
+}
+
+.ui-multiselect-checkboxes {
+    position: relative /* fixes bug in IE6/7 */;
+    overflow-y: scroll;
+}
+
+.ui-multiselect-ui-multiselect-scrollbar-up {
+    background-image: url('../images/rb_arrow_up.png');
+    height: 8px;
+    width: 8px;
+    float: right;
+    position: relative;
+    left: -10px;
+    z-index: -1;
+}
+
+.ui-multiselect-ui-multiselect-scrollbar-down {
+    background-image: url('../images/rb_arrow_down.png');
+    height: 8px;
+    width: 8px;
+    float: right;
+    position: relative;
+    left: -10px;
+    bottom: 10px;
+    z-index: -1;
+}
+
+.ui-multiselect-checkboxes label {
+    cursor: default;
+    display: block;
+    border: 1px solid transparent;
+    padding: 3px 1px
+}
+
+.ui-multiselect-checkboxes label input {
+    position: relative;
+    top: 1px
+}
+
+.ui-multiselect-checkboxes li {
+    clear: both;
+    font-size: 0.9em;
+    padding-right: 3px;
+    margin-right: 10px;
+}
+
+.ui-multiselect-checkboxes li.ui-multiselect-optgroup-label {
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px solid;
+}
+
+.ui-multiselect-checkboxes li.ui-multiselect-optgroup-label a {
+    display: block;
+    padding: 3px;
+    margin: 1px 0;
+    text-decoration: none;
+}
+
+/* remove label borders in IE6 because IE6 does not support transparency */
+* html .ui-multiselect-checkboxes label {
+    border: none
+}
+
+/* Indico roomBooking modifications */
+
+.ui-multiselect-header .ui-icon {
+    display: none;
+    float: right;
+}
+
+.ui-multiselect-header ul li {
+    float: left;
+    padding: 0;
+}
+
+.ui-multiselect.RoomBooking {
+    visibility: hidden;
+    height: 0;
+}
+
+.ui-multiselect-menu .ui-widget-header {
+    font-weight: normal;
+    padding-bottom: 5px;
+    background: #eaeaea !important;
+}
+
+.ui-multiselect-menu {
+    padding: 0px 0px 5px 0px;
+    background-color: #f2f2f2;
+}
+
+.ui-multiselect-menu .ui-state-hover {
+    background: #FFF6DF !important;
+}
+
+.ui-multiselect-menu .ui-state-selected  {
+    background: #CDEB8B !important;
+}
+
+.ui-multiselect-menu .ui-state-active {
+    background: #CDEB8B !important;
+}
+
+.ui-multiselect-menu label {
+    font-weight: normal;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 1px solid #DDD;
+}
+
+.ui-multiselect-images {
+    padding-left: 5px;
+    padding-right: 3px;
+}
+
+.ui-multiselect-search-options {
+    float: left;
+}
+
+.ui-multiselect-search-advanced {
+    float: right;
+}
+
+.ui-multiselect-selection-summary {
+    float: right;
+    color: gray;
+    padding: 10px 0px 0px 10px;
+}
+
+.ui-multiselect-selection-counter {
+    color: gray;
+    float: left;
+    padding: 10px 0px 0px 10px;
+}

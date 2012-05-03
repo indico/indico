@@ -42,8 +42,8 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     },
 
     _dateFromString: function(dateStr) {
-        var matches = /^(...) (\d+)\/(\d+)\/(\d+)$/.exec(dateStr);
-        return new Date(matches[4], matches[3] - 1, matches[2]);
+        var matches = /^(\d+)\/(\d+)\/(\d+)$/.exec(dateStr);
+        return new Date(matches[3], matches[2] - 1, matches[1]);
     },
 
     _verifyDates: function() {

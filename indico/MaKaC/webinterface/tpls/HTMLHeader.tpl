@@ -47,7 +47,7 @@
 
         <!-- Page Specific CSS files-->
         % for cssFile in extraCSS:
-            <link rel="stylesheet" type="text/css" href="${baseurl}/${cssFile.lstrip('/')}">
+            <link rel="stylesheet" type="text/css" href="${ baseurl + '/' + cssFile }">
         % endfor
 
         <!-- Page Specific, directly inserted Javascript -->

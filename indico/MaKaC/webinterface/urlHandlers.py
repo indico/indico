@@ -333,6 +333,9 @@ class UHRoomBookingSearch4Rooms( URLHandler ):
 class UHRoomBookingSearch4Bookings( URLHandler ):
     _relativeURL = "roomBooking.py/search4Bookings"
 
+class UHRoomBookingBookRoom( URLHandler ):
+    _relativeURL = "roomBooking.py/bookRoom"
+
 class UHRoomBookingRoomList( URLHandler ):
     _relativeURL = "roomBooking.py/roomList"
     @classmethod
@@ -344,7 +347,7 @@ class UHRoomBookingRoomList( URLHandler ):
 class UHRoomBookingBookingList( URLHandler ):
     _relativeURL = "roomBooking.py/bookingList"
     @classmethod
-    def getURL( cls, onlyMy = False, ofMyRooms = False, onlyPrebookings = False, autoCriteria = False, newParams = None, today = False, allRooms = False ):
+    def getURL( cls, onlyMy = False, newBooking = False,  ofMyRooms = False, onlyPrebookings = False, autoCriteria = False, newParams = None, today = False, allRooms = False ):
         """
         onlyMy - only bookings of the current user
         ofMyRooms - only bookings for rooms managed by the current user
@@ -353,6 +356,8 @@ class UHRoomBookingBookingList( URLHandler ):
         url = cls._getURL()
         if onlyMy:
             url.addParam( 'onlyMy', 'on' )
+        if newBooking:
+            url.addParam( 'newBooking', 'on' )
         if ofMyRooms:
             url.addParam( 'ofMyRooms', 'on' )
         if onlyPrebookings:

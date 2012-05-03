@@ -566,6 +566,22 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
                     candResv.useVC.append(vc)
         return candResv
 
+    def _loadResvBookingCandidateFromSession( self, params, room ):
+        if not params.has_key('roomGUID'):
+            raise MaKaCError( _("""The parameter roomGUID is missing."""))
+        roomID = int( room.id )
+        roomLocation = room.getLocationName()
+        candResv = Location.parse( roomLocation ).factory.newReservation() # Create in the same location as room
+        if not candResv.room:
+            candResv.room = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
+
+        self._checkParamsRepeatingPeriod( params )
+        candResv.startDT = self._startDT
+        candResv.endDT = self._endDT
+        candResv.repeatability = RepeatabilityEnum.daily
+
+        return candResv
+
     def _loadResvCandidateFromDefaults( self, params ):
         ws = self._websession
         # After room details
@@ -696,7 +712,7 @@ class RHRoomBookingWelcome( RHRoomBookingBase ):
         if Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable():
             self._redirect( urlHandlers.UHRoomBookingMapOfRooms.getURL())
         else:
-            self._redirect( urlHandlers.UHRoomBookingSearch4Rooms.getURL( forNewBooking = True ))
+            self._redirect( urlHandlers.UHRoomBookingBookRoom.getURL())
 
 
 # 1. Searching
@@ -754,6 +770,17 @@ class RHRoomBookingSearch4Bookings( RHRoomBookingBase ):
         p = roomBooking_wp.WPRoomBookingSearch4Bookings( self )
         return p.display()
 
+class RHRoomBookingBookRoom( RHRoomBookingBase ):
+
+    def _businessLogic( self ):
+        self._rooms = CrossLocationQueries.getRooms( allFast = True )
+        self._rooms.sort()
+
+    def _process( self ):
+        self._businessLogic()
+        p = roomBooking_wp.WPRoomBookingBookRoom( self )
+        return p.display()
+
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
     def _checkParams(self, params):
@@ -781,8 +808,8 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
             now = now + timedelta( 7 - now.weekday() )
 
         websession = self._websession
-        websession.setVar( "defaultStartDT", datetime( now.year, now.month, now.day, 8, 30 ) )
-        websession.setVar( "defaultEndDT", datetime( now.year, now.month, now.day, 17, 30 ) )
+        websession.setVar( "defaultStartDT", datetime( now.year, now.month, now.day, 0, 0 ) )
+        websession.setVar( "defaultEndDT", datetime( now.year, now.month, now.day, 0, 0 ) )
 
     def _checkParams(self, params):
         self._setGeneralDefaultsInSession()
@@ -978,6 +1005,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
 
     def _checkParams( self, params ):
         self._roomGUIDs = []
+        self._candResvs = []
         self._allRooms = False
         roomGUIDs = params.get( "roomGUID" )
         if isinstance( roomGUIDs, list ) and 'allRooms' in roomGUIDs:
@@ -1003,6 +1031,14 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
             resvEx.reason = reason.strip()
         self._title = "Bookings"
 
+        self._repeatability = None
+        repeatability = params.get("repeatability")
+        if repeatability and len( repeatability.strip() ) > 0:
+            if repeatability == "None":
+                self._repeatability = None
+            else:
+                self._repeatability = int( repeatability.strip() )
+
         onlyPrebookings = params.get( "onlyPrebookings" )
         self._onlyPrebookings = False
 
@@ -1021,6 +1057,11 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         else:
             # find pre-bookings as well
             resvEx.isConfirmed = None
+
+        self._capacity = None
+        capacity = params.get("capacity")
+        if capacity and len( capacity.strip() ) > 0:
+            self._capacity = int( capacity.strip() )
 
         self._onlyMy = False
         onlyMy = params.get( "onlyMy" )
@@ -1047,6 +1088,25 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 self._title = "Search " + self._title
 
         self._order = params.get( "order", "" )
+
+        self._finishDate = False
+        finishDate = params.get( "finishDate" )
+        if finishDate and len( finishDate.strip() ) > 0:
+            if finishDate == 'true':
+                self._finishDate = True
+
+        self._manyDays = False
+        manyDays = params.get( "manyDays" )
+        if manyDays and len( manyDays.strip() ) > 0:
+            if manyDays == 'true':
+                self._manyDays = True
+
+        self._newBooking = False
+        newBooking = params.get( "newBooking" )
+        if newBooking and len( newBooking.strip() ) > 0:
+            if newBooking == 'on':
+                self._newBooking = True
+                self._title = "Select a Room"
 
         isArchival = params.get( "isArchival" )
         if isArchival and len( isArchival.strip() ) > 0:
@@ -1109,6 +1169,10 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         session.setVar( 'title', None )
         session.setVar( 'description', None )
         session.setVar( 'prebookingsRejected', None )
+
+        if self._newBooking:
+            for rg in self._roomGUIDs:
+                self._candResvs.append(self._loadResvBookingCandidateFromSession( params, RoomGUID.parse( rg ).getRoom() ))
 
 
     def _process( self ):

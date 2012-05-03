@@ -214,7 +214,6 @@ class GetDateWarning( ServiceBase ):
 #            except ValueError:
 #                raise NoReportError(_("The End Date must be of the form DD/MM/YYYY and must be a valid date."))
 
-
         sTime = self._params.get( "sTime" )
         if sTime and len( sTime.strip() ) > 0:
             sTime = sTime.strip()
@@ -272,9 +271,9 @@ class GetDateWarning( ServiceBase ):
             return ""
 
         if isWeekend( self._startDT ) or isWeekend( self._endDT ):
-            return _("Warning: weekend chosen" )
+            return _("weekend chosen" )
 
-        return _( "Warning: holidays chosen" )
+        return _( "holidays chosen" )
 
 class RoomBookingMapBase( ServiceBase ):
     def _param(self, parameterName):

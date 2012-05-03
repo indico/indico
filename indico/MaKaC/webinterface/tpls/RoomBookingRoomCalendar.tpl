@@ -1,6 +1,6 @@
 % if withConflicts:
     <br /><br />
-    <span class="formTitle" style="border-bottom-width: 0px">Conflicts</span><br /><br />
+    <div class="groupTitle bookingTitle" style="padding-top: 0px">${ _("Conflicts") }</div>
     <p style="margin-left: 10px;">
         % if thereAreConflicts:
             <span style="color: Red; font-weight: bold;">${ conflictsNumber }&nbsp;${ _("conflict(s) with other bookings")}</span><br /><br />

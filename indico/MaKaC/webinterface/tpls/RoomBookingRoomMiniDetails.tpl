@@ -1,7 +1,11 @@
 <%page args="room=None"/>
                               <!-- ROOM -->
                               <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("Room")}</span></td>
+                                <td>
+                                    <div class="groupTitle bookingTitle">${'Room Details'}</div>
+                                </td>
+                              </tr>
+                              <tr>
                                 <td>
                                     <table width="100%">
                                         <tr>

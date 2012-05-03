@@ -82,6 +82,7 @@ from indico.web.http_api.util import generate_public_auth_request
 import pkgutil
 import pkg_resources
 
+
 MIN_PRESENT_EVENTS = 6
 OPTIMAL_PRESENT_EVENTS = 10
 
@@ -4748,6 +4749,20 @@ class WRoomBookingSearch4Bookings( WTemplated ):
 
         return vars
 
+class WRoomBookingBookRoom( WTemplated ):
+
+    def __init__( self, rh ):
+        self._rh = rh
+
+    def getVars( self ):
+        vars = WTemplated.getVars( self )
+
+        vars["today"] = datetime.now()
+        vars["rooms"] = self._rh._rooms
+        vars["roomBookingBookingListURL"] = urlHandlers.UHRoomBookingBookingList.getURL(newBooking = 'True')
+
+        return vars
+
 class WRoomBookingMapOfRooms(WTemplated):
 
     def __init__(self, **params):
@@ -4854,6 +4869,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
 
     def __init__( self, rh ):
         self._rh = rh
+        self._candResvs = rh._candResvs
         self._title = None
         try: self._title = self._rh._title;
         except: pass
@@ -4867,20 +4883,21 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
     def getVars( self ):
         vars = WTemplated.getVars( self )
         rh = self._rh
+        candResvs = self._candResvs
 
         #vars["smallPhotoUH"] = urlHandlers.UHSendRoomPhoto
+        vars["manyDays"] = rh._manyDays
+        vars["finishDate"] = rh._finishDate
         vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
         vars["withPhoto"] = False
         vars["title"] = self._title
         vars["search"] = rh._search
         vars["showRejectAllButton"] = rh._showRejectAllButton
-
         vars["prebookingsRejected"] = rh._prebookingsRejected
         vars["subtitle"] = rh._subtitle
         vars["description"] = rh._description
         yesterday = datetime.now() - timedelta( 1 )
         vars["yesterday"] = yesterday #datetime( dm.year, dm.month, dm.day, 0, 0, 1 )
-
         ed = None
         sd = rh._resvEx.startDT.date()
         if rh._resvEx.endDT:
@@ -4898,10 +4915,10 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                 ed = sd + timedelta( 30 )
 
         # set the calendar dates as calculated
-        calendarStartDT = datetime( sd.year, sd.month, sd.day, 0, 0, 0 )
+        calendarStartDT = datetime( sd.year, sd.month, sd.day, 0, 0 )
         calendarEndDT = datetime( ed.year, ed.month, ed.day, 23, 59 )
 
-        from MaKaC.rb_tools import formatDate
+        from MaKaC.common.utils import formatDate
 
         if  calendarStartDT.date() == calendarEndDT.date():
             vars["periodName"] = "day"
@@ -4956,6 +4973,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         vars["nextURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Next )
 
         vars['overload'] = self._rh._overload
+        vars['newBooking'] = self._rh._newBooking
 
         # empty days are shown for "User bookings" and "User pre-bookings"
         # and for the calendar as well
@@ -4965,13 +4983,43 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         #                  not self._rh._search
         #showEmptyRooms = showEmptyDays
         # Always show empty rooms/days
-        showEmptyDays = showEmptyRooms = not self._rh._search
 
+        showEmptyDays = showEmptyRooms = self._rh._newBooking or rh._allRooms
 
         # Calendar related stuff ==========
 
         bars = []
         collisionsOfResvs = []
+
+
+
+        # Bars: Candidate reservation
+        collisions = [] # only with confirmed resvs
+        for candResv in candResvs:
+            periodsOfCandResv = candResv.splitToPeriods()
+            for p in periodsOfCandResv:
+                bars.append( Bar( Collision( (p.startDT, p.endDT), candResv ), Bar.CANDIDATE  ) )
+
+            # Bars: Conflicts all vs candidate
+            candResvIsConfirmed = candResv.isConfirmed;
+            candResv.isConfirmed = None
+            allCollisions = candResv.getCollisions()
+            candResv.isConfirmed = candResvIsConfirmed
+            if candResv.id:
+                # Exclude candidate vs self pseudo-conflicts (Booking modification)
+                allCollisions = filter( lambda c: c.withReservation.id != candResv.id, allCollisions )
+            for c in allCollisions:
+                if c.withReservation.isConfirmed:
+                    bars.append( Bar( c, Bar.CONFLICT ) )
+                    collisions.append( c )
+                else:
+                    bars.append( Bar( c, Bar.PRECONFLICT ) )
+
+            if not candResv.isRejected and not candResv.isCancelled:
+                vars["thereAreConflicts"] = len( collisions ) > 0
+            else:
+                vars["thereAreConflicts"] = False
+            vars["conflictsNumber"] = len( collisions )
 
         # there's at least one reservation
         if len( rh._resvs ) > 0:
@@ -5010,7 +5058,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         # we want to display every room, with or without reservation
         else:
             # initialize collision bars
-            bars = {}
+            bars = barsList2Dictionary( bars )
             bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
 
             # insert rooms
@@ -5020,6 +5068,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                     rooms = []
 
             bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms, user = rh._aw.getUser() )
+
 
         fossilizedBars = {}
         for key in bars:
@@ -5055,7 +5104,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             vars["calendarParams"]["onlyPrebookings"] = "on"
         if rh._onlyBookings:
             vars["calendarParams"]["onlyBookings"] ="on"
-
+        vars["repeatability"] = rh._repeatability
         vars["calendarFormUrl"] = urlHandlers.UHRoomBookingBookingList.getURL()
 
         return vars
@@ -5392,8 +5441,11 @@ class WRoomBookingBookingForm( WTemplated ):
         vars["candResv"] = self._candResv
         vars["startDT"] = self._candResv.startDT
         vars["endDT"] = self._candResv.endDT
-        vars["startT"] = '%02d:%02d' % (self._candResv.startDT.hour, self._candResv.startDT.minute )
-        vars["endT"] = '%02d:%02d' % (self._candResv.endDT.hour, self._candResv.endDT.minute )
+        vars["startT"] = ''
+        vars["endT"] = ''
+        if any((self._candResv.startDT.hour, self._candResv.startDT.minute, self._candResv.endDT.hour,  self._candResv.endDT.minute)):
+            vars["startT"] = '%02d:%02d' % (self._candResv.startDT.hour, self._candResv.startDT.minute )
+            vars["endT"] = '%02d:%02d' % (self._candResv.endDT.hour, self._candResv.endDT.minute )
 
         vars["showErrors"] = self._rh._showErrors
         vars["errors"] = self._rh._errors

@@ -23,6 +23,8 @@ import MaKaC.webinterface.rh.roomBooking as roomBooking
 def index( req, **params ):
     return roomBooking.RHRoomBookingWelcome( req ).process( params )
 
+
+
 # 1. Searching
 def search4Rooms( req, **params ):
     return roomBooking.RHRoomBookingSearch4Rooms( req ).process( params )
@@ -38,8 +40,7 @@ def mapOfRoomsWidget(req, **params):
 def roomList( req, **params ):
     return roomBooking.RHRoomBookingRoomList( req ).process( params )
 def bookingList( req, **params ):
-    r = roomBooking.RHRoomBookingBookingList(req).process(params)
-    return r
+    return roomBooking.RHRoomBookingBookingList(req).process(params)
 
 # 3. Details of...
 def roomDetails( req, **params ):
@@ -56,6 +57,8 @@ def roomForm( req, **params ):
     return roomBooking.RHRoomBookingRoomForm(req).process(params)
 def cloneBooking( req, **params ):
     return roomBooking.RHRoomBookingCloneBooking(req).process(params)
+def bookRoom( req, **params ):
+    return roomBooking.RHRoomBookingBookRoom(req).process(params)
 
 # 4. Physical INSERT or UPDATE
 def saveBooking( req, **params ):

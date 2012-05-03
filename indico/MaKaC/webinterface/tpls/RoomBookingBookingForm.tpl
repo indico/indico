@@ -31,7 +31,11 @@
 
                 holidaysWarning.state.observe(function(state) {
                     if (state == SourceState.Loaded) {
-                        $E('holidays-warning').set(holidaysWarning.get());
+                        $('#holidays-warning').html("<strong>Info: </strong>" + holidaysWarning.get());
+                        if (holidaysWarning.get() == '')
+                            $('#holidays-warning').hide();
+                        else
+                            $('#holidays-warning').show();
                     }
                 });
             }
@@ -65,7 +69,7 @@
     }
 
 
-    IndicoUI.executeOnLoad(function() {
+    $(window).load(function() {
         % if candResv.room.needsAVCSetup:
             $('.videoConferenceOption, #needsAVCSupport').change(function() {
                 if(this.checked) {
@@ -84,7 +88,8 @@
         }
 
         $('#bookingForm').delegate(':input', 'keyup change', function() {
-            forms_are_valid();
+            if (forms_are_valid())
+                updateTimeSlider();
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
                 e.preventDefault();
@@ -135,144 +140,164 @@
 
     <form id="bookingForm" action="${bookingFormURL.getURL(conf)}#conflicts" method="post">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
-    <table cellpadding="0" cellspacing="0" border="0" width="80%">
-        % if standalone:
-            <tr>
-            <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
-            </tr>
-        % endif
+
+    <table style="width: 100%; padding-left: 20px;">
+    % if standalone:
         <tr>
-            <td class="bottomvtab" width="100%">
-                <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
-                    <tr>
-                        <td class="maincell">
-                            <span class="formTitle" style="border-bottom-width: 0px">
-                            <input type="hidden" name="roomID" id="roomID" value="${candResv.room.id}" />
-                            <input type="hidden" name="roomLocation" id="roomLocation" value="${candResv.room.locationName}" />
-                            % if formMode == FormMode.NEW:
-                                 ${ _("New")}&nbsp;${bookingMessage}ing
+            <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
+        </tr>
+    % endif
+        <tr>
+            <td>
+                <span class="groupTitle bookingTitle" style="border-bottom-width: 0px; font-weight: bold">
+                <input type="hidden" name="roomID" id="roomID" value="${candResv.room.id}" />
+                <input type="hidden" name="roomLocation" id="roomLocation" value="${candResv.room.locationName}" />
+                % if formMode == FormMode.NEW:
+                     ${ _("New")}&nbsp;${bookingMessage}ing
+                % endif
+                % if formMode == FormMode.MODIF:
+                     ${ _("Modify")}&nbsp;${bookingMessage}ing
+                    <input type="hidden" name="resvID" id="resvID" value="${candResv.id}" />
+                % endif
+                </span>
+                % if showErrors:
+                    <br /><a href="#conflicts" style="color: Red; margin-left: 6px;"> ${ _("Saving failed. Please review details below.")}</a><br /><br />
+                % endif
+                <table width="100%" align="left" border="0">
+                  <%include file="RoomBookingRoomMiniDetails.tpl" args="room = candResv.room "/>
+                  <tr>
+                    <td>
+                        <div class="groupTitle bookingTitle">${'Booking Time & Date'}</div>
+                    </td>
+                  </tr>
+                  <!-- WHEN -->
+                  <tr>
+                    <td>
+                        <table id="roomBookingTable" width="100%">
+                            <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(), maxAdvanceDays = candResv.room.maxAdvanceDays"/>
+                        </table>
+                    </td>
+                </tr>
+                <!-- BOOKED FOR -->
+                <tr>
+                    <td>
+                        <div class="groupTitle bookingTitle">${'Being Booked For'}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table width="100%">
+                            % if rh._requireRealUsers:
+                                <tr>
+                                    <td class="subFieldWidth" align="right" valign="top">
+                                        <small> ${ _("User")}&nbsp;&nbsp;</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        <input type="hidden" id="bookedForId" name="bookedForId" value="${ candResv.bookedForId or '' }" />
+                                        <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ candResv.bookedForUser.getFullName() if candResv.bookedForId else candResv.bookedForName }" onclick="searchForUsers();" readonly="readonly" />
+                                        <input type="button" value="Search" onclick="searchForUsers();" />
+                                        ${ inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) }
+                                    </td>
+                                </tr>
+                            % else:
+                                <tr>
+                                    <td class="subFieldWidth" align="right" valign="top">
+                                        <small> ${ _("Name")}&nbsp;&nbsp;</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ verbose( candResv.bookedForName ) }" />
+                                        ${ inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) }
+                                    </td>
+                                </tr>
                             % endif
-                            % if formMode == FormMode.MODIF:
-                                 ${ _("Modify")}&nbsp;${bookingMessage}ing
-                                <input type="hidden" name="resvID" id="resvID" value="${candResv.id}" />
-                            % endif
-                            </span><br />
-                            % if showErrors:
-                                <br /><a href="#conflicts" style="color: Red; margin-left: 6px;"> ${ _("Saving failed. Please review details below.")}</a><br /><br />
-                            % endif
-                            <br />
-                            <table width="100%" align="left" border="0">
-                              <%include file="RoomBookingRoomMiniDetails.tpl" args="room = candResv.room "/>
-                              <tr><td>&nbsp;</td></tr>
-                              <!-- WHEN -->
-                              <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("When")}</span></td>
-                                <td>
-                                    <table width="100%">
-                                        <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(), availableDayPeriods = candResv.room.getDailyBookablePeriods(), maxAdvanceDays = candResv.room.maxAdvanceDays"/>
-                                    </table>
+                            <tr>
+                                <td class="subFieldWidth" align="right" valign="top">
+                                    <small> ${ _("E-mail")}&nbsp;&nbsp;</small>
+                                </td>
+                                <td align="left" class="blacktext">
+                                    <input type="text" id="contactEmail" name="contactEmail" style="width: 240px;" value="${ verbose( candResv.contactEmail )}" />
+                                    ${inlineContextHelp('<b>Required.</b> Contact email. You can specify more than one email address by separating them with commas, semicolons or whitespaces.' )}
                                 </td>
                             </tr>
-                            <tr><td>&nbsp;</td></tr>
-                            <!-- BOOKED FOR -->
                             <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("Booked for")}</span></td>
+                                <td align="right" class="subFieldWidth" valign="top">
+                                    <small> ${ _("Telephone")}&nbsp;&nbsp;</small>
+                                </td>
+                                <td align="left" class="blacktext">
+                                    <input type="text" id="contactPhone" name="contactPhone" style="width: 240px;" value="${ verbose( candResv.contactPhone ) }" />
+                                    ${inlineContextHelp('Contact telephone.' )}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" class="subFieldWidth" valign="top">
+                                    <small> ${ _("Reason")}&nbsp;&nbsp;</small>
+                                </td>
+                                <td align="left" class="blacktext">
+                                    <textarea rows="3" cols="50" id="reason" name="reason" >${ verbose( candResv.reason ) }</textarea>
+                                    ${inlineContextHelp(_("<b>Required.</b> The justification for booking. Why do you need this room?"))}
+                                </td>
+                            </tr>
+                            % if candResv.room.needsAVCSetup:
+                                <tr>
+                                    <td align="right" class="subFieldWidth" valign="top">
+                                        <small><span style="color: Red;">${ _("I will use video-conf. equipment (please only check that which you need)")}</span>&nbsp;&nbsp;</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        <input id="usesAVC" name="usesAVC" type="checkbox" ${' checked="checked" ' if candResv.usesAVC else ""} />
+                                        ${contextHelp('iWillUseVideoConferencing' )}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right" class="subFieldWidth" valign="middle">
+                                        <small><span style="color: Red;">I will use video-conf. system</span>&nbsp;&nbsp;</small>
+                                    </td>
+                                    <td align="left" id="vcSystemList" class="blacktext">
+                                        % for vc in candResv.room.getAvailableVC():
+                                            <% checked = "" %>
+                                            % if vc in candResv.getUseVC():
+                                                <% checked = """checked="checked" """ %>
+                                            % endif
+                                            <% htmlCheckbox = """<br>\n<input id="vc_%s" name="vc_%s" class="videoConferenceOption" type="checkbox" %s /> %s""" %>
+                                            ${ htmlCheckbox % (vc[:3], vc[:3], checked, vc) }
+                                        % endfor
+                                    </td>
+                                </tr>
+                            % endif
+                            % if candResv.room.needsAVCSetup or (rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance):
+                            <tr>
+                                <td align="right" class="subFieldWidth" valign="top">
+                                    <small>${ _("Assistance")}&nbsp;&nbsp;</small>
+                                </td>
                                 <td>
-                                    <table width="100%">
-                                        % if rh._requireRealUsers:
-                                            <tr>
-                                                <td class="subFieldWidth" align="right" valign="top"><small> ${ _("User")}&nbsp;&nbsp;</small></td>
-                                                <td align="left" class="blacktext">
-                                                    <input type="hidden" id="bookedForId" name="bookedForId" value="${ candResv.bookedForId or '' }" />
-                                                    <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ candResv.bookedForUser.getFullName() if candResv.bookedForId else candResv.bookedForName }" onclick="searchForUsers();" readonly="readonly" />
-                                                    <input type="button" value="Search" onclick="searchForUsers();" />
-                                                    ${ inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) }
-                                                </td>
-                                            </tr>
-                                        % else:
-                                            <tr>
-                                                <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Name")}&nbsp;&nbsp;</small></td>
-                                                <td align="left" class="blacktext">
-                                                    <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ verbose( candResv.bookedForName ) }" />
-                                                    ${ inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) }
-                                                </td>
-                                            </tr>
-                                        % endif
-                                        <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small> ${ _("E-mail")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">
-                                                <input type="text" id="contactEmail" name="contactEmail" style="width: 240px;" value="${ verbose( candResv.contactEmail )}" />
-                                                ${inlineContextHelp('<b>Required.</b> Contact email. You can specify more than one email address by separating them with commas, semicolons or whitespaces.' )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="right" class="subFieldWidth" valign="top"><small> ${ _("Telephone")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">
-                                                <input type="text" id="contactPhone" name="contactPhone" style="width: 240px;" value="${ verbose( candResv.contactPhone ) }" />
-                                                ${inlineContextHelp('Contact telephone.' )}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="right" class="subFieldWidth" valign="top"><small> ${ _("Reason")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">
-                                                <textarea rows="3" cols="50" id="reason" name="reason" >${ verbose( candResv.reason ) }</textarea>
-                                                ${inlineContextHelp(_("<b>Required.</b> The justification for booking. Why do you need this room?"))}
-                                            </td>
-                                        </tr>
+                                    <table valign='top' cellpadding=0 cellspacing=0>
                                         % if candResv.room.needsAVCSetup:
-                                            <tr>
-                                                <td align="right" class="subFieldWidth" valign="top"><small><span style="color: Red;">${ _("I will use video-conf. equipment (please check only what you need)")}</span>&nbsp;&nbsp;</small></td>
-                                                <td align="left" class="blacktext">
-                                                    <input id="usesAVC" name="usesAVC" type="checkbox" ${' checked="checked" ' if candResv.usesAVC else ""} />
-                                                    ${contextHelp('iWillUseVideoConferencing' )}
-
-
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td align="right" class="subFieldWidth" valign="middle"><small><span style="color: Red;">I will use video-conf. system</span>&nbsp;&nbsp;</small></td>
-                                                <td align="left" id="vcSystemList" class="blacktext">
-                                                    % for vc in candResv.room.getAvailableVC():
-                                                        <% checked = "" %>
-                                                        % if vc in candResv.getUseVC():
-                                                            <% checked = """checked="checked" """ %>
-                                                        % endif
-                                                        <% htmlCheckbox = """<br>\n<input id="vc_%s" name="vc_%s" class="videoConferenceOption" type="checkbox" %s /> %s""" %>
-                                                        ${ htmlCheckbox % (vc[:3], vc[:3], checked, vc) }
-                                                    % endfor
-                                                    <br><br>
-                                                </td>
-                                            </tr>
-                                        % endif
-                                        % if candResv.room.needsAVCSetup or (rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance):
                                         <tr>
-                                            <td align="right" class="subFieldWidth" valign="top"><small>${ _("Assistance")}&nbsp;&nbsp;</small></td>
-                                            <td>
-                                                <table valign='top' cellpadding=0 cellspacing=0>
-                                                    % if candResv.room.needsAVCSetup:
-                                                    <tr>
-                                                        <td align="left" class="blacktext">
-                                                            <table cellpadding=0 cellspacing=0>
-                                                            <tr>
-                                                                <td style="vertical-align:top;"><input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} /></td>
-                                                                <td style="width:100%;padding-left: 3px;">${ _("Request assistance for the startup of the videoconference session. This support will most probably be done remotely")}</td>
-                                                            </tr>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                    % endif
-                                                    % if rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance:
-                                                    <tr>
-                                                        <td align="left" class="blacktext">
-                                                            <table cellpadding=0 cellspacing=0>
-                                                            <tr>
-                                                                <td style="vertical-align:top;"><input id="needsAssistance" name="needsAssistance" type="checkbox" ${' checked="checked" ' if candResv.needsAssistance else ""} /></td>
-                                                                <td style="width:100%;padding-left: 3px;">${_("Request assistance for the startup of your meeting. A technician will be physically present 10 to 15 mn before the event to help you start up the room equipment (microphone, projector, etc)")}</td>
-                                                            </tr>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                    % endif
+                                            <td align="left" class="blacktext">
+                                                <table cellpadding=0 cellspacing=0>
+                                                <tr>
+                                                    <td style="vertical-align:top;">
+                                                        <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} />
+                                                    </td>
+                                                    <td style="width:100%;padding-left: 3px;">
+                                                        ${ _("Request assistance for the startup of the videoconference session. This support is usually performed remotely.")}
+                                                    </td>
+                                                </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        % endif
+                                        % if rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance:
+                                        <tr>
+                                            <td align="left" class="blacktext">
+                                                <table cellpadding=0 cellspacing=0>
+                                                <tr>
+                                                    <td style="vertical-align:top;">
+                                                        <input id="needsAssistance" name="needsAssistance" type="checkbox" ${' checked="checked" ' if candResv.needsAssistance else ""} />
+                                                    </td>
+                                                    <td style="width:100%;padding-left: 3px;">
+                                                        ${_("Request assistance for the startup of your meeting. A technician will be physically present 10 to 15 minutes before the event to help you start up the room equipment (microphone, projector, etc)")}
+                                                    </td>
+                                                </tr>
                                                 </table>
                                             </td>
                                         </tr>
@@ -280,35 +305,53 @@
                                     </table>
                                 </td>
                             </tr>
-                            <tr><td>&nbsp;</td></tr>
-                            <!-- ACTIONS -->
-                            <tr>
-                                <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("Actions")}</span></td>
-                                <td>
-                                       <input type="hidden" name="conf" value="${ conf.getId()  if conf else ""}" />
-                                    <input type="hidden" name="standalone" value="${ standalone }" />
-                                       <input type="submit" id="checkBooking" class="btn" value="${ _("Re-check for conflicts")}" />
-                                       <input type="submit" id="saveBooking" class="btn"  ${' value="Save" ' if formMode==FormMode.MODIF else ""} value="${ bookingMessage }" />
-                                    (
-                                    <input type="checkbox" name="skipConflicting" id="skipConflicting" ${' checked="checked" ' if skipConflicting else ""} />
-                                     ${ _("skip conflicting dates")}
-                                    ${contextHelp('skipConflictsHelp' )}
-                                    )
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <a name="conflicts"></a>
-                                    ${ roomBookingRoomCalendar }
-                                </td>
-                            </tr>
+                            % endif
                         </table>
-                        </td>
-                    </tr>
-                </table>
+                    </td>
+                </tr>
+                <tr><td>&nbsp;</td></tr>
+                <!-- ACTIONS -->
+                <tr>
+                    <td colspan="2">
+                        <div class="groupTitle bookingTitle"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="hidden" name="conf" value="${ conf.getId()  if conf else ''}" />
+                        <input type="hidden" name="standalone" value="${ standalone }" />
 
+                        <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left;">
+                          <li class="button" onclick="$('#checkBooking').click(); return false;">
+                            <a href="#">${ _("Check again for conflicts")}</a>
+                          </li>
+                          <li style="display: none">
+                            <input type="submit" id="checkBooking" style="display: none;">
+                          </li>
+
+                          <li class="button" style="margin-left: 10px" onclick="$('#saveBooking').click(); return false;">
+                            <a href="#">${'Save' if formMode==FormMode.MODIF else 'Book'}</a>
+                          </li>
+                          <li style="display: none">
+                            <input type="submit" id="saveBooking" style="display: none;">
+                          </li>
+                        </ul>
+                        <div style="padding-top: 5px;">
+                            <!-- <input type="submit" id="saveBooking" class="btn"  ${' value="Save" ' if formMode==FormMode.MODIF else ""} value="${ bookingMessage }" /> -->
+                            <input type="checkbox" name="skipConflicting" id="skipConflicting" ${' checked="checked" ' if skipConflicting else ""} />
+                             ${ _("Skip conflicting dates")}
+                            ${contextHelp('skipConflictsHelp' )}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <a name="conflicts"></a>
+                        ${ roomBookingRoomCalendar }
+                    </td>
+                </tr>
+            </table>
             </td>
         </tr>
     </table>
     </form>
-    <br />
