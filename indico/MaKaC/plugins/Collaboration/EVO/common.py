@@ -33,7 +33,7 @@ from MaKaC.plugins.Collaboration.EVO.fossils import IEVOWarningFossil,\
     IEVOErrorFossil, IOverlappedErrorFossil, IChangesFromEVOErrorFossil
 
 readLimit = 100000;
-secondsToWait = 10;
+secondsToWait = 15;
 encodingTextStart = '<fmt:requestEncoding value='
 encodingTextEnd = '/>'
 
