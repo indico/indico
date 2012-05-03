@@ -30,7 +30,7 @@ import BTrees.OIBTree as OIBTree
 from datetime import datetime,timedelta
 import MaKaC
 from MaKaC.common.Counter import Counter
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NoReportError
 from MaKaC.accessControl import AdminList
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.common.timezoneUtils import nowutc
@@ -966,10 +966,10 @@ class AbstractMgr(Persistent):
             # * Remove dependencies with another abstracts:
             #       - If it's an accepted abstract-->remove abstract from contribution
             if isinstance(abstract.getCurrentStatus(), AbstractStatusAccepted):
-                raise MaKaCError( _("Cannot remove an accepted abstract before removing the contribution linked to it"))
+                raise NoReportError( _("Cannot remove an accepted abstract before removing the contribution linked to it"))
             # If it's a withdrawn abstract-->remove abstract from contribution
             if isinstance(abstract.getCurrentStatus(), AbstractStatusWithdrawn) and abstract.getContribution():
-                raise MaKaCError( _("Cannot remove the abstract before removing the contribution linked to it"))
+                raise NoReportError( _("Cannot remove the abstract before removing the contribution linked to it"))
             for abs in self._abstracts.values():
                 if abs != abstract:
                     st = abs.getCurrentStatus()
