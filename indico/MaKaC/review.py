@@ -312,6 +312,7 @@ class AbstractParticipation(Persistent):
         self._abstract = abs
 
     def delete( self ):
+        self._unindex()
         self._abstract = None
         TrashCanManager().add(self)
 
