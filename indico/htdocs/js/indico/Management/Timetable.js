@@ -27,9 +27,25 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
         draw: function() {
             var self = this;
 
+            var reverseSort = false;
             var selectAll = Html.span('fakeLink', $T('All'));
             var selectNone = Html.span('fakeLink', $T('None'));
+            var sortById = Html.span({className: 'fakeLink', id: 'sortById'}, $T('ID'));
+            var sortByTitle = Html.span({className: 'fakeLink', id: 'sortByTitle'}, $T('Title'));
+            var sortBar = Html.div({style: {cssFloat:'left', margin: pixels(3)}}, $T('Sort by: '), sortById, ', ', sortByTitle );
             var selectBar = Html.div({style: {textAlign:'right', margin: pixels(3)}}, $T('Select: '), selectAll, ', ', selectNone);
+
+            sortById.observeClick(function(){
+                $('#sortById').css('font-weight', 'bold');
+                $('#sortByTitle').css('font-weight', '');
+                self._sortList('id');
+            });
+
+            sortByTitle.observeClick(function(){
+                $('#sortByTitle').css('font-weight', 'bold');
+                $('#sortById').css('font-weight', '');
+                self._sortList('title');
+            });
 
             selectAll.observeClick(function(){
                 self.selectAll();
@@ -43,7 +59,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
                 }
             });
 
-            return [selectBar, this.SelectableListWidget.prototype.draw.call(this)];
+            return [sortBar, selectBar, this.SelectableListWidget.prototype.draw.call(this)];
         },
 
          _drawItem: function(pair) {
@@ -61,6 +77,27 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              return item;
          },
 
+         _sortList: function(type){
+             var self = this;
+             var items = {};
+             each(self.getAll(), function(item) {
+                 if(type == 'id')
+                     items[item.getAll().id] = item;
+                 if(type == 'title')
+                     items[item.getAll().title + item.getAll().id] = item;
+             });
+             self.clear();
+             var ks = keys(items);
+             ks.sort();
+             if (self.reverseSort)
+                 ks.reverse();
+             self.reverseSort = !self.reverseSort;
+             for (k in ks) {
+                 self.set(k, items[ks[k]]);
+             }
+
+         },
+
          getList: function() {
              return this.getSelectedList();
          }
@@ -72,17 +109,12 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
 
          this.SelectableListWidget(observer, false, 'UnscheduledContribList');
 
-         // Sort by name and add to the list
-         var items = {};
-         each(existing, function(item) {
-             items[item.title + item.id] = item;
-         });
-         var ks = keys(items);
-         ks.sort();
 
-         for (k in ks) {
-             this.set(k, $O(items[ks[k]]));
-         }
+         // Sort by title and add to the list
+         each(existing, function(item, index) {
+             self.set(index, $O(item));
+         });
+         this._sortList('id');
      }
     );
 
