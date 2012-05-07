@@ -9410,7 +9410,9 @@ class WTimeTableCustomizePDF(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         url=urlHandlers.UHConfTimeTablePDF.getURL(self._conf)
-        vars["getPDFURL"]=quoteattr(str(url))
+        vars["getPDFURL"] = quoteattr(str(url))
+        vars["showDays"] = vars.get("showDays", "all")
+        vars["showSessions"] = vars.get("showSessions", "all")
 
         wc = WConfCommonPDFOptions(self._conf)
         vars["commonPDFOptions"] = wc.getHTML()

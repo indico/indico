@@ -45,8 +45,10 @@ class StatisticsSMContributor(Component):
     @classmethod
     def fillManagementSideMenu(cls, obj, params={}):
         if obj._conf.canModify(obj._rh._aw):
-            params['Statistics'] = wcomponents.SideMenuItem(_('Statistics'),
-                UHConfModifStatistics.getURL(obj._conf))
+
+            if StatisticsRegister().hasActivePlugins():
+                params['Statistics'] = wcomponents.SideMenuItem(_('Statistics'),
+                    UHConfModifStatistics.getURL(obj._conf))
 
 
 class StatisticsEFContributor(Component):
@@ -59,11 +61,11 @@ class StatisticsEFContributor(Component):
         Add the footer extension for the statistics tracking.
         """
         stats = PluginsHolder().getPluginType('statistics')
+        register = StatisticsRegister()
 
-        if not stats.isActive():
+        if not stats.isActive() or not register.hasActivePlugins():
             return False
 
-        register = StatisticsRegister()
         key = 'extraFooterContent'
         extension = {}
         tracking = {}
@@ -174,7 +176,7 @@ class WPStatisticsView(WPConferenceModifBase):
         self._rh = rh
         self._conf = self._rh._conf
         self._register = StatisticsRegister()
-        self._plugins = self._register.getAllPlugins()
+        self._plugins = self._register.getAllPlugins(activeOnly=True)
         self._templateClass = templateClass
         self._extraJS = []
         self._activeTabName = activeTab

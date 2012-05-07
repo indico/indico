@@ -38,6 +38,9 @@ def getCategoryInfo( req, **params ):
 def webcastOnAir( req, **params ):
     return xmlGateway.RHWebcastOnAir( req ).process( params )
 
+def webcastForthcomingEvents( req, **params ):
+    return xmlGateway.RHWebcastForthcomingEvents( req ).process( params )
+
 def getStatsRoomBooking( req, **params ):
     return xmlGateway.RHStatsRoomBooking( req ).process( params )
 

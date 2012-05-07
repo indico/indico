@@ -251,7 +251,7 @@ class ContributionParticipantsUserBase(ContributionParticipantsBase):
         else:
             self._participant = self._contribution.getAuthorById(self._pm.extract("userId", pType=str, allowEmpty=False))
         if self._participant == None:
-            raise ServiceError("ERR-U0", _("User does not exist."))
+            raise ServiceAccessError(_("The user that you are trying to delete does not exist."))
 
 
 class ContributionAddExistingParticipant(ContributionParticipantsBase):

@@ -6899,6 +6899,8 @@ class RHConfPosterPrintingPDF(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.__templateId = params.get("templateId",None)
+        if self.__templateId == None:
+            raise FormValuesError(_("Poster not selected"))
         if self.__templateId.find('global') != -1:
             self.__templateId = self.__templateId.replace('global','')
             self.__template = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplateById(self.__templateId)

@@ -18,27 +18,21 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os
 from textwrap import TextWrapper
 
 from BTrees.IOBTree import IOBTree
-from datetime import datetime
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.mail as mail
 import MaKaC.webinterface.pages.abstracts as abstracts
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.review as review
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.common import DBMgr,Config
 from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.PDFinterface.conference import AbstractToPDF, AbstractsToPDF
-from MaKaC.webinterface.general import normaliseListParam
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils
-import MaKaC.conference as conference
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
@@ -356,6 +350,8 @@ class RHAbstractDisplayBase( RHAbstractSubmissionBase ):
         if not params.has_key("abstractId") and params.has_key("contribId"):
             params["abstractId"] = params["contribId"]
         self._abstract = self._target = cfaMgr.getAbstractById( params["abstractId"] )
+        if self._abstract == None:
+            raise NoReportError(_("The abstract you are trying to access does not exist or has been deleted"))
 
 
 class RHAbstractSubmissionConfirmation( RHAbstractDisplayBase ):

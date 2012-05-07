@@ -62,18 +62,38 @@ class StatisticsRegister():
         self.clearAll()
         self._buildRegister()
 
-    def getAllPlugins(self, instantiate=True):
+
+    def hasActivePlugins(self):
+        """
+        Returns True only if any implementations are active in the PluginsHolder
+        """
+
+        activePlugins = list(p for p in self.getAllPlugins(True) if p.isActive())
+
+        # The resultant activePlugins is only True if there are any plugins.
+        return bool(activePlugins)
+
+    def getAllPlugins(self, instantiate=True, activeOnly=False):
         """
         Returns a list of all plugin class registered, if instantiate is
-        True, instates all objects before appending to the list.
+        True, instates all objects before appending to the list. By default
+        this method only returns active implementations, however all implementations
+        may be returned by setting activeOnly to True.
         """
         result = []
 
         if instantiate:
             for plugin in self._getRegister().values():
+
+                if activeOnly and not plugin().isActive():
+                    continue
+
                 result.append(plugin())
         else:
-            result = self._getRegister().values()
+            if activeOnly:
+                result = list(p for p in self._getRegister().values() if p().isActive())
+            else:
+                result = self._getRegister().values()
 
         return result
 
@@ -83,7 +103,7 @@ class StatisticsRegister():
         """
         return self._getRegister().keys()
 
-    def getAllPluginJSHooks(self, extra=None):
+    def getAllPluginJSHooks(self, extra=None, includeInactive=False):
         """
         Returns a list of JSHook objects which contain the parameters
         required to propagate a hook with the data it needs. If extra is
@@ -93,6 +113,9 @@ class StatisticsRegister():
         hooks = []
 
         for plugin in self.getAllPlugins(True):
+
+            if not includeInactive and not plugin.isActive():
+                continue
 
             if extra is not None:
                 hook = plugin.getJSHookObject()(plugin, extra)
