@@ -1254,7 +1254,12 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
             // If none is defined in the function args,
             // execute the default action
-            data[result.day][result.id] = result.entry;
+            if(exists(result.slotEntry)){
+                data[result.day][result.slotEntry.id].entries[result.entry.id] = result.entry;
+            }
+            else {
+                data[result.day][result.id] = result.entry;
+            }
 
             // A session interval may contain entries, that
             // should be preserved (e.g. content (contribs, breaks) of
@@ -1419,7 +1424,6 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
             }
 
             if (exists(result.slotEntry)) {
-
                 // Save the entries, otherwise they are lost
                 result.slotEntry.entries = slot.entries;
                 this.parentTimetable.data[result.day][result.slotEntry.id] = result.slotEntry;
