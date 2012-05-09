@@ -26,6 +26,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.i18n import _
 from MaKaC.webinterface.urlHandlers import UHFileAccess
 
+
 class PiwikStatisticsImplementation(BaseStatisticsImplementation):
 
     QUERY_SCRIPT = 'piwik.php'
@@ -103,12 +104,6 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
 
         return reference() if instantiate else reference
 
-    # @staticmethod
-    # @BaseStatisticsImplementation.memoizeReport
-    # def getMaterialReport(**kwargs):
-        
-    #     return True
-
     def setAPISiteID(self, id):
         """
         Piwik identifies sites by their 'idSite' attribute.
@@ -162,14 +157,13 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         self.setAPIParams({'segment': segmentation})
 
 
-    def trackDownload(self, request):
+    def trackDownload(self, material):
         """
         Wraps around the Piwik query object for tracking downloads, constructs
         the name by which we want to log the download and the link.
         """
         from indico.ext.statistics.piwik.queries import PiwikQueryTrackDownload
         tracker = PiwikQueryTrackDownload()
-        material = request._file
 
         downloadLink = str(UHFileAccess().getURL(material))
         downloadTitle = _('Download') + ' - ' + material.getFileName()

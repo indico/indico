@@ -52,7 +52,7 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
             RHDisplayBaseProtected._checkProtection( self )
 
     def _process( self ):
-        self._notify('materialDownloaded')
+        self._notify('materialDownloaded', self._file)
 
         if isinstance(self._file, Link):
             self._redirect(self._file.getURL())
@@ -64,11 +64,13 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
             mimetype = cfg.getFileTypeMimeType( self._file.getFileType() )
             self._req.content_type = """%s"""%(mimetype)
             dispos = "inline"
+
             try:
                 if self._req.headers_in['User-Agent'].find('Android') != -1:
                     dispos = "attachment"
             except KeyError:
                 pass
+
             self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self._file.getFileName())
 
             if cfg.getUseXSendFile() and self._req.headers_in['User-Agent'].find('Android') == -1:

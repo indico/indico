@@ -150,22 +150,3 @@ class PiwikReport(PiwikReportBase):
     def getContributionId(self):
         return self._contribId
 
-
-class PiwikDownloadReport():
-    """
-    This object acts as a wrapper around the download of files tracked in the Piwik
-    API.
-    """
-
-    def __init__(self, urls):
-        if not isinstance(list, urls):
-            urls = list(urls)
-
-        self._urls = urls
-        self._query = pq.PiwikQueryMetricMultipleDownloads(urls)
-
-    def getDownloadReport():
-        """
-        Returns the fossilized object of the downloads.
-        """
-        return self._query.getQueryResult()

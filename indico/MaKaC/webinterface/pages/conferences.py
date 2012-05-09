@@ -1310,7 +1310,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
     def _getBody(self, params):
         """Return main information about the event."""
-
         if self._view != 'xml':
             vars = self._getVariables(self._conf)
             vars['getTime'] = lambda date : format_time(date.time(), format="HH:mm")

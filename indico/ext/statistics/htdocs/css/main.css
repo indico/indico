@@ -105,15 +105,16 @@ div.statsTableDivider {
 div#statsGenerated {
     font-style: italic;
     font-size: 0.8em;
+    padding-top: 10px;
 }
 
 div#materialTree {
     display: block;
-    width: 200px;
-    height: 90%;
+    width: 190px;
+    height: 80%;
     overflow: auto;
     float: left;
-    padding-top: 10px;
+    padding: 15px 10px 10px 10px;
 }
 
 div#materialContainer {
@@ -128,12 +129,24 @@ div#materialContainer {
 
 div#materialTree ul {
     margin: 0px;
-    padding: 0 0 0px 20px;
-    line-height: 1.1em;
+    padding: 0 0 0px 10px;
+    line-height: 1.5em;
 }
 
 div#marginTree ul ul {
     padding-left: 5px;
+}
+
+span.selectableNode {
+    color: #0B63A5 !important;
+    font-size: 0.9em;
+    display: block;
+    width: auto;
+    border-bottom: 1px solid #EFEFEF;
+}
+
+ul.tree .title {
+    color: #444;
 }
 
 /* jqPlot Formatting */

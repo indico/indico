@@ -48,6 +48,7 @@ class RHMaterialDisplayModifBase( RHMaterialDisplayBase ):
         else:
             raise MaKaCError( _("you are not authorised to manage material for this contribution"))
 
+
 class RHMaterialDisplayCommon:
 
     def _process(self):
@@ -56,6 +57,9 @@ class RHMaterialDisplayCommon:
 
         if len(self._material.getResourceList()) == 1:
             res = self._material.getResourceList()[0]
+
+            self._notify('materialDownloaded', res)
+
             if isinstance(res, conference.Link):
                 url = res.getURL()
                 if url.find(".wmv") != -1:
@@ -71,6 +75,7 @@ class RHMaterialDisplayCommon:
         else:
             return self._processManyMaterials()
 
+
 class RHMaterialDisplay( RHMaterialDisplayBase, RHMaterialDisplayCommon ):
     _uh = urlHandlers.UHMaterialDisplay
 
@@ -79,12 +84,14 @@ class RHMaterialDisplay( RHMaterialDisplayBase, RHMaterialDisplayCommon ):
 
     def _processManyMaterials( self ):
         if self._material.getConference()!=None:
-            p = material.WPMaterialConfDisplayBase(self, self._material  )
+            p = material.WPMaterialConfDisplayBase(self, self._material)
         else:
-            p= material.WPMaterialCatDisplayBase(self, self._material)
+            p = material.WPMaterialCatDisplayBase(self, self._material)
         wf=self.getWebFactory()
+
         if wf is not None:
             p = wf.getMaterialDisplay( self, self._material)
+
         return p.display()
 
 

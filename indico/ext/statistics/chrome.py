@@ -97,12 +97,12 @@ class StatisticsMaterialDownloadListener(Component):
     zope.interface.implements(IMaterialDownloadListener)
 
     @classmethod
-    def materialDownloaded(cls, obj):
-        register = StatisticsImplementationRegister.getInstance()
+    def materialDownloaded(cls, obj, resource):
+        register = StatisticsRegister()
         listeners = register.getAllPluginDownloadListeners()
 
         for listener in listeners:
-            listener.trackDownload(obj)
+            listener.trackDownload(resource)
 
         return False
 
@@ -251,6 +251,7 @@ class WPStatisticsView(WPConferenceModifBase):
 
     def getJSFiles(self):
         extraJS = ['statistics/js/statistics.js',
+                    'statistics/js/lib/jqPlot/excanvas.min.js',
                     'statistics/js/lib/jqTree/tree.jquery.js',
                     'statistics/js/lib/jqPlot/jquery.jqplot.min.js']
 

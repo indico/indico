@@ -4031,6 +4031,70 @@ class Conference(CommonObjectBase, Locatable):
         l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
 
+    def _getMaterialFiles(self, material):
+        """
+        Adaption of _getMaterialFiles in WPTPLConferenceDisplay for desired format, objects
+        seemed mutually exclusive hence use of similar logic here specific to Conference.
+        """
+        files = []
+        processed = []
+
+        for res in material.getResourceList():
+            try:
+                ftype = res.getFileType()
+                fname = res.getFileName()
+                furl = urlHandlers.UHFileAccess.getURL(res)
+
+                if fname in processed:
+                    fname = "%s - %s" % (fname, processed.count(fname))
+
+                processed.append(res.getFileName())
+            except:
+                # If we are here then the resource is a Link object.
+                fname, ftype, furl = str(res.getURL()), "link", str(res.getURL())
+            files.append({'title': fname, 'type': ftype, 'url': furl})
+
+        return files
+
+    def getAllMaterialDict(self, child=None):
+        """
+        This method iterates through the children of the conference, creating
+        a dictionary which maps type to material link URLs.
+        """
+
+        child = self if child is None else child
+
+        node = {}
+        node['title'] = child.getTitle()
+        node['type'] = child.getType()
+        node['children'] = []
+        node['material'] = []
+
+        if child.getType() in ['conference', 'meeting', 'session']:
+            for session in child.getSessionList():
+                node['children'].append(self.getAllMaterialDict(session))
+
+            for contrib in child.getContributionList():
+                node['children'].append(self.getAllMaterialDict(contrib))
+
+        for material in child.getAllMaterialList():
+            files = self._getMaterialFiles(material)
+
+            for file in files:
+                materialNode = {}
+                materialNode['type'] = 'material'
+                materialNode['title'] = material.getTitle()
+
+                if material.getTitle() != 'Minutes':
+                    materialNode['title'] += ' - ' + file['title']
+
+                materialNode['materialType'] = file['type']
+                materialNode['url'] = str(file['url'])
+
+                node['material'].append(materialNode)
+
+        return node
+
     def setPaper( self, newPaper ):
         if self.getPaper() != None:
             raise MaKaCError( _("The paper for this conference has already been set"), _("Conference"))

@@ -158,7 +158,7 @@ class PiwikQueryTrackBase(PiwikQueryBase):
         if not time or not isinstance(datetime.datetime, time):
             time = datetime.datetime.now()
 
-        params = {'h' : time.hour, 'm' : time.minute, 's' : time.second}
+        params = {'h': time.hour, 'm': time.minute, 's': time.second}
         self.setAPIParams(params)
 
     def setAPIDownloadLink(self, downloadLink):
@@ -166,34 +166,34 @@ class PiwikQueryTrackBase(PiwikQueryBase):
         Sets the downloaded URL for tracking, also sets the URL of the tracking
         to the same as per API recommendation.
         """
-        self.setAPIParams({'download' : urllib2.quote(downloadLink)})
+        self.setAPIParams({'download': urllib2.quote(downloadLink)})
         self.setAPIURL(downloadLink)
 
     def setAPIURL(self, url):
-        self.setAPIParams({'url' : urllib2.quote(url)})
+        self.setAPIParams({'url': urllib2.quote(url)})
 
     def setAPIVisitorID(self, visitorID):
-        self.setAPIParams({'_id' : self._generateVisitorID(visitorID)})
+        self.setAPIParams({'_id': self._generateVisitorID(visitorID)})
 
     def setAPIRecordMode(self, mode=1):
         """
         This is an int boolean which forces the API into 'record' mode if flag
         is set to 1.
         """
-        self.setAPIParams({'rec' : mode})
+        self.setAPIParams({'rec': mode})
 
     def setAPIPageTitle(self, title):
         """
         Sets the 'title' of the page, which is to be tracked.
         """
-        self.setAPIParams({'action_name' : urllib2.quote(title)})
+        self.setAPIParams({'action_name': urllib2.quote(title)})
 
     def setAPISiteID(self, id):
         """
         For some reason, recording to piwik has 'idSite' in the format 'idsite',
         overridden method to allow for this quirk.
         """
-        self.setAPIParams({'idsite' : id})
+        self.setAPIParams({'idsite': id})
 
 
 class PiwikQueryConferenceBase(PiwikQueryRequestBase):
@@ -470,60 +470,83 @@ class PiwikQueryMetricDownload(PiwikQueryRequestBase):
     on this string alone.
     """
 
-    def __init__(self, url):
+    # These links are classed as download, therefore _totalUniqueHits is the
+    # individual hosts which are referrers, _totalHitMetric is simply the
+    # cumulative number of hits the link has had.
+    _totalUniqueHits = 'nb_uniq_visitors'
+    _totalHitMetric = 'nb_hits'
+    _strTotalHits = 'total_hits'
+    _strUniqueHits = 'unique_hits'
+
+    def __init__(self, startDate, endDate, url):
         PiwikQueryRequestBase.__init__(self)
         self.setAPIDownloadURL(url)
+        self.setAPIPeriod('day')
+        self.setAPIDate([startDate, endDate])
+
         self._url = url
-
-    def _parseJSONForAPI(self, json):
-        """
-        Returns a simpler dictionary containing form:
-        {'date' : {'total_hits' : x, 'unique_hits' : y}}
-        """
-        cleanJSON = {}
-
-        for date in json.keys():
-            hits = json.get(date)
-
-            dayHits = {'total_hits' : 0,
-                       'unique_hits' : 0}
-
-            if hits:
-                # Piwik returns hits as a list of dictionaries, per date.
-                for metrics in hits:
-
-                    dayHits['total_hits'] += metrics['nb_hits']
-                    dayHits['unique_hits'] += metrics['nb_uniq_visitors']
-
-            cleanJSON[date] = dayHits
-
-        return cleanJSON
-
-    def _parseJSONForReduction(self, json):
-        """
-        Iterates through
-        """
-        pass
-
-    def setAPIDownloadURL(self, url):
-        """
-        Escapes and sets the download URL to match.
-        """
-        self.setAPIParams({'downloadUrl' : urllib2.quote(url)})
 
     def _buildType(self):
         self.setAPIModule('API')
         self.setAPIFormat('JSON')
         self.setAPIMethod('Actions.getDownload')
 
+    def _parseJSONForAPI(self, json, excludeEmptyDates=False):
+        """
+        Returns a simpler dictionary containing form:
+        {'date' : {'total_hits': x, 'unique_hits': y}}
+        """
+        cleanJSON = {}
+
+        for date, hits in json.iteritems():
+            dayHits = {self._strTotalHits: 0, self._strUniqueHits: 0}
+
+            if hits:  # Piwik returns hits as a list of dictionaries, per date.
+                for metrics in hits:
+                    dayHits[self._strTotalHits] += metrics[self._totalHitMetric]
+                    dayHits[self._strUniqueHits] += metrics[self._totalUniqueHits]
+
+            elif excludeEmptyDates:
+                continue
+
+            cleanJSON[date] = dayHits
+
+        return cleanJSON
+
+    def _parseJSONForSum(self, json):
+        """
+        Returns a dictionary of {'total_hits': x, 'unique_hits': y} for the
+        date range.
+        """
+        totalHits = {self._strTotalHits: 0, self._strUniqueHits: 0}
+
+        # Piwik has an odd format of returning this data, dictionaries inside
+        # a list of days, reduce it so that we can easily sum.
+        dayDicts = list(d[0] for d in json.values() if d)
+
+        for hits in dayDicts:
+            totalHits[self._strTotalHits] += hits[self._totalHitMetric]
+            totalHits[self._strUniqueHits] += hits[self._totalUniqueHits]
+
+        return totalHits
+
+    def setAPIDownloadURL(self, url):
+        """
+        Escapes and sets the download URL to match.
+        """
+        self.setAPIParams({'downloadUrl': urllib2.quote(url)})
+
     def getURL(self):
         return self._url
 
-    def getQueryResult(self, returnAsJSON=False):
+    def getQueryResult(self, returnJSON=False):
         downloadJSON = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
 
-        if returnAsJSON:
-            return self._parseJSONForAPI(downloadJSON)
+        if returnJSON:
+
+            jsData = {'cumulative': self._parseJSONForSum(downloadJSON),
+                      'individual': self._parseJSONForAPI(downloadJSON)}
+            return jsData
 
         return downloadJSON
 
@@ -554,11 +577,11 @@ class PiwikQueryMetricMultipleDownloads():
         for url in urls:
             self._downloads.append(PiwikQueryMetricDownload(url))
 
-    def getQueryResult(self, returnAsJson=False):
+    def getQueryResult(self, returnJSON=False):
         result = {}
 
         for download in self._downloads:
-            result[download.getURL()] = download.getQueryResult(returnAsJson)
+            result[download.getURL()] = download.getQueryResult(returnJSON)
 
 
 class PiwikQueryTrackDownload(PiwikQueryTrackBase):
