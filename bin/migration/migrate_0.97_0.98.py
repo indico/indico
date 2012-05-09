@@ -498,7 +498,7 @@ def collaborationRequestIndexCreate(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
-@since('0.98.1')
+@since('0.99')
 def migrateChatroomIndexes(verbose=False):
     """ The structure of the indexes is such that for each one self._data
         is a BTree and each node is referenced by the IndexBy___ designation,
