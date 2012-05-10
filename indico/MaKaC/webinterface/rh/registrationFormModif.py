@@ -622,7 +622,7 @@ class RHRegistrationFormModifGeneralSectionBase( RHRegistrationFormModifBase ):
         sectionFormId = params.get("sectionFormId","")
         if not sectionFormId:
             raise MaKaCError(_("sectionFormId not set"))
-        self._generalSectionForm=self._conf.getRegistrationForm().getGeneralSectionFormById(sectionFormId)
+        self._generalSectionForm = self._conf.getRegistrationForm().getGeneralSectionFormById(sectionFormId)
 
 class RHRegistrationFormModifGeneralSection( RHRegistrationFormModifGeneralSectionBase ):
 
