@@ -1538,13 +1538,6 @@ class AvatarHolder( ObjectHolder ):
             for authId in Config.getInstance().getAuthenticatorList():
                 if not authId == "Local":
                     dict = euh.getById(authId).match(criteria, exact=exact)
-                    if authId == "Nice":
-                        auth = NiceAuthentication.NiceAuthenticator()
-                    elif authId == "LDAP":
-                        auth = LDAPAuthentication.LDAPAuthenticator()
-                    else:
-                       raise MaKaCError(
-                           _("Authentication type " + authId + " is not known."))
                     for email in dict.iterkeys():
                         # TODO and TOSTUDY: result.keys should be replace it with
                         # l=[]; for av in result.values(): l.append(av.getAllEmails())
@@ -1557,7 +1550,7 @@ class AvatarHolder( ObjectHolder ):
                                     # TODO: logins can be reused, hence the removal
                                     # TODO: check if same can happen with emails
                                     # if auth.hasKey(dict[email]["login"]):
-                                      # av = auth.getById(dict[email]["login"]).getUser()
+                                    #     av = auth.getById(dict[email]["login"]).getUser()
                                     result[email] = av
                             else:
                                 av = self.match({'email': email}, exact=1, forceWithoutExtAuth=True)[0]

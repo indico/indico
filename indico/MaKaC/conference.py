@@ -9464,7 +9464,9 @@ class Contribution(CommonObjectBase, Locatable):
         self._initSubmissionPrivileges()
         if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
             ah = AvatarHolder()
-            results=ah.match({"email":sb.getEmail()}, exact=1)
+            results=ah.match({"email":sb.getEmail()}, exact=1, forceWithoutExtAuth=True)
+            if not results:
+                results=ah.match({"email":sb.getEmail()}, exact=1)
             r=None
             for i in results:
                 if i.hasEmail(sb.getEmail()):
