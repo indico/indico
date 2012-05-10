@@ -215,7 +215,7 @@ class WPStatisticsView(WPConferenceModifBase):
         if not isinstance(plugins, list):
             plugins = list(plugins)
 
-        prefix = 'statistics/js/lib/jqPlot/plugins/jqplot.'
+        prefix = '/statistics/js/lib/jqPlot/plugins/jqplot.'
         suffix = '.min.js'
 
         for plugin in plugins:
@@ -243,17 +243,17 @@ class WPStatisticsView(WPConferenceModifBase):
                                           self._register, self._activeTabName, self._params).getHTML(params))
 
     def getCSSFiles(self):
-        extraCSS = ['statistics/css/main.css',
-                    'statistics/js/lib/jqTree/jqtree.css',
-                    'statistics/js/lib/jqPlot/jquery.jqplot.css']
+        extraCSS = ['/statistics/css/main.css',
+                    '/statistics/js/lib/jqTree/jqtree.css',
+                    '/statistics/js/lib/jqPlot/jquery.jqplot.css']
 
         return WPConferenceModifBase.getCSSFiles(self) + extraCSS
 
     def getJSFiles(self):
-        extraJS = ['statistics/js/statistics.js',
-                    'statistics/js/lib/jqPlot/excanvas.min.js',
-                    'statistics/js/lib/jqTree/tree.jquery.js',
-                    'statistics/js/lib/jqPlot/jquery.jqplot.min.js']
+        extraJS = ['/statistics/js/statistics.js',
+                    '/statistics/js/lib/jqPlot/excanvas.min.js',
+                    '/statistics/js/lib/jqTree/tree.jquery.js',
+                    '/statistics/js/lib/jqPlot/jquery.jqplot.min.js']
 
         jqPlotPlugins = ['dateAxisRenderer', 'highlighter', 'cursor']
 

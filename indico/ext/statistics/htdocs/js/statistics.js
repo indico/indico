@@ -84,7 +84,8 @@ $(function() {
                     max: reportDates.end
                 },
                 yaxis: {
-                    min: 0
+                    min: 0,
+                    tickInterval: 1
                 }
             },
             cursor: {
@@ -96,16 +97,22 @@ $(function() {
                 show: true,
                 sizeAdjust: 5
             },
+            legend: {
+                show: true,
+                location: 'nw'
+            },
             grid: {
                 background: '#FFFFFF',
                 shadow: false
             },
             series: [{
                 lineWidth: 1,
-                color: '#CCCCCC'
+                color: '#CCCCCC',
+                label: $T('Total Downloads')
             }, {
                 lineWidth: 1,
-                color: '#0B63A5'
+                color: '#0B63A5',
+                label: $T('Unique Downloads')
             }]
         };
 
@@ -128,8 +135,8 @@ $(function() {
 
         indicoRequest('piwik.getMaterialStatistics',
         {
-            startDate: $('#startDate').val(),
-            endDate: $('#endDate').val(),
+            startDate: $('#statsFilterStartDate').val(),
+            endDate: $('#statsFilterEndDate').val(),
             confId: $('#confId').val(),
             contribId: $('#contribId').val(),
             materialURL: uri
@@ -138,9 +145,10 @@ $(function() {
             if (!error) {
                 if (result !== null) {
                     drawGraph(result['individual'], replot);
+                    $('#materialTotalDownloads').html(result['cumulative']['total_hits']);
                 }
             } else {
-                /* Log the issue here */
+                $('#dialogNoGraphData').dialog('open');
             }
         });
     };
@@ -185,8 +193,6 @@ $(function() {
                     /* There is no material present */
                     $(treeDOMTarget).html($T('No Material Found.'));
                 }
-            } else {
-                /* Handle error */
             }
         });
     }
@@ -198,6 +204,17 @@ $(function() {
         $('#materialTitle').html(event.node.name);
         $('#materialDownloadChart').html(progressIndicator(true, true).dom);
         loadGraph(event.node.id, true);
+    });
+
+    $('#dialogNoGraphData').dialog({
+        model: true,
+        resizable: false,
+        autoOpen: false,
+        buttons: {
+            Ok: function() {
+                $(this).dialog('close');
+            }
+        }
     });
 
     loadTree();

@@ -207,6 +207,7 @@
                         <span id="materialTitle">
                             ${_('No Material Selected.')}
                         </span>
+                        (${_('Total: ')}<span id="materialTotalDownloads">0</span>)
                     </div>
                     <div id="materialInfo">
                         <div id='materialDownloadChart'>
@@ -228,6 +229,16 @@
         "introduction. This means that there is no data present for the earlier " \
         "period of some events, this does not necessarily mean that there was no "\
         "activity in the event at that time.")}
+    </div>
+</div>
+
+<!--  Container for popup content -->
+<div style="display:none; visibility: false;">
+    <div id='dialogNoGraphData' title="${_('Unable to Retrieve Graph Data')}">
+        <p>
+            ${_("The server did not respond in a timely manner, " \
+                "it may be the case that the date-range is too large.")}
+        </p>
     </div>
 </div>
 

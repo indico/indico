@@ -89,7 +89,8 @@ indico_legacy = Bundle('js/indico/Legacy/Widgets.js',
                        'js/indico/Legacy/Util.js',
                        filters='jsmin', output='indico_legacy_%(version)s.min.js')
 
-indico_common = Bundle('js/indico/Common/TimezoneSelector.js',
+indico_common = Bundle('js/indico/Common/Export.js',
+                       'js/indico/Common/TimezoneSelector.js',
                        'js/indico/Common/IntelligentSearchBox.js',
                        'js/indico/Common/Social.js',
                        'js/indico/Common/Export.js',
