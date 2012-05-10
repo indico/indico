@@ -3,7 +3,7 @@
 <%block name="description" args="contrib=None">
     <div class="contributionListContribDescription">
         % if len(contrib.getDescription()):
-            ${contrib.getDescription()[0:400]}${"... <a href='${str( urlHandlers.UHContributionDisplay.getURL( contrib ))}'>"+_('More')+"</a>" if len(contrib.getDescription()) > 400 else ""}
+            ${contrib.getDescription()[0:400]}${"... <a href='"+ str( urlHandlers.UHContributionDisplay.getURL( contrib )) +"'>"+_('More')+"</a>" if len(contrib.getDescription()) > 400 else ""}
         % else:
             ${contrib.getDescription()}
         % endif
