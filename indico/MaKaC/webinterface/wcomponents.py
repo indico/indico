@@ -5474,7 +5474,7 @@ class WRoomBookingBookingForm( WTemplated ):
             bText = "Save"
 
         vars["roomBookingRoomCalendar"] = WRoomBookingRoomCalendar( self._rh, self._standalone, buttonText=bText).getHTML( {} )
-
+        vars["rooms"] = self._rh._rooms
         return vars
 
 class WRoomBookingConfirmBooking( WRoomBookingBookingForm ):

@@ -1428,7 +1428,8 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
                     raise MaKaCError( "You are not authorized to take this action." )
 
     def _businessLogic( self ):
-        pass
+        self._rooms = CrossLocationQueries.getRooms( allFast = True )
+        self._rooms.sort()
 
     def _process( self ):
         self._businessLogic()

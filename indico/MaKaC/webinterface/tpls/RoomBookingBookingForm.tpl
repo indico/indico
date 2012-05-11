@@ -68,6 +68,33 @@
             popup.execute();
     }
 
+    function isBookable() {
+        // Get the room location and id in the SELECT
+        var roomLocation = $("#roomName option:selected").data("location");
+        var roomID = $("#roomName option:selected").data("id");
+
+        // Send an asynchronous request to the server
+        // Depending of result, either recheck the conflicts
+        // Relaod Room Booking form or pop up a dialog
+        indicoRequest('user.canBook',
+            {roomLocation: roomLocation, roomID: roomID},
+            function(result, error) {
+                if(!error) {
+                    if (result) {
+                        $("#roomLocation").val(roomLocation);
+                        $("#roomID").val(roomID);
+                        $("#bookingForm").submit();
+                    } else {
+                        bookButtonWrapper.set(bookButton);
+                        var popup = new AlertPopup('Booking Not Allowed',
+                                "You're not allowed to book this room");
+                        popup.open();
+                    }
+                } else {
+                    IndicoUtil.errorReport(error);
+                }
+            });
+    }
 
     $(window).load(function() {
         % if candResv.room.needsAVCSetup:

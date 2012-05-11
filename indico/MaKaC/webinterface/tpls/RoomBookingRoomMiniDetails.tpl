@@ -9,12 +9,17 @@
                                 <td>
                                     <table width="100%">
                                         <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Name")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><a href="${ roomDetailsUH.getURL( room ) }">${ room.building }-${ room.floor }-${ room.roomNr }
-                                                % if room.name != str(room.building) + '-' + str(room.floor) + '-' + str(room.roomNr):
-                                                    <small>(${ room.name })</small>
-                                                 % endif
-</a>
+                                            <td class="subFieldWidth" align="right"><small> ${ _("Name")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                                <select name="roomName" id="roomName" onchange="isBookable()" style="width:200px">
+                                                % for roomItem in rooms:
+                                                  <% selected = "" %>
+                                                  % if room.name == roomItem.name:
+                                                    <% selected = 'selected="selected"' %>
+                                                  % endif
+                                                  <option data-location="${roomItem.locationName}" data-id="${roomItem.id}" ${ selected } class="${roomClass( roomItem )}">${ roomItem.locationName + ": &nbsp; " + roomItem.getFullName() }</option>
+                                                % endfor
+                                                </select>
                                             </td>
                                         </tr>
                                         % if room.photoId != None:
