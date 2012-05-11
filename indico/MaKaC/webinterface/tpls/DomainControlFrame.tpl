@@ -43,7 +43,7 @@ $(function(){
     refresh_state();
 });
 
-$('input:checkbox').live('change', function(){
+$('input:checkbox', '.domain_control').live('change', function(){
     $this = $(this);
     indicoRequest('event.protection.toggleDomains',
                   {

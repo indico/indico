@@ -263,7 +263,7 @@ type("ImportDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                 this.importerList = new ImporterList([],
                         {"height" : this.height - 80, "width" : this.width / 2 - 20, "cssFloat" : "left"},
                         'entryList', 'entryListSelected', true, _observeInsertButton);
-                this.timetableList = new TableTreeList(this.timetable,
+                this.timetableList = new TableTreeList(this.topTimetable,
                         {"height" : this.height - 80, "width" : this.width / 2 - 20, "cssFloat" : "right"},
                         'treeList', 'treeListDayName', 'treeListEntry', true, _observeInsertButton);
                 return Html.div({},
@@ -315,8 +315,8 @@ type("ImportDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
             var self = this;
             this.ExclusivePopupWithButtons($T("Import Entries"));
             this.timetable = timetable?timetable:window.timetable;
-            this.timetable = this.timetable.parentTimetable?this.timetable.parentTimetable:this.timetable
-            this.confId = this.timetable.contextInfo.id;
+            this.topTimetable = this.timetable.parentTimetable?this.timetable.parentTimetable:this.timetable
+            this.confId = this.topTimetable.contextInfo.id;
             this.height = document.body.clientHeight - 200;
             this.width = document.body.clientWidth - 200;
             this.importers;
@@ -492,7 +492,12 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
                                 time += duration;
                             });
                             var successCallback = function(result){
-                                self.timetable._updateEntry(result, result.id);
+                                if(exists(result.slotEntry) && self.timetable.contextInfo.id == result.slotEntry.id){
+                                    self.timetable._updateEntry(result, result.id);
+                                } else{
+                                    var timetable = self.timetable.parentTimetable?self.timetable.parentTimetable:self.timetable;
+                                    timetable._updateEntry(result, result.id);
+                                }
                             };
                             var finalCallback = function(){
                                 if(self.successFunction)

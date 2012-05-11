@@ -3334,7 +3334,7 @@ class WConferenceList(WTemplated):
                 future.append(conf)
 
         if len(present) < MIN_PRESENT_EVENTS:
-            present = list(index.values(oneMonthTS, thisMonthTS)) + present
+            present = index.values(oneMonthTS, thisMonthTS) + present
 
         if not present:
             maxDT = timezone('UTC').localize(datetime.utcfromtimestamp(index.maxKey())).astimezone(timezone(tz))
