@@ -114,7 +114,8 @@ class StatisticsRegister():
 
         for plugin in self.getAllPlugins(True):
 
-            if not includeInactive and not plugin.isActive():
+            if (not includeInactive and not plugin.isActive()) \
+                or not plugin.hasJSHook():
                 continue
 
             if extra is not None:

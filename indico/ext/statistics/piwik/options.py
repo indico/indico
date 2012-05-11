@@ -20,6 +20,16 @@
 from MaKaC.i18n import _
 
 globalOptions = [
+    ("jsHookEnabled", {"description": "Enable Conference & Contribution View Tracking",
+                  "type": bool,
+                  "defaultValue": True,
+                  "editable": True,
+                  "visible": True}),
+    ("downloadTrackingEnabled", {"description": "Enable Material Download Tracking",
+                  "type": bool,
+                  "defaultValue": True,
+                  "editable": True,
+                  "visible": True}),
     ("serverUrl", {"description": "Piwik Server URL",
                   "type": str,
                   "defaultValue": "http://127.0.0.1/",

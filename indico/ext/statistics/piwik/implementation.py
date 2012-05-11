@@ -79,6 +79,26 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         """
         return PiwikStatisticsImplementation.getVarFromPluginStorage('serverSiteID')
 
+    def hasJSHook(self):
+        """
+        This implementation permits the JSHook & Download listener to be
+        enabled/disabled separately, checks for this option first then falls
+        back to default plugin activity if not disabled locally. By doing this,
+        the components are not appended to the list of subsribers when listeners
+        are iterating.
+        """
+        enabled = PiwikStatisticsImplementation.getVarFromPluginStorage('jsHookEnabled')
+
+        return BaseStatisticsImplementation.hasJSHook(self) if enabled else False
+
+    def hasDownloadListener(self):
+        """
+        Overridden method, see self.hasJSHook for explaination of logic.
+        """
+        enabled = PiwikStatisticsImplementation.getVarFromPluginStorage('downloadTrackingEnabled')
+
+        return BaseStatisticsImplementation.hasDownloadListener(self) if enabled else False
+
     @staticmethod
     @BaseStatisticsImplementation.memoizeReport
     def getConferenceReport(startDate, endDate, confId, contribId=None):
