@@ -64,7 +64,10 @@ class WAuthorDisplay(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        authorList=self._conf.getAuthorIndex().getByAuthorObj(self._contrib.getAuthorById(self._authorId))
+        authorObj = self._contrib.getAuthorById(self._authorId)
+        if authorObj is None:
+            raise MaKaCError( _("Not found the author: %s")%self._authorId)
+        authorList=self._conf.getAuthorIndex().getByAuthorObj(authorObj)
         author = None
         if authorList is not None:
             author=authorList[0]
