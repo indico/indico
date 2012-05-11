@@ -412,10 +412,14 @@ class CachedReport(object):
         """
 
         ttl = self._config.getUpdateInterval()
+
         if not self._config.hasCacheEnabled():
             return self._function(*args)
 
-        key = self._generateKey(args)
+        keyParams = list(args)
+        keyParams.extend([self._function.__module__, self._function.__name__])
+        key = self._generateKey(keyParams)
+
         resource = self._cache.get(key, None)
 
         if not resource:
