@@ -123,10 +123,7 @@ class SIndex(Index):
         self._num_objs.change(-1)
 
     def values(self, *args):
-        res = self._fwd_set_class()
-        for s in self._fwd_index.itervalues(*args):
-            res = union(res, s)
-        return res
+        return list(self.itervalues(*args))
 
     def itervalues(self, *args):
         for s in self._fwd_index.itervalues(*args):
