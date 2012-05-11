@@ -62,7 +62,6 @@ class StatisticsRegister():
         self.clearAll()
         self._buildRegister()
 
-
     def hasActivePlugins(self):
         """
         Returns True only if any implementations are active in the PluginsHolder
@@ -141,7 +140,6 @@ class StatisticsRegister():
 
         return listeners
 
-
     def getAllPluginJSHookPaths(self):
         """
         Returns a list of all the paths to JSHook TPL files for registered
@@ -183,7 +181,6 @@ class StatisticsConfig(object):
     The current overall configuration of the plugin, wrapper around global
     options in PluginsHolder / plugin administration.
     """
-
 
     def getUpdateInterval(self):
         """

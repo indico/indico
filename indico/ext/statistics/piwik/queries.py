@@ -23,7 +23,6 @@ import urllib2
 import datetime
 
 from MaKaC.i18n import _
-from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 from indico.ext.statistics.register import StatisticsConfig
 from indico.ext.statistics.piwik.implementation import PiwikStatisticsImplementation
@@ -203,7 +202,14 @@ class PiwikQueryConferenceBase(PiwikQueryRequestBase):
     """
 
     def __init__(self, startDate, endDate, confId, contribId=None):
+        # Keep a reference for instantiating sub-queries
+        self._startDate = startDate
+        self._endDate = endDate
+        self._confId = confId
+        self._contribId = contribId
+
         PiwikQueryRequestBase.__init__(self)
+
         segmentation = {'customVariablePageName1': ('==', 'Conference'),
                         'customVariablePageValue1': ('==', confId)}
 
@@ -214,50 +220,6 @@ class PiwikQueryConferenceBase(PiwikQueryRequestBase):
 
         self.setAPISegmentation(segmentation)
         self.setAPIDate([startDate, endDate])
-
-
-""" Classes for returning iframe URLs relating to Piwik API Widgets. """
-
-
-class PiwikQueryWidgetConferenceBase(PiwikQueryConferenceBase):
-    """
-    A Piwik Widget is intended to be the source of an iframe, therefore
-    any objects inheriting from this class should have the resultant
-    getAPIQuery() value placed into an iframe tag for use.
-    """
-
-    def _buildType(self):
-        otherParams = {'widget': '1',
-                       'disableLink': '1'}
-        self.setAPIModule('Widgetize')
-        self.setAPIAction('iframe')
-        self.setAPIParams(otherParams)
-        self.setAPIPeriod('range')
-
-    def getQueryResult(self):
-        return self.getAPIQuery()
-
-    def setAPIModuleToWidgetize(self, module):
-        self.setAPIParams({'moduleToWidgetize': module})
-
-    def setAPIActionToWidgetize(self, action):
-        self.setAPIParams({'actionToWidgetize': action})
-
-
-class PiwikQueryWidgetConferenceWorldMap(PiwikQueryWidgetConferenceBase):
-
-    def _buildType(self):
-        super(PiwikQueryWidgetConferenceWorldMap, self)._buildType()
-        self.setAPIModuleToWidgetize('UserCountryMap')
-        self.setAPIActionToWidgetize('worldMap')
-
-
-class PiwikQueryWidgetConferenceStats(PiwikQueryWidgetConferenceBase):
-
-    def _buildType(self):
-        super(PiwikQueryWidgetConferenceStats, self)._buildType()
-        self.setAPIModuleToWidgetize('VisitFrequency')
-        self.setAPIActionToWidgetize('getSparklines')
 
 
 """ Classes for returning PNG static Graph images from the API. """
@@ -354,7 +316,7 @@ class PiwikQueryMetricConferenceBase(PiwikQueryConferenceBase):
         self.setAPIModule('API')
         self.setAPIFormat()
 
-    def getQueryResult(self):
+    def getQueryResult(self, returnJSON=False):
         """
         Returns the sum of all unique values, typical mode for child
         classes assumed. Overload where required, if no data is received,
@@ -362,7 +324,10 @@ class PiwikQueryMetricConferenceBase(PiwikQueryConferenceBase):
         """
         queryResult = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
 
-        return int(PiwikQueryUtils.getJSONValueSum(queryResult)) if queryResult else 0
+        if not queryResult:  # No useful data returned
+            return 0
+
+        return queryResult if returnJSON else int(PiwikQueryUtils.getJSONValueSum(queryResult))
 
 
 class PiwikQueryMetricConferenceUniqueVisits(PiwikQueryMetricConferenceBase):
@@ -462,9 +427,58 @@ class PiwikQueryMetricConferencePeakDateAndVisitors(PiwikQueryMetricConferenceBa
             return {'date': _('No Data'), 'users': 0}
 
 
-class PiwikQueryMetricDownload(PiwikQueryRequestBase):
+""" Classes which return JSON data from the API """
+
+
+class PiwikQueryJSONVisitors(PiwikQueryConferenceBase):
     """
-    This metric is agnostic of segmentation (though segmentation is possible)
+    This class returns a JSON of unique & total hits per day, over the date
+    range specified and segments via conference ID and/or contribution ID.
+    """
+
+    def _buildType(self):
+        params = {'startDate': self._startDate,
+                  'endDate': self._endDate,
+                  'confId': self._confId,
+                  'contribId': self._contribId}
+
+        # References to the metrics which we will amalgamate later
+        self._metricUnique = PiwikQueryMetricConferenceUniqueVisits(**params)
+        self._metricTotal = PiwikQueryMetricConferenceVisits(**params)
+
+    def _parseJSONForAPI(self, json):
+        """
+        Formats the JSON to be in a more usable syntax, collecting by date.
+        """
+
+        cleanJSON = {}
+
+        for hitType, records in json.iteritems():
+            for date, hits in records.iteritems():
+
+                if date not in cleanJSON:
+                    cleanJSON[date] = {}
+
+                cleanJSON[date][hitType] = int(hits)
+
+        return cleanJSON
+
+    def getQueryResult(self):
+        """
+        This method prepares and amalgamates the results of self._metricUnique
+        and self._metricTotal as they are references to other quieries which,
+        here, form the basis of our JSON response.
+        """
+
+        raw = {'total_hits': self._metricTotal.getQueryResult(returnJSON=True),
+               'unique_hits': self._metricUnique.getQueryResult(returnJSON=True)}
+
+        return self._parseJSONForAPI(raw)
+
+
+class PiwikQueryJSONDownload(PiwikQueryRequestBase):
+    """
+    This JSON is agnostic of segmentation (though segmentation is possible)
     as the query string used to download the files is unique, matching the
     Conference and/or Contribution, therefore we can simply query Piwik based
     on this string alone.
@@ -539,49 +553,16 @@ class PiwikQueryMetricDownload(PiwikQueryRequestBase):
     def getURL(self):
         return self._url
 
-    def getQueryResult(self, returnJSON=False):
+    def getQueryResult(self, returnFormatted=False):
         downloadJSON = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
 
-        if returnJSON:
+        if returnFormatted:
 
             jsData = {'cumulative': self._parseJSONForSum(downloadJSON),
                       'individual': self._parseJSONForAPI(downloadJSON)}
             return jsData
 
         return downloadJSON
-
-
-class PiwikQueryMetricMultipleDownloads():
-    """
-    This class acts as a wrapped around multiple download requests as Piwik
-    only permits retrieval one at a time.
-    """
-
-    def __init__(self, urls):
-        self._resetDownloads()
-        self.setAPIDownloadURLs(urls)
-
-    def _hasDownloads(self):
-        return bool(self._downloads)
-
-    def _resetDownloads(self):
-        self._downloads = {}
-
-    def setDownloadURLs(self, urls, reset=False):
-        if not isinstance(list, urls):
-            raise Exception(_('This method must be passed a list of URLs.'))
-
-        if reset:
-            self._resetDownloads()
-
-        for url in urls:
-            self._downloads.append(PiwikQueryMetricDownload(url))
-
-    def getQueryResult(self, returnJSON=False):
-        result = {}
-
-        for download in self._downloads:
-            result[download.getURL()] = download.getQueryResult(returnJSON)
 
 
 class PiwikQueryTrackDownload(PiwikQueryTrackBase):

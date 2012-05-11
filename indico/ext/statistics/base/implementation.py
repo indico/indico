@@ -23,6 +23,8 @@ import urlparse
 import indico.ext.statistics.base
 import indico.ext.statistics.base.implementation
 
+from functools import wraps
+
 from indico.core.extpoint import Component
 from indico.ext.statistics.register import StatisticsConfig
 
@@ -374,7 +376,12 @@ class BaseStatisticsImplementation(Component):
         Decorator method for the get<reports> methods, see CachedReport for
         details on how this works with GenericCache.
         """
-        return CachedReport(function)
+
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            return CachedReport(function).getReport(*args, **kwargs)
+
+        return wrapper
 
 
 class JSHookBase(object):
@@ -406,7 +413,7 @@ class CachedReport(object):
         plugin = function.__module__.split('.')[3]
         self._cache = GenericCache(plugin + 'StatisticsCache')
 
-    def __call__(self, *args):
+    def getReport(self, *args, **kwargs):
         """
         Ascertain if live updating first, if so disregard and continue.
         """
@@ -414,7 +421,7 @@ class CachedReport(object):
         ttl = self._config.getUpdateInterval()
 
         if not self._config.hasCacheEnabled():
-            return self._function(*args)
+            return self._function(*args, **kwargs)
 
         keyParams = list(args)
         keyParams.extend([self._function.__module__, self._function.__name__])
@@ -423,7 +430,7 @@ class CachedReport(object):
         resource = self._cache.get(key, None)
 
         if not resource:
-            result = self._function(*args)
+            result = self._function(*args, **kwargs)
             self._cache.set(key, result, ttl)
             return result
         else:

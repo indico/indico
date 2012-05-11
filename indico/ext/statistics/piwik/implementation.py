@@ -176,7 +176,6 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
 
         self.setAPIParams({'segment': segmentation})
 
-
     def trackDownload(self, material):
         """
         Wraps around the Piwik query object for tracking downloads, constructs

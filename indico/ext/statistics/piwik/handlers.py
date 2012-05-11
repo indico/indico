@@ -19,6 +19,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 import indico.ext.statistics.piwik.queries as pq
 
+from indico.ext.statistics.base.implementation import BaseStatisticsImplementation
+
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.conference import ConferenceHolder
 
@@ -38,9 +40,26 @@ class PiwikService(ConferenceModifBase):
             self._endDate = self._params['endDate']
 
 
+class PiwikConferenceService(PiwikService):
+    """
+    Handles requests which need conferenceID and/or contributionID
+    """
+
+    def _checkParams(self):
+        PiwikService._checkParams(self)
+
+        self._confId = self._params['confId']
+
+        # Treat this as a flag to test against later for segmentation.
+        if 'contribId' in self._params:
+            self._contribId = self._params['contribId']
+        else:
+            self._contribId = None
+
+
 class MaterialStatistics(PiwikService):
     """
-    Service for returning JSON object relating to material downloads
+    Service for returning a JSON object relating to material downloads
     over a given date range.
     """
 
@@ -48,12 +67,32 @@ class MaterialStatistics(PiwikService):
         PiwikService._checkParams(self)
         self._materialURL = self._params['materialURL']
 
+    @BaseStatisticsImplementation.memoizeReport
     def _getAnswer(self):
-        materialStats = pq.PiwikQueryMetricDownload(self._startDate,
-                                                    self._endDate,
-                                                    self._materialURL)
+        materialStats = pq.PiwikQueryJSONDownload(self._startDate,
+                                                  self._endDate,
+                                                  self._materialURL)
 
-        return materialStats.getQueryResult(returnJSON=True)
+        return materialStats.getQueryResult(returnFormatted=True)
+
+
+class EventVisitsStatistics(PiwikConferenceService):
+    """
+    Service for returning a JSON object of the number of visits to an event
+    over time.
+    """
+
+    def _checkParams(self):
+        PiwikConferenceService._checkParams(self)
+
+    @BaseStatisticsImplementation.memoizeReport
+    def _getAnswer(self):
+        visitStats = pq.PiwikQueryJSONVisitors(self._startDate,
+                                               self._endDate,
+                                               self._confId,
+                                               self._contribId)
+
+        return visitStats.getQueryResult()
 
 
 class MaterialTreeService(PiwikService):
@@ -64,6 +103,7 @@ class MaterialTreeService(PiwikService):
 
     TREE_STR_LIMIT = 24
 
+    @BaseStatisticsImplementation.memoizeReport
     def _getAnswer(self):
         confId = self._conf.getId()
         conference = ConferenceHolder().getById(confId)
@@ -132,5 +172,6 @@ class MaterialTreeService(PiwikService):
 
 methodMap = {
     "piwik.getMaterialStatistics": MaterialStatistics,
-    "piwik.getMaterialTreeData": MaterialTreeService
+    "piwik.getMaterialTreeData": MaterialTreeService,
+    "piwik.getEventVisits": EventVisitsStatistics
 }

@@ -70,13 +70,8 @@
                 </span>
             </div>
             <div class="statsWidgetContent">
-            % if report['images']['visitsDay'] != 'none':
-                <img src="${report['images']['visitsDay']}" alt="${_('Visitor hit rates.')}"/>
-            % else:
-                <div class="graphWarning">
-                    ${strNoGraphData}
+                <div id="visitorChart">
                 </div>
-            % endif
             </div>
         </div>
     </div>

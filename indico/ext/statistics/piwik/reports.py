@@ -47,7 +47,6 @@ class PiwikReportBase(BaseStatisticsReport):
     def __init__(self):
         BaseStatisticsReport.__init__(self)
         self._reportSetters = {'images': 'setImageSource',
-                               'widgets': 'setWidgetSource',
                                'values': 'setValueSource'}
 
 
@@ -80,8 +79,7 @@ class PiwikReport(PiwikReportBase):
 
         # This report only has need for images and values, not for widgets.
         self._reportGenerators = {
-            'images': {'visitsDay': report(pq.PiwikQueryGraphConferenceVisits, params),
-                    'visitsOS': report(pq.PiwikQueryGraphConferenceDevices, params),
+            'images': {'visitsOS': report(pq.PiwikQueryGraphConferenceDevices, params),
                     'visitsCountry': report(pq.PiwikQueryGraphConferenceCountries, params)},
 
             'values': {'visits': report(pq.PiwikQueryMetricConferenceVisits, params),
@@ -131,6 +129,7 @@ class PiwikReport(PiwikReportBase):
             self._contributions.append(('None', str(_('Conference: ') + self._conf.getTitle())))
 
             for ctrb in contributions:
+
                 if not ctrb.isScheduled():
                     continue
 
@@ -149,4 +148,3 @@ class PiwikReport(PiwikReportBase):
 
     def getContributionId(self):
         return self._contribId
-

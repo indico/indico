@@ -155,3 +155,9 @@ div#materialDownloadChart {
     width: auto;
     height: 250px;
 }
+
+div#visitorChart {
+    margin-left: 15px;
+    width: 95%;
+    height: 270px;
+}
