@@ -64,8 +64,8 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              }).join(", ");
              var selected = false;
 
-             var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
-             var item = Html.div({},  elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''), id);
+             var id = Html.em({id: elem.get('id'), style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
+             var item = Html.div({}, id, " - ", elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''));
 
              return item;
          },
@@ -73,29 +73,51 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
          _sortList: function(type){
              var self = this;
              var items = {};
+             var selectedItemsID = [];
+
+             if (type == 'id'){
+                 $('#sortById').css('font-weight', 'bold');
+                 $('#sortByTitle').css('font-weight', '');
+             }
+             if (type == 'title'){
+                 $('#sortById').css('font-weight', '');
+                 $('#sortByTitle').css('font-weight', 'bold');
+             }
+
+             // Get all items
              each(self.getAll(), function(item) {
-                 if (type == 'id'){
-                     $('#sortById').css('font-weight', 'bold');
-                     $('#sortByTitle').css('font-weight', '');
+                 if (type == 'id')
                      items[item.getAll().id] = item;
-                 }
-                 if (type == 'title'){
-                     $('#sortById').css('font-weight', '');
-                     $('#sortByTitle').css('font-weight', 'bold');
+                 if (type == 'title')
                      items[item.getAll().title + item.getAll().id] = item;
-                 }
              });
+
+             // Get selected items
+             each(self.getList(), function(item, index) {
+                 selectedItemsID.push(item.getAll().id);
+             });
+
+             // Clear
              self._clearSelection();
              self.clear();
+
+             // Sort
              var ks = keys(items);
              ks.sort();
              if (self.reverseSort)
                  ks.reverse();
              self.reverseSort = !self.reverseSort;
+
+             // Add items
              for (k in ks) {
                  self.set(k, items[ks[k]]);
              }
 
+             // Reselect items
+             each(self.domList, function(listItem) {
+                 if (jQuery.inArray(listItem.dom.children[0].children[0].id, selectedItemsID) != -1)
+                     listItem.eventObservers.click();
+             });
          },
 
          getList: function() {
