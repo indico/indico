@@ -30,20 +30,17 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
             var reverseSort = false;
             var selectAll = Html.span('fakeLink', $T('All'));
             var selectNone = Html.span('fakeLink', $T('None'));
-            var sortById = Html.span({className: 'fakeLink', id: 'sortById'}, $T('ID'));
+            var sortById = Html.span({className: 'fakeLink', id: 'sortById', style: {fontWeight: 'bold'}}, $T('ID'));
             var sortByTitle = Html.span({className: 'fakeLink', id: 'sortByTitle'}, $T('Title'));
             var sortBar = Html.div({style: {cssFloat:'left', margin: pixels(3)}}, $T('Sort by: '), sortById, ', ', sortByTitle );
             var selectBar = Html.div({style: {textAlign:'right', margin: pixels(3)}}, $T('Select: '), selectAll, ', ', selectNone);
 
             sortById.observeClick(function(){
-                $('#sortById').css('font-weight', 'bold');
-                $('#sortByTitle').css('font-weight', '');
                 self._sortList('id');
             });
 
             sortByTitle.observeClick(function(){
-                $('#sortByTitle').css('font-weight', 'bold');
-                $('#sortById').css('font-weight', '');
+
                 self._sortList('title');
             });
 
@@ -52,11 +49,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
             });
 
             selectNone.observeClick(function(){
-                self.clearSelection();
-
-                if (exists(self.selectedObserver)) {
-                    self.selectedObserver(self.selectedList);
-                }
+                self._clearSelection();
             });
 
             return [sortBar, selectBar, this.SelectableListWidget.prototype.draw.call(this)];
@@ -81,11 +74,18 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              var self = this;
              var items = {};
              each(self.getAll(), function(item) {
-                 if(type == 'id')
+                 if (type == 'id'){
+                     $('#sortById').css('font-weight', 'bold');
+                     $('#sortByTitle').css('font-weight', '');
                      items[item.getAll().id] = item;
-                 if(type == 'title')
+                 }
+                 if (type == 'title'){
+                     $('#sortById').css('font-weight', '');
+                     $('#sortByTitle').css('font-weight', 'bold');
                      items[item.getAll().title + item.getAll().id] = item;
+                 }
              });
+             self._clearSelection();
              self.clear();
              var ks = keys(items);
              ks.sort();
@@ -100,7 +100,16 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
 
          getList: function() {
              return this.getSelectedList();
-         }
+         },
+
+         _clearSelection: function() {
+             var self = this;
+             self.clearSelection();
+             if (exists(self.selectedObserver)) {
+                 self.selectedObserver(self.selectedList);
+             }
+         },
+
 
      }, function(existing, observer) {
          var self = this;
@@ -170,6 +179,9 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
          },
 
          existingSelectionObserver: function(selectedList) {
+             if (typeof this.saveButton == 'undefined') {
+                 return;
+             }
              if(selectedList.isEmpty()){
                  this.saveButton.disabledButtonWithTooltip('disable');
              } else {
