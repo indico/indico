@@ -122,7 +122,7 @@
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                                     <span id="inPlacePrimaryAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                                        <a class="dropDownMenu fakeLink"  onclick="primaryAuthorManager.addManagementMenu();">${ _("Add primary author")}</a>
+                                                        <a class="dropDownMenu fakeLink" >${ _("Add primary author")}</a>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -144,7 +144,7 @@
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                                     <span id="inPlaceCoAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                                        <a class="dropDownMenu fakeLink"  onclick="coAuthorManager.addManagementMenu();">${ _("Add co-author")}</a>
+                                                        <a class="dropDownMenu fakeLink">${ _("Add co-author")}</a>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -167,7 +167,7 @@
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                                     <span id="inPlaceSpeakersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                                        <a class="dropDownMenu fakeLink" onclick="speakerManager.addManagementMenu();">${ _("Add presenter") if eventType == "conference" else  _("Add speakers")}</a>
+                                                        <a class="dropDownMenu fakeLink">${ _("Add presenter") if eventType == "conference" else  _("Add speakers")}</a>
                                                     </span>
                                                 </td>
                                             </tr>
