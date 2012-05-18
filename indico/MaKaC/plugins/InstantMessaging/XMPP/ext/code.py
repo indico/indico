@@ -115,7 +115,7 @@ class deletedir:
 	return True
 
     def _getDirName(self, logsPath, cr, number):
-        if cr+'.'+str(number) in os.listdir(logsPath):
+        if os.path.exists(os.path.join(logsPath,cr+'.'+str(number))):
                 number = self._getDirName(logsPath, cr, number+1)
         return number
 
