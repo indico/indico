@@ -42,3 +42,6 @@ def active(req, **params ):
 
 def created(req, **params ):
     return users.RHUserCreated( req ).process( params )
+
+def disable(req, **params ):
+    return users.RHUserDisable( req ).process( params )

@@ -1457,15 +1457,12 @@ class WUserDetails(wcomponents.WTemplated):
         vars["unlockedFields"] = self._avatar.getNotSyncedFields()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         al = minfo.getAdminList()
+        vars["currentUserIsAdmin"] = self._currentUser in al.getList()
+        vars["user"] = self._avatar
         if self._currentUser == self._avatar or \
               self._currentUser in al.getList() or \
               len(self._avatar.getIdentityList())==0:
             vars["identities"] = WUserIdentitiesTable( self._avatar ).getHTML( { "addIdentityURL": vars["addIdentityURL"], "removeIdentityURL": vars["removeIdentityURL"] })
-        vars["activeButton"] = ""
-        if self._currentUser in al.getList() and not self._avatar.isActivated():
-            vars["activeButton"] = i18nformat("""<form action="%s" method="POST"><td bgcolor="white" width="100%%"\
-                    valign="top" align="left">&nbsp;&nbsp;&nbsp;<input type="submit" class="btn" \
-                    value=" _("activate the account") "></td></form>""")%vars["activeURL"]
         vars["categoryManager"] = ""
         categs = u.getLinkTo("category","manager")
         for categ in categs:
@@ -1537,6 +1534,7 @@ class WPUserDetails( WPPersonalArea ):
         params["addIdentityURL"] = urlHandlers.UHUserIdentityCreation.getURL( self._avatar )
         params["removeIdentityURL"] = urlHandlers.UHUserRemoveIdentity.getURL( self._avatar )
         params["activeURL"] = urlHandlers.UHUserActive.getURL( self._avatar )
+        params["disableURL"] = urlHandlers.UHUserDisable.getURL( self._avatar )
         return c.getHTML( self._getAW().getUser(), params )
 
     def _setActiveTab( self ):

@@ -218,7 +218,6 @@ class sendAccountActivated:
         self._user = user
 
     def send( self ):
-        minfo=HelperMaKaCInfo.getMaKaCInfoInstance()
         text =  _("""Welcome to Indico,
 Your registration has been accepted by the site administrator.
 
@@ -232,6 +231,18 @@ Thank you for using Indico.
             "subject": _("[%s] Registration accepted") % getSubjectIndicoTitle(),
             "body": text
             }
+        GenericMailer.send(GenericNotification(maildata))
+
+class sendAccountDisabled:
+
+    def __init__( self, user ):
+        self._user = user
+
+    def send( self ):
+        text =  _("""Dear user,
+Your account has been disabled by the site administrator.
+                """)
+        maildata = { "fromAddr": "Indico Mailer<%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(), "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
 class sendLoginInfo:

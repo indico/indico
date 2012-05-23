@@ -77,8 +77,12 @@
             <span class="dataCaptionFormat">${ _("Account status")}</span>
         </td>
         <td bgcolor="white" nowrap valign="top" class="blacktext">
-            ${ status }
-            ${ activeButton }
+            ${ user.getStatus() }
+            % if currentUserIsAdmin:
+                <form action="${activeURL if not user.isActivated() else disableURL}" method="POST" style="display: inline;">
+                    <input type="submit" class="btn" value="${_('activate the account') if not user.isActivated() else _('disable the account')}">
+                </form>
+            % endif
         </td>
     </tr>
     <tr>

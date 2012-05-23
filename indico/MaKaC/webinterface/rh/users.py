@@ -354,6 +354,20 @@ class RHUserActive( RHUserBase ):
             mail.sendAccountActivated(self._avatar).send()
         self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
 
+class RHUserDisable( RHUserBase ):
+
+    def _checkProtection( self ):
+        al = AdminList.getInstance()
+        if not (self._aw.getUser() in al.getList()):
+            raise errors.AccessError("user status")
+
+    def _process( self ):
+        self._avatar.disabledAccount()
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.getModerateAccountCreation():
+            mail.sendAccountDisabled(self._avatar).send()
+        self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
+
 #class RHUserPerformModification( RHUserBase ):
 #    _uh = urlHandlers.UHUserPerformModification
 #

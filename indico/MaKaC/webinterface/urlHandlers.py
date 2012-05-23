@@ -1754,6 +1754,8 @@ class UHUserCreated( UHConfUser ):
 class UHUserActive( URLHandler ):
     _relativeURL = "userRegistration.py/active"
 
+class UHUserDisable( URLHandler ):
+    _relativeURL = "userRegistration.py/disable"
 
 
 class UHUserDetails( URLHandler ):
