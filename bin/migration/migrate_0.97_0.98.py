@@ -318,7 +318,7 @@ def categoryDateIndexMigration(dbi, withRBDB, prevVersion):
         categoryDate = IndexesHolder().getIndex("categoryDate")
         IndexesHolder()._getIdx()["backupCategoryDate"] = categoryDate
         newIdx = CategoryDayIndex()
-        newIdx.buildIndex()
+        newIdx.buildIndex(dbi)
         IndexesHolder()._getIdx()["categoryDate"] = newIdx
     else:
         print """categoryDateIndexMigration: new categoryDate index has """ \
