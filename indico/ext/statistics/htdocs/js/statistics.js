@@ -264,7 +264,7 @@ $(function() {
      * jQuery UI Dialog if no data is received via AJAX (timeout)
      */
     $('#dialogNoGraphData').dialog({
-        model: true,
+        modal: true,
         resizable: false,
         autoOpen: false,
         buttons: {
