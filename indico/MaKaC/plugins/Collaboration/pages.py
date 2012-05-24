@@ -262,7 +262,7 @@ class WElectronicAgreement(wcomponents.WTemplated):
         # Here we check the rights again, and chose what contributions we should show
         requestType = CollaborationTools.getRequestTypeUserCanManage(self._conf, self._user)
 
-        self._fromList = self._user.getEmails()
+        self._fromList = [{"name": self._user.getStraightFullName() , "email": email} for email in self._user.getEmails()]
 
         contributions = manager.getContributionSpeakerByType(requestType)
 
@@ -317,7 +317,8 @@ class WElectronicAgreement(wcomponents.WTemplated):
         vars["conf"] = self._conf
         vars["contributions"] = self.getTableContent()
 
-        self._fromList.append(Config.getInstance().getNoReplyEmail())
+        self._fromList.append({"name": "Indico Mailer",
+                               "email": Config.getInstance().getNoReplyEmail()})
         vars['fromList'] = self._fromList
         manager = self._conf.getCSBookingManager()
         vars['manager'] = manager

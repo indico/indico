@@ -179,11 +179,11 @@ A booking / request was deleted in <a href="%s">%s</a>
 class SpeakersNotificationBase(GenericNotification):
     """ Base class to build an email notification to Speakers
     """
-    def __init__(self, sendToList, fromEmail):
+    def __init__(self, sendToList, fromEmail, fromName ="Indico Mailer"):
         GenericNotification.__init__(self)
 
         self.setContentType("text/html")
-        self.setFromAddr("Indico Mailer<%s>"%fromEmail)
+        self.setFromAddr("%s<%s>"%(fromName, fromEmail))
         self.setToList(sendToList)
 
 class ElectroniAgreementNotification(SpeakersNotificationBase):
@@ -191,7 +191,7 @@ class ElectroniAgreementNotification(SpeakersNotificationBase):
         to sign the electronic agreement.
     """
 
-    def __init__(self, sendToList, fromEmail, content, subject):
-        SpeakersNotificationBase.__init__(self, sendToList, fromEmail)
+    def __init__(self, sendToList, fromEmail, fromName, content, subject):
+        SpeakersNotificationBase.__init__(self, sendToList, fromEmail, fromName)
         self.setSubject(subject)
         self.setBody(content)

@@ -1757,36 +1757,7 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
             var self = this;
             return [
                 [$T('Send'), function() {
-                    var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending..."));
-                    indicoRequest(
-                        "collaboration.sendElectronicAgreement",
-                        {
-                            conference: self.confId,
-                            uniqueIdList: self.uniqueIdList,
-                            from: $E("fromEmailAddress"),
-                            content: self.rtWidget.get(),
-                        },
-                        function(result, error){
-                            killProgress();
-                            if (error) {
-                                IndicoUtil.errorReport(error);
-                                self.close();
-                            } else {
-                                if(result == "url_error"){
-                                    IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {url} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
-                                }else if(result == "talkTitle_error"){
-                                    IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {talkTitle} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
-                                }else{
-                                    self.close();
-                                    var divs = $('<div/>');
-                                    $('<div/>').html($T("Email sent successfully!")).appendTo(divs);
-                                    $('<div/>').html($T("The email has been sent to:")).appendTo(divs);
-                                    $('<div/>').text(result).appendTo(divs);
-                                    informationPopup(divs);
-                                }
-                            }
-                        }
-                    );
+                    self.sendFunction();
                 }],
                 [$T('Cancel'), function() {
                     self.close();
@@ -1798,8 +1769,8 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
         var self = this;
         // drop down list with senders
         optionList = Array();
-        for(var i in self.fromList){
-            optionList.push(Html.option({value: self.fromList[i]}, "Indico Mailer <"+self.fromList[i]+">"));
+        for(i in self.fromList){
+            optionList.push(Html.option({value: self.fromList[i].email}, self.fromList[i].name + " <"+self.fromList[i].email+">"));
         }
         var selectFromAddress = Html.select({id:"fromEmailAddress"}, optionList);
 
@@ -1829,15 +1800,18 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
         self.uniqueIdList = uniqueIdList;
         self.fromList = fromList;
         self.sendFunction=function(){
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending..."));
             indicoRequest(
                 "collaboration.sendElectronicAgreement",
                 {
                     conference : self.confId,
                     uniqueIdList: self.uniqueIdList,
-                    from: $E("fromEmailAddress"),
+                    from: {email: self.fromList[$("#fromEmailAddress")[0].selectedIndex].email,
+                        name: self.fromList[$("#fromEmailAddress")[0].selectedIndex].name },
                     content: self.rtWidget.get()
                 },
                 function(result, error){
+                    killProgress();
                     if (error) {
                         IndicoUtil.errorReport(error);
                         self.close();

@@ -76,7 +76,8 @@ class SendElectronicAgreement(ConferenceModifBase):
 
         self.emailToList = []
 
-        self.fromEmail = self._params['from']
+        self.fromEmail = self._params['from']['email']
+        self.fromName = self._params['from']['name']
         self.content = self._params['content']
         manager = self._conf.getCSBookingManager()
         for uniqueId in self.uniqueIdList:
@@ -111,7 +112,7 @@ class SendElectronicAgreement(ConferenceModifBase):
                 sw = manager.getSpeakerWrapperByUniqueId(uniqueId)
                 sw.setStatus(SpeakerStatusEnum.PENDING)
                 subject = """[Indico] Electronic Agreement: %s (event id: %s)"""%(self._conf.getTitle(), self._conf.getId())
-                notification = ElectroniAgreementNotification([sw.getObject().getEmail()], self.fromEmail, self.processContent(sw), subject)
+                notification = ElectroniAgreementNotification([sw.getObject().getEmail()], self.fromEmail, self.fromName, self.processContent(sw), subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
                                          "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
