@@ -1235,12 +1235,11 @@ class IndexesHolder( ObjectHolder ):
     counterName = None
     __allowedIdxs = [ "email", "name", "surName", "organisation", "group",
                     "status", "calendar", "category", "categoryDate",
-                    "categoryDateAll", "categoryName",
+                    "categoryDateAll", "categoryName","conferenceTitle",
                     "pendingSubmitters", "pendingConfSubmitters",
-                    "pendingConfSubmittersTasks", "pendingSubmittersTasks",
-                    "pendingManagers", "pendingManagersTasks",
-                    "pendingCoordinators", "pendingCoordinatorsTasks",
-                    "webcasts", "collaboration"]
+                    "pendingConfSubmittersTasks", "pendingSubmittersTasks", "pendingManagers",
+                    "pendingManagersTasks", "pendingCoordinators",
+                    "pendingCoordinatorsTasks", "webcasts", "collaboration"]
 
     def getIndex( self, name ):
         return self.getById(name)
@@ -1277,6 +1276,8 @@ class IndexesHolder( ObjectHolder ):
             elif id=="categoryDateAll":
                 Idx[str(id)] = CategoryDayIndex(visibility=False)
             elif id=="categoryName":
+                Idx[str(id)] = TextIndex()
+            elif id=="conferenceTitle":
                 Idx[str(id)] = TextIndex()
             elif id=="pendingSubmitters":
                 Idx[str(id)] = PendingSubmittersIndex()

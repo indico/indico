@@ -3144,6 +3144,10 @@ class Conference(CommonObjectBase, Locatable):
         self.cleanCategoryCache()
         self.notifyModification()
 
+        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
+        nameIdx.unindex(self.getId())
+        nameIdx.index(self.getId(), self.getTitle().decode('utf-8'))
+
         #we notify the observers that the conference's title has changed
         try:
             self._notify('eventTitleChanged', oldTitle, title)
@@ -4984,6 +4988,18 @@ class ConferenceHolder( ObjectHolder ):
     """
     idxName = "conferences"
     counterName = "CONFERENCE"
+
+    def add(self, conference):
+        ObjectHolder.add(self, conference)
+        # Add conference to the name index
+        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
+        nameIdx.index(conference.getId(), conference.getTitle().decode('utf-8'))
+
+    def remove(self, conference):
+        ObjectHolder.remove(self, conference)
+        # remove conference from the name index
+        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
+        nameIdx.unindex(conference.getId())
 
     def _newId( self ):
         id = ObjectHolder._newId( self )

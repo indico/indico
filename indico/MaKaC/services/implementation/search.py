@@ -164,9 +164,50 @@ class SearchCategoryNames(ServiceBase):
             }
 
 
+#################################
+# Category search
+#################################
+
+class SearchConferenceTitles(ServiceBase):
+
+    def _checkParams(self):
+        self._searchString = self._params.get("value")
+
+    def _getAnswer(self):
+
+        import MaKaC.common.indexes as indexes
+        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
+
+        try:
+            query = ' AND '.join(map(lambda y: "*%s*" % y, filter(lambda x: len(x) > 0, self._searchString.split(' '))))
+            foundEntries = nameIdx.search(query)
+        except parsetree.ParseError:
+            foundEntries = []
+
+        number = len(foundEntries)
+
+        # get only the first 10 results
+        foundEntries = foundEntries[:7]
+
+        entryTitles = []
+
+        for (confId, value) in foundEntries:
+            conference = CategoryManager().getById(confId)
+            entryTitles.append({
+                'title': conference.getTitle(),
+                'url': str(urlHandlers.UHConferenceDisplay.getURL(conference))
+                })
+
+        return {
+            "list": entryTitles,
+            "number": number
+            }
+
+
 methodMap = {
     "users" : SearchUsers,
     "groups" : SearchGroups,
     "usersGroups": SearchUsersGroups,
-    "categoryName": SearchCategoryNames
+    "categoryName": SearchCategoryNames,
+    "conferenceTitles": SearchConferenceTitles
 }

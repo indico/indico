@@ -418,6 +418,29 @@ class EventTimeTableHook(HTTPAPIHook):
                                            None, days = None, mgmtMode = False)
         return d
 
+
+@HTTPAPIHook.register
+class EventSearchHook(HTTPAPIHook):
+    TYPES = ('event',)
+    RE = r'search/(?P<search_term>[\w\s]+)'
+
+    def _getParams(self):
+        super(EventSearchHook, self)._getParams()
+        self._search = self._pathParams['search_term']
+
+
+    def export_event(self, aw):
+        ch = ConferenceHolder()
+        index = IndexesHolder().getIndex('conferenceTitle')
+        results = index.search(self._search)
+        d = []
+        for id, v in results:
+            event = ch.getById(id)
+            if not event.hasAnyProtection():
+                d.append({'id': id, 'title': event.getTitle(), 'startDate': event.getStartDate()})
+        return d
+
+
 @HTTPAPIHook.register
 class CategoryEventHook(HTTPAPIHook):
     TYPES = ('event', 'categ')

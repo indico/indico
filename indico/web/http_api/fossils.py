@@ -221,6 +221,15 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, IFossil):
     getVisibility.name = 'visibility'
     getVisibility.produce = lambda x: Conversion.visibility(x)
 
+    def hasAnyProtection(self):
+        pass
+
+    def getAddress(self):
+        pass
+
+    def getModificationDate(self):
+        pass
+
     def getRoomMapURL(self):
         pass
     getRoomMapURL.produce = lambda x: RoomLinker().getURL(x.getRoom(), x.getLocation())
