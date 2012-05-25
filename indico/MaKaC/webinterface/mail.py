@@ -152,7 +152,10 @@ Thank you for using our system.
                 """)%(urlHandlers.UHActiveAccount.getURL(), \
                         self._user.getId(), \
                         self._user.getKey())
-        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Confirmation request")%getSubjectIndicoTitle(), "body": text }
+        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
+                    "toList": [self._user.getEmail()], 
+                    "subject": _("[%s] Confirmation request")%getSubjectIndicoTitle(), 
+                    "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
 class sendAccountCreationModeration:
@@ -169,7 +172,10 @@ class sendAccountCreationModeration:
 In order to activate it, please go to this URL:
 <%s>
 """% (name,urlHandlers.UHUserDetails.getURL( self._user ))
-        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(), "toList": minfo.getAdminEmails(), "subject": _("[Indico] New account creation request"), "body": text }
+        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
+                    "toList": minfo.getAdminEmails(), 
+                    "subject": _("[Indico] New account request from %s") % name, 
+                    "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
 class sendAccountCreationNotification:
@@ -184,7 +190,10 @@ class sendAccountCreationNotification:
 %s has created a new account in Indico.
 <%s>
 """ % (name,urlHandlers.UHUserDetails.getURL( self._user ))
-        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getSupportEmail(), "toList": minfo.getAdminEmails(), "subject": _("[Indico] New account creation"), "body": text }
+        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getSupportEmail(),
+                    "toList": minfo.getAdminEmails(), 
+                    "subject": _("[Indico] New account creation"), 
+                    "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
 class sendAccountActivated:
@@ -201,7 +210,7 @@ You can now login using the following username: %s
 
 Thank you for using Indico.
                 """)%(self._user.getIdentityList()[0].getLogin())
-        maildata = { "fromAddr": "Indico Maile r<%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Registration accepted")%getSubjectIndicoTitle(), "body": text }
+        maildata = { "fromAddr": "Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Registration accepted")%getSubjectIndicoTitle(), "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
 class sendLoginInfo:
@@ -228,5 +237,5 @@ class sendLoginInfo:
                 text += _("Login:%s\n")%l[1]
                 text += _("Password:%s\n")%l[2]
                 text += "==================\n"
-        maildata = { "fromAddr": "Indico Mailer<%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Login Information")%getSubjectIndicoTitle(), "body": text }
+        maildata = { "fromAddr": "Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Login Information")%getSubjectIndicoTitle(), "body": text }
         GenericMailer.send(GenericNotification(maildata))
