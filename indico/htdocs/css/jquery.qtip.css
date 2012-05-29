@@ -9,7 +9,7 @@
 *   http://en.wikipedia.org/wiki/MIT_License
 *   http://en.wikipedia.org/wiki/GNU_General_Public_License
 *
-* Date: Mon Apr  2 13:46:17.0000000000 2012
+* Date: Sat May 19 09:45:07.0000000000 2012
 */
 
 /* Core qTip styles */
@@ -24,6 +24,9 @@
 
 	font-size: 10.5px;
 	line-height: 12px;
+
+	border-width: 1px;
+	border-style: solid;
 }
 
 	/* Fluid class for determining actual width in IE */
@@ -39,8 +42,6 @@
 		padding: 5px 9px;
 		overflow: hidden;
 
-		border: 1px solid #000001;
-
 		text-align: left;
 		word-wrap: break-word;
 		overflow: hidden;
@@ -52,9 +53,7 @@
 		padding: 5px 35px 5px 10px;
 		overflow: hidden;
 
-		border: 1px solid #000001;
-		border-width: 1px 1px 0;
-
+		border-width: 0 0 1px;
 		font-weight: bold;
 	}
 
@@ -113,8 +112,7 @@
 
 
 /*! Default tooltip style */
-.ui-tooltip-default .ui-tooltip-titlebar,
-.ui-tooltip-default .ui-tooltip-content{
+.ui-tooltip-default{
 	border-color: #F1D031;
 	background-color: #FFFFA3;
 	color: #555;
@@ -181,15 +179,11 @@
 	}
 
 /*! Light tooltip style */
-.ui-tooltip-light .ui-tooltip-titlebar,
-.ui-tooltip-light .ui-tooltip-content{
+.ui-tooltip-light{
+	background-color: white;
 	border-color: #E2E2E2;
 	color: #454545;
 }
-
-	.ui-tooltip-light .ui-tooltip-content{
-		background-color: white;
-	}
 
 	.ui-tooltip-light .ui-tooltip-titlebar{
 		background-color: #f1f1f1;
@@ -197,15 +191,11 @@
 
 
 /*! Dark tooltip style */
-.ui-tooltip-dark .ui-tooltip-titlebar,
-.ui-tooltip-dark .ui-tooltip-content{
+.ui-tooltip-dark{
+	background-color: #505050;
 	border-color: #303030;
 	color: #f3f3f3;
 }
-
-	.ui-tooltip-dark .ui-tooltip-content{
-		background-color: #505050;
-	}
 
 	.ui-tooltip-dark .ui-tooltip-titlebar{
 		background-color: #404040;
@@ -219,16 +209,13 @@
 		border-color: #303030;
 	}
 
+
 /*! Cream tooltip style */
-.ui-tooltip-cream .ui-tooltip-titlebar,
-.ui-tooltip-cream .ui-tooltip-content{
+.ui-tooltip-cream{
+	background-color: #FBF7AA;
 	border-color: #F9E98E;
 	color: #A27D35;
 }
-
-	.ui-tooltip-cream .ui-tooltip-content{
-		background-color: #FBF7AA;
-	}
 
 	.ui-tooltip-cream .ui-tooltip-titlebar{
 		background-color: #F0DE7D;
@@ -240,15 +227,11 @@
 
 
 /*! Red tooltip style */
-.ui-tooltip-red .ui-tooltip-titlebar,
-.ui-tooltip-red .ui-tooltip-content{
+.ui-tooltip-red{
+	background-color: #F78B83;
 	border-color: #D95252;
 	color: #912323;
 }
-
-	.ui-tooltip-red .ui-tooltip-content{
-		background-color: #F78B83;
-	}
 
 	.ui-tooltip-red .ui-tooltip-titlebar{
 		background-color: #F06D65;
@@ -268,15 +251,11 @@
 
 
 /*! Green tooltip style */
-.ui-tooltip-green .ui-tooltip-titlebar,
-.ui-tooltip-green .ui-tooltip-content{
+.ui-tooltip-green{
+	background-color: #CAED9E;
 	border-color: #90D93F;
 	color: #3F6219;
 }
-
-	.ui-tooltip-green .ui-tooltip-content{
-		background-color: #CAED9E;
-	}
 
 	.ui-tooltip-green .ui-tooltip-titlebar{
 		background-color: #B0DE78;
@@ -288,90 +267,69 @@
 
 
 /*! Blue tooltip style */
-.ui-tooltip-blue .ui-tooltip-titlebar,
-.ui-tooltip-blue .ui-tooltip-content{
+.ui-tooltip-blue{
+	background-color: #E5F6FE;
 	border-color: #ADD9ED;
 	color: #5E99BD;
 }
 
-	.ui-tooltip-blue .ui-tooltip-content{
-		background-color: #E5F6FE;
-	}
-
 	.ui-tooltip-blue .ui-tooltip-titlebar{
 		background-color: #D0E9F5;
-		color: #5E99BD;
 	}
 
 	.ui-tooltip-blue .ui-state-default .ui-tooltip-icon{
 		background-position: -2px 0;
 	}
 
-/*! Add shadows to your tooltips in: FF3+, Chrome 2+, Opera 10.6+, IE6+, Safari 2+ */
+/*! Add shadows to your tooltips in: FF3+, Chrome 2+, Opera 10.6+, IE9+, Safari 2+ */
 .ui-tooltip-shadow{
 	-webkit-box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
 	-moz-box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
 	box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
 }
 
-	.ui-tooltip-shadow .ui-tooltip-titlebar,
-	.ui-tooltip-shadow .ui-tooltip-content{
-		filter: progid:DXImageTransform.Microsoft.Shadow(Color='gray', Direction=135, Strength=3);
-		-ms-filter:"progid:DXImageTransform.Microsoft.Shadow(Color='gray', Direction=135, Strength=3)";
-
-		_margin-bottom: -3px; /* IE6 */
-		.margin-bottom: -3px; /* IE7 */
-	}
-
-
 /*! Add rounded corners to your tooltips in: FF3+, Chrome 2+, Opera 10.6+, IE9+, Safari 2+ */
 .ui-tooltip-rounded,
-.ui-tooltip-rounded .ui-tooltip-content,
 .ui-tooltip-tipsy,
-.ui-tooltip-tipsy .ui-tooltip-content,
-.ui-tooltip-youtube,
-.ui-tooltip-youtube .ui-tooltip-content{
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+.ui-tooltip-bootstrap{
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
 }
-
-.ui-tooltip-rounded .ui-tooltip-titlebar,
-.ui-tooltip-tipsy .ui-tooltip-titlebar,
-.ui-tooltip-youtube .ui-tooltip-titlebar{
-	-moz-border-radius: 5px 5px 0 0;
-	-webkit-border-radius: 5px 5px 0 0;
-	border-radius: 5px 5px 0 0;
-}
-
-.ui-tooltip-rounded .ui-tooltip-titlebar + .ui-tooltip-content,
-.ui-tooltip-tipsy .ui-tooltip-titlebar + .ui-tooltip-content,
-.ui-tooltip-youtube .ui-tooltip-titlebar + .ui-tooltip-content{
-	-moz-border-radius: 0 0 5px 5px;
-	-webkit-border-radius: 0 0 5px 5px;
-	border-radius: 0 0 5px 5px;
-}
-
 
 /*! Youtube tooltip style */
 .ui-tooltip-youtube{
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+
 	-webkit-box-shadow: 0 0 3px #333;
 	-moz-box-shadow: 0 0 3px #333;
 	box-shadow: 0 0 3px #333;
+
+	color: white;
+	border-width: 0;
+
+	background: #4A4A4A;
+	background-image: -moz-linear-gradient(top,#4A4A4A 0,black 100%);
+	background-image: -ms-linear-gradient(top,#4A4A4A 0,black 100%);
+	background-image: -o-linear-gradient(top,#4A4A4A 0,black 100%);
+	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0,#4A4A4A),color-stop(100%,black));
+	background-image: -webkit-linear-gradient(top,#4A4A4A 0,black 100%);
+	background-image: linear-gradient(to bottom,#4A4A4A 0,black 100%);
 }
 
-	.ui-tooltip-youtube .ui-tooltip-titlebar,
+	.ui-tooltip-youtube .ui-tooltip-titlebar{
+		background-color: #4A4A4A;
+		background-color: rgba(0,0,0,0);
+	}
+
 	.ui-tooltip-youtube .ui-tooltip-content{
-		_margin-bottom: 0; /* IE6 */
-		.margin-bottom: 0; /* IE7 */
+		padding: .75em;
+		font: 12px arial,sans-serif;
 
-		background: transparent;
-		background: rgba(0, 0, 0, 0.85);
-		filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#D9000000,endColorstr=#D9000000);
-		-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#D9000000,endColorstr=#D9000000)";
-
-		color: white;
-		border-color: #CCCCCC;
+		filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr=#4a4a4a,EndColorStr=#000000);
+		-ms-filter: "progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr=#4a4a4a,EndColorStr=#000000);";
 	}
 
 	.ui-tooltip-youtube .ui-tooltip-icon{
@@ -404,6 +362,7 @@
 
 	/* IE Specific */
 	.ui-tooltip-jtools .ui-tooltip-titlebar{
+		background-color: transparent;
 		filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#717171,endColorstr=#4A4A4A);
 		-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#717171,endColorstr=#4A4A4A)";
 	}
@@ -433,17 +392,15 @@
 	-webkit-box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.4);
 	-moz-box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.4);
 	box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.4);
+
+	background-color: #D9D9C2;
+	color: #111;
+	border: 0 dashed transparent;
 }
 
 	.ui-tooltip-cluetip .ui-tooltip-titlebar{
 		background-color: #87876A;
 		color: white;
-		border: 0 dashed transparent;
-	}
-
-	.ui-tooltip-cluetip .ui-tooltip-content{
-		background-color: #D9D9C2;
-		color: #111;
 		border: 0 dashed transparent;
 	}
 
@@ -459,31 +416,22 @@
 
 /* Tipsy style */
 .ui-tooltip-tipsy{
-	border: 0;
+	background: black;
+	background: rgba(0, 0, 0, .87);
+
+	color: white;
+	border: 0px solid transparent;
+
+	font-size: 11px;
+	font-family: 'Lucida Grande', sans-serif;
+	font-weight: bold;
+	line-height: 16px;
+	text-shadow: 0 1px black;
 }
-
-	.ui-tooltip-tipsy .ui-tooltip-titlebar,
-	.ui-tooltip-tipsy .ui-tooltip-content{
-		_margin-bottom: 0; /* IE6 */
-		.margin-bottom: 0; /* IE7 */
-
-		background: transparent;
-		background: rgba(0, 0, 0, .87);
-		filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#D9000000,endColorstr=#D9000000);
-		-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#D9000000,endColorstr=#D9000000)";
-
-		color: white;
-		border: 0px transparent;
-
-		font-size: 11px;
-		font-family: 'Lucida Grande', sans-serif;
-		font-weight: bold;
-		line-height: 16px;
-		text-shadow: 0 1px black;
-	}
 
 	.ui-tooltip-tipsy .ui-tooltip-titlebar{
 		padding: 6px 35px 0 10;
+		background-color: transparent;
 	}
 
 	.ui-tooltip-tipsy .ui-tooltip-content{
@@ -502,40 +450,28 @@
 
 /* Tipped style */
 .ui-tooltip-tipped{
+	border: 3px solid #959FA9;
 
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+
+	background-color: #F9F9F9;
+	color: #454545;
+
+	font-weight: normal;
+	font-family: serif;
 }
 
-	.ui-tooltip-tipped .ui-tooltip-titlebar,
-	.ui-tooltip-tipped .ui-tooltip-content{
-		border: 3px solid #959FA9;
-
-		filter: none; -ms-filter: none;
-	}
-
 	.ui-tooltip-tipped .ui-tooltip-titlebar{
+		border-bottom-width: 0;
+
+		color: white;
 		background: #3A79B8;
 		background-image: -moz-linear-gradient(top, #3A79B8, #2E629D);
 		background-image: -webkit-gradient(linear, left top, left bottom, from(#3A79B8), to(#2E629D));
 		filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#3A79B8,endColorstr=#2E629D);
 		-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#3A79B8,endColorstr=#2E629D)";
-
-		color: white;
-		font-weight: normal;
-		font-family: serif;
-
-		border-bottom-width: 0;
-		-moz-border-radius: 3px 3px 0 0;
-		-webkit-border-radius: 3px 3px 0 0;
-		border-radius: 3px 3px 0 0;
-	}
-
-	.ui-tooltip-tipped .ui-tooltip-content{
-		background-color: #F9F9F9;
-		color: #454545;
-
-		-moz-border-radius: 0 0 3px 3px;
-		-webkit-border-radius: 0 0 3px 3px;
-		border-radius: 0 0 3px 3px;
 	}
 
 	.ui-tooltip-tipped .ui-tooltip-icon{
@@ -547,6 +483,79 @@
 			background-color: #FBFBFB;
 			color: #555;
 		}
+
+
+/**
+ * Twitter Bootstrap style.
+ *
+ * Tested with IE 8, IE 9, Chrome 18, Firefox 9, Opera 11.
+ * Does not work with IE 7.
+ */
+.ui-tooltip-bootstrap{
+	font-size: 13px;
+	line-height: 18px;
+
+	color: #333333;
+	background-color: #ffffff;
+
+
+	border: 1px solid #ccc;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+
+	*border-right-width: 2px;
+	*border-bottom-width: 2px;
+
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+
+	-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding;
+	background-clip: padding-box;
+}
+
+	.ui-tooltip-bootstrap .ui-tooltip-titlebar{
+		font-size: 18px;
+		line-height: 22px;
+
+		border-bottom: 1px solid #ccc;
+		background-color: transparent;
+	}
+
+		.ui-tooltip-bootstrap .ui-tooltip-titlebar .ui-state-default{
+			right: 9px; top: 49%;
+			border-style: none;
+		}
+
+	.ui-tooltip-bootstrap .ui-tooltip-icon{
+		background: white;
+	}
+
+		.ui-tooltip-bootstrap .ui-tooltip-icon .ui-icon{
+			width: auto;
+			height: auto;
+			float: right;
+			font-size: 20px;
+			font-weight: bold;
+			line-height: 18px;
+			color: #000000;
+			text-shadow: 0 1px 0 #ffffff;
+			opacity: 0.2;
+			filter: alpha(opacity=20);
+		}
+
+		.ui-tooltip-bootstrap .ui-tooltip-icon .ui-icon:hover{
+			color: #000000;
+			text-decoration: none;
+			cursor: pointer;
+			opacity: 0.4;
+			filter: alpha(opacity=40);
+		}
+
 
 /* IE9 fix - removes all filters */
 .ui-tooltip:not(.ie9haxors) div.ui-tooltip-content,
