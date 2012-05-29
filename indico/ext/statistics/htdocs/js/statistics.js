@@ -278,6 +278,9 @@ $(function() {
     var staticGraphs = [{
         'apiMethod': 'piwik.getGeographyGraph',
         'el': 'graphGeography'
+    }, {
+        'apiMethod': 'piwik.getDevicesGraph',
+        'el': 'graphDevices'
     }];
 
     /* Iterates through the objects relating to static graphs and calls them

@@ -127,7 +127,8 @@
                 ${_('Visitors Geography')}
             </div>
             <div class="statsWidgetContent">
-                <img id="graphGeography" src="" alt="${_('Visitor Origins.')}"/>
+                <img id="graphGeography" src="images/loading.gif"
+                     alt="${_('Visitor Origins.')}" />
             </div>
         </div>
 
@@ -169,13 +170,8 @@
                 ${_('User Systems')}
             </div>
             <div class="statsWidgetContent" style="text-align:center;">
-            % if report['images']['visitsOS'] != 'none':
-                <img src="${report['images']['visitsOS']}" alt="${_('Visitor Systems.')}"/>
-            % else:
-                <div class="graphWarning">
-                    ${strNoGraphData}
-                </div>
-            % endif
+                <img id="graphDevices" src="images/loading.gif"
+                     alt="${_('Visitor Systems.')}" />
             </div>
         </div>
 

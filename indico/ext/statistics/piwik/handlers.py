@@ -108,6 +108,22 @@ class EventGraphGeographyStatistics(PiwikConferenceService):
         return geography.getQueryResult()
 
 
+class EventGraphDeviceStatistics(PiwikConferenceService):
+    """
+    Service which provides Base64 encoded PNG data for the graph covering
+    visitor device origin.
+    """
+
+    @BaseStatisticsImplementation.memoizeReport
+    def _getAnswer(self):
+        devices = pq.PiwikQueryGraphConferenceDevices(self._startDate,
+                                                      self._endDate,
+                                                      self._confId,
+                                                      self._contribId)
+
+        return devices.getQueryResult()
+
+
 class MaterialTreeService(PiwikService):
     """
     HTTP method for getting the Material dictionary of a Conference in
@@ -187,5 +203,6 @@ methodMap = {
     "piwik.getMaterialStatistics": MaterialStatistics,
     "piwik.getMaterialTreeData": MaterialTreeService,
     "piwik.getEventVisits": EventVisitsStatistics,
-    "piwik.getGeographyGraph": EventGraphGeographyStatistics
+    "piwik.getGeographyGraph": EventGraphGeographyStatistics,
+    "piwik.getDevicesGraph": EventGraphDeviceStatistics
 }
