@@ -120,7 +120,7 @@ type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
 
     _drawTop: function(){
         var self = this;
-        return Html.div({}, self._drawFromAddress(), self._drawToAddress(), self._drawSubject());
+        return Html.div({}, self._drawFromAddress(), self._drawToAddress(), self._drawCCAddress(), self._drawSubject());
     },
 
     _drawWidget: function(){
@@ -190,6 +190,10 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
         return Html.table({width:"688px"}, toField);
     },
 
+    _drawCCAddress: function(){
+        return null;
+    },
+
     _drawSubject: function(){
         var self = this;
         var subjectField = Html.tr({},
@@ -197,21 +201,6 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
                 Html.td({width:"85%"}, $B(Html.edit({style: {width: '100%'}}), self.subject.accessor()))
         );
         return Html.table({width:"688px"}, subjectField);
-    },
-
-    _drawExtras: function(){
-        legendTable = Html.table(
-                {},
-                Html.tr({}, Html.td({}, "{url} :"), Html.td({}, $T("field containing the url of the electronic agreement. (This field is mandatory)"))),
-                Html.tr({}, Html.td({}, "{confTitle} :"), Html.td({}, $T("field containing the conference title."))),
-                Html.tr({}, Html.td({}, "{name} :"), Html.td({}, $T("field containing the full name of the participant.")))
-                );
-        return Html.div({style:{marginLeft: '20px',
-                         fontStyle:'italic',
-                         color:'gray'}
-                  },
-                  Html.div({style:{fontWeight:'bold'}}, $T("Legend:")),
-                  legendTable);
     }
 
 },

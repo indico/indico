@@ -1757,7 +1757,9 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
             var self = this;
             return [
                 [$T('Send'), function() {
-                    self.sendFunction();
+                    if(self.parameterManager.check()){
+                        self.sendFunction();
+                    }
                 }],
                 [$T('Cancel'), function() {
                     self.close();
@@ -1779,11 +1781,21 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
                 Html.td({width:"85%"}, selectFromAddress)
         );
 
-        return Html.table({width:"95%", style:{margin:"20px"}}, fromField);
+        return Html.table({width:"95%"}, fromField);
     },
 
     _drawToAddress: function(){
         return null;
+    },
+
+    _drawCCAddress: function(){
+        var self = this;
+        var ccField = Html.tr({},
+                Html.td({width:"15%"}, Html.span({}, $T("CC:"))),
+                Html.td({width:"85%"}, $B(self.parameterManager.add(Html.edit({style: {width: '100%'}}), 'emaillist', false), self.cc.accessor()))
+        );
+
+        return Html.table({width:"688px"}, ccField);
     },
 
     draw: function(){
@@ -1795,10 +1807,13 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
     }
 
 },
-    function(confTitle, confId, uniqueIdList, fromList, subject, defaultText, legends){
+    function(confTitle, confId, uniqueIdList, fromList, ccList, subject, defaultText, legends){
         var self = this;
         self.uniqueIdList = uniqueIdList;
         self.fromList = fromList;
+        self.cc = new WatchObject();
+        self.parameterManager = new IndicoUtil.parameterManager();
+        $B(self.cc.accessor(), _.values(ccList).join(', '));
         self.sendFunction=function(){
             var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending..."));
             indicoRequest(
@@ -1808,6 +1823,7 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
                     uniqueIdList: self.uniqueIdList,
                     from: {email: self.fromList[$("#fromEmailAddress")[0].selectedIndex].email,
                         name: self.fromList[$("#fromEmailAddress")[0].selectedIndex].name },
+                    cc: self.cc.get(),
                     content: self.rtWidget.get()
                 },
                 function(result, error){

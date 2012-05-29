@@ -191,7 +191,8 @@ class ElectroniAgreementNotification(SpeakersNotificationBase):
         to sign the electronic agreement.
     """
 
-    def __init__(self, sendToList, fromEmail, fromName, content, subject):
+    def __init__(self, sendToList, sendToCCList, fromEmail, fromName, content, subject):
         SpeakersNotificationBase.__init__(self, sendToList, fromEmail, fromName)
+        self.setCCList(sendToCCList)
         self.setSubject(subject)
         self.setBody(content)

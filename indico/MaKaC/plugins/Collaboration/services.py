@@ -69,6 +69,17 @@ class GetSpeakerEmailListByCont(ConferenceModifBase):
         return resultList
 
 class SendElectronicAgreement(ConferenceModifBase):
+    def _buildEmailList(self, value):
+        emailList = []
+        if (value == ""):
+            return emailList
+        else:
+            # replace to have only one separator
+            value = value.replace(" ",",")
+            value = value.replace(";",",")
+            emailList = value.split(",")
+            return emailList
+
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
 
@@ -79,6 +90,7 @@ class SendElectronicAgreement(ConferenceModifBase):
         self.fromEmail = self._params['from']['email']
         self.fromName = self._params['from']['name']
         self.content = self._params['content']
+        self.cc = self._buildEmailList(self._params['cc'])
         manager = self._conf.getCSBookingManager()
         for uniqueId in self.uniqueIdList:
             self.emailToList.extend(manager.getSpeakerEmailByUniqueId(uniqueId, self._aw.getUser()))
@@ -112,7 +124,7 @@ class SendElectronicAgreement(ConferenceModifBase):
                 sw = manager.getSpeakerWrapperByUniqueId(uniqueId)
                 sw.setStatus(SpeakerStatusEnum.PENDING)
                 subject = """[Indico] Electronic Agreement: %s (event id: %s)"""%(self._conf.getTitle(), self._conf.getId())
-                notification = ElectroniAgreementNotification([sw.getObject().getEmail()], self.fromEmail, self.fromName, self.processContent(sw), subject)
+                notification = ElectroniAgreementNotification([sw.getObject().getEmail()], self.cc, self.fromEmail, self.fromName, self.processContent(sw), subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
                                          "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
