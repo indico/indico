@@ -82,9 +82,6 @@ class EventVisitsStatistics(PiwikConferenceService):
     over time.
     """
 
-    def _checkParams(self):
-        PiwikConferenceService._checkParams(self)
-
     @BaseStatisticsImplementation.memoizeReport
     def _getAnswer(self):
         visitStats = pq.PiwikQueryJSONVisitors(self._startDate,
@@ -93,6 +90,22 @@ class EventVisitsStatistics(PiwikConferenceService):
                                                self._contribId)
 
         return visitStats.getQueryResult()
+
+
+class EventGraphGeographyStatistics(PiwikConferenceService):
+    """
+    Service which provides Base64 encoded PNG data for the graph covering
+    visitor geography.
+    """
+
+    @BaseStatisticsImplementation.memoizeReport
+    def _getAnswer(self):
+        geography = pq.PiwikQueryGraphConferenceCountries(self._startDate,
+                                                          self._endDate,
+                                                          self._confId,
+                                                          self._contribId)
+
+        return geography.getQueryResult()
 
 
 class MaterialTreeService(PiwikService):
@@ -173,5 +186,6 @@ class MaterialTreeService(PiwikService):
 methodMap = {
     "piwik.getMaterialStatistics": MaterialStatistics,
     "piwik.getMaterialTreeData": MaterialTreeService,
-    "piwik.getEventVisits": EventVisitsStatistics
+    "piwik.getEventVisits": EventVisitsStatistics,
+    "piwik.getGeographyGraph": EventGraphGeographyStatistics
 }

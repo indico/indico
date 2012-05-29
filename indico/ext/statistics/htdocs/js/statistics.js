@@ -274,10 +274,33 @@ $(function() {
         }
     });
 
+    /* Static graph data being retrieved by the API. */
+    var staticGraphs = [{
+        'apiMethod': 'piwik.getGeographyGraph',
+        'el': 'graphGeography'
+    }];
+
+    /* Iterates through the objects relating to static graphs and calls them
+     * to populate page. @todo: Move this to Backbone.js
+     **/
+    var loadStaticGraphs = function() {
+        $.each(staticGraphs, function(index, graph) {
+            indicoRequest(graph.apiMethod, getIndicoBaseParams(),
+                function(result, error) {
+                    if (!error) {
+                        $('#' + graph.el).attr('src', result);
+                    } else {
+                        $('#' + graph.el).html($T('No Graph Data Received'));
+                    }
+                });
+        });
+    };
+
     /**
      * Initializer to begin the dynamic loading of widgets etc on pageload.
      */
     var statsInit = function() {
+        loadStaticGraphs();
         loadVisitorsGraph();
         loadTree();
     };

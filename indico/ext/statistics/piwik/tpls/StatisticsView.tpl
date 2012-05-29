@@ -127,13 +127,7 @@
                 ${_('Visitors Geography')}
             </div>
             <div class="statsWidgetContent">
-            % if report['images']['visitsCountry'] != 'none':
-                <img src="${report['images']['visitsCountry']}" alt="${_('Visitor Origins.')}"/>
-            % else:
-                <div class="graphWarning">
-                    ${strNoGraphData}
-                </div>
-            % endif
+                <img id="graphGeography" src="" alt="${_('Visitor Origins.')}"/>
             </div>
         </div>
 

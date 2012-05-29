@@ -79,8 +79,7 @@ class PiwikReport(PiwikReportBase):
 
         # This report only has need for images and values, not for widgets.
         self._reportGenerators = {
-            'images': {'visitsOS': report(pq.PiwikQueryGraphConferenceDevices, params),
-                    'visitsCountry': report(pq.PiwikQueryGraphConferenceCountries, params)},
+            'images': {'visitsOS': report(pq.PiwikQueryGraphConferenceDevices, params)},
 
             'values': {'visits': report(pq.PiwikQueryMetricConferenceVisits, params),
                     'uniqueVisits': report(pq.PiwikQueryMetricConferenceUniqueVisits, params),
