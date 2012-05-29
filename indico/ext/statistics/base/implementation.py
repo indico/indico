@@ -30,6 +30,7 @@ from indico.ext.statistics.register import StatisticsConfig
 
 from MaKaC.i18n import _
 from MaKaC.common.cache import GenericCache
+from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.plugins.base import PluginsHolder
 
 
@@ -179,6 +180,16 @@ class BaseStatisticsImplementation(Component):
         return None
 
     def _performCall(self, default=None):
+        """
+        Acts as an entry point for all derivative classes to use the
+        ExternalOperationsManager for performing remote calls.
+        """
+        return ExternalOperationsManager.execute(self,
+                                                 "performCall",
+                                                 self._performExternalCall,
+                                                 default)
+
+    def _performExternalCall(self, default=None):
         """
         Returns the raw results from the API to be handled elsewhere before
         being passed through to the report.
