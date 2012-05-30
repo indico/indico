@@ -121,6 +121,8 @@ class NiceAuthenticator(Authenthicator):
             if login != "" and not self.hasKey(login):
                 ni=NiceIdentity(login, av)
                 self.add(ni)
+            if login != "" and self.hasKey(login) and not av.getIdentityById(login, self.getId()):
+                av.addIdentity(self.getById(login))
             return av
 
         return None
