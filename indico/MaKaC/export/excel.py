@@ -254,7 +254,7 @@ class RegistrantsListToExcel:
 
 class AbstractListToExcel:
 
-    def __init__(self, conf,list=None, display=["ID","Title","Primary Authors","Track Name","Contribution Type"], excelSpecific=True):
+    def __init__(self, conf,list=None, display=["ID","Title","Primary Authors","Track Name","Contribution Type", "Rating"], excelSpecific=True):
         self._conf = conf
         self._abstractList = list
         self._displayList = display
@@ -292,6 +292,11 @@ class AbstractListToExcel:
                     if contribType is not None:
                         ctname=contribType.getName()
                     excelGen.addNumberAsString(ctname, self._excelSpecific)
+                elif key == "Rating":
+                    if abstract.getRating():
+                        excelGen.addValue("%.2f" % abstract.getRating())
+                    else:
+                        excelGen.addNumberAsString("-", self._excelSpecific)
             excelGen.newLine()
         return excelGen.getExcelContent()
 
