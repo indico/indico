@@ -132,8 +132,8 @@ class RHFileBase( RHConferenceSite ):
         l = locators.WebLocator()
         l.setResource( params )
         self._file = self._target = l.getObject()
-        if not isinstance(self._file, LocalFile):
-            raise MaKaCError("No file found, %s found instead"%type(self._file))
+#        if not isinstance(self._file, LocalFile):
+#            raise MaKaCError("No file found, %s found instead"%type(self._file))
         self._conf = self._file.getConference()
         if self._conf == None:
             self._categ = self._file.getCategory()

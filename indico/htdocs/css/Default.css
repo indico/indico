@@ -7631,6 +7631,10 @@ span.num_events {
     border-bottom-right-radius: 0;
 }
 
+.bookingLaunchLink {
+	font-weight: bold;
+}
+
 .videoServiceWrapper {
     display: block;
     width: auto;
