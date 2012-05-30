@@ -186,7 +186,7 @@ class SpeakersNotificationBase(GenericNotification):
         self.setFromAddr("%s<%s>"%(fromName, fromEmail))
         self.setToList(sendToList)
 
-class ElectroniAgreementNotification(SpeakersNotificationBase):
+class ElectronicAgreementNotification(SpeakersNotificationBase):
     """ Template to build an email notification to the speakers
         to sign the electronic agreement.
     """
@@ -194,5 +194,15 @@ class ElectroniAgreementNotification(SpeakersNotificationBase):
     def __init__(self, sendToList, sendToCCList, fromEmail, fromName, content, subject):
         SpeakersNotificationBase.__init__(self, sendToList, fromEmail, fromName)
         self.setCCList(sendToCCList)
+        self.setSubject(subject)
+        self.setBody(content)
+
+
+class ElectronicAgreementOrganiserNotification(SpeakersNotificationBase):
+    """ Template to build an email notification to the speakers
+        to sign the electronic agreement.
+    """
+    def __init__(self, sendToList, fromEmail, content, subject):
+        SpeakersNotificationBase.__init__(self, sendToList, fromEmail)
         self.setSubject(subject)
         self.setBody(content)

@@ -24,8 +24,9 @@ Services for Collaboration plugins
 from MaKaC.services.implementation.contribution import ContributionDisplayBase
 from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationElectronicAgreementForm
-from MaKaC.plugins.Collaboration.mail import ElectroniAgreementNotification
+from MaKaC.plugins.Collaboration.mail import ElectronicAgreementNotification, ElectronicAgreementOrganiserNotification
 from MaKaC.common.mail import GenericMailer
+from MaKaC.common.Configuration import Config
 
 from indico.util.i18n import N_
 
@@ -124,7 +125,7 @@ class SendElectronicAgreement(ConferenceModifBase):
                 sw = manager.getSpeakerWrapperByUniqueId(uniqueId)
                 sw.setStatus(SpeakerStatusEnum.PENDING)
                 subject = """[Indico] Electronic Agreement: %s (event id: %s)"""%(self._conf.getTitle(), self._conf.getId())
-                notification = ElectroniAgreementNotification([sw.getObject().getEmail()], self.cc, self.fromEmail, self.fromName, self.processContent(sw), subject)
+                notification = ElectronicAgreementNotification([sw.getObject().getEmail()], self.cc, self.fromEmail, self.fromName, self.processContent(sw), subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
                                          "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
@@ -136,6 +137,7 @@ class RejectElectronicAgreement(ConferenceDisplayBase):
         ConferenceDisplayBase._checkParams(self)
         self.authKey = self._params["authKey"]
         self.reason = self._params["reason"]
+        self.notifyOrganiser = self._params["notifyOrganiser"]
 
     def _getAnswer(self):
         spkWrapper = None
@@ -148,11 +150,25 @@ class RejectElectronicAgreement(ConferenceDisplayBase):
             spkWrapper.setStatus(SpeakerStatusEnum.REFUSED)
             spkWrapper.setRejectReason(self.reason)
             spkWrapper.triggerNotification()
+            if self.notifyOrganiser:
+                subject = """[Indico] Electronic Agreement Rejected: %s (event id: %s) (speaker : %s)"""%(self._conf.getTitle(), self._conf.getId(), spkWrapper.getSpeakerId())
+                content = """Dear manager,
+                The speaker %s has rejected the electronic agreement for the event %s.
+
+                Best Regards,
+
+                Cern Recording Team """%(spkWrapper.getObject().getFullName(), self._conf.getTitle())
+                notification = ElectronicAgreementOrganiserNotification([self._conf.getCreator()], Config.getInstance().getNoReplyEmail(), content, subject)
+
+                GenericMailer.sendAndLog(notification, self._conf,
+                                         "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
+                                         None)
 
 class AcceptElectronicAgreement(ConferenceDisplayBase):
     def _checkParams(self):
         ConferenceDisplayBase._checkParams(self)
         self.authKey = self._params["authKey"]
+        self.notifyOrganiser = self._params["notifyOrganiser"]
 
     def _getAnswer(self):
         spkWrapper = None
@@ -164,6 +180,21 @@ class AcceptElectronicAgreement(ConferenceDisplayBase):
         if spkWrapper:
             spkWrapper.setStatus(SpeakerStatusEnum.SIGNED, self._req.get_remote_ip())
             spkWrapper.triggerNotification()
+            if self.notifyOrganiser:
+                subject = """[Indico] Electronic Agreement Accepted: %s (event id: %s) (speaker : %s)"""%(self._conf.getTitle(), self._conf.getId(), spkWrapper.getSpeakerId())
+                content = """Dear manager,
+                The speaker %s has accepted the electronic agreement for the event %s.
+
+                Best Regards,
+
+                Cern Recording Team """%(spkWrapper.getObject().getFullName(), self._conf.getTitle())
+                notification = ElectronicAgreementOrganiserNotification([self._conf.getCreator()], Config.getInstance().getNoReplyEmail(), content, subject)
+
+                GenericMailer.sendAndLog(notification, self._conf,
+                                         "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
+                                         None)
+
+
 
 methodMap = {
     "collaboration.setEmailSpeaker": SetSpeakerEmailAddress,
