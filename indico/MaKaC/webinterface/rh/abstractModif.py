@@ -21,20 +21,17 @@
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.abstracts as abstracts
 import MaKaC.review as review
-import MaKaC.user as user
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHAbstractBase, RHConferenceBase
-from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF, ConfManagerAbstractsToPDF
+from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF
 from MaKaC.common.xmlGen import XMLGen
-from MaKaC.errors import MaKaCError,ModificationError, FormValuesError
+from MaKaC.errors import MaKaCError, ModificationError, FormValuesError, NoReportError
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 from MaKaC.common import Config
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
-from MaKaC.abstractReviewing import ConferenceAbstractReview
 from MaKaC.paperReviewing import Answer
-
 
 
 class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
@@ -581,6 +578,8 @@ class RHEditData(RHAbstractModifBase, AbstractParam):
         elif self._action == "VALIDATE":
             return self._doValidate()
         else:
+            if isinstance( self._abstract.getCurrentStatus(), review.AbstractStatusAccepted ):
+                raise NoReportError(_("The abstract with id %s cannot be edited because it is accepted.")%self._abstract.getId())
             p = abstracts.WPModEditData(self, self._target, self._abstractData)
             pars = self._abstractData.toDict()
             return p.display(**pars)
