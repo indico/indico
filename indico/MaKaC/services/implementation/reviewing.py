@@ -831,7 +831,7 @@ class ContributionReviewingSetSubmitted(ContributionReviewingBase):
                 raise ServiceError("ERR-REV9", e.getMsg())
 
             judgementObject.setAuthor(self._getUser())
-            judgementObject.sendNotificationEmail(widthdrawn = not self.getJudgementObject().isSubmitted())
+            judgementObject.sendNotificationEmail(withdrawn = not self.getJudgementObject().isSubmitted())
         return self.getJudgementObject().isSubmitted()
 
 class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):

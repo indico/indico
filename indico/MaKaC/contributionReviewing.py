@@ -423,13 +423,13 @@ class Judgement(Persistent, Fossilizable):
             if (self.getConfPaperReview().getReviewingQuestionById(answer.getQuestion().getId()) == None):
                 self._answers.remove(answer)
 
-    def sendNotificationEmail(self, widthdrawn = False):
+    def sendNotificationEmail(self, withdrawn = False):
         """ Sends an email to the contribution's authors when the referee, editor or reviewer
             pass a judgement on the contribution and only if the manager has enabled the option in 'Automatic e-mails' section.
         """
         authorList = self.getReviewManager().getContribution().getAuthorList()
         for author in authorList:
-            if widthdrawn:
+            if withdrawn:
                 if isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif():
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
@@ -1052,7 +1052,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
         if isinstance(judgement, EditorJudgement):
             if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
-                self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been widthdrawn by the layout reviewer"""
+                self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been withdrawn by the layout reviewer"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Author,
 
@@ -1070,7 +1070,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
         """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
         )
             else:
-                self.setSubject("""[Indico] The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn"""
+                self.setSubject("""[Indico] The judgement for the layout of your contribution "%s" (id: %s) has been withdrawn"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Author,
 
@@ -1089,7 +1089,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
         )
 
         elif isinstance(judgement, ReviewerJudgement):
-            self.setSubject("""[Indico] The judgement for the content of your contribution "%s" (id: %s) has been widthdrawn"""
+            self.setSubject("""[Indico] The judgement for the content of your contribution "%s" (id: %s) has been withdrawn"""
                             % (contribution.getTitle(), str(contribution.getId())))
             self.setBody("""Dear Author,
 
@@ -1108,7 +1108,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
         )
 
         elif isinstance(judgement, RefereeJudgement):
-            self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been widthdrawn by the referee"""
+            self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been withdrawn by the referee"""
                             % (contribution.getTitle(), str(contribution.getId())))
             self.setBody("""Dear Author,
 
