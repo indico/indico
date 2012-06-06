@@ -46,7 +46,7 @@ IndicoUI.executeOnLoad(function(){
             Html.img({src:imageSrc("enabledSection.png")}), Html.img({src:imageSrc("disabledSection.png")}), "event.participation.allowDisplay", "event.participation.allowDisplay",{confId:${confId}}).draw().dom));
     $("#inPlaceEditAllowForApply").append($(new RemoteSwitchButton(${"true" if allowForApply else "false"},
             Html.img({src:imageSrc("enabledSection.png")}), Html.img({src:imageSrc("disabledSection.png")}), "event.participation.allowForApply", "event.participation.allowForApply",{confId:${confId}}).draw().dom));
-    $("#inPlaceEditAutoAccept").append($(new RemoteSwitchButton(${"false" if autoAccept else "true"},
+    $("#inPlaceEditAutoAccept").append($(new RemoteSwitchButton(${"false" if autopAccept else "true"},
             Html.img({src:imageSrc("enabledSection.png")}), Html.img({src:imageSrc("disabledSection.png")}), "event.participation.autopAccept", "event.participation.autopAccept",{confId:${confId}}).draw().dom));
     $("#inPlaceEditNumMaxParticipants").append(new InputEditWidget('event.participation.setNumMaxParticipants',
             {confId:${confId}}, ${ jsonEncode(numMaxParticipants) }, false, null, function(value){return IndicoUtil.isInteger(value);}, '${_("The value set is not a positive number")}', '${_("Please insert a positive number or 0 for unlimited")}',
