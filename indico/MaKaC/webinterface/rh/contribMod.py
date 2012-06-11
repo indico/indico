@@ -440,7 +440,7 @@ class RHContributionData( RoomBookingDBMixin, RHContribModifBaseSpecialSesCoordR
         return p.display(**self._getRequestParams())
 
 
-class RHContributionModifData(RHContribModifBaseSpecialSesCoordRights):
+class RHContributionModifData(RoomBookingDBMixin, RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionDataModification
 
     def _checkParams(self, params):

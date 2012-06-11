@@ -7915,8 +7915,10 @@ class Contribution(CommonObjectBase, Locatable):
                 room=CustomRoom()
             self.setRoom(room)
             room.setName(data["roomName"])
+            room.retrieveFullName(data["locationName"])
         else:
             self.setRoom(None)
+
         tz = 'UTC'
         if self.getConference():
             tz = self.getConference().getTimezone()
