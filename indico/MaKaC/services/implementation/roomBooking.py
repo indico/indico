@@ -37,7 +37,6 @@ from MaKaC.common.utils import HolidaysHolder, isWeekend
 from MaKaC.errors import NoReportError
 from MaKaC.webinterface.rh.roomBooking import RoomBookingAvailabilityParamsMixin
 import MaKaC.webinterface.linking as linking
-from MaKaC.common.fossilize import fossilize
 from MaKaC.rb_factory import Factory
 
 class RoomBookingListLocations( ServiceBase ):
@@ -65,18 +64,16 @@ class RoomBookingListRooms( ServiceBase ):
         try:
             self._location = self._params["location"];
         except:
-            from MaKaC.services.interface.rpc.common import ServiceError
             raise ServiceError("ERR-RB0", "Invalid location.")
 
     def _getAnswer( self ):
 
-        if not Location.parse( self._location ):
-            return {}
-
         res = {}
-        for room in CrossLocationQueries.getRooms( location = self._location ):
-            res[room.name] = room.name
-
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.getRoomBookingModuleActive():
+            if Location.parse( self._location ):
+                for room in CrossLocationQueries.getRooms( location = self._location ):
+                    res[room.name] = room.name
         return sorted(res)
 
 class RoomBookingAvailabilitySearchRooms( ServiceBase, RoomBookingAvailabilityParamsMixin ):
@@ -85,7 +82,6 @@ class RoomBookingAvailabilitySearchRooms( ServiceBase, RoomBookingAvailabilityPa
         try:
             self._location = self._params["location"];
         except:
-            from MaKaC.services.interface.rpc.common import ServiceError
             raise ServiceError("ERR-RB0", "Invalid location.")
 
         self._checkParamsRepeatingPeriod(self._params)
@@ -105,11 +101,11 @@ class RoomBookingFullNameListRooms( RoomBookingListRooms):
     def _getAnswer( self ):
 
         res = []
-
-        if Location.parse( self._location ):
-            for room in CrossLocationQueries.getRooms( location = self._location ):
-                res.append((room.name, room.getFullName()))
-
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.getRoomBookingModuleActive():
+            if Location.parse( self._location ):
+                for room in CrossLocationQueries.getRooms( location = self._location ):
+                    res.append((room.name, room.getFullName()))
         return res
 
 class RoomBookingListLocationsAndRooms( ServiceBase ):
@@ -286,7 +282,6 @@ class RoomBookingMapBase( ServiceBase ):
         try:
             return self._params[parameterName]
         except:
-            from MaKaC.services.interface.rpc.common import ServiceError
             raise ServiceError("ERR-RB0", "Invalid %s." % parameterName)
 
 class RoomBookingMapCreateAspect(RoomBookingMapBase):
