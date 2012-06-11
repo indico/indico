@@ -646,6 +646,7 @@ class WWeekOverview(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        isWeekendFree = True
         prevOW = self._ow.getOverviewPrevPeriod()
         prevsel = urlHandlers.UHCategoryOverview.getURLFromOverview( prevOW )
         nextOW = self._ow.getOverviewNextPeriod()
@@ -666,6 +667,8 @@ class WWeekOverview(wcomponents.WTemplated):
             vars["date%i"%idx] = sd.strftime( "%a %d/%m" )
             res = []
             confs = self._ow.getConferencesWithStartTime( sd )
+            if sd.weekday() >= 5 and confs:
+                    isWeekendFree = False
             for tuple in confs:
                 conf = tuple[0]
                 stTime = tuple[1]
@@ -677,13 +680,12 @@ class WWeekOverview(wcomponents.WTemplated):
                                             self._ow.getDetailLevel(),
                                             stTime )
                 res.append( wc.getHTML( {} ) )
-
             if res==[]:
                 res.append("<tr><td></td></tr>")
             vars["item%i"%idx] = "".join( res )
             sd += inc
             idx += 1
-        vars["items"] = ""
+        vars["isWeekendFree"] = isWeekendFree
         return vars
 
 # This class is currently not used since the list of conference that we
@@ -733,13 +735,12 @@ class WMonthOverview(wcomponents.WTemplated):
 
     def __init__( self, ow ):
         self._ow = ow
+        self._isWeekendFree = True
 
-    def _getDayCell( self, day=None ):
-        if day == None:
-            return """<td>&nbsp;</td>"""
-        else:
-            res = []
-            confs = day.getConferencesWithStartTime()
+    def _getDayCell( self, day ):
+        res = []
+        confs = day.getConferencesWithStartTime()
+        if confs:
             for tuple in confs:
                 conf = tuple[0]
                 stTime = tuple[1]
@@ -751,35 +752,26 @@ class WMonthOverview(wcomponents.WTemplated):
                                             self._ow.getDetailLevel(),
                                             stTime )
                 res.append( wc.getHTML( {} ) )
-            return """
-                <td valign="top" bgcolor="#ECECEC">
-                    <table width="100%%">
-                        <tr>
-                            <td align="center">
-                                <strong style="font-size: 1.3em; color: #888;">%s</strong>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td valign="top">%s</td>
-                        </tr>
-                    </table>
-                </td>"""%(day.getDayNumber(), "".join(res))
+        return "".join(res)
 
     def _getMonth( self ):
+        dayList = [[]]
+        numWeek=0
         dl = self._ow.getDayList()
-        month = ""
-        week = ""
         for i in range( dl[0].getWeekDay() ):
-            week = "%s%s"%(week, self._getDayCell())
+            dayList[numWeek].append(None)
         for day in self._ow.getDayList():
-            week = "%s%s"%(week, self._getDayCell( day ))
-            if day.getWeekDay() == 6:
-                month = """%s<tr>%s</tr>"""%(month, week)
-                week = ""
+            dayList[numWeek].append(day)
+            if day.getWeekDay() >= 5:
+                if day.getConferencesWithStartTime():
+                    self._isWeekendFree = False
+                if day.getWeekDay() == 6:
+                    numWeek +=1
+                    dayList.append([])
 
         for i in range( 6-dl[-1].getWeekDay() ):
-            week = "%s%s"%(week, self._getDayCell())
-        return """%s<tr>%s</tr>"""%(month, week)
+            dayList[numWeek].append(None)
+        return dayList
 
 
     def getVars( self ):
@@ -810,7 +802,9 @@ class WMonthOverview(wcomponents.WTemplated):
         for name in dayNames:
             vars["nameDay%i"%dayNames.index(name)] = name
         self._displayConfURLGen = vars["displayConfURLGen"]
-        vars["items"] = self._getMonth()
+        vars["month"] = self._getMonth()
+        vars["isWeekendFree"] = self._isWeekendFree
+        vars["getDayCell"] = lambda day: self._getDayCell(day)
         return vars
 
 
@@ -911,40 +905,6 @@ class WCategoryOverview(wcomponents.WTemplated):
         for i in range(7):
             res.append((str(date.day)+"-"+str(date.month)+"-"+str(date.year)))
             date += delta
-
-        #if daynumber == 0:
-        #    res = [(str(day)+"-"+str(month)+"-"+str(year))]
-        #    i=1
-        #    while i <= 6:
-        #        if (day+i)<32 and (month==8 or month==1 or month==3 or month==5 or month==7 or month==10):
-        #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #        if (day+i)<31 and (month==4 or month==6 or month==9 or month==11):
-        #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #        if (day+i)<29 and month==2 and (year %4!=0 or (year %4 ==0 and year %100==0)):
-        #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #        if (day+i)<30 and month==2 and ((year%4==0 and year%100!=0) or year%400==0):
-        #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #
-        #        i+=1
-        #else:
-        #    res = [(str(day)+"-"+str(month)+"-"+str(year))]
-        #    i=1
-        #    while i <= 7:
-        #        j = day+7-daynumber-i          #day+i-(daynumber+1)
-        #        if j>0 and j <32 and (month==8 or month==1 or month==3 or month==5 or month==7 or month==10):
-        #
-        #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #
-        #        if j>0 and j<31 and (month==4 or month==6 or month==9 or month==11):
-        #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #
-        #        if j>0 and j<29 and month==2 and ((year %4!=0) or (year %4 ==0 and year %100==0)):
-        #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #
-        #        if j>0 and j<30 and month==2 and ((year%4==0 and year%100!=0) or year%400==0):
-        #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #
-        #        i+=1
 
         return res
 

@@ -481,6 +481,7 @@ class Overview:
         return ow
 
 
+
 class WeekOverview( Overview ):
 
     def getLocator( self ):

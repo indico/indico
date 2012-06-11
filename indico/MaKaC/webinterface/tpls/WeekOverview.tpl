@@ -23,12 +23,14 @@
                     <td style="background-color: #444; color: white; text-align: center" nowrap>
                         ${ date4 }
                     </td>
+                    % if not isWeekendFree:
                     <td style="background-color: #444; color: white; text-align: center" nowrap>
                         ${ date5 }
                     </td>
                     <td style="background-color: #444; color: white; text-align: center" nowrap>
                         ${ date6 }
                     </td>
+                    % endif
                 </tr>
                 <tr>
                     <td bgcolor="#ECECEC" valign="top">
@@ -56,6 +58,7 @@
                             ${ item4 }
                         </table>
                     </td>
+                    % if not isWeekendFree:
                     <td bgcolor="#ECECEC" valign="top">
                         <table width="100%">
                             ${ item5 }
@@ -66,6 +69,7 @@
                             ${ item6 }
                         </table>
                     </td>
+                    % endif
                 </tr>
             </table>
         </td>
