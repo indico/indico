@@ -402,7 +402,7 @@ class WPCollaborationDisplay(WPConferenceDefaultDisplayBase):
 
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Collaboration')
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Display') + self._includeJSPackage('Collaboration')
 
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
@@ -444,5 +444,6 @@ class WCollaborationDisplay(wcomponents.WTemplated):
         vars["OngoingBookings"] = ongoingBookings
         vars["ScheduledBookings"] = scheduledBookings
         vars["Timezone"] = self._tz
+        vars["conf"] = self._conf
 
         return vars
