@@ -21,6 +21,7 @@
 # python stdlib imports
 import datetime
 import icalendar as ical
+from lxml import html
 
 # indico imports
 from indico.util.metadata.serializer import Serializer
@@ -73,7 +74,8 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
         description += "Speakers: "+ (", ").join(speakerList) + "\n"
 
     if fossil['description']:
-        description += "Description: " + fossil['description'].decode('utf-8') + '\nURL: ' + fossil['url']
+        description += "Description: " + html.fromstring(fossil.get('description', "<p/>").decode('utf-8')).text_content() \
+                    + '\nURL: ' + fossil['url']
     else:
         description += "URL: " + fossil['url']
     event.set('description', description)
