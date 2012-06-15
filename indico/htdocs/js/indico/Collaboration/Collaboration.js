@@ -1906,23 +1906,25 @@ var successMakeEventModerator = function(videoLink, result){
 };
 
 var connectBookingRoom = function(booking, confId) {
-    $E("connectProgress"+booking["id"]).set(progressIndicator(true,true));
+    $("#connectProgress" + booking["id"]).html(progressIndicator(true, true).dom);
     jsonRpc(Indico.Urls.JsonRpcService, "collaboration.connectCSBooking",
-            { confId: confId,
-              bookingId: booking.id },
+            {
+                confId: confId,
+                bookingId: booking.id
+            },
             function(result, error){
-                  $E("connectProgress"+booking["id"]).set("");
-                  if (!error) {
-                      if (result.error){
-                          new WarningPopup($T("Cannot be connected"), result.userMessage).open();
-                      }
-                      else {
-                          new AlertPopup($T("Success"), $T("The room ") + booking.linkVideoRoomLocation  + $T(" has been conected to the Vidyo room.") ).open();
-                      }
-                  } else {
-                      IndicoUtil.errorReport(error);
-                  }
-    });
+                $("#connectProgress" + booking["id"]).html("");
+                if (!error) {
+                    if (result.error){
+                        new WarningPopup($T("Cannot be connected"), result.userMessage).open();
+                    }
+                    else {
+                        new AlertPopup($T("Success"), $T("The room ") + booking.linkVideoRoomLocation  + $T(" has been connected to the Vidyo room.") ).open();
+                    }
+                } else {
+                    IndicoUtil.errorReport(error);
+                }
+            });
 };
 
 var drawBookingPopup = function (videoInformation, confId, bookingId, displayModeratorLink) {
