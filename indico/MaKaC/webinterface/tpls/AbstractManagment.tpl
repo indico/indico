@@ -4,7 +4,7 @@
     <tr>
         <td align="center">
             <div style="padding: 10px; margin: 10px; border: 1px solid #DDD; font-size: 14px; color: #881122">
-                ${ _("You cannot modify this abstract because it has been accepted. In order to change the information that gets displayed in the Book of Abstracts and timetable, you should edit the corresponding contribution (%s)") % contribution}
+                ${ _("You cannot modify this abstract because it has already been accepted. In order to change the information that is displayed in the Book of Abstracts and timetable you should edit the corresponding contribution (%s) directly.") % contribution}
             </div>
         </td>
     </tr>

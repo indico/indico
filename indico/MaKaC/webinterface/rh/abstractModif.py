@@ -579,7 +579,7 @@ class RHEditData(RHAbstractModifBase, AbstractParam):
             return self._doValidate()
         else:
             if isinstance( self._abstract.getCurrentStatus(), review.AbstractStatusAccepted ):
-                raise NoReportError(_("The abstract with id %s cannot be edited because it is accepted.")%self._abstract.getId())
+                raise NoReportError(_("The abstract with id '%s' cannot be edited because it has already been accepted.") % self._abstract.getId())
             p = abstracts.WPModEditData(self, self._target, self._abstractData)
             pars = self._abstractData.toDict()
             return p.display(**pars)
