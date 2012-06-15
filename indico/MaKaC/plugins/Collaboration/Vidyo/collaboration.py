@@ -46,6 +46,7 @@ class CSBooking(CSBookingBase):
     _hasStart = True
     _hasStop = False
     _hasConnect = True
+    _hasDisconnect = True
     _hasCheckStatus = True
 
     _hasStartDate = False
@@ -56,6 +57,9 @@ class CSBooking(CSBookingBase):
 
     _requiresServerCallForConnect = True
     _requiresClientCallForConnect = False
+
+    _requiresServerCallForDisconnect = True
+    _requiresClientCallForDisconnect = False
 
     _needsBookingParamsCheck = True
     _needsToBeNotifiedOnView = True
@@ -102,6 +106,9 @@ class CSBooking(CSBookingBase):
         return False
 
     def canBeConnected(self):
+        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject())!=""
+
+    def canBeDisconnected(self):
         return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject())!=""
 
     def canBeDeleted(self):
@@ -226,6 +233,9 @@ class CSBooking(CSBookingBase):
 
     def setChecksDone(self, checksDone):
         self._checksDone = checksDone
+
+    def connectionStatus(self):
+        return {}
 
     def getBookingInformation(self):
         """ For retreiving the ServiceInformation sections dict built for the
@@ -379,6 +389,8 @@ class CSBooking(CSBookingBase):
     def _connect(self):
         self._checkStatus()
         if self.canBeConnected():
+            if self.isConnected():
+                return VidyoError("alreadyConnected", "connect", _("It seems that the room has been already connected, please refresh the page."))
             confRoomIp = VidyoTools.getLinkRoomIp(self.getLinkObject())
             if confRoomIp == "":
                 return VidyoError("noValidConferenceRoom", "connect")

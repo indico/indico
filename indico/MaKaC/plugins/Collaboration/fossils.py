@@ -102,6 +102,9 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
     def hasConnect(self):
         """ Returns if this booking belongs to a plugin who has a "connect" concept. """
 
+    def hasDisconnect(self):
+        """ Returns if this booking belongs to a plugin who has a "disconnect" concept. """
+
     def hasCheckStatus(self):
         """ Returns if this booking belongs to a plugin who has a "check status" concept. """
 
@@ -120,6 +123,10 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
         """ Returns if this booking belongs to a plugin who requires a server call when the connect button is pressed. """
     requiresServerCallForConnect.name = "requiresServerCallForConnect"
 
+    def requiresServerCallForDisconnect(self):
+        """ Returns if this booking belongs to a plugin who requires a server call when the disconnect button is pressed. """
+    requiresServerCallForDisconnect.name = "requiresServerCallForDisconnect"
+
     def requiresClientCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the start button is pressed. """
     requiresClientCallForStart.name = "requiresClientCallForStart"
@@ -131,6 +138,10 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
     def requiresClientCallForConnect(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the connect button is pressed. """
     requiresClientCallForConnect.name = "requiresClientCallForConnect"
+
+    def requiresClientCallForDisconnect(self):
+        """ Returns if this booking belongs to a plugin who requires a client call when the disconnect button is pressed. """
+    requiresClientCallForDisconnect.name = "requiresClientCallForDisconnect"
 
     def canBeDeleted(self):
         """ Returns if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed. """
@@ -148,6 +159,10 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
         """ Returns if this booking can be connected, in the sense that the "Connect" button will be active and able to be pressed. """
     canBeConnected.name = 'canBeConnected'
 
+    def canBeDisconnected(self):
+        """ Returns if this booking can be connected, in the sense that the "Disconnect" button will be active and able to be pressed. """
+    canBeDisconnected.name = 'canBeDisconnected'
+
     def isPermittedToStart(self):
         """ Returns if this booking is allowed to start, in the sense that it will be started after the "Start" button is pressed.
             For example a booking should not be permitted to start before a given time, even if the button is active. """
@@ -158,8 +173,12 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
     isPermittedToStop.name = "permissionToStop"
 
     def isPermittedToConnect(self):
-        """ Returns if this booking is allowed to stop, in the sense that it will be started after the "Stop" button is pressed."""
+        """ Returns if this booking is allowed to connect, in the sense that it will be started after the "Connect" button is pressed."""
     isPermittedToConnect.name = "permissionToConnect"
+
+    def isPermittedToDisconnect(self):
+        """ Returns if this booking is allowed to disconnect, in the sense that it will be started after the "Disconnect" button is pressed."""
+    isPermittedToDisconnect.name = "permissionToDisconnect"
 
     def canBeNotifiedOfEventDateChanges(self):
         """ Returns if bookings of this type should be able to be notified
