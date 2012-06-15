@@ -1171,13 +1171,18 @@ class TimetablePDFFormat:
 
 
 def sortEntries(x,y):
-    if cmp(x.getStartDate(),y.getStartDate()):
-        return cmp(x.getStartDate(),y.getStartDate())
+    if cmp(x.getStartDate(), y.getStartDate()):
+        return cmp(x.getStartDate(), y.getStartDate())
+    elif isinstance(x.getOwner(), conference.SessionSlot) and \
+            isinstance(y.getOwner(), conference.SessionSlot):
+        val = cmp(x.getOwner().getSession().getCode(), y.getOwner().getSession().getCode())
+
+        if val:
+            return val
+        else:
+            return cmp(x.getOwner().getSession().getTitle(), y.getOwner().getSession().getTitle())
     else:
-        try:
-            return cmp(x.getOwner().getSession().getTitle(),y.getOwner().getSession().getTitle())
-        except:
-            return cmp(x.getTitle(),y.getTitle())
+        return cmp(x.getTitle(), y.getTitle())
 
 class TimeTablePlain(PDFWithTOC):
 
