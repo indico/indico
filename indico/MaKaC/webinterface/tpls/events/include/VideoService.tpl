@@ -14,8 +14,8 @@
         <script type="text/javascript">
             var booking${video.getId()} = ${jsonEncode(fossilize(video))};
         </script>
-        <a href="#" style="font-size:12px" onClick="connectBookingRoom(booking${video.getId()},'${conf.getId()}')">${_("Connect")} ${video.getLinkVideoRoomLocation()}</a>
-        <span style="display:inline; vertical-align:middle" id="connectProgress${video.getId()}"></span>
+        <a href="#" style="font-size:12px" class="connect_room" data-booking-id=${video.getId()|n,j} data-event="${conf.getId()}">${_("Connect")} ${video.getLinkVideoRoomLocation()}</a>
+        <span style="display:inline; vertical-align:middle" class="progress"></span>
         % endif
 
     </span>

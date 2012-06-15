@@ -6,6 +6,7 @@
 <script type="text/javascript">
 ## Move this into js folder
 var videoServiceLaunchInfo = {};
+var bookings = ${dict((b['id'], b) for b in fossilize(bookings))|n,j};
 
 </script>
 <tr>
@@ -79,10 +80,10 @@ var videoServiceLaunchInfo = {};
         % if (bookingInfo or launchInfo) and booking.canBeConnected() and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or booking.getOwner()["id"] == self_._rh._getUser().getId()):
         <span style="margin-left:3px;margin-right:3px;">|</span>
         <script type="text/javascript">
-        var booking${booking.getId()} = ${jsonEncode(fossilize(booking))};
+          var booking${booking.getId()} = bookings[${pos}];
         </script>
-        <a href="#" style="font-size:12px; font-weight: bold" onClick="connectBookingRoom(booking${booking.getId()},'${conf.getId()}')">${_("Connect")} ${booking.getLinkVideoRoomLocation()}</a>
-        <span style="display:inline; vertical-align:middle" id="connectProgress${booking.getId()}"></span>
+        <a href="#" style="font-size:12px; font-weight: bold" class="connect_room" data-booking-id="${booking.getId()}" data-event="${conf.getId()}">${_("Connect")} ${booking.getLinkVideoRoomLocation()}</a>
+        <span style="display:inline; vertical-align:middle" class="progress"></span>
         % endif
 
     </span>

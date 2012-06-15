@@ -1906,14 +1906,16 @@ var successMakeEventModerator = function(videoLink, result){
 };
 
 var connectBookingRoom = function(booking, confId) {
-    $("#connectProgress" + booking["id"]).html(progressIndicator(true, true).dom);
+    var $this = $(this);
+
+    $this.siblings(".progress").html(progressIndicator(true, true).dom);
     jsonRpc(Indico.Urls.JsonRpcService, "collaboration.connectCSBooking",
             {
                 confId: confId,
                 bookingId: booking.id
             },
             function(result, error){
-                $("#connectProgress" + booking["id"]).html("");
+                $this.siblings(".progress").html("");
                 if (!error) {
                     if (result.error){
                         new WarningPopup($T("Cannot be connected"), result.userMessage).open();
@@ -2011,3 +2013,11 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
 
     popup.open();
 };
+
+
+$(function() {
+    $('.connect_room').click(function() {
+        connectBookingRoom.call(this, bookings[$(this).attr('data-booking-id')], $(this).attr('data-event'));
+        return false;
+    });
+});

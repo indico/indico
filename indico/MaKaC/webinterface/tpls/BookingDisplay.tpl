@@ -96,10 +96,11 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
     % if displayInfo and Booking.canBeConnected() and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or Booking.getOwner()["id"] == self_._rh._getUser().getId()):
         <span style="margin-left:3px;margin-right:3px;">|</span>
         <script type="text/javascript">
-            var booking${Booking.getId()} = ${jsonEncode(fossilize(Booking))};
+          var booking${Booking.getId()} = bookings[${Booking.getId()|n,j}];
         </script>
-        <a href="#" style="font-size:12px" onClick="connectBookingRoom(booking${Booking.getId()},'${conf.getId()}')">${_("Connect")} ${Booking.getLinkVideoRoomLocation()}</a>
-        <div style="display:inline; vertical-align:middle" id="connectProgress${Booking.getId()}"></div>
+
+        <a href="#" style="font-size:12px" data-booking-id="${Booking.getId()}" data-event="${conf.getId()}" class="connect_room">${_("Connect")} ${Booking.getLinkVideoRoomLocation()}</a>
+        <div style="display:inline; vertical-align:middle" class="progress"></div>
         % endif
 
     </div>

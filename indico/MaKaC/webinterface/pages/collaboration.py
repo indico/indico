@@ -443,6 +443,7 @@ class WCollaborationDisplay(wcomponents.WTemplated):
 
         vars["OngoingBookings"] = ongoingBookings
         vars["ScheduledBookings"] = scheduledBookings
+        vars["all_bookings"] = fossilize(bookings)
         vars["Timezone"] = self._tz
         vars["conf"] = self._conf
 
