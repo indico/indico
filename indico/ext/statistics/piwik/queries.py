@@ -87,6 +87,13 @@ class PiwikQueryBase(PiwikStatisticsImplementation):
     with the API.
     """
 
+    def _buildAPIPath(self, server='secondary'):
+        """
+        Overridden to ensure that all API calls use the secondary server if
+        defined and selected for use.
+        """
+        PiwikStatisticsImplementation._buildAPIPath(self, server)
+
     def getAPIQuery(self):
         """
         Overridden method call as we will use these queries to populate

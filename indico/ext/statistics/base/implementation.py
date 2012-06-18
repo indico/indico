@@ -73,11 +73,11 @@ class BaseStatisticsImplementation(Component):
         """
         pass
 
-    def _buildAPIPath(self):
+    def _buildAPIPath(self, server='primary'):
         """
         Internally constructs the API path.
         """
-        path = self._getSavedAPIPath()
+        path = self._getSavedAPIPath(server)
 
         if path is None:
             return
@@ -171,7 +171,7 @@ class BaseStatisticsImplementation(Component):
 
         return list(required.difference(given))
 
-    def _getSavedAPIPath(self):
+    def _getSavedAPIPath(self, server='primary'):
         """
         To be overridden in inheriting class, for plugin configurations
         where the target server is malleable and stored in the Plugins

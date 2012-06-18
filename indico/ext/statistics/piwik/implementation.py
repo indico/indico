@@ -58,12 +58,16 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         piwik = PluginsHolder().getPluginType('statistics').getPlugin('piwik')
         return piwik.getOptions()[varName].getValue()
 
-    def _getSavedAPIPath(self):
+    def _getSavedAPIPath(self, server='primary'):
         """
         Returns the String saved in the plugin configuration for the
         Piwik server URL.
         """
-        return PiwikStatisticsImplementation.getVarFromPluginStorage('serverUrl')
+
+        if not self._getUsesOnlyGeneralServer() and server == 'secondary':
+            return PiwikStatisticsImplementation.getVarFromPluginStorage('serverAPIUrl')
+        else:
+            return PiwikStatisticsImplementation.getVarFromPluginStorage('serverUrl')
 
     def _getSavedAPIToken(self):
         """
@@ -71,6 +75,13 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         Piwik token auth.
         """
         return PiwikStatisticsImplementation.getVarFromPluginStorage('serverTok')
+
+    def _getUsesOnlyGeneralServer(self):
+        """
+        Returns the boolean saved for whether we should only use the primary server
+        for all requests.
+        """
+        return PiwikStatisticsImplementation.getVarFromPluginStorage('useOnlyServerURL')
 
     def _getSavedAPISiteID(self):
         """
