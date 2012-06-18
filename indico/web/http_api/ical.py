@@ -74,7 +74,10 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
         description += "Speakers: "+ (", ").join(speakerList) + "\n"
 
     if fossil['description']:
-        description += "Description: " + html.fromstring(fossil.get('description', "<p/>").decode('utf-8')).text_content() \
+        desc_text = fossil.get('description', '').strip()
+        if not desc_text:
+            desc_text = '<p/>'
+        description += "Description: " + html.fromstring(desc_text.decode('utf-8')).text_content() \
                     + '\nURL: ' + fossil['url']
     else:
         description += "URL: " + fossil['url']
