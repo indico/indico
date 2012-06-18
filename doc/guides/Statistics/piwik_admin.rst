@@ -21,6 +21,8 @@ Underneath the global plugin options you will see each implementation has a tab 
   is active, a listener on Material downloads will then track the download in the Piwik instance.
 - Piwik Server URL: The URL to your Piwik instance in format `xxx.xxx.xxx.xxx/$path` (
   `$path` is optional, the URL should be the directory where `piwik.php` is located).
+- Piwik API Server URL: If your configuration requires a separate URL for API queries (targetting index.php), you may specify the address here in the same format as the Piwik Server URL here.
+- Use Only General URL: If this is enabled, only the first URL (Piwik Server URL) is used for *all* requests. If disabled, the plugin will use the latter URL (Piwik API Server URL) for all API requests.
 - Piwik API Token: The full API token provided by Piwik for your username & site ID
   combination.
 - Piwik Site ID: The integer ID assigned to each site in Piwik as a method of internal
