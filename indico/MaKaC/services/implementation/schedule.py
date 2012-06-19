@@ -84,7 +84,12 @@ class LocationSetter:
                 r = conference.CustomRoom()
             target.setRoom(r)
             r.setName(room)
-            r.retrieveFullName(location)
+            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+            if minfo.getRoomBookingModuleActive():
+                r.retrieveFullName(location)
+            else:
+                # invalidate full name, as we have no way to know it
+                r.fullName = None
 
 class ScheduleOperation:
 

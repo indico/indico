@@ -48,6 +48,7 @@ indico_core = Bundle('js/indico/Core/Presentation.js',
                      'js/indico/Core/Services.js',
                      'js/indico/Core/Util.js',
                      'js/indico/Core/Login.js',
+                     'js/indico/Core/Dragndrop.js',
                      filters='jsmin', output='indico_core_%(version)s.min.js')
 
 indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
@@ -57,10 +58,13 @@ indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
                            'js/indico/Management/AbstractReviewing.js',
                            'js/indico/Management/NotificationTPL.js',
                            'js/indico/Management/Registration.js',
+                           'js/indico/Management/Contributions.js',
                            'js/indico/Management/CFA.js',
+                           'js/indico/Management/RoomBookingMapOfRooms.js',
                            filters='jsmin', output='indico_management_%(version)s.min.js')
 
 indico_room_booking = Bundle('js/indico/RoomBooking/MapOfRooms.js',
+                             'js/indico/RoomBooking/RoomBookingCalendar.js',
                              filters='jsmin', output='indico_room_booking_%(version)s.min.js')
 
 indico_admin = Bundle('js/indico/Admin/News.js',
@@ -166,13 +170,13 @@ def register_all_js(env):
     env.register('presentation', presentation)
     env.register('indico_core', indico_core)
     env.register('indico_management', indico_management)
-    env.register('indico_room_booking', indico_room_booking)
+    env.register('indico_roombooking', indico_room_booking)
     env.register('indico_admin', indico_admin)
     env.register('indico_timetable', indico_timetable)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
     env.register('indico_collaboration', indico_collaboration)
-    env.register('indico_materialeditor', indico_legacy)
+    env.register('indico_materialeditor', indico_materialeditor)
     env.register('indico_display', indico_display)
     env.register('indico_jquery', indico_jquery)
     env.register('base_js', base_js)

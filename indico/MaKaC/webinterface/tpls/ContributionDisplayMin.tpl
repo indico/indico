@@ -90,6 +90,10 @@
                 % endif
                 <ul>
                 % for material in Contribution.getAllMaterialList():
+                    <% if not material.canView(self_._aw):
+                           continue
+                     %>
+
                     <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink">
                         ${material.getTitle()}
                         </a>

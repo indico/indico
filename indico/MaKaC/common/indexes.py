@@ -777,6 +777,9 @@ class CalendarDayIndex(Persistent):
         sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day))) if sDate else None
         eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day))) if eDate else None
         res = set()
+        #checking if 2038 problem occurs
+        if sDay > BTREE_MAX_INT or eDay > BTREE_MAX_INT:
+            return res
         for event in self._idxDay.values(sDay, eDay):
             res.update(event)
         return res

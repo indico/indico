@@ -28,7 +28,7 @@ from MaKaC.common import Config
 from MaKaC.errors import NotFoundError, AccessError
 
 from email.Utils import formatdate
-from MaKaC.conference import Reviewing
+from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from copy import copy
 
@@ -54,7 +54,9 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
 
     def _process( self ):
 
-        if self._file.getId() != "minutes":
+        if isinstance(self._file, Link):
+            self._redirect(self._file.getURL())
+        elif self._file.getId() != "minutes":
             #self._req.headers_out["Accept-Ranges"] = "bytes"
             self._req.headers_out["Content-Length"] = "%s"%self._file.getSize()
             self._req.headers_out["Last-Modified"] = "%s"%formatdate(time.mktime(self._file.getCreationDate().timetuple()))

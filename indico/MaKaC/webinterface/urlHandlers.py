@@ -95,7 +95,10 @@ class SecureURLHandler(URLHandler):
 
     @classmethod
     def _getURL(cls, **params):
-        return URL( "%s/%s"%(Config.getInstance().getBaseSecureURL(), cls.getRelativeURL()) , **params )
+        if Config.getInstance().getBaseSecureURL():
+            return URL( "%s/%s"%(Config.getInstance().getBaseSecureURL(), cls.getRelativeURL()) , **params )
+        else:
+            return super(SecureURLHandler, cls)._getURL(**params)
 
 class OptionallySecureURLHandler(URLHandler):
 
