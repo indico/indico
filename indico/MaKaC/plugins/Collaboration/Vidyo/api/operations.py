@@ -18,7 +18,7 @@
 
 from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue, VidyoError, VidyoTools
 from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
-from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi
+from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi, RavemApi
 from suds import WebFault
 from MaKaC.plugins.Collaboration.base import CollaborationException
 from MaKaC.common.logger import Logger
@@ -268,6 +268,8 @@ class VidyoOperations(object):
         try:
             searchFilter = SOAPObjectFactory.createFilter('user', extension)
             userApiAnswer = UserApi.search(searchFilter, confId, bookingId)
+            if userApiAnswer.total == 0:
+                return VidyoError("noExistsRoom", "connect", _("The conference room is not registered in the vidyo service. ") + VidyoTools.getContactSupportText())
             legacyMember = userApiAnswer.Entity[0].entityID
             AdminApi.connectRoom(roomId, confId, bookingId, legacyMember)
         except WebFault, e:
@@ -275,11 +277,37 @@ class VidyoOperations(object):
             if faultString.startswith('ConferenceID is invalid'):
                 return VidyoError("unknownRoom", "connect")
             if faultString.startswith('Failed to Invite to Conference'):
-                message = _("The connection has failed.")
-                if getVidyoOptionValue("contactSupport"):
-                    message += _("""\nPlease try again or contact %s for help.""")%getVidyoOptionValue("contactSupport")
+                message = _("The connection has failed. ") + VidyoTools.getContactSupportText()
                 return VidyoError("connectFailed", "connect", message)
             else:
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's connectRoom operation got WebFault: %s""" %
                         (confId, bookingId, e.fault.faultstring))
                 raise
+
+    @classmethod
+    def disconnectRoom(cls, roomIp, serviceType):
+        try:
+            answer = RavemApi.disconnectRoom(roomIp, serviceType)
+            if not answer.ok or answer.json.has_key("error"):
+                return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
+        except Exception:
+            return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
+
+
+    @classmethod
+    def isRoomConnected(cls, roomIp):
+        try:
+            answer =  RavemApi.isRoomConnected(roomIp)
+            if not answer.ok or answer.json.has_key("error"):
+                return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())
+            result = {"roomName": None, "isConnected": False, "service": None}
+            answer =  answer.json
+            if answer.has_key("result"):
+                for service in answer.get("result").get("services"):
+                    if service.get("name","") == "videoconference":
+                        result["roomName"] = VidyoTools.recoverVidyoName(service.get("eventName"))
+                        result["isConnected"] = service.get("status") == 1
+                        result["service"] = VidyoTools.recoverVidyoDescription(service.get("eventType"))
+            return result
+        except Exception:
+            return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())

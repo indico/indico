@@ -214,8 +214,16 @@ class VidyoTools(object):
         return roomIp
 
     @classmethod
+    def getContactSupportText(cls):
+        contactSupport = ""
+        if getVidyoOptionValue("contactSupport"):
+            contactSupport += _("""\nPlease try again or contact %s for help.""") % getVidyoOptionValue("contactSupport")
+        return contactSupport
+
+    @classmethod
     def getIndexByVidyoRoom(cls):
         return Catalog.getIdx(BOOKINGS_BY_VIDYO_ROOMS_INDEX)
+
 
 class FakeAvatarOwner(Persistent, Fossilizable):
     """ Used when a Vidyo admin changes the owner of a room to an account
