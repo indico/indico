@@ -101,6 +101,15 @@ class CollaborationAdminBookingModifBase(CollaborationBookingModifBase):
         if not RCCollaborationAdmin.hasRights(self) and not RCCollaborationPluginAdmin.hasRights(self, None, [self._bookingPlugin]):
             raise CollaborationException(_("You don't have the rights to perform this operation on this booking"))
 
+class CollaborationConnectCSBookingBase(CollaborationBookingModifBase):
+    """ Base class for services on booking objects for connect/disconnect
+    """
+
+    def _checkProtection(self):
+        booking = self._CSBookingManager.getBooking(self._bookingId)
+        if not hasattr(booking, "getOwnerObject") or booking.getOwnerObject() != self.getAW().getUser():
+            CollaborationBookingModifBase._checkProtection(self)
+
 class AdminCollaborationBase(AdminService):
     """ Base class for admin services in the Video Services Overview page, not directed towards a specific booking.
     """
@@ -191,17 +200,20 @@ class CollaborationStopCSBooking(CollaborationBookingModifBase):
         return fossilize(self._CSBookingManager.stopBooking(self._bookingId),
                                   timezone = self._conf.getTimezone())
 
-class CollaborationConnectCSBooking(CollaborationBookingModifBase):
+class CollaborationConnectCSBooking(CollaborationConnectCSBookingBase):
     """ Performs server-side actions when a booking is connected
     """
 
-    def _checkProtection(self):
-        booking = self._CSBookingManager.getBooking(self._bookingId)
-        if not hasattr(booking, "getOwnerObject") or booking.getOwnerObject() != self.getAW().getUser():
-            CollaborationBookingModifBase._checkProtection(self)
-
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.connectBooking(self._bookingId),
+                                  timezone = self._conf.getTimezone())
+
+class CollaborationDisconnectCSBooking(CollaborationConnectCSBookingBase):
+    """ Performs server-side actions when a booking is disconnected
+    """
+
+    def _getAnswer(self):
+        return fossilize(self._CSBookingManager.disconnectBooking(self._bookingId),
                                   timezone = self._conf.getTimezone())
 
 class CollaborationCheckCSBookingStatus(CollaborationBookingModifBase):
@@ -477,6 +489,7 @@ methodMap = {
     "startCSBooking": CollaborationStartCSBooking,
     "stopCSBooking": CollaborationStopCSBooking,
     "connectCSBooking": CollaborationConnectCSBooking,
+    "disconnectCSBooking": CollaborationDisconnectCSBooking,
     "checkCSBookingStatus": CollaborationCheckCSBookingStatus,
     "acceptCSBooking": CollaborationAcceptCSBooking,
     "rejectCSBooking": CollaborationRejectCSBooking,

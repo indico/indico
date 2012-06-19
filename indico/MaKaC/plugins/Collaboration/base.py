@@ -496,6 +496,14 @@ class CSBookingManager(Persistent, Observer):
         else:
             raise CollaborationException(_("Tried to connect booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be connected."))
 
+    def disconnectBooking(self, id):
+        booking = self._bookings[id]
+        if booking.canBeDisconnected():
+            return booking._disconnect()
+        else:
+            raise CollaborationException(_("Tried to disconnect booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be disconnected."))
+
+
     def checkBookingStatus(self, id):
         booking = self._bookings[id]
         if booking.hasCheckStatus():
@@ -1889,13 +1897,13 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Returns if this booking can be connected, in the sense that the "Connect" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeConnected" attribute
         """
-        return self.isHappeningNow()
+        return self._hasConnect
 
     def canBeDisconnected(self):
         """ Returns if this booking can be connected, in the sense that the "Disconnect" button will be active and able to be pressed.
             This attribute will be available in Javascript with the "canBeDisconnected" attribute
         """
-        return self.isHappeningNow()
+        return self._hasDisconnect
 
     def isPermittedToStart(self):
         """ Returns if this booking is allowed to start, in the sense that it will be started after the "Start" button is pressed.
