@@ -1,5 +1,14 @@
 
 <table border="0" width="90%" cellspacing="0" cellpadding="0" align="center">
+    % if abstractAccepted:
+    <tr>
+        <td align="center">
+            <div style="padding: 10px; margin: 10px; border: 1px solid #DDD; font-size: 14px; color: #881122">
+                ${ _("You cannot modify this abstract because it has already been accepted. In order to change the information that is displayed in the Book of Abstracts and timetable you should edit the corresponding contribution (%s) directly.") % contribution}
+            </div>
+        </td>
+    </tr>
+    % endif
     <tr>
         <td>
             <table width="100%">
@@ -56,7 +65,7 @@
                     </td>
                     <form action=${ modDataURL } method="POST">
                     <td align="right" valign="bottom">
-                        <input type="submit" class="btn" name="modify" value="${ _("modify") }">
+                        <input type="submit" class="btn" name="modify" value="${ _("modify") }" ${"disabled" if abstractAccepted else ""}>
                     </td>
                     </form>
                 </tr>
@@ -118,7 +127,7 @@
                             <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ title }">${ submitterFullName } (${ submitterAffiliation })</a>
                         </div>
                     </td>
-                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" onclick="changeSubmitter();"></td>
+                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" onclick="changeSubmitter();" ${"disabled" if abstractAccepted else ""}></td>
                 </tr>
                 <tr>
                     <td colspan="4" class="horizontalLine">&nbsp;</td>

@@ -449,7 +449,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
                   // add some extra stuff, since we're in the loop
                   self.visibility.set(key, true);
                   self.options.set(key, false);
-                  self.radioDict[key] = Html.radio({'name': this.name,
+                  self.radioDict[key] = Html.radio({'name': self.name,
                                                     style: {verticalAlign: 'middle'}});
               });
 

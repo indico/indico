@@ -108,12 +108,12 @@ class Conversion(object):
     @classmethod
     def parentSessionCode(cls, entry):
         from MaKaC.schedule import ContribSchEntry, BreakTimeSchEntry
-        from MaKaC.conference import SessionSlot
+        from MaKaC.conference import SessionSlot, Contribution
 
         session = None
         owner = entry.getOwner()
 
-        if type(entry) == ContribSchEntry or (type(entry) == BreakTimeSchEntry and type(owner) == SessionSlot):
+        if isinstance(owner, (SessionSlot, Contribution)):
             session = owner.getSession()
 
         if session:

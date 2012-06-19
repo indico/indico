@@ -1208,7 +1208,7 @@ type("PreloadedWidget", ["IWidget"],
          this.waitingList = waitingList;
      });
 
-progressIndicator = function(small, center) {
+var progressIndicator = function(small, center) {
     var htmlTag = small?Html.span:Html.div;
     return htmlTag(center?{style:{textAlign: 'center'}}:{},Html.img({src: imageSrc(small?"loading":"ui_loading"), alt: "Loading..."
 }));

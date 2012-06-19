@@ -171,34 +171,33 @@
 
 /* Indico styled tooltips USED WITH qTip2 */
 
-.ui-tooltip-default .ui-tooltip-content, .ui-tooltip-default .ui-tooltip-titlebar {
+.ui-tooltip-default{
     border: solid 1px #888;
     color: #222;
     background-color: #F0F0F0;
     font-size: 11px;
 }
 
-.ui-tooltip-popup .ui-tooltip-content {
+.ui-tooltip-default .ui-tooltip-titlebar {
+    background-color: #F0F0F0;
+    border-bottom: solid 1px #888;
+}
+
+.ui-tooltip-popup {
     border: solid 1px #E2E2E2;
     color: #454545;
     background-color: white;
     font-size: 10.5px;
-    padding: 5px 9px;
 }
-.ui-tooltip-balloon .ui-tooltip-content {
+.ui-tooltip-balloon {
     border: solid 1px #C0C0C0;
     background-color: #FFED92;
     font-size: 13px;
-    padding: 5px 6px 12px;
     width: 120px;
 }
 
 .ui-tooltip-timezone {
-    min-width: 300px;
-}
-
-.ui-tooltip-timezone .ui-tooltip-content{
-    min-width: 300px;
+    min-width: 320px;
     font-size: 13px;
 }
 

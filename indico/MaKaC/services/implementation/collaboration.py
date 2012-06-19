@@ -193,6 +193,12 @@ class CollaborationStopCSBooking(CollaborationBookingModifBase):
 class CollaborationConnectCSBooking(CollaborationBookingModifBase):
     """ Performs server-side actions when a booking is connected
     """
+
+    def _checkProtection(self):
+        booking = self._CSBookingManager.getBooking(self._bookingId)
+        if not hasattr(booking, "getOwnerObject") or booking.getOwnerObject() != self.getAW().getUser():
+            CollaborationBookingModifBase._checkProtection(self)
+
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.connectBooking(self._bookingId),
                                   timezone = self._conf.getTimezone())

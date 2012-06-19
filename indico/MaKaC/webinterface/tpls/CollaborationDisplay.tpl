@@ -15,6 +15,10 @@
     <div class="groupTitleNoBorder collaborationDisplayTitle">Upcoming:</div>
 % endif
 
+<script type="text/javascript">
+  var bookings = ${dict((b['id'], b) for b in all_bookings)|n,j};
+</script>
+
 % for date, bookings in ScheduledBookings:
     <div class="collaborationDisplayDateGroup">
         <div class="groupTitleSmallNoBackground" style="padding-left: 5px;">Scheduled for ${ formatDate (date, format = "%A %d/%m/%Y") }</div>

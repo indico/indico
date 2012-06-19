@@ -77,7 +77,7 @@ class UpcomingEventsModule(Module):
         # events in the list
         self._objects = []
         self._maxEvents = 10
-        self._ttl = 300
+        self._ttl = datetime.timedelta(minutes=5)
 
     @property
     def _cache(self):

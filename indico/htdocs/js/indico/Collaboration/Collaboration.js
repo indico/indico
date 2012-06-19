@@ -1905,6 +1905,30 @@ var successMakeEventModerator = function(videoLink, result){
     $(videoLink).parent().parent().html(Html.div({}, result.bookingParams.owner["name"]).dom);
 };
 
+var connectBookingRoom = function(booking, confId) {
+    var $this = $(this);
+
+    $this.siblings(".progress").html(progressIndicator(true, true).dom);
+    jsonRpc(Indico.Urls.JsonRpcService, "collaboration.connectCSBooking",
+            {
+                confId: confId,
+                bookingId: booking.id
+            },
+            function(result, error){
+                $this.siblings(".progress").html("");
+                if (!error) {
+                    if (result.error){
+                        new WarningPopup($T("Cannot be connected"), result.userMessage).open();
+                    }
+                    else {
+                        new AlertPopup($T("Success"), $T("The room ") + booking.linkVideoRoomLocation  + $T(" has been connected to the Vidyo room.") ).open();
+                    }
+                } else {
+                    IndicoUtil.errorReport(error);
+                }
+            });
+};
+
 var drawBookingPopup = function (videoInformation, confId, bookingId, displayModeratorLink) {
     var divWrapper = Html.div({className:"videoServiceInlinePopup"});
     for(section in videoInformation){
@@ -1989,3 +2013,11 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
 
     popup.open();
 };
+
+
+$(function() {
+    $('.connect_room').click(function() {
+        connectBookingRoom.call(this, bookings[$(this).attr('data-booking-id')], $(this).attr('data-event'));
+        return false;
+    });
+});

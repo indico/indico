@@ -29,7 +29,7 @@ import MaKaC.review as review
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.common import DBMgr,Config
-from MaKaC.review import AbstractStatusSubmitted
+from MaKaC.review import AbstractStatusSubmitted, AbstractStatusAccepted
 from MaKaC.PDFinterface.conference import AbstractToPDF, AbstractsToPDF
 from MaKaC.errors import MaKaCError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils

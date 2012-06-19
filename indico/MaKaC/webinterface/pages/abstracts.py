@@ -217,7 +217,6 @@ class WPAbstractCannotBeModified( WPAbstractDisplayBase ):
         wc = WAbstractCannotBeModified( self._abstract )
         return wc.getHTML()
 
-
 class WAbstractSubmissionConfirmation( wcomponents.WTemplated ):
 
     def __init__( self, aw, abstract ):
@@ -714,6 +713,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
         vars["submitterFullName"] = self._abstract.getSubmitter().getFullName()
         vars["submitterAffiliation"] = self._abstract.getSubmitter().getAffiliation()
         vars["submitterEmail"] = self._abstract.getSubmitter().getEmail()
+        vars["abstractAccepted"] = isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusAccepted)
 
         return vars
 
