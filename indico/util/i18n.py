@@ -141,11 +141,11 @@ class generate_messages_js(Command):
         localeDirs = [name for name in os.listdir(self.input_dir) if os.path.isdir(os.path.join(self.input_dir, name))]
 
         for locale in localeDirs:
-            result = convert(self.domain, os.path.join(
-                self.input_dir, locale, "LC_MESSAGES", 'messages-js.po'), js=True, pretty_print=True)
+            result = convert(os.path.join(
+                self.input_dir, locale, "LC_MESSAGES", 'messages-js.po'), pretty_print=True)
             fname = os.path.join(self.output_dir, '%s.js' % locale)
             with open(fname, 'w') as f:
-                f.write(result.encode('utf-8'))
+                f.write((u"var json_locale_data = {0};".format(result)).encode('utf-8'))
             print 'wrote %s' % fname
 
 
