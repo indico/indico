@@ -8538,3 +8538,12 @@ ul.material_list ul li {
     color: #aaa;
     border-left: 4px solid #999;
 }
+
+div.informationUserList {
+    background-color: #F2DEDE;
+    border-color: #EED3D7;
+    color: #B94A48;
+    border-radius: 4px 4px 4px 4px;
+    margin-bottom: 18px;
+    padding: 8px 35px 8px 14px;
+}

@@ -576,3 +576,53 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
                 rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu);
     }
 );
+
+/*
+ * List of users: The difference with ListOfUsersManager is that a checkbox to send mail to the current managers is shown
+ * You can also add your own options
+ * @param: confId -> Id of the conference (if needed)
+ * @param: methods -> json object with the methods for the indicoRequests, the methods have to be:
+ *    addExisting, addNew, edit, remove, upUser, downUser (for these functionalities, then you can add your own ones)
+ * @param: userListParams -> common params for all the indicoRequests for the component (ex. confId, contribId)
+ * @param: inPlaceListElem -> element of the webpage where the list will be.
+ * @param: userCaption -> String to show in the texts
+ * @param: elementClass -> Class for the <li> elements in the list
+ * @param: allowGroups -> Bool, true if to have groups in the list is allowed
+ * @param: rightsToShow -> dictionary object, It shows the rights that the added users will be able to have. These values has to be:
+ *         {submission: bool, management: bool, coordination: bool}
+ * @param: nameOptions -> json object, Options for the user's name in the list. The options are:
+ *         {'affiliation': bool, 'email': bool, 'title': bool}
+ * @param: userOptions -> dictionary object: Options that can be performanced for each user. The allowed values are:
+ *         {remove: bool, edit: bool, favorite: bool, arrows: bool, menu: bool}
+ * @param: initialList -> List, It contains the initial users to add when the component is loaded the first time
+ * @param: allowEmptyEmail -> Bool, true if it is allowed to have an empty email when we add a non existing user
+ * @param: blockOnRemove -> Bool, true if it is necessary to block the page when an user is removed
+ * @param: inPlaceMenu -> element where the menu with the options to add users will be placed
+ * @param: showEmailCheckbox -> Bool, true if we want to activate the notification
+ */
+type("ListOfUsersManagerProtection", ["ListOfUsersManager"], {
+
+    addExistingUser: function(){
+        this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true);
+    },
+
+    addExistingUser: function(){
+        if(this.showEmailCheckbox){
+            var sendEmailDiv = Html.div({className:"informationUserList", style:{marginTop: pixels(10)}});
+            var checkbox = Html.checkbox({style:{verticalAlign:"middle"}}, true);
+            checkbox.dom.id = "send-email-managers";
+            sendEmailDiv.append(Html.span({},checkbox, "Send email notification to the current category managers"));
+            this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true,{"sendEmailManagers": function(){return $("#send-email-managers")[0].checked;}}, sendEmailDiv);
+        }else {
+            this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true);
+        }
+    },
+},
+
+    function(confId, methods, userListParams, inPlaceListElem, userCaption, elementClass, allowGroups,
+             rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu, showEmailCheckbox) {
+        this.showEmailCheckbox = showEmailCheckbox;
+        this.ListOfUsersManager(confId, methods, userListParams, inPlaceListElem, userCaption, elementClass, allowGroups,
+                rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu);
+    }
+);

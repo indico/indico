@@ -24,21 +24,22 @@ Asynchronous request handlers for category-related services.
 from datetime import datetime
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
-from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
+from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import ExportToICalBase
 
 import MaKaC.conference as conference
-from MaKaC.common.logger import Logger
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError
 import MaKaC.webinterface.locators as locators
-from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvents, WConferenceListItem
+from MaKaC.webinterface.wcomponents import WConferenceListItem
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import PrincipalHolder, Avatar, Group
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
 import MaKaC.common.info as info
 from MaKaC import domain
+from MaKaC.common.Configuration import Config
+from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 class CategoryBase(object):
     """
@@ -282,13 +283,32 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
         CategoryControlUserListBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue = True)
+
+    def _sendMail(self, currentList, newManager):
+        text = _("""Dear managers,
+
+        %s has been added as manager to the category '%s'.
+
+        Best regards,
+
+        Indico Team
+        """) % (newManager.getStraightFullName(), self._categ.getName())
+        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(), "toList": [manager.getEmail() for manager in currentList], "subject": "New category manager", "body": text }
+        GenericMailer.send(GenericNotification(maildata))
+
 
     def _getAnswer(self):
         ph = PrincipalHolder()
-        for user in self._userList:
-            if self._kindOfList == "modification":
-                self._categ.grantModification(ph.getById(user["id"]))
-            elif self._kindOfList == "confCreation":
+        if self._kindOfList == "modification":
+            currentList = self._categ.getManagerList()
+            for user in self._userList:
+                newManager = ph.getById(user["id"])
+                self._categ.grantModification(newManager)
+                if self._sendEmailManagers and len(currentList) > 0:
+                    self._sendMail(currentList, newManager)
+        elif self._kindOfList == "confCreation":
+            for user in self._userList:
                 self._categ.grantConferenceCreation(ph.getById(user["id"]))
         return self._getControlUserList()
 
