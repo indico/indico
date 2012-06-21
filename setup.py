@@ -51,7 +51,7 @@ except ImportError:
 DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras",
                    "https://github.com/collective/icalendar/tarball/6f899869d462a23d0ebd3f54fb237e8670242bc4#egg=icalendar-3.0"]
 
-DEVELOP_REQUIRES = ['pojson', 'termcolor']
+DEVELOP_REQUIRES = ['pojson==0.3', 'termcolor']
 
 if sys.platform == 'linux2':
     import pwd
