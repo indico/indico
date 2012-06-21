@@ -76,7 +76,7 @@ from MaKaC.plugins.base import OldObservable
 from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
-from MaKaC.conference import Minutes, Session, Contribution
+from MaKaC.conference import Minutes, Session, Contribution, LocalFile
 from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.plugins.helpers import DBHelpers
@@ -1115,23 +1115,19 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         return vars
 
     def _getMaterialFiles(self, material):
-        processedFiles = []
         files = []
         for res in material.getResourceList():
-            try:
+            if isinstance(res, LocalFile):
                 fileType = res.getFileType().lower()
                 try:
                     fileType = WPTPLConferenceDisplay._Types[fileType]["mapsTo"]
                 except KeyError:
                     fileType = "other"
-                filename = res.getFileName()
-                if filename in processedFiles:
-                    filename = "%s-%s" % (processedFiles.count(filename) + 1, filename)
+                filename = res.getName() or res.getFileName()
                 fileURL = urlHandlers.UHFileAccess.getURL(res)
-                processedFiles.append(res.getFileName())
-            except:
-                filename, fileType, fileURL = str(res.getURL()), "link", str(res.getURL())
-            files.append({'id' : res.getId(), 'name' : filename, 'type' : fileType, 'url' : str(fileURL), "pdfConversionStatus" : res.getPDFConversionStatus()})
+            else:
+                filename, fileType, fileURL = str(res.getName() or res.getURL()), "link", str(res.getURL())
+            files.append({'id': res.getId(), 'name': filename, 'type': fileType, 'url': fileURL, "pdfConversionStatus": res.getPDFConversionStatus()})
         return files
 
     def _getItemType(self, item):

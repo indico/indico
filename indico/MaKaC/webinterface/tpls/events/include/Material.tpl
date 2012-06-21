@@ -29,7 +29,7 @@
                 );
                 var menuItems = {};
                 % for f in filesWithType:
-                    menuItems["${f['name']}"] = {action: "${f['url']}", display: "${f['name']}"}
+                    menuItems["${f['name']+f['id']}"] = {action: "${f['url']}", display: "${f['name']}"}
                 % endfor
                 var ${materialMenuName} = new PopupMenu(menuItems, [$E("${materialMenuName}")], 'materialMenuPopupList', false, false);
             </script>
