@@ -7915,7 +7915,7 @@ class Contribution(CommonObjectBase, Locatable):
                 room=CustomRoom()
             self.setRoom(room)
             room.setName(data["roomName"])
-            room.retrieveFullName(data["locationName"])
+            room.retrieveFullName(data.get("locationName", ""))
         else:
             self.setRoom(None)
 
