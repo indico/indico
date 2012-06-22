@@ -32,6 +32,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.errors import HostnameResolveError
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.utils import parseDate
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 """
 TODO: This must be refactor to be done with RH???
@@ -200,7 +201,7 @@ def createCSV(resvs, req):
     req.headers_out["Content-Length"] = "%s"%int(os.stat(tempFileName)[stat.ST_SIZE])
     mimetype = cfg.getFileTypeMimeType( cfg.getFileType("CSV") )
     req.content_type = """%s"""%(mimetype)
-    req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%os.path.basename(tempFileName).replace("\r\n"," ")
+    req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(os.path.basename(tempFileName))
 
     fr = open(tempFileName, "rb")
     data = fr.read()

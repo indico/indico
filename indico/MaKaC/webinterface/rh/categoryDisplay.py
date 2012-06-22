@@ -52,6 +52,7 @@ from MaKaC.webinterface.common.tools import escape_html
 from indico.web.http_api.api import CategoryEventHook
 from indico.util.metadata.serializer import Serializer
 from indico.web.wsgi import webinterface_handler_config as apache
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
@@ -551,7 +552,7 @@ class RHCategoryToiCal(RHCategDisplayBase):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
 
         return data
 

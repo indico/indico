@@ -35,6 +35,7 @@ import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
 from indico.web.http_api.api import ContributionHook
 from indico.util.metadata.serializer import Serializer
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 
 class RHContributionDisplayBase( RHContributionBase, RHDisplayBaseProtected ):
@@ -95,7 +96,7 @@ class RHContributionToXML(RHContributionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 
@@ -110,7 +111,7 @@ class RHContributionToPDF(RHContributionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 
@@ -134,7 +135,7 @@ class RHContributionToiCal(RHContributionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 class RHContributionToMarcXML(RHContributionDisplay):
@@ -154,7 +155,7 @@ class RHContributionToMarcXML(RHContributionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 

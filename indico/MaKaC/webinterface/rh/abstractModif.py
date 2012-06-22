@@ -32,6 +32,7 @@ from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
 from MaKaC.paperReviewing import Answer
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 
 class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
@@ -131,7 +132,7 @@ class RHAbstractToPDF(RHAbstractModifBase):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 
@@ -197,7 +198,7 @@ class RHAbstractToXML(RHAbstractModifBase):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 

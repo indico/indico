@@ -18,14 +18,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from datetime import timedelta,datetime, time
-import os, re, sys, pytz
+from datetime import datetime
+import os, re, pytz
 import MaKaC.common.info as info
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.pages.abstracts as abstracts
-import MaKaC.webinterface.pages.authors as authors
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
@@ -34,17 +32,14 @@ import MaKaC.webinterface.mail as mail
 from MaKaC.webinterface.pages.errors import WPAccessError, WPError404
 import MaKaC.conference as conference
 from MaKaC.common import Config, DBMgr
-from MaKaC.common.utils import isStringHTML,sortContributionByDate
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
-from MaKaC.errors import MaKaCError, ModificationError, NoReportError, AccessError, KeyAccessError, NotFoundError
-from MaKaC.PDFinterface.conference import TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, ProgrammeToPDF, TimetablePDFFormat
-from xml.sax.saxutils import escape
-from MaKaC.participant import Participant
+from MaKaC.errors import MaKaCError, NoReportError, NotFoundError
+from MaKaC.PDFinterface.conference import TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, TimetablePDFFormat
 from MaKaC.common.contribPacker import ConferencePacker, ZIPFileHandler
 import StringIO, zipfile
 from MaKaC.i18n import _
@@ -54,7 +49,6 @@ from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.web.http_api.api import CategoryEventFetcher
-from indico.util.fossilize import fossilize
 from indico.util.metadata.serializer import Serializer
 from indico.web.http_api.api import CategoryEventHook
 
@@ -650,7 +644,7 @@ class RHConferenceProgramPDF( RHConferenceBaseDisplay ):
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         #self._req.content_type = """%s; name="%s\""""%(mimetype, filename )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 class RHConferenceTimeTable( RoomBookingDBMixin, RHConferenceBaseDisplay ):
@@ -996,7 +990,7 @@ class RHAbstractBook(RHConferenceBaseDisplay):
         self._req.headers_out['Content-Length'] = str(len(data))
         cfg = Config.getInstance()
         self._req.content_type = cfg.getFileTypeMimeType('PDF')
-        self._req.headers_out['Content-Disposition'] = 'inline; filename="%s"' % pdfFilename.replace('\r\n', ' ')
+        self._req.headers_out['Content-Disposition'] = 'inline; filename="%s"' % cleanHTMLHeaderFilename(pdfFilename)
         return data
 
 class RHConfParticipantsRefusal(RHConferenceBaseDisplay):
@@ -1071,7 +1065,7 @@ class RHConferenceToiCal(RHConferenceBaseDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
@@ -1095,7 +1089,7 @@ class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 
@@ -1116,7 +1110,7 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 class RHInternalPageDisplay(RHConferenceBaseDisplay):
@@ -1194,7 +1188,7 @@ class RHConferenceLatexPackage(RHConferenceBaseDisplay):
         mimetype = cfg.getFileTypeMimeType( "ZIP" )
         #self._req.content_type = """%s; name="%s\""""%(mimetype, filename )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 

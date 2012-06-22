@@ -37,7 +37,6 @@ import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.pages.reviewing as reviewing
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.user as user
 import MaKaC.conference as conference
@@ -49,9 +48,7 @@ from MaKaC.webinterface.rh.base import RH   # Strange conflict was here: this li
 from MaKaC.webinterface.pages import admins
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, RHSubmitMaterialBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceDisplay
-from MaKaC.common import Config, info
-from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common import Config
 from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
     ConferenceClosedError, NoReportError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
@@ -66,13 +63,8 @@ from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.webinterface.common.slotDataWrapper import Slot
 from MaKaC.common.contribPacker import ZIPFileHandler,ContribPacker,ConferencePacker, ProceedingsPacker
 from MaKaC.common.dvdCreation import DVDCreation
-from MaKaC.participant import Participant
 from MaKaC.conference import ContributionParticipation, Contribution, CustomRoom
-from MaKaC.conference import SessionChair
-from MaKaC.webinterface.mail import GenericMailer
-from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common import pendingQueues
-from MaKaC.common import mail
 import httplib
 from MaKaC import booking
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
@@ -81,11 +73,11 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.plugins.base import Observable
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.rb_location import CrossLocationDB, Location, CrossLocationQueries
 
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.rb_tools import FormMode
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.modules.scheduler import tasks, Client
 from indico.util import json
@@ -5252,7 +5244,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             cfg = Config.getInstance()
             mimetype = cfg.getFileTypeMimeType( "PDF" )
             self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
             return data
 
         elif self._displayType == "bookOfAbstractBoardNo":
@@ -5264,7 +5256,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             cfg = Config.getInstance()
             mimetype = cfg.getFileTypeMimeType( "PDF" )
             self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
             return data
 
         elif self._displayType == "ContributionList":
