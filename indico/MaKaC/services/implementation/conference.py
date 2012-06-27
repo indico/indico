@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+
 """
 Asynchronous request handlers for conference-related data modification.
 """
@@ -1121,6 +1122,7 @@ class ConferenceEmailParticipants(ConferenceParticipantBase, ConferenceParticipa
         currentUser = self._getUser()
         if currentUser:
             data["fromAddr"] = currentUser.getEmail()
+        data["content-type"] = "text/html"
         data["subject"] = emailSubject
         for id in self._userList:
             participant = self._conf.getParticipation().getParticipantById(id)
