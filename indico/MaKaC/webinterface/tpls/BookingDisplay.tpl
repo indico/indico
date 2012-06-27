@@ -93,7 +93,7 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
         </script>
     % endif
 
-    % if displayInfo and Booking.canBeConnected() and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or Booking.getOwner()["id"] == self_._rh._getUser().getId()):
+    % if displayInfo and Booking.getType() == "Vidyo" and Booking.canBeConnected() and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or Booking.getOwner()["id"] == self_._rh._getUser().getId()):
         <span style="margin-left:3px;margin-right:3px;">|</span>
         <script type="text/javascript">
           var booking${Booking.getId()} = bookings[${Booking.getId()|n,j}];
