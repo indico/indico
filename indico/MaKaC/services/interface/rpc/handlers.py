@@ -84,5 +84,6 @@ endpointMap = {
     "admin": importModule('MaKaC.services.implementation.admin'),
 
     # Tests - just for remote testing of JSON-RPC
-    "test": importModule('MaKaC.services.implementation.test')
+    "test": importModule('MaKaC.services.implementation.test'),
+    "hello": importModule('MaKaC.services.implementation.hello')
 }

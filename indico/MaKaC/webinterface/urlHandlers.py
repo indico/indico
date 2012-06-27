@@ -4207,3 +4207,7 @@ class UHHelper(object):
     @classmethod
     def getDisplayUH(cls, klazz, type=""):
         return cls.displayUHs.get("%s%s"%(klazz.__name__, type), None)
+
+
+class UHHello(URLHandler):
+    _relativeURL = 'hello.py'

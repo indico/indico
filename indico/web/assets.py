@@ -160,6 +160,7 @@ presentation = Bundle('js/jquery/underscore.js',
                       'js/presentation/Ui/Widgets/WidgetGrid.js',
                       filters='jsmin', output='presentation_%(version)s.min.js')
 
+indico_hello = Bundle('js/indico/hello.js', filters='jsmin', output='hello_%(version)s.min.js')
 
 base_js = Bundle(jquery, presentation, indico_core,
                  indico_legacy, indico_common, indico_jquery)
@@ -179,6 +180,7 @@ def register_all_js(env):
     env.register('indico_materialeditor', indico_materialeditor)
     env.register('indico_display', indico_display)
     env.register('indico_jquery', indico_jquery)
+    env.register('indico_hello', indico_hello)
     env.register('base_js', base_js)
 
 
