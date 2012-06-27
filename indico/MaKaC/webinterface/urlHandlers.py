@@ -4207,14 +4207,3 @@ class UHHelper(object):
     @classmethod
     def getDisplayUH(cls, klazz, type=""):
         return cls.displayUHs.get("%s%s"%(klazz.__name__, type), None)
-
-# Testing helloworld
-class UHHelloWorld(URLHandler):
-    _relativeURL = "helloWorld.py"
-
-    @classmethod
-    def getURL( cls, name=None ):
-        url = cls._getURL()
-        if name != None:
-            url.addParam("name", name)
-        return url
