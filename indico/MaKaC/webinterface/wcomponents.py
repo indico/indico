@@ -3316,24 +3316,24 @@ class WConferenceList(WTemplated):
         return WTemplated.getHTML( self, params )
 
     def getEventTimeline(self, tz):
+        # Getting current and previous at the beggining
         index = Catalog.getIdx('categ_conf_sd').getCategory(self._categ.getId())
         today = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0)
         thisMonth = nowutc().astimezone(timezone(tz)).replace(hour=0, minute=0, second=0, day=1)
-        thisMonthTS = utc_timestamp(thisMonth)
         nextMonthTS = utc_timestamp(thisMonth + relativedelta(months=1))
-        todayTS = utc_timestamp(thisMonth)
-        oneMonthTS = utc_timestamp((today - timedelta(days=30)).replace(day=1))
+        previousMonthTS = utc_timestamp(thisMonth - relativedelta(months=1))
+        twoMonthTS = utc_timestamp((today - timedelta(days=60)).replace(day=1))
         future = []
         present = []
 
-        for ts, conf in index.iteritems(thisMonthTS):
+        for ts, conf in index.iteritems(previousMonthTS):
             if ts < nextMonthTS or len(present) < OPTIMAL_PRESENT_EVENTS:
                 present.append(conf)
             else:
                 future.append(conf)
 
         if len(present) < MIN_PRESENT_EVENTS:
-            present = index.values(oneMonthTS, thisMonthTS) + present
+            present = index.values(twoMonthTS, previousMonthTS) + present
 
         if not present:
             maxDT = timezone('UTC').localize(datetime.utcfromtimestamp(index.maxKey())).astimezone(timezone(tz))
