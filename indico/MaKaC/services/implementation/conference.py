@@ -107,10 +107,11 @@ class ConferenceModifBase(ProtectedModificationService, ConferenceBase):
 class ConferenceScheduleModifBase(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-
+        if not self._params.has_key("scheduleEntry"):
+            raise ServiceError("ERR-E4", "No scheduleEntry id set.")
         self._schEntry = self._conf.getSchedule().getEntryById(self._params["scheduleEntry"])
         if self._schEntry == None:
-            raise ServiceError("ERR-E4", "Invalid scheduleEntry id.")
+            raise NoReportError(_("It seems that the entry has been deleted or moved, please refresh the page"))
 
     def _checkProtection( self ):
         self._target = self._schEntry.getOwner()
