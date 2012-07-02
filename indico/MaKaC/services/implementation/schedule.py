@@ -1080,6 +1080,8 @@ class MoveEntryBase(ScheduleOperation):
         else:
             self._schEntry = self._conf.getSchedule().getEntryById(self._schEntryId)
 
+        if self._schEntry is None:
+            raise NoReportError("It seems that the entry has been deleted or already moved. Please refresh the page.")
         owner = self._schEntry.getOwner()
 
         if self._contribPlace.strip() != "":
