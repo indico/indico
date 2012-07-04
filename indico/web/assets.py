@@ -59,6 +59,7 @@ indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
                            'js/indico/Management/NotificationTPL.js',
                            'js/indico/Management/Registration.js',
                            'js/indico/Management/Contributions.js',
+                           'js/indico/Management/Sessions.js',
                            'js/indico/Management/CFA.js',
                            'js/indico/Management/RoomBookingMapOfRooms.js',
                            filters='jsmin', output='indico_management_%(version)s.min.js')

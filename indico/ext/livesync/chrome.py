@@ -46,7 +46,7 @@ from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.urlHandlers import URLHandler
 from MaKaC.webinterface.pages.admins import WPAdminPlugins
 from MaKaC.webinterface import wcomponents
-
+from MaKaC.common.info import HelperMaKaCInfo
 
 class UHAdminLiveSyncManagement(URLHandler):
     """
@@ -132,11 +132,12 @@ class WPLiveSyncAdmin(WPAdminPlugins):
     def __init__(self, rh, templateClass):
         WPAdminPlugins.__init__(self, rh, 'livesync', '')
         self._templateClass = templateClass
-
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._plugin_asset_env = Environment(RHLiveSyncHtdocs._local_path, '/livesync')
+        self._plugin_asset_env.debug = info.isDebugActive()
         self._plugin_asset_env.register('livesync', Bundle('js/livesync.js',
                                                            filters='jsmin',
-                                                           output="InstantMessaging__%(version)s.min.js"))
+                                                           output="livesync__%(version)s.min.js"))
 
     def getJSFiles(self):
         return WPAdminPlugins.getJSFiles(self) + \

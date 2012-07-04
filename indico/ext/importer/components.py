@@ -20,10 +20,14 @@
 
 import os
 import zope.interface
+from webassets import Bundle, Environment
+
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import ITimetableContributor
 from MaKaC.plugins.base import Observable
 from MaKaC.common.Configuration import Config
+from indico.ext.importer.handlers import RHImporterHtdocs
+from MaKaC.common.info import HelperMaKaCInfo
 
 class ImporterContributor(Component, Observable):
     """
@@ -37,7 +41,14 @@ class ImporterContributor(Component, Observable):
         """
         Includes additional javascript file.
         """
-        params['paths'].append("importer/js/importer.js?%d"%(os.stat(__file__).st_mtime))
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
+        asset_env = Environment( RHImporterHtdocs._local_path, '/importer')
+        asset_env.debug = info.isDebugActive()
+
+        asset_env.register('importer', Bundle('js/importer.js',
+                                                           filters='jsmin',
+                                                           output="importer__%(version)s.min.js"))
+        params['paths'].extend(asset_env['importer'].urls())
 
     @classmethod
     def includeTimetableCSSFiles(cls, obj, params = {}):
