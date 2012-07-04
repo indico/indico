@@ -80,21 +80,22 @@ $(function() {
                 }
                 $this.siblings('ul').hide();
                 $this.parent().addClass('');
-            }).click(function() {
+            }).click(function(e) {
                 var $this = $(this);
+
                 if ($this.data('expandable')) {
                     if ($this.data('on')) {
                         self._close($this);
                     } else {
                         self._open($this);
                     }
-                    return false;
+                    e.preventDefault();
                 } else {
                     var result = $this.triggerHandler('menu_select', self.element);
                     if(!result) {
                         self._close_all();
                     }
-                    return false;
+                    e.preventDefault();
                 }
             });
         },
@@ -102,8 +103,11 @@ $(function() {
         _create: function() {
             var self = this;
             this._menuize(this.element);
-            $('html').live('click', function() {
-                self._close_all();
+            $('html').live('click', function(e){
+                // click ourside? close menus.
+                if ($(self.element).has(e.target).length == 0) {
+                    self._close_all();
+                }
             });
         },
 
