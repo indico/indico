@@ -111,6 +111,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.click(ltext="Universe")
         self.select(name="roomID", label="1-b-c - DummyRoom2")
         self.click(css="input.btn")
+        self.wait(css="span.fakeLink")
         self.click(css="span.fakeLink")
         self.click(xpath="//div[@id='roomBookingCal']/div[2]/div[2]/div/div[2]/div/div/p[2]")
         self.click(xpath="//input[@value='Accept']")

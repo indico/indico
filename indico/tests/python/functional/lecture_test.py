@@ -70,6 +70,7 @@ class LectureBase(object):
         self.click(name="cloneGivenDays")
         self.click(name="confirm")
         self.click(css="span.listName > a > span")
+        self.wait(id='manageEventButton')
         self.click(id="manageEventButton")
         self.click(ltext="Tools")
         self.click(ltext="Delete")
