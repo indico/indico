@@ -1155,7 +1155,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
 
     def _extractInfoForButton(self, item):
         info = {}
-        for key in ['sessId', 'contId', 'subContId']:
+        for key in ['sessId', 'slotId', 'contId', 'subContId']:
             info[key] = 'null'
         info['confId'] = self._conf.getId()
 

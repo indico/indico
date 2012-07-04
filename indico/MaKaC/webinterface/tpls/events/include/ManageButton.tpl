@@ -2,7 +2,7 @@
 
 <%
     info = extractInfoForButton(item)
-    menuName = 'menu%(confId)s%(sessId)s%(contId)s%(subContId)s' % info
+    menuName = 'menu%(confId)s%(sessId)s%(slotId)s%(contId)s%(subContId)s' % info
 %>
 % if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink']):
 
