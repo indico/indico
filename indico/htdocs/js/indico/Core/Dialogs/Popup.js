@@ -374,29 +374,6 @@ type("BalloonPopup", ["PopupDialog"], {
 );
 
 /**
- * Utility function to display a simple notification popup.
- * @param {XElement} pointElement The element that triggers the event (onClick on it will be ignored)
- * @param {XElement} content Anything you want to put inside.
- */
-type("NotificationBalloonPopup", ["BalloonPopup"],
-     {
-     },
-     function(pointElement, content) {
-         this.pointElement = pointElement;
-
-         var canvas = Html.div({style:
-                                {padding: '5px'}}, content);
-
-         this.BalloonPopup(canvas,
-                           pointElement,
-                           null,
-                           null,
-                           'balloonPopup yellowBalloon',
-                           'balloonPopupArrow yellowArrow');
-     });
-
-
-/**
  * Utility function to display a simple alert popup.
  * You can think of it as an "alert" replacement.
  * It will have a title, a close button, and an OK button.
