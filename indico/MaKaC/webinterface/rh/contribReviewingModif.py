@@ -61,7 +61,9 @@ class RHContributionReviewingJudgements(RHContribModifBase):
 
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
-            if not (RCPaperReviewManager.hasRights(self) or RCContributionReferee.hasRights(self)):
+            if self._target.getConference().getConfPaperReview().getChoice() == CPR.NO_REVIEWING:
+                raise MaKaCError(_("Type of reviewing has not been chosen yet"))
+            elif not (RCPaperReviewManager.hasRights(self) or RCContributionReferee.hasRights(self)):
                 RHContribModifBase._checkProtection(self);
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
@@ -282,7 +284,9 @@ class RHEditorBase(RHContribModifBase):
 
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
-            if not (RCContributionEditor.hasRights(self)):
+            if not self._target.getConference().getConfPaperReview().getChoice() in [CPR.LAYOUT_REVIEWING, CPR.CONTENT_AND_LAYOUT_REVIEWING]:
+                raise MaKaCError(_("Layout Reviewing is not active for this conference"))
+            elif not (RCContributionEditor.hasRights(self)):
                 raise MaKaCError("Only the editor of this contribution can access this page / perform this request")
                 #RHContribModifBase._checkProtection(self);
         else:
@@ -345,7 +349,9 @@ class RHReviewerBase(RHContribModifBase):
 
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
-            if not (RCContributionReviewer.hasRights(self)):
+            if not self._target.getConference().getConfPaperReview().getChoice() in [CPR.CONTENT_REVIEWING, CPR.CONTENT_AND_LAYOUT_REVIEWING]:
+                raise MaKaCError(_("Content Reviewing is not active for this conference"))
+            elif not (RCContributionReviewer.hasRights(self)):
                 raise MaKaCError("Only the reviewer of this contribution can access this page / perform this request")
                 #RHContribModifBase._checkProtection(self);
         else:
