@@ -299,14 +299,30 @@ class PiwikQueryMetricConferenceVisitLength(PiwikQueryMetricConferenceBase):
 
     def _buildType(self):
         PiwikQueryMetricConferenceBase._buildType(self)
-        self.setAPIMethod('VisitsSummary.getSumVisitsLength')
+        self.setAPIMethod('VisitsSummary.get')
+
+    def _getAverages(self, data):
+        """
+        The resultant JSON of this call returns a list containing the average
+        for each day, hence we need to build the total and average it accordingly.
+        """
+        seconds = 0
+        avgKey = 'avg_time_on_site'
+
+        for day in data:
+            seconds += day[avgKey]
+
+        return seconds / len(data)
 
     def getQueryResult(self):
         """
         Returns a string of the time in hh:mm:ss
         """
         data = PiwikQueryUtils.getJSONFromRemoteServer(self._performCall)
-        seconds = PiwikQueryUtils.getJSONValueAverage(data) if data else 0
+        seconds = 0
+
+        if data:
+            seconds = self._getAverages(data.values())
 
         return PiwikQueryUtils.stringifySeconds(seconds)
 
