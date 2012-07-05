@@ -58,9 +58,6 @@ def finalJudge( req, **params ):
 def submitForReviewing( req, **params ):
     return contribReviewingModif.RHSubmitForReviewing( req ).process( params )
 
-def removeSubmittedMarkForReviewing( req, **params ):
-    return contribReviewingModif.RHRemoveSubmittedMarkForReviewing( req ).process( params )
-
 def reviewingHistory( req, **params ):
     return contribReviewingModif.RHReviewingHistory( req ).process( params )
 

@@ -1090,6 +1090,8 @@ var userSelected = function(user, contrPerAttribute){
  */
 var fetchContributions = function() {
 
+    var killProgress = IndicoUI.Dialogs.Util.progress("Loading papers to assign...");
+
     if (appliedFilter) {
         $E('resetFilters').dom.style.display = '';
     } else {
@@ -1114,6 +1116,7 @@ var fetchContributions = function() {
             showWithReviewer: $E('showWithReviewer').dom.checked
         },
         function(result, error){
+            killProgress();
             if (!error) {
                 for (i in result) {
                     c = result[i]

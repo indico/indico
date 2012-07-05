@@ -228,6 +228,22 @@
             </div>
         </td>
        </tr>
+       <tr id="editorSubmittedRefereeNotif" style="white-space:nowrap; display: ${display}">
+        <td style="padding-left: 20px;">
+            <div>
+                <span id="editorSubmittedRefereeNotifButton">
+                </span>
+            </div>
+        </td>
+       </tr>
+        <tr id="reviewerSubmittedRefereeNotif" style="white-space:nowrap; display: ${display}">
+        <td style="padding-left: 20px;">
+            <div>
+                <span id="reviewerSubmittedRefereeNotifButton">
+                </span>
+            </div>
+        </td>
+       </tr>
         <tr id="autoEmailsContentLabel" style="display:${display}">
            <td style="padding-top: 7px; padding-left: 7px;">
                ${ _("To the Content Reviewers when")}:
@@ -422,6 +438,9 @@ var observer = function() {
         $E('authorSubmittedMatRefereeNotif').dom.style.display = 'none';
         $E('authorSubmittedMatEditorNotif').dom.style.display = 'none';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = 'none';
+        $E('editorSubmittedRefereeNotif').dom.style.display = 'none';
+        $E('reviewerSubmittedRefereeNotif').dom.style.display = 'none';
+
         $E('templateTable').dom.style.display = 'none';
     }
     if (value == "Content reviewing") {
@@ -454,6 +473,8 @@ var observer = function() {
         $E('authorSubmittedMatRefereeNotif').dom.style.display = '';
         $E('authorSubmittedMatEditorNotif').dom.style.display = 'none';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
+        $E('editorSubmittedRefereeNotif').dom.style.display = 'none';
+        $E('reviewerSubmittedRefereeNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
 
         showReviewingStates();
@@ -491,6 +512,8 @@ var observer = function() {
         $E('authorSubmittedMatRefereeNotif').dom.style.display = 'none';
         $E('authorSubmittedMatEditorNotif').dom.style.display = '';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = 'none';
+        $E('editorSubmittedRefereeNotif').dom.style.display = 'none';
+        $E('reviewerSubmittedRefereeNotif').dom.style.display = 'none';
         $E('templateTable').dom.style.display = '';
 
         showEditingCriteria();
@@ -526,6 +549,8 @@ var observer = function() {
         $E('authorSubmittedMatRefereeNotif').dom.style.display = '';
         $E('authorSubmittedMatEditorNotif').dom.style.display = '';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
+        $E('editorSubmittedRefereeNotif').dom.style.display = '';
+        $E('reviewerSubmittedRefereeNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
 
         showReviewingStates();
@@ -733,6 +758,18 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
                                             'message13'
 ));
 
+$E('editorSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorSubmittedRefereeNotif',
+        {conference: '${ ConfReview.getConference().getId() }',
+        AutoEmailsToChange: 'Referee'},
+        $T('a editor submits an assesment'),
+        'message14'
+));
+$E('reviewerSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerSubmittedRefereeNotif',
+        {conference: '${ ConfReview.getConference().getId() }',
+    AutoEmailsToChange: 'Referee'},
+    $T('a reviewer submits an assesment'),
+    'message15'
+));
 
 % if ConfReview.hasReviewing():
     TemplateList();

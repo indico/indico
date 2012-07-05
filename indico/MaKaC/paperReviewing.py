@@ -94,6 +94,8 @@ class ConferencePaperReview(Persistent):
         self._enableAuthorSubmittedMatRefereeEmailNotif = False
         self._enableAuthorSubmittedMatEditorEmailNotif = False
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
+        self._enableEditorSubmittedRefereeEmailNotif = False
+        self._enableReviewerSubmittedRefereeEmailNotif = False
 
         self._statuses = [] # list of content reviewing and final judgement
         self._reviewingQuestions = [] #list of content reviewing and final judgement questions
@@ -263,6 +265,28 @@ class ConferencePaperReview(Persistent):
     def disableReviewerJudgementEmailNotif(self):
         self._enableReviewerJudgementEmailNotif = False
 
+    def getEnableEditorSubmittedRefereeEmailNotif(self):
+        if not hasattr(self, "_enableEditorSubmittedRefereeEmailNotif"):
+            self._enableEditorSubmittedRefereeEmailNotif = False
+        return self._enableEditorSubmittedRefereeEmailNotif
+
+    def enableEditorSubmittedRefereeEmailNotif(self):
+        self._enableEditorSubmittedRefereeEmailNotif = True
+
+    def disableEditorSubmittedRefereeEmailNotif(self):
+        self._enableEditorSubmittedRefereeEmailNotif = False
+
+    def getEnableReviewerSubmittedRefereeEmailNotif(self):
+        if not hasattr(self, "_enableReviewerSubmittedRefereeEmailNotif"):
+            self._enableReviewerSubmittedRefereeEmailNotif = False
+        return self._enableReviewerSubmittedRefereeEmailNotif
+
+    def enableReviewerSubmittedRefereeEmailNotif(self):
+        self._enableReviewerSubmittedRefereeEmailNotif = True
+
+    def disableReviewerSubmittedRefereeEmailNotif(self):
+        self._enableReviewerSubmittedRefereeEmailNotif = False
+
     #auto e-mails methods for authors' submittion materials notification
     def getEnableAuthorSubmittedMatRefereeEmailNotif(self):
         return self._enableAuthorSubmittedMatRefereeEmailNotif
@@ -290,7 +314,6 @@ class ConferencePaperReview(Persistent):
 
     def disableAuthorSubmittedMatReviewerEmailNotif(self):
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
-
 
     #Reviewing mode methods
     def setChoice(self, choice):
@@ -1065,18 +1088,17 @@ class ConferenceReviewingNotification(GenericNotification):
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setSubject("""[Indico] You have been chosen as %s for the conference "%s" (id: %s)"""
-                        % (role, conference.getTitle(), str(conference.getId())))
-        self.setBody("""Dear Sir or Madam,
+        self.setSubject("""You have been chosen as a %s for the conference "%s" """
+                        % (role, conference.getTitle()))
+        self.setBody("""Dear %s,
 
-        You have been chosen as %s of the conference "%s" (id: %s), in order to help with the paper reviewing process.
-        You can go to the conference main page:
-        %s
-        After logging in, you will find a link under 'Paper reviewing' on which you can click to perform your new functions.
+You have been chosen as a %s for the conference entitled "%s" in order to help with the paper reviewing process. Please find the Paper Reviewing utilities here:
 
-        Best regards
-        """ % ( role, conference.getTitle(), str(conference.getId()), urlHandlers.UHConferenceDisplay.getURL(conference)
-        ))
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+""" % ( user.getStraightFullName(), role, conference.getTitle(), urlHandlers.UHPaperReviewingDisplay.getURL(conference), conference.getTitle()))
 
 class ConferenceReviewingRemoveNotification(GenericNotification):
     """ Template to build an email notification to a removed PRM / Referee / Editor / Reviewer / Abstract Manager / Abstract Reviewer
@@ -1086,15 +1108,17 @@ class ConferenceReviewingRemoveNotification(GenericNotification):
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setSubject("""[Indico] You have been removed as %s of the conference "%s" (id: %s)"""
-                        % (role, conference.getTitle(), str(conference.getId())))
-        self.setBody("""Dear Indico user,
+        self.setSubject("""You are no longer a %s of the conference "%s" """
+                        % (role, conference.getTitle()))
+        self.setBody("""Dear %s,
 
-        We are sorry to inform you that you have been removed as %s of the conference "%s" (id: %s).
+Please, be aware that you are no longer a %s of the conference "%s":
 
-        Thank you for using our system.
-        """ % ( role, conference.getTitle(), str(conference.getId())
-        ))
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+"""% ( user.getStraightFullName(),  role, conference.getTitle(), urlHandlers.UHConferenceDisplay.getURL(conference), conference.getTitle()))
 
 
 class Question(Persistent, Fossilizable):

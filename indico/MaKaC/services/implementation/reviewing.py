@@ -326,6 +326,30 @@ class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer(Confer
         return self._confPaperReview.getEnableAuthorSubmittedMatReviewerEmailNotif()
 
 
+class ConferenceReviewingAutoEmailsModificationEditorSubmittedReferee(ConferenceReviewingSetupTextModificationBase):
+
+    def _handleSet(self):
+        if self._value:
+            self._confPaperReview.enableEditorSubmittedRefereeEmailNotif()
+        else:
+            self._confPaperReview.disableEditorSubmittedRefereeEmailNotif()
+
+    def _handleGet(self):
+        return self._confPaperReview.getEnableEditorSubmittedRefereeEmailNotif()
+
+
+class ConferenceReviewingAutoEmailsModificationReviewerSubmittedReferee(ConferenceReviewingSetupTextModificationBase):
+
+    def _handleSet(self):
+        if self._value:
+            self._confPaperReview.enableReviewerSubmittedRefereeEmailNotif()
+        else:
+            self._confPaperReview.disableReviewerSubmittedRefereeEmailNotif()
+
+    def _handleGet(self):
+        return self._confPaperReview.getEnableReviewerSubmittedRefereeEmailNotif()
+
+
 class ConferenceReviewingCompetenceModification(ListModificationBase, ConferenceReviewingPRMBase):
     #Note: don't change the order of the inheritance here!
     """ Class to change competences of users.
@@ -826,12 +850,12 @@ class ContributionReviewingSetSubmitted(ContributionReviewingBase):
         if self._params.has_key('value'):
             judgementObject = self.getJudgementObject()
             try:
-                judgementObject.setSubmitted(not self.getJudgementObject().isSubmitted())
+                judgementObject.setSubmitted(not judgementObject.isSubmitted())
             except MaKaCError, e:
                 raise ServiceError("ERR-REV9", e.getMsg())
 
             judgementObject.setAuthor(self._getUser())
-            judgementObject.sendNotificationEmail(withdrawn = not self.getJudgementObject().isSubmitted())
+            judgementObject.sendNotificationEmail(withdrawn = not judgementObject.isSubmitted())
         return self.getJudgementObject().isSubmitted()
 
 class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
@@ -1046,6 +1070,8 @@ methodMap = {
     "conference.AuthorSubmittedMatRefereeNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReferee,
     "conference.AuthorSubmittedMatEditorNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatEditor,
     "conference.AuthorSubmittedMatReviewerNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer,
+    "conference.EditorSubmittedRefereeNotif" : ConferenceReviewingAutoEmailsModificationEditorSubmittedReferee,
+    "conference.ReviewerSubmittedRefereeNotif" : ConferenceReviewingAutoEmailsModificationReviewerSubmittedReferee,
 
 
     "conference.assignTeamPRM" : ConferenceReviewingAssignTeamPRM,

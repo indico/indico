@@ -251,8 +251,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
 
             if (paperReviewChoice == 3 or paperReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
-                (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or paperReviewChoice == 3) and \
-                self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
+                not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
 
                 self._tabJudgeEditing = self._subtabReviewing.newSubTab( "editing", "Assess Layout", \
                 urlHandlers.UHContributionEditingJudgement.getURL(self._target) )

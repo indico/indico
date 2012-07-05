@@ -7565,8 +7565,8 @@ class ContributionParticipation(Persistent, Fossilizable):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
-    def getDirectFullNameNoTitle( self ):
-        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper())).strip()
+    def getDirectFullNameNoTitle( self, upper = True ):
+        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper() if upper else self.getFamilyName())).strip()
 
     def getFullName( self ):
         res = self.getFullNameNoTitle()
@@ -10088,8 +10088,8 @@ class SubContribParticipation(Persistent, Fossilizable):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
-    def getDirectFullNameNoTitle( self ):
-        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper())).strip()
+    def getDirectFullNameNoTitle( self, upper = True ):
+        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper() if upper else self.getFamilyName())).strip()
 
 class SubContribution(CommonObjectBase, Locatable):
     """

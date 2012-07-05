@@ -60,7 +60,7 @@
         </td>
     </tr>
 </table>
-% endif
+
 
 <script type="text/javascript">
 
@@ -234,3 +234,4 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
 updatePage(true);
 
 </script>
+% endif

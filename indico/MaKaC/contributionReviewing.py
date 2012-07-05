@@ -33,6 +33,7 @@ from MaKaC.fossils.reviewing import IReviewManagerFossil,\
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.paperReviewing import Answer
 from MaKaC.common.Counter import Counter
+from MaKaC.webinterface.urlHandlers import UHContributionDisplay, UHContributionReviewingJudgements
 ###############################################
 # Contribution reviewing classes
 ###############################################
@@ -331,6 +332,16 @@ class Judgement(Persistent, Fossilizable):
     def getComments(self):
         return self._comments
 
+    def getCommentsVerbose(self):
+        comments = ""
+        if self.getComments():
+            comments="""
+Please see the comments below from the reviewing team:
+
+"%s"
+"""%self.getComments()
+        return comments
+
     def getAnswers(self):
         """ To be implemented by sub-classes
         """
@@ -427,28 +438,33 @@ class Judgement(Persistent, Fossilizable):
         """ Sends an email to the contribution's authors when the referee, editor or reviewer
             pass a judgement on the contribution and only if the manager has enabled the option in 'Automatic e-mails' section.
         """
-        authorList = self.getReviewManager().getContribution().getAuthorList()
+        authorList = list(set(self.getReviewManager().getContribution().getSpeakerList()+list(self.getReviewManager().getContribution().getAuthorList())))
+        referee = self.getReviewManager().getReferee()
         for author in authorList:
             if withdrawn:
-                if isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif():
-                    notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-                if isinstance(self, EditorJudgement) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif():
-                    notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-                if isinstance(self, ReviewerJudgement) and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif():
+                if (isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif()) \
+                or (isinstance(self, EditorJudgement) and (self._review.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or not self.getJudgement() in ["Accept", "Reject"]) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif()) \
+                or (isinstance(self, ReviewerJudgement) and not self.getJudgement() in ["Accept", "Reject"] and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif()):
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
             else:
-                if isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif():
+                if (isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif()) \
+                or (isinstance(self, EditorJudgement) and (self._review.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or not self.getJudgement() in ["Accept", "Reject"]) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif()) \
+                or (isinstance(self, ReviewerJudgement) and not self.getJudgement() in ["Accept", "Reject"] and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif()):
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-                if isinstance(self, EditorJudgement) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif():
-                    notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-                if isinstance(self, ReviewerJudgement) and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif():
-                    notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
+
+        # We send an email to the Referee if the layout or the content reviewer has sent a judgement
+
+        if (self.getConfPaperReview().getChoice() == 4 and isinstance(self, EditorJudgement) \
+        and self.getConfPaperReview().getEnableEditorSubmittedRefereeEmailNotif()) \
+        or ((self.getConfPaperReview().getChoice() == 2 or self.getConfPaperReview().getChoice() == 4) and isinstance(self, ReviewerJudgement) \
+        and self.getConfPaperReview().getEnableReviewerSubmittedRefereeEmailNotif()):
+            if withdrawn:
+                notification = ContributionReviewingJudgementRefereeWithdrawalNotification(referee, self, self.getReviewManager().getContribution())
+            else:
+                notification = ContributionReviewingJudgementRefereeNotification(referee, self, self.getReviewManager().getContribution())
+            GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", referee)
 
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed
@@ -701,20 +717,6 @@ class Review(Persistent, Fossilizable):
                     notification = MaterialsSubmittedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
                     GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", reviewer)
 
-        else:
-            if self._reviewManager.hasReferee() and self.getConfPaperReview().getEnableAuthorSubmittedMatRefereeEmailNotif():
-                notification = MaterialsChangedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
-                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getReferee())
-
-            if self._reviewManager.hasEditor() and self.getConfPaperReview().getEnableAuthorSubmittedMatEditorEmailNotif():
-                notification = MaterialsChangedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
-                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getEditor())
-
-            for reviewer in self._reviewManager.getReviewersList():
-                if self.getConfPaperReview().getEnableAuthorSubmittedMatReviewerEmailNotif():
-                    notification = MaterialsChangedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
-                    GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", reviewer)
-
     def getVersion(self):
         """ Returns the version number for this review. The version number is an integer, starting by 0.
         """
@@ -922,8 +924,7 @@ class ContributionReviewingNotification(GenericNotification):
         conference = contribution.getConference()
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setSubject("""[Indico] You have been chosen as %s for the contribution "%s" (id: %s)"""
-                        % (role, contribution.getTitle(), str(contribution.getId())))
+        self.setSubject("""You have been chosen as a %s for "%s" """% (role, conference.getTitle()))
 
         if role == 'Referee':
             urlh = urlHandlers.UHConfModifListContribToJudge
@@ -932,17 +933,16 @@ class ContributionReviewingNotification(GenericNotification):
         elif role == 'Content Reviewer':
             urlh = urlHandlers.UHConfModifListContribToJudgeAsReviewer
 
-        self.setBody("""Dear Indico user,
+        self.setBody("""Dear %s,
 
-        You have been chosen as %s of the contribution "%s" (id: %s) of the conference %s (id: %s).
-        You can go to the contribution reviewing page:
-        %s
-        If you have not already, you will have to log in to see this page.
+You have been chosen as a %s for the paper entitled "%s" (id: %s) for the conference "%s". Please find the %s utilities here:
 
-        Thank you for using our system.
-        """ % ( role, contribution.getTitle(), str(contribution.getId()), conference.getTitle(),
-                str(conference.getId()), urlh.getURL(contribution)
-        ))
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+""" % ( user.getStraightFullName(), role, contribution.getTitle(), str(contribution.getId()),
+        conference.getTitle(), role, urlh.getURL(contribution), conference.getTitle()))
 
 class ContributionReviewingRemoveNotification(GenericNotification):
     """ Template to build an email notification to a removed PRM / Referee / Editor / Reviewer
@@ -950,95 +950,102 @@ class ContributionReviewingRemoveNotification(GenericNotification):
     """
 
     def __init__(self, user, role, contribution):
-        conference = contribution.getConference()
         GenericNotification.__init__(self)
+        conference = contribution.getConference()
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setSubject("""[Indico] You have been removed as %s of the contribution "%s" (id: %s) of the conference %s (id: %s)"""
-                        % (role, contribution.getTitle(), str(contribution.getId()), conference.getTitle(),str(conference.getId())))
-        self.setBody("""Dear Indico user,
+        self.setSubject("""You are no longer a %s of a paper for "%s" """ % (role, conference.getTitle()))
+        self.setBody("""Dear %s,
 
-        We are sorry to inform you that you have been removed as %s of the contribution "%s" (id: %s).
+Please, be aware that you are no longer a %s of the paper entitled "%s" (id: %s) for the conference "%s":
 
-        Thank you for using our system.
-        """ % ( role, contribution.getTitle(), str(contribution.getId())
-        ))
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+""" % (  user.getStraightFullName(), role, contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(urlHandlers.UHConferenceDisplay.getURL(conference)), conference.getTitle()))
 
 class ContributionReviewingJudgementNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
         once the contribution has been judged
     """
 
-    def __init__(self, user, judgement, contribution):
+    def setFullyReviewed(self, user, judgement, contribution, conference, role):
+        self.setSubject("""Your paper "%s" for "%s" has been completely reviewed """
+                    % (contribution.getTitle(), conference.getTitle()))
+        self.setBody("""Dear %s,
 
+The %s has reviewed your paper entitled "%s" (id: %s), submitted for "%s".
+The assessment is as follows: %s.
+%s
+You may then apply the requested modifications to your paper and submit the modified version for review. In order to do so, please proceed to your paper page:
+
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+""" % ( user.getDirectFullNameNoTitle(upper=False), role, contribution.getTitle(), str(contribution.getId()),
+         conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(), UHContributionDisplay.getURL(contribution), conference.getTitle()))
+
+
+    def setPartiallyReviewed(self, user, judgement, contribution, conference, typeR):
+                self.setSubject("""%s Assessment of your paper "%s" for "%s" """
+                            % (typeR, contribution.getTitle(), conference.getTitle()))
+                self.setBody("""Dear %s,
+
+The assigned %s Reviewer has partially reviewed your paper entitled "%s" (id: %s) submitted for "%s".
+The assessment is as follows: %s.
+%s
+You may then apply the requested modifications to your paper and submit the modified version for review. In order to do so, please proceed to your paper page:
+
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+"""  % ( user.getDirectFullNameNoTitle(upper=False),typeR, contribution.getTitle(), str(contribution.getId()),
+         conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(), UHContributionDisplay.getURL(contribution), conference.getTitle()))
+
+    def setAcceptedRejected(self, user, judgement, contribution, conference, role):
+        if judgement.getJudgement() == "Accept":
+            judgementText = "ACCEPTED"
+        elif judgement.getJudgement() == "Reject":
+            judgementText = "REJECTED"
+        self.setSubject("""Your paper "%s" for "%s" has been completely reviewed"""
+                            % (contribution.getTitle(), conference.getTitle()))
+        self.setBody("""Dear %s,
+
+The %s has %s your paper entitled "%s" (id: %s), submitted for "%s".
+%s
+You may proceed to your paper page:
+
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+""" % ( user.getDirectFullNameNoTitle(upper=False), role, judgementText, contribution.getTitle(), str(contribution.getId()),
+         conference.getTitle(), judgement.getCommentsVerbose(), UHContributionDisplay.getURL(contribution), conference.getTitle()))
+
+    def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
+        conference = contribution.getConference()
         self.setFromAddr("Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
-            if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
-                self.setSubject("""[Indico] Your contribution "%s" (id: %s) has been completely reviewed by the layout reviewer"""
-                            % (contribution.getTitle(), str(contribution.getId())))
-                self.setBody("""Dear Indico user,
-
-            Your contribution "%s" (id: %s) has been completely reviewed by the assigned layout reviewer.
-            The judgement was: %s
-
-            The comments of the layout reviewer were:
-            "%s"
-
-            Thank you for using our system.
-            """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement(),
-                    judgement.getComments())
-            )
-            else:
-                self.setSubject("""[Indico] The layout of your contribution "%s" (id: %s) has been reviewed"""
-                            % (contribution.getTitle(), str(contribution.getId())))
-                self.setBody("""Dear Indico user,
-
-        The layout of your contribution "%s" (id: %s) has been reviewed.
-        The judgement was: %s
-
-        The comments of the layout reviewer were:
-        "%s"
-
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement(),
-                judgement.getComments())
-        )
-
-        elif isinstance(judgement, ReviewerJudgement):
-            self.setSubject("""[Indico] The content of your contribution "%s" (id: %s) has been reviewed"""
-                            % (contribution.getTitle(), str(contribution.getId())))
-            self.setBody("""Dear Indico user,
-
-        The content of your contribution "%s" (id: %s) has been reviewed.
-        The judgement was: %s
-
-        The comments of the content reviewer were:
-        "%s"
-
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement(),
-                judgement.getComments())
-        )
-
+            if conference.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
+                if judgement.getJudgement() in ["Accept", "Reject"]:
+                    self.setAcceptedRejected(user, judgement, contribution, conference, "Layout Reviewer")
+                else:
+                    self.setFullyReviewed(user, judgement, contribution, conference, "Layout Reviewer")
+            elif not judgement.getJudgement() in ["Accept", "Reject"]:
+                self.setPartiallyReviewed(user, judgement, contribution, conference, "Layout")
+        elif isinstance(judgement, ReviewerJudgement) and not judgement.getJudgement() in ["Accept", "Reject"]:
+                self.setPartiallyReviewed(user, judgement, contribution, conference, "Content")
         elif isinstance(judgement, RefereeJudgement):
-            self.setSubject("""[Indico] Your contribution "%s" (id: %s) has been completely reviewed by the referee"""
-                            % (contribution.getTitle(), str(contribution.getId())))
-            self.setBody("""Dear Indico user,
-
-        Your contribution "%s" (id: %s) has been completely reviewed by the assigned referee.
-        The judgement was: %s
-
-        The comments of the referee were:
-        "%s"
-
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement(),
-                judgement.getComments())
-        )
-
+            if judgement.getJudgement() in ["Accept", "Reject"]:
+                self.setAcceptedRejected(user, judgement, contribution, conference, "Referee")
+            else:
+                self.setFullyReviewed(user, judgement, contribution, conference, "Referee")
 
 class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
@@ -1047,84 +1054,85 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
+        conference = contribution.getConference()
+        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
+        self.setToList([user.getEmail()])
+        if isinstance(judgement, RefereeJudgement):
+            typeR = "Referee"
+        elif isinstance(judgement, EditorJudgement):
+            typeR = "Layout Reviewer"
+        elif isinstance(judgement, ReviewerJudgement):
+            typeR = "Content Reviewer"
+        self.setSubject(""""%s" has been put back into reviewing by the %s """ % (contribution.getTitle(), typeR))
+        self.setBody("""Dear %s,
+
+Your paper entitled  "%s" (id: %s) submitted for "%s" has been put back into reviewing by the assigned %s:
+
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+""" % ( user.getDirectFullNameNoTitle(upper=False), contribution.getTitle(), str(contribution.getId()),
+        conference.getTitle(), typeR, urlHandlers.UHContributionDisplay.getURL(contribution), conference.getTitle())
+        )
+
+class ContributionReviewingJudgementRefereeNotification(GenericNotification):
+    """ Template to build an email notification for a referee
+        once the contribution has been judged
+    """
+
+    def __init__(self, user, judgement, contribution):
+        GenericNotification.__init__(self)
+        conference = contribution.getConference()
+        self.setFromAddr("Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail())
+        self.setToList([user.getEmail()])
+        if isinstance(judgement, EditorJudgement):
+            typeR = "Layout"
+        elif isinstance(judgement, ReviewerJudgement):
+            typeR = "Content"
+
+        self.setSubject("""%s Assessment of the paper "%s" for "%s" """% (typeR, contribution.getTitle(), conference.getTitle()))
+        self.setBody("""Dear %s,
+
+The assigned %s Reviewer, %s, has partially reviewed the paper entitled "%s" (id: %s) submitted for "%s".
+The assessment is as follows: %s.
+%s
+You may proceed to the Referee Area for this paper:
+
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+"""  % ( user.getStraightFullName(), typeR, judgement.getAuthor().getStraightFullName(), contribution.getTitle(),
+         str(contribution.getId()),conference.getTitle(), judgement.getJudgement(), judgement.getCommentsVerbose(),
+         UHContributionReviewingJudgements.getURL(contribution), conference.getTitle()))
+
+class ContributionReviewingJudgementRefereeWithdrawalNotification(GenericNotification):
+    """ Template to build an email notification for a contribution submitter
+        once the judgement of the contribution has been withdrawn.
+    """
+
+    def __init__(self, user, judgement, contribution):
+        GenericNotification.__init__(self)
+        conference = contribution.getConference()
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
-            if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
-                self.setSubject("""[Indico] The assessment for your contribution "%s" (id: %s) has been withdrawn by the layout reviewer"""
-                            % (contribution.getTitle(), str(contribution.getId())))
-                self.setBody("""Dear Author,
-
-        The assigned layout reviewer has reviewed your paper
-
-        "%s" (id: %s)
-
-        submitted for
-
-        "%s"
-
-        The assessment was: %s
-
-        Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
-        """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
-        )
-            else:
-                self.setSubject("""[Indico] The assessment for the layout of your contribution "%s" (id: %s) has been withdrawn"""
-                            % (contribution.getTitle(), str(contribution.getId())))
-                self.setBody("""Dear Author,
-
-        The assigned layout reviewer has reviewed your paper
-
-        "%s" (id: %s)
-
-        submitted for
-
-        "%s"
-
-        The assessment was: %s
-
-        Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
-        """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
-        )
-
+            typeR = "Layout"
         elif isinstance(judgement, ReviewerJudgement):
-            self.setSubject("""[Indico] The assessment for the content of your contribution "%s" (id: %s) has been withdrawn"""
-                            % (contribution.getTitle(), str(contribution.getId())))
-            self.setBody("""Dear Author,
+            typeR = "Content"
+        self.setSubject(""""%s" has been put back into reviewing by the %s Reviewer"""% (contribution.getTitle(), typeR))
+        self.setBody("""Dear %s,
 
-        The assigned content reviewer has reviewed your paper
+The paper entitled "%s" (id: %s) submitted for "%s" has been put back into reviewing by the assigned %s Reviewer:
 
-        "%s" (id: %s)
+%s
 
-        submitted for
-
-        "%s"
-
-        The assessment was: %s
-
-        Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
-        """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
-        )
-
-        elif isinstance(judgement, RefereeJudgement):
-            self.setSubject("""[Indico] The assessment for your contribution "%s" (id: %s) has been withdrawn by the referee"""
-                            % (contribution.getTitle(), str(contribution.getId())))
-            self.setBody("""Dear Author,
-
-        The assigned referee has reviewed your paper
-
-        "%s" (id: %s)
-
-        submitted for
-
-        "%s"
-
-        The assessment was: %s
-
-        Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
-        """  % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
-        )
+Kind regards,
+Indico on behalf of "%s"
+""" % ( user.getStraightFullName(), contribution.getTitle(), str(contribution.getId()),conference.getTitle(),
+        typeR, urlHandlers.UHConfModifListContribToJudge.getURL(contribution), conference.getTitle()))
 
 class MaterialsSubmittedNotification(GenericNotification):
 
@@ -1133,33 +1141,21 @@ class MaterialsSubmittedNotification(GenericNotification):
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setSubject("""[Indico] The author of the contribution %s (id: %s) of the conference %s has submitted his/her materials (id: %s)"""
-                        % (contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId())))
-        self.setBody("""Dear Indico user,
+        self.setSubject("""An author has submitted a paper for "%s" """%  conference.getTitle())
 
-        The author of the contribution %s (id: %s) of the conference %s (id: %s) has marked his / her materials as submitted.
-        You can now start the reviewing process as a %s.
+        if role == 'Referee':
+            urlh = urlHandlers.UHConfModifListContribToJudge
+        elif role == 'Layout Reviewer':
+            urlh = urlHandlers.UHConfModifListContribToJudgeAsEditor
+        elif role == 'Content Reviewer':
+            urlh = urlHandlers.UHConfModifListContribToJudgeAsReviewer
 
+        self.setBody("""Dear %s,
 
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId()), role))
+An author has submitted a paper entitled "%s" (id: %s) for the conference "%s". You can now start the reviewing process as a %s:
 
-class MaterialsChangedNotification(GenericNotification):
+%s
 
-    def __init__(self, user, role, contribution):
-        conference = contribution.getConference()
-        GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
-        self.setToList([user.getEmail()])
-        self.setSubject("""[Indico] Warning: the author of the contribution %s (id: %s) of the conference %s (id: %s) has changed his/her materials """
-                        % (contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId())))
-        self.setBody("""Dear Indico user,
-
-        The author of the contribution %s (id: %s) of the conference %s (id: %s) has removed the 'submitted' mark from his / her materials.
-        This means that he may have changed the content of the materials.
-        Thus, you should wait until he has marked the materials again to start / continue the reviewing process as a %s.
-
-        Thank you for using our system.
-        """ % ( contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId()), role))
-
-
+Kind regards,
+Indico on behalf of "%s"
+""" % ( user.getStraightFullName(), contribution.getTitle(), str(contribution.getId()), conference.getTitle(), role, urlh.getURL(contribution), conference.getTitle()))

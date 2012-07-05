@@ -422,19 +422,6 @@ class RHSubmitForReviewing(RHReviewingAuthorBase):
         self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
         self._redirect(urlHandlers.UHContributionDisplay.getURL(self._target))
 
-class RHRemoveSubmittedMarkForReviewing(RHReviewingAuthorBase):
-    _uh = urlHandlers.UHContributionDisplay
-
-    def _checkParams(self, params):
-        RHContributionMaterialSubmissionRightsBase._checkParams(self, params)
-        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or \
-        (self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted() and self._target.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING):
-            raise MaKaCError("This contribution has already been judged. You cannot un-submit the materials")
-
-    def _process (self):
-        self._target.getReviewManager().getLastReview().setAuthorSubmitted(False)
-        self._redirect(urlHandlers.UHContributionDisplay.getURL(self._target))
-
 #class to show reviewing history
 class RHReviewingHistory(RHContribModifBaseReviewingStaffRights):
     _uh = urlHandlers.UHContributionModifReviewing

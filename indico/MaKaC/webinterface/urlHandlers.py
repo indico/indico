@@ -4027,9 +4027,6 @@ class UHContributionReviewingJudgements ( URLHandler ):
 class UHContributionSubmitForRewiewing( URLHandler ):
     _relativeURL = "contributionReviewing.py/submitForReviewing"
 
-class UHContributionRemoveSubmittedMarkForReviewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/removeSubmittedMarkForReviewing"
-
 class UHAssignReferee(URLHandler):
     _relativeURL = "contributionReviewing.py/assignReferee"
 
