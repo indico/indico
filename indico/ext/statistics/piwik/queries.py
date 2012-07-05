@@ -306,6 +306,10 @@ class PiwikQueryMetricConferenceVisitLength(PiwikQueryMetricConferenceBase):
         The resultant JSON of this call returns a list containing the average
         for each day, hence we need to build the total and average it accordingly.
         """
+
+        if len(data) == 0:
+            return 0
+
         seconds = 0
         avgKey = 'avg_time_on_site'
 
