@@ -23,9 +23,9 @@
             <td style="padding-right:5px;padding-left:5px;"><a href="${ urlHandlers.UHContributionModifReviewing.getURL(c) }">${ c.getTitle() }</a></td>
             <td style="padding-right:5px;padding-left:5px;">
             % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                <span>${ _("Judged:")}</span> ${ c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() }
+                <span>${ _("Assessed:")}</span> ${ c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() }
             % else:
-                <span>${ _("Not judged yet")}</span><br>
+                <span>${ _("Not assessed yet")}</span><br>
                 ${ "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = False)) }
             % endif
             </td>

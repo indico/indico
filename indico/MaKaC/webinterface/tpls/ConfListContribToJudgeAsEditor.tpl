@@ -29,23 +29,23 @@
                 % endif
                 % if ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING and c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() :
                        <td style="padding-right:5px;padding-left:5px;">
-                                <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Final judgement already given by the referee')">
+                                <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Assesment already given by the referee')">
                                    ${ c.getTitle() }
                                 </span>
                         </td>
                 % endif
             % else:
                        <td style="padding-right:5px;padding-left:5px;">
-                                <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'You must wait for the author to submit the materials<br/> before you judge the contribution.')">
+                                <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'You must wait for the author to submit the materials<br/> before you assess the contribution.')">
                                    ${ c.getTitle() }
                                 </span>
                        </td>
             % endif
             <td style="padding-right:5px;padding-left:5px;">
                 % if c.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():
-                    <span>${ _("Layout judgement given")}</span>
+                    <span>${ _("Layout assessment given")}</span>
                 % else:
-                    <span>${ _("Layout judgement not given yet")}</span>
+                    <span>${ _("Layout assessment not given yet")}</span>
                     % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING:
                     <span><br>${ _("but Referee already judged contribution")}</span>
                     % endif
@@ -67,5 +67,5 @@
 <br>
 % endif
 % if not ConfReview.getEditedContributions(User):
-<p style="padding-left: 25px;"><font color="gray">${ _("There are no contributions assigned to you to judge yet.")}</font></p>
+<p style="padding-left: 25px;"><font color="gray">${ _("There are no contributions assigned to you to assess yet.")}</font></p>
 % endif

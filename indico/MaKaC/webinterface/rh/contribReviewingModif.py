@@ -294,7 +294,7 @@ class RHEditorBase(RHContribModifBase):
         RHContribModifBase._checkParams(self, params)
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
            not self._target.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
-            raise MaKaCError("The final judgement has been submitted")
+            raise MaKaCError("The editor assessment has been submitted")
 
 class RHContributionEditingJudgement(RHEditorBase):
     _uh = urlHandlers.UHContributionEditingJudgement
@@ -313,7 +313,7 @@ class RHJudgeEditing(RHEditorBase):
             raise MaKaCError("You must wait until the author has submitted the materials")
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
             not self._target.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
-            raise MaKaCError("This contribution has already been judged by the referee.")
+            raise MaKaCError("This contribution has already been assessed by the referee.")
         self._editingJudgement = params.get("editingJudgement")
         self._comments = params.get("comments")
         self._criteria = params.get("criteria")
@@ -322,7 +322,7 @@ class RHJudgeEditing(RHEditorBase):
     def _process( self ):
 
         if self._editingJudgement == None:
-            raise MaKaCError("Select a judgement for this contribution")
+            raise MaKaCError("Select an assessment for this contribution")
         else:
             lastReview = self._target.getReviewManager().getLastReview()
             lastReview.getEditorJudgement().setAuthor(self._editor)
@@ -356,7 +356,7 @@ class RHReviewerBase(RHContribModifBase):
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-            raise MaKaCError("The final judgement has been submitted")
+            raise MaKaCError("The content assessment has been submitted")
 
 class RHContributionGiveAdvice(RHReviewerBase):
     _uh = urlHandlers.UHContributionGiveAdvice
@@ -378,7 +378,7 @@ class RHGiveAdvice(RHReviewerBase):
         if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
             raise MaKaCError("You must wait until the author has submitted the materials")
         if self._target.getReviewManager().getLastReview().isSubmitted():
-            raise MaKaCError("This contribution has already been judged by the referee.")
+            raise MaKaCError("This contribution has already been assessed by the referee.")
         self._reviewer = self.getAW().getUser()
         self._questions = params.get("questions")
         self._adviceJudgement = params.get("adviceJudgement")
@@ -387,7 +387,7 @@ class RHGiveAdvice(RHReviewerBase):
 
     def _process( self ):
         if self._adviceJudgement == None:
-            raise MaKaCError("Select a judgement for this contribution")
+            raise MaKaCError("Select an assessment for this contribution")
         else:
             lastReview = self._target.getReviewManager().getLastReview()
             lastReview.addReviewerJudgement(self._reviewer)

@@ -101,7 +101,7 @@
 % endif
 <table id="defaultDueDatesTable" style="padding-left: 20px; padding-bottom: 20px; min-width: 320px; display:${display}">
     <tr>
-        <td id="defaultDatesHelp" colspan="2" class="subGroupTitle" style="min-width:500px;">${ _("Default deadlines for the judgements")}</td>
+        <td id="defaultDatesHelp" colspan="2" class="subGroupTitle" style="min-width:500px;">${ _("Default deadlines for the assessments")}</td>
     </tr>
     % if ConfReview.hasPaperReviewing():
         <% display = 'table-row' %>
@@ -178,7 +178,7 @@
         % endif
         <tr id="autoEmails" style="display:${display}">
             <td id="automaticNotificationHelp"  class="subGroupTitle" style="width:500px;">${ _("Automatic e-mails can be sent")}:
-               ${inlineContextHelp(_('Here you can enable/disable automatic e-mails sending.<br/>Notifications can be send to the Reviewing Team in the next several situations<br/><ul><li>when are added/removed Reviewers for the conference</li><li>when are assinged/removed contributions to Reviewers</li><li>when authors of the contributions have been submitted materials</li></ul>Notifications can be send to the authors when their contributions had been judged by the Reviewers.'))}
+               ${inlineContextHelp(_('Here you can enable/disable automatic e-mails sending.<br/>Notifications can be send to the Reviewing Team in the next several situations<br/><ul><li>when are added/removed Reviewers for the conference</li><li>when are assinged/removed contributions to Reviewers</li><li>when authors of the contributions have been submitted materials</li></ul>Notifications can be send to the authors when their contributions had been assessed by the Reviewers.'))}
             </td>
         </tr>
         <tr id="autoEmailsPRMLabel" style="display:${display}">
@@ -298,7 +298,7 @@
         % endif
         <tr id="autoEmailsAuthor" style="display:${display}">
            <td style="padding-top: 7px; padding-left: 7px;">
-               ${ _("To the Author of the paper when a judgement is submitted by")}:
+               ${ _("To the Author of the paper when an assessment is submitted by")}:
            </td>
         </tr>
          % if ConfReview.hasPaperReviewing():

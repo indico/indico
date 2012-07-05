@@ -28,12 +28,12 @@
                 % endif
                 % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                     <td style="padding-right:5px;padding-left:5px;">
-                        <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Final judgement already given by the referee')">${ c.getTitle() }</span>
+                        <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Final assessment already given by the referee')">${ c.getTitle() }</span>
                     </td>
                 % endif
                 % if not c.getReviewManager().getLastReview().isAuthorSubmitted():
                        <td style="padding-right:5px;padding-left:5px;">
-                                <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'You must wait for the author to submit the materials<br/> before you judge the contribution.')">
+                                <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'You must wait for the author to submit the materials<br/> before you assess the contribution.')">
                                    ${ c.getTitle() }
                                 </span>
                        </td>
@@ -44,7 +44,7 @@
                 % else:
                     <span>${ _("Advice not given yet")}</span>
                     % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                    <span><br>${ _("but Referee already judged contribution")}</span>
+                    <span><br>${ _("but Referee already assessed contribution")}</span>
                     % endif
                 % endif
             </td>
@@ -63,5 +63,5 @@
 </table>
 % endif
 % if not ConfReview.getReviewedContributions(User):
-<p style="padding-left: 25px;"><font color="gray">${ _("There are no contributions assigned to you to judge yet.")}</font></p>
+<p style="padding-left: 25px;"><font color="gray">${ _("There are no contributions assigned to you to assess yet.")}</font></p>
 % endif

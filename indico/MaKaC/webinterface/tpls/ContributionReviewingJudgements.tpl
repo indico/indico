@@ -35,8 +35,8 @@
 % if ConferenceChoice == 3 or ConferenceChoice == 4:
 <table width="90%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
     <tr>
-        <td id="editingJudgementHelp" colspan="5" class="groupTitle" style="border-bottom: none">${ _("Layout judgement details")}
-            ${inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.'))}
+        <td id="editingJudgementHelp" colspan="5" class="groupTitle" style="border-bottom: none">${ _("Layout assessment details")}
+            ${inlineContextHelp(_('Here is displayed the assessment given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.'))}
         </td>
     </tr>
     <tr>
@@ -44,7 +44,7 @@
                 % if Editing.isSubmitted():
                     <%include file="EditingJudgementDisplay.tpl" args="Editing = Editing, ShowEditor = True, format=format"/>
                 % else:
-                    <font>${ _("Warning: the layout reviewer has not given his judgement yet.")}</span>
+                    <span>${ _("Warning: the layout reviewer has not given his assessment yet.")}</span>
                 % endif
         </td>
     </tr>
@@ -55,8 +55,8 @@
 % if ConferenceChoice == 2 or ConferenceChoice == 4:
 <table width="90%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px; border-bottom: none">${ _("Content judgement details")}
-            ${inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.'))}
+        <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px; border-bottom: none">${ _("Content assessment details")}
+            ${inlineContextHelp(_('Here is displayed the assessment given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective assessments.'))}
         </td>
     </tr>
     <tr>
@@ -79,8 +79,8 @@
 % if ConferenceChoice == 2 or ConferenceChoice == 4:
 <table width="90%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a>${ _("Final Judgement")}
-            ${inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.'))}
+        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a>${ _("Final Assessment")}
+            ${inlineContextHelp(_('Here is displayed the assessment given by the Referee.<br/>If you are the Referee of this contribution, you can change this.'))}
         </td>
     </tr>
         % if not IsReferee:
@@ -88,8 +88,8 @@
                 <tr>
                     <td colspan="2" align="left">
                         <span>
-                        ${ _("This contribution has not been judged yet.")}<br>
-                        ${ _("You are not allowed to perform the final judgement on this contribution.")}
+                        ${ _("This contribution has not been assessed yet.")}<br>
+                        ${ _("You are not allowed to perform the assessment on this contribution.")}
                         </span>
                     </td>
                 </tr>
@@ -109,7 +109,7 @@
             </td>
         </tr>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong>${ _("Judgement")}:</strong></span></td>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong>${ _("Assessment")}:</strong></span></td>
             <td>
                 <div id="statusDiv">
                     <div id="initialStatus" style="display:inline">${ Review.getRefereeJudgement().getJudgement() }</div>
@@ -252,7 +252,7 @@ var updatePage = function (){
     if (submitted) {
         % if IsReferee:
         submitButton.set($T('Undo sending'));
-        $E('submittedmessage').set($T('Judgement has been sent'));
+        $E('submittedmessage').set($T('Assessment has been sent'));
         % endif
         if($E('initialStatus')) {
             $E('statusDiv').remove($E('initialStatus'));
@@ -267,12 +267,12 @@ var updatePage = function (){
             $E('submitHelpPopUp').append(HelpImg);
             % if not FinalJudge:
                    var submitHelpPopUpText = function(event) {
-                      IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You must give your judgement before sending.</span>");
+                      IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You must give your assessment before sending.</span>");
                         }
             % endif
             $E('submitHelpPopUp').dom.onmouseover = submitHelpPopUpText;
         % endif
-        $E('submittedmessage').set($T('Judgement not sent yet'));
+        $E('submittedmessage').set($T('Assessment not sent yet'));
         % endif
         showWidgets();
     }

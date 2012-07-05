@@ -243,10 +243,10 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
                 if self._contrib.getReviewManager().isReferee(self._rh._getUser()) and not (paperReviewChoice == 3 or paperReviewChoice == 1):
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "final", _("Final Judgement"), \
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "referee", _("Referee Assesment"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
                 else:
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judgements"), \
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Assesments", _("Assesments"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
 
             if (paperReviewChoice == 3 or paperReviewChoice == 4) and \
@@ -254,14 +254,14 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or paperReviewChoice == 3) and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
 
-                self._tabJudgeEditing = self._subtabReviewing.newSubTab( "editing", "Judge Layout", \
+                self._tabJudgeEditing = self._subtabReviewing.newSubTab( "editing", "Assess Layout", \
                 urlHandlers.UHContributionEditingJudgement.getURL(self._target) )
 
             if (paperReviewChoice == 2 or paperReviewChoice == 4) and \
                 self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
                 not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
 
-                self._tabGiveAdvice = self._subtabReviewing.newSubTab( "advice", "Judge Content", \
+                self._tabGiveAdvice = self._subtabReviewing.newSubTab( "advice", "Assess Content", \
                                       urlHandlers.UHContributionGiveAdvice.getURL(self._target))
 
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isInReviewingTeamforContribution(self._rh._getUser()):

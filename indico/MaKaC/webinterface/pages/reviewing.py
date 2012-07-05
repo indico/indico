@@ -66,13 +66,13 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
                     urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )
 
         if self._showListContribToJudge and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
-            self._tabListContribToJudge = self._tabCtrl.newTab( "contributionsToJudge", _("Judge as Referee"),\
+            self._tabListContribToJudge = self._tabCtrl.newTab( "contributionsToJudge", _("Assess as Referee"),\
                     urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) )
         if self._showListContribToJudgeAsReviewer and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
-            self._tabListContribToJudgeAsReviewer = self._tabCtrl.newTab( "contributionsToJudge", _("Judge as Content Reviewer"),\
+            self._tabListContribToJudgeAsReviewer = self._tabCtrl.newTab( "contributionsToJudge", _("Assess as Content Reviewer"),\
                     urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf ) )
         if self._showListContribToJudgeAsEditor and (self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
-            self._tabListContribToJudgeAsEditor = self._tabCtrl.newTab( "contributionsToJudge", _("Judge as Layout Reviewer"),\
+            self._tabListContribToJudgeAsEditor = self._tabCtrl.newTab( "contributionsToJudge", _("Assess as Layout Reviewer"),\
                     urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) )
 
         self._setActiveTab()

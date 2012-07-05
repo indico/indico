@@ -13,7 +13,7 @@
     ${ tracks }
 </table>
 % if not judgements:
-    <span style="padding-left: 10px;">There are no judgements yet.</span>
+    <span style="padding-left: 10px;">There are no assessments yet.</span>
 % endif
 % if ratingAverage:
     <br>
@@ -68,7 +68,7 @@ function showQuestionDetails(questions, answers, average, total) {
     trFooter.append(tdAverage);
     trFooter.append(tdValue);
 
-    popup = new AlertPopup('Judgement details',content);
+    popup = new AlertPopup('Assessment details',content);
     popup.open();
 
 }

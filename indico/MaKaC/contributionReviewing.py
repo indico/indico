@@ -632,26 +632,26 @@ class Review(Persistent, Fossilizable):
         if self.isAuthorSubmitted():
             if self.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
                 if self._editorJudgement.isSubmitted():
-                    status.append(_("Judged: ") + str(self._editorJudgement.getJudgement()))
+                    status.append(_("Assessed: ") + str(self._editorJudgement.getJudgement()))
                 else:
                     status.append(_("Pending layout reviewer decision"))
             elif self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING or self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING:
                 if self._refereeJudgement.isSubmitted():
-                    status.append(_("Judged: ") + str(self._refereeJudgement.getJudgement()))
+                    status.append(_("Assessed: ") + str(self._refereeJudgement.getJudgement()))
                 elif forAuthor:
                     status.append(_("Pending referee decision"))
                 else:
                     if self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING:
                         editor = self._reviewManager.getEditor()
                         if self._reviewManager.isEditor(editor) and self._editorJudgement.isSubmitted():
-                            status.append(_("Layout judged by ") + str(self._reviewManager.getEditor().getFullName())+ _(" as: ") + str(self._editorJudgement.getJudgement()))
+                            status.append(_("Layout assessed by ") + str(self._reviewManager.getEditor().getFullName())+ _(" as: ") + str(self._editorJudgement.getJudgement()))
                         else:
                             status.append(_("Pending layout reviewer decision"))
 
                         if self.anyReviewerHasGivenAdvice():
                             for reviewer in self._reviewManager.getReviewersList():
                                 if (self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement() != None):
-                                    status.append(_("Content judged by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
+                                    status.append(_("Content assessed by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
                             if not self.allReviewersHaveGivenAdvice():
                                 status.append(_("Some content reviewers have not decided yet"))
                         else:
@@ -660,7 +660,7 @@ class Review(Persistent, Fossilizable):
                         if self.anyReviewerHasGivenAdvice():
                             for reviewer in self._reviewManager.getReviewersList():
                                 if (self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement() != None):
-                                    status.append(_("Content judged by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
+                                    status.append(_("Content assessed by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
                             if not self.allReviewersHaveGivenAdvice():
                                 status.append(_("Some content reviewers have not decided yet"))
                         else:
@@ -1052,7 +1052,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
         if isinstance(judgement, EditorJudgement):
             if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
-                self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been withdrawn by the layout reviewer"""
+                self.setSubject("""[Indico] The assessment for your contribution "%s" (id: %s) has been withdrawn by the layout reviewer"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Author,
 
@@ -1064,13 +1064,13 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
         "%s"
 
-        The judgement was: %s
+        The assessment was: %s
 
         Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
         """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
         )
             else:
-                self.setSubject("""[Indico] The judgement for the layout of your contribution "%s" (id: %s) has been withdrawn"""
+                self.setSubject("""[Indico] The assessment for the layout of your contribution "%s" (id: %s) has been withdrawn"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Author,
 
@@ -1082,14 +1082,14 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
         "%s"
 
-        The judgement was: %s
+        The assessment was: %s
 
         Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
         """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
         )
 
         elif isinstance(judgement, ReviewerJudgement):
-            self.setSubject("""[Indico] The judgement for the content of your contribution "%s" (id: %s) has been withdrawn"""
+            self.setSubject("""[Indico] The assessment for the content of your contribution "%s" (id: %s) has been withdrawn"""
                             % (contribution.getTitle(), str(contribution.getId())))
             self.setBody("""Dear Author,
 
@@ -1101,14 +1101,14 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
         "%s"
 
-        The judgement was: %s
+        The assessment was: %s
 
         Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
         """ % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())
         )
 
         elif isinstance(judgement, RefereeJudgement):
-            self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been withdrawn by the referee"""
+            self.setSubject("""[Indico] The assessment for your contribution "%s" (id: %s) has been withdrawn by the referee"""
                             % (contribution.getTitle(), str(contribution.getId())))
             self.setBody("""Dear Author,
 
@@ -1120,7 +1120,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
         "%s"
 
-        The judgement was: %s
+        The assessment was: %s
 
         Please log into the system and visit the event homepage, where you can find further information concerning your paper under "Paper reviewing", "Upload Paper", "View".
         """  % ( contribution.getTitle(), str(contribution.getId()), contribution.getConference().getTitle(), judgement.getJudgement())

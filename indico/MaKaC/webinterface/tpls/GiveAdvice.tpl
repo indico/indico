@@ -27,7 +27,7 @@
 <table width="90%" align="center" border="0" style="padding-top: 15px;">
     <tr>
         <td colspan="5" class="groupTitle" style="border: none">${ _("Give opinion on the content of a contribution")}
-            ${inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.'))}
+            ${inlineContextHelp(_('Here is displayed the assessment given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective assessments.'))}
         </td>
     </tr>
     <tr>
@@ -42,14 +42,14 @@
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Judgement")}</span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Assessment")}</span></td>
         <td>
             <div id="statusDiv">
                 <div id="initialStatus" style="display:inline">${ Advice.getJudgement() }</div>
                 <div id="inPlaceEditJudgement" style="display:inline"></div>
             </div>
             <div id="commentsMessage" style="padding-top:5px;">
-                ${ _("The comments and your judgement, will be sent by e-mail to the author(s)")}
+                ${ _("The comments and your assessment, will be sent by e-mail to the author(s)")}
             </div>
         </td>
     </tr>
@@ -197,15 +197,15 @@ var updatePage = function (firstLoad){
         if($E('initialStatus')) {
             $E('statusDiv').remove($E('initialStatus'));
         }
-        submitButton.set($T('Modify judgement'));
-        $E('submittedmessage').set($T('Judgement has been submitted'));
+        submitButton.set($T('Modify assessment'));
+        $E('submittedmessage').set($T('Assessment has been submitted'));
         showValues();
     } else {
         if ("${ Advice.getJudgement() }" == "None") {
             submitButton.dom.disabled = true;
         }
         submitButton.set('Submit');
-        $E('submittedmessage').set('Judgement not submitted yet');
+        $E('submittedmessage').set('Assessment not submitted yet');
         showWidgets(firstLoad);
     }
 }

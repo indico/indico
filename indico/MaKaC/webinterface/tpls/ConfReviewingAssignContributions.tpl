@@ -507,7 +507,7 @@ var contributionTemplate = function(contribution) {
             span.dom.style.color = '#881122';
         else if (judgement == "Accept")
             span.dom.style.color = '#118822';
-        span.set($T("Judged") + ": " + judgement);
+        span.set($T("Assessed") + ": " + judgement);
         cell7.set(span);
 
     } else {
@@ -518,7 +518,7 @@ var contributionTemplate = function(contribution) {
         ul.dom.style.marginLeft = '5px';
 
         var li = Html.li();
-        li.set($T("Not judged yet:"));
+        li.set($T("Not assessed yet:"));
         ul.append(li);
 
         statusList = contribution.reviewManager.lastReview.reviewingStatus;

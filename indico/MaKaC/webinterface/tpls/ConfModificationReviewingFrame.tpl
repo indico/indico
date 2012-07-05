@@ -40,7 +40,7 @@
     </tr>
     <tr>
         <td class="questionContent" style="padding-top:5px; padding-left:3px;">
-            <span>${ _("Responsibilities: Assign contributions to reviewers and give final judgement") }</span>
+            <span>${ _("Responsibilities: Assign contributions to reviewers and give referee assessment") }</span>
         </td>
     </tr>
     <tr>
@@ -111,7 +111,7 @@
     </tr>
     <tr>
         <td class="questionContent" style="padding-top:5px; padding-left:3px;">
-            <span>${ _("Responsibility: Judge content verification of contributions") }</span>
+            <span>${ _("Responsibility: Assess content verification of contributions") }</span>
         </td>
     </tr>
     <tr>
@@ -185,7 +185,7 @@
     </tr>
     <tr>
         <td class="questionContent" style="padding-top:5px; padding-left:3px;">
-            <span>${ _("Responsibility: Judge form verification of contributions") }</span>
+            <span>${ _("Responsibility: Assess form verification of contributions") }</span>
         </td>
     </tr>
     <tr>

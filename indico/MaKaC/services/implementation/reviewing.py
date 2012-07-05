@@ -731,7 +731,7 @@ class ContributionReviewingBase(ProtectedModificationService, ContributionBase):
         elif self._current == 'reviewerJudgement':
             return lastReview.getReviewerJudgement(self._getUser())
         else:
-            raise ServiceError("ERR-REV7",_("Current kind of judgement not specified"))
+            raise ServiceError("ERR-REV7",_("Current kind of assessment not specified"))
 
 class ContributionReviewingTextModificationBase (TextModificationBase, ContributionReviewingBase):
     #Note: don't change the order of the inheritance here!
@@ -781,7 +781,7 @@ class ContributionReviewingJudgementModification(ContributionReviewingTextModifi
 
     def _handleSet(self):
         if self.getJudgementObject().isSubmitted():
-            raise ServiceError("ERR-REV8a",_("You cannot modify a judgement marked as submitted"))
+            raise ServiceError("ERR-REV8a",_("You cannot modify an assessment marked as submitted"))
         self.getJudgementObject().setJudgement(self._value)
 
     def _handleGet(self):
@@ -795,7 +795,7 @@ class ContributionReviewingCommentsModification(ContributionReviewingHTMLModific
 
     def _handleSet(self):
         if self.getJudgementObject().isSubmitted():
-            raise ServiceError("ERR-REV8b",_("You cannot modify a judgement marked as submitted"))
+            raise ServiceError("ERR-REV8b",_("You cannot modify an assessment marked as submitted"))
         self.getJudgementObject().setComments(self._value)
 
     def _handleGet(self):
@@ -809,7 +809,7 @@ class ContributionReviewingCriteriaModification(ContributionReviewingTextModific
 
     def _handleSet(self):
         if self.getJudgementObject().isSubmitted():
-            raise ServiceError("ERR-REV8c",_("You cannot modify a judgement marked as submitted"))
+            raise ServiceError("ERR-REV8c",_("You cannot modify an assessment marked as submitted"))
         self.getJudgementObject().setAnswer(self._criterion, int(self._value), self._conf.getConfPaperReview().getNumberOfAnswers())
 
     def _handleGet(self):
