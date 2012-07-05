@@ -64,11 +64,13 @@
                 % if len(AdviceList) > 0:
                     <table cellspacing="0" cellpadding="5" width="100%">
                     % for advice in AdviceList:
+                    <tr><td>
                         <%include file="AdviceJudgementDisplay.tpl" args="Advice = advice, ShowReviewer = True, format=format"/>
+                    </td></tr>
                     % endfor
                     </table>
                 % else:
-                    <font>${ _("Warning: all your content reviewers have not given their advices yet.")}</span>
+                    <span>${ _("Warning: all your content reviewers have not given their advices yet.")}</span>
                 % endif
         </td>
     </tr>
@@ -96,20 +98,20 @@
             % endif
         % endif
         <tr>
-            <td nowrap class="titleCellTD">
+            <td class="dataCaptionTD" style="white-space: nowrap; width: 50px">
                 <span class="titleCellFormat">${ _("Reviewing questions:")}</span>
             </td>
-            <td width="60%" id="questionListDisplay">
+            <td id="questionListDisplay">
             </td>
         </tr>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Comments")}:</span></td>
+            <td class="dataCaptionTD" style="white-space: nowrap; width: 50px"><span class="titleCellFormat">${ _("Comments")}:</span></td>
             <td>
                 <div id="inPlaceEditComments">${Review.getRefereeJudgement().getComments() | h, html_breaks}</div>
             </td>
         </tr>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong>${ _("Assessment")}:</strong></span></td>
+            <td class="dataCaptionTD" style="white-space: nowrap; width: 50px"><span class="titleCellFormat"><strong>${ _("Assessment")}:</strong></span></td>
             <td>
                 <div id="statusDiv">
                     <div id="initialStatus" style="display:inline">${ Review.getRefereeJudgement().getJudgement() }</div>
