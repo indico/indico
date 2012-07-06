@@ -817,8 +817,14 @@ class ConferenceParticipantsAutoAccept(ConferenceModifBase):
 
     def _getAnswer( self ):
         participation = self._conf.getParticipation()
-        participation.setAutoAccept(not participation.autoAccept(), self._getUser())
-        return True
+        participation.setAutoAccept(not participation.isAutoAccept(), self._getUser())
+        return participation.isAutoAccept()
+
+class ConferenceParticipantsNotifyMgrNewParticipant(ConferenceModifBase):
+
+    def _getAnswer( self ):
+        participation = self._conf.getParticipation()
+        participation.setNotifyMgrNewParticipant(not participation.isNotifyMgrNewParticipant())
 
 class ConferenceParticipantsSetNumMaxParticipants( ConferenceTextModificationBase ):
     """
@@ -869,10 +875,15 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
                                 % pending.getEmail()),title=_('Already pending participant'))
         else:
             if participation.addPendingParticipant(pending):
-                if participation.autoAccept():
+                if participation.isAutoAccept():
                     result["msg"] = _("The request for participation has been accepted")
                     if participation.displayParticipantList() :
                         result["listParticipants"] = participation.getPresentParticipantListText()
+                    # check if an e-mail should be sent...
+                    if participation.isNotifyMgrNewParticipant():
+                        # to notify the manager of new participant addition
+                        data = self.preparedNewParticipantMessage(pending)
+                        GenericMailer.sendAndLog(GenericNotification(data),self._conf)
                 else:
                     result["msg"] = _("The participant identified by email '%s' has been added to the list of pending participants"
                                     % pending.getEmail())
@@ -880,6 +891,32 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
                 return NoReportError(_("The participant cannot be added."), title=_("Error"))
         return result
 
+    def preparedNewParticipantMessage(self, participant):
+        if participant is None :
+            return None
+
+        profileURL = urlHandlers.UHConfModifParticipants.getURL(self._conf)
+
+        toList = []
+        for manager in self._conf.getManagerList():
+            if isinstance(manager, Avatar) :
+                toList.append(manager.getEmail())
+
+        data = {}
+        data["toList"] = toList
+        data["fromAddr"] = Config.getInstance().getSupportEmail()
+        data["subject"] = "New participant joined %s"%self._conf.getTitle()
+
+        data["body"] = """
+        Dear Event Manager,
+
+            A new participant, identified by email '%s' has been added to %s.
+            The full list of participants can be managed at %s
+
+        Your Indico
+        """%(participant.getEmail(), self._conf.getTitle(), profileURL)
+
+        return data
 
 class ConferenceAddParticipant(ConferenceModifBase, ConferenceAddEditParticipantBase):
 
@@ -1158,8 +1195,8 @@ class ConferenceRejectWithEmailPendingParticipants(ConferenceParticipantBase, Co
         data["fromAddr"] = Config.getInstance().getNoReplyEmail()
         data["subject"] =  emailSubject
         data["body"] =  emailBody
-        for id in self._userList:
-            pending = self._conf.getParticipation().getPendingParticipantByKey(id)
+        for userId in self._userList:
+            pending = self._conf.getParticipation().getPendingParticipantByKey(userId)
             pending.setStatusDeclined()
             self._conf.getParticipation().declineParticipant(pending)
             self._sendEmailWithFormat(pending, data)
@@ -1594,9 +1631,10 @@ methodMap = {
 #    "getFields": ConferenceGetFields,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
     "participation.allowDisplay": ConferenceParticipantsDisplay,
+    "participation.notifyMgrNewParticipant": ConferenceParticipantsNotifyMgrNewParticipant,
     "participation.addedInfo": ConferenceParticipantsAddedInfo,
     "participation.allowForApply": ConferenceParticipantsAllowForApplying,
-    "participation.autopAccept": ConferenceParticipantsAutoAccept,
+    "participation.autoAccept": ConferenceParticipantsAutoAccept,
     "participation.setNumMaxParticipants": ConferenceParticipantsSetNumMaxParticipants,
     "participation.applyParticipant": ConferenceApplyParticipant,
     "participation.addParticipant": ConferenceAddParticipant,

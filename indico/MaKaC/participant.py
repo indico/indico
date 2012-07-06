@@ -31,6 +31,7 @@ from MaKaC.i18n import _
 from MaKaC.common.Configuration import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
+from indico.util.contextManager import ContextManager
 
 class Participation(Persistent):
 
@@ -49,12 +50,14 @@ class Participation(Persistent):
         self._dateNegotiation = None
         self._displayParticipantList = True
         self._numMaxParticipants = 0
+        self._notifyMgrNewParticipant = False
 
     def clone(self, conference, options, eventManager=None):
         newParticipation = conference.getParticipation()
         newParticipation._obligatory = self._obligatory
         newParticipation._allowedForApplying = self._allowedForApplying
         newParticipation._autoAccept = self._autoAccept
+        newParticipation._notifyMgrNewParticipant = self.isNotifyMgrNewParticipant()
         newParticipation._displayParticipantList = self._displayParticipantList
         if options.get("addedInfo", False) :
             newParticipation._addedInfo = True
@@ -119,7 +122,7 @@ class Participation(Persistent):
         self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
         self.notifyModification()
 
-    def autoAccept(self):
+    def isAutoAccept(self):
         try:
             return self._autoAccept
         except AttributeError :
@@ -149,6 +152,21 @@ class Participation(Persistent):
             "value": str(value)
         }
         self._conference.getLogHandler().logAction(logData, "participants", responsibleUser)
+        self.notifyModification()
+
+    def isNotifyMgrNewParticipant(self):
+        try:
+            return self._notifyMgrNewParticipant
+        except AttributeError:
+            self._notifyMgrNewParticipant = False
+            return False
+
+    def setNotifyMgrNewParticipant(self, value):
+        currentUser = ContextManager.get('currentUser')
+        self._notifyMgrNewParticipant = value
+        logData = {}
+        logData["subject"] = "Sending email after application has been %s"%("activated" if value else "deactivated")
+        self._conference.getLogHandler().logAction(logData,"participants",currentUser)
         self.notifyModification()
 
     def isFull(self):
@@ -270,8 +288,8 @@ class Participation(Persistent):
             """)
 
         data["fromAddr"] = eventManager.getEmail()
-        data["subject"] = _("Invitation to %s")%self._conference.getTitle()
-        data["body"] = _("""
+        data["subject"] = "Invitation to %s"%self._conference.getTitle()
+        data["body"] = """
         Dear %s %s,
 
         you have been added to the list of '%s' participants.
@@ -280,7 +298,7 @@ class Participation(Persistent):
         Looking forward to meeting you at %s
         Your Indico
         on behalf of %s %s
-        """)%(title, familyName, \
+        """%(title, familyName, \
              self._conference.getTitle(), \
              eventURL, refuse, \
              self._conference.getTitle(), \
@@ -432,7 +450,7 @@ class Participation(Persistent):
             return False
         if self.alreadyParticipating(participant) != 0 :
             return False
-        if self.autoAccept():
+        if self.isAutoAccept():
             self.addParticipant(participant)
         else:
             self._pendingParticipantList["%d"%self._newPendingId()] = participant
@@ -562,10 +580,10 @@ on behalf of %s %s
         data["fromAddr"] = eventManager.getEmail()
 
         toList = []
-        for id in participantsIdList :
-            participant = self._participantList.get(id,None)
-            if Participant is not None :
-                toList.append(p.getEmail())
+        for userId in participantsIdList :
+            participant = self._participantList.get(userId,None)
+            if participant is not None :
+                toList.append(participant.getEmail())
         data["toList"] = toList
         GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants",eventManager)
         return True

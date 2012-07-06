@@ -2498,8 +2498,9 @@ class WConferenceParticipantsSetup(wcomponents.WTemplated):
         vars["allowDisplay"] = self._conf.getParticipation().displayParticipantList()
         vars["addedInfo"] = self._conf.getParticipation().isAddedInfo()
         vars["allowForApply"] = self._conf.getParticipation().isAllowedForApplying()
-        vars["autopAccept"] = self._conf.getParticipation().autoAccept()
+        vars["autoAccept"] = self._conf.getParticipation().isAutoAccept()
         vars["numMaxParticipants"] = self._conf.getParticipation().getNumMaxParticipants()
+        vars["notifyMgrNewParticipant"] = self._conf.getParticipation().isNotifyMgrNewParticipant()
         return vars
 
 class WPConfModifParticipantsSetup( WPConferenceModifParticipantBase ):

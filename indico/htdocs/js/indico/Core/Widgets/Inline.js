@@ -206,7 +206,9 @@ type("RemoteSwitchButton", ["InlineWidget"],
                                    else {
                                        chooser.set(targetState);
                                    }
-
+                                   if (exists(self.postRequest)) {
+                                       self.postRequest(response, error);
+                                   }
                                });
              };
 
@@ -249,12 +251,13 @@ type("RemoteSwitchButton", ["InlineWidget"],
       * disableMethod - remote method to be called in order to pass to "disabled state"
       * args - extra args to be passed to either method
       */
-     function(initState, imgEnabled, imgDisabled, enableMethod, disableMethod, args) {
+     function(initState, imgEnabled, imgDisabled, enableMethod, disableMethod, args, postRequest) {
          this.initState = initState;
          this.imgEnabled = imgEnabled;
          this.imgDisabled = imgDisabled;
          this.enableMethod = enableMethod;
          this.disableMethod = disableMethod;
+         this.postRequest = any(postRequest, null);
          this.args = args;
      });
 
