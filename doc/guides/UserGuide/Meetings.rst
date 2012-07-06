@@ -165,6 +165,7 @@ squares are the listed below.
 * Show the list of participants in the event page-
 * Allow the users to participate in this event by showing a link in the event page.
 * Approve the participation request by the event managers.
+	* Activate notification by email when a new participant applies with no need to be approved.
 * Setup the maximum numbers of participants where 0 means unlimited.
 
 |image153|
