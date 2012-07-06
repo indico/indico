@@ -56,7 +56,7 @@
                     % if abstract.getField(f.getId()):
                     <div class="abstractSection">
                         <h2 class="abstractSectionTitle">${f.getName()}</h2>
-                        <div class="abstractSectionContent">${abstract.getField(f.getId())}
+                        <div class="abstractSectionContent">${escape(abstract.getField(f.getId()))}
                         </div>
                     </div>
                     % endif
