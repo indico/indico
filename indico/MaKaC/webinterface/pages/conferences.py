@@ -8151,103 +8151,64 @@ class WPConfModifRoomBookingConfirmBooking( WPConfModifRoomBookingBase ):
 """
 Badge Printing classes
 """
-class WConfModifBadgePrinting( wcomponents.WTemplated ):
+class WConfModifBadgePrinting(wcomponents.WTemplated):
     """ This class corresponds to the screen where badge templates are
         listed and can be created, edited, deleted, and tried.
     """
 
-    def __init__( self, conference, user=None ):
+    def __init__(self, conference, user=None):
         self.__conf = conference
-        self._user=user
+        self._user = user
 
-    def _getBaseTemplatesHTML( self ):
+    def _getBaseTemplateOptions(self):
         dconf = conference.CategoryManager().getDefaultConference()
         templates = dconf.getBadgeTemplateManager().getTemplates()
 
-        html = i18nformat("""<option value="blank">&lt; _("Blank Page")&gt;</option>""")
+        options = [{'value': 'blank', 'label': _('Blank Page')}]
 
-        for id,template in templates.iteritems():
-            html += '<option value="'+id+'">'+template.getName()+'</option>'
+        for id, template in templates.iteritems():
+            options.append({'value': id, 'label': template.getName()})
 
-        return html
+        return options
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["NewTemplateURL"]=str(urlHandlers.UHConfModifBadgeDesign.getURL(self.__conf,self.__conf.getBadgeTemplateManager().getNewTemplateId(),new = True))
-        vars["CreatePDFURL"]=str(urlHandlers.UHConfModifBadgePrintingPDF.getURL(self.__conf))
-
-        vars["TryTemplateDisabled"] = ""
-        if len(self.__conf.getBadgeTemplateManager().getTemplates()) == 0:
-            vars["TryTemplateDisabled"] = "disabled"
-
-        templateListHTML = []
-        first = True
+    def getVars(self):
+        uh = urlHandlers
+        templates = []
         sortedTemplates = self.__conf.getBadgeTemplateManager().getTemplates().items()
-        sortedTemplates.sort(lambda item1, item2: cmp(item1[1].getName(), item2[1].getName()))
+        sortedTemplates.sort(lambda x, y: cmp(x[1].getName(), y[1].getName()))
+
         for templateId, template in sortedTemplates:
-            templateListHTML.append("""              <tr>""")
-            templateListHTML.append("""                <td>""")
-            radio = []
-            radio.append("""                  <input type="radio" name="templateId" value='""")
-            radio.append(str(templateId))
-            radio.append("""' id='""")
-            radio.append(str(templateId))
-            radio.append("""'""")
-            if first:
-                first = False
-                radio.append( _(""" CHECKED """))
-            radio.append(""">""")
-            templateListHTML.append("".join(radio))
-            templateListHTML.append("".join (["""                  """,
-                                              """<label for='""",
-                                              str(templateId),
-                                              """'>""",
-                                              template.getName(),
-                                              """</label>""",
-                                              """&nbsp;&nbsp;&nbsp;"""]))
-            edit = []
-            edit.append("""                  <a href='""")
-            edit.append(str(urlHandlers.UHConfModifBadgeDesign.getURL(self.__conf, templateId)))
-            edit.append("""'><img src='""")
-            edit.append(str(Config.getInstance().getSystemIconURL("file_edit")))
-            edit.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(edit))
-            delete = []
-            delete.append("""                  <a href='""")
-            delete.append(str(urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, deleteTemplateId=templateId)))
-            delete.append( i18nformat("""' onClick="return confirm('""" + _("Are you sure you want to delete this template?") + """');"><img src='"""))
-            delete.append(str(Config.getInstance().getSystemIconURL("smallDelete")))
-            delete.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(delete))
-            copy = []
-            copy.append("""                  <a href='""")
-            copy.append(str(urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, copyTemplateId=templateId)))
-            copy.append("""'><img src='""")
-            copy.append(str(Config.getInstance().getSystemIconURL("smallCopy")))
-            copy.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(copy))
 
-            templateListHTML.append("""                </td>""")
-            templateListHTML.append("""              </tr>""")
+            data = {
+                'id': templateId,
+                'name': template.getName(),
+                'urlEdit': str(uh.UHConfModifBadgeDesign.getURL(self.__conf, templateId)),
+                'urlDelete': str(uh.UHConfModifBadgePrinting.getURL(self.__conf, deleteTemplateId=templateId)),
+                'urlCopy': str(uh.UHConfModifBadgePrinting.getURL(self.__conf, copyTemplateId=templateId))
+            }
 
-        vars["templateList"] = "\n".join(templateListHTML)
+            templates.append(data)
 
         wcPDFOptions = WConfModifBadgePDFOptions(self.__conf)
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["NewTemplateURL"] = str(uh.UHConfModifBadgeDesign.getURL(self.__conf,
+                                    self.__conf.getBadgeTemplateManager().getNewTemplateId(),new = True))
+        vars["CreatePDFURL"] = str(uh.UHConfModifBadgePrintingPDF.getURL(self.__conf))
+        vars["templateList"] = templates
         vars['PDFOptions'] = wcPDFOptions.getHTML()
-        vars['baseTemplates'] = self._getBaseTemplatesHTML()
-
+        vars['baseTemplates'] = self._getBaseTemplateOptions()
 
         return vars
 
-class WConfModifBadgePDFOptions( wcomponents.WTemplated ):
+class WConfModifBadgePDFOptions(wcomponents.WTemplated):
 
-    def __init__( self, conference, showKeepValues = True, showTip = True ):
+    def __init__(self, conference, showKeepValues=True, showTip=True):
         self.__conf = conference
         self.__showKeepValues = showKeepValues
         self.__showTip = showTip
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
+        vars = wcomponents.WTemplated.getVars(self)
 
         pagesizeNames = PDFSizes().PDFpagesizes.keys()
         pagesizeNames.sort()
@@ -8260,13 +8221,19 @@ class WConfModifBadgePDFOptions( wcomponents.WTemplated ):
         return vars
 
 
-class WPConfModifBadgePrinting( WPConfModifToolsBase ):
+class WPConfModifBadgePrinting(WPConfModifToolsBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabBadges.setActive()
 
-    def _getTabContent( self, params ):
-        wc = WConfModifBadgePrinting( self._conf )
+    def getJSFiles(self):
+        files = WPConfModifToolsBase.getJSFiles(self)
+        files += self._includeJSPackage('BadgePosterPrinting')
+
+        return files
+
+    def _getTabContent(self, params):
+        wc = WConfModifBadgePrinting(self._conf)
         return wc.getHTML()
 
 
@@ -8373,13 +8340,11 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
         return vars
 
 
-class WPConfModifBadgeDesign( WPConfModifToolsBase ):
+class WPConfModifBadgeDesign(WPConfModifToolsBase):
 
-    def __init__(self, rh, conf, templateId = None, new = False, baseTemplateId = "blank"):
+    def __init__(self, rh, conf, templateId=None, new=False, baseTemplateId="blank"):
         WPConferenceModifBase.__init__(self, rh, conf)
-
         self.__templateId = templateId
-
         self.__new = new
         self.__baseTemplate = baseTemplateId
 
@@ -8392,11 +8357,11 @@ class WPConfModifBadgeDesign( WPConfModifToolsBase ):
             # handle the template as if it existed before
             self.__new = False
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabBadges.setActive()
 
-    def _getTabContent( self, params ):
-        wc = WConfModifBadgeDesign( self._conf, self.__templateId, self.__new )
+    def _getTabContent(self, params):
+        wc = WConfModifBadgeDesign(self._conf, self.__templateId, self.__new)
         return wc.getHTML()
 
 ##------------------------------------------------------------------------------------------------------------
@@ -8450,101 +8415,92 @@ class WConfCommonPDFOptions( wcomponents.WTemplated ):
 """
 Poster Printing classes
 """
-class WConfModifPosterPrinting( wcomponents.WTemplated ):
+class WConfModifPosterPrinting(wcomponents.WTemplated):
     """ This class corresponds to the screen where poster templates are
         listed and can be created, edited, deleted, and tried.
     """
 
-    def __init__( self, conference, user=None ):
+    def __init__(self, conference, user=None):
         self.__conf = conference
-        self._user=user
+        self._user = user
 
-    def _getFullTemplateListHTML( self ):
-        globaltemplates = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
-        localtemplates = self.__conf.getPosterTemplateManager().getTemplates()
-        html = ''
-        for id,template in globaltemplates.iteritems():
-            html += '<option value="global'+id+'">'+template.getName()+' (global)</option>'
-        for id,template in localtemplates.iteritems():
-            html += '<option value="'+id+'">'+template.getName()+' (local)</option>'
-        return html
+    def _getFullTemplateListOptions(self):
+        templates = {}
+        templates['global'] = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
+        templates['local'] = self.__conf.getPosterTemplateManager().getTemplates()
+        options = []
 
-    def _getBaseTemplateListHTML( self ):
-        globaltemplates = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
-        html = '<option value="blank">Blank Page</option>'
-        for id,template in globaltemplates.iteritems():
-            html += '<option value="'+id+'">'+template.getName()+'</option>'
-        return html
+        def _iterTemplatesToObjectList(key, templates):
+            newList = []
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["NewTemplateURL"]=str(urlHandlers.UHConfModifPosterDesign.getURL(self.__conf, self.__conf.getPosterTemplateManager().getNewTemplateId(),new = True))
-        vars["CreatePDFURL"]=str(urlHandlers.UHConfModifPosterPrintingPDF.getURL(self.__conf))
-        templateListHTML = []
-        first = True
+            for id, template in templates.iteritems():
+                pKey = ' (' + key + ')'
+                newList.append({'value': id, 'label': template.getName() + pKey})
+
+            return newList
+
+        for k, v in templates.iteritems():
+            options.extend(_iterTemplatesToObjectList(k, v))
+
+        return options
+
+    def _getBaseTemplateListOptions(self):
+        templates = conference.CategoryManager().getDefaultConference().getPosterTemplateManager().getTemplates()
+        options = [{'value': 'blank', 'label': _('Blank Page')}]
+
+        for id, template in templates.iteritems():
+            options.append({'value': id, 'label': template.getName()})
+
+        return options
+
+    def getVars(self):
+        uh = urlHandlers
+        templates = []
+        wcPDFOptions = WConfModifPosterPDFOptions(self.__conf)
         sortedTemplates = self.__conf.getPosterTemplateManager().getTemplates().items()
         sortedTemplates.sort(lambda item1, item2: cmp(item1[1].getName(), item2[1].getName()))
+
         for templateId, template in sortedTemplates:
-            templateListHTML.append("""              <tr>""")
-            templateListHTML.append("""                <td>""")
-            templateListHTML.append("".join (["""                  """,
-                                              """<label for='""",
-                                              str(templateId),
-                                              """'>""",
-                                              template.getName(),
-                                              """</label>""",
-                                              """&nbsp;&nbsp;&nbsp;"""]))
 
-            edit = []
-            edit.append("""                  <a href='""")
-            edit.append(str(urlHandlers.UHConfModifPosterDesign.getURL(self.__conf, templateId)))
-            edit.append("""'><img src='""")
-            edit.append(str(Config.getInstance().getSystemIconURL("file_edit")))
-            edit.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(edit))
-            delete = []
-            delete.append("""                  <a href='""")
-            delete.append(str(urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf, deleteTemplateId=templateId)))
-            delete.append("""'><img src='""")
-            delete.append(str(Config.getInstance().getSystemIconURL("smallDelete")))
-            delete.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(delete))
-            copy = []
-            copy.append("""                  <a href='""")
-            copy.append(str(urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf, copyTemplateId=templateId)))
-            copy.append("""'><img src='""")
-            copy.append(str(Config.getInstance().getSystemIconURL("smallCopy")))
-            copy.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(copy))
-            templateListHTML.append("""                </td>""")
-            templateListHTML.append("""              </tr>""")
+            data = {
+                'id': templateId,
+                'name': template.getName(),
+                'urlEdit': str(uh.UHConfModifPosterDesign.getURL(self.__conf, templateId)),
+                'urlDelete': str(uh.UHConfModifPosterPrinting.getURL(self.__conf, deleteTemplateId=templateId)),
+                'urlCopy': str(uh.UHConfModifPosterPrinting.getURL(self.__conf, copyTemplateId=templateId))
+            }
 
-        vars["templateList"] = "\n".join(templateListHTML)
+            templates.append(data)
 
-        wcPDFOptions = WConfModifPosterPDFOptions(self.__conf)
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["NewTemplateURL"] = str(uh.UHConfModifPosterDesign.getURL(self.__conf, self.__conf.getPosterTemplateManager().getNewTemplateId(),new=True))
+        vars["CreatePDFURL"]= str(uh.UHConfModifPosterPrintingPDF.getURL(self.__conf))
+        vars["templateList"] = templates
         vars['PDFOptions'] = wcPDFOptions.getHTML()
-
-        vars['baseTemplateList'] = self._getBaseTemplateListHTML()
-        vars['fullTemplateList'] = self._getFullTemplateListHTML()
+        vars['baseTemplateList'] = self._getBaseTemplateListOptions()
+        vars['fullTemplateList'] = self._getFullTemplateListOptions()
 
         return vars
 
-class WConfModifPosterPDFOptions( wcomponents.WTemplated ):
+class WConfModifPosterPDFOptions(wcomponents.WTemplated):
 
-    def __init__( self, conference, user=None ):
+    def __init__(self, conference, user=None):
         self.__conf = conference
-        self._user=user
+        self._user= user
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
+        vars = wcomponents.WTemplated.getVars(self)
 
         pagesizeNames = PDFSizes().PDFpagesizes.keys()
         pagesizeNames.sort()
         pagesizeOptions = []
+
         for pagesizeName in pagesizeNames:
             pagesizeOptions.append('<option ')
+
             if pagesizeName == 'A4':
                 pagesizeOptions.append('selected="selected"')
+
             pagesizeOptions.append('>')
             pagesizeOptions.append(pagesizeName)
             pagesizeOptions.append('</option>')
@@ -8553,15 +8509,19 @@ class WConfModifPosterPDFOptions( wcomponents.WTemplated ):
 
         return vars
 
-class WPConfModifPosterPrinting( WPConfModifToolsBase ):
+class WPConfModifPosterPrinting(WPConfModifToolsBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabPosters.setActive()
 
-    def _getTabContent( self, params ):
+    def getJSFiles(self):
+        files = WPConfModifToolsBase.getJSFiles(self)
+        files += self._includeJSPackage('BadgePosterPrinting')
 
-        wc = WConfModifPosterPrinting( self._conf )
+        return files
 
+    def _getTabContent(self, params):
+        wc = WConfModifPosterPrinting(self._conf)
         return wc.getHTML()
 
 ##------------------------------------------------------------------------------------------------------------
@@ -8573,25 +8533,24 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
         is designed inserting, dragging and editing items.
     """
 
-    def __init__( self, conference, templateId, new = False, user = None):
+    def __init__(self, conference, templateId, new=False, user=None):
         self.__conf = conference
         self.__templateId = templateId
         self.__new = new
-        self._user=user
+        self._user = user
 
 
-    def getVars( self ):
+    def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["baseURL"]=Config.getInstance().getBaseURL() ##base url of the application, used for the ruler images
-        vars["cancelURL"]=urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf, templateId = self.__templateId, cancel = True)
-        vars["saveBackgroundURL"]=urlHandlers.UHConfModifPosterSaveBackground.getURL(self.__conf, self.__templateId)
-        vars["loadingIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
-        vars["templateId"]=self.__templateId
+        vars["baseURL"] = Config.getInstance().getBaseURL()  # base url of the application, used for the ruler images
+        vars["cancelURL"] = urlHandlers.UHConfModifPosterPrinting.getURL(self.__conf, templateId = self.__templateId, cancel = True)
+        vars["saveBackgroundURL"] = urlHandlers.UHConfModifPosterSaveBackground.getURL(self.__conf, self.__templateId)
+        vars["loadingIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
+        vars["templateId"] = self.__templateId
 
         posterDesignConfiguration = PosterDesignConfiguration()
         from MaKaC.services.interface.rpc.json import encode as jsonEncode
         vars["translateName"]= jsonEncode(dict([(key, value[0]) for key, value in posterDesignConfiguration.items_actions.iteritems()]))
-
 
         cases = []
         for itemKey in posterDesignConfiguration.items_actions.keys():
@@ -8672,19 +8631,19 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
         return vars
 
 
-class WPConfModifPosterDesign( WPConfModifToolsBase ):
+class WPConfModifPosterDesign(WPConfModifToolsBase):
 
-    def __init__(self, rh, conf, templateId = None, new = False, baseTemplateId = "blank"):
+    def __init__(self, rh, conf, templateId=None, new=False, baseTemplateId="blank"):
         WPConferenceModifBase.__init__(self, rh, conf)
         self.__templateId = templateId
         self.__new = new
         self.__baseTemplate = baseTemplateId
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabPosters.setActive()
 
-    def _getTabContent( self, params ):
-        wc = WConfModifPosterDesign( self._conf, self.__templateId, self.__new)
+    def _getTabContent(self, params):
+        wc = WConfModifPosterDesign(self._conf, self.__templateId, self.__new)
         return wc.getHTML()
 
     def sortByName(x,y):

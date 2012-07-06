@@ -126,6 +126,9 @@ indico_jquery = Bundle('js/indico/jquery/defaults.js',
 indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
                                filters='rjsmin', output='indico_jquery_authors_%(version)s.min.js')
 
+indico_badgeposterprinting = Bundle('js/indico/Management/ConfModifBadgePosterPrinting.js',
+                                  filters='jsmin', output='indico_posterdesign_%(version)s.min.js')
+
 jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.js',
                 'js/jquery/jquery-ui.js',
@@ -201,6 +204,7 @@ def register_all_js(env):
     env.register('indico_display', indico_display)
     env.register('indico_jquery', indico_jquery)
     env.register('indico_authors', indico_jquery_authors)
+    env.register('indico_badgeposterprinting', indico_badgeposterprinting)
     env.register('base_js', base_js)
 
 
