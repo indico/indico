@@ -3,12 +3,12 @@
 <%block name="description" args="contrib=None">
     <div class="contributionListContribDescription">
         % if len(contrib.getDescription()):
-            ${contrib.getDescription()[0:400]}
+            ${escape(contrib.getDescription()[0:400])}
             % if len(contrib.getDescription()) > 400:
               ... <a href="${urlHandlers.UHContributionDisplay.getURL(contrib)}">${_('More')}</a>
             % endif
         % else:
-            ${contrib.getDescription()}
+            ${escape(contrib.getDescription())}
         % endif
     </div>
 </%block>
