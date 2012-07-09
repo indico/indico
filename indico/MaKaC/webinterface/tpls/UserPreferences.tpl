@@ -43,30 +43,30 @@
     var langCallback = function(){
         $E("selectLanguage").set(languageSelector.draw());
         languageSelector.observe(function(){
-            var req = indicoSource('user.setLanguage', {"lang":languageSelector.get()});
+            var req = indicoSource('user.setLanguage', {"userId": "${userId}", "lang":languageSelector.get()});
             req.state.observe(checkState("langStatus"));
         });
     };
-    var languageSelector = new SelectRemoteWidget("user.getLanguages",{},langCallback);
+    var languageSelector = new SelectRemoteWidget("user.getLanguages",{"userId": "${userId}"},langCallback);
 
     var tzCallback = function(){
         $E("myTimezone").set(myTimezoneSelector.draw());
         myTimezoneSelector.observe(function(){
-            var req = indicoSource('user.setTimezone', {"tz":myTimezoneSelector.get()});
+            var req = indicoSource('user.setTimezone', {"userId": "${userId}", "tz":myTimezoneSelector.get()});
             req.state.observe(checkState("myTimezoneStatus"));
         });
     };
-    var myTimezoneSelector = new SelectRemoteWidget("user.getTimezones",{},tzCallback);
+    var myTimezoneSelector = new SelectRemoteWidget("user.getTimezones",{"userId": "${userId}"},tzCallback);
 
     var displayTzCallback = function(){
         $E("displayTimezone").set(displayTimezoneSelector.draw());
         displayTimezoneSelector.observe(function(){
-            var req = indicoSource('user.setDisplayTimezone', {"tzMode":displayTimezoneSelector.get()});
+            var req = indicoSource('user.setDisplayTimezone', {"userId": "${userId}", "tzMode":displayTimezoneSelector.get()});
             req.state.observe(checkState("displayTimezoneStatus"));
         });
     };
-    var displayTimezoneSelector = new SelectRemoteWidget("user.getDisplayTimezones",{},displayTzCallback);
+    var displayTimezoneSelector = new SelectRemoteWidget("user.getDisplayTimezones",{"userId": "${userId}"},displayTzCallback);
 
     $E("tabShowPastEvents").set(new RemoteSwitchButton(${"true" if showPastEvents else "false"},
-            Html.img({src:imageSrc("tick.png")}), Html.img({src:imageSrc("cross.png")}), "user.hidePastEvents", "user.showPastEvents",{}).draw());
+            Html.img({src:imageSrc("tick.png")}), Html.img({src:imageSrc("cross.png")}), "user.hidePastEvents", "user.showPastEvents",{"userId": "${userId}"}).draw());
 </script>

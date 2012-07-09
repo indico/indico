@@ -39,7 +39,6 @@ import MaKaC.common.indexes as indexes
 from MaKaC.common.utils import validMail
 from indico.web.http_api.auth import APIKey
 
-
 class UserComparator(object):
 
     @staticmethod
@@ -53,18 +52,98 @@ class UserComparator(object):
     def cmpGroups(x, y):
         return cmp(x["name"].lower(), y["name"].lower())
 
+class UserBaseService(LoggedOnlyService):
 
-class UserAddToBasket(LoggedOnlyService):
+    def _checkParams(self):
+        self._pm = ParameterManager(self._params)
+        userId = self._pm.extract("userId", None)
+        if userId is not None:
+            ah = user.AvatarHolder()
+            self._target = ah.getById(userId)
+        else:
+            raise ServiceError("ERR-U5", _("User id not specified"))
+
+class UserModifyBase(UserBaseService):
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        if self._aw.getUser():
+            if not self._target.canModify( self._aw ):
+                raise ServiceError("ERR-U6", _("You are not allowed to perform this request"))
+        else:
+            raise ServiceError("ERR-U7", _("You are currently not authenticated. Please log in again."))
+
+
+class UserListEvents(LoggedOnlyService):
 
     def _checkParams(self):
         LoggedOnlyService._checkParams(self)
 
-        self._userList = []
+        self._time = self._params.get('time', None)
+        self._target = self.getAW().getUser()
 
+    def __exportElemDataFactory(self, moment):
+        return lambda elem: {
+            'id': elem[0].getId(),
+            'title': elem[0].getTitle(),
+            'roles': [elem[1]],
+            'timestamp':time.mktime(elem[0].getStartDate().timetuple()),
+            'startDate':str(elem[0].getStartDate().strftime("%d/%m/%Y")),
+            'endDate':str(elem[0].getEndDate().strftime("%d/%m/%Y")),
+            'startTime':str(elem[0].getStartDate().strftime("%H:%M")),
+            'endTime':str(elem[0].getEndDate().strftime("%H:%M")),
+            'type': moment,
+            'evtType': elem[0].getVerboseType()
+        }
+
+    def _getAnswer( self):
+
+        events = []
+
+        self._target.getTimedLinkedEvents().sync()
+
+        if (not self._time) or self._time == 'past':
+            events.extend( map( self.__exportElemDataFactory('past'),
+                               self._target.getTimedLinkedEvents().getPast()))
+
+        if (not self._time) or self._time == 'present':
+            events.extend( map(self.__exportElemDataFactory('present'),
+                              self._target.getTimedLinkedEvents().getPresent()))
+
+        if (not self._time) or self._time == 'future':
+            events.extend( map(self.__exportElemDataFactory('future'),
+                              self._target.getTimedLinkedEvents().getFuture()))
+
+        jsonData = {}
+
+        for event in events:
+            if jsonData.has_key(event['id']):
+                jsonData[event['id']]['roles'].append(event['roles'][0])
+            else:
+                jsonData[event['id']] = event
+
+        return jsonData
+
+class UserBasketBase:
+
+    def _checkParams(self):
+        ServiceBase._checkParams(self)
+        self._pm = ParameterManager(self._params)
+        userId = self._pm.extract("userId", pType=str, allowEmpty=True)
+        if userId is not None:
+            ah = user.AvatarHolder()
+            self._target = ah.getById(userId)
+        else:
+            self._target = self._aw.getUser()
+
+class UserAddToBasket(LoggedOnlyService, UserBasketBase):
+
+    def _checkParams(self):
+        UserBasketBase._checkParams(self)
+
+        self._userList = []
         for userData in self._params['value']:
             self._userList.append(user.AvatarHolder().getById(userData['id']))
-
-        self._target = self.getAW().getUser()
 
     def _getAnswer(self):
 
@@ -79,22 +158,24 @@ class UserAddToBasket(LoggedOnlyService):
             #we do not care if the user is already in the favourites
             self._target.getPersonalInfo().getBasket().addElement(user)
 
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
 
-class UserRemoveFromBasket(LoggedOnlyService):
+
+class UserRemoveFromBasket(LoggedOnlyService, UserBasketBase):
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-
+        UserBasketBase._checkParams(self)
         self._userData = self._params['value']
-
-        self._target = self.getAW().getUser()
 
     def _getAnswer( self):
         for obj in self._userData:
             if not self._target.getPersonalInfo().getBasket().deleteUser(obj['id']):
                 raise ServiceError("ERR-U0","Element '%s' not found in favorites!" % obj['id'])
 
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
 
-class UserListBasket(ServiceBase):
+class UserListBasket(UserBasketBase, ServiceBase):
 
     """
     Service that lists the users belonging to the the user's "favorites"
@@ -103,8 +184,7 @@ class UserListBasket(ServiceBase):
 
     def _checkParams(self):
         ServiceBase._checkParams(self)
-
-        self._target = self.getAW().getUser()
+        UserBasketBase._checkParams(self)
         self._allDetails = self._params.get("allDetails", False)
 
     def _getAnswer( self):
@@ -181,98 +261,87 @@ class UserCanBook(LoggedOnlyService):
             return True
         return False
 
-class UserShowPastEvents(LoggedOnlyService):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        self._target = self.getAW().getUser()
+class UserShowPastEvents(UserModifyBase):
 
     def _getAnswer( self):
         self._target.getPersonalInfo().setShowPastEvents(True)
         return True
 
 
-class UserHidePastEvents(LoggedOnlyService):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        self._target = self.getAW().getUser()
+class UserHidePastEvents(UserModifyBase):
 
     def _getAnswer( self):
         self._target.getPersonalInfo().setShowPastEvents(False)
         return True
 
 
-class UserGetLanguages(LoggedOnlyService):
+class UserGetLanguages(UserBaseService):
 
     def _getAnswer( self):
-        userLoc = self.getAW().getUser().getLang()
+        userLoc = self._target.getLang()
         return getLocaleDisplayNames(using=userLoc)
 
 
-class UserSetLanguage(LoggedOnlyService):
+class UserSetLanguage(UserModifyBase):
 
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        self._user = self.getAW().getUser()
+        UserModifyBase._checkParams(self)
         self._lang = self._params.get("lang",None)
 
     def _getAnswer( self):
         if self._lang and self._lang in availableLocales:
-            self._user.setLang(self._lang)
+            self._target.setLang(self._lang)
             return True
         else:
             return False
 
 
-class UserGetTimezones(LoggedOnlyService):
+class UserGetTimezones(UserBaseService):
 
     def _getAnswer( self):
-        userTz = self.getAW().getUser().getTimezone()
+        userTz = self._target.getTimezone()
         timezones = [tz for tz in TimezoneRegistry.getList() if tz != userTz]
         timezones.insert(0, userTz)
         return timezones
 
 
-class UserSetTimezone(LoggedOnlyService):
+class UserSetTimezone(UserModifyBase):
 
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        self._user = self.getAW().getUser()
+        UserModifyBase._checkParams(self)
         self._tz = self._params.get("tz",None)
 
     def _getAnswer( self):
         if self._tz and self._tz in TimezoneRegistry.getList():
-            self._user.setTimezone(self._tz)
+            self._target.setTimezone(self._tz)
             return True
         return False
 
 
-class UserGetDisplayTimezones(LoggedOnlyService):
+class UserGetDisplayTimezones(UserBaseService):
 
     def _getAnswer( self):
-        if self.getAW().getUser().getDisplayTZMode() == "Event Timezone":
+        if self._target.getDisplayTZMode() == "Event Timezone":
             tzMode = ["Event Timezone", "MyTimezone"]
         else:
             tzMode = ["MyTimezone", "Event Timezone"]
         return tzMode
 
 
-class UserSetDisplayTimezone(LoggedOnlyService):
+class UserSetDisplayTimezone(UserModifyBase):
 
     def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        self._user = self.getAW().getUser()
+        UserModifyBase._checkParams(self)
         self._tzMode = self._params.get("tzMode",None)
 
     def _getAnswer( self):
         if self._tzMode and self._tzMode in ["Event Timezone", "MyTimezone"]:
-            self._user.setDisplayTZMode(self._tzMode)
+            self._target.setDisplayTZMode(self._tzMode)
             return True
         return False
 
 
-class UserPersonalDataBase(LoggedOnlyService):
+class UserPersonalDataBase(UserModifyBase):
 
     _dataTypes = ["title", "surName", "name", "fullName", "straightFullName", "organisation",
                   "email", "secondaryEmails", "address", "telephone", "fax"]
@@ -288,12 +357,6 @@ class UserPersonalDataBase(LoggedOnlyService):
         self._dataType = self._pm.extract("dataType", pType=str, allowEmpty=False)
         if not self._dataType in self._dataTypes:
             raise ServiceError("ERR-U7", _("Data argument is not valid"))
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        if self._aw.getUser():
-            if not self._avatar.canModify( self._aw ):
-                raise ServiceError("ERR-U6", _("You are not allowed to perform this request"))
 
 
 class UserSetPersonalData(UserPersonalDataBase):
@@ -398,18 +461,15 @@ class UserSyncPersonalData(UserPersonalDataBase):
             getattr(self._user, setter)(val)
         return dict(val=val)
 
-class UserSetPersistentSignatures(UserPersonalDataBase):
+class UserSetPersistentSignatures(UserModifyBase):
 
     def _checkParams(self):
-        pm = ParameterManager(self._params)
-        userId = pm.extract("userId", str, False, "")
-        self._currentUser = self.getAW().getUser()
-        self._target = self._avatar = user.AvatarHolder().getById(userId)
+        UserModifyBase._checkParams(self)
         if self._target == None:
             raise ServiceAccessError((_("The user with does not exist")))
 
     def _getAnswer(self):
-        ak = self._avatar.getAPIKey()
+        ak = self._target.getAPIKey()
         ak.setPersistentAllowed(not ak.isPersistentAllowed())
         return ak.isPersistentAllowed()
 
@@ -430,6 +490,7 @@ class UserCreateKeyEnablePersistent(LoggedOnlyService):
         return True
 
 methodMap = {
+    "event.list": UserListEvents,
     "favorites.addUsers": UserAddToBasket,
     "favorites.removeUser": UserRemoveFromBasket,
     "favorites.listUsers": UserListBasket,

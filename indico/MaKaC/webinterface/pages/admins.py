@@ -1420,6 +1420,7 @@ class WUserPreferences(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["showPastEvents"] = self._avatar.getPersonalInfo().getShowPastEvents()
+        vars["userId"] = self._avatar.getId()
         return vars
 
 class WUserDetails(wcomponents.WTemplated):
@@ -1516,10 +1517,10 @@ class WPPersonalArea(WPUserBase):
             a side menu. Maybe the tab is needed in the future.
         """
         self._tabPreferences = self._tabCtrl.newTab( "preferences", _("Preferences"), \
-                urlHandlers.UHUserPreferences.getURL() )
+                urlHandlers.UHUserPreferences.getURL(self._avatar) )
 
         self._tabBaskets = self._tabCtrl.newTab( "baskets", _("Favorites"), \
-                urlHandlers.UHUserBaskets.getURL() )
+                urlHandlers.UHUserBaskets.getURL(self._avatar) )
 
         self._tabAPI = self._tabCtrl.newTab( "api", _("HTTP API"), \
                 urlHandlers.UHUserAPI.getURL(self._avatar) )

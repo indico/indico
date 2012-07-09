@@ -8,11 +8,12 @@
 
 <script type="text/javascript">
 
-    var favouriteList = ${ offlineRequest(self_._rh, 'user.favorites.listUsers') };
+    var favouriteList = ${ offlineRequest(self_._rh, 'user.favorites.listUsers',dict(userId=user.getId())) };
 
     var removeUser = function(user, setResult){
         jsonRpc(Indico.Urls.JsonRpcService, "user.favorites.removeUser",
-                {value: [{'id': user.get('id')}]},
+                { userId: '${user.getId()}',
+                  value: [{'id': user.get('id')}]},
                 function(result, error){
                     if (exists(error)) {
                         IndicoUtil.errorReport(error);
@@ -25,7 +26,8 @@
 
     var addUsers = function(list, setResult){
         jsonRpc(Indico.Urls.JsonRpcService, "user.favorites.addUsers",
-                { value: list },
+                { userId: '${user.getId()}',
+                  value: list },
                 function(result, error){
                     if (exists(error)) {
                         IndicoUtil.errorReport(error);
