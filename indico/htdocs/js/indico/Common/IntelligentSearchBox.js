@@ -267,6 +267,10 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
              if (this.selectorPos >= 0) {
                  this.suggestionList.item(this.selectorPos).dom.className = '';
              }
+         },
+
+         isAnyItemSelected: function(){
+             return this.selectorPos > 0;
          }
 
      },

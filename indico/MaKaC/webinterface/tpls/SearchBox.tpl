@@ -130,7 +130,7 @@ $(function() {
     })
 
     $('#searchText').keypress(function(e) {
-        if(e.which == 13){
+        if(e.which == 13 && !intelligentSearchBox.isAnyItemSelected()){
             if (verifyForm()) {
                 $('#searchBoxForm').submit();
             }
