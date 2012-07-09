@@ -487,14 +487,20 @@ class WConfDisplayFrame(wcomponents.WTemplated):
             vars["confLocation"] =  self._conf.getLocationList()[0].getName()
         vars["body"] = self._body
         vars["supportEmail"] = ""
-        if self._conf.hasSupportEmail():
-            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
+        vars["supportTelephone"] = ""
+        if self._conf.getSupportInfo().hasEmail():
+            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportInfo().getEmail(), urllib.quote( self._conf.getTitle() ) ))
             vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>"""%(mailto,
                                                 Config.getInstance().getSystemIconURL("smallEmail"),
-                                                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False).getSupportEmailCaption())
+                                                self._conf.getSupportInfo().getCaption())
+
+        if self._conf.getSupportInfo().hasTelephone():
+            vars["supportTelephone"] = "Phone: %s"%self._conf.getSupportInfo().getTelephone()
+
         p={"closeMenuURL": vars["closeMenuURL"], \
             "menuStatus": vars["menuStatus"], \
-            "supportEmail": vars["supportEmail"] \
+            "supportEmail": vars["supportEmail"], \
+            "supportTelephone": vars["supportTelephone"]  \
             }
         vars["menu"] = ConfDisplayMenu( self._menu ).getHTML(p)
 
@@ -530,8 +536,8 @@ class ConfDisplayMenu:
                     html.append(self._getLinkHTML(link))
             html.append("""<li class="menuConfBottomCell">&nbsp;</li>""")
             html.append("""     </ul>
-                                <div class="confSupportEmailBox">%s</div>
-                        </div>"""%params["supportEmail"])
+                                <div class="confSupportEmailBox">%s<br/>%s</div>
+                        </div>"""%(params["supportEmail"], params["supportTelephone"]))
         return "".join(html)
 
     def _getLinkHTML(self, link, indent=""):
@@ -1059,7 +1065,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         evaluation = conf.getEvaluation()
         if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions() > 0:
             vars['evaluationLink'] = urlHandlers.UHConfEvaluationDisplay.getURL(conf)
-        vars['supportEmailCaption'] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getSupportEmailCaption()
+        vars['supportEmailCaption'] = conf.getSupportInfo().getCaption()
 
         vars['types'] = WPTPLConferenceDisplay._Types
 
@@ -1841,10 +1847,10 @@ class WConfModifMainData(wcomponents.WTemplated):
             vars["contactInfo"]=self._conf.getContactInfo()
         else:
             vars["contactInfo"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._conf.getContactInfo()
-        vars["supportEmailCaption"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption()
+        vars["supportEmailCaption"] = self._conf.getSupportInfo().getCaption()
         vars["supportEmail"] = i18nformat("""--_("not set")--""")
-        if self._conf.hasSupportEmail():
-            vars["supportEmail"] = self.htmlText(self._conf.getSupportEmail())
+        if self._conf.getSupportInfo().hasEmail():
+            vars["supportEmail"] = self.htmlText(self._conf.getSupportInfo().getEmail())
         typeList = []
         for type in self._conf.getContribTypeList():
             typeList.append("""<input type="checkbox" name="types" value="%s"><a href="%s">%s</a><br>
@@ -2061,8 +2067,8 @@ class WConferenceDataModification(wcomponents.WTemplated):
 
         vars["locationAddress"] = locAddress
 
-        vars["supportCaption"] = quoteattr(displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
-        vars["supportEmail"] = quoteattr( self._conf.getSupportEmail() )
+        vars["supportCaption"] = quoteattr(self._conf.getSupportInfo().getCaption())
+        vars["supportEmail"] = quoteattr( self._conf.getSupportInfo().getEmail() )
         vars["locator"] = self._conf.getLocator().getWebForm()
         vars["event_type"] = ""
         vars["navigator"] = navigator
@@ -3366,8 +3372,8 @@ class WSetAlarm(wcomponents.WTemplated):
         for ch in self.__conf.getChairList():
             if not fromList.has_key(ch.getEmail().strip()):
                 fromList[ch.getEmail().strip()] = ch.getFullName()
-        if self.__conf.getSupportEmail().strip()!="" and not fromList.has_key(self.__conf.getSupportEmail().strip()):
-            fromList[self.__conf.getSupportEmail().strip()] = self.__conf.getSupportEmail().strip()
+        if self.__conf.getSupportInfo().getEmail().strip()!="" and not fromList.has_key(self.__conf.getSupportInfo().getEmail().strip()):
+            fromList[self.__conf.getSupportInfo().getEmail().strip()] = self.__conf.getSupportInfo().getEmail().strip()
         if self._aw.getUser() is not None and not fromList.has_key(self._aw.getUser().getEmail().strip()):
             fromList[self._aw.getUser().getEmail().strip()] = self._aw.getUser().getFullName()
         if self.__conf.getCreator() is not None and not fromList.has_key(self.__conf.getCreator().getEmail().strip()):
@@ -6319,8 +6325,8 @@ class WConfStaticDisplayFrame(wcomponents.WTemplated):
             vars["confLocation"] =  self._conf.getLocationList()[0].getName()
         vars["body"] = self._body
         vars["supportEmail"] = ""
-        if self._conf.hasSupportEmail():
-            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
+        if self._conf.getSupportInfo().hasEmail():
+            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportInfo().getEmail(), urllib.quote( self._conf.getTitle() ) ))
             vars["supportEmail"] = i18nformat("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> _("support")</a>""")%(mailto, self._staticPars["smallEmail"] )
         p=self._staticPars
         p["supportEmail"] = vars["supportEmail"]

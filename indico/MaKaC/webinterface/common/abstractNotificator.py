@@ -243,7 +243,7 @@ class EmailNotificator(Notificator):
     def notify(self,abstract,tpl):
         #if no from address is specified we should put the default one
         if tpl.getFromAddr().strip() == "":
-            tpl.setFromAddr(tpl.getConference().getSupportEmail(returnNoReply=True))
+            tpl.setFromAddr(tpl.getConference().getSupportInfo().getEmail(returnNoReply=True))
 
         GenericMailer.send(self.apply(abstract,tpl))
 

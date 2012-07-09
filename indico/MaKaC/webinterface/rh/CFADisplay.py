@@ -113,7 +113,7 @@ class _AbstractSubmissionNotification:
         return self._abstract.getSubmitter()
 
     def getFromAddr(self):
-        return self._conf.getSupportEmail(returnNoReply=True)
+        return self._conf.getSupportInfo().getEmail(returnNoReply=True)
 
     def getCCList(self):
         return self._abstract.getOwner().getSubmissionNotification().getCCList()
@@ -227,7 +227,7 @@ class RHAbstractSubmission( RHAbstractModificationAction ):
         #The commit must be forced before sending the confirmation
         DBMgr.getInstance().commit()
         #Email confirmation about the submission
-        mail.Mailer.send( _AbstractSubmissionNotification( abstract ), self._conf.getSupportEmail(returnNoReply=True) )
+        mail.Mailer.send( _AbstractSubmissionNotification( abstract ), self._conf.getSupportInfo().getEmail(returnNoReply=True) )
         #Email confirmation about the submission to coordinators
         if cfaMgr.getSubmissionNotification().hasDestination():
             asn=_AbstractSubmissionNotification( abstract )

@@ -36,7 +36,7 @@ from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayInd
 from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
-from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
+from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom, SupportInfo
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
@@ -568,6 +568,37 @@ def ip_based_acl(dbi, withRBDB, prevVersion):
     ip_set = set(minfo._oaiPrivateHarvesterList)
     ip_acl_mgr = minfo._ip_based_acl_mgr = IPBasedACLMgr()
     ip_acl_mgr._full_access_acl = ip_set
+    dbi.commit()
+
+
+@since('1.0')
+def supportInfo(dbi, withRBDB, prevVersion):
+    """
+    Moving support info fields from conference to an own class
+    """
+    ch = ConferenceHolder()
+    i = 0
+
+    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+        dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf)
+        caption = email = telephone = ""
+
+        if hasattr(dMgr, "_supportEmailCaption"):
+            caption = dMgr._supportEmailCaption
+            del dMgr._supportEmailCaption
+        if hasattr(conf, "_supportEmail"):
+            email = conf._supportEmail
+            del conf._supportEmail
+        if hasattr(conf, "_supportTelephone"):
+            telephone = conf._supportTelephone
+            del conf._supportTelephone
+
+        supportInfo = SupportInfo(conf, caption, email, telephone)
+        conf.setSupportInfo(supportInfo)
+
+        if i%1000 == 999:
+            dbi.commit()
+        i+=1
     dbi.commit()
 
 

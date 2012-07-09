@@ -1410,16 +1410,19 @@ type("SupportEditWidget", ["InlineEditWidget"],
         {
             /* builds the basic structure for both display and
                edit modes */
-            __buildStructure: function(captionValue, emailValue) {
+            __buildStructure: function(captionValue, emailValue, phoneValue) {
                 // keep everything in separate lines
                  return Html.table({},
                          Html.tbody({},
                                  Html.tr("support",
                                          Html.td("supportEntry", "Caption :"),
                                          Html.td({}, captionValue)),
-                                 Html.tr("support",
-                                         Html.td("supportEntry", "Email :"),
-                                         Html.td({}, emailValue))));
+                                         Html.tr("support",
+                                                 Html.td("supportEntry", "Email :"),
+                                                 Html.td({}, emailValue)),
+                                         Html.tr("support",
+                                                 Html.td("supportEntry", "Telephone :"),
+                                                 Html.td({}, phoneValue))));
             },
 
             _handleEditMode: function(value) {
@@ -1427,19 +1430,21 @@ type("SupportEditWidget", ["InlineEditWidget"],
                 // create support fields and set them to the values transmitted
                 this.caption = Html.edit({}, value.caption);
                 this.email = Html.edit({}, value.email);
+                this.phone = Html.edit({}, value.telephone);
 
 
                 // add the fields to the parameter manager
                 this.__parameterManager.add(this.caption, 'text', false);
                 this.__parameterManager.add(this.email, 'emaillist', true);
+                this.__parameterManager.add(this.phone, 'phone', true);
 
                 // call buildStructure with modification widgets
-                return this.__buildStructure(this.caption, this.email);
+                return this.__buildStructure(this.caption, this.email, this.phone);
             },
 
             _handleDisplayMode: function(value) {
                 // call buildStructure with spans
-                return this.__buildStructure(value.caption, value.email);
+                return this.__buildStructure(value.caption, value.email, value.telephone);
             },
 
             _getNewValue: function() {
@@ -1452,7 +1457,8 @@ type("SupportEditWidget", ["InlineEditWidget"],
                 emaillist = emaillist.replace(/[ ,;]+/g, ',');
 
                 return {caption: this.caption.get(),
-                        email: emaillist};
+                        email: emaillist,
+                        telephone: this.phone.get()};
             },
 
             _verifyInput: function() {

@@ -37,6 +37,17 @@ class IConferenceMinimalFossil(IFossil):
     def getTitle(self):
         """Conference title"""
 
+class ISupportInfoFossil(IFossil):
+
+    def getCaption(self):
+        """ Support Caption """
+
+    def getEmail(self):
+        """ Support Email """
+
+    def getTelephone(self):
+        """ Support Telephone """
+
 class IConferenceFossil(IConferenceMinimalFossil):
 
     def getType(self):
@@ -69,8 +80,9 @@ class IConferenceFossil(IConferenceMinimalFossil):
     def getTimezone(self):
         """ Time zone """
 
-    def getSupportEmail(self):
-        """ Support Email """
+    def getSupportInfo(self):
+        """ Support Info"""
+    getSupportInfo.result = ISupportInfoFossil
 
 
 class IConferenceParticipationMinimalFossil(IFossil):
@@ -117,7 +129,6 @@ class IConferenceParticipationFossil(IConferenceParticipationMinimalFossil):
 
     def getPhone(self):
         """Conference Participation Phone """
-
 
 class IResourceMinimalFossil(IFossil):
 

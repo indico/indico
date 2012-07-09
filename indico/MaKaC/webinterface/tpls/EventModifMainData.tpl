@@ -214,9 +214,7 @@ $E('inPlaceEditTitle').set(new InputEditWidget('event.main.changeTitle',
         {'conference':'${ conferenceId }'}, ${ jsonEncode(title) }, false, null, null,
         null).draw());
 
-<% dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(confObj) %>
-
-$E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'caption': "${ dMgr.getSupportEmailCaption() }", 'email': confFossile.supportEmail}).draw());
+$E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'caption': confFossile.supportInfo.caption, 'email': confFossile.supportInfo.email, 'telephone': confFossile.supportInfo.telephone}).draw());
 
 % if evtType == 'lecture':
     $E('inPlaceEditOrganiserText').set(new InputEditWidget('event.main.changeOrganiserText',

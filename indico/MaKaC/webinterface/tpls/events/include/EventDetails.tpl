@@ -113,13 +113,20 @@
 % endif
 
 ${pluginDetails}
-
-% if conf.getSupportEmail():
+% if conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone():
 <tr>
     <td class="leftCol">${supportEmailCaption}</td>
-    <td><a href="mailto:${conf.getSupportEmail()}">${conf.getSupportEmail()}</a></td>
+    <td>
+    % if conf.getSupportInfo().getEmail():
+        <span style="font-weight:bold; font-style:italic; color:#444">Email:</span> <a href="mailto:${conf.getSupportInfo().getEmail()}">${conf.getSupportInfo().getEmail()}</a>
+    % endif
+    % if conf.getSupportInfo().getTelephone():
+        <span style="font-weight:bold; font-style:italic; color:#444"">Telephone:</span> ${conf.getSupportInfo().getTelephone()}
+    % endif
+    </td>
 </tr>
 % endif
+
 </tbody>
 </table>
 <%include file="ApplyParticipation.tpl"/>

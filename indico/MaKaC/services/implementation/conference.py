@@ -328,52 +328,32 @@ class ConferenceOrganiserTextModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getOrgText()
 
-class ConferenceSupportEmailModification( ConferenceTextModificationBase ):
-    """
-    Conference support e-mail modification
-    """
-    def _handleSet(self):
-        # handling the case of a list of emails with separators different than ","
-        emailstr = setValidEmailSeparators(self._value)
-
-        if validMail(emailstr) or emailstr == '':
-            self._target.setSupportEmail(emailstr)
-        else:
-            raise ServiceError('ERR-E0', 'E-mail address %s is not valid!' %
-                               self._value)
-
-    def _handleGet(self):
-        return self._target.getSupportEmail()
-
 class ConferenceSupportModification( ConferenceTextModificationBase ):
     """
     Conference support caption and e-mail modification
     """
     def _handleSet(self):
-        dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target)
+        self._supportInfo = self._target.getSupportInfo()
         caption = self._value.get("caption","")
-        email = self._value.get("email")
+        email = self._value.get("email","")
+        phone = self._value.get("telephone","")
 
         if caption == "":
             raise ServiceError("ERR-E2", "The caption cannot be empty")
-        dMgr.setSupportEmailCaption(caption)
+        self._supportInfo.setCaption(caption)
 
         # handling the case of a list of emails with separators different than ","
         email = setValidEmailSeparators(email)
 
         if validMail(email) or email == "":
-            self._target.setSupportEmail(email)
+            self._supportInfo.setEmail(email)
         else:
             raise ServiceError('ERR-E0', 'E-mail address %s is not valid!' %
                                self._value)
+        self._supportInfo.setTelephone(phone)
 
     def _handleGet(self):
-        dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target)
-        caption = dMgr.getSupportEmailCaption()
-        email = self._target.getSupportEmail()
-
-        return { "caption": caption,
-                 "email": email }
+        return fossilize(self._supportInfo)
 
 class ConferenceDefaultStyleModification( ConferenceTextModificationBase ):
     """
@@ -1600,7 +1580,6 @@ class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
 
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
-    "main.changeSupportEmail": ConferenceSupportEmailModification,
     "main.changeSupport": ConferenceSupportModification,
     "main.changeSpeakerText": ConferenceSpeakerTextModification,
     "main.changeOrganiserText": ConferenceOrganiserTextModification,

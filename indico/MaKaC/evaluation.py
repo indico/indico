@@ -1479,7 +1479,7 @@ class Submission(Persistent):
                 if len(toList+ccList) > 0 :
                     subject = "Notification for evaluation '%s'"%evaluation.getTitle()
                     conf = evaluation.getConference()
-                    supportEmail = conf.getSupportEmail(returnNoReply=True, caption=True)
+                    supportEmail = conf.getSupportInfo().getEmail(returnNoReply=True, caption=True)
 
                     notification = GenericNotification({'fromAddr': supportEmail,
                                                         'toList': toList,

@@ -3458,7 +3458,7 @@ class NotificationTemplate(Persistent):
         try:
             return self._fromAddr
         except AttributeError:
-            self._fromAddr = self._owner.getConference().getSupportEmail()
+            self._fromAddr = self._owner.getConference().getSupportInfo().getEmail()
             return self._fromAddr
 
     def setFromAddr(self, addr):

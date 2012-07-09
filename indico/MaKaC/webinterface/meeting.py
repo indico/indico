@@ -565,11 +565,11 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         if self._conf.getLocationList():
             vars["confLocation"] =  self._conf.getLocationList()[0].getName()
             vars["supportEmail"] = ""
-        if self._conf.hasSupportEmail():
-            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
+        if self._conf.getSupportInfo().hasEmail():
+            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportInfo().getEmail(), urllib.quote( self._conf.getTitle() ) ))
             vars["supportEmail"] =  _("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>""")%(mailto,
                                                         Config.getInstance().getSystemIconURL("mail"),
-                                                        displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
+                                                        self._conf.getSupportInfo().getCaption())
         format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]

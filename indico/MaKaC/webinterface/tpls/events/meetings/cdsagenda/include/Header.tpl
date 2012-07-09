@@ -66,13 +66,13 @@
         </tr>
         % endif
 
-        % if conf.getSupportEmail():
+        % if conf.getSupportInfo().getEmail():
         <tr>
           <td valign="top" align="right"  class="headerTitle">
                   ${supportEmailCaption}
           </td>
           <td class="headerInfo">
-                  ${conf.getSupportEmail()}
+                  ${conf.getSupportInfo().getEmail()}
           </td>
         </tr>
         % endif

@@ -227,7 +227,7 @@ class RegistrationForm(Persistent):
         except AttributeError, e:
             pass
         if not sender:
-            self._notificationSender = self._conf.getSupportEmail(returnNoReply=True).split(',', 1)[0]
+            self._notificationSender = self._conf.getSupportInfo().getEmail(returnNoReply=True).split(',', 1)[0]
         return self._notificationSender
 
     def isSendRegEmail(self):

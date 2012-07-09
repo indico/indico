@@ -1331,7 +1331,7 @@ class ConferenceRecovery:
                 roomName = recoveredC.getRoom().getName()
             self._conf.setValues({"visibility": recoveredC.getVisibility(),\
             "title": recoveredC.getTitle(), "description": recoveredC.getDescription(),\
-            "supportEmail": recoveredC.getSupportEmail(), "contactInfo": recoveredC.getContactInfo(),\
+            "supportEmail": recoveredC.getSupportInfo().getEmail(), "contactInfo": recoveredC.getContactInfo(),\
             "locationName": locationName, "locationAddress": locationAddress,\
             "roomName": roomName})
             self._conf.setClosed(recoveredC.isClosed())

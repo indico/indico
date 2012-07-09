@@ -118,9 +118,6 @@ class ConfDisplayMgr(DisplayMgr):
         #Manager for CSS file rendering the main display page for the conference
         self._styleMngr = StyleManager(conf)
 
-        # Caption for the email support
-        self._supportEmailCaption = "Support"
-
         # Displaying navigation bar
         self._displayNavigationBar = True
 
@@ -236,15 +233,6 @@ class ConfDisplayMgr(DisplayMgr):
         except AttributeError, e:
             self._styleMngr = StyleManager(self._conf)
         return self._styleMngr
-
-    def getSupportEmailCaption(self):
-        # check if _supportEmailCaption exists in the db
-        if not hasattr(self, "_supportEmailCaption"):
-           self._supportEmailCaption = "Support"
-        return self._supportEmailCaption
-
-    def setSupportEmailCaption(self, value):
-        self._supportEmailCaption = value
 
 class Menu(Persistent):
     """

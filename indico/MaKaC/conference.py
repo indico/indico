@@ -34,7 +34,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
     IResourceMinimalFossil, ILinkMinimalFossil, ILocalFileMinimalFossil,\
     IResourceFossil, ILinkFossil, ILocalFileFossil,\
     ILocalFileExtendedFossil, IConferenceParticipationMinimalFossil,\
-    ICategoryFossil, ILocalFileAbstractMaterialFossil
+    ICategoryFossil, ILocalFileAbstractMaterialFossil, ISupportInfoFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
@@ -1993,6 +1993,62 @@ class ReportNumberHolder(Persistent):
         if self.getOwner() != None:
             self.getOwner().notifyModification()
 
+class SupportInfo(Persistent):
+    fossilizes(ISupportInfoFossil)
+    def __init__(self, owner, caption="", email="", telephone=""):
+        self._owner = owner
+        self._caption = caption
+        self._email = email
+        self._telephone = telephone
+
+    def getOwner(self):
+        return self._owner
+
+    def getCaption(self):
+        return self._caption
+
+    def setCaption(self, caption):
+        self._caption = caption
+
+    def getEmail(self, returnNoReply=False, caption=False):
+        """
+        Returns the support email address associated with the conference
+        :param returnNoReply: Return no-reply address in case there's no support e-mail (default True)
+        :type returnNoReply: bool
+
+        """
+        if self._caption.strip() == "" and returnNoReply:
+            # In case there's no conference support e-mail, return the no-reply
+            # address, and the 'global' support e-mail if there isn't one
+            return Config.getInstance().getNoReplyEmail()
+        else:
+            if caption and self._caption:
+                return '"%s" <%s>' % (self._caption, self._email)
+            else:
+                return self._caption
+
+    def setEmail( self, email ):
+        self._email = email.strip()
+
+    def hasEmail( self ):
+        return self._email != "" and self._email != None
+
+    def getTelephone(self):
+        return self._telephone
+
+    def setTelephone( self, telephone ):
+        self._telephone = telephone.strip()
+
+    def hasTelephone( self ):
+        return self._telephone != "" and self._telephone != None
+
+    def clone(self, owner):
+        supportInfo = SupportInfo(owner)
+        supportInfo.setCaption(self.getCaption())
+        supportInfo.setEmail(self.getEmail())
+        supportInfo.setTelephone(self.getTelephone())
+        return supportInfo
+
 class Conference(CommonObjectBase, Locatable):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
@@ -2048,7 +2104,7 @@ class Conference(CommonObjectBase, Locatable):
         self.__ac = AccessController(self)
         self.materials = {}
         self.__materialGenerator = Counter() # Provides material unique
-                                             #   identifiers for this conference
+                                            # identifiers for this conference
         self.paper = None
         self.slides = None
         self.video = None
@@ -2071,7 +2127,7 @@ class Conference(CommonObjectBase, Locatable):
         self.abstractMgr = review.AbstractMgr(self)
         self._logo = None
         self._trackCoordinators = TCIndex() #index for the track coordinators
-        self._supportEmail = "" #Support email for the conference
+        self._supportInfo = SupportInfo(self, "Support")
         self._contribTypes = {}
         self.___contribTypeGenerator = Counter()
         self._authorIdx=AuthorIndex()
@@ -2403,7 +2459,7 @@ class Conference(CommonObjectBase, Locatable):
         self.setVisibility(confData.get("visibility", "999"))
         self.setTitle(confData.get("title", _("NO TITLE ASSIGNED")))
         self.setDescription(confData.get("description", ""))
-        self.setSupportEmail(confData.get("supportEmail", ""))
+        self.getSupportInfo().setEmail(confData.get("supportEmail", ""))
         self.setContactInfo(confData.get("contactInfo", ""))
         if confData.get("locationName", "").strip() == "":
             self.setLocation(None)
@@ -3181,40 +3237,13 @@ class Conference(CommonObjectBase, Locatable):
         self.description = desc
         self.notifyModification()
 
-    def getSupportEmail(self, returnNoReply=False, caption=False):
-        """
-        Returns the support email address associated with the conference
-        :param returnNoReply: Return no-reply address in case there's no support e-mail (default True)
-        :type returnNoReply: bool
+    def getSupportInfo(self):
+        if not hasattr(self, "_supportInfo"):
+            self._supportInfo = SupportInfo(self, "Support")
+        return self._supportInfo
 
-        """
-        try:
-            if self._supportEmail:
-                pass
-        except AttributeError:
-            self._supportEmail = ""
-        if self._supportEmail.strip() == "" and returnNoReply:
-            # In case there's no conference support e-mail, return the no-reply
-            # address, and the 'global' support e-mail if there isn't one
-            return Config.getInstance().getNoReplyEmail()
-        else:
-            supportCaption = self.getDisplayMgr().getSupportEmailCaption()
-
-            if caption and supportCaption:
-                return '"%s" <%s>' % (supportCaption, self._supportEmail)
-            else:
-                return self._supportEmail
-
-    def setSupportEmail( self, newSupportEmail ):
-        self._supportEmail = newSupportEmail.strip()
-
-    def hasSupportEmail( self ):
-        try:
-            if self._supportEmail:
-                pass
-        except AttributeError, e:
-            self._supportEmail = ""
-        return self._supportEmail != "" and self._supportEmail != None
+    def setSupportInfo(self, supportInfo):
+        self._supportInfo = supportInfo
 
     def getChairmanText( self ):
         try:
@@ -4322,7 +4351,7 @@ class Conference(CommonObjectBase, Locatable):
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
         conf.setVisibility(self.getVisibility())
-        conf.setSupportEmail(self.getSupportEmail())
+        conf.setSupportInfo(self.getSupportInfo().clone(self))
         conf.setReportNumberHolder(self.getReportNumberHolder().clone(self))
         for ch in self.getChairList():
             conf.addChair(ch.clone())
