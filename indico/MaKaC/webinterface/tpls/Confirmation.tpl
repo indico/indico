@@ -1,5 +1,5 @@
 <table align="center" width="100%" class="confirmTab"><tr><td>
-<form action="${ postURL }" method="POST">
+<form id="confirmationForm" action="${ postURL }" method="POST">
 <br>
     ${ passingArgs }
     <table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
@@ -19,3 +19,15 @@
 </form>
 <br>
 </td></tr></table>
+
+<script type="text/javascript">
+
+$('#confirmationForm').submit(function(event) {
+    if (${"true" if loading else "false"}) {
+        if (event.originalEvent.explicitOriginalTarget.name == "confirm"){
+            var killLoadProgress = IndicoUI.Dialogs.Util.progress($T("Performing action..."));
+        }
+    }
+  });
+
+</script>

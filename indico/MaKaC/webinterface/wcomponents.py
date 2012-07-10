@@ -2677,7 +2677,7 @@ class WSignIn(WTemplated):
 
 class WConfirmation(WTemplated):
 
-    def getHTML( self, message, postURL, passingArgs, **opts):
+    def getHTML( self, message, postURL, passingArgs, loading=False, **opts):
         params = {}
         params["message"] = message
         params["postURL"] = postURL
@@ -2688,6 +2688,7 @@ class WConfirmation(WTemplated):
             for value in passingArgs[arg]:
                 pa.append("""<input type="hidden" name="%s" value="%s">"""%( arg, value ))
         params["passingArgs"] = "".join(pa)
+        params["loading"] = loading
         params["confirmButtonCaption"]=opts.get("confirmButtonCaption",  _("OK"))
         params["cancelButtonCaption"]=opts.get("cancelButtonCaption",  _("Cancel"))
         params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL( "warning" )

@@ -3318,7 +3318,7 @@ class WPConfCloneConfirm( WPConfModifToolsBase ):
         for key in params.keys():
             url.addParam(key,params[key])
         return wc.getHTML( msg, \
-                        url, {}, \
+                        url, {}, True, \
                         confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No") )
 
 #---------------------------------------------------------------------------

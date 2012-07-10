@@ -2025,7 +2025,7 @@ class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase, Observabl
         #we notify the event in case any plugin wants to add their options
         self._notify('fillCloneDict', {'options': options, 'paramNames': paramNames})
         if self._cancel:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
+            self._redirect( urlHandlers.UHConfClone.getURL( self._conf ) )
         elif self._confirm:
             if self._cloneType == "once" :
                 newConf = self._conf.clone( self._date, options, userPerformingClone = self._aw._currentUser )
