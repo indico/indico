@@ -575,8 +575,7 @@ class WPMMaterialDisplayBase( material.WPMaterialDisplayBase):
         body =  i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0"
-                                align="center" valign="top" width="95%%">
+                    <table border="0" cellpadding="0" cellspacing="0" valign="top" width="720px">
                         <tr>
                             <td><div class="groupTitle">_("Added Material") - %s</div></td>
                         </tr>
@@ -645,30 +644,14 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         return wcomponents.WTemplated.getHTML( self, params )
 
 class WMMaterialDisplay(material.WMaterialDisplay):
-        def __init__(self, aw, material, modif):
-            self._material=material
-            self._aw=aw
-            self._modif = modif
-
-        def getVars( self ):
-            vars=material.WMaterialDisplay.getVars( self )
-            vars["modif"]=""
-            if self._modif==1:
-                vars["modif"] = """<a href="%s"><img class="imglink" src="%s" alt="Modify"></a>"""%(urlHandlers.UHMaterialModification.getURL(self._material),Config.getInstance().getSystemIconURL( "modify" ))
-            return vars
+    pass
 
 class WPMMaterialDisplay( WPMMaterialDisplayBase):
     navigationEntry = navigation.NEMeetingMaterialDisplay
-    def __init__(self, rh, material):
-        WPMMaterialDisplayBase.__init__(self, rh, material)
 
     def _getBody( self, params ):
-        self._modif=0
-        if self._target.canModify(self._getAW()):
-            self._modif = 1
-        wc = WMMaterialDisplay( self._getAW(), self._material, self._modif )
-        pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
-        return wc.getHTML( pars )
+        wc = WMMaterialDisplay( self._getAW(), self._material)
+        return wc.getHTML(  )
 
 #################Conference Modification#############################
 

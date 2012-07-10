@@ -189,8 +189,7 @@ class WPMMaterialDisplayBase( conferences.WPConferenceDefaultDisplayBase):
         body =  i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0"
-                                align="center" valign="top" width="95%%">
+                    <table border="0" cellpadding="0" cellspacing="0" valign="top" width="720px">
                         <tr>
                             <td><div class="groupTitle">_("Added Material")</div></td>
                         </tr>
@@ -250,16 +249,15 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         self._body = body
         return wcomponents.WTemplated.getHTML( self, params )
 
+class WMMaterialDisplay(material.WMaterialDisplay):
+    pass
+
 class WPMMaterialDisplay( WPMMaterialDisplayBase):
     navigationEntry = navigation.NEMaterialDisplay
-    def __init__(self, rh, material):
-        WPMMaterialDisplayBase.__init__(self, rh, material)
-
 
     def _getBody( self, params ):
-        wc = material.WMaterialDisplay( self._getAW(), self._material )
-        pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
-        return wc.getHTML( pars )
+        wc = WMMaterialDisplay( self._getAW(), self._material )
+        return wc.getHTML()
 
 #################Conference Modification#############################
 

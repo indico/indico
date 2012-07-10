@@ -1,7 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.conference import Link %>
 <% from MaKaC.webinterface.general import strfFileSize %>
-
 <div id="buttonBar" class="materialButtonBar">
 % if material.canModify(accessWrapper) or canSubmitResource:
     <span id="manageMaterial" class="fakeLink" style="font-weight: bold">${_("Edit")}</span>
@@ -21,7 +20,7 @@
             % endif
             % if material.getResourceList() and material.canView(accessWrapper):
             <div class="materialSection">
-                <div class="materialSectionContent">
+                <div>
                 <ul>
                 % for resource in material.getResourceList():
                     <li>
