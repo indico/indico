@@ -1,1 +1,3 @@
-<%inherit file="MaterialDisplay.tpl"/>
+<div style="width: 720px;">
+    <%include file="MaterialDisplay.tpl"/>
+</div>

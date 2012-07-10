@@ -92,8 +92,7 @@ class WPMaterialCatDisplayBase(WPCategoryDisplayBase, WPMaterialDisplayBase ):
     def _getBody( self, params ):
 
         wc = WMaterialDisplay( self._getAW(), self._material )
-        pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
-        return wc.getHTML( pars )
+        return wc.getHTML( )
 
 
 class WPMaterialConfDisplayBase(WPMaterialDisplayBase, WPConferenceDefaultDisplayBase ):
@@ -141,6 +140,7 @@ class WMaterialDisplay(wcomponents.WTemplated):
         vars["material"] = self._material
         vars["accessWrapper"] = self._aw
         vars["getURL"] = lambda resource : self._getURL(resource)
+        vars["fileAccessURLGen"] = urlHandlers.UHFileAccess.getURL
         if self._material.getSubContribution():
             vars["uploadAction"] = 'Indico.Urls.UploadAction.subcontribution'
         elif self._material.getContribution():
