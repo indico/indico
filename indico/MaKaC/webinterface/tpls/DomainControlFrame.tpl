@@ -47,7 +47,7 @@ $('input:checkbox', '.domain_control').live('change', function(){
     $this = $(this);
     indicoRequest('event.protection.toggleDomains',
                   {
-                      confId: ${conference.getId()},
+                      confId: '${conference.getId()}',
                       domainId: $this.val(),
                       add: $this.is(':checked')
                   },
