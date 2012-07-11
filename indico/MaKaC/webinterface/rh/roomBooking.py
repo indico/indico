@@ -1472,7 +1472,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                 raise MaKaCError( "You are not authorized to book this room." )
 
             if self._formMode == FormMode.MODIF:
-                if not self._candResv.canModify( self.getAW() ):
+                if not self._orig_candResv.canModify( self.getAW() ):
                     raise MaKaCError( "You are not authorized to take this action." )
 
     def _businessLogic( self ):
@@ -1809,11 +1809,10 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
     def _checkProtection( self ):
         RHRoomBookingBase._checkProtection(self)
         user = self._getUser()
-        # Only owner (the one who created) and admin can CANCEL
+        # Only owner (the one who created), the requestor(booked for) and admin can CANCEL
         # (Responsible can not cancel a booking!)
-        if ( not self._resv.isOwnedBy( user ) ) and \
-            ( not self._getUser().isRBAdmin() ):
-                raise MaKaCError( "You are not authorized to take this action." )
+        if not self._resv.canCancel(user):
+            raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
         # Booking deletion is always possible - just delete

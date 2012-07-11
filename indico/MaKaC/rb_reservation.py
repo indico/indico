@@ -1313,16 +1313,13 @@ class ReservationBase( Fossilizable ):
             raise MaKaCError('canModify requires either AccessWrapper or Avatar object')
         if not user:
             return False
-        can = user.isRBAdmin() or \
-            self.isOwnedBy( user ) or \
-            self.room.isOwnedBy( user )
-        return can
+        return user.isRBAdmin() or self.isOwnedBy( user ) or self.room.isOwnedBy( user ) or self.isBookedFor(user)
 
     def canCancel( self, user ):
         """ Owner can cancel """
         if user == None:
             return False
-        return self.isOwnedBy( user ) or user.isRBAdmin()
+        return self.isOwnedBy( user ) or user.isRBAdmin() or self.isBookedFor(user)
 
     def canReject( self, user ):
         """ Responsible can reject """
@@ -1346,6 +1343,15 @@ class ReservationBase( Fossilizable ):
         if self.createdBy == avatar.id:
             return True
         return False
+
+    def isBookedFor(self, user):
+        """
+        Returns True if user is the one who is booked for the reservation.
+        False otherwise.
+        """
+        if user == None:
+            return False
+        return (getRoomBookingOption('bookingsForRealUsers') and self.bookedForUser == user) or self.contactEmail in user.getEmails()
 
     # Required by Indico architecture
     def getAccessKey( self ): return ""
