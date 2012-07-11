@@ -2,7 +2,7 @@
     <tbody>
       <tr>
         <td  colspan="2" class="groupTitle">
-           ${ _("Create poster")}
+           ${ _("Create a New Poster Template")}
         </td>
       </tr>
       <form action='${ CreatePDFURL }' method='post' target='_blank'>

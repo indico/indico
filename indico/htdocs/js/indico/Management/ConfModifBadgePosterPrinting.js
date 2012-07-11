@@ -11,7 +11,6 @@ $(document).ready(function() {
     modal: true,
     resizable: false,
     autoOpen: false,
-    position: 'top',
     maxHeight: '90%',
     buttons: {
       Ok: function() {
