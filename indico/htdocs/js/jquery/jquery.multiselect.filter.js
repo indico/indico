@@ -15,33 +15,30 @@
 */
 (function($){
 	var rEscape = /[\-\[\]{}()*+?.,\\\^$|#\s]/g;
-
+	
 	$.widget("ech.multiselectfilter", {
-
+		
 		options: {
-			label: " ",
+			label: "Filter:",
 			width: null, /* override default width set in css file (px). null will inherit */
 			placeholder: "Enter keywords",
-		    itemsName: 'items',
 			autoReset: false
 		},
-
+		
 		_create: function(){
 			var self = this,
 				opts = this.options,
 				instance = (this.instance = $(this.element).data("multiselect")),
-
+				
 				// store header; add filter class so the close/check all/uncheck all links can be positioned correctly
 				header = (this.header = instance.menu.find(".ui-multiselect-header").addClass("ui-multiselect-hasfilter")),
-
+				
 				// wrapper elem
 				wrapper = (this.wrapper = $('<div class="ui-multiselect-filter">'+(opts.label.length ? opts.label : '')+'<input placeholder="'+opts.placeholder+'" type="search"' + (/\d/.test(opts.width) ? 'style="width:'+opts.width+'px"' : '') + ' /></div>').prependTo( this.header ));
 
-			this.searchText = '';
-
 			// reference to the actual inputs
 			this.inputs = instance.menu.find('input[type="checkbox"], input[type="radio"]');
-
+			
 			// build the input box
 			this.input = wrapper
 			.find("input")
@@ -55,17 +52,17 @@
 				keyup: $.proxy(self._handler, self),
 				click: $.proxy(self._handler, self)
 			});
-
+			
 			// cache input values for searching
 			this.updateCache();
-
+			
 			// rewrite internal _toggleChecked fn so that when checkAll/uncheckAll is fired,
 			// only the currently filtered elements are checked
 			instance._toggleChecked = function(flag, group){
 				var $inputs = (group && group.length) ?
 						group :
 						this.labels.find('input'),
-
+					
 					_self = this,
 
 					// do not include hidden elems if the menu isn't open.
@@ -74,15 +71,15 @@
 						":disabled";
 
 				$inputs = $inputs.not( selector ).each(this._toggleState('checked', flag));
-
+				
 				// update text
 				this.update();
-
+				
 				// figure out which option tags need to be selected
 				var values = $inputs.map(function(){
 					return this.value;
 				}).get();
-
+				
 				// select option tags
 				this.element
 					.find('option')
@@ -92,7 +89,7 @@
 						}
 					});
 			};
-
+			
 			// rebuild cache when multiselect is updated
 			var doc = $(document).bind("multiselectrefresh", function(){
 				self.updateCache();
@@ -104,48 +101,30 @@
 				doc.bind("multiselectclose", $.proxy(this._reset, this));
 			}
 		},
-
-        _checkOptions: function (label) {
-            var searchValues = this.searchText.split(':');
-            var fieldValues = label.split(':');
-
-            for (var i = 0; i < searchValues.length; i++) {
-                // Integer
-                if (searchValues[i] && ((!isNaN(fieldValues[i]) && parseInt(searchValues[i]) > parseInt(fieldValues[i])) || fieldValues[i] == "None"))
-                    return false;
-                // Bool
-                if (searchValues[i].toLowerCase() == "true" && fieldValues[i].toLowerCase() == "false")
-                    return false;
-            }
-            return true;
-        },
-
+		
 		// thx for the logic here ben alman
 		_handler: function( e ){
-		    var self = this;
-			var term = $.trim( this.input[0].value.toLowerCase()),
-
-
-			// speed up lookups
-				rows = this.rows, inputs = this.inputs, cache = this.cache,  cache2 = this.cache2;
-
-
-			if( !term && !this.searchText ){
+			var term = $.trim( this.input[0].value.toLowerCase() ),
+			
+				// speed up lookups
+				rows = this.rows, inputs = this.inputs, cache = this.cache;
+			
+			if( !term ){
 				rows.show();
 			} else {
 				rows.hide();
+				
 				var regex = new RegExp(term.replace(rEscape, "\\$&"), 'gi');
-
+				
 				this._trigger( "filter", e, $.map(cache, function(v, i){
-					if( v.search(regex) !== -1 && self._checkOptions(cache2[i]) ){
+					if( v.search(regex) !== -1 ){
 						rows.eq(i).show();
 						return inputs.get(i);
 					}
-
+					
 					return null;
 				}));
 			}
-
 
 			// show/hide optgroups
 			this.instance.menu.find(".ui-multiselect-optgroup-label").each(function(){
@@ -153,63 +132,38 @@
 				var isVisible = $this.nextUntil('.ui-multiselect-optgroup-label').filter(function(){
 				  return $.css(this, "display") !== 'none';
 				}).length;
-
+				
 				$this[ isVisible ? 'show' : 'hide' ]();
 			});
-
-			// Indico
-			$('.ui-multiselect-selection-summary').text($('.ui-multiselect-checkboxes li:visible').length + " / " + $(".ui-multiselect-checkboxes li").length + " " +  self.options.itemsName);
-	        $('.ui-multiselect-selection-summary').effect("pulsate", { times:1 }, 400);
-
 		},
 
 		_reset: function() {
 			this.input.val('').trigger('keyup');
 		},
-
+		
 		updateCache: function(){
 			// each list item
 			this.rows = this.instance.menu.find(".ui-multiselect-checkboxes li:not(.ui-multiselect-optgroup-label)");
-
+			
 			// cache
 			this.cache = this.element.children().map(function(){
 				var self = $(this);
-
+				
 				// account for optgroups
 				if( this.tagName.toLowerCase() === "optgroup" ){
 					self = self.children();
 				}
-
+				
 				return self.map(function(){
 					return this.innerHTML.toLowerCase();
 				}).get();
 			}).get();
-
-			// cache2
-			this.cache2 = this.element.children().map(function(){
-			    var self = $(this);
-
-			    // account for optgroups
-			    if( this.tagName.toLowerCase() === "optgroup" ){
-			        self = self.children();
-			    }
-
-			    return self.map(function(){
-			        return $(this).attr('label');
-			    }).get();
-			}).get();
 		},
-
+		
 		widget: function(){
 			return this.wrapper;
 		},
-
-        advancedFilter: function (searchText) {
-            var self = this;
-            self.searchText = searchText;
-            self._handler(self);
-        },
-
+		
 		destroy: function(){
 			$.Widget.prototype.destroy.call( this );
 			this.input.val('').trigger("keyup");

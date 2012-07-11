@@ -1,4 +1,5 @@
 <script type="text/javascript">
+
     // Reds out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
     function forms_are_valid(onSubmit) {
@@ -10,19 +11,9 @@
         var bookingForm = $('#bookingForm');
         $(':input', bookingForm).removeClass('invalid');
 
-        var isValid = true;
-        isValid = validate_period(bookingForm[0], true, ${allowPast}) && isValid;
-        isValid = required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
-        % if not (user.isRBAdmin() or user.getId() == candResv.room.responsibleId) and candResv.room.maxAdvanceDays > 0:
-            isValid = validate_allow(${candResv.room.maxAdvanceDays}) && isValid;
-        % endif
-        if (!Util.Validation.isEmailList($('#contactEmail').val())) {
-            isValid = false;
-            $('#contactEmail').addClass('invalid');
-        }
 
         // Holidays warning
-        if (isValid && !onSubmit) {
+        if (!onSubmit) {
             var lastDateInfo = bookingForm.data('lastDateInfo');
             var dateInfo = $('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
             if (dateInfo != lastDateInfo) {
@@ -39,6 +30,29 @@
                     }
                 });
             }
+        }
+
+        var isValid = true;
+        % if not infoBookingMode:
+            // Date validator (repeatability)
+            if ($('#repeatability').val() != 'None') {
+                isValid = validate_period(true, ${allowPast}, 1) && isValid; // 1: validate dates
+            }
+            // Time validator
+            isValid = validate_period(false, ${allowPast}, 2) && isValid; // 2: validate only times
+        % endif
+        required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
+        if (onSubmit) {
+            isValid = required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
+        } else {
+            isValid = required_fields(['bookedForName', 'contactEmail']) && isValid;
+        }
+        % if not (user.isRBAdmin() or user.getId() == candResv.room.responsibleId) and candResv.room.maxAdvanceDays > 0:
+            isValid = validate_allow(${candResv.room.maxAdvanceDays}) && isValid;
+        % endif
+        if (!Util.Validation.isEmailList($('#contactEmail').val())) {
+            isValid = false;
+            $('#contactEmail').addClass('invalid');
         }
 
         % if candResv.room.needsAVCSetup:
@@ -85,7 +99,7 @@
                         $("#roomID").val(roomID);
                         $("#bookingForm").submit();
                     } else {
-                        bookButtonWrapper.set(bookButton);
+                        //bookButtonWrapper.set(bookButton);
                         var popup = new AlertPopup('Booking Not Allowed',
                                 "You're not allowed to book this room");
                         popup.open();
@@ -96,8 +110,50 @@
             });
     }
 
+    function saveBooking() {
+        $('#bookingForm').attr('action', '${saveBookingUH.getURL(conf)}');
+        if (forms_are_valid(true))
+            $('#bookingForm').submit();
+        else
+            new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
+    }
+
+    function checkBooking() {
+        $('#bookingForm').attr('action', '${bookingFormURL.getURL(conf)}');
+        $('#bookingForm').submit();
+    };
+
     $(window).load(function() {
-        % if candResv.room.needsAVCSetup:
+
+        % if showErrors:
+            var popup = new ExclusivePopupWithButtons($T('Booking failed'), function(){popup.close();}, false, false, true);
+
+            popup._getButtons = function() {
+                var self = this;
+                return [
+                    [$T('Change Search Criteria'), function() {
+                        window.location='${ urlHandlers.UHRoomBookingBookRoom.getURL() }';
+                        self.close();
+                    }],
+                    [$T('Close'), function() {
+                        self.close();
+                    }],
+                ];
+            }
+            popup.draw = function(){
+                var errorList = "";
+                % for error in errors:
+                    errorList +="${error}. ";
+                % endfor
+                var span1 = Html.span('', $T(errorList));
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br()]));
+            };
+
+            popup.open();
+        % elif candResv.room.needsAVCSetup:
+            var popup = new AlertPopup("Video equipment", "The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\nThank you for your understanding.")
+            popup.open();
+
             $('.videoConferenceOption, #needsAVCSupport').change(function() {
                 if(this.checked) {
                     $('#usesAVC').prop('checked', true);
@@ -110,39 +166,27 @@
             });
         % endif
 
-        if (forms_are_valid()) {
-            set_repeatition_comment();
-        }
-
         $('#bookingForm').delegate(':input', 'keyup change', function() {
             if (forms_are_valid())
-                updateTimeSlider();
+                % if not infoBookingMode:
+                    updateTimeSlider();
+                % endif
+                ;
         }).submit(function(e) {
-            if (!forms_are_valid(true)) {
+            if (!forms_are_valid()) {
                 e.preventDefault();
-                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct the fields with red background.")).open();
+                 new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
             };
         }).keydown(function(e) {
             if(e.which == 13 && !$(e.target).is('textarea, :submit')) {
                 e.preventDefault();
-                $('#saveBooking').click();
+                saveBooking();
             }
         });
 
-        $('#saveBooking').click(function(e) {
-            $('#bookingForm').attr('action', '${saveBookingUH.getURL(conf)}');
-        });
-        $('#checkBooking').click(function(e) {
-            $('#bookingForm').attr('action', '${bookingFormURL.getURL(conf)}#conflicts');
-            if (!validate_period($('#bookingForm')[0], true, ${ allowPast })) {
-                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct the fields with red background.")).open();
-                e.preventDefault();
-            }
-        });
-
-        % if candResv.room.needsAVCSetup:
-            new AlertPopup($T("Warning"), $T("The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\n                    Thank you for your understanding.")).open();
-        % endif
+        if (forms_are_valid()) {
+            set_repeatition_comment();
+        }
     });
 </script>
 
@@ -165,7 +209,7 @@
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <form id="bookingForm" action="${bookingFormURL.getURL(conf)}#conflicts" method="post">
+    <form id="bookingForm" action="${bookingFormURL.getURL(conf)}#" method="post">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
 
     <table style="width: 100%; padding-left: 20px;">
@@ -176,19 +220,33 @@
     % endif
         <tr>
             <td>
-                <span class="groupTitle bookingTitle" style="border-bottom-width: 0px; font-weight: bold">
                 <input type="hidden" name="roomID" id="roomID" value="${candResv.room.id}" />
                 <input type="hidden" name="roomLocation" id="roomLocation" value="${candResv.room.locationName}" />
-                % if formMode == FormMode.NEW:
-                     ${ _("New")}&nbsp;${bookingMessage}ing
+                <input type="hidden" name="finishDate" id="finishDate"  />
+                <input type="hidden" value="${ startDT.day }" name="sDay" id="sDay"/>
+                <input type="hidden" value="${ startDT.month }" name="sMonth" id="sMonth"/>
+                <input type="hidden" value="${ startDT.year }" name="sYear" id="sYear"/>
+                <input type="hidden" value="${ endDT.day }" name="eDay" id="eDay"/>
+                <input type="hidden" value="${ endDT.month }" name="eMonth" id="eMonth"/>
+                <input type="hidden" value="${ endDT.year }" name="eYear" id="eYear"/>
+                % if infoBookingMode:
+                    <input type="hidden" value="${ startT }" name="sTime" id="sTime"/>
+                    <input type="hidden" value="${ endT }" name="eTime" id="eTime"/>
+                    <ul id="breadcrumbs" style="margin:0px 0px 0px -15px; padding: 0; list-style: none;">
+                        <li><span><a href="${ urlHandlers.UHRoomBookingBookRoom.getURL() }">Specify Search Criteria</a></span></li>
+                        <li><span><a href="javascript:history.back(-1)">Select Available Period</a></span></li>
+                        <li><span class="current">Confirm Reservation</span></li>
+                    </ul>
+                % elif formMode == FormMode.NEW:
+                    <span class="groupTitle bookingTitle" style="border-bottom-width: 0px; font-weight: bold">
+                         ${ _("New")}&nbsp;${bookingMessage}ing
+                    </span>
                 % endif
                 % if formMode == FormMode.MODIF:
+                    <span class="groupTitle bookingTitle" style="border-bottom-width: 0px; font-weight: bold">
                      ${ _("Modify")}&nbsp;${bookingMessage}ing
                     <input type="hidden" name="resvID" id="resvID" value="${candResv.id}" />
-                % endif
-                </span>
-                % if showErrors:
-                    <br /><a href="#conflicts" style="color: Red; margin-left: 6px;"> ${ _("Saving failed. Please review details below.")}</a><br /><br />
+                    </span>
                 % endif
                 <table width="100%" align="left" border="0">
                   <%include file="RoomBookingRoomMiniDetails.tpl" args="room = candResv.room "/>
@@ -197,14 +255,21 @@
                         <div class="groupTitle bookingTitle">${'Booking Time & Date'}</div>
                     </td>
                   </tr>
-                  <!-- WHEN -->
+                  <!-- BOOKING TIME & DATE -->
                   <tr>
                     <td>
-                        <table id="roomBookingTable" width="100%">
+                        <table id="roomBookingTable">
                             <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(), maxAdvanceDays = candResv.room.maxAdvanceDays"/>
                         </table>
                     </td>
                 </tr>
+                % if not infoBookingMode:
+                    <tr>
+                        <td id="conflicts" colspan="2">
+                            ${ roomBookingRoomCalendar }
+                        </td>
+                    </tr>
+                % endif
                 <!-- BOOKED FOR -->
                 <tr>
                     <td>
@@ -217,7 +282,7 @@
                             % if rh._requireRealUsers:
                                 <tr>
                                     <td class="subFieldWidth" align="right" valign="top">
-                                        <small> ${ _("User")}&nbsp;&nbsp;</small>
+                                         ${ _("User")}&nbsp;&nbsp;
                                     </td>
                                     <td align="left" class="blacktext">
                                         <input type="hidden" id="bookedForId" name="bookedForId" value="${ candResv.bookedForId or '' }" />
@@ -229,7 +294,7 @@
                             % else:
                                 <tr>
                                     <td class="subFieldWidth" align="right" valign="top">
-                                        <small> ${ _("Name")}&nbsp;&nbsp;</small>
+                                        ${ _("Name")}&nbsp;&nbsp;
                                     </td>
                                     <td align="left" class="blacktext">
                                         <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ verbose( candResv.bookedForName ) }" />
@@ -239,7 +304,7 @@
                             % endif
                             <tr>
                                 <td class="subFieldWidth" align="right" valign="top">
-                                    <small> ${ _("E-mail")}&nbsp;&nbsp;</small>
+                                    ${ _("E-mail")}&nbsp;&nbsp;
                                 </td>
                                 <td align="left" class="blacktext">
                                     <input type="text" id="contactEmail" name="contactEmail" style="width: 240px;" value="${ verbose( candResv.contactEmail )}" />
@@ -248,7 +313,7 @@
                             </tr>
                             <tr>
                                 <td align="right" class="subFieldWidth" valign="top">
-                                    <small> ${ _("Telephone")}&nbsp;&nbsp;</small>
+                                    ${ _("Telephone")}&nbsp;&nbsp;
                                 </td>
                                 <td align="left" class="blacktext">
                                     <input type="text" id="contactPhone" name="contactPhone" style="width: 240px;" value="${ verbose( candResv.contactPhone ) }" />
@@ -257,7 +322,7 @@
                             </tr>
                             <tr>
                                 <td align="right" class="subFieldWidth" valign="top">
-                                    <small> ${ _("Reason")}&nbsp;&nbsp;</small>
+                                    ${ _("Reason")}&nbsp;&nbsp;
                                 </td>
                                 <td align="left" class="blacktext">
                                     <textarea rows="3" cols="50" id="reason" name="reason" >${ verbose( candResv.reason ) }</textarea>
@@ -267,7 +332,7 @@
                             % if candResv.room.needsAVCSetup:
                                 <tr>
                                     <td align="right" class="subFieldWidth" valign="top">
-                                        <small><span style="color: Red;">${ _("I will use video-conf. equipment (please only check that which you need)")}</span>&nbsp;&nbsp;</small>
+                                        <span style="color: Red;">${ _("I will use video-conf. equipment (please only check that which you need)")}</span>&nbsp;&nbsp;
                                     </td>
                                     <td align="left" class="blacktext">
                                         <input id="usesAVC" name="usesAVC" type="checkbox" ${' checked="checked" ' if candResv.usesAVC else ""} />
@@ -276,7 +341,7 @@
                                 </tr>
                                 <tr>
                                     <td align="right" class="subFieldWidth" valign="middle">
-                                        <small><span style="color: Red;">I will use video-conf. system</span>&nbsp;&nbsp;</small>
+                                        <span style="color: Red;">I will use video-conf. system</span>&nbsp;&nbsp;
                                     </td>
                                     <td align="left" id="vcSystemList" class="blacktext">
                                         % for vc in candResv.room.getAvailableVC():
@@ -293,7 +358,7 @@
                             % if candResv.room.needsAVCSetup or (rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance):
                             <tr>
                                 <td align="right" class="subFieldWidth" valign="top">
-                                    <small>${ _("Assistance")}&nbsp;&nbsp;</small>
+                                    ${ _("Assistance")}&nbsp;&nbsp;
                                 </td>
                                 <td>
                                     <table valign='top' cellpadding=0 cellspacing=0>
@@ -336,10 +401,9 @@
                         </table>
                     </td>
                 </tr>
-                <tr><td>&nbsp;</td></tr>
                 <!-- ACTIONS -->
                 <tr>
-                    <td colspan="2">
+                    <td>
                         <div class="groupTitle bookingTitle"></div>
                     </td>
                 </tr>
@@ -347,34 +411,17 @@
                     <td>
                         <input type="hidden" name="conf" value="${ conf.getId()  if conf else ''}" />
                         <input type="hidden" name="standalone" value="${ standalone }" />
-
                         <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left;">
-                          <li class="button" onclick="$('#checkBooking').click(); return false;">
-                            <a href="#">${ _("Check again for conflicts")}</a>
+                          <li class="button" style="margin-left: 10px" onclick="saveBooking()">
+                            <a href="#" onClick="return false;">${'Save' if formMode==FormMode.MODIF else bookingMessage}</a>
                           </li>
-                          <li style="display: none">
-                            <input type="submit" id="checkBooking" style="display: none;">
-                          </li>
-
-                          <li class="button" style="margin-left: 10px" onclick="$('#saveBooking').click(); return false;">
-                            <a href="#">${'Save' if formMode==FormMode.MODIF else 'Book'}</a>
-                          </li>
-                          <li style="display: none">
-                            <input type="submit" id="saveBooking" style="display: none;">
-                          </li>
+                          <li style="display: none"></li>
                         </ul>
                         <div style="padding-top: 5px;">
-                            <!-- <input type="submit" id="saveBooking" class="btn"  ${' value="Save" ' if formMode==FormMode.MODIF else ""} value="${ bookingMessage }" /> -->
                             <input type="checkbox" name="skipConflicting" id="skipConflicting" ${' checked="checked" ' if skipConflicting else ""} />
                              ${ _("Skip conflicting dates")}
                             ${contextHelp('skipConflictsHelp' )}
                         </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <a name="conflicts"></a>
-                        ${ roomBookingRoomCalendar }
                     </td>
                 </tr>
             </table>

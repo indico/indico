@@ -117,7 +117,7 @@ class WPRoomBookingBase( WPMainBase ):
                                         enabled=True)
         self._bookingsOpt = wcomponents.SideMenuSection(_("View My Bookings"), \
                                         urlHandlers.UHRoomBookingSearch4Bookings.getURL())
-        self._bookARoomOpt = wcomponents.SideMenuItem(_("Book a Room"), \
+        self._bookARoomOpt = wcomponents.SideMenuItem(_("Book a Room (Old)"), \
                                         urlHandlers.UHRoomBookingSearch4Rooms.getURL( forNewBooking = True ),
                                         enabled=True)
         self._myBookingListOpt = wcomponents.SideMenuItem(_("My bookings"),
@@ -217,7 +217,7 @@ class WPRoomBookingSearch4Rooms( WPRoomBookingBase ):
 
     def _setCurrentMenuItem( self ):
         if self._forNewBooking:
-            self._bookRoomNewOpt.setActive(True)
+            self._bookARoomOpt.setActive(True)
         else:
             self._roomSearchOpt.setActive(True)
 
@@ -242,6 +242,10 @@ class WPRoomBookingSearch4Bookings( WPRoomBookingBase ):
         return wc.getHTML( params )
 
 class WPRoomBookingBookRoom( WPRoomBookingBase ):
+
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+               self._includeJSPackage('RoomBooking')
 
     def __init__( self, rh ):
         self._rh = rh
@@ -425,7 +429,7 @@ class WPRoomBookingBookingForm( WPRoomBookingBase ):
 
     def getJSFiles(self):
         return WPRoomBookingBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
+               self._includeJSPackage('RoomBooking')
 
     def __init__( self, rh ):
         self._rh = rh
@@ -433,10 +437,6 @@ class WPRoomBookingBookingForm( WPRoomBookingBase ):
 
     def _setCurrentMenuItem( self ):
         self._bookRoomNewOpt.setActive(True)
-
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + \
-            self._includeJSPackage('RoomBooking')
 
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingBookingForm( self._rh, standalone = True )

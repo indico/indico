@@ -13,14 +13,12 @@
         }
         function submit_delete()
         {
-            new ConfirmPopup($T("Delete room"),
-                             $T("THIS ACTION IS IRREVERSIBLE. Please note that all archival BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?"),
-                             function(confirmed) {
-                if(confirmed) {
-                    $("#submits").attr("action", "${ deleteRoomUH.getURL( room ) }");
-                    $("#submits").submit();
-                }
-            }).open();
+            if ( confirm(  "${ _('THIS ACTION IS IRREVERSIBLE. Please note that all archival BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?')}" ) )
+            {
+                var frm = document.forms['submits']
+                frm.action = '${ deleteRoomUH.getURL( room ) }'
+                frm.submit()
+            }
         }
     </script>
 
@@ -48,7 +46,7 @@
                 <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                     <tr>
                         <td class="maincell">
-                            <span class="formTitle" style="border-bottom-width: 0px">Room</span><br />
+                            <span class="formTitle" style="border-bottom-width: 0px">Room ${ room.name }</span><br />
                             % if actionSucceeded:
                                 <br />
                                 <span class="actionSucceeded"> ${ _("Action succeeded.")}</span>  ${ _("Please review details below.")}<br />
@@ -70,36 +68,36 @@
                                 <td width="76%">
                                     <table width="100%">
                                         <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Location")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Location")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.locationName }</td>
                                         </tr>
                                         <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Name")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Name")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.name }</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Site")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Site")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.site }</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Building")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><a href="https://maps.cern.ch/mapsearch/mapsearch.htm?no=[${ room.building }]" title=" ${ _("Show on map")}">${ room.building }</a></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Building")}&nbsp;&nbsp;</td>
+                                            <td align="left" class="blacktext"><a href="http://building.web.cern.ch/map/building?bno=${ room.building }" title=" ${ _("Show on map")}">${ room.building }</a></td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Floor")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Floor")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.floor }</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Room")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Room")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.roomNr }</td>
                                         </tr>
                                         % if user.isAdmin():
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Latitude")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Latitude")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.latitude }</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Longitude")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Longitude")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.longitude }</td>
                                         </tr>
                                         % endif
@@ -120,7 +118,7 @@
                                 <td colspan="2">
                                     <table>
                                         <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Responsible")}&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Responsible")}&nbsp;</td>
                                             <% responsible = room.getResponsible() %>
                                             % if responsible:
                                                 <% responsibleName = responsible.getFullName() %>
@@ -130,7 +128,7 @@
                                             <td align="left" class="blacktext">${ responsibleName }${contextHelp('responsibleHelp' )}</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Where is key?")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Where is key?")}&nbsp;</td>
                                             <td align="left" class="blacktext">${ verbose( room.whereIsKey ) }${contextHelp('whereIsKeyHelp' )}</td>
                                         </tr>
                                  </table>
@@ -143,56 +141,44 @@
                                 <td colspan="2">
                                     <table width="100%">
                                         <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Capacity")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Capacity")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.capacity }${" "}${_("people")}</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Department")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top"> ${ _("Department")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ room.division }</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Surface area")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top"> ${ _("Surface area")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">
                                                 ${ verbose( room.surfaceArea )}
                                                 ${" m&sup2; " if room.surfaceArea else ""}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Room tel.")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top"> ${ _("Room tel.")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ verbose( room.telephone ) }</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Comments")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top"> ${ _("Comments")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">${ linkify( verbose( room.comments ) ) }</td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Unavailable booking periods")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top"> ${ _("Unavailable periods")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">
                                             % if room.getNonBookableDates():
-                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y (%H:%M)'), x.getEndDate().strftime('%d/%m/%Y (%H:%M)')), room.getNonBookableDates() )) }</li></ul>
-                                            % else:
-                                                ${_("Not set")}
+                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), room.getNonBookableDates() )) }</li></ul>
                                             % endif
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Daily availability periods")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">
-                                            % if room.getDailyBookablePeriods():
-                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), room.getDailyBookablePeriods() )) }</li></ul>
-                                            % else:
-                                                ${_("Not set")}
-                                            % endif
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="right" valign="top"><small> ${ _("Maximum advance time for bookings")}&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top"> ${ _("Maximum advance time")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">
                                                 ${ (_("%s days") % room.maxAdvanceDays) if room.maxAdvanceDays else _("Not set")}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small>&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">
                                                 % if not room.isReservable:
                                                     <span class="privateRoom"> ${ _("This room is not publicly bookable")}</span>
@@ -218,8 +204,8 @@
                                     <table width="100%">
                                     % for name, value in attrs.iteritems():
                                         <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small>${ name }&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ verbose( value ) if value else _("Not set") }</td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ name }&nbsp;&nbsp;</td>
+                                            <td align="left" class="blacktext">${ verbose( value ) }</td>
                                         </tr>
                                     % endfor
                                  </table>
@@ -233,7 +219,7 @@
                                 <td colspan="2">
                                     <table width="100%">
                                         <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small>${ _("Room has")}:&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top">${ _("Room has")}:&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">
                                                 <% l = [] %>
                                                 % for eq in room.getEquipment():
@@ -245,7 +231,7 @@
                                                         % if "I don't know" in VCs:
                                                               <% VCs.remove("I don't know") %>
                                                         % endif
-                                                        <% el.append( """<small><font color="grey">(%s) </font></small>"""%(", ".join(VCs))) %>
+                                                        <% el.append( """<font color="grey">(%s) </font>"""%(", ".join(VCs))) %>
                                                     % endif
                                                     <% l.append("".join(el)) %>
                                                 % endfor
@@ -260,21 +246,35 @@
                             <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("Actions")}</span></td>
                                 <td colspan="2">
-                                    <form name="submits" action="${bookingFormUH.getURL( room )}" method="post">
-                                        &nbsp;
-                                        % if room.canBook( user ):
-                                            <input style="margin-left: 18px;" type="submit" class="btn" value="${ _("Book")}" />
-                                        % endif
-                                        % if room.canPrebook( user ) and not room.canBook( user ):
-                                            <input style="margin-left: 18px;" type="submit" class="btn" value="${ _("PRE-Book")}"/>
-                                        % endif
-                                        % if room.canModify( user ):
-                                            <input style="margin-left: 18px;" type="submit" class="btn" value="${ _("Modify")}" onclick="submit_modify(); return false;" />
-                                        % endif
-                                        % if room.canDelete( user ):
-                                            <input style="margin-left: 18px;" type="submit" class="btn" value="${ _("Delete")}" onclick="submit_delete(); return false;" />
-                                        % endif
-                                        <input style="margin-left: 18px;" type="submit" class="btn" value="Stats" onclick="submit_stats(); return false;" />
+                                    <form id="submits" name="submits" action="${bookingFormUH.getURL( room )}" method="post">
+                                        <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left;">
+                                            % if room.canBook( user ):
+                                                <li class="button" style="margin-left: 10px" onclick="$('#submits').submit(); return false;">
+                                                    <a href="#" onClick="return false;">${ _("Book")}</a>
+                                                </li>
+                                            % endif
+                                            % if room.canPrebook( user ) and not room.canBook( user ):
+                                                <li class="button" style="margin-left: 10px" onclick="$('#submits').submit(); return false;">
+                                                    <a href="#" onClick="return false;">${ _("PRE-Book")}</a>
+                                                </li>
+                                            % endif
+                                            % if room.canModify( user ):
+                                                <li class="button" style="margin-left: 10px" onclick="submit_modify(); return false;">
+                                                    <a href="#" onClick="return false;">${ _("Modify")}</a>
+                                                </li>
+                                                <li style="display: none"></li>
+                                            % endif
+                                            % if room.canDelete( user ):
+                                                <li class="button" style="margin-left: 10px" onclick="submit_delete(); return false;">
+                                                    <a href="#" onClick="return false;">${ _("Delete")}</a>
+                                                </li>
+                                                <li style="display: none"></li>
+                                            % endif
+                                                <li class="button" style="margin-left: 10px" onclick="submit_stats(); return false;">
+                                                    <a href="#" onClick="return false;">${ _("Stats")}</a>
+                                                </li>
+                                                <li style="display: none"></li>
+                                         </ul>
                                     </form>
                                 </td>
                             </tr>

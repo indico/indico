@@ -27,10 +27,10 @@
 
         // Simple search
         if (!all_date_fields_are_blank()) {
-            isValid = validate_period(searchForm[0], false, true, 1) // 1: validate only dates
+            isValid = validate_period(false, true, 1) // 1: validate only dates
         }
         if (!all_time_fields_are_blank()) {
-            isValid = isValid && validate_period(searchForm[0], false, true, 2) // 2: validate only times
+            isValid = isValid && validate_period(false, true, 2) // 2: validate only times
         }
 
         // Holidays warning

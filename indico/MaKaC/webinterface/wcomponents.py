@@ -4886,7 +4886,6 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         candResvs = self._candResvs
 
         #vars["smallPhotoUH"] = urlHandlers.UHSendRoomPhoto
-        vars["manyDays"] = rh._manyDays
         vars["finishDate"] = rh._finishDate
         vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
         vars["withPhoto"] = False
@@ -4902,17 +4901,20 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         sd = rh._resvEx.startDT.date()
         if rh._resvEx.endDT:
             ed = rh._resvEx.endDT.date()
-
+        else:
+            ed = sd + timedelta(7)
         # autoCriteria - dates are calculated based on the next reservation
-        if rh._autoCriteria:
-            tmp = ReservationBase.findSoonest( rh._resvs, afterDT = yesterday )
-            if tmp:
-                tmp = tmp.getNextRepeating( afterDT = yesterday )
-                if tmp and tmp.startDT.date() > sd:
-                    sd = tmp.startDT
-            if not ed:
-                # one month of time span
-                ed = sd + timedelta( 30 )
+        if rh._autoCriteria and not rh._resvs:
+            # reservation not found for the next 7 days, change search period to 30 days
+            ed = sd + timedelta(30)
+            rh._resvEx.startDT = datetime(sd.year, sd.month, sd.day, 0, 0)
+            rh._resvEx.endDT = datetime(ed.year, ed.month, ed.day, 23, 59)
+            rh._resvs = ReservationBase.getReservations(resvExample=rh._resvEx, rooms=rh._rooms)
+            firstResv = ReservationBase.findSoonest(rh._resvs, afterDT=yesterday)
+            if firstResv:
+                # extend period to latest reservation date if necessarily
+                sd = firstResv.startDT
+                ed = sd + timedelta(7)
 
         # set the calendar dates as calculated
         calendarStartDT = datetime( sd.year, sd.month, sd.day, 0, 0 )
@@ -4973,25 +4975,22 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         vars["nextURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Next )
 
         vars['overload'] = self._rh._overload
+        vars['dayLimit'] = self._rh._dayLimit
         vars['newBooking'] = self._rh._newBooking
 
         # empty days are shown for "User bookings" and "User pre-bookings"
         # and for the calendar as well
         # but not for the booking search
-        #showEmptyDays = ( self._rh._ofMyRooms or \
+        # showEmptyDays = ( self._rh._ofMyRooms or \
         #                  (not self._rh._ofMyRooms and not self._rh._onlyMy) ) and \
         #                  not self._rh._search
-        #showEmptyRooms = showEmptyDays
-        # Always show empty rooms/days
 
-        showEmptyDays = showEmptyRooms = self._rh._newBooking or rh._allRooms
+        showEmptyDays = showEmptyRooms = not (self._rh._newBooking or self._rh._ofMyRooms or self._rh._onlyMy)
 
         # Calendar related stuff ==========
 
         bars = []
         collisionsOfResvs = []
-
-
 
         # Bars: Candidate reservation
         collisions = [] # only with confirmed resvs
@@ -5003,11 +5002,27 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             # Bars: Conflicts all vs candidate
             candResvIsConfirmed = candResv.isConfirmed;
             candResv.isConfirmed = None
+
+            candResv.startDT, calendarStartDT = calendarStartDT, candResv.startDT
+            candResv.endDT, calendarEndDT = calendarEndDT, candResv.endDT
+
             allCollisions = candResv.getCollisions()
+
+            candResv.startDT, calendarStartDT = calendarStartDT, candResv.startDT
+            candResv.endDT, calendarEndDT = calendarEndDT, candResv.endDT
+
             candResv.isConfirmed = candResvIsConfirmed
             if candResv.id:
                 # Exclude candidate vs self pseudo-conflicts (Booking modification)
                 allCollisions = filter( lambda c: c.withReservation.id != candResv.id, allCollisions )
+            for c in allCollisions:
+                if c.withReservation.isConfirmed:
+                    bars.append( Bar( c, Bar.UNAVAILABLE ) )
+                else:
+                    bars.append( Bar( c, Bar.PREBOOKED ) )
+
+            allCollisions = candResv.getCollisions()
+
             for c in allCollisions:
                 if c.withReservation.isConfirmed:
                     bars.append( Bar( c, Bar.CONFLICT ) )
@@ -5105,6 +5120,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         if rh._onlyBookings:
             vars["calendarParams"]["onlyBookings"] ="on"
         vars["repeatability"] = rh._repeatability
+        vars["flexibleDatesRange"] = rh._flexibleDatesRange
         vars["calendarFormUrl"] = urlHandlers.UHRoomBookingBookingList.getURL()
 
         return vars
@@ -5186,7 +5202,7 @@ def sortBarsByImportance( bars, calendarStartDT, calendarEndDT ):
 
     for day in iterdays( calendarStartDT, calendarEndDT ):
         if not bars.has_key( day.date() ):
-            bars[day.date()] = []
+           bars[day.date()] = []
 
     return bars
 
@@ -5475,6 +5491,8 @@ class WRoomBookingBookingForm( WTemplated ):
 
         vars["roomBookingRoomCalendar"] = WRoomBookingRoomCalendar( self._rh, self._standalone, buttonText=bText).getHTML( {} )
         vars["rooms"] = self._rh._rooms
+        vars["infoBookingMode"] = self._rh._infoBookingMode
+
         return vars
 
 class WRoomBookingConfirmBooking( WRoomBookingBookingForm ):

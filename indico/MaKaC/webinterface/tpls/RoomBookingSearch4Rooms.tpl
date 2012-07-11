@@ -21,7 +21,7 @@
         // Simple search -------------------------------------
         // Availability
         if (!$('input[name="availability"]', searchForm).is(':checked')) { // only if NOT "Don't care"
-            isValid = validate_period(searchForm[0]);
+            isValid = validate_period();
         }
         // capacity
         if ($('#capacity').val().length > 0 && parseInt($('#capacity').val(), 10).toString() == 'NaN') {
@@ -95,7 +95,7 @@
             });
     }
 
-    IndicoUI.executeOnLoad(function() {
+    $(window).load(function() {
         $('#searchForm').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {
@@ -295,7 +295,7 @@
                                                             ${contextHelp('availabilityHelp' )}
                                                         </td>
                                                     </tr>
-                                                    <%include file="RoomBookingPeriodForm.tpl" args="form = 1, unavailableDates = [], availableDayPeriods = [] "/>
+                                                    <%include file="RoomBookingPeriodFormOld.tpl" args="form = 1, unavailableDates = [] "/>
                                                     <tr id='includePrebookingsTR'>
                                                         <td class="subFieldWidth" align="right" ><small> ${ _("PRE-Bookings")}</small></td>
                                                         <td align="left" class="blacktext">
@@ -336,7 +336,7 @@
                                             <td align="right">
                                                 <table width="100%" cellspacing="4px">
                                                     <tr>
-                                                        <td width="80px" align="right" valign="top"><small> ${ _("I need...")}&nbsp;&nbsp;</small></td>
+                                                        <td class="subFieldWidth" align="right" valign="top">${ _("I need...")}&nbsp;&nbsp;</td>
                                                         <td align="left" class="blacktext" >
                                                             % for eq in possibleEquipment:
                                                                 <input id="${ "equ_" + eq }" name="${ "equ_" + eq }" type="checkbox">${ eq }</input><br />
@@ -351,7 +351,7 @@
                                             <td align="right">
                                                 <table width="100%" cellspacing="4px">
                                                     <tr>
-                                                        <td width="80px" align="right" valign="top"><small> ${ _("Is public")}&nbsp;&nbsp;</small></td>
+                                                        <td class="subFieldWidth" align="right" valign="top">${ _("Is public")}&nbsp;&nbsp;</td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="isReservable" name="isReservable" type="checkbox" checked="checked"/>
                                                             ${inlineContextHelp(_("[v] Include only publically reservable rooms.") )}
@@ -359,7 +359,7 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="80px" align="right" valign="top"><small> ${ _("Auto confirm")}&nbsp;&nbsp;</small></td>
+                                                        <td class="subFieldWidth" align="right" valign="top">${ _("Auto confirm")}&nbsp;&nbsp;</td>
                                                         <td align="left" class="blacktext">
                                                             <input id="isAutoConfirmed" name="isAutoConfirmed" type="checkbox"/>
                                                             ${inlineContextHelp(_("[v] Include only rooms, where bookings are automatically confirmed. This is the case for most rooms.") )}
@@ -368,7 +368,7 @@
                                                     </tr>
                                                     % if isResponsibleForRooms:
                                                         <tr>
-                                                            <td width="80px" align="right" valign="top"><small> ${ _("Only mine")}&nbsp;&nbsp;</small></td>
+                                                            <td class="subFieldWidth" align="right" valign="top">${ _("Only mine")}&nbsp;&nbsp;</td>
                                                             <td align="left" class="blacktext">
                                                                 <input id="onlyMy" name="onlyMy" type="checkbox" />
                                                                 ${inlineContextHelp(_("[v] Include only rooms you are responsible for.") )}
@@ -378,7 +378,7 @@
                                                     % endif
                                                     % if user.isAdmin():
                                                         <tr>
-                                                            <td width="80px" align="right" valign="top"><small> ${ _("Active?")}&nbsp;&nbsp;</small></td>
+                                                            <td class="subFieldWidth" align="right" valign="top">${ _("Active?")}&nbsp;&nbsp;</td>
                                                             <td align="left" class="blacktext">
                                                                 <input id="isActive" name="isActive" type="checkbox" checked="checked"/>
                                                                 ${inlineContextHelp(_("[v] Include only active rooms. <b>This should be checked.</b> Please note that inactive rooms are considered deleted.") )}

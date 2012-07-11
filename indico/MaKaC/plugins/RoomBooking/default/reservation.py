@@ -256,6 +256,7 @@ class Reservation( Persistent, ReservationBase, Observable ):
         heavy = kwargs.get( 'heavy' )
         location = kwargs.get( 'location' )
         days = kwargs.get( 'days' )
+        repeatability = kwargs.get( 'repeatability' )
 
         ret_lst = []
         counter = 0

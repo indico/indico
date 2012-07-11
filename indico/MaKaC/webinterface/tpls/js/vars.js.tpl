@@ -132,6 +132,7 @@ var Indico = {
             category: '${ str(urlHandlers.UHCategoryAddMaterial.getURL()) }'
         },
 
+        RoomBookingBookRoom: "${ urlHandlers.UHRoomBookingBookRoom.getURL() }",
         RoomBookingForm: "${ urlHandlers.UHRoomBookingBookingForm.getURL() }",
         RoomBookingDetails: "${ urlHandlers.UHRoomBookingRoomDetails.getURL() }",
         ConfModifSchedule: "${ urlHandlers.UHConfModifSchedule.getURL() }",

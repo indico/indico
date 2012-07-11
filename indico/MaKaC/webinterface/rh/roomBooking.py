@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from MaKaC.plugins.base import pluginId
 # Most of the following imports are probably not necessary - to clean
 
@@ -145,6 +146,7 @@ class RoomBookingAvailabilityParamsMixin:
         self._startDT = None
         self._endDT = None
         self._repeatability = repeatability
+
         if sYear and sMonth and sDay and sTime and eYear and eMonth and eDay and eTime:
             # Full period specified
             self._startDT = datetime( sYear, sMonth, sDay, sHour, sMinute )
@@ -578,7 +580,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         self._checkParamsRepeatingPeriod( params )
         candResv.startDT = self._startDT
         candResv.endDT = self._endDT
-        candResv.repeatability = RepeatabilityEnum.daily
+        candResv.repeatability = self._repeatability
 
         return candResv
 
@@ -647,7 +649,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             if candResv.endDT == None:
                 candResv.endDT = datetime( now.year, now.month, now.day, hourEnd, minuteEnd )
         if repeatability is not None:
-            if repeatability == 'None':
+            if not repeatability.isdigit():
                 candResv.repeatability = None
             else:
                 candResv.repeatability = int(repeatability)
@@ -1007,6 +1009,8 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._roomGUIDs = []
         self._candResvs = []
         self._allRooms = False
+        self._dayLimit = 400
+        self._resvLimit = 400
         roomGUIDs = params.get( "roomGUID" )
         if isinstance( roomGUIDs, list ) and 'allRooms' in roomGUIDs:
             roomGUIDs = 'allRooms'
@@ -1023,6 +1027,15 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._checkParamsRepeatingPeriod( params )
         resvEx.startDT = self._startDT
         resvEx.endDT = self._endDT
+
+        self._flexibleDatesRange = 0
+        flexibleDatesRange = params.get("flexibleDatesRange")
+        if flexibleDatesRange and len(flexibleDatesRange.strip()) > 0:
+            if flexibleDatesRange == "None":
+                self._flexibleDatesRange = 0
+            else:
+                self._flexibleDatesRange = int(flexibleDatesRange.strip())
+
         bookedForName = params.get( "bookedForName" )
         if bookedForName and len( bookedForName.strip() ) > 0:
             resvEx.bookedForName = bookedForName.strip()
@@ -1036,8 +1049,10 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         if repeatability and len( repeatability.strip() ) > 0:
             if repeatability == "None":
                 self._repeatability = None
+                resvEx.repeatability = None
             else:
                 self._repeatability = int( repeatability.strip() )
+                resvEx.repeatability = int( repeatability.strip() )
 
         onlyPrebookings = params.get( "onlyPrebookings" )
         self._onlyPrebookings = False
@@ -1094,12 +1109,6 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         if finishDate and len( finishDate.strip() ) > 0:
             if finishDate == 'true':
                 self._finishDate = True
-
-        self._manyDays = False
-        manyDays = params.get( "manyDays" )
-        if manyDays and len( manyDays.strip() ) > 0:
-            if manyDays == 'true':
-                self._manyDays = True
 
         self._newBooking = False
         newBooking = params.get( "newBooking" )
@@ -1160,22 +1169,43 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         else:
             self._isHeavy = None
 
-        self._resvEx = resvEx
+        #self._overload stores type of overload 0 - no overload 1 - too long period selected 2 - too many bookings fetched
+        self._overload = 0
+        if resvEx.startDT and resvEx.endDT:
+            if (resvEx.endDT - resvEx.startDT).days > self._dayLimit:
+                self._overload = 1
+            elif self._newBooking:
+                for rg in self._roomGUIDs:
+                    if self._repeatability == 0:
+                        self._candResvs.append(self._loadResvBookingCandidateFromSession( params, RoomGUID.parse( rg ).getRoom() ))
+                    else:
+                        candResv = self._loadResvBookingCandidateFromSession( params, RoomGUID.parse( rg ).getRoom() )
+                        candResv.startDT = self._startDT
+                        candResv.endDT = self._endDT - timedelta(2 * self._flexibleDatesRange)
+                        self._candResvs.append(candResv)
+                        for i in range(2 * self._flexibleDatesRange):
+                            candResv = self._loadResvBookingCandidateFromSession( params, RoomGUID.parse( rg ).getRoom() )
+                            candResv.startDT = self._startDT + timedelta(i + 1)
+                            candResv.endDT = self._endDT - timedelta(2 * self._flexibleDatesRange - i - 1)
+                            self._candResvs.append(candResv)
+
+        if ((resvEx.endDT - resvEx.startDT).days + 1) * len(self._candResvs) > self._resvLimit:
+            self._overload = 2
 
         session = self._websession
         self._prebookingsRejected = session.getVar( 'prebookingsRejected' )
         self._subtitle = session.getVar( 'title' )
         self._description = session.getVar( 'description' )
+        self._resvEx = resvEx
         session.setVar( 'title', None )
         session.setVar( 'description', None )
         session.setVar( 'prebookingsRejected', None )
 
-        if self._newBooking:
-            for rg in self._roomGUIDs:
-                self._candResvs.append(self._loadResvBookingCandidateFromSession( params, RoomGUID.parse( rg ).getRoom() ))
-
-
     def _process( self ):
+        # Init
+        self._resvs = []
+        self._dayBars = {}
+
         # The following can't be done in checkParams since it must be after checkProtection
         if self._onlyMy:
             self._resvEx.createdBy = str( self._getUser().id )
@@ -1187,30 +1217,6 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._showRejectAllButton = False
         if self._rooms and not self._resvEx.isConfirmed:
             self._showRejectAllButton = True
-
-        if self._roomGUIDs:
-            rooms = [ RoomGUID.parse( rg ).getRoom() for rg in self._roomGUIDs ]
-            if self._rooms is list:
-                self._rooms.extend( rooms )
-            else:
-                self._rooms = rooms
-
-        # Init
-        resvEx = self._resvEx
-
-        days = None
-        #self._overload stores type of overload 0 - no overload 1 - too long period selected 2 - too many bookings fetched
-        self._overload = 0
-        if resvEx.startDT and resvEx.endDT:
-            if ( resvEx.endDT - resvEx.startDT ).days > 400:
-                self._overload = 1
-                self._resvs = []
-            else:
-                # Prepare 'days' so .getReservations will use days index
-                if resvEx.repeatability == None:
-                    resvEx.repeatability = RepeatabilityEnum.daily
-                periods = resvEx.splitToPeriods(endDT = resvEx.endDT)
-                days = [ period.startDT.date() for period in periods ]
 
         # We only use the cache if no options except a start/end date are sent and all rooms are included
         self._useCache = (self._allRooms and
@@ -1233,26 +1239,52 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._cache = None
         self._updateCache = False
 
-        self._dayBars = {}
-        if not self._overload:
-            if self._useCache:
-                self._cache = GenericCache('RoomBookingCalendar')
-                self._dayBars = dict((day, bar) for day, bar in self._cache.get_multi(map(str, days)).iteritems() if bar)
-                dayMap = dict(((str(day), day) for day in days))
-                for day in self._dayBars.iterkeys():
-                    days.remove(dayMap[day])
-                self._updateCache = bool(len(days))
+        if self._overload != 0:
+            p = roomBooking_wp.WPRoomBookingBookingList( self )
+            return p.display()
 
-            self._resvs = []
-            day = None # Ugly but...othery way to avoid it?
-            for day in days:
-                for loc in Location.allLocations:
-                    self._resvs += CrossLocationQueries.getReservations( location = loc.friendlyName, resvExample = resvEx, rooms = self._rooms, archival = self._isArchival, heavy = self._isHeavy, days = [day] )
-                if len(self._resvs) > 400:
-                    self._overload = 2
-                    break
-            if day:
-                self._resvEx.endDT = datetime( day.year, day.month, day.day, 23, 59, 00 )
+        if self._roomGUIDs:
+            rooms = [ RoomGUID.parse( rg ).getRoom() for rg in self._roomGUIDs ]
+            if self._rooms is list:
+                self._rooms.extend( rooms )
+            else:
+                self._rooms = rooms
+
+        # Prepare 'days' so .getReservations will use days index
+        if not self._resvEx.repeatability:
+            self._resvEx.repeatability = RepeatabilityEnum.daily
+        periods = self._resvEx.splitToPeriods(endDT = self._resvEx.endDT)
+        if self._flexibleDatesRange:
+            startDate = self._startDT + timedelta(self._flexibleDatesRange)
+            endDate = self._endDT - timedelta(self._flexibleDatesRange)
+            for i in range(self._flexibleDatesRange):
+                self._resvEx.startDT = startDate - timedelta(i+1)
+                self._resvEx.endDT = endDate - timedelta(i+1)
+                periods.extend(self._resvEx.splitToPeriods())
+                self._resvEx.startDT = startDate + timedelta(i+1)
+                self._resvEx.endDT = endDate + timedelta(i+1)
+                periods.extend(self._resvEx.splitToPeriods())
+            self._resvEx.startDT = self._startDT
+            self._resvEx.endDT = self._endDT
+        days = [ period.startDT.date() for period in periods ]
+
+        if self._useCache:
+            self._cache = GenericCache('RoomBookingCalendar')
+            self._dayBars = dict((day, bar) for day, bar in self._cache.get_multi(map(str, days)).iteritems() if bar)
+            dayMap = dict(((str(day), day) for day in days))
+            for day in self._dayBars.iterkeys():
+                days.remove(dayMap[day])
+            self._updateCache = bool(len(days))
+
+        day = None # Ugly but...othery way to avoid it?
+        for day in days:
+            for loc in Location.allLocations:
+                self._resvs += CrossLocationQueries.getReservations( location = loc.friendlyName, resvExample = self._resvEx, rooms = self._rooms, archival = self._isArchival, heavy = self._isHeavy, repeatability=self._repeatability,  days = [day] )
+            if len(self._resvs) > self._resvLimit:
+                self._overload = 2
+                break
+        if day:
+            self._resvEx.endDT = datetime( day.year, day.month, day.day, 23, 59, 00 )
 
         p = roomBooking_wp.WPRoomBookingBookingList( self )
         return p.display()
@@ -1262,9 +1294,21 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
 
 class RHRoomBookingRoomDetails( RHRoomBookingBase ):
 
+    def _setGeneralDefaultsInSession( self ):
+        now = datetime.now()
+
+        # if it's saturday or sunday, postpone for monday as a default
+        if now.weekday() in [5,6]:
+            now = now + timedelta( 7 - now.weekday() )
+
+        websession = self._websession
+        websession.setVar( "defaultStartDT", datetime( now.year, now.month, now.day, 0, 0 ) )
+        websession.setVar( "defaultEndDT", datetime( now.year, now.month, now.day, 0, 0 ) )
+
     def _checkParams( self, params ):
         locator = locators.WebLocator()
         locator.setRoom( params )
+        self._setGeneralDefaultsInSession()
         self._room = self._target = locator.getObject()
 
         session = self._websession
@@ -1404,6 +1448,16 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
         self._errors = session.getVar( "errors" )
 
         self._candResv = candResv
+
+        if params.get("infoBookingMode"):
+            self._infoBookingMode = True
+        else:
+            self._infoBookingMode = False
+
+        if params.get("skipConflicting"):
+            self._skipConflicting = True
+        else:
+            self._skipConflicting = False
 
         self._clearSessionState()
         self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
@@ -1705,7 +1759,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
         self._businessLogic()
 
         if self._errors or self._answer == 'No':
-            url = urlHandlers.UHRoomBookingBookingForm.getURL( self._candResv.room, resvID=self._resvID )
+            url = urlHandlers.UHRoomBookingBookingForm.getURL( self._candResv.room, resvID=self._resvID, infoBookingMode=True )
         elif self._confirmAdditionFirst:
             p = roomBooking_wp.WPRoomBookingConfirmBooking( self )
             return p.display()

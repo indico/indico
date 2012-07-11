@@ -37,24 +37,14 @@ function compareRooms(elem1, elem2){
     return 0;
 }
 
-var calendarLegend = Html.div({style:{cssFloat: 'right', padding: pixels(5), marginBottom: pixels(20), width: pixels(390), border: "1px solid #eaeaea", textAlign: "center", borderRadius: pixels(10)}},
+var calendarLegend = Html.div({style:{cssFloat: 'left', clear: 'both', padding: pixels(5), marginBottom: pixels(20), border: "1px solid #eaeaea", textAlign: "center", borderRadius: pixels(10)}},
         Html.div( {className:'barLegend', style:{color: 'black'}}, $T('Legend:')),
         Html.div( {className:'barLegend barCand'}, $T('Available')),
         Html.div( {className:'barLegend barUnaval'}, $T('Booked')),
         Html.div( {className:'barLegend barConf'}, $T('Conflict')),
-        Html.div( {style:{cssFloat: 'right', paddingTop: pixels(4)}},
-            Html.a ({id: 'moreLegendText'}, $T('show more...'))),
-        Html.div( {id:'moreLegend', style:{clear: 'both', display: 'none'}},
-            Html.div( {className:'barLegend barPreB', style:{color: 'black'}}, $T('PRE-Booking')),
-            Html.div( {className:'barLegend barPreC', style:{color: 'white'}}, $T('Conflict with PRE-Booking')),
-            Html.div( {className:'barLegend barPreConc', style:{color: 'white'}}, $T('Concurrent PRE-Bookings'))
-            )
-        );
-
-calendarLegend.observeClick(function() {
-    $('#moreLegend').toggle(350);
-    $('#moreLegendText').text( $('#moreLegendText').text() == 'show more...' ? 'hide...' : 'show more...');
-});
+        Html.div( {className:'barLegend barPreB', style:{color: 'black'}}, $T('PRE-Booking')),
+        Html.div( {className:'barLegend barPreC', style:{color: 'white'}}, $T('Conflict with PRE-Booking')),
+        Html.div( {className:'barLegend barPreConc', style:{color: 'white'}}, $T('Concurrent PRE-Bookings')));
 
 /**
  * Represents a single room in the roombooking
@@ -66,15 +56,30 @@ type ("RoomBookingRoom", [],
             /**
              * Return booking form url for the specified dates.
              */
-            getBookingFormUrl: function(date, repeatability, minutes, finishDate, startD, endD){
+            getBookingFormUrl: function(date, repeatability, flexibleDatesRange, minutes, finishDate, startD, endD){
                 url = Indico.Urls.RoomBookingForm + "?roomLocation=" + this.location + "&roomID=" + this.id +
-                "&ignoreSession=1" + "&repeatability=" + repeatability;
+                "&ignoreSession=1&repeatability=" + repeatability + "&infoBookingMode=True";
                 if (minutes) {
                     url += "&hour=" + date.substr(11,2) + "&minute=" + date.substr(14,2) + "&hourEnd=" + date.substr(16,2) + "&minuteEnd=" + date.substr(19,2);
                 }
-                if (finishDate == 'true') {
-                    url += "&year=" + startD.substr(0,4) + "&month=" + startD.substr(5,2) + "&day=" + startD.substr(8,2);
-                    url += "&yearEnd=" + endD.substr(0,4) + "&monthEnd=" + endD.substr(5,2) + "&dayEnd=" + endD.substr(8,2);
+                if (typeof repeatability != 'undefined' && repeatability != 'None' && flexibleDatesRange > 0) {
+                    if (repeatability == 0)
+                        repeatabilityDays = 1;
+                    else if (repeatability < 4)
+                        repeatabilityDays = 7 * repeatability;
+                    else
+                        repeatabilityDays = 35;
+                    roomStartDate = new Date(date.substr(0,4), date.substr(5,2) - 1, date.substr(8,2));
+                    calendarStartDate = new Date(startD.substr(0,4), startD.substr(5,2) - 1, startD.substr(8,2));
+                    while (roomStartDate >= calendarStartDate)
+                        roomStartDate.setDate(roomStartDate.getDate() - repeatabilityDays);
+                    roomStartDate.setDate(roomStartDate.getDate() + repeatabilityDays);
+                    url += "&year=" + roomStartDate.getFullYear() + "&month=" + (roomStartDate.getMonth() + 1) + "&day=" + roomStartDate.getDate() +
+                    "&yearEnd=" + endD.substr(0,4) + "&monthEnd=" + endD.substr(5,2) + "&dayEnd=" + endD.substr(8,2);
+                }
+                else if (finishDate == 'true') {
+                    url += "&year=" + startD.substr(0,4) + "&month=" + startD.substr(5,2) + "&day=" + startD.substr(8,2) +
+                           "&yearEnd=" + endD.substr(0,4) + "&monthEnd=" + endD.substr(5,2) + "&dayEnd=" + endD.substr(8,2);
                 }
                 else {
                     url +="&year=" + date.substr(0,4) + "&month=" + date.substr(5,2) + "&day=" + date.substr(8,2);
@@ -231,19 +236,22 @@ type ("RoomBookingCalendarData", [],
                 return this.dayAttrs[day.date].tooltip || '';
             }
         },
-        function(reservationBars, dayAttrs, repeatability, manyDays, finishDate){
+        function(reservationBars, dayAttrs, repeatability, finishDate, flexibleDatesRange, dayLimit, overload){
             this.days = [];
             this.dayAttrs = dayAttrs;
             this.repeatability = repeatability;
-            this.manyDays = manyDays;
             this.finishDate = finishDate;
+            this.flexibleDatesRange = flexibleDatesRange;
+            this.dayLimit = dayLimit;
+            this.overload = overload;
+
             for (var date in reservationBars){
                 this.days.push(new RoomBookingCalendarDay(reservationBars[date], date));
             }
             this.days.sort(function(day1, day2){
                 return IndicoUtil.compare(day1.date, day2.date);
             });
-            if (finishDate == 'true'){
+            if (finishDate == 'true' && this.days.length){
                 this.endD = this.days[this.days.length-1].date;
                 this.startD = this.days[0].date;
             }
@@ -269,10 +277,10 @@ type ("RoomBookingCalendarDrawer", [],
                 var resvInfo = bar.startDT.print("%H:%M") + "  -  " +
                                bar.endDT.print("%H:%M") + "<br />" + bar.owner +
                                "<br />" + bar.reason;
-                var newResvInfo = "Click to book it now <br />" + bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
+                var newResvInfo = "Click to book it <br />" + bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
                 var barDiv =  Html.div({
                     className: bar.type + " barDefault",
-                    style: {cursor: (bar.inDB || bar.type == 'barCand' ? 'pointer' : ''), width: pixels(parseInt(width)), left: pixels(parseInt(left))}});
+                    style: {cursor: (bar.inDB || (bar.type == 'barCand' && showCandidateTip) ? 'pointer' : ''), width: pixels(parseInt(width)), left: pixels(parseInt(left))}});
                 if(bar.inDB) {
                     barDiv.observeClick(function(){
                         window.location = bar.bookingUrl;
@@ -280,7 +288,67 @@ type ("RoomBookingCalendarDrawer", [],
                 }
                 if(bar.type == 'barCand' && showCandidateTip) {
                     barDiv.observeClick(function(){
-                        window.location = bar.room.getBookingFormUrl(bar.startDT.print("%Y/%m/%d %H:%M") + bar.endDT.print("%H:%M"), self.data.repeatability, true, self.data.finishDate, self.data.startD, self.data.endD);
+                        var bookingImposible = true;
+                        var generalConflict = false;
+                        $.each($('.dayCalendarDivHover').parent(), function () {
+                            var conflict = false;
+                            $.each ($(this).find('.barDefault'), function () {
+                                if ($(this).hasClass('barConf')) {
+                                    conflict = true;
+                                    return false;
+                                }
+                            });
+                            if (conflict) {
+                                generalConflict = true;
+                            } else {
+                                bookingImposible = false;
+                            }
+                        });
+                        url = bar.room.getBookingFormUrl(bar.startDT.print("%Y/%m/%d %H:%M") + bar.endDT.print("%H:%M"), self.data.repeatability, self.data.flexibleDatesRange, true, self.data.finishDate, self.data.startD, self.data.endD);
+                        if (bookingImposible) {
+                            var popup = new ExclusivePopupWithButtons($T('Booking conflict'), function(){popup.close();}, false, false, true);
+
+                            popup._getButtons = function() {
+                                var self = this;
+                                return [
+                                    [$T('Search again'), function() {
+                                        window.location = Indico.Urls.RoomBookingBookRoom;
+                                        self.close();
+                                    }],
+                                    [$T('Close'), function() {
+                                        self.close();
+                                    }],
+                                ];
+                            };
+                            popup.draw = function(){
+                                var span1 = Html.span('', $T("This room cannot be booked at the time requested due a conflict with an existing reservation"));
+                                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br()]));
+                            };
+                            popup.open();
+                        } else if (generalConflict) {
+                            var popup = new ExclusivePopupWithButtons($T('Booking Conflict'), function(){popup.close();}, false, false, true);
+
+                            popup._getButtons = function() {
+                                var self = this;
+                                return [
+                                    [$T('Skip conflicting days'), function() {
+                                        url += "&skipConflicting=on";
+                                        window.location = url;
+                                        self.close();
+                                    }],
+                                    [$T('Close'), function() {
+                                        self.close();
+                                    }],
+                                ];
+                            };
+                            popup.draw = function(){
+                                var span1 = Html.span('', $T("You can continue booking for only the available dates..."));
+                                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br()]));
+                            };
+                            popup.open();
+                        } else {
+                            window.location = url;
+                        }
                     });
                     $(barDiv.dom).qtip({
                         content: {
@@ -333,7 +401,7 @@ type ("RoomBookingCalendarDrawer", [],
             /**
              * Draws a calendar header
              */
-            drawHeader: function(prevNextMenu){
+            drawHeader: function(){
 
             },
             /**
@@ -356,23 +424,16 @@ type ("RoomBookingCalendarDrawer", [],
             /**
              * Main drawing method.
              */
-            draw: function(prevNextMenu){
-                switch( this.overload ){
+            draw: function(){
+                switch( this.data.overload ){
                     //Too long period was chosen
                     case 1:
-                        overloadDivTop = Html.div({style:{clear:'both', fontSize:pixels(16), textAlign:'center', marginBottom:pixels(12), color:"#881122"}}, $T("Too large time span. Please issue a more specific query."));
-                        break;
+                        return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Time span is too large. Please issue a "), Html.a({href:Indico.Urls.RoomBookingBookRoom}, $T("more specific query.")), $T("Time span limit is {0} days.").format(this.data.dayLimit)));
                     //Too many results fetched
                     case 2:
-                        overloadDivBottom = Html.div({style:{clear:'both', fontSize:pixels(16), textAlign:'center', marginBottom:pixels(12), color:"#881122"}}, $T("Too many results. Use 'next period' and 'previous period' to navigate."));
-                        break;
-                    //Not overloaded
-                    default:
-                        var overloadDivTop = null;
-                        var overloadDivBottom = null;
+                        return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Too many possible periods found. Please issue a "), Html.a({href:Indico.Urls.RoomBookingBookRoom}, $T("more specific query."))));
                 }
-
-                return Html.div({}, overloadDivTop, this.drawHeader(prevNextMenu),  this.drawContent(), overloadDivBottom);
+                return Html.div({}, this.drawHeader(),  this.drawContent());
             }
         },
         /**
@@ -383,9 +444,8 @@ type ("RoomBookingCalendarDrawer", [],
          * 1 - too long period chosen (no bookings will be displayed) ,
          * 2 - too many bookings fetched. Booking from the shorter period are going to be displayed.
          */
-        function(data, overload){
+        function(data){
             this.data = data;
-            this.overload = overload;
         })
 
 type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
@@ -401,16 +461,16 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 var bars = [];
                 each(roomInfo.bars,
                         function(bar){
-                    bars.push(self.drawBar(bar, true));
-                })
-                return Html.div({style:{clear:'both', width:pixels(120), paddingTop:pixels(5)}}, Html.div({style:{cssFloat:'left'}},roomLink), Html.div('dayCalendarDiv',bars, this.drawSmallHours()));
+                            bars.push(self.drawBar(bar, true));
+                        });
+                return Html.div({style:{clear:'both', width:pixels(120), paddingTop:pixels(5)}}, Html.div({style:{cssFloat:'left', paddingLeft: pixels(5)}},roomLink), Html.div('dayCalendarDiv',bars, this.drawSmallHours()));
             },
 
             /**
              * Draws a day cell and all its rooms and reservations
              * @param {RoomBookingCalendarDay} day day to be drawn
              */
-            drawDay: function(day){
+            drawDay: function(day, highlight){
                 var self = this;
                 var rooms = [];
                 each(day.rooms,
@@ -418,11 +478,18 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                         roomDiv = self.drawRoom(room);
                         if(roomDiv)
                             rooms.push(roomDiv);
-                })
+                });
+                highlight ? wholeDayCalendarDayTitle = 'wholeDayCalendarDayHighlight' : wholeDayCalendarDayTitle = '';
                 if(_.size(rooms) > 0)
-                    return Html.div({className:"wholeDayCalendarDiv", style:{width:pixels(840), marginTop:pixels(15), marginBottom:pixels(40)}}, Html.div({style:{width:pixels(820),
-                        height:pixels(20), borderBottom: "1px solid #eaeaea", clear: "both"}}, Html.div({style:{cssFloat:'left', fontWeight:'bold'}},
-                        $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('yy-mm-dd', day.date)))), this.drawHours(), rooms);
+                    if (highlight)
+                        return Html.div({className:"wholeDayCalendarDiv", style:{border: '2px solid #D9EDF7'}},
+                                    Html.div({className:'wholeDayCalendarDayHighlight', style:{width:pixels(800), height:pixels(20), borderBottom: "1px solid #eaeaea", clear: "both"}},
+                                        Html.div({style:{cssFloat:'left', fontWeight: 'bold'}}, $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('yy-mm-dd', day.date)))), this.drawHours(), rooms);
+                    else
+                        return Html.div({className:"wholeDayCalendarDiv"},
+                                Html.div({style:{width:pixels(800), height:pixels(20), borderBottom: "1px solid #eaeaea", clear: "both"}},
+                                        Html.div({style:{cssFloat:'left', fontWeight: 'bold'}}, $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('yy-mm-dd', day.date)))), this.drawHours(), rooms);
+
             },
 
             /**
@@ -431,11 +498,14 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
             drawContent: function(){
                 var self = this;
                 var days = [];
-                each(this.data.days, function(day){
-                        days.push(self.drawDay(day));
+                $.each(this.data.days, function(index, day){
+                    highlight = false;
+                    if (self.data.repeatability == '0' || (index == self.data.flexibleDatesRange || (index - self.data.flexibleDatesRange) %  (2 * self.data.flexibleDatesRange + 1) == 0))
+                        highlight = true;
+                    days.push(self.drawDay(day, highlight));
                 });
 
-                return Html.div({},days);
+                return this.data.days.length != 0 ? Html.div({},days) : Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'infoMessage'},  Html.strong({}, 'Info: '), $T('No results found in the given period of time. Please change period.'));
             }
         },
         /**
@@ -446,8 +516,8 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
          * 1 - too long period chosen (no bookings will be displayed) ,
          * 2 - too many bookings fetched. Booking from the shorter period are going to be displayed.
          */
-        function(data, overload){
-            this.RoomBookingCalendarDrawer(data, overload);
+        function(data){
+            this.RoomBookingCalendarDrawer(data);
         })
 
 type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
@@ -476,7 +546,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                     if(tt) {
                         tt = tt.replace(/\n/g, '<br>');
                     }
-                    var link = Html.a({href:this.room.getBookingFormUrl(day.date, this.data.repeatability, false, false, null, null),  className : 'dateLink ' + dateClass},
+                    var link = Html.a({href:this.room.getBookingFormUrl(day.date, this.data.repeatability, this.data.flexibleDatesRange, false, false, null, null),  className : 'dateLink ' + dateClass},
                                       Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
                     var div = Html.div({style:{clear:'both', paddingTop:pixels(5)}},
                         Html.div({style:{display:'block', cssFloat:'left', width:pixels(125)}}, link),
@@ -497,11 +567,11 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 }
             },
 
-            drawHeader: function(prevNextMenu){
+            drawHeader: function(){
                 if( this.room )
                     var singleDayHeader = Html.div({className:"bookingTitle", style:{marginBottom: pixels(20), marginTop: pixels(28)}}, Html.span({className:"groupTitle bookingTitle", style:{borderBottom: pixels(0), paddingTop: pixels(0)}},
                                           $T("Availability for "), this.data.days[0].rooms[0].room.getFullName(false)), Html.a({href:this.room.getDetailsUrl(), style:{paddingLeft: pixels(5), fontSize:"x-small"}}, $T("( show 3 months preview )" )));
-                return Html.div({}, singleDayHeader, calendarLegend, prevNextMenu, this.RoomBookingCalendarDrawer.prototype.drawHeader.call(this));
+                return Html.div({}, singleDayHeader, calendarLegend, this.RoomBookingCalendarDrawer.prototype.drawHeader.call(this));
             },
             /**
              * Draws a day cell and all its rooms and reservations
@@ -531,8 +601,8 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
          * 1 - too long period chosen (no bookings will be displayed) ,
          * 2 - too many bookings fetched. Booking from the shorter period are going to be displayed.
          */
-        function(data, overload){
-            this.RoomBookingCalendarDrawer(data, overload);
+        function(data){
+            this.RoomBookingCalendarDrawer(data);
             this.room = this.data.days.length > 0?this.data.days[0].rooms[0].room:null;
         })
 
@@ -736,7 +806,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     content = Html.div({});
                     var rejectAllDiv = null;
                     if (this.rejectAllLink) {
-                        rejectAllDiv = Html.div({className:"fakeLink", style:{width:pixels(820), textAlign:"center", paddingBottom:pixels(10)}},
+                        rejectAllDiv = Html.div({className:"fakeLink", style:{width:pixels(800), textAlign:"center", paddingBottom:pixels(10)}},
                                 $T("Reject ALL Conflicting PRE-Bookings"));
                         rejectAllDiv.observeClick( function(){
                             new ConfirmPopup($T("Reject ALL Conflicting PRE-Bookings"),
@@ -748,7 +818,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                         });
                     }
                     return Html.div({style:{clear:'both', marginTop: pixels(20)}},rejectAllDiv,
-                            Html.div({style:{width:pixels(820), textAlign:'center', paddingTop: pixels(10), paddingBottom: pixels(10)}},toggleSummary, arrowDown), content);
+                            Html.div({style:{width:pixels(800), textAlign:'center', paddingTop: pixels(10), paddingBottom: pixels(10)}},toggleSummary, arrowDown), content);
                 }
             }
         },
@@ -798,16 +868,16 @@ type("RoomBookingPrevNext", [],
 
                 var verbosePeriod = this.startD == this.endD ? $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.endD)) : $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.startD)) + " -> " + $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.endD));
                 if (newBooking && firstHeader)
-                        return Html.div({}, calendarLegend, Html.div({style:{height:pixels(24), width:pixels(820), clear:"both", borderBottom:"1px solid #eaeaea", paddingTop: pixels(5)}},
-                            prevLink, Html.div({style:{width:"70%", textAlign:"center", cssFloat:"left"}}, verbosePeriod, Html.br()), nextLink));
+                        return Html.div({}, calendarLegend, Html.div({style:{height:pixels(24), width:pixels(800), clear:"both", borderBottom:"1px solid #eaeaea", paddingTop: pixels(5), marginBottom: pixels(10)}},
+                            Html.div({style:{width:"100%", textAlign:"center", cssFloat:"left"}}, verbosePeriod)));
                 if (newBooking && this.data.days.length)
-                        return Html.div({}, Html.div({style:{height:pixels(24), width:pixels(820), clear:"both", borderTop:"1px solid #eaeaea", paddingTop: pixels(5)}},
-                            prevLink, Html.div({style:{width:"70%", textAlign:"center", cssFloat:"left"}}, verbosePeriod, Html.br()), nextLink));
+                        return Html.div({}, Html.div({style:{height:pixels(24), width:pixels(800), clear:"both", borderTop:"1px solid #eaeaea", paddingTop: pixels(5), marginBottom: pixels(10)}},
+                            Html.div({style:{width:"100%", textAlign:"center", cssFloat:"left"}}, verbosePeriod)));
                 if (firstHeader)
-                        return Html.div({}, calendarLegend, Html.div({style:{height:pixels(24), width:pixels(820), clear:"both", borderBottom:"1px solid #eaeaea", paddingTop: pixels(5), paddingBottom: pixels(12)}},
+                        return Html.div({}, calendarLegend, Html.div({style:{height:pixels(24), width:pixels(800), clear:"both", borderBottom:"1px solid #eaeaea", paddingTop: pixels(5), paddingBottom: pixels(12), marginBottom: pixels(10)}},
                             prevLink, Html.div({style:{width:"70%", textAlign:"center", cssFloat:"left"}}, verbosePeriod, Html.br(), calendarButton), nextLink));
                 if (this.data.days.length)
-                        return Html.div({}, Html.div({style:{height:pixels(24), width:pixels(820), clear:"both", borderTop:"1px solid #eaeaea", paddingTop: pixels(5)}},
+                        return Html.div({}, Html.div({style:{height:pixels(24), width:pixels(800), clear:"both", borderTop:"1px solid #eaeaea", paddingTop: pixels(5), marginBottom: pixels(10)}},
                             prevLink, Html.div({style:{width:"70%", textAlign:"center", cssFloat:"left"}}, verbosePeriod, Html.br()), nextLink));
             }
         },
@@ -840,15 +910,14 @@ type("RoomBookingPrevNext", [],
 type ("RoomBookingCalendar", [],
         {
             draw: function(){
-                if( this.prevNextBarArgs && this.prevNextBarArgs.newBooking)
+                if (this.data.overload)
+                    return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = true),
+                            this.roomBookingCalendarContent.draw()];
+                if (this.prevNextBarArgs && this.prevNextBarArgs.newBooking)
                     return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = true),
                             this.roomBookingCalendarContent.draw(),
                             new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = false)];
-                else if( this.prevNextBarArgs && this.prevNextBarArgs.params.ofMyRooms == "on")
-                    return [this.roomBookingCalendarContent.draw(new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = true)),
-                            new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = false),
-                            this.roomBookingCalendarSummary.draw()];
-                else if( this.prevNextBarArgs )
+                else if ( this.prevNextBarArgs )
                     return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = true),
                             this.roomBookingCalendarContent.draw(),
                             new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = false),
@@ -858,36 +927,39 @@ type ("RoomBookingCalendar", [],
                             this.roomBookingCalendarSummary.draw()];
             },
 
-            applyManyDaysBookingLook: function(){
+            addRepeatabilityBarsHovers: function(){
                 // Repeat daily booking hover support
-                if (this.data.manyDays == 'true') {
-                    $('.wholeDayCalendarDiv').each(function() {
-                        $(this).find('.barCand').each(function(index) {
-                            $(this).attr('id', index);
-                        });
+                var flexibleNumber = 2 * this.data.flexibleDatesRange + 1;
+                if(this.data.repeatability == '0')
+                    flexibleNumber = 0;
+                $('.wholeDayCalendarDiv').each(function(indexDiv) {
+                    var flexibleIndex = indexDiv % flexibleNumber;
+                    $(this).find('.barCand').each(function(indexCand) {
+                        $(this).attr('id', indexCand + '-' + flexibleIndex);
                     });
+                });
 
-                    $('.barCand').each(function() {
-                        $(this).mouseover(function() {
-                            $('.wholeDayCalendarDiv').find(".barCand#" + $(this).attr('id')).each(function() {
-                                $(this).addClass("dayCalendarDivHover");
-                            })
-                        }).mouseleave(function() {
-                            $('.barCand').removeClass("dayCalendarDivHover");
-                        })
+                $('.barCand').each(function() {
+                    $(this).mouseover(function() {
+                        $('.wholeDayCalendarDiv').find(".barCand#" + $(this).attr('id')).each(function() {
+                            $(this).addClass("dayCalendarDivHover");
+                        });
+                    }).mouseleave(function() {
+                        $('.barCand').removeClass("dayCalendarDivHover");
                     });
-                }
-            }
+                });
+            },
+
         },
 
-        function(reservationBars, dayAttrs, overload, prevNextBarArgs, manyRooms, repeatability, manyDays, finishDate, rejectAllLink){
-           this.data = new RoomBookingCalendarData(reservationBars, dayAttrs, repeatability, manyDays, finishDate);
-           this.prevNextBarArgs = prevNextBarArgs;
+        function(reservationBars, dayAttrs, dayLimit, overload, prevNextBarArgs, manyRooms, repeatability, finishDate, flexibleDatesRange, rejectAllLink){
+           this.data = new RoomBookingCalendarData(reservationBars, dayAttrs, repeatability, finishDate, flexibleDatesRange, dayLimit, overload);
+           this.prevNextBarArgs = prevNextBarArgs
            if(manyRooms || (prevNextBarArgs && prevNextBarArgs.newBooking)) {
-               this.roomBookingCalendarContent = new RoomBookingManyRoomsCalendarDrawer(this.data, overload);
+               this.roomBookingCalendarContent = new RoomBookingManyRoomsCalendarDrawer(this.data);
            }
            else {
-               this.roomBookingCalendarContent = new RoomBookingSingleRoomCalendarDrawer(this.data, overload);
+               this.roomBookingCalendarContent = new RoomBookingSingleRoomCalendarDrawer(this.data);
            }
            this.roomBookingCalendarSummary = new RoomBookingCalendarSummaryDrawer(this.data, rejectAllLink);
         }

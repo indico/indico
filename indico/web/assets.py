@@ -84,6 +84,7 @@ indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
 
 indico_room_booking = Bundle('js/indico/RoomBooking/MapOfRooms.js',
                              'js/indico/RoomBooking/RoomBookingCalendar.js',
+							 'js/indico/jquery/multiselect.js',
                              filters='rjsmin', output='indico_room_booking_%(version)s.min.js')
 
 indico_admin = Bundle('js/indico/Admin/News.js',
@@ -122,6 +123,7 @@ indico_display = Bundle('js/indico/Display/Dialogs.js',
 
 indico_jquery = Bundle('js/indico/jquery/defaults.js',
                        'js/indico/jquery/global.js',
+                       'js/indico/jquery/multiselect.js',
                         filters='rjsmin', output='indico_jquery_%(version)s.min.js')
 
 indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
@@ -150,6 +152,9 @@ jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.colorpicker.js',
                 'js/jquery/jquery-extra-selectors.js',
                 'js/jquery/jquery.typewatch.js',
+                'js/jquery/jquery.multiselect.filter.js',
+                'js/jquery/jstorage.js',
+                'js/jquery/jquery.watermark.js',
                 filters='rjsmin', output='jquery_code_%(version)s.min.js')
 
 presentation = Bundle('js/jquery/underscore.js',
@@ -219,7 +224,6 @@ def register_all_js(env):
     env.register('base_js', base_js)
     env.register('selectivizr', selectivizr)
 
-
 def register_all_css(env, main_css_file):
     env.register('indico_badges_css', indico_badges_css)
     env.register('base_css', Bundle('css/{0}'.format(main_css_file),
@@ -237,5 +241,7 @@ def register_all_css(env, main_css_file):
                                     'css/jquery.colorbox.css',
                                     'css/jquery-ui-custom.css',
                                     'css/jquery.colorpicker.css',
+                                    'css/jquery.multiselect.filter.css',
+                                    'css/jquery.multiselect.css',
                                     filters=('cssmin', 'cssrewrite'),
                                     output='base_%(version)s.min.css'))

@@ -145,7 +145,6 @@ function add_load_event(func) {
 /*
 Validation for Period Module (dates, hours and repetition)
 Parameters:
-- f1 : form object
 - withRepeatability : whether to check 'repeatibility' field
 - allowPast : whether to allow dates in the past
 - what : what to validate: 0 - both dates and times, 1 - only dates, 2 - only times
@@ -155,7 +154,7 @@ sDay, sMonth, sYear, sTime
 eDay, eMonth, eYear, eTime
 repeatability
 */
-function validate_period( f1, withRepeatability, allowPast, what )
+function validate_period(withRepeatability, allowPast, what )
 {
     var DATES_AND_TIMES = 0; var ONLY_DATES = 1; var ONLY_TIMES = 2;
 
@@ -169,13 +168,19 @@ function validate_period( f1, withRepeatability, allowPast, what )
         // sDate
         if ( !is_valid_date( $('#sDay').val(), $('#sMonth').val(), $('#sYear').val() ) )
         {
-            f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid';
+            $('#sDay').addClass('invalid');
+            $('#sMonth').addClass('invalid');
+            $('#sYear').addClass('invalid');
+            $('#sdate').addClass('invalid');
             isValid = false;
         }
         // eDate
         if ( !is_valid_date( $('#eDay').val(), $('#eMonth').val(), $('#eYear').val() ) )
         {
-            f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid';
+            $('#eDay').addClass('invalid');
+            $('#eMonth').addClass('invalid');
+            $('#eYear').addClass('invalid');
+            $('#edate').addClass('invalid');
             isValid = false;
         }
 
@@ -188,8 +193,14 @@ function validate_period( f1, withRepeatability, allowPast, what )
             todayDate.setHours( 0, 0, 0, 0 );
             if ( !allowPast && ( sDate.valueOf() < (todayDate).valueOf()) )
             {
-                f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid';
-                f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid';
+                $('#sDay').addClass('invalid');
+                $('#sMonth').addClass('invalid');
+                $('#sYear').addClass('invalid');
+                $('#sdate').addClass('invalid');
+                $('#eDay').addClass('invalid');
+                $('#eMonth').addClass('invalid');
+                $('#eYear').addClass('invalid');
+                $('#edate').addClass('invalid');
                 isValid = false;
             }
         }
@@ -199,18 +210,21 @@ function validate_period( f1, withRepeatability, allowPast, what )
         // sTime
         if ( !is_valid_time( $('#sTime').val() ) )
         {
-            f1.sTime.className = 'invalid';
-            isValid = false
+            $('#sTime').addClass('invalid');
+            isValid = false;
         }
         // eTime
         if ( !is_valid_time( $('#eTime').val() ) )
         {
-            f1.eTime.className = 'invalid';  isValid = false;
+            $('#eTime').addClass('invalid');
+            isValid = false;
         }
         // sTime < eTime
         if ( !isBefore( $('#sTime').val(), $('#eTime').val() ) )
         {
-            f1.sTime.className = f1.eTime.className = 'invalid';  isValid = false;
+            $('#sTime').addClass('invalid');
+            $('#eTime').addClass('invalid');
+            isValid = false;
         }
     }
     // Repetition. Assume eDate >= sDate since the checking was made before
@@ -273,8 +287,8 @@ function validate_period( f1, withRepeatability, allowPast, what )
         }
 
         if (!isRepeatabilityValid) {
-            f1.repeatability.className = 'invalid';
-            f1.edate.className = 'invalid';
+            $('#repeatability').addClass('invalid');
+            $('#edate').addClass('invalid');
             isValid = false;
         }
     }

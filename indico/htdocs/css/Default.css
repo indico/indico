@@ -1433,12 +1433,7 @@ span.horizontalSeparator {
 .barDefault:hover {
     opacity:0.7;
     filter:alpha(opacity=70);
-    /*background-position: 0 -15px;
-    -webkit-transition: background-position 0.1s linear;
-    -moz-transition: background-position 0.1s linear;
-    -ms-transition: background-position 0.1s linear;
-    -o-transition: background-position 0.1s linear;
-    transition: background-position 0.1s linear;*/
+    border: 2px solid #06F;
 }
 
 .barCand {  /* Bar representing candidate reservation */
@@ -1454,14 +1449,10 @@ span.horizontalSeparator {
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
     filter: progid:dximagetransform.microsoft.gradient(startColorstr='#62c462', endColorstr='#51a351', GradientType=0);
     filter: progid:dximagetransform.microsoft.gradient(enabled=false);
-    /*background-color: #51A351;
-    box-shadow: inset 1px 6px 12px #6cff4f, inset -1px -10px 5px #45bc09, 1px 1px 2px gray;
-    -o-box-shadow: inset 1px 6px 12px #6cff4f, inset -1px -10px 5px #45bc09, 1px 1px 2px gray;
-    -webkit-box-shadow: inset 1px 6px 12px #6cff4f, inset -1px -10px 5px #45bc09, 1px 1px 2px gray;
-    -moz-box-shadow: inset 1px 6px 12px #6cff4f, inset -1px -10px 5px #45bc09, 1px 1px 2px gray;
 }
 
 .dayCalendarDivHover {
+    border: 2px solid #06F;
     opacity:0.7;
     filter:alpha(opacity=70);
 }
@@ -1573,17 +1564,37 @@ span.horizontalSeparator {
     z-index: 1000;
 }
 
+.wholeDayCalendarDiv {
+    clear: both;
+    float: left;
+    width: 800px;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+
+.wholeDayCalendarDayHighlight {
+    background-color: #D9EDF7;
+    padding: 5px 0px 0px 5px;
+}
+
 .ui-tooltip-bold {
     font-weight: bold;
 }
 
 /* Form fields: field description width. */
 .subFieldWidth {
-    width: 84px;
+    width: 160px;
+    color: #523D04;
 }
 .subFieldWidthSmaller
 {
     width: 60px;
+    color: #523D04;
 }
 
 .actionSucceeded
@@ -8815,3 +8826,98 @@ ul.speaker_list > li .contributions li {
 #roomBookingTable .ui-datepicker-week-end, .ui-datepicker-week-end .ui-state-default {
     color: #881122 !important;
 }
+
+.infoMessage {
+    color: #3A87AD;
+    background-color: #D9EDF7;
+    border-color: #BCE8F1;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #BCE8F1;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.errorMessage {
+    color: #B94A48;
+    background-color: #F2DEDE;
+    border-color: #EED3D7;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #FBEED5;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* roomBokoing breadcrumbs */
+
+#breadcrumbs{
+  overflow: hidden;
+  width: 100%;
+}
+
+#breadcrumbs li{
+  float: left;
+  margin: 0 .5em 0 1em;
+}
+
+#breadcrumbs span{
+  border-radius: 5px;
+  background: #EAEAEA;
+  padding: .7em 1em .7em 1em;
+  float: left;
+  position: relative;
+}
+
+#breadcrumbs li:first-child span:before{
+  border-width: 0px;
+}
+#breadcrumbs li:last-child span:after{
+  border-width: 0px;
+}
+
+#breadcrumbs span.current{
+  cursor: default;
+  background: #CDEB8B;
+  padding: .7em 1em;
+  float: left;
+  position: relative;
+}
+
+#breadcrumbs span:before{
+  content: "";
+  position: absolute;
+  top: 50%;
+  margin-top: -1.5em;
+  border-width: 1.5em 0 1.5em 1.24em;
+  border-style: solid;
+  border-color: #EAEAEA #EAEAEA #EAEAEA transparent;
+  left: -1em;
+}
+
+#breadcrumbs span:after{
+  content: "";
+  position: absolute;
+  top: 50%;
+  margin-top: -1.5em;
+  border-top: 1.5em solid transparent;
+  border-bottom: 1.5em solid transparent;
+  border-left: 1.3em solid #EAEAEA;
+  right: -1em;
+}
+
+#breadcrumbs span.current:before{
+  border-color: #CDEB8B #CDEB8B #CDEB8B transparent;
+}
+
+#breadcrumbs span.current:after{
+  border-left: 1.3em solid #CDEB8B;
+}
+
+

@@ -1,10 +1,10 @@
 <script type="text/javascript">
 
-var maxRoomCapacity = 0;
+    var maxRoomCapacity = 0;
 
-% if rooms:
-    var maxRoomCapacity = ${ max(room.capacity for room in rooms) };
-% endif
+    % if rooms:
+        var maxRoomCapacity = ${ max(room.capacity for room in rooms) };
+    % endif
 
     // Save calendar data
     function saveCalendarData(finishDate) {
@@ -24,7 +24,6 @@ var maxRoomCapacity = 0;
 
     // Store all fields in local storage
     function saveFormData() {
-
         // Prepare selected rooms
         var selectedRooms = new Array();
         $('.ui-multiselect-menu input:checkbox').each(function(index) {
@@ -50,7 +49,6 @@ var maxRoomCapacity = 0;
         $.jStorage.set("filter",  $('.ui-multiselect-filter :input').val());
         $.jStorage.set("selectedRooms",  selectedRooms);
         $.jStorage.set("showAdvancedOptions",  $('#advancedOptions').is(":visible"));
-        $.jStorage.set("manyDays", $('#manyDays').val());
         $.jStorage.set("finishDate", $('#finishDate').val());
         $.jStorage.set("flexibleDates", $('#flexibleDates').is(':checked'));
         $.jStorage.set("flexibleDatesRange", $('#flexibleDatesRange').val());
@@ -72,7 +70,6 @@ var maxRoomCapacity = 0;
         $.jStorage.setTTL("filter", ttl);
         $.jStorage.setTTL("selectedRooms", ttl);
         $.jStorage.setTTL("showAdvancedOptions", ttl);
-        $.jStorage.setTTL("manyDays", ttl);
         $.jStorage.setTTL("finishDate", ttl);
         $.jStorage.setTTL("flexibleDates", ttl);
         $.jStorage.setTTL("flexibleDatesRange", ttl);
@@ -81,11 +78,12 @@ var maxRoomCapacity = 0;
 
     // Restore selected rooms from local Storage
     function restoreSelection(selectedRooms) {
-         $("#roomGUID").multiselect("widget").find(":checkbox").each(function(index) {
-             if (jQuery.inArray(index, selectedRooms) != -1) {
-                   this.click();
-             }
-         });
+         if ($("#roomGUID").multiselect("getChecked").length == 0)
+             $("#roomGUID").multiselect("widget").find(":checkbox").each(function(index) {
+                 if (jQuery.inArray(index, selectedRooms) != -1) {
+                     this.click();
+                 }
+             });
     }
     // Show advanced option search menu
     function showAdvancedOptions() {
@@ -95,22 +93,18 @@ var maxRoomCapacity = 0;
             $('#advancedOptions').hide();
             $('#advancedOptionsText').css('color', '#0B63A5');
             $('#advancedOptionsText').html($T('Show advanced'));
-            advancedFilter(false);
+            advancedFilter();
         } else {
             $('#advancedOptions').show();
-            $('#advancedOptionsText').css('color', '#9A1F4B');
-            $('#advancedOptionsText').html($T('Clear advanced'));
+            $('#advancedOptionsText').html($T('Hide advanced'));
             updateCapacitySlider();
         }
     }
 
     // Trigger filter basic or advanced filter
-    function advancedFilter(isAdvanced) {
+    function advancedFilter() {
         $('.ui-multiselect-filter :input').watermark('');
 
-        if (isAdvanced) {
-            $('#roomGUID').multiselect('uncheckAll');
-        }
         var filterString = $("#videoconference").is(':checked') + ":" + $("#webcast").is(':checked') + ":" + $("#publicroom").is(':checked') + ":" + $("#capacity").val();
         $('#roomGUID').multiselectfilter('advancedFilter', filterString);
         $('.ui-multiselect-filter :input').watermark('Search: name, number, location...');
@@ -127,13 +121,8 @@ var maxRoomCapacity = 0;
         // Init
         var isValid = true;
 
-        // Time validator
-        if ($('#sTime').val() != '') {
-            isValid = validate_period(searchForm[0], false, true, 2) // 2: validate only times
-        }
-
         // Capacity validator
-        if ($('#capacity').val() != '' && ($('#capacity').val() < 1 || $('#capacity').val() > Math.max(1, maxRoomCapacity) || parseInt($('#capacity').val(), 10).toString() == 'NaN')) {
+        if ($('#capacity').val() != '' && ($('#capacity').val() < 0 || $('#capacity').val() > maxRoomCapacity || parseInt($('#capacity').val(), 10).toString() == 'NaN')) {
             $('#capacity').addClass('invalid');
             isValid = false;
         }
@@ -155,7 +144,7 @@ var maxRoomCapacity = 0;
         }
 
         // Flexible date range
-        if ($("#flexibleDates").prop('checked')) {
+        if ($("#flexibleDates").is(':checked')) {
             var sdate = new Date($('#sYear').val(), parseInt($('#sMonth').val() - 1), $('#sDay').val());
             var edate = new Date($('#eYear').val(), parseInt($('#eMonth').val() - 1), $('#eDay').val());
             sdate.setDate(sdate.getDate() - parseInt($('#flexibleDatesRange').val()));
@@ -163,31 +152,19 @@ var maxRoomCapacity = 0;
             $('#sDay').val(sdate.getDate());
             $('#sMonth').val(parseInt(sdate.getMonth() + 1));
             $('#sYear').val(sdate.getFullYear());
-            var today = new Date();
-            today.setDate(today.getDate() - 1);
-            if (sdate < today){
-                $('#sDay').val((new Date).getDate());
-                $('#sMonth').val(parseInt((new Date).getMonth() + 1));
-                $('#sYear').val((new Date).getFullYear());
-            }
             $('#eDay').val(edate.getDate());
             $('#eMonth').val(parseInt(edate.getMonth() + 1));
             $('#eYear').val(edate.getFullYear());
+        }
 
+        // Date validator (repeatability)
+        if ($('#repeatability').val() != 'None') {
+            isValid = validate_period(true, true, 1) && isValid; // 1: validate dates
         }
-        // Set form action (one/many rooms)
-        if ($("#roomGUID").multiselect("getChecked").length == 1 && !($('#finishDate').val() == 'true') && $('#flexibleDates').attr('checked') == undefined) {
-            var sTimeSplit = $("#sTime").val().split(":");
-            var eTimeSplit = $("#eTime").val().split(":");
-            searchForm.attr("action", $("#roomGUID :selected").attr("name") +
-                    "&year=" + $('#sYear').val() +
-                    "&month=" + $('#sMonth').val() +
-                    "&day=" + $('#sDay').val() +
-                    "&hour=" + sTimeSplit[0] +
-                    "&minute=" + sTimeSplit[1] + "&hourEnd=" + eTimeSplit[0] + "&minuteEnd=" + eTimeSplit[1] + "&ignoreSession=1" );
-        }
-        else {
-            searchForm.attr("action", "${ roomBookingBookingListURL }");
+
+        // Time validator
+        if ($('#sTime').val() != '') {
+            isValid = validate_period(false, false, 2) && isValid; // 2: validate only times
         }
 
         return isValid;
@@ -227,12 +204,36 @@ var maxRoomCapacity = 0;
         $('#capacityRange').slider('value', $("#capacity").val());
     }
 
+    // Multiselect style modification
+    function changeSelectedStyle(selector) {
+        if(selector.attr('checked') === undefined) {
+            selector.parent().removeClass('ui-state-selected');
+        } else {
+            selector.parent().addClass('ui-state-selected');
+        }
+
+    };
+
+    function changeSelectedStyleAll() {
+        $('.RoomBooking.ui-multiselect-menu input:checkbox').each(function() {
+            changeSelectedStyle($(this));
+        });
+        updateSelectionCounter();
+    };
+
+    function updateSelectionCounter() {
+        var o = $("#roomGUID").multiselect("option");
+        if (o.autoOpen){
+            $('.RoomBooking .ui-multiselect-selection-counter').text(o.selectedText.replace('#', $(".RoomBooking.ui-multiselect-menu input:checked").length));
+        }
+    }
+
     $(window).load(function() {
 
         // Multiselect widget init
         $('#roomGUID').multiselect({
             height: 255,
-            minWidth: 510,
+            minWidth: 490,
             checkAllText: 'All',
             uncheckAllText: 'None',
             noneSelectedText: '0 selected',
@@ -241,11 +242,75 @@ var maxRoomCapacity = 0;
                 return false;
             },
             classes : "RoomBooking",
-            advancedImages: ["../images/rb_video.png","../images/rb_webcast.png", "../images/rb_public.png", "../images/rb_capacity.png"],
-            advancedImagesTitles: ["Video conference","Webcast/Recording", "Public rooms", "Capacity"],
         }).multiselectfilter({
-            itemsName: "rooms",
+            label: "",
             placeholder: "",
+        });
+
+        $("#roomGUID").bind("multiselectclick", function(event, ui) {
+            changeSelectedStyle($('.RoomBooking.ui-multiselect-menu input[value="' + ui.value + '"]'));
+            updateSelectionCounter();
+        });
+
+        $("#roomGUID").bind("multiselectcheckall", function(event, ui) {
+            changeSelectedStyleAll();
+        });
+
+        $("#roomGUID").bind("multiselectuncheckall", function(event, ui) {
+            changeSelectedStyleAll();
+        });
+
+        $("#roomGUID").multiselect("widget").bind( {
+            mouseleave: function(){
+                $("#roomGUID").multiselect("widget").find('label').removeClass('ui-state-hover');
+            },
+        });
+
+        $("#roomGUID").bind("multiselectrefresh", function(event, ui) {
+
+           // Header modifications
+           var o = $("#roomGUID").multiselect("option");
+           var menu = $("#roomGUID").multiselect("widget");
+
+           $('.RoomBooking .ui-widget-header .ui-helper-reset').html('<li><span style="font-size: 13px">Select: </span><a class="ui-multiselect-all" href="#"><span class="ui-icon ui-icon-check"></span><span>' + o.checkAllText + '</span></a></li><li>, <a class="ui-multiselect-none" href="#"><span class="ui-icon ui-icon-close"></span><span>' + o.uncheckAllText + '</span></a>');
+
+           $('<div />').addClass('ui-multiselect-search-advanced')
+                .html(function(){
+                    return '<span id="advancedOptionsText" style="float: right; padding: 2px 10px 0px 20px" >&nbsp;</span>';
+                }).appendTo( menu.children().first() );
+
+            $('<div />').addClass('ui-multiselect-ui-multiselect-scrollbar-up').insertAfter( menu.children().first() );
+            $('<div />').addClass('ui-multiselect-ui-multiselect-scrollbar-down').appendTo( menu );
+            $('<div />').addClass('ui-multiselect-selection-counter').appendTo( menu );
+            $('<div />').addClass('ui-multiselect-selection-summary').appendTo( menu );
+
+            $('.RoomBooking .ui-multiselect-selection-counter').text(o.selectedText.replace('#', $(".RoomBooking.ui-multiselect-menu input:checked").length));
+
+            // Adding advanced lables
+            var advancedImages = ["../images/rb_video.png","../images/rb_webcast.png", "../images/rb_public.png", "../images/rb_capacity.png"];
+            var advancedImagesTitles = ["Video conference", "Webcast/Recording", "Public room", "Capacity"];
+
+            $("#roomGUID option").each(function(index) {
+                var advLabelsParts = $(this).attr('label').split(":");
+                var html = '</br><div style="padding: 4px 0px 0px 20px; color: gray">';
+                for (var i = 0; i < advLabelsParts.length; i++){
+                    if (advLabelsParts[i] != 'None' && advLabelsParts[i].toLowerCase() !='false'){
+                        html += '<img title="' + advancedImagesTitles[i] + '" class="ui-multiselect-images" src="' + advancedImages[i]+  '">';
+                        if (advLabelsParts[i].toLowerCase() != "true") {
+                            html += advLabelsParts[i];
+                        }
+                    }
+                }
+                var label = $('.RoomBooking.ui-multiselect-menu input[value="' + $(this).val() +'"]').next();
+                $(label).html(label.text() + html);
+            });
+
+            changeSelectedStyleAll();
+        });
+
+        $("#roomGUID").bind("multiselectfilterfilter", function(event, matches) {
+            $('.RoomBooking .ui-multiselect-selection-summary').text($('.RoomBooking .ui-multiselect-checkboxes li:visible').length + " / " + $(".RoomBooking .ui-multiselect-checkboxes li").length + " items");
+            $('.RoomBooking .ui-multiselect-selection-summary').effect("pulsate", { times:1 }, 400);
         });
 
         // Calendars init
@@ -268,7 +333,7 @@ var maxRoomCapacity = 0;
         // Capacity slider init
         $('#capacityRange').slider({
             range: "max",
-            min: 1,
+            min: 0,
             max: maxRoomCapacity,
             value: 1,
             step: 1,
@@ -301,17 +366,21 @@ var maxRoomCapacity = 0;
             $("#sDatePlace").datepicker('setDate', new Date ($.jStorage.get("sYear") + "/" + $.jStorage.get("sMonth") + "/" + $.jStorage.get("sDay")));
             $("#eDatePlace").datepicker('setDate', new Date ($.jStorage.get("eYear") + "/" + $.jStorage.get("eMonth") + "/" + $.jStorage.get("eDay")));
         }
-        $("#sTime").val($.jStorage.get("sTime"));
-        $("#eTime").val($.jStorage.get("eTime"));
+        if ($.jStorage.get("sTime")) {
+            $("#sTime").val($.jStorage.get("sTime"));
+            $("#eTime").val($.jStorage.get("eTime"));
+        } else  {
+            $("#sTime").val("8:30");
+            $("#eTime").val("17:30");
+        }
 
         $("#capacity").val($.jStorage.get("capacity"));
-        $("#videoconference").prop('checked',($.jStorage.get("videoconference")));
-        $("#webcast").prop('checked',($.jStorage.get("webcast")));
-        $("#publicroom").prop('checked',($.jStorage.get("publicroom")));
+        $("#videoconference").attr('checked',($.jStorage.get("videoconference")));
+        $("#webcast").attr('checked',($.jStorage.get("webcast")));
+        $("#publicroom").attr('checked',($.jStorage.get("publicroom")));
 
-        $("#manyDays").val($.jStorage.get("manyDays"));
         $("#finishDate").val($.jStorage.get("finishDate"));
-        $("#flexibleDates").prop('checked',($.jStorage.get("flexibleDates")));
+        $("#flexibleDates").attr('checked',($.jStorage.get("flexibleDates")));
         $("#flexibleDatesRange").val($.jStorage.get("flexibleDatesRange"));
         $("#repeatability").val($.jStorage.get("repeatability"));
 
@@ -323,6 +392,7 @@ var maxRoomCapacity = 0;
             step: 5,
             create: function(event, ui) {
                 updateTimeSlider(event,ui);
+
             },
 
             start: function(event, ui) {
@@ -336,18 +406,18 @@ var maxRoomCapacity = 0;
             },
           });
 
+        restoreSelection($.jStorage.get("selectedRooms"));
+        $("#roomGUID").multiselect("refresh");
+
         // Restore filter and advanced filter
         $('#advancedOptions').toggle(!$.jStorage.get("showAdvancedOptions"));
         showAdvancedOptions();
 
-        restoreSelection($.jStorage.get("selectedRooms"));
         $('.ui-multiselect-filter :input').val($.jStorage.get("filter"));
-        advancedFilter(false);
+        advancedFilter();
 
         // Set watermarks
         $('.ui-multiselect-filter :input').watermark('Search: name, number, location...');
-        $('#sTime').watermark('hh:mm');
-        $('#eTime').watermark('hh:mm');
         $('#capacity').watermark('0');
 
         // CSS and text
@@ -356,10 +426,9 @@ var maxRoomCapacity = 0;
         $('#bookingLegend').width($('.ui-multiselect-menu').width());
         $("#advancedOptionsText").addClass('fakeLink');
         $("#maxRoomCapacity").text(maxRoomCapacity);
-        $('#flexibleDatesRange').attr('disabled', !$("#flexibleDates").prop('checked'));
+        $('#flexibleDatesRange').attr('disabled', !$("#flexibleDates").attr('checked'));
         if ($("#finishDate").val() == 'true')
             $('#eDatePlaceDiv').show();
-
 
         // Qtips
         $("#publicRoomHelp").qtip({
@@ -384,11 +453,11 @@ var maxRoomCapacity = 0;
         }).submit(function(e) {
             saveFormData();
             if (!validateForm(true)) {
-                alert("${_('There are errors in the form. Please correct fields with red background.')}");
+                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
                 e.preventDefault();
             }
             else if($('#roomGUID').val() == null) {
-                alert("${_('Please select a room (or several rooms).')}");
+                new AlertPopup($T("Error"), $T("Please select a room (or several rooms)..")).open();
                 e.preventDefault();
             }
         });
@@ -398,27 +467,39 @@ var maxRoomCapacity = 0;
         });
 
         $('#repeatability').change(function() {
-                if ($(this).val() == '0') {
-                    $('#manyDays').val('true');
-                }
-                else {
-                    $('#manyDays').val('false');
-                }
+            if ($(this).val() != 'None') {
+                $('#sDatePlaceTitle').text('${ _("Start date")}');
+                $('#finishDate').val('true');
+                $('#eDatePlaceDiv').show();
+            } else {
+                $('#sDatePlaceTitle').text('${ _("Booking date")}');
+                $('#finishDate').val('false');
+                $('#eDatePlaceDiv').hide();
+            }
+            if ($(this).val() == '0') {
+                $('#flexibleDatesDiv').hide();
+                $('#flexibleDates').attr('checked', false);
+            } else {
+                $('#flexibleDatesDiv').show();
+            }
 
-                if ($(this).val() != 'None') {
-                    $('#finishDate').val('true');
-                    $('#eDatePlaceDiv').show();
-                }
-                else {
-                    $('#finishDate').val('false');
-                    $('#eDatePlaceDiv').hide();
-                }
         });
+
+        $('#repeatability').change();
  });
 </script>
 
 <form id="searchForm" method="post" action="${ roomBookingBookingListURL }">
     <table id="roomBookingTable" style="width: 100%; padding-left: 20px;">
+        <tr>
+            <td>
+                <ul id="breadcrumbs" style="margin:0px 0px 0px -15px; padding: 0; list-style: none;">
+                    <li><span class="current">Specify Search Criteria</span></li>
+                    <li><span>Select Available Period</span></li>
+                    <li><span>Confirm Reservation</span></li>
+                </ul>
+            </td>
+        </tr>
         <tr>
             <td>
                 <div class="groupTitle bookingTitle" style="padding-top: 0px">${ _("Choose rooms") }</div>
@@ -430,7 +511,7 @@ var maxRoomCapacity = 0;
              <div id="roomSelectWidgetSpace">
                 <select name="roomGUID" id="roomGUID" multiple="multiple" size="10" style="display: none" >
                     % for room in rooms:
-                        <option label="${str(room.needsAVCSetup) + ':' + str(room.hasWebcastRecording()) + ':' + str(room.isReservable) + ':' + str(room.capacity)}" name = "${ str(room.getBookingUrl()) }" value="${ str( room.guid ) }" class="${ roomClass( room ) }">${ room.locationName + " &nbsp; " + room.getFullName()}</option>
+                        <option label="${str(room.needsAVCSetup) + ':' + str(room.hasWebcastRecording()) + ':' + str(room.isReservable and not room.customAtts.get('Booking Simba List')) + ':' + (str(room.capacity) if room.capacity else '0')}" name = "${ str(room.getBookingUrl()) }" value="${ str( room.guid ) }" class="${ roomClass( room ) }">${ room.locationName + " &nbsp; " + room.getFullName()}</option>
                     % endfor
                 </select>
              </div>
@@ -444,13 +525,13 @@ var maxRoomCapacity = 0;
                             <small> ${ _("Minimum capacity")}&nbsp;&nbsp;</small>
                         </td>
                         <td>
-                            <input name="capacity" id="capacity" size="3" type="text" value="" style="width: 43px;" onkeyup="advancedFilter(true);" />
+                            <input name="capacity" id="capacity" size="3" type="text" value="" style="width: 43px;" onkeyup="advancedFilter();" />
                         </td>
                     </tr>
                     <!-- CAPACITY SLIDER-->
                     <tr>
                         <td colspan="2" >
-                            <div id="minRoomCapacity" style="float: left; color: gray; padding-right: 5px">1</div>
+                            <div id="minRoomCapacity" style="float: left; color: gray; padding-right: 5px">0</div>
                             <div id="capacityRange" style="float: left; width: 100px; margin: 0px 0px 9px 10px;"></div>
                             <div id="maxRoomCapacity"style="float: left; color: gray; padding-left: 12px;"></div>
                         </td>
@@ -462,7 +543,7 @@ var maxRoomCapacity = 0;
                             <small> ${ _("Video conference")}&nbsp;&nbsp;</small>
                         </td>
                         <td>
-                            <input name="videoconference" id="videoconference" type="checkbox" onchange="advancedFilter(true);" />
+                            <input name="videoconference" id="videoconference" type="checkbox" onchange="advancedFilter();" />
                         </td>
                     </tr>
                     <!-- WEBCAST/RECORDING -->
@@ -472,17 +553,17 @@ var maxRoomCapacity = 0;
                             <small> ${ _("Webcast/Recording")}&nbsp;&nbsp;</small>
                         </td>
                         <td>
-                            <input name="webcast" id="webcast" type="checkbox" onchange="advancedFilter(true);" />
+                            <input name="webcast" id="webcast" type="checkbox" onchange="advancedFilter();" />
                         </td>
                     </tr>
                     <!-- PUBLIC ROOM -->
                     <tr>
                         <td >
                             <img src="../images/rb_public.png">
-                            <small> ${ _("Public rooms")}&nbsp;&nbsp;</small>
+                            <small> ${ _("Public room")}&nbsp;&nbsp;</small>
                         </td>
                         <td>
-                            <input name="publicroom" id="publicroom" type="checkbox" onchange="advancedFilter(true);" />
+                            <input name="publicroom" id="publicroom" type="checkbox" onchange="advancedFilter();" />
                         </td>
                     </tr>
                 </table>
@@ -491,7 +572,7 @@ var maxRoomCapacity = 0;
              <div id="bookingLegend" style="background: #F2F2F2; border-top: 1px solid #DDD; padding: 5px 0px 3px 0px; margin-top: -9px">
                 <!-- CAPACITY -->
                 <img src="../images/rb_capacity.png" style="padding-left: 5px;">
-                <small> ${ _("Minimum capacity")}&nbsp;&nbsp;</small>
+                <small> ${ _("Capacity")}&nbsp;&nbsp;</small>
                 <!-- VIDEO CONFERENCE -->
                 <img src="../images/rb_video.png">
                 <small> ${ _("Video conference")}&nbsp;&nbsp;</small>
@@ -501,7 +582,7 @@ var maxRoomCapacity = 0;
                 <!-- PUBLIC ROOM -->
                 <span id="publicRoomHelp">
                     <img src="../images/rb_public.png">
-                    <small> ${ _("Public rooms")}&nbsp;&nbsp;</small>
+                    <small> ${ _("Public room")}&nbsp;&nbsp;</small>
                 </span>
              </div>
            </td>
@@ -516,7 +597,7 @@ var maxRoomCapacity = 0;
             <td style="text-align: center;" >
                 <div style="float: left; clear: both; padding-bottom: 20px;">
                     ${ _("Type")}
-                    <select name="repeatability" id="repeatability" style=" width: 190px;">
+                    <select name="repeatability" id="repeatability" style=" width: 230px;">
                         <option value="None"> ${ _("Single reservation")}</option>
                         <option value="0"> ${ _("Repeat daily")}</option>
                         <option value="1"> ${ _("Repeat once a week")}</option>
@@ -525,37 +606,25 @@ var maxRoomCapacity = 0;
                         <option value="4"> ${ _("Repeat every month")}</option>
                     </select>
                 </div>
-                <div id="sDatePlaceDiv" class="label titleCellFormat" style="clear: both; float: left; padding-right: 14px;" >
-                    ${ _("Booking date")}
+                <div id="sDatePlaceDiv" class="titleCellFormat" style="clear: both; float: left; padding-right: 35px;" >
+                    <span id='sDatePlaceTitle' class='label'>${ _("Booking date")}</span>
                     <div id="sDatePlace"></div>
                 </div>
-                <div id="eDatePlaceDiv" class="label titleCellFormat" style="float: left; display: none" >
-                    ${ _("End date")}
+                <div id="eDatePlaceDiv" class="titleCellFormat" style="float: left; display: none" >
+                    <span id='eDatePlaceTitle' class='label'>${ _("End date")}</span>
                     <div id="eDatePlace"></div>
                 </div>
                 <div class="infoMessage" id="holidays-warning" style="float: left; display: none"></div>
-                <!--
-                <div style="float: left; clear: both; ">
-                    <input type="checkbox" id="manyDays" name="manyDays" onclick="if ($(this).attr('checked')) {$('#eDatePlaceDiv').show();} else {$('#eDatePlaceDiv').hide();}" />
-                   ${ _("Many days booking") }
-                </div>
-                -->
-                <div style="float: left; clear: both; ">
-                    <input type="checkbox" id="flexibleDates" onclick="if ($(this).attr('checked')) {$('#flexibleDatesRange').attr('disabled', false);} else {$('#flexibleDatesRange').attr('disabled', true);}" />
+                <div id="flexibleDatesDiv" style="float: left; clear: both; ">
+                    <input name="flexibleDates" type="checkbox" id="flexibleDates" onclick="if ($(this).attr('checked')) {$('#flexibleDatesRange').attr('disabled', false);} else {$('#flexibleDatesRange').attr('disabled', true);}" />
                    ${ _("Flexible on dates") }
-                    <select id="flexibleDatesRange">
+                    <select name="flexibleDatesRange" id="flexibleDatesRange">
                       <option value="1">${ _("+/- 1 day")}</option>
                       <option value="2">${ _("+/- 2 days")}</option>
                       <option value="3">${ _("+/- 3 days")}</option>
-                      <option value="4">${ _("+/- 4 days")}</option>
-                      <option value="5">${ _("+/- 5 days")}</option>
-                      <option value="6">${ _("+/- 6 days")}</option>
-                      <option value="7">${ _("+/- 7 days")}</option>
                     </select>
                 </div>
-                <input name="manyDays" id="manyDays" type="hidden" />
                 <input name="finishDate" id="finishDate" type="hidden" />
-
                 <input name="sDay" id="sDay" type="hidden" />
                 <input name="sMonth" id="sMonth" type="hidden" />
                 <input name="sYear" id="sYear" type="hidden" />
@@ -567,14 +636,14 @@ var maxRoomCapacity = 0;
         <!-- TIME -->
         <tr>
             <td>
-                <div class="groupTitle bookingTitle">${ _("Select time range (optional)") }</div>
+                <div class="groupTitle bookingTitle">${ _("Select time range") }</div>
             </td>
         </tr>
         <tr>
             <td>
-                ${ _("Booking time from")}&nbsp;
+                ${ _("Booking time from")}
                 <input name="sTime" id="sTime" style="width: 43px;" type="text" />
-                ${ _("to")}&nbsp;
+                ${ _("to")}
                 <input name="eTime" id="eTime" style="width: 43px;" type="text" />
             </td>
         </tr>
@@ -583,7 +652,7 @@ var maxRoomCapacity = 0;
             <td>
                 <div style="margin: 13px 0px 32px 8px">
                     <div id="minHour" style="float: left; color: gray; padding-right: 12px">0:00</div>
-                    <div id="timeRange" style="width: 370px; float: left;"></div>
+                    <div id="timeRange" style="width: 390px; float: left;"></div>
                     <div id="maxHour" style="float: left; color: gray; padding-left: 12px">23:59</div>
                     <div id="sTimeBubble" style="position: absolute; margin: -19px 0px 0px -8px;">&nbsp;</div>
                     <div id="eTimeBubble" style="position: absolute; margin: 20px 0px 0px -8px;">&nbsp;</div>
@@ -599,12 +668,10 @@ var maxRoomCapacity = 0;
         <tr>
             <td>
                 <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left;">
-                  <li  class="button" onclick="$('#submitBtn').click(); return false;">
-                    <a href="#" >${ _('Search for avaliable room booking slots')}</a>
+                  <li class="button" onclick="$('#searchForm').submit(); return false;">
+                    <a href="#" >${ _('Search')}</a>
                   </li>
-                  <li style="display: none">
-                    <input id="submitBtn" type="submit" style="display: none;" >
-                  </li>
+                  <li style="display: none"></li>
                 </ul>
             </td>
         </tr>
