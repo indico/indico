@@ -100,7 +100,7 @@
                      <ul class="subList">
                      % for resource in material.getResourceList():
                      <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank">
-                        ${resource.getName()}
+                            ${getResourceName(resource)}
                         </a>
                         </li>
                      % endfor
