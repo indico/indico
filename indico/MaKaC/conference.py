@@ -4066,11 +4066,17 @@ class Conference(CommonObjectBase, Locatable):
 
         node = {}
         node['title'] = child.getTitle()
-        node['type'] = child.getType()
+
+        try:
+            node['type'] = child.getType()
+        except:
+            # If we land here, it's a session which doesn't have 'getType'
+            node['type'] = 'session'
+
         node['children'] = []
         node['material'] = []
 
-        if child.getType() in ['conference', 'meeting', 'session']:
+        if node['type'] in ['conference', 'meeting']:
             for session in child.getSessionList():
                 node['children'].append(self.getAllMaterialDict(session))
 
