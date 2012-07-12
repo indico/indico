@@ -33,6 +33,9 @@
     // List of badge template items
     var items = [];
 
+    // Pointer for the jQuery-UI tabs later.
+    var controlTabs = null;
+
     // Item class
     function Item(itemId, key) {
         this.id = itemId;
@@ -46,7 +49,7 @@
         this.color = "black";
         this.fontSize = "medium";
         this.width = 400;
-        this.text = "(Type your text)" // Only for fixed text items
+        this.text = "(Double click me to enter your text)" // Only for fixed text items
 
         // The following attributes have no meaning to the server
         this.selected = false;
@@ -140,6 +143,9 @@
         var id = newSelectedDiv.attr('id');
         $('#selection_text').html(translate[items[id].key]);
 
+        // Bring highlight to the element modification tab.
+        if (controlTabs) controlTabs.tabs('select', 1);
+
         // TODO: add check to see if there's a table inside and not an image
 
         // Change the background color of the old selected item and the new selected item
@@ -162,12 +168,25 @@
         $('#style_selector').prop('selectedIndex', newSelectedItem.styleIndex);
         $('#color_selector').prop('selectedIndex', newSelectedItem.colorIndex);
         $('#width_field').val(newSelectedItem.width / pixelsPerCm);
+
         if (newSelectedItem.key == "Fixed Text") {
             $('#fixed_text_field').val(newSelectedItem.text).prop('disabled', false);
             $('#changeText').prop('disabled', false);
         } else {
             $('#fixed_text_field').val("").prop('disabled', true);
             $('#changeText').prop('disabled', true);
+        }
+    }
+
+    function inlineEdit(div) {
+        var id = div.attr('id');
+        var selectedItem = items[id];
+
+        // Handle the individual cases as required.
+        if (selectedItem.key == "Fixed Text") {
+            var text = prompt("Enter fixed-text value", selectedItem.text);
+            selectedItem.text = text;
+            div.html(selectedItem.toHTML());
         }
     }
 
@@ -396,6 +415,11 @@
             markSelected($(this));
         });
 
+        // Handle double clicking on elements
+        $('#templateDiv > div').live('dblclick', function() {
+            inlineEdit($(this));
+        });
+
         // toggle grid/snap mode
         $('#snap_checkbox').change(function() {
             snapToGrid = this.checked;
@@ -463,7 +487,7 @@
             save();
         });
 
-        $('#controlTabs').tabs();
+        controlTabs = $('#controlTabs').tabs();
     });
 </script>
 
@@ -529,7 +553,7 @@
             </div>
             <div class="toolbar-container element">
                 <div class="container-title">
-                    ${_('Badge Layout')} <img src="/images/help.png" alt="Help" id="badgeLayoutHelp" />
+                    ${_('Badge Layout')}
                 </div>
                 Dimensions are in cm, decimals are allowed.
                 <br />
