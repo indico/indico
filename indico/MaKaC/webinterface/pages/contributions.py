@@ -16,7 +16,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-
 import urllib
 from xml.sax.saxutils import quoteattr
 from datetime import datetime
@@ -288,8 +287,6 @@ class WPContributionModifBase( WPConferenceModifBase  ):
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        #TODO: check if it comes from the timetable or the contribution list
-        # temp solution: isScheduled.
         banner = ""
         if self._canModify or self._isPRM:
             banner = wcomponents.WContribListBannerModif(self._target).getHTML()
@@ -300,7 +297,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 banner = wcomponents.WListOfPapersToReview(self._target, "reviewer").getHTML()
             if self._conf.getConfPaperReview().isEditorContribution(self._rh._getUser(), self._contrib):
                 banner = wcomponents.WListOfPapersToReview(self._target, "editor").getHTML()
-        if banner == "":
+        if banner == "" or self._timetableMenuItem._active is True:
             banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
 
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
