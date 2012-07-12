@@ -39,6 +39,7 @@ from MaKaC.user import PrincipalHolder, Avatar, Group
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
 import MaKaC.common.info as info
+from MaKaC import domain
 
 class CategoryBase(object):
     """
@@ -324,6 +325,23 @@ class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
         result["authRequestURL"] =  urls["authRequestURL"]
         return result
 
+class CategoryProtectionToggleDomains(CategoryModifBase):
+
+    def _checkParams(self):
+        self._params['categId'] = self._params['targetId']
+        CategoryModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._domainId = pm.extract("domainId", pType=str)
+        self._add = pm.extract("add", pType=bool)
+
+    def _getAnswer(self):
+        dh = domain.DomainHolder()
+        d = dh.getById(self._domainId)
+        if self._add:
+            self._target.requireDomain(d)
+        elif not self._add:
+            self._target.freeDomain(d)
+
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -336,5 +354,6 @@ methodMap = {
     "protection.removeManager": CategoryRemoveControlUser,
     "protection.addExistingConfCreator": CategoryAddExistingControlUser,
     "protection.removeConfCreator": CategoryRemoveControlUser,
+    "protection.toggleDomains": CategoryProtectionToggleDomains,
     "api.getExportURLs": CategoryExportURLs
     }

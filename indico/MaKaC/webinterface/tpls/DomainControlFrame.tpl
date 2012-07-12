@@ -6,6 +6,7 @@
 <div>${ locator }</div>
 <div class="domain_control">
   <div id="message"></div>
+  <form autocomplete="off">
   <ul>
   % for dom, state in domains.iteritems():
     <li>
@@ -15,6 +16,7 @@
     </li>
   % endfor
   </ul>
+  </form>
 </div>
 <script type="text/javascript">
 function smooth_slide(el, text) {
@@ -45,9 +47,9 @@ $(function(){
 
 $('input:checkbox', '.domain_control').live('change', function(){
     $this = $(this);
-    indicoRequest('event.protection.toggleDomains',
+    indicoRequest('${method}',
                   {
-                      confId: '${conference.getId()}',
+                      targetId: '${target.getId()}',
                       domainId: $this.val(),
                       add: $this.is(':checked')
                   },

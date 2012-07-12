@@ -1218,6 +1218,7 @@ class ConferenceProtectionRemoveUser(ConferenceModifBase):
 class ConferenceProtectionToggleDomains(ConferenceModifBase):
 
     def _checkParams(self):
+        self._params['confId'] = self._params['targetId']
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._domainId = pm.extract("domainId", pType=str)

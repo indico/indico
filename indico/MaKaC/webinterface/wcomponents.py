@@ -21,10 +21,9 @@
 from MaKaC.plugins import PluginsHolder, OldObservable
 
 import os,types,string
-import itertools
 from xml.sax.saxutils import escape, quoteattr
 from copy import copy
-from datetime import timedelta,datetime,date,time
+from datetime import timedelta,datetime,date
 from dateutil.relativedelta import relativedelta
 import exceptions
 import urllib
@@ -71,8 +70,6 @@ from MaKaC.common.contextManager import ContextManager
 
 from indico.util.date_time import utc_timestamp
 from indico.core.index import Catalog
-
-import re
 
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.auth import APIKey
@@ -2266,12 +2263,15 @@ class WDomainControlFrame(WTemplated):
     def getVars(self):
         tpl_vars = WTemplated.getVars(self)
         doms = dict((dom, dom in self._target.getDomainList()) for dom in domain.DomainHolder().getList())
-
+        if isinstance(self._target, Conference):
+            tpl_vars['method'] = 'event.protection.toggleDomains'
+        else:
+            tpl_vars['method'] = 'category.protection.toggleDomains'
         tpl_vars["domains"] = doms
         tpl_vars["removeURL"] = self._removeURL
         tpl_vars["addURL"] = self._addURL
         tpl_vars["locator"] = self._target.getLocator().getWebForm()
-        tpl_vars["conference"] = self._target
+        tpl_vars["target"] = self._target
         return tpl_vars
 
 
