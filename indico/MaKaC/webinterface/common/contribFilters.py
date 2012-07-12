@@ -29,7 +29,7 @@ class TypeFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getContribTypeList()) == len(self._values):
+        if len(self._conf.getContribTypeList()) == len(self._values) and contribution.getType():
             return True
         elif contribution.getType() is None:
             return self._showNoValue
@@ -52,7 +52,7 @@ class TrackFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getTrackList()) == len(self._values):
+        if len(self._conf.getTrackList()) == len(self._values) and contribution.getTrack():
             return True
         elif contribution.getTrack():
             if contribution.getTrack().getId() in self._values:
@@ -77,7 +77,7 @@ class SessionFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getSessionList()) == len(self._values):
+        if len(self._conf.getSessionList()) == len(self._values) and contribution.getSession():
             return True
         elif contribution.getSession():
             if contribution.getSession().getId() in self._values:
@@ -245,6 +245,58 @@ class ReviewerFilterField( filters.FilterField ):
             return self._showNoValue
 
 
+class ReviewingFilterField( filters.FilterField ):
+    """ Contains the filtering criteria for a Reviewing of a contribution.
+        Attributes:
+            _value -- (list) List of User objects with keys "referee", "editor" and "reviewer". Can also be the string "any",
+                      and then the contribution won't be filtered by reviewer.
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
+                filter if it doesn't have reviewing team
+    """
+    _id = "reviewing"
+
+    def __init__( self, conf, values, showNoValue = True ):
+        filters.FilterField.__init__(self, conf, values, showNoValue)
+
+    def satisfies( self, contribution ):
+        rm = contribution.getReviewManager()
+        if rm.isReferee(self._values[0].get("referee", "")):
+            if (self._values[0].get("editor", "") == "any" and rm.hasEditor()) \
+                or (self._values[0].get("reviewer", "") == "any" and rm.hasReviewers()):
+                return True
+            elif not rm.hasEditor() and not rm.hasReviewers():
+                return self._showNoValue
+            else:
+                return False
+        elif self._values[0].get("referee", "") == "any" or self._values[0].get("referee", "") == "":
+            if ((self._values[0].get("referee", "") == "any") and rm.hasReferee()) \
+                or (self._values[0].get("editor", "") == "any" and rm.hasEditor()) \
+                or (self._values[0].get("reviewer", "") == "any" and rm.hasReviewers()):
+                return True
+            elif not rm.hasReferee() and not rm.hasEditor() and not rm.hasReviewers():
+                return self._showNoValue
+            else:
+                return False
+
+
+class MaterialSubmittedFilterField( filters.FilterField ):
+    """ Contains the filtering criteria for a Review material of a contribution.
+        Attributes:
+            _value -- (User object) a User object. Can also be the string "any",
+                      and then the contribution won't be filtered by reviewer.
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
+                filter if it doesn't have any Reviewers
+    """
+    _id = "materialsubmitted"
+
+    def satisfies( self, contribution ):
+        review = contribution.getReviewManager().getLastReview()
+        if self._values[0] and review.isAuthorSubmitted():
+            return True
+        elif review.isAuthorSubmitted():
+            return False
+        else:
+            return self._showNoValue
 
 class TitleSF(filters.SortingField):
     _id="name"

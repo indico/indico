@@ -563,20 +563,21 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
     def _checkParams(self):
         ConferenceListModificationBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._selTypes = pm.extract("selTypes", pType=list, allowEmpty = True) #ids of selected types
-        self._selTracks = pm.extract("selTracks", pType=list, allowEmpty = True) #ids of selected tracks
-        self._selSessions = pm.extract("selSessions", pType=list, allowEmpty = True) #ids of selected sessions
+        self._selTypes = pm.extract("selTypes", pType=list, allowEmpty = True, defaultValue = []) #ids of selected types
+        self._selTracks = pm.extract("selTracks", pType=list, allowEmpty = True, defaultValue = []) #ids of selected tracks
+        self._selSessions = pm.extract("selSessions", pType=list, allowEmpty = True, defaultValue = []) #ids of selected sessions
 
         self._typeShowNoValue = self._params.get("typeShowNoValue", True)
         self._trackShowNoValue = self._params.get("trackShowNoValue", True)
         self._sessionShowNoValue = self._params.get("sessionShowNoValue", True)
 
+        self._showWithoutTeam = self._params.get("showWithoutTeam", True)
         self._showWithReferee = self._params.get("showWithReferee", False)
         self._showWithEditor = self._params.get("showWithEditor", False)
         self._showWithReviewer = self._params.get("showWithReviewer", False)
 
-        self._poster = self._params.get("poster", False)
-        self._posterShowNoValue = self._params.get("posterShowNoValue", True)
+        self._showWithMaterial = self._params.get("showWithMaterial", False)
+        self._showWithoutMaterial = self._params.get("showWithoutMaterial", False)
 
     def _checkProtection(self):
         if not RCPaperReviewManager.hasRights(self) and not RCReferee.hasRights(self):
@@ -591,48 +592,35 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
         isOnlyReferee = RCReferee.hasRights(self) \
                         and not RCPaperReviewManager.hasRights(self) \
                         and not self._conf.canModify(self.getAW())
+
+        # We want to make an 'or', not an 'and' of the reviewing assign status
+
+        filter["reviewing"] = {}
         if isOnlyReferee:
-            filter["referee"] = self._getUser()
+            filter["reviewing"]["referee"] = self._getUser()
         elif self._showWithReferee:
-            filter["referee"] = "any"
-        else:
-            filter["referee"] = None
-
+            filter["reviewing"]["referee"] = "any"
         if self._showWithEditor:
-            filter["editor"] = "any"
-        else:
-            filter["editor"] = None
+            filter["reviewing"]["editor"] = "any"
         if self._showWithReviewer:
-            filter["reviewer"] = "any"
-        else:
-            filter["reviewer"] = None
+            filter["reviewing"]["reviewer"] = "any"
 
 
-        #note by David: I added "if self._selTypes..." and the other ifs after this line,
-        #in order to make the recording request load contributions work
-        #but, it may break the paper reviewing module -> assign contributions filter
-        if self._selTypes:
-            filter["type"] = self._selTypes
-        if self._selTracks:
-            filter["track"] = self._selTracks
-        if self._selSessions:
-            filter["session"] = self._selSessions
-        if self._poster:
-            filter["poster"] = self._poster
+        filter["type"] = self._selTypes
+        filter["track"] = self._selTracks
+        filter["session"] = self._selSessions
+
+        filter["materialsubmitted"] = self._showWithMaterial
 
         filterCrit = ContributionsReviewingFilterCrit(self._conf, filter)
         sortingCrit = contribFilters.SortingCriteria(["number"])
 
-        if self._selTypes:
-            filterCrit.getField("type").setShowNoValue( self._typeShowNoValue )
-        if self._selTracks:
-            filterCrit.getField("track").setShowNoValue( self._trackShowNoValue )
-        if self._selSessions:
-            filterCrit.getField("session").setShowNoValue( self._sessionShowNoValue )
-        if self._poster:
-            filterCrit.getField("poster").setShowNoValue( self._posterShowNoValue )
+        filterCrit.getField("type").setShowNoValue( self._typeShowNoValue )
+        filterCrit.getField("track").setShowNoValue( self._trackShowNoValue )
+        filterCrit.getField("session").setShowNoValue( self._sessionShowNoValue )
 
-        filterCrit.getField("referee").setShowNoValue( not isOnlyReferee )
+        filterCrit.getField("reviewing").setShowNoValue( self._showWithoutTeam )
+        filterCrit.getField("materialsubmitted").setShowNoValue( self._showWithoutMaterial)
 
         f= filters.SimpleFilter(filterCrit, sortingCrit)
         contributions = f.apply(contributions)
@@ -665,7 +653,8 @@ class ContributionsReviewingFilterCrit(filters.FilterCriteria):
         contribFilters.TypeFilterField.getId() : contribFilters.TypeFilterField,
         contribFilters.TrackFilterField.getId() : contribFilters.TrackFilterField,
         contribFilters.SessionFilterField.getId() : contribFilters.SessionFilterField,
-        contribFilters.PosterFilterField.getId() : contribFilters.PosterFilterField
+        contribFilters.MaterialSubmittedFilterField.getId() : contribFilters.MaterialSubmittedFilterField,
+        contribFilters.ReviewingFilterField.getId(): contribFilters.ReviewingFilterField
     }
 
 #############################

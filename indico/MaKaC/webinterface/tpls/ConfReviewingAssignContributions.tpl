@@ -50,6 +50,9 @@
             <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
                 ${ _("assign status")}
             </td>
+            <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
+                ${ _("material submitted")}
+            </td>
         </tr>
     </thead>
     <tbody>
@@ -98,12 +101,19 @@
             </td>
             <td>
                 <table style="list-style-type:none">
+                    <tr><td><input type="checkbox" id="showWithoutTeam" checked/> ${ _("No reviewing team asigned")}</td></tr>
                     % if not IsOnlyReferee:
                         <tr><td><input type="checkbox" id="showWithReferee" checked/> ${ _("With Referee assigned")}</td></tr>
                     % endif
                     <tr><td><input type="checkbox" id="showWithEditor" checked/> ${ _("With Layout Reviewer assigned")}</td></tr>
                     <tr><td><input type="checkbox" id="showWithReviewer" checked/> ${ _("With at least 1 Content Reviewer assigned")}</td></tr>
 
+                </table>
+            </td>
+            <td>
+                <table style="list-style-type:none">
+                    <tr><td><input type="checkbox" id="showWithMaterial" checked/> ${ _("With material submitted")}</td></tr>
+                    <tr><td><input type="checkbox" id="showWithoutMaterial" checked/> ${ _("Without material submitted")}</td></tr>
                 </table>
             </td>
         </tr>
@@ -1109,11 +1119,14 @@ var fetchContributions = function() {
             selTypes : getCheckedBoxes('selTypes'),
             selTracks : getCheckedBoxes('selTracks'),
             selSessions : getCheckedBoxes('selSessions'),
+            showWithoutTeam : $E('showWithoutTeam').dom.checked,
             % if not IsOnlyReferee:
             showWithReferee: $E('showWithReferee').dom.checked,
             % endif
             showWithEditor: $E('showWithEditor').dom.checked,
-            showWithReviewer: $E('showWithReviewer').dom.checked
+            showWithReviewer: $E('showWithReviewer').dom.checked,
+            showWithMaterial: $E('showWithMaterial').dom.checked,
+            showWithoutMaterial: $E('showWithoutMaterial').dom.checked
         },
         function(result, error){
             killProgress();
