@@ -13,7 +13,8 @@
         <span class="confModifIcon" id="${menuName}"></span>
     % endif
 
-    <script type="text/javascript"> $E('${menuName}').observeClick(function() {
+    <script type="text/javascript">
+        $E('${menuName}').observeClick(function() {
         var element = $E('${menuName}');
         ${menuName}.open(element.getAbsolutePosition().x
         % if alignRight:
@@ -81,11 +82,21 @@
         % endif
 
         % if 'materialLink' in info:
-            'manageMaterial': {action: function(m) {
+            'addMaterial': {action: function(m) {
                 IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
-                    ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true);
+                    ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, true);
                 m.close();
-                return false;}, display: $T('Manage material')}
+                return false;}, display: $T('Add material')},
+            % if getItemType(item) == 'Conference' and item.getConference().getAllMaterialList() or \
+                 getItemType(item) == 'SubContribution' and item.getContribution().getAllMaterialList() or \
+                 getItemType(item) == 'Contribution' and item.getContribution().getAllMaterialList() or \
+                 getItemType(item) == 'Session' and item.getSession().getAllMaterialList():
+                'editMaterial': {action: function(m) {
+                     IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
+                         ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true);
+                     m.close();
+                     return false;}, display: $T('Edit material')}
+            % endif
         % endif
         }, [$E("${menuName}")], null, false, ${dumps(alignRight)});
     </script>
