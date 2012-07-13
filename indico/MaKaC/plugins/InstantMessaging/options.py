@@ -21,7 +21,7 @@
 from MaKaC.i18n import _
 
 globalOptions = [
-    ("customLinks", {"description": _("Create your own links for the chat rooms"),
+    ("customLinks", {"description": "Create your own links for the chat rooms",
                             "type": 'links',
                             "defaultValue": [{'name': 'your desktop client', 'structure': 'xmpp:[chatroom]@[host]?join'}],
                             "editable": True,

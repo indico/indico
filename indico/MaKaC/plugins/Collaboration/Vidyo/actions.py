@@ -35,20 +35,20 @@ from datetime import timedelta
 from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient
 
 pluginActions = [
-    ("deleteOldRooms", {"buttonText": _("Delete old Vidyo rooms"),
+    ("deleteOldRooms", {"buttonText": "Delete old Vidyo rooms",
                         "associatedOption": "cleanWarningAmount"}),
-    ("showOldRoomIndex", {"buttonText": _("Preview the cleanup operation"),
+    ("showOldRoomIndex", {"buttonText": "Preview the cleanup operation",
                           "associatedOption": "cleanWarningAmount"}),
-    ("cleanOldRoomIndex", {"buttonText": _("Clean the old room index"),
+    ("cleanOldRoomIndex", {"buttonText": "Clean the old room index",
                           "associatedOption": "cleanWarningAmount",
                           "visible": False}),
-    ("testCreateLotsOfBookings", {"buttonText": _("Create lots of bookings"),
+    ("testCreateLotsOfBookings", {"buttonText": "Create lots of bookings",
                           "associatedOption": "cleanWarningAmount",
                           "visible": False}),
-    ("testDeleteLotsOfBookings", {"buttonText": _("Delete lots of bookings"),
+    ("testDeleteLotsOfBookings", {"buttonText": "Delete lots of bookings",
                           "associatedOption": "cleanWarningAmount",
                           "visible": False}),
-    ("clearWSDLCache", {"buttonText": _("Clear WSDL Cache. Use when WSDL has changed"),
+    ("clearWSDLCache", {"buttonText": "Clear WSDL Cache. Use when WSDL has changed",
                         "associatedOption": "sudsCacheLocation"})
 ]
 

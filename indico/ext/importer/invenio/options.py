@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 globalOptions = [
-    ("location", {"description": _("Address of the Invenio instance"),
+    ("location", {"description": "Address of the Invenio instance",
                             "type": str,
                             "defaultValue": "",
                             "editable": True,

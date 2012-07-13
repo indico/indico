@@ -20,17 +20,17 @@
 from MaKaC.i18n import _
 
 globalOptions = [
-    ("serverUrl", {"description": _("Piwik Server URL"),
+    ("serverUrl", {"description": "Piwik Server URL",
                   "type": str,
                   "defaultValue": "http://127.0.0.1/",
                   "editable": True,
                   "visible": True}),
-    ("serverTok", {"description": _("Piwik API Token"),
+    ("serverTok", {"description": "Piwik API Token",
                   "type": str,
                   "defaultValue": "",
                   "editable": True,
                   "visible": True}),
-    ("serverSiteID", {"description": _("Piwik Site ID"),
+    ("serverSiteID", {"description": "Piwik Site ID",
                   "type": str,
                   "defaultValue": "1",
                   "editable": True,
