@@ -1253,11 +1253,6 @@ a.confSubSection:hover {
    background-repeat: no-repeat;
 }
 
-.confirmTab {
-   background-image: url(../images/warning.png);
-   background-repeat: no-repeat;
-}
-
 .moveTab {
    background-image: url(../images/greenarrow.png);
    background-repeat: no-repeat;

@@ -1,24 +1,32 @@
-<table align="center" width="100%" class="confirmTab"><tr><td>
-<form id="confirmationForm" action="${ postURL }" method="POST">
-<br>
-    ${ passingArgs }
-    <table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
-        <tr>
-            <td class="groupTitle" colspan="2" style="text-align:center">  ${ _("CONFIRMATION")} </td>
-        </tr>
-        <tr>
-            <td align="center" colspan="2" style="padding-bottom:10px">${ message }</td>
-        </tr>
-        <tr>
-            <td class="buttonBar" align="center">
-        <input type="submit" class="btn" name="confirm" value="${ confirmButtonCaption }">
-        <input type="submit" class="btn" name="cancel" value="${ cancelButtonCaption }">
+<table align="center" width="100%">
+    <tr>
+        <td>
+            <form id="confirmationForm" action="${ postURL }" method="POST">
+                ${ passingArgs }
+                <table border="0">
+                    <tr>
+                        <td class="groupTitle" colspan="2">
+                            ${ _("Confirmation Required")}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div class="bs-alert alert-toolbar">
+                            ${ message }
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="submit" class="bs-btn bs-btn-right" name="cancel" value="${ cancelButtonCaption }">
+                            <input type="submit" class="bs-btn bs-btn-right" name="confirm" value="${ confirmButtonCaption }">
+                        </td>
+                    </tr>
+                </table>
+            </form>
         </td>
-        </tr>
-    </table>
-</form>
-<br>
-</td></tr></table>
+    </tr>
+</table>
 
 <script type="text/javascript">
 

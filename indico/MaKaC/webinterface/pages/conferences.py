@@ -2304,7 +2304,7 @@ class WPConfClosing(WPConfModifToolsBase):
 
     def _getTabContent(self, params):
         msg = i18nformat("""
-        <font size="+2"> _("Are you sure that you want to LOCK the event") <i>"%s"</i>?</font><br>
+        _("Are you sure that you want to lock the event,") <br />"%s"?<br />
         (_("Note that if you lock the event, you will not be able to change its details any more <br>Only the creator of the event or an administrator of the system/category can unlock an event"))
               """) % (self._conf.getTitle())
         wc = wcomponents.WConfirmation()
@@ -2320,7 +2320,8 @@ class WPConfDeletion(WPConfModifToolsBase):
 
     def _getTabContent(self, params):
         msg = i18nformat("""
-        <font size="+2"> _("Are you sure that you want to DELETE the conference") <i>"%s"</i>?</font><br>( _("Note that if you delete the conference, all the items below it will also be deleted"))
+        _("Are you sure that you want to delete the conference,") <br />"%s"?<br />
+        ( _("Note that if you delete the conference, all the items below it will also be deleted"))
               """) % (self._conf.getTitle())
         wc = wcomponents.WConfirmation()
         return wc.getHTML(msg, \

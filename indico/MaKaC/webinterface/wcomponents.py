@@ -2469,42 +2469,51 @@ class WSignIn(WTemplated):
             vars["NiceMsg"]= _("Please note you can use your NICE (CERN) account")
         return vars
 
+
 class WConfirmation(WTemplated):
 
-    def getHTML( self, message, postURL, passingArgs, loading=False, **opts):
+    def getHTML(self, message, postURL, passingArgs, loading=False, **opts):
         params = {}
         params["message"] = message
         params["postURL"] = postURL
         pa = []
+
         for arg in passingArgs.keys():
-            if not type( passingArgs[arg] ) == types.ListType:
+            if not type(passingArgs[arg]) == types.ListType:
                 passingArgs[arg] = [passingArgs[arg]]
+
             for value in passingArgs[arg]:
-                pa.append("""<input type="hidden" name="%s" value="%s">"""%( arg, value ))
+                pa.append("""<input type="hidden" name="%s" value="%s">""" % (arg, value))
+
         params["passingArgs"] = "".join(pa)
         params["loading"] = loading
-        params["confirmButtonCaption"]=opts.get("confirmButtonCaption",  _("OK"))
-        params["cancelButtonCaption"]=opts.get("cancelButtonCaption",  _("Cancel"))
-        params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL( "warning" )
-        return WTemplated.getHTML( self, params )
+        params["confirmButtonCaption"] = opts.get("confirmButtonCaption", _("OK"))
+        params["cancelButtonCaption"] = opts.get("cancelButtonCaption", _("Cancel"))
+        params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL("warning")
+        return WTemplated.getHTML(self, params)
+
 
 class WDisplayConfirmation(WTemplated):
 
-    def getHTML( self, message, postURL, passingArgs, **opts):
+    def getHTML(self, message, postURL, passingArgs, **opts):
         params = {}
         params["message"] = message
         params["postURL"] = postURL
         pa = []
+
         for arg in passingArgs.keys():
-            if not type( passingArgs[arg] ) == types.ListType:
+            if not type(passingArgs[arg]) == types.ListType:
                 passingArgs[arg] = [passingArgs[arg]]
+
             for value in passingArgs[arg]:
-                pa.append("""<input type="hidden" name="%s" value="%s">"""%( arg, value ))
+                pa.append("""<input type="hidden" name="%s" value="%s">""" % (arg, value))
+
         params["passingArgs"] = "".join(pa)
-        params["confirmButtonCaption"]=opts.get("confirmButtonCaption",  _("OK"))
-        params["cancelButtonCaption"]=opts.get("cancelButtonCaption",  _("Cancel"))
-        params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL( "warning" )
-        return WTemplated.getHTML( self, params )
+        params["confirmButtonCaption"] = opts.get("confirmButtonCaption", _("OK"))
+        params["cancelButtonCaption"] = opts.get("cancelButtonCaption", _("Cancel"))
+        params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL("warning")
+        return WTemplated.getHTML(self, params)
+
 
 class SideMenu(object):
     def __init__(self, userStatus=False):
@@ -2523,15 +2532,18 @@ class SideMenu(object):
     def getSections(self):
         return self._sections
 
+
 class ManagementSideMenu(SideMenu):
 
     def getHTML(self):
         return WSideMenu(self, self._userStatus, type="management").getHTML()
 
+
 class BasicSideMenu(SideMenu):
 
     def getHTML(self):
         return WSideMenu(self, self._userStatus, type="basic").getHTML()
+
 
 class SideMenuSection:
     """ class coment
