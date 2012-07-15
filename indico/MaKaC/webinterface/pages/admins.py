@@ -2349,97 +2349,106 @@ class WPRoomBookingRoomForm( WPRoomBookingPluginAdminBase ):
         wc = wcomponents.WRoomBookingRoomForm( self._rh )
         return wc.getHTML( params )
 
-class WPRoomBookingAdmin( WPRoomBookingPluginAdminBase ):
 
-    def __init__( self, rh ):
+class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
+
+    def __init__(self, rh):
         self._rh = rh
-        WPRoomBookingPluginAdminBase.__init__( self, rh )
+        WPRoomBookingPluginAdminBase.__init__(self, rh)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabConfig.setActive()
 
-    def _getTabContent( self, params ):
-        wc = wcomponents.WRoomBookingAdmin( self._rh )
-        return wc.getHTML( params )
+    def _getTabContent(self, params):
+        wc = wcomponents.WRoomBookingAdmin(self._rh)
+        return wc.getHTML(params)
 
-class WPRoomBookingAdminLocation( WPRoomBookingPluginAdminBase ):
 
-    def __init__( self, rh, location, actionSucceeded = False ):
+class WPRoomBookingAdminLocation(WPRoomBookingPluginAdminBase):
+
+    def __init__(self, rh, location, actionSucceeded=False):
         self._rh = rh
         self._location = location
         self._actionSucceeded = actionSucceeded
-        WPRoomBookingPluginAdminBase.__init__( self, rh )
+        WPRoomBookingPluginAdminBase.__init__(self, rh)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabConfig.setActive()
 
-    def _getTabContent( self, params ):
-        wc = wcomponents.WRoomBookingAdminLocation( self._rh, self._location )
+    def _getTabContent(self, params):
+        wc = wcomponents.WRoomBookingAdminLocation(self._rh, self._location)
         params['actionSucceeded'] = self._actionSucceeded
-        return wc.getHTML( params )
+        return wc.getHTML(params)
+
 
 class WPAdminsSystemBase(WPAdminsBase):
-    def __init__( self, rh ):
-        WPAdminsBase.__init__( self, rh )
+    def __init__(self, rh):
+        WPAdminsBase.__init__(self, rh)
 
     def _setActiveSideMenuItem(self):
         self._systemMenuItem.setActive()
 
-    def _createTabCtrl( self ):
+    def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabConfiguration = self._tabCtrl.newTab( "configuration", _("Configuration"), \
-                urlHandlers.UHAdminsSystem.getURL() )
-        self._subTabTaskManager = self._tabCtrl.newTab( "tasks", _("Task Manager"), \
-                urlHandlers.UHTaskManager.getURL() )
-        self._subTabMaintenance = self._tabCtrl.newTab( "maintenance", _("Maintenance"), \
-                urlHandlers.UHMaintenance.getURL() )
+        self._subTabConfiguration = self._tabCtrl.newTab("configuration", _("Configuration"), \
+                urlHandlers.UHAdminsSystem.getURL())
+        self._subTabTaskManager = self._tabCtrl.newTab("tasks", _("Task Manager"), \
+                urlHandlers.UHTaskManager.getURL())
+        self._subTabMaintenance = self._tabCtrl.newTab("maintenance", _("Maintenance"), \
+                urlHandlers.UHMaintenance.getURL())
 
     def _getPageContent(self, params):
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
+
 
 class WPAdminsSystem(WPAdminsSystemBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabConfiguration.setActive()
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         wc = WAdminsSystem()
-        return wc.getHTML( params )
+        return wc.getHTML(params)
+
 
 class WAdminsSystem(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["minfo"] = minfo
         vars["ModifURL"] = urlHandlers.UHAdminsSystemModif.getURL()
         return vars
 
+
 class WPAdminsSystemModif(WPAdminsSystemBase):
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         wc = WAdminsSystemModif()
-        return wc.getHTML( params )
+        return wc.getHTML(params)
+
 
 class WAdminsSystemModif(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["minfo"] = minfo
         vars["postURL"] = urlHandlers.UHAdminsSystemModif.getURL()
         return vars
 
-class WPMaintenanceBase( WPAdminsSystemBase ):
 
-    def __init__( self, rh ):
-        WPAdminsBase.__init__( self, rh )
+class WPMaintenanceBase(WPAdminsSystemBase):
 
-    def _setActiveTab( self ):
+    def __init__(self, rh):
+        WPAdminsBase.__init__(self, rh)
+
+    def _setActiveTab(elf):
         self._subTabMaintenance.setActive()
 
-class WPMaintenance( WPMaintenanceBase ):
+
+class WPMaintenance(WPMaintenanceBase):
 
     def __init__(self, rh, s, dbSize, nWebsessions):
         WPMaintenanceBase.__init__(self, rh)
@@ -2447,34 +2456,36 @@ class WPMaintenance( WPMaintenanceBase ):
         self._dbSize = dbSize
         self._nWebsessions = nWebsessions
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         wc = WAdminMaintenance()
         pars = { "cleanupURL": urlHandlers.UHMaintenanceTmpCleanup.getURL(), \
                  "tempSize": self._stat[0], \
-                 "nFiles": "%s files"%self._stat[1], \
-                 "nDirs": "%s folders"%self._stat[2], \
+                 "nFiles": "%s files" % self._stat[1], \
+                 "nDirs": "%s folders" % self._stat[2], \
                  "packURL": urlHandlers.UHMaintenancePack.getURL(), \
                  "dbSize": self._dbSize, \
                  "websessionCleanupURL": urlHandlers.UHMaintenanceWebsessionCleanup.getURL(), \
                  "nWebsessions": self._nWebsessions}
-        return wc.getHTML( pars )
+        return wc.getHTML(pars)
+
 
 class WAdminMaintenance(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         return vars
+
 
 class WPMaintenanceTmpCleanup(WPMaintenanceBase):
 
-    def __init__(self,rh):
-        WPMaintenanceBase.__init__(self,rh)
+    def __init__(self, rh):
+        WPMaintenanceBase.__init__(self, rh)
 
-    def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        msg="""Are you sure you want to delete the temporary directory
+    def _getTabContent(self, params):
+        wc = wcomponents.WConfirmation()
+        msg = """Are you sure you want to delete the temporary directory
         (note that all the files in that directory will be deleted)?"""
-        url=urlHandlers.UHMaintenancePerformTmpCleanup.getURL()
+        url = urlHandlers.UHMaintenancePerformTmpCleanup.getURL()
         return """
                 <table align="center" width="95%%">
                     <tr>
@@ -2487,17 +2498,18 @@ class WPMaintenanceTmpCleanup(WPMaintenanceBase):
                         </td>
                     </tr>
                 </table>
-                """%wc.getHTML(msg,url,{})
+                """ % wc.getHTML(msg, url, {})
+
 
 class WPMaintenancePack(WPMaintenanceBase):
 
-    def __init__(self,rh):
-        WPMaintenanceBase.__init__(self,rh)
+    def __init__(self, rh):
+        WPMaintenanceBase.__init__(self, rh)
 
-    def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        msg="""Are you sure you want to pack the database?"""
-        url=urlHandlers.UHMaintenancePerformPack.getURL()
+    def _getTabContent(self, params):
+        wc = wcomponents.WConfirmation()
+        msg = """Are you sure you want to pack the database?"""
+        url = urlHandlers.UHMaintenancePerformPack.getURL()
         return """
                 <table align="center" width="95%%">
                     <tr>
@@ -2510,17 +2522,18 @@ class WPMaintenancePack(WPMaintenanceBase):
                         </td>
                     </tr>
                 </table>
-                """%wc.getHTML(msg,url,{})
+                """ % wc.getHTML(msg, url, {})
+
 
 class WPMaintenanceWebsessionCleanup(WPMaintenanceBase):
 
-    def __init__(self,rh):
-        WPMaintenanceBase.__init__(self,rh)
+    def __init__(self, rh):
+        WPMaintenanceBase.__init__(self, rh)
 
-    def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        msg="""Are you sure you want to delete all the web sessions?"""
-        url=urlHandlers.UHMaintenancePerformWebsessionCleanup.getURL()
+    def _getTabContent(self, params):
+        wc = wcomponents.WConfirmation()
+        msg = """Are you sure you want to delete all the web sessions?"""
+        url = urlHandlers.UHMaintenancePerformWebsessionCleanup.getURL()
         return """
                 <table align="center" width="95%%">
                     <tr>
@@ -2533,20 +2546,21 @@ class WPMaintenanceWebsessionCleanup(WPMaintenanceBase):
                         </td>
                     </tr>
                 </table>
-                """%wc.getHTML(msg,url,{})
+                """ % wc.getHTML(msg, url, {})
 
 
 class WPTaskManagerBase(WPAdminsSystemBase):
 
-    def __init__( self, rh ):
-        WPAdminsBase.__init__( self, rh )
+    def __init__(self, rh):
+        WPAdminsBase.__init__(self, rh)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabTaskManager.setActive()
 
-class WPTaskManager( WPTaskManagerBase ):
 
-    def _getTabContent( self, params ):
+class WPTaskManager(WPTaskManagerBase):
+
+    def _getTabContent(self, params):
         wc = WTaskManager()
 
         pars = {}
@@ -2563,51 +2577,57 @@ class WPConfirmDelete(WPTaskManagerBase):
         WPTaskManagerBase.__init__(self, req)
         self._taskId = taskId
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         wc = wcomponents.WConfirmation()
-        msg="""Are you sure you want to delete the following task?<br><ul>%s</ul>
-        <font color="red">(note you will permanently remove the task )</font><br>"""%(self._taskId)
+
+        msg = {'challenge': _('Are you sure you want to delete the following task'),
+               'target': self._taskId,
+               'subtext': _('Note that you will permanently remove the task.')
+               }
+
         postURL = urlHandlers.UHRemoveTask.getURL()
-        return wc.getHTML( msg, postURL, {"taskId":self._taskId} )
+        return wc.getHTML(msg, postURL, {"taskId": self._taskId})
 
 class WPIPBasedACL( WPServicesCommon ):
 
     def __init__( self, rh ):
         WPServicesCommon.__init__( self, rh )
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         wc = WIPBasedACL()
-        return wc.getHTML( params )
+        return wc.getHTML(params)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabIPBasedACL.setActive()
+
 
 class WIPBasedACL(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["ipList"] = minfo.getIPBasedACLMgr().get_full_access_acl()
-        vars["removeIcon"] = Config.getInstance().getSystemIconURL( "remove" )
+        vars["removeIcon"] = Config.getInstance().getSystemIconURL("remove")
         return vars
 
 
-class WPAnalytics( WPServicesCommon ):
+class WPAnalytics(WPServicesCommon):
 
-    def __init__( self, rh):
-        WPServicesCommon.__init__( self, rh )
+    def __init__(self, rh):
+        WPServicesCommon.__init__(self, rh)
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         wc = WAnalytics()
-        return wc.getHTML( params )
+        return wc.getHTML(params)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabAnalytics.setActive()
+
 
 class WAnalytics(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["analyticsActive"] = minfo.isAnalyticsActive()
         vars["analyticsCode"] = minfo.getAnalyticsCode()
@@ -2615,19 +2635,21 @@ class WAnalytics(wcomponents.WTemplated):
         vars["analyticsFormURL"] = urlHandlers.UHSaveAnalytics.getURL()
         return vars
 
-class WPAdminProtection( WPAdminsBase ):
+
+class WPAdminProtection(WPAdminsBase):
 
     def _setActiveSideMenuItem(self):
         self._protectionMenuItem.setActive()
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         wc = WAdminProtection()
         return wc.getHTML()
 
+
 class WAdminProtection(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["protectionDisclaimerProtected"] = minfo.getProtectionDisclaimerProtected()
         vars["protectionDisclaimerRestricted"] = minfo.getProtectionDisclaimerRestricted()

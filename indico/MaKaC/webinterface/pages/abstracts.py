@@ -1354,104 +1354,109 @@ class WAbstractTrackOrderByRating(wcomponents.WTemplated):
 
 class WPAbstractTrackOrderByRating(WPAbstractManagementBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabTracks.setActive()
         self._subTabRating.setActive()
 
-    def _getTabContent( self, params ):
-        wc = WAbstractTrackOrderByRating( self._getAW(), self._target )
-        return wc.getHTML( params )
+    def _getTabContent(self, params):
+        wc = WAbstractTrackOrderByRating(self._getAW(), self._target)
+        return wc.getHTML(params)
 
 
 class WAbstractModAC(wcomponents.WTemplated):
 
-    def __init__(self,abstract):
-        self._abstract=abstract
+    def __init__(self, abstract):
+        self._abstract = abstract
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["subCanModURL"]=quoteattr("")
-        vars["subCanModStatus"]=self.htmlText()
-        vars["subCanModBtnName"]=quoteattr("")
-        vars["subCanModBtnCaption"]=quoteattr("")
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["subCanModURL"] = quoteattr("")
+        vars["subCanModStatus"] = self.htmlText()
+        vars["subCanModBtnName"] = quoteattr("")
+        vars["subCanModBtnCaption"] = quoteattr("")
         return vars
 
 
 class WPModAC(WPAbstractManagementBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabAC.setActive()
 
-    def _getTabContent( self, params ):
-        wc=WAbstractModAC(self._target)
+    def _getTabContent(self, params):
+        wc = WAbstractModAC(self._target)
         return wc.getHTML()
 
 
 class WPModIntComments(WPAbstractManagementBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabComments.setActive()
 
-    def _getTabContent( self, params ):
-        wc=wcomponents.WAbstractModIntComments(self._getAW(),self._target)
-        p={"newCommentURL":urlHandlers.UHAbstractModNewIntComment.getURL(self._abstract),
-            "commentEditURLGen":urlHandlers.UHAbstractModIntCommentEdit.getURL,
-            "commentRemURLGen":urlHandlers.UHAbstractModIntCommentRem.getURL
+    def _getTabContent(self, params):
+        wc = wcomponents.WAbstractModIntComments(self._getAW(), self._target)
+        p = {"newCommentURL": urlHandlers.UHAbstractModNewIntComment.getURL(self._abstract),
+            "commentEditURLGen": urlHandlers.UHAbstractModIntCommentEdit.getURL,
+            "commentRemURLGen": urlHandlers.UHAbstractModIntCommentRem.getURL
         }
         return wc.getHTML(p)
 
 
 class WPModNewIntComment(WPModIntComments):
 
-    def _getTabContent( self, params ):
-        wc=wcomponents.WAbstractModNewIntComment(self._getAW(),self._target)
-        p={"postURL":urlHandlers.UHAbstractModNewIntComment.getURL(self._abstract)}
+    def _getTabContent(self, params):
+        wc = wcomponents.WAbstractModNewIntComment(self._getAW(), self._target)
+        p = {"postURL": urlHandlers.UHAbstractModNewIntComment.getURL(self._abstract)}
         return wc.getHTML(p)
 
 
 class WPModIntCommentEdit(WPModIntComments):
 
-    def __init__(self,rh,comment):
-        self._comment=comment
-        WPModIntComments.__init__(self,rh,comment.getAbstract())
+    def __init__(self, rh, comment):
+        self._comment = comment
+        WPModIntComments.__init__(self, rh, comment.getAbstract())
 
-    def _getTabContent( self, params ):
-        wc=wcomponents.WAbstractModIntCommentEdit(self._comment)
-        p={"postURL": urlHandlers.UHAbstractModIntCommentEdit.getURL(self._comment)}
+    def _getTabContent(self, params):
+        wc = wcomponents.WAbstractModIntCommentEdit(self._comment)
+        p = {"postURL": urlHandlers.UHAbstractModIntCommentEdit.getURL(self._comment)}
         return wc.getHTML(p)
 
 
 class WAbstractModNotifLog(wcomponents.WTemplated):
 
-    def __init__(self,abstract):
-        self._abstract=abstract
+    def __init__(self, abstract):
+        self._abstract = abstract
 
-    def _getResponsibleHTML( self, res ):
-        conf=self._abstract.getConference()
-        tmp = "%s (%s)"%(res.getFullName(), res.getAffiliation())
-        tmp = self.htmlText( tmp )
+    def _getResponsibleHTML(self, res):
+        conf = self._abstract.getConference()
+        tmp = "%s (%s)" % (res.getFullName(), res.getAffiliation())
+        tmp = self.htmlText(tmp)
+
         if res.getEmail() != "":
-            mailtoSubject = _("[%s] Abstract %s: %s")%( conf.getTitle(), self._abstract.getId(), self._abstract.getTitle() )
-            mailtoURL = "mailto:%s?subject=%s"%( res.getEmail(), \
-                                            urllib.quote( mailtoSubject ))
-            href = quoteattr( mailtoURL )
-            tmp = """<a href=%s>%s</a>"""%(href, tmp)
+            mailtoSubject = _("[%s] Abstract %s: %s") % (conf.getTitle(), self._abstract.getId(), self._abstract.getTitle())
+            mailtoURL = "mailto:%s?subject=%s" % (res.getEmail(), \
+                                            urllib.quote(mailtoSubject))
+            href = quoteattr(mailtoURL)
+            tmp = """<a href=%s>%s</a>""" % (href, tmp)
+
         return tmp
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        res=[]
+        vars = wcomponents.WTemplated.getVars(self)
+        res = []
+
         for entry in self._abstract.getNotificationLog().getEntryList():
-            d=entry.getDate().strftime("%Y-%m-%d %H:%M")
-            resp=entry.getResponsible()
-            tplCaption=entry.getTpl().getName()
-            tplLink= i18nformat("""
+            d = entry.getDate().strftime("%Y-%m-%d %H:%M")
+            resp = entry.getResponsible()
+            tplCaption = entry.getTpl().getName()
+            tplLink = i18nformat("""
                     <b>%s</b> <font color="red"> _("(This template doesn't exist anymore)")</font>
-                    """)%tplCaption
+                    """) % tplCaption
+
             if entry.getTpl().getOwner() is not None:
-                url=urlHandlers.UHAbstractModNotifTplDisplay.getURL(entry.getTpl())
-                tplLink="<a href=%s>%s</a>"%(quoteattr(str(url)),self.htmlText(tplCaption))
-            res.append( i18nformat("""
+                url = urlHandlers.UHAbstractModNotifTplDisplay.getURL(entry.getTpl())
+                tplLink = "<a href=%s>%s</a>" % (quoteattr(str(url)), self.htmlText(tplCaption))
+
+            res.append(i18nformat("""
                         <tr>
                             <td bgcolor="white">
                                 %s _("by") %s
@@ -1459,70 +1464,77 @@ class WAbstractModNotifLog(wcomponents.WTemplated):
                                 _("notification template used"): %s
                             </td>
                         </tr>
-                        """)%(self.htmlText(d),self._getResponsibleHTML(resp),tplLink))
-        vars["entries"]="".join(res)
+                        """) % (self.htmlText(d), self._getResponsibleHTML(resp), tplLink))
+
+        vars["entries"] = "".join(res)
         return vars
 
 
 class WPModNotifLog(WPAbstractManagementBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabNotifLog.setActive()
 
-    def _getTabContent( self, params ):
-        wc=WAbstractModNotifLog(self._target)
+    def _getTabContent(self, params):
+        wc = WAbstractModNotifLog(self._target)
         return wc.getHTML()
 
 
 class WConfModAbstractWithdraw(wcomponents.WTemplated):
 
-    def __init__(self,aw,abstract):
-        self._abstract=abstract
-        self._aw=aw
+    def __init__(self, aw, abstract):
+        self._abstract = abstract
+        self._aw = aw
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHConfModAbstractWithdraw.getURL(self._abstract)))
-        vars["comment"]=""
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["postURL"] = quoteattr(str(urlHandlers.UHConfModAbstractWithdraw.getURL(self._abstract)))
+        vars["comment"] = ""
         return vars
 
 
 class WPModWithdraw(WPAbstractManagment):
 
-    def _getTabContent( self, params ):
-        wc=WConfModAbstractWithdraw(self._rh.getAW(),self._abstract)
+    def _getTabContent(self, params):
+        wc = WConfModAbstractWithdraw(self._rh.getAW(), self._abstract)
         return wc.getHTML()
+
 
 class WAbstractModifTool(wcomponents.WTemplated):
 
-    def __init__( self, contrib ):
+    def __init__(self, contrib):
         self._contrib = contrib
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
         return vars
 
-class WPModTools( WPAbstractManagment ):
 
-    def _setActiveTab( self ):
+class WPModTools(WPAbstractManagment):
+
+    def _setActiveTab(self):
         self._tabTools.setActive()
 
-    def _getTabContent( self, params ):
-        wc = WAbstractModifTool( self._target )
+    def _getTabContent(self, params):
+        wc = WAbstractModifTool(self._target)
         pars = { \
-            "deleteContributionURL": urlHandlers.UHAbstractDelete.getURL( self._target )
+            "deleteContributionURL": urlHandlers.UHAbstractDelete.getURL(self._target)
                 }
-        return wc.getHTML( pars )
+        return wc.getHTML(pars)
+
 
 class WPModRemConfirmation(WPModTools):
 
-    def __init__(self,rh,abs):
-        WPAbstractManagment.__init__(self,rh,abs)
-        self._abs=abs
+    def __init__(self, rh, abs):
+        WPAbstractManagment.__init__(self, rh, abs)
+        self._abs = abs
 
-    def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        msg= _("""Are you sure you want to delete the abstract "%s"?""")%(self._abs.getTitle())
-        url=urlHandlers.UHAbstractDelete.getURL(self._abs)
-        return wc.getHTML(msg,url,{})
+    def _getTabContent(self, params):
+        wc = wcomponents.WConfirmation()
+        msg = {'challenge': _("Are you sure you want to delete the abstract"),
+               'target': self._abs.getTitle(),
+               'subtext': None
+               }
+        url = urlHandlers.UHAbstractDelete.getURL(self._abs)
+        return wc.getHTML(msg, url, {})

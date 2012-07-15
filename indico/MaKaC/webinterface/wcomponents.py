@@ -65,6 +65,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 
 from lxml import etree
 
+from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
 
 from MaKaC.common.TemplateExec import truncateTitle
@@ -1226,15 +1227,17 @@ class WContribModifTool(WTemplated):
 
 class WContributionDeletion(object):
 
-    def __init__( self, contribList ):
+    def __init__(self, contribList):
         self._contribList = contribList
 
-    def getHTML( self, actionURL ):
-        l = []
+    def getHTML(self, actionURL):
+        titles = []
+
         for contrib in self._contribList:
-            l.append("""<li><i>%s</i></li>"""%contrib.getTitle())
-        msg =  i18nformat("""
-        <font size="+2"> _("Are you sure that you want to DELETE the following contributions"):<ul>%s</ul>?</font><br>
+            titles.append("""<li><i>%s</i></li>""" % contrib.getTitle())
+
+        body = i18nformat("""
+        <ul>%s</ul>
             <table>
                 <tr><td>
                 <font color="red"> _("Note that the following changes will result from this deletion"):</font>
@@ -1245,43 +1248,51 @@ class WContributionDeletion(object):
                             <li> _("The status of the abstract will change to 'submitted'")</li>
                             <li> _("You'll lose the information about when and who accepted the abstract")</li>
                         </ul>
-                    <li> _("ALL the existing sub-contributions within the above contribution(s) will also be deleted")</li>
+                    </li>
                 </ul>
                 </td></tr>
             </table>
-              """)%("".join(l))
+              """) % ("".join(titles))
+
+        msg = {'challenge': _("Are you sure that you want to delete the following contributions"),
+               'target': body,
+               'subtext': _("All the existing sub-contributions within the above contribution(s) will also be deleted")
+               }
+
         wc = WConfirmation()
         contribIdList = []
-        for contrib in self._contribList:
-            contribIdList.append( contrib.getId() )
-        return wc.getHTML( msg, actionURL, {"selectedCateg": contribIdList}, \
-                                            confirmButtonCaption="Yes", \
-                                            cancelButtonCaption="No" )
 
-    def delete( self ):
+        for contrib in self._contribList:
+            contribIdList.append(contrib.getId())
+
+        return wc.getHTML(msg, actionURL, {"selectedCateg": contribIdList}, \
+                                            confirmButtonCaption="Yes", \
+                                            cancelButtonCaption="No")
+
+    def delete(self):
         for contrib in self._contribList:
             contrib.delete()
+
         return "done"
 
 
 class WContribModifSC(WTemplated):
 
-    def __init__( self, contrib ):
+    def __init__(self, contrib):
         self._contrib = contrib
         self._conf = self._contrib.getConference()
 
-
-    def getSubContItems(self,SCModifURL):
+    def getSubContItems(self, SCModifURL):
         temp = []
         scList = self._contrib.getSubContributionList()
         for sc in scList:
             id = sc.getId()
-            selbox = """<select name="newpos%s" onChange="this.form.oldpos.value='%s';this.form.submit();">""" % (scList.index(sc),scList.index(sc))
-            for i in range(1,len(scList)+1):
-                if i== scList.index(sc)+1:
-                    selbox += "<option selected value='%s'>%s" % (i-1,i)
+            selbox = """<select name="newpos%s" onChange="this.form.oldpos.value='%s';this.form.submit();">""" % (scList.index(sc), scList.index(sc))
+            for i in range(1, len(scList) + 1):
+                if i == scList.index(sc) + 1:
+                    selbox += "<option selected value='%s'>%s" % (i - 1, i)
                 else:
-                    selbox += "<option value='%s'>%s" % (i-1,i)
+                    selbox += "<option value='%s'>%s" % (i - 1, i)
             selbox += """
                 </select>"""
             temp.append("""
@@ -1291,15 +1302,15 @@ class WContribModifSC(WTemplated):
                         %s
                         &nbsp;<a href="%s">%s</a>
                     </td>
-                </tr>"""%(id, selbox,SCModifURL(sc), escape(sc.getTitle())))
+                </tr>""" % (id, selbox,SCModifURL(sc), escape(sc.getTitle())))
         html = """
                 <input type="hidden" name="oldpos">
                 <table align="center">%s
-                </table>"""%"".join( temp )
+                </table>""" % "".join(temp)
         return html
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
+    def getVars(self):
+        vars = WTemplated.getVars(self)
         cfg = Configuration.Config.getInstance()
         vars["subContList"] = self.getSubContItems(vars["subContModifURL"])
         vars["confId"] = self._contrib.getConference().getId()
@@ -1334,6 +1345,7 @@ class WContribModifSC(WTemplated):
 #                </table>"""%"".join( temp )
 #        return html
 ##ness##############################################################################
+
 
 class WMaterialModifHeader(WTemplated):
 

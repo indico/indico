@@ -2303,10 +2303,12 @@ class WPConfClosing(WPConfModifToolsBase):
         self._tabClose.setActive()
 
     def _getTabContent(self, params):
-        msg = i18nformat("""
-        _("Are you sure that you want to lock the event,") <br />"%s"?<br />
-        (_("Note that if you lock the event, you will not be able to change its details any more <br>Only the creator of the event or an administrator of the system/category can unlock an event"))
-              """) % (self._conf.getTitle())
+        msg = {'challenge': _("Are you sure that you want to lock the event"),
+               'target': self._conf.getTitle(),
+               'subtext': _("Note that if you lock the event, you will not be able to change its details any more." + 
+                "Only the creator of the event or an administrator of the system / category can unlock an event.")
+               }
+
         wc = wcomponents.WConfirmation()
         return wc.getHTML(msg, \
                         urlHandlers.UHConferenceClose.getURL(self._conf), {}, \
@@ -2319,10 +2321,11 @@ class WPConfDeletion(WPConfModifToolsBase):
         self._tabDelete.setActive()
 
     def _getTabContent(self, params):
-        msg = i18nformat("""
-        _("Are you sure that you want to delete the conference,") <br />"%s"?<br />
-        ( _("Note that if you delete the conference, all the items below it will also be deleted"))
-              """) % (self._conf.getTitle())
+        msg = {'challenge': _("Are you sure that you want to delete the conference"),
+               'target': self._conf.getTitle(),
+               'subtext': _("Note that if you delete the conference, all the items below it will also be deleted")
+               }
+
         wc = wcomponents.WConfirmation()
         return wc.getHTML(msg, \
                         urlHandlers.UHConfDeletion.getURL(self._conf), {}, \

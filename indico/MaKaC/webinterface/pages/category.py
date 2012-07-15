@@ -1566,134 +1566,154 @@ class WCategoryDataModification(wcomponents.WTemplated):
                 styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
             vars["%sStyleOptions" % type] = styleoptions
 
-
         return vars
 
 
-class WPCategoryDataModification( WPCategModifMain ):
+class WPCategoryDataModification(WPCategModifMain):
 
-    def _getPageContent( self, params ):
-        wc = WCategoryDataModification( self._target )
-        pars = {"postURL": urlHandlers.UHCategoryPerformModification.getURL() }
-        return wc.getHTML( pars )
+    def _getPageContent(self, params):
+        wc = WCategoryDataModification(self._target)
+        pars = {"postURL": urlHandlers.UHCategoryPerformModification.getURL()}
+        return wc.getHTML(pars)
 
 
 class WCategoryCreation(wcomponents.WTemplated):
 
-    def __init__( self, target ):
+    def __init__(self, target):
         self.__target = target
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         vars["locator"] = self.__target.getLocator().getWebForm()
-        for type in [ "simple_event", "meeting" ]:
+
+        for type in ["simple_event", "meeting"]:
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
             styles = styleMgr.getExistingStylesForEventType(type)
             styleoptions = ""
+
             for styleId in styles:
                 defStyle = self.__target.getDefaultStyle(type)
+
                 if defStyle == "":
                     defStyle = styleMgr.getDefaultStyleForEventType(type)
                 if styleId == defStyle:
                     selected = "selected"
                 else:
                     selected = ""
-                styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
+
+                styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId, selected, styleMgr.getStyleName(styleId))
             vars["%sStyleOptions" % type] = styleoptions
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
         try:
            default_tz = minfo.getTimezone()
         except:
            default_tz = 'UTC'
+
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(default_tz)
         vars["categTitle"] = self.__target.getTitle()
-        if self.__target.isProtected() :
+        if self.__target.isProtected():
             vars["categProtection"] = "private"
-        else :
+        else:
             vars["categProtection"] = "public"
         vars["numConferences"] = len(self.__target.conferences)
 
         return vars
 
 
-class WPCategoryCreation( WPCategModifMain ):
+class WPCategoryCreation(WPCategModifMain):
 
-    def _getPageContent( self, params ):
-        wc = WCategoryCreation( self._target )
-        pars = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
-                "postURL": urlHandlers.UHCategoryPerformCreation.getURL() }
-        return wc.getHTML( pars )
+    def _getPageContent(self, params):
+        wc = WCategoryCreation(self._target)
+        pars = {"categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
+                "postURL": urlHandlers.UHCategoryPerformCreation.getURL()}
+        return wc.getHTML(pars)
 
 
 class WCategoryDeletion(object):
 
-    def __init__( self, categoryList ):
+    def __init__(self, categoryList):
         self._categList = categoryList
 
-    def getHTML( self, actionURL ):
-        l = []
+    def getHTML(self, actionURL):
+        categories = []
+
         for categ in self._categList:
-            l.append("""<li><i>%s</i></li>"""%categ.getName())
-        msg = i18nformat("""
-        <font size="+2"> _("Are you sure that you want to DELETE the following categories"):<ul>%s</ul>?</font><br>( _("Note that ALL the existing sub-categories below will also be deleted"))
-              """)%("".join(l))
+            categories.append("""<li><i>%s</i></li>""" % categ.getName())
+
+        msg = {'challenge': _("Are you sure that you want to delete the following categories"),
+               'target': "".join(categories),
+               'subtext': _("Note that all the existing sub-categories below will also be deleted")
+               }
+
         wc = wcomponents.WConfirmation()
         categIdList = []
+
         for categ in self._categList:
-            categIdList.append( categ.getId() )
-        return wc.getHTML( msg, actionURL, {"selectedCateg": categIdList}, \
-                                            confirmButtonCaption= _("Yes"), \
-                                            cancelButtonCaption= _("No") )
+            categIdList.append(categ.getId())
+
+        return wc.getHTML(msg, actionURL, {"selectedCateg": categIdList}, \
+                                            confirmButtonCaption=_("Yes"), \
+                                            cancelButtonCaption=_("No"))
 
 
 class WConferenceDeletion(object):
 
-    def __init__( self, conferenceList ):
+    def __init__(self, conferenceList):
         self._confList = conferenceList
 
-    def getHTML( self, actionURL ):
-        l = []
+    def getHTML(self, actionURL):
+        events = []
+
         for event in self._confList:
-            l.append("""<li><i>%s</i></li>"""%event.getTitle())
-        msg = _("""<font size="+2">Are you sure that you want to <font color="red"><b>DELETE</b></font> the following events:<ul>%s</ul>?</font><br>(Note that ALL the existing sub-categories below will also be deleted)""")%("".join(l))
+            events.append("""<li><i>%s</i></li>""" % event.getTitle())
+
+        msg = {'challenge': _('Are you sure that you want to delete the following events'),
+               'target': "".join(events),
+               'subtext': _('Note that ALL the existing sub-categories below will also be deleted')
+               }
+
         wc = wcomponents.WConfirmation()
         eventIdList = []
+
         for event in self._confList:
-            eventIdList.append( event.getId() )
-        return wc.getHTML( msg, actionURL, {"selectedConf": eventIdList}, \
-                                            confirmButtonCaption= _("Yes"), \
-                                            cancelButtonCaption= _("No") )
+            eventIdList.append(event.getId())
+
+        return wc.getHTML(msg, actionURL, {"selectedConf": eventIdList}, \
+                                            confirmButtonCaption=_("Yes"), \
+                                            cancelButtonCaption=_("No"))
 
 
-class WPSubCategoryDeletion( WPCategModifMain ):
+class WPSubCategoryDeletion(WPCategModifMain):
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         selCategs = params["subCategs"]
-        wc = WCategoryDeletion( selCategs )
-        return wc.getHTML( urlHandlers.UHCategoryActionSubCategs.getURL( self._target ) )
+        wc = WCategoryDeletion(selCategs)
+        return wc.getHTML(urlHandlers.UHCategoryActionSubCategs.getURL(self._target))
 
-class WPConferenceDeletion(WPCategModifMain ):
 
-    def _getPageContent( self, params ):
+class WPConferenceDeletion(WPCategModifMain):
+
+    def _getPageContent(self, params):
         #raise '%s'%params
         selConfs = params["events"]
-        wc = WConferenceDeletion( selConfs )
-        return wc.getHTML( urlHandlers.UHCategoryActionConferences.getURL( self._target ) )
+        wc = WConferenceDeletion(selConfs)
+        return wc.getHTML(urlHandlers.UHCategoryActionConferences.getURL(self._target))
 
 
-class WItemReallocation( wcomponents.WTemplated ):
+class WItemReallocation(wcomponents.WTemplated):
 
-    def __init__( self, itemList ):
+    def __init__(self, itemList):
         self._itemList = itemList
 
-    def getHTML( self, selectTree, params):
+    def getHTML(self, selectTree, params):
         self._sTree = selectTree
-        return wcomponents.WTemplated.getHTML( self, params )
+        return wcomponents.WTemplated.getHTML(self, params)
 
-    def _getItemDescription( self, item ):
+    def _getItemDescription(self, item):
         return ""
 
-    def getVars( self ):
+    def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         l = []
         for item in self._itemList:

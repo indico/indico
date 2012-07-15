@@ -1,8 +1,8 @@
 <table align="center" width="100%">
     <tr>
         <td>
-            <form id="confirmationForm" action="${ postURL }" method="POST">
-                ${ passingArgs }
+            <form id="confirmationForm" action="${postURL}" method="POST">
+                ${passingArgs}
                 <table border="0">
                     <tr>
                         <td class="groupTitle" colspan="2">
@@ -12,7 +12,25 @@
                     <tr>
                         <td colspan="2">
                             <div class="bs-alert alert-toolbar">
-                            ${ message }
+                                <% new_format = 'challenge' in message %>
+                                % if new_format:
+                                <div class="toolbar-container">
+                                    <div class="container-title">
+                                        ${message['challenge']}
+                                    </div>
+                                    <div style="font-weight:bold;">
+                                        ${message['target']}
+                                    </div>
+                                    % if message['subtext']:
+                                    <div>
+                                        ${message['subtext']}
+                                    </div>
+                                    % endif
+                                </div>
+                                <div class="toolbar-clearer"></div>
+                                % else:
+                                    ${message}
+                                % endif
                             </div>
                         </td>
                     </tr>
