@@ -874,6 +874,7 @@ class WPBadgeTemplates( WPTemplatesCommon ):
     def _setActiveTab( self ):
         self._subTabBadges.setActive()
 
+
 class WPPosterTemplates( WPTemplatesCommon ):
     pageURL = "posterTemplates.py"
 
@@ -884,179 +885,135 @@ class WPPosterTemplates( WPTemplatesCommon ):
         wp = WPosterTemplates(conference.CategoryManager().getDefaultConference())
         return wp.getHTML(params)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabPosters.setActive()
 
-class WPBadgeTemplateDesign( WPTemplatesCommon ):
 
-    def __init__(self, rh, conf, templateId = None, new = False):
+class WPBadgeTemplateDesign(WPTemplatesCommon):
+
+    def __init__(self, rh, conf, templateId=None, new=False):
         WPTemplatesCommon.__init__(self, rh)
         self._conf = conf
         self.__templateId = templateId
         self.__new = new
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabBadges.setActive()
 
-    def _getTabContent( self, params ):
-        wc = conferences.WConfModifBadgeDesign( self._conf, self.__templateId, self.__new )
+    def _getTabContent(self, params):
+        wc = conferences.WConfModifBadgeDesign(self._conf, self.__templateId, self.__new)
         return wc.getHTML()
 
-class WPPosterTemplateDesign( WPTemplatesCommon ):
 
-    def __init__(self, rh, conf, templateId = None, new = False):
+class WPPosterTemplateDesign(WPTemplatesCommon):
+
+    def __init__(self, rh, conf, templateId=None, new=False):
         WPTemplatesCommon.__init__(self, rh)
         self._conf = conf
         self.__templateId = templateId
         self.__new = new
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabPosters.setActive()
 
-    def _getTabContent( self, params ):
-        wc = conferences.WConfModifPosterDesign( self._conf, self.__templateId, self.__new )
+    def _getTabContent(self, params):
+        wc = conferences.WConfModifPosterDesign(self._conf, self.__templateId, self.__new)
         return wc.getHTML()
 
-class WBadgeTemplates( wcomponents.WTemplated ):
 
-    def __init__( self, conference, user=None ):
-        self.__conf = conference
-        self._user=user
+class WBadgePosterTemplatingBase(wcomponents.WTemplated):
 
-    def getVars( self ):
+    DEF_TEMPLATE_BADGE = None
 
-        dconf = self.__conf
+    def __init__(self, conference, user=None):
+        wcomponents.WTemplated.__init__(self)
+        self._conf = conference
+        self._user = user
 
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["NewDefaultTemplateURL"] = str(urlHandlers.UHModifDefTemplateBadge.getURL(dconf,
-                                                                             dconf.getBadgeTemplateManager().getNewTemplateId(), new = True))
+    def getVars(self):
+        uh = urlHandlers
+        vars = wcomponents.WTemplated.getVars(self)
+        vars['NewDefaultTemplateURL'] = str(self.DEF_TEMPLATE_BADGE.getURL(self._conf,
+                                                                             self._conf.getBadgeTemplateManager().getNewTemplateId(), new=True))
 
-        templateListHTML = []
-        first = True
-
-
-        sortedTemplates = dconf.getBadgeTemplateManager().getTemplates().items()
-        sortedTemplates.sort(lambda item1, item2: cmp(item1[1].getName(), item2[1].getName()))
-        for templateId, template in sortedTemplates:
-            templateListHTML.append("""              <tr>""")
-            templateListHTML.append("""                <td>""")
-
-            radio = []
-            radio.append("""                  <input type="radio" name="templateId" value='""")
-            radio.append(str(templateId))
-            radio.append("""' id='""")
-            radio.append(str(templateId))
-            radio.append("""'""")
-            if first:
-                first = False
-                radio.append( _(""" CHECKED """))
-            radio.append(""">""")
-            templateListHTML.append("".join(radio))
-            templateListHTML.append("".join (["""                  """,
-                                              """<label for='""",
-                                              str(templateId),
-                                              """'>""",
-                                              template.getName(),
-                                              """</label>""",
-                                              """&nbsp;&nbsp;&nbsp;"""]))
-
-            edit = []
-            edit.append("""                  <a href='""")
-            edit.append(str(urlHandlers.UHConfModifBadgeDesign.getURL(dconf, templateId)))
-            edit.append("""'><img src='""")
-            edit.append(str(Config.getInstance().getSystemIconURL("file_edit")))
-            edit.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(edit))
-
-            delete = []
-            delete.append("""                  <a href='""")
-            delete.append(str(urlHandlers.UHConfModifBadgePrinting.getURL(dconf, deleteTemplateId=templateId)))
-            delete.append("""'><img src='""")
-            delete.append(str(Config.getInstance().getSystemIconURL("smallDelete")))
-            delete.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(delete))
-
-            templateListHTML.append("""                </td>""")
-            templateListHTML.append("""              </tr>""")
-
-        vars["templateList"] = "\n".join(templateListHTML)
-
-        vars['PDFOptions'] = WConfModifBadgePDFOptions(dconf, showKeepValues = False, showTip = False).getHTML()
+        vars['templateList'] = self._getTemplates()
+        self._addExtras(vars)
 
         return vars
 
-class WPosterTemplates( wcomponents.WTemplated ):
+    def _getConfTemplates(self):
+        """
+        To be overridden in inheriting class.
+        """
+        pass
 
-    def __init__( self, conference, user=None ):
-        self.__conf = conference
-        self._user=user
+    def _getTemplates(self):
+        templates = []
+        rawTemplates = self._getConfTemplates()
+        rawTemplates.sort(lambda x, y: cmp(x[1].getName(), y[1].getName()))
 
-    def getVars( self ):
+        for templateId, template in rawTemplates:
+            templates.append(self._processTemplate(templateId, template))
 
-        dconf = self.__conf
+        return templates
 
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["NewDefaultTemplateURL"] = str(urlHandlers.UHModifDefTemplatePoster.getURL(dconf,
-                                                                             dconf.getPosterTemplateManager().getNewTemplateId(), new = True))
+    def _addExtras(self, vars):
+        """
+        To be overridden in inheriting class, adds specific entries
+        into the dictionary vars which the child implementation may require.
+        """
+        pass
 
-        templateListHTML = []
-        first = True
+    def _processTemplate(self, templateId, template):
+        """
+        To be overridden in inheriting class, takes the template and its
+        ID, the child then processes the data into the format it expects later.
+        """
+        pass
 
 
-        sortedTemplates = dconf.getPosterTemplateManager().getTemplates().items()
-        sortedTemplates.sort(lambda item1, item2: cmp(item1[1].getName(), item2[1].getName()))
-        for templateId, template in sortedTemplates:
-            templateListHTML.append("""              <tr>""")
-            templateListHTML.append("""                <td>""")
+class WBadgeTemplates(WBadgePosterTemplatingBase):
 
-            radio = []
-            radio.append("""                  <input type="radio" name="templateId" value='""")
-            radio.append(str(templateId))
-            radio.append("""' id='""")
-            radio.append(str(templateId))
-            radio.append("""'""")
-            if first:
-                first = False
-                radio.append( _(""" CHECKED """))
-            radio.append(""">""")
-            templateListHTML.append("".join(radio))
-            templateListHTML.append("".join (["""                  """,
-                                              """<label for='""",
-                                              str(templateId),
-                                              """'>""",
-                                              template.getName(),
-                                              """</label>""",
-                                              """&nbsp;&nbsp;&nbsp;"""]))
+    DEF_TEMPLATE_BADGE = urlHandlers.UHModifDefTemplateBadge
 
-            edit = []
-            edit.append("""                  <a href='""")
-            edit.append(str(urlHandlers.UHConfModifPosterDesign.getURL(dconf, templateId)))
-            edit.append("""'><img src='""")
-            edit.append(str(Config.getInstance().getSystemIconURL("file_edit")))
-            edit.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(edit))
+    def _addExtras(self, vars):
+        vars['PDFOptions'] = WConfModifBadgePDFOptions(self._conf,
+                                                       showKeepValues=False,
+                                                       showTip=False).getHTML()
 
-            delete = []
-            delete.append("""                  <a href='""")
-            delete.append(str(urlHandlers.UHConfModifPosterPrinting.getURL(dconf, deleteTemplateId=templateId)))
-            delete.append("""'><img src='""")
-            delete.append(str(Config.getInstance().getSystemIconURL("smallDelete")))
-            delete.append("""' border='0'></a>&nbsp;""")
-            clone = []
-            clone.append("""                  <a href='""")
-            clone.append(str(urlHandlers.UHConfModifPosterPrinting.getURL(dconf, copyTemplateId=templateId)))
-            clone.append("""'><img src='""")
-            clone.append(str(Config.getInstance().getSystemIconURL("smallCopy")))
-            clone.append("""' border='0'></a>&nbsp;""")
-            templateListHTML.append("".join(delete))
-            templateListHTML.append("".join(clone))
+    def _getConfTemplates(self):
+        return self._conf.getBadgeTemplateManager().getTemplates().items()
 
-            templateListHTML.append("""                </td>""")
-            templateListHTML.append("""              </tr>""")
+    def _processTemplate(self, templateId, template):
+        uh = urlHandlers
 
-        vars["templateList"] = "\n".join(templateListHTML)
+        data = {
+            'name': template.getName(),
+            'urlEdit': str(uh.UHConfModifBadgeDesign.getURL(self._conf, templateId)),
+            'urlDelete': str(uh.UHConfModifBadgePrinting.getURL(self._conf, deleteTemplateId=templateId))
+        }
 
-        return vars
+        return data
+
+
+class WPosterTemplates(WBadgePosterTemplatingBase):
+
+    DEF_TEMPLATE_BADGE = urlHandlers.UHModifDefTemplatePoster
+
+    def _getConfTemplates(self):
+        return self._conf.getPosterTemplateManager().getTemplates().items()
+
+    def _processTemplate(self, templateId, template):
+        uh = urlHandlers
+
+        data = {
+            'name': template.getName(),
+            'urlEdit': str(uh.UHConfModifPosterDesign.getURL(self._conf, templateId)),
+            'urlDelete': str(uh.UHConfModifPosterPrinting.getURL(self._conf, deleteTemplateId=templateId)),
+            'urlCopy': str(uh.UHConfModifPosterPrinting.getURL(self._conf, copyTemplateId=templateId))
+        }
+
+        return data
 
 
 class WPUsersAndGroupsCommon(WPAdminsBase):
@@ -1064,15 +1021,15 @@ class WPUsersAndGroupsCommon(WPAdminsBase):
     def _setActiveSideMenuItem(self):
         self._usersAndGroupsMenuItem.setActive()
 
-    def _createTabCtrl( self ):
+    def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabMain = self._tabCtrl.newTab( "main", _("Main"), \
-                urlHandlers.UHUserManagement.getURL() )
-        self._subTabUsers = self._tabCtrl.newTab( "users", _("Manage Users"), \
-                urlHandlers.UHUsers.getURL() )
-        self._subTabGroups = self._tabCtrl.newTab( "groups", _("Manage Groups"), \
-                urlHandlers.UHGroups.getURL() )
+        self._subTabMain = self._tabCtrl.newTab("main", _("Main"), \
+                urlHandlers.UHUserManagement.getURL())
+        self._subTabUsers = self._tabCtrl.newTab("users", _("Manage Users"), \
+                urlHandlers.UHUsers.getURL())
+        self._subTabGroups = self._tabCtrl.newTab("groups", _("Manage Groups"), \
+                urlHandlers.UHGroups.getURL())
 
     def _getPageContent(self, params):
 
@@ -1081,7 +1038,7 @@ class WPUsersAndGroupsCommon(WPAdminsBase):
         #else:
         #    html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
 
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
 
     #def _getBody(self, params):
     #    if self._showAdmin:
@@ -1089,80 +1046,94 @@ class WPUsersAndGroupsCommon(WPAdminsBase):
     #    else:
     #        return self._getTabContent( params )
 
-class WUserManagement( wcomponents.WTemplated ):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+class WUserManagement(wcomponents.WTemplated):
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
-        iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
+        iconDisabled = str(Config.getInstance().getSystemIconURL("disabledSection"))
+        iconEnabled = str(Config.getInstance().getSystemIconURL("enabledSection"))
         vars["accountCreationData"] = ""
         url = urlHandlers.UHUserManagementSwitchAuthorisedAccountCreation.getURL()
+
         if minfo.getAuthorisedAccountCreation():
             icon = iconEnabled
         else:
             icon = iconDisabled
+
         vars["accountCreationData"] += i18nformat("""<a href="%s"><img src="%s" border="0"> _("Public Account Creation")</a>""") % (str(url), icon)
         url = urlHandlers.UHUserManagementSwitchNotifyAccountCreation.getURL()
+
         if minfo.getNotifyAccountCreation():
             icon = iconEnabled
         else:
             icon = iconDisabled
+
         vars["accountCreationData"] += i18nformat("""<br><a href="%s"><img src="%s" border="0"> _("Notify Account Creation by Email")</a>""") % (str(url), icon)
         url = urlHandlers.UHUserManagementSwitchModerateAccountCreation.getURL()
+
         if minfo.getModerateAccountCreation():
             icon = iconEnabled
         else:
             icon = iconDisabled
+
         vars["accountCreationData"] += i18nformat("""<br><a href="%s"><img src="%s" border="0"> _("Moderate Account Creation")</a>""") % (str(url), icon)
         vars["moderators"] = ""
         vars["moderatorsURL"] = ""
+
         return vars
 
 
-class WPUserManagement( WPUsersAndGroupsCommon ):
+class WPUserManagement(WPUsersAndGroupsCommon):
     pageURL = "userManagement.py"
 
     def __init__(self, rh, params):
         WPUsersAndGroupsCommon.__init__(self, rh)
         self._params = params
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         wp = WUserManagement()
         return wp.getHTML(self._params)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabMain.setActive()
 
-class WPUserCommon( WPUsersAndGroupsCommon ):
 
-    def _setActiveTab( self ):
+class WPUserCommon(WPUsersAndGroupsCommon):
+
+    def _setActiveTab(self):
         self._subTabUsers.setActive()
 
-class WBrowseUsers( wcomponents.WTemplated ):
 
-    def __init__( self, letter=None, browseIndex="surName" ):
+class WBrowseUsers(wcomponents.WTemplated):
+
+    def __init__(self, letter=None, browseIndex="surName"):
         self._letter = letter
         self._browseIndex = browseIndex
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         nameIndex = indexes.IndexesHolder().getById(self._browseIndex)
         letters = nameIndex.getBrowseIndex()
         vars["browseIndex"] = """
         <span class="nav_border"><a class="nav_link" href='' onClick="document.browseForm.letter.value='clear';document.browseForm.submit();return false;">clear</a></span>"""
+
         if self._letter == "all":
             vars["browseIndex"] += """
         [all] """
         else:
             vars["browseIndex"] += """
         <span class="nav_border"><a class="nav_link" href='' onClick="document.browseForm.letter.value='all';document.browseForm.submit();return false;">all</a></span> """
+
         for letter in letters:
             if self._letter == letter:
                 vars["browseIndex"] += """\n[%s] """ % letter
             else:
-                vars["browseIndex"] += """\n<span class="nav_border"><a class="nav_link" href='' onClick="document.browseForm.letter.value='%s';document.browseForm.submit();return false;">%s</a></span> """ % (escape(letter,True),letter)
+                vars["browseIndex"] += """\n<span class="nav_border"><a class="nav_link" href='' onClick="document.browseForm.letter.value='%s';document.browseForm.submit();return false;">%s</a></span> """ % (escape(letter, True), letter)
+
         vars["browseResult"] = ""
+
         if self._letter != None:
             ah = user.AvatarHolder()
             if self._letter != "all":
@@ -1180,89 +1151,101 @@ class WBrowseUsers( wcomponents.WTemplated ):
             else:
                 res.sort()
             vars["browseResult"] = WHTMLUserList(res).getHTML(vars)
+
         return vars
+
 
 class WHTMLUserList(wcomponents.WTemplated):
 
     def __init__(self, userList):
         self._userList = userList
 
-    def getVars( self ):
+    def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        color="white"
+        color = "white"
         ul = []
         vars["userList"] = ""
         ul.append( i18nformat("""
                         <tr>
                             <td bgcolor="white" style="color:black" align="center"><b>%s  _("users")</b></td>
                         </tr>
-                        """)%len(self._userList))
+                        """) % len(self._userList))
+
         for u in self._userList:
-            if color=="white":
-                color="#ececec"
+            if color == "white":
+                color = "#ececec"
             else:
-                color="white"
+                color = "white"
             organisation = ""
             if u.getOrganisation() != "":
                 organisation = " (%s)" % u.getOrganisation()
             email = ""
             if u.getEmail() != "":
                 email = " (%s)" % u.getEmail()
-            url = vars["userDetailsURLGen"]( u )
+            url = vars["userDetailsURLGen"](u)
             name = u.getFullName()
             if name == "":
                 name = "no name"
             ul.append("""<tr>
                             <td bgcolor="%s"><a href="%s">%s</a> %s %s</td>
-                         </tr>"""%(color, url, self.htmlText(name) , self.htmlText(email),self.htmlText(organisation)) )
+                         </tr>""" % (color, url, self.htmlText(name) , self.htmlText(email),self.htmlText(organisation)) )
+
         if ul:
-            vars["userList"] += "".join( ul )
+            vars["userList"] += "".join(ul)
         else:
             vars["userList"] += i18nformat("""<tr>
                             <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No users returned")</span></td></tr>""")
+
         return vars
+
 
 class WUserList(wcomponents.WTemplated):
 
-    def __init__( self, criteria, onlyActivated=True ):
+    def __init__(self, criteria, onlyActivated=True):
         self._criteria = criteria
-        self._onlyActivated=onlyActivated
+        self._onlyActivated = onlyActivated
 
-    def _performSearch( self, criteria ):
+    def _performSearch(self, criteria):
         ah = user.AvatarHolder()
+
         if  criteria["surName"] == "*" or \
-            criteria["name"] =="*" or \
-            criteria["email"] =="*" or \
-            criteria["organisation"] =="*":
-            res=ah.getValuesToList()
+            criteria["name"] == "*" or \
+            criteria["email"] == "*" or \
+            criteria["organisation"] == "*":
+            res = ah.getValuesToList()
         else:
             res = ah.match(criteria, onlyActivated=self._onlyActivated, forceWithoutExtAuth=True)
         res.sort(utils.sortUsersByName)
+
         return res
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         vars["nbUsers"] = indexes.IndexesHolder().getById("email").getLength()
         vars["createUserURL"] = urlHandlers.UHUserCreation.getURL()
         vars["mergeUsersURL"] = urlHandlers.UHUserMerge.getURL()
         vars["searchUsersURL"] = urlHandlers.UHUsers.getURL()
         vars["browseUsersURL"] = urlHandlers.UHUsers.getURL()
         vars["browseOptions"] = ""
-        options = { "surName": _("by last name"),
+        options = {"surName": _("by last name"),
                     "name": _("by first name"),
                     "organisation": _("by affiliation"),
                     "email": _("by email address"),
-                    "status": _("by status") }
+                    "status": _("by status")}
+
         for key in options.keys():
-            if key == vars.get("browseIndex","surName"):
+            if key == vars.get("browseIndex", "surName"):
                 vars["browseOptions"] += """<option value="%s" selected> %s""" % (key, options[key])
             else:
                 vars["browseOptions"] += """<option value="%s"> %s""" % (key, options[key])
-        vars["browseUsers"] = WBrowseUsers(vars.get("letter",None),vars.get("browseIndex","surName")).getHTML(vars)
+
+        vars["browseUsers"] = WBrowseUsers(vars.get("letter", None), vars.get("browseIndex", "surName")).getHTML(vars)
         vars["users"] = ""
+
         if self._criteria:
             userList = self._performSearch(self._criteria)
             vars["users"] = WHTMLUserList(userList).getHTML(vars)
+
         return vars
 
 
@@ -1273,15 +1256,16 @@ class WPUserList(WPUserCommon):
         WPUserCommon.__init__(self, rh)
         self._params = params
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         criteria = {}
         if filter(lambda x: self._params[x], self._params):
-            criteria["surName"] = self._params.get("sSurName","")
-            criteria["name"] = self._params.get("sName","")
-            criteria["email"] = self._params.get("sEmail","")
-            criteria["organisation"] = self._params.get("sOrganisation","")
+            criteria["surName"] = self._params.get("sSurName", "")
+            criteria["name"] = self._params.get("sName", "")
+            criteria["email"] = self._params.get("sEmail", "")
+            criteria["organisation"] = self._params.get("sOrganisation", "")
         comp = WUserList(criteria, onlyActivated=False)
         self._params["userDetailsURLGen"] = urlHandlers.UHUserDetails.getURL
+
         return comp.getHTML(self._params)
 
 
@@ -1290,27 +1274,31 @@ class WPUserCreation(WPUserCommon):
     def __init__(self, rh, params, participation=None):
         WPUserCommon.__init__(self, rh)
         self._params = params
-        self._participation=participation
+        self._participation = participation
 
-    def _getTabContent(self, params ):
+    def _getTabContent(self, params):
         pars = self._params
         p = wcomponents.WUserRegistration()
         pars["defaultLang"] = pars.get("lang", "")
         pars["defaultTZ"] = pars.get("timezone", "")
         pars["defaultTZMode"] = pars.get("displayTZMode", "")
-        pars["postURL"] =  urlHandlers.UHUserCreation.getURL()
+        pars["postURL"] = urlHandlers.UHUserCreation.getURL()
+
         if pars["msg"] != "":
-            pars["msg"] = "<table bgcolor=\"gray\"><tr><td bgcolor=\"white\">\n<font size=\"+1\" color=\"red\"><b>%s</b></font>\n</td></tr></table>"%pars["msg"]
+            pars["msg"] = "<table bgcolor=\"gray\"><tr><td bgcolor=\"white\">\n<font size=\"+1\" color=\"red\"><b>%s</b></font>\n</td></tr></table>" % pars["msg"]
+
         if self._participation is not None:
-            pars["email"]=self._participation.getEmail()
-            pars["name"]=self._participation.getFirstName()
-            pars["surName"]=self._participation.getFamilyName()
-            pars["title"]=self._participation.getTitle()
-            pars["organisation"]=self._participation.getAffiliation()
-            pars["address"]=self._participation.getAddress()
-            pars["telephone"]=self._participation.getPhone()
-            pars["fax"]=self._participation.getFax()
-        return p.getHTML( pars )
+            pars["email"] = self._participation.getEmail()
+            pars["name"] = self._participation.getFirstName()
+            pars["surName"] = self._participation.getFamilyName()
+            pars["title"] = self._participation.getTitle()
+            pars["organisation"] = self._participation.getAffiliation()
+            pars["address"] = self._participation.getAddress()
+            pars["telephone"] = self._participation.getPhone()
+            pars["fax"] = self._participation.getFax()
+
+        return p.getHTML(pars)
+
 
 class WPUserCreationNonAdmin(WPUserCreation):
 
@@ -1320,16 +1308,18 @@ class WPUserCreationNonAdmin(WPUserCreation):
     def _getBody(self, params):
         return WPUserCreation._getTabContent(self, params)
 
-class WPUserCreated( WPUserCommon ):
+
+class WPUserCreated(WPUserCommon):
 
     def __init__(self, rh, av):
         WPUserCommon.__init__(self, rh)
         self._av = av
 
-    def _getTabContent(self, params ):
+    def _getTabContent(self, params):
         p = wcomponents.WUserCreated(self._av)
-        pars = {"signInURL" : urlHandlers.UHSignIn.getURL()}
-        return p.getHTML( pars )
+        pars = {"signInURL": urlHandlers.UHSignIn.getURL()}
+        return p.getHTML(pars)
+
 
 class WPUserCreatedNonAdmin(WPUserCreated):
 

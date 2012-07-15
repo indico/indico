@@ -49,7 +49,7 @@
         this.color = "black";
         this.fontSize = "medium";
         this.width = 400;
-        this.text = "(Double click me to enter your text)" // Only for fixed text items
+        this.text = $T("(Double click me to enter your text)"); // Only for fixed text items
 
         // The following attributes have no meaning to the server
         this.selected = false;
@@ -185,8 +185,13 @@
         // Handle the individual cases as required.
         if (selectedItem.key == "Fixed Text") {
             var text = prompt("Enter fixed-text value", selectedItem.text);
-            selectedItem.text = text;
-            div.html(selectedItem.toHTML());
+
+            if (text) {
+                selectedItem.text = text;
+                div.html(selectedItem.toHTML());
+
+                markSelected(div); // Update the fixed-text field
+            }
         }
     }
 
@@ -569,7 +574,7 @@
         <div id="tabsFormatting">
             <div class="toolbar-container element">
                 <div class="container-title">
-                    ${_('Fonts Settings')}
+                    ${_('Font Settings')}
                 </div>
 
                 ${_('Font')}:

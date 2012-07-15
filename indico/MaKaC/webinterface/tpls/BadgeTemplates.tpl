@@ -2,26 +2,38 @@
   <table class="groupTable" cellpadding="0">
     <tbody>
       <tr>
-        <td colspan="1" class="subgroupTitle">${ _("Badge Default Templates")}</td>
-      </tr>
-      <tr>
         <td class="groupTitle">
-          ${ _("List of default templates")}
+          ${ _("Default Badge Templates")}
           ${inlineContextHelp(_('Templates that will be available for all conferences.') )}
         </td>
       </tr>
 
       <tr>
         <td>
-          <input name="New Template Button" class="btn" value="${ _("New")}" type="button" onClick="location.href='${ NewDefaultTemplateURL }'">
+          <div class="bs-alert bs-alert-info alert-toolbar">
+              <a class="bs-btn bs-btn-right bs-btn-info" href="${ NewDefaultTemplateURL }">${_('Create New Template')}</a>
+              ${_("Click 'Create New Template' to make a new global Badge template for any Indico users to make use of, or you can edit previously saved templates below")}
+            <div class="toolbar-clearer"></div>
+           </div>
         </td>
       </tr>
 
-      <tr>
+      % if templateList:
+      <tr class="trBottomSpacer">
         <td>
-          <table class="gestiontable" width="50%">
+          <table>
             <tbody>
-              ${ templateList }
+              % for template in templateList:
+              <tr>
+                <td>
+                  <a href="${template['urlEdit']}" class='bs-btn bs-btn-mini'>${_('Edit')}</a>
+                  <a href="${template['urlDelete']}" class='bs-btn bs-btn-mini'>${_('Delete')}</a>
+                </td>
+                <td style="padding-left:5px;">
+                  ${template['name']}
+                </td>
+              </tr>
+              % endfor
           </table>
         </td>
       </tr>
@@ -35,10 +47,26 @@
 <form method="post" action="${urlHandlers.UHTemplatesSetDefaultPDFOptions.getURL()}">
      <tr>
        <td>
-         <input name="savePDFOptions" class="btn" value="${ _("Save")}" type="submit">
+        <div class="bs-alert bs-alert-info">
+          <input name="savePDFOptions" class="bs-btn bs-btn-right" value="${ _("Save")}" type="submit">
+        ${_('Once you have modified the default settings, please click save to put the amendments into effect.')}
+        <div class="toolbar-clearer"></div>
+       </div>
        </td>
      </tr>
-      ${ PDFOptions }
-</form>
+    <tr>
+      <td>
+        ${PDFOptions}
+        </form>
+      </td>
+    </tr>
+    % else:
+      <tr>
+        <td>
+          ${_('There are currently no templates saved.')}
+        </td>
+      </tr>
+    % endif
+
     </tbody>
   </table>

@@ -8191,14 +8191,15 @@ class WConfModifBadgePrinting(wcomponents.WTemplated):
 
         wcPDFOptions = WConfModifBadgePDFOptions(self.__conf)
         vars = wcomponents.WTemplated.getVars(self)
-        vars["NewTemplateURL"] = str(uh.UHConfModifBadgeDesign.getURL(self.__conf,
+        vars['NewTemplateURL'] = str(uh.UHConfModifBadgeDesign.getURL(self.__conf,
                                     self.__conf.getBadgeTemplateManager().getNewTemplateId(),new = True))
-        vars["CreatePDFURL"] = str(uh.UHConfModifBadgePrintingPDF.getURL(self.__conf))
-        vars["templateList"] = templates
+        vars['CreatePDFURL'] = str(uh.UHConfModifBadgePrintingPDF.getURL(self.__conf))
+        vars['templateList'] = templates
         vars['PDFOptions'] = wcPDFOptions.getHTML()
         vars['baseTemplates'] = self._getBaseTemplateOptions()
 
         return vars
+
 
 class WConfModifBadgePDFOptions(wcomponents.WTemplated):
 
@@ -8213,7 +8214,6 @@ class WConfModifBadgePDFOptions(wcomponents.WTemplated):
         pagesizeNames = PDFSizes().PDFpagesizes.keys()
         pagesizeNames.sort()
         vars['PagesizeNames'] = pagesizeNames
-
         vars['PDFOptions'] = self.__conf.getBadgeTemplateManager().getPDFOptions()
         vars['ShowKeepValues'] = self.__showKeepValues
         vars['ShowTip'] = self.__showTip
@@ -8242,24 +8242,24 @@ class WPConfModifBadgePrinting(WPConfModifToolsBase):
 """
 Badge Design classes
 """
-class WConfModifBadgeDesign( wcomponents.WTemplated ):
+class WConfModifBadgeDesign(wcomponents.WTemplated):
     """ This class corresponds to the screen where a template
         is designed inserting, dragging and editing items.
     """
 
-    def __init__( self, conference, templateId, new = False, user = None ):
+    def __init__(self, conference, templateId, new=False, user=None):
         self.__conf = conference
         self.__templateId = templateId
         self.__new = new
-        self._user=user
+        self._user = user
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["baseURL"]=Config.getInstance().getBaseURL() ##base url of the application, used for the ruler images
-        vars["cancelURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, templateId = self.__templateId, cancel = True)
-        vars["saveBackgroundURL"]=urlHandlers.UHConfModifBadgeSaveBackground.getURL(self.__conf, self.__templateId)
-        vars["loadingIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
-        vars["templateId"]=self.__templateId
+        vars["baseURL"] = Config.getInstance().getBaseURL() ##base url of the application, used for the ruler images
+        vars["cancelURL"] = urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, templateId = self.__templateId, cancel = True)
+        vars["saveBackgroundURL"] = urlHandlers.UHConfModifBadgeSaveBackground.getURL(self.__conf, self.__templateId)
+        vars["loadingIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("loading")))
+        vars["templateId"] = self.__templateId
 
         badgeDesignConfiguration = BadgeDesignConfiguration()
         from MaKaC.services.interface.rpc.json import encode as jsonEncode
@@ -8435,7 +8435,8 @@ class WConfModifPosterPrinting(wcomponents.WTemplated):
 
             for id, template in templates.iteritems():
                 pKey = ' (' + key + ')'
-                newList.append({'value': id, 'label': template.getName() + pKey})
+                newList.append({'value': key + str(id),
+                                'label': template.getName() + pKey})
 
             return newList
 

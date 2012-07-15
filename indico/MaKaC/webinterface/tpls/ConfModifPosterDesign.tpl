@@ -2,7 +2,7 @@
     var snapToGrid = false;
 
     // "Zoom factor" - the size of the document, related to reality
-    var zoom_factor = 0.5
+    var zoom_factor = 0.5;
 
     // Dimensions of the template space, in pixels
     var templateDimensions;
@@ -37,6 +37,9 @@
     // List of poster template items
     var items = [];
 
+    // Pointer for the jQuery-UI tabs later
+    var controlTabs = null
+
     // Item class
     function Item(itemId, key) {
         this.id = itemId;
@@ -50,7 +53,7 @@
         this.color = "black";
         this.fontSize = "25pt";
         this.width = 400;
-        this.text = "(Type your text)" // Only for fixed text items
+        this.text = $T("(Double click me to enter your text)") // Only for fixed text items
 
         // The following attributes have no meaning to the server
         this.selected = false;
@@ -144,6 +147,9 @@
         var id = newSelectedDiv.attr('id');
         $('#selection_text').html(translate[items[id].key]);
 
+        // Bring highlight to the element modification tab.
+        if (controlTabs) controlTabs.tabs('select', 1);
+
         // TODO: add check to see if there's a table inside and not an image
 
         // Change the background color of the old selected item and the new selected item
@@ -172,6 +178,23 @@
         } else {
             $('#fixed_text_field').val("").prop('disabled', true);
             $('#changeText').prop('disabled', true);
+        }
+    }
+
+    function inlineEdit(div) {
+        var id = div.attr('id');
+        var selectedItem = items[id];
+
+        // Handle the individual cases as required.
+        if (selectedItem.key == "Fixed Text") {
+            var text = prompt("Enter fixed-text value", selectedItem.text);
+
+            if (text) {
+                selectedItem.text = text;
+                div.html(selectedItem.toHTML());
+
+                markSelected(div); // Update the fixed-text field
+            }
         }
     }
 
@@ -491,6 +514,11 @@
             markSelected($(this));
         });
 
+        // Handle double clicking on elements
+        $('#templateDiv > div').live('dblclick', function() {
+            inlineEdit($(this));
+        });
+
         // toggle grid/snap mode
         $('#snap_checkbox').change(function() {
             snapToGrid = this.checked;
@@ -558,109 +586,192 @@
             e.preventDefault();
             save();
         });
+
+        controlTabs = $('#controlTabs').tabs();
     });
 </script>
 
 
 <div style="width:100%">
-  <br/>
+    <div class="groupTitle">
+        ${titleMessage}
+    </div>
 
-  <table class="groupTable" cellpadding="0">
-    <tbody>
-      <tr>
-        <td class="groupTitle" colspan="6">${ titleMessage }</td>
-      </tr>
-      <tr>
-        <td class="titleCellTD">
-          <span class="titleCellFormat">${_("Name")}</span>
-        </td>
-        <td colspan="5">
-          <input id="template_name" size="50" name="Template Name">
-        </td>
-      </tr>
-      <tr>
-        <td class="titleCellTD">
-          <span class="titleCellFormat">${_("Background")}</span>
-        </td>
-        <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data">
-        <td height="20px" NOWRAP align="left" colspan="3">
-          <input name="file" size="58" type="file">
-          <input class="btn" value="${_("Send File")}" type="submit">
-          <input class="btn" type="button" value="${_("Remove background")}" id="removeBackground">
-        </td>
-        <td width="100%" align="left" colspan="4">
-          <img id="loadingIcon" src=${ loadingIconURL } width="20px" height="20px" style="display:none;">
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
-            <table>
-              <tbody>
-                <tr><td>
-                          <input checked type="radio" id="bgPosStretch" name ='bgPosition' value="Stretch">
-                          <label>${_("Stretch")}</label>
-                    </td>
-                    <td>
-                        <input type='radio' id="bgPosCenter" name ='bgPosition' value="Center">
-                        <label>${_("Center")}</label>
-                </td></tr>
-              </tbody>
-            </table>
-        </form>
-        </td>
-        <td></td>
-      </tr>
-      <tr>
-        <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat">${_("Poster Width (cm)")}&nbsp;</span>
-        </td>
-        <td>
-           <input id="poster_width" name="Poster Width" size="5">
-        </td>
-        <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat">${_("Poster Height (cm)")}&nbsp;</span>
-        </td>
-        <td>
-          <input id="poster_height" name="Poster Height" size="5">
-          <input class="btn" value="${ _("Change")}" type="button" id="changeTemplateSize">
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<!-- Save Document Options -->
+    <div class="bs-alert bs-alert-info alert-toolbar">
+      ${_('Once you have finished designing, you may either save or discard your changes here.')}
+      <div style="float:right;">
+          <input class="bs-btn bs-btn-small bs-btn-info" name="Save Template Button" value="${ _("Save Template")}" type="button" id="saveButton" />
+          <input class="bs-btn bs-btn-small bs-btn-info" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'" />
 
-  <br/>
+          <form id="saveForm" action="${saveTemplateURL}" method="POST">
+              <input name="templateId" value="${templateId}" type="hidden">
+              <input id="templateData" name="templateData" type="hidden">
+          </form>
+      </div>
+      <div class="toolbar-clearer"></div>
+    </div>
+
+    <!-- Tabulated controls -->
+    <div id="controlTabs">
+        <ul>
+            <li><a href="#tabsGeneral">${_('General Settings &amp; Layout')}</a></li>
+            <li><a href="#tabsFormatting">${_('Element Formatting')}</a></li>
+        </ul>
+
+        <!-- Tab for poster paramaters -->
+        <div id="tabsGeneral">
+            <div class="toolbar-container element">
+                <div class="container-title">
+                    ${_('Poster Settings')}
+                </div>
+                ${_('Poster Name')}:
+                <br />
+                <input id="template_name" size="30" name="Template Name">
+                <br />
+                ${ _("Background")}:
+                <br />
+                <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data">
+                  <input name="file" size="58" type="file">
+                  <br />
+                  <input class="btn" value="${ _("Upload")}" type="submit">
+                  <input class="btn" type="button" value="${ _("Remove Background")}" id="removeBackground">
+                  <img id="loadingIcon" src=${loadingIconURL} width="20px" height="20px" style="display:none;">
+                  <br />
+                    <label>${_("Stretch")}</label>
+                    <input checked type="radio" id="bgPosStretch" name='bgPosition' value="Stretch">
+                    <label>${_("Center")}</label>
+                    <input type='radio' id="bgPosCenter" name='bgPosition' value="Center">
+                  </form>
+            </div>
+            <div class="toolbar-container element">
+                <div class="container-title">
+                    ${_('Poster Layout')}
+                </div>
+                Dimensions are in cm, decimals are allowed.
+                <br />
+                ${_('Poster Width')}: <input id="poster_width" name="Poster Width" size="5">
+                <br />
+                ${_('Poster Height')}:<input id="poster_height" name="Poster Height" size="5">
+                <br />
+
+                  <input class="bs-btn bs-btn-small" value="${ _("Update Dimensions")}" type="button" id="changeTemplateSize">
+            </div>
+        </div>
+        <!-- Tab for element formatting -->
+        <div id="tabsFormatting">
+            <div class="toolbar-container element">
+                <div class="container-title">
+                    ${_('Font Settings')}
+                </div>
+
+                ${_('Font')}:
+                    <!-- Font Face -->
+                    <select id='font_selector' name="Template Element Font" class="attrSelect" data-attr="font">
+                        <optgroup label="${ _('Normal Fonts') }">
+                          <option>Times New Roman</option>
+                          <option>Courier</option>
+                          <option>Sans</option>
+                        </optgroup>
+                        <optgroup label="${ _('Special Character Fonts') }">
+                          <option>LinuxLibertine</option>
+                          <option>Kochi-Mincho</option>
+                          <option>Kochi-Gothic</option>
+                          <option>Uming-CN</option>
+                        </optgroup>
+                      </select>
+                      <!-- Font Colour -->
+                      <select id='color_selector' name="Template Element Color" class="attrSelect" data-attr="color">
+                        <option value="black"> ${ _("black")}</option>
+                        <option value="red"> ${ _("red")}</option>
+                        <option value="blue"> ${ _("blue")}</option>
+                        <option value="green"> ${ _("green")}</option>
+                        <option value="yellow"> ${ _("yellow")}</option>
+                        <option value="brown"> ${ _("brown")}</option>
+                        <option value="gold"> ${ _("gold")}</option>
+                        <option value="pink"> ${ _("pink")}</option>
+                        <option value="gray"> ${ _("gray")}</option>
+                        <option value="white"> ${ _("white")}</option>
+                      </select>
+                      <!-- Font Style -->
+                        <select id='style_selector' name="Template Element Style" class="attrSelect" data-attr="style">
+                            <option value="normal"> ${ _("Normal")}</option>
+                            <option value="bold"> ${ _("Bold")}</option>
+                            <option value="italic"> ${ _("Italic")}</option>
+                            <option value="bold_italic"> ${ _("Bold &amp; Italic")}</option>
+                          </select>
+                        <!-- Font Size -->
+                          <select id='size_selector' name="Template Element Size" class="attrSelect" data-attr="size">
+                            <option>160pt</option>
+                            <option>150pt</option>
+                            <option>140pt</option>
+                            <option>130pt</option>
+                            <option>120pt</option>
+                            <option>110pt</option>
+                            <option>100pt</option>
+                            <option>90pt</option>
+                            <option>80pt</option>
+                            <option>70pt</option>
+                            <option>60pt</option>
+                            <option>50pt</option>
+                            <option>40pt</option>
+                            <option SELECTED>30pt</option>
+                            <option>20pt</option>
+                            <option>15pt</option>
+                            <option>12pt</option>
+                            <option>10pt</option>
+                            <option>8pt</option>
+                          </select>
+                          <!-- Font Alignment -->
+                        <select id='alignment_selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
+                            <!-- Note: the value of the options is used directly in the style attribute of the items -->
+                            <option value="Left"> ${ _("Left")}</option>
+                            <option value="Right"> ${ _("Right")}</option>
+                            <option value="Center"> ${ _("Center")}</option>
+                            <option value="Justified"> ${ _("Justified")}</option>
+                          </select>
+
+                </div>
+                <div class="toolbar-container element">
+                    <div class="container-title">
+                        ${_('Element Adjustments')}
+                    </div>
+                    <!-- Width -->
+                    Width: <input id="width_field" size="5" name="Element Size">
+                          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="width">
+                    <!-- Text for fixed text -->
+                      Fixed Text: <input id="fixed_text_field" size="30" name="Element Size" disabled="disabled">
+                          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="text" id="changeText" disabled="disabled">
+                </div>
+        </div>
+        <!-- End of formatting tab -->
+        <div class="toolbar-clearer"></div>
+    </div>
+
 
   <table class="groupTable" cellpadding="0" cellspacing="0">
-
     <tbody>
-
       <tr>
-
         <td width="200" rowspan="2" valign="top"> <!-- Width attribute necessary so that the template design space doesn't move depending on selection text-->
-          <span class="titleCellFormat">${_("Elements")}</span>
+        <!-- Insert Elements -->
+        <div class="toolbar-container element">
+            <div class="container-title">${_('Insert Elements')}</div>
+              <select name="Template Elements List" id="elementList">
+                ${selectOptions}
+              </select>
+            <input name="insertButton" id="insertButton" class="bs-btn bs-btn-mini" value="${ _("Insert")}" type="button">
+        </div>
+        <!-- Modify Selected Element -->
+        <div class="toolbar-container element">
+            <div class="container-title">${_('Modify Element Placement')}</div>
+            <div id="currSelected">
+                ${ _("Currently Selected")}: <span id="selection_text"></span>
+            </div>
+            <input name="removeButton" id="removeButton" class="bs-btn bs-btn-primary bs-btn-mini bs-btn-fit" value="${ _("Remove Element From Poster")}" type="button" disabled="disabled">
+        </div>
 
-          <br/><br/>
-
-          <input name="insertButton" id="insertButton" class="btn" value="${ _("Insert")}" type="button">
-          <input name="removeButton" id="removeButton" class="btn" value="${ _("Remove")}" type="button" disabled="disabled">
-
-          <br/><br/>
-
-          <select name="Template Elements List" id="elementList">
-            ${ selectOptions }
-          </select>
-
-          <br/>
-          <br/>
-
-          ${ _("Selection")}: <span id="selection_text"></span>
-          <br/><br/>
-
-          ${ _("Position")}:
-          <br/>
-
-          <table>
+           ${ _("Position")}:
+          <table width="90%">
             <tbody>
               <tr>
                 <td></td>
@@ -690,13 +801,9 @@
               <tr>
             </tbody>
           </table>
-
           <input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">${ _("Snap to grid")}</label>
-
         </td>
-
         <td></td>
-
         <td align="left" valign="bottom" height="22"> <!-- height of the horizontal ruler images -->
           <div id="horizontal_ruler" style="position: relative; height: 5px; top: -6px;">
           </div>
@@ -713,7 +820,9 @@
           <div id="templateDiv" style="width:525px;height:742px;position:relative;left:0px;top:0px">
             <table border="1" width="100%" height="100%" cellspacing="0" cellpadding="0">
               <tbody>
-                <tr><td></td></tr>
+                <tr>
+                    <td></td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -722,161 +831,7 @@
     </tbody>
   </table>
 
-  <br/>
-
-  <table class="groupTable" cellpadding="0" cellspacing="0">
-
-    <tbody>
-
-      <tr>
-        <td colspan="3" rowspan="1" class="titleCellFormat">${ _("Attributes")}</td>
-        <td></td>
-        <td></td>
-      </tr>
-
-      <tr>
-
-       <td class="titleCellTD">
-          <span class="titleCellFormat">${ _("Font")}&nbsp;</span>
-       </td>
-
-        <td colspan="2">
-          <select id='font_selector' name="Template Element Font" class="attrSelect" data-attr="font">
-            <optgroup label="${ _('Normal Fonts') }">
-              <option>Times New Roman</option>
-              <option>Courier</option>
-              <option>Sans</option>
-            </optgroup>
-            <optgroup label="${ _('Special Character Fonts') }">
-              <option>LinuxLibertine</option>
-              <option>Kochi-Mincho</option>
-              <option>Kochi-Gothic</option>
-              <option>Uming-CN</option>
-              <!--<option>Bitstream Cyberbit</option>-->
-            </optgroup>
-          </select>
-        </td>
-
-        <td class="titleCellTD">
-          <span class="titleCellFormat">${ _("Color")}&nbsp;</span>
-        </td>
-
-        <td width="100%">
-          <select id='color_selector' name="Template Element Color" class="attrSelect" data-attr="color">
-            <option value="black"> ${ _("black")}</option>
-            <option value="red"> ${ _("red")}</option>
-            <option value="blue"> ${ _("blue")}</option>
-            <option value="green"> ${ _("green")}</option>
-            <option value="yellow"> ${ _("yellow")}</option>
-            <option value="brown"> ${ _("brown")}</option>
-            <option value="gold"> ${ _("gold")}</option>
-            <option value="pink"> ${ _("pink")}</option>
-            <option value="gray"> ${ _("gray")}</option>
-            <option value="white"> ${ _("white")}</option>
-          </select>
-        </td>
-
-      </tr>
-
-      <tr>
-
-        <td class="titleCellTD">
-          <span class="titleCellFormat">${ _("Style")}&nbsp;</span>
-        </td>
-
-        <td colspan="2">
-          <select id='style_selector' name="Template Element Style" class="attrSelect" data-attr="style">
-            <option value="normal"> ${ _("Normal")}</option>
-            <option value="bold"> ${ _("Bold")}</option>
-            <option value="italic"> ${ _("Italic")}</option>
-            <option value="bold_italic"> ${ _("Bold &amp; Italic")}</option>
-          </select>
-        </td>
-
-        <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Size")}&nbsp;</span>
-        </td>
-
-        <td width="100%">
-          <select id='size_selector' name="Template Element Size" class="attrSelect" data-attr="size">
-            <option>160pt</option>
-            <option>150pt</option>
-            <option>140pt</option>
-            <option>130pt</option>
-            <option>120pt</option>
-            <option>110pt</option>
-            <option>100pt</option>
-            <option>90pt</option>
-            <option>80pt</option>
-            <option>70pt</option>
-            <option>60pt</option>
-            <option>50pt</option>
-            <option>40pt</option>
-            <option SELECTED>30pt</option>
-            <option>20pt</option>
-            <option>15pt</option>
-            <option>12pt</option>
-            <option>10pt</option>
-            <option>8pt</option>
-          </select>
-        </td>
-      </tr>
-
-      <tr>
-        <td class="titleCellTD">
-          <span class="titleCellFormat">${ _("Alignment")}&nbsp;</span>
-        </td>
-        <td colspan="2">
-          <select id='alignment_selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
-            <!-- Note: the value of the options is used directly in the style attribute of the items -->
-            <option value="Left"> ${ _("Left")}</option>
-            <option value="Right"> ${ _("Right")}</option>
-            <option value="Center"> ${ _("Center")}</option>
-            <option value="Justified"> ${ _("Justified")}</option>
-          </select>
-        </td>
-        <td class="titleCellTD">
-          <span class="titleCellFormat">${ _("Width (cm)")}&nbsp;</span>
-        </td>
-        <td width="100%">
-          <input id="width_field" size="5" name="Element Size">
-          <input class="btn attrButton" value="Change" type="button" data-attr="width">
-        </td>
-      </tr>
-      <tr>
-        <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat">${ _("Text (for Fixed Text)")}&nbsp;</span>
-        </td>
-        <td>
-          <input id="fixed_text_field" size="30" name="Element Size" disabled="disabled">
-        </td>
-        <td>
-          <input class="btn attrButton" id="changeText" value="${ _("Change")}" type="button" data-attr="text" disabled="disabled" />
-        </td>
-        <td></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <br/>
-  <table class="groupTable">
-    <tbody>
-      <tr>
-        <td colspan="4" align="center" width="100%">
-          <input class="btn" name="Save Template Button" value="${ _("Save")}" type="button" id="saveButton">
-          <input class="btn" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'">
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <form id="saveForm" action="${ saveTemplateURL }" method="POST">
-      <input name="templateId" value="${ templateId }" type="hidden">
-      <input id="templateData" name="templateData" type="hidden">
-  </form>
-
   <script type="text/javascript">
-
     // We load the template if we are editing a template
     if (${ editingTemplate }) {
         var template = ${ templateData };
