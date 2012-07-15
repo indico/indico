@@ -2166,7 +2166,7 @@ class WConfModifACSessionCoordinatorRights(wcomponents.WTemplated):
 
 class WConfModifAC:
 
-    def __init__( self, conference, eventType, user ):
+    def __init__(self, conference, eventType, user):
         self.__conf = conference
         self._eventType = eventType
         self.__user = user
@@ -2181,70 +2181,71 @@ class WConfModifAC:
         mc = wcomponents.WConfModificationControlFrame().getHTML( self.__conf) + "<br>"
 
         if self._eventType == "conference":
-            rc = wcomponents.WConfRegistrarsControlFrame().getHTML( self.__conf) + "<br>"
+            rc = wcomponents.WConfRegistrarsControlFrame().getHTML(self.__conf) + "<br>"
         else:
             rc = ""
 
-        tf=""
-        if self._eventType in ["conference","meeting"]:
+        tf = ""
+        if self._eventType in ["conference", "meeting"]:
             tf = "<br>%s" % wcomponents.WConfProtectionToolsFrame(self.__conf).getHTML()
-        cr=""
+        cr = ""
         if self._eventType == "conference":
-            cr = "<br>%s"%WConfModifACSessionCoordinatorRights(self.__conf).getHTML()
+            cr = "<br>%s" % WConfModifACSessionCoordinatorRights(self.__conf).getHTML()
 
-        return """<br><table width="100%%" class="ACtab"><tr><td>%s%s%s%s%s%s<br></td></tr></table>"""%( mc, rc, ac, dc, tf, cr )
+        return """<br><table width="100%%" class="ACtab"><tr><td>%s%s%s%s%s%s<br></td></tr></table>""" % (mc, rc, ac, dc, tf, cr)
 
 
-class WPConfModifAC( WPConferenceModifBase ):
+class WPConfModifAC(WPConferenceModifBase):
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
-        self._eventType="conference"
+        self._eventType = "conference"
         if self._rh.getWebFactory() is not None:
-            self._eventType=self._rh.getWebFactory().getId()
+            self._eventType = self._rh.getWebFactory().getId()
         self._user = self._rh._getUser()
 
-    def _setActiveSideMenuItem( self ):
+    def _setActiveSideMenuItem(self):
         self._ACMenuItem.setActive()
 
-    def _getPageContent( self, params ):
-        wc = WConfModifAC( self._conf, self._eventType, self._user )
+    def _getPageContent(self, params):
+        wc = WConfModifAC(self._conf, self._eventType, self._user)
         import MaKaC.webinterface.rh.conferenceModif as conferenceModif
         p = {
             "setVisibilityURL": urlHandlers.UHConfSetVisibility.getURL()
             }
-        return wc.getHTML( p )
+        return wc.getHTML(p)
 
-#---------------------------------------------------------------------------
 
-class WConfModifTools( wcomponents.WTemplated ):
+class WConfModifTools(wcomponents.WTemplated):
 
-    def __init__( self, conference, user=None ):
+    def __init__(self, conference, user=None):
         self.__conf = conference
-        self._user=user
+        self._user = user
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["offlsiteMsg"]=""
-        vars["dvdURL"]=quoteattr(str(urlHandlers.UHConfDVDCreation.getURL(self.__conf)))
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["offlsiteMsg"] = ""
+        vars["dvdURL"] = quoteattr(str(urlHandlers.UHConfDVDCreation.getURL(self.__conf)))
+
         if self._user is None:
-            vars["offlsiteMsg"]= _("(Please, login if you want to apply for your Offline Website)")
-            vars["dvdURL"]=quoteattr("")
+            vars["offlsiteMsg"] = _("(Please, login if you want to apply for your Offline Website)")
+            vars["dvdURL"] = quoteattr("")
+
         vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
         vars["cloneIconURL"] = Config.getInstance().getSystemIconURL("clone")
-        vars["matPkgIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("materialPkg")))
-        vars["matPkgURL"]=quoteattr(str(urlHandlers.UHConfModFullMaterialPackage.getURL(self.__conf)))
-        vars["dvdIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("dvd")))
-        vars["closeIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("closeIcon")))
-        vars["closeURL"]=quoteattr(str(urlHandlers.UHConferenceClose.getURL(self.__conf)))
-        vars["alarmURL"]=quoteattr(str(urlHandlers.UHConfDisplayAlarm.getURL(self.__conf)))
-        vars["alarmIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("alarmIcon")))
-        vars["badgePrintingURL"]=quoteattr(str(urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)))
-        vars["badgeIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("badge")))
+        vars["matPkgIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("materialPkg")))
+        vars["matPkgURL"] = quoteattr(str(urlHandlers.UHConfModFullMaterialPackage.getURL(self.__conf)))
+        vars["dvdIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("dvd")))
+        vars["closeIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("closeIcon")))
+        vars["closeURL"] = quoteattr(str(urlHandlers.UHConferenceClose.getURL(self.__conf)))
+        vars["alarmURL"] = quoteattr(str(urlHandlers.UHConfDisplayAlarm.getURL(self.__conf)))
+        vars["alarmIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("alarmIcon")))
+        vars["badgePrintingURL"] = quoteattr(str(urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)))
+        vars["badgeIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("badge")))
         return vars
 
 
-class WPConfModifToolsBase( WPConferenceModifBase ):
+class WPConfModifToolsBase(WPConferenceModifBase):
 
     def _setActiveSideMenuItem(self):
         self._toolsMenuItem.setActive()
@@ -2252,22 +2253,22 @@ class WPConfModifToolsBase( WPConferenceModifBase ):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._tabAlarms = self._tabCtrl.newTab( "alarms", _("Alarms"), \
-                urlHandlers.UHConfDisplayAlarm.getURL(self._conf) )
-        self._tabCloneEvent = self._tabCtrl.newTab( "clone", _("Clone Event"), \
-                urlHandlers.UHConfClone.getURL( self._conf ) )
-        self._tabPosters = self._tabCtrl.newTab( "posters", _("Posters"), \
-                urlHandlers.UHConfModifPosterPrinting.getURL(self._conf) )
-        self._tabBadges = self._tabCtrl.newTab( "badges", _("Badges/Tablesigns"), \
-                urlHandlers.UHConfModifBadgePrinting.getURL(self._conf) )
-        self._tabClose = self._tabCtrl.newTab( "close", _("Lock"), \
-                urlHandlers.UHConferenceClose.getURL( self._conf ) )
-        self._tabDelete = self._tabCtrl.newTab( "delete", _("Delete"), \
-                urlHandlers.UHConfDeletion.getURL(self._conf) )
-        self._tabMatPackage = self._tabCtrl.newTab( "matPackage", _("Material Package"), \
-                urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf) )
-        self._tabOfflineSite = self._tabCtrl.newTab( "offlineSite", _("Offline Site"), \
-                urlHandlers.UHConfDVDCreation.getURL(self._conf) )
+        self._tabAlarms = self._tabCtrl.newTab("alarms", _("Alarms"), \
+                urlHandlers.UHConfDisplayAlarm.getURL(self._conf))
+        self._tabCloneEvent = self._tabCtrl.newTab("clone", _("Clone Event"), \
+                urlHandlers.UHConfClone.getURL(self._conf))
+        self._tabPosters = self._tabCtrl.newTab("posters", _("Posters"), \
+                urlHandlers.UHConfModifPosterPrinting.getURL(self._conf))
+        self._tabBadges = self._tabCtrl.newTab("badges", _("Badges/Tablesigns"), \
+                urlHandlers.UHConfModifBadgePrinting.getURL(self._conf))
+        self._tabClose = self._tabCtrl.newTab("close", _("Lock"), \
+                urlHandlers.UHConferenceClose.getURL(self._conf))
+        self._tabDelete = self._tabCtrl.newTab("delete", _("Delete"), \
+                urlHandlers.UHConfDeletion.getURL(self._conf))
+        self._tabMatPackage = self._tabCtrl.newTab("matPackage", _("Material Package"), \
+                urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf))
+        self._tabOfflineSite = self._tabCtrl.newTab("offlineSite", _("Offline Site"), \
+                urlHandlers.UHConfDVDCreation.getURL(self._conf))
 
         self._tabOfflineSite.setHidden(True)
 
@@ -2275,81 +2276,84 @@ class WPConfModifToolsBase( WPConferenceModifBase ):
 
         wf = self._rh.getWebFactory()
         if wf:
-            wf.customiseToolsTabCtrl( self._tabCtrl )
+            wf.customiseToolsTabCtrl(self._tabCtrl)
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         self._createTabCtrl()
 
-        html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        html = wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
         return html
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         pass
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         return "nothing"
+
 
 class WPConfClosing(WPConfModifToolsBase):
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
-        self._eventType="conference"
+        self._eventType = "conference"
         if self._rh.getWebFactory() is not None:
-            self._eventType=self._rh.getWebFactory().getId()
+            self._eventType = self._rh.getWebFactory().getId()
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabClose.setActive()
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         msg = i18nformat("""
         <font size="+2"> _("Are you sure that you want to LOCK the event") <i>"%s"</i>?</font><br>
         (_("Note that if you lock the event, you will not be able to change its details any more <br>Only the creator of the event or an administrator of the system/category can unlock an event"))
-              """)%(self._conf.getTitle())
+              """) % (self._conf.getTitle())
         wc = wcomponents.WConfirmation()
-        return wc.getHTML( msg, \
-                        urlHandlers.UHConferenceClose.getURL( self._conf ), {}, \
-                        confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No") )
+        return wc.getHTML(msg, \
+                        urlHandlers.UHConferenceClose.getURL(self._conf), {}, \
+                        confirmButtonCaption=_("Yes"), cancelButtonCaption=_("No"))
 
-class WPConfDeletion( WPConfModifToolsBase ):
 
-    def _setActiveTab( self ):
+class WPConfDeletion(WPConfModifToolsBase):
+
+    def _setActiveTab(self):
         self._tabDelete.setActive()
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         msg = i18nformat("""
         <font size="+2"> _("Are you sure that you want to DELETE the conference") <i>"%s"</i>?</font><br>( _("Note that if you delete the conference, all the items below it will also be deleted"))
-              """)%(self._conf.getTitle())
+              """) % (self._conf.getTitle())
         wc = wcomponents.WConfirmation()
-        return wc.getHTML( msg, \
-                        urlHandlers.UHConfDeletion.getURL( self._conf ), {}, \
-                        confirmButtonCaption= _("Yes"), cancelButtonCaption=_("No") )
+        return wc.getHTML(msg, \
+                        urlHandlers.UHConfDeletion.getURL(self._conf), {}, \
+                        confirmButtonCaption=_("Yes"), cancelButtonCaption=_("No"))
 
-class WPConfCloneConfirm( WPConfModifToolsBase ):
+
+class WPConfCloneConfirm(WPConfModifToolsBase):
 
     def __init__(self, rh, conf, nbClones):
         WPConfModifToolsBase.__init__(self, rh, conf)
         self._nbClones = nbClones
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabCloneEvent.setActive()
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         msg = i18nformat("""
         <font size="+1"> _("This action will create %s new events. Are you sure you want to proceed")?</font>
-              """)%self._nbClones
+              """) % self._nbClones
         wc = wcomponents.WConfirmation()
-        url = urlHandlers.UHConfPerformCloning.getURL( self._conf )
+        url = urlHandlers.UHConfPerformCloning.getURL(self._conf)
         params = self._rh._getRequestParams()
         for key in params.keys():
-            url.addParam(key,params[key])
+            url.addParam(key, params[key])
         return wc.getHTML( msg, \
                         url, {}, True, \
-                        confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No") )
+                        confirmButtonCaption=_("Yes"), cancelButtonCaption=_("No"))
 
 #---------------------------------------------------------------------------
 
 
-class WPConferenceModifParticipantBase( WPConferenceModifBase ):
+class WPConferenceModifParticipantBase(WPConferenceModifBase):
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
@@ -2357,26 +2361,26 @@ class WPConferenceModifParticipantBase( WPConferenceModifBase ):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._tabParticipantsSetup = self._tabCtrl.newTab( "participantsetup", _("Setup"), urlHandlers.UHConfModifParticipantsSetup.getURL( self._conf ) )
-        self._tabParticipantsList = self._tabCtrl.newTab( "participantsList", _("Participants"), urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
+        self._tabParticipantsSetup = self._tabCtrl.newTab("participantsetup", _("Setup"), urlHandlers.UHConfModifParticipantsSetup.getURL(self._conf))
+        self._tabParticipantsList = self._tabCtrl.newTab("participantsList", _("Participants"), urlHandlers.UHConfModifParticipants.getURL(self._conf))
         self._tabStatistics = self._tabCtrl.newTab("statistics", _("Statistics"), urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
         if self._conf.getParticipation().getPendingParticipantList() and nowutc() < self._conf.getStartDate():
-            self._tabParticipantsPendingList = self._tabCtrl.newTab( "pendingList", _("Pending"), urlHandlers.UHConfModifParticipantsPending.getURL( self._conf ), className="pendingTab" )
+            self._tabParticipantsPendingList = self._tabCtrl.newTab("pendingList", _("Pending"), urlHandlers.UHConfModifParticipantsPending.getURL(self._conf), className="pendingTab")
         if self._conf.getParticipation().getDeclinedParticipantList():
-            self._tabParticipantsDeclinedList = self._tabCtrl.newTab( "declinedList", _("Declined"), urlHandlers.UHConfModifParticipantsDeclined.getURL( self._conf ) )
+            self._tabParticipantsDeclinedList = self._tabCtrl.newTab("declinedList", _("Declined"), urlHandlers.UHConfModifParticipantsDeclined.getURL(self._conf))
 
         self._setActiveTab()
 
     def _getPageContent(self, params):
         self._createTabCtrl()
 
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
                self._includeJSPackage('Display')
 
-    def _setActiveSideMenuItem( self ):
+    def _setActiveSideMenuItem(self):
         self._participantsMenuItem.setActive()
 
     def _getTabContent(self, params):
@@ -2398,6 +2402,7 @@ class WConferenceParticipant(wcomponents.WTemplated):
         vars["participant"] = self._participant
         return vars
 
+
 class WConferenceParticipantPending(wcomponents.WTemplated):
 
     def __init__(self, conference, id, pending):
@@ -2411,6 +2416,7 @@ class WConferenceParticipantPending(wcomponents.WTemplated):
         vars["id"] = self._id
         vars["pending"] = self._pending
         return vars
+
 
 class WConferenceParticipantsSetup(wcomponents.WTemplated):
 
@@ -2429,16 +2435,16 @@ class WConferenceParticipantsSetup(wcomponents.WTemplated):
         vars["notifyMgrNewParticipant"] = self._conf.getParticipation().isNotifyMgrNewParticipant()
         return vars
 
-class WPConfModifParticipantsSetup( WPConferenceModifParticipantBase ):
 
-    def _setActiveTab( self ):
+class WPConfModifParticipantsSetup(WPConferenceModifParticipantBase):
+
+    def _setActiveTab(self):
         self._tabParticipantsSetup.setActive()
 
-    def _getTabContent( self, params ):
-        p = WConferenceParticipantsSetup( self._conf )
+    def _getTabContent(self, params):
+        p = WConferenceParticipantsSetup(self._conf)
         return p.getHTML(params)
 
-#---------------------------------------------------------------------------
 
 class WConferenceParticipants(wcomponents.WTemplated):
 
@@ -2460,16 +2466,15 @@ class WConferenceParticipants(wcomponents.WTemplated):
 
         return vars
 
-class WPConfModifParticipants( WPConferenceModifParticipantBase ):
 
-    def _setActiveTab( self ):
+class WPConfModifParticipants(WPConferenceModifParticipantBase):
+
+    def _setActiveTab(self):
         self._tabParticipantsList.setActive()
 
-    def _getTabContent( self, params ):
-        p = WConferenceParticipants( self._conf )
+    def _getTabContent(self, params):
+        p = WConferenceParticipants(self._conf)
         return p.getHTML(params)
-
-#---------------------------------------------------------------------------
 
 
 class WConferenceParticipantsPending(wcomponents.WTemplated):
@@ -2483,7 +2488,7 @@ class WConferenceParticipantsPending(wcomponents.WTemplated):
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
         vars["pending"] = self._getPendingParticipantsList()
-        vars["numberPending"] =  self._conf.getParticipation().getPendingNumber()
+        vars["numberPending"] = self._conf.getParticipation().getPendingNumber()
         vars["conf"] = self._conf
         vars["conferenceStarted"] = nowutc() > self._conf.getStartDate()
         vars["currentUser"] = self._rh._aw.getUser()
@@ -2493,21 +2498,20 @@ class WConferenceParticipantsPending(wcomponents.WTemplated):
     def _getPendingParticipantsList(self):
         l = []
 
-        for k in self._conf.getParticipation().getPendingParticipantList().keys() :
+        for k in self._conf.getParticipation().getPendingParticipantList().keys():
             p = self._conf.getParticipation().getPendingParticipantByKey(k)
             l.append((k, p))
         return l
 
-class WPConfModifParticipantsPending( WPConferenceModifParticipantBase ):
 
-    def _setActiveTab( self ):
+class WPConfModifParticipantsPending(WPConferenceModifParticipantBase):
+
+    def _setActiveTab(self):
         self._tabParticipantsPendingList.setActive()
 
-    def _getTabContent( self, params ):
-        p = WConferenceParticipantsPending( self._conf )
+    def _getTabContent(self, params):
+        p = WConferenceParticipantsPending(self._conf)
         return p.getHTML()
-
-#---------------------------------------------------------------------------
 
 
 class WConferenceParticipantsDeclined(wcomponents.WTemplated):
@@ -2519,27 +2523,28 @@ class WConferenceParticipantsDeclined(wcomponents.WTemplated):
 
         vars = wcomponents.WTemplated.getVars(self)
         vars["declined"] = self._getDeclinedParticipantsList()
-        vars["numberDeclined"] =  self._conf.getParticipation().getDeclinedNumber()
+        vars["numberDeclined"] = self._conf.getParticipation().getDeclinedNumber()
         return vars
 
     def _getDeclinedParticipantsList(self):
         l = []
 
-        for k in self._conf.getParticipation().getDeclinedParticipantList().keys() :
+        for k in self._conf.getParticipation().getDeclinedParticipantList().keys():
             p = self._conf.getParticipation().getDeclinedParticipantByKey(k)
             l.append((k, p))
         return l
 
-class WPConfModifParticipantsDeclined( WPConferenceModifParticipantBase ):
 
-    def _setActiveTab( self ):
+class WPConfModifParticipantsDeclined(WPConferenceModifParticipantBase):
+
+    def _setActiveTab(self):
         self._tabParticipantsDeclinedList.setActive()
 
-    def _getTabContent( self, params ):
-        p = WConferenceParticipantsDeclined( self._conf )
+    def _getTabContent(self, params):
+        p = WConferenceParticipantsDeclined(self._conf)
         return p.getHTML()
 
-#---------------------------------------------------------------------------
+
 class WConferenceParticipantsStatistics(wcomponents.WTemplated):
 
     def __init__(self, conference):
@@ -2561,44 +2566,41 @@ class WConferenceParticipantsStatistics(wcomponents.WTemplated):
         return vars
 
 
-class WPConfModifParticipantsStatistics( WPConferenceModifParticipantBase ):
+class WPConfModifParticipantsStatistics(WPConferenceModifParticipantBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabStatistics.setActive()
 
-    def _getTabContent( self, params ):
-        p = WConferenceParticipantsStatistics( self._conf )
+    def _getTabContent(self, params):
+        p = WConferenceParticipantsStatistics(self._conf)
         return p.getHTML(params)
 
-#---------------------------------------------------------------------------
 
 class WPConfModifParticipantsInvitationBase(WPConferenceDisplayBase):
 
-    def _getHeader( self ):
+    def _getHeader(self):
         """
         """
-        wc = wcomponents.WMenuSimpleEventHeader( self._getAW(),self._conf )
-        return wc.getHTML( { "loginURL": self.getLoginURL(),\
-                             "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.getId(),\
-                             "currentView": "static",\
-                             "type": WebFactory.getId(),\
-                             "dark": True } )
-
-#---------------------------------------------------------------------------
+        wc = wcomponents.WMenuSimpleEventHeader(self._getAW(), self._conf)
+        return wc.getHTML({"loginURL": self.getLoginURL(),\
+                            "logoutURL": self.getLogoutURL(),\
+                            "confId": self._conf.getId(),\
+                            "currentView": "static",\
+                            "type": WebFactory.getId(),\
+                            "dark": True})
 
 
 class WPConfModifParticipantsInvite(WPConfModifParticipantsInvitationBase):
 
-    def _getBody( self, params ):
+    def _getBody(self, params):
         msg = i18nformat("""
          <font size="+2">_("Please indicate whether you want to accept or reject the invitation to '%s'")? </font>
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
-        url = urlHandlers.UHConfParticipantsInvitation.getURL( self._conf )
+        url = urlHandlers.UHConfParticipantsInvitation.getURL(self._conf)
         url.addParam("participantId",params["participantId"])
         return wc.getHTML( msg, url, {}, \
-                        confirmButtonCaption= _("Accept"), cancelButtonCaption= _("Reject") )
+                        confirmButtonCaption=_("Accept"), cancelButtonCaption=_("Reject") )
 
 #---------------------------------------------------------------------------
 

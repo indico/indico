@@ -240,50 +240,52 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
 
         self._redirect( url )
 
-class RHConferenceCloseModifKey( RHConferenceBase ):
 
-    def _checkParams( self, params ):
-        RHConferenceBase._checkParams(self, params )
-        self._modifkey = params.get( "modifKey", "" ).strip()
-        self._redirectURL = params.get("redirectURL","")
+class RHConferenceCloseModifKey(RHConferenceBase):
 
-    def _process( self ):
+    def _checkParams(self, params):
+        RHConferenceBase._checkParams(self, params)
+        self._modifkey = params.get("modifKey", "").strip()
+        self._redirectURL = params.get("redirectURL", "")
+
+    def _process(self):
         modif_keys = self._getSession().getVar("modifKeys")
         if modif_keys != None and modif_keys != {}:
             if modif_keys.has_key(self._conf.getId()) and self._conf.getModifKey() in modif_keys[self._conf.getId()]:
                 del modif_keys[self._conf.getId()]
-            self._getSession().setVar("modifKeys",modif_keys)
+            self._getSession().setVar("modifKeys", modif_keys)
         if self._redirectURL != "":
             url = self._redirectURL
         else:
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-        self._redirect( url )
+            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
+        self._redirect(url)
 
-class RHConferenceClose( RHConferenceModifBase ):
+
+class RHConferenceClose(RHConferenceModifBase):
     _uh = urlHandlers.UHConferenceClose
 
-    def _checkParams( self, params ):
-        RHConferenceBase._checkParams(self, params )
-        self._confirm = params.has_key( "confirm" )
-        self._cancel = params.has_key( "cancel" )
+    def _checkParams(self, params):
+        RHConferenceBase._checkParams(self, params)
+        self._confirm = params.has_key("confirm")
+        self._cancel = params.has_key("cancel")
 
-    def _process( self ):
+    def _process(self):
 
         if self._cancel:
-            url = urlHandlers.UHConferenceModification.getURL( self._conf )
-            self._redirect( url )
+            url = urlHandlers.UHConferenceModification.getURL(self._conf)
+            self._redirect(url)
         elif self._confirm:
             self._target.setClosed(True)
-            url = urlHandlers.UHConferenceModification.getURL( self._conf )
-            self._redirect( url )
+            url = urlHandlers.UHConferenceModification.getURL(self._conf)
+            self._redirect(url)
         else:
-            return conferences.WPConfClosing( self, self._conf ).display()
+            return conferences.WPConfClosing(self, self._conf).display()
 
 
-class RHConferenceOpen( RHConferenceModifBase ):
+class RHConferenceOpen(RHConferenceModifBase):
     _allowClosed = True
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         RHConferenceModifBase._checkProtection(self)
 
         user = self._getUser()
@@ -301,27 +303,27 @@ class RHConferenceOpen( RHConferenceModifBase ):
             else:
                 raise ModificationError()
 
-    def _checkParams( self, params ):
-        RHConferenceBase._checkParams(self, params )
+    def _checkParams(self, params):
+        RHConferenceBase._checkParams(self, params)
 
-    def _process( self ):
+    def _process(self):
         self._target.setClosed(False)
-        url = urlHandlers.UHConferenceModification.getURL( self._conf )
-        self._redirect( url )
+        url = urlHandlers.UHConferenceModification.getURL(self._conf)
+        self._redirect(url)
 
 
-class RHConfDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
+class RHConfDataModif(RoomBookingDBMixin, RHConferenceModifBase):
     _uh = urlHandlers.UHConfDataModif
 
-    def _displayCustomPage( self, wf ):
+    def _displayCustomPage(self, wf):
         return None
 
-    def _displayDefaultPage( self ):
-        p = conferences.WPConfDataModif( self, self._target )
-        pars={}
-        wf=self.getWebFactory()
+    def _displayDefaultPage(self):
+        p = conferences.WPConfDataModif(self, self._target)
+        pars = {}
+        wf = self.getWebFactory()
         if wf is not None:
-            pars["type"]=wf.getId()
+            pars["type"] = wf.getId()
         return p.display(**pars)
 
 
