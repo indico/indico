@@ -20,14 +20,6 @@
                     <div class="contributionListContribDescription">
                         ${track['description']}
                     </div>
-                    % if track['subTracks']:
-                    <div class="contributionListContribSpeakers">
-                        ${_('Sub-Tracks')}:
-                        % for subtrack in track['subTracks']:
-                            ${subtrack},
-                        % endfor
-                    </div>
-                    % endif
                 </div>
             % endfor
         </td>

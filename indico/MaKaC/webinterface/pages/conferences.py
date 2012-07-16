@@ -1292,8 +1292,6 @@ class WConfProgram(wcomponents.WTemplated):
             else:
                 formattedTrack['url'] = urlHandlers.UHTrackModifAbstracts.getURL(track)
 
-        formattedTrack['subTracks'] = [s.getTitle() for s in track.getSubTrackList()]
-
         return formattedTrack
 
     def getVars(self):
