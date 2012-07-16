@@ -128,10 +128,22 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                             args.push(addInputLink);
                         }
                     }
-                    args.push(Html.div({style:{marginTop: '5px'}},
+                    var PDFdivLabel = Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
+                            $T("Conver to PDF"));
+                    var PDFdiv = Html.div({style:{marginTop: '5px'}},
                             toPDFCheckbox,
-                            Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
-                                    $T("Convert to PDF (when applicable)"))));
+                            PDFdivLabel
+                            );
+                    $(PDFdivLabel.dom).qtip({
+                        content: {
+                            text: $T("Avaliable files formats: <br>") + self.availablePDFConversions.toString().replace(/\./g,' ')
+                        },
+                        position: {
+                            target: 'mouse',
+                            adjust: { mouse: true, x: 11, y: 13 }
+                        }
+                    });
+                    args.push(PDFdiv);
 
                     return Html.div.apply(null, args);
                 },
@@ -575,7 +587,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
     }
 
 
-}, function(args, list, types, uploadAction, onUpload, forReviewing) {
+}, function(args, list, types, uploadAction, onUpload, forReviewing, availablePDFConversions) {
     this.AddEditMaterialDialog();
     var self = this;
     this.list = list;
@@ -584,7 +596,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
     this.uploading = false;
     this.onUpload = onUpload;
     this.forReviewing = forReviewing;
-
+    this.availablePDFConversions = availablePDFConversions;
     this.args = clone(args);
 //    this.args.materialId = material;
 
@@ -1532,7 +1544,9 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                     self,
                     self.types,
                     self.uploadAction,
-                    self.makeMaterialLoadFunction());
+                    self.makeMaterialLoadFunction(),
+                    false,
+                    self.availablePDFConversions);
         }
         var link = Widget.link(command(function(){
 
@@ -1540,7 +1554,9 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                           self,
                                           self.types,
                                           self.uploadAction,
-                                          self.makeMaterialLoadFunction());
+                                          self.makeMaterialLoadFunction(),
+                                          false,
+                                          self.availablePDFConversions);
         }, $T("Add Material")));
 
 
@@ -1553,7 +1569,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
     }
 },
 
-     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify, addMaterialMode) {
+     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify, addMaterialMode, availablePDFConversions) {
          var self = this;
          this.width = width;
          this.height = height;
@@ -1566,6 +1582,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          }
          this.canReviewModify = any(canReviewModify, false);
          this.addMaterialMode = addMaterialMode;
+         this.availablePDFConversions = availablePDFConversions;
          this.RemoteWidget(listMethod, args);
          this.args.materialIdsList = $O();
          this.showMainResources = showMainResources || false;
@@ -1699,7 +1716,7 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
             }
         });
 
-        var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height, null, null, null, this.addMaterialMode);
+        var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height, null, null, null, this.addMaterialMode, this.availablePDFConversions);
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(
             this,
@@ -1710,7 +1727,7 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
     }
 },
 
-     function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh, addMaterialMode) {
+     function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh, addMaterialMode, availablePDFConversions) {
          this.confId = confId;
          this.sessId = sessId;
          this.contId = contId;
@@ -1721,14 +1738,15 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
          this.height = height;
          this.refresh = refresh;
          this.addMaterialMode = addMaterialMode;
+         this.availablePDFConversions = availablePDFConversions;
          this.parentProtected = parentProtected;
          this.ExclusivePopupWithButtons(title);
      });
 
 IndicoUI.Dialogs.Material = {
 
-    add: function(args, list, types, uploadAction, onUpload, forReviewing) {
-        var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload, forReviewing);
+    add: function(args, list, types, uploadAction, onUpload, forReviewing, availablePDFConversions) {
+        var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload, forReviewing, availablePDFConversions);
         dialog.open();
     },
 
@@ -1743,8 +1761,8 @@ IndicoUI.Dialogs.Material = {
         dialog.execute();
     },
 
-    editor: function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh, addMaterialMode) {
-        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh, addMaterialMode);
+    editor: function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh, addMaterialMode, availablePDFConversions) {
+        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh, addMaterialMode, availablePDFConversions);
         dialog.open();
         if (addMaterialMode) {
             dialog.close();

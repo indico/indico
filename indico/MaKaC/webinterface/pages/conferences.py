@@ -84,6 +84,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
+from MaKaC.export import fileConverter
 
 
 def stringToDate( str ):
@@ -1328,6 +1329,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             vars['getItemType'] = lambda item : self._getItemType(item)
             vars['getLocationInfo'] = MaKaC.common.utils.getLocationInfo
             vars['dumps'] = json.dumps
+            vars['availablePDFConversions'] = fileConverter.CDSConvFileConverter.gatAvailableConversions()
         else:
             outGen = outputGenerator(self._rh._aw)
             varsForGenerator = self._getBodyVariables()

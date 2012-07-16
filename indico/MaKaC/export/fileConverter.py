@@ -279,3 +279,7 @@ class CDSConvFileConverter(FileConverter):
             return True
         return False
     hasAvailableConversionsFor=staticmethod(hasAvailableConversionsFor)
+
+    def gatAvailableConversions():
+        return CDSConvFileConverter._availableExt
+    gatAvailableConversions=staticmethod(gatAvailableConversions)
