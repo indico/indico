@@ -93,10 +93,22 @@ var stop = function(booking) {
 
 /**
  * Function that will be called when the user presses the "Connect" button of a booking.
- * It will call in turn 'stopBooking' in Collaboration.js
+ * It will call in turn 'connectBooking' in Collaboration.js
  */
 var connect = function(booking) {
     connectBooking(booking, '${ Conference.getId() }');
+}
+
+/**
+ * Function that will be called when the user presses the "Disconnect" button of a booking.
+ * It will call in turn 'disconnectBooking' in Collaboration.js
+ */
+var disconnect = function(booking) {
+    disconnectBooking(booking, '${ Conference.getId() }');
+}
+
+var checkConnection = function(booking, successHandler) {
+    checkBookingConnection(booking, '${ Conference.getId() }', successHandler);
 }
 
 /**

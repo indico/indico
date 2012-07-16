@@ -19,6 +19,11 @@
         return true;
     },
 
+    checkDisconnect : function(booking) {
+        booking.permissionToDisconnect = true;
+        return true;
+    },
+
     checkParams: function() {
         var self = this;
         return {
@@ -118,8 +123,27 @@
                     [$T("This public room seems to have been deleted from Vidyo."),
                      $T("Please delete it and try to create it again.")]);
         }
+
+        if (event === 'connect' && error.errorType === 'noExistsRoom') {
+            CSErrorPopup($T("Connect room failed"),[error.userMessage]);
+        }
+
         if (event === 'connect' && error.errorType === 'connectFailed') {
             CSErrorPopup($T("Connect room failed"),[error.userMessage]);
+        }
+
+        if (event === 'connect' && error.errorType === 'alreadyConnected') {
+            CSErrorPopup($T("Already connected"),[error.userMessage]);
+        }
+
+        if (event === 'disconnect' && error.errorType === 'disconnectFailed') {
+            CSErrorPopup($T("Disconnect room failed"),[error.userMessage]);
+        }
+        if (event === 'disconnect' && error.errorType === 'alreadyDisconnected') {
+            CSErrorPopup($T("Already disconnected"),[error.userMessage]);
+        }
+        if (event === 'roomConnected' && error.errorType === 'roomCheckFailed') {
+            CSErrorPopup($T("Room connection status failed"),[error.userMessage]);
         }
     },
 

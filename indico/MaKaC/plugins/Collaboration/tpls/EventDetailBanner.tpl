@@ -94,7 +94,9 @@ $(function() {
                (self_._rh.getHostIP() == VidyoTools.getLinkRoomIp(booking.getLinkObject(), ipAttName='IP')):
             <span style="margin-left:3px;margin-right:3px;">|</span>
             <script type="text/javascript">
-              var booking${booking.getId()} = bookings[${pos}];
+              $(function() {
+                checkBookingRoomConnection(${jsonEncode(fossilize(booking))}, ${conf.getId()});
+              });
             </script>
             <a href="#" style="font-size:12px; font-weight: bold" class="connect_room" data-booking-id="${booking.getId()}" data-event="${conf.getId()}">${_("Connect")} ${booking.getLinkVideoRoomLocation()}</a>
             <span style="display:inline; vertical-align:middle" class="progress"></span>

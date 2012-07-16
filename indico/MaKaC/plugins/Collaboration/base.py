@@ -503,6 +503,12 @@ class CSBookingManager(Persistent, Observer):
         else:
             raise CollaborationException(_("Tried to disconnect booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be disconnected."))
 
+    def checkBookingConnection(self, id):
+        booking = self._bookings[id]
+        if booking.canBeConnected():
+            return booking.connectionStatus()
+        else:
+            raise CollaborationException(_("Tried to check the connection of booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking does not support the check connection service."))
 
     def checkBookingStatus(self, id):
         booking = self._bookings[id]

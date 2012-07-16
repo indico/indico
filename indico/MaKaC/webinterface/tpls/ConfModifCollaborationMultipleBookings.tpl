@@ -85,6 +85,7 @@ ${ ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm)
   *     -hasStart : true if the plugin has a "start" concept. Otherwise, the "start" button will not appear, etc.
   *     -hasStop : true if the plugin has a "stop" concept. Otherwise, the "stop" button will not appear, etc.
   *     -hasConnect : true if the plugin has a "connect" concept. Otherwise, the "connect" button will not appear, etc.
+  *     -hasDisconnect : true if the plugin has a "disconnect" concept. Otherwise, the "disconnect" button will not appear, etc.
   *     -requiresServerCallForStart: true if we should notify the server when the user presses the "start" button.
   *     -requiresServerCallForStop: true if we should notify the server when the user presses the "stop" button.
   *     -requiresClientCallForStart: true if the browser should execute some JS action when the user presses the "start" button.
