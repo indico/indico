@@ -1,4 +1,6 @@
-
+<div class="groupTitle">
+    ${_('Call For Abstracts')}
+</div>
 <table width="90%" align="center">
     <tr><td>&nbsp;</td></tr>
     <tr>

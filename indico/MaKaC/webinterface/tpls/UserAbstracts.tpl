@@ -1,12 +1,13 @@
+<div class="groupTitle">
+    ${_('View My Abstracts')}
+</div>
+% if abstracts:
 <div style="border-bottom: 1px solid #EAEAEA; padding-bottom: 5px; margin-bottom: 15px;">
-    % if abstracts:
     <form action="${str(urlHandlers.UHUserAbstractsPDF.getURL(conf))}" method="post" target="_blank" id="formAbstracts">
         <span class="fakeLink" id="exportPDF">${ _("Export to PDF")}</span>
     </form>
-    % else:
-        <span class="collShowBookingsText">${_("No submitted abstract found within this conference")}</span>
-    % endif
 </div>
+
 <div id="abstractList">
     % for abstract in abstracts:
     <div class="abstractListAbstractItem">
@@ -29,3 +30,8 @@ IndicoUI.executeOnLoad(function(){
     });
 });
 </script>
+% else:
+<p>
+    ${_('There are currently no abstracts submitted for this conference.')}
+</p>
+% endif
