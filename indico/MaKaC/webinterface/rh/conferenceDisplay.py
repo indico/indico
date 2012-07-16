@@ -615,18 +615,16 @@ class RHConferenceSendEmail (RHConferenceBaseDisplay, base.RHProtected):
             self._redirect(urlHandlers.UHConferenceDisplay.getURL(self._conf))
 
 
-
-class RHConferenceProgram( RHConferenceBaseDisplay ):
+class RHConferenceProgram(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceProgram
 
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        self._xs = self._normaliseListParam( params.get("xs", []) )
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self._xs = self._normaliseListParam(params.get("xs", []))
 
-
-    def _process( self ):
-        p = conferences.WPConferenceProgram( self, self._target )
-        return p.display( xs = self._xs )
+    def _process(self):
+        p = conferences.WPConferenceProgram(self, self._target)
+        return p.display(xs=self._xs)
 
 
 class RHConferenceProgramPDF( RHConferenceBaseDisplay ):

@@ -1,6 +1,7 @@
-
-<div class="groupTitle">${ _("Program setup")}</div>
-<table width="90%" border="0">
+<div class="groupTitle">
+    ${ _("Programme Description")}
+</div>
+<table width="90%" align="center" border="0">
     <tr>
         <td class="dataCaptionTD">
             <span class="dataCaptionFormat">${ _("Description")}</span>
@@ -10,8 +11,9 @@
         </td>
     </tr>
 </table>
-
-<div class="groupTitle">${ _("Track List")}</div>
+<div class="groupTitle">
+    ${ _("Tracks")}
+</div>
 <table width="90%" align="center" border="0">
     <tr>
         <td bgcolor="white" width="100%" colspan="4" align="center">
@@ -61,12 +63,12 @@
             <table align="center">
                 <tr>
                     <td align="center">
-                            <input type="submit" class="btn" value="${ _("remove selected")}">
+                            <input type="submit" class="btn" value="${ _("Remove Selected")}">
                         </form>
                     </td>
                     <td>
                         <form action="${ addTrackURL }" method="POST">
-                            <input type="submit" class="btn" value="${ _("add track")}">
+                            <input type="submit" class="btn" value="${ _("Add Track")}">
                         </form>
                     </td>
                 </tr>

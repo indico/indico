@@ -1254,41 +1254,15 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             return _("Template could not be found.")
         return body
 
+
 class WPrintPageFrame (wcomponents.WTemplated):
     pass
+
 
 class WText(wcomponents.WTemplated):
 
     def __init__(self):
         wcomponents.WTemplated("events/Text")
-
-class WConfProgramTrack(wcomponents.WTemplated):
-
-    def __init__( self, aw, track ):
-        self._aw = aw
-        self._track = track
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["bulletURL"] = Config.getInstance().getSystemIconURL( "track_bullet" )
-        mgtIconHTML = ""
-        if self._track.getConference().getAbstractMgr().isActive() and self._track.getConference().hasEnabledSection("cfa") and self._track.canCoordinate( self._aw ):
-            url = urlHandlers.UHTrackModifAbstracts.getURL( self._track )
-            if self._track.getConference().canModify( self._aw ):
-                url = urlHandlers.UHTrackModification.getURL( self._track )
-            mgtIconHTML = """<a href="%s"><img src="%s" alt="Enter in track management area" border="0"></a>
-                    """%(url, Config.getInstance().getSystemIconURL( "modify" ))
-        vars["mgtIcon"] = mgtIconHTML
-        vars["title"] = self._track.getTitle()
-        vars["coordinators"] = ""
-        vars["description"] = self._track.getDescription()
-        subtracks = []
-        for subtrack in self._track.getSubTrackList():
-            subtracks.append( "%s"%subtrack.getTitle() )
-        vars["subtracks"] = ""
-        if subtracks:
-            vars["subtracks"] = i18nformat("""<i> _("Sub-tracks")</i>: %s""")%", ".join( subtracks )
-        return vars
 
 
 class WConfProgram(wcomponents.WTemplated):
@@ -1297,30 +1271,51 @@ class WConfProgram(wcomponents.WTemplated):
         self._conf = conf
         self._aw = aw
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["description"] = self._conf.getProgramDescription()
-        program = []
-        for track in self._conf.getTrackList():
-            program.append( WConfProgramTrack( self._aw, track ).getHTML() )
-        vars["program"] = "".join( program )
+    def buildTrackData(self, track):
+        """
+        Returns a dict representing the data of the track and its Sub-tracks
+        should it have any.
+        """
+        description = track.getDescription()
+
+        formattedTrack = {
+            'title': track.getTitle(),
+            'description': description if description else _('(No description given)')
+        }
+
+        if track.getConference().getAbstractMgr().isActive() and \
+           track.getConference().hasEnabledSection("cfa") and \
+           track.canCoordinate(self._aw):
+
+            if track.getConference().canModify(self._aw):
+                formattedTrack['url'] = urlHandlers.UHTrackModification.getURL(track)
+            else:
+                formattedTrack['url'] = urlHandlers.UHTrackModifAbstracts.getURL(track)
+
+        formattedTrack['subTracks'] = [s.getTitle() for s in track.getSubTrackList()]
+
+        return formattedTrack
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars['description'] = self._conf.getProgramDescription()
+        vars['program'] = [self.buildTrackData(t) for t in self._conf.getTrackList()]
+
         return vars
 
 
+class WPConferenceProgram(WPConferenceDefaultDisplayBase):
 
-
-class WPConferenceProgram( WPConferenceDefaultDisplayBase ):
-
-    def _getBody( self, params ):
-        wc = WConfProgram( self._getAW(), self._conf )
+    def _getBody(self, params):
+        wc = WConfProgram(self._getAW(), self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
+    def _defineSectionMenu(self):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._programOpt)
 
     def _defineToolBar(self):
-        pdf=wcomponents.WTBItem( _("get PDF of the programme"),
+        pdf = wcomponents.WTBItem(_("get PDF of the programme"),
             icon=Config.getInstance().getSystemIconURL("pdf"),
             actionURL=urlHandlers.UHConferenceProgramPDF.getURL(self._conf))
         if len(self._conf.getTrackList()) > 0:
