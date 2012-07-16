@@ -20,8 +20,8 @@
 import os
 from persistent import Persistent
 import tempfile
-import simplejson
 
+from indico.util.json import loads
 from MaKaC.common.Counter import Counter
 from MaKaC.common import Config
 import conference
@@ -91,11 +91,11 @@ class PosterTemplateManager(Persistent):
         """
         if self.__templates.has_key(templateId):
             # template already exists
-            self.__templates[templateId].setData(simplejson.loads(templateData))
+            self.__templates[templateId].setData(loads(templateData))
             self.__templates[templateId].archiveTempBackgrounds(self.__conf)
         else:
             # template does not exist
-            self.__templates[templateId] = PosterTemplate(templateId, simplejson.loads(templateData))
+            self.__templates[templateId] = PosterTemplate(templateId, loads(templateData))
         self.notifyModification()
 
     def addTemplate(self, templ, templateId):
@@ -147,8 +147,8 @@ class PosterTemplate (Persistent):
     def __init__(self, id, templateData):
         """ Class Constructor
             templateData is the templateData string used in the method storeTemplate() of the class
-            PosterTemplateManager, transformed to a Python object with the function simplejson.loads().
-            IMPORTANT NOTE: simplejson.loads() builds an objet with unicode objects inside.
+            PosterTemplateManager, transformed to a Python object with the function loads().
+            IMPORTANT NOTE: loads() builds an objet with unicode objects inside.
                             if these objects are then concatenated to str objects (for example in an Indico HTML template),
                             this can give problems. In those cases transform the unicode object to str with .encode('utf-8')
                             In this class, __cleanData() already does this by calling MaKaC.services.interface.rpc.json.unicodeToUtf8

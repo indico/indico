@@ -18,8 +18,10 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import tempfile, os, base64, socket
-import mimetypes, urlparse, simplejson
+import mimetypes, urlparse
 import httplib
+
+from indico.util.json import  loads
 
 from MaKaC.common.logger import Logger
 from MaKaC.common.Configuration import Config
@@ -253,7 +255,7 @@ class CDSConvFileConverter(FileConverter):
             locator={}
             # python dicts come with ' instead of " by default
             # using a json encoder on the server side would help...
-            locator = simplejson.loads(params["directory"].replace('\'','"'))
+            locator = loads(params["directory"].replace('\'','"'))
 
             mat=CDSConvFileConverter._getMaterial(locator)
             if mat is not None:

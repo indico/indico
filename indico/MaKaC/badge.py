@@ -17,10 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import os, simplejson
+import os
 from persistent import Persistent
 import tempfile
 
+from indico.util.json import loads
 from MaKaC.common.Counter import Counter
 from MaKaC.common import Config
 
@@ -89,10 +90,10 @@ class BadgeTemplateManager(Persistent):
         If the template had any temporary backgrounds, they are archived.
         """
         if self.__templates.has_key(templateId):
-            self.__templates[templateId].setData(simplejson.loads(templateData))
+            self.__templates[templateId].setData(loads(templateData))
             self.__templates[templateId].archiveTempBackgrounds(self.__conf)
         else:
-            self.__templates[templateId] = BadgeTemplate(templateId, simplejson.loads(templateData))
+            self.__templates[templateId] = BadgeTemplate(templateId, loads(templateData))
 
         self.notifyModification()
 
@@ -151,8 +152,8 @@ class BadgeTemplate (Persistent):
     def __init__(self, id, templateData):
         """ Class Constructor
             templateData is the templateData string used in the method storeTemplate() of the class
-            BadgeTemplateManager, transformed to a Python object with the function simplejson.loads().
-            IMPORTANT NOTE: simplejson.loads() builds an objet with unicode objects inside.
+            BadgeTemplateManager, transformed to a Python object with the function loads().
+            IMPORTANT NOTE: loads() builds an objet with unicode objects inside.
                             if these objects are then concatenated to str objects (for example in an Indico HTML template),
                             this can give problems. In those cases transform the unicode object to str with .encode('utf-8').
                             In this class, __cleanData() already does this by calling MaKaC.services.interface.rpc.json.unicodeToUtf8

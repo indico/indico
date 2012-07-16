@@ -49,7 +49,7 @@ def unicodeToUtf8(obj):
         This method will loop through the object and change unicode objects into str objects encoded in utf-8.
         If a list or a dictionary is found during the loop, a recursive call is made.
         However this method does not support objects that are not lists or dictionaries.
-        This method is useful to turn unicode objects from the output object given by simplejson.loads(),
+        This method is useful to turn unicode objects from the output object given by loads(),
         into str objects encoded in utf-8.
         In case of a persistent object or an object inside a persistent object,
         you will need to notify the database of changes in the object after calling this method.

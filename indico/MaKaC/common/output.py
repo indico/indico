@@ -24,7 +24,7 @@ from MaKaC.plugins import PluginsHolder
 from MaKaC.common.logger import Logger
 
 import string,re
-import simplejson
+from indico.util.json import dumps
 import StringIO
 
 from lxml import etree
@@ -304,8 +304,8 @@ class outputGenerator(Observable):
         else:
             out.writeTag("category","")
 
-        out.writeTag("parentProtection", simplejson.dumps(conf.getAccessController().isProtected()))
-        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(conf)))
+        out.writeTag("parentProtection", dumps(conf.getAccessController().isProtected()))
+        out.writeTag("materialList", dumps(self._generateMaterialList(conf)))
 
 #        Logger.get('RecMan').info('showContribution: ' + str(showContribution))
 
@@ -703,8 +703,8 @@ class outputGenerator(Observable):
         out.openTag("session", [["color", session.getColor()],["textcolor", session.getTextColor()]])
         out.writeTag("ID", session.getId())
 
-        out.writeTag("parentProtection", simplejson.dumps(session.getAccessController().isProtected()))
-        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(session)))
+        out.writeTag("parentProtection", dumps(session.getAccessController().isProtected()))
+        out.writeTag("materialList", dumps(self._generateMaterialList(session)))
 
 
         slotId = session.getSortedSlotList().index(slot)
@@ -811,8 +811,8 @@ class outputGenerator(Observable):
         out.openTag("contribution", [["color",contribution.getColor()],["textcolor",contribution.getTextColor()]])
         out.writeTag("ID",contribution.getId())
 
-        out.writeTag("parentProtection", simplejson.dumps(contribution.getAccessController().isProtected()))
-        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(contribution)))
+        out.writeTag("parentProtection", dumps(contribution.getAccessController().isProtected()))
+        out.writeTag("materialList", dumps(self._generateMaterialList(contribution)))
 
         if contribution.getBoardNumber() != "":
             out.writeTag("board",contribution.getBoardNumber())
@@ -963,8 +963,8 @@ class outputGenerator(Observable):
         out.openTag("subcontribution")
         out.writeTag("ID",subCont.getId())
 
-        out.writeTag("parentProtection", simplejson.dumps(subCont.getContribution().getAccessController().isProtected()))
-        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(subCont)))
+        out.writeTag("parentProtection", dumps(subCont.getContribution().getAccessController().isProtected()))
+        out.writeTag("materialList", dumps(self._generateMaterialList(subCont)))
 
         if subCont.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["subContribModifyURLGen"](subCont))

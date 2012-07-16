@@ -19,7 +19,7 @@
 
 from MaKaC.services.interface.rpc.process import processRequest
 
-from simplejson import dumps
+from indico.util.json import dumps
 
 import MaKaC
 

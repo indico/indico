@@ -19,8 +19,7 @@
 
 from UserDict import UserDict
 from types import ListType
-import simplejson
-
+from indico.util.json import dumps
 
 class Locator(UserDict):
     """Helper class specialising UserDict (dictionary) which contains a locator
@@ -35,7 +34,7 @@ class Locator(UserDict):
     def getJSONForm( self ):
         """Returns the current locator data as a JSON string.
         """
-        return simplejson.dumps(self.data)
+        return dumps(self.data)
 
     def getURLForm( self ):
         """Returns the current locator ready for being included in a URL.
