@@ -32,8 +32,10 @@
             % elif getItemType(item) == 'Contribution':
                 'editContribution': {action: '${info["modifyLink"]}', display:  $T('Edit contribution')},
             % elif getItemType(item) == 'Session':
-                'editSession': {action: function(){
-                    IndicoUI.Dialogs.__addSessionSlot("${info['slotId']}","${item.getSession().getId()}","${conf.getId()}")}, display:  $T('Edit session')},
+                'editSession': {action: function(m){
+                    IndicoUI.Dialogs.__addSessionSlot("${info['slotId']}","${item.getSession().getId()}","${conf.getId()}");
+                    m.close();
+                    return false; }, display:  $T('Edit session')},
             % else:
                  'editEntry': {action: '${info["modifyLink"]}', display: $T('Edit entry')},
             % endif

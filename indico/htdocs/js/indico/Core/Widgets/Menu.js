@@ -44,9 +44,9 @@ type("ChainedPopupWidget", ["PopupWidget"],
              this.PopupWidget.prototype.open.call(this, x, y);
 
              // define a handler for onclick events
-             $('body').on('click.chained_menu', function(event) {
+             $('html').on('click.chained_menu', function(event) {
                  if (self.clickTriggersClose($E(eventTarget(event)))) {
-                     // if the click should be followeb by a
+                     // if the click should be followed by a
                      // closing action (out of the chain)
                      self.close();
 
