@@ -1111,6 +1111,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
 
                             }
                         });
+                    var slotTitle = value.slotTitle? " (" + Util.truncate(value.slotTitle, 20) + ")":"";
 
                     moveEntryTable.append(Html.li(
                         {}, colorSquare, rb,
@@ -1120,7 +1121,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                                 verticalAlign: 'middle',
                                 fontWeight: 'normal'
                             }
-                        }, Util.truncate(value.title, 40), Html.span(
+                        }, Util.truncate(value.title, 20) + slotTitle, Html.span(
                             {style: {
                                 fontSize: '10px',
                                 marginLeft: '5px',
