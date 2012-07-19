@@ -51,13 +51,13 @@ ${ _("Warning: since you are not logged in, only results from public events will
         <td>${ _("Search in") }:</td>
         <td>
           <select class="UIFieldSpan" name="f">
-        <option value="" selected>${ _("Any Field")}</option>
-        <option value="title">${ _("Title")}</option>
-        <option value="abstract">${ _("Talk description/Abstract")}</option>
-        <option value="author">${ _("Author/Speaker")}</option>
-        <option value="affiliation">${ _("Affiliation")}</option>
-        <option value="fulltext">${ _("Fulltext")}</option>
-        <option value="keyword">${ _("Keyword")}</option>
+        <option value="" ${"selected" if f=="" else ""}>${ _("Any Field")}</option>
+        <option value="title" ${"selected" if f=="title" else ""}>${ _("Title")}</option>
+        <option value="abstract" ${"selected" if f=="abstract" else ""}>${ _("Talk description/Abstract")}</option>
+        <option value="author" ${"selected" if f=="author" else ""}>${ _("Author/Speaker")}</option>
+        <option value="affiliation" ${"selected" if f=="affiliation" else ""}>${ _("Affiliation")}</option>
+        <option value="fulltext" ${"selected" if f=="fulltext" else ""}>${ _("Fulltext")}</option>
+        <option value="keyword" ${"selected" if f=="keyword" else ""}>${ _("Keyword")}</option>
           </select>
         </td>
       </tr>
@@ -65,9 +65,9 @@ ${ _("Warning: since you are not logged in, only results from public events will
         <td>${ _("Search for") }:</td>
         <td>
           <select class="UIFieldSpan" name="collections">
-        <option value="Events">${ _("Events")}</option>
-        <option value="Contributions">${ _("Contributions")}</option>
-        <option value="" selected>${ _("Both (Events+Contributions)")}</option>
+        <option value="Events" ${"selected" if collections=="Events" else ""}>${ _("Events")}</option>
+        <option value="Contributions" ${"selected" if collections=="Contributions" else ""}>${ _("Contributions")}</option>
+        <option value="" ${"selected" if collections=="" else ""}>${ _("Both (Events+Contributions)")}</option>
           </select>
         </td>
       </tr>
@@ -85,9 +85,9 @@ ${ _("Warning: since you are not logged in, only results from public events will
         <td>${ _("Sort field") }:</td>
         <td>
           <select class="UIFieldSpan" name="sortField" style="display: inline;">
-            <option value="">${ _("Latest first")}</option>
-            <option value="title">${ _("Title")}</option>
-            <option value="author">${ _("Author")}</option>
+            <option value="" ${"selected" if sortField=="" else ""}>${ _("Latest first")}</option>
+            <option value="title" ${"selected" if sortField=="title" else ""}>${ _("Title")}</option>
+            <option value="author" ${"selected" if sortField=="author" else ""}>${ _("Author")}</option>
           </select>
         </td>
       </tr>
@@ -95,8 +95,8 @@ ${ _("Warning: since you are not logged in, only results from public events will
         <td>${ _("Sort order") }:</td>
         <td>
           <select class="UIFieldSpan" name="sortOrder" style="display: inline;">
-        <option value="a">${ _("Ascending")}</option>
-        <option value="d" selected>${ _("Descending")}</option>
+        <option value="a" ${"selected" if sortOrder=="a" else ""}>${ _("Ascending")}</option>
+        <option value="d" ${"selected" if sortOrder=="d" else ""}>${ _("Descending")}</option>
           </select>
         </td>
       </tr>
