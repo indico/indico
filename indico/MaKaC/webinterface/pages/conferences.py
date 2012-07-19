@@ -2859,171 +2859,162 @@ class WPConfClone( WPConfModifToolsBase, OldObservable ):
                                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>""") }
         #let the plugins add their own elements
         self._notify('addCheckBox2CloneConf', pars)
-        return p.getHTML( pars )
+        return p.getHTML(pars)
 
 #---------------------------------------------------------------------------------------
+
 
 class WConferenceAllSessionsConveners(wcomponents.WTemplated):
 
     def __init__(self, conference):
         self.__conf = conference
         self._display = []
-        self._dispopts = [ "Email", "Session", "Actions" ]
+        self._dispopts = ["Email", "Session", "Actions"]
         self._order = ""
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self.__conf.getTitle()
         vars["confId"] = self.__conf.getId()
-        vars["convenerSelectionAction"]=quoteattr(str(urlHandlers.UHConfAllSessionsConvenersAction.getURL(self.__conf)))
-        vars["contribSetIndex"]='index'
-        vars["convenerNumber"]=str(len(self.__conf.getAllSessionsConvenerList()))
-        vars["conveners"]=self._getAllConvenersHTML()
+        vars["convenerSelectionAction"] = quoteattr(str(urlHandlers.UHConfAllSessionsConvenersAction.getURL(self.__conf)))
+        vars["contribSetIndex"] = 'index'
+        vars["convenerNumber"] = str(len(self.__conf.getAllSessionsConvenerList()))
+        vars["conveners"] = self._getAllConvenersHTML()
         vars["columns"] = self._getColumnsHTML(None)
-        vars["backURL"]=quoteattr(str(urlHandlers.UHConfModifListings.getURL(self.__conf)))
+        vars["backURL"] = quoteattr(str(urlHandlers.UHConfModifListings.getURL(self.__conf)))
         return vars
 
     def _getTimetableURL(self, convener):
         url = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
-        url.addParam("sessionId",convener.getSession().getId() )
+        url.addParam("sessionId", convener.getSession().getId())
         if hasattr(convener, "getSlot"):
-            timetable = "#" + str(convener.getSlot().getStartDate().strftime("%Y%m%d")) + ".s%sl%s" %(convener.getSession().getId(), convener.getSlot().getId())
+            timetable = "#" + str(convener.getSlot().getStartDate().strftime("%Y%m%d")) + ".s%sl%s" % (convener.getSession().getId(), convener.getSlot().getId())
         else:
             timetable = "#" + str(convener.getSession().getStartDate().strftime("%Y%m%d"))
 
-        return "%s%s"%(url,timetable)
+        return "%s%s" % (url, timetable)
 
     def _getAllConvenersHTML(self):
-        html = ''
+        convenersFormatted = []
+        convenersDict = self.__conf.getAllSessionsConvenerList()
 
-        url = urlHandlers.UHSessionModification.getURL(self.__conf)
-        convenersDictionary = self.__conf.getAllSessionsConvenerList()
+        for key, conveners in convenersDict.iteritems():
 
-        for key in convenersDictionary.keys() :
-            counter = 0
-            sessions = []
-            actions = []
+            for convener in conveners:
+                data = {
+                    'email': convener.getEmail(),
+                    'name': convener.getFullName() or '',
+                    'urlTimetable': self._getTimetableURL(convener),
+                    'urlSessionModif': None
+                }
 
-            for convener in  convenersDictionary[key] :
-                if counter == 0 :
-                    html = html + """
-                    <tr>
-                        <td valign="top" nowrap class="abstractDataCell"><input type="checkbox" name="conveners" value="%s">&nbsp;&nbsp;%s</td>
-                        <td valign="top" nowrap class="abstractDataCell">&nbsp;&nbsp;%s</td>
-                        """    %(convener.getEmail(),\
-                        self.htmlText(convener.getFullName()) or "&nbsp;", \
-                        self.htmlText(convener.getEmail()) or "&nbsp;" )
                 if isinstance(convener, conference.SlotChair):
-                    sestitle = self.htmlText(convener.getSlot().getTitle()) or "Block %s" % convener.getSlot().getId()
-                    sessions.append("%s"%(self.htmlText(convener.getSession().getTitle()) + ": " + sestitle))
-                    actions.append('<a href="%s">'%self._getTimetableURL(convener) + _('Edit timetable') + '</a>')
+                    title = convener.getSlot().getTitle() or "Block %s" % convener.getSlot().getId()
+                    data['session'] = convener.getSession().getTitle() + ': ' + title
                 else:
                     url = urlHandlers.UHSessionModification.getURL(self.__conf)
-                    url.addParam("sessionId",convener.getSession().getId() )
-                    sesurl = quoteattr(str(url))
-                    sestitle = self.htmlText(convener.getSession().getTitle()) or "&nbsp;"
-                    sessions.append("%s"%(self.htmlText(sestitle)))
-                    actions.append('<a href="%s">'%self._getTimetableURL(convener) + _('Edit timetable') + '</a> | <a href=%s>%s</a>'%(sesurl,_("Edit session")))
+                    url.addParam('sessionId', convener.getSession().getId())
 
-                counter = counter + 1
+                    data['urlSessionModif'] = str(url)
+                    data['session'] = convener.getSession().getTitle() or ''
 
-            sessionlist = "<br/>".join(sessions)
-            actionsList = "<br/>".join(actions)
-            html = html + """<td valign="top"  class="abstractDataCell">%s</td>"""%sessionlist
-            html = html + """<td valign="top"  class="abstractDataCell">%s</td>"""%actionsList
-            html = html + """</tr>"""
-        html += i18nformat("""
-                    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                    <tr><td colspan="3" align="left">&nbsp;<input type="submit" class="btn" value="_("Send an E-mail")" name="sendEmails"></td></tr>
-                    </form>
-                          """)
-        return html
+                convenersFormatted.append(data)
+
+        return convenersFormatted
 
     def _getColumnsHTML(self, sortingField):
-        res =[]
-        columns ={"Email": _("Email"),"Session": _("Session"), "Actions": _("Actions") }
-        currentSorting=""
+        res = []
+        columns = {"Email": _("Email"), "Session": _("Session"), "Actions": _("Actions")}
+        currentSorting = ""
+
         if sortingField is not None:
-            currentSorting=sortingField.getId()
+            currentSorting = sortingField.getId()
+
         currentSortingHTML = ""
 
-        url=self._getURL()
-        url.addParam("sortBy","Name")
-        nameImg=""
+        url = self._getURL()
+        url.addParam("sortBy", "Name")
+        nameImg = ""
+
         if currentSorting == "Name":
             currentSortingHTML = """<input type="hidden" name="sortBy" value="Name">"""
             if self._order == "down":
-                nameImg = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
+                nameImg = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order", "up")
             elif self._order == "up":
-                nameImg = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        nameSortingURL=quoteattr("%s#results"%str(url))
-        checkAll = """<img src=%s border="0" alt="Select all" onclick="selectAll()" style="cursor:hand">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
-        uncheckAll = """<img src=%s border="0" alt="Unselect all" onclick="unselectAll()" style="cursor:hand"">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        checkboxes="%s%s"%(checkAll,uncheckAll)
+                nameImg = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order", "down")
+
+        nameSortingURL = quoteattr("%s#results" % str(url))
+        checkAll = """<img src=%s border="0" alt="Select all" onclick="selectAll()" style="cursor:hand">""" % quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
+        uncheckAll = """<img src=%s border="0" alt="Unselect all" onclick="unselectAll()" style="cursor:hand"">""" % quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
+        checkboxes = "%s%s" % (checkAll, uncheckAll)
         res.append("""
-                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s%s<a href=%s>Name</a></td>"""%(nameImg, checkboxes, nameSortingURL))
+                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s%s<a href=%s>Name</a></td>""" % (nameImg, checkboxes, nameSortingURL))
         if self._display == []:
             for key in self._dispopts:
-                if key in ["Email","Session", "Actions"]:
-                    url=self._getURL()
-                    url.addParam("sortBy",key)
-                    img=""
+                if key in ["Email", "Session", "Actions"]:
+                    url = self._getURL()
+                    url.addParam("sortBy", key)
+                    img = ""
+
                     if currentSorting == key:
-                        currentSortingHTML = """<input type="hidden" name="sortBy" value="%s">"""%key
+                        currentSortingHTML = """<input type="hidden" name="sortBy" value="%s">""" % key
                         if self._order == "down":
-                            img = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                            url.addParam("order","up")
+                            img = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                            url.addParam("order", "up")
                         elif self._order == "up":
-                            img = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                            url.addParam("order","down")
-                    sortingURL=quoteattr("%s#results"%str(url))
+                            img = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                            url.addParam("order", "down")
+
+                    sortingURL = quoteattr("%s#results" % str(url))
                     res.append("""
-                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>"""%(img, sortingURL, self.htmlText(columns[key])))
+                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>""" % (img, sortingURL, self.htmlText(columns[key])))
         else:
             for key in self._dispopts:
                 if key in self._display:
-                    url=self._getURL()
-                    url.addParam("sortBy",key)
-                    img=""
+                    url = self._getURL()
+                    url.addParam("sortBy", key)
+                    img = ""
+
                     if currentSorting == key:
-                        currentSortingHTML = """<input type="hidden" name="sortBy" value="%s">"""%key
+                        currentSortingHTML = """<input type="hidden" name="sortBy" value="%s">""" % key
                         if self._order == "down":
-                            img = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                            url.addParam("order","up")
+                            img = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                            url.addParam("order", "up")
                         elif self._order == "up":
-                            img = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                            url.addParam("order","down")
+                            img = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                            url.addParam("order", "down")
 
-                    sortingURL=quoteattr("%s#results"%str(url))
+                    sortingURL = quoteattr("%s#results" % str(url))
                     res.append("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>
-                               """%(img, sortingURL, self.htmlText(columns[key])))
+                               """ % (img, sortingURL, self.htmlText(columns[key])))
 
-        html= """
+        html = """
             <t>
-            <!--<td width="1px">%s</td>-->
+             <!--<td width="1px">%s</td>-->
             %s
             </tr>
-             """%(currentSortingHTML, "".join(res))
+             """ % (currentSortingHTML, "".join(res))
         return html
 
-    def _getURL( self ):
+    def _getURL(self):
         url = urlHandlers.UHConfAllSessionsConveners.getURL(self.__conf)
 
         if self._display == []:
-            url.addParam("disp", ["Email","Session"])
+            url.addParam("disp", ["Email", "Session"])
         else:
             url.addParam("disp", self._display)
 
         return url
 
-class WPConfAllSessionsConveners( WPConfModifListings ):
 
-    def _getPageContent( self, params ):
+class WPConfAllSessionsConveners(WPConfModifListings):
+
+    def _getPageContent(self, params):
         banner = wcomponents.WListingsBannerModif(self._conf, _("Conveners list")).getHTML()
-        p = WConferenceAllSessionsConveners( self._conf )
-        return banner+p.getHTML()
+        p = WConferenceAllSessionsConveners(self._conf)
+        return banner + p.getHTML()
 
 #---------------------------------------------------------------------------------------
 
@@ -7380,61 +7371,66 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
             vars["contribs"]=self._getTimeTableHTML()
         return vars
 
-class WPSessionStaticDisplay( WPConferenceStaticDefaultDisplayBase ):
+
+class WPSessionStaticDisplay(WPConferenceStaticDefaultDisplayBase):
 
     def __init__(self, rh, target, staticPars):
         WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target.getConference())
-        self._session=target
+        self._session = target
         self._staticPars = staticPars
 
-    def _defineSectionMenu( self ):
-        WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
+    def _defineSectionMenu(self):
+        WPConferenceStaticDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._timetableOpt)
 
     def _getBody(self,params):
-        wc=WSessionStaticDisplay(self._getAW(),self._session)
+        wc = WSessionStaticDisplay(self._getAW(), self._session)
         return wc.getHTML()
 
 #------------------------ End Static ---------------------------------------------------------------
 
-class WDVDDone( wcomponents.WTemplated ):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["supportAddr"]=Config.getInstance().getSupportEmail()
+class WDVDDone(wcomponents.WTemplated):
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["supportAddr"] = Config.getInstance().getSupportEmail()
         return vars
 
-class WPDVDDone( WPConfModifToolsBase ):
 
-    def _setActiveTab( self ):
+class WPDVDDone(WPConfModifToolsBase):
+
+    def _setActiveTab(self):
         self._tabOfflineSite.setActive()
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         w = WDVDDone()
-        p={}
-        p["url"]=quoteattr(str(params.get("url")))
+        p = {}
+        p["url"] = quoteattr(str(params.get("url")))
         return w.getHTML(p)
 
-class WPConfModifDVDCreationConfirm( WPConfModifToolsBase ):
 
-    def _setActiveTab( self ):
+class WPConfModifDVDCreationConfirm(WPConfModifToolsBase):
+
+    def _setActiveTab(self):
         self._tabOfflineSite.setActive()
 
-    def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        msg="""<br>Please confirm that you want to create an "Offline Website" for your event<br>
+    def _getTabContent(self, params):
+        wc = wcomponents.WConfirmation()
+        msg = """<br>Please confirm that you want to create an "Offline Website" for your event<br>
         <font color="red">(note if you confirm you cannot stop the creation of the website )</font><br>"""
-        url=urlHandlers.UHConfDVDCreation.getURL(self._conf)
-        return wc.getHTML(msg,url,{})
+        url = urlHandlers.UHConfDVDCreation.getURL(self._conf)
+        return wc.getHTML(msg, url, {})
+
 
 class WTimeTableCustomizePDF(wcomponents.WTemplated):
 
     def __init__(self, conf):
         self._conf = conf
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        url=urlHandlers.UHConfTimeTablePDF.getURL(self._conf)
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        url = urlHandlers.UHConfTimeTablePDF.getURL(self._conf)
         vars["getPDFURL"] = quoteattr(str(url))
         vars["showDays"] = vars.get("showDays", "all")
         vars["showSessions"] = vars.get("showSessions", "all")
@@ -7445,23 +7441,23 @@ class WTimeTableCustomizePDF(wcomponents.WTemplated):
         return vars
 
 
-class WPTimeTableCustomizePDF( WPConferenceDefaultDisplayBase ):
+class WPTimeTableCustomizePDF(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NETimeTableCustomizePDF
 
-    def _getBody( self, params ):
-        wc = WTimeTableCustomizePDF( self._conf )
+    def _getBody(self, params):
+        wc = WTimeTableCustomizePDF(self._conf)
         return wc.getHTML(params)
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
+    def _defineSectionMenu(self):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._timetableOpt)
 
 
-class WConfModifPendingQueuesList ( wcomponents.WTemplated ):
+class WConfModifPendingQueuesList(wcomponents.WTemplated):
 
-    def __init__(self, url, title, target, list, pType) :
-        self._postURL = url;
-        self._title = title;
+    def __init__(self, url, title, target, list, pType):
+        self._postURL = url
+        self._title = title
         self._target = target
         self._list = list
         self._pType = pType
@@ -7484,8 +7480,8 @@ class WConfModifPendingQueuesList ( wcomponents.WTemplated ):
             return 0
         return cmp(cp1.getSession().getTitle(), cp2.getSession().getTitle())
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
 
         vars["postURL"] = self._postURL
         vars["title"] = self._title
@@ -7495,51 +7491,51 @@ class WConfModifPendingQueuesList ( wcomponents.WTemplated ):
 
         return vars
 
-class WConfModifPendingQueues( wcomponents.WTemplated ):
+
+class WConfModifPendingQueues(wcomponents.WTemplated):
 
     def __init__(self, conf, aw, activeTab="submitters"):
         self._conf = conf
         self._aw = aw
-        self._activeTab=activeTab
-        self._pendingSubmitters=self._conf.getPendingQueuesMgr().getPendingSubmitters()
-        self._pendingManagers=self._conf.getPendingQueuesMgr().getPendingManagers()
-        self._pendingCoordinators=self._conf.getPendingQueuesMgr().getPendingCoordinators()
+        self._activeTab = activeTab
+        self._pendingSubmitters = self._conf.getPendingQueuesMgr().getPendingSubmitters()
+        self._pendingManagers = self._conf.getPendingQueuesMgr().getPendingManagers()
+        self._pendingCoordinators = self._conf.getPendingQueuesMgr().getPendingCoordinators()
 
-    def _createTabCtrl( self ):
-        self._tabCtrl=wcomponents.TabControl()
-        url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
-        url.addParam("tab","submitters")
-        self._tabSubmitters=self._tabCtrl.newTab("submitters", \
-                                                _("Pending Submitters"),str(url))
-        url.addParam("tab","managers")
-        self._tabManagers=self._tabCtrl.newTab("managers", \
-                                                _("Pending Managers"),str(url))
-        url.addParam("tab","coordinators")
-        self._tabCoordinators=self._tabCtrl.newTab("coordinators", \
-                                                _("Pending Coordinators"),str(url))
+    def _createTabCtrl(self):
+        self._tabCtrl = wcomponents.TabControl()
+        url = urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab", "submitters")
+        self._tabSubmitters = self._tabCtrl.newTab("submitters", \
+                                                _("Pending Submitters"), str(url))
+        url.addParam("tab", "managers")
+        self._tabManagers = self._tabCtrl.newTab("managers", \
+                                                _("Pending Managers"), str(url))
+        url.addParam("tab", "coordinators")
+        self._tabCoordinators = self._tabCtrl.newTab("coordinators", \
+                                                _("Pending Coordinators"), str(url))
         self._tabSubmitters.setEnabled(True)
-        tab=self._tabCtrl.getTabById(self._activeTab)
+        tab = self._tabCtrl.getTabById(self._activeTab)
         if tab is None:
-            tab=self._tabCtrl.getTabById("submitters")
+            tab = self._tabCtrl.getTabById("submitters")
         tab.setActive()
 
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         self._createTabCtrl()
-        list=[]
-        url=""
-        title=""
+        list = []
+        url = ""
+        title = ""
 
         if self._tabSubmitters.isActive():
             # Pending submitters
             keys = self._conf.getPendingQueuesMgr().getPendingSubmittersKeys(True)
 
-            url=urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
-            url.addParam("tab","submitters")
-            title= _("Pending authors/speakers to become submitters")
-            target= _("Contribution")
-            pType=_("Submitters")
+            url = urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
+            url.addParam("tab", "submitters")
+            title = _("Pending authors/speakers to become submitters")
+            target = _("Contribution")
+            pType = _("Submitters")
 
             for key in keys:
                 list.append((key, self._pendingSubmitters[key][:]))
@@ -7549,11 +7545,11 @@ class WConfModifPendingQueues( wcomponents.WTemplated ):
             # Pending managers
             keys = self._conf.getPendingQueuesMgr().getPendingManagersKeys(True)
 
-            url=urlHandlers.UHConfModifPendingQueuesActionMgr.getURL(self._conf)
-            url.addParam("tab","managers")
-            title= _("Pending conveners to become managers")
-            target= _("Session")
-            pType="Managers"
+            url = urlHandlers.UHConfModifPendingQueuesActionMgr.getURL(self._conf)
+            url.addParam("tab", "managers")
+            title = _("Pending conveners to become managers")
+            target = _("Session")
+            pType = "Managers"
 
             for key in keys:
                 list.append((key, self._pendingManagers[key][:]))
@@ -7563,59 +7559,65 @@ class WConfModifPendingQueues( wcomponents.WTemplated ):
             # Pending coordinators
             keys = self._conf.getPendingQueuesMgr().getPendingCoordinatorsKeys(True)
 
-            url=urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
-            url.addParam("tab","coordinators")
-            title= _("Pending conveners to become coordinators")
-            target= _("Session")
-            pType="Coordinators"
+            url = urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
+            url.addParam("tab", "coordinators")
+            title = _("Pending conveners to become coordinators")
+            target = _("Session")
+            pType = "Coordinators"
 
             for key in keys:
                 list.append((key, self._pendingCoordinators[key][:]))
                 list.sort(conference.ConferenceParticipation._cmpFamilyName)
 
         html = WConfModifPendingQueuesList(str(url), title, target, list, pType).getHTML()
-        vars["pendingQueue"]=wcomponents.WTabControl(self._tabCtrl, self._aw).getHTML(html)
-        vars["backURL"]=quoteattr(str(urlHandlers.UHConfModifListings.getURL(self._conf)))
+        vars["pendingQueue"] = wcomponents.WTabControl(self._tabCtrl, self._aw).getHTML(html)
+        vars["backURL"] = quoteattr(str(urlHandlers.UHConfModifListings.getURL(self._conf)))
 
         return vars
 
-class WPConfModifPendingQueuesBase( WPConferenceModifBase ):
+
+class WPConfModifPendingQueuesBase(WPConferenceModifBase):
 
     def __init__(self, rh, conf, activeTab=""):
         WPConferenceModifBase.__init__(self, rh, conf)
-        self._activeTab=activeTab
+        self._activeTab = activeTab
 
     def _getPageContent(self, params):
         banner = wcomponents.WListingsBannerModif(self._conf, _("Pending queues")).getHTML()
-        return banner+self._getTabContent( params )
+        return banner + self._getTabContent(params)
 
     def _setActiveSideMenuItem(self):
         self._listingsMenuItem.setActive(True)
 
-class WPConfModifPendingQueues( WPConfModifPendingQueuesBase ):
 
-    def _getTabContent( self, params ):
-        wc = WConfModifPendingQueues( self._conf, self._getAW(), self._activeTab )
+class WPConfModifPendingQueues(WPConfModifPendingQueuesBase):
+
+    def _getTabContent(self, params):
+        wc = WConfModifPendingQueues(self._conf, self._getAW(), self._activeTab)
         return wc.getHTML()
 
-class WPConfModifPendingQueuesRemoveSubmConfirm( WPConfModifPendingQueuesBase ):
 
-    def __init__(self,rh, conf, pendingSubms):
-        WPConfModifPendingQueuesBase.__init__(self,rh,conf)
+class WPConfModifPendingQueuesRemoveSubmConfirm(WPConfModifPendingQueuesBase):
+
+    def __init__(self, rh, conf, pendingSubms):
+        WPConfModifPendingQueuesBase.__init__(self, rh, conf)
         self._pendingSubms = pendingSubms
 
-    def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        pss=[]
+    def _getTabContent(self, params):
+        wc = wcomponents.WConfirmation()
+        pss = []
+
         for i in self._pendingSubms:
-           pss.append("""<li>%s</li>"""%i)
-        msg= i18nformat(""" _("Are you sure you want to delete the following participants pending to become submitters")?<br>
+           pss.append("""<li>%s</li>""" % i)
+
+        msg = i18nformat(""" _("Are you sure you want to delete the following participants pending to become submitters")?<br>
         <ul>
         %s
         </ul>
         <font color="red">( _("note they will not become submitters of their contributions but you will still keep them as participants"))</font><br>""")%"".join(pss)
-        url=urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
-        return wc.getHTML(msg,url,{"pendingSubmitters":self._pendingSubms, "remove": _("remove")})
+        url = urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
+        return wc.getHTML(msg, url, {"pendingSubmitters": self._pendingSubms, "remove": _("remove")})
+
 
 class WPConfModifPendingQueuesReminderSubmConfirm( WPConfModifPendingQueuesBase ):
 
