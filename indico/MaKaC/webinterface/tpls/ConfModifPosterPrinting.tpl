@@ -36,32 +36,23 @@
       </tr>
       <tr>
         <td colspan="2" class="groupTitle">
-           ${ _("Create New Local Poster Template")}
+           ${ _("Local Poster Templates")}
         </td>
       </tr>
-     <tr class="trBottomSpacer">
-        <form action='${ NewTemplateURL }' method='post'>
-        <td class="titleCellTD" NOWRAP>
-          ${ _("Based on:")}
-        </td>
-        <td>
+      <tr class="trBottomSpacer">
+        <td colspan="2">
+          <form action='${ NewTemplateURL }' method='post'>
+          ${ _("Create new local poster template based on")}:
           <select name="baseTemplate">
-          % for template in baseTemplateList:
-            <option value="${template['value']}">${template['label']}</option>
-          % endfor
+            % for template in baseTemplateList:
+              <option value="${template['value']}">${template['label']}</option>
+            % endfor
           </select>
           <input name="New Template Button" class="btn" value="${ _("New")}" type="submit">
           </form>
         </td>
-     </tr>
-
-      % if templateList:
-      <tr>
-        <td colspan="2" class="groupTitle">
-           ${ _("Current Local Poster Templates")}
-        </td>
       </tr>
-
+      % if templateList:
       <tr>
         <td colspan="2">
           <table>
@@ -74,7 +65,7 @@
                   <a href="${template['urlDelete']}" class='bs-btn bs-btn-mini'>${_('Delete')}</a>
                 </td>
                 <td style="padding-left:5px;">
-                  ${template['name']}
+                  <a href="${ NewTemplateURL }&baseTemplate=local${template['id']}" target="_blank">${template['name']}</a>
                 </td>
               </tr>
               % endfor

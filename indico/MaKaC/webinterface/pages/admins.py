@@ -2580,8 +2580,9 @@ class WPConfirmDelete(WPTaskManagerBase):
     def _getTabContent(self, params):
         wc = wcomponents.WConfirmation()
 
-        msg = {'challenge': _('Are you sure you want to delete the following task'),
+        msg = {'challenge': _('Are you sure you want to delete the following task?'),
                'target': self._taskId,
+               'important': True,
                'subtext': _('Note that you will permanently remove the task.')
                }
 

@@ -1254,8 +1254,9 @@ class WContributionDeletion(object):
             </table>
               """) % ("".join(titles))
 
-        msg = {'challenge': _("Are you sure that you want to delete the following contributions"),
+        msg = {'challenge': _("Are you sure that you want to delete the following contributions?"),
                'target': body,
+               'important': True,
                'subtext': _("All the existing sub-contributions within the above contribution(s) will also be deleted")
                }
 

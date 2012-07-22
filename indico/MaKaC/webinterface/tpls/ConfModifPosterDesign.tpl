@@ -172,12 +172,13 @@
         $('#style_selector').prop('selectedIndex', newSelectedItem.styleIndex);
         $('#color_selector').prop('selectedIndex', newSelectedItem.colorIndex);
         $('#width_field').val(newSelectedItem.width / pixelsPerCm);
+
         if (newSelectedItem.key == "Fixed Text") {
-            $('#fixed_text_field').val(newSelectedItem.text).prop('disabled', false);
-            $('#changeText').prop('disabled', false);
+            $('#fixedTextContainer').slideDown();
+            $('#fixed_text_field').val(newSelectedItem.text);
         } else {
-            $('#fixed_text_field').val("").prop('disabled', true);
-            $('#changeText').prop('disabled', true);
+            $('#fixedTextContainer').slideUp();
+            $('#fixed_text_field').val("");
         }
     }
 
@@ -737,11 +738,16 @@
                         ${_('Element Adjustments')}
                     </div>
                     <!-- Width -->
-                    Width: <input id="width_field" size="5" name="Element Size">
-                          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="width">
-                    <!-- Text for fixed text -->
-                      Fixed Text: <input id="fixed_text_field" size="30" name="Element Size" disabled="disabled">
-                          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="text" id="changeText" disabled="disabled">
+                    Width: <input id="width_field" size="5" name="Element Size" />
+                          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="width" />
+                </div>
+                <!-- Text for fixed text -->
+                <div  class="toolbar-container element" id="fixedTextContainer" style="display:none;">
+                    <div class="container-title">
+                        ${_('Fixed Text')}
+                    </div>
+                    <input id="fixed_text_field" size="30" name="Element Size" />
+                    <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="text" id="changeText" />
                 </div>
         </div>
         <!-- End of formatting tab -->

@@ -5,15 +5,21 @@
                 ${passingArgs}
                 <table border="0">
                     <tr>
-                        <td class="groupTitle" colspan="2">
-                            ${ _("Confirmation Required")}
+                        <td colspan="2">
+                            <div class="titleWarning">
+                                ${ _("Confirmation Required")}
+                            </div>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <div class="bs-alert alert-toolbar">
                                 <% new_format = 'challenge' in message %>
                                 % if new_format:
+                                    % if 'important' in message:
+                            <div class="bs-alert alert-warning">
+                                    % else:
+                            <div class="bs-alert alert-toolbar">
+                                    % endif
                                 <div class="toolbar-container">
                                     <div class="container-title">
                                         ${message['challenge']}
@@ -29,6 +35,7 @@
                                 </div>
                                 <div class="toolbar-clearer"></div>
                                 % else:
+                            <div class="bs-alert alert-toolbar">
                                     ${message}
                                 % endif
                             </div>

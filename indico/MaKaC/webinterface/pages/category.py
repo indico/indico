@@ -1641,8 +1641,9 @@ class WCategoryDeletion(object):
         for categ in self._categList:
             categories.append("""<li><i>%s</i></li>""" % categ.getName())
 
-        msg = {'challenge': _("Are you sure that you want to delete the following categories"),
+        msg = {'challenge': _("Are you sure that you want to delete the following categories?"),
                'target': "".join(categories),
+               'important': True,
                'subtext': _("Note that all the existing sub-categories below will also be deleted")
                }
 
@@ -1668,8 +1669,9 @@ class WConferenceDeletion(object):
         for event in self._confList:
             events.append("""<li><i>%s</i></li>""" % event.getTitle())
 
-        msg = {'challenge': _('Are you sure that you want to delete the following events'),
+        msg = {'challenge': _('Are you sure that you want to delete the following events?'),
                'target': "".join(events),
+               'important': True,
                'subtext': _('Note that ALL the existing sub-categories below will also be deleted')
                }
 

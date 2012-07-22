@@ -1532,8 +1532,9 @@ class WPModRemConfirmation(WPModTools):
 
     def _getTabContent(self, params):
         wc = wcomponents.WConfirmation()
-        msg = {'challenge': _("Are you sure you want to delete the abstract"),
+        msg = {'challenge': _("Are you sure you want to delete the abstract?"),
                'target': self._abs.getTitle(),
+               'important': True,
                'subtext': None
                }
         url = urlHandlers.UHAbstractDelete.getURL(self._abs)

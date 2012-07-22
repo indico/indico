@@ -2296,7 +2296,7 @@ class WPConfClosing(WPConfModifToolsBase):
         self._tabClose.setActive()
 
     def _getTabContent(self, params):
-        msg = {'challenge': _("Are you sure that you want to lock the event"),
+        msg = {'challenge': _("Are you sure that you want to lock the event?"),
                'target': self._conf.getTitle(),
                'subtext': _("Note that if you lock the event, you will not be able to change its details any more." + 
                 "Only the creator of the event or an administrator of the system / category can unlock an event.")
@@ -2314,8 +2314,9 @@ class WPConfDeletion(WPConfModifToolsBase):
         self._tabDelete.setActive()
 
     def _getTabContent(self, params):
-        msg = {'challenge': _("Are you sure that you want to delete the conference"),
+        msg = {'challenge': _("Are you sure that you want to delete the conference?"),
                'target': self._conf.getTitle(),
+               'important': True,
                'subtext': _("Note that if you delete the conference, all the items below it will also be deleted")
                }
 
