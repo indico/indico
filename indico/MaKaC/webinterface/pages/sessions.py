@@ -51,118 +51,190 @@ from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.user import Avatar
 
 
-class WPSessionBase( WPConferenceBase ):
+class WPSessionBase(WPConferenceBase):
 
-    def __init__( self, rh, session):
+    def __init__(self, rh, session):
         self._session = session
-        WPConferenceBase.__init__( self, rh, self._session.getConference() )
+        WPConferenceBase.__init__(self, rh, self._session.getConference())
 
 
-class WPSessionDisplayBase( WPSessionBase ):
+class WPSessionDisplayBase(WPSessionBase):
     pass
 
-class WPSessionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPSessionDisplayBase ):
 
-    def __init__( self, rh, session ):
-        WPSessionDisplayBase.__init__( self, rh, session )
+class WPSessionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSessionDisplayBase):
 
-class WContributionDisplayItemBase(wcomponents.WTemplated):
+    def __init__(self, rh, session):
+        WPSessionDisplayBase.__init__(self, rh, session)
 
-    def __init__(self,aw,contrib):
-        self._contrib=contrib
-        self._aw=aw
 
-    def getVars( self ):
-        vars=wcomponents.WTemplated.getVars( self )
-        tz = DisplayTZ(self._aw,self._contrib.getConference()).getDisplayTZ()
-        vars["id"]=self.htmlText(self._contrib.getId())
-        vars["title"]=self.htmlText(self._contrib.getTitle())
-        cType=""
-        if self._contrib.getType() is not None:
-            cType=self.htmlText(self._contrib.getType().getName())
-        vars["type"]=self.htmlText(cType)
-        vars["startDate"]="&nbsp;"
-        if self._contrib.isScheduled():
-            vars["startDate"]=self._contrib.getAdjustedStartDate(tz).strftime("%Y-%b-%d %H:%M")
-        vars["duration"] = "&nbsp;"
-        if self._contrib.getDuration() is not None:
-            if (datetime(1900,1,1)+self._contrib.getDuration()).minute>0:
-                vars["duration"]="%s"%(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%M'")
-            if (datetime(1900,1,1)+self._contrib.getDuration()).hour>0:
-                vars["duration"]="%s"%(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%Hh%M'")
-        lspk = []
-        for speaker in self._contrib.getSpeakerList():
-            lspk.append(self.htmlText(speaker.getFullName()))
-        vars["speakers"] = "<br>".join( lspk )
-        if vars["speakers"]=="":
-            vars["speakers"]="&nbsp;"
-        vars["displayURL"]=quoteattr(str(urlHandlers.UHContributionDisplay.getURL(self._contrib)))
-        vars["boardNumber"]=self.htmlText(self._contrib.getBoardNumber())
+class WContributionDisplayTableBase(wcomponents.WTemplated):
+
+    _linkFields = []
+
+    def __init__(self, aw, session, sortingCrit, tab=None):
+        self._aw = aw
+        self._session = session
+        self._sortingCrit = sortingCrit
+        self._activeTab = tab
+
+    def _getBaseRowData(self):
+        """
+        Returns the shared-format dictionary for the tables which
+        are generated from this class' children.
+        """
+        return {
+            'id': '',
+            'title': '',
+            'displayURL': '',
+            'type': '',
+            'startDate': '',
+            'duration': '',
+            'speakers': ''
+        }
+
+    def _getURL(self, sortByField):
+        url = urlHandlers.UHSessionDisplay.getURL(self._session)
+
+        if self._activeTab:
+            url.addParam("tab", self._activeTab)
+
+        url.addParam("sortBy", sortByField)
+
+        return url
+
+    def _getSortByLinks(self):
+        links = []
+
+        for field in self._getLinkFields():
+
+            if field['sortable']:
+                url = str(self._getURL(field['id']))
+                # Default to compare against 'id' if no criteria defined.
+                key = self._sortingCrit.getField().getId() if self._sortingCrit else 'number'
+                active = (field['id'] == key)
+            else:
+                url = None
+                active = False
+
+            links.append({
+                'label': field['label'],
+                'active': active,
+                'url': url,
+                'idx': field['idx']
+            })
+
+        return sorted(links, key=lambda i: i['idx'])
+
+    def _getLinkFields(self):
+        return self._linkFields
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars['contribs'] = []
+        vars['links'] = self._getSortByLinks()
+        vars['downArrow'] = quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
+
+        if self._sortingCrit is None:
+            self._sortingCrit = contribFilters.SortingCriteria(["number"])
+
+        fc = _NoWithdrawnFilterCriteria(self._session.getConference())
+        filtr = filters.SimpleFilter(fc, self._sortingCrit)
+
+        for contrib in filtr.apply(self._session.getContributionList()):
+            vars['contribs'].append(self._processContrib(contrib))
+
         return vars
 
+    def _initialProcess(self, contrib):
+        """
+        Shared functionality between the processing methods, including
+        ascertaining whether or not current user has rights to view and/or
+        access the contribution.
+        """
 
-class WContributionDisplayItemFull(WContributionDisplayItemBase):
-    pass
+        canAccess = contrib.canAccess(self._aw)
+        canView = contrib.canView(self._aw)
+        data = self._getBaseRowData()
+
+        if not canAccess and canView:
+            return data
+
+        tz = DisplayTZ(self._aw, contrib.getConference()).getDisplayTZ()
+        data["id"] = contrib.getId()
+        data["title"] = contrib.getTitle()
+        data["displayURL"] = quoteattr(str(urlHandlers.UHContributionDisplay.getURL(contrib)))
+
+        if canView and not canAccess:
+            # User can only see the ID, Title & URL
+            return data
+
+        data["type"] = contrib.getType().getName() if contrib.getType() else ''
+        data["startDate"] = contrib.getAdjustedStartDate(tz).strftime("%Y-%b-%d %H:%M") if \
+                            contrib.isScheduled() else ''
+
+        if contrib.getDuration() is not None:
+            if (datetime(1900, 1, 1) + contrib.getDuration()).minute > 0:
+                data["duration"] = "%s" % (datetime(1900, 1, 1) + contrib.getDuration()).strftime("%M'")
+            if (datetime(1900, 1, 1) + contrib.getDuration()).hour > 0:
+                data["duration"] = "%s" % (datetime(1900, 1, 1) + contrib.getDuration()).strftime("%Hh%M'")
+        else:
+            data["duration"] = ''
+
+        data["speakers"] = ','.join([x.getFullName() for x in contrib.getSpeakerList()])
+
+        return data
+
+    def _processContrib(self, contrib):
+        """
+        To be overridden in inheriting class
+        """
+        return contrib
 
 
-class WContributionDisplayItemMin(WContributionDisplayItemBase):
-    pass
+class WContributionDisplayTableFull(WContributionDisplayTableBase):
+    """
+    Builds a table of the contributions for Session display etc.
+    """
+
+    _linkFields = [{'id': 'number', 'label': _('ID'), 'sortable': True, 'idx': 1},
+                   {'id': 'duration', 'label': _('Title'), 'sortable': False, 'idx': 2},
+                   {'id': 'date', 'label': _('Date'), 'sortable': True, 'idx': 3},
+                   {'id': 'duration', 'label': _('Dur.'), 'sortable': False, 'idx': 4},
+                   {'id': 'type', 'label': _('Type'), 'sortable': True, 'idx': 5},
+                   {'id': 'speaker', 'label': _('Presenters'), 'sortable': True, 'idx': 6}]
+
+    def _processContrib(self, contrib):
+        return self._initialProcess(contrib)
 
 
-class WContributionDisplayItem:
+class WPosterContributionDisplayTableFull(WContributionDisplayTableBase):
 
-    def __init__( self, aw, contrib ):
-        self._contribution = contrib
-        self._aw = aw
+    _linkFields = [{'id': 'number', 'label': _('ID'), 'sortable': True, 'idx': 1},
+                   {'id': 'duration', 'label': _('Title'), 'sortable': False, 'idx': 2},
+                   {'id': 'speaker', 'label': _('Presenters'), 'sortable': True, 'idx': 3},
+                   {'id': 'board_number', 'label': _('Board No.'), 'sortable': True, 'idx': 4}]
 
-    def getHTML( self, params={} ):
-        if self._contribution.canAccess( self._aw ):
-            c = WContributionDisplayItemFull( self._aw, self._contribution )
-            return c.getHTML( params )
-        if self._contribution.canView( self._aw ):
-            c = WContributionDisplayItemMin( self._aw, self._contribution )
-            return c.getHTML( params )
-        return ""
-
-
-class WContributionDisplayPosterItemFull(WContributionDisplayItemBase):
-    pass
-
-
-class WContributionDisplayPosterItemMin(WContributionDisplayItemBase):
-    pass
-
-
-class WContributionDisplayPosterItem:
-
-    def __init__( self, aw, contrib ):
-        self._contribution = contrib
-        self._aw = aw
-
-    def getHTML( self, params={} ):
-        if self._contribution.canAccess( self._aw ):
-            c = WContributionDisplayPosterItemFull( self._aw, self._contribution )
-            return c.getHTML( params )
-        if self._contribution.canView( self._aw ):
-            c = WContributionDisplayPosterItemMin( self._aw, self._contribution )
-            return c.getHTML( params )
-        return ""
+    def _processContrib(self, contrib):
+        data = self._initialProcess(contrib)
+        data["boardNumber"] = contrib.getBoardNumber()
+        return data
 
 
 class _NoWitdhdrawFF(filters.FilterField):
-    _id="no_withdrawn"
+    _id = "no_withdrawn"
 
     def __init__(self):
         pass
 
-    def satisfies(self,contrib):
-        return not isinstance(contrib.getCurrentStatus(),conference.ContribStatusWithdrawn)
+    def satisfies(self, contrib):
+        return not isinstance(contrib.getCurrentStatus(), conference.ContribStatusWithdrawn)
 
 
 class _NoWithdrawnFilterCriteria(filters.FilterCriteria):
 
-    def __init__(self,conf):
-        self._fields={"no_withdrawn":_NoWitdhdrawFF()}
+    def __init__(self, conf):
+        self._fields = {"no_withdrawn": _NoWitdhdrawFF()}
 
 
 class WSessionDisplayBase(WICalExportBase):
@@ -176,7 +248,11 @@ class WSessionDisplayBase(WICalExportBase):
         if isinstance(resource, conference.Link):
             return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()
         else:
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() else resource.getFileName()
+            self._tabTimeTable.setEnabled(True)
+            tab = self._tabCtrl.getTabById(self._activeTab)
+            if tab is None:
+                tab = self._tabCtrl.getTabById("time_table")
+            tab.setActive()
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )

@@ -38,8 +38,4 @@
         </td>
     </tr>
 </table>
-<table width="100%">
-    <tr>
-        <td colspan="3">${ contribs }</td>
-    </tr>
-</table>
+${ contribs }
