@@ -1411,6 +1411,16 @@ class WUserPreferences(wcomponents.WTemplated):
         vars["defaultDisplayTimeZone"] =  self._avatar.getDisplayTZMode() or "MyTimezone"
         return vars
 
+
+class WUserThirdPartyAuth(wcomponents.WTemplated):
+
+    def __init__(self, av):
+        self._avatar = av
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars( self )
+        return vars
+
 class WUserDetails(wcomponents.WTemplated):
 
     def __init__(self, av):
@@ -1510,6 +1520,9 @@ class WPPersonalArea(WPUserBase):
         self._tabAPI = self._tabCtrl.newTab( "api", _("HTTP API"), \
                 urlHandlers.UHUserAPI.getURL(self._avatar) )
 
+        self._tabThirdPartyAuth = self._tabCtrl.newTab("auth_control", _("Authorized Apps"),
+                urlHandlers.UHUserThirdPartyAuth.getURL())
+
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer(_("User Details"))
 
@@ -1548,6 +1561,16 @@ class WPUserPreferences( WPPersonalArea ):
 
     def _setActiveTab( self ):
         self._tabPreferences.setActive()
+
+
+class WPUserThirdPartyAuth( WPPersonalArea ):
+
+    def _getTabContent( self, params ):
+        c = WUserThirdPartyAuth( self._avatar )
+        return c.getHTML( params )
+
+    def _setActiveTab( self ):
+        self._tabThirdPartyAuth.setActive()
 
 ### This class is not used anymore. To remove
 class WUserModify(wcomponents.WTemplated):

@@ -436,8 +436,8 @@ class EventSearchHook(HTTPAPIHook):
         d = []
         for id, v in results:
             event = ch.getById(id)
-            if not event.hasAnyProtection():
-                d.append({'id': id, 'title': event.getTitle(), 'startDate': event.getStartDate()})
+            if event.canAccess(aw):
+                d.append({'id': id, 'title': event.getTitle(), 'startDate': event.getStartDate(), 'hasAnyProtection': event.hasAnyProtection()})
         return d
 
 

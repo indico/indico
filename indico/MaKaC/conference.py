@@ -4989,6 +4989,10 @@ class ConferenceHolder( ObjectHolder ):
     idxName = "conferences"
     counterName = "CONFERENCE"
 
+    def updateIndex(self, conference):
+        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
+        nameIdx.index(conference.getId(), conference.getTitle().decode('utf-8'))
+
     def add(self, conference):
         ObjectHolder.add(self, conference)
         # Add conference to the name index

@@ -54,7 +54,8 @@ class ObjectHolder:
                      "localidentities", "niceidentities", "groupsregistration",
                      "ldapidentities", "fieldsregistration", "registrationform",
                      "domains", "indexes", "trashcan", "roomsmapping",
-                     "deletedobject", "shorturl", "modules", "plugins", "apikeys"]
+                     "deletedobject", "shorturl", "modules", "plugins", "apikeys",
+                     "consumers", "access_tokens", "request_tokens", "temp_request_tokens"]
     idxName = None
     counterName = None
 

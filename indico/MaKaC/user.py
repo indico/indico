@@ -269,6 +269,10 @@ class CERNGroup(Group):
         return False
 
     def _checkNice( self, id, avatar ):
+
+        if "Nice" not in Config.getInstance().getAuthenticatorList():
+            return False
+
         params = urllib.urlencode({'UserName': id, 'GroupName': self.name})
         #headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]

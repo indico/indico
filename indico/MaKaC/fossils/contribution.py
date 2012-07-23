@@ -94,6 +94,15 @@ class IContributionParticipationTTDisplayFossil(IFossil):
         pass
     getDirectFullName.name = "name"
 
+    def getEmail(self):
+        pass
+
+    def getFirstName(self):
+        pass
+
+    def getFamilyName(self):
+        pass
+
 
 class IContributionParticipationTTMgmtFossil(IFossil):
     """
@@ -107,6 +116,7 @@ class IContributionParticipationTTMgmtFossil(IFossil):
     def getDirectFullName(self):
         pass
     getDirectFullName.name = "name"
+
 
 class IContributionParticipationMinimalFossil(IFossil):
 
@@ -122,6 +132,7 @@ class IContributionParticipationMinimalFossil(IFossil):
 
     def isSubmitter(self):
         pass
+
 
 class IContributionParticipationFossil(IContributionParticipationMinimalFossil):
 

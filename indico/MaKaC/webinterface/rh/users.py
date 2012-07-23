@@ -311,6 +311,13 @@ class RHUserPreferences( RHUserBase ):
         p = adminPages.WPUserPreferences( self, self._avatar )
         return p.display()
 
+class RHUserThirdPartyAuth( base.RHProtected ):
+    _uh = urlHandlers.UHUserThirdPartyAuth
+
+    def _process( self ):
+        p = adminPages.WPUserThirdPartyAuth( self, self._getUser() )
+        return p.display()
+
 
 class RHUserPersBase( base.RHDisplayBaseProtected ):
 

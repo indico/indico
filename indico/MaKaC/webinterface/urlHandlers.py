@@ -1611,6 +1611,12 @@ class UHUserBaskets( URLHandler ):
 class UHUserPreferences( URLHandler ):
     _relativeURL = "userPreferences.py"
 
+class UHUserThirdPartyAuth( URLHandler ):
+    _relativeURL = "userThirdPartyAuth.py"
+
+class UHThirdPartyAuth( URLHandler ):
+    _relativeURL = "thirdPartyAuth.py"
+
 class UHUserAPI( URLHandler ):
     _relativeURL = "userAPI.py"
 
