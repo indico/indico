@@ -163,7 +163,8 @@ class Room( Persistent, RoomBase, Fossilizable ):
         RoomBase.remove( self )
         roomsBTree = Room.getRoot()
         del roomsBTree[self.id]
-        Catalog.getIdx('user_room').unindex_obj(self.guid)
+        if Catalog.getIdx('user_room').has_obj(self.guid):
+            Catalog.getIdx('user_room').unindex_obj(self.guid)
 
     @classmethod
     def isAvatarResponsibleForRooms(cls, avatar):
