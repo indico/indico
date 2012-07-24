@@ -68,30 +68,12 @@ class WPSessionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSessionDispl
         WPSessionDisplayBase.__init__(self, rh, session)
 
 
-class WContributionDisplayTableBase(wcomponents.WTemplated):
+class WContributionListDisplayTab(wcomponents.WTemplated):
 
-    _linkFields = []
-
-    def __init__(self, aw, session, sortingCrit, tab=None):
+    def __init__(self, aw, session, tab=None):
         self._aw = aw
         self._session = session
-        self._sortingCrit = sortingCrit
         self._activeTab = tab
-
-    def _getBaseRowData(self):
-        """
-        Returns the shared-format dictionary for the tables which
-        are generated from this class' children.
-        """
-        return {
-            'id': '',
-            'title': '',
-            'displayURL': '',
-            'type': '',
-            'startDate': '',
-            'duration': '',
-            'speakers': ''
-        }
 
     def _getURL(self, sortByField):
         url = urlHandlers.UHSessionDisplay.getURL(self._session)
@@ -99,126 +81,14 @@ class WContributionDisplayTableBase(wcomponents.WTemplated):
         if self._activeTab:
             url.addParam("tab", self._activeTab)
 
-        url.addParam("sortBy", sortByField)
-
         return url
-
-    def _getSortByLinks(self):
-        links = []
-
-        for field in self._getLinkFields():
-
-            if field['sortable']:
-                url = str(self._getURL(field['id']))
-                # Default to compare against 'id' if no criteria defined.
-                key = self._sortingCrit.getField().getId() if self._sortingCrit else 'number'
-                active = (field['id'] == key)
-            else:
-                url = None
-                active = False
-
-            links.append({
-                'label': field['label'],
-                'active': active,
-                'url': url,
-                'idx': field['idx']
-            })
-
-        return sorted(links, key=lambda i: i['idx'])
-
-    def _getLinkFields(self):
-        return self._linkFields
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars['contribs'] = []
-        vars['links'] = self._getSortByLinks()
-        vars['downArrow'] = quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-
-        if self._sortingCrit is None:
-            self._sortingCrit = contribFilters.SortingCriteria(["number"])
-
-        fc = _NoWithdrawnFilterCriteria(self._session.getConference())
-        filtr = filters.SimpleFilter(fc, self._sortingCrit)
-
-        for contrib in filtr.apply(self._session.getContributionList()):
-            vars['contribs'].append(self._processContrib(contrib))
-
+        vars['contributions'] = self._session.getContributionList()
+        vars['accessWrapper'] = self._aw
+        vars['posterSession'] = (self._session.getScheduleType() == "poster")
         return vars
-
-    def _initialProcess(self, contrib):
-        """
-        Shared functionality between the processing methods, including
-        ascertaining whether or not current user has rights to view and/or
-        access the contribution.
-        """
-
-        canAccess = contrib.canAccess(self._aw)
-        canView = contrib.canView(self._aw)
-        data = self._getBaseRowData()
-
-        if not canAccess and canView:
-            return data
-
-        tz = DisplayTZ(self._aw, contrib.getConference()).getDisplayTZ()
-        data["id"] = contrib.getId()
-        data["title"] = contrib.getTitle()
-        data["displayURL"] = quoteattr(str(urlHandlers.UHContributionDisplay.getURL(contrib)))
-
-        if canView and not canAccess:
-            # User can only see the ID, Title & URL
-            return data
-
-        data["type"] = contrib.getType().getName() if contrib.getType() else ''
-        data["startDate"] = contrib.getAdjustedStartDate(tz).strftime("%Y-%b-%d %H:%M") if \
-                            contrib.isScheduled() else ''
-
-        if contrib.getDuration() is not None:
-            if (datetime(1900, 1, 1) + contrib.getDuration()).minute > 0:
-                data["duration"] = "%s" % (datetime(1900, 1, 1) + contrib.getDuration()).strftime("%M'")
-            if (datetime(1900, 1, 1) + contrib.getDuration()).hour > 0:
-                data["duration"] = "%s" % (datetime(1900, 1, 1) + contrib.getDuration()).strftime("%Hh%M'")
-        else:
-            data["duration"] = ''
-
-        data["speakers"] = ','.join([x.getFullName() for x in contrib.getSpeakerList()])
-
-        return data
-
-    def _processContrib(self, contrib):
-        """
-        To be overridden in inheriting class
-        """
-        return contrib
-
-
-class WContributionDisplayTableFull(WContributionDisplayTableBase):
-    """
-    Builds a table of the contributions for Session display etc.
-    """
-
-    _linkFields = [{'id': 'number', 'label': _('ID'), 'sortable': True, 'idx': 1},
-                   {'id': 'duration', 'label': _('Title'), 'sortable': False, 'idx': 2},
-                   {'id': 'date', 'label': _('Date'), 'sortable': True, 'idx': 3},
-                   {'id': 'duration', 'label': _('Dur.'), 'sortable': False, 'idx': 4},
-                   {'id': 'type', 'label': _('Type'), 'sortable': True, 'idx': 5},
-                   {'id': 'speaker', 'label': _('Presenters'), 'sortable': True, 'idx': 6}]
-
-    def _processContrib(self, contrib):
-        return self._initialProcess(contrib)
-
-
-class WPosterContributionDisplayTableFull(WContributionDisplayTableBase):
-
-    _linkFields = [{'id': 'number', 'label': _('ID'), 'sortable': True, 'idx': 1},
-                   {'id': 'duration', 'label': _('Title'), 'sortable': False, 'idx': 2},
-                   {'id': 'speaker', 'label': _('Presenters'), 'sortable': True, 'idx': 3},
-                   {'id': 'board_number', 'label': _('Board No.'), 'sortable': True, 'idx': 4}]
-
-    def _processContrib(self, contrib):
-        data = self._initialProcess(contrib)
-        data["boardNumber"] = contrib.getBoardNumber()
-        return data
 
 
 class _NoWitdhdrawFF(filters.FilterField):
