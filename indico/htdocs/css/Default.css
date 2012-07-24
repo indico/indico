@@ -8355,3 +8355,11 @@ div.domain_control ul {
     list-style-type: none;
     padding: 0 0 0 10px;
 }
+.redWarningPopup {
+    background-color: #F2DEDE;
+    border-color: #EED3D7;
+    color: #B94A48;
+    border-radius: 4px 4px 4px 4px;
+    margin-bottom: 18px;
+    padding: 8px 35px 8px 14px;
+}

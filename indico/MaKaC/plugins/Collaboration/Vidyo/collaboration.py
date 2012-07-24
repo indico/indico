@@ -34,9 +34,11 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.plugins.Collaboration.Vidyo.pages import ServiceInformation
 from MaKaC.conference import Contribution, Session
+from indico.core.index import Catalog
+from MaKaC.plugins.Collaboration.Vidyo.indexes import IIndexableByVidyoRoom
 
 class CSBooking(CSBookingBase):
-    fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
+    fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil, IIndexableByVidyoRoom)
 
     _hasTitle = True
     _hasStart = True
@@ -88,6 +90,11 @@ class CSBooking(CSBookingBase):
 
     def canBeStarted(self):
         return self._created
+
+    def __conform__(self, proto):
+        if proto == IIndexableByVidyoRoom:
+            return self.getRoomId()
+        return None
 
     def canBeStopped(self):
         return False
@@ -226,6 +233,12 @@ class CSBooking(CSBookingBase):
         """
         return ServiceInformation().getInformation(self, True)
 
+    def isRoomInMultipleBookings(self):
+        """ If different CSBookings contains the same Vidyo Room.
+        """
+        return len(VidyoTools.getIndexByVidyoRoom().getBookingList(self._roomId)) > 1
+
+
     ## overriding methods
     def _getTitle(self):
         return self._bookingParams["roomName"]
@@ -314,6 +327,7 @@ class CSBooking(CSBookingBase):
             self.setOwnerAccount(str(result.ownerName))
             self.setBookingOK()
             VidyoTools.getEventEndDateIndex().indexBooking(self)
+            VidyoTools.getIndexByVidyoRoom().indexBooking(self)
 
 
     def _modify(self, oldBookingParams):
@@ -332,7 +346,7 @@ class CSBooking(CSBookingBase):
 
             if oldBookingParams["owner"]["id"] != self.getOwnerObject().getId():
                 self._sendNotificationToOldNewOwner(oldBookingParams["owner"])
-
+            self._updateRelatedBookings()
 
     def _notifyOnView(self):
         """ Will get called when manager sees list of bookings in management interface,
@@ -343,6 +357,16 @@ class CSBooking(CSBookingBase):
             or if there are no more checks to do.
         """
         pass
+
+    def _updateRelatedBookings(self):
+        for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(self.getRoomId()):
+            booking.setExtension(self.getExtension())
+            booking.setPin(self.getPin())
+            booking.setURL(self.getURL())
+            booking.setOwnerAccount(self.getOwnerAccount(), True)
+            booking.setBookingOK()
+            booking._bookingParams["roomName"] = self._bookingParams["roomName"]
+            booking._bookingParams["roomDescription"] = self._bookingParams["roomDescription"]
 
 
     def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
@@ -403,14 +427,15 @@ class CSBooking(CSBookingBase):
             # if str(adminApiResult.groupName) != getVidyoOptionValue("indicoGroup"):
             #     return VidyoError("invalidGroup", "checkStatus")
 
-
     def _delete(self, fromDeleteOld = False):
         """ Deletes the Vidyo Public room associated to this CSBooking, based on the roomId
             Returns None if success.
             If trying to delete a non existing room, there will be a message in self._warning
             so that it is caught by Main.js's postDelete function.
         """
-        result = ExternalOperationsManager.execute(self, "deleteRoom", VidyoOperations.deleteRoom, self, self._roomId)
+        result = None
+        if len(VidyoTools.getIndexByVidyoRoom().getBookingList(self._roomId)) == 1 or fromDeleteOld:
+            result = ExternalOperationsManager.execute(self, "deleteRoom", VidyoOperations.deleteRoom, self, self._roomId)
 
         if isinstance(result, VidyoError):
             if result.getErrorType() == "unknownRoom" and result.getOperation() == "delete":
@@ -421,7 +446,7 @@ class CSBooking(CSBookingBase):
 
         if not fromDeleteOld:
             VidyoTools.getEventEndDateIndex().unindexBooking(self)
-
+            VidyoTools.getIndexByVidyoRoom().unindexBooking(self)
 
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),

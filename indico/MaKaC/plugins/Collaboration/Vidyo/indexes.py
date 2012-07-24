@@ -22,7 +22,11 @@ from BTrees import LOBTree, OOBTree
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt, unixTimeToDatetime
 from BTrees.Length import Length
 from MaKaC.common.logger import Logger
+from MaKaC.conference import ConferenceHolder
+from zope.interface import Interface
+from indico.core.index import SIndex
 
+BOOKINGS_BY_VIDYO_ROOMS_INDEX = "BookingsByVidyoRoomIndex"
 
 class EventEndDateIndex(Persistent):
     """ List of bookings ordered by their event's ending date
@@ -167,3 +171,35 @@ class DateBookingList(Persistent):
             result[b.getConference()] = result.setdefault(b.getConference(), 0) + 1
         return result
 
+class IIndexableByVidyoRoom(Interface):
+    pass
+
+class BookingsByVidyoRoomIndex(SIndex):
+    _fwd_class = OOBTree.OOBTree
+    _fwd_set_class = OOBTree.OOTreeSet
+
+    def __init__(self):
+        super(BookingsByVidyoRoomIndex, self).__init__(IIndexableByVidyoRoom)
+
+    def getBookingList(self, key):
+        return list(self.get(key, self._fwd_set_class()))
+
+    def indexBooking(self, booking):
+        self.index_obj(booking)
+
+    def unindexBooking(self, booking):
+        self.unindex_obj(booking)
+
+    def initialize(self, dbi=None):
+        """ Cleans the indexes, and then indexes all the vidyo bookings from all the conferences
+            WARNING: obviously, this can potentially take a while
+        """
+        self.clear()
+        for conf in ConferenceHolder().getList():
+            csbm = conf.getCSBookingManager()
+            for booking in csbm.getBookingList():
+                if booking.getType() == "Vidyo":
+                    self.indexBooking(booking)
+
+    def dump(self):
+        return [(k, [b for b in self.get(k)]) for k in self.__iter__()]

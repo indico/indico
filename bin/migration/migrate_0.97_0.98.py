@@ -340,7 +340,7 @@ def categoryDateIndexWithoutVisibility(dbi, withRBDB, prevVersion):
         newIdx.buildIndex(dbi)
 
 
-@since('0.98b', always=True)
+@since('0.98.2', always=True)
 def catalogMigration(dbi, withRBDB, prevVersion):
     """
     Initializing/updating index catalog
