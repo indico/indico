@@ -1532,7 +1532,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._advancedOptionsSection = wcomponents.SideMenuSection(_("Advanced options"))
 
         self._listingsMenuItem = wcomponents.SideMenuItem(_("Lists"),
-            urlHandlers.UHConfModifListings.getURL( self._conf ) )
+            urlHandlers.UHConfAllSpeakers.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._listingsMenuItem)
 
         self._ACMenuItem = wcomponents.SideMenuItem(_("Protection"),
@@ -2781,13 +2781,34 @@ class WConfModifListings( wcomponents.WTemplated ):
         vars["allCoAuthorsURL"]=quoteattr(str(urlHandlers.UHConfAllCoAuthors.getURL( self.__conf )))
         return vars
 
-class WPConfModifListings( WPConferenceModifBase ):
+
+class WPConfModifListings(WPConferenceModifBase):
+
+    def __init__(self, rh, conference):
+        WPConferenceModifBase.__init__(self, rh, conference)
+        self._createTabCtrl()
+
     def _setActiveSideMenuItem(self):
         self._listingsMenuItem.setActive()
 
-    def _getPageContent( self, params ):
-        wc = WConfModifListings( self._conf )
-        return wc.getHTML()
+    def _createTabCtrl(self):
+        self._tabCtrl = wcomponents.TabControl()
+        self._subTabSpeakers = self._tabCtrl.newTab('speakers',
+            _('All Contribution Speakers'),
+            urlHandlers.UHConfAllSpeakers.getURL(self._conf))
+        self._subTabConveners = self._tabCtrl.newTab('conveners',
+            _('All Session Conveners'),
+            urlHandlers.UHConfAllSessionsConveners.getURL(self._conf))
+        self._subTabUsers = self._tabCtrl.newTab('users',
+            _('People Pending'),
+            urlHandlers.UHConfModifPendingQueues.getURL(self._conf))
+
+    def _getPageContent(self, params):
+        self._setActiveTab()
+        return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
+
+    def _setActiveTab(self):
+        self._subTabUsers.setActive()
 
 #---------------------------------------------------------------------------
 #---------------------------------------------------------------------------
@@ -2869,9 +2890,6 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
 
     def __init__(self, conference):
         self.__conf = conference
-        self._display = []
-        self._dispopts = ["Email", "Session", "Actions"]
-        self._order = ""
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
@@ -2880,8 +2898,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
         vars["convenerSelectionAction"] = quoteattr(str(urlHandlers.UHConfAllSessionsConvenersAction.getURL(self.__conf)))
         vars["contribSetIndex"] = 'index'
         vars["convenerNumber"] = str(len(self.__conf.getAllSessionsConvenerList()))
-        vars["conveners"] = self._getAllConvenersHTML()
-        vars["columns"] = self._getColumnsHTML(None)
+        vars["conveners"] = self._getAllConveners()
         vars["backURL"] = quoteattr(str(urlHandlers.UHConfModifListings.getURL(self.__conf)))
         return vars
 
@@ -2895,127 +2912,53 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
 
         return "%s%s" % (url, timetable)
 
-    def _getAllConvenersHTML(self):
+    def _getAllConveners(self):
         convenersFormatted = []
         convenersDict = self.__conf.getAllSessionsConvenerList()
 
         for key, conveners in convenersDict.iteritems():
+            data = None
 
-            for convener in conveners:
-                data = {
-                    'email': convener.getEmail(),
-                    'name': convener.getFullName() or '',
+            for convener in convenersDict[key]:
+
+                if not data:
+                    data = {
+                        'email': convener.getEmail(),
+                        'name': convener.getFullName() or '',
+                        'sessions': []
+                    }
+
+                sessionData = {
+                    'title': '',
                     'urlTimetable': self._getTimetableURL(convener),
                     'urlSessionModif': None
                 }
 
                 if isinstance(convener, conference.SlotChair):
                     title = convener.getSlot().getTitle() or "Block %s" % convener.getSlot().getId()
-                    data['session'] = convener.getSession().getTitle() + ': ' + title
+                    sessionData['title'] = convener.getSession().getTitle() + ': ' + title
                 else:
                     url = urlHandlers.UHSessionModification.getURL(self.__conf)
                     url.addParam('sessionId', convener.getSession().getId())
 
-                    data['urlSessionModif'] = str(url)
-                    data['session'] = convener.getSession().getTitle() or ''
+                    sessionData['urlSessionModif'] = str(url)
+                    sessionData['title'] = convener.getSession().getTitle() or ''
 
-                convenersFormatted.append(data)
+                data['sessions'].append(sessionData)
+
+            convenersFormatted.append(data)
 
         return convenersFormatted
-
-    def _getColumnsHTML(self, sortingField):
-        res = []
-        columns = {"Email": _("Email"), "Session": _("Session"), "Actions": _("Actions")}
-        currentSorting = ""
-
-        if sortingField is not None:
-            currentSorting = sortingField.getId()
-
-        currentSortingHTML = ""
-
-        url = self._getURL()
-        url.addParam("sortBy", "Name")
-        nameImg = ""
-
-        if currentSorting == "Name":
-            currentSortingHTML = """<input type="hidden" name="sortBy" value="Name">"""
-            if self._order == "down":
-                nameImg = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order", "up")
-            elif self._order == "up":
-                nameImg = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order", "down")
-
-        nameSortingURL = quoteattr("%s#results" % str(url))
-        checkAll = """<img src=%s border="0" alt="Select all" onclick="selectAll()" style="cursor:hand">""" % quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
-        uncheckAll = """<img src=%s border="0" alt="Unselect all" onclick="unselectAll()" style="cursor:hand"">""" % quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        checkboxes = "%s%s" % (checkAll, uncheckAll)
-        res.append("""
-                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s%s<a href=%s>Name</a></td>""" % (nameImg, checkboxes, nameSortingURL))
-        if self._display == []:
-            for key in self._dispopts:
-                if key in ["Email", "Session", "Actions"]:
-                    url = self._getURL()
-                    url.addParam("sortBy", key)
-                    img = ""
-
-                    if currentSorting == key:
-                        currentSortingHTML = """<input type="hidden" name="sortBy" value="%s">""" % key
-                        if self._order == "down":
-                            img = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                            url.addParam("order", "up")
-                        elif self._order == "up":
-                            img = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                            url.addParam("order", "down")
-
-                    sortingURL = quoteattr("%s#results" % str(url))
-                    res.append("""
-                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>""" % (img, sortingURL, self.htmlText(columns[key])))
-        else:
-            for key in self._dispopts:
-                if key in self._display:
-                    url = self._getURL()
-                    url.addParam("sortBy", key)
-                    img = ""
-
-                    if currentSorting == key:
-                        currentSortingHTML = """<input type="hidden" name="sortBy" value="%s">""" % key
-                        if self._order == "down":
-                            img = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                            url.addParam("order", "up")
-                        elif self._order == "up":
-                            img = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                            url.addParam("order", "down")
-
-                    sortingURL = quoteattr("%s#results" % str(url))
-                    res.append("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>
-                               """ % (img, sortingURL, self.htmlText(columns[key])))
-
-        html = """
-            <t>
-             <!--<td width="1px">%s</td>-->
-            %s
-            </tr>
-             """ % (currentSortingHTML, "".join(res))
-        return html
-
-    def _getURL(self):
-        url = urlHandlers.UHConfAllSessionsConveners.getURL(self.__conf)
-
-        if self._display == []:
-            url.addParam("disp", ["Email", "Session"])
-        else:
-            url.addParam("disp", self._display)
-
-        return url
 
 
 class WPConfAllSessionsConveners(WPConfModifListings):
 
-    def _getPageContent(self, params):
-        banner = wcomponents.WListingsBannerModif(self._conf, _("Conveners list")).getHTML()
+    def _setActiveTab(self):
+        self._subTabConveners.setActive()
+
+    def _getTabContent(self, params):
         p = WConferenceAllSessionsConveners(self._conf)
-        return banner + p.getHTML()
+        return p.getHTML()
 
 #---------------------------------------------------------------------------------------
 
@@ -3023,123 +2966,84 @@ class WPConfAllSessionsConveners(WPConfModifListings):
 class WConfModifAllContribParticipants(wcomponents.WTemplated):
 
     def __init__(self, conference, partIndex):
-        self._title= _("All participants list")
+        self._title = _("All participants list")
         self._conf = conference
         self._order = ""
-        self._dispopts = ["Email", "Contributions" ]
-        self._partIndex=partIndex
+        self._dispopts = ["Email", "Contributions"]
+        self._partIndex = partIndex
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        self._url=vars["participantMainPageURL"]
-        vars["participantNumber"]=str(len(self._partIndex.getParticipationKeys()))
-        vars["participants"]=self._getAllParticipantsHTML()
-        vars["backURL"]=quoteattr(str(urlHandlers.UHConfModifListings.getURL(self._conf)))
-        vars["columns"] = self._getColumnsHTML(None)
-        if not vars.has_key("title"):
-            vars["title"]=self._title
+        self._url = vars["participantMainPageURL"]
+        vars["speakers"] = self._getAllParticipants()
+        vars["backURL"] = quoteattr(str(urlHandlers.UHConfModifListings.getURL(self._conf)))
+        vars["participantNumber"] = str(len(self._partIndex.getParticipationKeys()))
+
         return vars
 
-    def _getAllParticipantsHTML(self):
-        html = []
+    def _getAllParticipants(self):
+        speakers = []
+
         for key in self._partIndex.getParticipationKeys():
-            contribPartList=self._partIndex.getById(key)
-            if contribPartList != []:
-                html.append("""
-                <tr>
-                    <td valign="top" nowrap class="abstractDataCell"><input type="checkbox" name="participants" value="%s">&nbsp;&nbsp;%s</td>
-                    <td valign="top" nowrap class="abstractDataCell">&nbsp;&nbsp;%s</td>
-                            """%(contribPartList[0].getEmail(), \
-                                self.htmlText(contribPartList[0].getFullName()) or "&nbsp;", \
-                                self.htmlText(contribPartList[0].getEmail()) or "&nbsp;" ))
-                contribs=[]
-                for contribPart in contribPartList:
-                    if contribPart.getContribution() is not None:
-                        url = quoteattr(str(urlHandlers.UHContributionModification.getURL(contribPart.getContribution())))
-                        contribtitle = self.htmlText(contribPart.getContribution().getTitle()) or "&nbsp;"
-                        contribs.append("<b>- </b><a href=%s>%s</a>"%(url,contribtitle))
-                html.append("""<td valign="top"  class="abstractDataCell">%s</td></tr>"""%("<br>".join(contribs)))
-        html.append( i18nformat("""
-                    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                    <tr><td colspan="3" align="left">&nbsp;<input type="submit" class="btn" value="_("Send an E-mail")" name="sendEmails"></td></tr>
-                    </form>
-                          """))
-        return "".join(html)
+            participationList = self._partIndex.getById(key)
 
-    def _getColumnsHTML(self, sortingField):
-        res =[]
-        currentSorting=""
-        if sortingField is not None:
-            currentSorting=sortingField.getId()
+            if participationList:
+                participant = participationList[0]
 
-        # Name
-        url=self._getURL()
-        url.addParam("sortBy","Name")
-        img=""
-        if currentSorting == "Name":
-            if self._order == "down":
-                img = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                img = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        sortingURL=quoteattr("%s#results"%str(url))
-        checkAll = """<img src=%s border="0" alt="Select all" onclick="selectAll()" style="cursor:hand">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
-        uncheckAll = """<img src=%s border="0" alt="Unselect all" onclick="unselectAll()" style="cursor:hand"">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
-        checkboxes="%s%s"%(checkAll,uncheckAll)
-        res.append("""
-                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s%s<a href=%s>Name</a></td>"""%(img, checkboxes, sortingURL))
+                pData = {
+                    'name': participant.getFullName(),
+                    'email': participant.getEmail(),
+                    'contributions': []
+                }
 
-        # Others
-        for i in self._dispopts:
-            url=self._getURL()
-            url.addParam("sortBy",i)
-            img=""
-            if currentSorting == i:
-                if self._order == "down":
-                    img = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                    url.addParam("order","up")
-                elif self._order == "up":
-                    img = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                    url.addParam("order","down")
-            sortingURL=quoteattr("%s#results"%str(url))
-            res.append("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>"""%(img, sortingURL, i))
+                for participation in participationList:
+                    contribution = participation.getContribution()
 
+                    if contribution:
+                        pData['contributions'].append({
+                            'title': contribution.getTitle(),
+                            'url': str(urlHandlers.UHContributionModification.getURL(contribution))
+                        })
 
-        html= """
-            <t>
-            %s
-            </tr>
-             """%("".join(res))
-        return html
+                speakers.append(pData)
 
-    def _getURL( self ):
+        return speakers
+
+    def _getURL(self):
         return self._url
 
-class WPConfAllSpeakers( WPConfModifListings ):
 
-    def _getPageContent( self, params ):
-        banner = wcomponents.WListingsBannerModif(self._conf, _("Speakers list")).getHTML()
+class WPConfAllSpeakers(WPConfModifListings):
+
+    def _setActiveTab(self):
+        self._subTabSpeakers.setActive()
+
+    def _getTabContent(self, params):
         p = WConfModifAllContribParticipants( self._conf, self._conf.getSpeakerIndex() )
-        return banner+p.getHTML({"title": _("All speakers list"), \
+        return p.getHTML({"title": _("All speakers list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllSpeakers.getURL(self._conf), \
                           "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllSpeakersAction.getURL(self._conf)))})
 
-class WPConfAllPrimaryAuthors( WPConfModifListings ):
+# I can't find where any of these are used or mathcing tpls,
+# I presume they are legacy  and (potentially) can be deleted? Matt
 
-    def _getPageContent( self, params ):
-        p = WConfModifAllContribParticipants( self._conf, self._conf.getPrimaryAuthorIndex() )
-        return p.getHTML({"title": _("All primary authors list"), \
-                          "participantMainPageURL":urlHandlers.UHConfAllPrimaryAuthors.getURL(self._conf), \
-                          "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllPrimaryAuthorsAction.getURL(self._conf)))})
+# class WPConfAllPrimaryAuthors( WPConfModifListings ):
 
-class WPConfAllCoAuthors( WPConfModifListings ):
+#     def _getPageContent( self, params ):
+#         p = WConfModifAllContribParticipants( self._conf, self._conf.getPrimaryAuthorIndex() )
+#         return p.getHTML({"title": _("All primary authors list"), \
+#                           "participantMainPageURL":urlHandlers.UHConfAllPrimaryAuthors.getURL(self._conf), \
+#                           "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllPrimaryAuthorsAction.getURL(self._conf)))})
 
-    def _getPageContent( self, params ):
-        p = WConfModifAllContribParticipants( self._conf, self._conf.getCoAuthorIndex() )
-        return p.getHTML({"title": _("All co-authors list"), \
-                          "participantMainPageURL":urlHandlers.UHConfAllCoAuthors.getURL(self._conf), \
-                          "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllCoAuthorsAction.getURL(self._conf)))})
+
+# class WPConfAllCoAuthors( WPConfModifListings ):
+
+#     def _getPageContent( self, params ):
+#         p = WConfModifAllContribParticipants( self._conf, self._conf.getCoAuthorIndex() )
+#         return p.getHTML({"title": _("All co-authors list"), \
+#                           "participantMainPageURL":urlHandlers.UHConfAllCoAuthors.getURL(self._conf), \
+#                           "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllCoAuthorsAction.getURL(self._conf)))})
+
 
 class WPEMailContribParticipants ( WPConfModifListings):
     def __init__(self, rh, conf, participantList):
@@ -7577,13 +7481,13 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
         return vars
 
 
-class WPConfModifPendingQueuesBase(WPConferenceModifBase):
+class WPConfModifPendingQueuesBase(WPConfModifListings):
 
     def __init__(self, rh, conf, activeTab=""):
-        WPConferenceModifBase.__init__(self, rh, conf)
+        WPConfModifListings.__init__(self, rh, conf)
         self._activeTab = activeTab
 
-    def _getPageContent(self, params):
+    def _getTabContent(self, params):
         banner = wcomponents.WListingsBannerModif(self._conf, _("Pending queues")).getHTML()
         return banner + self._getTabContent(params)
 
@@ -8437,7 +8341,9 @@ class WConfModifPosterPrinting(wcomponents.WTemplated):
 
             for id, template in templates.iteritems():
                 pKey = ' (' + key + ')'
-                newList.append({'value': key + str(id),
+                # Only if the template is 'global' should it have the word prefixed.
+                value = key + str(id) if key == 'global' else str(id)
+                newList.append({'value': value,
                                 'label': template.getName() + pKey})
 
             return newList

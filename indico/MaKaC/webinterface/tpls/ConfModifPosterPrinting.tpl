@@ -36,7 +36,7 @@
       </tr>
       <tr>
         <td colspan="2" class="groupTitle">
-           ${ _("Local Poster Templates")}
+           ${ _("Templates For This Event")}
         </td>
       </tr>
       <tr class="trBottomSpacer">

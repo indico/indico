@@ -1,69 +1,74 @@
-<script type="text/javascript">
-<!--
-function selectAll() {
-    if (!document.convenersForm.conveners.length) {
-        document.convenersForm.conveners.checked = true;
-    } else {
-        for (i = 0; i < document.convenersForm.conveners.length; i++) {
-            document.convenersForm.conveners[i].checked = true;
-        }
-    }
-}
-
-function unselectAll() {
-    if (!document.convenersForm.conveners.length) {
-        document.convenersForm.conveners.checked = false;
-    } else {
-        for (i = 0; i < document.convenersForm.conveners.length; i++) {
-            document.convenersForm.conveners[i].checked = false;
-        }
-    }
-}
-//-->
-</script>
-
-<div class="groupTitle" width="100%">
-    ${ _("All Sessions' Convener List")} (${ convenerNumber })
+<div id="speakerActions" class="bs-alert alert-toolbar">
+    <form action=${convenerSelectionAction} method="post" name="participantsForm">
+    <input type="text" id="filterSpeakers" value="" placeholder='${_("Search Name, Email &amp; Sessions")}' class="toolbar-search" />
+    <input type="submit" class="bs-btn bs-btn-right" value="${_("Email Selected Speakers")}" name="sendEmails" />
+    <div>
+        ${_('Total Conveners')}: ${convenerNumber}
+    </div>
+    <div style="padding-top:5px;">
+        <span class="fakeLink" id="selectAllParticipants">${_('Select All')}</span> -
+        <span class="fakeLink" id="selectNoParticipants">${_('Select None')}</span>
+    </div>
+    <div class="toolbar-clearer"></div>
 </div>
-<table width="100%">
-    <tr>
-        <td>
-            <table align="center" width="100%" cellpadding="0" cellspacing="0">
-                <form action=${ convenerSelectionAction } method="post" target="_blank" name="convenersForm">
-                <tr>
-                    ${ columns }
-                </tr>
-                % for convener in conveners:
-                <tr>
-                    <td class="abstractDataCell">
-                        <input type="checkbox" name="conveners" value="${convener['email']}" /> ${convener['name']}
-                    </td>
-                    <td class="abstractDataCell">
-                        ${convener['email']}
-                    </td>
-                    <td class="abstractDataCell">
-                        ${convener['session']}
-                    </td>
-                    <td class="abstractDataCell">
-                        <a href="${convener['urlTimetable']}">${_('Edit Timetable')}</a>
-                        % if convener['urlSessionModif']:
-                            | <a href="${convener['urlSessionModif']}">${_('Edit Session')}</a>
-                        % endif
-                    </td>
-                </tr>
-                % endfor
-                <tr><td colspan="4">&nbsp;</td></tr>
-                <tr>
-                    <td colspan="4" valign="bottom" align="left">
-<!--                        <input type="submit" class="btn" name="removeRegistrants" value="${ _("remove selected")}">    -->
-                        <input type="submit" class="btn" value="${_('Send an E-mail')}" name="sendEmails">
-                    </td>
-                </tr>
-                </form>
-                <tr>
-                    <td colspan="4">&nbsp;</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+
+<div>
+    % for convener in conveners:
+    <div class="speakerEntry">
+        <div class="speakerDetails">
+            <input type="checkbox" name="participants" value="${convener['email']}" />
+            <span class="speakerName">
+                ${convener['name']}
+            </span>
+            <span class="speakerEmail">
+                (${convener['email']})
+            </span>
+        </div>
+        <div class="speakerContributions">
+            <ol>
+            % for session in convener['sessions']:
+                <li>
+                    ${session['title']} -
+                    <a href="${session['urlTimetable']}">
+                        ${_('Edit Timetable')}
+                    </a>
+                    % if session['urlSessionModif']:
+                    | <a href="${session['urlSessionModif']}">
+                        ${_('Edit Session')}
+                    </a>
+                    % endif
+                </li>
+            % endfor
+            </ol>
+        </div>
+    </div>
+    % endfor
+    </form>
+</div>
+
+<script type="text/javascript">
+
+function verifyFilters() {
+    $(".speakerEntry").hide();
+    var term = $("#filterSpeakers").attr('value');
+    var items = $(".speakerContributions ol li:contains('"+ term +"'), " +
+                  ".speakerEmail:contains('"+ term +"'), " +
+                  ".speakerName:contains('"+ term +"')").closest('.speakerEntry');
+    items.show();
+};
+
+$(document).ready(function() {
+    $('#selectAllParticipants').click(function() {
+        $('.speakerDetails:visible input').prop('checked', true);
+    });
+
+    $('#selectNoParticipants').click(function() {
+        $('.speakerDetails input').prop('checked', false);
+    });
+
+    $("#filterSpeakers").keyup(function() {
+        verifyFilters();
+    });
+});
+
+</script>

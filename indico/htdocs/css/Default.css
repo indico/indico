@@ -8604,11 +8604,13 @@ div.informationUserList {
     min-width: 200px !important;
 }
 
+
 .see_protected_tip ul {
     list-style: none inside none;
     margin: 5px 0 0;
     padding: 0px 10px;
 }
+
 
 .see_protected_tip ul li {
     margin-bottom: 5px;
@@ -8619,4 +8621,26 @@ div.informationUserList {
 	margin-left: 5px;
 	vertical-align: -12%;
 	font-size: 15px;
+}
+
+/* Speakers List */
+
+div.speakerEntry {
+  border-bottom: 1px solid #BBB;
+  padding: 5px 0px 5px 0px;
+}
+
+div.speakerDetails {
+  font-size: 1.4em;
+  border-bottom: 1px solid #CCC;
+  padding-bottom: 3px;
+}
+
+span.speakerEmail a{
+  padding-left: 10px;
+  font-size: 1em;
+}
+
+div.speakerContributions {
+  line-height: 1.4em;
 }
