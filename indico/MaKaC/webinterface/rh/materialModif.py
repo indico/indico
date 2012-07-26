@@ -27,6 +27,7 @@ from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.common import Config
 from MaKaC.errors import FormValuesError
 from MaKaC.export import fileConverter
+from MaKaC.common.timezoneUtils import nowutc
 
 class RHMaterialModifBase( RHMaterialBase, RHModificationBaseProtected ):
 
@@ -149,6 +150,7 @@ class RHMaterialPerformAddFile( RHMaterialModifBase ):
         #apply conversion
         if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(f.getFileName())[1].strip().lower()):
             fileConverter.CDSConvFileConverter.convert(f.getFilePath(), "pdf", self._material)
+            f.setPDFConversionRequestDate(nowutc())
 
         self._redirect( urlHandlers.UHMaterialModification.getURL( self._material ) )
 

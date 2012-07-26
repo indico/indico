@@ -33,6 +33,7 @@ from MaKaC.i18n import _
 from MaKaC.user import AvatarHolder, GroupHolder
 
 from MaKaC.common.logger import Logger
+from MaKaC.common.timezoneUtils import nowutc
 
 from indico.util import json
 
@@ -402,6 +403,7 @@ class RHSubmitMaterialBase(object):
             if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
                 #Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
                 fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
+                resource.setPDFConversionRequestDate(nowutc())
 
             # store the repo id, for files
             if isinstance(resource, LocalFile) and self._repositoryIds is None:

@@ -24,6 +24,7 @@ import httplib
 from MaKaC.common.logger import Logger
 from MaKaC.common.Configuration import Config
 from MaKaC import conference
+from MaKaC.conference import LocalFile
 
 #URL_RESPONSE = "http://pcdh20.cern.ch/indico/getConvertedFile.py"
 #SERVER = 'http://pcdh20.cern.ch/getSegFile.py'#'http://pcuds01.cern.ch/getSegFile.py'
@@ -258,12 +259,15 @@ class CDSConvFileConverter(FileConverter):
             if mat is not None:
                 filePath = CDSConvFileConverter._saveFileToTemp( params )
                 fileName = params["filename"]
-                if not mat.hasFile(fileName):
-                    f = conference.LocalFile()
-                    f.setName(fileName)
-                    f.setFileName( fileName )
-                    f.setFilePath( filePath )
-                    mat.addResource( f )
+                for resource in mat.getResourceList():
+                    # if the pdf name is the same as any of the resources, and the material does not have a PDF yet:
+                    if os.path.splitext(resource.fileName)[0] == os.path.splitext(fileName)[0] and not mat.hasFile(fileName):
+                        resource.setPDFConversionRequestDate(None)
+                        f = conference.LocalFile()
+                        f.setName(fileName)
+                        f.setFileName( fileName )
+                        f.setFilePath( filePath )
+                        mat.addResource( f )
                 return filePath
             else:
                 #writeLog("Locator does not exist for file \"%s\": \n-locator:%s\nmessage:%s"%(params["filename"], params["directory"], params["error_message"]))
@@ -280,6 +284,6 @@ class CDSConvFileConverter(FileConverter):
         return False
     hasAvailableConversionsFor=staticmethod(hasAvailableConversionsFor)
 
-    def gatAvailableConversions():
+    def getAvailableConversions():
         return CDSConvFileConverter._availableExt
-    gatAvailableConversions=staticmethod(gatAvailableConversions)
+    getAvailableConversions=staticmethod(getAvailableConversions)

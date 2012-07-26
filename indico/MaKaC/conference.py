@@ -11084,7 +11084,6 @@ class Material(CommonObjectBase):
     def isBuiltin(self):
         return False
 
-
 class BuiltinMaterial(Material):
     """
     Non-customizable material types
@@ -11283,6 +11282,7 @@ class Resource(CommonObjectBase):
         self.description = ""
         self._owner = None
         self.__ac = AccessController(self)
+        self.pdfConversionRequestDate = None
 
     def clone( self, conf, protection=True ):
         res = self.__class__()
@@ -11516,7 +11516,6 @@ class Resource(CommonObjectBase):
                     return True
         return False
 
-
     def getReviewingState(self):
         """ Returns the reviewing state of a resource, which is the reviewing state of the material to which it belongs.
             The state is represented by an integer:
@@ -11532,6 +11531,18 @@ class Resource(CommonObjectBase):
             return self.getOwner().getReviewingState()
         else: #ressource does not belong to a material
             return 0
+
+    def setPDFConversionRequestDate( self, newPdfConversionRequestDate ):
+        self.pdfConversionRequestDate = newPdfConversionRequestDate
+
+    def getPDFConversionStatus(self):
+
+        if not hasattr(self, "pdfConversionRequestDate"):
+            self.pdfConversionRequestDate = None
+
+        if self.pdfConversionRequestDate is not None and self.pdfConversionRequestDate + timedelta(seconds=50) > nowutc() :
+            return 'converting'
+        return None
 
 
 class Link(Resource):

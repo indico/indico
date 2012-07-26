@@ -146,6 +146,10 @@ class IResourceFossil(IResourceMinimalFossil):
     def getReviewingState(self):
         """ Resource reviewing state """
 
+    def getPDFConversionStatus(self):
+        """ Resource PDF conversion status"""
+    getPDFConversionStatus.name = "pdfConversionStatus"
+
 class ILinkFossil(IResourceFossil, ILinkMinimalFossil):
 
     def getType(self):
@@ -235,7 +239,6 @@ class IMaterialFossil(IMaterialMinimalFossil):
 
     def isBuiltin(self):
         """ The material is a default one (builtin) """
-
 
 class ISessionFossil(IFossil):
 

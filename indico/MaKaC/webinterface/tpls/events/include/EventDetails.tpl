@@ -39,7 +39,7 @@
 
 % if len(materials) > 0:
 <tr id="materialList">
-    <td class="leftCol">${_("Material")}</td>
+    <td class="leftCol">${_("Material")}:</td>
     <td>
         <div class="materialList clearfix">
         % for material in materials:
