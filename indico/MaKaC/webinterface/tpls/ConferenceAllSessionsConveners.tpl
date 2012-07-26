@@ -1,5 +1,5 @@
 <div id="speakerActions" class="bs-alert alert-toolbar">
-    <form action=${convenerSelectionAction} method="post" name="participantsForm">
+    <form action=${convenerSelectionAction} method="post" name="convenersForm" target='_blank'>
     <input type="text" id="filterSpeakers" value="" placeholder='${_("Search Name, Email &amp; Sessions")}' class="toolbar-search" />
     <input type="submit" class="bs-btn bs-btn-right" value="${_("Email Selected Speakers")}" name="sendEmails" />
     <div>
@@ -16,7 +16,7 @@
     % for convener in conveners:
     <div class="speakerEntry">
         <div class="speakerDetails">
-            <input type="checkbox" name="participants" value="${convener['email']}" />
+            <input type="checkbox" name="conveners" value="${convener['email']}" />
             <span class="speakerName">
                 ${convener['name']}
             </span>
