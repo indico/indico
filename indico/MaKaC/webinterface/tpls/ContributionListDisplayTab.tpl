@@ -41,7 +41,7 @@ var verifyFiltersAndReset = function() {
     }
 };
 
-IndicoUI.executeOnLoad(function(){
+$(document).ready(function(){
     $("#resetFilters").click(function() {
         $("#filterContribs").attr("value", "");
         verifyFiltersAndReset();

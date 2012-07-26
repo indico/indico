@@ -712,6 +712,12 @@ From this list you can perform several actions on the registrants, as for exampl
 
 |image103|
 
+You may then select which template you which to use for your PDF by selecting the radio button to the left of it and then clicking 'Download Badges PDF'. You also have the option to edit, clone and delete the templates you have stored at will.
+
+Furthermore, clicking the 'PDF Layout Options' button provides access to further fine-tune your badges before downloading:
+
+|image158|
+
 * **Show stats**: It will show the statistics about the registrants.
 
 |image104|
@@ -1286,13 +1292,22 @@ process, see :ref:`event_evaluation`
 
 .. _lists_management:
 
-Lists Management
+This area gives you access to all the lists of pending users, dependent upon their pending actions. The default view presented is that of all contribution speakers.
+
+--------------
+
+List Management
 ~~~~~~~~~~~~~~~~
 
-From this option, you can get the lists of pending people to become Indico
-users, all sessions’ conveners and all contributions’ speakers.
+List of all contributions' speakers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-|image135|
+You are again presented with the corresponding list of users. You can send
+e-mails to selected users.
+
+|image143|
+
+The same options are available in the three different tabs.
 
 --------------
 
@@ -1315,18 +1330,6 @@ You are presented with a corresponding list of users. You can send e-mails
 to selected users.
 
 |image142|
-
---------------
-
-List of all contributions' speakers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-You are again presented with the corresponding list of users. You can send
-e-mails to selected users.
-
-|image143|
-
-The same options are available in the three different tabs.
 
 --------------
 
@@ -1423,9 +1426,20 @@ Posters
 ^^^^^^^
 
 It is possible to create your own posters for the conference in Indico.
-You can either create your own and customize it, or upload a template.
+You can either generate one of the pre-existing templates offered by your installation or generate event specific templates, either using the aforementioned ones as a basis or something entirely new.
 
 |image127|
+
+As with Badge / Tablesigns, you are permitted to alter the resultant PDF options by clicking the 'PDF Layout Options' button and setting the parameters as required beforehand.
+
+The list of event templates are templates which are only available for this event, you may freely edit, clone or delete these poster templates at will.
+
+|image157|
+
+The Poster design page is very similar to the Badge / Tablesigns design page. The options are broken into two tabs:
+
+* Template settings: Including dimensions, name.
+* Element settings: When an element is selected, this pane is auto enabled and permits you to modify font styles and sizes and, if the element is a fixed text item, you can edit its value here. For the latter, double clicking the element directly will prompt you to change its value.
 
 --------------
 
@@ -2050,4 +2064,6 @@ session. You may also make a PDF of the session.
 .. |image155| image:: UserGuidePics/confd152.png
 .. |image156| image:: UserGuidePics/abstractBackToSubmitted.png
 .. |image157| image:: UserGuidePics/abstractBackToSubmittedConfirm.png
-.. |image158| image:: UserGuidePics/childrenProtectedPopup.png
+.. |image158| image:: UserGuidePics/confreg15pdfopts.png
+.. |image159| image:: UserGuidePics/posterdesign.png
+.. |image160| image:: UserGuidePics/childrenProtectedPopup.png

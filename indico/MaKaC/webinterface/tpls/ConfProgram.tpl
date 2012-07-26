@@ -15,7 +15,11 @@
             % for track in program:
                 <div class='contributionListContribItem'>
                     <div class="contributionListContribHeader">
+                    % if 'url' in track:
                         <a href='${track['url']}'>${track['title']}</a>
+                    % else:
+                        ${track['title']}
+                    % endif
                     </div>
                     <div class="contributionListContribDescription">
                         ${track['description']}
