@@ -310,6 +310,7 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         self._scheduleType = pManager.extract("sessionType", pType=str,
                                           allowEmpty=False)
 
+
     def _performOperation(self):
 
         conf = self._target
@@ -807,6 +808,7 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
         sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         ScheduleEditSlotBase._checkParams(self)
         self._sessionTitle = self.pManager.extract("sessionTitle", pType = str, allowEmpty=False)
+        self._subtitle = self.pManager.extract("subtitle", pType = str, allowEmpty=True)
 
     def _addToSchedule(self):
         pass
@@ -829,7 +831,6 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
 
     def _setSessionTitle(self, slot):
         slot.getSession().setTitle(self._sessionTitle)
-
 
 class SessionScheduleEditSessionSlotById(SessionScheduleEditSessionSlot):
     """

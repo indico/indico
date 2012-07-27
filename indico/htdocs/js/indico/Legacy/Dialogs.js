@@ -212,6 +212,7 @@ extend(IndicoUI.Dialogs,
                            var contentDiv = Html.div({},
                                IndicoUtil.createFormFromMap([
                                    [$T('Title'), $B(parameterManager.add(Html.edit({ id: 'sessionTitle'}), 'text', false), info.accessor('title'))],
+                                   [$T('Sub-Title'), $B(parameterManager.add(Html.edit({ id: 'subtitle'}), 'text', true), info.accessor('subtitle'))],
                                    [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
                                    [$T('Date'), conferenceDays],
                                    startEndTimeComponent,
@@ -363,6 +364,7 @@ extend(IndicoUI.Dialogs,
 
                            }/******************************************************/
                            else {
+                               info.set('title', params.slotTitle);
                                info.set("conveners", params.sessionConveners);
                                // using default session location or event location (if sessions's one is inheriting)
                                if (roomInfo.location !== parentRoomInfo.get('location') ||
@@ -489,7 +491,7 @@ extend(IndicoUI.Dialogs,
 
                            var content = IndicoUtil.createFormFromMap([
                                sessionRenameComponent,
-                               isEdit ? [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))]:[],
+                               isEdit ? [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))]:[$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))],
                                [$T('Date'), conferenceDays],
                                startEndTimeComponent,
                                [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],

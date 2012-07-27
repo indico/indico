@@ -1473,8 +1473,8 @@ type("SessionRenameWidget", ["InlineWidget"],
                 this.modeChooser.set(mode);
                 // Adjust the height of the parent container (which is a popup) and
                 // prevent the appearance of a scroll bar.
-                var contentHeight = this.parentContainer.content.dom.offsetHeight;
-                this.parentContainer.contentWrapper.setStyle('height', pixels(contentHeight));
+                //var contentHeight = this.parentContainer.content.dom.offsetHeight;
+                //this.parentContainer.contentWrapper.setStyle('height', pixels(contentHeight));
             },
 
             _buildFrame: function(modeChooser, switchChooser) {
