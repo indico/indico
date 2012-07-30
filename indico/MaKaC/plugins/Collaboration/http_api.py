@@ -267,7 +267,6 @@ class VideoEventFetcher(DataFetcher):
                             # mark whole event as "added"
                             added_whole_events.add(evt)
 
-
                         if entries:
                             yield CSBookingInstanceWrapper(bkw.getOriginalBooking(),
                                                            evt,
@@ -284,36 +283,7 @@ class VideoEventFetcher(DataFetcher):
                 for evt, bks in tempBookings:
                     for bk in bks:
                         bk._conf = evt # Ensure all CSBookings are aware of their Conference
-
-                        """ This is for plugins whose structure include 'talkSelected',
-                            examples of which in CERN Indico being WebcastRequest and
-                            RecordingRequest.
-                        """
-                        if bk.hasTalkSelection():
-                            ts = bk.getTalkSelectionList()
-                            contributions = []
-
-                            if ts is None: # No individual talks, therefore an event for every contribution
-                                contributions = bk._conf.getContributionList()
-                            else:
-                                for contribId in ts:
-                                    tempContrib = bk._conf.getContributionById(contribId)
-                                    contributions.append(tempContrib)
-
-                            if len(contributions) == 0 or self._detail == "event": # If we are here, no contributions but a request exists.
-                                bk.setStartDate(bk._conf.getStartDate())
-                                bk.setEndDate(bk._conf.getEndDate())
-                                yield bk
-                            else: # Contributions is the list of all to be exported now
-                                contributions = filter(lambda c: c.isScheduled(), contributions)
-                                for contrib in contributions:
-                                    # Wrap the CSBooking object for export
-                                    bkw = CSBookingInstanceWrapper(bk, contrib)
-                                    bkw.setStartDate(contrib.getStartDate())
-                                    bkw.setEndDate(contrib.getEndDate())
-                                    yield bkw
-                        else:
-                            yield bk
+                        yield bk
 
     def video(self, idList, alarm = None):
 
