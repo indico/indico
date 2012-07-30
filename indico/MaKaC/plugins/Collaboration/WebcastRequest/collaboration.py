@@ -30,6 +30,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.i18n import _
 
+
 class CSBooking(CSBookingBase):
 
     _hasStart = False

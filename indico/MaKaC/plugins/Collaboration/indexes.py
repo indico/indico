@@ -17,6 +17,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from zope.interface import implements
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree
@@ -29,6 +30,79 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import fossilize, Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil,\
     IQueryResultFossil
+
+from indico.core.index.base import IUniqueIdProvider
+from indico.core.index.adapter import IIndexableByStartDateTime
+
+
+class CSBookingInstanceWrapper(Persistent):
+    """ This wrapper is required in order to export each contribution through
+        the iCal interface, giving each object its own unique address and
+        allows for the construction of iCal specific unique identifiers.
+    """
+
+    implements(IUniqueIdProvider, IIndexableByStartDateTime)
+
+    def __init__(self, booking, obj, startDate=None, endDate=None):
+        self._orig = booking
+        self._obj = obj
+        self._startDate = startDate
+        self._endDate = endDate
+
+    def __getattr__(self, name):
+        """ Checks for overridden method in this class, if not present then
+            delegates to original CSBooking object.
+        """
+
+        if name in self.__dict__:
+            return getattr(self, name)
+
+        return getattr(self._orig, name)
+
+    def _getShortTypeSuffix(self):
+        type = self._orig.getType()
+        return type.lower()[0:2]
+
+    def getUniqueId(self):
+        """ Each contribution will need a unique UID for each iCal event,
+            as RecordingRequests and WebcastRequests would share the same
+            UID per contribution, append a suffix denoting the type.
+        """
+        return self._obj.getUniqueId() + self._getShortTypeSuffix() + "_" + self.getStartDate().isoformat().replace('-','').replace(':', '')
+
+    def getTitle(self):
+        return self._orig._conf.getTitle() + ' - ' + self._obj.getTitle()
+
+    def getObject(self):
+        return self._obj
+
+    def getOriginalBooking(self):
+        return self._orig
+
+    def setStartDate(self, date):
+        self._startDate = date
+
+    def getStartDate(self):
+        return self._startDate or self._obj.getStartDate()
+
+    def setEndDate(self, date):
+        self._endDate = date
+
+    def getEndDate(self):
+        return self._endDate or self._obj.getEndDate()
+
+    def getLocation(self):
+        return self._obj.getLocation().getName() if self._obj.getLocation() else ""
+
+    def getRoom(self):
+        return self._obj.getRoom().getName() if self._obj.getRoom() else ""
+
+    def __conform__(self, proto):
+
+        if proto == IIndexableByStartDateTime:
+            return self.getStartDate()
+        else:
+            return None
 
 
 class CollaborationIndex(Persistent):

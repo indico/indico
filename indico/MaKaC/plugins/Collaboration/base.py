@@ -45,6 +45,7 @@ from indico.modules.scheduler.tasks import HTTPTask
 from indico.util import json
 from indico.util.i18n import gettext_lazy
 from indico.util.date_time import now_utc
+from indico.core.index import Catalog
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from BTrees.OOBTree import OOBTree
@@ -242,6 +243,10 @@ class CSBookingManager(Persistent, Observer):
         if booking.isHidden():
             self.getHiddenBookings().add(booking.getId())
         self._indexBooking(booking)
+
+        if booking.hasTalkSelection():
+            Catalog.getIdx('cs_booking_instance')[booking.getType()].index_booking(booking)
+
         self._notifyModification()
 
         # the unique id can be diferent for the new conference
@@ -295,6 +300,10 @@ class CSBookingManager(Persistent, Observer):
                     self._bookingsByType.setdefault(bookingType,[]).append(newId)
                     if newBooking.isHidden():
                         self.getHiddenBookings().add(newId)
+
+                    if newBooking.hasTalkSelection():
+                        Catalog.getIdx('cs_booking_instance')[bookingType].index_booking(newBooking)
+
                     self._indexBooking(newBooking)
                     self._notifyModification()
 
@@ -329,6 +338,9 @@ class CSBookingManager(Persistent, Observer):
         oldStartDate = booking.getStartDate()
         oldModificationDate = booking.getModificationDate()
         oldBookingParams = booking.getBookingParams() #this is a copy so it's ok
+
+        if booking.hasTalkSelection():
+            Catalog.getIdx('cs_booking_instance')[booking.getType()].unindex_booking(booking)
 
         error = booking.setBookingParams(bookingParams)
         if isinstance(error, CSSanitizationError):
@@ -379,6 +391,9 @@ class CSBookingManager(Persistent, Observer):
 
                 self._changeStartDateInIndex(booking, oldStartDate, booking.getStartDate())
                 self._changeModificationDateInIndex(booking, oldModificationDate, modificationDate)
+                if booking.hasTalkSelection():
+                    Catalog.getIdx('cs_booking_instance')[booking.getType()].index_booking(booking)
+
 
                 if booking.hasAcceptReject():
                     if booking.getAcceptRejectStatus() is not None:
@@ -442,6 +457,10 @@ class CSBookingManager(Persistent, Observer):
             # If there is an association to a session or contribution, remove it
             if bookingLinkId is not None:
                 self.removeVideoSingleService(bookingLinkId, booking)
+
+            if booking.hasTalkSelection():
+                Catalog.getIdx('cs_booking_instance')[booking.getType()].unindex_booking(booking)
+
             self._unindexBooking(booking)
 
             self._notifyModification()
@@ -649,6 +668,12 @@ class CSBookingManager(Persistent, Observer):
         if someDateChanged:
             problems = []
             for booking in self.getBookingList():
+
+                if booking.hasTalkSelection():
+                    dayIdx = Catalog.getIdx('cs_booking_instance')[booking.getType()]
+                    dayIdx.unindex_booking(booking, fromDT=oldStartDate, toDT=oldEndDate)
+                    dayIdx.index_booking(booking)
+
                 if booking.hasStartDate():
                     if startDateChanged:
                         try:

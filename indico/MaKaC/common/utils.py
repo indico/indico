@@ -407,7 +407,7 @@ def unicodeSlice(s, start, end, encoding = 'utf-8'):
 def daysBetween(dtStart, dtEnd):
     d = dtEnd - dtStart
     days = [ dtStart + timedelta(n) for n in range(0, d.days + 1)]
-    if days[-1] != dtEnd:
+    if days[-1].date() != dtEnd.date():
         # handles special case, when d.days is the
         # actual span minus 2
         # |----|----|----|----|

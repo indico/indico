@@ -21,6 +21,7 @@
 import icalendar as ical
 from datetime import timedelta
 
+from indico.core.index import Catalog
 from indico.web.http_api import HTTPAPIHook, DataFetcher
 from indico.web.http_api.ical import ICalSerializer
 from indico.web.http_api.util import get_query_parameter
@@ -36,6 +37,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.fossils import ICollaborationMetadataFossil
+from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper
 from MaKaC.common.timezoneUtils import getAdjustedDate
 
 
@@ -242,54 +244,83 @@ class VideoEventFetcher(DataFetcher):
 
         return fossil
 
-    def video(self, idList, alarm = None):
-
+    def iter_bookings(self, idList):
         idx = IndexesHolder().getById('collaboration');
-        bookings = []
-        dateFormat = '%d/%m/%Y'
-        self._alarm = alarm
 
         for vsid in idList:
-            tempBookings = idx.getBookings(self.ID_TO_IDX[vsid], "conferenceStartDate",
-                                           self._orderBy, self._fromDT, self._toDT,
-                                           'UTC', False, None, None, False, dateFormat)
-            bookings.extend(tempBookings.getResults())
 
-        def _iter_bookings(objs):
-            for obj in objs:
-                for bk in obj[1]:
-                    bk._conf = obj[0] # Ensure all CSBookings are aware of their Conference
+            if vsid in ['webcast', 'recording']:
+                added_whole_events = set()
 
-                    """ This is for plugins whose structure include 'talkSelected',
-                        examples of which in CERN Indico being WebcastRequest and
-                        RecordingRequest.
-                    """
-                    if bk.hasTalkSelection():
-                        ts = bk.getTalkSelectionList()
-                        contributions = []
+                for dt, bkw in Catalog.getIdx('cs_booking_instance')[self.ID_TO_IDX[vsid]].iteritems(self._fromDT, self._toDT):
+                    evt = bkw.getOriginalBooking().getConference()
+                    entries = evt.getSchedule().getEntriesOnDay(dt)
 
-                        if ts is None: # No individual talks, therefore an event for every contribution
-                            contributions = bk._conf.getContributionList()
-                        else:
-                            for contribId in ts:
-                                tempContrib = bk._conf.getContributionById(contribId)
-                                contributions.append(tempContrib)
+                    if bkw.getObject() == evt:
+                        # this means the booking relates to an event
+                        if evt in added_whole_events:
+                            continue
 
-                        if len(contributions) == 0 or self._detail == "event": # If we are here, no contributions but a request exists.
-                            bk.setStartDate(bk._conf.getStartDate())
-                            bk.setEndDate(bk._conf.getEndDate())
-                            yield bk
-                        else: # Contributions is the list of all to be exported now
-                            contributions = filter(lambda c: c.isScheduled(), contributions)
-                            for contrib in contributions:
-                                # Wrap the CSBooking object for export
-                                bkw = CSBookingContributionWrapper(bk, contrib)
-                                bkw.setStartDate(contrib.getStartDate())
-                                bkw.setEndDate(contrib.getEndDate())
+                        if not evt.getSchedule().getEntries():
+                            yield CSBookingInstanceWrapper(bkw.getOriginalBooking(),
+                                                           evt)
+                            # mark whole event as "added"
+                            added_whole_events.add(evt)
 
-                                yield bkw
+
+                        if entries:
+                            yield CSBookingInstanceWrapper(bkw.getOriginalBooking(),
+                                                           evt,
+                                                           entries[0].getStartDate(),
+                                                           entries[-1].getEndDate())
                     else:
-                        yield bk
+                        yield bkw
+            else:
+                dateFormat = '%d/%m/%Y'
+                tempBookings = idx.getBookings(self.ID_TO_IDX[vsid], "conferenceStartDate",
+                                               self._orderBy, self._fromDT, self._toDT,
+                                               'UTC', False, None, None, False, dateFormat).getResults()
+
+                for evt, bks in tempBookings:
+                    for bk in bks:
+                        bk._conf = evt # Ensure all CSBookings are aware of their Conference
+
+                        """ This is for plugins whose structure include 'talkSelected',
+                            examples of which in CERN Indico being WebcastRequest and
+                            RecordingRequest.
+                        """
+                        if bk.hasTalkSelection():
+                            ts = bk.getTalkSelectionList()
+                            contributions = []
+
+                            if ts is None: # No individual talks, therefore an event for every contribution
+                                contributions = bk._conf.getContributionList()
+                            else:
+                                for contribId in ts:
+                                    tempContrib = bk._conf.getContributionById(contribId)
+                                    contributions.append(tempContrib)
+
+                            if len(contributions) == 0 or self._detail == "event": # If we are here, no contributions but a request exists.
+                                bk.setStartDate(bk._conf.getStartDate())
+                                bk.setEndDate(bk._conf.getEndDate())
+                                yield bk
+                            else: # Contributions is the list of all to be exported now
+                                contributions = filter(lambda c: c.isScheduled(), contributions)
+                                for contrib in contributions:
+                                    # Wrap the CSBooking object for export
+                                    bkw = CSBookingInstanceWrapper(bk, contrib)
+                                    bkw.setStartDate(contrib.getStartDate())
+                                    bkw.setEndDate(contrib.getEndDate())
+                                    yield bkw
+                        else:
+                            yield bk
+
+    def video(self, idList, alarm = None):
+
+        res = []
+        bookings = []
+        self._alarm = alarm
+
 
         """ Simple filter, as this method can return None for Pending and True
             for accepted, both are valid booking statuses for exporting.
@@ -299,60 +330,6 @@ class VideoEventFetcher(DataFetcher):
 
         iface = self.DETAIL_INTERFACES.get('all')
 
-        for booking in self._process(_iter_bookings(bookings), _filter, iface):
+        for booking in self._process(self.iter_bookings(idList), _filter, iface):
             yield booking
 
-
-class CSBookingContributionWrapper():
-    """ This wrapper is required in order to export each contribution through
-        the iCal interface, giving each object its own unique address and
-        allows for the construction of iCal specific unique identifiers.
-    """
-
-    def __init__(self, booking, contrib):
-        self._orig = booking
-        self._contrib = contrib
-        self._startDate = None
-        self._endDate = None
-
-    def __getattr__(self, name):
-        """ Checks for overridden method in this class, if not present then
-            delegates to original CSBooking object.
-        """
-
-        if name in self.__dict__:
-            return getattr(self, name)
-
-        return getattr(self._orig, name)
-
-    def _getShortTypeSuffix(self):
-        type = self._orig.getType()
-        return type.lower()[0:2]
-
-    def getUniqueId(self):
-        """ Each contribution will need a unique UID for each iCal event,
-            as RecordingRequests and WebcastRequests would share the same
-            UID per contribution, append a suffix denoting the type.
-        """
-        return self._contrib.getUniqueId() + self._getShortTypeSuffix()
-
-    def getTitle(self):
-        return self._orig._conf.getTitle() + ' - ' + self._contrib.getTitle()
-
-    def setStartDate(self, date):
-        self._startDate = date
-
-    def getStartDate(self):
-        return self._startDate
-
-    def setEndDate(self, date):
-        self._endDate = date
-
-    def getEndDate(self):
-        return self._endDate
-
-    def getLocation(self):
-        return self._contrib.getLocation().getName() if self._contrib.getLocation() else ""
-
-    def getRoom(self):
-        return self._contrib.getRoom().getName() if self._contrib.getRoom() else ""

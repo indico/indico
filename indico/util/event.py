@@ -22,8 +22,10 @@
 Event-related utils
 """
 
+import re
 from MaKaC import conference
 
+UID_RE = re.compile(r'^(?P<event>\w+)(?:\.s(?P<session>\w+))?(?:\.(?P<contrib>\w+))?(?:\.(?P<subcont>\w+))?$')
 
 def uniqueId(obj):
     ret = obj.getId()
@@ -39,3 +41,20 @@ def uniqueId(obj):
         ret = "%s.s%s.%s" % (obj.getConference().getId(),
                              obj.getSession().getId(), ret)
     return ret
+
+
+def uid_to_obj(uid):
+    m = UID_RE.match(uid)
+    if not m:
+        return m
+    else:
+        d = m.groupdict()
+        obj = conference.ConferenceHolder().getById(d['event'])
+        if 'session' in d:
+            obj = obj.getSessionById(d['session'])
+        if 'contrib' in d:
+            obj = obj.getContributionById(d['contrib'])
+        if 'subcont' in d:
+            obj = obj.getSubContributionById(d['subcont'])
+
+        return obj
