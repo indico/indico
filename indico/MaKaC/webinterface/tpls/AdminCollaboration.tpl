@@ -490,9 +490,11 @@ var dateBookingTemplate = function(booking, viewBy) {
     var time = null;
     if (viewBy === "creationDate") {
         time = booking.creationDate.time.substring(0,5);
-    } else if (viewBy === "modificationDate") {
+    } else if (viewBy == "modificationDate") {
         time = booking.modificationDate.time.substring(0,5);
-    } else if (viewBy === "startDate" || viewBy === "conferenceStartDate") {
+    } else if (viewBy == "startDate" && (booking.type == "RecordingRequest" || booking.type == "WebcastRequest")) {
+        time = booking.instanceDate.time.substring(0, 5);
+    } else if (viewBy == "startDate" || viewBy == "conferenceStartDate") {
         time = (booking.bookingParams.startDate.length === 0)
                ? '' : Util.parseDateTime(booking.bookingParams.startDate,
                        IndicoDateTimeFormats.Default).time.substring(0, 5);

@@ -182,8 +182,10 @@ class ICSBookingBaseIndexingFossil(ICSBookingBaseFossil):
 
 
 class ICSBookingInstanceIndexingFossil(ICSBookingBaseIndexingFossil):
-    pass
-
+    def getStartDate(self):
+        pass
+    getStartDate.name = "instanceDate"
+    getStartDate.convert = Conversion.datetime
 
 ##################### Error fossils #####################
 
