@@ -18,7 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from datetime import timedelta
+from pytz import timezone
+from datetime import timedelta, date, time, datetime
 from MaKaC.services.implementation.base import ParameterManager, AdminService
 from MaKaC.services.interface.rpc.common import NoReportError
 from MaKaC.services.implementation.conference import ConferenceModifBase
@@ -289,6 +290,8 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
     def _checkParams(self):
         AdminCollaborationBase._checkParams(self)
         user = self.getAW().getUser()
+        pm = ParameterManager(self._params)
+
         if user: #someone is logged in. if not, AdminCollaborationBase's _checkProtection will take care of it
             self._tz = user.getTimezone()
 
@@ -304,10 +307,11 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
 
                 minKey = None
                 maxKey = None
+
                 if self._params['sinceDate']:
-                    minKey = setAdjustedDate(parseDateTime(self._params['sinceDate'].strip()), tz = self._tz)
+                    minKey = timezone(self._tz).localize(datetime.combine(pm.extract("sinceDate", pType=date, allowEmpty=True), time(0, 0)))
                 if self._params['toDate']:
-                    maxKey = setAdjustedDate(parseDateTime(self._params['toDate'].strip()), tz = self._tz)
+                    maxKey = timezone(self._tz).localize(datetime.combine(pm.extract("toDate", pType=date, allowEmpty=True), time(23, 59, 59)))
                 if self._params['fromTitle']:
                     minKey = self._params['fromTitle'].strip()
                 if self._params['toTitle']:

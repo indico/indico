@@ -50,8 +50,8 @@
                     <% checked2 = '' %>
                 % endif
                 <input type="radio" name="dateFilterType" id="sinceToDateRadio" onclick="updateDateFilterType()" class="CARadio" ${ checked1 } />
-                <span class="CAFormattingSpan">${ _("Since")}</span><span id="sinceDateContainer"></span>
-                ${ _("to")} <span id="toDateContainer"></span>
+                <span class="CAFormattingSpan">${ _("Since")}</span><input type="text" id="sinceDate">${InitialSinceDate}</input>
+                ${ _("to")} <input type="text" id="toDate">${InitialToDate}</input>
                 <span class="CAMinMaxKeySuggestion">${ _("Please input dates") }</span>
             </div>
             <div style="padding-top: 5px">
@@ -583,14 +583,8 @@ var pf = new PageFooter('${ InitialNumberOfPages }', '${ InitialPage }', 4, page
 
 IndicoUI.executeOnLoad(function(){
 
-    var sinceDate = IndicoUI.Widgets.Generic.dateField(true, {id:'sinceDate'});
-    $E('sinceDateContainer').set(sinceDate);
-    sinceDate.set(${ InitialSinceDate });
-    sinceDate.observeEvent("keypress", function (e) { updateFilterButton(); });
-    var toDate = IndicoUI.Widgets.Generic.dateField(true, {id:'toDate'});
-    $E('toDateContainer').set(toDate);
-    toDate.set(${ InitialToDate });
-    toDate.observeEvent("keypress", function (e) { updateFilterButton(); });
+    $('#sinceDate').datepicker({ dateFormat: "yy/mm/dd" }).on('keypress', function (e) { updateFilterButton(); });
+    $('#toDate').datepicker({ dateFormat: "yy/mm/dd" }).on('keypress', function (e) { updateFilterButton(); });
 
     buildIndexTooltips();
     confIdObs();
@@ -606,8 +600,8 @@ IndicoUI.executeOnLoad(function(){
 
     $E('pageNumberList').set(pf.draw());
 
-    dateParameterManager.add(sinceDate, 'datetime', true);
-    dateParameterManager.add($E('toDate'), 'datetime', true);
+    dateParameterManager.add($E('sinceDate'), 'date', true);
+    dateParameterManager.add($E('toDate'), 'date', true);
 
     resultsPerPageParameterManager.add($E('resultsPerPage'), 'int', false, function(value) {
         if (value < 1) {
