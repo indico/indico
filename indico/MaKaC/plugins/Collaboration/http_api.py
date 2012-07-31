@@ -245,36 +245,13 @@ class VideoEventFetcher(DataFetcher):
         return fossil
 
     def iter_bookings(self, idList):
-        idx = IndexesHolder().getById('collaboration');
-
         for vsid in idList:
-
             if vsid in ['webcast', 'recording']:
-                added_whole_events = set()
-
-                for dt, bkw in Catalog.getIdx('cs_booking_instance')[self.ID_TO_IDX[vsid]].iteritems(self._fromDT, self._toDT):
-                    evt = bkw.getOriginalBooking().getConference()
-                    entries = evt.getSchedule().getEntriesOnDay(dt)
-
-                    if bkw.getObject() == evt:
-                        # this means the booking relates to an event
-                        if evt in added_whole_events:
-                            continue
-
-                        if not evt.getSchedule().getEntries():
-                            yield CSBookingInstanceWrapper(bkw.getOriginalBooking(),
-                                                           evt)
-                            # mark whole event as "added"
-                            added_whole_events.add(evt)
-
-                        if entries:
-                            yield CSBookingInstanceWrapper(bkw.getOriginalBooking(),
-                                                           evt,
-                                                           entries[0].getStartDate(),
-                                                           entries[-1].getEndDate())
-                    else:
-                        yield bkw
+                idx = Catalog.getIdx('cs_booking_instance')[self.ID_TO_IDX[vsid]]
+                for __, bkw in idx.iter_bookings(self._fromDT, self._toDT):
+                    yield bkw
             else:
+                idx = IndexesHolder().getById('collaboration');
                 dateFormat = '%d/%m/%Y'
                 tempBookings = idx.getBookings(self.ID_TO_IDX[vsid], "conferenceStartDate",
                                                self._orderBy, self._fromDT, self._toDT,
@@ -284,6 +261,7 @@ class VideoEventFetcher(DataFetcher):
                     for bk in bks:
                         bk._conf = evt # Ensure all CSBookings are aware of their Conference
                         yield bk
+
 
     def video(self, idList, alarm = None):
 

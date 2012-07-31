@@ -181,6 +181,9 @@ class ICSBookingBaseIndexingFossil(ICSBookingBaseFossil):
     getModificationURL.convert = lambda url: str(url)
 
 
+class ICSBookingInstanceIndexingFossil(ICSBookingBaseIndexingFossil):
+    pass
+
 
 ##################### Error fossils #####################
 

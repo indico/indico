@@ -36,6 +36,7 @@ from MaKaC.webinterface.user import UserListModificationBase,\
 from MaKaC.common.fossilize import fossilize
 
 
+
 ## Base classes
 class CollaborationBase(ConferenceModifBase):
     """ This base class stores the _CSBookingManager attribute
@@ -298,6 +299,9 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
                 self._viewBy = self._params['viewBy']
                 self._orderBy = self._params['orderBy']
 
+                if self._indexName in ['RecordingRequest', 'WebcastRequest'] and self._viewBy == 'startDate':
+                    self._viewBy = 'instanceDate'
+
                 minKey = None
                 maxKey = None
                 if self._params['sinceDate']:
@@ -347,7 +351,6 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
 
     def _getAnswer(self):
         ci = IndexesHolder().getById('collaboration')
-
         return ci.getBookings(self._indexName,
                               self._viewBy,
                               self._orderBy,

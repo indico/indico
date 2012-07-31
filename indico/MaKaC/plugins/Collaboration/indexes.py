@@ -17,6 +17,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from collections import defaultdict
 from zope.interface import implements
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
@@ -29,10 +30,11 @@ from datetime import datetime
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import fossilize, Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil,\
-    IQueryResultFossil
+    IQueryResultFossil, ICollaborationMetadataFossil
 
 from indico.core.index.base import IUniqueIdProvider
 from indico.core.index.adapter import IIndexableByStartDateTime
+from indico.core.index import Catalog
 
 
 class CSBookingInstanceWrapper(Persistent):
@@ -41,7 +43,7 @@ class CSBookingInstanceWrapper(Persistent):
         allows for the construction of iCal specific unique identifiers.
     """
 
-    implements(IUniqueIdProvider, IIndexableByStartDateTime)
+    implements(IUniqueIdProvider, IIndexableByStartDateTime, ICollaborationMetadataFossil)
 
     def __init__(self, booking, obj, startDate=None, endDate=None):
         self._orig = booking
@@ -121,6 +123,13 @@ class CollaborationIndex(Persistent):
             self._indexes[name] = index
             return index
 
+    def _getBookingInstancesByDate(self, index, dateFormat, fromDate=None, toDate=None):
+        bookings = defaultdict(list)
+        for dt, bkw in Catalog.getIdx('cs_booking_instance')[index].iter_bookings(fromDate, toDate):
+            bookings[dt].append(bkw)
+        return list((dt.strftime(dateFormat), bkws) for (dt, bkws) in sorted(bookings.iteritems())), len(bookings)
+
+
     def getBookings(self, indexName, viewBy, orderBy, minKey, maxKey,
                     tz = 'UTC', onlyPending=False, conferenceId=None, categoryId=None,
                     pickle=False, dateFormat=None, page=None, resultsPerPage=None,
@@ -144,12 +153,13 @@ class CollaborationIndex(Persistent):
                 elif viewBy == "conferenceStartDate":
                     items, nBookings = index.getBookingsByConfDate(minKey, maxKey, conferenceId,
                                                                    categoryId, tz, dateFormat, grouped=grouped)
+                elif viewBy == "instanceDate":
+                    items, nBookings = self._getBookingInstancesByDate(indexName, dateFormat, minKey, maxKey)
                 else:
                     items, nBookings = index.getBookingsByDate(viewBy, minKey, maxKey, tz, conferenceId, categoryId, dateFormat)
 
                 if reverse:
                     items.reverse()
-
 
                 nGroups = len(items)
 
@@ -174,12 +184,13 @@ class CollaborationIndex(Persistent):
 
         except KeyError:
             Logger.get("VideoServ").warning("Tried to retrieve index with name " + indexName + " but the index did not exist. Maybe no bookings have been added to it yet")
-            finalResult = QueryResult([], 0, 0, 0)
+            finalResult = QueryResult([], 0, 0, 0, 0)
 
         if CollaborationTools.hasCollaborationOption("verifyIndexingResults") and CollaborationTools.getCollaborationOptionValue("verifyIndexingResults"):
             finalResult.purgeNonExistingBookings()
 
         if pickle:
+            # ATTENTION: this call silently changes the fossil map
             CollaborationTools.updateIndexingFossilsDict()
             return fossilize(finalResult, IQueryResultFossil, tz = tz)
         else:

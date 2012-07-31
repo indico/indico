@@ -27,7 +27,7 @@ from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay
 from MaKaC.common.Configuration import Config
 from MaKaC.conference import Contribution, Conference
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
-    IQueryResultFossil
+    IQueryResultFossil, ICSBookingInstanceIndexingFossil
 from MaKaC.fossils.conference import IConferenceFossil
 from MaKaC.common.contextManager import ContextManager
 
@@ -322,7 +322,8 @@ class CollaborationTools(object):
         """ Utility function that updates IQueryResultFossil's getResults method
             with the proper dict in order to fossilize bookings for the VS Overview page
         """
-        fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceFossil}
+        fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceFossil,
+                      'MaKaC.plugins.Collaboration.indexes.CSBookingInstanceWrapper': ICSBookingInstanceIndexingFossil}
         for pluginName in cls.getCollaborationPluginType().getPlugins():
             classObject = cls.getCSBookingClass(pluginName)
             fossilClassObject = cls.getIndexingFossil(pluginName)

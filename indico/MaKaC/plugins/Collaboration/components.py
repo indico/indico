@@ -86,6 +86,33 @@ class CSBookingInstanceIndex(OOIndex):
                                                day.replace(hour=23, minute=59, second=59))
                 self.index_obj(bkw)
 
+    def iter_bookings(self, fromDT, toDT):
+
+        added_whole_events = set()
+
+        for dt, bkw in self.iteritems(fromDT, toDT):
+            evt = bkw.getOriginalBooking().getConference()
+            entries = evt.getSchedule().getEntriesOnDay(dt)
+
+            if bkw.getObject() == evt:
+                # this means the booking relates to an event
+                if evt in added_whole_events:
+                    continue
+
+                if not evt.getSchedule().getEntries():
+                    yield dt, CSBookingInstanceWrapper(bkw.getOriginalBooking(),
+                                                   evt)
+                    # mark whole event as "added"
+                    added_whole_events.add(evt)
+
+                if entries:
+                    yield dt, CSBookingInstanceWrapper(bkw.getOriginalBooking(),
+                                                       evt,
+                                                       entries[0].getStartDate(),
+                                                       entries[-1].getEndDate())
+            else:
+                yield dt, bkw
+
     def unindex_booking(self, bk, fromDT=None, toDT=None):
         to_unindex = set()
         # go over possible wrappers

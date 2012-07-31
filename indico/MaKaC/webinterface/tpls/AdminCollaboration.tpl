@@ -201,7 +201,7 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
     var hasViewByStartDate = indexInformation[selectedIndexName].hasViewByStartDate;
     var hasShowOnlyPending = indexInformation[selectedIndexName].hasShowOnlyPending;
 
-    if (hasViewByStartDate) {
+    if (hasViewByStartDate || selectedIndexName == 'RecordingRequest' || selectedIndexName == 'WebcastRequest') {
         IndicoUI.Effect.appear($E('startDateViewBy'));
     } else {
         IndicoUI.Effect.disappear($E('startDateViewBy'));
