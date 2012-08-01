@@ -96,7 +96,7 @@ class RHUserCreation( RH ):
 
     def _process( self ):
         save = False
-        ih = AuthenticatorMgr()
+        authManager = AuthenticatorMgr.getInstance()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._params["msg"] = ""
         if self._save:
@@ -123,7 +123,7 @@ class RHUserCreation( RH ):
             if self._params.get("password","") != self._params.get("passwordBis",""):
                 self._params["msg"] += _("You must enter the same password twice.")+"<br>"
                 save = False
-            if not ih.isLoginFree(self._params.get("login","")):
+            if not authManager.isLoginFree(self._params.get("login","")):
                 self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
                 save = False
             if not self._validMail(self._params.get("email","")):
@@ -144,8 +144,8 @@ class RHUserCreation( RH ):
                     #create the identity to the user and send the comfirmatio email
                     _UserUtils.setUserData( a, self._params )
                     li = user.LoginInfo( self._params["login"], self._params["password"] )
-                    id = ih.createIdentity( li, a, "Local" )
-                    ih.add( id )
+                    id = authManager.createIdentity( li, a, "Local" )
+                    authManager.add( id )
                     DBMgr.getInstance().commit()
                     if minfo.getModerateAccountCreation():
                         mail.sendAccountCreationModeration(a).send()
@@ -158,8 +158,8 @@ class RHUserCreation( RH ):
                 _UserUtils.setUserData( a, self._params )
                 ah.add(a)
                 li = user.LoginInfo( self._params["login"], self._params["password"] )
-                id = ih.createIdentity( li, a, "Local" )
-                ih.add( id )
+                id = authManager.createIdentity( li, a, "Local" )
+                authManager.add( id )
                 DBMgr.getInstance().commit()
                 if minfo.getModerateAccountCreation():
                     mail.sendAccountCreationModeration(a).send()
@@ -374,9 +374,9 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
         msg = ""
         if self._ok:
             ok = True
-            ih = AuthenticatorMgr()
+            authManager = AuthenticatorMgr.getInstance()
             #first, check if login is free
-            if not ih.isLoginFree(self._login):
+            if not authManager.isLoginFree(self._login):
                 msg += "Sorry, the login you requested is already in use. Please choose another one.<br>"
                 ok = False
             if not self._pwd:
@@ -389,8 +389,8 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
             if ok:
                 #create the indentity
                 li = user.LoginInfo( self._login, self._pwd )
-                id = ih.createIdentity( li, self._avatar, self._system )
-                ih.add( id )
+                id = authManager.createIdentity( li, self._avatar, self._system )
+                authManager.add( id )
                 self._redirect( urlHandlers.UHUserDetails.getURL( self._avatar ) )
                 return
 
@@ -412,9 +412,9 @@ class RHUserIdPerformCreation( RHUserIdentityBase ):
         self._system = params.get("system", "")
 
     def _process( self ):
-        ih = AuthenticatorMgr()
+        authManager = AuthenticatorMgr.getInstance()
         #first, check if login is free
-        if not ih.isLoginFree(self._login):
+        if not authManager.isLoginFree(self._login):
             self._redirect(self._fromURL + "&msg=Login not avaible")
             return
         #then, check if password is OK
@@ -423,8 +423,8 @@ class RHUserIdPerformCreation( RHUserIdentityBase ):
             return
         #create the indentity
         li = user.LoginInfo( self._login, self._pwd )
-        id = ih.createIdentity( li, self._avatar, self._system )
-        ih.add( id )
+        id = authManager.createIdentity( li, self._avatar, self._system )
+        authManager.add( id )
         #commit and if OK, send activation mail
         DBMgr.getInstance().commit()
         scr = mail.sendConfirmationRequest(self._avatar)
@@ -471,11 +471,11 @@ class RHUserRemoveIdentity( RHUserIdentityBase ):
         self._identityList = self._normaliseListParam(params.get("selIdentities",[]))
 
     def _process( self ):
-        am = AuthenticatorMgr()
+        authManager = AuthenticatorMgr.getInstance()
         for i in self._identityList:
-            identity = am.getIdentityById(i)
+            identity = authManager.getIdentityById(i)
             if len(identity.getUser().getIdentityList()) > 1:
-                am.removeIdentity(identity)
+                authManager.removeIdentity(identity)
                 self._avatar.removeIdentity(identity)
         self._redirect( urlHandlers.UHUserDetails.getURL( self._avatar ) )
 

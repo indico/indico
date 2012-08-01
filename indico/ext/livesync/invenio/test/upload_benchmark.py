@@ -78,9 +78,9 @@ def runTests(host='localhost', port=FAKE_SERVICE_PORT,
 
     #setting up the login info
     li = user.LoginInfo( "dummyuser", "dummyuser" )
-    ih = AuthenticatorMgr()
-    userid = ih.createIdentity( li, avatar, "Local" )
-    ih.add( userid )
+    am = AuthenticatorMgr()
+    userid = am.createIdentity( li, avatar, "Local" )
+    am.add( userid )
 
     #activate the account
     avatar.activateAccount()

@@ -31,6 +31,7 @@ from MaKaC import domain
 from MaKaC.common import db
 import MaKaC.common.indexes as indexes
 from MaKaC.common.Counter import Counter
+from MaKaC.authentication import AuthenticatorMgr
 
 codec = "utf-8"
 file_host = "agenda.cern.ch"
@@ -96,9 +97,8 @@ def createUser(name, email, org, password):
         id = user.LocalIdentity(name, password, avatar)
     else:#user with no email address - identity not created
         return avatar
-    ih = user.AuthenticatorMgr()
     try:
-        ih.add(id)
+        AuthenticatorMgr.getInstance().add(id)
     except (UserError):
         pass
     avatar.activateAccount()

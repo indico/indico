@@ -70,8 +70,7 @@ class RHSignIn( RHXMLHandlerBase ):
     def _process( self ):
 
         li = LoginInfo( self._login, self._password )
-        auth = AuthenticatorMgr()
-        av = auth.getAvatar(li)
+        av = AuthenticatorMgr.getInstance().getAvatar(li)
         value = "OK"
         message = ""
         if not av:

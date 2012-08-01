@@ -72,9 +72,9 @@ class RoomBooking_Feature(IndicoTestFeature):
 
                 # setting up the login info
                 li = LoginInfo("fake-%d" % i, "fake-%d" % i)
-                ih = AuthenticatorMgr()
-                userid = ih.createIdentity(li, avatar, "Local")
-                ih.add(userid)
+                authManager = AuthenticatorMgr()
+                userid = authManager.createIdentity(li, avatar, "Local")
+                authManager.add(userid)
 
                 # activate the account
                 avatar.activateAccount()

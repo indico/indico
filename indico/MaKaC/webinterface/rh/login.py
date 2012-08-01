@@ -51,8 +51,8 @@ class RHSignIn( base.RH ):
     def _process( self ):
         self._disableCaching()
         #Check for automatic login
-        auth = AuthenticatorMgr()
-        av = auth.autoLogin(self)
+        authManager = AuthenticatorMgr.getInstance()
+        av = authManager.autoLogin(self)
         if av:
             url = self._returnURL
             tzUtil = timezoneUtils.SessionTZ(av)
@@ -67,7 +67,7 @@ class RHSignIn( base.RH ):
             return p.display( returnURL = self._returnURL )
         else:
             li = LoginInfo( self._login, self._password )
-            av = auth.getAvatar(li)
+            av = authManager.getAvatar(li)
             if not av:
                 p = signIn.WPSignIn( self, login = self._login, msg = _("Wrong login or password") )
                 return p.display( returnURL = self._returnURL )
@@ -106,8 +106,7 @@ class RHSignOut( base.RH ):
     def _process( self ):
         autoLogoutRedirect = None
         if self._getUser():
-            auth = AuthenticatorMgr()
-            autoLogoutRedirect = auth.autoLogout(self)
+            autoLogoutRedirect = AuthenticatorMgr.getInstance().autoLogout(self)
             session.clear()
             self._setUser(None)
         if autoLogoutRedirect:
@@ -125,8 +124,6 @@ class RHLogoutSSOHook( base.RH):
         dialog. It logouts the user from CDS Invenio and stream back the
         expected picture."""
         if self._getUser():
-            auth = AuthenticatorMgr()
-            auth.autoLogout(self)
             session.clear()
             self._setUser(None)
         path = os.path.join(Configuration.Config.getInstance().getImagesDir(), 'wsignout.gif')

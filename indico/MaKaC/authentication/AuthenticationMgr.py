@@ -18,41 +18,41 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session
 
-
 from MaKaC.common.Configuration import Config
-from MaKaC.authentication.LocalAuthentication import LocalAuthenticator
-
-
+from MaKaC.errors import MaKaCError
 
 class AuthenticatorMgr:
 
+    _instance = None
+
     def __init__(self):
 
-        self.AuthenticatorList = []
+        self._authenticator_list = []
         config = Config.getInstance()
-        for  auth in config.getAuthenticatorList():
-            if auth == "Local":
-                self.AuthenticatorList.append( LocalAuthenticator() )
-            if auth == "Nice":
-                from MaKaC.authentication.NiceAuthentication import NiceAuthenticator
-                self.AuthenticatorList.append( NiceAuthenticator() )
-            if auth == "LDAP":
-                from MaKaC.authentication.LDAPAuthentication import LDAPAuthenticator
-                self.AuthenticatorList.append(LDAPAuthenticator())
-        self.create = True
+        for auth in config.getAuthenticatorList():
+            try:
+                self._authenticator_list.append(getattr(__import__("MaKaC.authentication." + auth + "Authentication", globals(), locals(),[auth + "Authentication"]), auth + "Authenticator")())
+            except:
+                raise MaKaCError("Impossible to load %s" % auth)
 
+    @classmethod
+    def getInstance( cls ):
+
+        if cls._instance == None:
+            cls._instance = AuthenticatorMgr()
+        return cls._instance
 
     def add( self, newId):
         auth = self.getById( newId.getAuthenticatorTag() )
         auth.add( newId )
 
-    def getById( self, id ):
-        for auth in self.AuthenticatorList:
-            if auth.getId() == id.strip():
+    def getById( self, authId ):
+        for auth in self.getList():
+            if auth.getId() == authId.strip():
                 return auth
         return None
 
-    def getAvatar( self, li , authenticator=None, create=None):
+    def getAvatar( self, li , authenticator=None):
         if authenticator:
             auth = self.getById(authenticator)
             try:
@@ -60,23 +60,22 @@ class AuthenticatorMgr:
             except KeyError, e:
                 pass
         else:
-            for auth in self.AuthenticatorList:
+            for auth in self.getList():
                 try:
                     valid=auth.getAvatar( li )
                     if valid:
                         return valid
                 except KeyError, e:
                     pass
-            # The authentication failed. If create, check if we can create the user automaticaly
-            if self.create:
-                #check if the login is OK with Authenticator which can create a user
-                for auth in self.AuthenticatorList:
-                    if auth.getUserCreator():
-                        user = auth.getUserCreator().create(li)
-                        if user != None:
-                            if auth.getId().strip() == 'Nice':
-                                user.activateAccount()
-                            return user
+
+            #check if the login is OK with Authenticator which can create a user
+            for auth in self.getList():
+                if auth.getUserCreator():
+                    user = auth.getUserCreator().create(li)
+                    if user != None:
+                        if auth.getId().strip() == 'Nice':
+                            user.activateAccount()
+                        return user
         return None
 
     def getAvatarByLogin(self, login, auth = None):
@@ -96,7 +95,7 @@ class AuthenticatorMgr:
 
         if auth == None:
             # search all authenticators
-            authList = self.AuthenticatorList
+            authList = self.getList()
         else:
             # get the actual Authenticator objects
             authList = list(self.getById(a) for a in auth)
@@ -113,7 +112,7 @@ class AuthenticatorMgr:
         return foundAvatars
 
     def isLoginFree( self, login):
-        for au in self.AuthenticatorList:
+        for au in self.getList():
             try:
                 if au.getById(login):
                     return False
@@ -122,10 +121,10 @@ class AuthenticatorMgr:
         return True
 
     def _getDefaultAuthenticator( self ):
-        return self.AuthenticatorList[0]
+        return self.getList()[0]
 
     def getList(self):
-        return self.AuthenticatorList
+        return self._authenticator_list
 
     def createIdentity(self, li, avatar, system=""):
         auth = self.getById( system )
@@ -140,7 +139,7 @@ class AuthenticatorMgr:
             auth.remove(Id)
 
     def getIdentityById(self, id):
-        for auth in self.AuthenticatorList:
+        for auth in self.getList():
             try:
                 Id = auth.getById(id)
                 if Id:
@@ -151,7 +150,7 @@ class AuthenticatorMgr:
 
     def autoLogin(self, rh):
         # Try to login from request handler
-        for auth in self.AuthenticatorList:
+        for auth in self.getList():
             av = auth.autoLogin(rh)
             if av:
                 session['autoLogin'] = auth.getId()
@@ -163,5 +162,3 @@ class AuthenticatorMgr:
         if authId:
             auth = self.getById(authId)
             return auth.autoLogout(rh)
-
-

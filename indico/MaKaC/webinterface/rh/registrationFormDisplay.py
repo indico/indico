@@ -74,12 +74,11 @@ class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
 
 
     def _processIfActive( self ):
-        #Check for automatic login
+        # Check for automatic login
         if self._getUser():
             self._redirect(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf))
             return
-        auth = AuthenticatorMgr()
-        av = auth.autoLogin(self)
+        av = AuthenticatorMgr.getInstance().autoLogin(self)
         if av:
             url = self._returnURL
             session.user = av

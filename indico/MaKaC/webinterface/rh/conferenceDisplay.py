@@ -75,8 +75,8 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
 
     def _process( self ):
         #Check for automatic login
-        auth = AuthenticatorMgr()
-        av = auth.autoLogin(self)
+        authManager = AuthenticatorMgr.getInstance()
+        av = authManager.autoLogin(self)
         if av:
             url = self._returnURL
             session.user = av
@@ -88,7 +88,7 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
             return p.display( returnURL = self._returnURL )
         else:
             li = user.LoginInfo( self._login, self._password )
-            av = auth.getAvatar(li)
+            av = authManager.getAvatar(li)
             if not av:
                 p = conferences.WPConfSignIn( self, self._conf, login = self._login, msg = "Wrong login or password" )
                 return p.display( returnURL = self._returnURL )
@@ -198,7 +198,7 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
 
     def _process( self ):
         save = False
-        ih = AuthenticatorMgr()
+        authManager = AuthenticatorMgr.getInstance()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._params["msg"] = ""
         if self._save:
@@ -225,7 +225,7 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
             if self._params.get("password","") != self._params.get("passwordBis",""):
                 self._params["msg"] += _("You must enter the same password twice.")+"<br>"
                 save = False
-            if not ih.isLoginFree(self._params.get("login","")):
+            if not authManager.isLoginFree(self._params.get("login","")):
                 self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
                 save = False
             if not self._validMail(self._params.get("email","")):
@@ -245,8 +245,8 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
                 else:
                     #create the identity to the user and send the comfirmatio email
                     li = user.LoginInfo( self._params["login"], self._params["password"] )
-                    id = ih.createIdentity( li, a, "Local" )
-                    ih.add( id )
+                    id = authManager.createIdentity( li, a, "Local" )
+                    authManager.add( id )
                     DBMgr.getInstance().commit()
                     if minfo.getModerateAccountCreation():
                         mail.sendAccountCreationModeration(a).send()
@@ -259,8 +259,8 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
                 _UserUtils.setUserData( a, self._params )
                 ah.add(a)
                 li = user.LoginInfo( self._params["login"], self._params["password"] )
-                id = ih.createIdentity( li, a, "Local" )
-                ih.add( id )
+                id = authManager.createIdentity( li, a, "Local" )
+                authManager.add( id )
                 DBMgr.getInstance().commit()
                 if minfo.getModerateAccountCreation():
                     mail.sendAccountCreationModeration(a).send()
