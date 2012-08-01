@@ -44,6 +44,8 @@ class CSBooking(CSBookingBase):
 
     _hasStartDate = False
 
+    _commonIndexes = ["All Requests"]
+
     _simpleParameters = {
         "talks" : (str, ''),
         "talkSelection": (list, []),

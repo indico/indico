@@ -52,10 +52,10 @@ class CSBookingInstanceIndexCatalog(Index):
         self._container[key] = value
 
     def initialize(self, dbi=None):
-        for plugin in ['WebcastRequest', 'RecordingRequest']:
+        for index in ['WebcastRequest', 'RecordingRequest', 'All Requests']:
             idx = CSBookingInstanceIndex()
-            idx.initialize(plugin)
-            self._container[plugin] = idx
+            idx.initialize(index)
+            self._container[index] = idx
 
 
 class CSBookingInstanceIndex(OOIndex):
@@ -63,13 +63,13 @@ class CSBookingInstanceIndex(OOIndex):
     def __init__(self):
         super(CSBookingInstanceIndex, self).__init__(IIndexableByStartDateTime)
 
-    def initialize(self, plugin_name, dbi=None):
+    def initialize(self, index_name, dbi=None):
         # empty tree
         self.clear()
 
         idx = IndexesHolder().getById('collaboration')
 
-        for conf, bks in idx.getBookings(plugin_name, 'conferenceStartDate', None, None, None).getResults():
+        for conf, bks in idx.getBookings(index_name, 'conferenceStartDate', None, None, None).getResults():
             for bk in bks:
                 self.index_booking(bk)
 

@@ -4767,6 +4767,7 @@ ul.CAIndexList a {
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
+    color: #4C6A83;
 }
 
 ul.CAIndexList a:hover
@@ -4774,12 +4775,8 @@ ul.CAIndexList a:hover
     color: #dbb03a;
 }
 
-.CAIndexSelected  {
+ul.CAIndexList a.CAIndexSelected  {
     color: #B38B1F;
-}
-
-.CAIndexUnselected {
-    color: #4C6A83;
 }
 
 .CALastIndex {
@@ -4901,13 +4898,13 @@ div.CADiv input.CARadio {
     margin-left: 0px;
 }
 
+a.CAViewByLink {
+    color: #4C6A83;
+}
+
 a.CAViewBySelected  {
     color: #B38B1F;
     font-weight: bold;
-}
-
-a.CAViewByUnselected {
-    color: #4C6A83;
 }
 
 div.CASortByDiv {

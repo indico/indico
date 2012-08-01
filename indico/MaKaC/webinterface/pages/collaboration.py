@@ -53,6 +53,11 @@ class WPAdminCollaboration(WPMainBase):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage('Display') \
             + self._includeJSPackage('Collaboration')
 
+    def getCSSFiles(self):
+        return WPMainBase.getCSSFiles(self) + \
+            ['Collaboration/Style.css']
+
+
     def _getHeader(self):
         wc = wcomponents.WHeader(self._getAW())
         return wc.getHTML({ "subArea": _("Video Services Administration"), \
@@ -85,7 +90,7 @@ class WAdminCollaboration(wcomponents.WTemplated):
 
         #dictionary where the keys are names of false "indexes" for the user, and the values are IndexInformation objects
         indexes = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue()
-        vars["Indexes"] = indexes
+        vars["Indexes"] = ['all', None, 'Vidyo', 'EVO', 'CERNMCU', 'All Videoconference', None, 'WebcastRequest', 'RecordingRequest', 'All Requests']
         vars["IndexInformation"] = fossilize(dict([(i.getName(), i) for i in indexes]), IIndexInformationFossil)
         vars["InitialIndex"] = self._queryParams["indexName"]
         vars["InitialViewBy"] = self._queryParams["viewBy"]

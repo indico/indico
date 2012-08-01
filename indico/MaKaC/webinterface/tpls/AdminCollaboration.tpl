@@ -6,19 +6,16 @@
     <div class="CATopBanner">
         <ul class="CAIndexList">
         <label>Select Video Service Index:</label>&nbsp;
-        <% lastIndex = len(Indexes) - 1 %>
-        % for i, index in enumerate(Indexes):
-            <% indexName = index.getName() %>
+        % for index in Indexes:
+            % if index == None:
+            <li class="grey">|</li>
+            % else:
             <li>
-                % if i == lastIndex:
-                    <% additionalStyle = 'style="border-right\x3a 0px;"' %>
-                % else:
-                    <% additionalStyle = '' %>
-                % endif
-                <a id="index_${indexName}" onclick="indexSelectedObs('${indexName}', false)" class="CAIndexUnselected" ${additionalStyle} >
-                    ${ indexName[0].upper() + indexName[1:] }
+                <a data-index="${index}">
+                    ${index[0].upper() + index[1:]}
                 </a>
             </li>
+            % endif
         % endfor
         </ul>
     </div>
@@ -50,8 +47,9 @@
                     <% checked2 = '' %>
                 % endif
                 <input type="radio" name="dateFilterType" id="sinceToDateRadio" onclick="updateDateFilterType()" class="CARadio" ${ checked1 } />
-                <span class="CAFormattingSpan">${ _("Since")}</span><input type="text" id="sinceDate">${InitialSinceDate}</input>
-                ${ _("to")} <input type="text" id="toDate">${InitialToDate}</input>
+                <span class="CAFormattingSpan">${ _("Since")}</span><input type="text" id="sinceDate" value="${InitialSinceDate}" />
+                ${ _("to")} <input type="text" id="toDate" value="${InitialToDate}" />
+                <a href="#" id="today_button">Today</a>
                 <span class="CAMinMaxKeySuggestion">${ _("Please input dates") }</span>
             </div>
             <div style="padding-top: 5px">
@@ -139,7 +137,7 @@ var nBookings = ${ InitialNumberOfBookings }
 var totalInIndex = ${ InitialTotalInIndex }
 var nPages = ${ InitialNumberOfPages };
 
-var indexNames = ${[index.getName() for index in Indexes]};
+var indexNames = ${list(index for index in Indexes if index is not None) | n,j};
 var indexInformation = ${ jsonEncode(IndexInformation)};
 var viewBy = ['conferenceTitle','conferenceStartDate', 'creationDate','modificationDate','startDate'];
 
@@ -168,14 +166,16 @@ var codes = {
 ${ ",\n". join(['"' + pluginName + '" \x3a ' + code for pluginName, code in JSCodes.items()]) }
 }
 
-var buildIndexTooltips = function() {
-    for (var i=0; i<indexNames.length; i++) {
-        $E('index_' + indexNames[i]).dom.onmouseover = function(event) {
+var initialize_index_tabs = function() {
+        $('ul.CAIndexList a').on('mouseover', function(event) {
+            var index = $(this).data('index');
             IndicoUI.Widgets.Generic.tooltip(this, event, '<div style="padding:5px">' + $T("Plugins in this index:") + '<br \/>' +
-                    indexInformation[this.id.substring(6)].plugins.join(", ") +
+                    indexInformation[index].plugins.join(", ") +
                     '<\/div>');
-        }
-    }
+        }).click(function(){
+            var index = $(this).data('index');
+            indexSelectedObs(index, false);
+        });
 }
 
 var alertNoIndexSelected = function() {
@@ -185,15 +185,8 @@ var alertNoIndexSelected = function() {
 }
 
 var indexSelectedObs = function(selectedIndexName, firstTime) {
-
-    for (var i=0; i<indexNames.length; i++) {
-        var name = indexNames[i];
-        if(name == selectedIndexName) {
-            $E('index_' + name).dom.className = "CAIndexSelected";
-        } else {
-            $E('index_' + name).dom.className = "CAIndexUnselected";
-        }
-    }
+    $('.CAIndexList a').removeClass("CAIndexSelected");
+    $(".CAIndexList a[data-index='" + selectedIndexName + "']").addClass("CAIndexSelected");
 
     $E('indexPluginTypes').set(indexInformation[selectedIndexName].plugins.join(", "));
     queryParams.indexName = selectedIndexName;
@@ -201,13 +194,12 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
     var hasViewByStartDate = indexInformation[selectedIndexName].hasViewByStartDate;
     var hasShowOnlyPending = indexInformation[selectedIndexName].hasShowOnlyPending;
 
-    if (hasViewByStartDate || selectedIndexName == 'RecordingRequest' || selectedIndexName == 'WebcastRequest') {
-        IndicoUI.Effect.appear($E('startDateViewBy'));
+    if (hasViewByStartDate || selectedIndexName == 'RecordingRequest' || selectedIndexName == 'WebcastRequest' || selectedIndexName == 'All Requests') {
+        $('#startDateViewBy').fadeIn();
+            set_view_by('startDate');
     } else {
-        IndicoUI.Effect.disappear($E('startDateViewBy'));
-        if (queryParams.viewBy == 'startDate'){
-            queryParams.viewBy = 'modificationDate';
-        }
+        $('#startDateViewBy').fadeOut();
+        set_view_by('modificationDate');
     }
 
     if (hasShowOnlyPending) {
@@ -223,16 +215,14 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
     };
 }
 
-var viewByObs = function(viewBySelected, firstTime) {
-    for (var i=0; i<viewBy.length; i++) {
-        var name = viewBy[i];
-        if (viewBySelected == name) {
-            $E(name + 'ViewBy').dom.className = "CAViewBySelected";
-        } else {
-            $E(name + 'ViewBy').dom.className = "CAViewByUnselected";
-        }
-    }
+function set_view_by(viewBy) {
+    $('.CAViewByLink').removeClass("CAViewBySelected");
+    $('#' + viewBy + 'ViewBy').addClass("CAViewBySelected");
 
+    queryParams.viewBy = viewBy;
+}
+
+var viewByObs = function(viewBySelected, firstTime) {
     if ((endsWith(queryParams.viewBy, 'Date') || firstTime) && viewBySelected == 'conferenceTitle') {
         if (!(firstTime && bookings)) {
             $E('fromTitle').set('');
@@ -254,7 +244,7 @@ var viewByObs = function(viewBySelected, firstTime) {
         orderByObs('descending', true); // we put true because we don't want to trigger another request
     }
 
-    queryParams.viewBy = viewBySelected;
+    set_view_by(viewBySelected);
 
     if (!firstTime) {
         refresh();
@@ -583,12 +573,21 @@ var pageSelectedHandler = function(page) {
 
 var pf = new PageFooter('${ InitialNumberOfPages }', '${ InitialPage }', 4, pageSelectedHandler)
 
-IndicoUI.executeOnLoad(function(){
+$(function(){
+
+    $('#today_button').click(function(){
+        var now = new Date();
+        var today_text = Util.formatDateTime(now, IndicoDateTimeFormats.ServerHourless);
+        $('#sinceDate').val(today_text);
+        $('#toDate').val(today_text);
+        refresh();
+        return false;
+    });
 
     $('#sinceDate').datepicker({ dateFormat: "yy/mm/dd" }).on('keypress', function (e) { updateFilterButton(); });
     $('#toDate').datepicker({ dateFormat: "yy/mm/dd" }).on('keypress', function (e) { updateFilterButton(); });
 
-    buildIndexTooltips();
+    initialize_index_tabs();
     confIdObs();
     viewByObs('${InitialViewBy }', true);
     updateDateFilterType();

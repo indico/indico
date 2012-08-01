@@ -318,9 +318,14 @@ class CSBookingManager(Persistent, Observer):
             #we raise an exception because the web interface should take care of this never actually happening
             raise CollaborationServiceException(bookingType + " only allows to create 1 booking per event")
 
-    def _indexBooking(self, booking):
+    def _indexBooking(self, booking, index_names=None):
+        indexes = self._getIndexList(booking)
+        if index_names is not None:
+            ci = IndexesHolder().getById('collaboration')
+            all_indexes = list(ci.getIndex(index) for index in index_names)
+            indexes = list(index for index in all_indexes if index in indexes)
+
         if booking.shouldBeIndexed():
-            indexes = self._getIndexList(booking)
             for index in indexes:
                 index.indexBooking(booking)
 

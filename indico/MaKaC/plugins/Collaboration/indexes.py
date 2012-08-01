@@ -206,16 +206,22 @@ class CollaborationIndex(Persistent):
         for pluginInfo in CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue():
             self._indexes[pluginInfo.getName()] = BookingsIndex(pluginInfo.getName())
 
-    def indexAll(self):
+    def indexAll(self, index_names=None, dbi=None):
         """ Indexes all the bookings from all the conferences
             WARNING: obviously, this can potentially take a while
         """
+
+        i = 0
+
         for conf in ConferenceHolder().getList():
             csbm = conf.getCSBookingManager()
             #note: probably not the most efficient implementation since _indexBooking is getting the list
             #      of indexes where each booking should be indexed on every iteration
             for booking in csbm.getBookingList():
-                csbm._indexBooking(booking)
+                csbm._indexBooking(booking, index_names=index_names)
+            i += 1
+            if dbi and i % 1000 == 999:
+                dbi.commit()
 
     def reindexAll(self):
         """ Cleans the indexes, and then indexes all the bookings from all the conferences

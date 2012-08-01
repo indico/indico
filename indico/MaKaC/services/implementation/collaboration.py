@@ -302,7 +302,7 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
                 self._viewBy = self._params['viewBy']
                 self._orderBy = self._params['orderBy']
 
-                if self._indexName in ['RecordingRequest', 'WebcastRequest'] and self._viewBy == 'startDate':
+                if self._indexName in ['RecordingRequest', 'WebcastRequest', 'All Requests'] and self._viewBy == 'startDate':
                     self._viewBy = 'instanceDate'
 
                 minKey = None
