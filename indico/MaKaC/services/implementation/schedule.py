@@ -792,6 +792,8 @@ class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.Sessio
         sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         ScheduleEditSlotBase._checkParams(self)
         self._slot = conference.SessionSlot(self._target)
+        self._sessionTitle = self.pManager.extract("sessionTitle", pType = str, allowEmpty=False)
+
 
     def _addToSchedule(self):
         self._target.addSlot(self._slot)
@@ -801,6 +803,9 @@ class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.Sessio
             convener = conference.SlotChair()
             DictPickler.update(convener, convenerValues)
             slot.addConvener(convener)
+
+    def _setSessionTitle(self, slot):
+        slot.getSession().setTitle(self._sessionTitle)
 
 class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 

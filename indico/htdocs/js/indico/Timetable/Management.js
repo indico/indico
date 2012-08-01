@@ -528,6 +528,9 @@ type("TimetableManagementActions", [], {
         //Get the days in which the conference is being held
         var days = this.timetable.getDays();
 
+        //We need the session title for the edition inline widget
+        params['title'] = session.title;
+
         IndicoUI.Dialogs.addSessionSlot(
             this.methods[params.type].add,
             this.isSessionTimetable?this.methods.Session.dayEndDate:this.methods.Event.dayEndDate,
@@ -538,7 +541,20 @@ type("TimetableManagementActions", [], {
             params.selectedDay,
             this.eventInfo.favoriteRooms,
             days,
-            function(result) { self.timetable._updateEntry(result, result.id); },
+            function(result) {
+                var aux = result.entry.entries;
+                self.timetable._updateEntry(result, result.id);
+                /* update the inner timetable!
+                 * You need to create the aux before doing the updateEntry because otherwise the subentries
+                 * in the session won't have the correct value
+                 */
+                self.timetable.data[result.day][result.id].entries = aux;
+                /* since the session title can be changed from this dialog, we need to set the
+                 * title of all the blocks contained in the timetable that belong to the same
+                 * session.
+                 */
+                self.timetable._updateSessionData(result.session.id, ['title'], [result.session.title])
+            },
             false,
             this.eventInfo.bookedRooms,
             this.timetable

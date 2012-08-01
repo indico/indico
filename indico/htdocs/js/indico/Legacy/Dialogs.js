@@ -364,6 +364,7 @@ extend(IndicoUI.Dialogs,
 
                            }/******************************************************/
                            else {
+                               info.set('sessionTitle', params.title);
                                info.set('title', params.slotTitle);
                                info.set("conveners", params.sessionConveners);
                                // using default session location or event location (if sessions's one is inheriting)
@@ -485,13 +486,13 @@ extend(IndicoUI.Dialogs,
                            parameterManager.add(startEndTimeField.startTimeField, 'time', false);
                            parameterManager.add(startEndTimeField.endTimeField, 'time', false);
                            startEndTimeComponent = [$T('Time'), startEndTimeField.element];
-                           sessionRenameComponent = isEdit ? [$T('Session'), $T(Html.div({}, sessionRename.draw()))]:[];
+                           sessionRenameComponent = [$T('Session'), $T(Html.div({}, sessionRename.draw()))];
 
                            $B(info.accessor('conveners'), convListWidget.getUsers());
 
                            var content = IndicoUtil.createFormFromMap([
                                sessionRenameComponent,
-                               isEdit ? [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))]:[$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))],
+                               [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))],
                                [$T('Date'), conferenceDays],
                                startEndTimeComponent,
                                [$T('Place'), Html.div({style: {marginBottom: '15px'}}, roomEditor.draw())],
