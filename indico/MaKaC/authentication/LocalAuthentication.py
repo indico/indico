@@ -17,15 +17,20 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
+import bcrypt
+
+from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.i18n import _
 
 
-class LocalAuthenticator(Authenthicator):
+class LocalAuthenticator(Authenthicator, SSOHandler):
     idxName = "localIdentities"
     id = "Local"
     name = "Indico"
     desciption = "Indico Login"
+
+    def __init__(self):
+        Authenthicator.__init__(self)
 
     def createIdentity(self, li, avatar):
         return LocalIdentity(li.getLogin(), li.getPassword(), avatar)
@@ -34,15 +39,15 @@ class LocalAuthenticator(Authenthicator):
 class LocalIdentity(PIdentity):
 
     def __init__(self, login, password, user):
-        PIdentity.__init__( self, login, user )
-        self.setPassword( password )
+        PIdentity.__init__(self, login, user)
+        self.salt = bcrypt.gensalt()
+        self.setPassword(password)
 
-    def setPassword( self, newPwd ):
-        self.password = newPwd
+    def setPassword(self, newPwd):
+        self.password = bcrypt.hashpw(newPwd, self.salt)
 
-    def authenticate( self, id ):
-        if self.getLogin() == id.getLogin() and \
-            self.password == id.getPassword():
+    def authenticate(self, id):
+        if self.getLogin() == id.getLogin() and self.password == bcrypt.hashpw(id.getPassword(), self.password):
             return self.user
         return None
 

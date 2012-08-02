@@ -24,6 +24,7 @@ the task list in the order it is called.
 
 
 import sys, traceback, argparse
+import bcrypt
 from BTrees.OOBTree import OOTreeSet, OOBTree
 from BTrees.IOBTree import IOBTree
 from dateutil import rrule
@@ -47,6 +48,7 @@ from MaKaC.plugins.RoomBooking.tasks import RoomReservationTask
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 from MaKaC.plugins.Collaboration import urlHandlers
 from MaKaC.webinterface import displayMgr
+from MaKaC.authentication.LocalAuthentication import LocalAuthenticator
 from MaKaC.user import AvatarHolder
 from MaKaC.rb_location import CrossLocationQueries
 
@@ -819,6 +821,25 @@ def removeVideoServicesLinksFromCore(dbi, withRBDB, prevVersion):
         i += 1
         if dbi and i % 1000 == 999:
             dbi.commit()
+    dbi.commit()
+
+
+@since('1.1')
+def localIdentityMigration(dbi, withRBDB, prevVersion):
+    """
+    Generate the new password with a salt
+    """
+
+    auth = LocalAuthenticator()
+    i = 0
+
+    for identity in auth.getList():
+        if not hasattr(identity, "salt"):
+            identity.salt = bcrypt.gensalt()
+            identity.password = bcrypt.hashpw(identity.password, identity.salt)
+            if i % 1000 == 999:
+                dbi.commit()
+            i += 1
     dbi.commit()
 
 
