@@ -26,7 +26,6 @@ class LocalAuthenticator(Authenthicator):
     id = "Local"
     name = "Indico"
     desciption = "Indico Login"
-    UserCreator = None
 
     def createIdentity(self, li, avatar):
         return LocalIdentity(li.getLogin(), li.getPassword(), avatar)

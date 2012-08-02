@@ -28,24 +28,46 @@ from datetime import datetime, timedelta
 from persistent import Persistent
 from BTrees.OOBTree import OOTreeSet, union
 
-import MaKaC
-import MaKaC.common.info as info
-from MaKaC.accessControl import AdminList
+from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
+                            IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from random import random
+from indico.util.i18n import i18nformat
+
+import ZODB
+from persistent import Persistent
+from accessControl import AdminList
+import MaKaC,os
 from MaKaC.common import filters, indexes, logger
 from MaKaC.common.Configuration import Config
 from MaKaC.common.Locators import Locator
-from MaKaC.common.ObjectHolders import ObjectHolder
+from MaKaC.common.ObjectHolders import ObjectHolder, IndexHolder
 from MaKaC.errors import UserError, MaKaCError
+from MaKaC.authentication.LocalAuthentication import LocalIdentity
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.externUsers import ExtUserHolder
+from MaKaC.common.db import DBMgr
+import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.authentication.LDAPAuthentication import ldapFindGroups, ldapUserInGroup
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
+
+from datetime import datetime, timedelta
+
+from MaKaC.common.PickleJar import Updates
 from MaKaC.common.logger import Logger
 from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
                             IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 
+#import ldap
+from pytz import all_timezones
+import httplib
+import urllib
+import base64
+from xml.dom.minidom import parseString
+from copy import deepcopy
+from MaKaC.plugins.base import PluginsHolder
 
 from indico.util.contextManager import ContextManager
 from indico.util.caching import order_dict
@@ -282,10 +304,6 @@ class CERNGroup(Group):
         return False
 
     def _checkNice( self, id, avatar ):
-
-        if "Nice" not in Config.getInstance().getAuthenticatorList():
-            return False
-
         params = urllib.urlencode({'UserName': id, 'GroupName': self.name})
         #headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
@@ -1374,12 +1392,9 @@ class AvatarHolder( ObjectHolder ):
             if not onlyActivated or av.isActivated():
                 result[av.getEmail()]=av
         if not forceWithoutExtAuth:
-            euh = ExtUserHolder()
-            from MaKaC.authentication import NiceAuthentication
-            from MaKaC.authentication import LDAPAuthentication
-            for authId in Config.getInstance().getAuthenticatorList():
-                if not authId == "Local":
-                    dict = euh.getById(authId).match(criteria, exact=exact)
+            for authenticator in AuthenticatorMgr.getInstance().getList():
+                dict = authenticator.matchUser(criteria, exact=exact)
+                if dict:
                     for email in dict.iterkeys():
                         # TODO and TOSTUDY: result.keys should be replace it with
                         # l=[]; for av in result.values(): l.append(av.getAllEmails())
@@ -1464,8 +1479,7 @@ class AvatarHolder( ObjectHolder ):
         av = self.match({"email":extId}, forceWithoutExtAuth=True)
         if av:
             return av[0]
-        euh = ExtUserHolder()
-        dict = euh.getById(authId).getById(extId)
+        dict = AuthenticatorMgr.getInstance().getById(authId).searchUserById(extId)
         av = Avatar(dict)
         identity = dict["identity"](dict["login"], av)
         dict["authenticator"].add(identity)

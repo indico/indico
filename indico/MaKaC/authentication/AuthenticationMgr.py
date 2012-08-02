@@ -55,27 +55,19 @@ class AuthenticatorMgr:
     def getAvatar( self, li , authenticator=None):
         if authenticator:
             auth = self.getById(authenticator)
-            try:
-                return auth.getAvatar( li )
-            except KeyError, e:
-                pass
+            return auth.getAvatar( li )
         else:
             for auth in self.getList():
-                try:
-                    valid=auth.getAvatar( li )
-                    if valid:
-                        return valid
-                except KeyError, e:
-                    pass
-
+                valid = auth.getAvatar( li )
+                if valid:
+                    return valid
             #check if the login is OK with Authenticator which can create a user
             for auth in self.getList():
-                if auth.getUserCreator():
-                    user = auth.getUserCreator().create(li)
-                    if user != None:
-                        if auth.getId().strip() == 'Nice':
-                            user.activateAccount()
-                        return user
+                user = auth.createUser(li)
+                if user != None:
+                    if auth.getId().strip() == 'Nice':
+                        user.activateAccount()
+                    return user
         return None
 
     def getAvatarByLogin(self, login, auth = None):

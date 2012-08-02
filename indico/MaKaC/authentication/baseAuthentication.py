@@ -42,13 +42,10 @@ class Authenthicator(ObjectHolder):
             :type li: MaKaC.user.LoginInfo
         """
 
-        identity = self.getById( li.getLogin() )
-        return identity.authenticate( li )
-        #try:
-        #    identity = self.getById( li.getLogin() )
-        #except KeyError, e:
-        #    return None
-        #return identity.authenticate( li )
+        if self.hasKey(li.getLogin()):
+            identity = self.getById( li.getLogin() )
+            return identity.authenticate( li )
+        return None
 
     def getAvatarByLogin(self, login):
         """ Returns an Avatar object, WITHOUT checking the password!
@@ -57,7 +54,9 @@ class Authenthicator(ObjectHolder):
             :param login: the person's login string
             :type login: str
         """
-        return self.getById(login).getUser()
+        if self.hasKey(login):
+            return self.getById(login).getUser()
+        return None
 
     def getIdx(self):
         return self._getIdx()
@@ -72,17 +71,23 @@ class Authenthicator(ObjectHolder):
     def getDescription(self):
         return self.description
 
-    def getUserCreator(self):
-        return self.UserCreator
-
     def autoLogin(self, rh):
         return None
 
     def autoLogout(self, rh):
         return None
 
+    def createIdentity(self, li, avatar):
+        return None
 
+    def createUser(self, li):
+        return None
 
+    def matchUser(self, criteria, exact=0):
+        return None
+
+    def searchUserById(self, id):
+        return None
 
 class PIdentity(Persistent):
 

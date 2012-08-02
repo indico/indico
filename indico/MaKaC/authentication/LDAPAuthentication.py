@@ -73,9 +73,16 @@ class LDAPAuthenticator(Authenthicator):
     name = 'LDAP'
     description = "LDAP Login"
 
+    _operations = {
+    'email': '(mail={0})',
+    'name': '(givenName={0})',
+    'surName': '(sn={0})',
+    'organisation': '(|(o={0})(ou={0}))',
+    'login': '(uid={0})'
+    }
+
     def __init__(self):
         Authenthicator.__init__(self)
-        self.UserCreator = LDAPUserCreator()
 
     def createIdentity(self, li, avatar):
         Logger.get("auth.ldap").info("createIdentity %s (%s %s)" % \
@@ -85,6 +92,72 @@ class LDAPAuthenticator(Authenthicator):
             return LDAPIdentity(li.getLogin(), avatar)
         else:
             return None
+
+    def createUser(self, li):
+        Logger.get('auth.ldap').info("create '%s'" % li.getLogin())
+        # first, check if authentication is OK
+        data = LDAPChecker().check(li.getLogin(), li.getPassword())
+        if not data:
+            return None
+
+        # Search if user already exist, using email address
+        import MaKaC.user as user
+        ah = user.AvatarHolder()
+        userList = ah.match({"email": data["mail"]}, forceWithoutExtAuth=True)
+        if len(userList) == 0:
+            # User doesn't exist, create it
+            try:
+                av = user.Avatar()
+                name = data.get('cn')
+                av.setName(name.split()[0])
+                av.setSurName(name.split()[-1])
+                av.setOrganisation(data.get('o', ""))
+                av.setEmail(data['mail'])
+                if 'postalAddress' in data:
+                    av.setAddress(fromLDAPmultiline(data.get('postalAddress')))
+                #av.setTelephone(data.get('telephonenumber',""))
+                ah.add(av)
+                av.activateAccount()
+            except KeyError:
+                raise MaKaCError("LDAP account does not contain the mandatory"
+                                 "data to create an Indico account.")
+        else:
+            # user founded
+            av = userList[0]
+        #now create the nice identity for the user
+        na = LDAPAuthenticator()
+        id = na.createIdentity(li, av)
+        na.add(id)
+        return av
+
+    def matchUser(self, criteria, exact=0):
+        criteria = dict((k, ldap.filter.escape_filter_chars(v)) \
+                        for k, v in criteria.iteritems() if v.strip() != '')
+        lfilter = list((self._operations[k].format(v if exact else ("*%s*" % v))) \
+                       for k, v in criteria.iteritems())
+
+        if lfilter == []:
+            return {}
+        ldapc = LDAPConnector()
+        ldapc.open()
+        fquery = "(&%s)" % ''.join(lfilter)
+        d = ldapc.findUsers(fquery)
+        ldapc.close()
+        return d
+
+    def searchUserById(self, id):
+        ldapc = LDAPConnector()
+        ldapc.open()
+        ldapc.login()
+        ret = ldapc.lookupUser(id)
+        ldapc.close()
+        if(ret == None):
+            return None
+        av = dictToAv(ret)
+        av["id"] = id
+        av["identity"] = LDAPIdentity
+        av["authenticator"] = LDAPAuthenticator()
+        return av
 
 
 class LDAPIdentity(PIdentity):
@@ -348,47 +421,6 @@ def fromLDAPmultiline(s):
     else:
         return s
 
-
-class LDAPUserCreator(object):
-
-    def create(self, li):
-        Logger.get('auth.ldap').info("create '%s'" % li.getLogin())
-        # first, check if authentication is OK
-        data = LDAPChecker().check(li.getLogin(), li.getPassword())
-        if not data:
-            return None
-
-        # Search if user already exist, using email address
-        import MaKaC.user as user
-        ah = user.AvatarHolder()
-        userList = ah.match({"email": data["mail"]}, forceWithoutExtAuth=True)
-        if len(userList) == 0:
-            # User doesn't exist, create it
-            try:
-                av = user.Avatar()
-                name = data.get('cn')
-                av.setName(name.split()[0])
-                av.setSurName(name.split()[-1])
-                av.setOrganisation(data.get('o', ""))
-                av.setEmail(data['mail'])
-                if 'postalAddress' in data:
-                    av.setAddress(fromLDAPmultiline(data.get('postalAddress')))
-                #av.setTelephone(data.get('telephonenumber',""))
-                ah.add(av)
-                av.activateAccount()
-            except KeyError:
-                raise MaKaCError("LDAP account does not contain the mandatory"
-                                 "data to create an Indico account.")
-        else:
-            # user founded
-            av = userList[0]
-        #now create the nice identity for the user
-        na = LDAPAuthenticator()
-        id = na.createIdentity(li, av)
-        na.add(id)
-        return av
-
-
 # for MaKaC.externUsers
 def dictToAv(ret):
     av = {}
@@ -417,46 +449,6 @@ def is_empty(dict, key):
         return True
     else:
         return False
-
-
-class LDAPUser(object):
-
-    _operations = {
-        'email': '(mail={0})',
-        'name': '(givenName={0})',
-        'surName': '(sn={0})',
-        'organisation': '(|(o={0})(ou={0}))',
-        'login': '(uid={0})'
-        }
-
-    def match(self, criteria, exact=0):
-        criteria = dict((k, ldap.filter.escape_filter_chars(v)) \
-                        for k, v in criteria.iteritems() if v.strip() != '')
-        lfilter = list((self._operations[k].format(v if exact else ("*%s*" % v))) \
-                       for k, v in criteria.iteritems())
-
-        if lfilter == []:
-            return {}
-        ldapc = LDAPConnector()
-        ldapc.open()
-        fquery = "(&%s)" % ''.join(lfilter)
-        d = ldapc.findUsers(fquery)
-        ldapc.close()
-        return d
-
-    def getById(self, id):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
-        ret = ldapc.lookupUser(id)
-        ldapc.close()
-        if(ret == None):
-            return None
-        av = dictToAv(ret)
-        av["id"] = id
-        av["identity"] = LDAPIdentity
-        av["authenticator"] = LDAPAuthenticator()
-        return av
 
 
 def ldapFindGroups(name, exact):

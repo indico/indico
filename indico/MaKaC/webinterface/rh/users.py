@@ -499,16 +499,16 @@ class RHCreateExternalUsers(RH):
 
     def _process( self ):
         from MaKaC.common.Configuration import Config
-        from MaKaC.externUsers import ExtUserHolder
         from urllib import urlencode
-        euh = ExtUserHolder()
+        authManager = AuthenticatorMgr.getInstance()
         ah = user.AvatarHolder()
         newIdentityList = []
         for id in self._identityList:
             newId = id
-            for authId in Config.getInstance().getAuthenticatorList():
-                if id[:len(authId)] == authId:
-                    dict = euh.getById(authId).getById(id.split(':')[1])
+            for authenticator in authManager.getList():
+
+                if id[:len(authenticator.getId())] == authenticator.getId():
+                    dict = authenticator.getById(id.split(':')[1])
                     av = user.Avatar(dict)
                     newId = ah.add(av)
                     identity = dict["identity"](dict["login"], av)
