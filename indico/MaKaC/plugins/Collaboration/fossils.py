@@ -28,6 +28,7 @@
 
 from MaKaC.common.fossilize import IFossil
 from MaKaC.fossils.conference import IConferenceFossil
+from MaKaC.fossils.contribution import IContributionFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.plugins import Collaboration
 
@@ -186,6 +187,11 @@ class ICSBookingInstanceIndexingFossil(ICSBookingBaseIndexingFossil):
         pass
     getStartDate.name = "instanceDate"
     getStartDate.convert = Conversion.datetime
+
+    def getTalk(self):
+        """ Returns fossil of the talk this booking relates to """
+    getTalk.result = IContributionFossil
+
 
 ##################### Error fossils #####################
 

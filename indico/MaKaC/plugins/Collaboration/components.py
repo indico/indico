@@ -80,7 +80,7 @@ class CSBookingInstanceIndex(OOIndex):
             for contrib_id in contribs:
                 self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
         else:
-            for day in daysBetween(conf.getStartDate(),  conf.getEndDate()):
+            for day in daysBetween(conf.getStartDate(), conf.getEndDate()):
                 bkw = CSBookingInstanceWrapper(bk, conf,
                                                day.replace(hour=0, minute=0, second=0),
                                                day.replace(hour=23, minute=59, second=59))

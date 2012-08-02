@@ -25,7 +25,7 @@ from BTrees.IOBTree import IOBTree
 from MaKaC.common.logger import Logger
 from MaKaC.common.timezoneUtils import unixTimeToDatetime,\
     datetimeToUnixTimeInt
-from MaKaC.conference import ConferenceHolder, CategoryManager
+from MaKaC.conference import ConferenceHolder, CategoryManager, Contribution
 from datetime import datetime
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import fossilize, Fossilizable, fossilizes
@@ -77,6 +77,9 @@ class CSBookingInstanceWrapper(Persistent):
 
     def getObject(self):
         return self._obj
+
+    def getTalk(self):
+        return self._obj if isinstance(self._obj, Contribution) else None
 
     def getOriginalBooking(self):
         return self._orig

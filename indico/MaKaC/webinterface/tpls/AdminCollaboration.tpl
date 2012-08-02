@@ -132,6 +132,12 @@
 </div>
 <script type="text/javascript">
 
+var STATUS_MESSAGE = {
+  null: $T('Pending approval'),
+  true: $T('Accepted'),
+  false: $T('Rejected')
+};
+
 var bookings = ${ jsonEncode (InitialBookings) };
 var nBookings = ${ InitialNumberOfBookings }
 var totalInIndex = ${ InitialTotalInIndex }
@@ -199,7 +205,7 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
             set_view_by('startDate');
     } else {
         $('#startDateViewBy').fadeOut();
-        set_view_by('modificationDate');
+        set_view_by('conferenceStartDate');
     }
 
     if (hasShowOnlyPending) {
@@ -453,7 +459,7 @@ var confTitleBookingTemplate = function(booking) {
     var cell = Html.td('ACBookingFirstCell', Html.span('', booking.type));
     row.append(cell);
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.statusMessage));
+    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, STATUS_MESSAGE[booking.acceptRejectStatus]));
     row.append(cell);
 
     var cell = Html.td('ACBookingCellNoWrap', $T("Last modification:") + formatDateTimeCS(booking.modificationDate) );
@@ -475,7 +481,7 @@ var confTitleBookingTemplate = function(booking) {
 }
 
 var dateBookingTemplate = function(booking, viewBy) {
-    var row = Html.tr("ACBookingLine");
+    var row = $('<tr class="ACBookingLine"></tr>');
 
     var time = null;
     if (viewBy === "creationDate") {
@@ -490,30 +496,25 @@ var dateBookingTemplate = function(booking, viewBy) {
                        IndicoDateTimeFormats.Default).time.substring(0, 5);
     }
 
-    var cell = Html.td('ACBookingFirstCell ACBookingTime', time);
-    row.append(cell);
-
-    var cell = Html.td('ACBookingCellNoWrap', Html.span({}, booking.type));
-    row.append(cell);
-
-    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.statusMessage));
-    row.append(cell);
-
-    var cell = Html.td('ACBookingCell', Html.span({}, $T("In event: ")), Html.span({}, booking.conference.title));
-    row.append(cell);
+    row.append($('<td class="ACBookingFirstCell ACBookingTime"></td>').html(time)).
+        append($('<td class="ACBookingCellNoWrap"><span>' + booking.type + '</span></td>')).
+        append($('<td class="ACBookingCellNoWrap"></td>').append($('<span/>').
+               addClass(booking.statusClass).html(STATUS_MESSAGE[booking.acceptRejectStatus]))).
+        append($('<td class="ACBookingCell"></td>').html(booking.talk ? booking.talk.room : booking.conference.room)).
+        append($('<td class="ACBookingCell"></td>').append($('<span/>').html(booking.conference.title + 
+                                                          (booking.talk ? (': <em>' + booking.talk.title + '</em>') : ''))));
 
     if (pluginHasFunction(booking.type, 'customText')) {
-        var cell = Html.td('ACBookingCell', codes[booking.type].customText(booking, viewBy) );
-        row.append(cell);
+        row.append($('<td class="ACBookingCell"></td>').append(codes[booking.type].customText(booking, viewBy)));
     } else {
-        row.append(Html.td());
+        row.append($('<td></td>'));
     }
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, $T('Change')),
-            Html.span('horizontalSeparator', '|'),
-            Html.a({href: buildVideoServicesDisplayUrl(booking.conference)}, $T('Event Display')));
-    row.append(cell);
-
+    row.append($('<td class="ACBookingCellNoWrap"></td>').append(
+        $('<a></a>').html($T('Change')).attr('href', booking.modificationURL),
+        $('<span class="horizontalSeparator">|</span>'),
+        $('<a></a>').html($T('Event Display')).attr('href', buildVideoServicesDisplayUrl(booking.conference))
+    ));
     return row;
 }
 
@@ -521,10 +522,10 @@ var dateGroupTemplate = function(group, isFirst, viewBy) {
     var date = group[0];
     var bookings = group[1];
 
-    var result = Html.tbody({},
-            Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10},
-                Html.span({}, date)
-            )));
+    var result = $('<tbody/>').append($('<tr/>').append(
+      $('<td class="ACBookingGroupTitle" colspan=11 />').append(
+        $('<span/>').html(date)
+    )));
     each(bookings, function(booking){
         result.append(dateBookingTemplate(booking, viewBy));
     });
@@ -542,20 +543,21 @@ var updateResults = function() {
     $E('results').clear();
 
     if (nBookings < 1) {
-        $E('resultsMessage').set($T("No results found"));
-        IndicoUI.Effect.appear($E('resultsMessage'));
-        IndicoUI.Effect.disappear($E('resultsInfo'));
+        $('#resultsMessage').html($T("No results found"));
+        $('#resultsMessage').show();
+        $('#resultsInfo').hide();
     } else {
-        IndicoUI.Effect.disappear($E('resultsMessage'));
-        IndicoUI.Effect.appear($E('resultsInfo'));
-        $E('totalInIndex').set(totalInIndex);
-        $E('nBookings').set(nBookings);
+        $('#resultsMessage').hide();
+        $('#resultsInfo').show();
+
+        $('#totalInIndex').html(totalInIndex);
+        $('#nBookings').html(nBookings);
         for (var i = 0; i < bookings.length; i++) {
             group = bookings[i];
             if (queryParams.viewBy == 'conferenceTitle') {
                 $E('results').append(confTitleGroupTemplate(group, i == 0))
             } else {
-                $E('results').append(dateGroupTemplate(group, i == 0, queryParams.viewBy))
+                $('#results').append(dateGroupTemplate(group, i == 0, queryParams.viewBy))
             }
         }
     }

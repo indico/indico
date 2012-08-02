@@ -30,6 +30,8 @@ from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.i18n import _
 
+from indico.core.index import Catalog
+
 
 class CSBooking(CSBookingBase):
 
@@ -199,3 +201,13 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send RequestRelocatedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('edit', e)
+
+    def index_instances(self):
+        idx = Catalog.getIdx('cs_booking_instance')
+        idx['WebcastRequest'].index_booking(self)
+        idx['All Requests'].index_booking(self)
+
+    def unindex_instances(self):
+        idx = Catalog.getIdx('cs_booking_instance')
+        idx['WebcastRequest'].unindex_booking(self)
+        idx['All Requests'].unindex_booking(self)
