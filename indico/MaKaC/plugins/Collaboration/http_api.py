@@ -231,7 +231,8 @@ class VideoEventFetcher(IteratedDataFetcher):
         'webcast' : 'WebcastRequest',
         'recording' : 'RecordingRequest',
         'mcu' : 'CERNMCU',
-        'evo' : 'EVO'
+        'evo' : 'EVO',
+        'webex' : 'WebEx'
     }
 
     def __init__(self, aw, hook):

@@ -481,7 +481,6 @@ class MailTools(object):
             admins = plugin.getOption('admins').getValue()
             sendMail = plugin.getOption('sendMailNotifications').getValue()
             addEmails = plugin.getOption('additionalEmails').getValue()
-
         else:
             # get definitions from the Collaboration plugin type
             admins = CollaborationTools.getCollaborationOptionValue('collaborationAdmins')

@@ -509,6 +509,7 @@ if __name__ == '__main__':
             statistics.piwik = indico.ext.statistics.piwik
 
             Collaboration.EVO = MaKaC.plugins.Collaboration.EVO
+            Collaboration.WebEx = MaKaC.plugins.Collaboration.WebEx
             Collaboration.Vidyo = MaKaC.plugins.Collaboration.Vidyo
             Collaboration.CERNMCU = MaKaC.plugins.Collaboration.CERNMCU
             Collaboration.RecordingManager = MaKaC.plugins.Collaboration.RecordingManager
