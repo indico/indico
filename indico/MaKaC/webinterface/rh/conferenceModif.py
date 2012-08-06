@@ -370,7 +370,6 @@ class RHConfModifSchedule( RoomBookingDBMixin, RHConferenceModifBase ):
                 p=wf.getSessionModifSchedule( self, session )
             return p.display(**params)
 
-
 class RHScheduleDataEdit(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModScheduleDataEdit
 
