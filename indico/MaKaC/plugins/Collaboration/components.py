@@ -53,23 +53,24 @@ class CSBookingInstanceIndexCatalog(Index):
 
     def initialize(self, dbi=None):
         for index in ['WebcastRequest', 'RecordingRequest', 'All Requests']:
-            idx = CSBookingInstanceIndex()
-            idx.initialize(index)
+            idx = CSBookingInstanceIndex(index)
+            idx.initialize()
             self._container[index] = idx
 
 
 class CSBookingInstanceIndex(OOIndex):
 
-    def __init__(self):
+    def __init__(self, index_name):
         super(CSBookingInstanceIndex, self).__init__(IIndexableByStartDateTime)
+        self.index_name = index_name
 
-    def initialize(self, index_name, dbi=None):
+    def initialize(self, dbi=None):
         # empty tree
         self.clear()
 
         idx = IndexesHolder().getById('collaboration')
 
-        for conf, bks in idx.getBookings(index_name, 'conferenceStartDate', None, None, None).getResults():
+        for conf, bks in idx.getBookings(self.index_name, 'conferenceStartDate', None, None, None).getResults():
             for bk in bks:
                 self.index_booking(bk)
 
@@ -101,15 +102,24 @@ class CSBookingInstanceIndex(OOIndex):
 
                 if not evt.getSchedule().getEntries():
                     yield dt, CSBookingInstanceWrapper(bkw.getOriginalBooking(),
-                                                   evt)
+                                                       evt)
                     # mark whole event as "added"
                     added_whole_events.add(evt)
 
                 if entries:
-                    yield dt, CSBookingInstanceWrapper(bkw.getOriginalBooking(),
-                                                       evt,
-                                                       entries[0].getStartDate(),
-                                                       entries[-1].getEndDate())
+                    # what a mess...
+                    if self.index_name == 'All Requests':
+                        talks = set(CollaborationTools.getCommonTalkInformation(evt, 'RecordingRequest', 'recordingCapableRooms')[3]) | \
+                            set(CollaborationTools.getCommonTalkInformation(evt, 'WebcastRequest', 'webcastCapableRooms')[3])
+                    else:
+                        var = 'recordingCapableRooms' if self.index_name == 'RecordingRequest' else 'webcastCapableRooms'
+                        talks = CollaborationTools.getCommonTalkInformation(evt, self.index_name, var)[3]
+
+                    # add contribs that concern this day
+                    for contrib in talks:
+                        if contrib.isScheduled() and contrib.getStartDate().date() == dt.date():
+                            yield dt, CSBookingInstanceWrapper(bkw.getOriginalBooking(),
+                                                               contrib)
             else:
                 yield dt, bkw
 
@@ -127,7 +137,7 @@ class CSBookingInstanceIndex(OOIndex):
             self.unindex_obj(bkw)
 
 
-class CatalogIndexProvider(Component):
+class CatalogIndexPrintovider(Component):
     zope.interface.implements(ICatalogIndexProvider)
 
     def catalogIndexProvider(self, obj):
