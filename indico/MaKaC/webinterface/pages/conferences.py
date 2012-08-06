@@ -1343,8 +1343,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             html = body
         else:
             errorMessage = wcomponents.WErrorMessage().getHTML(params)
-            infoMessage = wcomponents.WInfoMessage().getHTML(params)
-            html = "%s\n%s\n%s" % (errorMessage, infoMessage, body)
+            html = "%s\n%s" % (errorMessage, body)
         return html
 
 class WPrintPageFrame (wcomponents.WTemplated):

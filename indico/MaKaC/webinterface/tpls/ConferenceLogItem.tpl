@@ -6,7 +6,6 @@
     <tr>
         <td colspan="2">
         ${ errorMsg }
-        ${ infoMsg }
         </td>
     </tr>
     <tr>

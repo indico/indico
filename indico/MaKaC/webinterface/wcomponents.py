@@ -188,11 +188,6 @@ class WTemplated(OldObservable):
         else:
             vars["errorMsg"] = ""
 
-        if len(vars.get("infoMsg", [])) > 0 :
-            vars["infoMsg"] = WInfoMessage().getHTML(vars)
-        else :
-            vars["infoMsg"] = ""
-
         return vars
 
     def getHTML( self, params=None ):
@@ -4911,27 +4906,6 @@ class WErrorMessage :
                     %s
                 </div>
                """%errorMsg
-
-        return html
-
-class WInfoMessage :
-
-    def getHTML( self, vars ):
-        if vars.get("infoMsg", None) is None :
-            return ""
-        if type(vars["infoMsg"]) != list:
-            vars["infoMsg"]=[vars["infoMsg"]]
-        for i in range(0,len(vars["infoMsg"])) :
-            vars["infoMsg"][i] = """<span style="color: green;">"""+vars["infoMsg"][i]+"""</span>"""
-
-        infoMsg = """
-        """.join(vars["infoMsg"])
-
-        html = """
-                <div class="errorMsgBox">
-                    %s
-                </div>
-        """%infoMsg
 
         return html
 

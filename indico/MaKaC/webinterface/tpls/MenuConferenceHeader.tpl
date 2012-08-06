@@ -40,6 +40,5 @@
     </tr>
     <tr>
         ${ errorMsg }
-        ${ infoMsg }
     </tr>
 </table>

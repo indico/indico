@@ -83,7 +83,6 @@ function deselectAll()
   <tr>
   <td colspan="5">
   ${ errorMsg }
-  ${ infoMsg }
   </td>
   </tr>
   <tr><td colspan="5">&nbsp;</td></tr>

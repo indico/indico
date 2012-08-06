@@ -35,7 +35,6 @@ function deselectAll()
     <tr>
         <td colspan="2">
         ${ errorMsg }
-        ${ infoMsg }
         </td>
     </tr>
     <form action=${ logFilterAction } method="post" name="logFilterForm">

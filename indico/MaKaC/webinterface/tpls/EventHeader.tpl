@@ -147,5 +147,4 @@ else:
 </script>
 
 ${ errorMsg }
-${ infoMsg }
 
