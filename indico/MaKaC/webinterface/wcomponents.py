@@ -364,14 +364,6 @@ class WHeader(WTemplated):
 
         return vars
 
-class WStaticWebHeader( WTemplated ):
-    """Templating web component for generating the HTML header for
-        the static web interface when generating a DVD.
-    """
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        return vars
-
 class WManagementHeader( WHeader ):
     """Templating web component for generating the HTML header for
         the management web interface.

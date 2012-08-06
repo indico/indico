@@ -64,9 +64,8 @@ from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
-from indico.util.decorators import cached_classproperty
 import MaKaC.webcast as webcast
-
+from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
@@ -860,28 +859,24 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
     class and re-implements them using normal Indico templates.
     """
 
-    @cached_classproperty
-    @classmethod
-    def _Types(cls):
-        _ImagesBaseURL = Config.getInstance().getImagesBaseURL()
-        return {
-            "pdf": {"mapsTo": "pdf", "imgURL": os.path.join(_ImagesBaseURL, "pdf_small.png"), "imgAlt": "pdf file"},
-            "doc": {"mapsTo": "doc", "imgURL": os.path.join(_ImagesBaseURL, "word.png"), "imgAlt": "word file"},
-            "docx": {"mapsTo": "doc", "imgURL": os.path.join(_ImagesBaseURL, "word.png"), "imgAlt": "word file"},
-            "ppt": {"mapsTo": "ppt", "imgURL": os.path.join(_ImagesBaseURL, "powerpoint.png"), "imgAlt": "powerpoint file"},
-            "pptx": {"mapsTo": "ppt", "imgURL": os.path.join(_ImagesBaseURL, "powerpoint.png"), "imgAlt": "powerpoint file"},
-            "sxi": {"mapsTo": "odp", "imgURL": os.path.join(_ImagesBaseURL, "impress.png"), "imgAlt": "presentation file"},
-            "odp": {"mapsTo": "odp", "imgURL": os.path.join(_ImagesBaseURL, "impress.png"), "imgAlt": "presentation file"},
-            "sxw": {"mapsTo": "odt", "imgURL": os.path.join(_ImagesBaseURL, "writer.png"), "imgAlt": "writer file"},
-            "odt": {"mapsTo": "odt", "imgURL": os.path.join(_ImagesBaseURL, "writer.png"), "imgAlt": "writer file"},
-            "sxc": {"mapsTo": "ods", "imgURL": os.path.join(_ImagesBaseURL, "calc.png"), "imgAlt": "spreadsheet file"},
-            "ods": {"mapsTo": "ods", "imgURL": os.path.join(_ImagesBaseURL, "calc.png"), "imgAlt": "spreadsheet file"},
-            "other": {"mapsTo": "other", "imgURL": os.path.join(_ImagesBaseURL, "file_small.png"), "imgAlt": "unknown type file"},
-            "link": {"mapsTo": "link", "imgURL": os.path.join(_ImagesBaseURL, "link.png"), "imgAlt": "link"}
-        }
-
     def __init__( self, rh, conference, view, type, params ):
         WPXSLConferenceDisplay.__init__( self, rh, conference, view, type, params )
+        imagesBaseURL = Config.getInstance().getImagesBaseURL()
+        self._types = {
+            "pdf"   :{"mapsTo" : "pdf",   "imgURL" : os.path.join(imagesBaseURL, "pdf_small.png"),  "imgAlt" : "pdf file"},
+            "doc"   :{"mapsTo" : "doc",   "imgURL" : os.path.join(imagesBaseURL, "word.png"),       "imgAlt" : "word file"},
+            "docx"  :{"mapsTo" : "doc",   "imgURL" : os.path.join(imagesBaseURL, "word.png"),       "imgAlt" : "word file"},
+            "ppt"   :{"mapsTo" : "ppt",   "imgURL" : os.path.join(imagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
+            "pptx"  :{"mapsTo" : "ppt",   "imgURL" : os.path.join(imagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
+            "sxi"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(imagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
+            "odp"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(imagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
+            "sxw"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(imagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
+            "odt"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(imagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
+            "sxc"   :{"mapsTo" : "ods",   "imgURL" : os.path.join(imagesBaseURL, "calc.png"),       "imgAlt" : "spreadsheet file"},
+            "ods"   :{"mapsTo" : "ods",   "imgURL" : os.path.join(imagesBaseURL, "calc.png"),       "imgAlt" : "spreadsheet file"},
+            "other" :{"mapsTo" : "other", "imgURL" : os.path.join(imagesBaseURL, "file_small.png"), "imgAlt" : "unknown type file"},
+            "link"  :{"mapsTo" : "link",  "imgURL" : os.path.join(imagesBaseURL, "link.png"),       "imgAlt" : "link"}
+        }
 
     def _getVariables(self, conf):
         vars = {}
@@ -937,11 +932,11 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             vars['evaluationLink'] = urlHandlers.UHConfEvaluationDisplay.getURL(conf)
         vars['supportEmailCaption'] = conf.getSupportInfo().getCaption()
 
-        vars['types'] = WPTPLConferenceDisplay._Types
+        vars['types'] = self._types
 
         vars['entries'] = []
         confSchedule = conf.getSchedule()
-        showSession = self._params.get("showSession","")
+        showSession = self._params.get("showSession","all")
         detailLevel = self._params.get("detailLevel", "contribution")
         showDate = self._params.get("showDate", "all")
         # Filter by day
@@ -983,7 +978,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             if isinstance(res, LocalFile):
                 fileType = res.getFileType().lower()
                 try:
-                    fileType = WPTPLConferenceDisplay._Types[fileType]["mapsTo"]
+                    fileType = self._types[fileType]["mapsTo"]
                 except KeyError:
                     fileType = "other"
                 filename = res.getName() or res.getFileName()
@@ -1090,19 +1085,21 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         return WPConferenceBase._getHTMLHeader(self)
 
     def _getHeadContent( self ):
+        conf = Config.getInstance()
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        htdocs = Config.getInstance().getHtdocsDir()
-        baseurl = self._getBaseURL()
+        htdocs = conf.getHtdocsDir()
+        baseurl = conf.getCssBaseURL()
         # First include the default Indico stylesheet
         timestamp = os.stat(__file__).st_mtime
-        styleText = """<link rel="stylesheet" href="%s/css/%s?%d">\n""" % \
+        styleText = """<link rel="stylesheet" href="%s/%s?%d">\n""" % \
             (baseurl, Config.getInstance().getCssStylesheetName(), timestamp)
         # Then the common event display stylesheet
         if os.path.exists("%s/css/events/common.css" % htdocs):
-            styleText += """        <link rel="stylesheet" href="%s/css/events/common.css?%d">\n""" % (baseurl, timestamp)
+            styleText += """        <link rel="stylesheet" href="%s/events/common.css?%d">\n""" % (baseurl, timestamp)
+        
         # And finally the specific display stylesheet
         if styleMgr.existsCSSFile(self._view):
-            cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
+            cssPath = os.path.join(baseurl, 'events', styleMgr.getCSSFilename(self._view))
             styleText += """        <link rel="stylesheet" href="%s?%d">\n""" % (cssPath, timestamp)
 
         confMetadata = WConfMetadata(self._conf).getHTML()
@@ -1176,6 +1173,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def _getBody(self, params):
         """Return main information about the event."""
+
         if self._view != 'xml':
             vars = self._getVariables(self._conf)
             vars['getTime'] = lambda date : format_time(date.time(), format="HH:mm")
@@ -1597,6 +1595,7 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
 
     def _setActiveTab(self):
         pass
+
 
 class WConfModifMainData(wcomponents.WTemplated):
 
@@ -5133,7 +5132,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         return vars
 
 
-class WConfAuthorIndex( wcomponents.WTemplated ):
+class WConfAuthorIndex(wcomponents.WTemplated):
 
     def __init__(self, conf):
         self._conf = conf
@@ -5172,7 +5171,7 @@ class WConfAuthorIndex( wcomponents.WTemplated ):
         return vars
 
 
-class WPAuthorIndex( WPConferenceDefaultDisplayBase ):
+class WPAuthorIndex(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEAuthorIndex
 
     def getJSFiles(self):
@@ -5187,8 +5186,7 @@ class WPAuthorIndex( WPConferenceDefaultDisplayBase ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
 
-
-class WConfSpeakerIndex( wcomponents.WTemplated ):
+class WConfSpeakerIndex(wcomponents.WTemplated):
 
     def __init__(self, conf):
         self._conf = conf
@@ -5218,7 +5216,7 @@ class WConfSpeakerIndex( wcomponents.WTemplated ):
         vars["items"] = res
         return vars
 
-class WPSpeakerIndex( WPConferenceDefaultDisplayBase ):
+class WPSpeakerIndex(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NESpeakerIndex
 
     def _getBody(self, params):
@@ -7442,152 +7440,6 @@ class WPAbstractBookCustomise( WPConferenceDefaultDisplayBase ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._abstractsBookOpt)
 
-##################################################################################3
-
-class WPMeetingStaticDisplay( WPConferenceStaticDefaultDisplayBase ):
-
-    def __init__(self, rh, target, staticPars):
-        WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target)
-        self._staticPars = staticPars
-
-    def _getBody( self, params ):
-        wc = WMeetingStaticDetails( self._getAW(), self._conf, self._staticPars )
-        return wc.getHTML({})
-
-    def _defineSectionMenu( self ):
-        WPConferenceStaticDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._overviewOpt)
-
-
-class WPMeetiStaticProgram( WPConferenceStaticDefaultDisplayBase ):
-
-    def __init__(self, rh, target, staticPars):
-        WPConferenceStaticDefaultDisplayBase.__init__(self, rh, target)
-        self._staticPars = staticPars
-
-    def _getBody( self, params ):
-        wc = WConfStaticProgram( self._getAW(), self._conf, self._staticPars )
-        return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceStaticDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._programOpt)
-
-
-class WMConfStaticDetails( wcomponents.WTemplated ):
-
-    def __init__(self, aw, conf, staticPars):
-        self._conf = conf
-        self._aw = aw
-        self._staticPars = staticPars
-
-    def _getChairsHTML( self ):
-        chairList = []
-        l = []
-        for chair in self._conf.getChairList():
-            mailToURL = """mailto:%s"""%urllib.quote(chair.getEmail())
-            l.append( """<a href=%s>%s</a>"""%(quoteattr(mailToURL),self.htmlText(chair.getFullName())))
-        res = ""
-        if len(l) > 0:
-            res = i18nformat("""
-    <tr>
-        <td align="right" valign="top" class="displayField"><b> _("Chairs"):</b></td>
-        <td>%s</td>
-    </tr>
-                """)%"<br>".join(l)
-        return res
-
-    def _getMaterialHTML( self ):
-        l = []
-        for mat in self._conf.getAllMaterialList():
-            temp = wcomponents.WMaterialDisplayItem()
-            url = urlHandlers.UHStaticMaterialDisplay.getRelativeURL(mat)
-            l.append( temp.getHTML( self._aw, mat, url, self._staticPars["material"] ) )
-        res = ""
-        if l:
-            res = i18nformat("""
-    <tr>
-        <td align="right" valign="top" class="displayField"><b> _("Material"):</b></td>
-        <td align="left" width="100%%">%s</td>
-    </tr>""")%"<br>".join( l )
-        return res
-
-    def _getMoreInfoHTML( self ):
-        res = ""
-        if self._conf.getContactInfo() != "":
-            res = i18nformat("""
-    <tr>
-        <td align="right" valign="top" class="displayField"><b> _("Additional info"):</b>
-        </td>
-        <td>%s</td>
-    </tr>""")%self._conf.getContactInfo()
-        return res
-
-    def _getActionsHTML( self, showActions = False):
-        html=[]
-        if showActions:
-            html=[ i18nformat("""
-                <table style="padding-top:40px; padding-left:20px">
-                <tr>
-                    <td nowrap>
-                        <b> _("Conference sections"):</b>
-                        <ul>
-                """)]
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            for link in menu.getLinkList():
-                if link.isVisible() and link.isEnabled():
-                    html.append(""" <li><a href="%s">%s</a></li>
-                            """%( link.getURL(), link.getCaption() ) )
-            html.append("""
-                        </ul>
-                    </td>
-                </tr>
-                </table>
-                """)
-        return "".join(html)
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["description"] = self._conf.getDescription()
-        sdate, edate = self._conf.getAdjustedStartDate(), self._conf.getAdjustedEndDate()
-        fsdate, fedate = format_date(sdate, format='long'), format_date(edate, format='long')
-        fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
-        vars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s""")%(fsdate, fstime, \
-                                                        fedate, fetime)
-        if sdate.strftime("%d%B%Y") == edate.strftime("%d%B%Y"):
-            timeInterval = fstime
-            if sdate.strftime("%H%M") != edate.strftime("%H%M"):
-                timeInterval = "%s-%s"%(fstime, fetime)
-            vars["dateInterval"] = "%s (%s)"%( fsdate, timeInterval)
-        vars["location"] = ""
-        location = self._conf.getLocation()
-        if location:
-            vars["location"] = "<i>%s</i><br><pre>%s</pre>"%( location.getName(), location.getAddress() )
-            room = self._conf.getRoom()
-            if room:
-                roomLink = linking.RoomLinker().getHTMLLink( room, location )
-                vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
-        vars["chairs"] = self._getChairsHTML()
-        vars["material"] = self._getMaterialHTML()
-        vars["moreInfo"] = self._getMoreInfoHTML()
-        vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
-
-        return vars
-
-class WConfStaticProgram(wcomponents.WTemplated):
-
-    def __init__(self, aw, conf, staticPars):
-        self._conf = conf
-        self._aw = aw
-        self._staticPars = staticPars
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        program = []
-        for track in self._conf.getTrackList():
-            program.append( WConfStaticProgramTrack( self._aw, track, self._staticPars ).getHTML() )
-        vars["program"] = "".join( program )
-        return vars
 
 class WConfModifReschedule(wcomponents.WTemplated):
 
@@ -8378,10 +8230,10 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         return wc.getHTML(params)
 
     def _getHeadContent( self ):
-        path = self._getBaseURL()
+        path = Config.getInstance().getCssBaseURL()
         timestamp = os.stat(__file__).st_mtime
         printCSS = """
-        <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css?%d" >
+        <link rel="stylesheet" type="text/css" href="%s/Conf_Basic.css?%d" >
             """ % (path, timestamp)
 
         if self._selectedCSS:

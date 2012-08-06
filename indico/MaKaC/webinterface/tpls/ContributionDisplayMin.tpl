@@ -68,8 +68,10 @@
         </div>
     </div>
     <div class="contributionRightPanel">
-        <%block name="paperReview">
-        </%block>
+        % if not offlineMode:
+            <%block name="paperReview">
+            </%block>
+        % endif
         <%block name="place">
         </%block>
         <%block name="authors">

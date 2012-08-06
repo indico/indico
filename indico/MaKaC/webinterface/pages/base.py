@@ -86,12 +86,13 @@ class WPBase(OldObservable):
         self._extraCSS = []
         self._extraJS = []
 
-    def _getBaseURL( self ):
-        if request.is_secure and Config.getInstance().getBaseSecureURL():
-            baseurl = Config.getInstance().getBaseSecureURL()
+    def _getBaseURL(self):
+        if ContextManager.get('relativeURL', False):
+            return ''
+        elif request.is_secure and Config.getInstance().getBaseSecureURL():
+            return Config.getInstance().getBaseSecureURL()
         else:
-            baseurl = Config.getInstance().getBaseURL()
-        return baseurl
+            return Config.getInstance().getBaseURL()
 
     def _getTitle( self ):
         return self._title

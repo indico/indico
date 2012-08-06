@@ -58,8 +58,7 @@ import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.contribPacker import ZIPFileHandler,AbstractPacker, ContribPacker,ConferencePacker, ProceedingsPacker
-from MaKaC.common.dvdCreation import DVDCreation
-from MaKaC.conference import CustomRoom
+from MaKaC.conference import ContributionParticipation, Contribution, CustomRoom
 from MaKaC.common import pendingQueues
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
@@ -3338,31 +3337,6 @@ class RHFullMaterialPackagePerform(RHConferenceModifBase):
             raise NoReportError(_("You have to select at least one material type"))
         else:
             self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
-
-class RHConfDVDCreation(RHConferenceModifBase):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._create=params.has_key("confirm")
-        self._confirmed=params.has_key("confirm") or params.has_key("cancel")
-
-    def _process( self ):
-        if self._confirmed:
-            if self._create:
-                DVDCreation(self, self._conf, self.getWebFactory()).create()
-                self._redirect( urlHandlers.UHDVDDone.getURL( self._conf ) )
-            else:
-                self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
-        else:
-            wp = conferences.WPConfModifDVDCreationConfirm(self, self._conf)
-            return wp.display()
-
-class RHConfDVDDone(RHConferenceModifBase):
-
-    def _process( self ):
-        url=urlHandlers.UHConfModifTools.getURL(self._conf)
-        p = conferences.WPDVDDone(self, self._conf)
-        return p.display(url=url)
 
 class RHModifSessionCoordRights( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfPerformDataModif

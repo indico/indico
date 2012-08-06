@@ -56,8 +56,9 @@ class ZIPFileHandler:
         self._file.write(str(path),self._normalisePath(name))
 
     def addNewFile(self, name, bytes):
-        name = utf8rep(name)
-        self._file.writestr(name, bytes)
+        if not self.hasFile(name):
+            name = utf8rep(name)
+            self._file.writestr(name, bytes)
 
     def addDir(self,path):
         self.addNewFile("%s/indico_file.dat" % self._normalisePath(path), "# Indico File")
@@ -67,6 +68,12 @@ class ZIPFileHandler:
 
     def getPath(self):
         return self._name
+
+    def hasFile(self, fileName):
+        for zfile in self._file.infolist():
+            if zfile.filename == fileName:
+                return True
+        return False
 
 class AbstractPacker:
     """

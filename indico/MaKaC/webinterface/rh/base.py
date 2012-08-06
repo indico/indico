@@ -81,6 +81,8 @@ class RequestHandlerBase(OldObservable):
         """
         Returns the access wrapper related to this session/user
         """
+        #if ContextManager.get('offlineMode', False):
+        #    return AccessWrapper()
         return self._aw
 
     def _getUser(self):

@@ -541,6 +541,7 @@ class Config:
             'WorkerName'                : socket.getfqdn(),
             'StylesheetsDir'            : os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'stylesheets'),
             'ImagesDir'                 : os.path.join(self.getHtdocsDir(), 'images'),
+            'JSDir'                     : os.path.join(self.getHtdocsDir(), 'js'),
             'PublicURL'                 : "%s/%s" % (self.getBaseURL(), self.getPublicFolder()),
             'SystemIcons'               : self.__systemIcons,
             'Styles'                    : self.__styles,
@@ -550,7 +551,7 @@ class Config:
             'RoomPhotosDir'             : os.path.join(self.getHtdocsDir(), 'images', "rooms", "large_photos"),
             'RoomSmallPhotosDir'        : os.path.join(self.getHtdocsDir(), 'images', "rooms", "small_photos"),
             'CssDir'                    : "%s/css/" % (self.getHtdocsDir()),
-            'CssBaseURL'                : "%s/css" % self.getBaseURL(),
+            'CssBaseURL'                : self.getCssBaseURL(),
             'CssConfTemplateBaseURL'    : self.getCssConfTemplateBaseURL(),
             'DefaultEventStylesheet'    : self.__defaultEventStylesheet,
             'TPLDir'                    : os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'tpls')),
@@ -558,8 +559,8 @@ class Config:
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
             'FileConverterServerURL'    : self.getFileConverter().get("conversion_server", ""),
             'FileConverterResponseURL'  : self.getFileConverter().get("response_url", ""),
-            'ImagesBaseURL'             : "%s/images" % self._configVars['BaseURL'],
-            'ImagesBaseSecureURL'       : "%s/images" % self._configVars['BaseSecureURL'],
+            'ImagesBaseURL'             : self.getImagesBaseURL(),
+            'ImagesBaseSecureURL'       : self.getImagesBaseSecureURL(),
             'Version'                   : MaKaC.__version__,
         })
 
@@ -859,3 +860,21 @@ class Config:
             if auth == authId:
                 return config
         return {}
+
+    def getImagesBaseURL(self):
+        if ContextManager.get('offlineMode', False):
+            return "static/images"
+        else:
+            return "%s/images" % self.getBaseURL()
+
+    def getImagesBaseSecureURL(self):
+        if ContextManager.get('offlineMode', False):
+            return "static/images"
+        else:
+            return "%s/images" % self.getBaseSecureURL()
+
+    def getCssBaseURL(self):
+        if ContextManager.get('offlineMode', False):
+            return "static/css"
+        else:
+            return "%s/css" % self.getBaseURL()

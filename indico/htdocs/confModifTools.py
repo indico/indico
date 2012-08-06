@@ -62,12 +62,6 @@ def matPkg( req, **params ):
 def performMatPkg( req, **params ):
     return conferenceModif.RHFullMaterialPackagePerform( req ).process( params )
 
-def dvdCreation( req, **params ):
-    return conferenceModif.RHConfDVDCreation(req).process(params)
-
-def dvdDone( req, **params ):
-    return conferenceModif.RHConfDVDDone(req).process(params)
-
 def badgePrinting (req, **params):
     return conferenceModif.RHConfBadgePrinting(req).process(params)
 

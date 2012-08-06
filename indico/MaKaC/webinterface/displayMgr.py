@@ -30,6 +30,7 @@ from MaKaC.conference import LocalFile
 from MaKaC.plugins.base import Observable
 import re
 from MaKaC.i18n import _
+from MaKaC.common.contextManager import ContextManager
 
 class ConfDisplayMgrRegistery:
     """
@@ -716,7 +717,6 @@ class Link(Persistent):
         return ""
 
     def __str__(self, indent=""):
-
         str = """%s<a href="%s">%s</a><br>\n"""%(indent, self.getURL(), self.getName())
         for link in self._listLink:
             if link.isEnabled():
@@ -724,6 +724,13 @@ class Link(Persistent):
         return str
 
     def isVisible(self):
+        from MaKaC.common.offlineWebsiteCreator import ConferenceOfflineCreator
+        if ContextManager.get('offlineMode', False):
+            if self.getName() in ConferenceOfflineCreator._menu_offline_itens.keys() or \
+            isinstance(self, PageLink) or isinstance(self, ExternLink):
+                return True
+            else:
+                return False
         try:
             if self._v_visible:
                 pass

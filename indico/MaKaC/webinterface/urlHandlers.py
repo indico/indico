@@ -17,6 +17,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import re
+import os
 import string
 import urlparse
 from flask import request, session
@@ -73,6 +74,11 @@ class URLHandler(object):
         return cls._relativeURL
 
     @classmethod
+    def getStaticURL(cls, target=None):
+        url = cls._relativeURL.replace("py", "html")
+        return url
+
+    @classmethod
     def _getURL(cls, _force_secure=None, **params):
         """ Gives the full URL for the corresponding request handler.
 
@@ -125,7 +131,8 @@ class URLHandler(object):
                     is able to retrieve it.
                 params - (Dict) parameters to be added to the URL.
         """
-
+        if ContextManager.get('offlineMode', False):
+            return URL(cls.getStaticURL(target), **params)
         return cls._getURL(**cls._getParams(target, params))
 
 
@@ -307,9 +314,21 @@ class UHPreviousEvent(URLHandler):
 class UHConferenceOverview(URLHandler):
     _endpoint = 'event.conferenceDisplay-overview'
 
+    @classmethod
+    def getURL(cls, target):
+        if ContextManager.get('offlineMode', False):
+            return cls.getStaticURL(target)
+        return super(UHConferenceOverview, cls).getURL(target)
+
 
 class UHConferenceEmail(URLHandler):
     _endpoint = 'event.EMail'
+
+    @classmethod
+    def getStaticURL(cls, target):
+        if target is not None:
+            return "mailto:%s" % str(target.getEmail())
+        return cls.getURL(target)
 
 
 class UHConferenceSendEmail(URLHandler):
@@ -334,6 +353,11 @@ class UHConferenceOtherViews(URLHandler):
 
 class UHConferenceLogo(URLHandler):
     _endpoint = 'event.conferenceDisplay-getLogo'
+
+    @classmethod
+    def getStaticURL(cls, target):
+        url = os.path.join(Config.getInstance().getImagesBaseURL(), "logo", str(target.getLogo()))
+        return url
 
 
 class UHConferenceCSS(URLHandler):
@@ -998,6 +1022,11 @@ class UHContribToPDFConfManager(URLHandler):
 class UHContribToPDF(URLHandler):
     _endpoint = 'event.contributionDisplay-pdf'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            return "files/generatedPdf/%s-Contribution.pdf" % target.getId()
+
 
 class UHContribModifAC(URLHandler):
     _endpoint = 'event_mgmt.contributionAC'
@@ -1081,6 +1110,12 @@ class UHConfModifLog(URLHandler):
 
 class UHInternalPageDisplay(URLHandler):
     _endpoint = 'event.internalPage'
+
+    @classmethod
+    def getStaticURL(cls, target):
+        params = target.getLocator()
+        url = os.path.join("internalPage-%s.html" % params["pageId"])
+        return url
 
 
 class UHConfModifDisplay(URLHandler):
@@ -1869,6 +1904,10 @@ class UHConferenceProgram(URLHandler):
 class UHConferenceProgramPDF(URLHandler):
     _endpoint = 'event.conferenceProgram-pdf'
 
+    @classmethod
+    def getStaticURL(cls, target):
+        return "files/generatedPdf/Programme.pdf"
+
 
 class UHConferenceTimeTable(URLHandler):
     _endpoint = 'event.conferenceTimeTable'
@@ -1885,6 +1924,13 @@ class UHConferenceCFA(URLHandler):
 class UHSessionDisplay(URLHandler):
     _endpoint = 'event.sessionDisplay'
 
+    @classmethod
+    def getStaticURL(cls, target):
+        if target is not None:
+            params = target.getLocator()
+            return "%s-session.html" % (params["sessionId"])
+        return cls._getURL()
+
 
 class UHSessionToiCal(URLHandler):
     _endpoint = 'event.sessionDisplay-ical'
@@ -1892,6 +1938,13 @@ class UHSessionToiCal(URLHandler):
 
 class UHContributionDisplay(URLHandler):
     _endpoint = 'event.contributionDisplay'
+
+    @classmethod
+    def getStaticURL(cls, target):
+        if target is not None:
+            params = target.getLocator()
+            return "%s-contrib.html" % (params["contribId"])
+        return cls._getURL()
 
 
 class UHSubContributionDisplay(URLHandler):
@@ -1904,6 +1957,30 @@ class UHSubContributionModification(URLHandler):
 
 class UHFileAccess(URLHandler):
     _endpoint = 'files.getFile-access'
+
+    @staticmethod
+    def generateFileStaticLink(target):
+        from MaKaC import conference
+
+        params = target.getLocator()
+        owner = target.getOwner().getOwner()
+
+        if isinstance(owner, conference.Conference):
+            path = "events/%s-conference" % owner.getId()
+        elif isinstance(owner, conference.Session):
+            path = "agenda/%s-session" % owner.getId()
+        elif isinstance(owner, conference.Contribution):
+            path = "agenda/%s-contribution" % owner.getId()
+        elif isinstance(owner, conference.SubContribution):
+            path = "agenda/%s-subcontribution" % owner.getId()
+        else:
+            return "non static link"
+        url = os.path.join("files", path, params["materialId"], params["resId"] + "-" + target.getName())
+        return url
+
+    @classmethod
+    def getStaticURL(cls, target):
+        return cls.generateFileStaticLink(target)
 
 
 class UHVideoWmvAccess(URLHandler):
@@ -2198,6 +2275,10 @@ class UHConferenceDisplayMaterialPackagePerform(URLHandler):
 class UHConfAbstractBook(URLHandler):
     _endpoint = 'event.conferenceDisplay-abstractBook'
 
+    @classmethod
+    def getStaticURL(cls, target):
+        return "files/generatedPdf/BookOfAbstracts.pdf"
+
 
 class UHConfAbstractBookLatex(URLHandler):
     _endpoint = 'event.conferenceDisplay-abstractBookLatex'
@@ -2460,6 +2541,7 @@ class UHAnnouncementSave(URLHandler):
 class UHConfigUpcomingEvents(URLHandler):
     _endpoint = 'admin.adminUpcomingEvents'
 
+
 # ------- DVD creation and static webpages ------
 
 class UHConfDVDCreation(URLHandler):
@@ -2469,14 +2551,16 @@ class UHConfDVDCreation(URLHandler):
 class UHStaticConferenceDisplay(URLHandler):
     _relativeURL = "./index.html"
 
+
 class UHStaticMaterialDisplay(URLHandler):
     _relativeURL = "none-page-material.html"
 
+    @classmethod
     def _normalisePathItem(cls,name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"","___________"))
-    _normalisePathItem = classmethod( _normalisePathItem )
+        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
 
-    def getRelativeURL(cls, target=None, escape = True):
+    @classmethod
+    def getRelativeURL(cls, target=None, escape=True):
         from MaKaC.conference import Contribution, Conference, Link, Video, Session
         if target is not None:
             if len(target.getResourceList()) == 1:
@@ -2505,26 +2589,32 @@ class UHStaticMaterialDisplay(URLHandler):
 
                 return relativeURL
         return cls._relativeURL
-    getRelativeURL = classmethod( getRelativeURL )
+
 
 class UHStaticConfAbstractBook(URLHandler):
     _relativeURL = "./abstractBook.pdf"
 
+
 class UHStaticConferenceProgram(URLHandler):
     _relativeURL = "./programme.html"
+
 
 class UHStaticConferenceTimeTable(URLHandler):
     _relativeURL = "./timetable.html"
 
+
 class UHStaticContributionList(URLHandler):
     _relativeURL = "./contributionList.html"
+
 
 class UHStaticConfAuthorIndex(URLHandler):
     _relativeURL = "./authorIndex.html"
 
+
 class UHStaticContributionDisplay(URLHandler):
     _relativeURL = ""
 
+    @classmethod
     def getRelativeURL(cls, target=None, prevPath=".", escape=True):
         url = cls._relativeURL
         if target is not None:
@@ -2542,22 +2632,24 @@ class UHStaticContributionDisplay(URLHandler):
             url = utf8rep(url)
 
         return url
-    getRelativeURL = classmethod( getRelativeURL )
+
 
 class UHStaticSessionDisplay(URLHandler):
     _relativeURL = ""
 
+    @classmethod
     def getRelativeURL(cls, target=None):
         return "./sessions/s%s.html"%target.getId()
-    getRelativeURL = classmethod( getRelativeURL )
+
 
 class UHStaticResourceDisplay(URLHandler):
     _relativeURL = "none-page-resource.html"
 
+    @classmethod
     def _normalisePathItem(cls,name):
         return str(name).translate(string.maketrans(" /:()*?<>|\"","___________"))
-    _normalisePathItem = classmethod( _normalisePathItem )
 
+    @classmethod
     def getRelativeURL(cls, target=None, escape=True):
         from MaKaC.conference import Contribution, Conference, Video, Link, Session
         relativeURL = cls._relativeURL
@@ -2579,11 +2671,12 @@ class UHStaticResourceDisplay(URLHandler):
                 relativeURL = utf8rep(relativeURL)
 
             return relativeURL
-    getRelativeURL = classmethod( getRelativeURL )
+
 
 class UHStaticTrackContribList(URLHandler):
     _relativeURL = ""
 
+    @classmethod
     def getRelativeURL(cls, target=None, escape=True):
         url = cls._relativeURL
         if target is not None:
@@ -2593,7 +2686,6 @@ class UHStaticTrackContribList(URLHandler):
             url = utf8rep(url)
         return url
 
-    getRelativeURL = classmethod( getRelativeURL )
 
 class UHDVDDone(URLHandler):
     _endpoint = 'legacy.confModifTools-dvdDone'
@@ -2602,10 +2694,11 @@ class UHDVDDone(URLHandler):
 class UHMStaticMaterialDisplay(URLHandler):
     _relativeURL = "none-page.html"
 
-    def _normalisePathItem(cls,name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"","___________"))
-    _normalisePathItem = classmethod( _normalisePathItem )
+    @classmethod
+    def _normalisePathItem(cls, name):
+        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
 
+    @classmethod
     def getRelativeURL(cls, target=None, escape=True):
         from MaKaC.conference import Contribution, Link, Session, SubContribution
         if target is not None:
@@ -2647,15 +2740,16 @@ class UHMStaticMaterialDisplay(URLHandler):
                     relativeURL = utf8rep(relativeURL)
                 return relativeURL
         return cls._relativeURL
-    getRelativeURL = classmethod( getRelativeURL )
+
 
 class UHMStaticResourceDisplay(URLHandler):
     _relativeURL = "none-page.html"
 
+    @classmethod
     def _normalisePathItem(cls,name):
         return str(name).translate(string.maketrans(" /:()*?<>|\"","___________"))
-    _normalisePathItem = classmethod( _normalisePathItem )
 
+    @classmethod
     def getRelativeURL(cls, target=None, escape=True):
         from MaKaC.conference import Contribution, Session, SubContribution
         if target is not None:
@@ -2692,13 +2786,18 @@ class UHMStaticResourceDisplay(URLHandler):
                 relativeURL = utf8rep(relativeURL)
             return relativeURL
         return cls._relativeURL
-    getRelativeURL = classmethod( getRelativeURL )
 
 
 # ------- END: DVD creation and static webpages ------
 
 class UHContribAuthorDisplay(URLHandler):
     _endpoint = 'event.contribAuthorDisplay'
+
+    @classmethod
+    def getStaticURL(cls, target):
+        if target is not None:
+            return "%s-authorDisplay.html" % target.getId()
+        return cls._getURL()
 
 
 class UHConfTimeTableCustomizePDF(URLHandler):
@@ -3026,6 +3125,10 @@ class UHCategOverviewToRSS(URLHandler):
 
 class UHConfRegistrantsList(URLHandler):
     _endpoint = 'event.confRegistrantsDisplay-list'
+
+    @classmethod
+    def getStaticURL(cls, target):
+        return "confRegistrantsDisplay.html"
 
 
 class UHConfModifRegistrantSessionModify(URLHandler):

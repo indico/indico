@@ -33,9 +33,21 @@ class RHRegistrantsDisplayBase( conferenceDisplay.RHConferenceBaseDisplay):
 
 class RHRegistrantsList( RHRegistrantsDisplayBase ):
 
+    @staticmethod
+    def create_filter(conf, params, filterUsed=False, sessionFilterName="session"):
+        regForm = conf.getRegistrationForm()
+        newFilter = {}
+        sessform =regForm.getSessionsForm()
+        sesstypes = sessform.getSessionList()
+        lsessions = []
+        if not filterUsed:
+            for sess in sesstypes:
+                lsessions.append( sess.getId() )
+        newFilter[sessionFilterName]=params.get("session",lsessions)
+        return regFilters.RegFilterCrit(conf,newFilter)
+
     def _checkParams(self, params):
         RHRegistrantsDisplayBase._checkParams(self, params)
-        regForm = self._conf.getRegistrationForm()
 
         # ---- FILTERING ----
         if params.has_key("firstChoice"):
@@ -44,17 +56,8 @@ class RHRegistrantsList( RHRegistrantsDisplayBase ):
             self._sessionFilterName="session"
 
         filterUsed=params.has_key("OK")
-        filter = {}
+        self._filterCrit=self.create_filter(self._conf, params, filterUsed, self._sessionFilterName)
 
-        sessform =regForm.getSessionsForm()
-        sesstypes = sessform.getSessionList()
-        lsessions = []
-        if not filterUsed:
-            for sess in sesstypes:
-                lsessions.append( sess.getId() )
-        filter[self._sessionFilterName]=self._normaliseListParam(params.get("session",lsessions))
-
-        self._filterCrit=regFilters.RegFilterCrit(self._conf,filter)
         sessionShowNoValue=True
         if filterUsed:
             sessionShowNoValue =  params.has_key("sessionShowNoValue")

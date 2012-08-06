@@ -1,11 +1,10 @@
 <%page args="material, sessionId='', contribId='', subContId=''"/>
-
 <span class="materialGroup">
     <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="material materialGroup" title="${material.description}">
         ${material.type}
         ${material.title}
         % if material.isItselfProtected():
-            <img src="${Config.getInstance().getBaseURL()}/images/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
+            <img src="${Config.getInstance().getImagesBaseURL()}/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
         % endif
     </a>
 
@@ -19,7 +18,7 @@
         % elif len(filesWithType) > 1:
             <% materialMenuName = 'materialMenu%s%s%s%s%s' % (material.getId(), typeName, sessionId, contribId, subContId) %>
             <a class="material dropDownMaterialMenu" id="${materialMenuName}" title="${typeInfo['imgAlt']}">
-                <img class="resourceIcon" src="${typeInfo['imgURL']}" border="0" alt="${typeInfo['imgAlt']}"/><img class="arrow" src="${Config.getInstance().getBaseURL()}/images/menu_arrow_black.png" border='0' alt="down arrow"/>
+                <img class="resourceIcon" src="${typeInfo['imgURL']}" border="0" alt="${typeInfo['imgAlt']}"/><img class="arrow" src="${Config.getInstance().getImagesBaseURL()}/menu_arrow_black.png" border='0' alt="down arrow"/>
             </a>
             <script type="text/javascript">
                 $E('${materialMenuName}').observeClick(function() {

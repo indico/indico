@@ -56,6 +56,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.api import CategoryEventHook
 from indico.web.flask.util import send_file
+from indico.util.contextManager import ContextManager
 
 
 class RHConfSignIn( conferenceBase.RHConferenceBase, RHSignInBase):
@@ -404,9 +405,49 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
                 p = wf.getConferenceDisplayPage( self, self._target, self._reqParams )
             else:
                 p = conferences.WPConferenceDisplay( self, self._target )
-        # generate the html
 
         return warningText + p.display(**params)
+
+# Generate Static pages
+class RHStaticEventDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
+    _uh = urlHandlers.UHConferenceDisplay
+
+    def _process( self ):
+
+        ContextManager.set('offlineMode', True)
+
+        # get event type
+        wf = self.getWebFactory()
+        if wf != None:
+            eventType = self.getWebFactory().getId()
+        else:
+            eventType = "conference"
+
+        if eventType == "conference":
+            p = conferences.WPStaticConferenceDisplay( self, self._target )
+            html = p.display()
+        else:
+            # get default/selected view
+            styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+            view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
+            # if no default view was attributed, then get the configuration default
+            if view == "" or not styleMgr.existsStyle(view):
+                view=styleMgr.getDefaultStyleForEventType( eventType )
+
+            if view in styleMgr.getXSLStyles():
+                return "Sorry! Not allowed for XSL Style"
+            else:
+                p = conferences.WPTPLStaticConferenceDisplay( self, self._target, view, eventType, self._reqParams )
+                html = p.display(**self._getRequestParams())
+
+        print "Loading offline website..."
+
+        from MaKaC.common.offlineWebsiteCreator import OfflineEvent
+        websiteZipFile=OfflineEvent(self, self._conf, eventType, html).create()
+
+        if websiteZipFile == None:
+            return "Offline website creation had caused an error."
+        return "Offline website created! File: %s"%websiteZipFile
 
 
 class RHRelativeEvent(RHConferenceBaseDisplay):
@@ -746,27 +787,31 @@ class ContributionsFilterCrit(filters.FilterCriteria):
 class RHContributionList( RHConferenceBaseDisplay ):
     _uh = urlHandlers.UHContributionList
 
+    @staticmethod
+    def create_filter(conf, params, filterUsed=False):
+        filter = {"hide_withdrawn": True}
+        ltypes = ltracks = lsessions = []
+        if not filterUsed:
+            for type in conf.getContribTypeList():
+                ltypes.append( type.getId() )
+            for track in conf.getTrackList():
+                ltracks.append( track.getId() )
+            for session in conf.getSessionList():
+                lsessions.append( session.getId() )
+
+        filter["type"] = params.get("selTypes", ltypes)
+        filter["track"] = params.get("selTracks", ltracks)
+        filter["session"] = params.get("selSessions", lsessions)
+        return ContributionsFilterCrit(conf,filter)
+
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
 
         # Filtering
         filterUsed = params.get("filter","no") == "yes"
         self._filterText =  params.get("filterText","")
-        filter = {"hide_withdrawn": True}
-        ltypes = ltracks = lsessions = []
-        if not filterUsed:
-            for type in self._conf.getContribTypeList():
-                ltypes.append( type.getId() )
-            for track in self._conf.getTrackList():
-                ltracks.append( track.getId() )
-            for session in self._conf.getSessionList():
-                lsessions.append( session.getId() )
+        self._filterCrit = self.create_filter(self._conf, params, filterUsed)
 
-        filter["type"] = self._normaliseListParam( params.get("selTypes", ltypes) )
-        filter["track"] = self._normaliseListParam( params.get("selTracks", ltracks) )
-        filter["session"] = self._normaliseListParam( params.get("selSessions", lsessions) )
-
-        self._filterCrit=ContributionsFilterCrit(self._conf,filter)
         typeShowNoValue, trackShowNoValue, sessionShowNoValue = True, True, True
         if filterUsed:
             if self._conf.getContribTypeList():
