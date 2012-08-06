@@ -34,7 +34,8 @@ from MaKaC.errors import UserError
 import MaKaC.common.info as info
 from indico.web.flask.util import send_file
 
-class RHSignIn( base.RH ):
+
+class RHSignInBase( base.RH ):
 
     _tohttps = True
     _isMobile = False
@@ -44,54 +45,65 @@ class RHSignIn( base.RH ):
         self._login = params.get( "login", "" ).strip()
         self._password = params.get( "password", "" )
         self._returnURL = params.get( "returnURL", "").strip()
-        if self._returnURL == "":
-            self._returnURL = urlHandlers.UHWelcome.getURL()
-        self._userId = params.get( "userId", "").strip()
 
-    def _process( self ):
-        self._disableCaching()
+
+    def _setSessionVars(self, av):
+        self._url = self._returnURL
+        tzUtil = timezoneUtils.SessionTZ(av)
+        tz = tzUtil.getSessionTZ()
+        session.timezone = tz
+        session.user = av
+        if Config.getInstance().getBaseSecureURL().startswith('https://'):
+            self._url = str(self._url).replace('http://', 'https://')
+
+    def _makeLoginProcess( self ):
         #Check for automatic login
         authManager = AuthenticatorMgr.getInstance()
         av = authManager.autoLogin(self)
         if av:
-            url = self._returnURL
-            tzUtil = timezoneUtils.SessionTZ(av)
-            tz = tzUtil.getSessionTZ()
-            session.timezone = tz
-            session.user = av
-            if Config.getInstance().getBaseSecureURL().startswith('https://'):
-                url = str(url).replace('http://', 'https://')
-            self._redirect(url)
+            self._setSessionVars(av)
+            self._redirect(self._url)
         if not self._signIn:
-            p = signIn.WPSignIn( self )
-            return p.display( returnURL = self._returnURL )
+            return self._signInPage.display( returnURL = self._returnURL )
         else:
             li = LoginInfo( self._login, self._password )
             av = authManager.getAvatar(li)
             if not av:
-                p = signIn.WPSignIn( self, login = self._login, msg = _("Wrong login or password") )
-                return p.display( returnURL = self._returnURL )
+                return self._signInPageFailed.display( returnURL = self._returnURL )
             elif not av.isActivated():
                 if av.isDisabled():
-                    self._redirect(urlHandlers.UHDisabledAccount.getURL(av))
+                    self._redirect(self._disabledAccountURL(av))
                 else:
-                    self._redirect(urlHandlers.UHUnactivatedAccount.getURL(av))
+                    self._redirect(self._unactivatedAccountURL(av))
                 return _("your account is not activate\nPlease active it and retry")
             else:
-                url = self._returnURL
-                session.user = av
-                tzUtil = timezoneUtils.SessionTZ(av)
-                tz = tzUtil.getSessionTZ()
-                session.timezone = tz
+                self._setSessionVars(av)
+            self._redirect(self._url)
 
-            if self._userId != "":
-                if "?" in url:
-                    url += "&userId=%s"%self._userId
-                else:
-                    url += "?userId=%s"%self._userId
-            if Config.getInstance().getBaseSecureURL().startswith('https://'):
-                url = str(url).replace('http://', 'https://')
-            self._redirect(url)
+
+class RHSignIn( RHSignInBase ):
+
+    def _checkParams( self, params ):
+        RHSignInBase._checkParams(self, params)
+        if self._returnURL == "":
+            self._returnURL = urlHandlers.UHWelcome.getURL()
+        self._userId = params.get( "userId", "").strip()
+        self._disableCaching()
+        self._disabledAccountURL = lambda av: urlHandlers.UHDisabledAccount.getURL(av)
+        self._unactivatedAccountURL = lambda av: urlHandlers.UHUnactivatedAccount.getURL(av)
+        self._signInPage = signIn.WPSignIn( self )
+        self._signInPageFailed = signIn.WPSignIn( self, login = self._login, msg = _("Wrong login or password") )
+        self._noCacheRedirect = True
+
+    def _addExtraParamsToURL(self):
+        if self._userId != "":
+            if "?" in self._url:
+                self._url += "&userId=%s"%self._userId
+            else:
+                self._url += "?userId=%s"%self._userId
+
+    def _process(self):
+        return self._makeLoginProcess()
 
 
 class RHSignOut( base.RH ):

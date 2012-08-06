@@ -1301,11 +1301,8 @@ class UHConfSignIn(SecureURLHandler):
     _endpoint = 'event.confLogin'
 
     @classmethod
-    def getURL(cls, conf, returnURL=''):
-        if Config.getInstance().getLoginURL():
-            url = URL(Config.getInstance().getLoginURL())
-        else:
-            url = cls._getURL()
+    def getURL(cls, conf, returnURL=""):
+        url = cls._getURL()
         if conf is not None:
             url.setParams(conf.getLocator())
         if returnURL:

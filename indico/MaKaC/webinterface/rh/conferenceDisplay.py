@@ -39,6 +39,7 @@ from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
+from MaKaC.webinterface.rh.login import RHSignInBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.errors import MaKaCError, NoReportError, NotFoundError
@@ -57,56 +58,25 @@ from indico.web.http_api.api import CategoryEventHook
 from indico.web.flask.util import send_file
 
 
-class RHConfSignIn( conferenceBase.RHConferenceBase ):
-
-    _tohttps = True
-    _isMobile = False
+class RHConfSignIn( conferenceBase.RHConferenceBase, RHSignInBase):
 
     def _checkParams( self, params ):
         conferenceBase.RHConferenceBase._checkParams( self, params )
-        self._login = params.get( "login", "" ).strip()
-        self._password = params.get( "password", "" ).strip()
-        self._returnURL = params.get( "returnURL", "").strip()
+        RHSignInBase._checkParams(self, params)
         if self._returnURL == "":
             self._returnURL = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-        self._loginURL = params.get( "loginURL", "").strip()
-        self._signIn = params.get("signIn", "").strip()
 
+        self._disabledAccountURL = lambda av: urlHandlers.UHConfDisabledAccount.getURL(self._conf, av)
+        self._unactivatedAccountURL = lambda av: urlHandlers.UHConfUnactivatedAccount.getURL(self.conf, av)
+        self._signInPage = conferences.WPConfSignIn( self, self._conf )
+        self._signInPageFailed = conferences.WPConfSignIn( self, self._conf, login = self._login, msg = _("Wrong login or password")  )
+        self._noCacheRedirect = False
 
-    def _process( self ):
-        #Check for automatic login
-        authManager = AuthenticatorMgr.getInstance()
-        av = authManager.autoLogin(self)
-        if av:
-            url = self._returnURL
-            session.user = av
-            if Config.getInstance().getBaseSecureURL().startswith('https://'):
-                url = str(url).replace('http://', 'https://')
-            self._redirect( url )
-        if not self._signIn:
-            p = conferences.WPConfSignIn( self, self._conf )
-            return p.display( returnURL = self._returnURL )
-        else:
-            li = user.LoginInfo( self._login, self._password )
-            av = authManager.getAvatar(li)
-            if not av:
-                p = conferences.WPConfSignIn( self, self._conf, login = self._login, msg = "Wrong login or password" )
-                return p.display( returnURL = self._returnURL )
-            elif not av.isActivated():
-                if av.isDisabled():
-                    self._redirect(urlHandlers.UHConfDisabledAccount.getURL(self._conf, av))
-                else:
-                    self._redirect(urlHandlers.UHConfUnactivatedAccount.getURL( self._conf, av))
-                return "your account is not active\nPlease activate it and retry"
-            else:
-                url = self._returnURL
-                session.user = av
-                tzUtil = timezoneUtils.SessionTZ(av)
-                tz = tzUtil.getSessionTZ()
-                session.timezone = tz
-            if Config.getInstance().getBaseSecureURL().startswith('https://'):
-                url = str(url).replace('http://', 'https://')
-            self._redirect( url )
+    def _addExtraParamsToURL(self):
+        pass
+
+    def _process(self):
+        return self._makeLoginProcess()
 
 
 class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):

@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session, request
 
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay, RHConfSignIn
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC import registration
@@ -61,32 +61,18 @@ class RHRegistrationForm( RHBaseRegistrationForm ):
         p = registrationForm.WPRegistrationForm(self, self._conf)
         return p.display()
 
-class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
+
+class RHRegistrationFormSignIn(RHBaseRegistrationForm, RHConfSignIn):
     _uh = urlHandlers.UHConfRegistrationFormSignIn
-    _tohttps = True
-    _isMobile = False
 
     def _checkParams( self, params ):
         RHBaseRegistrationForm._checkParams( self, params )
-        self._returnURL = params.get( "returnURL", "").strip()
-        if self._returnURL == "":
-            self._returnURL = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-
+        RHConfSignIn._checkParams(self, params)
+        self._signInPage = registrationForm.WPRegistrationFormSignIn( self, self._conf )
 
     def _processIfActive( self ):
-        # Check for automatic login
-        if self._getUser():
-            self._redirect(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf))
-            return
-        av = AuthenticatorMgr.getInstance().autoLogin(self)
-        if av:
-            url = self._returnURL
-            session.user = av
-            if Config.getInstance().getBaseSecureURL().startswith('https://'):
-                url = str(url).replace('http://', 'https://')
-            self._redirect( url )
-        p = registrationForm.WPRegistrationFormSignIn(self, self._conf)
-        return p.display()
+        return self._makeLoginProcess()
+
 
 class RHRegistrationFormDisplayBase( RHBaseRegistrationForm ):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
