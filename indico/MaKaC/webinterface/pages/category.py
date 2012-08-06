@@ -172,12 +172,6 @@ class WCategoryDisplay(WICalExportBase):
         if mgrs != []:
             vars["managers"]= "; ".join(mgrs)
 
-        # TODO: Should be added to submenu
-        if self._target.tasksAllowed() :
-            vars["taskList"] = i18nformat("""<a href="%s"> _("Task List")</a>""")%urlHandlers.UHTaskList.getURL(self._target)
-        else :
-            vars["taskList"] = ""
-
         # Export ICS
         if self._target.conferences:
             vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId(), {'from':"-7d"}))
@@ -1883,9 +1877,7 @@ class WCategModifAC(wcomponents.WTemplated):
                                                     type)
         if not self._categ.isProtected():
             df =  wcomponents.WDomainControlFrame( self._categ )
-            vars["accessControlFrame"] += "<br>%s"%df.getHTML( \
-                                                    vars["addDomainURL"], \
-                                                    vars["removeDomainURL"] )
+            vars["accessControlFrame"] += "<br>%s"%df.getHTML()
         vars["confCreationControlFrame"] = ""
         vars["categoryId"] = self._categ.getId()
         if not self._categ.getSubCategoryList():
@@ -1904,26 +1896,8 @@ class WPCategModifAC( WPCategoryModifBase ):
         wc = WCategModifAC( self._target )
         pars = { \
 "setVisibilityURL": urlHandlers.UHCategorySetVisibility.getURL(), \
-"addAllowedURL": urlHandlers.UHCategorySelectAllowed.getURL(), \
-"removeAllowedURL": urlHandlers.UHCategoryRemoveAllowed.getURL(), \
-"addDomainURL": urlHandlers.UHCategoryAddDomain.getURL(), \
-"removeDomainURL": urlHandlers.UHCategoryRemoveDomain.getURL(),\
 "setConferenceCreationControlURL": urlHandlers.UHCategorySetConfCreationControl.getURL() }
         return wc.getHTML( pars )
-
-
-
-class WPCategorySelectAllowed( WPCategModifAC ):
-
-    def _getPageContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHCategorySelectAllowed.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHCategoryAddAllowed.getURL()
-        return wc.getHTML( params )
 
 #---------------------------------------------------------------------------------
 

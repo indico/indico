@@ -630,65 +630,6 @@ class RHContributionSetVisibility(RHContribModifBaseSpecialSesCoordRights):
         self._target.setProtection(self._protect)
         self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
 
-
-class RHContributionSelectAllowed(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionSelectAllowed
-
-    def _process(self):
-        p = contributions.WPContributionSelectAllowed(self, self._target)
-        return p.display(**self._getRequestParams())
-
-
-class RHContributionAddAllowed(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionAddAllowed
-
-    def _process(self):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam(params["selectedPrincipals"]):
-                self._target.grantAccess(ph.getById(id))
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHContributionRemoveAllowed(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionRemoveAllowed
-
-    def _process(self):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam(params["selectedPrincipals"]):
-                self._target.revokeAccess(ph.getById(id))
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHContributionAddDomains(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionAddDomain
-
-    def _process(self):
-        params = self._getRequestParams()
-        if ("addDomain" in params) and (len(params["addDomain"])!=0):
-            dh = domain.DomainHolder()
-            for domId in self._normaliseListParam(params["addDomain"]):
-                self._target.requireDomain(dh.getById(domId))
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHContributionRemoveDomains(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionRemoveDomain
-
-    def _process(self):
-        params = self._getRequestParams()
-        if ("selectedDomain" in params) and (len(params["selectedDomain"])!=0):
-            dh = domain.DomainHolder()
-            for domId in self._normaliseListParam(params["selectedDomain"]):
-                self._target.freeDomain(dh.getById(domId))
-        #self._endRequest()
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
 class RHContributionDeletion(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionDelete
 
@@ -713,7 +654,7 @@ class RHContributionDeletion(RHContribModifBaseSpecialSesCoordRights):
             owner = self._target.getOwner()
             self._perform()
             if self._target.getSession():
-                self._redirect(urlHandlers.UHsessionModification.getURL(owner))
+                self._redirect(urlHandlers.UHSessionModification.getURL(owner))
             else:
                 self._redirect(urlHandlers.UHConferenceModification.getURL(owner))
         else:

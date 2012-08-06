@@ -1095,19 +1095,6 @@ class UHConfModifSchedule( URLHandler ):
 class UHConfModifScheduleCustomizePDF( URLHandler ):
     _relativeURL = "confModifSchedule.py/customizePdf"
 
-
-##class UHConfModifScheduleGraphic( URLHandler ):
-##    _relativeURL = "confModifSchedule.py/graphic"
-
-
-class UHConfModifScheduleEntries( URLHandler ):
-    _relativeURL = "confModifSchedule.py/entries"
-
-
-class UHConfModifScheduleEntriesRemove( URLHandler ):
-    _relativeURL = "confModifSchedule.py/removeEntries"
-
-
 class UHConfModifScheduleRelocate( URLHandler ):
     _relativeURL = "confModifSchedule.py/relocate"
 
@@ -1115,36 +1102,11 @@ class UHConfModifScheduleRelocate( URLHandler ):
 class UHConfDelSchItems( URLHandler ):
     _relativeURL = "confModifSchedule.py/deleteItems"
 
-
-#class UHConfModSchEditBreak( URLHandler ):
-#    _relativeURL = "confModifSchedule.py/editBreak"
-
-
 class UHConfModSchEditContrib(URLHandler):
     _relativeURL = "confModifSchedule.py/editContrib"
 
-
 class UHConfModSchEditSlot(URLHandler):
     _relativeURL = "confModifSchedule.py/editSlot"
-
-
-
-class UHConfAddSession( URLHandler ):
-    _relativeURL = "confModifSchedule.py/addSession"
-
-class UHConfPerformAddSession( URLHandler ):
-    _relativeURL = "confModifSchedule.py/performAddSession"
-
-
-class UHConfAddContribution( URLHandler ):
-    _relativeURL = "confModifContribList.py/addContribution"
-
-class UHConfPerformAddContribution( URLHandler ):
-    _relativeURL = "confModifContribList.py/performAddContribution"
-
-class UHMConfPerformAddContribution( URLHandler ):
-    _relativeURL = "confModifContribList.py/performAddContributionM"
-
 
 class UHContribConfSelectionAction( URLHandler ):
     _relativeURL = "confModifContribList.py/contribsActions"
@@ -1155,6 +1117,11 @@ class UHContribsConfManagerDisplayPDF( URLHandler ):
 class UHContribsConfManagerDisplayMenuPDF( URLHandler ):
     _relativeURL = "confModifContribList.py/contribsToPDFMenu"
 
+class UHConfPerformAddContribution( URLHandler ):
+    _relativeURL = "confModifContribList.py/performAddContribution"
+
+class UHMConfPerformAddContribution( URLHandler ):
+    _relativeURL = "confModifContribList.py/performAddContributionM"
 
 class UHContribsConfManagerDisplayParticipantList( URLHandler ):
     _relativeURL = "confModifContribList.py/participantList"
@@ -1227,18 +1194,6 @@ class UHContribModifAC( URLHandler ):
 class UHContributionSetVisibility( URLHandler ):
     _relativeURL = "contributionAC.py/setVisibility"
 
-
-class UHContributionSelectAllowed( URLHandler ):
-    _relativeURL = "contributionAC.py/selectAllowedToAccess"
-
-
-class UHContributionAddAllowed( URLHandler ):
-    _relativeURL = "contributionAC.py/addAllowedToAccess"
-
-
-class UHContributionRemoveAllowed( URLHandler ):
-    _relativeURL = "contributionAC.py/removeAllowedToAccess"
-
 class UHContribModifMaterialMgmt( URLHandler ):
     _relativeURL = "contributionModification.py/materials"
 
@@ -1255,13 +1210,6 @@ class UHContributionAddMaterial( URLHandler ):
 class UHContributionPerformAddMaterial( URLHandler ):
     _relativeURL = "contributionModification.py/performAddMaterial"
 # </Deprecated>
-
-class UHContributionAddDomain( URLHandler ):
-    _relativeURL = "contributionAC.py/addDomains"
-
-
-class UHContributionRemoveDomain( URLHandler ):
-    _relativeURL = "contributionAC.py/removeDomains"
 
 
 class UHContribModifSubCont( URLHandler ):
@@ -1321,34 +1269,6 @@ class UHConfModifAC( URLHandler ):
 
 class UHConfSetVisibility( URLHandler ):
     _relativeURL = "confModifAC.py/setVisibility"
-
-
-class UHConfSetAccessKey( URLHandler ):
-    _relativeURL = "confModifAC.py/setAccessKey"
-
-
-class UHConfSetModifKey( URLHandler ):
-    _relativeURL = "confModifAC.py/setModifKey"
-
-
-class UHConfSelectAllowed( URLHandler ):
-    _relativeURL = "confModifAC.py/selectAllowed"
-
-
-class UHConfAddAllowed( URLHandler ):
-    _relativeURL = "confModifAC.py/addAllowed"
-
-
-class UHConfRemoveAllowed( URLHandler ):
-    _relativeURL = "confModifAC.py/removeAllowed"
-
-
-class UHConfAddDomain( URLHandler ):
-    _relativeURL = "confModifAC.py/addDomains"
-
-
-class UHConfRemoveDomain( URLHandler ):
-    _relativeURL = "confModifAC.py/removeDomains"
 
 class UHConfGrantSubmissionToAllSpeakers( URLHandler ):
     _relativeURL = "confModifAC.py/grantSubmissionToAllSpeakers"
@@ -1916,136 +1836,11 @@ class UHMaterialModification( URLHandler ):
         return handler.getURL(owner, returnURL=returnURL)
 
 
-class UHMaterialModifyData( URLHandler ):
-    _relativeURL = "materialModification.py/modify"
-
-class UHMaterialPerformModifyData( URLHandler ):
-    _relativeURL = "materialModification.py/performModify"
-
-
-class UHMaterialRemoveResources( URLHandler ):
-    _relativeURL = "materialModification.py/removeResources"
-
-
-class UHMaterialLinkCreation( URLHandler ):
-    _relativeURL = "materialModification.py/addLink"
-
-
-class UHMaterialPerformLinkCreation( URLHandler ):
-    _relativeURL = "materialModification.py/performAddLink"
-
-
-class UHMaterialFileCreation( URLHandler ):
-    _relativeURL = "materialModification.py/addFile"
-
-
-class UHMaterialPerformFileCreation( URLHandler ):
-    _relativeURL = "materialModification.py/performAddFile"
-
-
-class UHMaterialModifAC( URLHandler ):
-    _relativeURL = "materialModifAC.py"
-
-
-class UHMaterialSetPrivacy( URLHandler ):
-    _relativeURL = "materialModifAC.py/setPrivacy"
-
-class UHMaterialSetVisibility( URLHandler ):
-    _relativeURL = "materialModifAC.py/setVisibility"
-
-
 class UHMaterialEnterAccessKey( URLHandler ):
     _relativeURL = "materialDisplay.py/accessKey"
 
 class UHFileEnterAccessKey( URLHandler ):
     _relativeURL = "getFile.py/accessKey"
-
-class UHMaterialSetAccessKey( URLHandler ):
-    _relativeURL = "materialModifAC.py/setAccessKey"
-
-
-class UHMaterialSelectAllowed( URLHandler ):
-    _relativeURL = "materialModifAC.py/selectAllowed"
-
-
-class UHMaterialAddAllowed( URLHandler ):
-    _relativeURL = "materialModifAC.py/addAllowed"
-
-
-class UHMaterialRemoveAllowed( URLHandler ):
-    _relativeURL = "materialModifAC.py/removeAllowed"
-
-
-class UHMaterialAddDomains( URLHandler ):
-    _relativeURL = "materialModifAC.py/addDomains"
-
-
-class UHMaterialRemoveDomains( URLHandler ):
-    _relativeURL = "materialModifAC.py/removeDomains"
-
-
-class UHFileModification( URLHandler ):
-    _relativeURL = "fileModification.py"
-
-
-class UHFileModifyData( URLHandler ):
-    _relativeURL = "fileModification.py/modifyData"
-
-
-class UHFilePerformModifyData( URLHandler ):
-    _relativeURL = "fileModification.py/performModifyData"
-
-
-class UHFileModifAC( URLHandler ):
-    _relativeURL = "fileModifAC.py"
-
-
-class UHFileSetVisibility( URLHandler ):
-    _relativeURL = "fileModifAC.py/setVisibility"
-
-
-class UHFileSelectAllowed( URLHandler ):
-    _relativeURL = "fileModifAC.py/selectAllowed"
-
-
-class UHFileAddAllowed( URLHandler ):
-    _relativeURL = "fileModifAC.py/addAllowed"
-
-
-class UHFileRemoveAllowed( URLHandler ):
-    _relativeURL = "fileModifAC.py/removeAllowed"
-
-
-class UHLinkModification( URLHandler ):
-    _relativeURL = "linkModification.py"
-
-
-class UHLinkModifyData( URLHandler ):
-    _relativeURL = "linkModification.py/modifyData"
-
-
-class UHLinkPerformModifyData( URLHandler ):
-    _relativeURL = "linkModification.py/performModifyData"
-
-
-class UHLinkModifAC( URLHandler ):
-    _relativeURL = "linkModifAC.py"
-
-
-class UHLinkSetVisibility( URLHandler ):
-    _relativeURL = "linkModifAC.py/setVisibility"
-
-
-class UHLinkSelectAllowed( URLHandler ):
-    _relativeURL = "linkModifAC.py/selectAllowed"
-
-
-class UHLinkAddAllowed( URLHandler ):
-    _relativeURL = "linkModifAC.py/addAllowed"
-
-
-class UHLinkRemoveAllowed( URLHandler ):
-    _relativeURL = "linkModifAC.py/removeAllowed"
 
 
 class UHCategoryModification( URLHandler ):
@@ -2113,26 +1908,6 @@ class UHCategorySetVisibility( URLHandler ):
     _relativeURL = "categoryAC.py/setVisibility"
 
 
-class UHCategorySelectAllowed( URLHandler ):
-    _relativeURL = "categoryAC.py/selectAllowedToAccess"
-
-
-class UHCategoryAddAllowed( URLHandler ):
-    _relativeURL = "categoryAC.py/addAllowedToAccess"
-
-
-class UHCategoryRemoveAllowed( URLHandler ):
-    _relativeURL = "categoryAC.py/removeAllowedToAccess"
-
-
-class UHCategoryAddDomain( URLHandler ):
-    _relativeURL = "categoryAC.py/addDomains"
-
-
-class UHCategoryRemoveDomain( URLHandler ):
-    _relativeURL = "categoryAC.py/removeDomains"
-
-
 class UHCategoryCreation( URLHandler ):
     _relativeURL = "categoryCreation.py"
 
@@ -2187,49 +1962,6 @@ class UHCategoryOverview( URLHandler ):
              "detail" : "conference"}
         url.addParams(p)
         return url
-
-class UHTaskList( URLHandler ):
-    _relativeURL = "taskList.py"
-
-class UHTaskListAction( URLHandler ):
-    _relativeURL = "taskList.py/taskListAction"
-
-class UHTaskNew( URLHandler ):
-    _relativeURL = "taskList.py/newTask"
-
-class UHTaskNewAdd( URLHandler ):
-    _relativeURL = "taskList.py/addNewTask"
-
-class UHTaskNewResponsibleSearch( URLHandler ):
-    _relativeURL = "taskList.py/searchResponsible"
-
-class UHTaskNewResponsibleNew( URLHandler ):
-    _relativeURL = "taskList.py/newResponsible"
-
-class UHTaskNewPersonAdd( URLHandler ):
-    _relativeURL = "taskList.py/personAdd"
-
-class UHTaskDetails( URLHandler ):
-    _relativeURL = "taskList.py/taskDetails"
-
-class UHTaskDetailsAction( URLHandler ):
-    _relativeURL = "taskList.py/taskDetailsAction"
-
-class UHTaskDetailsResponsibleSearch( URLHandler ):
-    _relativeURL = "taskList.py/detailSearchResponsible"
-
-class UHTaskDetailsResponsibleNew( URLHandler ):
-    _relativeURL = "taskList.py/detailNewResponsible"
-
-class UHTaskDetailsPersonAdd( URLHandler ):
-    _relativeURL = "taskList.py/detailPersonAdd"
-
-
-class UHTaskCommentNew( URLHandler ):
-    _relativeURL = "taskList.py/commentNew"
-
-class UHTaskCommentNewAction( URLHandler ):
-    _relativeURL = "taskList.py/commentNewAction"
 
 class UHGeneralInfoModification( URLHandler ):
     _relativeURL = "generalInfoModification.py"
@@ -2382,25 +2114,6 @@ class UHSessionModifAC( URLHandler ):
 class UHSessionSetVisibility( URLHandler ):
     _relativeURL = "sessionModifAC.py/setVisibility"
 
-
-class UHSessionSelectAllowed( URLHandler ):
-    _relativeURL = "sessionModifAC.py/selectAllowed"
-
-
-class UHSessionAddAllowed( URLHandler ):
-    _relativeURL = "sessionModifAC.py/addAllowed"
-
-
-class UHSessionRemoveAllowed( URLHandler ):
-    _relativeURL = "sessionModifAC.py/removeAllowed"
-
-
-class UHSessionAddDomains( URLHandler ):
-    _relativeURL = "sessionModifAC.py/addDomains"
-
-
-class UHSessionRemoveDomains( URLHandler ):
-    _relativeURL = "sessionModifAC.py/removeDomains"
 
 class UHSessionModifTools( URLHandler ):
     _relativeURL = "sessionModifTools.py"
@@ -2663,33 +2376,6 @@ class UHConfModScheduleNewContrib(URLHandler):
 
 class UHConfModScheduleAddContrib(URLHandler):
     _relativeURL = "confModifSchedule.py/addContrib"
-
-class UHConfModScheduleNewContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/newContrib"
-
-class UHConfModSchedulePerformNewContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/performNewContrib"
-
-class UHConfModSchedulePresenterSearch(URLHandler):
-    _relativeURL = "contributionCreation.py/presenterSearch"
-
-class UHConfModSchedulePresenterNew(URLHandler):
-    _relativeURL = "contributionCreation.py/presenterNew"
-
-class UHConfModSchedulePersonAdd(URLHandler):
-    _relativeURL = "contributionCreation.py/personAdd"
-
-class UHConfModScheduleAuthorSearch(URLHandler):
-    _relativeURL = "contributionCreation.py/authorSearch"
-
-class UHConfModScheduleAuthorNew(URLHandler):
-    _relativeURL = "contributionCreation.py/authorNew"
-
-class UHConfModScheduleCoauthorSearch(URLHandler):
-    _relativeURL = "contributionCreation.py/coauthorSearch"
-
-class UHConfModScheduleCoauthorNew(URLHandler):
-    _relativeURL = "contributionCreation.py/coauthorNew"
 
 class UHConfModScheduleMoveEntryUp( URLHandler ):
     _relativeURL = "confModifSchedule.py/moveEntryUp"
@@ -3032,12 +2718,6 @@ class UHAnnouncementSave( URLHandler ):
 
 class UHConfigUpcomingEvents( URLHandler ):
     _relativeURL = "adminUpcomingEvents.py"
-
-class UHMaterialMainResourceSelect( URLHandler ):
-    _relativeURL = "materialModification.py/selectMainResource"
-
-class UHMaterialMainResourcePerformSelect( URLHandler ):
-    _relativeURL = "materialModification.py/performSelectMainResource"
 
 # ------- DVD creation and static webpages ------
 
@@ -3958,42 +3638,6 @@ class UHConfModifUserCompetencesAbstracts ( URLHandler ):
 
 class UHConfModifModifyUserCompetences ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py/modifyCompetences"
-
-class UHConfSelectPaperReviewManager( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectPaperReviewManager"
-
-class UHConfAddPaperReviewManager( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addPaperReviewManager"
-
-class UHConfRemovePaperReviewManager( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/removePaperReviewManager"
-
-class UHConfSelectEditor( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectEditor"
-
-class UHConfAddEditor( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addEditor"
-
-class UHConfRemoveEditor( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/removeEditor"
-
-class UHConfSelectReviewer( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectReviewer"
-
-class UHConfAddReviewer( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addReviewer"
-
-class UHConfRemoveReviewer( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/removeReviewer"
-
-class UHConfSelectReferee( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectReferee"
-
-class UHConfAddReferee( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addReferee"
-
-class UHConfRemoveReferee( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/removeReferee"
 
 class UHConfModifListContribToJudge( URLHandler ):
     _relativeURL = "confListContribToJudge.py"

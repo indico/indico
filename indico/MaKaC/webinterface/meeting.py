@@ -113,10 +113,6 @@ class WebFactory(WebFactory):
         return WPMConfModifSchedule(rh, conf)
 
     @staticmethod
-    def getConfAddContribution(rh, conf, targetday):
-        return WPMConfAddContribution(rh,conf, targetday)
-
-    @staticmethod
     def getTimeTableCustomizePDF(rh, conf, view):
         return WPMTimeTableCustomizePDF(rh, conf, view)
 
@@ -162,10 +158,6 @@ class WebFactory(WebFactory):
     def getContributionEditData(rh, contrib):
         return WPMContribEditData(rh, contrib)
     getContributionEditData = staticmethod (getContributionEditData)
-
-    def getContribAddMaterial(rh,contrib, mf):
-        return WPMContribAddMaterial (rh,contrib,mf)
-    getContribAddMaterial = staticmethod(getContribAddMaterial)
 
     def getContribAddSC(rh, contrib):
         return WPMContribAddSC(rh,contrib)
@@ -483,13 +475,6 @@ class WPMContributionModification(contributions.WPContributionModification):
         wc = WContribModifMain( self._contrib, ContribMFRegistry(), eventType = "meeting" )
         return wc.getHTML()
 
-
-class WPMContribAddMaterial(contributions.WPContribAddMaterial):
-    pass
-#    def _getBody( self, params ):
-#        return ContribModifTabsFrame._getBody(self, params)
-
-
 class WPMContribEditData(contributions.WPEditData):
     pass
 
@@ -687,37 +672,6 @@ class WPMConfClone(conferences.WPConfClone):
 ##TimeTable view##
 class WPMConfModifSchedule(conferences.WPConfModifScheduleGraphic):
     pass
-
-## Add Contributions to main meeting ##
-class WPMConfAddContribution(conferences.WPModScheduleNewContrib):
-
-    def __init__(self, rh, conf, targetDay):
-        conferences.WPModScheduleNewContrib.__init__(self, rh, conf)
-        self._targetDay = targetDay
-
-
-    def _getTabContent( self, params ):
-        p = WMContributionCreation( self._conf, self._targetDay )
-        pars = {"postURL": urlHandlers.UHMConfPerformAddContribution.getURL(), \
-        "calendarIconURL": Config.getInstance().getSystemIconURL( "calendar" ), \
-        "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL(), \
-        "targetDay": self._targetDay.strftime("%Y-%m-%d") \
-        }
-        return p.getHTML(pars)
-
-
-class WMContributionCreation(conferences.WContributionCreation):
-
-    def __init__( self, target, targetDay):
-        conferences.WContributionCreation.__init__(self, target)
-        self._targetDay=targetDay
-
-    def getVars( self ):
-        vars = conferences.WContributionCreation.getVars( self )
-        vars["sHour"]=self._targetDay.hour
-        vars["sMinute"]=self._targetDay.minute
-        vars["durationHours"],vars["durationMinutes"]="0","20"
-        return vars
 
 ######################### Session View #######################
 

@@ -657,9 +657,7 @@ class WContribModifAC(wcomponents.WTemplated):
 
         if not self._contrib.isProtected():
             df=wcomponents.WDomainControlFrame( self._contrib )
-            addDomURL=urlHandlers.UHContributionAddDomain.getURL()
-            remDomURL=urlHandlers.UHContributionRemoveDomain.getURL()
-            vars["accessControlFrame"] += "<br>%s"%df.getHTML(addDomURL,remDomURL)
+            vars["accessControlFrame"] += "<br>%s"%df.getHTML()
         vars["confId"] = self._contrib.getConference().getId()
         vars["contribId"] = self._contrib.getId()
         vars["eventType"] = self._contrib.getConference().getType()
@@ -732,18 +730,6 @@ class WPContribAddSC( WPContributionModifBase ):
 
 
 #---------------------------------------------------------------------------
-
-class WPContributionSelectAllowed( WPContribModifAC ):
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHContributionSelectAllowed.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHContributionAddAllowed.getURL()
-        return wc.getHTML( params )
 
 
 class WContributionDataModificationBoard(wcomponents.WTemplated):
@@ -922,21 +908,6 @@ class WPEditData(WPContribModifMain):
         "calendarIconURL": Config.getInstance().getSystemIconURL( "calendar" ), \
         "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL() }
         return wc.getHTML( pars )
-
-
-class WPContribAddMaterial( WPContribModifMain ):
-
-    def __init__( self, rh, contrib, mf ):
-        WPContribModifMain.__init__( self, rh, contrib )
-        self._mf = mf
-
-    def _getTabContent( self, params ):
-        if self._mf:
-            comp = self._mf.getCreationWC( self._target )
-        else:
-            comp = wcomponents.WMaterialCreation( self._target )
-        pars = { "postURL": urlHandlers.UHContributionPerformAddMaterial.getURL() }
-        return comp.getHTML( pars )
 
 class WPContributionDeletion( WPContributionModifTools ):
 

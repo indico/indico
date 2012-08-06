@@ -23,15 +23,6 @@ from MaKaC.webinterface.rh import conferenceModif
 def index( req, **params ):
     return conferenceModif.RHContributionList( req ).process( params )
 
-def addContribution( req, **params ):
-    return conferenceModif.RHConfAddContribution(req).process(params)
-
-def performAddContribution( req, **params ):
-    return conferenceModif.RHConfPerformAddContribution(req).process(params)
-
-def performAddContributionM( req, **params ):
-    return conferenceModif.RHMConfPerformAddContribution(req).process(params)
-
 def contribQuickAccess(req,**params):
     return conferenceModif.RHContribQuickAccess(req).process(params)
 

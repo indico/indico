@@ -590,63 +590,6 @@ class RHCategorySetVisibility( RHCategModifBase ):
         self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
 
 
-class RHCategorySelectAllowed( RHCategModifBase ):
-    _uh = urlHandlers.UHCategorySelectAllowed
-
-    def _process( self ):
-        p = category.WPCategorySelectAllowed( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHCategoryAddAllowed( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryAddAllowed
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                self._target.grantAccess( ph.getById( id ) )
-        self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
-
-
-class RHCategoryRemoveAllowed( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryRemoveAllowed
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                self._target.revokeAccess( ph.getById( id ) )
-        self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
-
-
-class RHCategoryAddDomains( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryAddDomain
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("addDomain" in params) and (len(params["addDomain"])!=0):
-            dh = domain.DomainHolder()
-            for domId in self._normaliseListParam( params["addDomain"] ):
-                self._target.requireDomain( dh.getById( domId ) )
-        self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
-
-
-class RHCategoryRemoveDomains( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryRemoveDomain
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedDomain" in params) and (len(params["selectedDomain"])!=0):
-            dh = domain.DomainHolder()
-            for domId in self._normaliseListParam( params["selectedDomain"] ):
-                self._target.freeDomain( dh.getById( domId ) )
-        self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
-
-
 class RHCategorySetConfControl( RHCategModifBase ):
     _uh = urlHandlers.UHCategorySetConfCreationControl
 

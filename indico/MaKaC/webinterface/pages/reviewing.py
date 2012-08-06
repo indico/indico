@@ -306,17 +306,7 @@ class WPConfModifReviewingControl(WPConfModifReviewingBase):
 
     def _getTabContent( self, params ):
         wc = WConfModifReviewingControl( self._conf )
-        p = {
-            "addPaperReviewManagerURL": urlHandlers.UHConfSelectPaperReviewManager.getURL(), \
-            "removePaperReviewManagerURL": urlHandlers.UHConfRemovePaperReviewManager.getURL(), \
-            "addEditorURL": urlHandlers.UHConfSelectEditor.getURL(), \
-            "removeEditorURL": urlHandlers.UHConfRemoveEditor.getURL(), \
-            "addReviewerURL": urlHandlers.UHConfSelectReviewer.getURL(), \
-            "removeReviewerURL": urlHandlers.UHConfRemoveReviewer.getURL(), \
-            "addRefereeURL": urlHandlers.UHConfSelectReferee.getURL(), \
-            "removeRefereeURL": urlHandlers.UHConfRemoveReferee.getURL(), \
-            }
-        return wc.getHTML( p )
+        return wc.getHTML(params)
 
 
 class WConfModifReviewingControl(wcomponents.WTemplated):
@@ -338,17 +328,9 @@ class WConfModifReviewingControl(wcomponents.WTemplated):
                     %s
                     <a href="%s">%s</a></td></tr></table>"""% (message, urlHandlers.UHConfModifReviewingPaperSetup.getURL(self._conf), setupText)
         else:
-            rcPRM = WConfModificationReviewingFramePRM().getHTML(self._conf, \
-                                                params["addPaperReviewManagerURL"], \
-                                                params["removePaperReviewManagerURL"])
+            rcPRM = WConfModificationReviewingFramePRM().getHTML(self._conf)
 
-            rc = WConfModificationReviewingFrame().getHTML( self._conf,\
-                                                params["addRefereeURL"], \
-                                                params["removeRefereeURL"], \
-                                                params["addEditorURL"], \
-                                                params["removeEditorURL"], \
-                                                params["addReviewerURL"], \
-                                                params["removeReviewerURL"])
+            rc = WConfModificationReviewingFrame().getHTML( self._conf)
 
             return """<table width="100%%" class="Revtab"><tr><td>%s</td></tr><tr><td>%s</td></tr></table>"""%(rcPRM, rc)
 
@@ -357,11 +339,9 @@ class WConfModificationReviewingFramePRM(wcomponents.WTemplated):
     """Template used by previous class. For the list of review managers of the conference
     """
 
-    def getHTML( self, target, addPaperReviewManagerURL, removePaperReviewManagerURL):
+    def getHTML( self, target):
         self.__target = target
-        params = { "addPaperReviewManagerURL": addPaperReviewManagerURL, \
-                   "removePaperReviewManagerURL": removePaperReviewManagerURL}
-        return  wcomponents.WTemplated.getHTML( self, params )
+        return  wcomponents.WTemplated.getHTML( self )
 
     def getVars( self ):
 
@@ -377,15 +357,9 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         for the list of referees, editors and reviewers of the conference.
     """
 
-    def getHTML( self, target, addRefereeURL, removeRefereeURL, addEditorURL, removeEditorURL, addReviewerURL, removeReviewerURL):
+    def getHTML( self, target):
         self.__target = target
-        params = { "addRefereeURL": addRefereeURL, \
-                   "removeRefereeURL": removeRefereeURL, \
-                   "addEditorURL": addEditorURL, \
-                   "removeEditorURL": removeEditorURL, \
-                   "addReviewerURL": addReviewerURL, \
-                   "removeReviewerURL": removeReviewerURL}
-        return  wcomponents.WTemplated.getHTML( self, params )
+        return  wcomponents.WTemplated.getHTML( self )
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -393,79 +367,6 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         vars["Conference"] = self.__target.getId()
         vars["ConfReview"] = self.__target.getConfPaperReview()
         return vars
-
-
-class WPConfSelectPaperReviewManager( WPConfModifReviewingBase ):
-    """ Page to select a PRM
-    """
-
-    def _createTabCtrl(self):
-        WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabPaperReviewingControl.setActive()
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectPaperReviewManager.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfAddPaperReviewManager.getURL()
-        return wc.getHTML( params )
-
-class WPConfSelectEditor( WPConfModifReviewingBase ):
-    """ Page to select an editor
-    """
-
-    def _createTabCtrl(self):
-        WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabPaperReviewingControl.setActive()
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectEditor.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfAddEditor.getURL()
-        return wc.getHTML( params )
-
-class WPConfSelectReviewer( WPConfModifReviewingBase ):
-    """ Page to select a reviewer
-    """
-
-    def _createTabCtrl(self):
-        WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabPaperReviewingControl.setActive()
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectReviewer.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfAddReviewer.getURL()
-        return wc.getHTML( params )
-
-class WPConfSelectReferee( WPConfModifReviewingBase ):
-    """ Page to select a referee
-    """
-
-    def _createTabCtrl(self):
-        WPConfModifReviewingBase._createTabCtrl(self)
-        self._tabPaperReviewingControl.setActive()
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectReferee.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfAddReferee.getURL()
-        return wc.getHTML( params )
 
 #classes for contributions to judge list tab
 class WPConfListContribToJudge(WPConfModifReviewingBase):

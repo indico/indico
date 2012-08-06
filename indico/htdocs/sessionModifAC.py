@@ -25,18 +25,3 @@ def index( req, **params ):
 
 def setVisibility( req, **params ):
     return sessionModif.RHSessionSetVisibility( req ).process( params )
-
-def selectAllowed( req, **params ):
-    return sessionModif.RHSessionSelectAllowed( req ).process( params )
-
-def addAllowed( req, **params ):
-    return sessionModif.RHSessionAddAllowed( req ).process( params )
-
-def removeAllowed( req, **params ):
-    return sessionModif.RHSessionRemoveAllowed( req ).process( params )
-
-def addDomains( req, **params ):
-    return sessionModif.RHSessionAddDomains( req ).process( params )
-
-def removeDomains( req, **params ):
-    return sessionModif.RHSessionRemoveDomains( req ).process( params )

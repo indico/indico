@@ -48,13 +48,6 @@ containsCategories = len(categ.getSubCategoryList()) > 0
     <div class="categoryManagers"><strong>${ _("Managers") }:</strong> ${ managers }</div>
 % endif
 
-<!--
-% if taskList:
-<h2 class="subtitle">
-    ${ taskList }
-</h2>
-% endif
--->
 </div>
 
 <div>

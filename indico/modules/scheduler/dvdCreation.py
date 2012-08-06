@@ -27,7 +27,6 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC import conference, schedule
-from MaKaC.tasks.base import OneShotTask
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification

@@ -80,7 +80,6 @@ from MaKaC.common import pendingQueues
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.participant import Participation
 from MaKaC.common.log import LogHandler
-import MaKaC.task as task
 import MaKaC.common.info as info
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager

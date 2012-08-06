@@ -23,19 +23,6 @@ import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.common.Configuration import Config
 from MaKaC.i18n import _
 
-class WSpecialMaterialCreationBase( wcomponents.WMaterialCreation ):
-
-    def __init__( self, owner, factory ):
-        wcomponents.WMaterialCreation.__init__(self, owner)
-        self._factory = factory
-
-    def getVars( self ):
-        vars = wcomponents.WMaterialCreation.getVars( self )
-        vars["typeMaterial"] = self._factory.getId()
-        vars["title"] = self._factory.getTitle()
-        return vars
-
-
 class MaterialFactory:
     """Defines the class base for Material factories.
     """
@@ -106,16 +93,11 @@ class MaterialFactory:
         return False
     appliesToMaterial=classmethod(appliesToMaterial)
 
-
-class WPaperCreation( WSpecialMaterialCreationBase ):
-    pass
-
 class PaperFactory(MaterialFactory):
 
     _id = "paper"
     _title = "Paper"
     _iconURL = Config.getInstance().getSystemIconURL("paper")
-    _creationWC = WPaperCreation
     _materialKlasses=[conference.Paper]
     _needsCreationPage = False
 
@@ -151,10 +133,6 @@ class PaperFactory(MaterialFactory):
         target.setPaper( m )
         return m
     create = classmethod( create )
-
-
-class WSlidesCreation( WSpecialMaterialCreationBase ):
-    pass
 
 
 class SlidesFactory(MaterialFactory):
@@ -198,15 +176,11 @@ class SlidesFactory(MaterialFactory):
         return m
     create = classmethod( create )
 
-class WVideoCreation( WSpecialMaterialCreationBase ):
-    pass
-
 class VideoFactory(MaterialFactory):
 
     _id = "video"
     _title = "Video"
     _iconURL = Config.getInstance().getSystemIconURL("video")
-    _creationWC = WVideoCreation
     _materialKlasses=[conference.Video]
     _needsCreationPage = False
 
@@ -242,9 +216,6 @@ class VideoFactory(MaterialFactory):
         target.setVideo( m )
         return m
     create = classmethod( create )
-
-class WPosterCreation( WSpecialMaterialCreationBase ):
-    pass
 
 class PosterFactory(MaterialFactory):
 
@@ -325,15 +296,11 @@ class MinutesFactory(MaterialFactory):
         return target.createMinutes()
     create = staticmethod( create )
 
-class WReviewingCreation( WSpecialMaterialCreationBase ):
-    pass
-
 class ReviewingFactory(MaterialFactory):
 
     _id = "reviewing"
     _title = "Reviewing"
     _iconURL = Config.getInstance().getSystemIconURL("material")
-    _creationWC = WReviewingCreation
     _materialKlasses=[conference.Reviewing]
     _needsCreationPage = False
 

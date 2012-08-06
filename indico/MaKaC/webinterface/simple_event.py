@@ -91,10 +91,6 @@ class WebFactory(WebFactory):
         return WPSEConfClone(rh, conf)
     getConfClone = staticmethod(getConfClone)
 
-    def getConfAddContribution(rh, conf, targetday):
-        return WPSEConfAddContribution(rh,conf, targetday)
-    getConfAddContribution = staticmethod(getConfAddContribution)
-
     def getMaterialDisplay( rh, material):
         return WPMMaterialDisplay(rh, material)
     getMaterialDisplay = staticmethod(getMaterialDisplay)
@@ -318,30 +314,12 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
 class WSEConfModifTools (conferences.WConfModifTools):
     pass
 
-################## TimeTable, Contributions ####################
+class WPSEConfModifBookings (conferences.WPConfModifBookings):
+    pass
 
+class WSEConfModifBookings (conferences.WConfModifBookings):
+    pass
 
-### Add Contributions ##############
-class WPSEConfAddContribution(conferences.WPModScheduleNewContrib):
-
-    def __init__(self, rh, conf, targetDay):
-        conferences.WPConfAddContribution.__init__(self, rh, conf)
-        self._targetDay = targetDay
-
-
-    def _getTabContent( self, params ):
-        p = WSEContributionCreation( self._conf )
-        pars = {"postURL": urlHandlers.UHMConfPerformAddContribution.getURL(), \
-        "calendarIconURL": Config.getInstance().getSystemIconURL( "calendar" ), \
-        "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL(), \
-        "targetDay": self._targetDay}
-        return p.getHTML(pars)
-
-
-class WSEContributionCreation(conferences.WContributionCreation):
-    def getVars( self ):
-        vars = conferences.WContributionCreation.getVars( self )
-        return vars
 
 #################### Material Modif #####################################
 

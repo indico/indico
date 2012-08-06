@@ -25,19 +25,3 @@ def index(req, **params):
 
 def setVisibility( req, **params ):
     return categoryMod.RHCategorySetVisibility( req ).process( params )
-
-def selectAllowedToAccess( req, **params ):
-    return categoryMod.RHCategorySelectAllowed( req ).process( params )
-
-def addAllowedToAccess( req, **params ):
-    return categoryMod.RHCategoryAddAllowed( req ).process( params )
-
-def removeAllowedToAccess( req, **params ):
-    return categoryMod.RHCategoryRemoveAllowed( req ).process( params )
-
-def addDomains( req, **params ):
-    return categoryMod.RHCategoryAddDomains( req ).process( params )
-
-def removeDomains( req, **params ):
-    return categoryMod.RHCategoryRemoveDomains( req ).process( params )
-

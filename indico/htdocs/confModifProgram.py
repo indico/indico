@@ -42,3 +42,6 @@ def moveTrackUp(req,**params):
 
 def moveTrackDown(req,**params):
     return conferenceModif.RHProgramTrackDown( req ).process( params )
+
+def modifyDescription(req,**params):
+    return conferenceModif.RHProgramDescription( req ).process( params )

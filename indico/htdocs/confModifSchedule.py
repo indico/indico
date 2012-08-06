@@ -24,23 +24,8 @@ from MaKaC.webinterface.rh import conferenceDisplay
 def index( req, **params ):
     return conferenceModif.RHConfModifSchedule( req ).process( params )
 
-def entries( req, **params ):
-    return conferenceModif.RHConfModifScheduleEntries( req ).process( params )
-
-def removeEntries( req, **params ):
-    return conferenceModif.RHConfModifScheduleEntriesRemove( req ).process( params )
-
-def addSession( req, **params ):
-    return conferenceModif.RHConfAddSession( req ).process( params )
-
 def addContrib(req,**params):
     return conferenceModif.RHScheduleAddContrib(req).process(params)
-
-def newContrib(req,**params):
-    return conferenceModif.RHScheduleNewContribution(req).process(params)
-
-def performNewContrib(req,**params):
-    return conferenceModif.RHSchedulePerformNewContribution(req).process(params)
 
 def addBreak( req, **params ):
     return conferenceModif.RHConfAddBreak( req ).process( params )

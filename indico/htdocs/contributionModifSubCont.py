@@ -61,18 +61,3 @@ def Down(req, **params):
 
 def setVisibility( req, **params ):
     return contribMod.RHContributionSetVisibility( req ).process( params )
-
-def selectAllowedToAccess( req, **params ):
-    return contribMod.RHContributionSelectAllowed( req ).process( params )
-
-def addAllowedToAccess( req, **params ):
-    return contribMod.RHContributionAddAllowed( req ).process( params )
-
-def removeAllowedToAccess( req, **params ):
-    return contribMod.RHContributionRemoveAllowed( req ).process( params )
-
-def addDomains( req, **params ):
-    return contribMod.RHContributionAddDomains( req ).process( params )
-
-def removeDomains( req, **params ):
-    return contribMod.RHContributionRemoveDomains( req ).process( params )

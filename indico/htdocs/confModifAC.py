@@ -31,27 +31,6 @@ def index( req, **params ):
 def setVisibility(req, **params):
     return conferenceModif.RHConfSetVisibility( req ).process( params )
 
-def setAccessKey(req, **params):
-    return conferenceModif.RHConfSetAccessKey( req ).process( params )
-
-def setModifKey(req, **params):
-    return conferenceModif.RHConfSetModifKey( req ).process( params )
-
-def selectAllowed( req, **params ):
-    return conferenceModif.RHConfSelectAllowed( req ).process( params )
-
-def addAllowed( req, **params ):
-    return conferenceModif.RHConfAddAllowed( req ).process( params )
-
-def removeAllowed(req, **params):
-    return conferenceModif.RHConfRemoveAllowed( req ).process( params )
-
-def addDomains( req, **params ):
-    return conferenceModif.RHConfAddDomains( req ).process( params )
-
-def removeDomains( req, **params ):
-    return conferenceModif.RHConfRemoveDomains( req ).process( params )
-
 def modifySessionCoordRights( req, **params ):
     return conferenceModif.RHModifSessionCoordRights( req ).process( params )
 

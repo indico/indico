@@ -27,7 +27,7 @@ import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.linking as linking
-from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WContributionCreation, WPModScheduleNewContribBase, WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.common import Config, info
 import MaKaC.webinterface.timetable as timetable
@@ -431,10 +431,6 @@ class WPSessionDataModification(WPSessionModification):
         if self._session.isTextColorToLinks():
             params["textColorToLinks"]="checked=\"checked\""
 
-        #wconvener = wcomponents.WAddPersonModule("convener")
-        #params["convenerDefined"] = self._getDefinedDisplayList("convener")
-        #params["convenerOptions"] = ""
-        #params["convener"] = wconvener.getHTML(params)
         params["convener"] = ""
         return p.getHTML(params)
 
@@ -715,33 +711,6 @@ class WPModScheduleAddContrib(WPSessionModifSchedule):
         pars={"postURL":urlHandlers.UHSessionModScheduleAddContrib.getURL(target)}
         return p.getHTML(pars)
 
-class WPModScheduleNewContrib(WPModScheduleNewContribBase, WPSessionModifSchedule):
-
-    def __init__(self, rh, ses, targetDay):
-        WPSessionModifSchedule.__init__(self, rh, ses)
-        WPModScheduleNewContribBase.__init__(self, targetDay)
-
-class WSessionModifSchContribCreation(WContributionCreation):
-
-    def __init__(self, slot):
-        WContributionCreation.__init__(self, slot.getConference())
-        self._slot = slot
-
-    def getVars(self):
-        vars=WContributionCreation.getVars(self)
-        if self._slot is not None:
-            d=self._slot.getSchedule().calculateDayEndDate(self._slot.getAdjustedStartDate())
-            vars["day"]=d.day
-            vars["month"]=d.month
-            vars["year"]=d.year
-            vars["sHour"]=d.hour
-            vars["sMinute"]=d.minute
-            vars["durationHours"],vars["durationMinutes"]="0","20"
-            vars["poster"]=""
-            if self._slot.getSession().getScheduleType() == "poster":
-                vars["poster"]="disabled"
-        return vars
-
 
 class WPSessionAddBreak(WPSessionModifSchedule):
 
@@ -796,9 +765,7 @@ class WSessionModifAC(wcomponents.WTemplated):
                                 "Session")
         if not self._session.isProtected():
             df=wcomponents.WDomainControlFrame(self._session)
-            vars["accessControlFrame"] += "<br>%s"%df.getHTML( \
-                                    urlHandlers.UHSessionAddDomains.getURL(),\
-                                    urlHandlers.UHSessionRemoveDomains.getURL())
+            vars["accessControlFrame"] += "<br>%s"%df.getHTML()
         wc=wcomponents.WModificationControlFrame()
         vars["modifyControlFrame"] = wc.getHTML(self._session)
 
@@ -817,20 +784,6 @@ class WPSessionModifAC( WPSessionModifBase ):
     def _getTabContent( self, params ):
         comp=WSessionModifAC(self._session)
         return comp.getHTML()
-
-
-class WPSessionSelectAllowed( WPSessionModifAC ):
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHSessionSelectAllowed.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHSessionAddAllowed.getURL()
-        return wc.getHTML( params )
-
 
 class WSessionModifTools(wcomponents.WTemplated):
 
