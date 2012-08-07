@@ -81,6 +81,12 @@ class IConferenceParticipationMinimalFossil(IFossil):
     def getFamilyName( self ):
         """ Conference Participation Family Name """
 
+    def getDirectFullName(self):
+        """ Conference Participation Full Name """
+
+    getDirectFullName.name = "name"
+
+
 
 class IConferenceParticipationFossil(IConferenceParticipationMinimalFossil):
 

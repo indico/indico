@@ -98,7 +98,7 @@
             <h2 class="contributionSectionTitle">${_("Primary authors")}</h2>
             <ul>
             % for pa in Contribution.getPrimaryAuthorList()[:4]:
-                <li><a href="${getAuthorURL(pa)}">${pa.getDirectFullNameNoTitle()}</a>
+                <li><a href="${getAuthorURL(pa)}">${pa.getDirectFullName()}</a>
                     <span style="font-size:10px">${pa.getAffiliation()}</span>
             % endfor
             </ul>
@@ -110,7 +110,7 @@
             <h2 class="contributionSectionTitle">${_("Co-authors")}</h2>
             <ul>
             % for ca in Contribution.getCoAuthorList()[:4]:
-                <li><a href="${getAuthorURL(ca)}">${ca.getDirectFullNameNoTitle()}</a>
+                <li><a href="${getAuthorURL(ca)}">${ca.getDirectFullName()}</a>
                     <span style="font-size:10px">${ca.getAffiliation()}</span>
             % endfor
             </ul>

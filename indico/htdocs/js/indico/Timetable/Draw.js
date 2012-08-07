@@ -121,8 +121,7 @@ type("TimetableBlockBase", [],
                  return translate(
                      conveners,
                      function(conv) {
-                         return conv.firstName + ' ' +
-                             conv.familyName;
+                         return conv.name;
                      }).join(', ');
              } else {
                  return '';
