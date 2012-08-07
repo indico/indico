@@ -78,9 +78,9 @@ class IContributionParticipationTTDisplayFossil(IFossil):
     def getAffiliation(self):
         pass
 
-    def getFullNameNoTitle(self):
+    def getDirectFullName(self):
         pass
-    getFullNameNoTitle.name = "name"
+    getDirectFullName.name = "name"
 
 
 class IContributionParticipationTTMgmtFossil(IFossil):
@@ -92,9 +92,9 @@ class IContributionParticipationTTMgmtFossil(IFossil):
     def getId(self):
         pass
 
-    def getFullNameNoTitle(self):
+    def getDirectFullName(self):
         pass
-    getFullNameNoTitle.name = "name"
+    getDirectFullName.name = "name"
 
 class IContributionParticipationMinimalFossil(IFossil):
 
