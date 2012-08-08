@@ -131,22 +131,24 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                             args.push(addInputLink);
                         }
                     }
-                    var pdfDivLabel = Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
-                            $T("Convert to PDF"));
-                    var pdfDiv = Html.div({style:{marginTop: '5px'}},
-                            toPDFCheckbox,
-                            pdfDivLabel
-                            );
-                    $(pdfDivLabel.dom).qtip({
-                        content: {
-                            text: $T("The only available file formats are: ") + Indico.AvailablePDFConversions.toString().replace(/\./g,' ')
-                        },
-                        position: {
-                            target: 'mouse',
-                            adjust: { mouse: true, x: 11, y: 13 }
-                        }
-                    });
-                    args.push(pdfDiv);
+                    if (Indico.PDFConversion.HasFileConverter){
+                        var pdfDivLabel = Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
+                                $T("Convert to PDF"));
+                        var pdfDiv = Html.div({style:{marginTop: '5px'}},
+                                toPDFCheckbox,
+                                pdfDivLabel
+                                );
+                        $(pdfDivLabel.dom).qtip({
+                            content: {
+                                text: $T("The only available file formats are: ") + Indico.PDFConversion.AvailablePDFConversions.toString().replace(/\./g,' ')
+                            },
+                            position: {
+                                target: 'mouse',
+                                adjust: { mouse: true, x: 11, y: 13 }
+                            }
+                        });
+                        args.push(pdfDiv);
+                    }
 
                     return Html.div.apply(null, args);
                 },

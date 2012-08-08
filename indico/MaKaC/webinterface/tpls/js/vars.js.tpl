@@ -170,6 +170,9 @@ var Indico = {
         MaxUploadFileSize: ${ config.getMaxUploadFileSize() }
     },
 
-    AvailablePDFConversions: ${fileConverter.CDSConvFileConverter.getAvailableConversions()}
+    PDFConversion: {
+        AvailablePDFConversions: ${fileConverter.CDSConvFileConverter.getAvailableConversions()},
+        HasFileConverter: ${jsonEncode(Config.getInstance().hasFileConverter())}
+    }
 
 };
