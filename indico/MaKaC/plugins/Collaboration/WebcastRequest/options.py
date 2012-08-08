@@ -37,7 +37,7 @@ globalOptions = [
                       "defaultValue": [],
                       "editable": True,
                       "visible": True} ),
-    ("ElectronicAgreementTab", {"description": _("Name of tab where the Electronic Agreement will be placed"),
+    ("ElectronicAgreementTab", {"description": "Name of tab where the Electronic Agreement will be placed",
                "defaultValue": "Electronic Agreement",
                "type": str,
                "editable": False
@@ -60,19 +60,19 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
-    ("ConsentFormURL", {"description" : _("Link to the paper agreement"),
+    ("ConsentFormURL", {"description" : "Link to the paper agreement",
                "type": str,
                "defaultValue": "",
                "editable": True,
                "visible": True}),
 
-    ("AgreementName", {"description" : _("Agreement name"),
+    ("AgreementName", {"description" : "Agreement name",
                "type": str,
                "defaultValue": "agreement",
                "editable": True,
                "visible": True}),
 
-    ("AgreementNotificationURL", {"description" : _("URL to send agreement notification to"),
+    ("AgreementNotificationURL", {"description" : "URL to send agreement notification to",
                "type": str,
                "defaultValue": "",
                "editable": True,

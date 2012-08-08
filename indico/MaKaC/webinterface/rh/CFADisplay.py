@@ -36,7 +36,7 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
-
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 
 class RHBaseCFA( RHConferenceBaseDisplay ):
@@ -386,7 +386,7 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 

@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 globalOptions = [
-    ("location", {"description": _("Address of the Invenio instance"),
+    ("location", {"description": "Address of the Invenio instance",
                             "type": str,
                             "defaultValue": "",
                             "editable": True,

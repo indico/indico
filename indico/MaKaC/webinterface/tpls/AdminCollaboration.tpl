@@ -6,19 +6,16 @@
     <div class="CATopBanner">
         <ul class="CAIndexList">
         <label>Select Video Service Index:</label>&nbsp;
-        <% lastIndex = len(Indexes) - 1 %>
-        % for i, index in enumerate(Indexes):
-            <% indexName = index.getName() %>
+        % for index in Indexes:
+            % if index == None:
+            <li class="grey">|</li>
+            % else:
             <li>
-                % if i == lastIndex:
-                    <% additionalStyle = 'style="border-right\x3a 0px;"' %>
-                % else:
-                    <% additionalStyle = '' %>
-                % endif
-                <a id="index_${indexName}" onclick="indexSelectedObs('${indexName}', false)" class="CAIndexUnselected" ${additionalStyle} >
-                    ${ indexName[0].upper() + indexName[1:] }
+                <a data-index="${index}">
+                    ${index[0].upper() + index[1:]}
                 </a>
             </li>
+            % endif
         % endfor
         </ul>
     </div>
@@ -50,8 +47,9 @@
                     <% checked2 = '' %>
                 % endif
                 <input type="radio" name="dateFilterType" id="sinceToDateRadio" onclick="updateDateFilterType()" class="CARadio" ${ checked1 } />
-                <span class="CAFormattingSpan">${ _("Since")}</span><span id="sinceDateContainer"></span>
-                ${ _("to")} <span id="toDateContainer"></span>
+                <span class="CAFormattingSpan">${ _("Since")}</span><input type="text" id="sinceDate" value="${InitialSinceDate}" />
+                ${ _("to")} <input type="text" id="toDate" value="${InitialToDate}" />
+                <a href="#" id="today_button">Today</a>
                 <span class="CAMinMaxKeySuggestion">${ _("Please input dates") }</span>
             </div>
             <div style="padding-top: 5px">
@@ -134,12 +132,18 @@
 </div>
 <script type="text/javascript">
 
+var STATUS_MESSAGE = {
+  null: $T('Pending approval'),
+  true: $T('Accepted'),
+  false: $T('Rejected')
+};
+
 var bookings = ${ jsonEncode (InitialBookings) };
 var nBookings = ${ InitialNumberOfBookings }
 var totalInIndex = ${ InitialTotalInIndex }
 var nPages = ${ InitialNumberOfPages };
 
-var indexNames = ${[index.getName() for index in Indexes]};
+var indexNames = ${list(index for index in Indexes if index is not None) | n,j};
 var indexInformation = ${ jsonEncode(IndexInformation)};
 var viewBy = ['conferenceTitle','conferenceStartDate', 'creationDate','modificationDate','startDate'];
 
@@ -168,14 +172,16 @@ var codes = {
 ${ ",\n". join(['"' + pluginName + '" \x3a ' + code for pluginName, code in JSCodes.items()]) }
 }
 
-var buildIndexTooltips = function() {
-    for (var i=0; i<indexNames.length; i++) {
-        $E('index_' + indexNames[i]).dom.onmouseover = function(event) {
+var initialize_index_tabs = function() {
+        $('ul.CAIndexList a').on('mouseover', function(event) {
+            var index = $(this).data('index');
             IndicoUI.Widgets.Generic.tooltip(this, event, '<div style="padding:5px">' + $T("Plugins in this index:") + '<br \/>' +
-                    indexInformation[this.id.substring(6)].plugins.join(", ") +
+                    indexInformation[index].plugins.join(", ") +
                     '<\/div>');
-        }
-    }
+        }).click(function(){
+            var index = $(this).data('index');
+            indexSelectedObs(index, false);
+        });
 }
 
 var alertNoIndexSelected = function() {
@@ -185,15 +191,8 @@ var alertNoIndexSelected = function() {
 }
 
 var indexSelectedObs = function(selectedIndexName, firstTime) {
-
-    for (var i=0; i<indexNames.length; i++) {
-        var name = indexNames[i];
-        if(name == selectedIndexName) {
-            $E('index_' + name).dom.className = "CAIndexSelected";
-        } else {
-            $E('index_' + name).dom.className = "CAIndexUnselected";
-        }
-    }
+    $('.CAIndexList a').removeClass("CAIndexSelected");
+    $(".CAIndexList a[data-index='" + selectedIndexName + "']").addClass("CAIndexSelected");
 
     $E('indexPluginTypes').set(indexInformation[selectedIndexName].plugins.join(", "));
     queryParams.indexName = selectedIndexName;
@@ -201,13 +200,12 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
     var hasViewByStartDate = indexInformation[selectedIndexName].hasViewByStartDate;
     var hasShowOnlyPending = indexInformation[selectedIndexName].hasShowOnlyPending;
 
-    if (hasViewByStartDate) {
-        IndicoUI.Effect.appear($E('startDateViewBy'));
+    if (hasViewByStartDate || selectedIndexName == 'RecordingRequest' || selectedIndexName == 'WebcastRequest' || selectedIndexName == 'All Requests') {
+        $('#startDateViewBy').fadeIn();
+            set_view_by('startDate');
     } else {
-        IndicoUI.Effect.disappear($E('startDateViewBy'));
-        if (queryParams.viewBy == 'startDate'){
-            queryParams.viewBy = 'modificationDate';
-        }
+        $('#startDateViewBy').fadeOut();
+        set_view_by('conferenceStartDate');
     }
 
     if (hasShowOnlyPending) {
@@ -223,16 +221,14 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
     };
 }
 
-var viewByObs = function(viewBySelected, firstTime) {
-    for (var i=0; i<viewBy.length; i++) {
-        var name = viewBy[i];
-        if (viewBySelected == name) {
-            $E(name + 'ViewBy').dom.className = "CAViewBySelected";
-        } else {
-            $E(name + 'ViewBy').dom.className = "CAViewByUnselected";
-        }
-    }
+function set_view_by(viewBy) {
+    $('.CAViewByLink').removeClass("CAViewBySelected");
+    $('#' + viewBy + 'ViewBy').addClass("CAViewBySelected");
 
+    queryParams.viewBy = viewBy;
+}
+
+var viewByObs = function(viewBySelected, firstTime) {
     if ((endsWith(queryParams.viewBy, 'Date') || firstTime) && viewBySelected == 'conferenceTitle') {
         if (!(firstTime && bookings)) {
             $E('fromTitle').set('');
@@ -254,7 +250,7 @@ var viewByObs = function(viewBySelected, firstTime) {
         orderByObs('descending', true); // we put true because we don't want to trigger another request
     }
 
-    queryParams.viewBy = viewBySelected;
+    set_view_by(viewBySelected);
 
     if (!firstTime) {
         refresh();
@@ -463,7 +459,7 @@ var confTitleBookingTemplate = function(booking) {
     var cell = Html.td('ACBookingFirstCell', Html.span('', booking.type));
     row.append(cell);
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.statusMessage));
+    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, STATUS_MESSAGE[booking.acceptRejectStatus]));
     row.append(cell);
 
     var cell = Html.td('ACBookingCellNoWrap', $T("Last modification:") + formatDateTimeCS(booking.modificationDate) );
@@ -485,43 +481,40 @@ var confTitleBookingTemplate = function(booking) {
 }
 
 var dateBookingTemplate = function(booking, viewBy) {
-    var row = Html.tr("ACBookingLine");
+    var row = $('<tr class="ACBookingLine"></tr>');
 
     var time = null;
     if (viewBy === "creationDate") {
         time = booking.creationDate.time.substring(0,5);
-    } else if (viewBy === "modificationDate") {
+    } else if (viewBy == "modificationDate") {
         time = booking.modificationDate.time.substring(0,5);
-    } else if (viewBy === "startDate" || viewBy === "conferenceStartDate") {
+    } else if (viewBy == "startDate" && (booking.type == "RecordingRequest" || booking.type == "WebcastRequest")) {
+        time = booking.instanceDate.time.substring(0, 5);
+    } else if (viewBy == "startDate" || viewBy == "conferenceStartDate") {
         time = (booking.bookingParams.startDate.length === 0)
                ? '' : Util.parseDateTime(booking.bookingParams.startDate,
                        IndicoDateTimeFormats.Default).time.substring(0, 5);
     }
 
-    var cell = Html.td('ACBookingFirstCell ACBookingTime', time);
-    row.append(cell);
-
-    var cell = Html.td('ACBookingCellNoWrap', Html.span({}, booking.type));
-    row.append(cell);
-
-    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.statusMessage));
-    row.append(cell);
-
-    var cell = Html.td('ACBookingCell', Html.span({}, $T("In event: ")), Html.span({}, booking.conference.title));
-    row.append(cell);
+    row.append($('<td class="ACBookingFirstCell ACBookingTime"></td>').html(time)).
+        append($('<td class="ACBookingCellNoWrap"><span>' + booking.type + '</span></td>')).
+        append($('<td class="ACBookingCellNoWrap"></td>').append($('<span/>').
+               addClass(booking.statusClass).html(STATUS_MESSAGE[booking.acceptRejectStatus]))).
+        append($('<td class="ACBookingCell"></td>').html(booking.talk ? booking.talk.room : booking.conference.room)).
+        append($('<td class="ACBookingCell"></td>').append($('<span/>').html(booking.conference.title + 
+                                                          (booking.talk ? (': <em>' + booking.talk.title + '</em>') : ''))));
 
     if (pluginHasFunction(booking.type, 'customText')) {
-        var cell = Html.td('ACBookingCell', codes[booking.type].customText(booking, viewBy) );
-        row.append(cell);
+        row.append($('<td class="ACBookingCell"></td>').append(codes[booking.type].customText(booking, viewBy)));
     } else {
-        row.append(Html.td());
+        row.append($('<td></td>'));
     }
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, $T('Change')),
-            Html.span('horizontalSeparator', '|'),
-            Html.a({href: buildVideoServicesDisplayUrl(booking.conference)}, $T('Event Display')));
-    row.append(cell);
-
+    row.append($('<td class="ACBookingCellNoWrap"></td>').append(
+        $('<a></a>').html($T('Change')).attr('href', booking.modificationURL),
+        $('<span class="horizontalSeparator">|</span>'),
+        $('<a></a>').html($T('Event Display')).attr('href', buildVideoServicesDisplayUrl(booking.conference))
+    ));
     return row;
 }
 
@@ -529,10 +522,10 @@ var dateGroupTemplate = function(group, isFirst, viewBy) {
     var date = group[0];
     var bookings = group[1];
 
-    var result = Html.tbody({},
-            Html.tr({}, Html.td({className : 'ACBookingGroupTitle', colspan: 10, colSpan: 10},
-                Html.span({}, date)
-            )));
+    var result = $('<tbody/>').append($('<tr/>').append(
+      $('<td class="ACBookingGroupTitle" colspan=11 />').append(
+        $('<span/>').html(date)
+    )));
     each(bookings, function(booking){
         result.append(dateBookingTemplate(booking, viewBy));
     });
@@ -550,20 +543,21 @@ var updateResults = function() {
     $E('results').clear();
 
     if (nBookings < 1) {
-        $E('resultsMessage').set($T("No results found"));
-        IndicoUI.Effect.appear($E('resultsMessage'));
-        IndicoUI.Effect.disappear($E('resultsInfo'));
+        $('#resultsMessage').html($T("No results found"));
+        $('#resultsMessage').show();
+        $('#resultsInfo').hide();
     } else {
-        IndicoUI.Effect.disappear($E('resultsMessage'));
-        IndicoUI.Effect.appear($E('resultsInfo'));
-        $E('totalInIndex').set(totalInIndex);
-        $E('nBookings').set(nBookings);
+        $('#resultsMessage').hide();
+        $('#resultsInfo').show();
+
+        $('#totalInIndex').html(totalInIndex);
+        $('#nBookings').html(nBookings);
         for (var i = 0; i < bookings.length; i++) {
             group = bookings[i];
             if (queryParams.viewBy == 'conferenceTitle') {
                 $E('results').append(confTitleGroupTemplate(group, i == 0))
             } else {
-                $E('results').append(dateGroupTemplate(group, i == 0, queryParams.viewBy))
+                $('#results').append(dateGroupTemplate(group, i == 0, queryParams.viewBy))
             }
         }
     }
@@ -581,18 +575,21 @@ var pageSelectedHandler = function(page) {
 
 var pf = new PageFooter('${ InitialNumberOfPages }', '${ InitialPage }', 4, pageSelectedHandler)
 
-IndicoUI.executeOnLoad(function(){
+$(function(){
 
-    var sinceDate = IndicoUI.Widgets.Generic.dateField(true, {id:'sinceDate'});
-    $E('sinceDateContainer').set(sinceDate);
-    sinceDate.set(${ InitialSinceDate });
-    sinceDate.observeEvent("keypress", function (e) { updateFilterButton(); });
-    var toDate = IndicoUI.Widgets.Generic.dateField(true, {id:'toDate'});
-    $E('toDateContainer').set(toDate);
-    toDate.set(${ InitialToDate });
-    toDate.observeEvent("keypress", function (e) { updateFilterButton(); });
+    $('#today_button').click(function(){
+        var now = new Date();
+        var today_text = Util.formatDateTime(now, IndicoDateTimeFormats.ServerHourless);
+        $('#sinceDate').val(today_text);
+        $('#toDate').val(today_text);
+        refresh();
+        return false;
+    });
 
-    buildIndexTooltips();
+    $('#sinceDate').datepicker({ dateFormat: "yy/mm/dd" }).on('keypress', function (e) { updateFilterButton(); });
+    $('#toDate').datepicker({ dateFormat: "yy/mm/dd" }).on('keypress', function (e) { updateFilterButton(); });
+
+    initialize_index_tabs();
     confIdObs();
     viewByObs('${InitialViewBy }', true);
     updateDateFilterType();
@@ -606,8 +603,8 @@ IndicoUI.executeOnLoad(function(){
 
     $E('pageNumberList').set(pf.draw());
 
-    dateParameterManager.add(sinceDate, 'datetime', true);
-    dateParameterManager.add($E('toDate'), 'datetime', true);
+    dateParameterManager.add($E('sinceDate'), 'date', true);
+    dateParameterManager.add($E('toDate'), 'date', true);
 
     resultsPerPageParameterManager.add($E('resultsPerPage'), 'int', false, function(value) {
         if (value < 1) {

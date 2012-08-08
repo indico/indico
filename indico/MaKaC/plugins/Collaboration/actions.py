@@ -91,6 +91,7 @@ class IndexPluginsPerIndexAction(ActionBase):
 
         result.append(itiAll)
         result.extend(pluginIndexes)
+        result.append(IndexInformation("requests"))
         result.extend([commonIndexes[k] for k in commonIndexNames])
 
         self._pluginType.getOption("pluginsPerIndex").setValue(result)

@@ -166,7 +166,7 @@ class RHAdminCollaboration(RHAdminBase):
         self._queryParams["page"] = params.get("page", 1)
         self._queryParams["resultsPerPage"] = params.get("resultsPerPage", 10)
         self._queryParams["indexName"] = params.get('indexName', None)
-        self._queryParams["viewBy"] = params.get('viewBy', 'conferenceStartDate')
+        self._queryParams["viewBy"] = params.get('viewBy', 'startDate')
         self._queryParams["orderBy"] = params.get('orderBy', '')
         self._queryParams["sinceDate"] = params.get('sinceDate', '').strip()
         self._queryParams["toDate"] = params.get('toDate', '').strip()

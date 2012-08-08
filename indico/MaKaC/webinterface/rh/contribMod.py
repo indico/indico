@@ -33,12 +33,11 @@ from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.PDFinterface.conference import ConfManagerContribToPDF
 from MaKaC.errors import FormValuesError
-from MaKaC.conference import SubContribParticipation
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
-from MaKaC.user import AvatarHolder
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 class RHContribModifBase(RHModificationBaseProtected):
     """ Base RH for contribution modification.
@@ -820,7 +819,7 @@ class RHContributionToXML(RHContributionModification):
         mimetype = cfg.getFileTypeMimeType("XML")
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Length"] = "%s"%len(data)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 
@@ -836,7 +835,7 @@ class RHContributionToPDF(RHContributionModification):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType("PDF")
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 

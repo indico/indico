@@ -241,6 +241,9 @@ class CSBookingManager(Persistent, Observer):
         if booking.isHidden():
             self.getHiddenBookings().add(booking.getId())
         self._indexBooking(booking)
+
+        booking.index_instances()
+
         self._notifyModification()
 
         # the unique id can be diferent for the new conference
@@ -294,6 +297,9 @@ class CSBookingManager(Persistent, Observer):
                     self._bookingsByType.setdefault(bookingType,[]).append(newId)
                     if newBooking.isHidden():
                         self.getHiddenBookings().add(newId)
+
+                    newBooking.index_instances()
+
                     self._indexBooking(newBooking)
                     self._notifyModification()
 
@@ -308,9 +314,14 @@ class CSBookingManager(Persistent, Observer):
             #we raise an exception because the web interface should take care of this never actually happening
             raise CollaborationServiceException(bookingType + " only allows to create 1 booking per event")
 
-    def _indexBooking(self, booking):
+    def _indexBooking(self, booking, index_names=None):
+        indexes = self._getIndexList(booking)
+        if index_names is not None:
+            ci = IndexesHolder().getById('collaboration')
+            all_indexes = list(ci.getIndex(index) for index in index_names)
+            indexes = list(index for index in all_indexes if index in indexes)
+
         if booking.shouldBeIndexed():
-            indexes = self._getIndexList(booking)
             for index in indexes:
                 index.indexBooking(booking)
 
@@ -328,6 +339,8 @@ class CSBookingManager(Persistent, Observer):
         oldStartDate = booking.getStartDate()
         oldModificationDate = booking.getModificationDate()
         oldBookingParams = booking.getBookingParams() #this is a copy so it's ok
+
+        booking.unindex_instances()
 
         error = booking.setBookingParams(bookingParams)
         if isinstance(error, CSSanitizationError):
@@ -378,6 +391,7 @@ class CSBookingManager(Persistent, Observer):
 
                 self._changeStartDateInIndex(booking, oldStartDate, booking.getStartDate())
                 self._changeModificationDateInIndex(booking, oldModificationDate, modificationDate)
+                booking.index_instances()
 
                 if booking.hasAcceptReject():
                     if booking.getAcceptRejectStatus() is not None:
@@ -441,6 +455,9 @@ class CSBookingManager(Persistent, Observer):
             # If there is an association to a session or contribution, remove it
             if bookingLinkId is not None:
                 self.removeVideoSingleService(bookingLinkId, booking)
+
+            booking.unindex_instances()
+
             self._unindexBooking(booking)
 
             self._notifyModification()
@@ -648,6 +665,11 @@ class CSBookingManager(Persistent, Observer):
         if someDateChanged:
             problems = []
             for booking in self.getBookingList():
+
+                # booking "instances" provide higher granularity in search
+                booking.unindex_instances()
+                booking.index_instances()
+
                 if booking.hasStartDate():
                     if startDateChanged:
                         try:
@@ -1917,6 +1939,18 @@ class CSBookingBase(Persistent, Fossilizable):
             be included in.
         """
         return self._commonIndexes
+
+    def index_instances(self):
+        """
+        To be overloaded
+        """
+        return
+
+    def unindex_instances(self):
+        """
+        To be overloaded
+        """
+        return
 
     def getModificationURL(self):
         return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),

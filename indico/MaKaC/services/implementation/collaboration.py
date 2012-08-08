@@ -17,7 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import timedelta
+from pytz import timezone
+from datetime import timedelta, date, time, datetime
 from MaKaC.services.implementation.base import ParameterManager, AdminService
 from MaKaC.services.interface.rpc.common import NoReportError
 from MaKaC.services.implementation.conference import ConferenceModifBase
@@ -33,6 +34,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.webinterface.user import UserListModificationBase,\
     UserModificationBase
 from MaKaC.common.fossilize import fossilize
+
 
 
 ## Base classes
@@ -287,6 +289,8 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
     def _checkParams(self):
         AdminCollaborationBase._checkParams(self)
         user = self.getAW().getUser()
+        pm = ParameterManager(self._params)
+
         if user: #someone is logged in. if not, AdminCollaborationBase's _checkProtection will take care of it
             self._tz = user.getTimezone()
 
@@ -297,12 +301,16 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
                 self._viewBy = self._params['viewBy']
                 self._orderBy = self._params['orderBy']
 
+                if self._indexName in ['RecordingRequest', 'WebcastRequest', 'All Requests'] and self._viewBy == 'startDate':
+                    self._viewBy = 'instanceDate'
+
                 minKey = None
                 maxKey = None
+
                 if self._params['sinceDate']:
-                    minKey = setAdjustedDate(parseDateTime(self._params['sinceDate'].strip()), tz = self._tz)
+                    minKey = timezone(self._tz).localize(datetime.combine(pm.extract("sinceDate", pType=date, allowEmpty=True), time(0, 0)))
                 if self._params['toDate']:
-                    maxKey = setAdjustedDate(parseDateTime(self._params['toDate'].strip()), tz = self._tz)
+                    maxKey = timezone(self._tz).localize(datetime.combine(pm.extract("toDate", pType=date, allowEmpty=True), time(23, 59, 59)))
                 if self._params['fromTitle']:
                     minKey = self._params['fromTitle'].strip()
                 if self._params['toTitle']:
@@ -346,7 +354,6 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
 
     def _getAnswer(self):
         ci = IndexesHolder().getById('collaboration')
-
         return ci.getBookings(self._indexName,
                               self._viewBy,
                               self._orderBy,

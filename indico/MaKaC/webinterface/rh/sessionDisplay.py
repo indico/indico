@@ -27,6 +27,7 @@ from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from MaKaC.common import Config
 from indico.web.http_api.api import SessionHook
 from indico.util.metadata.serializer import Serializer
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 
 class RHSessionDisplayBase( RHSessionBase, RHDisplayBaseProtected ):
@@ -73,7 +74,7 @@ class RHSessionToiCal(RHSessionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 class RHSessionToMarcXML(RHSessionDisplay):
@@ -93,7 +94,7 @@ class RHSessionToMarcXML(RHSessionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 

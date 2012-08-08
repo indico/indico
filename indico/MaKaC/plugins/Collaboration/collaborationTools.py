@@ -20,13 +20,14 @@
 import pkg_resources, sys
 from MaKaC.plugins import PluginsHolder, Plugin
 from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime, \
     formatDuration
 from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay
 from MaKaC.common.Configuration import Config
 from MaKaC.conference import Contribution, Conference
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
-    IQueryResultFossil
+    IQueryResultFossil, ICSBookingInstanceIndexingFossil
 from MaKaC.fossils.conference import IConferenceFossil
 from MaKaC.common.contextManager import ContextManager
 
@@ -321,7 +322,8 @@ class CollaborationTools(object):
         """ Utility function that updates IQueryResultFossil's getResults method
             with the proper dict in order to fossilize bookings for the VS Overview page
         """
-        fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceFossil}
+        fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceFossil,
+                      'MaKaC.plugins.Collaboration.indexes.CSBookingInstanceWrapper': ICSBookingInstanceIndexingFossil}
         for pluginName in cls.getCollaborationPluginType().getPlugins():
             classObject = cls.getCSBookingClass(pluginName)
             fossilClassObject = cls.getIndexingFossil(pluginName)
@@ -409,6 +411,37 @@ class CollaborationTools(object):
             if audience == "":
                 audience = "Public"
         return audience
+
+    @classmethod
+    def getCommonTalkInformation(cls, conference, plugin_name, plugin_option):
+        """
+        Returns a tuple of 3 lists:
+        - List of talks (Contribution objects which are not in a Poster session)
+        - List of webcast capable rooms, as a list of "locationName:roomName" strings
+        - List of webcast-able talks (list of Contribution objects who take place in a webcast capable room)
+        """
+
+        #a talk is defined as a non-poster contribution
+        filter = PosterFilterField(conference, False, False)
+        talks = [cont for cont in conference.getContributionList() if filter.satisfies(cont)]
+
+        #list of "locationName:roomName" strings
+        capableRooms = CollaborationTools.getOptionValueRooms(plugin_name, plugin_option)
+
+        roomFullNames = [r.locationName + ':' + r.getFullName() for r in capableRooms]
+        roomNames = [r.locationName + ':' + r.name for r in capableRooms]
+
+        #a webcast-able talk is defined as a talk talking place in a webcast-able room
+        ableTalks = []
+        for t in talks:
+            location = t.getLocation()
+            room = t.getRoom()
+            if location and room and (location.getName() + ":" + room.getName() in roomNames):
+                ableTalks.append(t)
+
+        return (talks, roomFullNames, roomNames, ableTalks)
+
+
 
 class MailTools(object):
 

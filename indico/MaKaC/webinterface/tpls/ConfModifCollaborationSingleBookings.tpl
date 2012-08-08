@@ -26,10 +26,8 @@
 
 <script type="text/javascript">
 
-var singlePluginNames = ${ str([plugin.getId() for plugin in SingleBookingPlugins]) }
-var singleBookings = {
-    ${ ",\n". join(['"' + str(name) + '" \x3a ' + jsonEncode(booking).replace('%','%%') for name, booking in BookingsS.items()]) }
-}
+var singlePluginNames = ${[plugin.getId() for plugin in SingleBookingPlugins] | n,j};
+var singleBookings = ${BookingsS | n,j};
 
 var send = function(pluginId) {
     sendRequest(pluginId, '${ Conference.getId() }');

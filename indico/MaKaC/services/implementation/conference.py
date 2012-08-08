@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+
 """
 Asynchronous request handlers for conference-related data modification.
 """
@@ -1120,6 +1121,7 @@ class ConferenceEmailParticipants(ConferenceParticipantBase, ConferenceParticipa
         currentUser = self._getUser()
         if currentUser:
             data["fromAddr"] = currentUser.getEmail()
+        data["content-type"] = "text/html"
         data["subject"] = emailSubject
         for id in self._userList:
             participant = self._conf.getParticipation().getParticipantById(id)
@@ -1215,6 +1217,7 @@ class ConferenceProtectionRemoveUser(ConferenceModifBase):
 class ConferenceProtectionToggleDomains(ConferenceModifBase):
 
     def _checkParams(self):
+        self._params['confId'] = self._params['targetId']
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._domainId = pm.extract("domainId", pType=str)

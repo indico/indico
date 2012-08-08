@@ -20,32 +20,32 @@ from MaKaC.i18n import _
 
 
 globalOptions = [
-    ("collaborationAdmins", {"description": _("Global collaboration admins"),
+    ("collaborationAdmins", {"description": "Global collaboration admins",
                             "type": 'users',
                             "defaultValue": []} ),
-    ("sendMailNotifications", {"description" : _("Should mail notifications be sent to Collaborations admins?"),
+    ("sendMailNotifications", {"description" : "Should mail notifications be sent to Collaborations admins?",
                "type": bool,
                "defaultValue": False,
                "editable": True,
                "visible": True} ),
-    ("additionalEmails", {"description": _("Additional email addresses who will receive notifications (always)"),
+    ("additionalEmails", {"description": "Additional email addresses who will receive notifications (always)",
                           "type": list,
                           "defaultValue": [],
                           "editable": True,
                           "visible": True} ),
-    ("tabOrder", {"description": _("Order in which the tabs will appear"),
+    ("tabOrder", {"description": "Order in which the tabs will appear",
                   "type": list,
                   "defaultValue": ["Videoconferencing", "Recording Request", "Webcast Request"]
                   }),
-    ("pluginsPerEventType", {"description": _("Plugins allowed for each event type"),
+    ("pluginsPerEventType", {"description": "Plugins allowed for each event type",
                             "type": dict, #key: a string: conference, simple_event or meeting. Value: list of Plugin objects
                             "editable": False,
                             "visible": True} ),
-    ("pluginsPerIndex", {"description": _("Information about each index seen by collaboration admins"),
+    ("pluginsPerIndex", {"description": "Information about each index seen by collaboration admins",
                          "type": list, #a list of IndexInformation objects
                          "editable": False,
                          "visible": True} ),
-    ("verifyIndexingResults", {"description": _("""Verify that indexing results do not contain bookings from plugins that have been removed in order to avoid exceptions (not efficient)"""),
+    ("verifyIndexingResults", {"description": """Verify that indexing results do not contain bookings from plugins that have been removed in order to avoid exceptions (not efficient)""",
                          "type": bool,
                          "defaultValue": False})
 ]

@@ -24,7 +24,6 @@ from BTrees.OOBTree import OOBTree
 import MaKaC.webinterface.pages.tracks as tracks
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.user as user
 import MaKaC.webinterface.common.abstractFilters as abstractFilters
 import MaKaC.review as review
 from MaKaC.webinterface.rh.conferenceBase import RHTrackBase
@@ -38,9 +37,8 @@ from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
-from MaKaC.abstractReviewing import ConferenceAbstractReview
 from MaKaC.paperReviewing import Answer
-
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 class RHTrackModifBase( RHTrackBase, RHModificationBaseProtected ):
 
@@ -530,7 +528,7 @@ class RHAbstractToPDF(RHTrackAbstractBase):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data
 
 

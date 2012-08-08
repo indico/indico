@@ -155,6 +155,11 @@ class IConferenceMetadataFossil(IFossil):
     getVisibility.name = 'visibility'
     getVisibility.produce = lambda x: Conversion.visibility(x)
 
+    def getRoomMapURL(self):
+        pass
+    getRoomMapURL.produce = lambda x: RoomLinker().getURL(x.getRoom(), x.getLocation())
+
+
 
 class IContributionParticipationMetadataFossil(IFossil):
 

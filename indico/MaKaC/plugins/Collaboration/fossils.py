@@ -27,6 +27,7 @@
 
 from MaKaC.common.fossilize import IFossil
 from MaKaC.fossils.conference import IConferenceFossil
+from MaKaC.fossils.contribution import IContributionFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.plugins import Collaboration
 
@@ -179,6 +180,16 @@ class ICSBookingBaseIndexingFossil(ICSBookingBaseFossil):
     getModificationURL.name = "modificationURL"
     getModificationURL.convert = lambda url: str(url)
 
+
+class ICSBookingInstanceIndexingFossil(ICSBookingBaseIndexingFossil):
+    def getStartDate(self):
+        pass
+    getStartDate.name = "instanceDate"
+    getStartDate.convert = Conversion.datetime
+
+    def getTalk(self):
+        """ Returns fossil of the talk this booking relates to """
+    getTalk.result = IContributionFossil
 
 
 ##################### Error fossils #####################

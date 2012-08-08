@@ -21,37 +21,37 @@
 from MaKaC.i18n import _
 
 globalOptions = [
-    ("chatServerHost", {"description": _("Hostname of the chat server"),
+    ("chatServerHost", {"description": "Hostname of the chat server",
                         "type": str,
                         "defaultValue": "",
                         "editable": True,
                         "visible": True} ),
 
-    ("admins", {"description": _("XMPP admins / responsibles"),
+    ("admins", {"description": "XMPP admins / responsibles",
                 "type": 'users',
                 "defaultValue": [],
                 "editable": True,
                 "visible": True}),
 
-    ("sendMailNotifications", {"description" : _("Should mail notifications be sent to XMPP admins?"),
+    ("sendMailNotifications", {"description" : "Should mail notifications be sent to XMPP admins?",
                                "type": bool,
                                "defaultValue": False,
                                "editable": True,
                                "visible": True}),
 
-    ("additionalEmails", {"description": _("Additional email addresses who will receive notifications (always)"),
+    ("additionalEmails", {"description": "Additional email addresses who will receive notifications (always)",
                           "type": list,
                           "defaultValue": [],
                           "editable": True,}),
 
-    ("indicoUsername" , {"description" : _("Indico username for XMPP"),
+    ("indicoUsername" , {"description" : "Indico username for XMPP",
                          "type": str,
                          "defaultValue": "indico"}),
 
-    ("indicoPassword" , {"description" : _("Indico password for XMPP"),
+    ("indicoPassword" , {"description" : "Indico password for XMPP",
                       "type": 'password',
                       "defaultValue": ""}),
-     ("ckEditor" , {"description" : _("Information about how to connect to the chat with a client (Optional)"),
+     ("ckEditor" , {"description" : "Information about how to connect to the chat with a client (Optional)",
                       "type": 'ckEditor',
                       "defaultValue": "<table width=\"100%\" align=\"center\" border=\"0\">\
     <tr>\
@@ -69,12 +69,12 @@ globalOptions = [
     </tr>\
 </table>"}),
 
-    ("activateLogs", {"description": _("""Make possible to see chat logs and attach them to the material <div style="font-style: italic; margin-top:5px;">You will need to configure a web service in your XMPP server - see <a href="">here</a>.</div>"""),
+    ("activateLogs", {"description": """Make possible to see chat logs and attach them to the material <div style="font-style: italic; margin-top:5px;">You will need to configure a web service in your XMPP server - see <a href="">here</a>.</div>""",
                             "type": bool,
                             "defaultValue": False,
                             "editable": True,
                             "visible": True})
-#    ("joinWebClient", {"description": _("Show a link to join a chat room through our web client"),
+#    ("joinWebClient", {"description": "Show a link to join a chat room through our web client",
 #                            "type": bool,
 #                            "defaultValue": True,
 #                            "editable": True,

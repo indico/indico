@@ -137,6 +137,9 @@ def handler(req, **params):
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
+    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+    if minfo.getRoomBookingModuleActive():
+        Factory.getDALManager().connect()
 
     mode = path.split('/')[1]
 
@@ -209,9 +212,13 @@ def handler(req, **params):
             # Commit only if there was an API key and no error
             for _retry in xrange(10):
                 dbi.sync()
+                if minfo.getRoomBookingModuleActive():
+                    Factory.getDALManager().sync()
                 normPath, normQuery = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
                 ak.used(_get_remote_ip(req), normPath, normQuery, not onlyPublic)
                 try:
+                    if minfo.getRoomBookingModuleActive():
+                        Factory.getDALManager().disconnect()
                     dbi.endRequest(True)
                 except ConflictError:
                     pass # retry
@@ -220,6 +227,9 @@ def handler(req, **params):
         else:
             # No need to commit stuff if we didn't use an API key
             # (nothing was written)
+            if minfo.getRoomBookingModuleActive():
+                Factory.getDALManager().rollback()
+                Factory.getDALManager().disconnect()
             dbi.endRequest(False)
 
         # Log successful POST api requests

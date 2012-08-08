@@ -1115,10 +1115,11 @@ class MoveEntryBase(ScheduleOperation):
                 # Moving inside a session
                 session = self._conf.getSessionById(sessionId)
 
-                if session.getScheduleType() == "poster" and isinstance(self._schEntry, BreakTimeSchEntry):
-                    raise NoReportError(_("It is not possible to move a break inside a poster session"))
-
                 if session is not None:
+
+                    if session.getScheduleType() == "poster" and isinstance(self._schEntry, BreakTimeSchEntry):
+                        raise NoReportError(_("It is not possible to move a break inside a poster session"))
+
                     slot = session.getSlotById(sessionSlotId)
                     if slot is not None:
                         fossilizedDataSession = session.fossilize(ISessionFossil, tz=self._conf.getTimezone())
@@ -1141,9 +1142,9 @@ class MoveEntryBase(ScheduleOperation):
                         slot.getSchedule().addEntry(self._schEntry, check=2)
                         fossilizedDataSlotSchEntry = slot.getConfSchEntry().fossilize(entriesFossilsDict, tz=self._conf.getTimezone())
                     else:
-                        raise ServiceError("ERR-S3","Invalid slot ID")
+                        raise NoReportError(_("It seems that the session slot has been deleted, please refresh the page"))
                 else:
-                    raise ServiceError("ERR-S4","Invalid session ID")
+                    raise NoReportError(_("It seems that the session has been deleted, please refresh the page"))
             else:
                 # Moving inside the top-level timetable
 

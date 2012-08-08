@@ -23,7 +23,7 @@ from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
     RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHSubContributionBase
 from MaKaC.common import Config
-from MaKaC.errors import ModificationError
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 
 
@@ -63,5 +63,5 @@ class RHSubContributionToMarcXML(RHSubContributionDisplayBase):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
         return data

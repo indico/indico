@@ -37,6 +37,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.errors import MaKaCError
 from MaKaC.conference import LocalFile
 import MaKaC.webinterface.displayMgr as displayMgr
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 
 class RHElectronicAgreement(RHConfModifCSBookings):
@@ -129,7 +130,7 @@ class RHElectronicAgreementGetFile(RHConferenceBaseDisplay):
                     dispos = "attachment"
             except KeyError:
                 pass
-            self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self.file.getFileName())
+            self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, cleanHTMLHeaderFilename(self.file.getFileName()))
 
             if cfg.getUseXSendFile():
                 # X-Send-File support makes it easier, just let the web server

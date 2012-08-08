@@ -52,3 +52,7 @@ form.EAChoiceButton{
 .speakerLine.selected:hover {
     background: #CDEB8B;
 }
+
+.grey {
+    color: #aaa;
+}

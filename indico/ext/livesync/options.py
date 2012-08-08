@@ -19,7 +19,7 @@
 from MaKaC.i18n import _
 
 globalOptions = [
-    ("excludedCategories", {"description": _("Excluded categories"),
+    ("excludedCategories", {"description": "Excluded categories",
                             "type": list,
                             "defaultValue": []} )
     ]

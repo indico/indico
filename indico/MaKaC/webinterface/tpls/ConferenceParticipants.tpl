@@ -244,7 +244,7 @@ IndicoUI.executeOnLoad(function(){
             });
             var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()},
                                                    method, participantsChecked, "${currentUser.getStraightFullName()}",
-                                                   null, null, legends, function() {
+                                                   "", null, legends, function() {
                                                        (new AlertPopup($T("E-mail sent"), $T('An e-mail has been sent to: ') + \
                                                                        "<em>" + _.values(participantsChecked).join("</em>, <em>") + "</em>.")).open();
                                                        deselectAll();

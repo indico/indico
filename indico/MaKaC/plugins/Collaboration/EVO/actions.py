@@ -23,25 +23,25 @@ from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEV
 from MaKaC.i18n import _
 
 pluginActions = [
-    ("reloadCommunityList", {"buttonText": _("Reload Community List"),
+    ("reloadCommunityList", {"buttonText": "Reload Community List",
                             "associatedOption": "communityList"} )
 ]
 
 class ReloadCommunityListAction(ActionBase):
-    
+
     def call(self):
 
         try:
             answer = getEVOAnswer("reloadCommunityList")
         except EVOControlledException, e:
             raise EVOException('Error when parsing list of communities. Message from EVO Server: "' + e.message + '".')
-        
+
         try:
             communityStringList = answer.split('&&')
             communities = {}
-            
+
             ignoredCommunities = getEVOOptionValueByName("ingnoredCommunities")
-            
+
             for communityString in communityStringList:
                 id, name = communityString.split(',')
                 id = id.strip()
@@ -49,9 +49,9 @@ class ReloadCommunityListAction(ActionBase):
                 if id not in ignoredCommunities:
                     communities[id] = name
             self._plugin.getOption("communityList").setValue(communities)
-            
+
         except Exception, e:
             raise EVOException('Error when parsing list of communities. Message from EVO Server: "' + answer + '". Exception ocurred: ' + str(e))
-            
 
-                 
+
+
