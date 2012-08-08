@@ -208,12 +208,3 @@ class Conversion(object):
             name = categ.getTitle()
         return {'id': id,
                 'name': name}
-
-#    @classmethod
-#    def resourceType(cls, obj):
-#
-#        from MaKaC.conference import Link
-#        if type(obj) == Link:
-#            return 'external'
-#        else:
-#            return 'stored'

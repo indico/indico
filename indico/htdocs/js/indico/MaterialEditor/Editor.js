@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+var CONVERSION_POLL_INTERVAL = 10000;
+
+
 function updateMaterialList(oldList, newList) {
     oldList.length = 0;
 
@@ -75,11 +78,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
         var self = this;
         return [
             [$T("Create Resource"), function() {
-                if (self._upload() && self.addMaterialMode) {
-                    setTimeout(function(){
-                        window.location.reload(true);
-                    }, 2000);
-                }
+                self._upload();
             }],
             [$T("Cancel"), function() {
                 self.close();
@@ -140,7 +139,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                             );
                     $(pdfDivLabel.dom).qtip({
                         content: {
-                            text: $T("The only available file formats are: ") + self.availablePDFConversions.toString().replace(/\./g,' ')
+                            text: $T("The only available file formats are: ") + Indico.AvailablePDFConversions.toString().replace(/\./g,' ')
                         },
                         position: {
                             target: 'mouse',
@@ -593,7 +592,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
     }
 
 
-}, function(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode, availablePDFConversions) {
+}, function(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode) {
     this.AddEditMaterialDialog();
     var self = this;
     this.list = list;
@@ -603,9 +602,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
     this.onUpload = onUpload;
     this.forReviewing = forReviewing;
     this.addMaterialMode = addMaterialMode;
-    this.availablePDFConversions = availablePDFConversions;
     this.args = clone(args);
-//    this.args.materialId = material;
 
     this.protectionStatus = $O();
     this.uploadType = new WatchValue();
@@ -1301,6 +1298,7 @@ type("ResourceListWidget", ["ListWidget"], {
             setMain = IndicoUI.Buttons.starButton(true);
             setMain.dom.title = '';
 
+            // show the helper popups only for real files (not for 'converting to PDF' file)
             if (resource.get('type') != 'converting') {
                 removeButton.dom.onmouseover = modifyDisabledHelpPopup;
                 editButton.dom.onmouseover = modifyDisabledHelpPopup;
@@ -1329,7 +1327,7 @@ type("ResourceListWidget", ["ListWidget"], {
             var fileData = storedDataInfo(resource.get('file'));
             resourceNode = Widget.block(concat([IndicoUI.Buttons.arrowExpandIcon(fileData)], information));
             resourceNode.append(fileData);
-        } else {
+        } else if (resource.get('type') == 'converting') {
             resourceNode = Html.div({}, Html.img({src:imageSrc("collapsd.png")}), information);
             $(resourceNode.dom).qtip({
                     content: {
@@ -1340,7 +1338,10 @@ type("ResourceListWidget", ["ListWidget"], {
                         adjust: { mouse: true, x: 11, y: 13 }
                     }
                 });
+        } else { // it is a link
+            resourceNode = Html.div({style:{paddingLeft: '12px'}}, information);
         }
+
         if (resource.get('pdfConversionStatus') == 'converting') {
             var counter = 0;
             (function conversionWorker() {
@@ -1349,6 +1350,7 @@ type("ResourceListWidget", ["ListWidget"], {
                         resParams,
                         function(response,error) {
                             if (response) {
+                                // We suppose that the PDF file is not converted yet and so we gray it out.
                                 if (counter == 0) {
                                     var convertingResource = clone(resource);
                                     convertingResource.url = '';
@@ -1357,6 +1359,7 @@ type("ResourceListWidget", ["ListWidget"], {
                                     convertingResource.type = 'converting';
                                     self.resources.append(watchize(convertingResource));
                                 }
+                                // Now we check if the file is converted and if so, we show the PDF and stop the 'setTimetout'
                                 for (var value in response.resources) {
                                     if (response.resources[value].name == resource.get('name').split('.')[0] + '.pdf') {
                                         self.set(resourceId + 'converting', null);
@@ -1364,8 +1367,8 @@ type("ResourceListWidget", ["ListWidget"], {
                                         return;
                                     }
                                 }
-                                if (counter < 6) {
-                                    setTimeout(conversionWorker, 10000);
+                                if (counter < 6) { // poll up to a maximum of 6 times if the PDF is already converted
+                                    setTimeout(conversionWorker, CONVERSION_POLL_INTERVAL);
                                     counter++;
                                 }
                              }
@@ -1599,26 +1602,20 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
             self.set(key, obj);
         });
 
-        if (self.addMaterialMode) {
+        var openAddMaterialDialog = function(onUpdate) {
             IndicoUI.Dialogs.Material.add(self.args,
                     self,
                     self.types,
                     self.uploadAction,
-                    self.makeMaterialLoadFunction(),
+                    onUpdate,
                     false,
-                    self.addMaterialMode,
-                    self.availablePDFConversions);
+                    self.addMaterialMode);
+        };
+
+        if (self.addMaterialMode) {
+            openAddMaterialDialog(function(param) {window.location.reload(true);});
         }
-        var link = Widget.link(command(function(){
-            IndicoUI.Dialogs.Material.add(self.args,
-                                          self,
-                                          self.types,
-                                          self.uploadAction,
-                                          self.makeMaterialLoadFunction(),
-                                          false,
-                                          self.addMaterialMode,
-                                          self.availablePDFConversions);
-        }, $T("Add Material")));
+        var link = Widget.link(command(function(){openAddMaterialDialog(self.makeMaterialLoadFunction());}, $T("Add Material")));
 
 
         return Html.div(
@@ -1630,7 +1627,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
     }
 },
 
-     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify, addMaterialMode, availablePDFConversions) {
+     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify, addMaterialMode) {
          var self = this;
          this.width = width;
          this.height = height;
@@ -1643,7 +1640,6 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          }
          this.canReviewModify = any(canReviewModify, false);
          this.addMaterialMode = addMaterialMode;
-         this.availablePDFConversions = availablePDFConversions;
          this.RemoteWidget(listMethod, args);
          this.args.materialIdsList = $O();
          this.showMainResources = showMainResources || false;
@@ -1671,8 +1667,7 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
                                                   self.uploadAction,
                                                   self.makeMaterialLoadFunction(),
                                                   true,
-                                                  self.addMaterialMode,
-                                                  self.availablePDFConversions);
+                                                  self.addMaterialMode);
                 }, $T("Upload paper")));
         var visibility = "hidden";
         if(self.canReviewModify){
@@ -1779,7 +1774,7 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
             }
         });
 
-        var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height, null, null, null, this.addMaterialMode, this.availablePDFConversions);
+        var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height, null, null, null, this.addMaterialMode);
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(
             this,
@@ -1790,7 +1785,7 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
     }
 },
 
-     function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh, addMaterialMode, availablePDFConversions) {
+     function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh, addMaterialMode) {
          this.confId = confId;
          this.sessId = sessId;
          this.contId = contId;
@@ -1801,15 +1796,59 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
          this.height = height;
          this.refresh = refresh;
          this.addMaterialMode = addMaterialMode;
-         this.availablePDFConversions = availablePDFConversions;
          this.parentProtected = parentProtected;
          this.ExclusivePopupWithButtons(title);
      });
 
+type("MaterialConversionHelper", [], {
+
+    setQtip: function(file) {
+        $("img#"+file['id']).parent().qtip({
+            content: {
+                text: format($T('Indico is currently performing the conversion to PDF of the file:<br>{fileName}<br>The conversion may take a few seconds.'),
+                        {fileName: file['name']}),
+            },
+            position: {
+                target: 'mouse',
+                adjust: { mouse: true, x: 11, y: 13 },
+            }
+        });
+    },
+
+    poll: function(file, params, pdfImgURL) {
+        var endTime = new Date();
+        endTime.setDate(endTime.getDate() + 60);
+        (function conversionWorker() {
+            jsonRpc(Indico.Urls.JsonRpcService,
+                    'material.resources.list',
+                    params,
+                    function(response,error) {
+                        if (response) {
+                            for (var value in response){
+                                if (response[value].name == file['name'].split('.')[0] + '.pdf') {
+                                    var convertedImg = $("img#"+file['id']);
+                                    $(convertedImg).parent().qtip('destroy');
+                                    $(convertedImg).parent().attr('href',response[value].url);
+                                    $(convertedImg).parent().attr('title',response[value].name);
+                                    $(convertedImg).attr('src', pdfImgURL);
+                                    return;
+                                }
+                            }
+                            if (new Date() < endTime) {
+                                setTimeout(conversionWorker, CONVERSION_POLL_INTERVAL);
+                            }
+                        }
+                    });
+            })();
+    }
+
+},
+function() {});
+
 IndicoUI.Dialogs.Material = {
 
-    add: function(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode, availablePDFConversions) {
-        var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode, availablePDFConversions);
+    add: function(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode) {
+        var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode);
         dialog.open();
     },
 
@@ -1824,8 +1863,8 @@ IndicoUI.Dialogs.Material = {
         dialog.execute();
     },
 
-    editor: function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh, addMaterialMode, availablePDFConversions) {
-        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh, addMaterialMode, availablePDFConversions);
+    editor: function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh, addMaterialMode) {
+        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh, addMaterialMode);
         dialog.open();
         if (addMaterialMode) {
             dialog.close();

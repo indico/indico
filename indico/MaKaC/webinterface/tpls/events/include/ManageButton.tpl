@@ -85,7 +85,7 @@
         % if 'materialLink' in info:
             'addMaterial': {action: function(m) {
                 IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
-                    ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, true, ${availablePDFConversions});
+                    ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, true);
                 m.close();
                 return false;}, display: $T('Add material')},
             % if getItemType(item) == 'Conference' and item.getConference().getAllMaterialList() or \
@@ -94,7 +94,7 @@
             getItemType(item) == 'Session' and item.getSession().getAllMaterialList():
                 'editMaterial': {action: function(m) {
                      IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
-                         ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, false, ${availablePDFConversions});
+                         ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, false);
                      m.close();
                      return false;}, display: $T('Edit material')}
             % endif

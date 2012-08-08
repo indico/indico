@@ -84,8 +84,6 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
-from MaKaC.export import fileConverter
-
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -1132,7 +1130,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                 processedFiles.append(res.getFileName())
             except:
                 filename, fileType, fileURL = str(res.getURL()), "link", str(res.getURL())
-            files.append({'id' : res.getId(), 'name' : filename, 'type' : fileType, 'url' : fileURL, "pdfConversionStatus" : res.getPDFConversionStatus()})
+            files.append({'id' : res.getId(), 'name' : filename, 'type' : fileType, 'url' : str(fileURL), "pdfConversionStatus" : res.getPDFConversionStatus()})
         return files
 
     def _getItemType(self, item):
@@ -1329,7 +1327,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             vars['getItemType'] = lambda item : self._getItemType(item)
             vars['getLocationInfo'] = MaKaC.common.utils.getLocationInfo
             vars['dumps'] = json.dumps
-            vars['availablePDFConversions'] = fileConverter.CDSConvFileConverter.getAvailableConversions()
         else:
             outGen = outputGenerator(self._rh._aw)
             varsForGenerator = self._getBodyVariables()

@@ -5,6 +5,7 @@
 <% from MaKaC.rb_location import Location %>
 <% import simplejson %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
+<% from MaKaC.export import fileConverter %>
 <%
 config = Config.getInstance()
 authenticators = filter(lambda x: x.id != 'Local', AuthenticatorMgr().getList())
@@ -167,5 +168,8 @@ var Indico = {
     FileRestrictions: {
         MaxUploadFilesTotalSize: ${ config.getMaxUploadFilesTotalSize() },
         MaxUploadFileSize: ${ config.getMaxUploadFileSize() }
-    }
+    },
+
+    AvailablePDFConversions: ${fileConverter.CDSConvFileConverter.getAvailableConversions()}
+
 };
