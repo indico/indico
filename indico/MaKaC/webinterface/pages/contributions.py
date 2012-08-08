@@ -480,7 +480,7 @@ class WContribModifMain(wcomponents.WTemplated):
             partFossil = fossilize(part)
             # var to control if we have to show the entry in the author menu to allow add submission rights
             isSubmitter = False
-            av = AvatarHolder().match({"email": part.getEmail()}, forceWithoutExtAuth=True, exact=True)
+            av = AvatarHolder().match({"email": part.getEmail()}, searchInAuthenticators=False, exact=True)
             if not av:
                 if part.getEmail() in self._contrib.getSubmitterEmailList():
                     isSubmitter = True

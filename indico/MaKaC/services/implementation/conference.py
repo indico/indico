@@ -58,6 +58,7 @@ from MaKaC.services.implementation.base import ProtectedModificationService, Lis
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, Warning, \
         ResultWithWarning, TimingNoReportError, NoReportError
 
+
 # indico imports
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
@@ -912,7 +913,7 @@ class ConferenceAddParticipant(ConferenceModifBase, ConferenceAddEditParticipant
 
     def _getAnswer(self):
         eventManager = self._getUser()
-        av = AvatarHolder().match({"email": self._email.strip()}, exact=1, forceWithoutExtAuth=False)
+        av = AvatarHolder().match({"email": self._email.strip()}, exact=1, searchInAuthenticators=True)
         participation = self._conf.getParticipation()
         if av != None and av != []:
             participant = self._generateParticipant(av[0])
@@ -1320,7 +1321,7 @@ class ConferenceChairPersonBase(ConferenceModifBase):
         result = fossilize(self._conf.getChairList())
         for chair in result:
             av = AvatarHolder().match({"email": chair['email']},
-                                  forceWithoutExtAuth=True, exact=True)
+                                  searchInAuthenticators=False, exact=True)
             chair['showSubmitterCB'] = True
             if not av:
                 if self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(chair['email']):
@@ -1397,7 +1398,7 @@ class ConferenceAddNewChairPerson(ConferenceChairPersonBase):
         self._conf.addChair(chair)
         #If the chairperson needs to be given management rights
         if self._userData.get("manager", None):
-            avl = AvatarHolder().match({"email": self._userData.get("email", "")}, exact=True, forceWithoutExtAuth=True)
+            avl = AvatarHolder().match({"email": self._userData.get("email", "")}, exact=True, searchInAuthenticators=False)
             if avl:
                 av = avl[0]
                 self._conf.grantModification(av)
@@ -1460,7 +1461,7 @@ class ConferenceEditChairPerson(ConferenceChairPersonBase):
         #If the chairperson needs to be given management rights
         if self._userData.get("manager", None):
             avl = AvatarHolder().match({"email": self._userData.get("email", "")},
-                                       forceWithoutExtAuth=True, exact=True)
+                                       searchInAuthenticators=False, exact=True)
             if avl:
                 av = avl[0]
                 self._conf.grantModification(av)

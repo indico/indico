@@ -1144,7 +1144,7 @@ class WBrowseUsers(wcomponents.WTemplated):
         if self._letter != None:
             ah = user.AvatarHolder()
             if self._letter != "all":
-                res = ah.matchFirstLetter(self._browseIndex, self._letter, onlyActivated=False, forceWithoutExtAuth=False)
+                res = ah.matchFirstLetter(self._browseIndex, self._letter, onlyActivated=False, searchInAuthenticators=True)
             else:
                 res = ah.getValuesToList()
             if self._browseIndex == "surName" or self._browseIndex == "status":
@@ -1221,7 +1221,7 @@ class WUserList(wcomponents.WTemplated):
             criteria["organisation"] == "*":
             res = ah.getValuesToList()
         else:
-            res = ah.match(criteria, onlyActivated=self._onlyActivated, forceWithoutExtAuth=True)
+            res = ah.match(criteria, onlyActivated=self._onlyActivated, searchInAuthenticators=False)
         res.sort(utils.sortUsersByName)
 
         return res
@@ -1722,7 +1722,7 @@ class WBrowseGroups( wcomponents.WTemplated ):
         res = []
         if self._letter != None:
             if self._letter != "all":
-                res = gh.matchFirstLetter(self._letter, forceWithoutExtAuth=False)
+                res = gh.matchFirstLetter(self._letter, searchInAuthenticators=True)
             else:
                 res = gh.getValuesToList()
             res.sort(utils.sortGroupsByName)
@@ -1736,7 +1736,7 @@ class WGroupList(wcomponents.WTemplated):
 
     def _performSearch( self, criteria ):
         gh = user.GroupHolder()
-        res = gh.match(criteria,forceWithoutExtAuth=True)
+        res = gh.match(criteria,searchInAuthenticators=False)
         return res
 
     def getVars( self ):

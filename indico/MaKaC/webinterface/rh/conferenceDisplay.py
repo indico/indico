@@ -204,7 +204,7 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
         if save:
             #Data are OK, Now check if there is an existing user or create a new one
             ah = user.AvatarHolder()
-            res =  ah.match({"email": self._params["email"]}, exact=1, forceWithoutExtAuth=True)
+            res =  ah.match({"email": self._params["email"]}, exact=1, searchInAuthenticators=False)
             if res:
                 #we find a user with the same email
                 a = res[0]

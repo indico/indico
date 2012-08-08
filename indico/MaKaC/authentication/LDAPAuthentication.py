@@ -103,7 +103,7 @@ class LDAPAuthenticator(Authenthicator):
         # Search if user already exist, using email address
         import MaKaC.user as user
         ah = user.AvatarHolder()
-        userList = ah.match({"email": data["mail"]}, forceWithoutExtAuth=True)
+        userList = ah.match({"email": data["mail"]}, searchInAuthenticators=False)
         if len(userList) == 0:
             # User doesn't exist, create it
             try:

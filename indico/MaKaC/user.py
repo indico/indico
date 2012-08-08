@@ -264,7 +264,7 @@ class CERNGroup(Group):
         avatarLists = []
         for email in emailList:
             # First, try localy (fast)
-            lst = AvatarHolder().match( { 'email': email }, exact = 1, forceWithoutExtAuth = True )
+            lst = AvatarHolder().match( { 'email': email }, exact = 1, searchInAuthenticators = False )
             if not lst:
                 # If not found, try with NICE web service (can found anyone)
                 lst = AvatarHolder().match( { 'email': email }, exact =1 )
@@ -380,7 +380,7 @@ class LDAPGroup(Group):
         for uid in uidList:
             # First, try locally (fast)
             lst = AvatarHolder().match({'login': uid }, exact=1,
-                                       forceWithoutExtAuth=True)
+                                       searchInAuthenticators=False)
             if not lst:
                 # If not found, try external
                 lst = AvatarHolder().match({'login': uid}, exact=1)
@@ -438,7 +438,7 @@ class GroupHolder(ObjectHolder):
     def getLength( self ):
         return self.getIndex().getLength()
 
-    def matchFirstLetter( self, letter, forceWithoutExtAuth=False ):
+    def matchFirstLetter( self, letter, searchInAuthenticators=True ):
         result = []
         index = self.getIndex()
         match = index.matchFirstLetter( letter )
@@ -448,21 +448,21 @@ class GroupHolder(ObjectHolder):
                     if self.getById(groupid) not in result:
                         gr=self.getById(groupid)
                         result.append(gr)
-        if not forceWithoutExtAuth:
+        if searchInAuthenticators:
             #TODO: check all authenticators
             pass
         return result
 
-    def match(self,criteria,forceWithoutExtAuth=False, exact=False):
+    def match(self,criteria,searchInAuthenticators=True, exact=False):
         crit={}
         result = []
         for f,v in criteria.items():
             crit[f]=[v]
         if crit.has_key("groupname"):
             crit["name"] = crit["groupname"]
-        if "Nice" in Config.getInstance().getAuthenticatorList() and not forceWithoutExtAuth:
+        if "Nice" in Config.getInstance().getAuthenticatorList() and searchInAuthenticators:
             self.updateCERNGroupMatch(crit["name"][0],exact)
-        if "LDAP" in Config.getInstance().getAuthenticatorList() and not forceWithoutExtAuth:
+        if "LDAP" in Config.getInstance().getAuthenticatorList() and searchInAuthenticators:
             self.updateLDAPGroupMatch(crit["name"][0],exact)
         match = self.getIndex().matchGroup(crit["name"][0], exact=exact)
 
@@ -1195,7 +1195,7 @@ class Avatar(Persistent, Fossilizable):
             # there shouldn't be uppercase letters
             groups.append(GroupHolder().getById(simbaListName))
         except KeyError:
-            groups = GroupHolder().match( { 'name': simbaListName }, forceWithoutExtAuth = True, exact=True)
+            groups = GroupHolder().match( { 'name': simbaListName }, searchInAuthenticators = False, exact=True)
             if not groups:
                 groups = GroupHolder().match( { 'name': simbaListName }, exact=True)
 
@@ -1350,7 +1350,7 @@ class AvatarHolder( ObjectHolder ):
     counterName = "PRINCIPAL"
     _indexes = [ "email", "name", "surName","organisation", "status" ]
 
-    def matchFirstLetter( self, index, letter, onlyActivated=True, forceWithoutExtAuth=False ):
+    def matchFirstLetter( self, index, letter, onlyActivated=True, searchInAuthenticators=True ):
         result = {}
         if index not in self._indexes:
             return None
@@ -1361,17 +1361,17 @@ class AvatarHolder( ObjectHolder ):
                     av=self.getById(userid)
                     if not onlyActivated or av.isActivated():
                         result[av.getEmail()]=av
-        if not forceWithoutExtAuth:
+        if searchInAuthenticators:
             #TODO: check all authenticators
             pass
         return result.values()
 
-    def match(self, criteria, exact=0, onlyActivated=True, forceWithoutExtAuth=False):
+    def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
         # for external requests, attemp caching
         # this is a simple request-level cache that should be replaced
         # by an appropriate one when the auth system is re-done
-        cache_result = not forceWithoutExtAuth
-        if not forceWithoutExtAuth:
+        cache_result = searchInAuthenticators
+        if searchInAuthenticators:
             cache = ContextManager.setdefault('external_user_cache', {})
             key = order_dict(criteria)
             if key in cache:
@@ -1391,7 +1391,7 @@ class AvatarHolder( ObjectHolder ):
             av=self.getById(userid)
             if not onlyActivated or av.isActivated():
                 result[av.getEmail()]=av
-        if not forceWithoutExtAuth:
+        if searchInAuthenticators:
             for authenticator in AuthenticatorMgr.getInstance().getList():
                 dict = authenticator.matchUser(criteria, exact=exact)
                 if dict:
@@ -1399,7 +1399,7 @@ class AvatarHolder( ObjectHolder ):
                         # TODO and TOSTUDY: result.keys should be replace it with
                         # l=[]; for av in result.values(): l.append(av.getAllEmails())
                         if not email in result.keys():
-                            if not self.match({'email': email}, exact=1, forceWithoutExtAuth=True):
+                            if not self.match({'email': email}, exact=1, searchInAuthenticators=False):
                                 av = Avatar(dict[email])
                                 av.setId(dict[email]["id"])
                                 av.status = dict[email]["status"]
@@ -1410,7 +1410,7 @@ class AvatarHolder( ObjectHolder ):
                                     #     av = auth.getById(dict[email]["login"]).getUser()
                                     result[email] = av
                             else:
-                                av = self.match({'email': email}, exact=1, forceWithoutExtAuth=True)[0]
+                                av = self.match({'email': email}, exact=1, searchInAuthenticators=False)[0]
                                 if self._userMatchCriteria(av, criteria, exact):
                                     result[av.getEmail()] = av
         if cache_result:
@@ -1476,7 +1476,7 @@ class AvatarHolder( ObjectHolder ):
             authId, extId = id.split(":")
         except:
             return None
-        av = self.match({"email":extId}, forceWithoutExtAuth=True)
+        av = self.match({"email":extId}, searchInAuthenticators=False)
         if av:
             return av[0]
         dict = AuthenticatorMgr.getInstance().getById(authId).searchUserById(extId)
@@ -1484,12 +1484,7 @@ class AvatarHolder( ObjectHolder ):
         identity = dict["identity"](dict["login"], av)
         dict["authenticator"].add(identity)
         av.activateAccount()
-
-        #try:
         self.add(av)
-
-        #except:
-        #    av = self.match({'email': av.getEmail()}, exact=1, forceWithoutExtAuth=True)[0]
         return av
 
 
@@ -1499,7 +1494,7 @@ class AvatarHolder( ObjectHolder ):
         """
         if av.getEmail() is None or av.getEmail()=="":
             raise UserError( _("User not created. You must enter an email address"))
-        emailmatch = self.match({'email': av.getEmail()}, exact=1, forceWithoutExtAuth=True)
+        emailmatch = self.match({'email': av.getEmail()}, exact=1, searchInAuthenticators=False)
         if emailmatch != None and len(emailmatch) > 0 and emailmatch[0] != '':
             raise UserError( _("User not created. The email address %s is already used.")% av.getEmail())
         id = ObjectHolder.add(self,av)

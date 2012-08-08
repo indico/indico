@@ -65,7 +65,7 @@ class NiceAuthenticator(Authenthicator):
         # Search if user already exist, using email address
         import MaKaC.user as user
         ah = user.AvatarHolder()
-        userList = ah.match({"email":data["mail"]}, forceWithoutExtAuth=True)
+        userList = ah.match({"email":data["mail"]}, searchInAuthenticators=False)
         if len(userList) == 0:
             # User doesn't exist, create it
             try:
@@ -106,7 +106,7 @@ class NiceAuthenticator(Authenthicator):
                 personId = None
             from MaKaC.user import AvatarHolder
             ah = AvatarHolder()
-            av = ah.match({"email":email},exact=1, onlyActivated=False, forceWithoutExtAuth=True)
+            av = ah.match({"email":email},exact=1, onlyActivated=False, searchInAuthenticators=False)
             if av:
                 av = av[0]
                 # don't allow disabled accounts

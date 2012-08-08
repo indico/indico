@@ -125,7 +125,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
         managers = set([self.getResponsible()])
         if self.customAtts.get('Simba List'):
             groups = GroupHolder().match({'name': self.customAtts['Simba List']},
-                                         exact=True, forceWithoutExtAuth=True)
+                                         exact=True, searchInAuthenticators=False)
             if not groups:
                 groups = GroupHolder().match({'name': self.customAtts['Simba List']}, exact=True)
             if groups and len(groups) == 1:
@@ -155,7 +155,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
         listName = self.customAtts.get( 'Simba List' )
         if listName:
             from MaKaC.user import GroupHolder
-            groups = GroupHolder().match( { 'name': listName }, forceWithoutExtAuth = True )
+            groups = GroupHolder().match( { 'name': listName }, searchInAuthenticators = False )
             if not groups:
                 groups = GroupHolder().match( { 'name': listName } )
             if not groups:

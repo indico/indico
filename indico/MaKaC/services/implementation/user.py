@@ -418,7 +418,7 @@ class UserSetPersonalData(UserPersonalDataBase):
             elif self._dataType == "email":
                 # Check if there is any user with this email address
                 if self._value != self._avatar.getEmail():
-                    other = user.AvatarHolder().match({"email": self._value}, forceWithoutExtAuth=True)
+                    other = user.AvatarHolder().match({"email": self._value}, searchInAuthenticators=False)
                     if other and other[0] != self._avatar:
                         raise NoReportError(_("The email address %s is already used by another user.") % self._value)
                 email = idxs.getById("email")
@@ -431,7 +431,7 @@ class UserSetPersonalData(UserPersonalDataBase):
                 # check if every secondary email is valid
                 for email in emailList:
                     if email != "":
-                        av = user.AvatarHolder().match({"email": email}, forceWithoutExtAuth=True)
+                        av = user.AvatarHolder().match({"email": email}, searchInAuthenticators=False)
                         if av and av[0] != self._avatar:
                             raise NoReportError(_("The email address %s is already used by another user.") % email)
                         else:

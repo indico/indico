@@ -1604,7 +1604,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         result = fossilize(self._conf.getChairList())
         for chair in result:
             av = AvatarHolder().match({"email": chair['email']},
-                                  forceWithoutExtAuth=True, exact=True)
+                                  searchInAuthenticators=False, exact=True)
             chair['showManagerCB'] = True
             chair['showSubmitterCB'] = True
             if not av:

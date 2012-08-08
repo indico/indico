@@ -30,7 +30,7 @@ def searchUsers(surName="", name="", organisation="", email="", conferenceId=Non
             "email": email
         }
         # search users
-        people = AvatarHolder().match(criteria, exact=exactMatch, forceWithoutExtAuth=(not searchExt))
+        people = AvatarHolder().match(criteria, exact=exactMatch, searchInAuthenticators=searchExt)
         # search authors
         if conferenceId != None:
             try:
@@ -61,7 +61,7 @@ def searchGroups(group="", searchExt=False):
             "name": group
         }
         # search not obsolete groups
-        groups = [ group for group in GroupHolder().match(criteria, forceWithoutExtAuth=(not searchExt)) if not group.isObsolete()]
+        groups = [ group for group in GroupHolder().match(criteria, searchInAuthenticators=searchExt) if not group.isObsolete()]
         return groups
     else:
         return []

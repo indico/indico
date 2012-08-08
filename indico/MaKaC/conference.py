@@ -9488,7 +9488,7 @@ class Contribution(CommonObjectBase, Locatable):
         """
         if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
             ah = AvatarHolder()
-            results=ah.match({"email":sb.getEmail()}, exact=1, forceWithoutExtAuth=True)
+            results=ah.match({"email":sb.getEmail()}, exact=1, searchInAuthenticators=False)
             if not results:
                 results=ah.match({"email":sb.getEmail()}, exact=1)
             r=None
