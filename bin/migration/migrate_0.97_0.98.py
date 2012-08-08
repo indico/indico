@@ -455,6 +455,7 @@ def pluginOptionsRoomGUIDs(dbi, withRBDB, prevVersion):
                 newValue.append(str(room.guid))
         opt.setValue(newValue)
 
+
 @since('0.98.1')
 def slotLocationMigration(dbi, withRBDB, prevVersion):
     """
@@ -487,6 +488,15 @@ def slotLocationMigration(dbi, withRBDB, prevVersion):
         i+=1
     dbi.commit()
 
+
+@since('0.98.3')
+def collaborationRequestIndexCreate(dbi, withRBDB, prevVersion):
+    """
+    Creating new "All Requests" index
+    """
+    ci = IndexesHolder().getById('collaboration')
+    ci.indexAll(index_names=['All Requests'], dbi=dbi)
+    dbi.commit()
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
