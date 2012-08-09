@@ -17,6 +17,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from zope.interface import implements
+
 from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.i18n import _
@@ -37,8 +39,9 @@ from MaKaC.conference import Contribution, Session
 from indico.core.index import Catalog
 from MaKaC.plugins.Collaboration.Vidyo.indexes import IIndexableByVidyoRoom
 
+
 class CSBooking(CSBookingBase):
-    fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil, IIndexableByVidyoRoom)
+    implements(ICSBookingConfModifFossil, ICSBookingIndexingFossil, IIndexableByVidyoRoom)
 
     _hasTitle = True
     _hasStart = True

@@ -194,12 +194,16 @@ class BookingsByVidyoRoomIndex(SIndex):
         """ Cleans the indexes, and then indexes all the vidyo bookings from all the conferences
             WARNING: obviously, this can potentially take a while
         """
+        i = 0
         self.clear()
         for conf in ConferenceHolder().getList():
             csbm = conf.getCSBookingManager()
             for booking in csbm.getBookingList():
                 if booking.getType() == "Vidyo":
                     self.indexBooking(booking)
+            i += 1
+            if dbi and i % 100 == 0:
+                dbi.commit()
 
     def dump(self):
         return [(k, [b for b in self.get(k)]) for k in self.__iter__()]
