@@ -59,7 +59,7 @@ import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.webinterface.common.slotDataWrapper import Slot
-from MaKaC.common.contribPacker import ZIPFileHandler,ContribPacker,ConferencePacker, ProceedingsPacker
+from MaKaC.common.contribPacker import ZIPFileHandler,AbstractPacker, ContribPacker,ConferencePacker, ProceedingsPacker
 from MaKaC.common.dvdCreation import DVDCreation
 from MaKaC.conference import ContributionParticipation, Contribution, CustomRoom
 from MaKaC.common import pendingQueues
@@ -2986,6 +2986,8 @@ class RHAbstractsActions:
             return RHAbstractManagmentAcceptMultiple(self._req).process(params)
         elif params.has_key("rejectMultiple"):
             return RHAbstractManagmentRejectMultiple(self._req).process(params)
+        elif params.has_key("PKGA"):
+            return RHMaterialPackageAbstract(self._req).process(params)
         return "no action to do"
 
 
@@ -5442,6 +5444,28 @@ class RHMoveContribsToSession(RHConferenceModifBase):
         p=conferences.WPModMoveContribsToSession(self,self._target)
         return p.display(contribIds=self._contribIds)
 
+class RHMaterialPackageAbstract(RHConferenceModifBase):
+    # Export a Zip file
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        abstractIds = self._normaliseListParam( params.get("abstracts", []) )
+        self._abstracts = []
+        for aID in abstractIds:
+            self._abstracts.append(self._conf.getAbstractMgr().getAbstractById(aID))
+
+    def _process( self ):
+        if not self._abstracts:
+            return FormValuesError(_("No abstract selected"))
+        p = AbstractPacker(self._conf)
+        path = p.pack(self._abstracts, ZIPFileHandler())
+        filename = "abstractFiles.zip"
+        cfg = Config.getInstance()
+        mimetype = cfg.getFileTypeMimeType( "ZIP" )
+        self._req.content_type = """%s"""%(mimetype)
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.sendfile(path)
+
 
 class RHMaterialPackage(RHConferenceModifBase):
 
@@ -5456,7 +5480,7 @@ class RHMaterialPackage(RHConferenceModifBase):
         if not self._contribs:
             return "No contribution selected"
         p=ContribPacker(self._conf)
-        path=p.pack(self._contribs,["paper","slides"],ZIPFileHandler())
+        path=p.pack(self._contribs,["paper","slides"], ZIPFileHandler())
         filename = "material.zip"
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ZIP" )

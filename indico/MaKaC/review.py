@@ -989,6 +989,7 @@ class AbstractMgr(Persistent):
     def recoverAbstract(self, abstract):
         self.addAbstract(abstract)
         abstract.recoverFromTrashCan()
+
     def getAbstractList(self):
         return self._abstracts.values()
 

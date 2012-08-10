@@ -66,6 +66,26 @@ class ZIPFileHandler:
     def getPath(self):
         return self._name
 
+class AbstractPacker:
+    """
+    """
+
+    def __init__(self,conf):
+        self._conf=conf
+
+    def _normalisePathItem(self,name):
+        return str(name).translate(string.maketrans("",""),"\\/")
+
+    def pack(self,absList,fileHandler):
+        if len(absList)<=0:
+            raise MaKaCError( _("no abstract to pack"))
+        for abstract in absList:
+            abstractDirName="abstract-%04d"%(int(abstract.getId()))
+            if abstract.getAttachments() is not None :
+                for res in abstract.getAttachments().values():
+                    fileHandler.add("%s/%s-%s"%(abstractDirName, res.getId(), res.getFileName()), res.getFilePath())
+        fileHandler.close()
+        return fileHandler.getPath()
 
 class ContribPacker:
     """
