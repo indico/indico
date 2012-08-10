@@ -1045,7 +1045,7 @@ class RHConfParticipantsInvitation(RHConferenceBaseDisplay):
         else:
             return conferences.WPConfModifParticipantsInvite( self, self._conf ).display(**params)
 
-class RHConferenceToiCal(RHConferenceBaseDisplay):
+class RHConferenceToiCal(RoomBookingDBMixin, RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
