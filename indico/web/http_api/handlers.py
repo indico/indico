@@ -42,6 +42,7 @@ from indico.web.wsgi import webinterface_handler_config as apache
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.util.network import _get_remote_ip
 from indico.util.contextManager import ContextManager
+from indico.modules.oauth import ACCESS_TOKEN_TTL
 from indico.modules.oauth.db import AccessTokenHolder
 
 # indico legacy imports
@@ -125,12 +126,15 @@ def checkAK(apiKey, signature, timestamp, path, query):
 
 def checkAT(atKey, signature, timestamp, path, query):
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+    now = time.time()
     apiMode = minfo.getAPIMode()
     ath = AccessTokenHolder()
     if not ath.hasKey(atKey):
         raise HTTPAPIError('Invalid Access Token Key', apache.HTTP_FORBIDDEN)
     at = ath.getById(atKey)
     # Signature validation
+    if now-at.getTimestamp() > ACCESS_TOKEN_TTL:
+        raise HTTPAPIError('Access Token has expired', apache.HTTP_UNAUTHORIZED)
     onlyPublic = False
     if signature:
         validateTokenSignature(at, minfo, signature, timestamp, path, query)

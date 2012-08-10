@@ -35,6 +35,8 @@ from MaKaC.rb_tools import Period
 from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
 from MaKaC.user import Group, Avatar
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
+from MaKaC.rb_room import RoomBase
+from MaKaC.common.logger import Logger
 from MaKaC.rb_location import Location, CrossLocationFactory, CrossLocationQueries
 from MaKaC.rb_tools import doesPeriodOverlap
 from MaKaC.authentication import AuthenticatorMgr
@@ -48,8 +50,7 @@ from indico.web.http_api.util import get_query_parameter
 from indico.util.fossilize import fossilize, IFossil
 from indico.util.fossilize.conversion import Conversion
 
-
-globalHTTPAPIHooks = ['RoomHook', 'ReservationHook', 'BookRoomHook']
+globalHTTPAPIHooks = ['RoomHook', 'RoomNameHook', 'ReservationHook', 'BookRoomHook']
 MAX_DATETIME = datetime(2099, 12, 31, 23, 59, 00)
 MIN_DATETIME = datetime(2000, 1, 1, 00, 00, 00)
 
@@ -58,9 +59,7 @@ def utcdate(datet):
     d = datet.astimezone(timezone('UTC'))
     return utc2server(d)
 
-
 class RoomBookingHook(HTTPAPIHook):
-    GUEST_ALLOWED = False
 
     def _getParams(self):
         super(RoomBookingHook, self)._getParams()
@@ -103,8 +102,43 @@ class RoomHook(RoomBookingHook):
         expInt = RoomFetcher(aw, self)
         return expInt.room(self._location, self._idList)
 
+    def _hasAccess(self, aw):
+        if self._detail == 'reservations':
+            return super(RoomNameHook, self)._hasAccess(aw)
+        return True
+        
+
+class RoomNameHook(RoomBookingHook):
+    TYPES = ('roomName', )
+    RE = r'(?P<location>[\w\s]+)/(?P<room_name>[\w\s\-]+)'
+    DEFAULT_DETAIL = 'rooms'
+    MAX_RECORDS = {
+        'rooms': 500,
+        'reservations': 10
+    }
+    SERIALIZER_TYPE_MAP = {
+        'RoomCERN': 'Room',
+        'ReservationCERN': 'Reservation'
+    }
+    VALID_FORMATS = ('json', 'jsonp', 'xml')
+
+    def _getParams(self):
+        super(RoomNameHook, self)._getParams()
+        self._location = self._pathParams['location']
+        self._room_name = self._pathParams['room_name']
+
+    def export_roomName(self, aw):
+        expInt = RoomFetcher(aw, self)
+        return expInt.search(self._location, self._room_name)
+
+    def _hasAccess(self, aw):
+        if self._detail == 'reservations':
+            return super(RoomNameHook, self)._hasAccess(aw)
+        return True
+
 
 class ReservationHook(RoomBookingHook):
+    GUEST_ALLOWED = False
     TYPES = ('reservation', )
     RE = r'(?P<loclist>[\w\s]+(?:-[\w\s]+)*)'
     DEFAULT_DETAIL = 'reservations'
@@ -238,6 +272,14 @@ class IRoomMetadataFossil(IFossil):
     def getAvailableVC(self):
         pass
     getAvailableVC.name = 'vcList'
+
+    def latitude(self):
+        """ Room latitude """
+        pass
+
+    def longitude(self):
+        """ Room longitude """
+        pass
 
 
 class IMinimalRoomMetadataFossil(IFossil):
@@ -409,6 +451,20 @@ class RoomFetcher(RoomBookingFetcher):
             yield obj
         Factory.getDALManager().rollback()
         Factory.getDALManager().disconnect()
+
+    def search(self, location, name):
+
+        Factory.getDALManager().connect()
+        rooms = CrossLocationQueries.getRooms(location=location)
+
+        def _search_rooms(name):
+            return (room for room in rooms if name in room.getFullName())
+
+        for obj in self._process(_search_rooms(name)):
+            yield obj
+        Factory.getDALManager().rollback()
+        Factory.getDALManager().disconnect()
+
 
 
 class ReservationFetcher(RoomBookingFetcher):

@@ -8,12 +8,12 @@
         <td class="titleCellTD">&nbsp;</td>
         <td class="contentCellTD">
             <div class="yellowButton loginButton">
-                <a href="${ returnURL }?user_id=${ user_id }&user_name=${ user_name }&third_party_app=${ third_party_app }&callback=${ callback }" id="acceptButton" name="accept">${ _("Allow")}</a>
+                <a href="${ returnURL }?user_id=${ user_id }&response=accept&third_party_app=${ third_party_app }&callback=${ callback }" id="acceptButton" name="accept">${ _("Allow")}</a>
             </div>
         </td>
         <td class="contentCellTD">
             <div class="yellowButton loginButton">
-                <a href="${ returnURL }?user_id=${ user_id }&user_name=&third_party_app=${ third_party_app }&callback=${ callback }" id="refuseButton" name="refuse">${ _("Refuse")}</a>
+                <a href="${ returnURL }?user_id=${ user_id }&response=refuse&third_party_app=${ third_party_app }&callback=${ callback }" id="refuseButton" name="refuse">${ _("Refuse")}</a>
             </div>
         </td>
     </tr>

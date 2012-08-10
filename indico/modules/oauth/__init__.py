@@ -4,6 +4,8 @@ from MaKaC.common.logger import Logger
 from zope.interface import Interface, implements
 from indico.core.extpoint.base import Component
 
+ACCESS_TOKEN_TTL = 10800 # 3 hours in seconds
+
 class IIndexableByUserId(Interface):
     pass
 

@@ -59,6 +59,7 @@ from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.rb_tools import Period, datespan
 from MaKaC.schedule import ScheduleToJson
+from MaKaC.common.logger import Logger
 from MaKaC.errors import NoReportError
 
 utc = pytz.timezone('UTC')
@@ -102,6 +103,7 @@ class HTTPAPIHook(object):
         path = urllib.unquote(path)
         hooks = itertools.chain(cls.HOOK_LIST, cls._getPluginHooks())
         for expCls in hooks:
+            Logger.get('HTTPAPIHook.parseRequest').info(expCls)
             m = expCls._matchPath(path)
             if m:
                 gd = m.groupdict()
@@ -439,6 +441,25 @@ class EventSearchHook(HTTPAPIHook):
             if event.canAccess(aw):
                 d.append({'id': id, 'title': event.getTitle(), 'startDate': event.getStartDate(), 'hasAnyProtection': event.hasAnyProtection()})
         return d
+
+
+@HTTPAPIHook.register
+class UserInfoHook(HTTPAPIHook):
+    TYPES = ('user',)
+    RE = r'(?P<user_id>[\d]+)'
+
+    def _getParams(self):
+        super(UserInfoHook, self)._getParams()
+        self._user_id = self._pathParams['user_id']
+
+
+    def export_user(self, aw):
+        user = aw.getUser()
+        if user:
+            if user.getId() == self._user_id:
+                return user.fossilize()
+            raise HTTPAPIError('You do not have access to that info', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('You need to be logged in.', apache.HTTP_FORBIDDEN)
 
 
 @HTTPAPIHook.register

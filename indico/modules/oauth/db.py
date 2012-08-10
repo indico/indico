@@ -74,13 +74,12 @@ class Token(Persistent):
 
     implements(IUniqueIdProvider, IIndexableByUserId, IIndexableByConsumerName)
 
-    def __init__(self, key, token, timestamp, consumer, user_id, user_name):
+    def __init__(self, key, token, timestamp, consumer, user_id):
         self._key = key
         self._token = token
         self._timestamp = timestamp
         self._consumer = consumer
         self._user_id = user_id
-        self._user_name = user_name
 
     def getId(self):
         return self._key
@@ -97,17 +96,14 @@ class Token(Persistent):
     def getTimestamp(self):
         return self._timestamp
 
+    def setTimestamp(self, timestamp):
+        self._timestamp = timestamp
+
     def getUserId(self):
         return self._user_id
 
     def setUserId(self, user_id):
         self._user_id = user_id
-
-    def getUserName(self):
-        return self._user_name
-
-    def setUserName(self, user_name):
-        self._user_name = user_name
 
     def getConsumer(self):
         return self._consumer

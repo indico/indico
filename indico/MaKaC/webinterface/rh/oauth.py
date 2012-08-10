@@ -89,7 +89,7 @@ class RHOAuthRequestToken(RHOAuth):
             token = oauth.Token(gen_random_string(), gen_random_string())
             token.set_callback(oauth_request.get_parameter('oauth_callback'))
             timestamp = time.time()
-            TempRequestTokenHolder().add(Token(token.key, token, timestamp, ZODB_consumer, None, None))
+            TempRequestTokenHolder().add(Token(token.key, token, timestamp, ZODB_consumer, None))
             # return the token
 
             Logger.get('oauth.request_token').info(token.to_string())
@@ -104,7 +104,6 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
     def process_req(self, oauth_request):
         try:
             user_id = self.getAW().getUser().getId()
-            user_name = self.getAW().getUser().getAbrName()
             request_token_key = oauth_request.get_parameter('oauth_token')
             request_token = TempRequestTokenHolder().getById(request_token_key)
             verifier = gen_random_string()
@@ -115,18 +114,15 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
             if old_request_token is not None:
                 TempRequestTokenHolder().remove(request_token)
                 request_token.setUserId(user_id)
-                request_token.setUserName(user_name)
                 RequestTokenHolder().update(old_request_token, request_token)
                 self._redirect(request_token.getToken().get_callback_url()+'&oauth_verifier='+verifier)
             else:
                 TempRequestTokenHolder().remove(request_token)
                 request_token.setUserId(user_id)
-                request_token.setUserName(user_name)
                 RequestTokenHolder().add(request_token)
-                redirectURL = '%s?user_id=%s&user_name=%s&returnURL=%s&callback=%s&third_party_app=%s' %\
+                redirectURL = '%s?user_id=%s&returnURL=%s&callback=%s&third_party_app=%s' %\
                     (UHThirdPartyAuth.getURL(),
                     user_id,
-                    user_name,
                     urllib2.quote(AUTHORIZE_CONSUMER_URL),
                     urllib2.quote(request_token.getToken().get_callback_url()),
                     urllib2.quote(request_token.getConsumer().getName()))
@@ -156,14 +152,14 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
 class RHOAuthAuthorizeConsumer(RHOAuth, base.RHProtected):
     def process_req(self, oauth_request):
         user_id = oauth_request.get_parameter('user_id')
-        user_name = oauth_request.get_parameter('user_name')
+        response = oauth_request.get_parameter('response')
         verifier = oauth_request.get_parameter('oauth_verifier')
         third_party_app = oauth_request.get_parameter('third_party_app')
         callback = oauth_request.get_parameter('callback')
         request_tokens = list(Catalog.getIdx('user_oauth_request_token').get(user_id))
         for request_token in request_tokens:
             if request_token.getToken().verifier == verifier:
-                if user_name != '':
+                if response == 'accept':
                     self._redirect(callback+'&oauth_verifier='+verifier)
                 else:
                     RequestTokenHolder().remove(request_token)
@@ -199,7 +195,6 @@ class RHOAuthAccessTokenURL(RHOAuth):
             consumer = oauth.Consumer(request_token.getConsumer().getId(), request_token.getConsumer().getSecret())
             self.oauth_server.verify_request(oauth_request, consumer, request_token.getToken())
             user_id = request_token.getUserId()
-            user_name = request_token.getUserName()
             access_tokens = Catalog.getIdx('user_oauth_access_token').get(user_id)
             timestamp = time.time()
             access_token_key = gen_random_string()
@@ -207,16 +202,17 @@ class RHOAuthAccessTokenURL(RHOAuth):
             if access_tokens is not None:
                 for access_token in list(access_tokens):
                     if access_token.getConsumer().getName() == request_token.getConsumer().getName():
-                        AccessTokenHolder().remove(access_token)
+                        access_token.setTimestamp(timestamp)
+                        response = {'oauth_token': access_token.getId(),
+                        'oauth_token_secret': access_token.getToken().secret,
+                        'user_id': user_id}
+                        return urlencode(response)
             access_token = Token(access_token_key, oauth.Token(access_token_key, access_token_secret),
-                timestamp, request_token.getConsumer(), user_id, user_name)
+                timestamp, request_token.getConsumer(), user_id)
             AccessTokenHolder().add(access_token)
             response = {'oauth_token': access_token_key,
             'oauth_token_secret': access_token_secret,
-            'user_id': user_id,
-            'user_name': user_name}
-            # return the token
-            # return access_token.to_string()
+            'user_id': user_id}
             return urlencode(response)
         except oauth.Error, err:
             self.send_oauth_error(err)
