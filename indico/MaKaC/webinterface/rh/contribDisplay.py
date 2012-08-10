@@ -115,7 +115,7 @@ class RHContributionToPDF(RHContributionDisplay):
         return data
 
 
-class RHContributionToiCal(RHContributionDisplay):
+class RHContributionToiCal(RoomBookingDBMixin, RHContributionDisplay):
 
     def _process( self ):
 
