@@ -37,6 +37,7 @@ from MaKaC.fossils.schedule import IContribSchEntryDisplayFossil,\
         IContribSchEntryMgmtFossil, IBreakTimeSchEntryFossil,\
         IBreakTimeSchEntryMgmtFossil,\
         ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil
+from MaKaC.common.cache import GenericCache
 
 class Schedule:
     """base schedule class. Do NOT instantiate
@@ -983,6 +984,9 @@ class LinkedTimeSchEntry(TimeSchEntry):
                 (entry.getEndDate()>self.getStartDate() and \
                 entry.getEndDate()<=self.getEndDate())
 
+    def getUniqueId(self):
+        return self.getOwner().getUniqueId()
+
 
 class IndTimeSchEntry(TimeSchEntry):
 
@@ -1378,6 +1382,9 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     def recover(self):
         TrashCanManager().remove(self)
 
+    def getUniqueId(self):
+        return self.getOwner().getUniqueId() + "brk" + self.getId()
+
 class ContribSchEntry(LinkedTimeSchEntry):
 
     fossilizes(IContribSchEntryDisplayFossil,
@@ -1418,24 +1425,43 @@ class ContribSchEntry(LinkedTimeSchEntry):
 
 class ScheduleToJson:
 
+    _cacheEntries = GenericCache("ConferenceTimetableEntries")
+    _cache = GenericCache("ConferenceTimetable")
+
+    @staticmethod
+    def obtainFossil(entry, tz, fossilInterface = None, mgmtMode = False, useAttrCache = False):
+
+        if mgmtMode:
+            result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
+        else:
+            cache_key = entry.getUniqueId()
+
+            result = ScheduleToJson._cacheEntries.get(cache_key)
+
+            if result is None:
+                result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
+                ScheduleToJson._cacheEntries.set(entry.getUniqueId(), result, timedelta(minutes=5))
+
+        return result
+
     @staticmethod
     def processEntry(obj, tz, aw, mgmtMode = False, useAttrCache = False):
 
         if mgmtMode:
             if isinstance(obj, BreakTimeSchEntry):
-                entry = obj.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                entry = ScheduleToJson.obtainFossil(obj, tz, IBreakTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
             elif isinstance(obj, ContribSchEntry):
-                entry = obj.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                entry = ScheduleToJson.obtainFossil(obj, tz, IContribSchEntryMgmtFossil, mgmtMode, useAttrCache)
             elif isinstance(obj, LinkedTimeSchEntry):
-                entry = obj.fossilize(ILinkedTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                entry = ScheduleToJson.obtainFossil(obj, tz, ILinkedTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
             else:
-                entry = obj.fossilize(useAttrCache = useAttrCache, tz = tz, convert=True)
+                entry = ScheduleToJson.obtainFossil(obj, tz, None, mgmtMode, useAttrCache)
         else:
             # the fossils used for the display of entries
             # will be taken by default, since they're first
             # in the list of their respective Fossilizable
             # objects
-            entry = obj.fossilize(useAttrCache = useAttrCache, tz = tz, convert=True)
+            entry = ScheduleToJson.obtainFossil(obj, tz, None, mgmtMode, useAttrCache)
 
         genId = entry['id']
 
@@ -1450,17 +1476,17 @@ class ScheduleToJson:
                 if ScheduleToJson.checkProtection(contrib, aw):
                     if mgmtMode:
                         if isinstance(contrib, ContribSchEntry):
-                            contribData = contrib.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                            contribData = ScheduleToJson.obtainFossil(contrib, tz, IContribSchEntryMgmtFossil, mgmtMode, useAttrCache)
                         elif isinstance(contrib, BreakTimeSchEntry):
-                            contribData = contrib.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                            contribData = ScheduleToJson.obtainFossil(contrib, tz, IBreakTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
                         else:
-                            contribData = contrib.fossilize(useAttrCache = useAttrCache, tz = tz, convert=True)
+                            contribData = ScheduleToJson.obtainFossil(contrib, tz, None, mgmtMode, useAttrCache)
                     else:
                         # the fossils used for the display of entries
                         # will be taken by default, since they're first
                         # in the list of their respective Fossilizable
                         # objects
-                        contribData = contrib.fossilize(useAttrCache = useAttrCache, tz = tz, convert=True)
+                        contribData = ScheduleToJson.obtainFossil(contrib, tz, None, mgmtMode, useAttrCache)
 
                     entries[contribData['id']] = contribData
 
@@ -1493,24 +1519,32 @@ class ScheduleToJson:
 
         scheduleDict={}
 
-        if not days:
-            days = daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
+        if not days and schedule.getOwner().isFullyPublic() and not mgmtMode:
+            scheduleDict = ScheduleToJson._cache.get(schedule.getOwner().getUniqueId())
 
-        dates = [d.strftime("%Y%m%d") for d in days]
+        if not scheduleDict:
+            scheduleDict={}
+            if not days:
+                days = daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
 
-        # Generating the days dictionnary
-        for d in dates:
-            scheduleDict[d] = {}
+            dates = [d.strftime("%Y%m%d") for d in days]
 
-        # Filling the day dictionnary with entries
-        for obj in schedule.getEntries():
+            # Generating the days dictionnary
+            for d in dates:
+                scheduleDict[d] = {}
 
-            if ScheduleToJson.checkProtection(obj, aw):
-                genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
-                day = obj.getAdjustedStartDate(tz).strftime("%Y%m%d")
-                # verify that start date is in dates
-                if day in dates:
-                    scheduleDict[day][genId] = resultData
+            # Filling the day dictionnary with entries
+            for obj in schedule.getEntries():
+
+                if ScheduleToJson.checkProtection(obj, aw):
+                    day = obj.getAdjustedStartDate(tz).strftime("%Y%m%d")
+                    # verify that start date is in dates
+                    if day in dates:
+                        genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
+                        scheduleDict[day][genId] = resultData
+            if not days and schedule.getConference().isFullyPublic() and not mgmtMode:
+                ScheduleToJson._cache.set(schedule.getConference().getUniqueId(), scheduleDict, timedelta(minutes=5))
+
         if hideWeekends:
             for entry in scheduleDict.keys():
                 weekDay = datetime.strptime(entry, "%Y%m%d").weekday()
@@ -1529,3 +1563,11 @@ class ScheduleToJson:
             new_dict[key] = dict[key]
 
         return new_dict
+
+    @staticmethod
+    def cleanCache(obj, cleanConferenceCache = True):
+        ScheduleToJson._cacheEntries.delete(obj.getUniqueId())
+        if cleanConferenceCache:
+            ScheduleToJson._cache.delete(obj.getOwner().getConference().getUniqueId())
+
+

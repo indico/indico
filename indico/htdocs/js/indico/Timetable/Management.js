@@ -310,6 +310,7 @@ type("TimetableManagementActions", [], {
     },
 
     changeSessionColors: function(eventData, bgColor, textColor) {
+        var self = this;
         if (eventData.entryType != 'Session') {
             return;
         }
@@ -327,8 +328,8 @@ type("TimetableManagementActions", [], {
             if (error) {
                 IndicoUtil.errorReport(error);
             }else {
-                this.timetable._updateSessionData(eventData.sessionId, ['color', 'textColor'], [bgColor, textColor]);
-                this.timetable.timetableDrawer.redraw();
+                self.timetable._updateSessionData(eventData.sessionId, ['color', 'textColor'], [bgColor, textColor]);
+                self.timetable.timetableDrawer.redraw();
                 eventData.color = bgColor;
                 eventData.textColor = textColor;
             }
