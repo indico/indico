@@ -38,7 +38,7 @@ from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionLis
      IMetadataChangeListener
 from indico.core.extpoint.location import ILocationActionListener
 from indico.core.extpoint.index import ICatalogIndexProvider
-
+from indico.core.index import Catalog
 
 class CSBookingInstanceIndexCatalog(Index):
 
@@ -56,6 +56,9 @@ class CSBookingInstanceIndexCatalog(Index):
             idx = CSBookingInstanceIndex(index)
             idx.initialize()
             self._container[index] = idx
+
+    def getIndexes(self):
+        return self._container.values()
 
 
 class CSBookingInstanceIndex(OOIndex):
@@ -79,7 +82,8 @@ class CSBookingInstanceIndex(OOIndex):
         contribs = bk.getTalkSelectionList()
         if contribs:
             for contrib_id in contribs:
-                self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
+                if conf.getContributionById(contrib_id).isScheduled():
+                    self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
         else:
             for day in daysBetween(conf.getStartDate(), conf.getEndDate()):
                 bkw = CSBookingInstanceWrapper(bk, conf,
@@ -133,6 +137,15 @@ class CSBookingInstanceIndex(OOIndex):
             if bkw.getOriginalBooking() == bk:
                 to_unindex.add(bkw)
 
+        for bkw in to_unindex:
+            self.unindex_obj(bkw)
+
+    def unindex_talk(self, bk, talk):
+        to_unindex = set()
+        bookingList = self.get(talk.getStartDate())
+        for bkw in bookingList:
+            if bkw.getObject() == talk:
+                to_unindex.add(bkw)
         for bkw in to_unindex:
             self.unindex_obj(bkw)
 
@@ -207,6 +220,13 @@ class EventCollaborationListener(Component):
                                        oldEndDate, newEndDate)
         except Exception, e:
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
+
+    @classmethod
+    def contributionUnscheduled(self, contrib):
+        csBookingManager = contrib.getCSBookingManager()
+        for booking in csBookingManager.getBookingList():
+            booking.unindex_talk(contrib)
+
 
     @classmethod
     def eventTitleChanged(cls, obj, oldTitle, newTitle):

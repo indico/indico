@@ -212,3 +212,8 @@ class CSBooking(CSBookingBase):
         idx = Catalog.getIdx('cs_booking_instance')
         idx['RecordingRequest'].unindex_booking(self)
         idx['All Requests'].unindex_booking(self)
+
+    def unindex_talk(self, talk):
+        idx = Catalog.getIdx('cs_booking_instance')
+        idx['RecordingRequest'].unindex_talk(self, talk)
+        idx['All Requests'].unindex_talk(self, talk)

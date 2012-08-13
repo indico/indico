@@ -1953,6 +1953,12 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return
 
+    def unindex_talk(self, talk):
+        """
+        To be overloaded
+        """
+        return
+
     def getModificationURL(self):
         return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),
                                                            secure = ContextManager.get('currentRH').use_https(),

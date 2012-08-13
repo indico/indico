@@ -437,7 +437,7 @@ class CollaborationTools(object):
         for t in talks:
             location = t.getLocation()
             room = t.getRoom()
-            if location and room and (location.getName() + ":" + room.getName() in roomNames):
+            if location and room and (location.getName() + ":" + room.getName() in roomNames) and t.isScheduled():
                 ableTalks.append(t)
 
         return (talks, roomFullNames, roomNames, ableTalks)

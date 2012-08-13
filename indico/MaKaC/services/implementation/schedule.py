@@ -373,9 +373,9 @@ class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.Conf
 class ConferenceScheduleDeleteContribution(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
     def _performOperation(self):
-
         contrib = self._schEntry.getOwner()
         logInfo = contrib.getLogInfo()
+        contrib._notify("contributionUnscheduled")
 
         if self._conf.getType() == "meeting":
             logInfo["subject"] =  _("Deleted contribution: %s")%contrib.getTitle()
@@ -547,6 +547,8 @@ class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.S
         contrib = self._schEntry.getOwner()
 
         logInfo = contrib.getLogInfo()
+
+        contrib._notify("contributionUnscheduled")
 
         if type == "meeting":
             logInfo["subject"] = "Deleted contribution: %s" %contrib.getTitle()
