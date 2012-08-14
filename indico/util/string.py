@@ -40,3 +40,22 @@ def remove_non_alpha(text):
 
 def html_line_breaks(text):
     return '<p>' + text.replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'
+
+
+def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
+    """
+    Truncate text, taking unicode chars into account
+    """
+    encode = False
+
+    if isinstance(text, str):
+        encode = True
+        text = text.decode(encoding)
+
+    if len(text) > max_size:
+        text = text[:max_size] + ellipsis
+
+    if encode:
+        text = text.encode(encoding)
+
+    return text
