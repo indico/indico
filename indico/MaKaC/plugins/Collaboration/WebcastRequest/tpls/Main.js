@@ -36,8 +36,8 @@
 
     onLoad : function() {
 
-        WRUpdateContributionList();
-
+        WRUpdateContributionList('contributionList', true);
+        WRUpdateContributionList('contributionWebcastedList', false);
         IndicoUtil.enableDisableForm($E("WRForm"), WRWebcastCapable);
 
         if (!isLecture) {

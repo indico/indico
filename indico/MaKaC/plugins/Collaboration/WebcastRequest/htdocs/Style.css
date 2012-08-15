@@ -47,7 +47,7 @@ ul.WROptionList li.WRInnerQuestion {
     font-weight: bold;
 }
 
-div.WRFormSection label {
+div.WRFormSection label, ul.WROptionList label {
     font-weight: normal;
 }
 

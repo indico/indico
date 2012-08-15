@@ -109,7 +109,12 @@
                         <span class="WRNoteText">
                             ${_("Some of your talks")} (${ str(NTalks - NWebcastCapableContributions) + _(" out of ") + str(NTalks) }) ${_(" are not in a room capable of webcasting and thus cannot be webcasted.")}
                         </span>
-                        <span class='fakeLink' onclick='toggleWebcastCapableRooms();' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
+                        <span class='fakeLink' id="webcastTalksText">${_("See list of webcasted talks.")} </span>
+                        <span class='fakeLink' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
+                        <div id="webcastCapableTalksDiv" style="padding:5px; display:none;">
+                            <ul class="WROptionList" style="font-size: 13px" id="contributionWebcastedList">
+                            </ul>
+                         </div>
                         <div id="webcastCapableRoomsDiv" style="display:none;">
                             <div style="padding-top:15px;padding-bottom:15px;">
                                 <span class="WRNoteText">${_("These are the rooms capable of webcasting:")} </span>
@@ -218,15 +223,39 @@
 
 % if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable):
 <script type="text/javascript">
-    var webcastSwitch = false;
-    var toggleWebcastCapableRooms = function () {
-        IndicoUI.Effect.toggleAppearance($E('webcastCapableRoomsDiv'));
-        if (webcastSwitch) {
-            $E("webcastRoomsText").dom.innerHTML = $T("See list of webcast-able rooms.");
+    $("#webcastRoomsText").click( function () {
+        if ($('#webcastCapableRoomsDiv').is(':hidden')) {
+            $("#webcastRoomsText").text($T("Hide list of webcast-able rooms."));
+            $("#webcastCapableRoomsDiv").show();
         } else {
-            $E("webcastRoomsText").dom.innerHTML = $T("Hide list of webcast-able rooms.");
+            $("#webcastRoomsText").text($T("See list of webcast-able rooms."));
+            $("#webcastCapableRoomsDiv").hide();
         }
-        webcastSwitch = !webcastSwitch;
-    }
+    });
+    $("#webcastTalksText").qtip({
+        style: {
+            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-default',
+        },
+        position: {
+            my: 'top center',
+            at: 'bottom center'
+        },
+        content: function(api){
+            return $('#webcastCapableTalksDiv');
+            },
+        show: {
+            event: "click",
+            effect: function() {
+                $(this).fadeIn(300);
+            }
+        },
+        hide: {
+            event: 'unfocus click',
+            fixed: true,
+            effect: function() {
+                $(this).fadeOut(300);
+            }
+        }
+    });
 </script>
 % endif

@@ -48,7 +48,7 @@ ul.RROptionList li.RRInnerQuestion {
     font-weight: bold;
 }
 
-div.RRFormSection label {
+div.RRFormSection label, ul.RROptionList label {
     font-weight: normal;
 }
 

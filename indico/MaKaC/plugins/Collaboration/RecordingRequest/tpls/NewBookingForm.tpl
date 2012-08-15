@@ -109,7 +109,12 @@
                         <span class="RRNoteText">
                             ${_("Some of your talks (%d out of %d) are not in a room capable of recording and thus cannot be recorded.") % (NTalks - NRecordingCapableContributions, NTalks)}
                         </span>
-                        <span class='fakeLink' onclick='toggleRecordingCapableRooms();' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
+                        <span class='fakeLink' id="recordTalksText">${_("See list of recorded talks.")} </span>
+                        <span class='fakeLink' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
+                        <div id="recordCapableTalksDiv" style="padding:5px; display:none;">
+                            <ul class="RROptionList" style="font-size: 13px" id="contributionRecordedList">
+                            </ul>
+                         </div>
                         <div id="recordingCapableRoomsDiv" style="display:none;">
                             <div style="padding-top:15px;padding-bottom:15px;">
                                 <span class="RRNoteText">${_("These are the rooms capable of recording:")} </span>
@@ -237,16 +242,40 @@
 
 % if (not RecordingCapable and RecordingCapableRooms) or (NTalks > NRecordingCapableContributions and RecordingCapable):
 <script type="text/javascript">
-    var recordingSwitch = false;
-    var toggleRecordingCapableRooms = function () {
-        IndicoUI.Effect.toggleAppearance($E('recordingCapableRoomsDiv'));
-        if (recordingSwitch) {
-            $E("recordingRoomsText").dom.innerHTML = $T("See list of record-able rooms.");
+    $("#recordingRoomsText").click( function () {
+        if ($('#recordingCapableRoomsDiv').is(':hidden')) {
+            $("#recordingRoomsText").text($T("Hide list of webcast-able rooms."));
+            $("#recordingCapableRoomsDiv").show();
         } else {
-            $E("recordingRoomsText").dom.innerHTML = $T("Hide list of record-able rooms.");
+            $("#recordingRoomsText").text($T("See list of webcast-able rooms."));
+            $("#recordingCapableRoomsDiv").hide();
         }
-        recordingSwitch = !recordingSwitch;
-    }
+    });
+    $("#recordTalksText").qtip({
+        style: {
+            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-default',
+        },
+        position: {
+            my: 'top center',
+            at: 'bottom center'
+        },
+        content: function(api){
+            return $('#recordCapableTalksDiv');
+            },
+        show: {
+            event: "click",
+            effect: function() {
+                $(this).fadeIn(300);
+            }
+        },
+        hide: {
+            event: 'unfocus click',
+            fixed: true,
+            effect: function() {
+                $(this).fadeOut(300);
+            }
+        }
+    });
 </script>
 % endif
 

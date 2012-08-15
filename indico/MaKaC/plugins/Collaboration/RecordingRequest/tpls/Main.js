@@ -36,7 +36,8 @@
     },
 
     onLoad : function() {
-        RRUpdateContributionList();
+        RRUpdateContributionList('contributionList', true);
+        RRUpdateContributionList('contributionRecordedList', false);
 
         IndicoUtil.enableDisableForm($E("RRForm"), RRRecordingCapable);
 

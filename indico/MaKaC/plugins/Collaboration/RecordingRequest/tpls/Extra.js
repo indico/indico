@@ -16,7 +16,7 @@ var RRSpeakersTemplate = function(speakerList) {
     return speakers;
 }
 
-var RRTalkTemplate = function(talk) {
+var RRTalkTemplate = function(talk, showCheckbox) {
 
     // Checkbox
     var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
@@ -83,22 +83,23 @@ var RRTalkTemplate = function(talk) {
     // Finally, the id
     label.append(Html.span("RRContributionId", "(id: " + talk.id + ")"));
 
-    return Html.li('', checkBox, label);
+    if(showCheckbox) return Html.li('', checkBox, label);
+    else return Html.li('', label);
 
 };
 
-var RRUpdateContributionList = function () {
+var RRUpdateContributionList = function (targetId, showCheckbox) {
     if (RR_contributions.length > 0) {
-        $E('contributionList').set('');
+        $E(targetId).set('');
         for (i in RR_contributions) {
             contribution = RR_contributions[i];
-            $E('contributionList').append(RRTalkTemplate(contribution));
+            $E(targetId).append(RRTalkTemplate(contribution, showCheckbox));
         }
     } else {
-        if (exists($E('contributionList'))) { // we are not in a lecture
-            $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of recording.")));
+        if (exists($E(targetId))) { // we are not in a lecture
+            $E(targetId).set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of recording.")));
             // Hack to send a empty list and not make the server crash
-            $E('contributionList').append(Html.input('checkbox', {style: {display:"none", disabled:"disabled"},name: "talkSelection", id: "noTalks"}));
+            $E(targetId).append(Html.input('checkbox', {style:{display:"none", disabled:"disabled"},name: "talkSelection", id: "noTalks"}));
         }
     }
 }

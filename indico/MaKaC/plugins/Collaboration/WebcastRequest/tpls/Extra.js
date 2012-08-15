@@ -17,7 +17,7 @@ var WRSpeakersTemplate = function(speakerList) {
     return speakers;
 }
 
-var WRTalkTemplate = function(talk) {
+var WRTalkTemplate = function(talk, showCheckbox) {
 
     // Checkbox
     var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
@@ -84,22 +84,22 @@ var WRTalkTemplate = function(talk) {
     // Finally, the id
     label.append(Html.span("WRContributionId", "(id: " + talk.id + ")"));
 
-    return Html.li('', checkBox, label);
-
+    if(showCheckbox) return Html.li('', checkBox, label);
+    else return Html.li('', label);
 };
 
-var WRUpdateContributionList = function () {
+var WRUpdateContributionList = function (targetId, showCheckbox) {
     if (WR_contributions.length > 0) {
-        $E('contributionList').set('');
+        $E(targetId).set('');
         for (i in WR_contributions) {
             contribution = WR_contributions[i];
-            $E('contributionList').append(WRTalkTemplate(contribution));
+            $E(targetId).append(WRTalkTemplate(contribution, showCheckbox));
         }
     } else {
-        if (exists($E('contributionList'))) { // we are not in a lecture
-            $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting.")));
+        if (exists($E(targetId))) { // we are not in a lecture
+            $E(targetId).set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting.")));
             // Hack to send a empty list and not make the server crash
-            $E('contributionList').append(Html.input('checkbox', {style: {display:"none", disabled:"disabled"},name: "talkSelection", id: "noTalks"}));
+            $E(targetId).append(Html.input('checkbox', {style: {display:"none", disabled:"disabled"},name: "talkSelection", id: "noTalks"}));
         }
     }
 }
@@ -152,7 +152,7 @@ var WR_loadTalks = function () {
             function(result, error){
                 if (!error) {
                     WR_contributions = result;
-                    WRUpdateContributionList();
+                    WRUpdateContributionList(true);
                     IndicoUI.Effect.appear($E('contributionsDiv'));
                     WR_contributionsLoaded = true;
                     killProgress();
