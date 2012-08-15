@@ -58,7 +58,7 @@ class RHSessionDisplay( RoomBookingDBMixin, RHSessionDisplayBase ):
         return p.display(activeTab=self._activeTab,
                         sortingCrit=self._sortingCrit)
 
-class RHSessionToiCal(RHSessionDisplay):
+class RHSessionToiCal(RoomBookingDBMixin, RHSessionDisplay):
 
     def _process( self ):
         filename = "%s-Session.ics"%self._session.getTitle()

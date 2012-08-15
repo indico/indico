@@ -26,12 +26,13 @@ from MaKaC.plugins.Collaboration.Vidyo.fossils import IVidyoErrorFossil, \
 from MaKaC.i18n import _
 import re
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
-from MaKaC.plugins.Collaboration.Vidyo.indexes import EventEndDateIndex
+from MaKaC.plugins.Collaboration.Vidyo.indexes import EventEndDateIndex, BOOKINGS_BY_VIDYO_ROOMS_INDEX
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
 from MaKaC.common.logger import Logger
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.common import info
+from indico.core.index import Catalog
 
 
 
@@ -212,6 +213,9 @@ class VidyoTools(object):
                     Logger.get("Vidyo").warning("Location: " + location.getName() + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
         return roomIp
 
+    @classmethod
+    def getIndexByVidyoRoom(cls):
+        return Catalog.getIdx(BOOKINGS_BY_VIDYO_ROOMS_INDEX)
 
 class FakeAvatarOwner(Persistent, Fossilizable):
     """ Used when a Vidyo admin changes the owner of a room to an account

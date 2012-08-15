@@ -1,3 +1,6 @@
+<div class="redWarningPopup" style="display:none">
+${_(" Please be aware that if you modify any sensitive data such as the room name, moderator or PIN that it will be reflected in other bookings which use the same Vidyo room.")}
+</div>
 <table style="margin-top: 10px;">
     <tr>
         <td class="bookingFormFieldName" nowrap>

@@ -208,6 +208,7 @@ class IMaterialMetadataFossil(IFossil):
         pass
     getResourceList.result = {'MaKaC.conference.Link': ILinkMetadataFossil, 'MaKaC.conference.LocalFile': ILocalFileMetadataFossil}
     getResourceList.name = 'resources'
+    getResourceList.filterBy = 'access'
 
 
 class _IncludeMaterialFossil(IFossil):
@@ -216,6 +217,7 @@ class _IncludeMaterialFossil(IFossil):
         pass
     getAllMaterialList.name = 'material'
     getAllMaterialList.result = IMaterialMetadataFossil
+    getAllMaterialList.filterBy = 'access'
 
 
 class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):

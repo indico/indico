@@ -45,6 +45,9 @@ class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
     def getLinkId(self):
         """returns the uniqueId"""
 
+    def isRoomInMultipleBookings(self):
+        """ If different CSBookings contains the same Vidyo Room"""
+
 
 def removePin(bookingParams):
     del bookingParams["pin"]

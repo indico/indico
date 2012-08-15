@@ -535,7 +535,7 @@ class RHCategoryGetIcon(RHCategDisplayBase):
         self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%icon.getFileName()
         return self._target.getIcon().readBin()
 
-class RHCategoryToiCal(RHCategDisplayBase):
+class RHCategoryToiCal(RoomBookingDBMixin, RHCategDisplayBase):
 
     def _process( self ):
         filename = "%s-Categ.ics"%self._target.getName().replace("/","")
@@ -565,7 +565,7 @@ class RHTodayCategoryToRSS(RHCategoryToRSS):
     def _process( self ):
         self._redirect(urlHandlers.UHCategoryToAtom.getURL(self._target), status=apache.HTTP_MOVED_PERMANENTLY)
 
-class RHCategoryToAtom(RHCategDisplayBase):
+class RHCategoryToAtom(RoomBookingDBMixin, RHCategDisplayBase):
     _uh = urlHandlers.UHCategoryToAtom
 
     def _process( self ):

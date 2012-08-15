@@ -43,6 +43,8 @@ import sys
 from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunication
 from MaKaC.i18n import _
 
+from indico.util.string import truncate
+
 def getTalks(conference, sort = False):
     """
     sort: if True, contributions are sorted by start date (non scheduled contributions
@@ -73,7 +75,7 @@ def getTalks(conference, sort = False):
                                               contribution    = None,
                                               subcontribution = None)
     event_info["title"]      = conference.getTitle()
-    event_info["titleshort"] = truncateString(event_info["title"], 40)
+    event_info["titleshort"] = truncate(event_info["title"], 40)
     # this always comes first, so just pretend it's 0 seconds past the epoch
     event_info["date"]       = int(time.mktime(conference.getAdjustedStartDate().timetuple()))
 
@@ -102,7 +104,7 @@ def getTalks(conference, sort = False):
                                               contribution    = contribution.getId(),
                                               subcontribution = None)
             event_info["title"]      = contribution.getTitle()
-            event_info["titleshort"] = truncateString(event_info["title"], title_length)
+            event_info["titleshort"] = truncate(event_info["title"], title_length)
             # Sometimes contributions are not scheduled, so they have no start date.
             # In this case assign it the value None, and it will be displayed
             # at the end of the list with the time value "not scheduled"
@@ -133,7 +135,7 @@ def getTalks(conference, sort = False):
                                               contribution    = contribution.getId(),
                                               subcontribution = subcontribution.getId())
                 event_info["title"]      = subcontribution.getTitle()
-                event_info["titleshort"] = truncateString(event_info["title"], title_length)
+                event_info["titleshort"] = truncate(event_info["title"], title_length)
                 # Subcontribution objects don't have start dates,
                 # so get the owner contribution's start date
                 # and add the counter ctr_sc so they appear in order
@@ -157,7 +159,7 @@ def getTalks(conference, sort = False):
                                                   contribution    = None,
                                                   subcontribution = None)
         event_info["title"]      = session.getTitle()
-        event_info["titleshort"] = truncateString(event_info["title"], title_length)
+        event_info["titleshort"] = truncate(event_info["title"], title_length)
         # Get start time as seconds since the epoch so we can sort
         if session.getAdjustedStartDate() is not None:
             event_info["date"]   = int(time.mktime(session.getAdjustedStartDate().timetuple()))
@@ -246,15 +248,6 @@ def startTimeCompare(a, b):
             return 0
     else:  #a < b
         return -1
-
-def truncateString(string, length):
-    '''Truncates given string to the desired length and if it
-    was longer than that, sticks ellipses on the end'''
-
-    if len(string) < length:
-        return string
-    else:
-        return string[:length] + "..."
 
 def formatDate(date_str):
     '''Given number of seconds since the epoch, convert for display in the main Recording Manager interface.'''

@@ -223,7 +223,7 @@
     // (even though it's called RMTalkList, which is confusing)
     var RMTalkList = {
     % for talk in Talks:
-    "${ talk["IndicoID"] }": ${ jsonEncode(talk) },
+    "${ talk["IndicoID"] }": ${talk | n,j},
     % endfor
     };
 

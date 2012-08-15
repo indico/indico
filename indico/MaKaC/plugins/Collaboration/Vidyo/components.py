@@ -23,12 +23,14 @@ from MaKaC.common.utils import *
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import INavigationContributor
 from MaKaC.plugins.util import PluginsWrapper
-
-import zope.interface
+from indico.core.extpoint.index import ICatalogIndexProvider
+from zope.interface import implements
+from MaKaC.plugins.Collaboration.Vidyo.indexes import BookingsByVidyoRoomIndex, BOOKINGS_BY_VIDYO_ROOMS_INDEX
+from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 
 class VidyoContributor(Component):
 
-    zope.interface.implements(INavigationContributor)
+    implements(INavigationContributor)
 
     @classmethod
     def addCheckBox2CloneConf(cls, obj, list):
@@ -59,6 +61,12 @@ class VidyoContributor(Component):
                 if (options.get('sessions', False) and options.get('contributions', False)) or not vs.hasSessionOrContributionLink():
                     newBooking = vs.clone(conf)
                     conf.getCSBookingManager().addBooking(newBooking)
+                    VidyoTools.getIndexByVidyoRoom().index_obj(newBooking)
 
+class CatalogIndexProvider(Component):
+    implements(ICatalogIndexProvider)
+
+    def catalogIndexProvider(self, obj):
+        return [(BOOKINGS_BY_VIDYO_ROOMS_INDEX, BookingsByVidyoRoomIndex)]
 
 

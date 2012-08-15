@@ -17,39 +17,41 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+# stdlib imports
 import time, re, os
 from random import randint
 from datetime import datetime, date, timedelta
+
+# 3rd party imports
+from BTrees.OOBTree import OOBTree
+from babel.dates import format_datetime
+
+# indico legacy imports
 from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
 from MaKaC.common import info
 from MaKaC import user, errors
-from indico.util.i18n import currentLocale
-from babel.dates import format_datetime
+from MaKaC.common.db import DBMgr
 from MaKaC.webinterface.linking import RoomLinker
 from MaKaC.rb_location import CrossLocationQueries
+
+# indico imports
+from indico.util.i18n import currentLocale
+
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
     import fcntl
 
-
-
-###########
-#CONSTANTS#
-###########
 _KEY_DEFAULT_LENGTH = 20
 _FAKENAME_SIZEMIN = 5
 _FAKENAME_SIZEMAX = 10
 
 
+### Backward-compatible utilities
 
-###########
-#functions#
-###########
+from indico.util.string import truncate
 
-from MaKaC.common.db import DBMgr
-from BTrees.OOBTree import OOBTree
 
 
 def isWeekend( d ):
@@ -640,11 +642,6 @@ def resolveHierarchicalId(objId):
     except errors.MaKaCError:
         return None
 
-def truncate(text, maxSize):
-    if len(text) > maxSize:
-        return text[:maxSize]+'...'
-    else:
-        return text
 
 class OSSpecific(object):
     """
