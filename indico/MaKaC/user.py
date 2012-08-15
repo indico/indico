@@ -1768,6 +1768,7 @@ class AvatarHolder( ObjectHolder ):
                     if role == "registrant":
                         for reg in links[objType][role]:
                             reg.setAvatar(prin)
+                            prin.addRegistrant(reg)
 
             if objType == "alarm":
                 for role in links[objType].keys():
