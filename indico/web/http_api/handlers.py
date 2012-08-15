@@ -49,6 +49,7 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
+from MaKaC.plugins.RoomBooking.default.factory import Factory
 
 
 # Remove the extension at the end or before the querystring
