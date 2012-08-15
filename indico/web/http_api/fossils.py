@@ -24,6 +24,7 @@ Basic fossils for data export
 from indico.util.fossilize import IFossil, fossilize
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.linking import RoomLinker
 from MaKaC.fossils.conference import ISessionFossil
 
 
