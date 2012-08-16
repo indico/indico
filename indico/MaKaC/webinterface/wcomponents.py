@@ -1921,11 +1921,60 @@ class WMaterialTable( WTemplated ):
         vars["matTypesSelectItems"] = "".join(l)
         return vars
 
+class WAccessControlFrameBase(WTemplated):
 
-class WAccessControlFrame(WTemplated):
+    def _getChildURL(self, child):
+        if isinstance(child, conference.Session):
+            return urlHandlers.UHSessionModification.getURL(child)
+        if isinstance(child, conference.Material):
+            return urlHandlers.UHMaterialModification.getURL(child)
+        if isinstance(child, conference.Contribution):
+            return urlHandlers.UHContributionModification.getURL(child)
+        if isinstance(child, conference.SubContribution):
+            return urlHandlers.UHSubContributionModification.getURL(child)
+
+
+    def _getAccessControlFrametParams( self ):
+        vars = {}
+        if self._target.getAccessProtectionLevel() == -1:
+            vars["privacy"] = "PUBLIC"
+            vars["statusColor"] = "#128F33"
+        elif self._target.isItselfProtected():
+            vars["privacy"] = "PRIVATE"
+            vars["statusColor"] = "#B02B2C"
+        else :
+            vars["privacy"] = "INHERITING"
+            vars["statusColor"] = "#444444"
+
+        vars["isFullyPublic"] = None
+        vars["childrenProtected"] = None
+
+        if not isinstance(self._target, Category) :
+            vars["isFullyPublic"] = self._target.isFullyPublic()
+            vars["childrenProtected"] = self._target.getChildrenProtected()
+
+        if isinstance(self._target, Category) and self._target.isRoot():
+            vars["parentName"] = vars["parentPrivacy"] = vars["parentStatusColor"] = ''
+        else:
+            if isinstance(self._target, Conference):
+                vars["parentName"] = self._target.getOwner().getName()
+            else:
+                vars["parentName"] = self._target.getOwner().getTitle()
+            if self._target.hasProtectedOwner():
+                    vars["parentPrivacy"] = "PRIVATE"
+                    vars["parentStatusColor"] = "#B02B2C"
+            else :
+                    vars["parentPrivacy"] = "PUBLIC"
+                    vars["parentStatusColor"] = "#128F33"
+
+        vars["locator"] = self._target.getLocator().getWebForm()
+        vars["getChildURL"] = lambda child: self._getChildURL(child)
+        return vars
+
+class WAccessControlFrame(WAccessControlFrameBase):
 
     def getHTML( self, target, setVisibilityURL, type ):
-        self.__target = target
+        self._target = target
 
         params = { "setPrivacyURL": setVisibilityURL,\
                    "target": target,\
@@ -1934,43 +1983,14 @@ class WAccessControlFrame(WTemplated):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-
-        if self.__target.getAccessProtectionLevel() == -1:
-            vars["privacy"] = "PUBLIC"
-            vars["statusColor"] = "#128F33"
-        elif self.__target.isItselfProtected():
-            vars["privacy"] = "PRIVATE"
-            vars["statusColor"] = "#B02B2C"
-        else :
-            vars["privacy"] = "INHERITING"
-            vars["statusColor"] = "#444444"
-
-        vars["isFullyPublic"] = None
-
-        if not isinstance(self.__target, Category) :
-            vars["isFullyPublic"] = self.__target.isFullyPublic()
-
-        if isinstance(self.__target, Category) and self.__target.isRoot():
-            vars["parentName"] = vars["parentPrivacy"] = vars["parentStatusColor"] = ''
-        else :
-            vars["parentName"] = self.__target.getOwner().getTitle()
-
-            if self.__target.hasProtectedOwner():
-                vars["parentPrivacy"] = "PRIVATE"
-                vars["parentStatusColor"] = "#B02B2C"
-            else :
-                vars["parentPrivacy"] = "PUBLIC"
-                vars["parentStatusColor"] = "#128F33"
-
-        vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["contactInfo"] = self.__target.getAccessController().getContactInfo()
+        vars.update(self._getAccessControlFrametParams())
         return vars
 
 
-class WConfAccessControlFrame(WTemplated):
+class WConfAccessControlFrame(WAccessControlFrameBase):
 
     def getHTML( self, target, setVisibilityURL):
-        self.__target = target
+        self._target = target
         params = { "target": target,\
                    "setPrivacyURL": setVisibilityURL,\
                    "type": "Event" }
@@ -1978,30 +1998,8 @@ class WConfAccessControlFrame(WTemplated):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-
-        if self.__target.getAccessProtectionLevel() == -1:
-            vars["privacy"] = "PUBLIC"
-            vars["statusColor"] = "#128F33"
-        elif self.__target.isItselfProtected():
-            vars["privacy"] = "PRIVATE"
-            vars["statusColor"] = "#B02B2C"
-        else :
-            vars["privacy"] = "INHERITING"
-            vars["statusColor"] = "#444444"
-
-        vars["isFullyPublic"] = self.__target.isFullyPublic()
-        vars["parentName"] = self.__target.getOwner().getName()
-
-        if self.__target.hasProtectedOwner():
-            vars["parentPrivacy"] = "PRIVATE"
-            vars["parentStatusColor"] = "#B02B2C"
-        else :
-            vars["parentPrivacy"] = "PUBLIC"
-            vars["parentStatusColor"] = "#128F33"
-
-        vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["accessKey"] = self.__target.getAccessKey()
-        vars["contactInfo"] = self.__target.getAccessController().getContactInfo()
+        vars["accessKey"] = self._target.getAccessKey()
+        vars.update(self._getAccessControlFrametParams())
         return vars
 
 

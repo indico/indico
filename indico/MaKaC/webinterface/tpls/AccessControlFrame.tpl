@@ -15,7 +15,7 @@ if isFullyPublic_ == None :
 % else :
 <%include file="AccessControlStatusFrame.tpl" args="parentName=parentName, privacy=privacy,
     parentPrivacy=parentPrivacy, statusColor = statusColor, parentStatusColor=parentStatusColor,
-    locator=locator, isFullyPublic=isFullyPublic_"/>
+    locator=locator, isFullyPublic=isFullyPublic, childrenProtected=childrenProtected"/>
 % endif
 </table>
 

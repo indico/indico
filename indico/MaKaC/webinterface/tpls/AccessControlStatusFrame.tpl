@@ -1,4 +1,4 @@
-<%page args="parentName=None, privacy=None, parentPrivacy=None, statusColor=None, parentStatusColor=None, locator=None, isFullyPublic=None"/>
+<%page args="parentName=None, privacy=None, parentPrivacy=None, statusColor=None, parentStatusColor=None, locator=None, isFullyPublic=None, childrenProtected=None"/>
 <%
 termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName':'category'},
             'Event':    {'name':'event', 'paramsKey': 'confId', 'parentName':'category'},
@@ -17,7 +17,19 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
                 ${ _("from a")} <span style="color: ${parentStatusColor};">${ _(parentPrivacy)}</span> ${ _(termsDict[type]['parentName'])}
             % endif
             % if not isFullyPublic and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
-                ${ _(", but be aware that some parts of your " + termsDict[type]['name'] + " are")} <span style="color: #B02B2C;">${ _("protected") }</span>
+                ${ _(", but be aware that some parts of your " + termsDict[type]['name'] + " are")} <span style="color: #B02B2C;">${ _("protected") }</span>. <span class="fakeLink" id="childrenProtectedText">${_("See protected elements")}</span>
+                <div id="childrenProtected" style="display:none">
+                % for childType in childrenProtected:
+                    %if childrenProtected[childType]:
+                        <div style="font-size:13px; font-weight: bold; color:#444; margin: 5px 0px">${childType}</div>
+                        <ul style="list-style: none inside none; margin: 5px 0 0; padding: 0px 10px;">
+                        % for child in childrenProtected[childType]:
+                            <li><a href="${getChildURL(child)}">${child.getTitle()}</a></li>
+                        % endfor
+                        </ul>
+                    % endif
+                % endfor
+                </div>
             % endif
             .
         </div>
@@ -42,85 +54,6 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
             <div class="ACUserListWrapper" id="ACUserListWrapper">
             </div>
         </div>
-
-        <script type="text/javascript">
-            % if type != 'Category' and type!= 'Home' and type != 'Event':
-            var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId()), ('confId', target.getConference().getId())])) };
-            % else :
-            var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId())])) };
-            % endif
-
-            var removeUser = function(user, setResult){
-                // This operation may be very expensive for categories
-                % if type == 'Category' or type == 'Home' :
-                var killProgress = IndicoUI.Dialogs.Util.progress($T("This operation may take a few minutes..."));
-                % endif
-                jsonRpc(Indico.Urls.JsonRpcService, "${ termsDict[type]['name'] }.protection.removeAllowedUser",
-                        {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
-                        % if type != 'Category' and type!= 'Home' and type != 'Event':
-                            'confId' : '${ target.getConference().getId() }',
-                        % endif
-                            value: {'id': user.get('id')}},
-                        function(result, error){
-                            if (exists(error)) {
-                                % if type == 'Category' or type == 'Home' :
-                                killProgress();
-                                % endif
-                                IndicoUtil.errorReport(error);
-                                setResult(false);
-                            } else {
-                                % if type == 'Category' or type == 'Home' :
-                                killProgress();
-                                % endif
-                                setResult(true);
-                            }
-                        });
-            };
-
-            var addUsers = function(list, setResult){
-                // This operation may be very expensive for categories
-                % if type == 'Category' or type == 'Home' :
-                var killProgress = IndicoUI.Dialogs.Util.progress($T("This operation may take a few minutes..."));
-                % endif
-                jsonRpc(Indico.Urls.JsonRpcService, "${termsDict[type]['name']}.protection.addAllowedUsers",
-                        {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
-                        % if type != 'Category' and type!= 'Home' and type != 'Event':
-                            'confId' : '${ target.getConference().getId() }',
-                        % endif
-                            value: list },
-                        function(result, error){
-                            if (exists(error)) {
-                                % if type == 'Category' or type == 'Home' :
-                                killProgress();
-                                % endif
-                                IndicoUtil.errorReport(error);
-                                setResult(false);
-                            } else {
-                                % if type == 'Category' or type == 'Home' :
-                                killProgress();
-                                % endif
-                                setResult(true);
-                            }
-                        });
-            };
-
-            // ---- List of users allowed to view the categ/event/material/resource
-
-            var allowedUsersList = new UserListField(
-                    'userListDiv', 'userList',
-                    allowedList, true, null,
-                    true, true, null, null,
-                    false, false, true,
-                    addUsers, null, removeUser);
-
-            // ---- On Load
-
-            IndicoUI.executeOnLoad(function()
-            {
-                $E('ACUserListWrapper').set(allowedUsersList.draw());
-            });
-
-        </script>
         % endif
     </td>
 </tr>
@@ -130,10 +63,6 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
     <td bgcolor="white" width="100%" valign="top" class="blacktext">
     <span id="inPlaceEditContact"></span></td>
 </tr>
-<script type="text/javascript">
-new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[type]['name'] + '.protection.changeContactInfo'}', ${dict([(termsDict[type]['paramsKey'], target.getId())])}, '${contactInfo or _("no contact info defined")}');
-</script>
-
 % endif
 <tr>
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Modify status")}</span></td>
@@ -163,4 +92,111 @@ new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[ty
     </div>
     </td>
 </tr>
+<script type="text/javascript">
+% if not isFullyPublic and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
+    $("#childrenProtectedText").qtip({
+        style: {
+            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+        },
+        show: {
+            event: 'click',
+            effect: function() {
+                $(this).fadeIn(300);
+            }
+        },
+        position: {
+            my: 'top center',
+            at: 'bottom center',
+        },
+        hide: {
+            event: 'unfocus click',
+            fixed: true,
+            effect: function() {
+                $(this).fadeOut(300);
+            }
+        },
+        content: {
+            text: $("#childrenProtected")
+        }
+    });
+% endif
 
+% if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
+    new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[type]['name'] + '.protection.changeContactInfo'}', ${dict([(termsDict[type]['paramsKey'], target.getId())])}, '${contactInfo or _("no contact info defined")}');
+    % if type != 'Category' and type!= 'Home' and type != 'Event':
+    var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId()), ('confId', target.getConference().getId())])) };
+    % else :
+    var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId())])) };
+    % endif
+
+    var removeUser = function(user, setResult){
+        // This operation may be very expensive for categories
+        % if type == 'Category' or type == 'Home' :
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("This operation may take a few minutes..."));
+        % endif
+        jsonRpc(Indico.Urls.JsonRpcService, "${ termsDict[type]['name'] }.protection.removeAllowedUser",
+                {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
+                % if type != 'Category' and type!= 'Home' and type != 'Event':
+                    'confId' : '${ target.getConference().getId() }',
+                % endif
+                    value: {'id': user.get('id')}},
+                function(result, error){
+                    if (exists(error)) {
+                        % if type == 'Category' or type == 'Home' :
+                        killProgress();
+                        % endif
+                        IndicoUtil.errorReport(error);
+                        setResult(false);
+                    } else {
+                        % if type == 'Category' or type == 'Home' :
+                        killProgress();
+                        % endif
+                        setResult(true);
+                    }
+                });
+    };
+
+    var addUsers = function(list, setResult){
+        // This operation may be very expensive for categories
+        % if type == 'Category' or type == 'Home' :
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("This operation may take a few minutes..."));
+        % endif
+        jsonRpc(Indico.Urls.JsonRpcService, "${termsDict[type]['name']}.protection.addAllowedUsers",
+                {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
+                % if type != 'Category' and type!= 'Home' and type != 'Event':
+                    'confId' : '${ target.getConference().getId() }',
+                % endif
+                    value: list },
+                function(result, error){
+                    if (exists(error)) {
+                        % if type == 'Category' or type == 'Home' :
+                        killProgress();
+                        % endif
+                        IndicoUtil.errorReport(error);
+                        setResult(false);
+                    } else {
+                        % if type == 'Category' or type == 'Home' :
+                        killProgress();
+                        % endif
+                        setResult(true);
+                    }
+                });
+    };
+
+    // ---- List of users allowed to view the categ/event/material/resource
+
+    var allowedUsersList = new UserListField(
+            'userListDiv', 'userList',
+            allowedList, true, null,
+            true, true, null, null,
+            false, false, true,
+            addUsers, null, removeUser);
+
+    // ---- On Load
+
+    IndicoUI.executeOnLoad(function()
+    {
+        $E('ACUserListWrapper').set(allowedUsersList.draw());
+    });
+% endif
+</script>

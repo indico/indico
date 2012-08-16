@@ -2246,6 +2246,21 @@ class Conference(CommonObjectBase, Locatable):
         # Room booking related
         #self.__roomBookingGuids = []
 
+    def getChildrenProtected(self):
+        children = {"Material": [],
+                    "Contributions" :[],
+                    "Sessions": []}
+        if not self.isProtected():
+            for mat in self.getAllMaterialList():
+                if not mat.isFullyPublic():
+                    children["Material"].append(mat)
+            for contrib in self.getContributionList():
+                if not contrib.isFullyPublic():
+                    children["Contributions"].append(contrib)
+            for session in self.getSessionList():
+                if not session.isFullyPublic():
+                    children["Sessions"].append(session)
+        return children
 
     def getKeywords(self):
         try:
@@ -5464,6 +5479,18 @@ class Session(CommonObjectBase, Locatable):
         self.setFullyPublic()
         self.getOwner().updateFullyPublic()
 
+    def getChildrenProtected(self):
+        children = {"Material": [],
+                    "Contributions" :[]}
+        if not self.isProtected():
+            for mat in self.getAllMaterialList():
+                if not mat.isFullyPublic():
+                    children["Material"].append(mat)
+            for contrib in self.getContributionList():
+                if not contrib.isFullyPublic():
+                    children["Contributions"].append(contrib)
+        return children
+
     def getKeywords(self):
         try:
             return self._keywords
@@ -7865,6 +7892,18 @@ class Contribution(CommonObjectBase, Locatable):
     def updateFullyPublic( self ):
         self.setFullyPublic()
         self.getOwner().updateFullyPublic()
+
+    def getChildrenProtected(self):
+        children = {"Material": [],
+                    "Subcontributions" :[]}
+        if not self.isProtected():
+            for mat in self.getAllMaterialList():
+                if not mat.isFullyPublic():
+                    children["Material"].append(mat)
+            for subContrib in self.getSubContributionList():
+                if not subContrib.isFullyPublic():
+                    children["Subcontributions"].append(subContrib)
+        return children
 
     def getKeywords(self):
         try:
