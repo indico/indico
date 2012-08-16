@@ -184,6 +184,7 @@ def handler(req, **params):
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
+    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 
     mode = path.split('/')[1]
 

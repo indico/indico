@@ -106,7 +106,7 @@ class RoomHook(RoomBookingHook):
         if self._detail == 'reservations':
             return super(RoomNameHook, self)._hasAccess(aw)
         return True
-        
+
 
 class RoomNameHook(RoomBookingHook):
     TYPES = ('roomName', )
