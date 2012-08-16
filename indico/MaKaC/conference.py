@@ -3288,6 +3288,12 @@ class Conference(CommonObjectBase, Locatable):
     def getLocation( self ):
         return self.getOwnLocation()
 
+    def getAddress( self ):
+        if self.getOwnLocation():
+            return self.getOwnLocation().getAddress()
+        else:
+            return None
+
     def getRoom( self ):
         return self.getOwnRoom()
 

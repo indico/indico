@@ -3,7 +3,7 @@ from indico.core.index import IUniqueIdProvider, OOIndex, Catalog
 from zope.interface import implements
 from MaKaC.common.ObjectHolders import ObjectHolder
 from persistent import Persistent
-from indico.modules.oauth import IIndexableByUserId, IIndexableByConsumerName
+from indico.modules.oauth import IIndexableByUserId
 
 class ConsumerHolder(ObjectHolder):
     idxName = "consumers"
@@ -72,7 +72,7 @@ class Consumer(Persistent):
 
 class Token(Persistent):
 
-    implements(IUniqueIdProvider, IIndexableByUserId, IIndexableByConsumerName)
+    implements(IUniqueIdProvider, IIndexableByUserId)
 
     def __init__(self, key, token, timestamp, consumer, user_id):
         self._key = key
@@ -111,5 +111,3 @@ class Token(Persistent):
     def __conform__(self, proto):
         if proto == IIndexableByUserId:
             return self.getUserId()
-        elif proto == IIndexableByConsumerName:
-            return self.getConsumer().getName()

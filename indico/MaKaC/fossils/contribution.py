@@ -78,6 +78,9 @@ class IContributionFossil(IFossil):
         pass
     getType.convert = lambda t: t and t.getName()
 
+    def getAddress(self):
+        pass
+
     def getProtectionURL(self):
         """Contribution protection URL"""
     getProtectionURL.produce = lambda s: str(urlHandlers.UHContribModifAC.getURL(s))

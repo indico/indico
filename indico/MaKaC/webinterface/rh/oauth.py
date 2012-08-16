@@ -10,6 +10,7 @@ from MaKaC.webinterface.rh import base
 from MaKaC.webinterface import urlHandlers
 from indico.core.index import Catalog
 from MaKaC.webinterface.urlHandlers import UHThirdPartyAuth
+from indico.web.wsgi import webinterface_handler_config as apache
 
 from indico.modules.oauth.db import Consumer, Token, ConsumerHolder, AccessTokenHolder, RequestTokenHolder, TempRequestTokenHolder
 

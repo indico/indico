@@ -23,7 +23,7 @@ from indico.core.index.event import CategoryEventStartDateIndex
 
 from MaKaC.common import DBMgr
 from MaKaC.plugins.base import extension_point
-from indico.modules.oauth import UserOAuthRequestTokenIndex, UserOAuthAccessTokenIndex, ConsumerOAuthRequestTokenIndex
+from indico.modules.oauth import UserOAuthRequestTokenIndex, UserOAuthAccessTokenIndex
 
 
 # TODO: decorator for annoying 'db parameter'
@@ -32,8 +32,7 @@ class Catalog(OOBTree):
     _indexMap = {
         'categ_conf_sd': CategoryEventStartDateIndex,
         'user_oauth_access_token': UserOAuthAccessTokenIndex,
-        'user_oauth_request_token': UserOAuthRequestTokenIndex,
-        'consumer_oauth_request_token': ConsumerOAuthRequestTokenIndex
+        'user_oauth_request_token': UserOAuthRequestTokenIndex
         }
 
     @classmethod

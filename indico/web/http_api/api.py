@@ -424,7 +424,7 @@ class EventTimeTableHook(HTTPAPIHook):
 @HTTPAPIHook.register
 class EventSearchHook(HTTPAPIHook):
     TYPES = ('event',)
-    RE = r'search/(?P<search_term>[\w\s]+)'
+    RE = r'search/(?P<search_term>[^\/]+)'
 
     def _getParams(self):
         super(EventSearchHook, self)._getParams()

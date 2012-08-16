@@ -40,23 +40,3 @@ class CatalogIndexProvider(Component):
 
     def catalogIndexProvider(self, obj):
         return [('user_oauth_access_token', UserOAuthAccessTokenIndex)]
-
-
-class IIndexableByConsumerName(Interface):
-    pass
-
-
-class ConsumerOAuthRequestTokenIndex(OOIndex):
-
-    def __init__(self):
-        super(ConsumerOAuthRequestTokenIndex, self).__init__(IIndexableByConsumerName)
-
-    def initialize(self, dbi=None):
-        pass
-
-
-class CatalogIndexProvider(Component):
-    implements(ICatalogIndexProvider)
-
-    def catalogIndexProvider(self, obj):
-        return [('consumer_oauth_request_token', ConsumerOAuthRequestTokenIndex)]
