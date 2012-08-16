@@ -81,7 +81,7 @@ type("ListOfUsersManager", [], {
     },
 
     _personName: function(user) {
-        if (user._type == "Group" || user._type == "CERNGroup") {
+        if (user._type == "Group" || user._type == "CERNGroup" || user._type == "LDAPGroup") {
             var fullName = user.name;
         } else {
             if (user.pending) {

@@ -34,7 +34,7 @@ mail: john@example.com
 o: Example Inc.
 postalAddress: Example Inc., Some City, Some Country
 
-and groups listing their members by DNs, like:
+and groups in the OpenLDAP/SLAPD format listing their members by DNs, like:
 
 dn: cn=somegroup,ou=groups,dc=example,dc=com
 objectClass: groupOfNames
@@ -44,7 +44,10 @@ member: uid=alice,ou=people,dc=example,dc=com
 member: uid=bob,ou=people,dc=example,dc=com
 description: Just a group of people ...
 
-Adjust it to your needs if your LDAP structure is different.
+or groups in ActiveDirectory format marked by 'memberof' attribute.
+
+Adjust it to your needs if your LDAP structure is different,
+preferably by changing the extractUserDataFromLdapData() method.
 
 See indico.conf for information about customization options.
 """
@@ -53,6 +56,7 @@ See indico.conf for information about customization options.
 try:
     import ldap
     import ldap.filter
+    import re
 except:
     pass
 
@@ -65,7 +69,6 @@ from MaKaC.common import Configuration
 
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
                     'sn', 'postalAddress', 'userPrincipalName']
-
 
 class LDAPAuthenticator(Authenthicator):
     idxName = "LDAPIdentities"
@@ -94,7 +97,7 @@ class LDAPAuthenticator(Authenthicator):
             return None
 
     def createUser(self, li):
-        Logger.get('auth.ldap').info("create '%s'" % li.getLogin())
+        Logger.get('auth.ldap').debug("create '%s'" % li.getLogin())
         # first, check if authentication is OK
         data = LDAPChecker().check(li.getLogin(), li.getPassword())
         if not data:
@@ -108,21 +111,21 @@ class LDAPAuthenticator(Authenthicator):
             # User doesn't exist, create it
             try:
                 av = user.Avatar()
-                name = data.get('cn')
-                av.setName(name.split()[0])
-                av.setSurName(name.split()[-1])
-                av.setOrganisation(data.get('o', ""))
-                av.setEmail(data['mail'])
-                if 'postalAddress' in data:
-                    av.setAddress(fromLDAPmultiline(data.get('postalAddress')))
-                #av.setTelephone(data.get('telephonenumber',""))
+                udata = extractUserDataFromLdapData(data)
+                av.setName(udata['name'])
+                av.setSurName(udata['surName'])
+                av.setOrganisation(udata['organisation'])
+                av.setEmail(udata['email'])
+                av.setAddress(udata['address'])
                 ah.add(av)
                 av.activateAccount()
+                Logger.get('auth.ldap').info("created '%s'" % li.getLogin())
             except KeyError:
                 raise MaKaCError("LDAP account does not contain the mandatory"
                                  "data to create an Indico account.")
         else:
             # user founded
+            Logger.get('auth.ldap').info("found user '%s'" % li.getLogin())
             av = userList[0]
         #now create the nice identity for the user
         na = LDAPAuthenticator()
@@ -157,6 +160,7 @@ class LDAPAuthenticator(Authenthicator):
         av["id"] = id
         av["identity"] = LDAPIdentity
         av["authenticator"] = LDAPAuthenticator()
+        Logger.get('auth.ldap').debug('LDAPUser.getById(%s) return %s '%(id,av))
         return av
 
 
@@ -171,45 +175,44 @@ class LDAPIdentity(PIdentity):
         id is MaKaC.user.LoginInfo instance, self.user is Avatar
         """
 
-        Logger.get('auth.ldap').info("authenticate(%s)" % id.getLogin())
+        log = Logger.get('auth.ldap')
+        log.info("authenticate(%s)" % id.getLogin())
         data = LDAPChecker().check(id.getLogin(), id.getPassword())
         if data:
             if self.getLogin() == id.getLogin():
                 # modify Avatar with the up-to-date info from LDAP
                 av = self.user
-
                 av.clearAuthenticatorPersonalData()
-
-                if 'postalAddress' in data:
-                    postalAddress = fromLDAPmultiline(data['postalAddress'])
-                    if av.getAddress() != postalAddress:
-                        av.setAddress(postalAddress)
-
-                if 'sn' in data:
-                    surname = data['sn']
-                    av.setAuthenticatorPersonalData('surName', surname)
-                    if surname and av.getSurName() != surname and av.isFieldSynced('surName'):
-                        av.setSurName(surname, reindex=True)
-
-                if 'givenName' in data:
-                    firstName = data['givenName']
+                udata = extractUserDataFromLdapData(data)
+                if 'name' in udata:
+                    firstName = udata['name']
                     av.setAuthenticatorPersonalData('firstName', firstName)
                     if firstName and av.getName() != firstName and av.isFieldSynced('firstName'):
                         av.setName(firstName, reindex=True)
-
-                if 'o' in data:
-                    org = data.get('o', '')
-                else:
-                    org = data.get('company', '')
-
-                av.setAuthenticatorPersonalData('affiliation', org)
-                if org.strip() != '' and org != av.getOrganisation() and av.isFieldSynced('affiliation'):
-                    av.setOrganisation(org, reindex=True)
-
-                mail = data.get('mail', '')
-
-                if mail.strip() != '' and mail != av.getEmail():
-                    av.setEmail(mail, reindex=True)
+                        log.info('updated name for user '+id.getLogin()+' to '+firstName)
+                    if 'surName' in udata:
+                        surname = udata['surName']
+                        av.setAuthenticatorPersonalData('surName', surname)
+                        if surname and av.getSurName() != surname and av.isFieldSynced('surName'):
+                            av.setSurName(surname, reindex=True)
+                            log.info('updated surName for user '+id.getLogin()+' to '+surname)
+                    if 'organisation' in udata:
+                        org = udata['organisation']
+                        av.setAuthenticatorPersonalData('affiliation', org)
+                        if org.strip() != '' and org != av.getOrganisation() and av.isFieldSynced('affiliation'):
+                            av.setOrganisation(org, reindex=True)
+                            log.info('updated organisation for user '+id.getLogin()+' to '+org)
+                    if 'email' in udata:
+                        mail = udata['email']
+                        if mail.strip() != '' and mail != av.getEmail():
+                            av.setEmail(mail, reindex=True)
+                            log.info('updated email for user '+id.getLogin()+' to '+mail)
+                    if 'address' in udata:
+                        address = udata['address']
+                        if address != av.getAddress():
+                            av.setFieldSynced('address',True)
+                            av.setAddress(address)
+                            log.info('updated address for user '+id.getLogin()+' to '+address)
 
                 return self.user
             else:
@@ -265,8 +268,8 @@ class LDAPConnector(object):
         self.ldapGroupsFilter, self.ldapGroupsDN = \
                                ldapConfig.get('groupDNQuery')
         self.ldapAccessCredentials = ldapConfig.get('accessCredentials')
-        self.ldapMembershipQuery = ldapConfig.get('membershipQuery')
         self.ldapUseTLS = ldapConfig.get('useTLS')
+        self.groupStyle = ldapConfig.get('groupStyle')
 
     def login(self):
         try:
@@ -341,6 +344,7 @@ class LDAPConnector(object):
 
         for dn, data in res:
             if dn:
+                Logger.get('auth.ldap').debug('lookupUser(%s) successful'%uid)
                 return objectAttributes(dn, data, RETRIEVED_FIELDS)
         return None
 
@@ -375,6 +379,7 @@ class LDAPConnector(object):
             gfilter = self.ldapGroupsFilter.format(star + name + star)
         else:
             return []
+        Logger.get('auth.ldap').debug('findGroups(%s) '%name)
         res = self.l.search_s(self.ldapGroupsDN, ldap.SCOPE_SUBTREE, gfilter)
         groupDicts = []
         for dn, data in res:
@@ -385,31 +390,93 @@ class LDAPConnector(object):
 
     def userInGroup(self, login, name):
         """
-        Finds uids of users referenced by the member attribute
-        of the group LDAP object
+        Returns whether a user is in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
         """
-        query = self.ldapMembershipQuery.format(self._findDNOfGroup(name))
-        res = self.l.search_s(self._findDNOfUser(login), ldap.SCOPE_BASE, query)
+        Logger.get('auth.ldap').debug('userInGroup(%s,%s) '%(login,name))
+        # In ActiveDirectory users have multivalued attribute 'memberof' with list of groups
+        # In SLAPD groups have multivalues attribute 'member' with list of users
+        if self.groupStyle=='ActiveDirectory':
+            query = 'memberof={0}'.format(self._findDNOfGroup(name))
+            res = self.l.search_s(self._findDNOfUser(login), ldap.SCOPE_BASE, query)
+        elif self.groupStyle=='SLAPD':
+            query = 'member={0}'.format(self._findDNOfUser(login))
+            res = self.l.search_s(self._findDNOfGroup(name), ldap.SCOPE_BASE, query)
+        else:
+            raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
 
         return res != []
 
+    def findGroupMemberUids(self,name):
+        """
+         Finds uids of users in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
+        """
+        Logger.get('auth.ldap').debug('findGroupMemberUids(%s) '%name)
+        # In ActiveDirectory users have multivalued attribute 'memberof' with list of groups
+        # In SLAPD groups have multivalues attribute 'member' with list of users
+        if self.groupStyle=='ActiveDirectory':
+            #!not tested, I have not ActiveDirectory instance to try test it
+            #search for users with attribute memberof=groupdn
+            memberUids = []
+            query = 'memberof={0}'.format(self._findDNOfGroup(name))
+            res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE,query)
+            for dn, data in res:
+                if dn:
+                    memberUids.append( data['uid'] )
+            return memberUids
+        elif self.groupStyle=='SLAPD':
+            #read member attibute values from the group object
+            members = None
+            res = self.l.search_s(self._findDNOfGroup(name), ldap.SCOPE_BASE)
+            for dn, data in res:
+                if dn:
+                    members = data['member']
+            if not members:
+                return []
+            memberUids = []
+            for memberDN in members:
+                m = re.search('uid=([^,]*),',memberDN)
+                if m:
+                    uid = m.group(1)
+                    memberUids.append( uid )
+            Logger.get('auth.ldap').debug('findGroupMemberUids(%s) returns %s'%(name,memberUids))
+            return memberUids
+        else:
+            raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
 
 class LDAPChecker(object):
     def check(self, userName, password):
+        if not password or not password.strip():
+            Logger.get('auth.ldap').info("Username: %s - empty password" % userName)
+            return None
         try:
             ret = {}
             ldapc = LDAPConnector()
             ldapc.openAsUser(userName, password)
             ret = ldapc.lookupUser(userName)
             ldapc.close()
-            Logger.get('auth.ldap').debug("Username: %s checked: %s" % \
-                                          (userName, ret))
+            Logger.get('auth.ldap').debug("Username: %s checked: %s" % (userName, ret))
+            if not ret :
+                return None
+            #LDAP search is case-insensitive, we want case-sensitive match
+            if ret.get('uid')!=userName :
+                Logger.get('auth.ldap').info('user %s invalid case %s' % (userName,ret.get('uid')))
+                return None
             return ret
         except ldap.INVALID_CREDENTIALS:
-            Logger.get('auth.ldap').exception(
-                "Username: %s - invalid credentials" % userName)
+            Logger.get('auth.ldap').info("Username: %s - invalid credentials" % userName)
             return None
 
+def extractUserDataFromLdapData(ret):
+    """extracts user data from a LDAP record as a dictionary, edit to modify for your needs"""
+    udata= {}
+    udata["login"] = ret['uid']
+    udata["email"] = ret['mail']
+    udata["name"]= ret.get('givenName', '')
+    udata["surName"]= ret.get('sn', '')
+    udata["organisation"] = ret.get('o','')
+    udata['address'] = fromLDAPmultiline(ret['postalAddress']) if 'postalAddress' in ret else ''
+    Logger.get('auth.ldap').debug("extractUserDataFromLdapData(): %s " % udata)
+    return udata
 
 def fromLDAPmultiline(s):
     """
@@ -421,37 +488,22 @@ def fromLDAPmultiline(s):
     else:
         return s
 
-# for MaKaC.externUsers
 def dictToAv(ret):
+    """converts user data obtained from LDAP to the structure expected by Avatar"""
     av = {}
-    av["email"] = [ret['mail']]
-    av["name"] = ret.get('givenName', '')
-    av["surName"] = ret.get('sn', '')
-
-    if 'o' in ret:
-        av["organisation"] = [ret.get('o', '')]
-    else:
-        av["organisation"] = [ret.get('company', '')]
-
-    if 'postalAddress' in ret:
-        av['address'] = [fromLDAPmultiline(ret['postalAddress'])]
-
-    av["login"] = ret.get('uid') if 'uid' in ret else ret['userPrincipalName']
-    av["id"] = 'LDAP:' + av["login"]
+    udata=extractUserDataFromLdapData(ret)
+    av["login"] = udata["login"]
+    av["email"] = [udata["email"]]
+    av["name"]= udata["name"]
+    av["surName"]= udata["surName"]
+    av["organisation"] = [udata["organisation"]]
+    av["address"] = [udata["address"]]
+    av["id"] = 'LDAP:'+udata["login"]
     av["status"] = "NotCreated"
     return av
 
-
-def is_empty(dict, key):
-    if key not in dict:
-        return False
-    if dict[key]:
-        return True
-    else:
-        return False
-
-
 def ldapFindGroups(name, exact):
+    """used in user.py"""
     ldapc = LDAPConnector()
     ldapc.open()
     ldapc.login()
@@ -461,9 +513,20 @@ def ldapFindGroups(name, exact):
 
 
 def ldapUserInGroup(user, name):
+    """used in user.py"""
     ldapc = LDAPConnector()
     ldapc.open()
     ldapc.login()
     ret = ldapc.userInGroup(user, name)
+    ldapc.close()
+    return ret
+
+
+def ldapFindGroupMemberUids(name):
+    """used in user.py"""
+    ldapc = LDAPConnector()
+    ldapc.open()
+    ldapc.login()
+    ret = ldapc.findGroupMemberUids(name)
     ldapc.close()
     return ret

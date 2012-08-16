@@ -490,7 +490,7 @@ class Config:
                        'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
                        'groupDNQuery': ('cn={0}',
                                         'OU=Groups,DC=example,DC=com'),
-                       'membershipQuery': 'memberof={0}',
+                       'groupStyle': 'SLAPD',
                        'accessCredentials': ('CN=user,OU=Users,'
                                              'DC=example,DC=com',
                                              'secret_password')}

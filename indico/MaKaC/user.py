@@ -49,7 +49,7 @@ from MaKaC.externUsers import ExtUserHolder
 from MaKaC.common.db import DBMgr
 import MaKaC.common.info as info
 from MaKaC.i18n import _
-from MaKaC.authentication.LDAPAuthentication import ldapFindGroups, ldapUserInGroup
+from MaKaC.authentication.LDAPAuthentication import ldapFindGroups, ldapUserInGroup, ldapFindGroupMemberUids
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 from datetime import datetime, timedelta
