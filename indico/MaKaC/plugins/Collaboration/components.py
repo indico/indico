@@ -45,6 +45,7 @@ class CSBookingInstanceIndexCatalog(Index):
 
     def __init__(self):
         self._container = {}
+        self.initialize(initialize=False)
 
     def __getitem__(self, key):
         return self._container[key]
@@ -52,10 +53,11 @@ class CSBookingInstanceIndexCatalog(Index):
     def __setitem__(self, key, value):
         self._container[key] = value
 
-    def initialize(self, dbi=None):
+    def initialize(self, dbi=None, initialize=True):
         for index in ['WebcastRequest', 'RecordingRequest', 'All Requests']:
             idx = CSBookingInstanceIndex(index)
-            idx.initialize()
+            if initialize:
+                idx.initialize()
             self._container[index] = idx
 
 
