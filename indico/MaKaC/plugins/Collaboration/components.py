@@ -140,7 +140,7 @@ class CSBookingInstanceIndex(OOIndex):
             self.unindex_obj(bkw)
 
 
-class CatalogIndexPrintovider(Component):
+class CatalogIndexProvider(Component):
     zope.interface.implements(ICatalogIndexProvider)
 
     def catalogIndexProvider(self, obj):

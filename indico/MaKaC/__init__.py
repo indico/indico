@@ -18,4 +18,4 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 DEVELOPMENT = 0
-__version__="0.99-dev"
+__version__="0.99"

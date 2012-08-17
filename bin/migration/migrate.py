@@ -19,7 +19,7 @@ from MaKaC.user import AvatarHolder
 from MaKaC.rb_location import CrossLocationQueries
 
 """
-Migration script: v0.97 -> v0.98
+Migration script
 
 NOTE: Methods should be specified in order of execution, since @since adds them to
 the task list in the order it is called.
@@ -31,6 +31,7 @@ from BTrees.OOBTree import OOTreeSet, OOBTree
 from BTrees.IOBTree import IOBTree
 from dateutil import rrule
 from pkg_resources import parse_version
+from collections import defaultdict
 
 from MaKaC import __version__
 from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayIndex
@@ -499,85 +500,48 @@ def collaborationRequestIndexCreate(dbi, withRBDB, prevVersion):
 
 
 @since('0.99')
-def migrateChatroomIndexes(verbose=False):
-    """ The structure of the indexes is such that for each one self._data
-        is a BTree and each node is referenced by the IndexBy___ designation,
-        where ___ is the ID in question. Each node is then a TreeSet of
-        ChatRoom or XMPPChatRoom objects originally orderded by ID, we need
-        this to be ordered by title for effective searching / querying.
-        The __cmp__ method has been altered to accommodate this new format,
-        take each subnode, iterate through saving the current objects, clear the
-        index and reinsert them - they will now be in the correct order.
+def chatroomIndexMigration(dbi, withRBDB, prevVersio):
+    """
+    Migrating Chat Room index to new structure
     """
 
-    buffer = {}
-    error = {'index' : None, 'point' : None}
-    dbi = DBMgr.getInstance()
-    dbi.startRequest()
-    idc = [IndexByUser(), IndexByConf(), IndexByCRName(), IndexByID()]
+    # The structure of the indexes is such that for each one self._data
+    #    is a BTree and each node is referenced by the IndexBy___ designation,
+    #    where ___ is the ID in question. Each node is then a TreeSet of
+    #    ChatRoom or XMPPChatRoom objects originally orderded by ID, we need
+    #    this to be ordered by title for effective searching / querying.
+    #   The __cmp__ method has been altered to accommodate this new format,
+    #    take each subnode, iterate through saving the current objects, clear the
+    #    index and reinsert them - they will now be in the correct order.
 
-    def _node_to_buffer(accum, node):
-        if not buffer.has_key(accum):
-            buffer[accum] = []
-        for leaf in node:
-            buffer[accum].append(leaf)
-
-    def _buffer_to_idx(idx):
-        for accum in buffer.keys():
-            for room in buffer.get(accum):
-                idx.index(room)
-
-    def _print_idx_entries(idx):
-        if verbose:
-            for i in idx._data.keys():
-                print "  -", str(i), ":", str(idx._data[i])
+    from MaKaC.plugins.InstantMessaging.indexes import IndexByUser, IndexByConf, IndexByCRName, IndexByID
 
     try:
-        for idx in idc:
-            error['index'] = str(idx)
+        for idx in [IndexByUser(), IndexByConf(), IndexByCRName()]:
+            tmp_idx = defaultdict(list)
+            print console.colored("  * Index: " + str(idx), 'blue')
 
-            if verbose:
-                print " Starting index: " + str(idx)
+            for key, node in idx._data.iteritems():
+                for leaf in node:
+                    tmp_idx[key].append(leaf)
 
-            if isinstance(idx, IndexByID):
-                """ This index is a OOBTree of int chatroom ID : Chatroom
-                    and, therefore, does not need to be re-indexed.
-                """
-                continue
-
-            error['point'] = "Backing Up / Reading Error"
-            _print_idx_entries(idx)
-
-            for accum in idx._data.keys():
-                node = idx._data.get(accum)
-                _node_to_buffer(accum, node)
-
+            # reset index
             idx._data.clear()
-            error['point'] = "Reinsertion Error"
 
-            # Specific handling as IndexByUser & IndexByConf have different
-            # arguements for tree insertion.
-            if isinstance(idx, IndexByUser) or isinstance(idx, IndexByConf):
-                for accum in buffer.keys():
-                    for room in buffer.get(accum):
+            for accum, rooms in tmp_idx.iteritems():
+                for room in rooms:
+                    # Specific handling as IndexByUser & IndexByConf have different
+                    # arguements for tree insertion.
+                    if isinstance(idx, IndexByUser) or isinstance(idx, IndexByConf):
                         idx.index(str(accum), room)
-            else:
-                _buffer_to_idx(idx)
+                    else:
+                        idx.index(room)
 
-            if verbose:
-                print " Finished index: " + str(idx)
-
-            _print_idx_entries(idx)
-            buffer = {}
-
-        dbi.endRequest()
-
-        print "All indexes have now been re-indexed and committed to the DB."
-
+        print console.colored("\tAll indexes have now been re-indexed and committed to the DB.", 'green')
     except:
         dbi.abort()
         print console.colored("Process failed, ended abruptly, changes not committed.", 'red')
-        print "Path to error:", error
+        raise
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
@@ -600,7 +564,7 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
         if specified and task.__name__ not in specified:
             continue
         if parse_version(version) > prevVersion or always:
-            print console.colored("->", 'green', attrs=['bold']), \
+            print console.colored("#", 'green', attrs=['bold']), \
                   task.__doc__.replace('\n', '').strip(),
             print console.colored("(%s)" % version, 'yellow')
             dbi.startRequest()
@@ -613,7 +577,7 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                 DALManager.commit()
             dbi.endRequest()
 
-            print console.colored("   DONE\n", 'green', attrs=['bold'])
+            print console.colored("  DONE\n", 'green', attrs=['bold'])
 
     print console.colored("Database Migration successful!\n",
                           'green', attrs=['bold'])
@@ -624,7 +588,7 @@ def main():
     Main program cycle
     """
 
-    print console.colored("""\nThis script will migrate the Indico DB from v0.97.x to v0.98. We recommend that
+    print console.colored("""\nThis script will migrate your Indico DB to a new version. We recommend that
 this operation be executed while the web server is down, in order to avoid
 concurrency problems and DB conflicts.\n\n""", 'yellow')
 
