@@ -79,37 +79,76 @@ type("TimetableBlockBase", [],
                          description: item.description};
                  });
              });
-
              var menu = new SectionPopupMenu(sections, [triggerElement], null, null, true, closeHandler);
 
              return menu;
          },
+
+         getMaterialMenu: function (material) {
+                 var sections = [];
+                 each(material, function(section) {
+                     var sectionItems = [];
+                     each(section.resources, function(material) {
+                         sectionItems.push(Html.li({}, Html.a({className:"fakeLink", href: material.url}, material.name ? material.name : material.url)));
+                     });
+                     sections.push(Html.li({}, Html.li({className:'section'}, Html.div({className:'line'}, Html.div({className:'name', style: {background: '#F0F0F0'}}, section.title))), Html.ul({className:'subPopupList'}, sectionItems)));
+                 });
+                 var materialMenu = (Html.ul({className:'popupListNoShadows popupList sectionPopupList', style: {background: '#F0F0F0', border: 'none'}}, sections));
+                 return materialMenu;
+         },
+
+         createMaterialMenuQtip: function (selector, material) {
+             var self = this;
+             selector.qtip({
+                 content: {
+                     text: self.getMaterialMenu(material).dom.outerHTML,
+                 },
+                 show: {
+                     event: 'click'
+                 },
+                 hide: {
+                     event: 'unfocus'
+                 },
+                 position: {
+                     my: 'top right',
+                     at: 'bottom left',
+                 }
+             });
+         },
+
          createMaterialButton: function(material) {
              var self = this;
 
-            this.materialMenuOpen = false;
-
              var button = Html.div('timetableBlockMaterial');
              button.observeClick(function(e) {
-
                  e.stopPropagation();
-
-                 self.materialMenuOpen = true;
 
                  self.closePopup();
 
                  // use this style as long as the menu is open
                  button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
-
-                 var menu = self.createMaterialMenu(material, button, function () {
-                     // Restores the button style when menu is closed
-                     button.dom.className = "timetableBlockMaterial";
-                     self.materialMenuOpen = false;
-                     return true;
+                 $(".timetableBlockMaterialActive").qtip({
+                         content: {
+                             text: self.getMaterialMenu(material).dom.outerHTML,
+                         },
+                         show: {
+                             event: 'click'
+                         },
+                         hide: {
+                             event: 'unfocus'
+                         },
+                         position: {
+                             my: 'top right',
+                             at: 'bottom left',
+                         },
+                         events: {
+                             hide: function(event, api) {
+                                 // Restores the button style when menu is closed
+                                 button.dom.className = "timetableBlockMaterial";
+                             }
+                         },
                  });
-
-                 var pos = button.getAbsolutePosition();
-                 menu.open(pos.x + 20, pos.y + 18);
+                 $(".timetableBlockMaterialActive").qtip().show();
              });
 
              return button;

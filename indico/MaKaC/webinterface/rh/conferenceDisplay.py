@@ -853,24 +853,20 @@ class RHAuthorIndex(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
-        self._view=params.get("view","full")
-        self._letter=params.get("letter","a")
 
     def _process(self):
         p=conferences.WPAuthorIndex(self,self._target)
-        return p.display(viewMode=self._view,selLetter=self._letter)
+        return p.display()
 
 class RHSpeakerIndex(RHConferenceBaseDisplay):
     _uh=urlHandlers.UHConfAuthorIndex
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
-        self._view=params.get("view","full")
-        self._letter=params.get("letter","a")
 
     def _process(self):
         p=conferences.WPSpeakerIndex(self,self._target)
-        return p.display(viewMode=self._view,selLetter=self._letter)
+        return p.display()
 
 class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
     _uh=urlHandlers.UHConfMyStuff

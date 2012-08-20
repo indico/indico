@@ -15,11 +15,11 @@
 <div class="contributionListFiltersContainer">
     <%block name="filterHeader">
         <div>
-            <input type="text" id="filterContribs" value="${filterText}" placeholder=${ _("Search in contributions") }>
-            <div id="resetFiltersContainer" style="display:none"><a class="fakeLink" style="color: #881122" id="resetFilters">${_("Reset filters")}</a> |</div>
-            <a class="fakeLink" id="showFilters">${_("More filters")}</a> |
-            <a class="fakeLink" id="staticURLLink">${ _("Static URL for this result")}</a> |
-            <a class="fakeLink" id="exportPDF">${ _("Export to PDF")}</a>
+          <input type="text" id="filterContribs" value="${filterText}" placeholder="${ _("Search in contributions") }">
+          <div id="resetFiltersContainer" style="display:none"><a class="fakeLink" style="color: #881122" id="resetFilters">${_("Reset filters")}</a> |</div>
+          <a class="fakeLink" id="showFilters">${_("More filters")}</a> |
+          <a class="fakeLink" id="staticURLLink">${ _("Static URL for this result")}</a> |
+          <a class="fakeLink" id="exportPDF">${ _("Export to PDF")}</a>
         </div>
     </%block>
     <div id="filterContent" class="CRLDiv" style="display:none">

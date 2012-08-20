@@ -84,6 +84,8 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
+from MaKaC.conference import Link
+import collections
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -703,13 +705,22 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         self._conf = conf
         self._aw = aw
 
-    def _getChairsHTML( self ):
-        chairList = []
+    def _getChairsHTML(self):
         l = []
         for chair in self._conf.getChairList():
-            if chair.getEmail():
-                mailToURL = """%s"""%urlHandlers.UHConferenceEmail.getURL(chair)
-                l.append( """<a href=%s>%s</a>"""%(quoteattr(mailToURL),self.htmlText(chair.getFullName())))
+            if chair.getEmail() and self._aw.getUser() is not None:
+                l.append("""<a href=mailto:%s>%s</a>""" % (quoteattr(chair.getEmail()), self.htmlText(chair.getFullName())))
+            elif chair.getEmail():
+                l.append("""
+    <a href=# class="chairs" style="cursor: pointer">%s</a>
+    <script type="text/javascript">
+        $('.chairs').qtip({
+             content: {
+                 text: $T("Login to send an email"),
+             },
+         });
+    </script>
+                """ % (self.htmlText(chair.getFullName())))
             else:
                 l.append(self.htmlText(chair.getFullName()))
         res = ""
@@ -6742,312 +6753,78 @@ class WConfContributionList ( wcomponents.WTemplated ):
         return vars
 
 
-class WConfAuthorIndex(wcomponents.WTemplated):
+class WConfAuthorIndex( wcomponents.WTemplated ):
 
-    def __init__(self,aw,conf,view,selLetter="[all]"):
-        self._aw=aw
-        self._conf=conf
-        self._view=view
-        self._selLetter=selLetter
+    def __init__(self, conf):
+        self._conf = conf
 
-
-    def _getContribMinView(self,contrib):
-        return """<a href=%s>#%s</a>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()))
-
-    def _getContribFullView(self,contrib):
-        return """<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a></p>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()))
-
-    def _getMaterialHTML(self, contrib):
-        lm=[]
-        paper=contrib.getPaper()
-        if paper is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="paper"><span style="font-style: italic;"><small> %s</small></span></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(paper))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallPaper" ))),
-                self.htmlText("paper")))
-        slides=contrib.getSlides()
-        if slides is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="slides"><span style="font-style: italic;"><small> %s</small></span></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(slides))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallSlides" ))),
-                self.htmlText("slides")))
-        poster=contrib.getPoster()
-        if poster is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="poster"><span style="font-style: italic;"><small> %s</small></span></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(poster))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallPoster" ))),
-                self.htmlText("poster")))
-        slides=contrib.getSlides()
-        video=contrib.getVideo()
-        if video is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="video"><span style="font-style: italic;"><small> %s</small></span></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(video))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallVideo" ))),
-                self.htmlText("video")))
-        return ", ".join(lm)
-
-    def _getItemHTML(self,pl, key):
-
-        if len(pl)<=0:
-            return ""
-        auth=pl[0]
-        authCaption = auth.getFullNameNoTitle()
-
-        self._urlGen=urlHandlers.UHContributionDisplay.getURL
-        if authCaption.strip()=="":
-            return ""
-        authId = auth.getId()
-        authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution())
-        authorURL.addParam( "authorId", authId )
-        contribList=[]
-        for auth in pl:
-            contrib=auth.getContribution()
-            if contrib is not None:
-                url=urlHandlers.UHContributionDisplay.getURL(contrib)
-                if self._view=="full":
-                    material = self._getMaterialHTML(contrib)
-                    if material.strip()!="":
-                        material = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( %s )"%material
-                    contribList.append("""<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a>%s</p>"""%(quoteattr(str(url)),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()), material ))
-                else:
-                    contribList.append("""<a href=%s>#%s</a>"""%(quoteattr(str(url)),self.htmlText(contrib.getId())))
-        if self._view=="full":
-            res="""
-                <tr>
-                    <td valign="top" nowrap><a href=%s>%s</a></td>
-                    <td width="100%%">%s</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="border-bottom: 1px solid; border-color: #EAEAEA">&nbsp;</td>
-                </tr>"""%(quoteattr(str(authorURL)), self.htmlText(authCaption),"".join(contribList))
-        else:
-            res="""
-                <tr>
-                    <td valign="top"><a href=%s>%s</a></td>
-                    <td width="100%%">%s</td>
-                </tr>
-                """%(quoteattr(str(authorURL)), self.htmlText(authCaption),", ".join(contribList))
-        return res
-
-    def _getLetterIndex(self):
-        url=urlHandlers.UHConfAuthorIndex.getURL(self._conf)
-        res=[]
-        for letter in ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','[all]']:
-            url.addParam("letter",letter)
-            url.addParam("view",self._view)
-            res.append("""<a href=%s>%s</a> """%(quoteattr(str(url)),letter))
-        return " | ".join(res)
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        availViewModes=[["full", _("use contribution ids and titles")],
-                        ["onlyIds", _("use contribution ids")]]
-        res=[]
-
-        for vm in availViewModes:
-            sel=""
-            if self._view==vm[0]:
-                sel=" selected"
-
-            res.append("""<option value=%s%s>%s</option>"""%(
-                    quoteattr(str(vm[0])),sel,self.htmlText(vm[1])))
-        vars["viewModes"]="".join(res)
-        displayURL = urlHandlers.UHConfAuthorIndex.getURL(self._conf)
-        displayURL.addParam("letter", self._selLetter)
-        vars["displayURL"]=quoteattr(str(displayURL))
-        vars["letterIndex"]=self._getLetterIndex()
-        res=[]
-        for key in self._conf.getAuthorIndex().getParticipationKeys():
+        vars = wcomponents.WTemplated.getVars(self)
+        res = collections.defaultdict(list)
+        for index, key in enumerate(self._conf.getAuthorIndex().getParticipationKeys()):
             pl = self._conf.getAuthorIndex().getById(key)
             try:
-                auth=pl[0]
+                auth = pl[0]
             except IndexError:
                 continue
-            authCaption="%s"%auth.getFamilyName().upper()
-            if authCaption.strip()=="":
-                continue
-            if self._selLetter!='[all]':
-                if authCaption[0].lower()>self._selLetter:
-                    break
-                elif authCaption[0].lower()!=self._selLetter:
-                    continue
-            res.append(self._getItemHTML(pl, key))
-        vars["items"]="".join(res)
+            authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution())
+            authorURL.addParam("authorId", auth.getId())
+            res[index].append({'fullName': auth.getFullNameNoTitle(), 'affiliation': auth.getAffiliation(), 'authorURL': authorURL })
+            for auth in pl:
+                contrib = auth.getContribution()
+                if contrib is not None:
+                    res[index].append({'title': contrib.getTitle(), 'url': str(urlHandlers.UHContributionDisplay.getURL( auth.getContribution())), 'materials': fossilize(contrib.getAllMaterialList())})
+        vars["items"] = res
         return vars
 
 
-class WPAuthorIndex(WPConferenceDefaultDisplayBase):
+class WPAuthorIndex( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAuthorIndex
 
     def _getBody(self,params):
-        view = params.get("viewMode","full")
-        wc=WConfAuthorIndex(self._getAW(),self._conf,view,params.get("selLetter","a"))
+        wc = WConfAuthorIndex(self._conf)
         return wc.getHTML()
 
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
 
-class WConfSpeakerIndex(wcomponents.WTemplated):
+class WConfSpeakerIndex( wcomponents.WTemplated ):
 
-    def __init__(self,aw,conf,view,selLetter="[all]"):
-        self._aw=aw
-        self._conf=conf
-        self._view=view
-        self._selLetter=selLetter
-
-
-    def _getContribMinView(self,contrib):
-        return """<a href=%s>#%s</a>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()))
-
-    def _getContribFullView(self,contrib):
-        if contrib is not None:
-            return """<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a></p>"""%(quoteattr(str(self._urlGen(contrib))),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()))
-        return ""
-
-    def _getMaterialHTML(self, contrib):
-        lm=[]
-        paper=contrib.getPaper()
-        if paper is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="paper"><span style="font-style: italic;"><small> %s</small></span></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(paper))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallPaper" ))),
-                self.htmlText("paper")))
-        slides=contrib.getSlides()
-        if slides is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="slides"><span style="font-style: italic;"><small> %s</small></span></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(slides))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallSlides" ))),
-                self.htmlText("slides")))
-        poster=contrib.getPoster()
-        if poster is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="poster"><span style="font-style: italic;"><small> %s</small></span></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(poster))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallPoster" ))),
-                self.htmlText("poster")))
-        slides=contrib.getSlides()
-        video=contrib.getVideo()
-        if video is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="video"><span style="font-style: italic;"><small> %s</small></span></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(video))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallVideo" ))),
-                self.htmlText("video")))
-        return ", ".join(lm)
-
-    def _getItemHTML(self,pl, key):
-        if len(pl)<=0:
-                return ""
-        auth=pl[0]
-        authCaption="%s"%auth.getFamilyName().upper()
-        #if authCaption.strip()=="":
-        #    return ""
-        #if self._selLetter!='[all]' and authCaption[0].lower()!=self._selLetter:
-        #    return ""
-        if auth.getFirstName()!="":
-            authCaption="%s, %s"%(authCaption,auth.getFirstName())
-        itemFormatFunc=self._getContribMinView
-        if self._view=="full":
-            itemFormatFunc=self._getContribFullView
-
-        self._urlGen=urlHandlers.UHContributionDisplay.getURL
-        participationList=[itemFormatFunc(auth.getContribution()) for auth in pl]
-        if authCaption.strip()=="":
-                return ""
-        authId = key
-        #authorURL = urlHandlers.UHContribAuthorDisplay.getURL(self._conf)
-        #authorURL.addParam( "authorId", authId )
-        participationList=[]
-        for auth in pl:
-            participationId=""
-            if isinstance(auth, conference.SubContribParticipation):
-                participation=auth.getSubContrib()
-                if participation is None:
-                    continue
-                url=urlHandlers.UHSubContributionDisplay.getURL(participation)
-                participationId="%s-%s"%(participation.getContribution().getId(), participation.getId())
-            else:
-                participation=auth.getContribution()
-                if participation is None:
-                    continue
-                url=urlHandlers.UHContributionDisplay.getURL(participation)
-                participationId="%s"%(participation.getId())
-            if self._view=="full":
-                material = self._getMaterialHTML(participation)
-                if material.strip()!="":
-                        material = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( %s )"%material
-                participationList.append("""<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a>%s</p>"""%(quoteattr(str(url)),self.htmlText(participationId),self.htmlText(participation.getTitle()), material ))
-            else:
-                participationList.append("""<a href=%s>#%s</a>"""%(quoteattr(str(url)),self.htmlText(participationId)))
-        if self._view=="full":
-            res="""
-                    <tr>
-                            <td valign="top" nowrap>%s</td>
-                            <td width="100%%">%s</td>
-                    </tr>
-                    <tr>
-                            <td colspan="2" style="border-bottom: 1px solid; border-color: #EAEAEA">&nbsp;</td>
-                    </tr>"""%(self.htmlText(authCaption),"".join(participationList))
-        else:
-            res="""
-                    <tr>
-                            <td valign="top">%s</td>
-                            <td width="100%%">%s</td>
-                    </tr>
-                    """%(self.htmlText(authCaption),", ".join(participationList))
-        return res
-
-    def _getLetterIndex(self):
-        url=urlHandlers.UHConfSpeakerIndex.getURL(self._conf)
-        res=[]
-        for letter in ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','[all]']:
-            url.addParam("letter",letter)
-            url.addParam("view",self._view)
-            res.append("""<a href=%s>%s</a> """%(quoteattr(str(url)),letter))
-        return " | ".join(res)
+    def __init__(self, conf):
+        self._conf = conf
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        availViewModes=[["full", _("use contribution ids and titles")],
-                        ["onlyIds", _("use contribution ids")]]
-        res=[]
-
-        for vm in availViewModes:
-            sel=""
-            if self._view==vm[0]:
-                sel=" selected"
-
-            res.append("""<option value=%s%s>%s</option>"""%(
-                    quoteattr(str(vm[0])),sel,self.htmlText(vm[1])))
-        vars["viewModes"]="".join(res)
-        displayURL = urlHandlers.UHConfSpeakerIndex.getURL(self._conf)
-        displayURL.addParam("letter", self._selLetter)
-        vars["displayURL"]=quoteattr(str(displayURL))
-        vars["letterIndex"]=self._getLetterIndex()
-        res=[]
-        for key in self._conf.getSpeakerIndex().getParticipationKeys():
+        vars = wcomponents.WTemplated.getVars(self)
+        res = collections.defaultdict(list)
+        for index, key in enumerate(self._conf.getSpeakerIndex().getParticipationKeys()):
             pl = self._conf.getSpeakerIndex().getById(key)
             try:
-                auth=pl[0]
+                speaker = pl[0]
             except IndexError:
                 continue
-            authCaption="%s"%auth.getFamilyName().upper()
-            if authCaption.strip()=="":
-                continue
-            if self._selLetter!='[all]':
-                if authCaption[0].lower()>self._selLetter:
-                    break
-                elif authCaption[0].lower()!=self._selLetter:
-                    continue
-            res.append(self._getItemHTML(pl, key))
-        vars["items"]="".join(res)
+            res[index].append({'fullName': speaker.getFullNameNoTitle(), 'affiliation': speaker.getAffiliation()})
+            for speaker in pl:
+                if isinstance(speaker, conference.SubContribParticipation):
+                    participation = speaker.getSubContrib()
+                    if participation is None:
+                        continue
+                    url = urlHandlers.UHSubContributionDisplay.getURL(participation)
+                else:
+                    participation = speaker.getContribution()
+                    if participation is None:
+                        continue
+                    url = urlHandlers.UHContributionDisplay.getURL(participation)
+                res[index].append({'title': participation.getTitle(), 'url': str(url), 'materials': fossilize(participation.getAllMaterialList())})
+        vars["items"] = res
         return vars
 
-class WPSpeakerIndex(WPConferenceDefaultDisplayBase):
+class WPSpeakerIndex( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NESpeakerIndex
 
-    def _getBody(self,params):
-        view = params.get("viewMode","full")
-        wc=WConfSpeakerIndex(self._getAW(),self._conf,view,params.get("selLetter","a"))
+    def _getBody(self, params):
+        wc=WConfSpeakerIndex(self._conf)
         return wc.getHTML()
 
     def _defineSectionMenu( self ):

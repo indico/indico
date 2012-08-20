@@ -82,7 +82,7 @@ type("ChainedPopupWidget", ["PopupWidget"],
          close: function() {
              // close() cleans up the onclick handler too
              this.active = false;
-             $('body').off('click.chained_menu');
+             $('html').off('click.chained_menu');
              this.PopupWidget.prototype.close.call(this);
          }
      },
