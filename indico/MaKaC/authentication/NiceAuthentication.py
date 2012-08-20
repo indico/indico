@@ -25,7 +25,7 @@ from copy import copy
 from flask import request
 from xml.dom.minidom import parseString
 
-from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
+from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface import urlHandlers
 from MaKaC.user import Avatar
@@ -35,7 +35,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
 
-class NiceAuthenticator(Authenthicator):
+class NiceAuthenticator(Authenthicator, SSOHandler):
     idxName = "NiceIdentities"
     id = 'Nice'
     name = 'CERN user database'
@@ -88,86 +88,6 @@ class NiceAuthenticator(Authenthicator):
         id = na.createIdentity( li, av)
         na.add(id)
         return av
-
-    def autoLogin(self, rh):
-        """
-        Login using Shibbolet.
-        """
-        if 'ADFS_EMAIL' in request.environ:
-            email = request.environ['ADFS_EMAIL']
-            login = request.environ['ADFS_LOGIN']
-            personId = request.environ['ADFS_PERSONID']
-            phone = request.environ.get('ADFS_PHONENUMBER', "")
-            fax = request.environ.get('ADFS_FAXNUMBER', "")
-            lastname = request.environ.get('ADFS_LASTNAME', "")
-            firstname = request.environ.get('ADFS_FIRSTNAME', "")
-            institute = request.environ.get('ADFS_HOMEINSTITUTE', "")
-            if personId == '-1':
-                personId = None
-            from MaKaC.user import AvatarHolder
-            ah = AvatarHolder()
-            av = ah.match({"email":email},exact=1, onlyActivated=False, searchInAuthenticators=False)
-            if av:
-                av = av[0]
-                # don't allow disabled accounts
-                if av.isDisabled():
-                    return None
-#                # TODO: is this checking necessary?
-#                if av.getStatus() == 'NotCreated':
-#                    #checking if comming from Nice
-#                    if av.getId()[:len(self.id)] == self.id:
-#                        av.setId("")
-#                        ah.add(av) #XXXXX
-#                        av.activateAccount()
-#                    else:
-#                        return None
-                # if not activated
-                elif not av.isActivated():
-                    av.activateAccount()
-
-                av.clearAuthenticatorPersonalData()
-                av.setAuthenticatorPersonalData('phone', phone)
-                av.setAuthenticatorPersonalData('fax', fax)
-                av.setAuthenticatorPersonalData('surName', lastname)
-                av.setAuthenticatorPersonalData('firstName', firstname)
-                av.setAuthenticatorPersonalData('affiliation', institute)
-                if phone != '' and phone != av.getPhone() and av.isFieldSynced('phone'):
-                    av.setTelephone(phone)
-                if fax != '' and fax != av.getFax() and av.isFieldSynced('fax'):
-                    av.setFax(fax)
-                if lastname != '' and lastname != av.getFamilyName() and av.isFieldSynced('surName'):
-                    av.setSurName(lastname, reindex=True)
-                if firstname != '' and firstname != av.getFirstName() and av.isFieldSynced('firstName'):
-                    av.setName(firstname, reindex=True)
-                if institute != '' and institute != av.getAffiliation() and av.isFieldSynced('affiliation'):
-                    av.setAffiliation(institute, reindex=True)
-                if personId != None and personId != av.getPersonId():
-                    av.setPersonId(personId)
-            else:
-                avDict = {"email": email,
-                          "name": firstname,
-                          "surName": lastname,
-                          "organisation": institute,
-                          "telephone": phone,
-                          "login": login}
-
-                av = Avatar(avDict)
-                ah.add(av)
-                av.setPersonId(personId)
-                av.activateAccount()
-
-            if login != "" and not self.hasKey(login):
-                ni=NiceIdentity(login, av)
-                self.add(ni)
-            if login != "" and self.hasKey(login) and not av.getIdentityById(login, self.getId()):
-                av.addIdentity(self.getById(login))
-            return av
-
-        return None
-
-    def autoLogout(self, rh):
-        return "https://login.cern.ch/adfs/ls/?wa=wsignout1.0"
-
 
     def matchUser(self, criteria, exact=0):
         dict = {}

@@ -25,6 +25,10 @@ def index(req, **params):
     return login.RHSignIn( req ).process( params )
 
 
+def sso(req, **params):
+    return login.RHSignInSSO( req ).process( params )
+
+
 def active(req, **params):
     return login.RHActive( req ).process( params )
 

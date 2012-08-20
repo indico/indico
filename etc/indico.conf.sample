@@ -203,37 +203,64 @@ MaxUploadFileSize = 0
 # If you want to have all users authenticate only to an external user management
 # system (for example: MyAuthSystem) you should write:
 #
-#     AuthenticatorList = ['MyAuthSystem']
+#     AuthenticatorList = [('MyAuthSystem', {})]
+#
+# Where the second element of the tuple is a dictionary with the configuration.
 #
 # If you want to authenticate users against more than one authentication system
 # you can write them like this (systems will be queried about users from left
 # to right):
 #
-#     AuthenticatorList = ['Local', 'LDAP', 'MyAuthSystem']
+#     AuthenticatorList = [('Local', {}), ('LDAP', {}), ('MyAuthSystem', {})]
+#
+# If you want to setup SSO in your authenticator you should setup the variable
+# SSOActive to True.
+#
+#     AuthenticatorList = [('MyAuthSystem', {'SSOActive': True})]
+#
+# You can also can configure the mapping of the SSO attributes with the variable SSOMapping. An example:
+#
+# AuthenticatorList = [ ('Local', {}),
+#                        ('MyAuthSystem', {'SSOActive': True,
+#                                          'LogoutCallbackURL': 'https://example.com/wsignout',
+#                                          'SSOMapping' = { 'email': 'ADFS_EMAIL',
+#                                                           'login': 'ADFS_LOGIN',
+#                                                           'personId': 'ADFS_PERSONID',
+#                                                           'phone': 'ADFS_PHONENUMBER',
+#                                                           'fax': 'ADFS_FAXNUMBER',
+#                                                           'lastname': 'ADFS_LASTNAME',
+#                                                           'firstname': 'ADFS_FIRSTNAME',
+#                                                           'institute': 'ADFS_HOMEINSTITUTE'}
+#                                          })]
+#
+#
 #
 # The default configuration will use only Indico's authentication system.
 
-AuthenticatorList    = ['Local']
+AuthenticatorList    = [('Local', {})]
 
-# Uncomment/customize the following lines if you want to use LDAP authentication
+# For instance if you want to setup the LDAP Authenticator you should define as following:
 #
-# LDAPConfig = {'host': 'myldapserver.example.com',
+# AuthenticatorList  = [('Local', { 'host': 'myldapserver.example.com',
 #
-#               # use TLS (do so, if your server allows)
-#               'useTLS': True,
+#                                   # use TLS (do so, if your server allows)
+#                                   'useTLS': True,
 #
-#               # filter parameters for users, base DN to use
-#               'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
+#                                   # filter parameters for users, base DN to use
+#                                   'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
 #
-#               # filter parameters for groups, base DN to use
-#               'groupDNQuery': ('cn={0}', 'OU=Groups,DC=example,DC=com'),
+#                                   # filter parameters for groups, base DN to use
+#                                   'groupDNQuery': ('cn={0}', 'OU=Groups,DC=example,DC=com'),
 #
-#               # query used to infer membership of a group
-#               'membershipQuery': 'memberof={0}',
+#                                   # SLAPD or ActiveDirectory
+#                                   'groupStyle': 'SLAPD',
 #
-#               # access credentials of a user with read access
-#               'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
-# }
+#                                   # access credentials of a user with read access
+#                                    'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
+#                                   }
+#
+#
+#
 
 # Sessions are only stored for a certain time. You can modify the duration here. By setting
 # the lifetime to 0 the cookie will expire when the browser is closed.

@@ -30,7 +30,7 @@ from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
 import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.errors import UserError
+from MaKaC.errors import UserError, MaKaCError, FormValuesError
 import MaKaC.common.info as info
 from indico.web.flask.util import send_file
 
@@ -59,10 +59,8 @@ class RHSignInBase( base.RH ):
     def _makeLoginProcess( self ):
         #Check for automatic login
         authManager = AuthenticatorMgr.getInstance()
-        av = authManager.autoLogin(self)
-        if av:
-            self._setSessionVars(av)
-            self._redirect(self._url)
+        if authManager.isSSOLoginActive() and len(authManager.getList()) == 1 and not Config.getInstance().getDisplayLoginPage():
+            self._redirect(urlHandlers.UHSignInSSO.getURL(authId=authManager.getDefaultAuthenticator().getId()))
         if not self._signIn:
             return self._signInPage.display( returnURL = self._returnURL )
         else:
@@ -78,6 +76,7 @@ class RHSignInBase( base.RH ):
                 return _("your account is not activate\nPlease active it and retry")
             else:
                 self._setSessionVars(av)
+            self._addExtraParamsToURL()
             self._redirect(self._url)
 
 
@@ -105,41 +104,48 @@ class RHSignIn( RHSignInBase ):
     def _process(self):
         return self._makeLoginProcess()
 
+class RHSignInSSO(RHSignInBase):
+
+    _isMobile = False
+
+    def _checkParams( self, params ):
+        self._authId = params.get( "authId", "").strip()
+        if self._authId == "":
+            raise FormValuesError(_("You must choose the authenticator to sign in with"))
+
+    def _process(self):
+        authenticator = session.pop('Authenticator', None)
+        if self._authId:
+            session['Authenticator'] = self._authId
+            self._redirect(str(urlHandlers.UHSignIn.getURL()) + "/SSO" + self._authId)
+        elif authenticator is not None:
+            authManager = AuthenticatorMgr.getInstance()
+            if authManager.isSSOLoginActive():
+                av = authManager.SSOLogin(self, authenticator)
+                if av:
+                    self._setSessionVars(av)
+                    self._redirect(self._url)
+                else:
+                    raise MaKaCError(_("You could not login through SSO."))
+            else:
+                raise MaKaCError(_("SSO Login is not active."))
+        else:
+            raise MaKaCError(_("You did not pass the authenticator"))
+
 
 class RHSignOut( base.RH ):
 
     _isMobile = False
 
     def _checkParams( self, params ):
-        self._returnURL = params.get( "returnURL", "").strip()
-        if self._returnURL == "":
-            self._returnURL = urlHandlers.UHWelcome.getURL()
+        self._returnURL = params.get( "returnURL", str(urlHandlers.UHWelcome.getURL())).strip()
 
     def _process( self ):
-        autoLogoutRedirect = None
         if self._getUser():
-            autoLogoutRedirect = AuthenticatorMgr.getInstance().autoLogout(self)
+            self._returnURL = AuthenticatorMgr.getInstance().getLogoutCallbackURL(self) or self._returnURL
             session.clear()
             self._setUser(None)
-        if autoLogoutRedirect:
-            self._redirect(autoLogoutRedirect)
-        else:
-            self._redirect(self._returnURL)
-
-
-class RHLogoutSSOHook( base.RH):
-
-    _isMobile = False
-
-    def _process(self):
-        """Script triggered by the display of the centralized SSO logout
-        dialog. It logouts the user from CDS Invenio and stream back the
-        expected picture."""
-        if self._getUser():
-            session.clear()
-            self._setUser(None)
-        path = os.path.join(Configuration.Config.getInstance().getImagesDir(), 'wsignout.gif')
-        return send_file('wsignout.gif', path, 'GIF')
+        self._redirect(self._returnURL)
 
 
 class RHActive( base.RH ):

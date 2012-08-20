@@ -26,10 +26,9 @@ class AuthenticatorMgr:
     _instance = None
 
     def __init__(self):
-
         self._authenticator_list = []
         config = Config.getInstance()
-        for auth in config.getAuthenticatorList():
+        for auth, config in config.getAuthenticatorList():
             try:
                 self._authenticator_list.append(getattr(__import__("MaKaC.authentication." + auth + "Authentication", globals(), locals(),[auth + "Authentication"]), auth + "Authenticator")())
             except:
@@ -112,16 +111,25 @@ class AuthenticatorMgr:
                 pass
         return True
 
-    def _getDefaultAuthenticator( self ):
+    def getDefaultAuthenticator( self ):
         return self.getList()[0]
 
     def getList(self):
         return self._authenticator_list
 
+    def getAuthenticatorIdList(self):
+        return [auth.getId() for auth in self._authenticator_list]
+
+    def hasExternalAuthenticators(self):
+        for auth in self.getList():
+            if auth.getId() != 'Local':
+                return True
+        return False
+
     def createIdentity(self, li, avatar, system=""):
         auth = self.getById( system )
         if not auth:
-            auth = self._getDefaultAuthenticator()
+            auth = self.getDefaultAuthenticator()
         return auth.createIdentity(li, avatar)
 
     def removeIdentity( self, Id):
@@ -140,17 +148,23 @@ class AuthenticatorMgr:
                 pass
         return None
 
-    def autoLogin(self, rh):
-        # Try to login from request handler
+    def isSSOLoginActive(self):
         for auth in self.getList():
-            av = auth.autoLogin(rh)
+            if auth.isSSOLoginActive():
+                return True
+        return False
+
+    def SSOLogin(self, rh, authId):
+        auth = self.getById( authId )
+        if auth and auth.isSSOLoginActive():
+            av = auth.retrieveAvatar(rh)
             if av:
-                session['autoLogin'] = auth.getId()
+                rh._getSession().setVar("SSOLogin", auth.getId())
                 return av
         return None
 
-    def autoLogout(self, rh):
-        authId = session.pop('autoLogin', None)
+    def getLogoutCallbackURL(self, rh):
+        authId = session.pop('SSOLogin', None)
         if authId:
             auth = self.getById(authId)
-            return auth.autoLogout(rh)
+            return auth.getLogoutCallbackURL(rh)

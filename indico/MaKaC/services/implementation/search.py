@@ -30,6 +30,7 @@ from zope.index.text import parsetree
 from MaKaC.services.implementation.user import UserComparator
 
 from MaKaC.common.Configuration import Config
+from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 #################################
 # User and group search
@@ -43,8 +44,7 @@ class SearchBase(ServiceBase):
             1 external authenticator, so we just see if a proper external authenticator is present or not
         """
         self._searchExt = False
-        config = Config.getInstance()
-        for authenticatorName in config.getAuthenticatorList():
+        for authenticatorName in AuthenticatorMgr.getInstance().getAuthenticatorIdList():
             authParamName = "searchExternal-" + authenticatorName
             if authParamName in self._params and self._params[authParamName]:
                 self._searchExt = True

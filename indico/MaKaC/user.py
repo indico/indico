@@ -655,38 +655,6 @@ class Avatar(Persistent, Fossilizable):
             else:
                 self.setDisplayTZMode("Event Timezone")
 
-            ################################
-            #Fermi timezone awareness(end) #
-            ################################
-
-##    def __getattribute__(self, attr):
-##        if object.__getattribute__(self, '_p_getattr')(attr):
-##            return Persistent.__getattribute__(self, attr)
-##
-##        #attributs that always get from this instance
-##        if attr in ["_mergeTo", "getId", "id", "mergeTo", "_mergeFrom", "isMerged", "getMergeTo", "mergeFrom", \
-##                    "unmergeFrom", "getMergeFromList"]:
-##            return Persistent.__getattribute__(self,attr)
-##
-##        #if _mergeTo, get attributs from the _mergeTo
-##        elif hasattr(self,"_mergeTo") and Persistent.__getattribute__(self,"_mergeTo") != None:
-##            return Persistent.__getattribute__(self,"_mergeTo").__getattribute__(attr)
-##        else:
-##            return Persistent.__getattribute__(self,attr)
-##
-##    def __setattr__(self, attr, value):
-##        if self._p_setattr(attr, value):
-##            return Persistent.__setattr__(self, attr, value)
-##
-##        #attribute always set in this instance
-##        if attr in ["_mergeTo", "id", "_mergeFrom"]:
-##            Persistent.__setattr__(self, attr, value)
-##
-##        elif hasattr(self,"_mergeTo") and Persistent.__getattribute__(self,"_mergeTo") != None:
-##            Persistent.__getattribute__(self,"_mergeTo").__setattr__(attr, value)
-##        else:
-##            Persistent.__setattr__(self, attr, value)
-
     def mergeTo(self, av):
         if av:
             av.mergeFrom(self)

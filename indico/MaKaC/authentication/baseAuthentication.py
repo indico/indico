@@ -22,8 +22,13 @@ from persistent import Persistent
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import UserError
 from MaKaC.i18n import _
+from MaKaC.common.Configuration import Config
+
 
 class Authenthicator(ObjectHolder):
+
+    def __init__(self):
+        ObjectHolder.__init__(self)
 
     def add( self, newId ):
         if self.hasKey( newId.getId() ):
@@ -66,15 +71,18 @@ class Authenthicator(ObjectHolder):
     getId = classmethod( getId )
 
     def getName(self):
-        return self.name
+        return Config.getInstance().getAuthenticatorConfigById(self.getId()).get("name", self.name)
 
     def getDescription(self):
         return self.description
 
-    def autoLogin(self, rh):
+    def isSSOLoginActive(self):
+        return Config.getInstance().getAuthenticatorConfigById(self.getId()).get("SSOActive", False)
+
+    def SSOLogin(self, rh):
         return None
 
-    def autoLogout(self, rh):
+    def getLogoutCallbackURL(self, rh):
         return None
 
     def createIdentity(self, li, avatar):
@@ -116,3 +124,81 @@ class PIdentity(Persistent):
 
     def authenticate(self, id):
         return None
+
+class SSOHandler:
+
+    def retrieveAvatar(self, rh):
+        """
+        Login using Shibbolet.
+        """
+
+        from MaKaC.user import AvatarHolder, Avatar
+        config = Config.getInstance().getAuthenticatorConfigById(self.id).get("SSOMapping", {})
+
+        req = rh._req
+        req.add_common_vars()
+        if  req.subprocess_env.has_key(config.get("email", "ADFS_EMAIL")):
+            email = req.subprocess_env[config.get("email", "ADFS_EMAIL")]
+            login = req.subprocess_env[config.get("personId", "ADFS_LOGIN")]
+            personId = req.subprocess_env[config.get("personId", "ADFS_PERSONID")]
+            phone = req.subprocess_env.get(config.get("phone", "ADFS_PHONENUMBER"),"")
+            fax = req.subprocess_env.get(config.get("fax", "ADFS_FAXNUMBER"),"")
+            lastname = req.subprocess_env.get(config.get("lastname", "ADFS_LASTNAME"),"")
+            firstname = req.subprocess_env.get(config.get("firstname", "ADFS_FIRSTNAME"),"")
+            institute = req.subprocess_env.get(config.get("institute", "ADFS_HOMEINSTITUTE"),"")
+            if personId == '-1':
+                personId = None
+            ah = AvatarHolder()
+            av = ah.match({"email":email},exact=1, onlyActivated=False, forceWithoutExtAuth=True)
+            if av:
+                av = av[0]
+                # don't allow disabled accounts
+                if av.isDisabled():
+                    return None
+                elif not av.isActivated():
+                    av.activateAccount()
+
+                av.clearAuthenticatorPersonalData()
+                av.setAuthenticatorPersonalData('phone', phone)
+                av.setAuthenticatorPersonalData('fax', fax)
+                av.setAuthenticatorPersonalData('surName', lastname)
+                av.setAuthenticatorPersonalData('firstName', firstname)
+                av.setAuthenticatorPersonalData('affiliation', institute)
+                if phone != '' and phone != av.getPhone() and av.isFieldSynced('phone'):
+                    av.setTelephone(phone)
+                if fax != '' and fax != av.getFax() and av.isFieldSynced('fax'):
+                    av.setFax(fax)
+                if lastname != '' and lastname != av.getFamilyName() and av.isFieldSynced('surName'):
+                    av.setSurName(lastname, reindex=True)
+                if firstname != '' and firstname != av.getFirstName() and av.isFieldSynced('firstName'):
+                    av.setName(firstname, reindex=True)
+                if institute != '' and institute != av.getAffiliation() and av.isFieldSynced('affiliation'):
+                    av.setAffiliation(institute, reindex=True)
+                if personId != None and personId != av.getPersonId():
+                    av.setPersonId(personId)
+            else:
+                avDict = {"email": email,
+                          "name": firstname,
+                          "surName": lastname,
+                          "organisation": institute,
+                          "telephone": phone,
+                          "login": login}
+
+                av = Avatar(avDict)
+                ah.add(av)
+                av.setPersonId(personId)
+                av.activateAccount()
+
+            self._postLogin(login, av)
+            return av
+        return None
+
+    def getLogoutCallbackURL(self, rh):
+        return Config.getInstance().getAuthenticatorConfigById(self.id).get("LogoutCallbackURL", "https://login.cern.ch/adfs/ls/?wa=wsignout1.0")
+
+    def _postLogin(self, login, av):
+        if login != "" and not self.hasKey(login):
+            ni = self.createIdentity(av, login)
+            self.add(ni)
+        if login != "" and self.hasKey(login) and not av.getIdentityById(login, self.getId()):
+            av.addIdentity(self.getById(login))

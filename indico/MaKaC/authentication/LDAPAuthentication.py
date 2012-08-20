@@ -61,7 +61,8 @@ except:
     pass
 
 # legacy indico imports
-from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
+from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
+from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
 from MaKaC.common import Configuration
@@ -70,7 +71,8 @@ from MaKaC.common import Configuration
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
                     'sn', 'postalAddress', 'userPrincipalName']
 
-class LDAPAuthenticator(Authenthicator):
+
+class LDAPAuthenticator(Authenthicator, SSOHandler):
     idxName = "LDAPIdentities"
     id = 'LDAP'
     name = 'LDAP'
@@ -91,7 +93,7 @@ class LDAPAuthenticator(Authenthicator):
         Logger.get("auth.ldap").info("createIdentity %s (%s %s)" % \
                                      (li.getLogin(), avatar.getId(),
                                       avatar.getEmail()))
-        if LDAPChecker().check(li.getLogin(), li.getPassword()):
+        if self.checkLoginPassword(li.getLogin(), li.getPassword()):
             return LDAPIdentity(li.getLogin(), avatar)
         else:
             return None
@@ -99,7 +101,7 @@ class LDAPAuthenticator(Authenthicator):
     def createUser(self, li):
         Logger.get('auth.ldap').debug("create '%s'" % li.getLogin())
         # first, check if authentication is OK
-        data = LDAPChecker().check(li.getLogin(), li.getPassword())
+        data = self.checkLoginPassword(li.getLogin(), li.getPassword())
         if not data:
             return None
 
@@ -111,7 +113,7 @@ class LDAPAuthenticator(Authenthicator):
             # User doesn't exist, create it
             try:
                 av = user.Avatar()
-                udata = extractUserDataFromLdapData(data)
+                udata = LDAPTools.extractUserDataFromLdapData(data)
                 av.setName(udata['name'])
                 av.setSurName(udata['surName'])
                 av.setOrganisation(udata['organisation'])
@@ -156,12 +158,34 @@ class LDAPAuthenticator(Authenthicator):
         ldapc.close()
         if(ret == None):
             return None
-        av = dictToAv(ret)
+        av = LDAPTools.dictToAv(ret)
         av["id"] = id
         av["identity"] = LDAPIdentity
         av["authenticator"] = LDAPAuthenticator()
         Logger.get('auth.ldap').debug('LDAPUser.getById(%s) return %s '%(id,av))
         return av
+
+    def checkLoginPassword(self, userName, password):
+        if not password or not password.strip():
+            Logger.get('auth.ldap').info("Username: %s - empty password" % userName)
+            return None
+        try:
+            ret = {}
+            ldapc = LDAPConnector()
+            ldapc.openAsUser(userName, password)
+            ret = ldapc.lookupUser(userName)
+            ldapc.close()
+            Logger.get('auth.ldap').debug("Username: %s checked: %s" % (userName, ret))
+            if not ret :
+                return None
+            #LDAP search is case-insensitive, we want case-sensitive match
+            if ret.get('uid')!=userName :
+                Logger.get('auth.ldap').info('user %s invalid case %s' % (userName,ret.get('uid')))
+                return None
+            return ret
+        except ldap.INVALID_CREDENTIALS:
+            Logger.get('auth.ldap').info("Username: %s - invalid credentials" % userName)
+            return None
 
 
 class LDAPIdentity(PIdentity):
@@ -177,13 +201,13 @@ class LDAPIdentity(PIdentity):
 
         log = Logger.get('auth.ldap')
         log.info("authenticate(%s)" % id.getLogin())
-        data = LDAPChecker().check(id.getLogin(), id.getPassword())
+        data = AuthenticatorMgr.getInstance().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(), id.getPassword())
         if data:
             if self.getLogin() == id.getLogin():
                 # modify Avatar with the up-to-date info from LDAP
                 av = self.user
                 av.clearAuthenticatorPersonalData()
-                udata = extractUserDataFromLdapData(data)
+                udata = LDAPTools.extractUserDataFromLdapData(data)
                 if 'name' in udata:
                     firstName = udata['name']
                     av.setAuthenticatorPersonalData('firstName', firstName)
@@ -223,28 +247,6 @@ class LDAPIdentity(PIdentity):
         return LDAPAuthenticator.getId()
 
 
-def objectAttributes(dn, result_data, attributeNames):
-    """
-    adds selected attributes
-    """
-    object = {'dn': dn}
-    for name in attributeNames:
-        addAttribute(object, result_data, name)
-    return object
-
-
-def addAttribute(object, attrMap, attrName):
-    """
-    safely adds attribute
-    """
-    if attrName in attrMap:
-        attr = attrMap[attrName]
-        if len(attr) == 1:
-            object[attrName] = attr[0]
-        else:
-            object[attrName] = attr
-
-
 class LDAPConnector(object):
     """
     handles communication with the LDAP server specified in indico.conf
@@ -261,7 +263,7 @@ class LDAPConnector(object):
 
     def __init__(self):
         conf = Configuration.Config.getInstance()
-        ldapConfig = conf.getLDAPConfig()
+        ldapConfig = conf.getAuthenticatorConfigById("LDAP")
         self.ldapHost = ldapConfig.get('host')
         self.ldapPeopleFilter, self.ldapPeopleDN = \
                                ldapConfig.get('peopleDNQuery')
@@ -298,7 +300,7 @@ class LDAPConnector(object):
         """
         Opens an anonymous LDAP connection
         """
-        self.l = ldap.open(self.ldapHost)
+        self.l = ldap.initialize("ldap://" + self.ldapHost)
         self.l.protocol_version = ldap.VERSION3
 
         if self.ldapUseTLS:
@@ -330,6 +332,27 @@ class LDAPConnector(object):
         self.l.unbind_s()
         self.l = None
 
+    def _objectAttributes(self, dn, result_data, attributeNames):
+        """
+        adds selected attributes
+        """
+        objectAttr = {'dn': dn}
+        for name in attributeNames:
+            self._addAttribute(objectAttr, result_data, name)
+        return objectAttr
+
+
+    def _addAttribute(self, objectAttr, attrMap, attrName):
+        """
+        safely adds attribute
+        """
+        if attrName in attrMap:
+            attr = attrMap[attrName]
+            if len(attr) == 1:
+                objectAttr[attrName] = attr[0]
+            else:
+                objectAttr[attrName] = attr
+
     def lookupUser(self, uid):
         """
         Finds a user in LDAP
@@ -345,7 +368,7 @@ class LDAPConnector(object):
         for dn, data in res:
             if dn:
                 Logger.get('auth.ldap').debug('lookupUser(%s) successful'%uid)
-                return objectAttributes(dn, data, RETRIEVED_FIELDS)
+                return self._objectAttributes(dn, data, RETRIEVED_FIELDS)
         return None
 
     def findUsers(self, ufilter):
@@ -359,8 +382,8 @@ class LDAPConnector(object):
         res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE, ufilter)
         for dn, data in res:
             if dn:
-                ret = objectAttributes(dn, data, RETRIEVED_FIELDS)
-                av = dictToAv(ret)
+                ret = self._objectAttributes(dn, data, RETRIEVED_FIELDS)
+                av = LDAPTools.dictToAv(ret)
                 d[ret['mail']] = av
         return d
 
@@ -384,7 +407,7 @@ class LDAPConnector(object):
         groupDicts = []
         for dn, data in res:
             if dn:
-                groupDicts.append(objectAttributes(
+                groupDicts.append(self._objectAttributes(
                     dn, data, ['cn', 'description']))
         return groupDicts
 
@@ -443,64 +466,46 @@ class LDAPConnector(object):
         else:
             raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
 
-class LDAPChecker(object):
-    def check(self, userName, password):
-        if not password or not password.strip():
-            Logger.get('auth.ldap').info("Username: %s - empty password" % userName)
-            return None
-        try:
-            ret = {}
-            ldapc = LDAPConnector()
-            ldapc.openAsUser(userName, password)
-            ret = ldapc.lookupUser(userName)
-            ldapc.close()
-            Logger.get('auth.ldap').debug("Username: %s checked: %s" % (userName, ret))
-            if not ret :
-                return None
-            #LDAP search is case-insensitive, we want case-sensitive match
-            if ret.get('uid')!=userName :
-                Logger.get('auth.ldap').info('user %s invalid case %s' % (userName,ret.get('uid')))
-                return None
-            return ret
-        except ldap.INVALID_CREDENTIALS:
-            Logger.get('auth.ldap').info("Username: %s - invalid credentials" % userName)
-            return None
+class LDAPTools:
 
-def extractUserDataFromLdapData(ret):
-    """extracts user data from a LDAP record as a dictionary, edit to modify for your needs"""
-    udata= {}
-    udata["login"] = ret['uid']
-    udata["email"] = ret['mail']
-    udata["name"]= ret.get('givenName', '')
-    udata["surName"]= ret.get('sn', '')
-    udata["organisation"] = ret.get('o','')
-    udata['address'] = fromLDAPmultiline(ret['postalAddress']) if 'postalAddress' in ret else ''
-    Logger.get('auth.ldap').debug("extractUserDataFromLdapData(): %s " % udata)
-    return udata
+    @staticmethod
+    def _fromLDAPmultiline(s):
+        """
+        conversion for inetOrgPerson.postalAddress attribute that can contain
+        newlines encoded following the RFC 2252
+        """
+        if s:
+            return s.replace('$', "\r\n").replace('\\24', '$').replace('\\5c', '\\')
+        else:
+            return s
 
-def fromLDAPmultiline(s):
-    """
-    conversion for inetOrgPerson.postalAddress attribute that can contain
-    newlines encoded following the RFC 2252
-    """
-    if s:
-        return s.replace('$', "\r\n").replace('\\24', '$').replace('\\5c', '\\')
-    else:
-        return s
+    @staticmethod
+    def extractUserDataFromLdapData(ret):
+        """extracts user data from a LDAP record as a dictionary, edit to modify for your needs"""
+        udata= {}
+        udata["login"] = ret['uid']
+        udata["email"] = ret['mail']
+        udata["name"]= ret.get('givenName', '')
+        udata["surName"]= ret.get('sn', '')
+        udata["organisation"] = ret.get('o','')
+        udata['address'] = LDAPTools._fromLDAPmultiline(ret['postalAddress']) if 'postalAddress' in ret else ''
+        Logger.get('auth.ldap').debug("extractUserDataFromLdapData(): %s " % udata)
+        return udata
 
-def dictToAv(ret):
-    """converts user data obtained from LDAP to the structure expected by Avatar"""
-    av = {}
-    udata=extractUserDataFromLdapData(ret)
-    av["login"] = udata["login"]
-    av["email"] = [udata["email"]]
-    av["name"]= udata["name"]
-    av["surName"]= udata["surName"]
-    av["organisation"] = [udata["organisation"]]
-    av["address"] = [udata["address"]]
-    av["id"] = 'LDAP:'+udata["login"]
-    av["status"] = "NotCreated"
-    return av
+    @staticmethod
+    def dictToAv(ret):
+        """converts user data obtained from LDAP to the structure expected by Avatar"""
+        av = {}
+        udata=LDAPTools.extractUserDataFromLdapData(ret)
+        av["login"] = udata["login"]
+        av["email"] = [udata["email"]]
+        av["name"]= udata["name"]
+        av["surName"]= udata["surName"]
+        av["organisation"] = [udata["organisation"]]
+        av["address"] = [udata["address"]]
+        av["id"] = 'LDAP:'+udata["login"]
+        av["status"] = "NotCreated"
+        return av
 
 def ldapFindGroups(name, exact):
     """used in user.py"""

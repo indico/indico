@@ -1,41 +1,37 @@
 
-<div class="container" style="width: 100%; margin: 50px auto; max-width: 800px">
+<div class="container" style="width: 100%; margin: 50px auto; max-width: 600px">
 
 <div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt;    ">${ _("Log in to Indico")}</div>
+<div id="cookiesEnabled" style="display:none; text-align:center; color:#881122; font-size:large; padding-bottom:15px" colspan="2">
+    ${("Please enable cookies in your browser!")}
+</div>
+% if isSSOLoginActive:
+<div style="width:80%; margin:10px auto;color:#444;font-size:14px">
+    <div>${_("You can login through SSO:")}</div>
+    <form name="signInSSOForm" action=${ ssoURL } method="POST">
+    <div style="text-align:center;margin:10px">
+        % for auth in authenticators:
+            % if auth.isSSOLoginActive():
+                <input type="submit" id="loginButton" value="${ auth.getId()}" name="authId">
+            % endif
+        % endfor
+    </div>
+    </form>
+    <div>${_("or you can enter your credentials in the following form:")}</div>
+</div>
+
+% endif
 
 <form name="signInForm" action=${ postURL } method="POST">
 <input type="hidden" name="returnURL" value=${ returnURL }>
 
-<table class="groupTable">
+<table style="border: 1px solid #DDDDDD; padding: 20px; margin:auto; width:80%; border-radius:6px">
     <tr>
-
-        <script type="text/javascript">
-        //Free JavaScripts on http://www.ScriptBreaker.com
-        var cookiesEnabled = false;
-
-
-        // Check whether cookies enabled
-        document.cookie = "Enabled=true";
-        var cookieValid = document.cookie;
-
-        // if retrieving the VALUE we just set actually works
-        // then we know cookies enabled
-        if (cookieValid.indexOf("Enabled=true") != -1)
-        {
-           cookiesEnabled = true;
-        }
-        else
-        {
-           cookiesEnabled = false;
-        }
-
-        if(cookiesEnabled == false) document.write('<td colspan="2"><br><center><font size=+1 color=red>Please enable cookies in your browser!</font></center><br></td></tr><tr>');
-        </SCRIPT>
         <td class="titleCellTD">
-            <span class="titleCellFormat">${ _("User Name")}</span>
+            <span class="titleCellFormat">${ _("Login")}</span>
         </td>
         <td class="contentCellTD" id="usernameInput">
-            <input type="text" name="login" size="40" value=${ login }>
+            <input type="text" name="login" size="20" value=${ login }>
         </td>
     </tr>
     <tr>
@@ -43,15 +39,15 @@
             <span class="titleCellFormat">${ _("Password")}</span>
         </td>
         <td class="contentCellTD" id="passwordInput">
-            <input type="password" name="password" size="40">
+            <input type="password" name="password" size="20">
         </td>
     </tr>
 
-    % if NiceMsg:
+    % if hasExternalAuthentication:
     <tr>
         <td class="titleCellTD">&nbsp;</td>
         <td class="contentCellTD">
-            <em>${ NiceMsg }</em>
+            <em>${_("Please note you can use your external") + " (%s) "%", ".join(externalAuthenticators)  + _("account")}</em>
         </td>
     </tr>
     % endif
@@ -75,11 +71,6 @@
     </tr>
 </table>
 </form>
-
-<script type="text/javascript">
-    document.signInForm.login.focus();
-</script>
-
 <div style="margin: 20px 30px 0 30px;">
 
     <table width="100%" cellspacing="5" cellpadding="0"><tbody>
@@ -87,7 +78,9 @@
             <td align="left"><img src="${ itemIcon }" alt="o" style="padding-right: 10px;"></td>
             <td align="left" width="100%">
                 <div style="padding: 5px 0; color: #444">
-                    ${ createAccount }
+                    % if isAuthorisedAccountCreation:
+                        ${_("If you don't have an account, you can create one")} <a href="${createAccountURL}">${_("here")}</a>
+                    % endif
                 </div>
             </td>
         </tr>
@@ -125,3 +118,12 @@
 </div>
 
 </div>
+<script type="text/javascript">
+    // Check whether cookies enabled
+    document.cookie = "Enabled=true";
+    // if retrieving the VALUE we just set actually works
+    // then we know cookies enabled
+    if (document.cookie.indexOf("Enabled=true") == -1) $("#cookiesEnabled").show();
+
+    document.signInForm.login.focus();
+</script>

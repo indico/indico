@@ -184,6 +184,9 @@ class UHSignIn(URLHandler):
             url.addParam('returnURL', returnURL)
         return url
 
+class UHSignInSSO( SecureURLHandler ):
+    _relativeURL = "signIn.py/sso"
+
 
 class UHActiveAccount(URLHandler):
     _endpoint = 'user.signIn-active'

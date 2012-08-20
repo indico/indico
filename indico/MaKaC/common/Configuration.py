@@ -466,7 +466,8 @@ class Config:
         'PublicSupportEmail'        : 'root@localhost',
         'NoReplyEmail'              : 'noreply-root@localhost',
         'FileConverter'             : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},
-        'AuthenticatorList'         : ['Local'],
+        'DisplayLoginPage'          : "yes",
+        'AuthenticatorList'         : [('Local',{})],
         'NiceLogin'                 : '',
         'NicePassword'              : '',
         'CssStylesheetName'         : 'indico.css',
@@ -494,7 +495,7 @@ class Config:
                        'accessCredentials': ('CN=user,OU=Users,'
                                              'DC=example,DC=com',
                                              'secret_password')}
-        }
+    }
 
     if sys.platform == 'win32':
         default_values.update({
@@ -675,6 +676,10 @@ class Config:
             return None
         else:
             return val
+
+    def geDisplayLoginPage(self):
+        return self._yesOrNoVariable('DisplayLoginPage')
+
 
     def getAuthenticatedEnforceSecure(self):
         return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
@@ -863,3 +868,9 @@ class Config:
         if std == "":
             std = self.getUploadedFilesTempDir()
         return std
+
+    def getAuthenticatorConfigById(self, authId):
+        for auth, config in self.getAuthenticatorList():
+            if auth == authId:
+                return config
+        return {}

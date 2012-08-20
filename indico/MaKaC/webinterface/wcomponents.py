@@ -57,6 +57,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.common.TemplateExec as templateEngine
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.rb_tools import FormMode, overlap
+from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 from lxml import etree
 
@@ -2188,23 +2189,23 @@ class WSignIn(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        authManager = AuthenticatorMgr.getInstance()
         vars["postURL"] = quoteattr( str( vars.get( "postURL", "" ) ) )
         vars["returnURL"] = quoteattr( str( vars.get( "returnURL", "" ) ) )
         vars["forgotPasswordURL"] = quoteattr( str( vars.get( "forgotPassordURL", "" ) ) )
         vars["login"] = quoteattr( vars.get( "login", "" ) )
         vars["msg"] = self.htmlText( vars.get( "msg" ) )
+        vars["ssoURL"] = urlHandlers.UHSignInSSO.getURL()
         imgIcon=Configuration.Config.getInstance().getSystemIconURL("currentMenuItem")
         if Configuration.Config.getInstance().getAuthenticatedEnforceSecure():
             imgIcon=imgIcon.replace("http://", "https://")
             imgIcon = urlHandlers.setSSLPort( imgIcon )
         vars["itemIcon"] = imgIcon
-        vars["createAccount"] = ""
-        if minfo.getAuthorisedAccountCreation():
-            vars["createAccount"] =  i18nformat("""_("If you don't have an account, you can create one")<a href="%s"> _("here")</a>
-        """) % (vars["createAccountURL"])
-        vars["NiceMsg"]=""
-        if "Nice" in Configuration.Config.getInstance().getAuthenticatorList():
-            vars["NiceMsg"]= _("Please note you can use your NICE (CERN) account")
+        vars["isAuthorisedAccountCreation"] = minfo.getAuthorisedAccountCreation()
+        vars["hasExternalAuthentication"] = authManager.hasExternalAuthenticators()
+        vars["externalAuthenticators"]= [auth for auth in authManager.getAuthenticatorIdList() if auth != 'Local']
+        vars["isSSOLoginActive"] = authManager.isSSOLoginActive()
+        vars["authenticators"] = authManager.getList()
         return vars
 
 
