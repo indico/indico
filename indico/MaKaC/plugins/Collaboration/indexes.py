@@ -226,12 +226,12 @@ class CollaborationIndex(Persistent):
             if dbi and i % 1000 == 999:
                 dbi.commit()
 
-    def reindexAll(self):
+    def reindexAll(self, dbi=None):
         """ Cleans the indexes, and then indexes all the bookings from all the conferences
             WARNING: obviously, this can potentially take a while
         """
         self.cleanAll()
-        self.indexAll()
+        self.indexAll(dbi=dbi)
 
 class BookingsIndex(Persistent):
 
