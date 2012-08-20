@@ -215,7 +215,7 @@ class CollaborationIndex(Persistent):
 
         i = 0
 
-        for conf in ConferenceHolder().getList():
+        for cid, conf in ConferenceHolder()._getIdx().iteritems():
             csbm = conf.getCSBookingManager()
             #note: probably not the most efficient implementation since _indexBooking is getting the list
             #      of indexes where each booking should be indexed on every iteration
