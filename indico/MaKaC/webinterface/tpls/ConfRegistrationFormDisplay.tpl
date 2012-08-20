@@ -70,30 +70,6 @@
 		    var rfView = new RegFormDisplayView({el : $("div#registrationForm")} ,confId );
 		});
 
-//     $('form').bind('firstinvalid', function(e){
-//         console.log('firstinvalid');
-//         console.log(e);
-//         /*show the invalid alert for first invalid element*/
-//         $.webshims.validityAlert.showFor( e.target );
-//         /*prevent browser from showing native validation message */
-//         return false;
-//     });
-
-//     $('form').bind('changedinvalid', function(e){
-//         $(e).addClass('validationError');
-//         $(e).removeClass('validationValid');
-//         console.log('changedinvalid');
-//         console.log(e);
-//         return false;
-//     });
-
-//     $('form').bind('changedvalid', function(e){
-//         $(e).addClass('validationValid');
-//         $(e).removeClass('validationError');
-//         console.log('changedvalid');
-//         console.log(e);
-//         return false;
-//     });
     $(".regFormButton").click(function(){
         var self = this;
         new ConfirmPopup($T("Registration"),$T("Are you sure you want to submit this form?"), function(confirmed) {
