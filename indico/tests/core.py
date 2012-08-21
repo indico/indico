@@ -187,7 +187,7 @@ class TestManager(object):
         defaults = {
             'BaseURL': 'http://localhost:8000/indico',
             'BaseSecureURL': '',
-            'AuthenticatorList': ['Local'],
+            'AuthenticatorList': [('Local', {})],
             'SmtpServer': ('localhost', 58025),
             'SmtpUseTLS': 'no',
             'DBConnectionParams': ('localhost', TestConfig.getInstance().getFakeDBPort()),

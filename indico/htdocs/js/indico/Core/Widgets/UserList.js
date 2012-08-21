@@ -81,7 +81,7 @@ type("ListOfUsersManager", [], {
     },
 
     _personName: function(user) {
-        if (user._type == "Group" || user._type == "CERNGroup" || user._type == "LDAPGroup") {
+        if (user._type.indexOf("Group") != -1) {
             var fullName = user.name;
         } else {
             if (user.pending) {
@@ -108,7 +108,7 @@ type("ListOfUsersManager", [], {
 
         menu: function(user) {
             var self = this;
-            if (!user.pending && user._type != "Group" && user._type != "CERNGroup") {
+            if (!user.pending && user._type.indexOf("Group") == -1) {
                 var optionsMenuSpan = $('<span/>').css('float', 'right');
                 var optionsMenuLink = $('<a/>').attr({
                     id: user.id,

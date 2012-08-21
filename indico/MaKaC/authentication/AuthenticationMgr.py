@@ -64,7 +64,7 @@ class AuthenticatorMgr:
             for auth in self.getList():
                 user = auth.createUser(li)
                 if user != None:
-                    if auth.getId().strip() == 'Nice':
+                    if auth.canUserBeActivated():
                         user.activateAccount()
                     return user
         return None

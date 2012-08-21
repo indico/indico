@@ -79,6 +79,9 @@ class Authenthicator(ObjectHolder):
     def isSSOLoginActive(self):
         return Config.getInstance().getAuthenticatorConfigById(self.getId()).get("SSOActive", False)
 
+    def canUserBeActivated(self):
+        return False
+
     def SSOLogin(self, rh):
         return None
 
@@ -94,8 +97,24 @@ class Authenthicator(ObjectHolder):
     def matchUser(self, criteria, exact=0):
         return None
 
+    def matchUserFirstLetter(self, index, letter):
+        return None
+
     def searchUserById(self, id):
         return None
+
+    def matchGroup(self, criteria, exact=0):
+        return None
+
+    def matchGroupFirstLetter(self, letter):
+        return None
+
+    def getGroupMemberList(self, group):
+        return None
+
+    def isUserInGroup(self, user, group):
+        return False
+
 
 class PIdentity(Persistent):
 

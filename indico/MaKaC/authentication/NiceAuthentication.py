@@ -28,7 +28,7 @@ from xml.dom.minidom import parseString
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface import urlHandlers
-from MaKaC.user import Avatar
+from MaKaC.user import Avatar, CERNGroup
 from MaKaC.common import Configuration
 from MaKaC.common.Configuration import Config
 from MaKaC.common.logger import Logger
@@ -43,6 +43,9 @@ class NiceAuthenticator(Authenthicator, SSOHandler):
 
     def __init__(self):
         Authenthicator.__init__(self)
+
+    def canUserBeActivated(self):
+        return True
 
     def createIdentity(self, li, avatar):
         if NiceChecker().check(li.getLogin(), li.getPassword()):
@@ -88,6 +91,10 @@ class NiceAuthenticator(Authenthicator, SSOHandler):
         id = na.createIdentity( li, av)
         na.add(id)
         return av
+
+    #################
+    #   Searching   #
+    #################
 
     def matchUser(self, criteria, exact=0):
         dict = {}
@@ -205,6 +212,109 @@ class NiceAuthenticator(Authenthicator, SSOHandler):
         av["login"] = login
         av["authenticator"] = NiceAuthenticator()
         return av
+
+    def _findGroups(self, criteria):
+        params = urllib.urlencode({'pattern': criteria})
+        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
+        headers = {}
+        headers["Content-type"] = "application/x-www-form-urlencoded"
+        headers["Accept"] = "text/plain"
+        headers["Authorization"] = "Basic %s"%cred
+        try:
+            conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
+            conn.request("POST", "/winservices-soap/generic/Authentication.asmx/SearchGroups", params, headers)
+            response = conn.getresponse()
+            data = response.read()
+            conn.close()
+        except Exception:
+            raise MaKaCError( _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
+        doc = parseString(data)
+        groupList = []
+        for elem in doc.getElementsByTagName("string"):
+            name = elem.childNodes[0].nodeValue.encode("utf-8")
+            gr = CERNGroup()
+            gr.setId(name)
+            gr.setName(name)
+            gr.setDescription("Mapping of the Nice group %s<br><br>\n"
+                              "Members list: https://websvc02.cern.ch/WinServices/Services/GroupManager/GroupManager.aspx" %
+                              name)
+            groupList.append(gr)
+        return groupList
+
+    def matchGroup(self, criteria, exact=0):
+        if not exact:
+            criteria = "*%s*" % criteria
+        return self._findGroups(criteria)
+
+    def matchGroupFirstLetter(self, letter):
+        criteria = "%s*" % letter
+        return self._findGroups(criteria)
+
+    def getGroupMemberList(self, group):
+        params = urllib.urlencode( { 'ListName': group } )
+        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
+        headers = {}
+        headers["Content-type"] = "application/x-www-form-urlencoded"
+        headers["Accept"] = "text/plain"
+        headers["Authorization"] = "Basic %s"%cred
+        conn = httplib.HTTPSConnection( "winservices-soap.web.cern.ch" )
+        try:
+            conn.request( "POST", "/winservices-soap/generic/Authentication.asmx/GetListMembers", params, headers )
+        except Exception, e:
+            raise MaKaCError(  _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
+        response = conn.getresponse()
+        #print response.status, response.reason
+        data = response.read()
+        #print data
+        conn.close()
+
+        try:
+            doc = parseString( data )
+        except:
+            if "Logon failure" in data:
+                return False
+            raise MaKaCError( _("Nice authentication problem: %s")% data )
+
+        elements = doc.getElementsByTagName( "string" )
+        emailList = []
+        for element in elements:
+            emailList.append( element.childNodes[0].nodeValue.encode( "utf-8" ) )
+        return emailList
+
+    def isUserInGroup(self, user, group):
+        params = urllib.urlencode({'UserName': user, 'GroupName': group})
+        #headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
+        headers = {}
+        headers["Content-type"] = "application/x-www-form-urlencoded"
+        headers["Accept"] = "text/plain"
+        headers["Authorization"] = "Basic %s"%cred
+        conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
+        try:
+            conn.request("POST", "/winservices-soap/generic/Authentication.asmx/UserIsMemberOfGroup", params, headers)
+        except Exception, e:
+            raise MaKaCError( _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
+        try:
+            response = conn.getresponse()
+        except Exception, e:
+            Logger.get("NICE").info("Error getting response from winservices: %s\nusername: %s\ngroupname: %s"%(e, id, group))
+            raise
+        data = response.read()
+        conn.close()
+        try:
+            doc = parseString(data)
+        except:
+            if "Logon failure" in data:
+                return False
+            raise MaKaCError( _("Nice authentication problem: %s")%data)
+        if doc.getElementsByTagName("boolean"):
+            if doc.getElementsByTagName("boolean")[0].childNodes[0].nodeValue.encode("utf-8") == "true":
+                return True
+        return False
+
+    #################
+    # End Searching #
+    #################
 
 class NiceIdentity(PIdentity):
 

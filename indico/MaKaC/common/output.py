@@ -184,10 +184,10 @@ class outputGenerator(Observable):
                 roomName = roomFromDB.getFullName()
         return roomName
 
-    def _getNiceAccounts(self, user):
+    def _getExternalUserAccounts(self, user):
         accounts = []
         for identity in user.getIdentityList():
-            if identity.getAuthenticatorTag() == 'Nice':
+            if identity.getAuthenticatorTag() != 'Local':
                 accounts.append(identity.getLogin())
 
         return accounts
@@ -240,7 +240,7 @@ class outputGenerator(Observable):
 
         for user_obj in allowed_users:
             if isinstance(user_obj, Avatar):
-                for account in self._getNiceAccounts(user_obj):
+                for account in self._getExternalUserAccounts(user_obj):
                     allowed_logins.append(account)
             elif isinstance(user_obj, CERNGroup):
                 allowed_groups.append(user_obj.getId())

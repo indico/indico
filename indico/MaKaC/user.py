@@ -49,7 +49,6 @@ from MaKaC.externUsers import ExtUserHolder
 from MaKaC.common.db import DBMgr
 import MaKaC.common.info as info
 from MaKaC.i18n import _
-from MaKaC.authentication.LDAPAuthentication import ldapFindGroups, ldapUserInGroup, ldapFindGroupMemberUids
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 from datetime import datetime, timedelta
@@ -232,35 +231,7 @@ class CERNGroup(Group):
         pass
 
     def getMemberList( self ):
-        params = urllib.urlencode( { 'ListName': self.name } )
-        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
-        headers = {}
-        headers["Content-type"] = "application/x-www-form-urlencoded"
-        headers["Accept"] = "text/plain"
-        headers["Authorization"] = "Basic %s"%cred
-        conn = httplib.HTTPSConnection( "winservices-soap.web.cern.ch" )
-        try:
-            conn.request( "POST", "/winservices-soap/generic/Authentication.asmx/GetListMembers", params, headers )
-        except Exception, e:
-            raise MaKaCError(  _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
-        response = conn.getresponse()
-        #print response.status, response.reason
-        data = response.read()
-        #print data
-        conn.close()
-
-        try:
-            doc = parseString( data )
-        except:
-            if "Logon failure" in data:
-                return False
-            raise MaKaCError( _("Nice authentication problem: %s")% data )
-
-        elements = doc.getElementsByTagName( "string" )
-        emailList = []
-        for element in elements:
-            emailList.append( element.childNodes[0].nodeValue.encode( "utf-8" ) )
-
+        emailList = AuthenticatorMgr.getInstance().getById('Nice').getGroupMemberList(self.name)
         avatarLists = []
         for email in emailList:
             # First, try localy (fast)
@@ -292,47 +263,15 @@ class CERNGroup(Group):
         ids = avatar.getIdentityList()
         for id in ids:
             if id.getAuthenticatorTag() == "Nice":
-                if self._checkNice( id.getLogin(), avatar ):
+                if AuthenticatorMgr.getInstance().getById('LDAP').isUserInGroup( id.getLogin(), self.name ):
                     self._v_memberCache[avatar] = datetime.now()
                     return True
         #check also with all emails contained in account
         for email in avatar.getEmails():
-            if self._checkNice( email, avatar ):
+            if AuthenticatorMgr.getInstance().getById('LDAP').isUserInGroup( email, self.name ):
                 self._v_memberCache[avatar] = datetime.now()
                 return True
         self._v_nonMemberCache[avatar] = datetime.now()
-        return False
-
-    def _checkNice( self, id, avatar ):
-        params = urllib.urlencode({'UserName': id, 'GroupName': self.name})
-        #headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
-        headers = {}
-        headers["Content-type"] = "application/x-www-form-urlencoded"
-        headers["Accept"] = "text/plain"
-        headers["Authorization"] = "Basic %s"%cred
-        conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
-        try:
-            conn.request("POST", "/winservices-soap/generic/Authentication.asmx/UserIsMemberOfGroup", params, headers)
-        except Exception, e:
-            raise MaKaCError( _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
-        try:
-            response = conn.getresponse()
-        except Exception, e:
-            logger.Logger.get("NICE").info("Error getting response from winservices: %s\nusername: %s\ngroupname: %s"%(e, id, self.name))
-            raise
-        data = response.read()
-        conn.close()
-        try:
-            doc = parseString(data)
-        except:
-            if "Logon failure" in data:
-                return False
-            raise MaKaCError( _("Nice authentication problem: %s")%data)
-        if doc.getElementsByTagName("boolean"):
-            if doc.getElementsByTagName("boolean")[0].childNodes[0].nodeValue.encode("utf-8") == "true":
-                self._v_memberCache[avatar] = datetime.now()
-                return True
         return False
 
     def containsMember( self, member ):
@@ -375,7 +314,7 @@ class LDAPGroup(Group):
         pass
 
     def getMemberList(self):
-        uidList = ldapFindGroupMemberUids(self.getName())
+        uidList = AuthenticatorMgr.getInstance().getById('LDAP').getGroupMemberList(self.getName())
         avatarLists = []
         for uid in uidList:
             # First, try locally (fast)
@@ -398,7 +337,7 @@ class LDAPGroup(Group):
                 login = aid.getLogin()
         if not login:
             return False
-        return ldapUserInGroup(login, self.getName())
+        return AuthenticatorMgr.getInstance().getById('LDAP').isUserInGroup((login, self.getName()))
 
     def containsMember(self, avatar):
         return 0
@@ -441,6 +380,8 @@ class GroupHolder(ObjectHolder):
     def matchFirstLetter( self, letter, searchInAuthenticators=True ):
         result = []
         index = self.getIndex()
+        if searchInAuthenticators:
+            self._updateGroupMatchFirstLetter(letter)
         match = index.matchFirstLetter( letter )
         if match != None:
             for groupid in match:
@@ -448,22 +389,17 @@ class GroupHolder(ObjectHolder):
                     if self.getById(groupid) not in result:
                         gr=self.getById(groupid)
                         result.append(gr)
-        if searchInAuthenticators:
-            #TODO: check all authenticators
-            pass
         return result
 
-    def match(self,criteria,searchInAuthenticators=True, exact=False):
+    def match(self, criteria, searchInAuthenticators=True, exact=False):
         crit={}
         result = []
         for f,v in criteria.items():
             crit[f]=[v]
         if crit.has_key("groupname"):
             crit["name"] = crit["groupname"]
-        if "Nice" in Config.getInstance().getAuthenticatorList() and searchInAuthenticators:
-            self.updateCERNGroupMatch(crit["name"][0],exact)
-        if "LDAP" in Config.getInstance().getAuthenticatorList() and searchInAuthenticators:
-            self.updateLDAPGroupMatch(crit["name"][0],exact)
+        if searchInAuthenticators:
+            self._updateGroupMatch(crit["name"][0],exact)
         match = self.getIndex().matchGroup(crit["name"][0], exact=exact)
 
         if match != None:
@@ -473,51 +409,17 @@ class GroupHolder(ObjectHolder):
                     result.append(gr)
         return result
 
-    def updateLDAPGroupMatch(self, name, exact=False):
-        logger.Logger.get('GroupHolder').debug(
-            "updateLDAPGroupMatch(name=" + name + ")")
+    def _updateGroupMatch(self, name, exact=False):
+        for auth in AuthenticatorMgr.getInstance().getList():
+            for group in auth.matchGroup(name, exact):
+                if not self.hasKey(group.getId()):
+                    self.add(group)
 
-        for grDict in ldapFindGroups(name, exact):
-            grName = grDict['cn']
-            if not self.hasKey(grName):
-                gr = LDAPGroup()
-                gr.setId(grName)
-                gr.setName(grName)
-                gr.setDescription('LDAP group: ' + grDict['description'])
-                self.add(gr)
-                logger.Logger.get('GroupHolder').debug(
-                    "updateLDAPGroupMatch() added" + str(gr))
-
-    def updateCERNGroupMatch(self, name, exact=False):
-        if not exact:
-            name = "*%s*" % name
-        params = urllib.urlencode({'pattern': name})
-        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
-        headers = {}
-        headers["Content-type"] = "application/x-www-form-urlencoded"
-        headers["Accept"] = "text/plain"
-        headers["Authorization"] = "Basic %s"%cred
-        try:
-            conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
-            conn.request("POST", "/winservices-soap/generic/Authentication.asmx/SearchGroups", params, headers)
-            response = conn.getresponse()
-            data = response.read()
-            conn.close()
-        except Exception:
-            raise MaKaCError( _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
-        doc = parseString(data)
-        for elem in doc.getElementsByTagName("string"):
-            name = elem.childNodes[0].nodeValue.encode("utf-8")
-            if not self.hasKey(name):
-                gr = CERNGroup()
-                gr.setId(name)
-                gr.setName(name)
-                gr.setDescription("Mapping of the Nice group %s<br><br>\n"
-                                  "Members list: https://websvc02.cern.ch/WinServices/Services/GroupManager/GroupManager.aspx" %
-                                  name)
-                self.add(gr)
-
-
+    def _updateGroupMatchFirstLetter(self, letter):
+        for auth in AuthenticatorMgr.getInstance().getList():
+            for group in auth.matchGroupFirstLetter(letter):
+                if not self.hasKey(group.getId()):
+                    self.add(group)
 
 class Avatar(Persistent, Fossilizable):
     """This class implements the representation of users inside the system.
@@ -1330,7 +1232,21 @@ class AvatarHolder( ObjectHolder ):
                     if not onlyActivated or av.isActivated():
                         result[av.getEmail()]=av
         if searchInAuthenticators:
-            #TODO: check all authenticators
+            for authenticator in AuthenticatorMgr.getInstance().getList():
+                dict = authenticator.matchUserFirstLetter(index, letter)
+                if dict:
+                    for email in dict.iterkeys():
+                        emailResultList = [av.getEmails() for av in result.values()]
+                        if not email in emailResultList:
+                            userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
+                            if not userMatched:
+                                av = Avatar(dict[email])
+                                av.setId(dict[email]["id"])
+                                av.status = dict[email]["status"]
+                                result[email] = av
+                            else:
+                                av = userMatched[0]
+                                result[av.getEmail()] = av
             pass
         return result.values()
 

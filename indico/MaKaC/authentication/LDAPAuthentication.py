@@ -89,6 +89,9 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
     def __init__(self):
         Authenthicator.__init__(self)
 
+    def canUserBeActivated(self):
+        return True
+
     def createIdentity(self, li, avatar):
         Logger.get("auth.ldap").info("createIdentity %s (%s %s)" % \
                                      (li.getLogin(), avatar.getId(),
@@ -129,7 +132,7 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             # user founded
             Logger.get('auth.ldap').info("found user '%s'" % li.getLogin())
             av = userList[0]
-        #now create the nice identity for the user
+        #now create the LDAP identity for the user
         na = LDAPAuthenticator()
         id = na.createIdentity(li, av)
         na.add(id)
@@ -141,6 +144,17 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         lfilter = list((self._operations[k].format(v if exact else ("*%s*" % v))) \
                        for k, v in criteria.iteritems())
 
+        if lfilter == []:
+            return {}
+        ldapc = LDAPConnector()
+        ldapc.open()
+        fquery = "(&%s)" % ''.join(lfilter)
+        d = ldapc.findUsers(fquery)
+        ldapc.close()
+        return d
+
+    def matchUserFirstLetter(self, index, letter):
+        lfilter = self._operations[index].format("%s*" % letter)
         if lfilter == []:
             return {}
         ldapc = LDAPConnector()
@@ -187,6 +201,55 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             Logger.get('auth.ldap').info("Username: %s - invalid credentials" % userName)
             return None
 
+    def matchGroup(self, criteria, exact=0):
+        from MaKaC.user import LDAPGroup
+        ldapc = LDAPConnector()
+        ldapc.open()
+        ldapc.login()
+        ret = ldapc.findGroups(ldap.filter.escape_filter_chars(criteria), exact)
+        ldapc.close()
+        groupList = []
+        for grDict in ret:
+            grName = grDict['cn']
+            gr = LDAPGroup()
+            gr.setId(grName)
+            gr.setName(grName)
+            gr.setDescription('LDAP group: ' + grDict['description'])
+            groupList.append(gr)
+        return groupList
+
+    def matchGroupFirstLetter(self, letter):
+        from MaKaC.user import LDAPGroup
+        ldapc = LDAPConnector()
+        ldapc.open()
+        ldapc.login()
+        ret = ldapc.findGroupsFirstLetter(ldap.filter.escape_filter_chars(letter))
+        ldapc.close()
+        groupList = []
+        for grDict in ret:
+            grName = grDict['cn']
+            gr = LDAPGroup()
+            gr.setId(grName)
+            gr.setName(grName)
+            gr.setDescription('LDAP group: ' + grDict['description'])
+            groupList.append(gr)
+        return groupList
+
+    def getGroupMemberList(self, group):
+        ldapc = LDAPConnector()
+        ldapc.open()
+        ldapc.login()
+        ret = ldapc.findGroupMemberUids(group)
+        ldapc.close()
+        return ret
+
+    def isUserInGroup(self, user, group):
+        ldapc = LDAPConnector()
+        ldapc.open()
+        ldapc.login()
+        ret = ldapc.userInGroup(user, group)
+        ldapc.close()
+        return ret
 
 class LDAPIdentity(PIdentity):
 
@@ -387,6 +450,15 @@ class LDAPConnector(object):
                 d[ret['mail']] = av
         return d
 
+    def _findGroups(self, gfilter):
+        res = self.l.search_s(self.ldapGroupsDN, ldap.SCOPE_SUBTREE, gfilter)
+        groupDicts = []
+        for dn, data in res:
+            if dn:
+                groupDicts.append(self._objectAttributes(
+                    dn, data, ['cn', 'description']))
+        return groupDicts
+
     def findGroups(self, name, exact):
         """
         Finds a group in LDAP
@@ -403,44 +475,52 @@ class LDAPConnector(object):
         else:
             return []
         Logger.get('auth.ldap').debug('findGroups(%s) '%name)
-        res = self.l.search_s(self.ldapGroupsDN, ldap.SCOPE_SUBTREE, gfilter)
-        groupDicts = []
-        for dn, data in res:
-            if dn:
-                groupDicts.append(self._objectAttributes(
-                    dn, data, ['cn', 'description']))
-        return groupDicts
+        return self._findGroups(gfilter)
 
-    def userInGroup(self, login, name):
+
+    def findGroupsFirstLetter(self, letter):
+        """
+        Finds a group in LDAP by the first letter
+        Returns an array of groups matching the group name, each group
+        is represented by a map with keys cn and description
+        """
+        if len(letter) == 1:
+            gfilter = self.ldapGroupsFilter.format(letter + "*")
+        else:
+            return []
+        Logger.get('auth.ldap').debug('findGroupsFirstLEtter(%s) '%letter)
+        return self._findGroups(gfilter)
+
+    def userInGroup(self, login, group):
         """
         Returns whether a user is in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
         """
-        Logger.get('auth.ldap').debug('userInGroup(%s,%s) '%(login,name))
+        Logger.get('auth.ldap').debug('userInGroup(%s,%s) '%(login, group))
         # In ActiveDirectory users have multivalued attribute 'memberof' with list of groups
         # In SLAPD groups have multivalues attribute 'member' with list of users
         if self.groupStyle=='ActiveDirectory':
-            query = 'memberof={0}'.format(self._findDNOfGroup(name))
+            query = 'memberof={0}'.format(self._findDNOfGroup(group))
             res = self.l.search_s(self._findDNOfUser(login), ldap.SCOPE_BASE, query)
         elif self.groupStyle=='SLAPD':
             query = 'member={0}'.format(self._findDNOfUser(login))
-            res = self.l.search_s(self._findDNOfGroup(name), ldap.SCOPE_BASE, query)
+            res = self.l.search_s(self._findDNOfGroup(group), ldap.SCOPE_BASE, query)
         else:
             raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
 
         return res != []
 
-    def findGroupMemberUids(self,name):
+    def findGroupMemberUids(self, group):
         """
          Finds uids of users in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
         """
-        Logger.get('auth.ldap').debug('findGroupMemberUids(%s) '%name)
+        Logger.get('auth.ldap').debug('findGroupMemberUids(%s) '%group)
         # In ActiveDirectory users have multivalued attribute 'memberof' with list of groups
         # In SLAPD groups have multivalues attribute 'member' with list of users
         if self.groupStyle=='ActiveDirectory':
             #!not tested, I have not ActiveDirectory instance to try test it
             #search for users with attribute memberof=groupdn
             memberUids = []
-            query = 'memberof={0}'.format(self._findDNOfGroup(name))
+            query = 'memberof={0}'.format(self._findDNOfGroup(group))
             res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE,query)
             for dn, data in res:
                 if dn:
@@ -449,7 +529,7 @@ class LDAPConnector(object):
         elif self.groupStyle=='SLAPD':
             #read member attibute values from the group object
             members = None
-            res = self.l.search_s(self._findDNOfGroup(name), ldap.SCOPE_BASE)
+            res = self.l.search_s(self._findDNOfGroup(group), ldap.SCOPE_BASE)
             for dn, data in res:
                 if dn:
                     members = data['member']
@@ -461,7 +541,7 @@ class LDAPConnector(object):
                 if m:
                     uid = m.group(1)
                     memberUids.append( uid )
-            Logger.get('auth.ldap').debug('findGroupMemberUids(%s) returns %s'%(name,memberUids))
+            Logger.get('auth.ldap').debug('findGroupMemberUids(%s) returns %s'%(group, memberUids))
             return memberUids
         else:
             raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
@@ -506,32 +586,3 @@ class LDAPTools:
         av["id"] = 'LDAP:'+udata["login"]
         av["status"] = "NotCreated"
         return av
-
-def ldapFindGroups(name, exact):
-    """used in user.py"""
-    ldapc = LDAPConnector()
-    ldapc.open()
-    ldapc.login()
-    ret = ldapc.findGroups(ldap.filter.escape_filter_chars(name), exact)
-    ldapc.close()
-    return ret
-
-
-def ldapUserInGroup(user, name):
-    """used in user.py"""
-    ldapc = LDAPConnector()
-    ldapc.open()
-    ldapc.login()
-    ret = ldapc.userInGroup(user, name)
-    ldapc.close()
-    return ret
-
-
-def ldapFindGroupMemberUids(name):
-    """used in user.py"""
-    ldapc = LDAPConnector()
-    ldapc.open()
-    ldapc.login()
-    ret = ldapc.findGroupMemberUids(name)
-    ldapc.close()
-    return ret
