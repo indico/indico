@@ -110,8 +110,8 @@ try:
 
 except IOError:
     # this is much less secure than the above function
-    import sha
-    _randstate = sha.new(str(time() + clock()))
+    import hashlib
+    _randstate = hashlib.sha1(str(time() + clock()))
     def randlong(bytes):
         """Return bits of random data as a long integer."""
         global _randstate

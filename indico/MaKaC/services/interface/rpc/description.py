@@ -19,7 +19,7 @@
 
 from MaKaC.common import Config
 
-import sha
+import hashlib
 
 def fetchClasses(module, namespace):
     table = {}
@@ -71,7 +71,7 @@ def describe(params, remoteHost, session):
     from MaKaC.services.interface.rpc import handlers
 
     # a unique identifier for the service
-    shaObj = sha.new(Config.getInstance().getBaseURL())
+    shaObj = hashlib.sha1(Config.getInstance().getBaseURL())
     jsonRpcServiceId = shaObj.hexdigest()
     # endpoint
     jsonRpcServiceURL = Config.getInstance().getBaseURL() + '/services/json-rpc/'

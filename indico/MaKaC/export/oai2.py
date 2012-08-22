@@ -27,7 +27,7 @@ import string
 from string import split
 import re
 import time
-import md5
+import hashlib
 from datetime import datetime
 from pytz import timezone
 
@@ -1309,7 +1309,7 @@ class OAIResponse:
     def OAIGenResumptionToken(self):
         "Generates unique ID for resumption token management."
 
-        return md5.new(str(time.time())).hexdigest()
+        return hashlib.md5(str(time.time())).hexdigest()
 
 
     def OAICacheIn(self, resumptionToken, sysnos):
