@@ -7581,9 +7581,8 @@ class WConfMyStuffMySessions(wcomponents.WTemplated):
         if self._aw.getUser() is None:
             return ""
         #ls=self._conf.getCoordinatedSessions(self._aw.getUser())+self._conf.getManagedSession(self._aw.getUser())
-        from sets import Set
-        ls = Set(self._conf.getCoordinatedSessions(self._aw.getUser()))
-        ls = list(ls | Set(self._conf.getManagedSession(self._aw.getUser())))
+        ls = set(self._conf.getCoordinatedSessions(self._aw.getUser()))
+        ls = list(ls | set(self._conf.getManagedSession(self._aw.getUser())))
         if len(ls)<=0:
             return ""
         res=[]

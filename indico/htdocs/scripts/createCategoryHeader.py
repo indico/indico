@@ -56,7 +56,7 @@ def index(req, **params):
 
   for cid in ids:
     confIds = calIdx.getObjectsInDays(cid, startdate, enddate)
-    res.union_update(confIds)
+    res.update(confIds)
 
   res = list(res)
   res.sort(sortByStartDate)

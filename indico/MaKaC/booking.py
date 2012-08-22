@@ -20,7 +20,6 @@
 import os
 import re
 import tempfile
-import sets
 import os.path
 import copy
 from pytz import timezone

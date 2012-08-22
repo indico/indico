@@ -28,7 +28,6 @@ from pytz import timezone
 import MaKaC.webinterface.common.timezones as convertTime
 import MaKaC.common.timezoneUtils as timezoneUtils
 from BTrees.OOBTree import OOBTree
-from sets import Set
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -5112,9 +5111,9 @@ class RHAbstractsParticipantList(RHConfModifCFABase):
         submitters = OOBTree()
         primaryAuthors = OOBTree()
         coAuthors = OOBTree()
-        submitterEmails = Set()
-        primaryAuthorEmails = Set()
-        coAuthorEmails = Set()
+        submitterEmails = set()
+        primaryAuthorEmails = set()
+        coAuthorEmails = set()
 
         self._setGroupsToDisplay()
 

@@ -642,8 +642,7 @@ class JSLintTestRunner(BaseTestRunner):
 
         # Folders which are not going to be scanned.
         # Files are going to be find recursively in the other folders
-        import sets
-        blackList = sets.Set(['pack', 'Loader.js', 'Common', 'i18n'])
+        blackList = set(['pack', 'Loader.js', 'Common', 'i18n'])
 
         #checking if rhino is accessible
         statusOutput = commands.getstatusoutput("rhino -?")

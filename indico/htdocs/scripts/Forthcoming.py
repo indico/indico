@@ -18,7 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import sys,re
-import sets
 
 from MaKaC.common.general import *
 from MaKaC.common import db
@@ -85,16 +84,16 @@ def sortByStartDate(conf1,conf2):
 
 def getConfList(startdate,ids):
   #create result set
-  res = sets.Set()
+  res = set()
   #instanciate indexes
   im = indexes.IndexesHolder()
   catIdx = im.getIndex('category')
   calIdx = im.getIndex('calendar')
   c1 = calIdx.getObjectsStartingAfter(startdate)
   for id in ids:
-    confIds=sets.Set(catIdx.getItems(id))
+    confIds=set(catIdx.getItems(id))
     confIds.intersection_update(c1)
-    res.union_update(confIds)
+    res.update(confIds)
   res = list(res)
   res.sort(sortByStartDate)
   return res

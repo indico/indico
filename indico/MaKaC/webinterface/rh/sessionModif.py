@@ -41,7 +41,6 @@ from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
 from MaKaC.common import Config
 from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree
-from sets import Set
 from datetime import datetime,timedelta,date
 from MaKaC.errors import FormValuesError
 from MaKaC.conference import SessionChair
@@ -1387,9 +1386,9 @@ class RHContribsParticipantList(RHSessionModUnrestrictedContribMngCoordBase):
         speakers = OOBTree()
         primaryAuthors = OOBTree()
         coAuthors = OOBTree()
-        speakerEmails = Set()
-        primaryAuthorEmails = Set()
-        coAuthorEmails = Set()
+        speakerEmails = set()
+        primaryAuthorEmails = set()
+        coAuthorEmails = set()
 
         self._setGroupsToDisplay()
         for contribId in self._contribIds:

@@ -19,7 +19,6 @@
 
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
-import sets
 from datetime import timedelta,datetime
 import pytz
 from pytz import timezone
@@ -536,19 +535,19 @@ class Day(object):
         return False
 
     def getContainerMaxOverlap(self):
-        contSet = sets.Set()
+        contSet = set()
         for slot in self.getSlotList():
-            contSet.union_update( sets.Set(slot.getContainerList()) )
+            contSet.update( set(slot.getContainerList()) )
         max = 0
         for cont in contSet:
             max += cont.getMaxOverlap(self)
         return max
 
     def getNumContainers(self):
-        containerSet = sets.Set()
+        containerSet = set()
         for slot in self.getSlotList():
-            slotContainerSet = sets.Set(slot.getContainerList())
-            containerSet.union_update(slotContainerSet)
+            slotContainerSet = set(slot.getContainerList())
+            containerSet.update(slotContainerSet)
         return len(containerSet)
 
     def removeSlot(self, slot):

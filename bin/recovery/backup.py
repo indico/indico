@@ -21,7 +21,6 @@ import os
 import sys
 ## TO BE CHANGED:
 #sys.path.append('C:/Documents and Settings/smilenko/My Documents/project/indico/code/code')
-import sets
 from distutils import sysconfig
 from datetime import datetime
 from MaKaC.common import Config
@@ -40,12 +39,12 @@ python = os.path.join(sysconfig.get_config_vars()["exec_prefix"], "python")
 repozo = "C:/Python23/Scripts/repozo.py"
 
 def main():
-    tmp = sets.Set(os.listdir(backupsPath))
+    tmp = set(os.listdir(backupsPath))
     name = datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")
     os.system("%s %s %s %s %s %s %s %s %s"%(python, repozo, "-B", "-f",\
     "\"%s\""%os.path.join(currentPath, dataFile), "-F", "-z", "-r",\
     "\"%s\""%backupsPath))
-    names = sets.Set(os.listdir(backupsPath))
+    names = set(os.listdir(backupsPath))
     names.difference_update(tmp)
     for n in names:
         os.rename(os.path.join(backupsPath, n), os.path.join(backupsPath,\

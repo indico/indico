@@ -124,7 +124,7 @@ def index(req, **params):
     for id in ids:
       confIds=sets.Set(catIdx.getItems(id))
       confIds.intersection_update(c1)
-      res.union_update(confIds)
+      res.update(confIds)
 
     res = list(res)
     res.sort(sortByStartDate)

@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from sets import Set
 
 from BTrees.OOBTree import OOBTree
 
@@ -748,9 +747,9 @@ class RHAbstractsParticipantList(RHTrackAbstractsBase):
         submitters = OOBTree()
         primaryAuthors = OOBTree()
         coAuthors = OOBTree()
-        submitterEmails = Set()
-        primaryAuthorEmails = Set()
-        coAuthorEmails = Set()
+        submitterEmails = set()
+        primaryAuthorEmails = set()
+        coAuthorEmails = set()
 
         self._setGroupsToDisplay()
 
