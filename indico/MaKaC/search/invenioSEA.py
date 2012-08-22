@@ -212,7 +212,7 @@ class InvenioSEA(base.SearchEngineAdapter):
         if startDate != '':
             startDate = time.strftime("%Y-%m-%d", time.strptime(startDate, "%d/%m/%Y"))
         if endDate != '':
-            endDate = time.strftime("%Y-%m-%d", time.strptime(endDate, "%d/%m/%Y"))
+            endDate = (datetime.datetime.strptime(endDate, "%d/%m/%Y") + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
 
         if startDate != '' and endDate != '':
@@ -220,7 +220,7 @@ class InvenioSEA(base.SearchEngineAdapter):
         elif startDate != '':
             return '518__d:"%s"->"2100"' % (startDate)
         elif endDate != '':
-            return '518__d:->"%s"' % (endDate)
+            return '518__d:"1975"->"%s"' % (endDate)
         else:
             return ""
 
