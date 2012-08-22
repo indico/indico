@@ -42,6 +42,7 @@ from MaKaC.common import filters, indexes, logger
 from MaKaC.common.Configuration import Config
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder, IndexHolder
+from MaKaC.common.cache import GenericCache
 from MaKaC.errors import UserError, MaKaCError
 from MaKaC.authentication.LocalAuthentication import LocalIdentity
 from MaKaC.trashCan import TrashCanManager
@@ -75,6 +76,8 @@ from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.avatar_links as avatar_links
+
+EXTERNAL_CACHE_TTL = 300
 
 """Contains the classes that implement the user management subsystem
 """
@@ -1219,6 +1222,7 @@ class AvatarHolder( ObjectHolder ):
     idxName = "avatars"
     counterName = "PRINCIPAL"
     _indexes = [ "email", "name", "surName","organisation", "status" ]
+    _external_user_cache = GenericCache("external_user_cache")
 
     def matchFirstLetter( self, index, letter, onlyActivated=True, searchInAuthenticators=True ):
         result = {}
@@ -1251,15 +1255,13 @@ class AvatarHolder( ObjectHolder ):
         return result.values()
 
     def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
-        # for external requests, attemp caching
-        # this is a simple request-level cache that should be replaced
-        # by an appropriate one when the auth system is re-done
-        cache_result = searchInAuthenticators
+        # for external requests, attemp caching.
+        # We use a Generic Cache
         if searchInAuthenticators:
-            cache = ContextManager.setdefault('external_user_cache', {})
             key = order_dict(criteria)
-            if key in cache:
-                return cache[key]
+            cache_result = self._external_user_cache.get(key)
+            if cache_result is not None:
+                return cache_result
 
         result = {}
         iset = set()
@@ -1280,10 +1282,10 @@ class AvatarHolder( ObjectHolder ):
                 dict = authenticator.matchUser(criteria, exact=exact)
                 if dict:
                     for email in dict.iterkeys():
-                        # TODO and TOSTUDY: result.keys should be replace it with
-                        # l=[]; for av in result.values(): l.append(av.getAllEmails())
-                        if not email in result.keys():
-                            if not self.match({'email': email}, exact=1, searchInAuthenticators=False):
+                        emailResultList = [av.getEmails() for av in result.values()]
+                        if not email in emailResultList:
+                            userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
+                            if not userMatched:
                                 av = Avatar(dict[email])
                                 av.setId(dict[email]["id"])
                                 av.status = dict[email]["status"]
@@ -1294,12 +1296,10 @@ class AvatarHolder( ObjectHolder ):
                                     #     av = auth.getById(dict[email]["login"]).getUser()
                                     result[email] = av
                             else:
-                                av = self.match({'email': email}, exact=1, searchInAuthenticators=False)[0]
+                                av = userMatched[0]
                                 if self._userMatchCriteria(av, criteria, exact):
                                     result[av.getEmail()] = av
-        if cache_result:
-            cache[key] = result.values()
-
+            self._external_user_cache.set(key, result.values(), EXTERNAL_CACHE_TTL)
         return result.values()
 
     def _userMatchCriteria(self, av, criteria, exact):

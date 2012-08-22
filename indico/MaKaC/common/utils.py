@@ -30,7 +30,7 @@ from babel.dates import format_datetime
 from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
 from MaKaC.common import info
-from MaKaC import user, errors
+from MaKaC import errors
 from MaKaC.common.db import DBMgr
 from MaKaC.webinterface.linking import RoomLinker
 from MaKaC.rb_location import CrossLocationQueries
@@ -172,10 +172,12 @@ def sortCategoryByTitle(x,y):
     return cmp(x.getTitle().lower(),y.getTitle().lower())
 
 def sortPrincipalsByName(x,y):
+
+    from MaKaC.user import CERNGroup, Group
     firstNamex, firstNamey = "", ""
     if x is None:
         namex = ""
-    elif isinstance(x, user.CERNGroup) or isinstance(x, user.Group):
+    elif isinstance(x, CERNGroup) or isinstance(x, Group):
         namex = x.getName()
     else:
         namex = x.getFamilyName()
@@ -183,7 +185,7 @@ def sortPrincipalsByName(x,y):
 
     if y is None:
         namey = ""
-    elif isinstance(y, user.CERNGroup) or isinstance(y, user.Group):
+    elif isinstance(y, CERNGroup) or isinstance(y, Group):
         namey = y.getName()
     else:
         namey = y.getFamilyName()
