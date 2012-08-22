@@ -1736,7 +1736,7 @@ class WGroupList(wcomponents.WTemplated):
 
     def _performSearch( self, criteria ):
         gh = user.GroupHolder()
-        res = gh.match(criteria,searchInAuthenticators=False)
+        res = gh.match(criteria)
         return res
 
     def getVars( self ):

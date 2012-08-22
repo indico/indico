@@ -69,8 +69,8 @@ from MaKaC.common import Configuration
 
 
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
-                    'sn', 'postalAddress', 'userPrincipalName']
-
+                    'sn', 'postalAddress', 'userPrincipalName', "telephoneNumber", "facsimileTelephoneNumber"]
+UID_FIELD = "cn" # or uid
 
 class LDAPAuthenticator(Authenthicator, SSOHandler):
     idxName = "LDAPIdentities"
@@ -83,7 +83,7 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
     'name': '(givenName={0})',
     'surName': '(sn={0})',
     'organisation': '(|(o={0})(ou={0}))',
-    'login': '(uid={0})'
+    'login': '(cn={0})'
     }
 
     def __init__(self):
@@ -193,8 +193,8 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             if not ret :
                 return None
             #LDAP search is case-insensitive, we want case-sensitive match
-            if ret.get('uid')!=userName :
-                Logger.get('auth.ldap').info('user %s invalid case %s' % (userName,ret.get('uid')))
+            if ret.get(UID_FIELD)!=userName :
+                Logger.get('auth.ldap').info('user %s invalid case %s' % (userName,ret.get(UID_FIELD)))
                 return None
             return ret
         except ldap.INVALID_CREDENTIALS:
@@ -231,7 +231,7 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             gr = LDAPGroup()
             gr.setId(grName)
             gr.setName(grName)
-            gr.setDescription('LDAP group: ' + grDict['description'])
+            gr.setDescription('LDAP group: ' + grDict.get('description',''))
             groupList.append(gr)
         return groupList
 
@@ -300,6 +300,16 @@ class LDAPIdentity(PIdentity):
                             av.setFieldSynced('address',True)
                             av.setAddress(address)
                             log.info('updated address for user '+id.getLogin()+' to '+address)
+                    if 'phone' in udata:
+                        phone = udata['phone']
+                        if phone and phone != av.getPhone() and av.isFieldSynced('phone'):
+                            av.setPhone(phone)
+                            log.info('updated phone for user '+id.getLogin()+' to '+phone)
+                    if 'fax' in udata:
+                        fax = udata['fax']
+                        if fax and fax != av.getFax() and av.isFieldSynced('fax'):
+                            av.setFax(fax)
+                            log.info('updated fax for user '+id.getLogin()+' to '+fax)
 
                 return self.user
             else:
@@ -524,7 +534,7 @@ class LDAPConnector(object):
             res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE,query)
             for dn, data in res:
                 if dn:
-                    memberUids.append( data['uid'] )
+                    memberUids.append( data[UID_FIELD] )
             return memberUids
         elif self.groupStyle=='SLAPD':
             #read member attibute values from the group object
@@ -537,7 +547,7 @@ class LDAPConnector(object):
                 return []
             memberUids = []
             for memberDN in members:
-                m = re.search('uid=([^,]*),',memberDN)
+                m = re.search('%s=([^,]*),'%UID_FIELD.upper(),memberDN)
                 if m:
                     uid = m.group(1)
                     memberUids.append( uid )
@@ -563,12 +573,14 @@ class LDAPTools:
     def extractUserDataFromLdapData(ret):
         """extracts user data from a LDAP record as a dictionary, edit to modify for your needs"""
         udata= {}
-        udata["login"] = ret['uid']
+        udata["login"] = ret[UID_FIELD]
         udata["email"] = ret['mail']
         udata["name"]= ret.get('givenName', '')
         udata["surName"]= ret.get('sn', '')
-        udata["organisation"] = ret.get('o','')
+        udata["organisation"] = ret.get('company','')
         udata['address'] = LDAPTools._fromLDAPmultiline(ret['postalAddress']) if 'postalAddress' in ret else ''
+        udata["phone"] = ret.get('telephoneNumber','')
+        udata["fax"] = ret.get('facsimileTelephoneNumber','')
         Logger.get('auth.ldap').debug("extractUserDataFromLdapData(): %s " % udata)
         return udata
 
@@ -583,6 +595,8 @@ class LDAPTools:
         av["surName"]= udata["surName"]
         av["organisation"] = [udata["organisation"]]
         av["address"] = [udata["address"]]
+        av["phone"] = udata["phone"]
+        av["fax"] = udata["fax"]
         av["id"] = 'LDAP:'+udata["login"]
         av["status"] = "NotCreated"
         return av
