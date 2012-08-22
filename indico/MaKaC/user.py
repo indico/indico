@@ -198,90 +198,6 @@ class Group(Persistent, Fossilizable):
         d["groupId"] = self.getId()
         return d
 
-class NiceGroup(Group):
-
-    groupType = "Nice"
-
-    def addMember( self, newMember ):
-        pass
-
-    def removeMember( self, member ):
-        pass
-
-    def getMemberList( self ):
-        return []
-
-    def containsUser( self, avatar ):
-        if avatar == None:
-            return False
-        ids = avatar.getIdentityList()
-        for id in ids:
-            if id.getAuthenticatorTag() == "Nice":
-                return True
-        return False
-
-    def containsMember( self, member ):
-        return 0
-
-class CERNGroup(Group):
-
-    groupType = "CERN"
-
-    def addMember( self, newMember ):
-        pass
-
-    def removeMember( self, member ):
-        pass
-
-    def getMemberList( self ):
-        emailList = AuthenticatorMgr.getInstance().getById('Nice').getGroupMemberList(self.name)
-        avatarLists = []
-        for email in emailList:
-            # First, try localy (fast)
-            lst = AvatarHolder().match( { 'email': email }, exact = 1, searchInAuthenticators = False )
-            if not lst:
-                # If not found, try with NICE web service (can found anyone)
-                lst = AvatarHolder().match( { 'email': email }, exact =1 )
-            avatarLists.append( lst )
-        return [ avList[0] for avList in avatarLists if avList ]
-
-    def containsUser( self, avatar ):
-
-        if avatar == None:
-            return False
-        try:
-            if avatar in self._v_memberCache.keys():
-                if self._v_memberCache[avatar] + timedelta(0,600) > datetime.now():
-                    return True
-                else:
-                    del self._v_memberCache[avatar]
-        except:
-            self._v_memberCache = {}
-            self._v_nonMemberCache = {}
-        if avatar in self._v_nonMemberCache:
-            if self._v_nonMemberCache[avatar] + timedelta(0,600) > datetime.now():
-                return False
-            else:
-                del self._v_nonMemberCache[avatar]
-        ids = avatar.getIdentityList()
-        for id in ids:
-            if id.getAuthenticatorTag() == "Nice":
-                if AuthenticatorMgr.getInstance().getById('LDAP').isUserInGroup( id.getLogin(), self.name ):
-                    self._v_memberCache[avatar] = datetime.now()
-                    return True
-        #check also with all emails contained in account
-        for email in avatar.getEmails():
-            if AuthenticatorMgr.getInstance().getById('LDAP').isUserInGroup( email, self.name ):
-                self._v_memberCache[avatar] = datetime.now()
-                return True
-        self._v_nonMemberCache[avatar] = datetime.now()
-        return False
-
-    def containsMember( self, member ):
-        return 0
-
-
-
 class _GroupFFName(filters.FilterField):
     _id="name"
 
@@ -965,7 +881,7 @@ class Avatar(Persistent, Fossilizable):
 
     def getIdentityByAuthenticatorName(self, authenticatorName):
         """ Return a list of PIdentity objects given an authenticator name
-            :param authenticatorName: the name of an authenticator, e.g. 'Local', 'Nice', etc
+            :param authenticatorName: the name of an authenticator, e.g. 'Local', 'LDAP', etc
             :type authenticatorName: str
         """
         result = []
@@ -979,7 +895,7 @@ class Avatar(Persistent, Fossilizable):
         """ Returns a PIdentity object given an authenticator name and the identity's login
             :param id: the login string for this identity
             :type id: str
-            :param tag: the name of an authenticator, e.g. 'Local', 'Nice', etc
+            :param tag: the name of an authenticator, e.g. 'Local', 'LDAP', etc
             :type tag: str
         """
 

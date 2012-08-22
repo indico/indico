@@ -235,7 +235,7 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
         return list(av_set)
 
     def getRecursiveAllowedToAccessList(self, onlyManagers=False):
-        """Returns a set of Avatar resp. CERNGroup objects for those people resp.
+        """Returns a set of Avatar resp. Group objects for those people resp.
         e-groups allowed to access this object as well as all parent objects.
         """
 

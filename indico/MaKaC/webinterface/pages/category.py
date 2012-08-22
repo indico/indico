@@ -106,6 +106,7 @@ class WCategoryDisplay(WICalExportBase):
         vars["materials"] = self._getMaterials()
 
         subcats = self._target.subcategories
+
         confs = self._target.conferences
         if subcats:
             cl = wcomponents.WCategoryList(self._target)

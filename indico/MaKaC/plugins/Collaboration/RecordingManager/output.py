@@ -19,7 +19,7 @@
 
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.user import Avatar
-from MaKaC.user import CERNGroup
+from MaKaC.user import LDAPGroup
 from MaKaC.conference import Category
 
 from MaKaC.common.logger import Logger
@@ -41,7 +41,7 @@ class RecordingManagerMarcTagGenerator(object):
             for user_obj in allowed_users:
                 if isinstance(user_obj, Avatar):
                     allowed_emails.append(user_obj.getEmail())
-                elif isinstance(user_obj, CERNGroup):
+                elif isinstance(user_obj, LDAPGroup):
                     allowed_groups.append(user_obj.getId() + " [CERN]")
                 else:
                     allowed_emails.append("UNKNOWN: %s" % user_obj.getId())

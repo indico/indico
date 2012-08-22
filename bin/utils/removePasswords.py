@@ -25,7 +25,7 @@ from MaKaC.authentication.LocalAuthentication import LocalIdentity
 
 print('This script will remove all local identities from users.')
 print('This will remove passwords from the database and prevent them from')
-print('logging in locally (so you need e.g. NICE or LDAP authentication)')
+print('logging in locally (so you need e.g. LDAP authentication)')
 print
 if raw_input('Do you want to continue? [yes|NO]: ').lower() != 'yes':
     print 'Cancelled.'

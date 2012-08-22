@@ -378,7 +378,7 @@ class UtilPersons:
 
         if accessingAvatars:
             for person in accessingAvatars :
-                if isinstance(person, user.Avatar) or isinstance(person, user.Group) or isinstance(person, user.CERNGroup):
+                if isinstance(person, user.Avatar) or isinstance(person, user.Group):
                     conf.grantAccess(person)
 
     @staticmethod

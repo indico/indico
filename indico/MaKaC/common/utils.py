@@ -173,11 +173,11 @@ def sortCategoryByTitle(x,y):
 
 def sortPrincipalsByName(x,y):
 
-    from MaKaC.user import CERNGroup, Group
+    from MaKaC.user import Group
     firstNamex, firstNamey = "", ""
     if x is None:
         namex = ""
-    elif isinstance(x, CERNGroup) or isinstance(x, Group):
+    elif isinstance(x, Group):
         namex = x.getName()
     else:
         namex = x.getFamilyName()
@@ -185,7 +185,7 @@ def sortPrincipalsByName(x,y):
 
     if y is None:
         namey = ""
-    elif isinstance(y, CERNGroup) or isinstance(y, Group):
+    elif isinstance(y, Group):
         namey = y.getName()
     else:
         namey = y.getFamilyName()

@@ -270,7 +270,7 @@ class sendLoginInfo:
             try:
                 pw = id.password
             except AttributeError, e:
-                pw = _(" Sorry, you are using your NICE credentials to login into Indico. Please contact the CERN helpdesk in case you do not remember your password (helpdesk@cern.ch).")
+                pw = _(" Sorry, you are using your CERN credentials to login into Indico. Please contact the CERN helpdesk in case you do not remember your password (helpdesk@cern.ch).")
             logins.append( [id.getAuthenticatorTag(), id.getLogin(),pw])
         if logins == []:
             text = _("Sorry, we did not find your login.\nPlease, create one here:\n%s")%urlHandlers.UHUserDetails.getURL(self._user)

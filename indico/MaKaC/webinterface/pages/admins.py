@@ -21,7 +21,6 @@ from collections import OrderedDict
 
 import datetime
 from pytz import timezone
-from MaKaC.user import CERNGroup
 from MaKaC.fossils.user import IAvatarFossil
 
 import os
@@ -1796,8 +1795,7 @@ class WGroupModification(wcomponents.WTemplated):
         else:
             self.__setGroupVars( self._group, vars )
             vars["locator"] = self._group.getLocator().getWebForm()
-            if isinstance(self._group, CERNGroup) or \
-                   isinstance(self._group, user.LDAPGroup):
+            if isinstance(self._group, user.LDAPGroup):
                 vars["allowModif"] = False
         return vars
 

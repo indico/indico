@@ -337,7 +337,7 @@ class RHCategoryPerformCreation( RHCategModifBase ):
                 allowedUsers = self._getAllowedUsers(params)
                 if allowedUsers :
                     for person in allowedUsers :
-                        if isinstance(person, user.Avatar) or isinstance(person, user.Group) or isinstance(person, user.CERNGroup):
+                        if isinstance(person, user.Avatar) or isinstance(person, user.Group):
                             nc.grantAccess(person)
 
         self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )

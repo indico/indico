@@ -115,7 +115,7 @@ class RHGroupPerformModification( RHGroupBase ):
         self._grpData = params
 
     def _process( self ):
-        if not isinstance(self._group, user.CERNGroup):
+        if not isinstance(self._group, user.LDAPGroup):
             _GroupUtils.setGroupValues( self._group, self._grpData )
         else:
             self._group.setObsolete(self._grpData.has_key('obsolete'))

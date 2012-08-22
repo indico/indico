@@ -214,7 +214,7 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             gr = LDAPGroup()
             gr.setId(grName)
             gr.setName(grName)
-            gr.setDescription('LDAP group: ' + grDict['description'])
+            gr.setDescription('LDAP group: ' + grDict.get('description',''))
             groupList.append(gr)
         return groupList
 

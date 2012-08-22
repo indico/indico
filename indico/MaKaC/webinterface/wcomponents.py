@@ -1885,8 +1885,6 @@ class WPrincipalTable(WTemplated):
         for principal in self.__principalList:
             if isinstance(principal, user.Avatar):
                 ul.append( WUserTableItem().getHTML( principal, selected, self.__selectable, self._principalTableId ) )
-            elif isinstance(principal, user.CERNGroup):
-                ul.append( WGroupNICETableItem().getHTML( principal, selected, self.__selectable ) )
             elif isinstance(principal, user.Group):
                 ul.append( WGroupTableItem().getHTML( principal, selected, self.__selectable ) )
         for email in self.__pendings:
@@ -2155,8 +2153,6 @@ class WUserSearchResultsTable( WTemplated ):
     def __getItemClass( self, principal ):
         if principal.__class__.__name__ == "Avatar":
             return WUserTableItem
-        elif isinstance(principal, user.CERNGroup):
-            return WGroupNICETableItem
         elif isinstance(principal, user.Group):
             return WGroupTableItem
         elif isinstance(principal,conference.ContributionParticipation):

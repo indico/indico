@@ -24,7 +24,7 @@ from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 from MaKaC.rb_location import RoomGUID, Location
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 import datetime
-from MaKaC.user import Avatar, CERNGroup, Group, AvatarHolder, GroupHolder
+from MaKaC.user import Avatar, LDAPGroup, Group, AvatarHolder, GroupHolder
 from MaKaC.rb_reservation import RepeatabilityEnum
 from MaKaC.plugins.RoomBooking.default.reservation import ResvHistoryEntry
 from MaKaC.webinterface.wcomponents import WTemplated
@@ -94,7 +94,7 @@ class RoomBlocking(Persistent, RoomBlockingBase):
 
     def addAllowed(self, principal):
         """
-        Add a principal (Avatar, Group, CERNGroup or a RoomBlockingPrincipal)
+        Add a principal (Avatar, Group, LDAPGroup or a RoomBlockingPrincipal)
         to the blocking's ACL
         """
         if isinstance(principal, RoomBlockingPrincipal):
@@ -104,7 +104,7 @@ class RoomBlocking(Persistent, RoomBlockingBase):
 
     def delAllowed(self, principal):
         """
-        Remove a principal (Avatar, Group, CERNGroup or a RoomBlockingPrincipal)
+        Remove a principal (Avatar, Group, LDAPGroup or a RoomBlockingPrincipal)
         from the blocking's ACL
         """
         if isinstance(principal, RoomBlockingPrincipal):
@@ -341,8 +341,6 @@ class RoomBlockingPrincipal(Persistent):
         self._id = principal.id
         if isinstance(principal, Avatar):
             self._type = 'Avatar'
-        elif isinstance(principal, CERNGroup):
-            self._type = 'CERNGroup'
         elif isinstance(principal, Group):
             self._type = 'Group'
         else:

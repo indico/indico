@@ -120,7 +120,7 @@ globalOptions = [
     ('authenticatorList', {"description": "Authenticators used to translate Indico user <-> Vidyo account name, by order of preference.",
                        "type": list,
                        "editable": True,
-                       "defaultValue": ["Nice", "Local"] }),
+                       "defaultValue": ["LDAP", "Local"] }),
 
     ('sudsCacheLocation', {"description": "Location of the SOAP client library file cache",
                        "type": str,

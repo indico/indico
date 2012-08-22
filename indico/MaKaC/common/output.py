@@ -43,7 +43,7 @@ from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.plugins.base import Observable
-from MaKaC.user import Avatar, CERNGroup
+from MaKaC.user import Avatar, LDAPGroup
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 from indico.util.event import uniqueId
@@ -242,7 +242,7 @@ class outputGenerator(Observable):
             if isinstance(user_obj, Avatar):
                 for account in self._getExternalUserAccounts(user_obj):
                     allowed_logins.append(account)
-            elif isinstance(user_obj, CERNGroup):
+            elif isinstance(user_obj, LDAPGroup):
                 allowed_groups.append(user_obj.getId())
             else:
                 allowed_logins.append(user_obj.getId())

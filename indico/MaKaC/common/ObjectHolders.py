@@ -51,7 +51,7 @@ class ObjectHolder:
     """
     __allowedIdxs = ["conferences", "avatars", "groups", "counters",
                      "identities", "principals", "categories",
-                     "localidentities", "niceidentities", "groupsregistration",
+                     "localidentities", "groupsregistration",
                      "ldapidentities", "fieldsregistration", "registrationform",
                      "domains", "indexes", "trashcan", "roomsmapping",
                      "deletedobject", "shorturl", "modules", "plugins", "apikeys",

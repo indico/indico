@@ -160,9 +160,7 @@ class AccessController( Persistent, Observable ):
         # TODO: make this extensible
         if principal not in self.allowed and \
                (isinstance(principal, MaKaC.user.Avatar) or \
-                isinstance(principal, MaKaC.user.CERNGroup) or \
-                isinstance(principal, MaKaC.user.Group) or \
-                isinstance(principal, MaKaC.user.LDAPGroup)):
+                isinstance(principal, MaKaC.user.Group)):
             self.allowed.append( principal )
             self._p_changed = 1
         self._notify('accessGranted', principal)
@@ -252,7 +250,7 @@ class AccessController( Persistent, Observable ):
             if principal == None:
                 self.revokeAccess(principal)
                 continue
-            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( av ):
+            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( av ):
                 return True
         if isinstance(av, MaKaC.user.Avatar):
             for email in av.getEmails():
@@ -295,7 +293,7 @@ class AccessController( Persistent, Observable ):
         """grants modification access for the related resource to the specified
             principal"""
         # ToDo: should the groups allowed to be managers?
-        if principal not in self.managers and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)):
+        if principal not in self.managers and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)):
             self.managers.append( principal )
             self._p_changed = 1
         self._notify('modificationGranted', principal)
@@ -314,7 +312,7 @@ class AccessController( Persistent, Observable ):
             return True
 
         for principal in self.managers:
-            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( user ):
+            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( user ):
                 return True
         ret = False
         if isinstance(user, MaKaC.user.Avatar):
