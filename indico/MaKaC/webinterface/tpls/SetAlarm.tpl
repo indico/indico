@@ -160,7 +160,7 @@ IndicoUI.executeOnLoad(function()
         dateAlarm.set('${ day }/${ month }/${ year } ${ hour }:${ minute }');
     % endif
     var checkRecipients = function(){
-        if(!$('#toAllParticipants').attr('checked') && (!$('#defineRecipients').attr('checked')||($('#defineRecipients').attr('checked') && $("#email").val()=="")) ){
+        if((!$('#toAllParticipants').attr('checked') && !$('#defineRecipients').attr('checked')) || ($('#defineRecipients').attr('checked') && !Util.Validation.isEmailList($("#email").val())) ){
             return Html.span({}, $T("Please select the checkbox 'Send to all participants' or 'Define recipients' with a list of emails."));
         }
         return null;
