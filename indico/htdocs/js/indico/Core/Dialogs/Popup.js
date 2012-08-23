@@ -483,11 +483,8 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
 /**
  * Works exactly the same as the ConfirmPopup, but includes a parametermanager to perform checks when pressing OK
  */
-type("ConfirmPopupWithPM", ["ExclusivePopupWithButtons"],
+type("ConfirmPopupWithPM", ["ConfirmPopup"],
     {
-        draw: function() {
-            return this.ExclusivePopup.prototype.draw.call(this, this.content);
-        },
         _getButtons: function() {
             var self = this;
             return [
@@ -504,16 +501,9 @@ type("ConfirmPopupWithPM", ["ExclusivePopupWithButtons"],
         }
     },
 
-    function(title, content, handler) {
-        var self = this;
-
-        this.content = content;
-        this.handler = handler;
+    function(title, content, handler, buttonTitle, cancelButtonTitle) {
         this.parameterManager = new IndicoUtil.parameterManager();
-        this.ExclusivePopupWithButtons(title, function(){
-            self.handler(false);
-            return true;
-        });
+        this.ConfirmPopup(title, content, handler, buttonTitle, cancelButtonTitle);
     }
 );
 
