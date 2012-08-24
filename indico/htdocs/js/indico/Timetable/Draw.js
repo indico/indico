@@ -1029,7 +1029,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
             this.startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
                     this.eventData.startDate.time.substring(0,5),
-                    this.eventData.endDate.time.substring(0,5));
+                    this.eventData.endDate.time.substring(0,5), {style: {width: '50px'}}, {style: {width: '50px'}});
 
             this.startEndTimeField.accessor.set('date', this.eventData.startDate.date);
 

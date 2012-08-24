@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from MaKaC.plugins.base import pluginId
-
 # Most of the following imports are probably not necessary - to clean
 
 import os,time,re
@@ -262,6 +261,14 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         except ValueError:
             errors.append("Latitude must be a number")
 
+        try:
+            for dailyNonBookablePeriod in c.getDailyNonBookablePeriods():
+                if datetime.strptime(dailyNonBookablePeriod.getStartTime(), "%H:%M").time() > datetime.strptime(dailyNonBookablePeriod.getEndTime(), "%H:%M").time():
+                    errors.append("period start time should be before end time in daily unavailability period field")
+                    break
+        except ValueError:
+            errors.append("Daily unavailability periods must be in correct time format 'HH:MM'")
+
         params = self._params
         if ( params['largePhotoPath'] != '' ) ^ ( params['smallPhotoPath'] != '' ):
             errors.append( "Either upload both photos or none")
@@ -382,11 +389,21 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.surfaceArea = intd( params.get( "surfaceArea" ) )
         candRoom.comments = params.get( "comments" )
         candRoom.maxAdvanceDays = intd(params.get( "maxAdvanceDays" ))
-        #TODO: change this in order to support many periods
         candRoom.clearNonBookableDates()
-        if params.get("startDateNonBookablePeriod0", "") and params.get("endDateNonBookablePeriod0",""):
-            candRoom.addNonBookableDateFromParams({"startDate": datetime(*(time.strptime(params.get("startDateNonBookablePeriod0"), '%d/%m/%Y')[0:6])),
-                                                   "endDate": datetime(*(time.strptime(params.get("endDateNonBookablePeriod0"), '%d/%m/%Y')[0:6]))})
+        candRoom.clearDailyNonBookablePeriods()
+
+        for periodNumber in range(int(params.get("nonBookablePeriodCounter"))):
+            if params.get("startDateNonBookablePeriod" + str(periodNumber)):
+                # adding formated data to be compatible with the old DB version
+                try:
+                    candRoom.addNonBookableDates(datetime.strptime(params.get("startDateNonBookablePeriod" + str(periodNumber)), '%d/%m/%Y %H:%M'),
+                                             datetime.strptime(params.get("endDateNonBookablePeriod" + str(periodNumber)), '%d/%m/%Y %H:%M'))
+                except ValueError:
+                    continue
+
+        for periodNumber in range(int(params.get("dailyNonBookablePeriodCounter"))):
+            if params.get("startTimeDailyNonBookablePeriod" + str(periodNumber)):
+                candRoom.addDailyNonBookablePeriod(params.get("startTimeDailyNonBookablePeriod" + str(periodNumber)), params.get("endTimeDailyNonBookablePeriod" + str(periodNumber)))
 
         eqList = []
         vcList = []
@@ -1454,8 +1471,11 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
         self._candResv = candResv
 
         for nbd in self._candResv.room.getNonBookableDates():
-            if (doesPeriodsOverlap(nbd.getStartDate(),nbd.getEndDate(),self._candResv.startDT,self._candResv.endDT)):
+            if doesPeriodsOverlap(nbd.getStartDate(), nbd.getEndDate(), self._candResv.startDT, self._candResv.endDT):
                 raise FormValuesError("You cannot book this room during the following periods: %s"%("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
+        for nbp in self._candResv.room.getDailyNonBookablePeriods():
+            if nbp.doesPeriodOverlap(self._candResv.startDT.time(), self._candResv.endDT.time()):
+                raise FormValuesError("You cannot book this room during the following time periods: %s" % (", ".join(map(lambda x: "from %s to %s" % (x.getStartTime(), x.getEndTime()), self._candResv.room.getDailyNonBookablePeriods()))))
 
         user = self._getUser()
         days = self._candResv.room.maxAdvanceDays

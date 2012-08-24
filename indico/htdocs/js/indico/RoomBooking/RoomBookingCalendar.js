@@ -389,12 +389,12 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                     bars.push(self.drawBar(bar));
                 });
 
-
                 var dateClass = "weekday";
                 var dateArray = day.date.split('-');
                 var date = new Date(dateArray[0], dateArray[1]-1, dateArray[2]);
-                if (date.getDay() == 0 || date.getDay() == 6)
+                if (date.getDay() == 0 || date.getDay() == 6) {
                     dateClass = "weekend";
+                }
                 if (this.room.nonBookableDates) {
                     return Html.span({title: $T("This room cannot be booked for this date"), className: "unavailable"}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
                 } else {

@@ -988,23 +988,32 @@ IndicoUI.Widgets = {
             return elem;
         },
 
-        dateStartEndTimeField: function(defaultStartTime, defaultEndTime, additional) {
+        dateEditor: function(elem, method, attributes, cachedValue){
+
+            IndicoUI.Effect.mouseOver(elem.dom);
+
+            var context = new WidgetEditableContext();
+
+            var editable = new WidgetEditable(WidgetEditable.getClickableView(WidgetEditable.getTemplatedTextView(getBlankTemplate(Html.span({
+                style: {
+                    fontStyle: 'italic'
+                }
+            }, "None")))), WidgetEditable.getFieldEditor(curry(IndicoUI.Widgets.Generic.dateField, true)));
+
+            $B(elem, [editable(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, method, attributes, cachedValue), context), Widget.text(" "), IndicoUI.Aux.defaultEditMenu(context)]);
+        },
+
+        dateStartEndTimeField: function(defaultStartTime, defaultEndTime, attributesStartTime, attributesEndTime, additional) {
 
             var obj = new WatchObject();
             obj.set('startTime', defaultStartTime);
             obj.set('endTime', defaultEndTime);
 
-            var attributes = {
-                style: {
-                    width: '50px'
-                }
-            };
-
             var dash = Html.span({style: {padding: '0 10px'}});
             dash.dom.innerHTML = '&ndash;';
 
-            var startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
-            var endTimeField =  IndicoUI.Widgets.Generic.timeField(attributes);
+            var startTimeField = IndicoUI.Widgets.Generic.timeField(attributesStartTime);
+            var endTimeField = IndicoUI.Widgets.Generic.timeField(attributesEndTime);
 
             var element = Widget.block([
                 $B(startTimeField, obj.accessor('startTime')), dash,

@@ -1,4 +1,4 @@
-<%page args="repeatability=None, form=None, unavailableDates=None, maxAdvanceDays=None"/>
+<%page args="repeatability=None, form=None, unavailableDates=None, unavailableDayPeriods=None, maxAdvanceDays=None"/>
 <script type="text/javascript">
 
     // Comments the repeatition for user, to make it clear
@@ -59,7 +59,15 @@
                                         <tr id="sdatesTR" >
                                             <td class="subFieldWidth" align="right" valign="top" ><small>${ _("Unavailability") }</small></td>
                                             <td class="blacktext">
-                                            <span style="color:#881122">${ _("This room cannot be booked during the following dates") }:<ul><li>${ "</li><li>".join(map(lambda x: _('from %s to %s') % (x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), unavailableDates )) }</li></ul></span>
+                                            <span style="color:#881122">${ _("This room cannot be booked during the following dates") }:<ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y (%H:%M)'), x.getEndDate().strftime('%d/%m/%Y (%H:%M)')), unavailableDates )) }</li></ul></span>
+                                            </td>
+                                        </tr>
+                                        % endif
+                                        % if unavailableDayPeriods:
+                                        <tr id="sdatesTR" >
+                                            <td class="subFieldWidth" align="right" valign="top" ><small>${ _("Unavailable day periods") }</small></td>
+                                            <td class="blacktext">
+                                            <span style="color:#881122">${ _("This room cannot be book during the following time periods") }:<ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), unavailableDayPeriods )) }</li></ul></span>
                                             </td>
                                         </tr>
                                         % endif

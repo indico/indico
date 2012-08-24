@@ -169,7 +169,19 @@
                                             <td align="right" valign="top"><small> ${ _("Unavailable booking periods")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
                                             % if room.getNonBookableDates():
-                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), room.getNonBookableDates() )) }</li></ul>
+                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y (%H:%M)'), x.getEndDate().strftime('%d/%m/%Y (%H:%M)')), room.getNonBookableDates() )) }</li></ul>
+                                            % else:
+                                                ${_("Not set")}
+                                            % endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> ${ _("Daily unavailability periods")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                            % if room.getDailyNonBookablePeriods():
+                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), room.getDailyNonBookablePeriods() )) }</li></ul>
+                                            % else:
+                                                ${_("Not set")}
                                             % endif
                                             </td>
                                         </tr>
@@ -207,7 +219,7 @@
                                     % for name, value in attrs.iteritems():
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small>${ name }&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ verbose( value ) }</td>
+                                            <td align="left" class="blacktext">${ verbose( value ) if value else _("Not set") }</td>
                                         </tr>
                                     % endfor
                                  </table>

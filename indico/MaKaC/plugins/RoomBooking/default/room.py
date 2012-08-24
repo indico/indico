@@ -59,6 +59,25 @@ class Room( Persistent, RoomBase, Fossilizable ):
         self.customAtts = PersistentMapping()
         self.avaibleVC = []
         self._nonBookableDates = []
+        self._dailyNonBookablePeriods = []
+
+    def getDailyNonBookablePeriods(self):
+        try:
+            if self._dailyNonBookablePeriods:
+                pass
+        except AttributeError:
+            self._dailyNonBookablePeriods = []
+            self._p_changed = 1
+        return self._dailyNonBookablePeriods
+
+    def addDailyNonBookablePeriod(self, startTime, endTime):
+        nbp = DailyNonBookablePeriod(startTime, endTime)
+        self._dailyNonBookablePeriods.append(nbp)
+        self._p_changed = 1
+
+    def clearDailyNonBookablePeriods(self):
+        self._dailyNonBookablePeriods = []
+        self._p_changed = 1
 
     def getNonBookableDates(self):
         try:
@@ -69,24 +88,14 @@ class Room( Persistent, RoomBase, Fossilizable ):
             self._p_changed = 1
         return self._nonBookableDates
 
-    def addNonBookableDate(self, udate):
-        self._nonBookableDates.append(udate)
-        self._p_changed = 1
-
-    def addNonBookableDateFromParams(self, params):
-        nbd = NonBookableDate(params["startDate"], params["endDate"])
+    def addNonBookableDates(self, startDate, endDate):
+        nbd = NonBookableDate(startDate, endDate)
         self._nonBookableDates.append(nbd)
         self._p_changed = 1
 
     def clearNonBookableDates(self):
         self._nonBookableDates = []
         self._p_changed = 1
-
-    def isNonBookableDay(self, day):
-        for nbd in self.getNonBookableDates():
-            if nbd.doesDayOverlap(day):
-                return True
-        return False
 
     def getBlockedDay(self, day):
         blockings = Factory.newRoomBlocking().getByDate(day)
@@ -520,7 +529,7 @@ class NonBookableDate(Persistent):
         if startDate is None:
             self._startDate = None
         else:
-            self._startDate = startDate.replace(hour=0,minute=0,second=0)
+            self._startDate = startDate
 
     def getEndDate(self):
         return self._endDate
@@ -529,13 +538,50 @@ class NonBookableDate(Persistent):
         if endDate is None:
             self._endDate = None
         else:
-            self._endDate = endDate.replace(hour=23,minute=59,second=59)
+            self._endDate = endDate
 
-    def doesDayOverlap(self, day):
-        if day >= self.getStartDate().date() and day <= self.getEndDate().date():
-            return True
+class DailyNonBookablePeriod(Persistent):
+
+    def __init__(self, startTime, endTime):
+        self.setStartTime(startTime)
+        self.setEndTime(endTime)
+
+    def toDict(self):
+        return {"startTime": self._startTime,
+                "endTime": self._endTime}
+
+    def saveFromDict(self, data):
+        self.setStartTime(data["startTime"])
+        self.setEndTime(data["endTime"])
+
+    def getStartTime(self):
+        return self._startTime
+
+    def setStartTime(self, startTime):
+        if startTime is None:
+            self._startTime = None
         else:
-            return False
+            self._startTime = startTime
+
+    def getEndTime(self):
+        return self._endTime
+
+    def setEndTime(self, endTime):
+        if endTime is None:
+            self._endTime = None
+        else:
+            self._endTime = endTime
+
+    def doesPeriodOverlap(self, startTime, endTime):
+        periodStart = datetime.datetime.strptime(self.getStartTime(), "%H:%M").time()
+        periodEnd = datetime.datetime.strptime(self.getEndTime(), "%H:%M").time()
+        try:
+            return (startTime <= periodStart and endTime >= periodStart) or \
+                (startTime <= periodEnd and endTime >= periodEnd) or \
+                (startTime >= periodStart and endTime <= periodEnd)
+        except ValueError:
+            return None
+
 # ============================================================================
 # ================================== TEST ====================================
 # ============================================================================

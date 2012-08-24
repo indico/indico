@@ -76,6 +76,9 @@
                 <li> ${ _("Large photo may be of any size.")}</li>
             </ul>
         </div>
+        <div id="dailyNonBookablePeriodsCH" class="tip">
+            ${ _("Time format: 'HH:MM'")}
+        </div>
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
@@ -257,18 +260,42 @@
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Unavailable booking periods")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                                <span id="nonBookablePeriods" name="nonBookablePeriods" >
-                                                    <table><tbody>
-                                                        % for i in range(0, len(nonBookableDates)):
+                                                <table id="nonBookablePeriodsTable">
+                                                    % for i in range(len(nonBookableDates)):
+                                                    <tr class="startEndDate">
+                                                        <td class="startEndDateEntry">${ _("from") }:</td>
+                                                        <td><span id="startDateNonBookablePeriod${i}"></span></td>
+                                                        <td class="startEndDateEntry">${ _("to") }:</td>
+                                                        <td><span id="endDateNonBookablePeriod${i}"></span></td>
+                                                        % if i is 0:
+                                                            <td><span onclick="addNonBookablePeriod()"><a class="fakeLink">${_("add period")}</a></span></td>
+                                                        % endif
+                                                    </tr>
+                                                    % endfor
+                                                </table>
+                                                <input type="hidden" id="nonBookablePeriodCounter" name="nonBookablePeriodCounter" value="0" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> ${ _("Daily unavailability periods")}&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                                <table id="dailyNonBookablePeriodsTable">
+                                                    % for i in range(len(dailyNonBookablePeriods)):
                                                         <tr class="startEndDate">
                                                             <td class="startEndDateEntry">${ _("from") }:</td>
-                                                            <td><span id="startDateNonBookablePeriod${ i }"></span></td>
+                                                            <td><span id="startTimeDailyNonBookablePeriod${i}"></span></td>
                                                             <td class="startEndDateEntry">${ _("to") }:</td>
-                                                            <td><span id="endDateNonBookablePeriod${ i }"></span></td>
+                                                            <td><span id="endTimeDailyNonBookablePeriod${i}"></span>
+                                                            % if i is 0:
+                                                                ${contextHelp('dailyNonBookablePeriodsCH')}</td>
+                                                                <td><span onclick="addDailyNonBookablePeriod()"><a class="fakeLink">${_("add period")}</a></span></td>
+                                                            % else:
+                                                                </td>
+                                                            % endif
                                                         </tr>
-                                                        % endfor
-                                                    </tbody></table>
-                                                </span>
+                                                    % endfor
+                                                </table>
+                                                <input type="hidden" id="dailyNonBookablePeriodCounter" name="dailyNonBookablePeriodCounter" value="0" />
                                             </td>
                                         </tr>
                                         <tr>
@@ -342,36 +369,71 @@
     </form>
 
 <script type="text/javascript">
+    var nonBookablePeriodCounter = ${len(nonBookableDates)};
+    $('#nonBookablePeriodCounter').val(nonBookablePeriodCounter);
+
+    var dailyNonBookablePeriodCounter = ${len(dailyNonBookablePeriods)};
+    $('#dailyNonBookablePeriodCounter').val(dailyNonBookablePeriodCounter);
+
     IndicoUI.executeOnLoad(function(){
-    % for i in range(0, len(nonBookableDates)):
-        <% nbd = nonBookableDates[i] %>
-        var startDateNonBookablePeriod${ i } = IndicoUI.Widgets.Generic.dateField(false,{id:'startDateNonBookablePeriod${ i }', name:'startDateNonBookablePeriod${ i }'});
-        $E('startDateNonBookablePeriod${ i }').set(startDateNonBookablePeriod${ i });
-        % if nbd.getStartDate() is not None:
-            startDateNonBookablePeriod${ i }.set('${ nbd.getStartDate().strftime("%d/%m/%Y") }');
-        % endif
+    % for i in range(len(nonBookableDates)):
+        var startDateField = IndicoUI.Widgets.Generic.dateField(true, {id:'startDateNonBookablePeriod${i}', name:'startDateNonBookablePeriod${i}'});
+        var endDateField = IndicoUI.Widgets.Generic.dateField(true, {id:'endDateNonBookablePeriod${i}', name:'endDateNonBookablePeriod${i}'});
 
+        $E('startDateNonBookablePeriod${i}').set(startDateField);
+        $E('endDateNonBookablePeriod${i}').set(endDateField);
 
-        var endDateNonBookablePeriod${ i } = IndicoUI.Widgets.Generic.dateField(false,{id:'endDateNonBookablePeriod${ i }', name:'endDateNonBookablePeriod${ i }'});
-        $E('endDateNonBookablePeriod${ i }').set(endDateNonBookablePeriod${ i });
-        % if nbd.getStartDate() is not None:
-            endDateNonBookablePeriod${ i }.set('${ nbd.getEndDate().strftime("%d/%m/%Y") }');
-        % endif
+        startDateField.set('${nonBookableDates[i].getStartDate().strftime("%d/%m/%Y %H:%M") if nonBookableDates[i].getStartDate() else ""}')
+        endDateField.set('${nonBookableDates[i].getEndDate().strftime("%d/%m/%Y %H:%M") if nonBookableDates[i].getEndDate() else ""}')
+    % endfor
+
+    % for i in range(len(dailyNonBookablePeriods)):
+        var dateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
+            "${dailyNonBookablePeriods[i].getStartTime() if dailyNonBookablePeriods[i].getStartTime() else ""}",
+            "${dailyNonBookablePeriods[i].getEndTime() if dailyNonBookablePeriods[i].getEndTime() else ""}",
+            {id:'startTimeDailyNonBookablePeriod${i}', name:'startTimeDailyNonBookablePeriod${i}', style: {width: '50px'}},
+            {id:'endTimeDailyNonBookablePeriod${i}', name:'endTimeDailyNonBookablePeriod${i}', style: {width: '50px'}});
+        $E('startTimeDailyNonBookablePeriod${i}').set(dateStartEndTimeField.startTimeField);
+        $E('endTimeDailyNonBookablePeriod${i}').set(dateStartEndTimeField.endTimeField);
     % endfor
     });
 
-  function searchForUsers() {
+    function addNonBookablePeriod(){
+        $("#nonBookablePeriodsTable tr:last").after('<tr class="startEndDate"><td class="startEndDateEntry">${ _("from") }:</td><td><span id="startDateNonBookablePeriod' + nonBookablePeriodCounter + '"></span></td><td class="startEndDateEntry">${ _("to") }:</td><td><span id="endDateNonBookablePeriod' + nonBookablePeriodCounter +'"></span></td></tr>');
 
-    var popup = new ChooseUsersPopup($T('Select a responsible'),
-                                     true,
-                                     null, false,
-                                     true, null,
-                                     true, true,
-                                     function(users) {
-                                         $E('responsibleName').set(users[0].name);
-                                         $E('responsibleId').set(users[0].id);
-                                     });
+        $E('startDateNonBookablePeriod' + nonBookablePeriodCounter).set(IndicoUI.Widgets.Generic.dateField(true, {id:'startDateNonBookablePeriod' + nonBookablePeriodCounter, name:'startDateNonBookablePeriod' + nonBookablePeriodCounter}));
+        $E('endDateNonBookablePeriod' + nonBookablePeriodCounter).set(IndicoUI.Widgets.Generic.dateField(true, {id:'endDateNonBookablePeriod' + nonBookablePeriodCounter, name:'endDateNonBookablePeriod' + nonBookablePeriodCounter}));
 
-    popup.execute();
-  }
+        nonBookablePeriodCounter = nonBookablePeriodCounter + 1;
+        $("#nonBookablePeriodCounter").val(nonBookablePeriodCounter);
+
+    }
+
+    function addDailyNonBookablePeriod(){
+        $("#dailyNonBookablePeriodsTable tr:last").after('<tr class="startEndDate"><td class="startEndDateEntry">${ _("from") }:</td><td><span id="startTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter + '"></span></td><td class="startEndDateEntry">${ _("to") }:</td><td><span id="endTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter +'"></span></td></tr>');
+
+        newDateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField("","",
+            {id:'startTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter, name:'startTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter, style: {width: '50px'}}, 
+            {id:'endTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter, name:'endTimeDailyNonBookablePeriod' + 
+                dailyNonBookablePeriodCounter, style: {width: '50px'}});
+
+        $E('startTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter).set(newDateStartEndTimeField.startTimeField);
+        $E('endTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter).set(newDateStartEndTimeField.endTimeField);
+
+        dailyNonBookablePeriodCounter = dailyNonBookablePeriodCounter + 1;
+        $("#dailyNonBookablePeriodCounter").val(dailyNonBookablePeriodCounter);
+    }
+
+    function searchForUsers(){
+        var popup = new ChooseUsersPopup($T('Select a responsible'),
+                                         true,
+                                         null, false,
+                                         true, null,
+                                         true, true,
+                                         function(users) {
+                                             $E('responsibleName').set(users[0].name);
+                                             $E('responsibleId').set(users[0].id);
+                                         });
+        popup.execute();
+    }
 </script>
