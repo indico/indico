@@ -316,3 +316,136 @@ type("CategoryChooser", ["ExclusivePopup"], {
      }
 
 );
+
+
+type("AddReportNumberPopup", ["ServiceDialogWithButtons"], {
+
+    _success: function(response) {
+        this.onSuccess(response);
+    },
+
+    _save: function(response) {
+        var self = this;
+        if(self.parameterManager.check()){
+            self.request(self.reportNumberData);
+        }
+    },
+
+    _getButtons: function(){
+        var self = this;
+        return [
+            [$T('Add report number'), function() {
+                self._save();
+            }, true],
+            [$T('Cancel'), function(){
+                self.close();
+            }]
+        ]
+    },
+
+    _drawSelectReportNumberSystems: function(){
+        var options = [Html.option({value: ""}, "")];
+        for(system in this.reportNumberSystems){
+            options.push(Html.option({value: system}, this.reportNumberSystems[system]));
+        }
+        return Html.select({}, options);
+    },
+
+    draw: function() {
+        var self = this;
+
+        var content = IndicoUtil.createFormFromMap(
+                [
+                 [$T('Report Number System'), $B(self.parameterManager.add(self._drawSelectReportNumberSystems()), self.reportNumberData.accessor('reportNumberSystem'))],
+                 [$T('Report Number'), $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'text', false), self.reportNumberData.accessor('reportNumber'))],
+             ]);
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, content);
+
+    },
+    },
+     function(uploadAction, reportNumberSystems, onSuccess, params) {
+         this.reportNumberData = $O(params);
+         this.uploadAction = uploadAction;
+         this.onSuccess = onSuccess;
+         this.reportNumberSystems = reportNumberSystems;
+         this.parameterManager = new IndicoUtil.parameterManager();
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, uploadAction, this.reportNumberData, "Add report number", function() {self.close();});
+     }
+
+);
+
+type("ReportNumberList", ["ListWidget"], {
+
+    _createRemoveButton: function(reportNumber){
+        var self = this;
+        return Widget.link(command(function(){
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing report number..."));
+            var args = self.params;
+            args["reportNumberSystem"] = reportNumber.get().system;
+            args["reportNumber"] = reportNumber.get().number;
+
+            indicoRequest(
+                    self.removeAction,
+                    args,
+                function(result,error) {
+                    if (!error){
+                        killProgress();
+                        self.set(reportNumber.key, null);
+                    }
+                    else{
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+            );
+        }, IndicoUI.Buttons.removeButton()));
+
+    },
+
+    _drawItem: function(reportNumber){
+        var self = this;
+        var removeButton = self._createRemoveButton(reportNumber);
+        var removeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}}, removeButton);
+        var reportNumberSpan = Html.span({}, Html.span({style:{fontWeight: "bold"}}, reportNumber.get().name + ": "),  Html.span({}, reportNumber.get().number));
+        return Html.span({}, removeButtonDiv, reportNumberSpan);
+    }},
+     function(removeAction, params) {
+         this.removeAction = removeAction;
+         this.params = clone(params);
+         this.ListWidget("PeopleList");
+     }
+
+);
+
+type("ReportNumberEditor", ["IWidget"], {
+
+    draw: function() {
+        var self = this;
+        var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
+        var addNewUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add New') );
+        buttonDiv.append(addNewUserButton);
+        buttonDiv.observeClick(function(){
+            var onSuccess = function(response){
+                if(response){
+                    self.reportNumberList.set(response.id, response);
+                }
+            }
+            new AddReportNumberPopup(self.uploadAction, self.reportNumberSystems, onSuccess, self.params).open();
+        });
+        return Widget.block([Html.div({className: "PluginOptionPeopleListDiv", style : {width: "300px"}},this.reportNumberList.draw()),buttonDiv]);
+    }
+    },
+     function(uploadAction, removeAction, reportNumbers, reportNumberSystems, params) {
+         var self = this;
+         this.uploadAction = uploadAction;
+         this.reportNumberList = new ReportNumberList(removeAction, params);
+         if (exists(reportNumbers)) {
+             each(reportNumbers, function(reportNumber){
+                 self.reportNumberList.set(reportNumber.id, reportNumber);
+             });
+         }
+         this.reportNumberSystems = reportNumberSystems;
+         this.params = params;
+     }
+
+);

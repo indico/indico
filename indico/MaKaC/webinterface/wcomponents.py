@@ -5475,46 +5475,37 @@ class WReportNumbersTable(WTemplated):
         self._type=type
 
     def _getCurrentItems(self):
-        html=[]
         rns = self._target.getReportNumberHolder().listReportNumbers()
-        id = 0
-
         reportCodes = []
 
         for rn in rns:
             key = rn[0]
-            number = rn[1]
-            name=key
             if key in Configuration.Config.getInstance().getReportNumberSystems().keys():
+                number = rn[1]
+                reportNumberId="s%sr%s"%(key, number)
                 name=Configuration.Config.getInstance().getReportNumberSystems()[key]["name"]
-                reportCodes.append((id, number, name))
-            id+=1
+                reportCodes.append({"id" : reportNumberId, "number": number, "system": key, "name": name})
         return reportCodes
-
-    def _getSystems(self):
-        html=[]
-        rnsystems=Configuration.Config.getInstance().getReportNumberSystems()
-        keys=rnsystems.keys()
-        keys.sort()
-        for system in keys:
-            html.append("""
-                        <option value="%s">%s</option>
-                        """%(system, rnsystems[system]["name"] ) )
-        return "".join(html)
 
     def getVars(self):
         vars = WTemplated.getVars(self)
+        vars["params"] = {"confId": self._target.getConference().getId()}
+
         if self._type == "event":
-            vars["deleteURL"]=quoteattr(str(urlHandlers.UHConfModifReportNumberRemove.getURL(self._target)))
-            vars["addURL"]=quoteattr(str(urlHandlers.UHConfModifReportNumberEdit.getURL(self._target)))
+            vars["addAction"] = "event.main.addReportNumber"
+            vars["deleteAction"] = "event.main.removeReportNumber"
         elif self._type == "contribution":
-            vars["deleteURL"]=quoteattr(str(urlHandlers.UHContributionReportNumberRemove.getURL(self._target)))
-            vars["addURL"]=quoteattr(str(urlHandlers.UHContributionReportNumberEdit.getURL(self._target)))
+            vars["params"]["contribId"] = self._target.getId()
+            vars["addAction"] = "contribution.addReportNumber"
+            vars["deleteAction"] = "contribution.removeReportNumber"
         else:
-            vars["deleteURL"]=quoteattr(str(urlHandlers.UHSubContributionReportNumberRemove.getURL(self._target)))
-            vars["addURL"]=quoteattr(str(urlHandlers.UHSubContributionReportNumberEdit.getURL(self._target)))
+            vars["params"]["contribId"] = self._target.getContribution().getId()
+            vars["params"]["subcontribId"] = self._target.getId()
+            vars["addAction"] = "contribution.subcontribution.addReportNumber"
+            vars["deleteAction"] = "contribution.subcontribution.removeReportNumber"
         vars["items"]=self._getCurrentItems()
-        vars["repTypesSelectItems"]=self._getSystems()
+        systems = Configuration.Config.getInstance().getReportNumberSystems()
+        vars["reportNumberSystems"]= dict([(system, systems[system]["name"]) for system in systems])
         return vars
 
 class WModifReportNumberEdit(WTemplated):

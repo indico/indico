@@ -20,6 +20,7 @@
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
+from MaKaC.services.implementation.base import ReportNumberAdd, ReportNumberRemove
 from MaKaC.services.implementation.roomBooking import GetBookingBase
 
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
@@ -179,6 +180,35 @@ class ContributionDeleteSubContribution(ContributionModifBase):
 
 class ContributionGetBooking(ContributionDisplayBase, GetBookingBase):
     pass
+
+
+class ContributionAddReportNumber(ReportNumberAdd, ContributionModifBase):
+
+    def _checkParams(self):
+        ContributionModifBase._checkParams(self)
+        ReportNumberAdd._checkParams(self)
+
+class ContributionRemoveReportNumber(ReportNumberRemove, ContributionModifBase):
+
+    def _checkParams(self):
+        ContributionModifBase._checkParams(self)
+        ReportNumberRemove._checkParams(self)
+
+class SubContributionAddReportNumber(ReportNumberAdd, ContributionModifBase):
+
+    def _checkParams(self):
+        ContributionModifBase._checkParams(self)
+        ReportNumberAdd._checkParams(self)
+        subContId = self._pm.extract("subcontribId", pType=str, allowEmpty=False)
+        self._target = self._contribution.getSubContributionById(subContId)
+
+class SubContributionRemoveReportNumber(ReportNumberRemove, ContributionModifBase):
+
+    def _checkParams(self):
+        ContributionModifBase._checkParams(self)
+        ReportNumberRemove._checkParams(self)
+        subContId = self._pm.extract("subcontribId", pType=str, allowEmpty=False)
+        self._target = self._contribution.getSubContributionById(subContId)
 
 class ContributionProtectionUserList(ContributionModifBase):
 
@@ -868,6 +898,10 @@ methodMap = {
     "addSubContribution": ContributionAddSubContribution,
     "deleteSubContribution": ContributionDeleteSubContribution,
     "getBooking": ContributionGetBooking,
+    "addReportNumber": ContributionAddReportNumber,
+    "removeReportNumber": ContributionRemoveReportNumber,
+    "subcontribution.addReportNumber": SubContributionAddReportNumber,
+    "subcontribution.removeReportNumber": SubContributionRemoveReportNumber,
     "protection.getAllowedUsersList": ContributionProtectionUserList,
     "protection.addAllowedUsers": ContributionProtectionAddUsers,
     "protection.removeAllowedUser": ContributionProtectionRemoveUser,

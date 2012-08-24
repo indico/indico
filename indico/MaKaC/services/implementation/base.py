@@ -507,3 +507,27 @@ class ExportToICalBase(object):
         elif apiKey.isBlocked():
             raise ServiceAccessError("This API key is blocked!")
         self._apiKey = apiKey
+
+class ReportNumberBase:
+
+    def _checkParams(self):
+        pm = ParameterManager(self._params)
+        self._reportNumber = pm.extract("reportNumber", pType=str, allowEmpty=False)
+        self._reportNumberSystem = pm.extract("reportNumberSystem", pType=str, allowEmpty=False)
+
+class ReportNumberAdd(ReportNumberBase):
+
+    def _getAnswer(self):
+        self._target.getReportNumberHolder().addReportNumber(self._reportNumberSystem, self._reportNumber)
+        if self._reportNumberSystem in Config.getInstance().getReportNumberSystems().keys():
+            reportNumberId="s%sr%s"%(self._reportNumberSystem, self._reportNumber)
+            name = Config.getInstance().getReportNumberSystems()[self._reportNumberSystem]["name"]
+            return {"id":reportNumberId, "name":name , "system":self._reportNumberSystem, "number": self._reportNumber}
+        else:
+            return {}
+
+class ReportNumberRemove(ReportNumberBase):
+
+    def _getAnswer(self):
+        self._target.getReportNumberHolder().removeReportNumber(self._reportNumberSystem, self._reportNumber)
+        return True
