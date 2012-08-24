@@ -414,11 +414,15 @@ class SendMailTask(OneShotTask):
         for user in self.toUser:
             addrs.append(smtplib.quoteaddr(user.getEmail()))
 
-        GenericMailer.send(GenericNotification({"fromAddr": self.fromAddr,
-                                                "toList": addrs,
-                                                "ccList": ccaddrs,
-                                                "subject": self.subject,
-                                                "body": self.text }))
+        addrs = filter (lambda addr: addr != '<>', addrs)
+        ccaddrs = filter (lambda ccaddr: ccaddr != '<>', ccaddrs)
+
+        if addrs:
+            GenericMailer.send(GenericNotification({"fromAddr": self.fromAddr,
+                                                    "toList": addrs,
+                                                    "ccList": ccaddrs,
+                                                    "subject": self.subject,
+                                                    "body": self.text }))
 
     def setFromAddr(self, addr):
         self.fromAddr = addr

@@ -433,7 +433,6 @@ class obj(Persistent):
         self.id = id
 
 
-
 class sendMail(obj):
     """
     """
@@ -456,8 +455,11 @@ class sendMail(obj):
             ccaddrs.append(smtplib.quoteaddr(ccaddr))
         for user in self.toUser:
             addrs.append(smtplib.quoteaddr(user.getEmail()))
-        maildata = { "fromAddr": self.fromAddr, "toList": addrs, "ccList": ccaddrs, "subject": self.subject, "body": self.text }
-        GenericMailer.send(GenericNotification(maildata))
+        addrs = filter (lambda addr: addr != '<>', addrs)
+        ccaddrs = filter (lambda ccaddr: ccaddr != '<>', ccaddrs)
+        if addrs:
+            maildata = { "fromAddr": self.fromAddr, "toList": addrs, "ccList": ccaddrs, "subject": self.subject, "body": self.text }
+            GenericMailer.send(GenericNotification(maildata))
 
     def setFromAddr(self, addr):
         self.fromAddr = addr
