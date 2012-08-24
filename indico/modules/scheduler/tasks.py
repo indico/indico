@@ -403,21 +403,19 @@ class SendMailTask(OneShotTask):
         if not send:
             return
 
-        addrs = [smtplib.quoteaddr(x) for x in self.toAddr]
-        ccaddrs = [smtplib.quoteaddr(x) for x in self.ccAddr]
+        # just in case some ill-behaved code generates empty addresses
+        addrs = list(smtplib.quoteaddr(x) for x in self.toAddr if x)
+        ccaddrs = list(smtplib.quoteaddr(x) for x in self.ccAddr if x)
 
         if len(addrs) + len(ccaddrs) == 0:
-            self.getLogger().warning("Attention: mail contains no recipients!")
+            self.getLogger().warning("Attention: no recipients, mail won't be sent")
         else:
             self.getLogger().info("Sending mail To: %s, CC: %s" % (addrs, ccaddrs))
 
         for user in self.toUser:
             addrs.append(smtplib.quoteaddr(user.getEmail()))
 
-        addrs = filter (lambda addr: addr != '<>', addrs)
-        ccaddrs = filter (lambda ccaddr: ccaddr != '<>', ccaddrs)
-
-        if addrs:
+        if addrs or ccadrs:
             GenericMailer.send(GenericNotification({"fromAddr": self.fromAddr,
                                                     "toList": addrs,
                                                     "ccList": ccaddrs,

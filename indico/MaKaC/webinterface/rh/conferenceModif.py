@@ -2319,7 +2319,9 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
         al.setToAddrList([])
         if(self._defineRecipients or self._testAlarm):
             for addr in self._emails.split(","):
-                al.addToAddr(addr.strip())
+                addr = addr.strip()
+                if addr:
+                    al.addToAddr(addr)
 
         al.setFromAddr(self._fromAddr)
 

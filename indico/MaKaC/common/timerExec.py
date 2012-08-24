@@ -455,11 +455,8 @@ class sendMail(obj):
             ccaddrs.append(smtplib.quoteaddr(ccaddr))
         for user in self.toUser:
             addrs.append(smtplib.quoteaddr(user.getEmail()))
-        addrs = filter (lambda addr: addr != '<>', addrs)
-        ccaddrs = filter (lambda ccaddr: ccaddr != '<>', ccaddrs)
-        if addrs:
-            maildata = { "fromAddr": self.fromAddr, "toList": addrs, "ccList": ccaddrs, "subject": self.subject, "body": self.text }
-            GenericMailer.send(GenericNotification(maildata))
+        maildata = { "fromAddr": self.fromAddr, "toList": addrs, "ccList": ccaddrs, "subject": self.subject, "body": self.text }
+        GenericMailer.send(GenericNotification(maildata))
 
     def setFromAddr(self, addr):
         self.fromAddr = addr
