@@ -6098,47 +6098,6 @@ class RHRelocate(RHConferenceModifBase):
                         self._conf.getSchedule().addEntry(self._schEntry, check=self._check)
         self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
 
-class RHConfModfReportNumberEdit(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._reportNumberSystem=params.get("reportNumberSystem","")
-
-    def _process(self):
-        if self._reportNumberSystem!="":
-            p=conferences.WPConfModifReportNumberEdit(self,self._conf, self._reportNumberSystem)
-            return p.display()
-        else:
-            self._redirect(urlHandlers.UHConferenceModification.getURL( self._conf ))
-
-class RHConfModfReportNumberPerformEdit(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._reportNumberSystem=params.get("reportNumberSystem","")
-        self._reportNumber=params.get("reportNumber","")
-
-    def _process(self):
-        if self._reportNumberSystem!="" and self._reportNumber!="":
-            self._conf.getReportNumberHolder().addReportNumber(self._reportNumberSystem, self._reportNumber)
-        self._redirect("%s#reportNumber"%urlHandlers.UHConferenceModification.getURL( self._conf ))
-
-
-class RHConfModfReportNumberRemove(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._reportNumberIdsToBeDeleted=self._normaliseListParam( params.get("deleteReportNumber",[]))
-
-    def _process(self):
-        nbDeleted = 0
-        for id in self._reportNumberIdsToBeDeleted:
-            self._conf.getReportNumberHolder().removeReportNumberById(int(id)-nbDeleted)
-            nbDeleted += 1
-        self._redirect("%s#reportNumber"%urlHandlers.UHConferenceModification.getURL( self._conf ))
-
-
-
 class RHMaterialsAdd(RHSubmitMaterialBase, RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifAddMaterials
 

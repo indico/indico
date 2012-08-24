@@ -989,16 +989,6 @@ class WPContributionDisplayRemoveMaterialsConfirm( WPContributionDefaultDisplayB
         url=urlHandlers.UHContributionDisplayRemoveMaterial.getURL(self._mat.getOwner())
         return wc.getHTML(msg,url,{"deleteMaterial":self._mat.getId()})
 
-class WPContributionReportNumberEdit(WPContributionModifBase):
-
-    def __init__(self, rh, contribution, reportNumberSystem):
-        WPContributionModifBase.__init__(self, rh, contribution)
-        self._reportNumberSystem=reportNumberSystem
-
-    def _getTabContent( self, params):
-        wc=wcomponents.WModifReportNumberEdit(self._target, self._reportNumberSystem, "contribution")
-        return wc.getHTML()
-
 
 class WContributionICalExport(WICalExportBase):
 

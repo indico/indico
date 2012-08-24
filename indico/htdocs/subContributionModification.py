@@ -45,10 +45,3 @@ def materialsAdd(req, **params):
 def materials(req, **params):
     return subContribMod.RHMaterials( req ).process( params )
 
-def editReportNumber(req, **params):
-    return subContribMod.RHSubContributionReportNumberEdit(req).process(params)
-
-def performEditReportNumber(req, **params):
-    return subContribMod.RHSubContributionReportNumberPerformEdit(req).process(params)
-def removeReportNumber(req, **params):
-    return subContribMod.RHSubContributionReportNumberRemove(req).process(params)

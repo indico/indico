@@ -112,15 +112,6 @@ def modificationClosed(req, **params):
 def sectionsSettings(req, **params):
     return conferenceModif.RHConfSectionsSettings(req).process(params)
 
-def editReportNumber(req, **params):
-    return conferenceModif.RHConfModfReportNumberEdit(req).process(params)
-
-def performEditReportNumber(req, **params):
-    return conferenceModif.RHConfModfReportNumberPerformEdit(req).process(params)
-
-def removeReportNumber(req, **params):
-    return conferenceModif.RHConfModfReportNumberRemove(req).process(params)
-
 def materialsAdd(req, **params):
     return conferenceModif.RHMaterialsAdd(req).process(params)
 

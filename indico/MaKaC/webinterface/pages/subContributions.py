@@ -305,18 +305,3 @@ class WSubContribModifMain(wcomponents.WTemplated):
         vars["authors"] = fossilize(self._subContrib.getContribution().getAllAuthors())
         vars["eventType"] = self._subContrib.getConference().getType()
         return vars
-
-class WPSubContributionReportNumberEdit(WPSubContributionModifBase):
-
-    def __init__(self, rh, subcontribution, reportNumberSystem):
-        WPSubContributionModifBase.__init__(self, rh, subcontribution)
-        self._reportNumberSystem=reportNumberSystem
-
-    def _setActiveTab( self ):
-        #self._innerTabMain.setActive()
-        pass
-
-
-    def _getTabContent( self, params):
-        wc=wcomponents.WModifReportNumberEdit(self._target, self._reportNumberSystem, "subcontribution")
-        return wc.getHTML(params)

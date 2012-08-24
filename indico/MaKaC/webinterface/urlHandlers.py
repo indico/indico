@@ -676,15 +676,6 @@ class UHConfModifCFAAbsFieldUp(URLHandler):
 class UHConfModifCFAAbsFieldDown(URLHandler):
     _relativeURL = "confModifCFA.py/absFieldDown"
 
-class UHConfModifReportNumberEdit( URLHandler ):
-    _relativeURL = "conferenceModification.py/editReportNumber"
-
-class UHConfModifReportNumberPerformEdit( URLHandler ):
-    _relativeURL = "conferenceModification.py/performEditReportNumber"
-
-class UHConfModifReportNumberRemove( URLHandler ):
-    _relativeURL = "conferenceModification.py/removeReportNumber"
-
 class UHConfModifProgram( URLHandler ):
     _relativeURL = "confModifProgram.py"
 
@@ -1318,15 +1309,6 @@ class UHContributionDataModification( URLHandler ):
 class UHContributionCreation( URLHandler ):
     _relativeURL = "contributionCreation.py"
 
-
-class UHContributionReportNumberEdit( URLHandler ):
-    _relativeURL = "contributionModification.py/editReportNumber"
-
-class UHContributionReportNumberPerformEdit( URLHandler ):
-    _relativeURL = "contributionModification.py/performEditReportNumber"
-
-class UHContributionReportNumberRemove( URLHandler ):
-    _relativeURL = "contributionModification.py/removeReportNumber"
 
 
 class UHSubContributionCreation( URLHandler ):
@@ -2300,15 +2282,6 @@ class UHContributionDelete( URLHandler ):
 
 class UHSubContributionDataModification( URLHandler ):
     _relativeURL = "subContributionModification.py/data"
-
-class UHSubContributionReportNumberEdit( URLHandler ):
-    _relativeURL = "subContributionModification.py/editReportNumber"
-
-class UHSubContributionReportNumberPerformEdit( URLHandler ):
-    _relativeURL = "subContributionModification.py/performEditReportNumber"
-
-class UHSubContributionReportNumberRemove( URLHandler ):
-    _relativeURL = "subContributionModification.py/removeReportNumber"
 
 class UHSubContributionDataModif( URLHandler ):
     _relativeURL = "subContributionModification.py/modifData"

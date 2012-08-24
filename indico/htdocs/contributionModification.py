@@ -74,12 +74,3 @@ def withdraw(req, **params):
 
 def materials(req, **params):
     return contribMod.RHMaterials( req ).process( params )
-
-def editReportNumber(req, **params):
-    return contribMod.RHContributionReportNumberEdit(req).process(params)
-
-def performEditReportNumber(req, **params):
-    return contribMod.RHContributionReportNumberPerformEdit(req).process(params)
-
-def removeReportNumber(req, **params):
-    return contribMod.RHContributionReportNumberRemove(req).process(params)

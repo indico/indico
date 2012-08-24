@@ -9887,18 +9887,6 @@ class WPConfModifRelocate(WPConferenceModifBase):
                 "targetDay":quoteattr(str(self._targetDay))}
         return wc.getHTML(p)
 
-
-class WPConfModifReportNumberEdit(WPConferenceModifBase):
-
-    def __init__(self, rh, conf, reportNumberSystem):
-        WPConferenceModifBase.__init__(self, rh, conf)
-        self._reportNumberSystem=reportNumberSystem
-
-    def _getPageContent( self, params):
-        wc=wcomponents.WModifReportNumberEdit(self._conf, self._reportNumberSystem)
-        return wc.getHTML()
-
-
 class WPConfModifExistingMaterials( WPConferenceModifBase ):
 
     _userData = ['favorite-user-list', 'favorite-user-ids']

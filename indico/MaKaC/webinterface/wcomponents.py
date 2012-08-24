@@ -5508,30 +5508,6 @@ class WReportNumbersTable(WTemplated):
         vars["reportNumberSystems"]= dict([(system, systems[system]["name"]) for system in systems])
         return vars
 
-class WModifReportNumberEdit(WTemplated):
-
-    def __init__(self, target, rns, type="event"):
-        self._target=target
-        self._rnSystem=rns
-        self._type=type
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["reportNumber"]=""
-        vars["reportNumberSystem"]=self._rnSystem
-        name=self._rnSystem
-        if self._rnSystem in Config.getInstance().getReportNumberSystems().keys():
-            name=Config.getInstance().getReportNumberSystems()[self._rnSystem]["name"]
-        vars["system"]=name
-        if self._type == "event":
-            vars["postURL"]=quoteattr(str(urlHandlers.UHConfModifReportNumberPerformEdit.getURL(self._target)))
-        elif self._type == "contribution":
-            vars["postURL"]=quoteattr(str(urlHandlers.UHContributionReportNumberPerformEdit.getURL(self._target)))
-        else:
-            vars["postURL"]=quoteattr(str(urlHandlers.UHSubContributionReportNumberPerformEdit.getURL(self._target)))
-        return vars
-
-
 # ============================================================================
 # === ROOM BOOKING RELATED ===================================================
 # ============================================================================
