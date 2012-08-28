@@ -2168,7 +2168,7 @@ class CSBookingBase(Persistent, Fossilizable):
         return self._getTalkSelection()
 
     def __cmp__(self, booking):
-        return cmp(self.getUniqueId(), booking.getUniqueId())
+        return cmp(self.getUniqueId(), booking.getUniqueId()) if booking else 1
 
 class WCSTemplateBase(wcomponents.WTemplated):
     """ Base class for Collaboration templates.
