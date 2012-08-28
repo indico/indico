@@ -8319,7 +8319,6 @@ class Contribution(CommonObjectBase, Locatable):
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
-
         if newDate == None:
             self.startDate=None
             return
@@ -8328,7 +8327,9 @@ class Contribution(CommonObjectBase, Locatable):
 
         if newDate != None and check != 0:
             self.verifyStartDate(newDate, check)
+        self._notify("contributionUnscheduled")
         self.startDate=copy.copy(newDate)
+        self._notify("contributionScheduled")
         self.getSchEntry().synchro()
         self.notifyModification()
 

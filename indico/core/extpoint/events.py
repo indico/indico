@@ -81,6 +81,9 @@ class ITimeActionListener(IListener):
     def contributionUnscheduled(self, obj):
         pass
 
+    def contributionScheduled(self, contrib):
+        pass
+
 class IObjectLifeCycleListener(IListener):
 
     def created(self, obj, owner):

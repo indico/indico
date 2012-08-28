@@ -149,6 +149,8 @@ class CSBookingInstanceIndex(OOIndex):
         for bkw in to_unindex:
             self.unindex_obj(bkw)
 
+    def index_talk(self, bk, talk):
+        self.index_obj(CSBookingInstanceWrapper(bk, talk))
 
 class CatalogIndexPrintovider(Component):
     zope.interface.implements(ICatalogIndexProvider)
@@ -223,10 +225,16 @@ class EventCollaborationListener(Component):
 
     @classmethod
     def contributionUnscheduled(self, contrib):
+        if contrib.getStartDate() is not None:
+            csBookingManager = contrib.getCSBookingManager()
+            for booking in csBookingManager.getBookingList():
+                booking.unindex_talk(contrib)
+
+    @classmethod
+    def contributionScheduled(self, contrib):
         csBookingManager = contrib.getCSBookingManager()
         for booking in csBookingManager.getBookingList():
-            booking.unindex_talk(contrib)
-
+            booking.index_talk(contrib)
 
     @classmethod
     def eventTitleChanged(cls, obj, oldTitle, newTitle):
