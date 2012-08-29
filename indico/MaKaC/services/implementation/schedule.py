@@ -229,7 +229,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
                                                "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
                                             tz=self._conf.getTimezone())
-        fossilizedDataSlotSchEntry = self._getSlotEntry()
+        fossilizedDataSlotSchEntry = self._getSlotEntryFossil()
 
         result = {'id': fossilizedData['id'],
                 'entry': fossilizedData,
@@ -256,7 +256,7 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
         if self._needsToBeScheduled:
             self._target.getSchedule().addEntry(contribution.getSchEntry(), 2)
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return None
 
 
@@ -274,7 +274,7 @@ class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionService
         return  self._slot.getSchedule().addEntry(contribution.getSchEntry(),
                                                   check = self._getCheckFlag())
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
@@ -458,7 +458,7 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         self._setLocationInfo(self._brk)
         self._addToSchedule(self._brk)
 
-        fossilizedDataSlotSchEntry = self._getSlotEntry()
+        fossilizedDataSlotSchEntry = self._getSlotEntryFossil()
         fossilizedData = self._brk.fossilize(IBreakTimeSchEntryMgmtFossil, tz=self._conf.getTimezone())
 
         res = {'day': self._brk.getAdjustedStartDate().strftime("%Y%m%d"),
@@ -482,7 +482,7 @@ class ConferenceScheduleAddBreak(ScheduleEditBreakBase, conferenceServices.Confe
     def _addToSchedule(self, b):
         self._target.getSchedule().addEntry(b, 2)
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return None
 
 
@@ -496,7 +496,7 @@ class ConferenceScheduleEditBreak(ScheduleEditBreakBase, conferenceServices.Conf
     def _addToSchedule(self, b):
         pass
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return None
 
 class ConferenceScheduleDeleteBreak(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
@@ -514,7 +514,7 @@ class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.Session
     def _addToSchedule(self, b):
         self._slot.getSchedule().addEntry(b, check = self._getCheckFlag())
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
@@ -542,7 +542,7 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
             # add it on the new date
             self._conf.getSchedule().addEntry(self._schEntry, check=2)
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
@@ -1026,7 +1026,7 @@ class ScheduleContributions(ScheduleOperation):
             self._target.getSchedule().addEntry(schEntry, check = self._getCheckFlag())
 
             fossilizedData = schEntry.fossilize(IContribSchEntryMgmtFossil, tz=self._conf.getTimezone())
-            fossilizedDataSlotSchEntry = self._getSlotEntry()
+            fossilizedDataSlotSchEntry = self._getSlotEntryFossil()
 
             entries.append({'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                             'id': fossilizedData['id'],
@@ -1058,7 +1058,7 @@ class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.Se
             return True
         return False
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
 
         if self._isSessionTimetable:
             entry = self._slot.getSessionSchEntry()
@@ -1081,7 +1081,7 @@ class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.
     def _handlePosterContributions(self, contrib):
         pass
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return None
 
 class MoveEntryBase(ScheduleOperation):
