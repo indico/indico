@@ -76,6 +76,8 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
         vars["duration"] =(datetime(1900,1,1)+self._subContrib.getDuration()).strftime("%H:%M")
         vars["SubContrib"] = self._subContrib
         vars["accessWrapper"] = self._aw
+        vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
+
         return vars
 
 class WSubContributionDisplayFull(WSubContributionDisplayBase):

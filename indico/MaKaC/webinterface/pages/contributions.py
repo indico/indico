@@ -150,6 +150,7 @@ class WContributionDisplayBase(WICalExportBase):
             vars["statusClass"] = "contributionReviewingStatusNotSubmitted"
         vars["prefixUpload"] = "Re-" if  statusReviewing not in ["Accept", "Reject", None] else ""
         vars["getResourceName"] = lambda resource: self._getResourceName(resource)
+        vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
         return vars
 
 

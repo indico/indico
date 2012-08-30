@@ -10,6 +10,19 @@
 </tr>
 % endif
 
+% if conf.getReportNumberHolder().listReportNumbers() and conf.getType() == "meeting":
+<tr id="eventReportNumbers">
+    <td class="leftCol">${_("Report Numbers")}</td>
+    <td id="eventListParticipants">
+        % if reportNumberSystems[reportNumber[0]]["url"]:
+            <a href="${reportNumberSystems[reportNumber[0]]["url"] + reportNumber[1]}" target="_blank">${reportNumber[1]} </a>
+        % else:
+            ${reportNumber[1]}
+        % endif
+    </td>
+</tr>
+% endif
+
 % if participants:
 <tr id="eventParticipants">
     <td class="leftCol">${_("Participants")}</td>

@@ -1110,6 +1110,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         vars["firstDay"] = self._firstDay
         vars["lastDay"] = self._lastDay
         vars["currentUser"] = self._rh._aw.getUser()
+        vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
 
         return vars
 

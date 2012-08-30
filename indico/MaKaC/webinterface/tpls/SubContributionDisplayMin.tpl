@@ -25,6 +25,8 @@
                         </a>
                     </div>
                 % endif
+                <%block name="reportNumber">
+                </%block>
             </div>
         </div>
         <div class="subContributionDetail">

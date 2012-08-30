@@ -39,6 +39,8 @@
                 % endif
                 <%block name="board">
                 </%block>
+                <%block name="reportNumber">
+                </%block>
             </div>
         </div>
         <div class="contributionDetail">

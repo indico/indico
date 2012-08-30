@@ -26,6 +26,20 @@
     % endif
 </%block>
 
+<%block name="reportNumber">
+    % if Contribution.getReportNumberHolder().listReportNumbers():
+        <div><span style="font-weight:bold">${_("Report Numbers")}:</span>
+        % for reportNumber in Contribution.getReportNumberHolder().listReportNumbers():
+            % if reportNumberSystems[reportNumber[0]]["url"]:
+                <a href="${reportNumberSystems[reportNumber[0]]["url"] + reportNumber[1]}" target="_blank">${reportNumber[1]} </a>
+            % else:
+                ${reportNumber[1]}
+            % endif
+        % endfor
+        </div>
+    % endif
+</%block>
+
 <%block name="detail">
     % if not self_._rh._target.getConference().getAbstractMgr().isActive() or not self_._rh._target.getConference().hasEnabledSection("cfa") or not self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
     <div class="contributionSection">

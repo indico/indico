@@ -17,7 +17,15 @@
     <table class="sessionDetails">
         <tbody>
         % if item.getReportNumberHolder().listReportNumbers():
-            (${ ' '.join([rn[1] for rn in item.getReportNumberHolder().listReportNumbers()])})
+            (
+            % for reportNumber in item.getReportNumberHolder().listReportNumbers():
+                % if reportNumberSystems[reportNumber[0]]["url"]:
+                    <a href="${reportNumberSystems[reportNumber[0]]["url"] + reportNumber[1]}" target="_blank">${reportNumber[1]}</a>
+                % else:
+                    ${reportNumber[1]}
+                % endif
+            % endfor
+            )
         % endif
 
         % if item.getSpeakerList() or item.getSpeakerText():

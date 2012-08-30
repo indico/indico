@@ -21,11 +21,13 @@
                     <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True"/>
                 </div>
             </span>
-            <span style="font-size:x-small;">
-            % for rn in conf.getReportNumberHolder().listReportNumbers():
-                <br/>${rn[1]}
-            % endfor
-            </span>
+            % if conf.getReportNumberHolder().listReportNumbers():
+                <span style="font-size:x-small;">
+                    % for reportNumber in conf.getReportNumberHolder().listReportNumbers():
+                        <br/><a style="color:#FFFFFF;" href="${reportNumberSystems[reportNumber[0]]["url"] + reportNumber[1]}" target="_blank">${reportNumber[1]} </a>
+                    % endfor
+                </span>
+            % endif
           </td>
         </tr>
         </table>
@@ -102,7 +104,7 @@
                 ${_("Want to participate")}
           </td>
           <td style="font-size:x-small;font-style:italic;">
-            <span class="fakeLink" id="applyLink">${_("Apply here")}</span> 
+            <span class="fakeLink" id="applyLink">${_("Apply here")}</span>
           </td>
         </tr>
         % endif
