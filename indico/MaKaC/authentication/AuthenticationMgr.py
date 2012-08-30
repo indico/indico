@@ -167,4 +167,4 @@ class AuthenticatorMgr:
         authId = session.pop('SSOLogin', None)
         if authId:
             auth = self.getById(authId)
-            return auth.getLogoutCallbackURL(rh)
+            return auth.getLogoutCallbackURL()

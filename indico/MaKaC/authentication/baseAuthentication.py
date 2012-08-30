@@ -24,6 +24,12 @@ from MaKaC.errors import UserError
 from MaKaC.i18n import _
 from MaKaC.common.Configuration import Config
 
+"""
+In this file the Authenticator base class is defined, also the PIdentity base.
+
+Every Authenticator that is developed has to overwrite the main methods if they want to have a full functionallity.
+"""
+
 
 class Authenthicator(ObjectHolder):
 
@@ -31,6 +37,13 @@ class Authenthicator(ObjectHolder):
         ObjectHolder.__init__(self)
 
     def add( self, newId ):
+        """ Add a new Id to the ObjectHolder.
+            Returns the identity Id.
+
+            :param newId: a PIdentity object that contains the user and login
+            :type newId: MaKaC.baseAuthentication.PIdentity child class
+        """
+
         if self.hasKey( newId.getId() ):
             raise UserError( _("identity already exists"))
         id = newId.getId()
@@ -64,55 +77,131 @@ class Authenthicator(ObjectHolder):
         return None
 
     def getIdx(self):
+        """ Returns the index of the ObjectHolder
+        """
         return self._getIdx()
 
     def getId(self):
+        """ Returns the Id of the Authenticator
+        """
         return self.id
     getId = classmethod( getId )
 
     def getName(self):
+        """ Returns the name of the Authenticator. If it is setup in the configuration, otherwise, default name.
+        """
         return Config.getInstance().getAuthenticatorConfigById(self.getId()).get("name", self.name)
 
     def getDescription(self):
+        """ Returns the description of the Authenticator.
+        """
         return self.description
 
     def isSSOLoginActive(self):
+        """ Returns if Single Sign-on is active
+        """
         return Config.getInstance().getAuthenticatorConfigById(self.getId()).get("SSOActive", False)
 
     def canUserBeActivated(self):
+        """ Returns if the Avatar object of the created users are activated by default
+
+            To override
+        """
         return False
 
     def SSOLogin(self, rh):
-        return None
+        """ Returns the Avatar object when the Authenticator makes login trough Single Sign-On
 
-    def getLogoutCallbackURL(self, rh):
+            :param rh: the Request Handler
+            :type rh: MaKaC.webinterface.rh.base.RH and subclasses
+        """
         return None
 
     def createIdentity(self, li, avatar):
+        """ Returns the created PIdentity object with the LoginInfo an Avatar
+
+            :param li: a LoginInfo object with the person's login string and password
+            :type li: MaKaC.user.LoginInfo
+
+            :param avatar: an Avatar object of the user
+            :type avatar: MaKaC.user.Avatar
+        """
         return None
 
     def createUser(self, li):
+        """ Returns the created Avatar object through an LoginInfo object
+
+            :param li: a LoginInfo object with the person's login string
+            :type li: MaKaC.user.LoginInfo
+        """
         return None
 
     def matchUser(self, criteria, exact=0):
+        """ Returns the list of users (Avatar) with the given criteria
+
+            :param criteria: the criteria to search
+            :type criteria: dict
+
+            :param exact: the match has to be exact
+            :type exact: boolean
+        """
         return None
 
     def matchUserFirstLetter(self, index, letter):
+        """ Returns the list of users (Avatar) starting by the given letter
+
+            :param index: the index string (name, Surname...)
+            :type index: str
+
+            :param letter: the letter char
+            :type letter: str
+        """
         return None
 
     def searchUserById(self, id):
+        """ Returns an Avatar by the given id
+
+            :param id: the id string
+            :type id: str
+        """
         return None
 
     def matchGroup(self, criteria, exact=0):
+        """ Returns the list of groups (Group) with the given criteria
+
+            :param criteria: the criteria to search
+            :type criteria: dict
+
+            :param exact: the match has to be exact
+            :type exact: boolean
+        """
         return None
 
     def matchGroupFirstLetter(self, letter):
+        """ Returns the list of groups (Group) starting by the given letter
+
+            :param letter: the letter char
+            :type letter: str
+        """
         return None
 
     def getGroupMemberList(self, group):
+        """ Returns the list of members (string) for the given group
+
+            :param group: the group string
+            :type group: str
+        """
         return None
 
     def isUserInGroup(self, user, group):
+        """ Returns True if the user belongs to the group
+
+            :param user: the user string
+            :type user: str
+
+            :param group: the group string
+            :type group: str
+        """
         return False
 
 
@@ -212,7 +301,7 @@ class SSOHandler:
             return av
         return None
 
-    def getLogoutCallbackURL(self, rh):
+    def getLogoutCallbackURL(self):
         return Config.getInstance().getAuthenticatorConfigById(self.id).get("LogoutCallbackURL", "https://login.cern.ch/adfs/ls/?wa=wsignout1.0")
 
     def _postLogin(self, login, av):
