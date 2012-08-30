@@ -13,6 +13,8 @@ import MaKaC.webinterface.locators as locators
 from MaKaC.conference import SessionSlot, SessionChair
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+import MaKaC.domain as domain
+
 
 class SessionBase(conferenceServices.ConferenceBase):
 
@@ -493,6 +495,23 @@ class SessionRevokeRights(SessionModifyConvenerRights):
         return self._getConvenerList()
 
 
+class SessionProtectionToggleDomains(SessionModifBase):
+
+    def _checkParams(self):
+        self._params['sessionId'] = self._params['targetId']
+        SessionModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._domainId = pm.extract("domainId", pType=str)
+        self._add = pm.extract("add", pType=bool)
+
+    def _getAnswer(self):
+        dh = domain.DomainHolder()
+        d = dh.getById(self._domainId)
+        if self._add:
+            self._target.requireDomain(d)
+        elif not self._add:
+            self._target.freeDomain(d)
+
 
 
 methodMap = {
@@ -506,6 +525,7 @@ methodMap = {
     "protection.removeAsConvener": SessionRemoveAsConvener,
     "protection.addExistingCoordinator": SessionAddExistingChair,
     "protection.removeCoordinator": SessionRemoveChair,
+    "protection.toggleDomains": SessionProtectionToggleDomains,
 
     "conveners.addExistingConvener": SessionAddExistingConvener,
     "conveners.addNewConvener": SessionAddNewConvener,

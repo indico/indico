@@ -16,6 +16,8 @@ from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.webinterface.wcomponents as wcomponents
+import MaKaC.domain as domain
+
 
 class ContributionBase(object):
 
@@ -845,6 +847,25 @@ class ContributionReviewHistory(ContributionDisplayBase):
     def _getAnswer(self):
         return contributionReviewing.WContributionReviewingHistory(self._contribution).getHTML({"ShowReviewingTeam" : False})
 
+
+class ContributionProtectionToggleDomains(ContributionModifBase):
+
+    def _checkParams(self):
+        self._params['contribId'] = self._params['targetId']
+        ContributionModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._domainId = pm.extract("domainId", pType=str)
+        self._add = pm.extract("add", pType=bool)
+
+    def _getAnswer(self):
+        dh = domain.DomainHolder()
+        d = dh.getById(self._domainId)
+        if self._add:
+            self._target.requireDomain(d)
+        elif not self._add:
+            self._target.freeDomain(d)
+
+
 methodMap = {
     "addSubContribution": ContributionAddSubContribution,
     "deleteSubContribution": ContributionDeleteSubContribution,
@@ -873,6 +894,7 @@ methodMap = {
     "protection.submissionControl.addAsAuthor": ContributionSumissionControlAddAsAuthor,
     "protection.submissionControl.removeAsAuthor": ContributionSumissionControlRemoveAsAuthor,
 
+    "protection.toggleDomains": ContributionProtectionToggleDomains,
     "protection.addExistingManager": ContributionAddExistingManager,
     "protection.removeManager": ContributionRemoveManager,
     "review.getReviewHistory": ContributionReviewHistory

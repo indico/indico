@@ -2263,15 +2263,28 @@ class WDomainControlFrame(WTemplated):
     def getVars(self):
         tpl_vars = WTemplated.getVars(self)
         doms = dict((dom, dom in self._target.getDomainList()) for dom in domain.DomainHolder().getList())
-        if isinstance(self._target, Conference):
+
+
+
+        if isinstance(self._target, conference.Conference):
             tpl_vars['method'] = 'event.protection.toggleDomains'
+            event = self._target
+        elif isinstance(self._target, conference.Contribution):
+            tpl_vars['method'] = 'contribution.protection.toggleDomains'
+            event = self._target.getConference()
+        elif isinstance(self._target, conference.Session):
+            tpl_vars['method'] = 'session.protection.toggleDomains'
+            event = self._target.getConference()
         else:
             tpl_vars['method'] = 'category.protection.toggleDomains'
+            event = None
         tpl_vars["domains"] = doms
         tpl_vars["removeURL"] = self._removeURL
         tpl_vars["addURL"] = self._addURL
         tpl_vars["locator"] = self._target.getLocator().getWebForm()
         tpl_vars["target"] = self._target
+        tpl_vars["event"] = event
+
         return tpl_vars
 
 
