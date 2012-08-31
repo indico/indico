@@ -220,7 +220,7 @@ class InvenioSEA(base.SearchEngineAdapter):
         elif startDate != '':
             return '518__d:"%s"->"2100"' % (startDate)
         elif endDate != '':
-            return '518__d:"1975"->"%s"' % (endDate)
+            return '518__d:"1950"->"%s"' % (endDate)
         else:
             return ""
 
