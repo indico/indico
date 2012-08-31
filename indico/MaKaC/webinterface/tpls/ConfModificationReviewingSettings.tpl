@@ -625,25 +625,28 @@ var TemplateList = function(){
                         var params = {conference: ${ ConfReview.getConference().getId() },
                                       templateId: selectedRow.dom.id.split("TemplateRow_")[1]};
                         var name = $E('TemplateSpanName_' + selectedRow.dom.id.split("TemplateRow_")[1]).dom.innerHTML;
-                        if (confirm("Are you sure you want to delete '"+ name +"'?")) {
-                            var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
-                            jsonRpc(Indico.Urls.JsonRpcService,
-                                'reviewing.conference.deleteTemplate',
-                                params,
-                                function(response,error) {
-                                        if (exists(error)) {
-                                            killProgress();
-                                            IndicoUtil.errorReport(error);
-                                        } else {
-                                            killProgress();
-                                            $E('templateListTable').remove(selectedRow);
-                                            tablerows = document.getElementById('templateListTableAll').rows.length;
-                                            if(tablerows == '1'){
-                                                $E('NoTemplateTable').dom.style.display = '';
-                                                $E('templateListTableAll').dom.style.display = 'none';}
-                                        }
-                                    });
-                        }
+
+                        new ConfirmPopup($T("Delete template"),$T("Are you sure you want to delete {0}?").format(name), function(confirmed) {
+                            if(confirmed) {
+                                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+                                jsonRpc(Indico.Urls.JsonRpcService,
+                                    'reviewing.conference.deleteTemplate',
+                                    params,
+                                    function(response,error) {
+                                            if (exists(error)) {
+                                                killProgress();
+                                                IndicoUtil.errorReport(error);
+                                            } else {
+                                                killProgress();
+                                                $E('templateListTable').remove(selectedRow);
+                                                tablerows = document.getElementById('templateListTableAll').rows.length;
+                                                if(tablerows == '1'){
+                                                    $E('NoTemplateTable').dom.style.display = '';
+                                                    $E('templateListTableAll').dom.style.display = 'none';}
+                                            }
+                                        });
+                            }
+                        }).open();
                     };
 
                     var nameSpan = Html.span({id:'TemplateSpanName_'+'${ t.getId()}'}, '${ t.getName()}');
@@ -789,8 +792,9 @@ $E('reviewerSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
             var row = Html.tr({id:'TemplateRow_' + value.id, className:'infoTR'});
             var params = {conference: '${ ConfReview.getConference().getId() }',templateId: value.id}
             var deleteTemplate = function() {
-                if (confirm("Are you sure you want to delete '"+ value.name+"'?")) {
-                    var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+                new ConfirmPopup($T("Delete template"),$T("Are you sure you want to delete {0}?").format(name), function(confirmed) {
+                    if(confirmed) {
+                        var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
                         jsonRpc(Indico.Urls.JsonRpcService,
                         'reviewing.conference.deleteTemplate',
                         params,
@@ -807,7 +811,8 @@ $E('reviewerSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
                                         $E('templateListTableAll').dom.style.display = 'none';}
                                 }
                             });
-                }
+                    }
+                }).open();
             };
 
             var nameSpan = Html.span({}, value.name);

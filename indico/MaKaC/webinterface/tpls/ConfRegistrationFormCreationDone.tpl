@@ -3,7 +3,7 @@
 function checkConditions(){
     if (document.epay.conditions) {
         if (!document.epay.conditions.checked) {
-            alert('${ _("Please, confirm that you have read the conditions")}');
+            new AlertPopup($T("Warning"), $T("Please, confirm that you have read the conditions.")).open();
         }else{
             return true;
         }

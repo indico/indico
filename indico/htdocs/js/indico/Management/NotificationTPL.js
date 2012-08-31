@@ -45,7 +45,7 @@ function insertTag(tag) {
             currentArea.dom.focus();
         }
     } else {
-        alert("You can only insert tags in Subject or Body.\nPlease click in the Subject or Body text box before inserting.");
+        new AlertPopup($T("Warning"), $T("You can only insert tags in Subject or Body.\nPlease click in the Subject or Body text box before inserting.")).open();
     }
 }
 

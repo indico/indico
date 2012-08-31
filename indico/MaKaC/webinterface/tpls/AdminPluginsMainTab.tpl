@@ -48,7 +48,7 @@
                 % for pluginType in PluginsHolder.getPluginTypes(includeNonVisible = False):
                 <tr>
                     <td>
-                        <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}">
+                        <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}" class="togglePluginType">
                         % if not pluginType.isUsable():
                             <img class="imglink" alt="${ _("Not in usable state")}" src="${Config.getInstance().getSystemIconURL( 'greyedOutSection' )}"/>
                         % elif pluginType.isActive():
@@ -63,7 +63,7 @@
                                 (${ pluginType.getNotUsableReason() })
                             </small>
                         % else:
-                            <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}" onclick="return confirm('${ _('This will reload all the plugins too. Do you want to continue?')}');">
+                            <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}" class="togglePluginType">
                                 ${ pluginType.getName() }
                             </a>
                         % endif
@@ -82,3 +82,15 @@
 % else:
     ${ _("No plugin types in the system (or non marked as visible)") }
 % endif
+
+<script type="text/javascript">
+$(".togglePluginType").click(function(cosa){
+    var self = this;
+    new ConfirmPopup($T("Toggle Plugin Type"), $T("This will reload all the plugins too. Do you want to continue?"), function(confirmed){
+        if(confirmed){
+            window.location = self.getAttribute("href");
+        }
+    }).open();
+    return false;
+});
+</script>

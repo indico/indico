@@ -70,32 +70,32 @@
                             var userId = user.get('id');
                             var del = true;
                             var contribsPerUser = [];
+                            var removeReferee = function(){
+                                indicoRequest('reviewing.conference.removeTeamReferee',
+                                        {
+                                            conference: '${ Conference }',
+                                            user: user.get('id')
+                                        },
+                                        function(result,error) {
+                                            if (!error) {
+                                                setResult(true);
+                                            } else {
+                                                IndicoUtil.errorReport(error);
+                                                setResult(false);
+                                            }
+                                        }
+                                    );
+                            };
                             % for r in ConfReview.getRefereesList():
                             contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getJudgedContributions(r))};
                             % endfor
-                            if(exists(contribsPerUser[userId])){
-                                if (contribsPerUser[userId] > 0){
-                                    if (!(confirm($T('This referee has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
-                                        del = false;
+                            if(exists(contribsPerUser[userId]) && contribsPerUser[userId] > 0){
+                                new ConfirmPopup($T("Remove referee"),$T('This referee has been assigned {0} contributions. Do you want to remove the referee anyway?').format(contribsPerUser[userId]), function(confirmed) {
+                                    if(confirmed) {
+                                        removeReferee();
                                     }
-                                }
-                            }
-                            if (del) {
-                                indicoRequest('reviewing.conference.removeTeamReferee',
-                                            {
-                                                conference: '${ Conference }',
-                                                user: user.get('id')
-                                            },
-                                            function(result,error) {
-                                                if (!error) {
-                                                    setResult(true);
-                                                } else {
-                                                    IndicoUtil.errorReport(error);
-                                                    setResult(false);
-                                                }
-                                            }
-                                        );
-                            }
+                                }).open();
+                            }else removeReferee();
                         };
 
                         var uf = new UserListField('reviewersPRUserListDiv', 'userList',
@@ -139,17 +139,7 @@
                             var userId = user.get('id');
                             var del = true;
                             var contribsPerUser = [];
-                            % for r in ConfReview.getReviewersList():
-                            contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getReviewedContributions(r))};
-                            % endfor
-                            if(exists(contribsPerUser[userId])){
-                                if (contribsPerUser[userId] > 0){
-                                    if (!(confirm($T('This content reviewer has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
-                                        del = false;
-                                    }
-                                }
-                            }
-                            if (del) {
+                            var removeReviewer = function(){
                                 indicoRequest('reviewing.conference.removeTeamReviewer',
                                         {
                                             conference: '${ Conference }',
@@ -164,7 +154,20 @@
                                             }
                                         }
                                     );
-                            }
+                            };
+
+                            % for r in ConfReview.getReviewersList():
+                            contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getReviewedContributions(r))};
+                            % endfor
+
+                            if(exists(contribsPerUser[userId]) && contribsPerUser[userId] > 0){
+                                new ConfirmPopup($T("Remove content reviewer"),$T('This content reviewer has been assigned {0} contributions. Do you want to remove the content reviewer  anyway?').format(contribsPerUser[userId]), function(confirmed) {
+                                    if(confirmed) {
+                                        removeReviewer();
+                                    }
+                                }).open();
+                            }else removeReviewer();
+
                         };
 
                         var uf = new UserListField('reviewersPRUserListDiv', 'userList',
@@ -212,17 +215,7 @@
                             var userId = user.get('id');
                             var del = true;
                             var contribsPerUser = [];
-                            % for r in ConfReview.getEditorsList():
-                            contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getEditedContributions(r))};
-                            % endfor
-                            if(exists(contribsPerUser[userId])){
-                                if (contribsPerUser[userId] > 0){
-                                    if (!(confirm($T('This layout reviewer has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
-                                        del = false;
-                                    }
-                                }
-                            }
-                            if (del) {
+                            var removeEditor = function(){
                                 indicoRequest('reviewing.conference.removeTeamEditor',
                                         {
                                             conference: '${ Conference }',
@@ -237,7 +230,17 @@
                                             }
                                         }
                                     );
-                            }
+                            };
+                            % for r in ConfReview.getEditorsList():
+                            contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getEditedContributions(r))};
+                            % endfor
+                            if(exists(contribsPerUser[userId]) && contribsPerUser[userId] > 0){
+                                new ConfirmPopup($T("Remove layout reviewer"),$T('This layout reviewer has been assigned {0} contributions. Do you want to remove the layout reviewer  anyway?').format(contribsPerUser[userId]), function(confirmed) {
+                                    if(confirmed) {
+                                        removeEditor();
+                                    }
+                                }).open();
+                            }else removeEditor();
                         };
                         var uf = new UserListField('reviewersPRUserListDiv', 'userList',
                                                    ${ jsonEncode(fossilize(ConfReview.getEditorsList())) },

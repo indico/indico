@@ -269,27 +269,29 @@ $("input[name=delete]").click(function(event){
     event.preventDefault();
     if (atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'))) {
         var listContribsToDelete = $('input:checked[name=contributions]').map(function(){return this.value;}).toArray();
-        if (confirm('${ _("Are you sure you wish to delete the selected contributions?\\nNote that you cannot undo this action.")}')){
-            var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting the contributions..."));
-            indicoRequest('event.contributions.delete',
-                    { confId: ${self_._conf.id},
-                      contributions: listContribsToDelete },
-                      function(result, error){
-                          if (!error) {
-                              $('input:checked[name=contributions]').parents('tr[id^=contributions]').remove();
-                              killProgress();
-                          } else {
-                              killProgress();
-                              IndicoUtil.errorReport(error);
-                          }
-                        }
-                );
-        }
+        new ConfirmPopup($T("Delete style"), $T("Are you sure you wish to delete the selected contributions? Note that you cannot undo this action."), function(confirmed){
+            if(confirmed){
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting the contributions..."));
+                indicoRequest('event.contributions.delete',
+                        { confId: ${self_._conf.id},
+                          contributions: listContribsToDelete },
+                          function(result, error){
+                              if (!error) {
+                                  $('input:checked[name=contributions]').parents('tr[id^=contributions]').remove();
+                                  killProgress();
+                              } else {
+                                  killProgress();
+                                  IndicoUtil.errorReport(error);
+                              }
+                            }
+                    );
+            }
+        }).open();
     }
 });
 
 $("#contribsForm").submit(function(event){
     return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));
-});
+};
 
 </script>

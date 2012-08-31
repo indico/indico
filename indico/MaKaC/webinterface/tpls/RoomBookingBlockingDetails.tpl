@@ -52,8 +52,8 @@
                                         </form>
                                     % endif
                                     % if canDelete:
-                                        <form style="display:inline;" action="${ urlHandlers.UHRoomBookingDeleteBlocking.getURL(block) }" method="post" onsubmit="return confirm($T('Do you really want to DELETE this blocking?'));">
-                                            <input type="submit" class="btn" value="${ _("Delete")}" />
+                                        <form id="deleteBlockingForm" style="display:inline;" action="${ urlHandlers.UHRoomBookingDeleteBlocking.getURL(block) }" method="post">
+                                            <input type="submit" id="deleteBlocking" class="btn" value="${ _("Delete")}" />
                                         </form>
                                     % endif
                                 </td>
@@ -112,3 +112,15 @@
         </tr>
     </table>
     <br />
+
+ <script type="text/javascript">
+
+ $("#deleteBlocking").click(function(){
+     new ConfirmPopup($T("Delete blocking"),$T("Do you really want to DELETE this blocking?"), function(confirmed) {
+         if(confirmed) {
+             $("#deleteBlockingForm").submit();
+         }
+     }).open();
+     return false;
+ });
+ </script>

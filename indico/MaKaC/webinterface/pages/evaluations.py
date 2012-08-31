@@ -631,9 +631,9 @@ class WConfModifEvaluationEditQuestionView( wcomponents.WTemplated ):
         #remove question
         url = urlHandlers.UHConfModifEvaluationEditPerformChanges.getURL(conf, mode=Question._REMOVE, questionPos=questionPos)
         vars["removeQuestionUrl"] = url
-        vars["removeQuestionConfirm"] = i18nformat("""javascript:return confirm( _("Are you sure you want to remove this question?"));""")
         vars["removeQuestionInput"] = WUtils.createInput(type="image",
                                                          name="remove",
+                                                         id="questionRemove%s"%self._question.getPosition(),
                                                          alt="remove",
                                                          src=Config.getInstance().getSystemIconURL("remove"))
         #return

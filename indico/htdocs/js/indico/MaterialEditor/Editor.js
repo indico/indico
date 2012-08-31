@@ -1193,27 +1193,29 @@ type("ResourceListWidget", ["ListWidget"], {
 
         var resParams = clone(this.matParams);
         resParams.resourceId = resourceId;
-
         var deleteResource = function() {
-            if (confirm($T("Are you sure you want to delete")+" "+resource.get('name')+"?")) {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+            var confirmHandler = function(value){
+                if (value) {
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
 
-                jsonRpc(Indico.Urls.JsonRpcService,
-                        self.deleteResourceMethod,
-                        resParams,
-                        function(response,error) {
-                            if (exists(error)) {
-                                killProgress();
-                                IndicoUtil.errorReport(error);
-                            } else {
-                                self.resources.remove(resource);
-                                self.set(resourceId, null);
-                                updateMaterialList(self.materialTypes, response.newMaterialTypes);
-                                killProgress();
+                    jsonRpc(Indico.Urls.JsonRpcService,
+                            self.deleteResourceMethod,
+                            resParams,
+                            function(response,error) {
+                                if (exists(error)) {
+                                    killProgress();
+                                    IndicoUtil.errorReport(error);
+                                } else {
+                                    self.resources.remove(resource);
+                                    self.set(resourceId, null);
+                                    updateMaterialList(self.materialTypes, response.newMaterialTypes);
+                                    killProgress();
+                                }
                             }
-                        }
-                       );
-            }
+                           );
+                }
+            };
+            new ConfirmPopup($T("Delete Resource"), $T("Are you sure you want to delete") + " "+resource.get('name')+"?", confirmHandler).open();
         };
 
         var setMainResource = function() {
@@ -1442,25 +1444,28 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         args.mainResourceId = material.get('mainResource')?material.get('mainResource').get('id'):null;
 
         var deleteMaterial = function() {
-            if (confirm("Are you sure you want to delete '"+material.get('title')+"'?")) {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+            var confirmHandler = function(value){
+                if(value){
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
 
-                jsonRpc(Indico.Urls.JsonRpcService,
-                        'material.delete',
-                        args,
-                        function(response,error) {
-                            if (exists(error)) {
-                                killProgress();
-                                IndicoUtil.errorReport(error);
-                            } else {
-                                self.set(materialId, null);
-                                killProgress();
+                    jsonRpc(Indico.Urls.JsonRpcService,
+                            'material.delete',
+                            args,
+                            function(response,error) {
+                                if (exists(error)) {
+                                    killProgress();
+                                    IndicoUtil.errorReport(error);
+                                } else {
+                                    self.set(materialId, null);
+                                    killProgress();
 
-                                updateMaterialList(self.types, response.newMaterialTypes);
+                                    updateMaterialList(self.types, response.newMaterialTypes);
+                                }
                             }
-                        }
-                       );
-            }
+                           );
+                }
+            };
+            new ConfirmPopup($T("Delete Material"), $T("Are you sure you want to delete '")+material.get('title')+"'?", confirmHandler).open();
         };
 
         var menu;

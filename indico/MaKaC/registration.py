@@ -2234,7 +2234,7 @@ class RadioGroupInput(FieldInputType):
                   return true;
                 }
             }
-            alert('You must select option for "%s"!');
+            new AlertPopup($T("Warning"), $T('You must select option for "%s"!')).open();
             return false;
             """ % (counter, self.getHTMLName(), caption)
             script = """<script>addValidator(function() {%s});</script>""" % validator

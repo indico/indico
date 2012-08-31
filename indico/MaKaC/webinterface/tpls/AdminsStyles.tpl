@@ -39,7 +39,7 @@
             % if style == "static":
             ${inlineContextHelp(_('This style cannot be deleted. This is the default style for conferences.'))}
             % else:
-            <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(templatefile=style)}" onClick="if (!confirm('${ _("Are you sure you want to delete this style?")}')) { return false; }"><img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"></a>
+            <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(templatefile=style)}" class="deleteStyle"><img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"></a>
             % endif
             </td>
           </tr>
@@ -84,3 +84,15 @@
       % endfor
     </tbody>
   </table>
+
+<script type="text/javascript">
+$(".deleteStyle").click(function(cosa){
+    var self = this;
+    new ConfirmPopup($T("Delete style"), $T("Are you sure you want to delete this style?"), function(confirmed){
+        if(confirmed){
+            window.location = self.getAttribute("href");
+        }
+    }).open();
+    return false;
+});
+</script>

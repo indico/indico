@@ -222,7 +222,7 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
                 location.href = "${ urlHandlers.UHContributionModifReviewing.getURL(Contribution) }";
                 location.reload(true);
             } else {
-                alert (error.message);
+                new AlertPopup($T("Error"), error.message).open();
                 //IndicoUtil.errorReport(error);
             }
         },

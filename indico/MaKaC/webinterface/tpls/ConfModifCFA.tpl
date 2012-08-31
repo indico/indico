@@ -125,11 +125,17 @@ var lateSubmissionAuthUsers = new ListOfUsersManager('${ confId }',
 IndicoUI.executeOnLoad(function(){
     $('#makePresenterMandatory').qtip({content: "${_('This option is automatically disabled when the option \'Allow to choose the presenter(s) of the abstracts\' is also disabled')}", position: {my: 'top middle', at: 'bottom middle'}});
     $('#showAttachedFiles').click(function(){
+        var self = this;
         if(this.dataset.active=='no'){
-            return confirm($T("Please, note that if you enable this option the files (attached to the abstracts) will be public and accessible by everybody. Are you sure to continue?"));
+            new ConfirmPopup($T("Show attached files"), $T("Please, note that if you enable this option the files (attached to the abstracts) will be public and accessible by everybody. Are you sure to continue?"), function(confirmed){
+                if(confirmed){
+                    window.location = self.getAttribute("href");
+                }
+            }).open();
+            return false;
+        }else {
+            return true;
         }
-        return true;
-
-    })
+    });
 });
 </script>

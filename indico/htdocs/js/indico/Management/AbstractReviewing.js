@@ -67,10 +67,10 @@ type("ScaleEditWidget", ["InlineEditWidget"],
                     return false;
                 }
                 if (parseInt(this.min.dom.value) >= parseInt(this.max.dom.value)) {
-                    alert("The \"From\" value must be lower than \"To\" value.");
+                    new AlertPopup($T("Warning"), $T("The \"From\" value must be lower than \"To\" value.")).open();
                     return false;
                 } else if ((parseInt(this.max.dom.value) - parseInt(this.min.dom.value)) > 100) {
-                    alert("The maximun difference between limits is 100 units.");
+                    new AlertPopup($T("Warning"), $T("The maximun difference between limits is 100 units.")).open();
                     return false;
                 }
                 return true;
@@ -553,7 +553,7 @@ type("QuestionsManager", [],
                 if(this.questionPM.check()) {
                     return true;
                 }
-                alert($T('Please answer all questions.'));
+                new AlertPopup($T("Warning"), $T("Please answer all questions.")).open();
                 return false;
             }
         },

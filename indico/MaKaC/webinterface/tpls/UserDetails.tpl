@@ -153,7 +153,7 @@ var unlockField = function(field) {
             }
             lockField(field);
             if(!result.val) {
-                alert($T('Synchronization has been re-enabled for this field. To update the data with the {0} database, you need to log out and then login again.').format(authenticatorName));
+                new AlertPopup($T("Error"), $T('Synchronization has been re-enabled for this field. To update the data with the {0} database, you need to log out and then login again.').format(authenticatorName)).open();
             }
             else {
                self.value = result.val;
@@ -196,15 +196,17 @@ var requestTitle = function() {
     $E('titleHeader').set(this.value);
 };
 
-var beforeEdit = function(field) {
+var beforeEdit = function(field, widget) {
     if(!canSynchronize) {
         return;
     }
-    if(!_.contains(unlockedFields, field) && !confirm($T('This field is currently synchronized with the {0} database. If you change it, synchronization will be disabled.').format(authenticatorName))) {
-        return false;
-    }
+    new ConfirmPopup($T("Change field"), $T('This field is currently synchronized with the {0} database. If you change it, synchronization will be disabled.').format(authenticatorName), function(confirmed){
+        if(confirmed || _.contains(unlockedFields, field)){
+            widget.modeChooser.set("edit");
+        }
+    }).open();
+    return false;
 }
-
 
 $E('inPlaceEditTitle').set(new SelectEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'title'}, ${ titleList }, ${ jsonEncode(title) }, requestTitle).draw());

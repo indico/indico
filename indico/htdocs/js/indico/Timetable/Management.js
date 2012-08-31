@@ -75,67 +75,67 @@ type("TimetableManagementActions", [], {
     },
     deleteEntry: function(eventData) {
         var self = this;
+        var confirmHandler = function(value){
+            if(value) {
+                var info = new WatchObject();
+                var type = eventData.entryType;
 
-        if (!confirm("Are you sure you want to delete this timetable entry?"))
-            {
-                return;
+                if (exists(eventData.sessionId)) {
+                    info.set('session', eventData.sessionId);
+                    info.set('slot', eventData.sessionSlotId);
+
+                    if (type != 'Session') {
+                        type = 'Session' + eventData.entryType;
+                    } else if (self.eventInfo.sessions[eventData.sessionId].numSlots > 1) {
+                        // There are more than this slot so just delete the slot not
+                        // the whole session
+                        type = 'SessionSlot';
+                    }
+                }
+
+                info.set('scheduleEntry', eventData.scheduleEntryId);
+                info.set('conference', eventData.conferenceId);
+                info.set('sessionTimetable', this.isSessionTimetable);
+
+                var method = self.methods[type]['delete'];
+
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting entry..."));
+
+                indicoRequest(method, info, function(result, error){
+                    if (error) {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }else {
+
+                        var data = self.timetable.getData();
+                        var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
+
+                        killProgress();
+
+                        if (self.session) {
+                            delete data[eventData.id];
+                        } else {
+                            delete data[day][eventData.id];
+                        }
+
+                        if (self.session) {
+                            self.timetable.setData(self.session);
+                        } else {
+                            self.timetable.setData(data);
+                        }
+
+                        if (type == 'Session') {
+                            // Delete the session from the eventInfo session list
+                            delete self.eventInfo.sessions[eventData.sessionId];
+                        }
+                        else if (type == 'SessionSlot') {
+                            self.eventInfo.sessions[eventData.sessionId].numSlots--;
+                        }
+                    }
+                });
             }
-        var info = new WatchObject();
-        var type = eventData.entryType;
-
-        if (exists(eventData.sessionId)) {
-            info.set('session', eventData.sessionId);
-            info.set('slot', eventData.sessionSlotId);
-
-            if (type != 'Session') {
-                type = 'Session' + eventData.entryType;
-            } else if (this.eventInfo.sessions[eventData.sessionId].numSlots > 1) {
-                // There are more than this slot so just delete the slot not
-                // the whole session
-                type = 'SessionSlot';
-            }
-        }
-
-        info.set('scheduleEntry', eventData.scheduleEntryId);
-        info.set('conference', eventData.conferenceId);
-        info.set('sessionTimetable', this.isSessionTimetable);
-
-        var method = this.methods[type]['delete'];
-
-        var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting entry..."));
-
-        indicoRequest(method, info, function(result, error){
-            if (error) {
-                killProgress();
-                IndicoUtil.errorReport(error);
-            }else {
-
-                var data = self.timetable.getData();
-                var day = IndicoUtil.formatDate2(IndicoUtil.parseJsonDate(eventData.startDate));
-
-                killProgress();
-
-                if (self.session) {
-                    delete data[eventData.id];
-                } else {
-                    delete data[day][eventData.id];
-                }
-
-                if (self.session) {
-                    self.timetable.setData(self.session);
-                } else {
-                    self.timetable.setData(data);
-                }
-
-                if (type == 'Session') {
-                    // Delete the session from the eventInfo session list
-                    delete this.eventInfo.sessions[eventData.sessionId];
-                }
-                else if (type == 'SessionSlot') {
-                    this.eventInfo.sessions[eventData.sessionId].numSlots--;
-                }
-            }
-        });
+        };
+        new ConfirmPopup($T("Delete entry"), $T("Are you sure you want to delete this timetable entry?"), confirmHandler).open();
     },
     editEntry: function(eventData) {
         var url;

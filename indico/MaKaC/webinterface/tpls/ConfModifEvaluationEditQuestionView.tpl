@@ -25,7 +25,7 @@
                         </form>
                       </td>
                       <td style="padding-right:2px;">
-                        <form action="${removeQuestionUrl}" method="post" onsubmit="${removeQuestionConfirm}">
+                        <form action="${removeQuestionUrl}" method="post">
                             <div>
                                   ${removeQuestionInput}
                             </div>
@@ -53,3 +53,15 @@
           </tr>
         </table>
         <!--view of question end-->
+<script type="text/javascript">
+$("[id^=questionRemove]").click(function(){
+    var self = this;
+    new ConfirmPopup($T("Remove referee"),$T("The reviewers already assigned to this contribution will be removed. Do you want to remove the referee anyway?"), function(confirmed) {
+        if(confirmed) {
+            $(self).closest("form").submit();
+        }
+    }).open();
+    return false;
+});
+
+</script>

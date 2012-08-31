@@ -88,7 +88,7 @@
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
                 e.preventDefault();
-                alert("${_('There are errors in the form. Please correct the fields with red background.')}");
+                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct the fields with red background.")).open();
             };
         }).keydown(function(e) {
             if(e.which == 13 && !$(e.target).is('textarea, :submit')) {
@@ -103,13 +103,13 @@
         $('#checkBooking').click(function(e) {
             $('#bookingForm').attr('action', '${bookingFormURL.getURL(conf)}#conflicts');
             if (!validate_period($('#bookingForm')[0], true, ${ allowPast })) {
-                alert("${_('There are errors in the form. Please correct fields with red background.')}");
+                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct the fields with red background.")).open();
                 e.preventDefault();
             }
         });
 
         % if candResv.room.needsAVCSetup:
-            alert("The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\n                    Thank you for your understanding.")
+            new AlertPopup($T("Warning"), $T("The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\n                    Thank you for your understanding.")).open();
         % endif
     });
 </script>

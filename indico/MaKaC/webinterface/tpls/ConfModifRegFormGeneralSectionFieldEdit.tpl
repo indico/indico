@@ -8,25 +8,25 @@
         && document.WConfModifRegFormGeneralSectionFieldEdit.billable != null
         && document.WConfModifRegFormGeneralSectionFieldEdit.billable.checked == "1"
         && document.WConfModifRegFormGeneralSectionFieldEdit.price.value == "") {
-            alert("${ _("As you checked 'Billable', please enter now a price or uncheck 'Billable'.")}");
+            new AlertPopup($T("Warning"), $T("As you checked 'Billable', please enter now a price or uncheck 'Billable'.")).open();
             return false;
     } else if (saveIsFocused
         && document.WConfModifRegFormGeneralSectionFieldEdit.billable != null
         && document.WConfModifRegFormGeneralSectionFieldEdit.billable.checked == "1"
         && !pricePattern.test(document.WConfModifRegFormGeneralSectionFieldEdit.price.value)) {
-            alert("${ _("Please enter a valid price, only a number.")}");
+            new AlertPopup($T("Warning"), $T("Please enter a valid price, only a number.")).open();
             return false;
     } else if (addIsFocused
         && document.WConfModifRegFormGeneralSectionFieldEdit.newbillable != null
         && document.WConfModifRegFormGeneralSectionFieldEdit.newbillable.checked == "1"
         && document.WConfModifRegFormGeneralSectionFieldEdit.newprice.value == "") {
-            alert("${ _("As you checked 'Billable', please enter now a price or uncheck 'Billable'.")}");
+            new AlertPopup($T("Warning"), $T("As you checked 'Billable', please enter now a price or uncheck 'Billable'.")).open();
             return false;
     } else if (addIsFocused
         && document.WConfModifRegFormGeneralSectionFieldEdit.newbillable != null
         && document.WConfModifRegFormGeneralSectionFieldEdit.newbillable.checked == "1"
         && !pricePattern.test(document.WConfModifRegFormGeneralSectionFieldEdit.newprice.value)) {
-            alert("${ _("Please enter a valid price, only a number.")}");
+            new AlertPopup($T("Warning"), $T("Please enter a valid price, only a number.")).open();
             return false;
     } else {
         return true;

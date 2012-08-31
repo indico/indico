@@ -31,8 +31,8 @@
             <tr>
             <td>&nbsp;</td>
             <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
-                 <form id="removeReferee" action="${ removeAssignRefereeURL }" method="post" onsubmit="${removeRefereeConfirm}">
-                    <input type="submit" class=btn value="Remove">
+                 <form id="removeRefereeForm" action="${ removeAssignRefereeURL }" method="post">
+                    <input type="submit" id="removeReferee" class=btn value="Remove">
                 </form>
             </td>
             </tr>
@@ -348,6 +348,17 @@
 
 
 <script type="text/javascript">
+
+% if (ConferenceChoice == 2 or ConferenceChoice == 4) and CanAssignReferee and (ContributionReviewManager.hasEditor() or ContributionReviewManager.hasReviewers()):
+    $("#removeReferee").click(function(){
+        new ConfirmPopup($T("Remove referee"),$T("The reviewers already assigned to this contribution will be removed. Do you want to remove the referee anyway?"), function(confirmed) {
+            if(confirmed) {
+                $("#removeRefereeForm").submit();
+            }
+        }).open();
+        return false;
+    });
+% endif
 
 % if CanEditDueDates:
     % if ContributionReviewManager.hasReferee():

@@ -37,7 +37,7 @@ type('TaskActions', [],
                            {id: task.id},
                            function(result) {
                                // add some kind of decent notification bar?
-                               alert('done!');
+                               new AlertPopup($T("Success"), $T("Task deleted.")).open();
                                this._table.refresh();
                            });
          },
@@ -47,7 +47,7 @@ type('TaskActions', [],
                            {id: task.id},
                            function(result) {
                                // add some kind of decent notification bar?
-                               alert('done!');
+                               new AlertPopup($T("Success"), $T("Task failed ran.")).open();
                                this._table.refresh();
                            });
          }

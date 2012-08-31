@@ -15,7 +15,7 @@
 
   function formSubmit(f) {
       if (!parameterManager.check()) {
-          alert($T("The form contains some errors. Please, correct them and submit again."));
+          new AlertPopup($T("Error"), $T("The form contains some errors. Please, correct them and submit again.")).open();
           return false;
       }
 
@@ -48,9 +48,20 @@
     </tr>
     <tr>
         <td align="center" style="padding-bottom: 40px;">
-            <input type="submit" class="regFormButton" value="Register" onClick="return confirm('${ _("Are you sure you want to submit this form?") }');">
+            <input type="submit" class="regFormButton" value="Register">
         </td>
     </tr>
 </table>
 <br>
 </form>
+<script type="text/javascript">
+$(".regFormButton").click(function(){
+    var self = this;
+    new ConfirmPopup($T("Registration"),$T("Are you sure you want to submit this form?"), function(confirmed) {
+        if(confirmed) {
+            $(self).closest("form").submit();
+        }
+    }).open();
+    return false;
+});
+</script>

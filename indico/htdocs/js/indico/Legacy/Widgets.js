@@ -611,7 +611,7 @@ IndicoUI.Widgets = {
                 return table;
             }
             else {
-                alert($T("developer error: kind of radioButtonField is not correct, should be 'vertical', 'horizontal1', 'horizontal2'"));
+                new AlertPopup($T("Developer error"), $T("Kind of radioButtonField is not correct, should be 'vertical', 'horizontal1', 'horizontal2'")).open();
             }
 
         },

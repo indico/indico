@@ -60,7 +60,7 @@ type("AgentModificationDialog", ["ExclusivePopupWithButtons"],
                          }
                      });
              } else {
-                 alert($T("Please fill in the missing parameters"));
+                 new AlertPopup($T("Warning"), $T("Please fill in the missing parameters")).open();
              }
          },
 

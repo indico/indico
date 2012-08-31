@@ -302,7 +302,7 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
             if (!error) {
                 location.reload(true)
             } else {
-                alert (error.message);
+                new AlertPopup($T("Error"), error.message).open();
             }
         },
         $T('Send')

@@ -1836,7 +1836,7 @@ type("ToggleFavouriteButton", ["InlineWidget"], {
                 IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(IndicoGlobalVars['favorite-user-ids'][avatar.id] === true);
             } else {
                 if (!exists(IndicoGlobalVars['favorite-user-ids']) && !exists(initialState)) {
-                    alert("Warning: ToggleFavouriteButton used without IndicoGlobalVars['favorite-user-ids'] variable and without initialState");
+                    new AlertPopup($T("Warning"), $T("ToggleFavouriteButton used without IndicoGlobalVars['favorite-user-ids'] variable and without initialState")).open();
                 }
                 initialState = any(initialState, false);
                 IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(initialState);

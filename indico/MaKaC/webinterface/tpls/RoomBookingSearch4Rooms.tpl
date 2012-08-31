@@ -101,7 +101,7 @@
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
                 e.preventDefault();
-                alert("${_('There are errors in the form. Please correct the fields with red background.')}");
+                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
             };
         });
 

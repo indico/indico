@@ -82,23 +82,23 @@
       // we must enter choiceItems (in case of Radio buttons, Checkboxes, ...).
       function controle(){
         if (saveIsFocused && questionValue != null && questionValue.value == ""){
-          alert(" ${ _("Please enter a Question.")}");
+          new AlertPopup($T("Warning"), $T("Please enter a Question.")).open();
           return false;
         }
         else if (saveIsFocused && keyword != null && keyword.value == ""){
-          alert(" ${ _("Please enter a Keyword.")}");
+          new AlertPopup($T("Warning"), $T("Please enter a Keyword.")).open();
           return false;
         }
         else if (saveIsFocused && choiceItem_1 != null && choiceItem_1.value == ""){
-          alert(" ${ _("Please enter all value for Choice Items.")}");
+          new AlertPopup($T("Warning"), $T("Please enter all value for Choice Items.")).open();
           return false;
         }
         else if (saveIsFocused && choiceItem_2 != null && choiceItem_2.value == ""){
-          alert(" ${ _("Please enter all values for Choice Items.")}");
+          new AlertPopup($T("Warning"), $T("Please enter all values for Choice Items.")).open();
           return false;
         }
         else if (saveIsFocused && choiceItem_1 != null && choiceItem_2 != null && choiceItem_1.value == choiceItem_2.value){
-          alert(" ${ _("Please enter different values for Choice Items.")}");
+          new AlertPopup($T("Warning"), $T("Please enter different values for Choice Items.")).open();
           return false;
         }
         else{

@@ -33,7 +33,7 @@
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
         ${len(Rooms)} rooms found in this location.
         <% url = urlHandlers.UHRoomBookingRoomDetails.getURL() %>
-        <form method="post" action="${url}">
+        <form method="post" action="${url}" id="roomListForm">
         <input type="hidden" name="roomLocation" value="${location.friendlyName}">
         <select name="roomID">
           % for room in Rooms:
@@ -42,7 +42,7 @@
         </select>
         <input class="btn" type="submit" value="Details"/>
         <input class="btn" type="submit" value="Modify" onClick="this.form.action='${ urlHandlers.UHRoomBookingRoomForm.getURL( )}'; this.form.submit();"/>
-        <input class="btn" type="submit" value="Delete" onClick="if (confirm('Are you sure you want to delete this room? All related bookings will also be deleted. this action is PERMANENT!')) {this.form.action='${ urlHandlers.UHRoomBookingDeleteRoom.getURL( )}'; this.form.submit();} else { return false; }"/>
+        <input class="btn" type="submit" value="Delete" id="deleteRoom"/>
         </form>
         <form method="post" action="${urlHandlers.UHRoomBookingRoomForm.getURL( )}">
         <input type="hidden" name="roomLocation" value="${location.friendlyName}">
@@ -151,6 +151,16 @@
     <br>
 
 <script type="text/javascript">
+
+$("#deleteRoom").click(function(){
+    new ConfirmPopup($T("Delete room"),$T("Are you sure you want to delete this room? All related bookings will also be deleted. this action is PERMANENT!"), function(confirmed) {
+        if(confirmed) {
+            $("#roomListForm").attr("action", '${ urlHandlers.UHRoomBookingDeleteRoom.getURL( )}');
+            $("#roomListForm").submit();
+        }
+    }).open();
+    return false;
+});
 
 var newAspectsHandler = function(newAspect, setResult) {
     var killProgress = IndicoUI.Dialogs.Util.progress();

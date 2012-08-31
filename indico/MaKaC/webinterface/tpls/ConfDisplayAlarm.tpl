@@ -71,7 +71,7 @@
                         % if al.getEndedOn():
                             <span class="alarmSentDelete">${_("Delete")}</span>
                         % elif al.getId():
-                            <a href="${deleteAlarmURL}?${al.getLocator().getURLForm()}" onclick="return confirm('${_("Are you sure to delete this alarm?")}');">${_("Delete")}</a>
+                            <a href="${deleteAlarmURL}?${al.getLocator().getURLForm()}" class="deleteAlarm">${_("Delete")}</a>
                         % else:
                             <span class="notScheduled">${_("Delete")}</span>
                         % endif:
@@ -99,5 +99,14 @@ IndicoUI.executeOnLoad(function(){
     $('span.alarmSent').qtip({content: '${_("The alarm has already been sent.")}', position: {my: 'top middle', at: 'bottom middle'}});
     $('span.alarmSentDelete').qtip({content: '${_("Sent alarms cannot be deleted.")}', position: {my: 'top middle', at: 'bottom middle'}});
     $('span.notScheduled').qtip({content: '${_("The alarm is being scheduled, please wait some seconds and refresh the page.")}', position: {my: 'top middle', at: 'bottom middle'}});
+    $(".deleteAlarm").click(function(cosa){
+        var self = this;
+        new ConfirmPopup($T("Delete alarm"), $T("Are you sure to delete this alarm?"), function(confirmed){
+            if(confirmed){
+                window.location = self.getAttribute("href");
+            }
+        }).open();
+        return false;
+    });
 });
 </script>

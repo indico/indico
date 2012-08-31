@@ -25,7 +25,7 @@
         {
             setCloneType('once');
         }else {
-            alert('The specified date (' + dateOnce.get() + ') is not valid.');
+            new AlertPopup($T("Date invalid"), $T('The specified date (' + dateOnce.get() + ') is not valid.')).open();
         }
 
     }
@@ -38,21 +38,20 @@
         if (isValid == true) {
             if ($E("intEndDateUntil").dom.checked) {
                 isValid = dateInterval_until.processDate();
-                errorText = "The specified end date is not valid.";
+                errorText = $T("The specified end date is not valid.");
             } else {
                 isValid = parseInt($E("numi").dom.value) > 0;
-                errorText = "The specified number of times is not valid.";
+                errorText = $T("The specified number of times is not valid.");
             }
         }else {
-            errorText = "The specified starting date is not valid.";
+            errorText = $T("The specified starting date is not valid.");
         }
 
         if (isValid == true)
         {
-            //alert('clonando');
             setCloneType('intervals');
         }else {
-            alert(errorText);
+            new AlertPopup($T("Clone Error"), errorText).open();
         }
 
     }
@@ -65,20 +64,20 @@
         if (isValid == true) {
             if ($E("daysEndDateUntil").dom.checked) {
                 isValid = dateDays_until.processDate();
-                errorText = "The specified end date is not valid.";
+                errorText = $T("The specified end date is not valid.");
             } else {
                 isValid = parseInt($E("numd").dom.value) > 0;
-                errorText = "The specified number of times is not valid.";
+                errorText = $T("The specified number of times is not valid.");
             }
         }else {
-            errorText = "The specified starting date is not valid.";
+            errorText = $T("The specified starting date is not valid.");
         }
 
         if (isValid == true)
         {
             setCloneType('days');
         }else {
-            alert(errorText);
+            new AlertPopup($T("Clone Error"), errorText).open();
         }
 
     }

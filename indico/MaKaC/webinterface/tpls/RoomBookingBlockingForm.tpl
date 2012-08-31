@@ -110,15 +110,19 @@
                     return false;
                 }
                 else if(!hasRooms) {
-                    alert($T('Please add at least one room.'));
+                    new AlertPopup($T("Warning"), $T("Please add at least one room.")).open();
                     return false;
                 }
                 % if rh._createNew:
-                if(!confirm($T('Do you want to create the blocking? Please note that the start and end date cannot be changed after creation.'))) {
+                    new ConfirmPopup($T("Create blocking"),$T("Do you want to create the blocking? Please note that the start and end date cannot be changed after creation."), function(confirmed) {
+                        if(confirmed) {
+                            $("#blockingForm").submit();
+                        }
+                    }).open();
                     return false;
-                }
+                % else:
+                    return true;
                 % endif
-                return true;
             });
 
             var serializeACL = function() {

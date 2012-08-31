@@ -125,13 +125,13 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
                            this.error,
                            function(result, error){
                                if (error) {
-                                   alert($T("Unable to send your error report: ") + error.message);
+                                   new AlertPopup($T("Error"), $T("Unable to send your error report: ") + error.message).open();
                                }
                                else {
                                    if (result) {
-                                       alert($T("Your report has been sent. Thank you!"));
+                                       new AlertPopup($T("Success"), $T("Your report has been sent. Thank you!")).open();
                                    } else {
-                                       alert($T("Your report could not be sent to the support address."));
+                                       new AlertPopup($T("Error"), $T("Your report could not be sent to the support address.")).open();
                                    }
                                    self.close();
                                }

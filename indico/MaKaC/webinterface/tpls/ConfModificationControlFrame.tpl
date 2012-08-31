@@ -22,39 +22,34 @@
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Modification key")}</span></td>
         <td class="blacktext">
-            <form action="${ setModifKeyURL }" id="setModifKey" method="POST">
-                    ${ locator }
-            <input name="modifKey" id="modifKey" type="password" autocomplete="off" size=25 value="${ modifKey }">
-            <input type="submit" class="btn" value="${ _("change")}"> <span id="modifKeyChanged" class="successText"></span>
+            <input name=modifKey id="modifKey" type="password" autocomplete="off" size=25 value="${ modifKey }">
+            <input id="setModifKey" type="submit" class="btn" value="${ _("change")}"> <span id="modifKeyChanged" class="successText"></span>
             <div class="warningText">${_("Note: It is more secure to use the manager list instead of a modification key!")}</div>
-            </form>
-
             <script type="text/javascript">
-                $E('setModifKey').dom.onsubmit = function(e) {
+                $('#setModifKey').click(function(e) {
                     var modifKey = $E('modifKey').dom.value;
-                    if(modifKey && !confirm(${_("Please note that it is more secure to make the event private instead of using a modification key.")|n,j})) {
-                        return false;
-                    }
+                    new ConfirmPopup($T("Set modification key"), $T("Please note that it is more secure to make the event private instead of using a modification key."), function(confirmed){
+                        if(confirmed && modifKey){
+                            indicoRequest('event.protection.setModifKey', {
+                                confId: ${target.getId()},
+                                accessKey: modifKey
+                            },
+                            function(result, error) {
+                                if(error) {
+                                    IndicoUtil.errorReport(error);
+                                    return;
+                                }
 
-                    indicoRequest('event.protection.setModifKey', {
-                            confId: ${target.getId()},
-                            modifKey: modifKey
-                        },
-                        function(result, error) {
-                            if(error) {
-                                IndicoUtil.errorReport(error);
-                                return;
+                                var elem = $E('modifKeyChanged');
+                                elem.dom.innerHTML = modifKey ? '${_("Modification key saved")}' : '${_("Modification key removed")}';
+                                window.setTimeout(function() {
+                                    elem.dom.innerHTML = '';
+                                }, 3000);
                             }
-
-                            var elem = $E('modifKeyChanged');
-                            elem.dom.innerHTML = modifKey ? '${_("Modification key saved")}' : '${_("Modification key removed")}';
-                            window.setTimeout(function() {
-                                elem.dom.innerHTML = '';
-                            }, 3000);
+                        );
                         }
-                    );
-                    return false;
-                }
+                    }).open();
+                });
             </script>
        </td>
     </tr>

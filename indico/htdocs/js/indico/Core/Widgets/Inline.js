@@ -159,7 +159,7 @@ type("SwitchOptionButton", ["InlineRemoteWidgetForOptionButton"],
      {
          error: function(error) {
              this.checkbox.set(true);
-             alert(error.message);
+             new AlertPopup($T("Error"), error.message).open();
          },
 
          drawContent: function() {
@@ -1298,7 +1298,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
 
          setMode: function(mode) {
              if(mode == 'edit' && isFunction(this.beforeEdit)) {
-                 if(this.beforeEdit() === false) {
+                 if(this.beforeEdit(this) === false) {
                      return;
                  }
              }

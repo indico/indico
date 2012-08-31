@@ -824,21 +824,6 @@ var removeReviewersAlerts = function(contributions, role) {
         return false;
     }
 
-    /*contributionsWithoutEditor = []
-    for (i in contributions) {
-        contributionId = contributions[i]
-        contribution = getContribution(contributionId)
-        if (contribution.reviewManager.editor = null) {
-            contributionsWithoutEditor.push(contributionId)
-        }
-    }
-
-    if (contributionsWithoutEditor.length == contributions.length) {
-        alert($T("There is no assigned Layout Reviewer to remove.")
-        );
-        return false;
-    } */
-
     if (contributionsWithoutReviewers.length > 0) {
         title =$T('Contributions without reviewer');
 

@@ -40,8 +40,13 @@
   var agentExtraOptions = ${ jsonEncode(extraAgentOptions) };
 
   function deleteAgent(agentId) {
-      if (confirm($T("Are you sure you want to delete agent ") + agentId + "?")) {
-          agentRequest('livesync.deleteAgent', agentId)
+      new ConfirmPopup($T('Agent activation'),
+              $T("Are you sure you want to delete agent ") + agentId + "?",
+              function(value) {
+                  if (value) {
+                     agentRequest('livesync.deleteAgent', agentId)
+                  }
+              }).open();
       }
   }
 

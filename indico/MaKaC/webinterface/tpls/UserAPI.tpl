@@ -60,12 +60,12 @@
             <td></td>
             <td>
                 % if not apiKey:
-                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" style="display: inline;" onsubmit="return confirm($T('Please only create an API key if you actually need one. Unused API keys might be deleted after some time.'));">
-                        <input type="submit" value="${_('Create API key')}" />
+                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" style="display: inline;">
+                        <input type="submit" id="createAPIKey" value="${_('Create API key')}" />
                     </form>
                 % else:
-                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" style="display: inline;" onsubmit="return confirm($T('Warning: When creating a new API key pair, your old key pair will stop working immediately!'));">
-                        <input type="submit" value="${_('Create a new API key pair')}" />
+                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" style="display: inline;">
+                        <input type="submit" id="createNewAPIKey" value="${_('Create a new API key pair')}" />
                     </form>
                     % if persistentAllowed:
                          <input type="submit" id="enablePersistentSignatures" data-enabled="${'1' if apiKey.isPersistentAllowed() else '0'}" value="${(_('Disable') if apiKey.isPersistentAllowed() else _('Enable')) + _(' persistent signatures')}" />
@@ -90,8 +90,8 @@
                         <input type="submit" value="${_('Unblock API key') if apiKey.isBlocked() else _('Block API key')}" />
                     </form>
 
-                    <form action="${urlHandlers.UHUserAPIDelete.getURL(avatar)}" method="POST" style="display:inline;" onsubmit="return confirm('${_("Do you really want to DELETE the API key? The user will be able to create a new key, but all history will be lost.")}');">
-                        <input type="submit" value="${_('Delete API key')}" />
+                    <form action="${urlHandlers.UHUserAPIDelete.getURL(avatar)}" method="POST" style="display:inline;">
+                        <input type="submit" id="deleteAPIKey" value="${_('Delete API key')}" />
                     </form>
                 </td>
             </tr>
@@ -122,20 +122,58 @@
 <script type="text/javascript">
     var disableText = $T('${apiPersistentDisableAgreement}');
     var enableText = $T('${apiPersistentEnableAgreement}');
+
     $('#enablePersistentSignatures').click(function(e) {
-        if(confirm(this.dataset.enabled == "1" ? disableText : enableText)){
-            $E('progressPersistentSignatures').set(progressIndicator(true, false));
-            indicoRequest('user.togglePersistentSignatures', {userId: '${avatar.getId()}'},
-                function(result, error) {
-                    $E('progressPersistentSignatures').set('');
-                    if (error){
-                        IndicoUI.Dialogs.Util.error(error);
-                    }
-                    else{
-                        $('#enablePersistentSignatures').attr('value', (result == true ? $T('Disable') : $T('Enable')) + $T(' persistent signatures') )
-                        $('#enablePersistentSignatures')[0].dataset.enabled = result == true ? "1" : "0";
-                    }
-                });
+        var confirmHandler= function(value){
+            if(value){
+                $E('progressPersistentSignatures').set(progressIndicator(true, false));
+                indicoRequest('user.togglePersistentSignatures', {userId: '${avatar.getId()}'},
+                    function(result, error) {
+                        $E('progressPersistentSignatures').set('');
+                        if (error){
+                            IndicoUI.Dialogs.Util.error(error);
+                        }
+                        else{
+                            $('#enablePersistentSignatures').attr('value', (result == true ? $T('Disable') : $T('Enable')) + $T(' persistent signatures') )
+                            $('#enablePersistentSignatures')[0].dataset.enabled = result == true ? "1" : "0";
+                        }
+                    });
+            }
         }
+        new ConfirmPopup($T("Persistent signatures"), Html.div({style: {width: '350px'}},this.dataset.enabled == "1" ? disableText : enableText), confirmHandler).open();
     });
+% if not apiKey or not apiKey.isBlocked():
+    % if not apiKey:
+    $("#createAPIKey").click(function(){
+        var self = this;
+        new ConfirmPopup($T("Create API Key"),$T("Please only create an API key if you actually need one. Unused API keys might be deleted after some time."), function(confirmed) {
+            if(confirmed) {
+                $(self).closest("form").submit();
+            }
+        }).open();
+        return false;
+    });
+    % else:
+    $("#createNewAPIKey").click(function(){
+        var self = this;
+        new ConfirmPopup($T("Create a new API Key pair"),$T("'Warning: When creating a new API key pair, your old key pair will stop working immediately!"), function(confirmed) {
+            if(confirmed) {
+                $(self).closest("form").submit();
+            }
+        }).open();
+        return false;
+    });
+    % endif
+% endif
+% if apiKey and isAdmin:
+    $("#deleteAPIKey").click(function(){
+        var self = this;
+        new ConfirmPopup($T("Delete API Key"),$T("Do you really want to DELETE the API key? The user will be able to create a new key, but all history will be lost."), function(confirmed) {
+            if(confirmed) {
+                $(self).closest("form").submit();
+            }
+        }).open();
+        return false;
+    });
+% endif
 </script>

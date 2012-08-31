@@ -60,7 +60,7 @@
             return true;
         }
         try { if ($('#ofMyRooms').is(':checked')) { return true; } } catch (err) {}
-        alert('Please select a room (or several rooms).');
+        new AlertPopup($T("Select room"), $T("Please select a room (or several rooms).")).open();
         return false;
     }
 
@@ -112,7 +112,7 @@
             forms_are_valid();
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
-                alert("${_('There are errors in the form. Please correct fields with red background.')}");
+                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
                 e.preventDefault();
             }
             else if(!confirm_search()) {

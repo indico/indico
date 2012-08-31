@@ -349,7 +349,7 @@
 
     function save() {
         if ($('#template_name').val() == '') {
-            alert("Please choose a name for the template");
+            new AlertPopup($T("Warning"), $T("Please choose a name for the template")).open();
             return;
         }
         var template = [];
@@ -406,7 +406,7 @@
             iframe: true,
             success: function(data) {
                 if(data.status != 'OK') {
-                    alert($T('An error occurred.'));
+                    new AlertPopup($T("Error"), $T("An error occurred")).open();
                     $('#loadingIcon').hide();
                     return;
                 }
