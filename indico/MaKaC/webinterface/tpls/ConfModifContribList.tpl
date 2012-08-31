@@ -262,7 +262,7 @@ var addContribution = function() {
                           window.location.reload();
                        },
                        ${ jsBoolean(self_._conf.getAbstractMgr().isActive()) },
-                       ${ bookings }
+                       ${ bookings |n,j }
                        );
 
     dialog.execute();
