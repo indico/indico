@@ -55,9 +55,9 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(xpath="//button[@type='button']")
         self.click(name="contributions")
         self.click(xpath="(//input[@name='delete'])[2]")
-        alert = self.get_alert()
-        self.assertEqual("Are you sure you wish to delete the selected contributions?\nNote that you cannot undo this action.", alert.text)
-        alert.accept()
+        alert = self.elem(css=".ui-dialog-content")
+        self.assertEqual("Are you sure you wish to delete the selected contributions? Note that you cannot undo this action.", alert.text)
+        self.click(css="button.ui-button")
 
 
     def test_programme(self):
@@ -136,6 +136,6 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.select(name="departureDate", label="15-July-2011")
         self.click(xpath="//input[@name='accommodationType' and @value='own-accommodation']")
         self.click(css="input.regFormButton[type=submit]")
-        alert = self.get_alert()
+        alert = self.elem(css=".ui-dialog-content")
         self.assertEqual("Are you sure you want to submit this form?", alert.text)
-        alert.accept()
+        self.click(css="button.ui-button")
