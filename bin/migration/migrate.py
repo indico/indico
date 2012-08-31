@@ -544,6 +544,20 @@ def chatroomIndexMigration(dbi, withRBDB, prevVersio):
         raise
 
 
+@since('0.99')
+def timedLinkedEventListRemoval(dbi, withRBDB, prevVersio):
+    """
+    Removing TimedLinkedEvents
+    """
+    i = 0
+    for uid, user in AvatarHolder()._getIdx().iteritems():
+        if hasattr(user, 'timedLinkedEvents'):
+            del user.timedLinkedEvents
+        i += 1
+        if i % 100 == 0:
+            dbi.commit()
+
+
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[]):
 
