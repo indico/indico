@@ -577,7 +577,6 @@ class Avatar(Persistent, Fossilizable):
         #################################
 
         self.resetLinkedTo()
-        self.resetTimedLinkedEvents()
 
         self.personalInfo = PersonalInfo()
         self.unlockedFields = [] # fields that are not synchronized with auth backends
@@ -722,28 +721,6 @@ class Avatar(Persistent, Fossilizable):
             self.resetLinkedTo()
             return self.linkedTo
 
-    def getTimedLinkedEvents(self):
-        try:
-            return self.timedLinkedEvents
-        except:
-            self.resetTimedLinkedEvents()
-            return self.timedLinkedEvents
-
-    def resetTimedLinkedEvents(self):
-
-        ltt = self.getLinkedTo()
-
-        self.timedLinkedEvents = TimedLinkedEvents()
-
-        for registrantRole in ltt['registration']:
-            for registrant in ltt['registration'][registrantRole]:
-                self.timedLinkedEvents.addFuture(registrant.getConference(),registrantRole)
-
-        for confRole in ltt['conference']:
-            for conf in ltt['conference'][confRole]:
-                self.timedLinkedEvents.addFuture(conf,confRole)
-
-
     def updateLinkedTo(self):
         self.getLinkedTo() #Create attribute if not exist
         for type in self.linkedToBase.keys():
@@ -769,10 +746,6 @@ class Avatar(Persistent, Fossilizable):
             else:
                 if not obj in self.linkedTo["conference"][role]:
                     self.linkedTo["conference"][role].append(obj)
-
-                    # add directly to the time-ordered list
-                    self.getTimedLinkedEvents().addFuture(obj, role)
-
                     self._p_changed = 1
 
         elif isinstance(obj, MaKaC.conference.Session):
@@ -831,8 +804,6 @@ class Avatar(Persistent, Fossilizable):
                     self.linkedTo["registration"][role].append(obj)
 
                      # add directly to the time-ordered list
-                    self.getTimedLinkedEvents().addFuture(obj.getConference(), role)
-
                     self._p_changed = 1
 
         elif isinstance(obj, MaKaC.user.Group):
@@ -876,8 +847,6 @@ class Avatar(Persistent, Fossilizable):
                     self.linkedTo["conference"][role].remove(obj)
 
                     # remove from the time-ordered list
-                    self.getTimedLinkedEvents().delete(obj, role)
-
                     self._p_changed = 1
 
         elif isinstance(obj, MaKaC.conference.Session):
@@ -928,8 +897,6 @@ class Avatar(Persistent, Fossilizable):
                     self.linkedTo["registration"][role].remove(obj)
 
                     # remove from the time-ordered list
-                    self.getTimedLinkedEvents().delete(obj.getConference(), role)
-
                     self._p_changed = 1
 
         elif isinstance(obj, MaKaC.user.Group):
@@ -1903,89 +1870,6 @@ class LoginInfo:
     def getPassword( self ):
         return self.password
 
-
-## Personalization
-
-class TimedLinkedEvents(Persistent):
-
-    def __init__(self):
-        self._past = []
-        self._present = []
-        self._future = []
-
-    def addPast(self, event, relation):
-        self._past.append((event, relation))
-        self._p_changed = 1
-
-    def addPresent(self, event, relation):
-        self._present.append((event, relation))
-        self._p_changed = 1
-
-    def addFuture(self, event, relation):
-        self._future.append((event, relation))
-        self._p_changed = 1
-
-    def getPast(self):
-        return self._past
-
-    def getPresent(self):
-        return self._present
-
-    def getFuture(self):
-        return self._future
-
-    def sync(self):
-
-        now = datetime.now()
-
-        # Let's check past events
-
-        for elem in self._past:
-            if elem[0].getEndDate() > now:
-                self.addPresent(elem[0],elem[1])
-                self._past.remove(elem)
-                self._p_changed = 1
-
-        # pass "future" events to present and past
-        for elem in self._future[:]:
-            # play consistent, iterate over a copy
-            if elem[0].getStartDate() < now:
-                self.addPresent(elem[0],elem[1])
-                self._future.remove(elem)
-                self._p_changed = 1
-
-        # pass present events to past or future
-        for elem in self._present[:]:
-            # play consistent, iterate over a copy
-            if elem[0].getEndDate() < now:
-                self.addPast(elem[0],elem[1])
-                self._present.remove(elem)
-                self._p_changed = 1
-            elif elem[0].getStartDate() > now:
-                self.addFuture(elem[0],elem[1])
-                self._present.remove(elem)
-                self._p_changed = 1
-
-
-
-    def deleteFromList(self, list, elem, role):
-
-            for tuple in list[:]:
-                if (tuple == (elem, role)):
-                    list.remove(tuple)
-                    self._p_changed = 1
-                    return True
-            return False
-
-    def delete(self, elem, role):
-
-        if (self.deleteFromList(self._past, elem, role) or
-            self.deleteFromList(self._present, elem, role) or
-            self.deleteFromList(self._future, elem, role)):
-            self._p_changed = 1
-            return True
-
-        return False
 
 class PersonalInfo(Persistent, Fossilizable):
 

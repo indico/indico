@@ -39,6 +39,7 @@ import MaKaC.common.indexes as indexes
 from MaKaC.common.utils import validMail
 from indico.web.http_api.auth import APIKey
 
+
 class UserComparator(object):
 
     @staticmethod
@@ -51,57 +52,6 @@ class UserComparator(object):
     @staticmethod
     def cmpGroups(x, y):
         return cmp(x["name"].lower(), y["name"].lower())
-
-
-class UserListEvents(LoggedOnlyService):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-
-        self._time = self._params.get('time', None)
-        self._target = self.getAW().getUser()
-
-    def __exportElemDataFactory(self, moment):
-        return lambda elem: {
-            'id': elem[0].getId(),
-            'title': elem[0].getTitle(),
-            'roles': [elem[1]],
-            'timestamp':time.mktime(elem[0].getStartDate().timetuple()),
-            'startDate':str(elem[0].getStartDate().strftime("%d/%m/%Y")),
-            'endDate':str(elem[0].getEndDate().strftime("%d/%m/%Y")),
-            'startTime':str(elem[0].getStartDate().strftime("%H:%M")),
-            'endTime':str(elem[0].getEndDate().strftime("%H:%M")),
-            'type': moment,
-            'evtType': elem[0].getVerboseType()
-        }
-
-    def _getAnswer( self):
-
-        events = []
-
-        self._target.getTimedLinkedEvents().sync()
-
-        if (not self._time) or self._time == 'past':
-            events.extend( map( self.__exportElemDataFactory('past'),
-                               self._target.getTimedLinkedEvents().getPast()))
-
-        if (not self._time) or self._time == 'present':
-            events.extend( map(self.__exportElemDataFactory('present'),
-                              self._target.getTimedLinkedEvents().getPresent()))
-
-        if (not self._time) or self._time == 'future':
-            events.extend( map(self.__exportElemDataFactory('future'),
-                              self._target.getTimedLinkedEvents().getFuture()))
-
-        jsonData = {}
-
-        for event in events:
-            if jsonData.has_key(event['id']):
-                jsonData[event['id']]['roles'].append(event['roles'][0])
-            else:
-                jsonData[event['id']] = event
-
-        return jsonData
 
 
 class UserAddToBasket(LoggedOnlyService):
@@ -480,7 +430,6 @@ class UserCreateKeyEnablePersistent(LoggedOnlyService):
         return True
 
 methodMap = {
-    "event.list": UserListEvents,
     "favorites.addUsers": UserAddToBasket,
     "favorites.removeUser": UserRemoveFromBasket,
     "favorites.listUsers": UserListBasket,
