@@ -517,21 +517,27 @@ class PDFBase:
                 try:
                     img = PILImage.open(imagePath)
                     width, height = img.size
-                    if width > self._PAGE_WIDTH:
+
+                    # resize in case too big for page
+                    if width > self._PAGE_WIDTH / 2:
                         ratio =  float(height)/width
-                        width = self._PAGE_WIDTH
-                        height = self._PAGE_WIDTH * ratio
-                        img = img.resize((int(width), int(height)))
+                        width = self._PAGE_WIDTH / 2
+                        height = width * ratio
                     startHeight = self._PAGE_HEIGHT
+
                     if drawTitle:
                         startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
-                        height = 0
-                    c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, startHeight - 1.5 * inch - height)
+
+                    # lower edge of the image
+                    startHeight = startHeight - inch / 2 - height
+
+                    # draw horizontally centered, with recalculated width and height
+                    c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height)
                 except IOError:
                     if drawTitle:
                         self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
-                return True
-        return False
+                return startHeight
+        return 0
 
 
 
