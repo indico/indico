@@ -120,7 +120,7 @@ else:
                             <input type="button" onclick="addContribution()" class="btn" name="" value="${ _("Add new")}">
                           </form>
                         </td>
-                        <form action=${ contribSelectionAction } method="post" name="contribsForm" onsubmit="return atLeastOneContribSelected();">
+                        <form action=${ contribSelectionAction } method="post" name="contribsForm" id="contribsForm">
                         <td>
                            <input type="submit" onclick="deleteContributions(); return false;" class="btn" name="" value="${ _("Delete")}">
                         </td>
@@ -144,6 +144,9 @@ else:
                         </td>
                         <td valign="bottom" align="left">
                             <input type="image" name="excel" src=${ excelIconURL} border="0">
+                        </td>
+                        <td valign="bottom" align="left">
+                            <input type="image" name="xml" src=${ xmlIconURL} border="0">
                         </td>
                 </tbody>
             </table>
@@ -207,6 +210,9 @@ else:
                                 </td>
                                 <td valign="bottom" align="left">
                                     <input type="image" name="excel" src=${ excelIconURL} border="0">
+                                </td>
+                                <td valign="bottom" align="left">
+                                    <input type="image" name="xml" src=${ xmlIconURL} border="0">
                                 </td>
                         </tbody>
                     </table>
@@ -284,9 +290,8 @@ var deleteContributions = function() {
     }
 };
 
-var atLeastOneContribSelected = function() {
+$("#contribsForm").submit(function(event){
     return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));
-};
-
+});
 
 </script>

@@ -6262,6 +6262,7 @@ class WConfModifContribList(wcomponents.WTemplated):
                                   <input type="hidden" name="order" value="%s">"""%(self._sortingCrit.getField().getId(), self._order)
         vars["pdfIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["excelIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
+        vars["xmlIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("xml")))
         return vars
 
 class WFilterCriteriaContribs(wcomponents.WFilterCriteria):

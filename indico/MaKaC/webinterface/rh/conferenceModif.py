@@ -79,7 +79,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.modules.scheduler import tasks, Client
 from indico.util import json
-
+from indico.util.metadata.serializer import Serializer
 
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
 
@@ -5210,6 +5210,8 @@ class RHContribsActions:
             return RHContribsToPDF(self._req).process(params)
         elif params.has_key("excel.x"):
             return  RHContribsToExcel(self._req).process(params)
+        elif params.has_key("xml.x"):
+            return  RHContribsToXML(self._req).process(params)
         elif params.has_key("AUTH"):
             return RHContribsParticipantList(self._req).process(params)
         elif params.has_key("move"):
@@ -5322,6 +5324,27 @@ class RHContribsToExcel(RHConferenceModifBase):
         self._req.set_content_length(len(data))
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "CSV" )
+        self._req.content_type = """%s"""%(mimetype)
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        return data
+
+class RHContribsToXML(RHConferenceModifBase):
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        self._contribIds = self._normaliseListParam( params.get("contributions", []) )
+        self._contribs = []
+        for id in self._contribIds:
+            self._contribs.append(self._conf.getContributionById(id))
+    def _process( self ):
+        filename = "Contributions.xml"
+        from MaKaC.common.fossilize import fossilize
+        resultFossil = fossilize(self._contribs)
+        serializer = Serializer.create('xml')
+        data = serializer(resultFossil)
+        self._req.headers_out["Content-Length"] = "%s"%len(data)
+        cfg = Config.getInstance()
+        mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
