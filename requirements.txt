@@ -15,7 +15,6 @@ py==1.4.9
 pyPdf==1.13
 pyatom==1.2
 pytest==2.2.4
-python-cjson==1.0.5
 python-dateutil==1.5
 pytz==2012c
 simplejson==2.5.2

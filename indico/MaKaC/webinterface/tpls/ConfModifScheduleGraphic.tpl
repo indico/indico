@@ -9,8 +9,8 @@
 <div class="clearfix"></div>
 
 <script type="text/javascript">
-var ttdata = ${ str(ttdata) };
-var eventInfo = ${ eventInfo };
+var ttdata = ${ ttdata | n,j };
+var eventInfo = ${eventInfo | n,j };
 
 
 //Variables used to resize the timetable.
