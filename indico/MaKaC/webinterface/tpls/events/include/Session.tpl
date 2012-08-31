@@ -33,21 +33,21 @@
         <tbody>
         % if len(item.getConvenerList()) > 0 or session.getConvenerText():
             <tr>
-                <td class="leftCol">Convener${'s' if len(session.getConvenerList()) > 1 else ''}:</td>
+                <td class="leftCol">${ _("Conveners") if len(session.getConvenerList()) > 1 else _("Convener")}:</td>
                 <td>${common.renderUsers(item.getConvenerList(), unformatted=session.getConvenerText())}</td>
             </tr>
         % endif
 
         % if getLocationInfo(item) != getLocationInfo(item.getConference()):
             <tr>
-                <td class="leftCol">Location:</td>
+                <td class="leftCol">${ _("Location")}:</td>
                 <td>${common.renderLocation(item, parent=item.getConference())}</td>
             </tr>
         % endif
 
         % if len(session.getAllMaterialList()) > 0:
         <tr>
-            <td class="leftCol">Material:</td>
+            <td class="leftCol">${ _("Material")}:</td>
             <td>
             % for material in session.getAllMaterialList():
                 % if material.canView(accessWrapper):

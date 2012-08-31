@@ -30,14 +30,14 @@
 
         % if item.getSpeakerList() or item.getSpeakerText():
         <tr>
-            <td class="leftCol">Speaker${'s' if len(item.getSpeakerList()) > 1 else ''}:</td>
+            <td class="leftCol">${ _("Speakers") if len(item.getSpeakerList()) > 1 else _("Speaker")}:</td>
             <td>${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText())}</td>
         </tr>
         % endif
 
         % if len(item.getAllMaterialList()) > 0:
         <tr>
-            <td class="leftCol">Material:</td>
+            <td class="leftCol">${ _("Material")}:</td>
             <td>
             % for material in item.getAllMaterialList():
                 % if material.canView(accessWrapper):

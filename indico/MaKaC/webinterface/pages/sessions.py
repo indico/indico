@@ -43,6 +43,7 @@ from indico.util.i18n import i18nformat
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ
 from indico.util import json
+from indico.util.date_time import format_date, format_datetime
 import pytz
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
@@ -452,11 +453,11 @@ class WSessionDisplayBase(WICalExportBase):
         sDate=self._session.getAdjustedStartDate(tz)
         eDate=self._session.getAdjustedEndDate(tz)
         if sDate.strftime("%d%b%Y")==eDate.strftime("%d%b%Y"):
-            vars["dateInterval"]=sDate.strftime("%A %d %B %Y %H:%M")
+            vars["dateInterval"]=format_datetime(sDate, format='EEEE d MMMM yyyy H:mm')
         else:
             vars["dateInterval"]= i18nformat(""" _("from") %s  _("to") %s""")%(
-                sDate.strftime("%A %d %B %Y %H:%M"),
-                eDate.strftime("%A %d %B %Y %H:%M"))
+                format_datetime(sDate, format='EEEE d MMMM yyyy H:mm'),
+                format_datetime(eDate, format='EEEE d MMMM yyyy H:mm'))
         vars["location"]=""
         loc=self._session.getLocation()
         if loc is not None and loc.getName().strip()!="":
@@ -714,8 +715,8 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["place"]+="<i>Room:</i> %s"%self.htmlText(room.getName())
         vars["startDate"],vars["endDate"],vars["duration"]="","",""
         if self._session.getAdjustedStartDate() is not None:
-            vars["startDate"]=self.htmlText(self._session.getAdjustedStartDate().strftime("%A %d %B %Y %H:%M"))
-            vars["endDate"]=self.htmlText(self._session.getAdjustedEndDate().strftime("%A %d %B %Y %H:%M"))
+            vars["startDate"]=self.htmlText(format_datetime(self._session.getAdjustedStartDate(), format='EEEE d MMMM yyyy H:mm'))
+            vars["endDate"]=self.htmlText(format_datetime(self._session.getAdjustedEndDate(), format='EEEE d MMMM yyyy H:mm'))
         vars["bgcolor"] = self._session.getColor()
         vars["textcolor"] = self._session.getTextColor()
         vars["entryDuration"]=self.htmlText((datetime(1900,1,1)+self._session.getContribDuration()).strftime("%Hh%M'"))
@@ -1032,7 +1033,7 @@ class WSessionModPlainTTDay(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["day"]=self._day.strftime("%A, %d %B %Y")
+        vars["day"]=format_date(self._day, format='full')
         tz = self._session.getTimezone()
         sDate=timezone(tz).localize(datetime(self._day.year,self._day.month,self._day.day,0,0))
         eDate=timezone(tz).localize(datetime(self._day.year,self._day.month,self._day.day,23,59))
@@ -1212,7 +1213,7 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["day"]=self._day.strftime("%A, %d %B %Y")
+        vars["day"]=format_date(self._day, format='full')
         tz = self._session.getTimezone()
         sDate=timezone(tz).localize(datetime(self._day.year,self._day.month,self._day.day,0,0))
         eDate=timezone(tz).localize(datetime(self._day.year,self._day.month,self._day.day,23,59))
@@ -1770,7 +1771,7 @@ class WPModSlotRemConfirmation(WPSessionModifSchedule):
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         slotCaption="on %s %s-%s"%(
-            self._slot.getAdjustedStartDate().strftime("%A %d %B %Y"),
+            format_date(self._slot.getAdjustedStartDate(), format='full'),
             self._slot.getAdjustedStartDate().strftime("%H:%M"),
             self._slot.getAdjustedEndDate().strftime("%H:%M"))
         if self._slot.getTitle()!="":

@@ -68,10 +68,15 @@
 
 <% location, room, url = getLocationInfo(conf) %>
 
-${conf.getTitle()}  (${prettyDate(conf.getAdjustedStartDate()) + (" to " + prettyDate(conf.getAdjustedEndDate()) if conf.getAdjustedStartDate().date() != conf.getAdjustedEndDate().date() else "")})<br/><br/>
+${ conf.getTitle()}
+${ prettyDate(conf.getAdjustedStartDate()) }
+% if conf.getAdjustedStartDate().date() != conf.getAdjustedEndDate().date():
+   ${ _("to") ${ prettyDate(conf.getAdjustedEndDate()) }
+  <br/><br/>
+% endif
 % if conf.getDescription():
     Description: ${conf.getDescription()}<br/>
-%endif
+% endif
 
 % if conf.getParticipation().displayParticipantList() and conf.getParticipation().getParticipantList():
     Participants: ${ conf.getParticipation().getPresentParticipantListText() }<br/>

@@ -77,8 +77,12 @@
     ${separator.join(result)}
 </%def>
 
-<%def name="timeTag(name, dt, text)">
-      <time itemprop="${name}" datetime="${dt.isoformat()}">${text}</time>
+<%def name="timeTag1(name, dt, date)">
+    <time itemprop="${name}" datetime="${dt.isoformat()}">${date}</time>
+</%def>
+
+<%def name="timeTag2(name, dt, date, time)">
+    <time itemprop="${name}" datetime="${dt.isoformat()}">${date} ${_("at")} ${time}</time>
 </%def>
 
 <%def name="renderEventTime(startDate, endDate, timezone, strong=True)">
@@ -86,14 +90,14 @@
     % if getDate(startDate) == getDate(endDate):
         ${prettyDate(startDate)}
         % if not isTime0H0M(startDate):
-            from ${timeTag('startDate', startDate, timeFormat % getTime(startDate))}
+            ${ _("from")} ${timeTag1('startDate', startDate, timeFormat % getTime(startDate))}
         % endif
         % if not isTime0H0M(endDate):
-            to ${timeTag('endDate', endDate, timeFormat % getTime(endDate))}
+            ${ _("to")} ${timeTag1('endDate', endDate, timeFormat % getTime(endDate))}
         % endif
     % else:
-        from ${timeTag('startDate', startDate, '%s at %s' % (prettyDate(startDate), (timeFormat % getTime(startDate))))}
-        to ${timeTag('endDate', endDate, '%s at %s' % (prettyDate(endDate), (timeFormat % getTime(endDate))))}
+        ${ _("from")} ${timeTag2('startDate', startDate, prettyDate(startDate), (timeFormat % getTime(startDate)))}
+        ${ _("to")} ${timeTag2('endDate', endDate, prettyDate(endDate), (timeFormat % getTime(endDate)))}
     % endif
     (${str(timezone)})
 </%def>
@@ -105,8 +109,8 @@
             - <u>${ getTime(startDate)}</u>
         % endif
     % else:
-        from ${prettyDate(startDate)} (${getTime(startDate)})
-        to ${prettyDate(endDate)} (${getTime(endDate)})
+        ${ _("from")} ${prettyDate(startDate)} (${getTime(startDate)})
+        ${ _("to")} ${prettyDate(endDate)} (${getTime(endDate)})
     % endif
     % if timezone!='':
         (${str(timezone)})
@@ -130,8 +134,8 @@
             - <u>${ getTime(startDate)}</u>
         % endif
     % else:
-        from <b>${prettyDate(startDate)} (${getTime(startDate)})</b>
-        to <b>${prettyDate(endDate)} (${getTime(endDate)})</b>
+        ${ _("from")} <b>${prettyDate(startDate)} (${getTime(startDate)})</b>
+        ${ _("to")} <b>${prettyDate(endDate)} (${getTime(endDate)})</b>
     % endif
 </%def>
 

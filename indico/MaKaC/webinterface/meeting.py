@@ -44,6 +44,7 @@ from MaKaC.webinterface.materialFactories import ConfMFRegistry, ContribMFRegist
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.date_time import format_date
 import MaKaC.common.timezoneUtils as timezoneUtils
 
 class WebFactory(WebFactory):
@@ -608,18 +609,12 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         #################################
         # Fermi timezone awareness      #
         #################################
-        #vars["confDateInterval"] = "from %s to %s"%(self._conf.getStartDate().strftime("%d %B %Y"), self._conf.getEndDate().strftime("%d %B %Y"))
-        #if self._conf.getStartDate().strftime("%d%B%Y") == \
-        #        self._conf.getEndDate().strftime("%d%B%Y"):
-        #    vars["confDateInterval"] = self._conf.getStartDate().strftime("%d %B %Y")
-        #elif self._conf.getStartDate().month == self._conf.getEndDate().month:
-        #    vars["confDateInterval"] = "%s-%s %s"%(self._conf.getStartDate().day, self._conf.getEndDate().day, self._conf.getStartDate().strftime("%B %Y"))
-        vars["confDateInterval"] = "from %s to %s"%(self._conf.getStartDate().strftime("%d %B %Y"), self._conf.getEndDate().strftime("%d %B %Y"))
+        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s""")%(format_date(self._conf.getStartDate(), format='long'), format_date(self._conf.getEndDate(), format='long'))
         if self._conf.getStartDate().strftime("%d%B%Y") == \
                 self._conf.getEndDate().strftime("%d%B%Y"):
-            vars["confDateInterval"] = self._conf.getStartDate().strftime("%d %B %Y")
+            vars["confDateInterval"] = format_date(self._conf.getStartDate(), format='long')
         elif self._conf.getStartDate().month == self._conf.getEndDate().month:
-            vars["confDateInterval"] = "%s-%s %s"%(self._conf.getStartDate().day, self._conf.getEndDate().day, self._conf.getStartDate().strftime("%B %Y"))
+            vars["confDateInterval"] = "%s-%s %s"%(self._conf.getStartDate().day, self._conf.getEndDate().day, format_date(self._conf.getStartDate(), format='MMMM yyyy'))
         #################################
         # Fermi timezone awareness(end) #
         #################################
@@ -1095,7 +1090,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
             </tr>
         </table>
                 """)%(day.getDate().strftime("%Y-%m-%d"),maxOverlap+2,
-                        day.getDate().strftime("%A, %d %B %Y"),
+                        format_date(day.getDate(), format='full'),
                         quoteattr(str(reducedScheduleActionURL)),
                         "".join(slotList))
             daySch.append(res)
@@ -1198,7 +1193,7 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
             if self.__contrib.getParent().getStartDate().strftime("%Y%B%d") ==\
                self.__contrib.getStartDate().strftime("%Y%B%d"):
                 vars["startDate"] = self.__contrib.getStartDate().strftime("%H:%M")
-        vars["endDate"] = self.__contrib.getEndDate().strftime("%A %d %B %Y")
+        vars["endDate"] = format_date(self.__contrib.getEndDate(), format='full')
         vars["endTime"] = self.__contrib.getEndDate().strftime("%H:%M")
         vars["duration"] = (datetime(1900,1,1)+self.__contrib.getDuration()).strftime("%M'")
         if self.__contrib.getDuration()>timedelta(seconds=3600):
@@ -1332,9 +1327,9 @@ class WMeetingSessionSlotBaseDisplayItem(wcomponents.WTemplated):
             location = self.__session.getLocation()
             roomLink = linking.RoomLinker().getHTMLLink( room, location )
             vars["room"] = self.__getHTMLRow( "Room", roomLink )
-        vars["startDate"] = self.__session.getStartDate().strftime("%A %d %B %Y")
+        vars["startDate"] = format_date(self.__session.getStartDate(), format='full')
         vars["startTime"] = self.__session.getStartDate().strftime("%H:%M")
-        vars["endDate"] = self.__session.getEndDate().strftime("%A %d %B %Y")
+        vars["endDate"] = format_date(self.__session.getEndDate(), format='full')
         vars["endTime"] = self.__session.getEndDate().strftime("%H:%M")
         if vars["startDate"] == vars["endDate"]:
             vars["dateInterval"] = "%s (%s -> %s)"%(vars["startDate"],\
@@ -1451,9 +1446,9 @@ class WMeetingBaseDisplay(wcomponents.WTemplated):
             roomLink = linking.RoomLinker().getHTMLLink( room, location )
             vars["room"] = self.__getHTMLRow( _("Room"), roomLink )
         sdate, edate = self.__conf.getStartDate(), self.__conf.getEndDate()
-        fsdate, fedate = sdate.strftime("%d %B %Y"), edate.strftime("%d %B %Y")
+        fsdate, fedate = format_date(sdate, format='long'), format_date(edate, format='long')
         fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
-        vars["dateInterval"] = "from %s %s to %s %s"%(fsdate, fstime, \
+        vars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s""")%(fsdate, fstime, \
                                                         fedate, fetime)
         if sdate.strftime("%d%B%Y") == edate.strftime("%d%B%Y"):
             timeInterval = fstime

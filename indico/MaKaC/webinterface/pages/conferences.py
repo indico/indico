@@ -101,12 +101,12 @@ class WPConferenceBase( base.WPDecorated ):
         tz = self._tz = DisplayTZ(rh._aw,self._conf).getDisplayTZ()
         sDate = self.sDate = self._conf.getAdjustedScreenStartDate(tz)
         eDate = self.eDate = self._conf.getAdjustedScreenEndDate(tz)
-        dates=" (%s)"%sDate.strftime("%d %B %Y")
+        dates=" (%s)"%format_date(sDate, format='long')
         if sDate.strftime("%d%B%Y") != eDate.strftime("%d%B%Y"):
             if sDate.strftime("%B%Y") == eDate.strftime("%B%Y"):
-                dates=" (%s-%s)"%(sDate.strftime("%d"), eDate.strftime("%d %B %Y"))
+                dates=" (%s-%s)"%(sDate.strftime("%d"), format_date(eDate, format='long'))
             else:
-                dates=" (%s - %s)"%(sDate.strftime("%d %B %Y"), eDate.strftime("%d %B %Y"))
+                dates=" (%s - %s)"%(format_date(sDate, format='long'), format_date(eDate, format='long'))
         self._setTitle( "%s %s"%(strip_ml_tags(self._conf.getTitle()), dates ))
 
     def _getFooter( self ):
@@ -114,7 +114,7 @@ class WPConferenceBase( base.WPDecorated ):
         """
         wc = wcomponents.WFooter()
 
-        p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),
+        p = {"modificationDate": format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),
              "subArea": self._getSiteArea()
              }
         return wc.getHTML(p)
@@ -146,7 +146,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
     def _getFooter( self ):
         wc = wcomponents.WFooter()
-        p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),
+        p = {"modificationDate": format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),
                 "subArea": self._getSiteArea()}
 
         cid = self._conf.getUrlTag().strip() or self._conf.getId()
@@ -471,13 +471,14 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         adjusted_sDate = self._conf.getAdjustedScreenStartDate(tz)
         adjusted_eDate = self._conf.getAdjustedScreenEndDate(tz)
+
         vars["timezone"] = tz
-        vars["confDateInterval"] = "from %s to %s (%s)"%(adjusted_sDate.strftime("%d %B %Y"), adjusted_eDate.strftime("%d %B %Y"), tz)
+        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s (%s)""")%(format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'), tz)
         if adjusted_sDate.strftime("%d%B%Y") == \
                 adjusted_eDate.strftime("%d%B%Y"):
-            vars["confDateInterval"] = adjusted_sDate.strftime("%d %B %Y")
+            vars["confDateInterval"] = format_date(adjusted_sDate, format='long')
         elif adjusted_sDate.strftime("%B%Y") == adjusted_eDate.strftime("%B%Y"):
-            vars["confDateInterval"] = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, adjusted_sDate.strftime("%B %Y"))
+            vars["confDateInterval"] = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'))
         vars["confLocation"] = ""
         if self._conf.getLocationList():
             vars["confLocation"] =  self._conf.getLocationList()[0].getName()
@@ -787,10 +788,10 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         else:
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._conf.getDescription()
         sdate, edate = self._conf.getAdjustedScreenStartDate(tz), self._conf.getAdjustedScreenEndDate(tz)
-        fsdate, fedate = sdate.strftime("%d %B %Y"), edate.strftime("%d %B %Y")
+        fsdate, fedate = format_date(sdate, format='long'), format_date(edate, format='long')
         fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
 
-        vars["dateInterval"] = "from %s %s to %s %s "%(fsdate, fstime, \
+        vars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s """)%(fsdate, fstime, \
                                                         fedate, fetime)
         if sdate.strftime("%d%B%Y") == edate.strftime("%d%B%Y"):
             timeInterval = fstime
@@ -1246,7 +1247,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         """
         """
         wc = wcomponents.WEventFooter(self._conf)
-        p = {"modificationDate":self._conf.getModificationDate().strftime("%d %B %Y %H:%M"),"subArea": self._getSiteArea(),"dark":True}
+        p = {"modificationDate":format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),"subArea": self._getSiteArea(),"dark":True}
         if Config.getInstance().getShortEventURL():
             id=self._conf.getUrlTag().strip()
             if not id:
@@ -1952,7 +1953,7 @@ class WBookingsVRVS(WBookings):
             sel = ""
             if i == self._conf.getStartDate().month:
                 sel = " selected"
-            vars["smonth"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(i,sel,datetime(1900,i,1).strftime("%B"))
+            vars["smonth"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(i,sel,format_date(datetime(1900,i,1), format='MMMM'))
         vars["syear"] = ""
         for i in range(self._conf.getStartDate().year - 1,self._conf.getStartDate().year + 2):
             sel = ""
@@ -1979,7 +1980,7 @@ class WBookingsVRVS(WBookings):
             sel = ""
             if i == self._conf.getEndDate().month:
                 sel = " selected"
-            vars["emonth"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(i,sel,datetime(1900,i,1).strftime("%B"))
+            vars["emonth"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(i,sel,format_date(datetime(1900,i,1), format='MMMM'))
         vars["eyear"] = ""
         for i in range(self._conf.getEndDate().year - 1, self._conf.getEndDate().year + 2):
             sel = ""
@@ -2258,12 +2259,12 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["shortURLBase"] = Config.getInstance().getShortEventURL()
         vars["shortURLTag"] = self._conf.getUrlTag()
         vars["screenDatesURL"] = urlHandlers.UHConfScreenDatesEdit.getURL(self._conf)
-        ssdate = self._conf.getAdjustedScreenStartDate().strftime("%A %d %B %Y %H:%M")
+        ssdate = format_datetime(self._conf.getAdjustedScreenStartDate(), format='EEEE d MMMM yyyy H:mm')
         if self._conf.getScreenStartDate() == self._conf.getStartDate():
             ssdate += i18nformat(""" <i> _("(normal)")</i>""")
         else:
             ssdate += i18nformat(""" <font color='red'>_("(modified)")</font>""")
-        sedate = self._conf.getAdjustedScreenEndDate().strftime("%A %d %B %Y %H:%M")
+        sedate = format_datetime(self._conf.getAdjustedScreenEndDate(), format='EEEE d MMMM yyyy H:mm')
         if self._conf.getScreenEndDate() == self._conf.getEndDate():
             sedate += i18nformat(""" <i> _("(normal)")</i>""")
         else:
@@ -2316,8 +2317,8 @@ class WConfModScreenDatesEdit(wcomponents.WTemplated):
         ###################################
         # Fermi timezone awareness(end)   #
         ###################################
-        vars["conf_start_date"]=self.htmlText(csd.strftime("%A %d %B %Y %H:%M"))
-        vars["conf_end_date"]=self.htmlText(ced.strftime("%A %d %B %Y %H:%M"))
+        vars["conf_start_date"]=self.htmlText(format_datetime(csd, format='EEEE d MMMM yyyy H:mm'))
+        vars["conf_end_date"]=self.htmlText(format_datetime(ced, format='EEEE d MMMM yyyy H:mm'))
         vars["start_date_own_sel"]=""
         vars["start_date_conf_sel"]=" checked"
         vars["sDay"],vars["sMonth"],vars["sYear"]=csd.day,csd.month,csd.year
@@ -3034,7 +3035,7 @@ class WSessionMoveConfirmation(wcomponents.WTemplated):
         tz = conf.getTimezone()
         sd = self._session.getAdjustedStartDate()
         if sd is not None:
-            vars["currentDate"]=sd.strftime("%A %d %B %Y %H:%M")
+            vars["currentDate"]=format_datetime(sd, format='EEEE d MMMM yyyy H:mm')
             vars["sDay"] = sd.day
             vars["sMonth"] = sd.month
             vars["sYear"] = sd.year
@@ -3058,7 +3059,7 @@ class WPModSlotRemConfirmation(WPConfModifSchedule):
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         slotCaption="on %s %s-%s"%(
-            self._slot.getAdjustedStartDate().strftime("%A %d %B %Y"),
+            format_date(self._slot.getAdjustedStartDate(), format='full'),
             self._slot.getAdjustedStartDate().strftime("%H:%M"),
             self._slot.getAdjustedEndDate().strftime("%H:%M"))
         if self._slot.getTitle()!="":
@@ -4529,14 +4530,14 @@ class WConfModifCFA( wcomponents.WTemplated ):
             vars["changeTo"] = "False"
             vars["status"] = _("ENABLED")
             vars["changeStatus"] = _("DISABLE")
-            vars["startDate"]=abMgr.getStartSubmissionDate().strftime("%A %d %B %Y")
-            vars["endDate"]=abMgr.getEndSubmissionDate().strftime("%A %d %B %Y")
+            vars["startDate"] = format_date(abMgr.getStartSubmissionDate(), format='full')
+            vars["endDate"] = format_date(abMgr.getEndSubmissionDate(), format='full')
             vars["announcement"] = abMgr.getAnnouncement()
             vars["disabled"] = ""
             modifDL = abMgr.getModificationDeadline()
             vars["modifDL"] = i18nformat("""--_("not specified")--""")
             if modifDL:
-                vars["modifDL"] = modifDL.strftime("%A %d %B %Y")
+                vars["modifDL"] = format_date(modifDL, format='full')
             vars["notification"] = i18nformat("""
                         <table align="left">
                             <tr>
@@ -5109,7 +5110,7 @@ class WAbstracts( wcomponents.WTemplated ):
                         accType=self.htmlText(s.getType().getName())
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%accType)
             if self._fields["SubmissionDate"][1] == "checked":
-                m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%abstract.getSubmissionDate().strftime("%d %B %Y"))
+                m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%format_date(abstract.getSubmissionDate(), format='long'))
             if len(m) == 1:
                 m = ["<td></td>"]
             l.append("""<tr id="abstracts%s" style="background-color: transparent;" onmouseout="javascript:onMouseOut('abstracts%s')" onmouseover="javascript:onMouseOver('abstracts%s')">
@@ -7788,7 +7789,7 @@ class WFullMaterialPackage(wcomponents.WTemplated):
                     <tr>
                         <td nowrap="nowrap" valign="top"><input name="days" type="checkbox" checked="checked" value="%s">%s</td>
                     </tr>
-                  """%(sDate.strftime("%d%B%Y"), sDate.strftime("%d %B %Y") ) )
+                  """%(format_date(sDate, format='dMMMMyyyy'), format_date(sDate, format='long') ) )
             sDate += timedelta(days=1)
         vars["dayList"] = "".join(htmlDay)
         vars["sessionList"] = ""
@@ -7796,7 +7797,7 @@ class WFullMaterialPackage(wcomponents.WTemplated):
             vars["sessionList"] = "No session in this event"
         for session in self._conf.getSessionList():
             vars["sessionList"] += i18nformat("""
-                 <input name="sessionList" type="checkbox" value="%s" checked="checked">%s _("(last modified: %s)")<br>""") % (session.getId(),session.getTitle(),session.getModificationDate().strftime("%d %B %Y %H:%M"))
+                 <input name="sessionList" type="checkbox" value="%s" checked="checked">%s _("(last modified: %s)")<br>""") % (session.getId(),session.getTitle(), format_datetime(session.getModificationDate(), format='d MMMM yyyy H:mm'))
         vars["materialType"] = i18nformat("""
                                 <tr>
             <td>
@@ -7935,9 +7936,9 @@ class WConfStaticDetails( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["description"] = self._conf.getDescription()
         sdate, edate = self._conf.getAdjustedStartDate(), self._conf.getAdjustedEndDate()
-        fsdate, fedate = sdate.strftime("%d %B %Y"), edate.strftime("%d %B %Y")
+        fsdate, fedate = format_date(sDate, format='long'), format_date(eDate, format='long')
         fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
-        vars["dateInterval"] = "from %s %s to %s %s"%(fsdate, fstime, \
+        vars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s""")%(fsdate, fstime, \
                                                         fedate, fetime)
         if sdate.strftime("%d%B%Y") == edate.strftime("%d%B%Y"):
             timeInterval = fstime
@@ -8061,12 +8062,12 @@ class WConfStaticDisplayFrame(wcomponents.WTemplated):
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         adjusted_sDate = self._conf.getAdjustedStartDate(tz)
         adjusted_eDate = self._conf.getAdjustedEndDate(tz)
-        vars["confDateInterval"] = "from %s to %s"%(adjusted_sDate.strftime("%d %B %Y"), adjusted_eDate.strftime("%d %B %Y"))
+        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s""")%(format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'))
         if adjusted_sDate.strftime("%d%B%Y") == \
                 adjusted_eDate.strftime("%d%B%Y"):
-           vars["confDateInterval"] = adjusted_sDate.strftime("%d %B %Y")
+           vars["confDateInterval"] = format_date(adjusted_sDate, format='long')
         elif adjusted_sDate.strftime("%B%Y") == adjusted_eDate.strftime("%B%Y"):
-           vars["confDateInterval"] = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, adjusted_sDate.strftime("%B %Y"))
+           vars["confDateInterval"] = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'))
         vars["confLocation"] = ""
         if self._conf.getLocationList():
             vars["confLocation"] =  self._conf.getLocationList()[0].getName()
@@ -9037,7 +9038,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
                         </tr>
                     </table>
                     """%(maxOverlap+2,\
-                            day.getDate().strftime("%A, %d %B %Y"), \
+                            format_date(day.getDate(), format='full'), \
                             maxOverlap+2, legend, \
                             "".join(slotList) )
                 daySch.append(str)
@@ -9255,7 +9256,7 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
                     </tr>
                 </table>
                 """%(day.getDate().strftime("%Y-%m-%d"),maxOverlap+2,
-                        day.getDate().strftime("%A, %d %B %Y"),
+                        format_date(day.getDate(), format='full'),
                         "".join(slotList) )
             daySch.append(str)
         str = "<br>".join( daySch )
@@ -9286,11 +9287,11 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
         sDate=self._session.getAdjustedStartDate()
         eDate=self._session.getAdjustedEndDate()
         if sDate.strftime("%d%b%Y")==eDate.strftime("%d%b%Y"):
-            vars["dateInterval"]=sDate.strftime("%A %d %B %Y %H:%M")
+            vars["dateInterval"]=format_datetime(sDate, format='EEEE d MMMM yyyy H:mm')
         else:
-            vars["dateInterval"]="from %s to %s"%(
-                sDate.strftime("%A %d %B %Y %H:%M"),
-                eDate.strftime("%A %d %B %Y %H:%M"))
+            vars["dateInterval"]=i18nformat("""_("from") %s _("to") %s""")%(
+                format_datetime(sDate, format='EEEE d MMMM yyyy H:mm'),
+                format_datetime(eDate, format='EEEE d MMMM yyyy H:mm'))
         #################################
         # Fermi timezone awareness(end) #
         #################################
@@ -9812,9 +9813,9 @@ class WMConfStaticDetails( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["description"] = self._conf.getDescription()
         sdate, edate = self._conf.getAdjustedStartDate(), self._conf.getAdjustedEndDate()
-        fsdate, fedate = sdate.strftime("%d %B %Y"), edate.strftime("%d %B %Y")
+        fsdate, fedate = format_date(sdate, format='long'), format_date(edate, format='long')
         fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
-        vars["dateInterval"] = "from %s %s to %s %s"%(fsdate, fstime, \
+        vars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s""")%(fsdate, fstime, \
                                                         fedate, fetime)
         if sdate.strftime("%d%B%Y") == edate.strftime("%d%B%Y"):
             timeInterval = fstime

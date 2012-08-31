@@ -37,6 +37,7 @@ from MaKaC.webinterface import meeting
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.date_time import format_date
 import MaKaC.common.timezoneUtils as timezoneUtils
 from pytz import timezone
 
@@ -224,13 +225,13 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         adjusted_sDate = self._conf.getStartDate().astimezone(timezone(tz))
         adjusted_eDate = self._conf.getEndDate().astimezone(timezone(tz))
 
-        vars["confDateInterval"] = "from %s to %s (%s)"%(adjusted_sDate.strftime("%d %B %Y"), adjusted_eDate.strftime("%d %B %Y"), tz)
+        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s (%s)""")%(format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'), tz)
 
         if self._conf.getStartDate().strftime("%d%B%Y") == \
                 self._conf.getEndDate().strftime("%d%B%Y"):
-            vars["confDateInterval"] = adjusted_sDate.strftime("%d %B %Y") + " (" + tz + ")"
+            vars["confDateInterval"] = format_date(adjusted_sDate, format='long') + " (" + tz + ")"
         elif self._conf.getStartDate().month == self._conf.getEndDate().month:
-            vars["confDateInterval"] = "%s-%s %s %s"%(adjusted_sDate.day, adjusted_eDate.day, adjusted_sDate.strftime("%B %Y"), tz)
+            vars["confDateInterval"] = "%s-%s %s %s"%(adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'), tz)
         vars["body"] = self._body
         vars["confLocation"] = ""
         if self._conf.getLocationList():
@@ -469,9 +470,8 @@ class WSimpleEventBaseDisplay(wcomponents.WTemplated):
         tz = tzUtil.getDisplayTZ()
         sdate = self._conf.getStartDate().astimezone(timezone(tz))
         edate = self._conf.getEndDate().astimezone(timezone(tz))
-        dformat, tformat = "%A %d %B %Y", "%H:%M"
-        fsdate, fedate = sdate.strftime(dformat), edate.strftime(dformat)
-        fstime, fetime = sdate.strftime(tformat), edate.strftime(tformat)
+        fsdate, fedate = format_date(sdate, format='full'), format_date(edate, format='full')
+        fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
         if sdate.strftime("%Y%B%d") == edate.strftime("%Y%B%d"):
             timeInterval = fstime
             if sdate.strftime("%H%M") != edate.strftime("%H%M"):
