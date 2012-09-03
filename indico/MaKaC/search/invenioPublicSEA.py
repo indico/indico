@@ -201,7 +201,7 @@ class InvenioPublicSEA(base.SearchEngineAdapter):
         if startDate != '':
             startDate = time.strftime("%Y-%m-%d", time.strptime(startDate, "%d/%m/%Y"))
         if endDate != '':
-            endDate = (datetime.datetime.strptime(endDate, "%d/%m/%Y") + datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
+            endDate = (datetime.datetime.strptime(endDate, "%d/%m/%Y") + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
 
         if startDate != '' and endDate != '':
