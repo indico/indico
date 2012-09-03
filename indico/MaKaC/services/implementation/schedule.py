@@ -547,14 +547,13 @@ class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.S
         contrib = self._schEntry.getOwner()
 
         logInfo = contrib.getLogInfo()
-
+        contrib._notify("contributionUnscheduled")
         if type == "meeting":
             logInfo["subject"] = "Deleted contribution: %s" %contrib.getTitle()
             contrib.delete()
         else:
             logInfo["subject"] = "Unscheduled contribution: %s"%contrib.getTitle()
 
-        self._slot.getSchedule().removeEntry(self._schEntry)
         self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
         self._slot.getSchedule().removeEntry(self._schEntry)
 

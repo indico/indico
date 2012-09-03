@@ -142,7 +142,7 @@ class CSBookingInstanceIndex(OOIndex):
 
     def unindex_talk(self, bk, talk):
         to_unindex = set()
-        bookingList = self.get(talk.getStartDate())
+        bookingList = self.get(talk.getStartDate(), [])
         for bkw in bookingList:
             if bkw.getObject() == talk:
                 to_unindex.add(bkw)
