@@ -4243,52 +4243,9 @@ class WConfModifProgram(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
-        urlGen=urlHandlers.UHTrackModification.getURL
-        vars["description"] = self._conf.getProgramDescription()
-        vars["modifyDescriptionURL"] = urlHandlers.UHConfModifProgramDescription.getURL(self._conf)
-        if len(self._conf.getTrackList()) == 0:
-            ht = _("No track defined")
-        else:
-            ht = []
-            upIconURL=Config.getInstance().getSystemIconURL("upArrow")
-            downIconURL=Config.getInstance().getSystemIconURL("downArrow")
-            for track in self._conf.getTrackList():
-                upURL=urlHandlers.UHTrackModMoveUp.getURL(track)
-                downURL=urlHandlers.UHTrackModMoveDown.getURL(track)
-                ht.append("""
-                    <tr>
-                        <td style="border-bottom: 1px solid #5294CC;">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <a href=%s><img border="0" src=%s alt=""></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href=%s><img border="0" src=%s alt=""></a>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td style="border-bottom: 1px solid #5294CC;">
-                            <input type="checkbox" name="selTracks" value=%s>
-                        </td>
-                        <td align="left" style="border-bottom: 1px solid #5294CC;">%s</td>
-                        <td align="left" width="30%%" style="border-bottom: 1px solid #5294CC;"><a href=%s>%s</a></td>
-                        <td align="left" width="70%%" style="border-bottom: 1px solid #5294CC;">%s</td>
-                    </tr>"""%(quoteattr(str(upURL)),quoteattr(str(upIconURL)),\
-                                quoteattr(str(downURL)), \
-                                quoteattr(str(downIconURL)), \
-                                quoteattr(str(track.getId())),\
-                                self.htmlText(track.getCode()), \
-                                quoteattr(str(urlGen(track))),\
-                                self.htmlText(track.getTitle()), \
-                                self.htmlText(track.getDescription())))
-            ht="""<table cellspacing="0" cellpadding="5" width="100%%">%s</table>"""%"".join(ht)
-        vars["listTrack"] = ht
         vars["deleteItemsURL"]=urlHandlers.UHConfDelTracks.getURL(self._conf)
         vars["addTrackURL"]=urlHandlers.UHConfAddTrack.getURL( self._conf )
+        vars["conf"] = self._conf
         return vars
 
 
@@ -4299,27 +4256,6 @@ class WPConfModifProgram( WPConferenceModifBase ):
 
     def _getPageContent( self, params ):
         wc = WConfModifProgram( self._conf )
-        return wc.getHTML()
-
-
-class WConfModifProgramDescription(wcomponents.WTemplated):
-
-    def __init__( self, conference ):
-        self._conf = conference
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["description"] = self._conf.getProgramDescription()
-        vars["submitURL"] = urlHandlers.UHConfModifProgramDescription.getURL(self._conf)
-        return vars
-
-class WPConfModifProgramDescription( WPConferenceModifBase ):
-
-    def _setActiveSideMenuItem(self):
-        self._programMenuItem.setActive()
-
-    def _getPageContent( self, params ):
-        wc = WConfModifProgramDescription( self._conf )
         return wc.getHTML()
 
 

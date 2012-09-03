@@ -1431,6 +1431,15 @@ class ConferenceEditChairPerson(ConferenceChairPersonBase):
         self._editChair(chair)
         return self._getChairPersonsList()
 
+class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase ):
+    """
+    Conference program description modification
+    """
+    def _handleSet(self):
+        self._target.setProgramDescription(self._value)
+
+    def _handleGet(self):
+        return self._target.getProgramDescription()
 
 class ConferenceAddParticipantBase(ConferenceModifBase):
 
@@ -1580,6 +1589,7 @@ methodMap = {
     "main.addNewChairPerson": ConferenceAddNewChairPerson,
     "main.removeChairPerson": ConferenceRemoveChairPerson,
     "main.editChairPerson": ConferenceEditChairPerson,
+    "program.changeDescription": ConferenceProgramDescriptionModification,
     "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributionsReview,
     "contributions.listAll" : ConferenceListContributions,

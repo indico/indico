@@ -2240,25 +2240,6 @@ class RHConfModifProgram( RHConferenceModifBase ):
         return p.display()
 
 
-class RHProgramDescription( RHConferenceModifBase ):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._cancel = params.has_key("Cancel")
-        self._save = params.has_key("Save")
-        self._description = params.get("description", "")
-
-    def _process( self ):
-        if self._save:
-            self._target.setProgramDescription(self._description)
-            self._redirect(urlHandlers.UHConfModifProgram.getURL(self._target))
-        elif self._cancel:
-            self._redirect(urlHandlers.UHConfModifProgram.getURL(self._target))
-        else:
-            p = conferences.WPConfModifProgramDescription( self, self._target )
-            return p.display()
-
-
 class RHConfAddTrack( RHConferenceModifBase ):
 
     def _process( self ):

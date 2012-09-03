@@ -679,9 +679,6 @@ class UHConfModifCFAAbsFieldDown(URLHandler):
 class UHConfModifProgram( URLHandler ):
     _relativeURL = "confModifProgram.py"
 
-class UHConfModifProgramDescription( URLHandler ):
-    _relativeURL = "confModifProgram.py/modifyDescription"
-
 class UHConfModifCFA( URLHandler ):
     _relativeURL = "confModifCFA.py"
 

@@ -42,25 +42,3 @@ def moveTrackUp(req,**params):
 
 def moveTrackDown(req,**params):
     return conferenceModif.RHProgramTrackDown( req ).process( params )
-
-def modifyDescription(req,**params):
-    return conferenceModif.RHProgramDescription( req ).process( params )
-
-
-#def addContribution( req, **params ):
-#    return conferenceModif.RHConfAddContribution( req ).process( params )
-#
-#def performAddContribution( req, **params ):
-#    return conferenceModif.RHConfPerformAddContribution( req ).process( params )
-#
-#def addBreak( req, **params ):
-#    return conferenceModif.RHConfAddBreak( req ).process( params )
-#
-#def performAddBreak( req, **params ):
-#    return conferenceModif.RHConfPerformAddBreak( req ).process( params )
-#
-#def modifyBreak( req, **params ):
-#    return conferenceModif.RHConfModifyBreak( req ).process( params )
-#
-#def performModifyBreak( req, **params ):
-#    return conferenceModif.RHConfPerformModifyBreak( req ).process( params )
