@@ -23,48 +23,41 @@
 Asynchronous request handlers for conference-related data modification.
 """
 
-from MaKaC.services.implementation.base import ProtectedModificationService,\
-    ListModificationBase, ParameterManager
-from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
-
-import MaKaC.webinterface.displayMgr as displayMgr
-
-from MaKaC.common import filters
-from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
-from MaKaC.common.url import ShortURLMapper
-from MaKaC.common import indexes, info
-from MaKaC.common.fossilize import fossilize
-
-from MaKaC.conference import ConferenceHolder, ConferenceChair
-import MaKaC.conference as conference
-from MaKaC.services.implementation.base import TextModificationBase
-from MaKaC.services.implementation.base import HTMLModificationBase
-from MaKaC.services.implementation.base import DateTimeModificationBase
-from MaKaC.services.implementation.base import ExportToICalBase
-from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
-from MaKaC.webinterface.common import contribFilters
-import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.common.contextManager import ContextManager
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
-from MaKaC.participant import Participant
-from MaKaC.common.Configuration import Config
-import MaKaC.domain as domain
-
+# 3rd party imports
+from email.utils import formataddr
 import datetime
 from pytz import timezone
 
-from MaKaC.errors import TimingError
-from MaKaC.common.logger import Logger
+# legacy indico imports
 from MaKaC.i18n import _
+from MaKaC import domain, conference as conference
 
+from MaKaC.common import indexes, info, filters, Config, timezoneUtils
+from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
+from MaKaC.common.url import ShortURLMapper
+from MaKaC.common.fossilize import fossilize
+from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.logger import Logger
+
+from MaKaC.errors import TimingError
+from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.participant import Participant
+from MaKaC.fossils.contribution import IContributionFossil
+
+import MaKaC.webinterface.displayMgr as displayMgr
+from MaKaC.webinterface import urlHandlers, wcomponents
+from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
+from MaKaC.webinterface.common import contribFilters
+from MaKaC.webinterface.mail import GenericMailer, GenericNotification
+import MaKaC.webinterface.pages.conferences as conferences
+
+from MaKaC.services.implementation.base import ProtectedModificationService, ListModificationBase, ParameterManager, \
+    ProtectedDisplayService, ServiceBase, TextModificationBase, HTMLModificationBase, DateTimeModificationBase, ExportToICalBase
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, Warning, \
         ResultWithWarning, TimingNoReportError, NoReportError
-from MaKaC.fossils.contribution import IContributionFossil
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
+
+# indico imports
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
 from indico.web.http_api.util import generate_public_auth_request
@@ -78,7 +71,7 @@ class ConferenceBase:
     def _checkParams( self ):
 
         try:
-            self._target = self._conf = ConferenceHolder().getById(self._params["conference"]);
+            self._target = self._conf = conference.ConferenceHolder().getById(self._params["conference"]);
         except:
             try:
                 self._target = self._conf = ConferenceHolder().getById(self._params["confId"]);
@@ -1034,7 +1027,12 @@ class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticip
 
         result = {}
         data = {}
-        data["fromAddr"] = currentUser.getEmail() if currentUser else Config.getInstance().getNoReplyEmail()
+
+        if currentUser:
+            data["fromAddr"] = currentUser.getEmail()
+        else:
+            data["fromAddr"] = formataddr((self._conf.getTitle(), Config.getInstance().getNoReplyEmail()))
+
         data["subject"] = self._emailSubject
         data["body"] = self._emailBody
         for user in self._userList:
@@ -1120,7 +1118,12 @@ class ConferenceEmailParticipants(ConferenceParticipantBase, ConferenceParticipa
         emailBody = self._params.get("body","")
         data = {}
         currentUser = self._getUser()
-        data["fromAddr"] = currentUser.getEmail() if currentUser else Config.getInstance().getNoReplyEmail()
+
+        if currentUser:
+            data["fromAddr"] = currentUser.getEmail()
+        else:
+            data["fromAddr"] = formataddr((self._conf.getTitle(), Config.getInstance().getNoReplyEmail()))
+
         data["content-type"] = "text/html"
         data["subject"] = emailSubject
         for id in self._userList:
@@ -1319,7 +1322,7 @@ class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
                 raise ServiceAccessError(_("A user with the email address %s is already in the Chairpersons list. Chairperson(s) not added.") % person["email"])
 
     def _newChair(self, av):
-        chair = ConferenceChair()
+        chair = conference.ConferenceChair()
         chair.setTitle(av.getTitle())
         chair.setFirstName(av.getFirstName())
         chair.setFamilyName(av.getSurName())
@@ -1349,7 +1352,7 @@ class ConferenceAddNewChairPerson(ConferenceChairPersonBase):
             raise ServiceAccessError(_("The email address is already used by another chairperson. Chairperson not added."))
 
     def _newChair(self):
-        chair = ConferenceChair()
+        chair = conference.ConferenceChair()
         chair.setTitle(self._userData.get("title", ""))
         chair.setFirstName(self._userData.get("firstName", ""))
         chair.setFamilyName(self._userData.get("familyName", ""))

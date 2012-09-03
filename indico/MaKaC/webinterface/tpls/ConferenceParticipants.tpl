@@ -243,7 +243,7 @@ IndicoUI.executeOnLoad(function(){
                 participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=nameParticipant]").children("[id^=participantEdit]").text();
             });
             var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()},
-                                                   method, participantsChecked, "${currentUser.getStraightFullName() if currentUser else 'Indico Team'}",
+                                                   method, participantsChecked, "${currentUser.getStraightFullName() if currentUser else conf.getTitle()}",
                                                    "", null, legends, function() {
                                                        (new AlertPopup($T("E-mail sent"), $T('An e-mail has been sent to: ') + \
                                                                        "<em>" + _.values(participantsChecked).join("</em>, <em>") + "</em>.")).open();
@@ -306,7 +306,7 @@ IndicoUI.executeOnLoad(function(){
             'Looking forward to meeting you at {confTitle} <br/>' +
             'Kindest regards';
             var subject = "Invitation to ${conf.getTitle()}";
-            var popup = new ParticipantsInvitePopup($T("Send an Email to Selected Participants"),"${conf.getTitle()}", ${conf.getId()}, "event.participation.inviteParticipants", peopleList, "${currentUser.getFullName() if currentUser else 'Indico Team'}" ,subject, text, legends, successAddParticipantsHandler);
+            var popup = new ParticipantsInvitePopup($T("Send an Email to Selected Participants"),"${conf.getTitle()}", ${conf.getId()}, "event.participation.inviteParticipants", peopleList, "${currentUser.getFullName() if currentUser else conf.getTitle()}" ,subject, text, legends, successAddParticipantsHandler);
             popup.open();
         };
         return searchUsers("Invite Participant(s)", inviteHandler);

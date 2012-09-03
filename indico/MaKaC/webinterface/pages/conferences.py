@@ -3436,7 +3436,7 @@ class WConferenceParticipants(wcomponents.WTemplated):
         vars["currentUser"] = self._rh._aw.getUser()
         vars["numberParticipants"] = len(self._conf.getParticipation().getParticipantList())
         vars["conf"] = self._conf
-        vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
+        vars["excelIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
 
         return vars
 
