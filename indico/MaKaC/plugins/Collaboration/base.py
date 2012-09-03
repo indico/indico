@@ -1953,6 +1953,12 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return
 
+    def index_talk(self, talk):
+        """
+        To be overloaded
+        """
+        return
+
     def unindex_talk(self, talk):
         """
         To be overloaded

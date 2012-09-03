@@ -74,7 +74,7 @@ class ConferenceBase:
             self._target = self._conf = conference.ConferenceHolder().getById(self._params["conference"]);
         except:
             try:
-                self._target = self._conf = ConferenceHolder().getById(self._params["confId"]);
+                self._target = self._conf = conference.ConferenceHolder().getById(self._params["confId"]);
             except:
                 raise ServiceError("ERR-E4", "Invalid conference id.")
             if self._target == None:
