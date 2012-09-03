@@ -1034,8 +1034,7 @@ class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticip
 
         result = {}
         data = {}
-        if currentUser:
-            data["fromAddr"] = currentUser.getEmail()
+        data["fromAddr"] = currentUser.getEmail() if currentUser else Config.getInstance().getNoReplyEmail()
         data["subject"] = self._emailSubject
         data["body"] = self._emailBody
         for user in self._userList:
@@ -1121,8 +1120,7 @@ class ConferenceEmailParticipants(ConferenceParticipantBase, ConferenceParticipa
         emailBody = self._params.get("body","")
         data = {}
         currentUser = self._getUser()
-        if currentUser:
-            data["fromAddr"] = currentUser.getEmail()
+        data["fromAddr"] = currentUser.getEmail() if currentUser else Config.getInstance().getNoReplyEmail()
         data["content-type"] = "text/html"
         data["subject"] = emailSubject
         for id in self._userList:
