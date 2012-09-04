@@ -101,6 +101,7 @@ from indico.modules.scheduler import Client, tasks
 from indico.util.date_time import utc_timestamp
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.core.db.event import SupportInfo
+from indico.MaKaC.schedule import ScheduleToJson
 
 
 class CoreObject(Persistent):
@@ -5452,7 +5453,7 @@ class Session(CommonObjectBase, Locatable):
     def setKeywords(self, keywords):
         self._keywords = keywords
 
-    def notifyModification( self, date = None ):
+    def notifyModification( self, date = None, cleanCache = True ):
         """Method called to notify the current session has been modified.
         """
         self.setModificationDate(date)
@@ -5460,6 +5461,9 @@ class Session(CommonObjectBase, Locatable):
         parent = self.getConference()
         if parent:
             parent.setModificationDate(date)
+        if cleanCache:
+            for slot in self.getSlotList():
+                slot.cleanCache()
         self._p_changed=1
 
     def getModificationDate( self ):
@@ -5537,7 +5541,7 @@ class Session(CommonObjectBase, Locatable):
 
     def setClosed( self, closed=True ):
         self._closed = closed
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def includeInConference(self,conf,newId):
         self.conference=conf
@@ -5918,6 +5922,7 @@ class Session(CommonObjectBase, Locatable):
 
     def setColor(self,newColor):
         self._color=str(newColor).strip()
+        self.notifyModification()
     setBgColor=setColor
 
     def getTextColor(self):
@@ -5930,6 +5935,7 @@ class Session(CommonObjectBase, Locatable):
 
     def setTextColor(self,newColor):
         self._textColor=str(newColor).strip()
+        self.notifyModification()
 
     def isTextColorToLinks(self):
         try:
@@ -5941,6 +5947,7 @@ class Session(CommonObjectBase, Locatable):
 
     def setTextColorToLinks(self, v):
         self._textColorToLink=v
+        self.notifyModification()
 
     def getStartDate(self):
         return self.startDate
@@ -6787,7 +6794,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
                     ContextManager.setdefault("clone.unique_id_map", {})[contrib.getUniqueId()] = newcontrib.getUniqueId()
 
         slot.setContribDuration(0, 0, self.getContribDuration())
-        slot.notifyModification()
+        slot.notifyModification(cleanCache = False)
 
         return slot
 
@@ -6947,9 +6954,19 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
             self._contributionDuration = None
         return self._contributionDuration
 
-    def notifyModification( self ):
-        self.getSession().notifyModification()
+    def notifyModification( self, cleanCache = True, cleanEntries = False):
+        self.getSession().notifyModification(cleanCache = False)
+        if cleanCache:
+            self.cleanCache(cleanEntries)
         self._p_changed = 1
+
+    def cleanCache(self, cleanEntries = False):
+        if not ContextManager.get('clean%s'%self.getUniqueId(), False):
+            ScheduleToJson.cleanCache(self)
+            ContextManager.set('clean%s'%self.getUniqueId(), True)
+            if cleanEntries:
+                for entry in self.getSchedule().getEntries():
+                    entry.getOwner().cleanCache(cleanConference = False)
 
     def getLocator( self ):
         l=self.getSession().getLocator()
@@ -7805,20 +7822,20 @@ class Contribution(CommonObjectBase, Locatable):
     def setFullyPublic( self ):
         if self.isProtected():
             self._fullyPublic = False
-            self._p_changed = 1
+            self.notifyModification(raiseEvent = False)
             return
         for res in self.getAllMaterialList():
             if not res.isFullyPublic():
                 self._fullyPublic = False
-                self._p_changed = 1
+                self.notifyModification(raiseEvent = False)
                 return
         for res in self.getSubContributionList():
             if not res.isFullyPublic():
                 self._fullyPublic = False
-                self._p_changed = 1
+                self.notifyModification(raiseEvent = False)
                 return
         self._fullyPublic = True
-        self._p_changed = 1
+        self.notifyModification(raiseEvent = False)
 
     def updateFullyPublic( self ):
         self.setFullyPublic()
@@ -7836,7 +7853,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._keywords = keywords[0]
         else:
             self._keywords = keywords
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def getFields( self ):
         try:
@@ -7854,12 +7871,12 @@ class Contribution(CommonObjectBase, Locatable):
     def removeField( self, field ):
         if self.getFields().has_key(field):
             del self.getFields()[field]
-            self.notifyModification()
+            self.notifyModification(cleanCache = False)
 
     def setField( self, field, value ):
         try:
             self.getFields()[field] = value
-            self.notifyModification()
+            self.notifyModification(cleanCache = False)
         except:
             pass
 
@@ -8112,17 +8129,26 @@ class Contribution(CommonObjectBase, Locatable):
                 cont.addSubContribution(sc.clone(cont, self, options))
         return cont
 
-    def notifyModification( self, date = None, raiseEvent = True):
-
+    def notifyModification( self, date = None, raiseEvent = True, cleanCache = True):
         self.setModificationDate(date)
 
         if raiseEvent:
             self._notify('infoChanged')
 
+
+        if cleanCache:
+            self.cleanCache()
+
         parent = self.getParent()
         if parent:
             parent.setModificationDate()
         self._p_changed = 1
+
+    def cleanCache(self, cleanConference = True):
+        # Do not clean cache if already cleaned
+        if not ContextManager.get('clean%s'%self.getUniqueId(), False):
+            ScheduleToJson.cleanCache(self)
+            ContextManager.set('clean%s'%self.getUniqueId(), cleanConference)
 
     def getCategoriesPath(self):
         return self.getConference().getCategoriesPath()
@@ -8243,7 +8269,7 @@ class Contribution(CommonObjectBase, Locatable):
 
     def setParent(self,parent):
         self.parent=parent
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
         if self.parent==None:
             return
 
@@ -8517,7 +8543,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._primaryAuthors.append( part )
         if self.getConference() is not None:
             self.getConference().indexAuthor(part)
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def removePrimaryAuthor( self, part, removeSpeaker=1, removePendingSubm=True):
         """
@@ -8539,7 +8565,7 @@ class Contribution(CommonObjectBase, Locatable):
             #--Pending queue: remove pending participant waiting to became submitter if anything
             self.getConference().getPendingQueuesMgr().removePendingSubmitter(part)
             #--
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def recoverPrimaryAuthor(self, pa, isPendingSubmitter):
         self.addPrimaryAuthor(pa)
@@ -8595,7 +8621,7 @@ class Contribution(CommonObjectBase, Locatable):
             return
         self._primaryAuthors.remove(part)
         self._primaryAuthors.insert(index,part)
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def upPrimaryAuthor(self,part):
         """
@@ -8613,7 +8639,7 @@ class Contribution(CommonObjectBase, Locatable):
             return
         self._primaryAuthors.remove(part)
         self._primaryAuthors.insert(idx-1,part)
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def downPrimaryAuthor(self,part):
         """
@@ -8631,7 +8657,7 @@ class Contribution(CommonObjectBase, Locatable):
             return
         self._primaryAuthors.remove(part)
         self._primaryAuthors.insert(idx+1,part)
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def newAuthorsList(self, prAuthors, coAuthors):
         ''' calculate new lists of both kind of authors, because something has
@@ -8679,11 +8705,11 @@ class Contribution(CommonObjectBase, Locatable):
 
     def setPrimaryAuthorList(self, l):
         self._primaryAuthors = l
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def setCoAuthorList(self, l):
         self._coAuthors = l
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def changePosCoAuthor(self, part, index):
         """
@@ -8697,7 +8723,7 @@ class Contribution(CommonObjectBase, Locatable):
             return
         self._coAuthors.remove(part)
         self._coAuthors.insert(index,part)
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
 
     def upCoAuthor(self,part):
@@ -8716,7 +8742,7 @@ class Contribution(CommonObjectBase, Locatable):
             return
         self._coAuthors.remove(part)
         self._coAuthors.insert(idx-1,part)
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def downCoAuthor(self,part):
         """
@@ -8734,7 +8760,7 @@ class Contribution(CommonObjectBase, Locatable):
             return
         self._coAuthors.remove(part)
         self._coAuthors.insert(idx+1,part)
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def getPrimaryAuthorList( self ):
         """
@@ -8780,7 +8806,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._coAuthors.append( part )
         if self.getConference() is not None:
             self.getConference().indexAuthor(part)
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def removeCoAuthor( self, part, removeSpeaker=1, removePendingSubm=True):
         """
@@ -8802,7 +8828,7 @@ class Contribution(CommonObjectBase, Locatable):
             #--Pending queue: remove pending participant waiting to became submitter if anything
             self.getConference().getPendingQueuesMgr().removePendingSubmitter(part)
             #--
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def recoverCoAuthor(self, ca, isPendingSubmitter):
         self.addCoAuthor(ca)
@@ -9024,11 +9050,13 @@ class Contribution(CommonObjectBase, Locatable):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
+        self.notifyModification(raiseEvent = False)
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
+        self.notifyModification(raiseEvent = False)
 
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
@@ -9076,11 +9104,13 @@ class Contribution(CommonObjectBase, Locatable):
         self.__ac.grantModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
+        self.notifyModification(raiseEvent = False)
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
+        self.notifyModification(raiseEvent = False)
 
     def canModify( self, aw ):
         return self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
@@ -9112,19 +9142,14 @@ class Contribution(CommonObjectBase, Locatable):
             self.notifyModification()
         elif mat.getId().lower() == 'paper':
             self.removePaper()
-            self.notifyModification()
         elif mat.getId().lower() == 'slides':
             self.removeSlides()
-            self.notifyModification()
         elif mat.getId().lower() == 'minutes':
             self.removeMinutes()
-            self.notifyModification()
         elif mat.getId().lower() == 'video':
             self.removeVideo()
-            self.notifyModification()
         elif mat.getId().lower() == 'poster':
             self.removePoster()
-            self.notifyModification()
 
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
@@ -9183,21 +9208,21 @@ class Contribution(CommonObjectBase, Locatable):
         newSubCont.setId(str( self.__subContGenerator.newCount()) )
         newSubCont.setOwner( self )
         self._subConts.append( newSubCont )
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def removeSubContribution( self, subCont ):
         if subCont in self._subConts:
             subCont.delete()
             subCont.setOwner(None)
             self._subConts.remove(subCont)
-            self.notifyModification()
+            self.notifyModification(cleanCache = False)
 
     def recoverSubContribution( self, recSubCont ):
     # Id must already be set in recSubCont.
         recSubCont.setOwner( self )
         self._subConts.append( recSubCont )
         recSubCont.recover()
-        self.notifyModification()
+        self.notifyModification(cleanCache = False)
 
     def getSubContributionById(self, SCId):
         for sb in self._subConts:
@@ -9219,7 +9244,7 @@ class Contribution(CommonObjectBase, Locatable):
                 index = self._subConts.index(subcont)
                 sb = self._subConts.pop(index)
                 self._subConts.insert(index-1, sb)
-                self.notifyModification()
+                self.notifyModification(cleanCache = False)
 
     def downSubContribution(self, subCont):
         if subCont in self._subConts:
@@ -9227,7 +9252,7 @@ class Contribution(CommonObjectBase, Locatable):
                 index = self._subConts.index(subCont)
                 sb = self._subConts.pop(index)
                 self._subConts.insert(index+1, sb)
-                self.notifyModification()
+                self.notifyModification(cleanCache = False)
 
     def setPaper( self, newPaper ):
         if self.getPaper() != None:

@@ -192,6 +192,7 @@ class TimeSchedule(Schedule, Persistent):
         self._entries.append(entry)
         entry.setSchedule(self,self._getNewEntryId())
         self.reSchedule()
+        self._cleanCache(entry)
         self._p_changed = 1
 
     def _setEntryDuration(self,entry):
@@ -207,11 +208,22 @@ class TimeSchedule(Schedule, Persistent):
         return result
 
     def _removeEntry(self,entry):
+        self._cleanCache(entry)
         self._entries.remove(entry)
         entry.setSchedule(None,"")
         entry.setStartDate(None)
         entry.delete()
         self._p_changed = 1
+
+    def _cleanCache(self, entry):
+        if isinstance(entry, ContribSchEntry):
+            entry.getOwner().cleanCache()
+            self.getOwner().cleanCache()
+        elif isinstance(entry, BreakTimeSchEntry):
+            self.getOwner().cleanCache()
+            ScheduleToJson.cleanCache(entry, False)
+        else:
+            entry.getOwner().cleanCache()
 
     def removeEntry(self,entry):
         if entry is None or not self.hasEntry(entry):
@@ -755,6 +767,7 @@ class SlotSchedule(TimeSchedule):
         self._addEntry(entry,check)
 
 
+
     def moveUpEntry(self,entry):
         #not very smart, should be improved: contribs with same start date,
         #   can cause overlapings
@@ -1213,7 +1226,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         if moveEntriesBelow == 1 and self.getSchedule():
             diff = (self.getStartDate() - oldStartDate) + (self.getDuration() - oldDuration)
             self.getSchedule().moveEntriesBelow(diff, entriesList)
-        self.notifyModification()
+        self.notifyModification(False)
 
 
     def getLocationParent( self ):
@@ -1223,6 +1236,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setLocation(self, loc):
         self.place = loc
+        self.notifyModification()
 
     def getLocation(self):
         if self.getOwnLocation() is None:
@@ -1246,6 +1260,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setRoom(self, room):
         self.room = room
+        self.notifyModification()
 
     def getRoom(self):
         if self.getOwnRoom() is None:
@@ -1339,10 +1354,11 @@ class BreakTimeSchEntry(IndTimeSchEntry):
                 owner.setEndDate(self.getEndDate(),check)
                 ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
                                                           owner, owner.getAdjustedEndDate()))
-        self.notifyModification()
+        self.notifyModification(cleanCache = self.getSchedule() is not None)
 
     def setColor(self,newColor):
         self._color=newColor
+        self.notifyModification()
     setBgColor=setColor
 
     def getColor(self):
@@ -1356,6 +1372,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setTextColor(self,newColor):
         self._textColor=newColor
+        self.notifyModification()
 
     def getTextColor(self):
         try:
@@ -1367,6 +1384,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setTextColorToLinks(self,v):
         self._textColorToLink=v
+        self.notifyModification()
 
     def isTextColorToLinks(self):
         try:
@@ -1384,6 +1402,13 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def getUniqueId(self):
         return self.getOwner().getUniqueId() + "brk" + self.getId()
+
+    def notifyModification(self, cleanCache = True):
+        IndTimeSchEntry.notifyModification(self)
+        if cleanCache and self.getOwner() and not ContextManager.get('clean%s'%self.getUniqueId(), False):
+            ScheduleToJson.cleanCache(self)
+            ContextManager.set('clean%s'%self.getUniqueId(), True)
+
 
 class ContribSchEntry(LinkedTimeSchEntry):
 
