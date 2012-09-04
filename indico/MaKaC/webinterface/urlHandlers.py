@@ -2673,6 +2673,8 @@ class UHSessionModContribList( URLHandler ):
 class UHSessionModContribListEditContrib( URLHandler ):
     _relativeURL = "sessionModification.py/editContrib"
 
+class UHConfModScheduleNewContrib(URLHandler):
+    _relativeURL = "confModifSchedule.py/newContrib"
 
 class UHConfModScheduleAddContrib(URLHandler):
     _relativeURL = "confModifSchedule.py/addContrib"
