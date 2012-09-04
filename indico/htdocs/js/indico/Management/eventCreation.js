@@ -404,10 +404,12 @@ type("ReportNumberList", ["ListWidget"], {
 
     _drawItem: function(reportNumber){
         var self = this;
-        var removeButton = self._createRemoveButton(reportNumber);
-        var removeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}}, removeButton);
-        var reportNumberSpan = Html.span({}, Html.span({style:{fontWeight: "bold"}}, reportNumber.get().name + ": "),  Html.span({}, reportNumber.get().number));
-        return Html.span({}, removeButtonDiv, reportNumberSpan);
+        var removeButton = self._createRemoveButton(reportNumber).dom;
+        var removeButtonDiv = $("<div/>").css({float: "right", "padding-right": "10px", "padding-top": "5px"}).html(removeButton);
+        var reportNumberSpan = $("<span/>");
+        reportNumberSpan.append($("<span/>").css("font-weight", "bold").html(reportNumber.get().name + ": "));
+        reportNumberSpan.append($("<span/>").html(reportNumber.get().number));
+        return $("<span/>").append(removeButtonDiv).append(reportNumberSpan)[0];
     }},
      function(removeAction, params) {
          this.removeAction = removeAction;
@@ -421,10 +423,11 @@ type("ReportNumberEditor", ["IWidget"], {
 
     draw: function() {
         var self = this;
-        var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
-        var addNewUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add New') );
+        var container = $("<div/>");
+        var buttonDiv = $("<div/>").css("margin-top", "10px");
+        var addNewUserButton =  $("<input/>").attr({type:"button", value:"Add New"}).css("margin-right", "10px");
         buttonDiv.append(addNewUserButton);
-        buttonDiv.observeClick(function(){
+        buttonDiv.click(function(){
             var onSuccess = function(response){
                 if(response){
                     self.reportNumberList.set(response.id, response);
@@ -432,8 +435,10 @@ type("ReportNumberEditor", ["IWidget"], {
             }
             new AddReportNumberPopup(self.uploadAction, self.reportNumberSystems, onSuccess, self.params).open();
         });
-        return Widget.block([Html.div({className: "PluginOptionPeopleListDiv", style : {width: "300px"}},this.reportNumberList.draw()),buttonDiv]);
-    }
+        container.append($("<div/>").addClass("PluginOptionPeopleListDiv").css("width", "300px").html(this.reportNumberList.draw().dom));
+        container.append(buttonDiv);
+        return container;
+   }
     },
      function(uploadAction, removeAction, reportNumbers, reportNumberSystems, params) {
          var self = this;
