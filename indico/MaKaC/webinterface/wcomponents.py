@@ -5492,17 +5492,17 @@ class WReportNumbersTable(WTemplated):
         vars["params"] = {"confId": self._target.getConference().getId()}
 
         if self._type == "event":
-            vars["addAction"] = "event.main.addReportNumber"
-            vars["deleteAction"] = "event.main.removeReportNumber"
+            vars["addAction"] = "reportNumbers.conference.addReportNumber"
+            vars["deleteAction"] = "reportNumbers.conference.removeReportNumber"
         elif self._type == "contribution":
             vars["params"]["contribId"] = self._target.getId()
-            vars["addAction"] = "contribution.addReportNumber"
-            vars["deleteAction"] = "contribution.removeReportNumber"
+            vars["addAction"] = "reportNumbers.contribution.addReportNumber"
+            vars["deleteAction"] = "reportNumbers.contribution.removeReportNumber"
         else:
             vars["params"]["contribId"] = self._target.getContribution().getId()
             vars["params"]["subcontribId"] = self._target.getId()
-            vars["addAction"] = "contribution.subcontribution.addReportNumber"
-            vars["deleteAction"] = "contribution.subcontribution.removeReportNumber"
+            vars["addAction"] = "reportNumbers.subcontribution.addReportNumber"
+            vars["deleteAction"] = "reportNumbers.subcontribution.removeReportNumber"
         vars["items"]=self._getCurrentItems()
         systems = Configuration.Config.getInstance().getReportNumberSystems()
         vars["reportNumberSystems"]= dict([(system, systems[system]["name"]) for system in systems])

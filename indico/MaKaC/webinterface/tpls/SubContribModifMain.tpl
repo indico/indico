@@ -52,7 +52,7 @@
       </tr>
       <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Report numbers")}</span></td>
-        <td bgcolor="white" colspan="2"><i>${ reportNumbersTable }</i></td>
+        <td bgcolor="white" colspan="2">${ reportNumbersTable }</td>
       </tr>
       <tr>
 </table>

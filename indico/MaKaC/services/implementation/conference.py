@@ -40,7 +40,6 @@ from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import HTMLModificationBase
 from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.services.implementation.base import ExportToICalBase
-from MaKaC.services.implementation.base import ReportNumberAdd, ReportNumberRemove
 from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
 from MaKaC.webinterface.common import contribFilters
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -1431,17 +1430,6 @@ class ConferenceEditChairPerson(ConferenceChairPersonBase):
         self._editChair(chair)
         return self._getChairPersonsList()
 
-class ConferenceAddReportNumber(ReportNumberAdd, ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        ReportNumberAdd._checkParams(self)
-
-class ConferenceRemoveReportNumber(ReportNumberRemove, ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        ReportNumberRemove._checkParams(self)
 
 class ConferenceAddParticipantBase(ConferenceModifBase):
 
@@ -1591,8 +1579,6 @@ methodMap = {
     "main.addNewChairPerson": ConferenceAddNewChairPerson,
     "main.removeChairPerson": ConferenceRemoveChairPerson,
     "main.editChairPerson": ConferenceEditChairPerson,
-    "main.addReportNumber": ConferenceAddReportNumber,
-    "main.removeReportNumber": ConferenceRemoveReportNumber,
     "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributionsReview,
     "contributions.listAll" : ConferenceListContributions,

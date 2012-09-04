@@ -344,7 +344,7 @@ type("AddReportNumberPopup", ["ServiceDialogWithButtons"], {
     },
 
     _drawSelectReportNumberSystems: function(){
-        var options = [Html.option({value: ""}, "")];
+        var options = [Html.option({value: ""}, $T("Select system"))];
         for(system in this.reportNumberSystems){
             options.push(Html.option({value: system}, this.reportNumberSystems[system]));
         }
