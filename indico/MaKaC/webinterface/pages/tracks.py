@@ -1072,7 +1072,6 @@ class WPModAbstractMarkAsDup(WPTrackAbstractModifBase):
         wc = wcomponents.WAbstractModMarkAsDup(self._abstract)
         p={"comments":params.get("comments",""),
             "id":params.get("originalId",""),
-            "errorMsg":params.get("errorMsg",""),
             "duplicateURL":urlHandlers.UHTrackAbstractModMarkAsDup.getURL(self._track,self._abstract),
             "cancelURL":urlHandlers.UHTrackAbstractModif.getURL(self._track,self._abstract)}
         return wc.getHTML(p)

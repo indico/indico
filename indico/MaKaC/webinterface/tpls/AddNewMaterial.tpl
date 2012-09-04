@@ -6,7 +6,6 @@
     <tr>
         <td colspan="5" class="groupTitle">${ _("Add new material")}</td>
     </tr>
-    ${ errors }
     <tr>
         <td class="titleCellTD">
             <span class="titleCellFormat">${ _("Number of files:")}

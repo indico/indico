@@ -145,6 +145,3 @@ else:
     setMouseEvents($E('manageEventButton'), '${ _("Switch to management area for this event")}');
 
 </script>
-
-${ errorMsg }
-

@@ -1420,10 +1420,9 @@ class WPModSchEditContrib(WPSessionModifSchedule):
 
 class WSessionAddSlot(wcomponents.WTemplated):
 
-    def __init__(self, slotData , conf, errors=[]):
+    def __init__(self, slotData , conf):
         self._session = slotData.getSession()
         self._slotData = slotData
-        self._errors=errors
         self._conf = conf
 
     def _getConvenersHTML(self):
@@ -1470,28 +1469,6 @@ class WSessionAddSlot(wcomponents.WTemplated):
                     quoteattr(conv.getEmail()) )
             res.append(tmp)
         return "".join(res)
-
-    def _getErrorHTML( self, msgList ):
-        if not msgList:
-            return ""
-        return """
-            <table align="center" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-                """%"<br>".join( msgList )
-
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
@@ -1546,7 +1523,6 @@ class WSessionAddSlot(wcomponents.WTemplated):
         vars["roomName"] = roomName
         vars["conveners"]=self._getConvenersHTML()
         vars["postURL"]=quoteattr(str(urlHandlers.UHSessionModSlotNew.getURL(self._session)))
-        vars["errors"]=self._getErrorHTML(self._errors)
         rx=[]
         roomsexist = self._conf.getRoomList()
         roomsexist.sort()
@@ -1561,21 +1537,19 @@ class WSessionAddSlot(wcomponents.WTemplated):
 
 class WPModSlotNew(WPSessionModifSchedule):
 
-    def __init__(self, rh, slotData, errors=[] ):
+    def __init__(self, rh, slotData):
         WPSessionModifSchedule.__init__(self, rh, slotData.getSession())
         self._slotData = slotData
-        self._errors=errors
 
 
     def _getTabContent( self, params ):
-        wc=WSessionAddSlot(self._slotData, self._conf, self._errors)
+        wc=WSessionAddSlot(self._slotData, self._conf)
         return wc.getHTML()
 
 class WSlotModifMainData(wcomponents.WTemplated):
 
-    def __init__(self, slot, conf, errors=[]):
+    def __init__(self, slot, conf):
         self._slotData = slot
-        self._errors=errors
         self._conf = conf
 
     def _getConvenersHTML(self):
@@ -1622,27 +1596,6 @@ class WSlotModifMainData(wcomponents.WTemplated):
                     quoteattr(conv.getEmail()) )
             res.append(tmp)
         return "".join(res)
-
-    def _getErrorHTML( self, msgList ):
-        if not msgList:
-            return ""
-        return """
-            <table align="center" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-                """%"<br>".join( msgList )
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
@@ -1707,7 +1660,6 @@ class WSlotModifMainData(wcomponents.WTemplated):
                         self.htmlText(room)))
         vars ["roomsexist"] = "".join(rx)
         vars["conveners"]=self._getConvenersHTML()
-        vars["errors"]=self._getErrorHTML(self._errors)
         vars["locator"] = ""
         slot = self._slotData.getSession().getSlotById(self._slotData.getId())
         vars["locator"] = slot.getLocator().getWebForm()
@@ -1718,16 +1670,15 @@ class WSlotModifMainData(wcomponents.WTemplated):
 
 class WPModSlotEdit(WPConferenceModifBase):
 
-    def __init__(self,rh, slot, errors=[]):
+    def __init__(self,rh, slot):
         WPConferenceModifBase.__init__(self,rh,slot.getSession().getConference())
         self._slotData=slot
-        self._errors=errors
 
     def _setActiveSideMenuItem(self):
         self._timetableMenuItem.setActive()
 
     def _getPageContent( self, params ):
-        wc=WSlotModifMainData(self._slotData,self._conf,self._errors)
+        wc=WSlotModifMainData(self._slotData,self._conf)
         return wc.getHTML()
 
 class WSchModifRecalculate(wcomponents.WTemplated):
@@ -2598,27 +2549,8 @@ class WSessionModEditDates(wcomponents.WTemplated):
         self._conf=targetConf
         self._targetDay=targetDay
 
-    def _getErrorHTML(self,l):
-        if len(l)>0:
-            return """
-                <tr>
-                    <td colspan="2" align="center">
-                        <br>
-                        <table bgcolor="red" cellpadding="6">
-                            <tr>
-                                <td bgcolor="white" style="color: red">%s</td>
-                            </tr>
-                        </table>
-                        <br>
-                    </td>
-                </tr>
-                    """%"<br>".join(l)
-        else:
-            return ""
-
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["errors"]=self._getErrorHTML(vars.get("errors",[]))
         vars["postURL"]=quoteattr(str(vars["postURL"]))
         vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
         vars["calendarSelectURL"]=urlHandlers.UHSimpleCalendar.getURL()

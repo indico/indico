@@ -7,7 +7,6 @@
         <td bgcolor="white">
             <br>
             <table width="100%">
-                ${ error }
                 <tr>
                     <form action=${ duplicateURL } method="POST">
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Comments")}</span></td>

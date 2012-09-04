@@ -5,10 +5,10 @@
         </tr>
         <tr>
             <td class="titleCellTD">
-                <span class="titleCellFormat">${ _("Title")}</span>
+                <span class="titleCellFormat">${ _("Title")}</span><span class="mandatoryField"> *</span>
             </td>
             <td bgcolor="white" width="100%" valign="top" class="blacktext">
-                <input type="text" name="title" size="80" value=${ title } />
+                <input type="text" name="title" id="title" size="80" value=${ title } />
             </td>
         </tr>
         % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
@@ -54,7 +54,7 @@
         </tr>
         <tr align="center">
           <td colspan="2" class="buttonBar" valign="bottom" align="center">
-        <input type="submit" class="btn" value="${ _("ok")}" name="ok" />
+        <input type="submit" class="btn" value="${ _("ok")}" name="ok" id="ok" />
         <input type="submit" class="btn" value="${ _("cancel")}" name="cancel" />
           </td>
         </tr>
@@ -62,6 +62,13 @@
 </form>
 
 <script type="text/javascript">
+    var parameterManager = new IndicoUtil.parameterManager();
+    parameterManager.add($E('title'), 'text', false);
+
+    $("#ok").click(function() {
+        if (!parameterManager.check())
+            event.preventDefault();
+    });
 IndicoUI.executeOnLoad(function()
         {
             var info = new WatchObject();

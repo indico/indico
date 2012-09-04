@@ -38,7 +38,4 @@
            </tr>
         </table>
     </tr>
-    <tr>
-        ${ errorMsg }
-    </tr>
 </table>

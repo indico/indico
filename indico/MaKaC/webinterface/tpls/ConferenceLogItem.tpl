@@ -4,11 +4,6 @@
     </tr>
     <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
     <tr>
-        <td colspan="2">
-        ${ errorMsg }
-        </td>
-    </tr>
-    <tr>
         <td>
             <table>
                 ${ logItem }

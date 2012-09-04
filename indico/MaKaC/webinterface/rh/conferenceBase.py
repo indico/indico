@@ -285,10 +285,7 @@ class RHSubmitMaterialBase(object):
 
 
     def _setErrorList(self, fileEntry):
-        res=[]
-
         maxUploadFilesTotalSize = float(self._cfg.getMaxUploadFilesTotalSize())
-
         if self._uploadType == "file":
             if "filePath" in fileEntry and not fileEntry["filePath"].strip():
                 self._errorList.append(_("""A valid file to be submitted must be specified. """))
@@ -303,7 +300,6 @@ class RHSubmitMaterialBase(object):
 
         if self._materialId=="":
             self._errorList.append(_("""A material ID must be selected."""))
-        return res
 
     def _getMaterial(self, forceCreate = True):
         """

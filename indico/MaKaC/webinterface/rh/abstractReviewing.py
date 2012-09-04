@@ -26,8 +26,7 @@ from MaKaC.webinterface.pages.abstractReviewing import WPAbstractReviewingSetup,
     WPModCFANotifTplDisplay, WPModCFANotifTplEdit
 from MaKaC.webinterface.locators import WebLocator
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
-
-
+from MaKaC.errors import MaKaCError, NoReportError
 
 class RHAbstractReviewingSetup(RHConfModifCFABase):
 
@@ -88,16 +87,15 @@ class RHCFANotifTplNew(RHConfModifCFABase):
         self._otherData = {"contribType":cType, "track":track}
 
     def _process(self):
-        error = []
         if self._cancel:
             self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL( self._conf )  )
             return
         elif self._save:
             if len(self._toList) <= 0:
-                error.append( _("""At least one "To Address" must be selected"""))
+                raise NoReportError( _("""At least one "To Address" must be selected"""))
             elif self._tplCondition is None:
                 #TODO: translate
-                error.append( _("Choose a condition"))
+                raise NoReportError( _("Choose a condition"))
             else:
                 tpl = review.NotificationTemplate()
                 tpl.setName(self._title)
@@ -127,8 +125,7 @@ class RHCFANotifTplNew(RHConfModifCFABase):
                         body = self._body,\
                         fromAddr = self._fromAddr,\
                         toList = self._toList,\
-                        ccList = self._ccList,\
-                        errorList = error)
+                        ccList = self._ccList)
 
 
 class RHCFANotifTplRem(RHConfModifCFABase):
@@ -207,16 +204,14 @@ class RHCFANotifTplEdit(RHNotificationTemplateModifBase):
             self._CAasCCAddr = params.get("CAasCCAddr","")
 
     def _process(self):
-        error=[]
         if self._cancel:
             self._redirect(urlHandlers.UHAbstractModNotifTplDisplay.getURL(self._target))
             return
         elif self._save:
             if len(self._toList)<=0:
-                error.append( _("""At least one "To Address" must be seleted """))
+                raise NoReportError( _("""At least one "To Address" must be seleted """))
                 p=WPModCFANotifTplEdit(self, self._target)
-                return p.display(errorList=error, \
-                                    title=self._title, \
+                return p.display(title=self._title, \
                                     subject=self._subject, \
                                     body=self._body, \
                                     fromAddr=self._fromAddr, \

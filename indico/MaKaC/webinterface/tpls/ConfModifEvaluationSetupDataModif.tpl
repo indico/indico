@@ -1,26 +1,3 @@
-<script type="text/javascript">
-// ---- On Load
-    IndicoUI.executeOnLoad(function()
-    {
-
-        var startDate = IndicoUI.Widgets.Generic.dateField(false,null,['sDay', 'sMonth', 'sYear']);
-        $E('sDatePlace').set(startDate);
-
-        var endDate = IndicoUI.Widgets.Generic.dateField(false,null,['eDay', 'eMonth', 'eYear']);
-        $E('eDatePlace').set(endDate);
-
-        % if sDay != '':
-            startDate.set('${ sDay }/${ sMonth }/${ sYear }');
-        % endif
-
-        % if eDay != '':
-            endDate.set('${ eDay }/${ eMonth }/${ eYear }');
-        % endif
-
-     });
-
-</script>
-
 <!-- context help dialogs : start -->
 <div id="tooltipPool" style="display:none">
   <div id="anonymousHelp" class="tip">
@@ -68,8 +45,8 @@
       </td>
     </tr>
     <tr>
-      <td class="titleCellTD"><span class="titleCellFormat">${ _("Title")}</span></td>
-      <td class="modifRight"><input type="text" size="50" name="title" value="${title}"/></td>
+      <td class="titleCellTD"><span class="titleCellFormat">${ _("Title")}</span><span class="mandatoryField"> *</span></td>
+      <td class="modifRight"><input type="text" size="50" name="title" id="title" value="${title}"/></td>
     </tr>
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat">${ _("Announcement")}</span></td>
@@ -96,7 +73,7 @@
             <td class="notifLeft">${ _("To")}:</td>
             <td class="notifMain">
               <input type="checkbox" name="notifyAllAdherents"/>Add&nbsp;current&nbsp;${adherent}s
-              <textarea name="evaluationStartNotifyTo" rows="5" cols="15">${evaluationStartNotifyTo}</textarea>
+              <textarea name="evaluationStartNotifyTo" id="evaluationStartNotifyTo" rows="5" cols="15">${evaluationStartNotifyTo}</textarea>
             </td>
             <td class="notifRight">
               ${contextHelp("notificationHelp")}
@@ -105,7 +82,7 @@
           <tr>
             <td class="notifLeft">${ _("Cc")}:</td>
             <td class="notifMain">
-              <textarea name="evaluationStartNotifyCc" rows="5" cols="15">${evaluationStartNotifyCc}</textarea>
+              <textarea name="evaluationStartNotifyCc" id="evaluationStartNotifyCc" rows="5" cols="15">${evaluationStartNotifyCc}</textarea>
             </td>
             <td></td>
           </tr>
@@ -115,14 +92,14 @@
           <tr>
             <td class="notifLeft">${ _("To")}:</td>
             <td class="notifMain">
-              <textarea name="newSubmissionNotifyTo" rows="5" cols="15">${newSubmissionNotifyTo}</textarea>
+              <textarea name="newSubmissionNotifyTo" id="newSubmissionNotifyTo" rows="5" cols="15">${newSubmissionNotifyTo}</textarea>
             </td>
             <td>${inlineContextHelp(_("When a new submission arrives, notify following emails (separated by commas)."))}</td>
           </tr>
           <tr>
             <td class="notifLeft">${ _("Cc")}:</td>
             <td class="notifMain">
-              <textarea name="newSubmissionNotifyCc" rows="5" cols="15">${newSubmissionNotifyCc}</textarea>
+              <textarea name="newSubmissionNotifyCc" id="newSubmissionNotifyCc" rows="5" cols="15">${newSubmissionNotifyCc}</textarea>
             </td>
             <td></td>
           </tr>
@@ -149,7 +126,7 @@
       <td colspan="2">
         <table>
           <tr>
-            <td><input type="submit" class="btn" name="modify" value="${ _("ok")}"/></td>
+            <td><input type="submit" class="btn" name="modify" value="${ _("ok")}" id="ok"/></td>
             <td><input type="submit" class="btn" name="cancel" value="${ _("cancel")}"/></td>
           </tr>
         </table>
@@ -157,3 +134,36 @@
     </tr>
   </table>
 </form>
+
+<script type="text/javascript">
+    var parameterManager = new IndicoUtil.parameterManager();
+    parameterManager.add($E('title'), 'text', false);
+    parameterManager.add($E('evaluationStartNotifyTo'), 'emaillist', true);
+    parameterManager.add($E('evaluationStartNotifyCc'), 'emaillist', true);
+    parameterManager.add($E('newSubmissionNotifyTo'), 'emaillist', true);
+    parameterManager.add($E('newSubmissionNotifyCc'), 'emaillist', true);
+
+    $("#ok").click(function() {
+        if (!parameterManager.check())
+            event.preventDefault();
+    });
+    IndicoUI.executeOnLoad(function()
+    {
+
+        var startDate = IndicoUI.Widgets.Generic.dateField(false,null,['sDay', 'sMonth', 'sYear']);
+        $E('sDatePlace').set(startDate);
+
+        var endDate = IndicoUI.Widgets.Generic.dateField(false,null,['eDay', 'eMonth', 'eYear']);
+        $E('eDatePlace').set(endDate);
+
+        % if sDay != '':
+            startDate.set('${ sDay }/${ sMonth }/${ sYear }');
+        % endif
+
+        % if eDay != '':
+            endDate.set('${ eDay }/${ eMonth }/${ eYear }');
+        % endif
+
+     });
+
+</script>

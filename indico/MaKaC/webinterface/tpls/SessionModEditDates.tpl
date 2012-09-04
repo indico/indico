@@ -3,7 +3,6 @@
 <tr>
   <td colspan="2" class="groupTitle"> ${ _("Edit Session Dates")}</td>
 </tr>
-${ errors }
         <tr>
             <td class="titleCellTD"><span class="titleCellFormat"> ${ _("Start date")}</span></td>
             <td valign="top" bgcolor="white" width="100%">&nbsp;

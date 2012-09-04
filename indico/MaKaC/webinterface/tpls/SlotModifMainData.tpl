@@ -4,9 +4,6 @@
             <td colspan="2" class="groupTitle"> ${ _("Edit slot")}</td>
         </tr>
         <tr>
-            <td colspan="2">${ errors }</td>
-        </tr>
-        <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Title")}</span></td>
             <td bgcolor="white" width="100%">
         <input type="text" size="60" name="title" value="${ title }">

@@ -3816,19 +3816,6 @@ div.ACUserListDiv ul.UIPeopleList {
 
 /* Forms */
 
-.errorMsgBox
-{
-    margin-top: 15px;
-    margin-bottom: 15px;
-    margin-left: auto;
-    margin-right: auto;
-    padding:10px;
-    border:1px solid #5294CC;
-    background:#F6F6F6;
-    text-align: center;
-    width: 33%;
-}
-
 .oneline {
     display: block;
     margin-top: 5px;

@@ -1196,7 +1196,6 @@ class RHFullMaterialPackage(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
-        self._errors = params.get("errors","")
 
     def _process( self ):
 
@@ -1205,7 +1204,7 @@ class RHFullMaterialPackage(RHConferenceBaseDisplay):
             p = wf.getDisplayFullMaterialPackage(self,self._target)
         else : #Event == Conference
             p = conferences.WPDisplayFullMaterialPackage(self,self._target)
-        return p.display(errors=self._errors)
+        return p.display()
 
 
 
@@ -1242,9 +1241,7 @@ class RHFullMaterialPackagePerform(RHConferenceBaseDisplay):
                 self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
                 self._req.sendfile(path)
             else:
-                url = urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self._conf)
-                url.addParam("errors", _("You have to select at least one material type"))
-                self._redirect( url )
+                raise NoReportError(_("You have to select at least one material type"))
         else:
             self._redirect( urlHandlers.UHConferenceDisplay.getURL( self._conf ) )
 

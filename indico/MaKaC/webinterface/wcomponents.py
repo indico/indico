@@ -183,10 +183,6 @@ class WTemplated(OldObservable):
 
         for paramName in self.__params:
             vars[ paramName ] = self.__params[ paramName ]
-        if len(vars.get("errorMsg", [])) > 0 :
-            vars["errorMsg"] = WErrorMessage().getHTML(vars)
-        else:
-            vars["errorMsg"] = ""
 
         return vars
 
@@ -4512,7 +4508,6 @@ class WAbstractModMarkAsDup(WTemplated):
         vars=WTemplated.getVars(self)
         vars["duplicateURL"]=quoteattr(str(vars["duplicateURL"]))
         vars["cancelURL"]=quoteattr(str(vars["cancelURL"]))
-        vars["error"] = vars.get("errorMsg","")
         return vars
 
 
@@ -4675,24 +4670,6 @@ class WSessionModEditData(WTemplated):
         self._targetDay=targetDay
         self._aw = aw
 
-    def _getErrorHTML(self,l):
-        if len(l)>0:
-            return """
-                <tr>
-                    <td colspan="2" align="center">
-                        <br>
-                        <table bgcolor="red" cellpadding="6">
-                            <tr>
-                                <td bgcolor="white" style="color: red">%s</td>
-                            </tr>
-                        </table>
-                        <br>
-                    </td>
-                </tr>
-                    """%"<br>".join(l)
-        else:
-            return ""
-
     def getVars( self ):
         vars=WTemplated.getVars(self)
         vars["conference"] = self._conf
@@ -4702,7 +4679,6 @@ class WSessionModEditData(WTemplated):
         vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
         vars["calendarSelectURL"]=urlHandlers.UHSimpleCalendar.getURL()
         vars["pageTitle"]=self.htmlText(self._title)
-        vars["errors"]=self._getErrorHTML(vars.get("errors",[]))
         vars["postURL"]=quoteattr(str(vars["postURL"]))
         vars["title"]=quoteattr(str(vars.get("title","")))
         vars["description"]=self.htmlText(vars.get("description",""))
@@ -4886,28 +4862,6 @@ class WConfTBDrawer(WTemplated):
         vars=WTemplated.getVars(self)
         vars["items"] = [item for item in self._tb.getItemList() if item.isEnabled()]
         return vars
-
-class WErrorMessage :
-
-    def getHTML( self, vars ):
-
-        if vars.get("errorMsg", None) is None :
-            return ""
-        if type(vars["errorMsg"]) != list:
-            vars["errorMsg"]=[vars["errorMsg"]]
-        for i in range(0,len(vars["errorMsg"])) :
-            vars["errorMsg"][i] = """<span style="color: red;">"""+vars["errorMsg"][i]+"""</span>"""
-
-        errorMsg = """
-        """.join(vars["errorMsg"])
-
-        html = """
-                <div class="errorMsgBox">
-                    %s
-                </div>
-               """%errorMsg
-
-        return html
 
 class WConfTickerTapeDrawer(WTemplated):
 
@@ -5216,29 +5170,6 @@ class WAddNewMaterial(WTemplated):
         self._target=target
         self._availMF=availMF
 
-    def _getErrorHTML(self,errorList):
-        if len(errorList)==0:
-            return ""
-        return """
-            <tr>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td colspan="2" align="center">
-                    <table bgcolor="red">
-                        <tr>
-                            <td bgcolor="white">
-                                <font color="red">%s</font>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-            </tr>
-                """%("<br>".join(errorList))
-
     def _getTargetName(self):
         if isinstance(self._target, conference.Contribution):
             return "Contribution"
@@ -5282,7 +5213,6 @@ class WAddNewMaterial(WTemplated):
                                     <td><input type="checkbox" name="topdf" checked="checked">Automatic conversion to pdf (when applicable)? (PPT, DOC)</td>
                                 </tr>
                                 """
-        vars["errors"]=self._getErrorHTML(vars.get("errorList",[]))
         if vars["cancel"]:
             vars["CancelButton"] = """<input type="submit" name="CANCEL" value="cancel" class="btn">"""
         else:
@@ -5294,29 +5224,6 @@ class WSubmitMaterial(WTemplated):
     def __init__(self,target,availMF):
         self._target=target
         self._availMF=availMF
-
-    def _getErrorHTML(self,errorList):
-        if len(errorList)==0:
-            return ""
-        return """
-            <tr>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td colspan="2" align="center">
-                    <table bgcolor="red">
-                        <tr>
-                            <td bgcolor="white">
-                                <font color="red">%s</font>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-            </tr>
-                """%("<br>".join(errorList))
 
     def _getTargetName(self):
         if isinstance(self._target, conference.Contribution):
@@ -5378,7 +5285,6 @@ class WSubmitMaterial(WTemplated):
                                     <td align="left"><input type="checkbox" name="topdf" checked="checked"> _("Automatic conversion to pdf (when applicable)? (PPT, DOC)")</td>
                                 </tr>
                                 """)
-        vars["errors"]=self._getErrorHTML(vars.get("errorList",[]))
         if vars["cancel"]:
             vars["CancelButton"] =  i18nformat("""<input type="submit" name="CANCEL" value="_("cancel")" class="btn">""")
         else:

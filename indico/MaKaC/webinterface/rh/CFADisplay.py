@@ -216,7 +216,6 @@ class RHAbstractSubmission( RHAbstractModificationAction ):
         if errors:
             p = abstracts.WPAbstractSubmission( self, self._target )
             pars = self._abstractData.toDict()
-            pars["errors"] = errors
             pars["action"] = self._action
             pars["attachments"] = []
             return p.display( **pars )
@@ -305,7 +304,6 @@ class RHAbstractModify(RHAbstractModificationAction, RHModificationBaseProtected
         if errors:
             p = abstracts.WPAbstractModify( self, self._target )
             pars = self._abstractData.toDict()
-            pars["errors"] = errors
             pars["action"] = self._action
             # restart the current value of the param attachments to show the existing files
             pars["attachments"] = self._abstract.getAttachments().values()

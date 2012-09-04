@@ -2863,20 +2863,19 @@ class RHAbstractsMerge(RHConfModifCFABase):
             self._doNotify=True
 
     def _process(self):
-        errorList=[]
         if self._action=="CANCEL":
             self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._target))
             return
         elif self._action=="MERGE":
             absMgr=self._target.getAbstractMgr()
             if len(self._abstractIds)==0:
-                errorList.append( _("No ABSTRACT TO BE MERGED has been specified"))
+                raise NoReportError( _("No ABSTRACT TO BE MERGED has been specified"))
             else:
                 self._abstracts=[]
                 for id in self._abstractIds:
                     abs=absMgr.getAbstractById(id)
                     if abs is None:
-                        errorList.append( _("ABSTRACT TO BE MERGED ID '%s' is not valid")%(id))
+                        raise NoReportError( _("ABSTRACT TO BE MERGED ID '%s' is not valid")%(id))
                     else:
                         statusKlass=abs.getCurrentStatus().__class__
                         if statusKlass in (review.AbstractStatusAccepted,\
@@ -2885,16 +2884,16 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                             review.AbstractStatusDuplicated,\
                                             review.AbstractStatusMerged):
                             label=AbstractStatusList.getInstance().getCaption(statusKlass)
-                            errorList.append( _("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)")%(abs.getId(),label.upper()))
+                            raise NoReportError( _("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)")%(abs.getId(),label.upper()))
                         self._abstracts.append(abs)
             if self._targetAbsId=="":
-                errorList.append( _("Invalid TARGET ABSTRACT ID"))
+                raise NoReportError( _("Invalid TARGET ABSTRACT ID"))
             else:
                 if self._targetAbsId in self._abstractIds:
-                   errorList.append( _("TARGET ABSTRACT ID is among the ABSTRACT IDs TO BE MERGED"))
+                   raise NoReportError( _("TARGET ABSTRACT ID is among the ABSTRACT IDs TO BE MERGED"))
                 self._targetAbs=absMgr.getAbstractById(self._targetAbsId)
                 if self._targetAbs is None:
-                   errorList.append( _("Invalid TARGET ABSTRACT ID"))
+                   raise NoReportError( _("Invalid TARGET ABSTRACT ID"))
                 else:
                     statusKlass=self._targetAbs.getCurrentStatus().__class__
                     if statusKlass in (review.AbstractStatusAccepted,\
@@ -2903,20 +2902,18 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                         review.AbstractStatusMerged,\
                                         review.AbstractStatusDuplicated):
                         label=AbstractStatusList.getInstance().getInstance().getCaption(statusKlass)
-                        errorList.append( _("TARGET ABSTRACT is in status which does not allow to merge (%s)")%label.upper())
-            if len(errorList)==0:
-                for abs in self._abstracts:
-                    abs.mergeInto(self._getUser(),self._targetAbs,\
-                        mergeAuthors=self._inclAuthors,comments=self._comments)
-                    if self._doNotify:
-                        abs.notify(EmailNotificator(),self._getUser())
-                return self._redirect(urlHandlers.UHAbstractManagment.getURL(self._targetAbs))
+                        raise NoReportError( _("TARGET ABSTRACT is in status which does not allow to merge (%s)")%label.upper())
+            for abs in self._abstracts:
+                abs.mergeInto(self._getUser(),self._targetAbs,\
+                    mergeAuthors=self._inclAuthors,comments=self._comments)
+                if self._doNotify:
+                    abs.notify(EmailNotificator(),self._getUser())
+            return self._redirect(urlHandlers.UHAbstractManagment.getURL(self._targetAbs))
         p=conferences.WPModMergeAbstracts(self,self._target)
         return p.display(absIdList=self._abstractIds,\
                             targetAbsId=self._targetAbsId, \
                             inclAuth=self._inclAuthors,\
                             comments=self._comments,\
-                            errorMsgList=errorList,\
                             notify=self._doNotify)
 
 #Base class for multi abstract management
@@ -5028,7 +5025,6 @@ class RHNewAbstract(RHConfModifCFABase, AbstractParam):
         if errors:
             p = conferences.WPModNewAbstract(self, self._target, self._abstractData)
             pars = self._abstractData.toDict()
-            pars["errors"] = errors
             pars["action"] = self._action
             return p.display( **pars )
         #Then, we create the abstract object and set its data to the one
@@ -5426,11 +5422,10 @@ class RHFullMaterialPackage(RHConferenceModifBase):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._errors = params.get("errors","")
 
     def _process( self ):
         p = conferences.WPFullMaterialPackage(self,self._target)
-        return p.display(errors=self._errors)
+        return p.display()
 
 
 class RHFullMaterialPackagePerform(RHConferenceModifBase):

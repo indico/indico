@@ -5,9 +5,6 @@
             <td colspan="2" class="groupTitle">${ formTitle }</td>
         </tr>
         <tr>
-            <td colspan="2">${ errors }</td>
-        </tr>
-        <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Session title")}</span></td>
             <td bgcolor="white" width="100%">&nbsp;${ sessionTitle }</td>
         </tr>

@@ -80,11 +80,6 @@ function deselectAll()
     ${ removeButton }
   </td>
   </tr>
-  <tr>
-  <td colspan="5">
-  ${ errorMsg }
-  </td>
-  </tr>
   <tr><td colspan="5">&nbsp;</td></tr>
   <tr>
   <td colspan="5">

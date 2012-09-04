@@ -32,11 +32,6 @@ function deselectAll()
         <td colspan="2" class="groupTitle"> ${ _("Event Log")}</td>
     </tr>
     <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-    <tr>
-        <td colspan="2">
-        ${ errorMsg }
-        </td>
-    </tr>
     <form action=${ logFilterAction } method="post" name="logFilterForm">
     <tr>
         <td width="18%">

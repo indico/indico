@@ -31,7 +31,7 @@ from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase, RHSessionSlotBase, RHSubmitMaterialBase
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.errors import MaKaCError, FormValuesError
+from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 import MaKaC.webinterface.pages.errors as errors
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
@@ -153,17 +153,9 @@ class RHSessionDatesModification(RHSessionModifBase):
         params["eDate"] = ed.astimezone(timezone('UTC'))
         self._target.setDates(params["sDate"],params["eDate"],self._check,self._slmove)
 
-    def _getErrors(self,params):
-        l=[]
-        title=str(params.get("title",""))
-        if title.strip()=="":
-            l.append( _("session title cannot be empty"))
-        return l
-
     def _process( self ):
         url=urlHandlers.UHSessionModifSchedule.getURL(self._target)
         params=self._getRequestParams()
-        errorList = []
         if self._action=="CANCEL":
             self._redirect(url)
             return
@@ -173,7 +165,6 @@ class RHSessionDatesModification(RHSessionModifBase):
             return
         p=sessions.WPSessionDatesModification(self,self._target)
         params=self._getRequestParams()
-        params["errors"]=errorList
         return p.display(**params)
 
     def _getPreservedParams(self):
@@ -222,13 +213,6 @@ class RHSessionDataModification( RoomBookingDBMixin, RHSessionModifBase ):
 
         self._evt = self._session
 
-    def _getErrors(self,params):
-        l=[]
-        title=str(params.get("title",""))
-        if title.strip()=="":
-            l.append("session title cannot be empty")
-        return l
-
     def _modify(self,params):
         tz = self._conf.getTimezone()
         sd = timezone(tz).localize(datetime( int( params["sYear"] ), \
@@ -254,15 +238,16 @@ class RHSessionDataModification( RoomBookingDBMixin, RHSessionModifBase ):
         self._target.setScheduleType(params.get("tt_type",self._target.getScheduleType()))
 
     def _process( self ):
-        errorList=[]
         url=urlHandlers.UHSessionModification.getURL(self._target)
         params=self._getRequestParams()
         if self._action=="CANCEL":
             self._redirect(url)
             return
         elif self._action=="MODIFY":
-            errorList=self._getErrors(self._getRequestParams())
-            if len(errorList)==0:
+            title=str(params.get("title",""))
+            if title.strip()=="":
+                raise NoReportError("session title cannot be empty")
+            else:
                 newSchType=params.get("tt_type",self._target.getScheduleType())
                 if self._target.getScheduleType()!=newSchType and\
                         not self._confirmed:
@@ -279,7 +264,6 @@ class RHSessionDataModification( RoomBookingDBMixin, RHSessionModifBase ):
         if wf != None:
             p = wf.getSessionDataModification(self,self._target)
         params=self._getRequestParams()
-        params["errors"]=errorList
         return p.display(**params)
 
 
@@ -808,22 +792,17 @@ class RHSlotNew( RoomBookingDBMixin, RHSessionModUnrestrictedTTCoordinationBase 
             self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
         elif self._action == "submit":
             self._slotData.setValues(params)
-            errors = self._slotData.getErrors()
-            if errors ==[]:
-                slot=conference.SessionSlot(self._session)
-                params["conveners"]=self._slotData.getConvenerList()
-                params["sDate"]=self._slotData.getStartDate()
-                params["eDate"]=self._slotData.getEndDate()
-                slot.setValues( params,self._check )
-                self._session.addSlot(slot)
-                logInfo = slot.getLogInfo()
-                logInfo["subject"] = "Create new slot: %s"%slot.getTitle()
-                self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
-
-                self._redirect( urlHandlers.UHSessionModifSchedule.getURL( slot ) )
-            else:
-                p = sessions.WPModSlotNew(self,self._slotData, errors)
-                return p.display()
+            self._slotData.checkErrors()
+            slot=conference.SessionSlot(self._session)
+            params["conveners"]=self._slotData.getConvenerList()
+            params["sDate"]=self._slotData.getStartDate()
+            params["eDate"]=self._slotData.getEndDate()
+            slot.setValues( params,self._check )
+            self._session.addSlot(slot)
+            logInfo = slot.getLogInfo()
+            logInfo["subject"] = "Create new slot: %s"%slot.getTitle()
+            self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
+            self._redirect( urlHandlers.UHSessionModifSchedule.getURL( slot ) )
         elif self._action == "addConvener":
             self._slotData.setValues(params)
             self._slotData.newConvener()
@@ -959,14 +938,10 @@ class RHSlotEdit( RoomBookingDBMixin, RHSessionModUnrestrictedTTCoordinationBase
             params["move"]=self._move
 
             self._slotData.setValues(params)
-            sloterrors = self._slotData.getErrors()
-            if sloterrors ==[]:
-                params["conveners"]=self._slotData.getConvenerList()
-                self._slot.setValues( params, self._check )
-                self._redirect( '%s#slot%s' % (urlHandlers.UHConfModifSchedule.getURL( self._conf, session=self._slot.getSession().getId() ), self._slot.getId()) )
-            else:
-                p = sessions.WPModSlotEdit(self, self._slotData, sloterrors)
-                return p.display()
+            self._slotData.checkErrors()
+            params["conveners"]=self._slotData.getConvenerList()
+            self._slot.setValues( params, self._check )
+            self._redirect( '%s#slot%s' % (urlHandlers.UHConfModifSchedule.getURL( self._conf, session=self._slot.getSession().getId() ), self._slot.getId()) )
         elif self._action == "addConvener":
             params = self._getRequestParams()
             params["id"]=self._slot.getId()

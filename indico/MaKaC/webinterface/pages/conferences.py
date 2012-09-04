@@ -1337,14 +1337,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             body = wcomponents.WTemplated(os.path.join("events", fileName)).getHTML(vars)
         else:
             return _("Template could not be found.")
-
-        frame = all(self._params.get(key, "") != "no" for key in ("frame", "fr"))
-        if not frame:
-            html = body
-        else:
-            errorMessage = wcomponents.WErrorMessage().getHTML(params)
-            html = "%s\n%s" % (errorMessage, body)
-        return html
+        return body
 
 class WPrintPageFrame (wcomponents.WTemplated):
     pass
@@ -2472,9 +2465,8 @@ class WPModSchEditContrib(WPConfModifSchedule):
 
 class WSchEditSlot(wcomponents.WTemplated):
 
-    def __init__(self,slotData, errors=[]):
+    def __init__(self,slotData):
         self._slotData=slotData
-        self._errors = errors
 
     #def _getTitleItemsHTML(self,selected=""):
     #    titles=["", "Mr.", "Mrs.", "Miss.", "Prof.", "Dr."]
@@ -2530,27 +2522,6 @@ class WSchEditSlot(wcomponents.WTemplated):
                     quoteattr(conv.getEmail()) )
             res.append(tmp)
         return "".join(res)
-
-    def _getErrorHTML( self, msgList ):
-        if not msgList:
-            return ""
-        return """
-            <table align="center" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-                """%"<br>".join( msgList )
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
@@ -2615,7 +2586,6 @@ class WSchEditSlot(wcomponents.WTemplated):
             vars["confRoom"]=confRoom.getName()
         vars["roomName"] = quoteattr(roomName)
         vars["conveners"]=self._getConvenersHTML()
-        vars["errors"]=self._getErrorHTML(self._errors)
         vars["parentType"]="conference"
         if self._slotData.getSession() is not None:
             vars["parentType"]="session"
@@ -2623,13 +2593,12 @@ class WSchEditSlot(wcomponents.WTemplated):
 
 class WPModSchEditSlot(WPConfModifSchedule):
 
-    def __init__(self,rh,slotData, errors=[]):
+    def __init__(self,rh,slotData):
         WPConfModifSchedule.__init__(self,rh,slotData.getSession().getConference())
         self._slotData=slotData
-        self._errors = errors
 
     def _getTabContent(self,params):
-        wc=WSchEditSlot(self._slotData, self._errors)
+        wc=WSchEditSlot(self._slotData)
         return wc.getHTML(params)
 
 class WPModSessionMoveConfirmation(WPConfModifSchedule):
@@ -3230,11 +3199,6 @@ class WConferenceLog(wcomponents.WTemplated):
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
 
-        if len(vars.get("errorMsg", [])) > 0 :
-            vars["errorMsg"] = wcomponents.WErrorMessage().getHTML(vars)
-        else :
-            vars["errorMsg"] = ""
-
         #default ordering by date
         #default general log list
         order = vars.get("order","date")
@@ -3319,11 +3283,6 @@ class WConferenceLogItem(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self.__conf.getTitle()
         vars["confId"] = self.__conf.getId()
-
-        if len(vars.get("errorMsg", [])) > 0 :
-            vars["errorMsg"] = wcomponents.WErrorMessage().getHTML(vars)
-        else :
-            vars["errorMsg"] = ""
 
         logId = vars.get("logId","")
         logItem = self.__conf.getLogHandler().getLogItemById(logId)
@@ -4043,7 +4002,6 @@ class WConfModifCFAAddField( wcomponents.WTemplated ):
             if type == fieldType:
                 selected = " selected"
             vars["fieldTypeOptions"] += """<option value="%s"%s>%s\n""" % (type, selected, type)
-        vars["errors"] = ""
         return vars
 
 
@@ -4801,32 +4759,8 @@ class WConfModAbstractsMerge(wcomponents.WTemplated):
     def __init__(self,conf):
         self._conf=conf
 
-    def _getErrorHTML(self,errorMsgList):
-        if len(errorMsgList)==0:
-            return ""
-        res=[]
-        for error in errorMsgList:
-            res.append("- %s"%self.htmlText(error))
-        return """
-                <tr><td>&nbsp;</td></tr>
-                <tr align="center">
-                    <td colspan="2">
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr><td>&nbsp;</td></tr>"""%"<br>".join(res)
-
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["errorMsg"]=self._getErrorHTML(vars.get("errorMsgList",[]))
         vars["postURL"]=quoteattr(str(urlHandlers.UHConfModAbstractsMerge.getURL(self._conf)))
         vars["selAbstracts"]=",".join(vars.get("absIdList",[]))
         vars["targetAbs"]=quoteattr(str(vars.get("targetAbsId","")))
@@ -4851,8 +4785,8 @@ class WPModMergeAbstracts(WPConfAbstractList):
             "targetAbsId":params.get("targetAbsId",""),
             "inclAuth":params.get("inclAuth",False),
             "comments":params.get("comments",""),
-            "errorMsgList":params.get("errorMsgList",[]),
             "notify":params.get("notify",True),
+            "abstractMgr":self._conf.getAbstractMgr(),
             }
         return wc.getHTML(p)
 
@@ -7383,8 +7317,7 @@ class WPFullMaterialPackage( WPConfModifToolsBase ):
 
     def _getTabContent( self, params ):
         wc = WFullMaterialPackage( self._conf )
-        p = {"errors": params.get("errors","")}
-        return wc.getHTML(p)
+        return wc.getHTML()
 
 class WFullMaterialPackage(wcomponents.WTemplated):
 
@@ -9562,8 +9495,7 @@ class WPDisplayFullMaterialPackage( WPConferenceDefaultDisplayBase ):
 
     def _getBody(self,params):
         wc = WFullMaterialPackage( self._conf )
-        p = {"errors": params.get("errors",""),\
-             "getPkgURL": urlHandlers.UHConferenceDisplayMaterialPackagePerform.getURL(self._conf)}
+        p = {"getPkgURL": urlHandlers.UHConferenceDisplayMaterialPackagePerform.getURL(self._conf)}
         return wc.getHTML(p)
 
 # ============================================================================

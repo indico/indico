@@ -7,19 +7,6 @@
     <table width="85%" align="left" style="padding: 5px 0 0 15px;">
 % endif
         <input type="hidden" name="origin" value=${ origin }>
-        % if errorList:
-        <tr>
-            <td>
-                <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                % for error in errorList:
-                    <tr>
-                        <td><span class="formError">${ error }</span></td>
-                    </tr>
-                % endfor
-                </table>
-            </td>
-        </tr>
-        % endif
         <tr>
             <td>
                 <table width="100%" class="groupTable" align="center">

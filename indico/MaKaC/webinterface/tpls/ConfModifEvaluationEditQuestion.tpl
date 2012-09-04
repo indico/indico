@@ -61,8 +61,6 @@
 
       <!--submission-->
       <table class="evalEditMain">
-        <!--Error message-->
-        <tr><td class="errorCelTD">${error}</td></tr>
         <!--submit save question-->
         <tr>
           <td class="submitCelTD">

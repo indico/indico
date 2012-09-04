@@ -477,24 +477,15 @@ class RHModAbstractMarkAsDup(RHTrackAbstractBase):
             self._originalId=params.get("id","")
             self._original=self._abstract.getOwner().getAbstractById(self._originalId)
 
-    def _getErrorsInData(self):
-        res=[]
-        if self._original==None or self._target==self._original:
-            res.append("invalid original abstract id")
-        return res
-
     def _process( self ):
-        errMsg=""
         if self._action=="MARK":
-            errorList=self._getErrorsInData()
-            if len(errorList)==0:
-                self._abstract.markAsDuplicated(self._getUser(),self._original,self._comments, self._track)
-                self._redirect(urlHandlers.UHTrackAbstractModif.getURL(self._track,self._abstract))
-                return
-            else:
-                errMsg="<br>".join(errorList)
+            if self._original==None or self._target==self._original:
+                raise MaKaCError( _("invalid original abstract id"))
+            self._abstract.markAsDuplicated(self._getUser(),self._original,self._comments, self._track)
+            self._redirect(urlHandlers.UHTrackAbstractModif.getURL(self._track,self._abstract))
+            return
         p=tracks.WPModAbstractMarkAsDup(self,self._track,self._abstract)
-        return p.display(comments=self._comments,originalId=self._originalId,errorMsg=errMsg)
+        return p.display(comments=self._comments,originalId=self._originalId)
 
 
 class RHModAbstractUnMarkAsDup(RHTrackAbstractBase):

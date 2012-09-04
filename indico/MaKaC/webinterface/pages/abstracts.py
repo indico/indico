@@ -365,7 +365,6 @@ class WAbstractDataModification( wcomponents.WTemplated ):
         vars["limitedFieldList"] = self._limitedFieldList
         vars["mandatoryFieldList"] = self._mandatoryFieldList
         vars["attachedFilesAllowed"] = cfaMgr.canAttachFiles()
-        vars["errorList"] = vars.get("errors", [])
         vars["showSelectAsSpeaker"] = cfaMgr.showSelectAsSpeaker()
         vars["isSelectSpeakerMandatory"] = cfaMgr.isSelectSpeakerMandatory()
         #TODO: In case of error we will lose the attached files, we should keep them somehow
@@ -944,7 +943,6 @@ class WPModMarkAsDup(WPAbstractManagment):
         wc = wcomponents.WAbstractModMarkAsDup(self._target)
         p={"comments":params.get("comments",""),
             "id":params.get("originalId",""),
-            "errorMsg":params.get("errorMsg",""),
             "duplicateURL":urlHandlers.UHAbstractModMarkAsDup.getURL(self._abstract),
             "cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract)}
         return wc.getHTML(p)
@@ -965,31 +963,10 @@ class WAbstractModMergeInto(wcomponents.WTemplated):
     def __init__(self,abstract):
         self._abstract=abstract
 
-    def _getErrorHTML(self,msg):
-        if msg.strip()=="":
-            return ""
-        return """
-                <tr align="center">
-                    <td colspan="2">
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr><td>&nbsp;</td></tr>
-                """%self.htmlText(msg)
-
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         vars["mergeURL"]=quoteattr(str(vars["mergeURL"]))
         vars["cancelURL"]=quoteattr(str(vars["cancelURL"]))
-        vars["error"]=self._getErrorHTML(vars.get("errorM",""))
         vars["includeAuthorsChecked"]=""
         if vars.get("includeAuthors",False):
             vars["includeAuthorsChecked"]=" checked"
@@ -1007,7 +984,6 @@ class WPModMergeInto(WPAbstractManagment):
             "mergeURL":urlHandlers.UHAbstractModMergeInto.getURL(self._abstract),\
             "comments":params.get("comments",""),\
             "id":params.get("targetId",""),\
-            "errorM":params.get("errorMsg",""),\
             "includeAuthors":params.get("includeAuthors",False),
             "doNotify":params.get("notify",False)}
         return wc.getHTML(p)

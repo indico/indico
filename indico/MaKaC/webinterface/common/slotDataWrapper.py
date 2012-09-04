@@ -19,6 +19,7 @@
 
 from datetime import timedelta,datetime
 from MaKaC.i18n import _
+from MaKaC.errors import MaKaCError, NoReportError
 from pytz import timezone
 
 class Convener:
@@ -192,20 +193,16 @@ class Slot:
     def hasErrors(self):
         return False
 
-    def getErrors(self):
-        errors = []
-        idx = 1
+    def checkErrors(self):
         for conv in self.getConvenerList():
             if conv.getFirstName().strip() == "":
-                errors.append( _("FIRST NAME has not been specified for convener #%s")%idx )
+                raise NoReportError( _("FIRST NAME has not been specified for convener #%s")%idx )
             if conv.getFamilyName().strip() == "":
-                errors.append( _("SURNAME has not been specified for convener #%s")%idx )
+                raise NoReportError( _("SURNAME has not been specified for convener #%s")%idx )
             if conv.getAffiliation().strip() == "":
-                errors.append( _("AFFILIATION has not been specified for convener #%s")%idx )
+                raise NoReportError( _("AFFILIATION has not been specified for convener #%s")%idx )
             if conv.getEmail().strip() == "":
-                errors.append( _("EMAIL has not been specified for convener #%s")%idx )
-            idx += 1
-        return errors
+                raise NoReportError( _("EMAIL has not been specified for convener #%s")%idx )
 
     def updateSlot(self,slot):
         slot.setTitle(self.getTitle())

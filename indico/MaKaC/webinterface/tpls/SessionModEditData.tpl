@@ -3,12 +3,11 @@
     <tr>
       <td colspan="2" class="groupTitle">${ pageTitle }</td>
     </tr>
-    ${ errors }
     ${ code }
     <tr>
-      <td class="titleCellTD"><span class="titleCellFormat">${ _("Title")}</span></td>
+      <td class="titleCellTD"><span class="titleCellFormat">${ _("Title")}</span><span class="mandatoryField">*</span></td>
       <td>
-    <input type="text" name="title" size="80" value=${ title }>
+    <input id="sessionTitle" type="text" name="title" size="80" value=${ title }>
       </td>
     </tr>
     <tr>
@@ -57,7 +56,7 @@
     ${ convener }
     <tr align="center">
       <td colspan="2" class="buttonBar" valign="bottom" align="center">
-    <input type="submit" class="btn" value="${ _("ok")}" name="OK" onClick="this.form.eDay.disabled=0;this.form.eMonth.disabled=0;this.form.eYear.disabled=0;" />
+    <input type="submit" class="btn" value="${ _("ok")}" name="OK" id="ok" />
     <input type="submit" class="btn" value="${ _("cancel")}" name="CANCEL" />
       </td>
     </tr>
@@ -65,9 +64,18 @@
 </form>
 
 <script type="text/javascript">
+    var parameterManager = new IndicoUtil.parameterManager();
+    parameterManager.add($E('sessionTitle'), 'text', false);
+
+    $("#ok").click(function() {
+        this.form.eDay.disabled = 0;
+        this.form.eMonth.disabled = 0;
+        this.form.eYear.disabled = 0;
+        if (!parameterManager.check())
+            event.preventDefault();
+    });
 IndicoUI.executeOnLoad(function()
     {
-
         var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute']);
         $E('sDatePlace').set(startDate);
 
@@ -81,7 +89,7 @@ IndicoUI.executeOnLoad(function()
         % if eDay != '':
             endDate.set('${ eDay }/${ eMonth }/${ eYear } ${"0"+ eHour  if len (eHour) == 1 else  eHour }:${"0"+ eMinute  if len (eMinute) == 1 else  eMinute }');
         % endif
-     });
-injectValuesInForm($E('SessionDataModificationForm'));
+    });
+    injectValuesInForm($E('SessionDataModificationForm'));
 
 </script>
