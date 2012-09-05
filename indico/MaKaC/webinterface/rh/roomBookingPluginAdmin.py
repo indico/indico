@@ -21,6 +21,7 @@ import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.common.info as info
 import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.plugins.base import PluginsHolder
 
 class RHRoomBookingPluginAdminBase( admins.RHAdminBase ):
     pass
@@ -48,16 +49,19 @@ class RHSwitchRoomBookingModuleActive( RHRoomBookingPluginAdminBase ):
 
     def _process( self ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        
+
         active = minfo.getRoomBookingModuleActive()
         if not active:
             # Initialize built-in plugin on activation
-            from MaKaC.plugins.RoomBooking.CERN.initialize import initializeRoomBookingDB 
+            from MaKaC.plugins.RoomBooking.CERN.initialize import initializeRoomBookingDB
             from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
+            PluginsHolder().reloadAllPlugins()
+            if not PluginsHolder().getPluginType("RoomBooking").isActive():
+                PluginsHolder().getPluginType("RoomBooking").setActive(True)
             DALManagerCERN.connect()
             initializeRoomBookingDB( "Universe", force = False ) # Safe if data present
             DALManagerCERN.disconnect()
-            
+
         minfo.setRoomBookingModuleActive( not active )
 
         self._redirect( urlHandlers.UHRoomBookingPluginAdmin.getURL() )
@@ -66,7 +70,7 @@ class RHZODBSave( RHRoomBookingPluginAdminBase ):
 
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
-        
+
         self._host = params.get('ZODBHost','')
         self._port = int( params.get('ZODBPort','') )
         self._realm = params.get('ZODBRealm', "")
