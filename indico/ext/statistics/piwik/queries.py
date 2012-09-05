@@ -314,7 +314,9 @@ class PiwikQueryMetricConferenceVisitLength(PiwikQueryMetricConferenceBase):
         avgKey = 'avg_time_on_site'
 
         for day in data:
-            seconds += day[avgKey]
+            # Check if the day has stastistics, because if it does not the day will be a empty list
+            if isinstance(day, dict):
+                seconds += day.get(avgKey, 0)
 
         return seconds / len(data)
 
