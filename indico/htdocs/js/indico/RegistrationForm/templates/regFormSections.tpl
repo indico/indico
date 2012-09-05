@@ -1,4 +1,4 @@
-<div id="section-<%= section.id %>" class="<%= classes.section %>" >
+<div data-section-id="<%= section.id %>" class="<%= classes.section %>" >
     <div class="<%= classes.header %>">
         <div class="<%= classes.title %>"><%= section.title %></div>
         <% if ( section.id != "reasonParticipation" && section.id != "furtherInformation") { %>

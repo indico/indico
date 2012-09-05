@@ -130,18 +130,18 @@ var GeneralSection = SectionBase.extend({
     defaults: _.extend({},SectionBase.prototype.defaults, {
         items: null,
         fieldTypes: [
-            { url: regForm.icons.checkbox,      id: 'checkbox',         desc: $T("Checkbox") },
-            { url: regForm.icons.country,       id: 'country',          desc: $T("Country") },
-            { url: regForm.icons.date,          id: 'date',             desc: $T("Date") },
-            { url: regForm.icons.dropdown_menu, id: 'radio-dropdown',   desc: $T("Dropdown") },
-            { url: regForm.icons.file,          id: 'file',             desc: $T("File") },
-            { url: regForm.icons.label,         id: 'label',            desc: $T("Label") },
-            { url: regForm.icons.phone,         id: 'telephone',        desc: $T("Phone") },
-            { url: regForm.icons.radio_list,    id: 'radio-radiogroup', desc: $T("unique opt") },
-            { url: regForm.icons.text,          id: 'text',             desc: $T("Text input") },
-            { url: regForm.icons.textarea,      id: 'textarea',         desc: $T("Text area") },
-            { url: regForm.icons.yesno,         id: 'yesno',           desc: $T("Yes/No") },
-            { url: regForm.icons.number,        id: 'number',           desc: $T("number") }
+            { id: 'label',            desc: $T("Label") },
+            { id: 'text',             desc: $T("Text input") },
+            { id: 'number',           desc: $T("Number") },
+            { id: 'textarea',         desc: $T("Text area") },
+            { id: 'radio-dropdown',   desc: $T("Dropdown") },
+            { id: 'radio-radiogroup', desc: $T("Choice") },
+            { id: 'checkbox',         desc: $T("Checkbox") },
+            { id: 'date',             desc: $T("Date") },
+            { id: 'yesno',            desc: $T("Yes/No") },
+            { id: 'telephone',        desc: $T("Phone") },
+            { id: 'country',          desc: $T("Country") },
+            { id: 'file',             desc: $T("File") }
             ]
         }
     ),

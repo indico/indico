@@ -165,6 +165,7 @@ input[type="checkbox"]:focus {
 
 .regFormInfoMessage {
     margin: 20px;
+
     text-align: center;
     padding: 15px;
     color: #3A87AD;
@@ -179,20 +180,19 @@ input[type="checkbox"]:focus {
 }
 
 .regFormAddFieldEntry:hover {
-    background-color:#ECEEFC;
+    background-color: #ddd;
 }
 
 .regFormAddFieldEntry {
-    margin: 8px;
-    padding: 8px;
-    border : 1px solid #CCC;
+    background-color: #f0f0f0;
+    width: 60px;
+    height: 60px;
+    padding: 4px;
+    margin: 2px;
+    border: 1px solid;
+    border-color: #ccc;
     float : left;
-}
-
-.regFormAddFielIcon,  .regFormAddFielIcon img{
-    width : 48px;
-    height: 48px;
-    float : left;
+    cursor: pointer;
 }
 
 .regFormAddFieldCloseBtn {
@@ -490,7 +490,7 @@ textarea.regFormDescriptionInputMgmt {
 .span1 {
   width: 60px;
 }
-=======
+
 /* CSS for the tabs */
 
 .tabbable {
@@ -621,4 +621,84 @@ textarea.regFormDescriptionInputMgmt {
 .tab-content > .active,
 .pill-content > .active {
   display: block;
+}
+
+.regFormAddField {
+    max-width: 296px;
+    background: #fff;
+    border: 1px solid #ccc;
+    width: 296px;
+}
+
+.regFormAddField .ui-tooltip-content {
+    padding: 0px;
+}
+
+.regFormAddField .ui-tooltip-titlebar {
+    border-bottom: none !important;
+    background: transparent;
+}
+
+.regFormAddField .icon_desc {
+    text-align: center;
+    color: #555;
+    clear:both;
+    font-size:10px;
+}
+
+.regFormAddField .icon {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 48px;
+    height: 48px;
+    background-image: url("../../../../images/regform_buttons.png");
+}
+
+div[data-field-type="label"] img.icon {
+    background-position: 0 0;
+}
+
+div[data-field-type="text"] img.icon {
+    background-position: -48px 0;
+}
+
+div[data-field-type="number"] img.icon {
+    background-position: -96px 0;
+}
+
+div[data-field-type="textarea"] img.icon {
+    background-position: -144px 0;
+}
+
+div[data-field-type="radio-dropdown"] img.icon {
+    background-position: 0 -48px;
+}
+
+div[data-field-type="radio-radiogroup"] img.icon {
+    background-position: -48px -48px;
+}
+
+div[data-field-type="checkbox"] img.icon {
+    background-position: -96px -48px;
+}
+
+div[data-field-type="date"] img.icon {
+    background-position: -144px -48px;
+}
+
+div[data-field-type="yesno"] img.icon {
+    background-position: 0px -96px;
+}
+
+div[data-field-type="telephone"] img.icon {
+    background-position: -48px -96px;
+}
+
+div[data-field-type="country"] img.icon {
+    background-position: -96px -96px;
+}
+
+div[data-field-type="file"] img.icon {
+    background-position: -144px -96px;
 }

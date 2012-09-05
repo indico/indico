@@ -79,6 +79,7 @@ var Indico = {
         indico_small: "${ iconFileName("indico_small")}",
         protected: "${ iconFileName("protected")}",
         calendarWidget: "${ iconFileName("calendarWidget") }",
+        regform_buttons: "${ iconFileName("regform_buttons") }",
         tt_time: "${ iconFileName("tt_time") }"
     },
     FileTypeIcons:

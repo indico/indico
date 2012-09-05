@@ -12,7 +12,7 @@
 <script type="text/template" id="sectionButtons">
     <div style="float:right;">
         <% if (actions.indexOf("addField") > -1) { %>
-        <button id="buttonAddField" class="regFormButtonAdd"><%= $T('Click to add a field to this section') %></button>
+        <button class="buttonAddField regFormButtonAdd"><%= $T('Click to add a field to this section') %></button>
         <% } if (actions.indexOf("settings") > -1) { %>
         <button id="buttonEditSection" class="regFormButtonEdition"><%= $T('Edit this section') %></button>
         <% } if (actions.indexOf("disable") > -1) { %>

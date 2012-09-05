@@ -32,7 +32,6 @@ var RegFormEditionView = RegFormDisplayView.extend({
     },
 
     additionalEvents: {
-        'click #buttonAddField'             : '_popupAddField',
         'click #buttonEditSection'          : '_editSectionDialog',
         'click #buttonCollpaseSection'      : '_collapseSection',
         'click #buttonDisableSection'       : '_disableSection',
@@ -67,8 +66,59 @@ var RegFormEditionView = RegFormDisplayView.extend({
         self.fieldEdition = new RegFormFieldsEditView({el : $('#edit-popup')}, self.model);
     },
 
+    _setTooltips: function() {
+        var self = this;
+        $(this.el).find('.buttonAddField').qtip({
+            content: {
+                title: {
+                    text: $T('Click on the new field to create'),
+                    button : 'close'
+                },
+                text:  self.getTplAddField( self.model.getSectionById('0').get('fieldTypes'))
+            },
+            position: { my: 'top right', at: 'bottom left' },
+
+            show: {  event: 'click', solo: true },
+
+            hide: {
+                event: 'unfocus click',
+                fixed: true,
+                effect: function() {
+                    $(this).fadeOut(300);
+                }
+            },
+            style: {
+                classes: 'regFormAddField ui-tooltip-addField',
+                width: '296px',
+                padding: '20px',
+                name: 'light'
+            },
+
+            events: {
+                render: function(event, api) {
+                    var that = this;
+                    var sectionId = self._getSectionId($(api.elements.target));
+                    $('.regFormAddFieldEntry', this).bind('click', function(event,ui) {
+                        var newFieldType = $(event.target).closest('.regFormAddFieldEntry').data('fieldType').split('-');
+                        var field = {
+                            input   : newFieldType[0],
+                            caption : '',
+                            values  : {}
+                        };
+                        if(newFieldType[1]){
+                            field.values.inputType = newFieldType[1];
+                        }
+                        self._createField(sectionId, field);
+                        $(that).qtip('destroy');
+                    });
+                }
+            }
+        });
+    },
+
     render: function(){
         var self = this;
+
         $(self.el).empty();
         _.each(self.model.get('sections'), function(section){
             var newSection = self.getSection({ section : section.toJSON() });
@@ -88,6 +138,8 @@ var RegFormEditionView = RegFormDisplayView.extend({
         var elList = self.model.getHighlights();
         self._animateSection(elList);
         self.model.emptyHighlights();
+        self._setTooltips();
+
         return self;
     },
 
@@ -125,15 +177,18 @@ var RegFormEditionView = RegFormDisplayView.extend({
     
 
 
-    _getSectionId: function ( event ) {
-        return $(event.target).closest("."+regForm.classes.section).data('id');
+    _getSectionId: function($element) {
+        /*
+          Returns the form section the $element in question is contained in
+         */
+        return $element.closest('.' + regForm.classes.section).data('sectionId');
     },
 
     _editSectionDialog: function(event, ui){
         if (this.editSectionDialogView) {
             this.editSectionDialogView.remove();
         }
-        var sectionId = this._getSectionId(event);
+        var sectionId = this._getSectionId($(event.target));
         var section = this.model.getSectionById(sectionId);
         this.editSectionDialogView = this._editSectionDialogMapper(section.get("_type"), section);
     },
@@ -197,7 +252,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
 
     /* Button actions functions */
     _editField: function (event, ui){
-        var sectionId = this._getSectionId(event);
+        var sectionId = this._getSectionId($(event.target));
         var fieldId = $(event.currentTarget).closest('.' + this.config.editableItemClass).attr('id');
         this.fieldEdition.render(sectionId, fieldId);
     },
@@ -218,7 +273,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
     _disableSection: function (event){
         var rep = confirm($T('Are you sure you want to disable this field?\nThis action can be undone using "recover/discard sections" menu'));
         if(rep === true) {
-            var data = { 'sectionId' : this._getSectionId(event) };
+            var data = { 'sectionId' : this._getSectionId($(event.target)) };
             this.model.disableSection(data);
             var sectionEl = $(event.currentTarget).closest('.'+this.classes.section);
             $(sectionEl).fadeOut('slow',function(){ $(sectionEl).remove(); });
@@ -233,9 +288,9 @@ var RegFormEditionView = RegFormDisplayView.extend({
         };
         var field = $(event.currentTarget).closest('.' + this.config.editableItemClass + ', .' + regForm.classes.fieldDisabled);
         var data = {
-                action: actionsList[$(event.currentTarget).attr('id')],
-                sectionId: this._getSectionId(event),
-                fieldId: $(field).attr('id')
+            action: actionsList[$(event.currentTarget).attr('id')],
+            sectionId: this._getSectionId($(event.target)),
+            fieldId: $(field).attr('id')
         };
         var rep = true;
         if (data.action == 'remove'){
@@ -258,7 +313,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
 
             // Data given to the template render
             var data = [];
-            data.sectionId = this._getSectionId(event);
+            data.sectionId = this._getSectionId($(event.target));
             data.text = $(this.currentTarget).text();
             data.itemType = $(this.currentTarget).data().itemType;
 
@@ -324,69 +379,11 @@ var RegFormEditionView = RegFormDisplayView.extend({
         });
     },
 
-    _popupAddField: function(event, ui){
-        var self = this;
-        if(this.editing === false) {
-            var sectionId = this._getSectionId(event);
-            $(event.target).qtip({
-                    content: {
-                        title: {
-                            text: $T('Click on the new field to create'),
-                            button : 'close'
-                        },
-                        text:  self.getTplAddField( self.model.getSectionById('0').get('fieldTypes'))
-                    },
-                    position: { my: 'top right', at: 'bottom left' },
-
-                    id : 'addField',
-                    show: {  event: false, ready: true, solo: true  },
-
-                    hide: {
-                        event: 'unfocus click',
-                        fixed: true,
-                        effect: function() {
-                            $(this).fadeOut(300);
-                        }
-                    },
-                    style: {
-                        width: { max: 350 },
-                        padding: '20px',
-                        border: {
-                           width: 15,
-                           radius: 15,
-                           color: '#666666'
-                        },
-                        name: 'light'
-                    },
-
-                    events: {
-                        render: function(event, api) {
-                            var that = this;
-                            $('.regFormAddFieldEntry',this).bind('click', function(event,ui) {
-
-                                var newFieldType = $(event.target).closest('.regFormAddFieldEntry').attr('id').split('-');
-                                var field = {
-                                            input   : newFieldType[0],
-                                            caption : '',
-                                            values  : {}
-                                            };
-                                if(newFieldType[1]){
-                                    field.values.inputType = newFieldType[1];
-                                }
-                                self._createField(sectionId, field);
-                                $(that).qtip('destroy');
-                            });
-                        }
-                    }
-            });
-        }
-    },
-
     /* Hover actions */
     _displayFieldOptions: function (event, ui) {
         if(event.type == 'mouseenter' && this.editing === false){
             // Get locks
-            var sectionId = this._getSectionId(event);
+            var sectionId = this._getSectionId($(event.target));
             var fieldId = $(event.currentTarget).closest('.' + this.config.editableItemClass).attr('id');
             var field =  this.model.getSectionById(sectionId).getFieldById(fieldId);
             var dict = {locks : any(field.lock,[]) };
@@ -480,7 +477,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
         // Save the initial position of the section/item
         $( '.sortableForm' ).bind( 'sortstart', function (event, ui){
             event.stopPropagation();
-            sectionId = self._getSectionId(event);
+            sectionId = self._getSectionId($(event.target));
             fieldId = $(event.target).closest('.' + self.config.editableItemClass + ', .' + regForm.classes.fieldDisabled).attr('id');
         });
     },
@@ -492,7 +489,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
 
     getTplAddField: function(dict) {
         var tpl = TemplateManager.getCached('RegistrationForm','regFormAddField', false);
-        return _.template(tpl, {fields:dict} );
+        return _.template(tpl, {fields: dict} );
     }
 });
 

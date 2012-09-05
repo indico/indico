@@ -15,25 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-var baseDirs = {
-    imageRegForm           : ScriptRoot + "/indico/RegistrationForm/images/"
-};
-
 var regForm = {
-        icons : {
-            checkbox        : baseDirs.imageRegForm + "checkbox.png",
-            country         : baseDirs.imageRegForm + "country.png",
-            date            : baseDirs.imageRegForm + "date.png",
-            dropdown_menu   : baseDirs.imageRegForm + "dropdown_menu.png",
-            file            : baseDirs.imageRegForm + "file.png",
-            label           : baseDirs.imageRegForm + "label.png",
-            phone           : baseDirs.imageRegForm + "phone.png",
-            radio_list      : baseDirs.imageRegForm + "radio_list.png",
-            text            : baseDirs.imageRegForm + "text.png",
-            textarea        : baseDirs.imageRegForm + "textarea.png",
-            yesno           : baseDirs.imageRegForm + "yesno.png",
-            number          : baseDirs.imageRegForm + "number.png"
-        },
         classes : {
             section                 : "regFormSection",
             header                  : "regFormHeader",

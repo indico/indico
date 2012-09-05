@@ -136,7 +136,6 @@ var RegFormDisplayView = Backbone.View.extend({
         _.each(self.model.get('sections'), function(section){
             var newSection = self.getSection({ section : section.toJSON() });
             $(self.el).append(newSection);
-            $("#"+$(newSection).attr('id')).data('id',section.id);
         });
         this._setCurrency();
         this.insertData();
