@@ -1705,7 +1705,9 @@ class AbstractSortingCriteria( filters.SortingCriteria ):
         _AbstractIdSF.getId(): _AbstractIdSF, \
         _AbstractRatingSF.getId(): _AbstractRatingSF, \
         abstractFilters.SubmissionDateSortingField.getId() : \
-                                    abstractFilters.SubmissionDateSortingField
+                                    abstractFilters.SubmissionDateSortingField, \
+        abstractFilters.ModificationDateSortingField.getId() : \
+                                    abstractFilters.ModificationDateSortingField
                                      }
 
 class RHAbstractListMenuClose(RHConfModifCFABase):

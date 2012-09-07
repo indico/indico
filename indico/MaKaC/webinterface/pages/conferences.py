@@ -3754,7 +3754,7 @@ class WFilterCriterionOptionsAbstracts(wcomponents.WTemplated):
 class WAbstracts( wcomponents.WTemplated ):
 
     # available columns
-    COLUMNS = ["ID", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate"]
+    COLUMNS = ["ID", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate", "ModificationDate"]
 
     def __init__( self, conference, filterCrit, sortingCrit, order, display, filterUsed):
         self._conf = conference
@@ -3889,7 +3889,7 @@ class WAbstracts( wcomponents.WTemplated ):
                 pass
         except AttributeError:
             self._columns = {"ID":"ID", "PrimaryAuthor":"Primary Author", "Tracks": "Tracks", "Type":"Type", "Status":"Status", \
-                      "Rating":"Rating", "AccTrack":"Acc. Track", "AccType":"Acc. Type", "SubmissionDate":"Submission Date"}
+                      "Rating":"Rating", "AccTrack":"Acc. Track", "AccType":"Acc. Type", "SubmissionDate":"Submission Date", "ModificationDate":"Modification Date"}
         return self._columns
 
     def _getDisplay(self):
@@ -3931,6 +3931,7 @@ class WAbstracts( wcomponents.WTemplated ):
             html.append("""<input type="hidden" name="disp" value="AccTrack">""")
             html.append("""<input type="hidden" name="disp" value="AccType">""")
             html.append("""<input type="hidden" name="disp" value="SubmissionDate">""")
+            html.append("""<input type="hidden" name="disp" value="ModificationDate">""")
         else:
             for d in self._display:
                 html.append("""<input type="hidden" name="disp" value="%s">"""%(d))
@@ -4022,7 +4023,6 @@ class WAbstracts( wcomponents.WTemplated ):
 
         url = self._getURL()
         url.addParam("sortBy", "date")
-
         vars["dateImg"] = ""
         if sortingField and sortingField.getId() == "date":
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="date">"""
@@ -4033,6 +4033,20 @@ class WAbstracts( wcomponents.WTemplated ):
                 vars["dateImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["dateSortingURL"] = quoteattr( str( url ) )
+
+        url = self._getURL()
+        url.addParam("sortBy", "modifDate")
+        vars["modifDateImg"] = ""
+        if sortingField and sortingField.getId() == "modifDate":
+            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="modifDate">"""
+            if self._order == "down":
+                vars["modifDateImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order","up")
+            elif self._order == "up":
+                vars["modifDateImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order","down")
+        vars["modifDateSortingURL"] = quoteattr( str( url ) )
+
         l = []
         f = filters.SimpleFilter( self._filterCrit, self._sortingCrit )
         abstractList=f.apply(self._conf.getAbstractMgr().getAbstractsMatchingAuth(self._authSearch))
@@ -4100,6 +4114,8 @@ class WAbstracts( wcomponents.WTemplated ):
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%accType)
             if "SubmissionDate" in self._getDisplay():
                 m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%format_date(abstract.getSubmissionDate(), format='long'))
+            if "ModificationDate" in self._getDisplay():
+                m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%format_date(abstract.getModificationDate(), format='long'))
             if len(m) == 1:
                 m = ["<td></td>"]
             l.append("""<tr id="abstracts%s" style="background-color: transparent;">

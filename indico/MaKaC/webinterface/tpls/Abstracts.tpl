@@ -1,14 +1,14 @@
 <a href="" name="results"></a>
 <table width="100%" valign="top" align="left" cellspacing="0">
     <tr>
-        <td class="titleCellFormat" nowrap colspan="10">
+        <td class="titleCellFormat" nowrap colspan="12">
             <form action=${ accessAbstract } method="post">
             ${ _("Quick search: Abstract ID")} <input type="text" name="abstractId" size="4"><input type="submit" class="btn" value="${ _("seek it")}"><br>
             </form>
         </td>
     </tr>
     <tr>
-       <td nowrap colspan="11">
+       <td nowrap colspan="12">
             <div class="CRLgroupTitleNoBorder">${ _("Displaying")}<strong> ${ filteredNumberAbstracts } </strong>
             % if filteredNumberAbstracts == "1":
                 ${ _("abstract")}
@@ -41,7 +41,7 @@
         </td>
     </tr>
     <tr>
-        <td colspan="11" align="left" width="100%">
+        <td colspan="12" align="left" width="100%">
           <form action=${ filterPostURL } method="post" name="displayOptionForm">
             <input type="hidden" name="operationType" value="display" />
             <div class="CRLDiv" style="display: none;" id="displayMenu">
@@ -87,7 +87,7 @@
         </td>
     </tr>
     <tr>
-        <td colspan="11" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
+        <td colspan="12" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
         <form action=${abstractSelectionAction} method="post" name="abstractsForm" id="abstractsForm" onSubmit="return atLeastOneSelected()">
             <table>
                 <tr>
@@ -180,6 +180,9 @@
         % endif
         % if "SubmissionDate" in displayColumns:
             <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${dateSortingURL}> ${_("Submission date")}</a>${dateImg}</td>
+        % endif
+        % if "ModificationDate" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${modifDateSortingURL}> ${_("Modification date")}</a>${modifDateImg}</td>
         % endif
         </tr>
     % endif

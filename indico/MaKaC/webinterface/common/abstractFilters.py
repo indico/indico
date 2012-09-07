@@ -48,6 +48,15 @@ class SubmissionDateSortingField(filters.SortingField):
         """
         return cmp( a2.getSubmissionDate(), a1.getSubmissionDate() )
 
+class ModificationDateSortingField(filters.SortingField):
+    """
+    """
+    _id = "modifDate"
+
+    def compare( self, a1, a2 ):
+        """
+        """
+        return cmp( a2.getModificationDate(), a1.getModificationDate() )
 
 class TrackFilterField(filters.FilterField):
     """Contains the filtering criteria for the track of an abstract.
