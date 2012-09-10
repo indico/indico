@@ -295,6 +295,7 @@ class ISessionFossil(IFossil):
 
     def getConvenerList(self):
         """ Session Conveners list """
+    getConvenerList.produce = lambda s: s.getAllConvenerList()
     getConvenerList.result = IConferenceParticipationFossil
     getConvenerList.name = "sessionConveners"
 
