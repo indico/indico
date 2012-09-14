@@ -152,7 +152,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                  var source = indicoSource(
                      self.args.session?'schedule.session.getUnscheduledContributions':
                          'schedule.event.getUnscheduledContributions',
-                     self.args);
+                     self.args.get("args"));
                  source.state.observe(function(state) {
                      if (state == SourceState.Loaded) {
                          killProgress();
@@ -209,7 +209,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              var self = this;
              var killProgress = IndicoUI.Dialogs.Util.progress();
 
-             var args = clone(this.args);
+             var args = clone(this.args.get("args"));
              args.ids = contribs;
              args.date = date;
 
@@ -272,8 +272,8 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
          }
      },
-     function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms) {
+     function(method, timeStartMethod, args, parentRoomData,
+              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
          var self = this;
 
          this.newArgs = Array.prototype.slice.call(arguments, 0);
@@ -297,7 +297,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
     _preload: [
         function(hook) {
             var self = this;
-            if (!self.timeStartMethod) {
+            if (!self.timeStartMethod || self.isEdit) {
                 hook.set(true);
             }else {
 
@@ -378,16 +378,19 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         // value is the new date
         conferenceDays.observe(function(value) {
             // it is neccesary to update the date in dateArgs with the new date
-            self.dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal);
+            self.dateArgs.set("selectedDay", Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal));
             // but we need to check if the contribution is inside a session and if the day changed, in order
             // to make the request for the session timetable or the top level timetable
-            if(exists(self.timetable.parentTimetable)){
-                if(self.previousDate.substr(0,10) != self.dateArgs.selectedDay) {
-                    self.timeStartMethod = self.timetable.managementActions.methods.Event.dayEndDate;
-                } else {
-                    self.timeStartMethod = self.timetable.managementActions.methods.SessionSlot.dayEndDate;
-                }
-            }
+
+            if(self.previousDate.substr(0,10) != self.dateArgs.get('selectedDay')){
+                /* if we chose a different day, it doesn't matter
+                    if we are inside a session */
+                     self.timeStartMethod = self.timetable.managementActions.methods.Event.dayEndDate;
+             } else {
+                 if(exists(self.timetable.parentTimetable)) {
+                         self.timeStartMethod = self.timetable.managementActions.methods[self.originalArgs.parentType].dayEndDate;
+                 }
+             }
 
             // we make a timeStartMethod request specifying the date for the request
             // and we get the result of the request in result
@@ -403,7 +406,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                         startDate.setHours(23);
                         startDate.setMinutes(0);
                     }
-                    info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+                    self.info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
                }
             });
 
@@ -422,8 +425,6 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
     _drawMainTab: function(info, conferenceDays) {
         var self = this;
 
-        info.set('roomInfo', $O(self.roomInfo));
-
         if( self.timetable )
             var ttdata = self.timetable.parentTimetable?self.timetable.parentTimetable.getData():self.timetable.getData()
         else
@@ -437,12 +438,13 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             SessionSlot: $T('session')
         }[this.info.get('parentType')];
 
-        this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null, self.bookedRooms, ttdata, info, undefined, parentName);
+        this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData,
+                this.isEdit?nullRoomInfo(info.get('roomInfo')):true, self.favoriteRooms, null, self.bookedRooms, ttdata, info, undefined, parentName);
 
         var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
-            null, true, null,
-            true, false, self.args.conference, {"presenter-grant-submission": [$T("submission rights"), true]},
+            self.isEdit?self.info.get("presenters"):null, true, null,
+            true, false, self.info.get("conference"), {"presenter-grant-submission": [$T("submission rights"), true]},
             true, true, true,
             userListNothing, userListNothing, userListNothing);
 
@@ -452,7 +454,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var startTimeLine, daySelect, datecomponent;
 
         // in case of poster sessions
-        if (exists(this.timetable) && this.args.session && this.timetable.isPoster) {
+        if (exists(this.timetable) && this.args.get("session") && this.timetable.isPoster) {
             daySelect = [];
             startTimeLine = [];
             this.info.set('duration', self.timeField);
@@ -473,9 +475,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             startTimeLine = [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
                                                         $T(' Duration '), this.timeField, $T('min'))];
             daySelect = self._configureDaySelect(conferenceDays);
-
-            $B(info.accessor('startDate'), self.startTimeField, timeTranslation);
-            $B(info.accessor('duration'), self.timeField);
+            //$B(info.accessor('startDate'), self.startTimeField, timeTranslation);
+            invertableBind(info.accessor('startDate'),
+                    this.startTimeField,
+                    this.isEdit,
+                    timeTranslation);
+            invertableBind(info.accessor('duration'),
+                            this.timeField,
+                            this.isEdit);
 
             self.parameterManager.add(self.startTimeField, 'time', false);
             self.parameterManager.add(self.timeField, 'unsigned_int', false);
@@ -498,10 +505,6 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 startTimeLine,
                 [$T('Presenter(s)'), presListWidget.draw()]
             ]);
-
-
-
-
     },
 
     _drawAdvancedTab: function(info) {
@@ -509,14 +512,22 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var keywordField = IndicoUI.Widgets.keywordList('oneLineListItem');
         var fields = [];
 
+        if(self.isEdit){
+            each(info.get("keywords"), function(value) {
+                keywordField.accessor.append(value);
+            });
+        }
+
         if (!this.isConference || !this.isCFAEnabled) {
             // if it's a meeting, just add a description
+            if(self.isEdit) info.set("field_content", info.get("fields")["content"])
             fields = [[$T('Description'),$B(Html.textarea({cols: 50,rows: 2}),
                                             info.accessor('field_content'))]];
         } else {
             // otherwise, add the abstract fields (conferences)
             fields = translate(self.fields,
                                function(value, key) {
+                                   if(self.isEdit) info.set("field_"+key, info.get("fields")[key])
                                    return [value, $B(Html.textarea({cols: 50,rows: 2}),
                                                      info.accessor('field_'+key))];
                                });
@@ -540,9 +551,8 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 }
             );
             fields.push([$T('Type'), $B(typeSelect,
-                                        info.accessor('type'))]);
+                                        info.accessor('contributionType'))]);
         }
-
 
         return IndicoUtil.createFormFromMap(fields);
 
@@ -553,14 +563,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
 
         var authorListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
-            null, true, null,
+            self.info.get("authors"), true, null,
             true, false, this.args.conference, {"author-grant-submission": [$T("submission rights"), true]},
             true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         var coauthorListWidget = new UserListField(
                 'VeryShortPeopleListDiv', 'PeopleList',
-                null, true, null,
+                self.info.get("coauthors"), true, null,
                 true, false, this.args.conference, {"coauthor-grant-submission": [$T("submission rights"), true]},
                 true, true, true,
                 userListNothing, userListNothing, userListNothing);
@@ -579,33 +589,37 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
     _getButtons: function() {
         var self = this;
         return [
-            [$T('Add'), function() {
+            [self.isEdit ? $T('Save'):$T('Add'), function() {
                 // check if the day changed
                 if(self.timetable && !self.timetable.isPoster && Util.formatDateTime(self.conferenceDays.get(), IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) != self.previousDate.substr(0,10)){
                     self.dayChanged = true;
                     // if we are inside a session and the new contribution is set for a different day, we suppose that the contribution is not part of the session
-                    self.method = self.timetable.managementActions.methods.Contribution.add;
                 }
-
-            each(self.args, function(value, key) {
-                self.info.set(key, value);
-            });
-
-            if (self.parameterManager.check()) {
-                var killProgress = IndicoUI.Dialogs.Util.progress();
-                indicoRequest(self.method, self.info, function(result, error){
-                    killProgress();
-                    if (error) {
-                        IndicoUtil.errorReport(error);
+                if(!self.isEdit){
+                    if(self.dayChanged){
+                        self.method = self.timetable.managementActions.methods.Contribution.add;
                     }
-                    else {
-                        self.close();
-                        // Only one element is returned but put it in an array
-                        // since the successFunc expects arrays
-                        self.successFunc([result]);
+                    else{
+                        if(exists(self.timetable.parentTimetable)) {
+                            self.method = self.timetable.managementActions.methods.SessionContribution.add;
+                        }
                     }
-                });
-            }
+                }
+                if (self.parameterManager.check()) {
+                    var killProgress = IndicoUI.Dialogs.Util.progress();
+                    indicoRequest(self.method, self.info, function(result, error){
+                        killProgress();
+                        if (error) {
+                            IndicoUtil.errorReport(error);
+                        }
+                        else {
+                            self.close();
+                            // Only one element is returned but put it in an array
+                            // since the successFunc expects arrays
+                            self.successFunc([result]);
+                        }
+                    });
+                }
             }],
             [$T('Cancel'), function() {
             self.close();
@@ -647,15 +661,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
      /**
       * @param timeStartMethod rpc_method_name if this parameter is null, the date will not be shown in the form.
       */
-     function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms) {
-         this.args = clone(args);
+     function(method, timeStartMethod, args, parentRoomData,
+              dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
 
+         var self = this;
+         this.args = clone(args);
          this.dateArgs = clone(args);
          this.dateArgs.selectedDay = dayStartDate;
          this.timeStartMethod = timeStartMethod;
-         this.roomInfo = roomInfo;
-         this.confStartDate = confStartDate;
          this.dayStartDate = dayStartDate;
          this.parentRoomData = parentRoomData;
          this.existing = existing;
@@ -666,17 +679,31 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
          this.favoriteRooms = favoriteRooms;
          this.isCFAEnabled = isCFAEnabled;
          this.bookedRooms = bookedRooms;
-
-         this.previousDate = dayStartDate;
-         this.info = new WatchObject();
-         this.info.set('parentType', args.parentType);
+         this.isEdit = isEdit;
+         this.originalArgs = {};
+         each(keys(args), function(key) {
+             self.originalArgs[key] = args.get(key);
+         });
+         this.previousDate = args.get('startDate');
+         if(this.isEdit) {
+             this.info = args;
+             this.dateArgs = args;
+         } else{
+             this.info = clone(args);
+             this.info.set('roomInfo', $O({location: args.get('roomInfo').location, room: args.get('roomInfo').room}));
+             this.dateArgs = args;
+             var sargs = args.get('args');
+             each(sargs, function(value, key) {
+                 self.info.set(key,value);
+             });
+         }
 
          if (this.timeStartMethod === null) {
-             args.schedule = false;
+             self.info.set("schedule", false);
          }
          // if it is a poster, we do not need to query for the start date. We need this 'if' after
          // the previous 'if (this.timeStartMethod === null)' because the contribution needs to be scheduled anyways.
-         if (this.args.session && this.timetable.isPoster) {
+         if (this.args.get("session") && this.timetable.isPoster) {
              this.timeStartMethod = null;
          }
 
@@ -687,7 +714,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
              };
 
          this.startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
-         var durationDefault = this.args.session?(this.timetable.isPoster?this.timetable.contextInfo.duration:this.timetable.contextInfo.contribDuration):20;
+         var durationDefault = this.args.get("session")?(this.timetable.isPoster?this.timetable.contextInfo.duration:this.timetable.contextInfo.contribDuration):20;
          this.timeField = IndicoUI.Widgets.Generic.durationField(durationDefault);
 
          var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
@@ -700,7 +727,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                  self.open();
              });
 
-         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args, $T("Add Contribution"),
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args, self.isEdit?$T("Edit Contribution"):$T("Add Contribution"),
                             function() {
                                 self.close();
                             });

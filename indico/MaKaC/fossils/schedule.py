@@ -187,11 +187,26 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
     def getPresenters(self):
         """ Entry Presenters """
     getPresenters.produce = lambda x: x.getOwner().getSpeakerList()
-    getPresenters.result = IContributionParticipationTTMgmtFossil
+    getPresenters.result = IConferenceParticipationFossil
+
+    def getAuthors(self):
+        """ Entry Primary authors """
+    getAuthors.produce = lambda x: x.getOwner().getPrimaryAuthorList()
+    getAuthors.result = IConferenceParticipationFossil
+
+    def getCoauthors(self):
+        """ Entry Co-Authors """
+    getCoauthors.produce = lambda x: x.getOwner().getCoAuthorList()
+    getCoauthors.result = IConferenceParticipationFossil
 
     def getId(self):
         """ Default Id """
     getId.name = "scheduleEntryId"
+
+    def getAddress(self):
+        """ Entry Address """
+    getAddress.produce = lambda x: x.getLocation()
+    getAddress.convert = Conversion.locationAddress
 
     def getInheritLoc(self):
         """ Inherited Loc """
@@ -204,6 +219,22 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
     def getDuration(self):
         """ Entry End Date """
     getDuration.convert = Conversion.duration
+
+    def getKeywords(self):
+        """ Entry Keywords """
+    getKeywords.produce = lambda x: x.getOwner().getKeywords().split("\n") if x.getOwner().getKeywords().strip() else []
+
+    def getBoardNumber(self):
+        """ Entry board number """
+    getBoardNumber.produce = lambda x: x.getOwner().getBoardNumber()
+
+    def getContributionType(self):
+        """ Entry type """
+    getContributionType.produce = lambda x: x.getOwner().getType().getId() if x.getOwner().getType() else None
+
+    def getFields(self):
+        """ Entry type """
+    getFields.produce = lambda x: x.getOwner().getFields()
 
 
 class ILinkedTimeSchEntryFossil(ISchEntryFossil):

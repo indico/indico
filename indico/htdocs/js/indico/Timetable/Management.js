@@ -28,6 +28,7 @@ type("TimetableManagementActions", [], {
         },
         'SessionContribution': {
             add: 'schedule.slot.addContribution',
+            edit: 'schedule.slot.editContribution',
             modifyStartEndDate: 'schedule.slot.modifyStartEndDate',
             'delete': 'schedule.slot.deleteContribution',
             moveUpDown: 'schedule.slot.moveEntryUpDown',
@@ -55,6 +56,7 @@ type("TimetableManagementActions", [], {
         },
         'Contribution': {
             add: 'schedule.event.addContribution',
+            edit: 'schedule.event.editContribution',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
             'delete': 'schedule.event.deleteContribution',
             moveUpDown: 'schedule.event.moveEntryUpDown',
@@ -416,10 +418,8 @@ type("TimetableManagementActions", [], {
         var dialog = new AddContributionDialog(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
-            params.args,
-            params.roomInfo,
+            $O(params),
             $O(params.roomInfo),
-            params.startDate,
             params.selectedDay,
             this.eventInfo.isConference,
             this.eventInfo.favoriteRooms,
@@ -429,7 +429,60 @@ type("TimetableManagementActions", [], {
                 self._addEntries(result);
             },
             this.eventInfo.isCFAEnabled,
-            this.eventInfo.bookedRooms);
+            this.eventInfo.bookedRooms,
+            false);
+
+        dialog.execute();
+    },
+
+    editContribution: function(eventData) {
+        var self = this;
+
+        var params;
+
+        var args = $O();
+
+        var days = this.timetable.getDays();
+
+        if (this.session !== null) {
+            params = this._addToSessionParams(this.session, 'Contribution');
+        } else {
+            params = this._addParams('Contribution');
+        }
+
+
+        args.set('conference', eventData.conferenceId);
+        args.set('scheduleEntry', eventData.scheduleEntryId);
+        args.set('parentType', params.parentType);
+
+        each(eventData, function(value, key) {
+            args.set(key, value);
+        });
+
+        args.set('type', params.type);
+
+        args.set('startDate', Util.formatDateTime(eventData.startDate, IndicoDateTimeFormats.Server));
+        args.set('roomInfo',$O({"location": eventData.inheritLoc?'':eventData.location,
+                                "room": eventData.inheritRoom?null:eventData.room,
+                                "address": eventData.inheritLoc?'':eventData.address}));
+
+        params.args.parentType = params.parentType;
+        var dialog = new AddNewContributionDialog(
+            this.methods[params.type].edit,
+            this.methods[params.parentType].dayEndDate,
+            args,
+            $O(params.roomInfo),
+            params.selectedDay,
+            this.eventInfo.isConference,
+            this.eventInfo.favoriteRooms,
+            days,
+            this.timetable,
+            function(result) {
+                self._addEntries(result);
+            },
+            this.eventInfo.isCFAEnabled,
+            this.eventInfo.bookedRooms,
+            true);
 
         dialog.execute();
     },

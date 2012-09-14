@@ -244,12 +244,8 @@ var addContribution = function() {
     var dialog = new AddNewContributionDialog(
                        'schedule.event.addContribution',
                        null,
-               ${ jsonEncode(dict(conference=self_._conf.id)) },
-               ${ jsonEncode(dict(location=locationName,
-                                   room=roomName,
-                                   address=address)) },
+                       $O(${ jsonEncode(dict(conference=self_._conf.id, roomInfo=roomInfo(self_._rh._target)))}),
                        parentEventRoomData,
-                       '',
                        '',
                        ${ jsBoolean(self_._conf.getType() != 'meeting') },
                        [],
@@ -259,8 +255,8 @@ var addContribution = function() {
                           window.location.reload();
                        },
                        ${ jsBoolean(self_._conf.getAbstractMgr().isActive()) },
-                       ${ bookings |n,j }
-                       );
+                       ${ bookings },
+                       false);
 
     dialog.execute();
 };

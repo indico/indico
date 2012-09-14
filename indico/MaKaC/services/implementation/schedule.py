@@ -128,25 +128,36 @@ class ScheduleOperation:
         return ContextManager.get('autoOps')
 
 
-class ScheduleAddContribution(ScheduleOperation, LocationSetter):
+class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
 
-    def __addPeople(self, contribution, pManager, elemType, method):
+    def __addPeople(self, contribution, pManager, elemType, addMethod, deleteMethod, getListMethod):
         """ Generic method for adding presenters, authors and
         co-authors. """
 
         pList = pManager.extract("%ss" % elemType, pType=list,
                                  allowEmpty=True)
 
+        peopleIds = []
+
         for elemValues in pList:
-            element = conference.ContributionParticipation()
-            DictPickler.update(element, elemValues)
+            if elemValues["_type"] == "Avatar": #new
+                element = conference.ContributionParticipation()
+                DictPickler.update(element, elemValues)
 
-            # call the appropriate method
-            method(contribution, element)
+                # call the appropriate method
+                addMethod(contribution, element)
+                peopleIds.append(element.getId())
+                if self._privileges is not None:
+                    if self._privileges.get('%s-grant-submission' % elemType, False):
+                        contribution.grantSubmission(element)
+            else:
+                peopleIds.append(elemValues["id"])
 
-            if self._privileges is not None:
-                if self._privileges.get('%s-grant-submission' % elemType, False):
-                    contribution.grantSubmission(element)
+        for person in getListMethod(contribution)[:]:
+            if str(person.getId()) not in peopleIds:
+                deleteMethod(contribution, person)
+
+
 
     def _checkParams(self):
         self._pManager = ParameterManager(self._params)
@@ -169,31 +180,28 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
             self._fields[field.getId()] = self._pManager.extract("field_%s"%field.getId(), pType=str,
                                                      allowEmpty=True, defaultValue='')
         self._privileges = self._pManager.extract("privileges", pType=dict,                                                  allowEmpty=True)
-        self._contribTypeId = self._pManager.extract("type", pType=str, allowEmpty=True)
+        self._contribTypeId = self._pManager.extract("contributionType", pType=str, allowEmpty=True)
         self._materials = self._pManager.extract("materials", pType=dict, allowEmpty=True)
+
 
     def _performOperation(self):
 
-        contribution = conference.Contribution()
+        self._contribution.setTitle(self._title, notify = False)
 
-        self._addToParent(contribution)
+        self._contribution.setKeywords('\n'.join(self._keywords))
 
-        contribution.setTitle(self._title, notify = False)
-
-        contribution.setKeywords('\n'.join(self._keywords))
-
-        contribution.setBoardNumber(self._boardNumber)
-        contribution.setDuration(self._duration/60, self._duration%60)
+        self._contribution.setBoardNumber(self._boardNumber)
+        self._contribution.setDuration(self._duration/60, self._duration%60)
 
         if self._reportNumbers:
             for reportTuple in self._reportNumbers:
                 for recordNumber in reportTuple[1]:
-                    contribution.getReportNumberHolder().addReportNumber(reportTuple[0], recordNumber)
+                    self._contribution.getReportNumberHolder().addReportNumber(reportTuple[0], recordNumber)
 
         if self._needsToBeScheduled:
             checkFlag = self._getCheckFlag()
             adjDate = setAdjustedDate(self._dateTime, self._conf)
-            contribution.setStartDate(adjDate, check = checkFlag)
+            self._contribution.setStartDate(adjDate, check = checkFlag)
 
         if self._materials:
             for material in self._materials.keys():
@@ -204,27 +212,26 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
                     newLink.setURL(resource)
                     newLink.setName(resource)
                     newMaterial.addResource(newLink)
-                contribution.addMaterial(newMaterial)
+                self._contribution.addMaterial(newMaterial)
 
-        self._schedule(contribution)
+        self._schedule(self._contribution)
 
         for field, value in self._fields.iteritems():
-            contribution.setField(field, value)
+            self._contribution.setField(field, value)
 
         if (self._target.getConference().getType() == "conference"):
             # for conferences, add authors and coauthors
-            self.__addPeople(contribution, self._pManager, "author", conference.Contribution.addPrimaryAuthor)
-            self.__addPeople(contribution, self._pManager, "coauthor", conference.Contribution.addCoAuthor)
-            # and also set type if it exists
-            if (self._contribTypeId):
-                contribution.setType(self._target.getConference().getContribTypeById(self._contribTypeId))
+            self.__addPeople(self._contribution, self._pManager, "author", conference.Contribution.addPrimaryAuthor, conference.Contribution.removePrimaryAuthor, conference.Contribution.getPrimaryAuthorList)
+            self.__addPeople(self._contribution, self._pManager, "coauthor", conference.Contribution.addCoAuthor, conference.Contribution.removeCoAuthor, conference.Contribution.getCoAuthorList)
+            # set type, if does not exist,
+            self._contribution.setType(self._target.getConference().getContribTypeById(self._contribTypeId))
 
 
-        self.__addPeople(contribution, self._pManager, "presenter", conference.Contribution.newSpeaker)
+        self.__addPeople(self._contribution, self._pManager, "presenter", conference.Contribution.newSpeaker, conference.Contribution.removeSpeaker, conference.Contribution.getSpeakerList)
 
-        self._setLocationInfo(contribution)
+        self._setLocationInfo(self._contribution)
 
-        schEntry = contribution.getSchEntry()
+        schEntry = self._contribution.getSchEntry()
         fossilizedData = schEntry.fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
@@ -242,11 +249,13 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         return result
 
 
-class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServices.ConferenceModifBase):
+class ConferenceScheduleAddContribution(ScheduleEditContributionBase, conferenceServices.ConferenceModifBase):
 
     def _checkParams(self):
         conferenceServices.ConferenceModifBase._checkParams(self)
-        ScheduleAddContribution._checkParams(self)
+        ScheduleEditContributionBase._checkParams(self)
+        self._contribution = conference.Contribution()
+        self._addToParent(self._contribution)
 
     def _addToParent(self, contribution):
         self._target.addContribution( contribution )
@@ -260,11 +269,13 @@ class ConferenceScheduleAddContribution(ScheduleAddContribution, conferenceServi
         return None
 
 
-class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionServices.SessionSlotModifCoordinationBase):
+class SessionSlotScheduleAddContribution(ScheduleEditContributionBase, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
-        ScheduleAddContribution._checkParams(self)
+        ScheduleEditContributionBase._checkParams(self)
+        self._contribution = conference.Contribution()
+        self._addToParent(self._contribution)
 
     def _addToParent(self, contribution):
         self._session.addContribution( contribution )
@@ -280,6 +291,41 @@ class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionService
                                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
                                                tz=self._conf.getTimezone())
 
+class ConferenceScheduleEditContribution(ScheduleEditContributionBase, conferenceServices.ConferenceScheduleModifBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceScheduleModifBase._checkParams(self)
+        ScheduleEditContributionBase._checkParams(self)
+        self._contribution = self._schEntry.getOwner()
+
+    def _addToParent(self, contribution):
+        pass
+
+    def _schedule(self, contribution):
+        pass
+
+    def _getSlotEntry(self):
+        return None
+
+
+class SessionSlotScheduleEditContribution(ScheduleEditContributionBase, sessionServices.SessionSlotModifCoordinationBase):
+
+    def _checkParams(self):
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
+        ScheduleEditContributionBase._checkParams(self)
+        self._contribution = self._schEntry.getOwner()
+
+    def _addToParent(self, contribution):
+        pass
+
+    def _schedule(self, contribution):
+        pass
+
+    def _getSlotEntry(self):
+        return self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
+                                               tz=self._conf.getTimezone())
 
 class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.ConferenceModifBase, LocationSetter):
 
@@ -334,7 +380,7 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
 
         tz = pytz.timezone(self._conf.getTimezone())
         if session.getEndDate().astimezone(tz).date() > session.getStartDate().astimezone(tz).date():
-            newEndDate = session.getStartDate().astimezone(tz).replace(hour=23,minute=59).astimezone(timezone('UTC'))
+            newEndDate = session.getStartDate().astimezone(tz).replace(hour=23,minute=59).astimezone(pytz.timezone('UTC'))
         else:
             newEndDate = session.getEndDate()
         dur = newEndDate - session.getStartDate()
@@ -1362,6 +1408,7 @@ methodMap = {
     "get": ConferenceGetSchedule,
 
     "event.addContribution": ConferenceScheduleAddContribution,
+    "event.editContribution": ConferenceScheduleEditContribution,
     "event.addSession": ConferenceScheduleAddSession,
     "event.addBreak": ConferenceScheduleAddBreak,
     "event.editBreak": ConferenceScheduleEditBreak,
@@ -1375,6 +1422,7 @@ methodMap = {
     "event.moveEntry": MoveEntry,
 
     "slot.addContribution": SessionSlotScheduleAddContribution,
+    "slot.editContribution": SessionSlotScheduleEditContribution,
     "slot.addBreak": SessionSlotScheduleAddBreak,
     "slot.editBreak": SessionSlotScheduleEditBreak,
     "slot.deleteContribution": SessionSlotScheduleDeleteContribution,

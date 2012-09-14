@@ -1144,8 +1144,12 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             } else if (self.eventData.entryType == 'Contribution') {
                 editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
                 var menuItems = {};
-                menuItems['contributionProperties'] = {action: self.managementActions.editEntry(self.eventData), display: $T('Contribution properties')};
-                menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Contribution protection')};
+                menuItems['contributionProperties'] = {action: function() {
+                    self.managementActions.editContribution(self.eventData);
+                    self.close();
+                }, display: $T('Basic edition')};
+                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Full edition')};
+                menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Edit protection')};
                 editLink.observeClick(function() {
                     var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
                     var pos = editLink.getAbsolutePosition();
