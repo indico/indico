@@ -274,17 +274,11 @@ class RHUserBase( RHProtected ):
 
         RHProtected._checkProtection( self )
         if not self._avatar.canUserModify( self._getUser() ):
-            raise ModificationError("user")
+            raise errors.AccessControlError("user")
 
 
 class RHUserDetails( RHUserBase):
     _uh = urlHandlers.UHUserDetails
-
-    def _checkProtection( self ):
-        RHUserBase._checkProtection( self )
-        if self._aw.getUser():
-            if not self._avatar.canModify( self._aw ):
-                raise errors.AccessControlError("user")
 
     def _process( self ):
         p = adminPages.WPUserDetails( self, self._avatar )
