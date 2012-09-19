@@ -44,19 +44,13 @@ class RHSessionDisplay( RoomBookingDBMixin, RHSessionDisplayBase ):
 
     def _checkParams( self, params ):
         RHSessionDisplayBase._checkParams( self, params )
-        self._activeTab=params.get("tab","")
-        self._sortingCrit=None
-        sortBy=params.get("sortBy","")
-        if sortBy.strip()!="":
-            self._sortingCrit=SortingCriteria([sortBy])
 
     def _process( self ):
         p = sessions.WPSessionDisplay(self,self._session)
         wf = self.getWebFactory()
         if wf != None:
             p=wf.getSessionDisplay(self,self._session)
-        return p.display(activeTab=self._activeTab,
-                        sortingCrit=self._sortingCrit)
+        return p.display()
 
 class RHSessionToiCal(RoomBookingDBMixin, RHSessionDisplay):
 

@@ -167,358 +167,37 @@ class _NoWithdrawnFilterCriteria(filters.FilterCriteria):
 
 class WSessionDisplayBase(WICalExportBase):
 
-    def __init__(self,aw,session,activeTab="time_table",sortingCrit=None):
-        self._aw=aw
-        self._session=session
-        self._activeTab=activeTab
-        self._sortingCrit=sortingCrit
+    def __init__(self,aw,session):
+        self._aw = aw
+        self._session = session
         self._tz = timezoneUtils.DisplayTZ(self._aw,self._session.getConference()).getDisplayTZ()
 
-    def _getHTMLRow(self,title,body):
-        str = """
-                <tr>
-                    <td nowrap class="displayField" valign="top"><b>%s:</b></td>
-                    <td>%s</td>
-                </tr>"""%(title,body)
-        if body.strip() == "":
-            return ""
-        return str
-
-    def _createTabCtrl( self ):
-        self._tabCtrl=wcomponents.TabControl()
-        url=urlHandlers.UHSessionDisplay.getURL(self._session)
-        url.addParam("tab","contribs")
-        self._tabContribs=self._tabCtrl.newTab("contribs", \
-                                                _("Contribution List"),str(url))
-        url.addParam("tab","time_table")
-        self._tabTimeTable=self._tabCtrl.newTab("time_table", \
-                                                _("Time Table"),str(url))
-        if self._session.getScheduleType()=="poster":
-            self._tabTimeTable.setEnabled(False)
-            self._tabCtrl.getTabById("contribs").setActive()
+    def _getResourceName(self, resource):
+        if isinstance(resource, conference.Link):
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()
         else:
-            self._tabTimeTable.setEnabled(True)
-            tab=self._tabCtrl.getTabById(self._activeTab)
-            if tab is None:
-                tab=self._tabCtrl.getTabById("time_table")
-            tab.setActive()
-
-    def _getURL(self,sortByField):
-        url=urlHandlers.UHSessionDisplay.getURL(self._session)
-        url.addParam("tab",self._activeTab)
-        url.addParam("sortBy",sortByField)
-        return url
-
-    def _getContribListHTML(self):
-        cl = []
-        if self._sortingCrit is None:
-            self._sortingCrit=contribFilters.SortingCriteria(["number"])
-        fc=_NoWithdrawnFilterCriteria(self._session.getConference())
-        f=filters.SimpleFilter(fc,self._sortingCrit)
-        for contrib in f.apply(self._session.getContributionList()):
-            wc=WContributionDisplayItem(self._aw,contrib)
-            html=wc.getHTML()
-            cl.append("""<tr><td valign="top">%s</td></tr>"""%html)
-        idHTML="""id <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="number":
-            idHTML="""<a href=%s>id</a>"""%quoteattr(str(self._getURL("number")))
-        dateHTML="""date <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="date":
-            dateHTML="""<a href=%s>date</a>"""%quoteattr(str(self._getURL("date")))
-        typeHTML="""type <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="type":
-            typeHTML="""<a href=%s>type</a>"""%quoteattr(str(self._getURL("type")))
-        spkHTML="""presenters <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="speaker":
-            spkHTML="""<a href=%s>presenters</a>"""%quoteattr(str(self._getURL("speaker")))
-        return """
-            <table cellspacing="0" cellpadding="5" width="100%%">
-                <tr>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">dur.</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">title</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                </tr>
-                %s
-            </table>"""%(idHTML,dateHTML,typeHTML,spkHTML,"".join(cl))
-
-    def _getPosterContribListHTML(self):
-        cl = []
-        if self._sortingCrit is None:
-            self._sortingCrit=contribFilters.SortingCriteria(["number"])
-        fc=_NoWithdrawnFilterCriteria(self._session.getConference())
-        f=filters.SimpleFilter(fc,self._sortingCrit)
-        for contrib in f.apply(self._session.getContributionList()):
-            wc=WContributionDisplayPosterItem(self._aw,contrib)
-            html=wc.getHTML()
-            cl.append("""<tr><td valign="top">%s</td></tr>"""%html)
-        idHTML="""id <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="number":
-            idHTML="""<a href=%s>id</a>"""%quoteattr(str(self._getURL("number")))
-        #dateHTML="""date <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        #if self._sortingCrit.getField().getId()!="date":
-        #    dateHTML="""<a href=%s>date</a>"""%quoteattr(str(self._getURL("date")))
-        typeHTML="""type <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="type":
-            typeHTML="""<a href=%s>type</a>"""%quoteattr(str(self._getURL("type")))
-        spkHTML="""presenters <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="speaker":
-            spkHTML="""<a href=%s>presenters</a>"""%quoteattr(str(self._getURL("speaker")))
-        boardNumHTML="""board # <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="board_number":
-            boardNumHTML="""<a href=%s>board #</a>"""%quoteattr(str(self._getURL("board_number")))
-        return """
-            <table cellspacing="0" cellpadding="5" width="100%%">
-                <tr>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">title</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                </tr>
-                %s
-            </table>"""%(idHTML,typeHTML,spkHTML,boardNumHTML,"".join(cl))
-
-    def _getColor(self,entry):
-        bgcolor = "white"
-        if isinstance(entry,schedule.LinkedTimeSchEntry):
-            if isinstance(entry.getOwner(),conference.Contribution):
-                bgcolor = entry.getOwner().getSession().getColor()
-        elif isinstance(entry,schedule.BreakTimeSchEntry):
-            bgcolor = entry.getColor()
-        return bgcolor
-
-    def _getMaterialHTML(self, contrib):
-        lm=[]
-        paper=contrib.getPaper()
-        if paper is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="paper"><small> %s</small></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(paper))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallPaper" ))),
-                self.htmlText("paper")))
-        slides=contrib.getSlides()
-        if slides is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="slides"><small> %s</small></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(slides))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallSlides" ))),
-                self.htmlText("slides")))
-        proceedings=None
-        for mat in contrib.getMaterialList():
-            if mat.getTitle().lower() == "proceedings":
-                proceedings=mat
-                break
-        if proceedings is not None:
-            lm.append("""<a href=%s><small> %s</small></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(proceedings))),
-                self.htmlText("proceedings")))
-        video=contrib.getVideo()
-        if video is None:
-            for mat in contrib.getMaterialList():
-               if mat.getTitle().lower().find("video") != -1:
-                   video = mat
-        if video is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="video"><small> %s</small></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(video))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallVideo" ))),
-                self.htmlText("video")))
-        return ", ".join(lm)
-
-    def _getContributionHTML(self,contrib):
-        URL=urlHandlers.UHContributionDisplay.getURL(contrib)
-        room = ""
-        if contrib.getRoom() != None:
-            room = "%s: "%contrib.getRoom().getName()
-        speakerList = []
-        for spk in contrib.getSpeakerList():
-            spkcapt=spk.getDirectFullName()
-            if spk.getAffiliation().strip() != "":
-                spkcapt="%s (%s)"%(spkcapt, spk.getAffiliation())
-            speakerList.append(spkcapt)
-        speakers =""
-        if speakerList != []:
-            speakers = i18nformat("""<br><small> _("by") %s</small>""")%"; ".join(speakerList)
-        linkColor=""
-        if contrib.getSession().isTextColorToLinks():
-            linkColor="color:%s"%contrib.getSession().getTextColor()
-        return """<table width="100%%">
-                        <tr>
-                            <td width="100%%" align="center" style="color:%s">
-                                [%s] <a href="%s" style="%s">%s</a>%s<br><small>(%s%s - %s)</small>
-                            </td>
-                            <td align="right" valign="top" nowrap style="color:%s">
-                                %s
-                            </td>
-                        </tr>
-                    </table>"""%(
-                contrib.getSession().getTextColor(),contrib.getId(),URL,\
-                linkColor, contrib.getTitle(),speakers,room,
-                contrib.getAdjustedStartDate(self._tz).strftime("%H:%M"),
-                contrib.getAdjustedEndDate(self._tz).strftime("%H:%M"),
-                contrib.getSession().getTextColor(),
-                self._getMaterialHTML(contrib))
-
-    def _getBreakHTML(self,breakEntry):
-        return """
-                <font color="%s">%s<br><small>(%s - %s)</small></font>
-                """%(\
-                    breakEntry.getTextColor(),\
-                    self.htmlText(breakEntry.getTitle()),\
-                    self.htmlText(breakEntry.getAdjustedStartDate(self._tz).strftime("%H:%M")),\
-                    self.htmlText(breakEntry.getAdjustedEndDate(self._tz).strftime("%H:%M")))
-
-    def _getSchEntries(self):
-        res=[]
-        for slot in self._session.getSlotList():
-            for entry in slot.getSchedule().getEntries():
-                res.append(entry)
-        return res
-
-    def _getEntryHTML(self,entry):
-        if isinstance(entry,schedule.LinkedTimeSchEntry):
-            if isinstance(entry.getOwner(),conference.Contribution):
-                return self._getContributionHTML(entry.getOwner())
-        elif isinstance(entry,schedule.BreakTimeSchEntry):
-            return self._getBreakHTML(entry)
-
-    def _getTimeTableHTML(self):
-
-        ttdata = json.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz,
-                                                                           None, days = None, mgmtMode = False))
-
-        eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz=self._tz)
-        eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz=self._tz)
-        eventInfo = json.dumps(eventInfo)
-
-        return """
-            <div id="timetableDiv" style="position: relative;">
-
-            <div class="timetablePreLoading" style="width: 700px; height: 300px;">
-                <div class="text" style="padding-top: 200px;">&nbsp;&nbsp;&nbsp;%s</div>
-            </div>
-
-            <div class="clearfix"></div>
-
-            <script type="text/javascript">
-                var ttdata = %s;
-                var eventInfo = %s;
-
-                var historyBroker = new BrowserHistoryBroker();
-                var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timetableDiv'), historyBroker);
-
-                IndicoUI.executeOnLoad(function(){
-
-                  $E('timetableDiv').set(timetable.draw());
-                  timetable.postDraw();
-
-                });
-            </script>
-        """ %(_("Building timetable..."),
-              str(ttdata),
-              eventInfo)
-
-    def _getContribsHTML(self):
-        self._createTabCtrl()
-        if self._tabContribs.isActive():
-            if self._session.getScheduleType()=="poster":
-                html=self._getPosterContribListHTML()
-            else:
-                html=self._getContribListHTML()
-        else:
-            html=self._getTimeTableHTML()
-        return wcomponents.WTabControl(self._tabCtrl, self._aw).getHTML(html)
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() else resource.getFileName()
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars( self )
+        vars = wcomponents.WTemplated.getVars( self )
 
-        vars["title"]=self.htmlText(self._session.getTitle())
-
-        if self._session.getDescription():
-            desc = self._session.getDescription().strip()
-        else:
-            desc = ""
-
-        if desc!="":
-            vars["description"]="""
-                <tr>
-                    <td colspan="2"><table width="100%%" cellpadding="0" cellspacing="0" class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
-                </tr>
-                                """%desc
-        else:
-            vars["description"]=""
-
-        tzUtil = timezoneUtils.DisplayTZ(self._aw,self._session.getOwner())
-        tz = tzUtil.getDisplayTZ()
-        sDate=self._session.getAdjustedStartDate(tz)
-        eDate=self._session.getAdjustedEndDate(tz)
-        if sDate.strftime("%d%b%Y")==eDate.strftime("%d%b%Y"):
-            vars["dateInterval"]=format_datetime(sDate, format='EEEE d MMMM yyyy H:mm')
-        else:
-            vars["dateInterval"]= i18nformat(""" _("from") %s  _("to") %s""")%(
-                format_datetime(sDate, format='EEEE d MMMM yyyy H:mm'),
-                format_datetime(eDate, format='EEEE d MMMM yyyy H:mm'))
-        vars["location"]=""
-        loc=self._session.getLocation()
-        if loc is not None and loc.getName().strip()!="":
-            vars["location"]="""<i>%s</i>"""%self.htmlText(loc.getName())
-            if loc.getAddress() is not None and loc.getAddress().strip()!="":
-                vars["location"]="""%s<pre>%s</pre>"""%(vars["location"],
-                                                        loc.getAddress())
-        room = self._session.getRoom()
-        if room is not None:
-            roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= i18nformat("""%s<br><small> _("Room"):</small> %s""")%(vars["location"],
-                                                            roomLink)
-        vars["location"]=self._getHTMLRow( _("Place"), vars["location"])
-        sessionConvs=[]
-        for convener in self._session.getConvenerList():
-            sessionConvs.append("""<a href="mailto:%s">%s</a>"""%(convener.getEmail(),
-                                        self.htmlText(convener.getFullName())))
-        slotConvsHTML=""
+        slotConveners = []
         for entry in self._session.getSchedule().getEntries():
-            slot=entry.getOwner()
-            l=[]
+            slot = entry.getOwner()
+            conveners = []
             for convener in slot.getOwnConvenerList():
-                l.append("""<a href="mailto:%s">%s</a>"""%(convener.getEmail(),
-                                        self.htmlText(convener.getFullName())))
-            if len(l)>0:
-                slotConvsHTML+="""
-                    <tr>
-                        <td valign="top">%s (<small>%s-%s</small>):</td>
-                        <td>%s</td>
-                    </tr>
-                      """%(self.htmlText(slot.getTitle()),
-                      slot.getAdjustedStartDate().strftime("%d-%b-%y %H:%M"),
-                      slot.getAdjustedEndDate().strftime("%d-%b-%y %H:%M"),
-                      "; ".join(l))
-        convs=""
-        if len(sessionConvs)>0 or slotConvsHTML.strip()!="":
-            convs="""
-                <table>
-                    <tr>
-                        <td valign="top" colspan="2">%s</td>
-                    </tr>
-                    %s
-                </table>"""%("<br>".join(sessionConvs),slotConvsHTML)
-        vars["conveners"]=self._getHTMLRow( _("Conveners"),convs)
-        lm = []
-        for material in self._session.getAllMaterialList():
-            url=urlHandlers.UHMaterialDisplay.getURL(material)
-            lm.append(wcomponents.WMaterialDisplayItem().getHTML(self._aw,material,url))
-        vars["material"] = self._getHTMLRow( _("Material"), "<br>".join( lm ) )
-        vars["contribs"]= ""
-        if self._session.getContributionList() != []:
-            vars["contribs"]=self._getContribsHTML()
-        vars["PDFIcon"]=quoteattr(str(Config.getInstance().getSystemIconURL("print")))
-        url=urlHandlers.UHConfTimeTablePDF.getURL(self._session.getConference())
-        url.addParam("showSessions",self._session.getId())
-        if self._session.getScheduleType()=="poster":
-            if self._sortingCrit is not None and \
-                    self._sortingCrit.getField() is not None:
-                url.addParam("sortBy",self._sortingCrit.getField().getId())
-        vars["PDFURL"]=quoteattr(str(url))
-        vars["target"] = vars["session"] = self._session
+                conveners.append({'fullName': convener.getFullName(), 'email': convener.getEmail() if self._aw.getUser() else "", 'affiliation' : convener.getAffiliation()})
+            if conveners:
+                slotConveners.append({'title': slot.getTitle(), 'startDate': slot.getAdjustedStartDate(self._tz), 'endDate': slot.getAdjustedEndDate(self._tz), 'conveners': conveners})
+        vars["slotConveners"] = slotConveners
+
+        eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz = self._tz)
+        eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz = self._tz)
+        vars["ttdata"]= json.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz, None, days = None, mgmtMode = False))
+        vars["eventInfo"]= json.dumps(eventInfo)
+
+        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
+        vars["session"] = vars["target"] = self._session
         vars["urlICSFile"] = urlHandlers.UHSessionToiCal.getURL(self._session)
         vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/session/%s.ics' % \
                                               (self._session.getConference().getId(), self._session.getId())))
@@ -537,53 +216,26 @@ class WSessionDisplayMin(WSessionDisplayBase):
 
 class WSessionDisplay:
 
-    def __init__(self,aw,session):
+    def __init__(self, aw, session):
         self._aw = aw
         self._session = session
 
-    def getHTML(self,params={}):
+    def getHTML(self):
         if self._session.canAccess( self._aw ):
-            c=WSessionDisplayFull(self._aw,self._session,params["activeTab"],
-                    params.get("sortingCrit",None))
-            return c.getHTML( params )
-        if self._session.canView( self._aw ):
-            c = WSessionDisplayMin(self._aw,self._session,params["activeTab"],
-                    params.get("sortingCrit",None))
-            return c.getHTML( params )
-        return ""
+            c = WSessionDisplayFull(self._aw, self._session)
+            return c.getHTML()
 
 
 class WPSessionDisplay( WPSessionDefaultDisplayBase ):
     navigationEntry = navigation.NESessionDisplay
 
-    def _getBody(self,params):
-        wc=WSessionDisplay(self._getAW(),self._session)
-        return wc.getHTML({"activeTab":params["activeTab"],
-                            "sortingCrit":params.get("sortingCrit",None)})
-
-    def _defineToolBar(self):
-        edit=wcomponents.WTBItem( _("manage this session"),
-            icon=Config.getInstance().getSystemIconURL("modify"),
-            actionURL=urlHandlers.UHSessionModification.getURL(self._session),
-            enabled=self._session.canModify(self._getAW()) or \
-                    self._session.canCoordinate(self._getAW()))
-        url=urlHandlers.UHConfTimeTablePDF.getURL(self._session.getConference())
-        url.addParam("showSessions",self._session.getId())
-        pdf=wcomponents.WTBItem( _("get PDF of this session"),
-            icon=Config.getInstance().getSystemIconURL("pdf"),
-            actionURL=url)
-        ical=wcomponents.WTBItem( _("get ICal of this session"),
-            icon=Config.getInstance().getSystemIconURL("ical"),
-            actionURL="#",
-            className="exportIcal",
-            id=self._session.getUniqueId(),
-            elementId="exportIcal%s"%self._session.getUniqueId())
-        self._toolBar.addItem(edit)
-        self._toolBar.addItem(pdf)
-        self._toolBar.addItem(ical)
+    def _getBody(self, params):
+        wc = WSessionDisplay(self._getAW(), self._session)
+        return wc.getHTML()
 
     def getJSFiles(self):
         return WPSessionDefaultDisplayBase.getJSFiles(self) + \
+               self._includeJSPackage('MaterialEditor') + \
                self._includeJSPackage('Timetable')
 
 class WPSessionModifBase( WPConferenceModifBase ):

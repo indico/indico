@@ -1,46 +1,178 @@
-<table width="100%" align="center">
-    <tr>
-        <td>
-            <table align="center" width="100%" border="0">
-                <tr>
-                    <td>
-                        <table align="center" width="100%" border="0">
-                            <tr>
-                                <td colspan="2">
-                                    <table cellspacing="0" cellpadding="0" width="100%">
-                                        <tr>
-                                            <td width="100%"><b><font color="black" size="+1">${ title }</font></b></td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="left" colspan="2" width="100%">
-                                    <table width="100%" align="left" border="0">
-                                        ${ description }
-                                        ${ location }
-                                        <tr>
-                                            <td nowrap class="displayField" valign="top"><b> ${ _("Dates")}:</b></td>
-                                            <td width="100%">${ dateInterval }</td>
-                                        </tr>
-                                        ${ conveners }
-                                        ${ material }
-                                        <tr>
-                                            <td colspan="2">&nbsp;</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-<table width="100%">
-    <tr>
-        <td colspan="3">${ contribs }</td>
-    </tr>
-</table>
-<%include file="SessionICalExport.tpl" args="item=session"/>
+<% import MaKaC.webinterface.urlHandlers as urlHandlers %>
+<% import MaKaC.common.timezoneUtils as timezoneUtils %>
+<% import MaKaC.webinterface.linking as linking %>
+<% from MaKaC.common.timezoneUtils import DisplayTZ %>
+<% from indico.util.date_time import format_date, format_time %>
+<% from pytz import timezone %>
+
+<div id="buttonBar" class="sessionButtonBar">
+    % if session.canModify(self_._aw):
+        <a href="${str(urlHandlers.UHSessionModification.getURL(session))}" style="font-weight: bold" >${_("Edit")}</a> |
+    % endif
+    <% pdfUrl = urlHandlers.UHConfTimeTablePDF.getURL(session.getConference()) %>
+    <% pdfUrl.addParam("showSessions", session.getId()) %>
+    <a href="${str(pdfUrl)}" target="_blank">${_("PDF")}</a> |
+    <a href="#" id="exportIcal${session.getUniqueId()}" class="fakeLink exportIcal" data-id="${session.getUniqueId()}">${_("iCal")}</a>
+    <%include file="SessionICalExport.tpl" args="item=session"/>
+</div>
+<h1 class="sessionTitle">
+    ${session.getTitle()}
+</h1>
+<div class="sessionMainContent abstractMainContent">
+    <div class="sessionRightPanel abstractRightPanel">
+        <% location = session.getLocation() %>
+        <% room = session.getRoom() %>
+        % if (room and room.getName()) or location:
+            <div class="sessionRightPanelSection">
+                <h2 class="sessionSectionTitle">${_("Place")}</h2>
+                <div>
+                % if location:
+                    <div><span style="font-weight:bold">${_("Location")}: </span>${location.getName()}</div>
+                    % if location.getAddress() is not None and location.getAddress() != "":
+                        <div><span style="font-weight:bold">${_("Address")}: </span>${location.getAddress()}</div>
+                    % endif
+                % endif
+                % if room and room.getName():
+                    <div><span style="font-weight:bold">${_("Room")}: </span>${linking.RoomLinker().getHTMLLink(room, location)}</div>
+                % endif
+                </div>
+            </div>
+        % endif
+        <% canEditFiles = self_._aw.getUser() and session.canModify(self_._aw) %>
+        % if session.getAllMaterialList() or canEditFiles:
+            <div class="sessionRightPanelSection" style="border: none;">
+                <h2 class="sessionSectionTitle">${_("Files")}</h2>
+                    % if canEditFiles:
+                        <div style="float:right; line-height: 17px">
+                            <a class="fakeLink" id="manageMaterial">${_("Edit files")}</a>
+                        </div>
+                    % endif
+                <ul>
+                % for material in session.getAllMaterialList():
+                    <% if not material.canView(self_._aw):
+                        continue
+                    %>
+                    <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink">${material.getTitle()}</a>
+                        <ul class="subList">
+                         % for resource in material.getResourceList():
+                            <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank">${getResourceName(resource)}</a></li>
+                         % endfor
+                        </ul>
+                    </li>
+                % endfor
+                </ul>
+            </div>
+        % endif
+    </div>
+    <div class="sessionLeftPanel">
+        <div class="sessionInformation">
+            <div class="sessionDateInformation">
+                <% tzUtil = timezoneUtils.DisplayTZ(self_._aw, session.getOwner()) %>
+                <% tz = tzUtil.getDisplayTZ() %>
+                <% sDate = session.getAdjustedStartDate(tz) %>
+                <% eDate = session.getAdjustedEndDate(tz) %>
+                ${_("Date")}:
+                % if sDate.strftime("%d%b%Y") == eDate.strftime("%d%b%Y"):
+                    <span style="font-weight: bold"> ${format_date(sDate)}, ${format_time(sDate)} - ${format_time(eDate)}</span>
+                % else:
+                    ${_("from")} <span style="font-weight: bold">${format_date(sDate)} ${format_time(sDate)}</span> ${_("to")} <span style="font-weight: bold">${format_date(eDate)} ${format_time(eDate)}</span>
+                % endif
+            </div>
+        </div>
+    </div>
+    <div class="sessionLeftPanel">
+        % if session.getDescription():
+            <div class="sessionSection">
+                <h2 class="sessionSectionTitle">${_("Description")}</h2>
+                <div class="sessionSectionContent">${session.getDescription()}</div>
+            </div>
+        % endif
+        % if slotConveners:
+            <div class="sessionSection">
+                <h2 class="sessionSectionTitle">${_("Conveners")}</h2>
+                <div class="sessionSectionContent" style="white-space: normal">
+                    <div class="sessionConvenersTable">
+                    % for slot in slotConveners:
+                        <div style="display: table-row">
+                            % if sDate.strftime("%d%b%Y") != eDate.strftime("%d%b%Y"):
+                                <div class="sessionConvenersTableUserCell" style="display: table-cell">
+                                ${format_date(slot['startDate'])}, ${format_time(slot['startDate'], timezone = timezone(tz))} - ${format_time(slot['endDate'], timezone = timezone(tz))}
+                                % if slot['title']:
+                                    <span>(${slot['title']})</span>
+                                % endif
+                                </div>
+                            % endif
+                            <div style="display: table-cell">
+                            % for convener in slot['conveners']:
+                                <div style="clear:both">
+                                    % if self_._aw.getUser():
+                                        <a href="mailto:${convener['email']}">${convener['fullName']}</a>
+                                    % else:
+                                        <span>${convener['fullName']}</span>
+                                    % endif
+                                    <span style="font-size:10px"> (${convener['affiliation']})</span>
+                                </div>
+                            % endfor
+                            </div>
+                        </div>
+                    % endfor
+                    </div>
+                </div>
+            </div>
+        % endif
+    </div>
+</div>
+<div class="sessionContributionsSection">
+    % if session.getContributionList():
+        <div class="sessionContributionsSectionTitle">
+            <h2 class="sessionSectionTitle">
+                <span id="timeTableTitle" class="fakeLink">${_("Time Table")}</span><span style="font-weight: normal"> | </span><span id="contribListTitle" class="fakeLink" style="font-weight: normal" >${_("Contribution List")}</span>
+            </h2>
+        </div>
+        <div id="contribListDiv" style="display: none">
+            % for contrib in session.getContributionList():
+                % if contrib.canAccess(self_._aw):
+                    <%include file="ConfContributionListContribFull.tpl" args="contrib=contrib"/>
+                % elif contrib.canView(self_._aw):
+                    <%include file="ConfContributionListContribMin.tpl" args="contrib=contrib"/>
+                % endif
+            % endfor
+        </div>
+        <div id="timeTableDiv">
+            <div class="timetablePreLoading" style="width: 700px; height: 300px">
+                <div class="text" style="padding-top: 200px">${_("Building timetable...")}</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <script type="text/javascript">
+            var ttdata = ${str(ttdata)};
+            var eventInfo = ${eventInfo};
+            var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timeTableDiv'), new BrowserHistoryBroker());
+            $E('timeTableDiv').set(timetable.draw());
+            timetable.postDraw();
+        </script>
+    % endif
+</div>
+
+<script type="text/javascript">
+    $("#manageMaterial").click(function(){
+        IndicoUI.Dialogs.Material.editor('${session.getConference().getId()}', '${session.getId()}','','',
+                ${jsonEncode(session.getAccessController().isProtected())}, ${jsonEncode(session.getMaterialRegistry().getMaterialList(session.getConference()))}, ${'Indico.Urls.UploadAction.session'}, true);
+    });
+
+    $("#timeTableTitle").click(function(){
+        $("#contribListTitle").css('font-weight','normal');
+        $("#timeTableTitle").css('font-weight','bold');
+        $('#contribListDiv').hide();
+        $('#timeTableDiv').show();
+    });
+
+    $("#contribListTitle").click(function(){
+        $("#contribListTitle").css('font-weight','bold');
+        $("#timeTableTitle").css('font-weight','normal');
+        $('#contribListDiv').show();
+        $('#timeTableDiv').hide();
+    });
+
+    $('.sessionRightPanel').css('height', $('.sessionMainContent').css('height'));
+</script>

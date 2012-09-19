@@ -444,21 +444,15 @@ class WPMSessionDisplay(sessions.WPSessionDisplay):
                         body)
         return frame.getHTML( body, frameParams)
 
-    def _getBody(self,params):
-        wc=WMSessionDisplay(self._getAW(),self._session)
-        return wc.getHTML({"activeTab":params["activeTab"],
-                            "sortingCrit":params.get("sortingCrit",None)})
+    def _getBody(self, params):
+        wc = WMSessionDisplay(self._getAW(), self._session)
+        return wc.getHTML()
 
 class WMSessionDisplay(sessions.WSessionDisplay):
-    def getHTML(self,params={}):
+    def getHTML(self):
         if self._session.canAccess( self._aw ):
-            c=WMSessionDisplayFull(self._aw,self._session,params["activeTab"],
-                    params.get("sortingCrit",None))
-            return c.getHTML( params )
-        if self._session.canView( self._aw ):
-            c = WMSessionDisplayMin(self._aw,self._session,params["activeTab"],
-                    params.get("sortingCrit",None))
-            return c.getHTML( params )
+            c = WMSessionDisplayFull(self._aw,self._session)
+            return c.getHTML()
         return ""
 
 
@@ -466,30 +460,8 @@ class WMSessionDisplay(sessions.WSessionDisplay):
 class WMSessionDisplayBase(sessions.WSessionDisplayBase):
     pass
 
-
-class WMSessionDisplayMin(WMSessionDisplayBase ):
+class WMSessionDisplayFull(WMSessionDisplayBase):
     pass
-
-class WMSessionDisplayFull(WMSessionDisplayBase ):
-    def _createTabCtrl( self ):
-        self._tabCtrl=wcomponents.TabControl()
-        url=urlHandlers.UHSessionDisplay.getURL(self._session)
-        url.addParam("tab","contribs")
-        self._tabContribs=self._tabCtrl.newTab("contribs", \
-                                                _("Contribution List"),str(url))
-        self._tabCtrl.getTabById("contribs").disable()
-        url.addParam("tab","time_table")
-        self._tabTimeTable=self._tabCtrl.newTab("time_table", \
-                                                _("Time Table"),str(url))
-        if self._session.getScheduleType()=="poster":
-            self._tabTimeTable.setEnabled(False)
-            self._tabCtrl.getTabById("contribs").setActive()
-        else:
-            self._tabTimeTable.setEnabled(True)
-            tab=self._tabCtrl.getTabById(self._activeTab)
-            if tab is None:
-                tab=self._tabCtrl.getTabById("time_table")
-            tab.setActive()
 
 #################Contribution Modification##############################
 

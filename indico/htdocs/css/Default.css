@@ -8156,7 +8156,7 @@ a.lightGreyLink:hover {
     text-decoration: underline;
 }
 
-.contributionListContribHeader, .contributionHeader, .subContributionHeader, .abstractHeader {
+.contributionListContribHeader, .contributionHeader, .subContributionHeader, .sessionHeader, .abstractHeader {
     line-height:17px;
     color:#888;
     font-size: 12px;
@@ -8170,12 +8170,12 @@ a.lightGreyLink:hover {
     width: 12px;
 }
 
-.contributionButtonBar, .subContributionButtonBar, .materialButtonBar, .abstractButtonBar {
+.contributionButtonBar, .subContributionButtonBar, .sessionButtonBar, .materialButtonBar, .abstractButtonBar {
     text-align: right;
     margin-bottom: 5px;
 }
 
-.contributionTitle, .subContributionTitle, .materialTitle, .abstractTitle {
+.contributionTitle, .subContributionTitle, .sessionTitle, .materialTitle, .abstractTitle {
     font-size: 18px;
     font-weight: bold;
     line-height: 24px;
@@ -8189,6 +8189,12 @@ a.lightGreyLink:hover {
     float:left;
     width:500px;
 }
+
+.sessionMainContent {
+    width: 720px;
+    padding-bottom: 10px;
+}
+
 .contributionRightPanel, .subContributionRightPanel, .materialRightPanel, .abstractRightPanel {
     float:right;
     width: 200px;
@@ -8196,7 +8202,10 @@ a.lightGreyLink:hover {
     padding-left:10px;
     border-left: 1px solid #EAEAEA;
 }
-.contributionRightPanelSection, .subContributionRightPanelSection, .abstractRightPanelSection {
+.sessionRightPanel {
+    min-height: 0px;
+}
+.contributionRightPanelSection, .subContributionRightPanelSection, .sessionRightPanelSection, .abstractRightPanelSection {
     border-bottom: 1px solid #EAEAEA;
     font-size: 11px;
     color: #888;
@@ -8204,13 +8213,13 @@ a.lightGreyLink:hover {
     padding-bottom: 5px;
 }
 
-.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul {
+.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .sessionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul {
     list-style: none inside none;
     margin: 5px 0px 0px;
     padding: 0px;
 }
 
-.contributionRightPanelSection li, .subContributionRightPanelSection li, .materialSection li, .abstractRightPanelSection li {
+.contributionRightPanelSection li, .subContributionRightPanelSection li, .sessionRightPanelSection li, .materialSection li, .abstractRightPanelSection li {
     margin-bottom: 3px;
 }
 
@@ -8220,7 +8229,7 @@ ul.subList{
     padding: 5px 15px;
 }
 
-.contributionRightPanelSection a, .subContributionRightPanelSection a, .abstractRightPanelSection a {
+.contributionRightPanelSection a, .subContributionRightPanelSection a, .sessionRightPanelSection a, .abstractRightPanelSection a {
     font-size: 11px;
     word-wrap: break-word;
 }
@@ -8235,7 +8244,7 @@ a.titleWithLink:hover{
     text-decoration: underline;
 }
 
-.contributionInformation, .subContributionInformation, .abstractInformation {
+.contributionInformation, .subContributionInformation, .sessionInformation, .abstractInformation {
     border-bottom: 1px solid #EAEAEA;
     margin-bottom: 15px;
     padding-bottom: 10px;
@@ -8243,10 +8252,35 @@ a.titleWithLink:hover{
 
 .contributionDetail, .subContributionDetail, .materialDetail, .abstractDetail {}
 
-.contributionSection, .subContributionSection, .materialSection, .abstractSection {
+.contributionSection, .subContributionSection, .sessionSection, .materialSection, .abstractSection {
     margin-bottom: 10px;
 }
-.contributionSectionTitle, .subContributionSectionTitle, .abstractSectionTitle {
+
+.sessionLeftPanel {
+    float: left;
+    width: 500px;
+}
+
+.sessionContributionsSection {
+    clear: both;
+    border-top: 1px solid #EAEAEA;
+}
+
+.sessionContributionsSectionTitle {
+    padding: 15px 0px 15px 0px;
+}
+
+.sessionConvenersTable {
+    display: table;
+    padding: 10px 0px 0px 15px;
+}
+.sessionConvenersTableUserCell {
+    white-space: nowrap;
+    padding-bottom: 4px;
+    padding-right: 20px;
+}
+
+.contributionSectionTitle, .subContributionSectionTitle, .sessionSectionTitle, .abstractSectionTitle {
     color: #444;
     font-size: 14px;
     font-weight: bold;
@@ -8254,7 +8288,7 @@ a.titleWithLink:hover{
     margin-top: 0;
     display: inline;
 }
-.contributionSectionContent, .subContributionSectionContent, .materialSectionContent, .abstractSectionContent {
+.contributionSectionContent, .subContributionSectionContent, .sessionSectionContent, .materialSectionContent, .abstractSectionContent {
     font-size: 12px;
     line-height: 1.5em;
     text-align:justify;
@@ -8263,7 +8297,7 @@ a.titleWithLink:hover{
     white-space: pre-wrap;
 }
 
-.contributionSpeakerList,  .subContributionSpeakerList, .abstractSubmitter {
+.contributionSpeakerList, .subContributionSpeakerList, .sessionDateInformation, .abstractSubmitter {
     margin-bottom:3px;
     color:#666666;
 }
