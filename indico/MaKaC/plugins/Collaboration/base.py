@@ -770,6 +770,7 @@ class CSBookingManager(Persistent, Observer):
                     removeResult = booking._delete()
                     if isinstance(removeResult, CSErrorBase):
                         Logger.get('VideoServ').warning("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getLogMessage() ))
+                booking.unindex_instances()
                 self._unindexBooking(booking)
             except Exception, e:
                 Logger.get('VideoServ').exception("Exception while deleting a booking of type %s after deleting an event: %s" % (booking.getType(), str(e)))
