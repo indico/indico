@@ -66,12 +66,22 @@
 </div>
 
 <script type="text/javascript">
+
+var resultCache = [];
+var allItems = $(".contributionListContribItem");
+
 var verifyFilters = function(){
     $(".contributionListContribItem").hide();
     var selector= [];
-    var term = $("#filterContribs").attr('value');
 
-    var items = $(".contributionListContribItem:contains('"+ term +"')");
+    var term = $("#filterContribs").attr('value');
+    allItems.css('display', 'none');
+    if (resultCache[term] == undefined) {
+        var items = $(".contributionListContribItem:contains('"+ term +"')");
+        resultCache[term] = items;
+    } else {
+        var items = resultCache[term];
+    }
 
     % if len(conf.getContribTypeList()) > 0:
         $("#contribTypeSelector").multiselect("getChecked").each(function(index) {
@@ -96,7 +106,7 @@ var verifyFilters = function(){
         items = items.filter(selector.join(', '));
     % endif
 
-    items.show();
+    items.css('display', 'block');
     $("#numberFiltered").text(items.length);
     if(items.length == 1) {
         $("#numberFilteredText").text($T("contribution"));
