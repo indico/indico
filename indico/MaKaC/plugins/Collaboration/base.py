@@ -2180,6 +2180,17 @@ class CSBookingBase(Persistent, Fossilizable):
 
         return self._getTalkSelection()
 
+    def _hasTalks(self):
+        """ Returns the attribute if it is defined, None on error. """
+        return self._bookingParams.has_key('talks')
+
+    def isChooseTalkSelection(self):
+        """ Returns if the talks are choosen"""
+        if self._hasTalks():
+            return self._bookingParams.get('talks') == "choose"
+        else:
+            return False
+
     def __cmp__(self, booking):
         return cmp(self.getUniqueId(), booking.getUniqueId()) if booking else 1
 

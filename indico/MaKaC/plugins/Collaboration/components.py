@@ -80,10 +80,12 @@ class CSBookingInstanceIndex(OOIndex):
     def index_booking(self, bk):
         conf = bk.getConference()
         contribs = bk.getTalkSelectionList()
-        if contribs:
-            for contrib_id in contribs:
-                if conf.getContributionById(contrib_id).isScheduled():
-                    self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
+        choose = bk.isChooseTalkSelection()
+        if choose:
+            if contribs:
+                for contrib_id in contribs:
+                    if conf.getContributionById(contrib_id).isScheduled():
+                        self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
         else:
             for day in daysBetween(conf.getStartDate(), conf.getEndDate()):
                 bkw = CSBookingInstanceWrapper(bk, conf,
@@ -152,7 +154,7 @@ class CSBookingInstanceIndex(OOIndex):
     def index_talk(self, bk, talk):
         self.index_obj(CSBookingInstanceWrapper(bk, talk))
 
-class CatalogIndexPrintovider(Component):
+class CatalogIndexProvider(Component):
     zope.interface.implements(ICatalogIndexProvider)
 
     def catalogIndexProvider(self, obj):
