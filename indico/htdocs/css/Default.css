@@ -8272,7 +8272,7 @@ a.titleWithLink:hover{
 
 .sessionConvenersTable {
     display: table;
-    padding: 10px 0px 0px 15px;
+    padding-top: 15px;
 }
 .sessionConvenersTableUserCell {
     white-space: nowrap;

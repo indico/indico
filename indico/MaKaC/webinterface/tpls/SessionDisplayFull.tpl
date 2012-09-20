@@ -96,7 +96,7 @@
                         <div style="display: table-row">
                             % if sDate.strftime("%d%b%Y") != eDate.strftime("%d%b%Y"):
                                 <div class="sessionConvenersTableUserCell" style="display: table-cell">
-                                ${format_date(slot['startDate'])}, ${format_time(slot['startDate'], timezone = timezone(tz))} - ${format_time(slot['endDate'], timezone = timezone(tz))}
+                                ${format_date(slot['startDate'])}, ${format_time(slot['startDate'])} - ${format_time(slot['endDate'])}
                                 % if slot['title']:
                                     <span>(${slot['title']})</span>
                                 % endif
@@ -110,7 +110,9 @@
                                     % else:
                                         <span>${convener['fullName']}</span>
                                     % endif
-                                    <span style="font-size:10px"> (${convener['affiliation']})</span>
+                                    % if convener['affiliation']:
+                                        <span style="font-size:10px"> (${convener['affiliation']})</span>
+                                    % endif
                                 </div>
                             % endfor
                             </div>
@@ -126,31 +128,45 @@
     % if session.getContributionList():
         <div class="sessionContributionsSectionTitle">
             <h2 class="sessionSectionTitle">
-                <span id="timeTableTitle" class="fakeLink">${_("Time Table")}</span><span style="font-weight: normal"> | </span><span id="contribListTitle" class="fakeLink" style="font-weight: normal" >${_("Contribution List")}</span>
+                % if session.getScheduleType() == "poster":
+                    ${_("Contribution List")}
+                % else:
+                    <span id="timeTableTitle" class="fakeLink">${_("Time Table")}</span><span> | </span><span id="contribListTitle" class="fakeLink">${_("Contribution List")}</span>
+                % endif
             </h2>
         </div>
-        <div id="contribListDiv" style="display: none">
-            % for contrib in session.getContributionList():
-                % if contrib.canAccess(self_._aw):
-                    <%include file="ConfContributionListContribFull.tpl" args="contrib=contrib"/>
-                % elif contrib.canView(self_._aw):
-                    <%include file="ConfContributionListContribMin.tpl" args="contrib=contrib"/>
-                % endif
-            % endfor
+
+        <div id="contributionListDiv">
+            <%include file="SessionContributionList.tpl" args="contributions=sorted(session.getContributionList(), key=lambda contrib: contrib.getTitle()), accessWrapper=self_._aw"/>
         </div>
-        <div id="timeTableDiv">
-            <div class="timetablePreLoading" style="width: 700px; height: 300px">
-                <div class="text" style="padding-top: 200px">${_("Building timetable...")}</div>
+        % if session.getScheduleType() != "poster":
+            <div id="timeTableDiv">
+                <div class="timetablePreLoading" style="width: 700px; height: 300px">
+                    <div class="text" style="padding-top: 200px">${_("Building timetable...")}</div>
+                </div>
+                <div class="clearfix"></div>
             </div>
-            <div class="clearfix"></div>
-        </div>
-        <script type="text/javascript">
-            var ttdata = ${str(ttdata)};
-            var eventInfo = ${eventInfo};
-            var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timeTableDiv'), new BrowserHistoryBroker());
-            $E('timeTableDiv').set(timetable.draw());
-            timetable.postDraw();
-        </script>
+            <script type="text/javascript">
+                var ttdata = ${str(ttdata)};
+                var eventInfo = ${eventInfo};
+                var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timeTableDiv'), new BrowserHistoryBroker());
+                $E('timeTableDiv').set(timetable.draw());
+                timetable.postDraw();
+                $("#timeTableTitle").click(function(){
+                    $("#contribListTitle").css('font-weight','normal');
+                    $("#timeTableTitle").css('font-weight','bold');
+                    $('#contributionListDiv').hide();
+                    $('#timeTableDiv').show();
+                });
+                $("#contribListTitle").click(function(){
+                    $("#contribListTitle").css('font-weight','bold');
+                    $("#timeTableTitle").css('font-weight','normal');
+                    $('#contributionListDiv').show();
+                    $('#timeTableDiv').hide();
+                });
+                $("#timeTableTitle").click();
+            </script>
+        % endif
     % endif
 </div>
 
@@ -158,20 +174,6 @@
     $("#manageMaterial").click(function(){
         IndicoUI.Dialogs.Material.editor('${session.getConference().getId()}', '${session.getId()}','','',
                 ${jsonEncode(session.getAccessController().isProtected())}, ${jsonEncode(session.getMaterialRegistry().getMaterialList(session.getConference()))}, ${'Indico.Urls.UploadAction.session'}, true);
-    });
-
-    $("#timeTableTitle").click(function(){
-        $("#contribListTitle").css('font-weight','normal');
-        $("#timeTableTitle").css('font-weight','bold');
-        $('#contribListDiv').hide();
-        $('#timeTableDiv').show();
-    });
-
-    $("#contribListTitle").click(function(){
-        $("#contribListTitle").css('font-weight','bold');
-        $("#timeTableTitle").css('font-weight','normal');
-        $('#contribListDiv').show();
-        $('#timeTableDiv').hide();
     });
 
     $('.sessionRightPanel').css('height', $('.sessionMainContent').css('height'));
