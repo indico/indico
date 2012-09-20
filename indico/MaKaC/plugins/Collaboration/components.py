@@ -80,7 +80,7 @@ class CSBookingInstanceIndex(OOIndex):
     def index_booking(self, bk):
         conf = bk.getConference()
         contribs = bk.getTalkSelectionList()
-        choose = bk.isChooseTalkSelection()
+        choose = bk.isChooseTalkSelected()
         if choose:
             if contribs:
                 for contrib_id in contribs:
