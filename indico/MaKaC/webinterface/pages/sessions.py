@@ -201,6 +201,8 @@ class WSessionDisplayBase(WICalExportBase):
         vars["urlICSFile"] = urlHandlers.UHSessionToiCal.getURL(self._session)
         vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/session/%s.ics' % \
                                               (self._session.getConference().getId(), self._session.getId())))
+        vars["conf"] = self._session.getConference()
+        vars["contributions"] = sorted(self._session.getContributionList(), key=lambda contrib: contrib.getTitle())
         return vars
 
 

@@ -98,7 +98,7 @@
                                 <div class="sessionConvenersTableUserCell" style="display: table-cell">
                                 ${format_date(slot['startDate'])}, ${format_time(slot['startDate'])} - ${format_time(slot['endDate'])}
                                 % if slot['title']:
-                                    <span>(${slot['title']})</span>
+                                    (${slot['title']})
                                 % endif
                                 </div>
                             % endif
@@ -137,7 +137,7 @@
         </div>
 
         <div id="contributionListDiv">
-            <%include file="SessionContributionList.tpl" args="contributions=sorted(session.getContributionList(), key=lambda contrib: contrib.getTitle()), accessWrapper=self_._aw"/>
+            <%include file="SessionContributionList.tpl" args="accessWrapper=self_._aw"/>
         </div>
         % if session.getScheduleType() != "poster":
             <div id="timeTableDiv">
