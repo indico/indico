@@ -942,9 +942,10 @@ class WPModMarkAsDup(WPAbstractManagment):
     def _getTabContent( self, params ):
         wc = wcomponents.WAbstractModMarkAsDup(self._target)
         p={"comments":params.get("comments",""),
-            "id":params.get("originalId",""),
-            "duplicateURL":urlHandlers.UHAbstractModMarkAsDup.getURL(self._abstract),
-            "cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract)}
+           "id":params.get("originalId",""),
+           "duplicateURL":urlHandlers.UHAbstractModMarkAsDup.getURL(self._abstract),
+           "cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract),
+           "error": params.get('errorMsg', '')}
         return wc.getHTML(p)
 
 
@@ -952,9 +953,9 @@ class WPModUnMarkAsDup(WPAbstractManagment):
 
     def _getTabContent( self, params ):
         wc = wcomponents.WAbstractModUnMarkAsDup(self._target)
-        p={ "comments":params.get("comments",""),
-            "unduplicateURL":urlHandlers.UHAbstractModUnMarkAsDup.getURL(self._abstract),
-            "cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract)}
+        p={"comments":params.get("comments",""),
+           "unduplicateURL":urlHandlers.UHAbstractModUnMarkAsDup.getURL(self._abstract),
+           "cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract)}
         return wc.getHTML(p)
 
 
@@ -980,12 +981,13 @@ class WPModMergeInto(WPAbstractManagment):
 
     def _getTabContent( self, params ):
         wc=WAbstractModMergeInto(self._target)
-        p={"cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract),\
-            "mergeURL":urlHandlers.UHAbstractModMergeInto.getURL(self._abstract),\
-            "comments":params.get("comments",""),\
-            "id":params.get("targetId",""),\
-            "includeAuthors":params.get("includeAuthors",False),
-            "doNotify":params.get("notify",False)}
+        p = {"cancelURL": urlHandlers.UHAbstractManagment.getURL(self._abstract),
+             "mergeURL": urlHandlers.UHAbstractModMergeInto.getURL(self._abstract),
+             "comments": params.get("comments",""),
+             "id": params.get("targetId",""),
+             "includeAuthors": params.get("includeAuthors",False),
+             "doNotify": params.get("notify",False),
+             "error": params.get('errorMsg', '')}
         return wc.getHTML(p)
 
 
@@ -1005,9 +1007,10 @@ class WPModUnMerge(WPAbstractManagment):
 
     def _getTabContent( self, params ):
         wc = WAbstractModUnMerge(self._target)
-        p={ "comments":params.get("comments",""),
-            "unmergeURL":urlHandlers.UHAbstractModUnMerge.getURL(self._abstract),
-            "cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract)}
+        p={"comments":params.get("comments",""),
+           "unmergeURL":urlHandlers.UHAbstractModUnMerge.getURL(self._abstract),
+           "cancelURL":urlHandlers.UHAbstractManagment.getURL(self._abstract),
+           "error": params.get('errorMsg', '')}
         return wc.getHTML(p)
 
 

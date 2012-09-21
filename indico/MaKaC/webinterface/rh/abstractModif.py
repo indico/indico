@@ -284,16 +284,24 @@ class RHMarkAsDup(RHAbstractModifBase):
             self._originalId=params.get("id","")
             self._original=self._target.getOwner().getAbstractById(self._originalId)
 
+    def _getErrorsInData(self):
+        res=[]
+        if self._original==None or self._target==self._original:
+            res.append( _("invalid original abstract id"))
+        return res
+
     def _process( self ):
+        errMsg=""
         if self._action=="MARK":
-            if self._original==None or self._target==self._original:
-                raise NoReportError( _("invalid target abstract id"))
-            else:
+            errorList=self._getErrorsInData()
+            if len(errorList)==0:
                 self._target.markAsDuplicated(self._getUser(),self._original,self._comments)
                 self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
                 return
+            else:
+                errMsg="<br>".join(errorList)
         p=abstracts.WPModMarkAsDup(self,self._target)
-        return p.display(comments=self._comments,originalId=self._originalId)
+        return p.display(comments=self._comments,originalId=self._originalId,errorMsg=errMsg)
 
 
 class RHUnMarkAsDup(RHAbstractModifBase):
@@ -308,12 +316,13 @@ class RHUnMarkAsDup(RHAbstractModifBase):
 
 
     def _process( self ):
+        errMsg=""
         if self._action=="UNMARK":
             self._target.unMarkAsDuplicated(self._getUser(),self._comments)
             self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
             return
         p=abstracts.WPModUnMarkAsDup(self,self._target)
-        return p.display(comments=self._comments,originalId=self._originalId)
+        return p.display(comments=self._comments,originalId=self._originalId,errorMsg=errMsg)
 
 
 class RHMergeInto(RHAbstractModifBase):
@@ -330,18 +339,26 @@ class RHMergeInto(RHAbstractModifBase):
             self._doNotify=params.has_key("notify")
             self._targetAbs=self._target.getOwner().getAbstractById(self._targetAbsId)
 
+    def _getErrorsInData(self):
+        res=[]
+        if self._targetAbs==None or self._target==self._targetAbs:
+            res.append("invalid target abstract id")
+        return res
+
     def _process( self ):
+        errMsg=""
         if self._action=="MERGE":
-            if self._targetAbs==None or self._target==self._targetAbs:
-                raise NoReportError( _("invalid target abstract id"))
-            else:
+            errorList=self._getErrorsInData()
+            if len(errorList)==0:
                 self._target.mergeInto(self._getUser(),self._targetAbs,comments=self._comments,mergeAuthors=self._includeAuthors)
                 if self._doNotify:
                     self._target.notify(EmailNotificator(),self._getUser())
                 self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
                 return
+            else:
+                errMsg="<br>".join(errorList)
         p=abstracts.WPModMergeInto(self,self._target)
-        return p.display(comments=self._comments,targetId=self._targetAbsId,includeAuthors=self._includeAuthors,notify=self._doNotify)
+        return p.display(comments=self._comments,targetId=self._targetAbsId,errorMsg=errMsg,includeAuthors=self._includeAuthors,notify=self._doNotify)
 
 
 class RHUnMerge(RHAbstractModifBase):
@@ -545,6 +562,7 @@ class RHEditData(RHAbstractModifBase, AbstractParam):
         if errors:
             p = abstracts.WPModEditData(self, self._target, self._abstractData)
             pars = self._abstractData.toDict()
+            pars["errors"] = errors
             pars["action"] = self._action
             # restart the current value of the param attachments to show the existing files
             pars["attachments"] = self._abstract.getAttachments().values()

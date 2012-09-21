@@ -1,12 +1,14 @@
+<div class="groupTitle">${ _("Merging an abstract into another")}</div>
 
-<table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
+% if error:
+  <div class="errorMessage">${error}</div>
+% endif
+
+
+<table>
     <tr>
-        <td class="groupTitle" colspan="2"> ${ _("Merging an abstract into another")}</td>
-    </tr>
-    <tr>
-        <td bgcolor="white">
-            <br>
-            <table width="100%">
+        <td>
+            <table>
                 <tr>
                     <form action=${ mergeURL } method="POST">
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Comments")}</span></td>

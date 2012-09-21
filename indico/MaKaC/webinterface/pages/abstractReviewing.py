@@ -174,6 +174,7 @@ class WConfModCFANotifTplNew(wcomponents.WTemplated):
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         vars["postURL"] = quoteattr(str(urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)))
+        vars["errors"] = vars.get("errorList",[])
         vars["title"] = quoteattr(str(vars.get("title","")))
         vars["description"] = self.htmlText(vars.get("description",""))
         vars["subject"] = quoteattr(str(vars.get("subject","")))
@@ -208,6 +209,7 @@ class WConfModCFANotifTplEditData(wcomponents.WTemplated):
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         vars["postURL"] = quoteattr(str(urlHandlers.UHAbstractModNotifTplEdit.getURL(self._notifTpl)))
+        vars["errors"] = vars.get("errorList",[])
         if not vars.has_key("title"):
             vars["title"] = quoteattr(str(self._notifTpl.getName()))
         else:
@@ -241,6 +243,7 @@ class WPModCFANotifTplNew(WPConfModifAbstractsReviewingNotifTplBase):
 
     def _getTabContent(self,params):
         wc = WConfModCFANotifTplNew(self._conf)
+        params["errorList"] = params.get("errorList",[])
         return wc.getHTML(params)
 
     def getJSFiles(self):
@@ -307,6 +310,7 @@ class WPModCFANotifTplEdit(WPModCFANotifTplBase):
 
     def _getTabContent(self, params):
         wc=WConfModCFANotifTplEditData(self._notifTpl)
+        params["errorList"] = params.get("errorList",[])
         return wc.getHTML(params)
 
     def getJSFiles(self):
