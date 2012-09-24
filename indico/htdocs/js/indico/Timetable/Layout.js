@@ -75,6 +75,7 @@ type("TimetableLayoutManager", [],
          },
 
          assign: function(assigned, block) {
+
              var ks = keys(assigned);
              ks.sort();
 
@@ -121,11 +122,15 @@ type("TimetableLayoutManager", [],
 
              // Changes the column of a block
              var reassign = function(block, col) {
+                 assigned[block.assigned] = null;
                  block.assigned = col;
                  assigned[col] = block;
+
                  if (!exists(block.sessionId)) {
                      lastAssign(block, col);
                  }
+
+                 lastAssigned[block.sessionId].col = col;
              };
 
              for (key in currentGroup) {
@@ -138,13 +143,13 @@ type("TimetableLayoutManager", [],
                      continue;
                  }
 
-                 if (!exists(lastAssigned[block.sessionId])) {
+                 if (exists(lastAssigned[block.sessionId])) {
+                     lastAssign(block);
+                 } else {
                      // This block has never been assigned before. Just update the lastAssigned.
                      lastAssign(block, block.assigned);
                      continue;
                  }
-
-                 lastAssign(block);
 
                  if (correctlyAssigned(block)) {
                      // The block has already got its prefered position
@@ -163,7 +168,6 @@ type("TimetableLayoutManager", [],
                      }
                  } else if (!exists(existingBlock.sessionId) || !exists(lastAssigned[existingBlock.sessionId]) ||
                      numAssignedBlocks(block.sessionId) > numAssignedBlocks(existingBlock.sessionId)) {
-
                      // The block currently placed in the prefered column has either no prefered column
                      // or has a preferred column but has fewer previous placed session slots (this
                      // gives lower priority).
@@ -206,7 +210,7 @@ type("TimetableLayoutManager", [],
          shouldShowRoom: function() {
              return true;
          },
-         reorderColumns:function() {
+         reorderColumns:function(group) {
          }
      }
     );
@@ -277,8 +281,8 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
                  // current block is [minutes, minutes + 5]
                  var startMin = (startingHour * 60 + minutes);
                  endMin = (startingHour * 60 + minutes + TimetableDefaults.resolution);
-                 var hStart = zeropad(parseInt(startMin/60, 10))+''+zeropad(startMin%60);
-                 hEnd = zeropad(parseInt(endMin/60, 10))+''+zeropad(endMin%60);
+                 var hStart = zeropad(parseInt(startMin / 60, 10)) + '' + zeropad(startMin % 60);
+                 hEnd = zeropad(parseInt(endMin / 60, 10)) + '' + zeropad(endMin % 60);
 
                  self.processTimeBlock(hStart, hEnd, startMin, minutes, algData);
              }
@@ -299,8 +303,8 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
                  });
                  counter++;
              });
-             return [algData.topPx, algData.grid, algData.blocks, algData.groups, algData.wholeDayBlocks];
 
+             return [algData.topPx, algData.grid, algData.blocks, algData.groups, algData.wholeDayBlocks];
          }
 
      });
@@ -446,7 +450,6 @@ type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
              var pxStep = Math.floor(TimetableDefaults.layouts.proportional.values.pxPerHour*TimetableDefaults.resolution/60);
              var smallBlocks = [];
 
-
              each(points, function(point) {
 
                  if (point[1] == 'end') {
@@ -515,7 +518,9 @@ type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
              }
 
              algData.topPx += pxStep;
+
          }
+
      });
 
 type("RoomLayoutManager", ["CompactLayoutManager"],

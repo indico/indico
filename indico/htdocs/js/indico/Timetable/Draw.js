@@ -1505,12 +1505,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
 
                  var block;
 
-                 var empty = true;
-
-                 for (b in eventData.entries) {
-                     empty = false;
-                     break;
-                 }
+                 var empty = _(eventData.entries).size() > 0;
                  compactMode = false;
                  // For now don't use the compact mode. Activating it makes short entries displaying less
                  // information in the block (only time and title).
@@ -1557,7 +1552,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
              }
 
              var dayData = this.layoutChooser.get().drawDay(dayFiltered, 'session', this.startTime, this.endTime, this.managementMode);
-             var height = dayData[0]+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
+             var height = dayData[0] + TimetableDefaults.topMargin + TimetableDefaults.bottomMargin;
              this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 
              this.grid.length = 0;
