@@ -1,3 +1,4 @@
+<% from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools %>
 <%
     ## Only show event-level video services.
     event_bookings = filter(lambda x: x.hasSessionOrContributionLink() != True, bookings)
@@ -77,7 +78,7 @@ var bookings = ${dict((b['id'], b) for b in fossilize(bookings))|n,j};
             videoServiceLaunchInfo["${bookingId}"] = ${jsonEncode(launchInfo['launchTooltip'])};
         </script>
         % endif
-        % if (bookingInfo or launchInfo) and booking.getType() == "Vidyo" and booking.canBeConnected() and booking and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or booking.getOwner()["id"] == self_._rh._getUser().getId()):
+        % if (bookingInfo or launchInfo) and booking.getType() == "Vidyo" and booking.canBeConnected() and booking and ((self_._rh._getUser() and (conf.canModify(self_._rh._aw) or booking.getOwner()["id"] != self_._rh._getUser().getId())) or (self_._rh.getHostIP() is VidyoTools.getLinkRoomIp(booking.getLinkObject(), ipAttName='IP'))):
         <span style="margin-left:3px;margin-right:3px;">|</span>
         <script type="text/javascript">
           var booking${booking.getId()} = bookings[${pos}];

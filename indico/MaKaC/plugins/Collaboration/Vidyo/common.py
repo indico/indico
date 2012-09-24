@@ -196,7 +196,7 @@ class VidyoTools(object):
         return nowutc() - timedelta(days = getVidyoOptionValue("maxDaysBeforeClean"))
 
     @classmethod
-    def getLinkRoomIp(cls, linkVideo):
+    def getLinkRoomIp(cls, linkVideo, ipAttName="H323 IP"):
         if linkVideo is None:
             return ""
         location = linkVideo.getLocation()
@@ -208,9 +208,9 @@ class VidyoTools(object):
                 CrossLocationDB.connect()
                 try:
                     roomInfo = CrossLocationQueries.getRooms( location = location.getName(), roomName = room.getName())
-                    roomIp = roomInfo.customAtts["H323 IP"]
+                    roomIp = roomInfo.customAtts[ipAttName]
                 except Exception, e:
-                    Logger.get("Vidyo").warning("Location: " + location.getName() + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
+                    Logger.get("Vidyo").warning("Location: " + location.getName() + "Problem with CrossLocationQueries when retrieving the list of all rooms with a " + ipAttName + ": " + str(e))
         return roomIp
 
     @classmethod
