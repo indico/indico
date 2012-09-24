@@ -109,7 +109,7 @@
                         <span class="RRNoteText">
                             ${_("Some of your talks (%d out of %d) are not in a room capable of recording and thus cannot be recorded.") % (NTalks - NRecordingCapableContributions, NTalks)}
                         </span>
-                        <span class='fakeLink' id="recordTalksText">${_("See list of recorded talks.")} </span>
+                        <span class='fakeLink' id="recordTalksText">${_("See list of record-able talks.")} </span>
                         <span class='fakeLink' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
                         <div id="recordCapableTalksDiv" style="padding:5px; display:none;">
                             <ul class="RROptionList" style="font-size: 13px" id="contributionRecordedList">
@@ -236,18 +236,17 @@
     var isLecture = ${ jsBoolean(IsLecture) };
     var RRRecordingCapable = ${ jsBoolean(RecordingCapable) };
     var RR_contributions = ${ jsonEncode(Contributions) };
+    var NRecordingCapableContributions = ${NRecordingCapableContributions};
+    var NTalks = ${NTalks};
     var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
-</script>
-
 
 % if (not RecordingCapable and RecordingCapableRooms) or (NTalks > NRecordingCapableContributions and RecordingCapable):
-<script type="text/javascript">
     $("#recordingRoomsText").click( function () {
         if ($('#recordingCapableRoomsDiv').is(':hidden')) {
-            $("#recordingRoomsText").text($T("Hide list of webcast-able rooms."));
+            $("#recordingRoomsText").text($T("Hide list of record-able rooms."));
             $("#recordingCapableRoomsDiv").show();
         } else {
-            $("#recordingRoomsText").text($T("See list of webcast-able rooms."));
+            $("#recordingRoomsText").text($T("See list of record-able rooms."));
             $("#recordingCapableRoomsDiv").hide();
         }
     });
@@ -276,6 +275,6 @@
             }
         }
     });
-</script>
 % endif
+</script>
 

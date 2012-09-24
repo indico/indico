@@ -109,7 +109,7 @@
                         <span class="WRNoteText">
                             ${_("Some of your talks")} (${ str(NTalks - NWebcastCapableContributions) + _(" out of ") + str(NTalks) }) ${_(" are not in a room capable of webcasting and thus cannot be webcasted.")}
                         </span>
-                        <span class='fakeLink' id="webcastTalksText">${_("See list of webcasted talks.")} </span>
+                        <span class='fakeLink' id="webcastTalksText">${_("See list of webcast-able talks.")} </span>
                         <span class='fakeLink' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
                         <div id="webcastCapableTalksDiv" style="padding:5px; display:none;">
                             <ul class="WROptionList" style="font-size: 13px" id="contributionWebcastedList">
@@ -215,14 +215,12 @@
 <script type="text/javascript">
     var isLecture = ${ jsBoolean(IsLecture) };
     var WRWebcastCapable = ${ jsBoolean(WebcastCapable) };
-
     var WR_contributions = ${ jsonEncode(Contributions) };
-
+    var NWebcastCapableContributions = ${NWebcastCapableContributions};
+    var NTalks = ${NTalks};
     var WR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasWebcastCapableTalks) };
-</script>
 
 % if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable):
-<script type="text/javascript">
     $("#webcastRoomsText").click( function () {
         if ($('#webcastCapableRoomsDiv').is(':hidden')) {
             $("#webcastRoomsText").text($T("Hide list of webcast-able rooms."));
@@ -257,5 +255,5 @@
             }
         }
     });
-</script>
 % endif
+</script>
