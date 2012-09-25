@@ -210,7 +210,7 @@ class VidyoTools(object):
                     roomInfo = CrossLocationQueries.getRooms( location = location.getName(), roomName = room.getName())
                     roomIp = roomInfo.customAtts[ipAttName]
                 except Exception, e:
-                    Logger.get("Vidyo").warning("Location: " + location.getName() + "Problem with CrossLocationQueries when retrieving the list of all rooms with a " + ipAttName + ": " + str(e))
+                    Logger.get("Vidyo").warning("Location: '%s' - Problem with CrossLocationQueries: '%s'" % (location.getName(), str(e)))
         return roomIp
 
     @classmethod
