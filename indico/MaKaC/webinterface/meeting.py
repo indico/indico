@@ -690,16 +690,6 @@ class WPMConfModifTools (conferences.WPConfModifToolsBase):
 class WMConfModifTools (conferences.WConfModifTools):
     pass
 
-#Bookings#
-
-class WPMConfModifBookings(conferences.WPConfModifBookings):
-    pass
-
-class WMConfModifBookings (conferences.WConfModifBookings):
-    pass
-
-##
-
 class WPMConfModifListings (conferences.WPConfModifListings):
 
     def _getTabContent( self, params ):

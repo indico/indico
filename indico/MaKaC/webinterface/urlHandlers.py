@@ -1365,41 +1365,6 @@ class UHConfGrantModificationToAllConveners( URLHandler ):
 class UHConfModifCoordinatorRights(URLHandler):
     _relativeURL = "confModifAC.py/modifySessionCoordRights"
 
-## Old Videoconference related
-class UHBookingsVRVS( URLHandler ):
-    _relativeURL = "confModifBookings.py/createBookingVRVS"
-
-
-class UHPerformBookingsVRVS( URLHandler ):
-    _relativeURL = "confModifBookings.py/performBookingVRVS"
-
-
-class UHBookingDetail(URLHandler):
-    _relativeURL = "confModifBookings.py/BookingDetail"
-
-
-class UHConfModifBookings( URLHandler ):
-    _relativeURL = "confModifBookings.py"
-
-
-class UHConfModifBookingList( URLHandler ):
-    _relativeURL = "confModifBookings.py/index"
-
-
-class UHConfModifBookingAction( URLHandler ):
-    _relativeURL = "confModifBookings.py/performBookingAction"
-
-
-class UHConfModifBookingPerformDeletion( URLHandler ):
-    _relativeURL = "confModifBookings.py/performBookingDeletion"
-
-
-class UHConfModifBookingModification(URLHandler):
-    _relativeURL = "confModifBookings.py/performBookingModification"
-## End of old Videoconference related
-
-
-## New Collaboration related
 class UHAdminCollaboration(URLHandler):
     _relativeURL = "adminCollaboration.py"
 
@@ -1411,8 +1376,6 @@ class UHConfModifCollaborationManagers(URLHandler):
 
 class UHCollaborationDisplay(URLHandler):
     _relativeURL = "collaborationDisplay.py"
-
-## End of new Collaboration related
 
 class UHConfModifTools( URLHandler ):
     _relativeURL = "confModifTools.py"
