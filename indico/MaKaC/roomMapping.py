@@ -109,29 +109,26 @@ class RoomMapper(Persistent):
         self._regexps=[]
 
     def applyRegularExpressions(self, roomName):
-        """Returns the attribute we have to pass to the Map URL or None if no matching"""
+        """Returns the group of attributes we have to pass to the Map URL or None if no matching"""
         for regexp in self.getRegularExpressions():
             p = re.compile(regexp)
-            m=p.match(roomName)
-            if m is not None:
-                if len(m.groups()) == 1:
-                    return m.group(1)
-                elif len(m.groups()) == 0 and m.group() != "":
-                    return m.group()
+            m = p.match(roomName)
+            if m:
+                return m.groups()
         return None
 
     def getMapURL(self, roomName):
-        m = re.match("([0-9]+)-([A-Z0-9]+)-([A-Z0-9]+)", roomName)
-        if m:
-            return self.getBaseMapURL()%(m.group(1) + "/" + m.group(2) + "-" + m.group(3))
+        group = self.applyRegularExpressions(roomName)
+        if group:
+            return self.getBaseMapURL() % group
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
             rooms = CrossLocationQueries.getRooms(roomName = roomName)
             rooms = [r for r in rooms if r is not None]
             if rooms and rooms[0]:
-                return self.getBaseMapURL()%(str(rooms[0].building) + "/" + rooms[0].floor + "-" + rooms[0].roomNr)
+                return self.getBaseMapURL() % (str(rooms[0].building), rooms[0].floor, rooms[0].roomNr)
         return ""
-    getCompleteMapURL=getMapURL
+    getCompleteMapURL = getMapURL
 
     def getLocator( self ):
         d = Locator()
