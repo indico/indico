@@ -121,15 +121,15 @@ class RoomMapper(Persistent):
         return None
 
     def getMapURL(self, roomName):
-        if re.match("[0-9]+-([0-9]+|R)-[0-9]+", roomName):
-            return "%s%s"%(self.getBaseMapURL(), roomName[:roomName.find('-')])
-        else:
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
-                rooms = CrossLocationQueries.getRooms(roomName = roomName)
-                rooms = [r for r in rooms if r is not None]
-                if rooms and rooms[0]:
-                    return "%s%s"%(self.getBaseMapURL(), str(rooms[0].building))
+        m = re.match("([0-9]+)-([A-Z0-9]+)-([A-Z0-9]+)", roomName)
+        if m:
+            return self.getBaseMapURL()%(m.group(1) + "/" + m.group(2) + "-" + m.group(3))
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.getRoomBookingModuleActive():
+            rooms = CrossLocationQueries.getRooms(roomName = roomName)
+            rooms = [r for r in rooms if r is not None]
+            if rooms and rooms[0]:
+                return self.getBaseMapURL()%(str(rooms[0].building) + "/" + rooms[0].floor + "-" + rooms[0].roomNr)
         return ""
     getCompleteMapURL=getMapURL
 
