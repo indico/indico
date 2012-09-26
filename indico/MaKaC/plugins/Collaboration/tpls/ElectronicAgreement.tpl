@@ -3,18 +3,19 @@
 
     % if canShow:
         <span class="RRNoteText" style="float:left;">
-            ${_("""Before any recording can be published, each speaker must sign the %s.<br/>
-                     To do so, two different ways are available:
-                     <ol>
+            ${_("""Before any recording can be published, each speaker must sign a %s.<br/>
+                     This can be done <strong>in two different ways</strong>:
+                     <ul>
                         <li><span style="font-weight:bold;">Electronic signature:</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
                         </li>
+                        <em class="grey">or</em>
                         <li>Ask the speaker to sign the """)%(agreementName)}
 
             ${urlPaperAgreement}
 
              ${_("""<br/>Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
                            </li>
-                        </ol>
+                        </ul>
                 """)}
         </span>
 
