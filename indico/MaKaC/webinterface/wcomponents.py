@@ -5164,61 +5164,6 @@ class WShowExistingReviewingMaterial(WTemplated):
 
         return vars
 
-class WAddNewMaterial(WTemplated):
-
-    def __init__(self,target,availMF):
-        self._target=target
-        self._availMF=availMF
-
-    def _getTargetName(self):
-        if isinstance(self._target, conference.Contribution):
-            return "Contribution"
-        elif isinstance(self._target, conference.SubContribution):
-            return "Subcontribution"
-        elif isinstance(self._target, conference.Conference):
-            return "Event"
-        return ""
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        nbFiles=int(vars.get("nbFiles",1))
-        nbLinks=int(vars.get("nbLinks",1))
-        vars["targetName"]=self._getTargetName()
-        vars["targetId"]=self.htmlText(self._target.getId())
-        vars["targetTitle"]=self.htmlText(self._target.getTitle())
-
-        vars["selectNumberOfFiles"] = ""
-        for i in range(1,10):
-            if i == nbFiles:
-                vars["selectNumberOfFiles"] += "<option selected>%s" % i
-            else:
-                vars["selectNumberOfFiles"] += "<option>%s" % i
-        vars["fileSubmitForms"] = ""
-        for i in range(1,nbFiles+1):
-            vars["fileSubmitForms"] += WSubmitMaterialFile(i,self._availMF).getHTML(vars)
-        vars["selectNumberOfLinks"] = ""
-        for i in range(1,10):
-            if i == nbLinks:
-                vars["selectNumberOfLinks"] += "<option selected>%s" % i
-            else:
-                vars["selectNumberOfLinks"] += "<option>%s" % i
-        vars["linkSubmitForms"] = ""
-        for i in range(1,nbLinks+1):
-            vars["linkSubmitForms"] += WSubmitMaterialLink(i,self._availMF).getHTML(vars)
-        vars["conversion"]=""
-        if Configuration.Config.getInstance().hasFileConverter():
-            vars["conversion"]="""
-                                <tr>
-                                    <td class="titleCellTD"><span class="titleCellFormat">To PDF</span></td>
-                                    <td><input type="checkbox" name="topdf" checked="checked">Automatic conversion to pdf (when applicable)? (PPT, DOC)</td>
-                                </tr>
-                                """
-        if vars["cancel"]:
-            vars["CancelButton"] = """<input type="submit" name="CANCEL" value="cancel" class="btn">"""
-        else:
-            vars["CancelButton"] = ""
-        return vars
-
 class WSubmitMaterial(WTemplated):
 
     def __init__(self,target,availMF):
