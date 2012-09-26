@@ -2063,7 +2063,7 @@ class WRoomMapperDetails(wcomponents.WTemplated):
         vars["description"] = self._roomMapper.getDescription()
         vars["url"] = self._roomMapper.getBaseMapURL()
         vars["placeName"] = self._roomMapper.getPlaceName()
-        vars["regexps"] = "<ul><li>%s</li></ul>"%"</li><li>".join(self._roomMapper.getRegularExpressions())
+        vars["regexps"] = self._roomMapper.getRegularExpressions()
         return vars
 
 

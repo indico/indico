@@ -49,6 +49,7 @@ class RHRoomMapperBase( RHRoomMapperProtected ):
     def _checkParams( self, params ):
         RHRoomMapperProtected._checkParams( self, params )
         self._roomMapper = locators.RoomMapperWebLocator( params ).getObject()
+        self._doNotSanitizeFields.append("regexps")
 
 
 class RHRoomMapperDetails( RHRoomMapperBase ):

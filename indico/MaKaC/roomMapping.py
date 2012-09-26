@@ -109,24 +109,25 @@ class RoomMapper(Persistent):
         self._regexps=[]
 
     def applyRegularExpressions(self, roomName):
-        """Returns the group of attributes we have to pass to the Map URL or None if no matching"""
+        """Returns the groupdict of attributes we have to pass to the Map URL or None if no matching"""
         for regexp in self.getRegularExpressions():
             p = re.compile(regexp)
             m = p.match(roomName)
             if m:
-                return m.groups()
+                return m.groupdict()
         return None
 
     def getMapURL(self, roomName):
-        group = self.applyRegularExpressions(roomName)
-        if group:
-            return self.getBaseMapURL() % group
+        groupdict = self.applyRegularExpressions(roomName)
+        if groupdict:
+            return self.getBaseMapURL().format(**groupdict)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
             rooms = CrossLocationQueries.getRooms(roomName = roomName)
             rooms = [r for r in rooms if r is not None]
             if rooms and rooms[0]:
-                return self.getBaseMapURL() % (str(rooms[0].building), rooms[0].floor, rooms[0].roomNr)
+                if all(field in self.getBaseMapURL() for field in ['{building}','{floor}','{roomNr}']):
+                    return self.getBaseMapURL().format(**{'building': str(rooms[0].building),'floor': rooms[0].floor,'roomNr': rooms[0].roomNr})
         return ""
     getCompleteMapURL = getMapURL
 
