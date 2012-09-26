@@ -704,7 +704,7 @@ class ShowConcurrentEvents(ServiceBase):
 
     def _getAnswer( self ):
         im = indexes.IndexesHolder()
-        ch = ConferenceHolder()
+        ch = conference.ConferenceHolder()
         calIdx = im.getIndex("calendar")
         evtIds = calIdx.getObjectsIn(self._sDate, self._eDate)
 
