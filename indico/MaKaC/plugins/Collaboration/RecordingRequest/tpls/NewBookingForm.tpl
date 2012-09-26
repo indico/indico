@@ -95,7 +95,7 @@
                         <input type="radio" name="talks" value="all" id="allTalksRB" onclick="RR_hideTalks()" checked />
                     </td>
                     <td>
-                        % if NTalks == NWebcastCapableContributions:
+                        % if NTalks == NRecordingCapableContributions:
                         <label for="allTalksRB" id="allTalksRBLabel" >${_("All talks") }</label>
                         % else:
                         <label for="allTalksRB" id="allTalksRBLabel">${_("All record-able talks.")}</label>
@@ -240,7 +240,7 @@
     var recordingSwitch = false;
     var toggleRecordingCapableRooms = function () {
         IndicoUI.Effect.toggleAppearance($E('recordingCapableRoomsDiv'));
-        if (webcastSwitch) {
+        if (recordingSwitch) {
             $E("recordingRoomsText").dom.innerHTML = $T("See list of record-able rooms.");
         } else {
             $E("recordingRoomsText").dom.innerHTML = $T("Hide list of record-able rooms.");

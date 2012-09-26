@@ -84,9 +84,10 @@ class CSBookingInstanceIndex(OOIndex):
         if choose:
             if contribs:
                 for contrib_id in contribs:
-                    if conf.getContributionById(contrib_id).isScheduled():
+                    if CollaborationTools.isAbleToBeWebcastOrRecorded(conf.getContributionById(contrib_id), bk.getType()):
                         self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
-        else:
+        # We need to check if it is a lecture with a correct room
+        elif CollaborationTools.isAbleToBeWebcastOrRecorded(conf, bk.getType()) or conf.getType() !="simple_event":
             for day in daysBetween(conf.getStartDate(), conf.getEndDate()):
                 bkw = CSBookingInstanceWrapper(bk, conf,
                                                day.replace(hour=0, minute=0, second=0),
@@ -264,9 +265,27 @@ class EventCollaborationListener(Component):
         if obj.__class__ == Conference:
             obj = obj.getCSBookingManager()
             obj.notifyDeletion()
+        elif obj.__class__ == Contribution:
+            csBookingManager = obj.getCSBookingManager()
+            for booking in csBookingManager.getBookingList():
+                booking.unindex_talk(obj)
 
     # ILocationActionListener
     @classmethod
     def placeChanged(cls, obj):
         obj = obj.getCSBookingManager()
         obj.notifyLocationChange()
+
+    @classmethod
+    def locationChanged(cls, obj, oldLocation, newLocation):
+        csBookingManager = obj.getCSBookingManager()
+        for booking in csBookingManager.getBookingList():
+            booking.unindex_talk(obj)
+            booking.index_talk(obj)
+
+    @classmethod
+    def roomChanged(cls, obj, oldLocation, newLocation):
+        csBookingManager = obj.getCSBookingManager()
+        for booking in csBookingManager.getBookingList():
+            booking.unindex_talk(obj)
+            booking.index_talk(obj)

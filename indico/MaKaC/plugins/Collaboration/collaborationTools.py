@@ -442,6 +442,17 @@ class CollaborationTools(object):
 
         return (talks, roomFullNames, roomNames, ableTalks)
 
+    @classmethod
+    def isAbleToBeWebcastOrRecorded(cls, obj, plugin_name):
+        plugin_option ='recordingCapableRooms' if plugin_name == 'RecordingRequest' else 'webcastCapableRooms'
+        capableRooms = CollaborationTools.getOptionValueRooms(plugin_name, plugin_option)
+        roomNames = [r.locationName + ':' + r.name for r in capableRooms]
+        location = obj.getLocation()
+        room = obj.getRoom()
+        isAble = location and room and (location.getName() + ":" + room.getName() in roomNames)
+        if isinstance(obj, Contribution):
+            isAble = isAble and obj.isScheduled()
+        return isAble
 
 
 class MailTools(object):
