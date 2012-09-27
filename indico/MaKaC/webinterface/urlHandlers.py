@@ -2338,18 +2338,6 @@ class UHSessionModFit( URLHandler ):
 class UHSessionModSchEditContrib(URLHandler):
     _relativeURL = "sessionModifSchedule.py/editContrib"
 
-
-class UHSessionModSlotEdit( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotEdit"
-
-
-class UHSessionModSlotNew( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotNew"
-
-
-class UHSessionModSlotRem( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotRem"
-
 class UHSessionModSlotCalc( URLHandler ):
     _relativeURL = "sessionModifSchedule.py/slotCalc"
 

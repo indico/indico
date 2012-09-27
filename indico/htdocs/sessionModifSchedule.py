@@ -23,17 +23,8 @@ from MaKaC.webinterface.rh import sessionModif
 def index( req, **params ):
     return sessionModif.RHSessionModifSchedule( req ).process( params )
 
-def slotNew( req, **params ):
-    return sessionModif.RHSlotNew(req).process(params)
-
-def slotRem( req, **params ):
-    return sessionModif.RHSlotRem(req).process(params)
-
 def slotCalc( req, **params ):
     return sessionModif.RHSlotCalc(req).process(params)
-
-def slotEdit( req, **params ):
-    return sessionModif.RHSlotEdit(req).process(params)
 
 def slotCompact( req, **params ):
     return sessionModif.RHSlotCompact(req).process(params)

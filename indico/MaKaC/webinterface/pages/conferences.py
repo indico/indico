@@ -4786,7 +4786,6 @@ class WPModMergeAbstracts(WPConfAbstractList):
             "inclAuth":params.get("inclAuth",False),
             "comments":params.get("comments",""),
             "notify":params.get("notify",True),
-            "abstractMgr":self._conf.getAbstractMgr(),
             }
         return wc.getHTML(p)
 

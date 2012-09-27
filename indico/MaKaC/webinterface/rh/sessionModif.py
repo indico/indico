@@ -77,13 +77,6 @@ class RHSessionModCoordinationBase(RHSessionModifBase):
             return
         RHSessionModifBase._checkProtection( self )
 
-class RHSessionModUnrestrictedTTCoordinationBase(RHSessionModifBase):
-
-    def _checkProtection(self):
-        if self._target.canCoordinate(self.getAW(), "unrestrictedSessionTT"):
-            return
-        RHSessionModifBase._checkProtection( self )
-
 class RHSessionModUnrestrictedContribMngCoordBase(RHSessionModifBase):
 
     def _checkProtection(self):
@@ -759,97 +752,6 @@ class RHFitSession(RHSessionModCoordinationBase):
         self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
 
 
-class RHSlotNew( RoomBookingDBMixin, RHSessionModUnrestrictedTTCoordinationBase ):
-
-    def _checkParams(self, params):
-        self._check = int(params.get("check",1))
-        RHSessionModifBase._checkParams(self, params)
-        self._slotDate = params.get("slotDate","")
-        self._action = ""
-        if params.get("cancel", None) is not None:
-            self._action = "cancel"
-        elif params.get("OK", None) is not None:
-            self._action = "submit"
-        elif params.get("addConvener", None) is not None:
-            self._action = "addConvener"
-        elif params.get("remConveners", None) is not None:
-            self._action = "remConveners"
-        toNorm=["conv_id","conv_title", "conv_first_name",
-            "conv_family_name","conv_affiliation",
-            "conv_email"]
-        for k in toNorm:
-            params[k]=self._normaliseListParam(params.get(k,[]))
-
-        self._evt = None
-
-
-    def _process(self):
-
-        self._slotData = Slot()
-        params = self._getRequestParams()
-        params["session"]=self._session
-        if self._action == "cancel":
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-        elif self._action == "submit":
-            self._slotData.setValues(params)
-            self._slotData.checkErrors()
-            slot=conference.SessionSlot(self._session)
-            params["conveners"]=self._slotData.getConvenerList()
-            params["sDate"]=self._slotData.getStartDate()
-            params["eDate"]=self._slotData.getEndDate()
-            slot.setValues( params,self._check )
-            self._session.addSlot(slot)
-            logInfo = slot.getLogInfo()
-            logInfo["subject"] = "Create new slot: %s"%slot.getTitle()
-            self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
-            self._redirect( urlHandlers.UHSessionModifSchedule.getURL( slot ) )
-        elif self._action == "addConvener":
-            self._slotData.setValues(params)
-            self._slotData.newConvener()
-            p = sessions.WPModSlotNew(self, self._slotData)
-            return p.display()
-        elif self._action == "remConveners":
-            self._slotData.setValues(params)
-            idList = self._normaliseListParam( params.get("sel_conv", []) )
-            self._slotData.removeConveners( idList )
-            p = sessions.WPModSlotNew(self, self._slotData)
-            return p.display()
-        else:
-            dateTuple = re.compile("^(\d*)-(\d*)-(\d*)$").match(self._slotDate).groups()
-            auxdate = timezone(self._conf.getTimezone()).localize(datetime(int(dateTuple[2]), int(dateTuple[1]), int(dateTuple[0])))
-            sdate = self._session.getSchedule().getFirstFreeSlotOnDay(auxdate)
-            edate = sdate + timedelta(hours=1)
-            params["sDate"]=sdate
-            params["eDate"]=edate
-            if self._session.getContribDuration()!=None:
-                params["contribDuration"] = self._session.getContribDuration()
-            else:
-                params["contribDuration"] = timedelta(hours=0,minutes=20)
-            self._slotData.setValues(params)
-            p = sessions.WPModSlotNew(self, self._slotData )
-            return p.display()
-
-
-class RHSlotRem(RHSessionModUnrestrictedTTCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModUnrestrictedTTCoordinationBase._checkParams(self, params)
-        self._slotId=params.get("slotId","")
-        self._confirmed=params.has_key("confirm")
-        self._cancel=params.has_key("cancel")
-
-    def _process(self):
-        if not self._cancel:
-            slot=self._session.getSlotById(self._slotId)
-            if not self._confirmed:
-                p=sessions.WPModSlotRemConfirmation(self,slot)
-                wf = self.getWebFactory()
-                if wf != None:
-                    p = wf.getModSlotRemConfirmation(self,slot)
-                return p.display()
-            self._session.removeSlot(slot)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-
 class RHSlotCalc(RHSessionModCoordinationBase):
 
     def _checkParams(self, params):
@@ -897,75 +799,6 @@ class RHSlotCalc(RHSessionModCoordinationBase):
             self._redirect(self._formatRedirectURL(urlHandlers.UHSessionModifSchedule.getURL(self._session)))
         else:
             self._redirect(self._formatRedirectURL(urlHandlers.UHConfModifSchedule.getURL(self._conf)))
-
-class RHSlotEdit( RoomBookingDBMixin, RHSessionModUnrestrictedTTCoordinationBase ):
-
-    def _checkParams(self, params):
-        RHSessionModUnrestrictedTTCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._check = int(params.get("check",1))
-        self._move = int(params.get("move",0))
-        self._action = ""
-        if params.get("cancel", None) is not None:
-            self._action = "cancel"
-        elif params.get("OK", None) is not None:
-            self._action = "submit"
-        elif params.get("addConvener", None) is not None:
-            self._action = "addConvener"
-        elif params.get("remConveners", None) is not None:
-            self._action = "remConveners"
-        if params.get( "bookedRoomName" ):
-            params["roomName"] = params["bookedRoomName"]
-        toNorm=["conv_id","conv_title", "conv_first_name",
-            "conv_family_name","conv_affiliation",
-            "conv_email"]
-        for k in toNorm:
-            params[k]=self._normaliseListParam(params.get(k,[]))
-
-        self._evt = self._slot
-
-    def _process(self):
-
-        self._slotData = Slot()
-        if self._action == "cancel":
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._slot.getSession(), slotId=self._slot.getId()))
-        elif self._action == "submit":
-            params = self._getRequestParams()
-
-            params["id"]=self._slot.getId()
-            params["session"]=self._slot.getSession()
-            params["conf"]=self._slot.getConference()
-            params["move"]=self._move
-
-            self._slotData.setValues(params)
-            self._slotData.checkErrors()
-            params["conveners"]=self._slotData.getConvenerList()
-            self._slot.setValues( params, self._check )
-            self._redirect( '%s#slot%s' % (urlHandlers.UHConfModifSchedule.getURL( self._conf, session=self._slot.getSession().getId() ), self._slot.getId()) )
-        elif self._action == "addConvener":
-            params = self._getRequestParams()
-            params["id"]=self._slot.getId()
-            params["session"]=self._slot.getSession()
-            self._slotData.setValues(params)
-            self._slotData.newConvener()
-            p = sessions.WPModSlotEdit(self, self._slotData)
-            return p.display()
-        elif self._action == "remConveners":
-            params = self._getRequestParams()
-            params["id"]=self._slot.getId()
-            params["session"]=self._slot.getSession()
-            self._slotData.setValues(params)
-            idList = self._normaliseListParam( params.get("sel_conv", []) )
-            self._slotData.removeConveners( idList )
-            p = sessions.WPModSlotEdit(self, self._slotData)
-            return p.display()
-        else:
-            self._slotData.mapSlot(self._slot)
-            wf = self.getWebFactory()
-            p = sessions.WPModSlotEdit(self, self._slotData)
-            if wf != None:
-                   p = wf.getModSlotEdit(self, self._slotData)
-            return p.display()
 
 
 class RHSlotCompact(RHSessionModCoordinationBase):
