@@ -274,92 +274,96 @@ class RHAbstractManagmentReject(RHAbstractModifBase):
 
 class RHMarkAsDup(RHAbstractModifBase):
 
-    def _checkParams( self, params ):
-        RHAbstractModifBase._checkParams( self, params )
-        self._action,self._comments,self._original="","",None
-        self._originalId=""
-        if params.has_key("OK"):
-            self._action="MARK"
-            self._comments=params.get("comments","")
-            self._originalId=params.get("id","")
-            self._original=self._target.getOwner().getAbstractById(self._originalId)
+    def _checkParams(self, params):
+        RHAbstractModifBase._checkParams(self, params)
+        self._action, self._comments, self._original = "", "", None
+        self._originalId = ""
+        if "OK" in params:
+            self._action = "MARK"
+            self._comments = params.get("comments", "")
+            self._originalId = params.get("id", "")
+            self._original = self._target.getOwner(
+            ).getAbstractById(self._originalId)
 
     def _getErrorsInData(self):
-        res=[]
-        if self._original==None or self._target==self._original:
-            res.append( _("invalid original abstract id"))
+        res = []
+        if self._original is None or self._target == self._original:
+            res.append(_("invalid original abstract id"))
         return res
 
-    def _process( self ):
-        errMsg=""
-        if self._action=="MARK":
-            errorList=self._getErrorsInData()
-            if len(errorList)==0:
-                self._target.markAsDuplicated(self._getUser(),self._original,self._comments)
-                self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
+    def _process(self):
+        errMsg = ""
+        if self._action == "MARK":
+            errorList = self._getErrorsInData()
+            if len(errorList) == 0:
+                self._target.markAsDuplicated(
+                    self._getUser(), self._original, self._comments)
+                self._redirect(
+                    urlHandlers.UHAbstractManagment.getURL(self._target))
                 return
             else:
-                errMsg="<br>".join(errorList)
-        p=abstracts.WPModMarkAsDup(self,self._target)
-        return p.display(comments=self._comments,originalId=self._originalId,errorMsg=errMsg)
+                errMsg = "<br>".join(errorList)
+        p = abstracts.WPModMarkAsDup(self, self._target)
+        return p.display(comments=self._comments, originalId=self._originalId, errorMsg=errMsg)
 
 
 class RHUnMarkAsDup(RHAbstractModifBase):
 
-    def _checkParams( self, params ):
-        RHAbstractModifBase._checkParams( self, params )
-        self._action,self._comments,self._original="","",None
-        self._originalId=""
-        if params.has_key("OK"):
-            self._action="UNMARK"
-            self._comments=params.get("comments","")
+    def _checkParams(self, params):
+        RHAbstractModifBase._checkParams(self, params)
+        self._action, self._comments, self._original = "", "", None
+        self._originalId = ""
+        if "OK" in params:
+            self._action = "UNMARK"
+            self._comments = params.get("comments", "")
 
-
-    def _process( self ):
-        errMsg=""
-        if self._action=="UNMARK":
-            self._target.unMarkAsDuplicated(self._getUser(),self._comments)
-            self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
+    def _process(self):
+        errMsg = ""
+        if self._action == "UNMARK":
+            self._target.unMarkAsDuplicated(self._getUser(), self._comments)
+            self._redirect(
+                urlHandlers.UHAbstractManagment.getURL(self._target))
             return
-        p=abstracts.WPModUnMarkAsDup(self,self._target)
-        return p.display(comments=self._comments,originalId=self._originalId,errorMsg=errMsg)
+        p = abstracts.WPModUnMarkAsDup(self, self._target)
+        return p.display(comments=self._comments, originalId=self._originalId, errorMsg=errMsg)
 
 
 class RHMergeInto(RHAbstractModifBase):
 
-    def _checkParams( self, params ):
-        RHAbstractModifBase._checkParams( self, params )
-        self._action,self._comments,self._targetAbs="","",None
-        self._targetAbsId,self._includeAuthors,self._doNotify="",False,True
-        if params.has_key("OK"):
-            self._action="MERGE"
-            self._comments=params.get("comments","")
-            self._targetAbsId=params.get("id","")
-            self._includeAuthors=params.has_key("includeAuthors")
-            self._doNotify=params.has_key("notify")
-            self._targetAbs=self._target.getOwner().getAbstractById(self._targetAbsId)
+    def _checkParams(self, params):
+        RHAbstractModifBase._checkParams(self, params)
+        self._action, self._comments, self._targetAbs = "", "", None
+        self._targetAbsId, self._includeAuthors, self._doNotify = "", False, True
+        if "OK" in params:
+            self._action = "MERGE"
+            self._comments = params.get("comments", "")
+            self._targetAbsId = params.get("id", "")
+            self._includeAuthors = "includeAuthors" in params
+            self._doNotify = "notify" in params
+            self._targetAbs = self._target.getOwner(
+            ).getAbstractById(self._targetAbsId)
 
     def _getErrorsInData(self):
-        res=[]
-        if self._targetAbs==None or self._target==self._targetAbs:
+        res = []
+        if self._targetAbs is None or self._target == self._targetAbs:
             res.append("invalid target abstract id")
         return res
 
-    def _process( self ):
-        errMsg=""
-        if self._action=="MERGE":
-            errorList=self._getErrorsInData()
-            if len(errorList)==0:
-                self._target.mergeInto(self._getUser(),self._targetAbs,comments=self._comments,mergeAuthors=self._includeAuthors)
+    def _process(self):
+        errMsg = ""
+        if self._action == "MERGE":
+            errorList = self._getErrorsInData()
+            if len(errorList) == 0:
+                self._target.mergeInto(self._getUser(), self._targetAbs, comments=self._comments, mergeAuthors=self._includeAuthors)
                 if self._doNotify:
-                    self._target.notify(EmailNotificator(),self._getUser())
-                self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
+                    self._target.notify(EmailNotificator(), self._getUser())
+                self._redirect(
+                    urlHandlers.UHAbstractManagment.getURL(self._target))
                 return
             else:
-                errMsg="<br>".join(errorList)
-        p=abstracts.WPModMergeInto(self,self._target)
-        return p.display(comments=self._comments,targetId=self._targetAbsId,errorMsg=errMsg,includeAuthors=self._includeAuthors,notify=self._doNotify)
-
+                errMsg = "<br>".join(errorList)
+        p = abstracts.WPModMergeInto(self, self._target)
+        return p.display(comments=self._comments, targetId=self._targetAbsId, errorMsg=errMsg, includeAuthors=self._includeAuthors, notify=self._doNotify)
 
 class RHUnMerge(RHAbstractModifBase):
 

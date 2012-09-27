@@ -2846,78 +2846,83 @@ class RHAbstractsActions:
 
 class RHAbstractsMerge(RHConfModifCFABase):
 
-    def _checkParams(self,params):
-        RHConfModifCFABase._checkParams(self,params)
-        self._abstractIds=normaliseListParam(params.get("abstracts",[]))
-        self._targetAbsId=params.get("targetAbstract","")
-        self._inclAuthors=params.has_key("includeAuthors")
-        self._doNotify=params.has_key("notify")
-        self._comments=params.get("comments","")
-        self._action=""
-        if params.has_key("CANCEL"):
-            self._action="CANCEL"
-        elif params.has_key("OK"):
-            self._action="MERGE"
-            self._abstractIds=params.get("selAbstracts","").split(",")
+    def _checkParams(self, params):
+        RHConfModifCFABase._checkParams(self, params)
+        self._abstractIds = normaliseListParam(params.get("abstracts", []))
+        self._targetAbsId = params.get("targetAbstract", "")
+        self._inclAuthors = "includeAuthors" in params
+        self._doNotify = "notify" in params
+        self._comments = params.get("comments", "")
+        self._action = ""
+        if "CANCEL" in params:
+            self._action = "CANCEL"
+        elif "OK" in params:
+            self._action = "MERGE"
+            self._abstractIds = params.get("selAbstracts", "").split(",")
         else:
-            self._doNotify=True
+            self._doNotify = True
 
     def _process(self):
-        errorList=[]
-        if self._action=="CANCEL":
-            self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._target))
+        errorList = []
+        if self._action == "CANCEL":
+            self._redirect(
+                urlHandlers.UHConfAbstractManagment.getURL(self._target))
             return
-        elif self._action=="MERGE":
-            absMgr=self._target.getAbstractMgr()
-            if len(self._abstractIds)==0:
-                errorList.append( _("No ABSTRACT TO BE MERGED has been specified"))
+        elif self._action == "MERGE":
+            absMgr = self._target.getAbstractMgr()
+            if len(self._abstractIds) == 0:
+                errorList.append(
+                    _("No ABSTRACT TO BE MERGED has been specified"))
             else:
-                self._abstracts=[]
+                self._abstracts = []
                 for id in self._abstractIds:
-                    abs=absMgr.getAbstractById(id)
+                    abs = absMgr.getAbstractById(id)
                     if abs is None:
-                        errorList.append( _("ABSTRACT TO BE MERGED ID '%s' is not valid")%(id))
+                        errorList.append(_("ABSTRACT TO BE MERGED ID '%s' is not valid") % (id))
                     else:
-                        statusKlass=abs.getCurrentStatus().__class__
-                        if statusKlass in (review.AbstractStatusAccepted,\
-                                            review.AbstractStatusRejected,\
-                                            review.AbstractStatusWithdrawn,\
-                                            review.AbstractStatusDuplicated,\
-                                            review.AbstractStatusMerged):
-                            label=AbstractStatusList.getInstance().getCaption(statusKlass)
-                            errorList.append( _("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)")%(abs.getId(),label.upper()))
+                        statusKlass = abs.getCurrentStatus().__class__
+                        if statusKlass in (review.AbstractStatusAccepted,
+                                           review.AbstractStatusRejected,
+                                           review.AbstractStatusWithdrawn,
+                                           review.AbstractStatusDuplicated,
+                                           review.AbstractStatusMerged):
+                            label = AbstractStatusList.getInstance(
+                            ).getCaption(statusKlass)
+                            errorList.append(_("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)") % (abs.getId(), label.upper()))
                         self._abstracts.append(abs)
-            if self._targetAbsId=="":
-                errorList.append( _("Invalid TARGET ABSTRACT ID"))
+            if self._targetAbsId == "":
+                errorList.append(_("Invalid TARGET ABSTRACT ID"))
             else:
                 if self._targetAbsId in self._abstractIds:
-                   errorList.append( _("TARGET ABSTRACT ID is among the ABSTRACT IDs TO BE MERGED"))
-                self._targetAbs=absMgr.getAbstractById(self._targetAbsId)
+                    errorList.append(_("TARGET ABSTRACT ID is among the ABSTRACT IDs TO BE MERGED"))
+                self._targetAbs = absMgr.getAbstractById(self._targetAbsId)
                 if self._targetAbs is None:
-                   errorList.append( _("Invalid TARGET ABSTRACT ID"))
+                    errorList.append(_("Invalid TARGET ABSTRACT ID"))
                 else:
-                    statusKlass=self._targetAbs.getCurrentStatus().__class__
-                    if statusKlass in (review.AbstractStatusAccepted,\
-                                        review.AbstractStatusRejected,\
-                                        review.AbstractStatusWithdrawn,\
-                                        review.AbstractStatusMerged,\
-                                        review.AbstractStatusDuplicated):
-                        label=AbstractStatusList.getInstance().getInstance().getCaption(statusKlass)
-                        errorList.append( _("TARGET ABSTRACT is in status which does not allow to merge (%s)")%label.upper())
-            if len(errorList)==0:
+                    statusKlass = self._targetAbs.getCurrentStatus().__class__
+                    if statusKlass in (review.AbstractStatusAccepted,
+                                       review.AbstractStatusRejected,
+                                       review.AbstractStatusWithdrawn,
+                                       review.AbstractStatusMerged,
+                                       review.AbstractStatusDuplicated):
+                        label = AbstractStatusList.getInstance(
+                        ).getInstance().getCaption(statusKlass)
+                        errorList.append(_("TARGET ABSTRACT is in status which does not allow to merge (%s)") % label.upper())
+            if len(errorList) == 0:
                 for abs in self._abstracts:
-                    abs.mergeInto(self._getUser(),self._targetAbs,\
-                        mergeAuthors=self._inclAuthors,comments=self._comments)
+                    abs.mergeInto(self._getUser(), self._targetAbs,
+                                  mergeAuthors=self._inclAuthors, comments=self._comments)
                     if self._doNotify:
-                        abs.notify(EmailNotificator(),self._getUser())
+                        abs.notify(EmailNotificator(), self._getUser())
                 return self._redirect(urlHandlers.UHAbstractManagment.getURL(self._targetAbs))
-        p=conferences.WPModMergeAbstracts(self,self._target)
-        return p.display(absIdList=self._abstractIds,\
-                            targetAbsId=self._targetAbsId, \
-                            inclAuth=self._inclAuthors,\
-                            comments=self._comments,\
-                            errorMsgList=errorList,\
-                            notify=self._doNotify)
+        p = conferences.WPModMergeAbstracts(self, self._target)
+        return p.display(absIdList=self._abstractIds,
+                         targetAbsId=self._targetAbsId,
+                         inclAuth=self._inclAuthors,
+                         comments=self._comments,
+                         errorMsgList=errorList,
+                         notify=self._doNotify)
+
 
 #Base class for multi abstract management
 class RHAbstractManagmentMultiple( RHConferenceModifBase ):
@@ -5016,38 +5021,41 @@ class RHNewAbstract(RHConfModifCFABase, AbstractParam):
         #if the user is not logged in we return inmediately as this form needs
         #   the user to be logged in and therefore all the checking below is not
         #   necessary
-        if self._getUser() == None:
+        if self._getUser() is None:
             return
         headerSize = self._req.headers_in["content-length"]
         AbstractParam._checkParams(self, params, self._conf, headerSize)
 
-
-    def _doValidate( self ):
+    def _doValidate(self):
         #First, one must validate that the information is fine
         errors = self._abstractData.check()
         if errors:
-            p = conferences.WPModNewAbstract(self, self._target, self._abstractData)
+            p = conferences.WPModNewAbstract(
+                self, self._target, self._abstractData)
             pars = self._abstractData.toDict()
             pars["action"] = self._action
-            return p.display( **pars )
+            return p.display(**pars)
         #Then, we create the abstract object and set its data to the one
         #   received
         cfaMgr = self._target.getAbstractMgr()
-        abstract = cfaMgr.newAbstract( self._getUser() )
+        abstract = cfaMgr.newAbstract(self._getUser())
         #self._setAbstractData(abstract)
         self._abstractData.setAbstractData(abstract)
         #Finally, we display the abstract list page
         self._redirect(urlHandlers.UHConfAbstractList.getURL(self._conf))
 
-    def _process( self ):
+    def _process(self):
         if self._action == "CANCEL":
-            self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._target))
+            self._redirect(
+                urlHandlers.UHConfAbstractManagment.getURL(self._target))
         elif self._action == "VALIDATE":
             return self._doValidate()
         else:
-            p = conferences.WPModNewAbstract(self, self._target, self._abstractData)
+            p = conferences.WPModNewAbstract(
+                self, self._target, self._abstractData)
             pars = self._abstractData.toDict()
             return p.display(**pars)
+
 
 
 class RHContribsActions:

@@ -467,25 +467,29 @@ class RHTrackAbstractPropForOtherTracks( RHTrackAbstractBase ):
 
 class RHModAbstractMarkAsDup(RHTrackAbstractBase):
 
-    def _checkParams( self, params ):
-        RHTrackAbstractBase._checkParams( self, params )
-        self._action,self._comments,self._original="","",None
-        self._originalId=""
-        if params.has_key("OK"):
-            self._action="MARK"
-            self._comments=params.get("comments","")
-            self._originalId=params.get("id","")
-            self._original=self._abstract.getOwner().getAbstractById(self._originalId)
+    def _checkParams(self, params):
+        RHTrackAbstractBase._checkParams(self, params)
+        self._action, self._comments, self._original = "", "", None
+        self._originalId = ""
+        if "OK" in params:
+            self._action = "MARK"
+            self._comments = params.get("comments", "")
+            self._originalId = params.get("id", "")
+            self._original = self._abstract.getOwner(
+            ).getAbstractById(self._originalId)
 
-    def _process( self ):
-        if self._action=="MARK":
-            if self._original==None or self._target==self._original:
-                raise MaKaCError( _("invalid original abstract id"))
-            self._abstract.markAsDuplicated(self._getUser(),self._original,self._comments, self._track)
-            self._redirect(urlHandlers.UHTrackAbstractModif.getURL(self._track,self._abstract))
+    def _process(self):
+        if self._action == "MARK":
+            if self._original is None or self._target == self._original:
+                raise MaKaCError(_("invalid original abstract id"))
+            self._abstract.markAsDuplicated(
+                self._getUser(), self._original, self._comments, self._track)
+            self._redirect(urlHandlers.UHTrackAbstractModif.getURL(
+                self._track, self._abstract))
             return
-        p=tracks.WPModAbstractMarkAsDup(self,self._track,self._abstract)
-        return p.display(comments=self._comments,originalId=self._originalId)
+        p = tracks.WPModAbstractMarkAsDup(self, self._track, self._abstract)
+        return p.display(comments=self._comments, originalId=self._originalId)
+
 
 
 class RHModAbstractUnMarkAsDup(RHTrackAbstractBase):

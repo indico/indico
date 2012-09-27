@@ -100,151 +100,157 @@ class RHSessionModification(RHSessionModCoordinationBase):
 #--------------------------------------------------------------------------
 
 class RHSessionDatesModification(RHSessionModifBase):
-    _uh=urlHandlers.UHSessionDatesModification
+    _uh = urlHandlers.UHSessionDatesModification
 
-    def _checkParams(self,params):
-        self._check = int(params.get("check",1))
-        self._slmove = int(params.get("slmove",1))
-        RHSessionModifBase._checkParams(self,params)
-        self._confirmed=params.has_key("confirm")
-        self._action=""
-        if params.has_key("CANCEL") or params.has_key("cancel"):
-            self._action="CANCEL"
-        elif params.has_key("OK") or params.has_key("confirm"):
-            self._action="MODIFY"
-        elif params.has_key("performedAction") :
-            self._action=params["performedAction"]
+    def _checkParams(self, params):
+        self._check = int(params.get("check", 1))
+        self._slmove = int(params.get("slmove", 1))
+        RHSessionModifBase._checkParams(self, params)
+        self._confirmed = "confirm" in params
+        self._action = ""
+        if "CANCEL" in params or "cancel" in params:
+            self._action = "CANCEL"
+        elif "OK" in params or "confirm" in params:
+            self._action = "MODIFY"
+        elif "performedAction" in params:
+            self._action = params["performedAction"]
         else:
-            sd,ed=self._session.getAdjustedStartDate(),self._session.getAdjustedEndDate()
-            params["sYear"],params["sMonth"]=sd.year,sd.month
-            params["sDay"]=sd.day
-            params["sHour"],params["sMinute"]=sd.hour,sd.minute
-            params["eYear"],params["eMonth"]=ed.year,ed.month
-            params["eDay"]=ed.day
-            params["eHour"],params["eMinute"]=ed.hour,ed.minute
+            sd, ed = self._session.getAdjustedStartDate(
+            ), self._session.getAdjustedEndDate()
+            params["sYear"], params["sMonth"] = sd.year, sd.month
+            params["sDay"] = sd.day
+            params["sHour"], params["sMinute"] = sd.hour, sd.minute
+            params["eYear"], params["eMonth"] = ed.year, ed.month
+            params["eDay"] = ed.day
+            params["eHour"], params["eMinute"] = ed.hour, ed.minute
 
-    def _modify(self,params):
+    def _modify(self, params):
         tz = self._session.getConference().getTimezone()
-        sd = timezone(tz).localize(datetime( int( params["sYear"] ), \
-                                             int( params["sMonth"] ), \
-                                             int( params["sDay"] ), \
-                                             int( params["sHour"] ), \
-                                             int( params["sMinute"] )))
-        params["sDate"]=sd.astimezone(timezone('UTC'))
-        if params.get("eYear","") == "":
-           ed = timezone(tz).localize(datetime( int( params["sYear"] ),
-                                                int( params["sMonth"] ), \
-                                                int( params["sDay"] ), \
-                                                int( params["eHour"] ), \
-                                                int( params["eMinute"] )))
+        sd = timezone(tz).localize(datetime(int(params["sYear"]),
+                                            int(params["sMonth"]),
+                                            int(params["sDay"]),
+                                            int(params["sHour"]),
+                                            int(params["sMinute"])))
+        params["sDate"] = sd.astimezone(timezone('UTC'))
+        if params.get("eYear", "") == "":
+            ed = timezone(tz).localize(datetime(int(params["sYear"]),
+                                                int(params["sMonth"]),
+                                                int(params["sDay"]),
+                                                int(params["eHour"]),
+                                                int(params["eMinute"])))
         else:
-           ed = timezone(tz).localize(datetime( int( params["eYear"] ),
-                                                int( params["eMonth"] ), \
-                                                int( params["eDay"] ), \
-                                                int( params["eHour"] ), \
-                                                int( params["eMinute"] )))
+            ed = timezone(tz).localize(datetime(int(params["eYear"]),
+                                                int(params["eMonth"]),
+                                                int(params["eDay"]),
+                                                int(params["eHour"]),
+                                                int(params["eMinute"])))
         params["eDate"] = ed.astimezone(timezone('UTC'))
-        self._target.setDates(params["sDate"],params["eDate"],self._check,self._slmove)
+        self._target.setDates(
+            params["sDate"], params["eDate"], self._check, self._slmove)
 
-    def _process( self ):
-        url=urlHandlers.UHSessionModifSchedule.getURL(self._target)
-        params=self._getRequestParams()
-        if self._action=="CANCEL":
+    def _process(self):
+        url = urlHandlers.UHSessionModifSchedule.getURL(self._target)
+        params = self._getRequestParams()
+        if self._action == "CANCEL":
             self._redirect(url)
             return
-        elif self._action=="MODIFY":
+        elif self._action == "MODIFY":
             self._modify(params)
             self._redirect(url)
             return
-        p=sessions.WPSessionDatesModification(self,self._target)
-        params=self._getRequestParams()
+        p = sessions.WPSessionDatesModification(self, self._target)
+        params = self._getRequestParams()
         return p.display(**params)
 
     def _getPreservedParams(self):
         params = self._websession.getVar("preservedParams")
-        if params is None :
+        if params is None:
             return {}
         return params
 
     def _preserveParams(self, params):
-        self._websession.setVar("preservedParams",params)
+        self._websession.setVar("preservedParams", params)
 
     def _removePreservedParams(self):
-        self._websession.setVar("preservedParams",None)
+        self._websession.setVar("preservedParams", None)
 
-class RHSessionDataModification( RoomBookingDBMixin, RHSessionModifBase ):
-    _uh=urlHandlers.UHSessionDataModification
 
-    def _checkParams(self,params):
-        self._check = int(params.get("check",1))
-        self._slmove = int(params.get("slmove",0))
-        RHSessionModifBase._checkParams(self,params)
-        self._confirmed=params.has_key("confirm")
-        self._action=""
-        if params.has_key("CANCEL") or params.has_key("cancel"):
-            self._action="CANCEL"
-        elif params.has_key("OK") or params.has_key("confirm"):
-            self._action="MODIFY"
-        elif params.has_key("performedAction") :
-            self._action=params["performedAction"]
+class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
+    _uh = urlHandlers.UHSessionDataModification
+
+    def _checkParams(self, params):
+        self._check = int(params.get("check", 1))
+        self._slmove = int(params.get("slmove", 0))
+        RHSessionModifBase._checkParams(self, params)
+        self._confirmed = "confirm" in params
+        self._action = ""
+        if "CANCEL" in params or "cancel" in params:
+            self._action = "CANCEL"
+        elif "OK" in params or "confirm" in params:
+            self._action = "MODIFY"
+        elif "performedAction" in params:
+            self._action = params["performedAction"]
         else:
-            params["title"]=self._session.getTitle()
-            params["code"]=self._session.getCode()
-            params["description"]=self._session.getDescription()
+            params["title"] = self._session.getTitle()
+            params["code"] = self._session.getCode()
+            params["description"] = self._session.getDescription()
             tz = self._session.getConference().getTimezone()
-            sd=self._session.getStartDate().astimezone(timezone(tz))
-            ed=self._session.getEndDate().astimezone(timezone(tz))
-            params["sYear"],params["sMonth"]=sd.year,sd.month
-            params["sDay"]=sd.day
-            params["sHour"],params["sMinute"]=sd.hour,sd.minute
-            params["eYear"],params["eMonth"]=ed.year,ed.month
-            params["eDay"]=ed.day
-            params["eHour"],params["eMinute"]=ed.hour,ed.minute
-            cdur=self._session.getContribDuration()
-            params["durHour"],params["durMin"]=int(cdur.seconds/3600),int((cdur.seconds % 3600)/60)
-            params["tt_type"]=self._session.getScheduleType()
+            sd = self._session.getStartDate().astimezone(timezone(tz))
+            ed = self._session.getEndDate().astimezone(timezone(tz))
+            params["sYear"], params["sMonth"] = sd.year, sd.month
+            params["sDay"] = sd.day
+            params["sHour"], params["sMinute"] = sd.hour, sd.minute
+            params["eYear"], params["eMonth"] = ed.year, ed.month
+            params["eDay"] = ed.day
+            params["eHour"], params["eMinute"] = ed.hour, ed.minute
+            cdur = self._session.getContribDuration()
+            params["durHour"], params["durMin"] = int(
+                cdur.seconds / 3600), int((cdur.seconds % 3600) / 60)
+            params["tt_type"] = self._session.getScheduleType()
 
         self._evt = self._session
 
-    def _modify(self,params):
+    def _modify(self, params):
         tz = self._conf.getTimezone()
-        sd = timezone(tz).localize(datetime( int( params["sYear"] ), \
-                                                        int( params["sMonth"] ), \
-                                                        int( params["sDay"] ), \
-                                                        int( params["sHour"] ), \
-                                                        int( params["sMinute"] )))
+        sd = timezone(tz).localize(datetime(int(params["sYear"]),
+                                            int(params["sMonth"]),
+                                            int(params["sDay"]),
+                                            int(params["sHour"]),
+                                            int(params["sMinute"])))
         params["sDate"] = sd.astimezone(timezone('UTC'))
-        if params.get("eYear","") == "":
-            ed = timezone(tz).localize(datetime( int( params["sYear"] ), \
-                                    int( params["sMonth"] ), \
-                                    int( params["sDay"] ), \
-                                    int( params["eHour"] ), \
-                                    int( params["eMinute"] )))
+        if params.get("eYear", "") == "":
+            ed = timezone(tz).localize(datetime(int(params["sYear"]),
+                                                int(params["sMonth"]),
+                                                int(params["sDay"]),
+                                                int(params["eHour"]),
+                                                int(params["eMinute"])))
         else:
-            ed = timezone(tz).localize(datetime( int( params["eYear"] ), \
-                                    int( params["eMonth"] ), \
-                                    int( params["eDay"] ), \
-                                    int( params["eHour"] ), \
-                                    int( params["eMinute"] )))
+            ed = timezone(tz).localize(datetime(int(params["eYear"]),
+                                                int(params["eMonth"]),
+                                                int(params["eDay"]),
+                                                int(params["eHour"]),
+                                                int(params["eMinute"])))
         params["eDate"] = ed.astimezone(timezone('UTC'))
-        self._target.setValues(params,self._check,self._slmove)
-        self._target.setScheduleType(params.get("tt_type",self._target.getScheduleType()))
+        self._target.setValues(params, self._check, self._slmove)
+        self._target.setScheduleType(
+            params.get("tt_type", self._target.getScheduleType()))
 
-    def _process( self ):
-        url=urlHandlers.UHSessionModification.getURL(self._target)
-        params=self._getRequestParams()
-        if self._action=="CANCEL":
+    def _process(self):
+        url = urlHandlers.UHSessionModification.getURL(self._target)
+        params = self._getRequestParams()
+        if self._action == "CANCEL":
             self._redirect(url)
             return
-        elif self._action=="MODIFY":
-            title=str(params.get("title",""))
-            if title.strip()=="":
+        elif self._action == "MODIFY":
+            title = str(params.get("title", ""))
+            if title.strip() == "":
                 raise NoReportError("session title cannot be empty")
             else:
-                newSchType=params.get("tt_type",self._target.getScheduleType())
-                if self._target.getScheduleType()!=newSchType and\
+                newSchType = params.get(
+                    "tt_type", self._target.getScheduleType())
+                if self._target.getScheduleType() != newSchType and\
                         not self._confirmed:
-                    p=sessions.WPModEditDataConfirmation(self,self._target)
+                    p = sessions.WPModEditDataConfirmation(self, self._target)
                     del params["confId"]
                     del params["sessionId"]
                     del params["OK"]
@@ -252,82 +258,81 @@ class RHSessionDataModification( RoomBookingDBMixin, RHSessionModifBase ):
                 self._modify(params)
                 self._redirect(url)
                 return
-        p=sessions.WPSessionDataModification(self,self._target)
+        p = sessions.WPSessionDataModification(self, self._target)
         wf = self.getWebFactory()
-        if wf != None:
-            p = wf.getSessionDataModification(self,self._target)
-        params=self._getRequestParams()
+        if wf is not None:
+            p = wf.getSessionDataModification(self, self._target)
+        params = self._getRequestParams()
         return p.display(**params)
 
-
     def _getDefinedDisplayList(self, typeName):
-         list = self._websession.getVar("%sList"%typeName)
-         if list is None :
-             return ""
-         html = []
-         counter = 0
-         for person in list :
-             text = """
-                 <tr>
-                     <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
-                     <td>&nbsp;%s</td>
-                 </tr>"""%(typeName,counter,person[0].getFullName())
-             html.append(text)
-             counter = counter + 1
-         return """
-             """.join(html)
+        list = self._websession.getVar("%sList" % typeName)
+        if list is None:
+            return ""
+        html = []
+        counter = 0
+        for person in list:
+            text = """
+                <tr>
+                    <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
+                    <td>&nbsp;%s</td>
+                </tr>""" % (typeName, counter, person[0].getFullName())
+            html.append(text)
+            counter = counter + 1
+        return """
+            """.join(html)
 
     def _getDefinedList(self, typeName):
-        definedList = self._websession.getVar("%sList"%typeName)
-        if definedList is None :
+        definedList = self._websession.getVar("%sList" % typeName)
+        if definedList is None:
             return []
         return definedList
 
     def _setDefinedList(self, definedList, typeName):
-        self._websession.setVar("%sList"%typeName,definedList)
+        self._websession.setVar("%sList" % typeName, definedList)
 
     def _alreadyDefined(self, person, definedList):
-        if person is None :
+        if person is None:
             return True
-        if definedList is None :
+        if definedList is None:
             return False
         fullName = person.getFullName()
-        for p in definedList :
-            if p[0].getFullName() == fullName :
+        for p in definedList:
+            if p[0].getFullName() == fullName:
                 return True
         return False
 
     def _removeDefinedList(self, typeName):
-        self._websession.setVar("%sList"%typeName,None)
-
+        self._websession.setVar("%sList" % typeName, None)
 
     def _getPreservedParams(self):
         params = self._websession.getVar("preservedParams")
-        if params is None :
+        if params is None:
             return {}
         return params
 
     def _preserveParams(self, params):
-        self._websession.setVar("preservedParams",params)
+        self._websession.setVar("preservedParams", params)
 
     def _removePreservedParams(self):
-        self._websession.setVar("preservedParams",None)
+        self._websession.setVar("preservedParams", None)
 
     def _removePersons(self, params, typeName):
-        persons = self._normaliseListParam(params.get("%ss"%typeName,[]))
+        persons = self._normaliseListParam(params.get("%ss" % typeName, []))
         """
         List of persons is indexed by their ID in the apropriate
         list in session
         """
         list = None
-        if typeName == "convener" :
+        if typeName == "convener":
             list = self._session.getConvenerList()
 
-        for p in persons :
+        for p in persons:
             perspntoRemove = None
-            if typeName == "convener" :
+            if typeName == "convener":
                 personToRemove = self._session.getConvenerById(p)
             list.remove(personToRemove)
+
 
 #-------------------------------------------------------------------------------------
 

@@ -181,60 +181,68 @@ class RHCFANotifTplPreview(RHNotificationTemplateModifBase):
 
 class RHCFANotifTplEdit(RHNotificationTemplateModifBase):
 
-    def _checkParams( self, params):
+    def _checkParams(self, params):
         RHNotificationTemplateModifBase._checkParams(self, params)
-        self._cancel=params.get("cancel", None)
-        self._save=params.get("save", None)
+        self._cancel = params.get("cancel", None)
+        self._save = params.get("save", None)
         if self._save is not None:
-            self._title=params.get("title", "")
-            self._description=params.get("description","")
-            self._subject=params.get("subject","")
-            self._body=params.get("body","")
-            self._fromAddr=params.get("fromAddr","")
-            self._toList=self._normaliseListParam(params.get("toAddrs",[]))
-            auxCCList = params.get("CCAddrs","")
+            self._title = params.get("title", "")
+            self._description = params.get("description", "")
+            self._subject = params.get("subject", "")
+            self._body = params.get("body", "")
+            self._fromAddr = params.get("fromAddr", "")
+            self._toList = self._normaliseListParam(params.get("toAddrs", []))
+            auxCCList = params.get("CCAddrs", "")
             # replace to have only one separator
-            auxCCList = auxCCList.replace(" ", ",").replace(";", ",").split(",")
+            auxCCList = auxCCList.replace(
+                " ", ",").replace(";", ",").split(",")
             # clean the list in order to avoid empty emails, for instance, comma at the end
             cleanList = []
             for email in auxCCList:
                 if email != "":
                     cleanList.append(email)
             self._ccList = cleanList
-            self._CAasCCAddr = params.get("CAasCCAddr","")
+            self._CAasCCAddr = params.get("CAasCCAddr", "")
 
     def _process(self):
         if self._cancel:
-            self._redirect(urlHandlers.UHAbstractModNotifTplDisplay.getURL(self._target))
+            self._redirect(
+                urlHandlers.UHAbstractModNotifTplDisplay.getURL(self._target))
             return
         elif self._save:
-            if len(self._toList)<=0:
-                raise NoReportError( _("""At least one "To Address" must be seleted """))
-                p=WPModCFANotifTplEdit(self, self._target)
-                return p.display(title=self._title, \
-                                    subject=self._subject, \
-                                    body=self._body, \
-                                    fromAddr=self._fromAddr, \
-                                    toList=self._toList, \
-                                    ccList=self._ccList)
+            if len(self._toList) <= 0:
+                raise NoReportError(
+                    _("""At least one "To Address" must be seleted """))
+                p = WPModCFANotifTplEdit(self, self._target)
+                return p.display(title=self._title,
+                                 subject=self._subject,
+                                 body=self._body,
+                                 fromAddr=self._fromAddr,
+                                 toList=self._toList,
+                                 ccList=self._ccList)
             else:
                 self._notifTpl.setName(self._title)
                 self._notifTpl.setDescription(self._description)
-                self._notifTpl.setTplSubject(self._subject, EmailNotificator.getVarList())
-                self._notifTpl.setTplBody(self._body, EmailNotificator.getVarList())
+                self._notifTpl.setTplSubject(
+                    self._subject, EmailNotificator.getVarList())
+                self._notifTpl.setTplBody(
+                    self._body, EmailNotificator.getVarList())
                 self._notifTpl.setFromAddr(self._fromAddr)
                 self._notifTpl.setCCAddrList(self._ccList)
                 self._notifTpl.setCAasCCAddr(self._CAasCCAddr)
                 self._notifTpl.clearToAddrs()
                 for toAddr in self._toList:
-                    toAddrWrapper=NotifTplToAddrsFactory.getToAddrById(toAddr)
+                    toAddrWrapper = NotifTplToAddrsFactory.getToAddrById(
+                        toAddr)
                     if toAddrWrapper:
                         toAddrWrapper.addToAddr(self._notifTpl)
-                self._redirect(urlHandlers.UHAbstractModNotifTplDisplay.getURL(self._target))
+                self._redirect(urlHandlers.UHAbstractModNotifTplDisplay.getURL(
+                    self._target))
                 return
         else:
-            p=WPModCFANotifTplEdit(self, self._target)
+            p = WPModCFANotifTplEdit(self, self._target)
             return p.display()
+
 
 
 class RHNotifTplConditionNew(RHNotificationTemplateModifBase):

@@ -2465,8 +2465,8 @@ class WPModSchEditContrib(WPConfModifSchedule):
 
 class WSchEditSlot(wcomponents.WTemplated):
 
-    def __init__(self,slotData):
-        self._slotData=slotData
+    def __init__(self, slotData):
+        self._slotData = slotData
 
     #def _getTitleItemsHTML(self,selected=""):
     #    titles=["", "Mr.", "Mrs.", "Miss.", "Prof.", "Dr."]
@@ -2593,13 +2593,15 @@ class WSchEditSlot(wcomponents.WTemplated):
 
 class WPModSchEditSlot(WPConfModifSchedule):
 
-    def __init__(self,rh,slotData):
-        WPConfModifSchedule.__init__(self,rh,slotData.getSession().getConference())
-        self._slotData=slotData
+    def __init__(self, rh, slotData):
+        WPConfModifSchedule.__init__(
+            self, rh, slotData.getSession().getConference())
+        self._slotData = slotData
 
-    def _getTabContent(self,params):
-        wc=WSchEditSlot(self._slotData)
+    def _getTabContent(self, params):
+        wc = WSchEditSlot(self._slotData)
         return wc.getHTML(params)
+
 
 class WPModSessionMoveConfirmation(WPConfModifSchedule):
 
@@ -4776,18 +4778,19 @@ class WConfModAbstractsMerge(wcomponents.WTemplated):
 
 class WPModMergeAbstracts(WPConfAbstractList):
 
-    def __init__(self,rh,conf):
-        WPConfAbstractList.__init__(self, rh, conf,"")
+    def __init__(self, rh, conf):
+        WPConfAbstractList.__init__(self, rh, conf, "")
 
-    def _getTabContent(self,params):
-        wc=WConfModAbstractsMerge(self._conf)
-        p={"absIdList":params.get("absIdList",[]),
-            "targetAbsId":params.get("targetAbsId",""),
-            "inclAuth":params.get("inclAuth",False),
-            "comments":params.get("comments",""),
-            "notify":params.get("notify",True),
-            }
+    def _getTabContent(self, params):
+        wc = WConfModAbstractsMerge(self._conf)
+        p = {"absIdList": params.get("absIdList", []),
+             "targetAbsId": params.get("targetAbsId", ""),
+             "inclAuth": params.get("inclAuth", False),
+             "comments": params.get("comments", ""),
+             "notify": params.get("notify", True),
+             }
         return wc.getHTML(p)
+
 
 
 class WPConfModifDisplayBase( WPConferenceModifBase ):
@@ -7309,14 +7312,16 @@ class WPModAbstractBook(WPConferenceModifAbstractBase):
         wc=WConfModAbstractBook(self._conf)
         return wc.getHTML()
 
-class WPFullMaterialPackage( WPConfModifToolsBase ):
 
-    def _setActiveTab( self ):
+class WPFullMaterialPackage(WPConfModifToolsBase):
+
+    def _setActiveTab(self):
         self._tabMatPackage.setActive()
 
-    def _getTabContent( self, params ):
-        wc = WFullMaterialPackage( self._conf )
+    def _getTabContent(self, params):
+        wc = WFullMaterialPackage(self._conf)
         return wc.getHTML()
+
 
 class WFullMaterialPackage(wcomponents.WTemplated):
 
@@ -9490,12 +9495,13 @@ class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
         return vars
 
 
-class WPDisplayFullMaterialPackage( WPConferenceDefaultDisplayBase ):
+class WPDisplayFullMaterialPackage(WPConferenceDefaultDisplayBase):
 
-    def _getBody(self,params):
-        wc = WFullMaterialPackage( self._conf )
+    def _getBody(self, params):
+        wc = WFullMaterialPackage(self._conf)
         p = {"getPkgURL": urlHandlers.UHConferenceDisplayMaterialPackagePerform.getURL(self._conf)}
         return wc.getHTML(p)
+
 
 # ============================================================================
 # === Room booking related ===================================================
