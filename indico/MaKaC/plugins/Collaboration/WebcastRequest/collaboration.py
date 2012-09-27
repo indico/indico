@@ -216,7 +216,8 @@ class CSBooking(CSBookingBase):
         idx['All Requests'].unindex_booking(self)
 
     def index_talk(self, talk):
-        if CollaborationTools.isAbleToBeWebcastOrRecorded(talk, "WebcastRequest"):
+        if CollaborationTools.isAbleToBeWebcastOrRecorded(talk, "WebcastRequest") and self.isChooseTalkSelection() \
+        and talk.getId() in self.getTalkSelectionList():
             idx = Catalog.getIdx('cs_booking_instance')
             idx['WebcastRequest'].index_talk(self, talk)
             idx['All Requests'].index_talk(self, talk)
