@@ -762,8 +762,8 @@ class ResponseWrapper:
             if name in ("Max_Age", "Path", "Domain", "Version"):
                 name = name.replace("_", "-")
                 options += "; %s=%s"%(name, value)
-            elif name =="secure" and value:
-                options += "; secure"
+        if self.request.is_https():
+            options += "; secure"
         self.request.headers_out["Set-Cookie"] = "%s=%s%s"%(cookie_name, cookie_value, options)
 
 
