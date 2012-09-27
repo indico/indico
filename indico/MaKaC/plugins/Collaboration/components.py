@@ -81,11 +81,13 @@ class CSBookingInstanceIndex(OOIndex):
         conf = bk.getConference()
         contribs = bk.getTalkSelectionList()
         choose = bk.isChooseTalkSelected()
-        if choose:
-            if contribs:
-                for contrib_id in contribs:
-                    if CollaborationTools.isAbleToBeWebcastOrRecorded(conf.getContributionById(contrib_id), bk.getType()):
-                        self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
+
+        # if contributions chosen individually
+        if choose and contribs:
+            for contrib_id in contribs:
+                # check that contrib is in valid room
+                if CollaborationTools.isAbleToBeWebcastOrRecorded(conf.getContributionById(contrib_id), bk.getType()):
+                    self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
         # We need to check if it is a lecture with a correct room
         elif CollaborationTools.isAbleToBeWebcastOrRecorded(conf, bk.getType()) or conf.getType() !="simple_event":
             for day in daysBetween(conf.getStartDate(), conf.getEndDate()):
