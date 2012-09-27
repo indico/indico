@@ -30,7 +30,7 @@ Utility functions
 
 def get_query_parameter(queryParams, keys, default=None, integer=False):
     if type(keys) != list:
-        keys = list(keys)
+        keys = [keys]
     for k in keys:
         paramlist = queryParams.get(k)
         if paramlist:

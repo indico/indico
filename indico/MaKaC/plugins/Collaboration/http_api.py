@@ -206,10 +206,11 @@ class VideoEventHook(HTTPAPIHook):
     def _getParams(self):
         super(VideoEventHook, self)._getParams()
 
-        """ In this case, idlist refers to the different indicies which can
+        """ In this case, idlist refers to the different indices which can
             be called, e.g: vidyo, evo, mcu etc.
         """
         self._idList = self._pathParams['idlist'].split('-')
+        self._categ_id = get_query_parameter(self._queryParams, 'categ')
 
         if not self._queryParams.has_key('alarms'):
             self._alarms = None
@@ -218,7 +219,7 @@ class VideoEventHook(HTTPAPIHook):
 
     def export_video(self, aw):
         expInt = VideoEventFetcher(aw, self)
-        return expInt.video(self._idList, self._alarms)
+        return expInt.video(self._idList, self._alarms, self._categ_id)
 
 
 class VideoEventFetcher(DataFetcher):
@@ -244,7 +245,7 @@ class VideoEventFetcher(DataFetcher):
 
         return fossil
 
-    def iter_bookings(self, idList):
+    def iter_bookings(self, idList, categ_id=None):
         for vsid in idList:
             if vsid in ['webcast', 'recording']:
                 idx = Catalog.getIdx('cs_booking_instance')[self.ID_TO_IDX[vsid]]
@@ -253,9 +254,10 @@ class VideoEventFetcher(DataFetcher):
             else:
                 idx = IndexesHolder().getById('collaboration');
                 dateFormat = '%d/%m/%Y'
+
                 tempBookings = idx.getBookings(self.ID_TO_IDX[vsid], "conferenceStartDate",
                                                self._orderBy, self._fromDT, self._toDT,
-                                               'UTC', False, None, None, False, dateFormat).getResults()
+                                               'UTC', False, None, categ_id, False, dateFormat).getResults()
 
                 for evt, bks in tempBookings:
                     for bk in bks:
@@ -263,7 +265,7 @@ class VideoEventFetcher(DataFetcher):
                         yield bk
 
 
-    def video(self, idList, alarm = None):
+    def video(self, idList, alarm=None, categ_id=None):
 
         res = []
         bookings = []
@@ -278,6 +280,6 @@ class VideoEventFetcher(DataFetcher):
 
         iface = self.DETAIL_INTERFACES.get('all')
 
-        for booking in self._process(self.iter_bookings(idList), _filter, iface):
+        for booking in self._process(self.iter_bookings(idList, categ_id=categ_id), _filter, iface):
             yield booking
 
