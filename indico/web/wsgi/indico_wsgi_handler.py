@@ -496,7 +496,8 @@ class SimulatedModPythonRequest(object):
             del self.__headers['content-length']
 
     def is_https(self):
-        return int(guess_scheme(self.__environ) == 'https')
+        scheme = self.__environ.get('wsgi.url_scheme', guess_scheme(self.__environ))
+        return int(scheme == 'https')
 
     def get_method(self):
         return self.__environ['REQUEST_METHOD']
