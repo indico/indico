@@ -719,7 +719,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
             write: function() {
                 bind.detach(select);
                 pm.remove(select);
-                pm.add(text);
+                pm.add(text, 'text');
                 return Html.div({}, text,
                                 " ",
                                $T("or"),
@@ -914,10 +914,13 @@ type("EditMaterialDialog", ["EditMaterialResourceBase"], {
             this.types.push([params.materialInfo.get('id'), params.materialInfo.get('title')]);
         }
 
-        this.request(params);
+        if (this.pm.check()) {
+            this.request(params);
+        }
     },
 
     _success: function(response) {
+
         this.list.set(this.materialId, null);
         this.list.set(this.materialId, watchize(response.material));
 
@@ -959,6 +962,9 @@ type("EditMaterialDialog", ["EditMaterialResourceBase"], {
 
         self.materialTitle = Html.input("text",{'name':'title', style:{width:'220px'}});
         self.description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
+
+        self.pm = new IndicoUtil.parameterManager();
+        self.pm.add(self.materialTitle, 'text', false);
 
         if (self.material.get('isBuiltin')) {
             $(self.materialTitle.dom).attr('readonly', 'readonly').css('color', '#888').qtip(
@@ -1027,7 +1033,9 @@ type("EditResourceDialog", ["EditMaterialResourceBase"], {
         var params = clone(this.args);
         params.resourceInfo = this.newResource;
         this.newResource.set('userList', this.userList.getUsers());
-        this.request(params);
+        if (this.pm.check()) {
+            this.request(params);
+        }
     },
 
     _success: function(response) {
@@ -1055,6 +1063,10 @@ type("EditResourceDialog", ["EditMaterialResourceBase"], {
         self.name = Html.input("text",{'name':'name', style:{width:'220px'}});
         self.url = Html.input("text",{'name':'url', style:{width:'220px'}});
         self.description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
+
+        self.pm = new IndicoUtil.parameterManager();
+        self.pm.add(self.name, 'text', false);
+        self.pm.add(self.url, 'url', false);
 
         return IndicoUtil.createFormFromMap(
                 [
