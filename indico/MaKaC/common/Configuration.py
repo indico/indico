@@ -566,7 +566,7 @@ class Config:
             'DefaultEventStylesheet'    : self.__defaultEventStylesheet,
             'ShortCategURL'             : '%s/%s' % (self.getBaseURL(), self.getShortCategTag()),
             'ShortEventURL'             : '%s/%s' % (self.getBaseURL(), self.getShortEventTag()),
-            'TPLDir'                    : os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'tpls'),
+            'TPLDir'                    : os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'tpls')),
             'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
             'FileConverterServerURL'    : self.getFileConverter().get("conversion_server", ""),
