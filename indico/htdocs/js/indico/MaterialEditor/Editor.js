@@ -1179,7 +1179,6 @@ type("ResourceListWidget", ["ListWidget"], {
 
         var self = this;
 
-        var resourceNode;
         var resParams = clone(this.matParams);
         resParams.resourceId = resourceId;
 
@@ -1195,9 +1194,9 @@ type("ResourceListWidget", ["ListWidget"], {
                                 killProgress();
                                 IndicoUtil.errorReport(error);
                             } else {
-                                var parent = resourceNode.dom.parentNode;
                                 self.resources.remove(resource);
                                 self.set(resourceId, null);
+                                updateMaterialList(self.materialTypes, response.newMaterialTypes);
                                 killProgress();
                             }
                         }
