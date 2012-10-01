@@ -87,10 +87,6 @@ class WebFactory(WebFactory):
         return WPSEConfModifAC(rh, conf)
     getConfModifAC = staticmethod(getConfModifAC)
 
-    def getConfModifBookings(rh, conf, bs):
-        return WPSEConfModifBookings(rh, conf, bs)
-    getConfModifBookings = staticmethod(getConfModifBookings)
-
     def getConfClone(rh, conf):
         return WPSEConfClone(rh, conf)
     getConfClone = staticmethod(getConfClone)

@@ -101,10 +101,6 @@ class WebFactory(WebFactory):
         return WPMConfModifAC(rh, conf)
 
     @staticmethod
-    def getConfModifBookings(rh, conf, bs):
-        return WPMConfModifBookings(rh, conf, bs)
-
-    @staticmethod
     def getConfModifListings(rh, conf):
         return WPMConfModifListings(rh, conf)
 
@@ -680,18 +676,10 @@ class WPMConfModifTools (conferences.WPConfModifToolsBase):
             }
         return wc.getHTML( p )
 
+
 class WMConfModifTools (conferences.WConfModifTools):
     pass
 
-#Bookings#
-
-class WPMConfModifBookings(conferences.WPConfModifBookings):
-    pass
-
-class WMConfModifBookings (conferences.WConfModifBookings):
-    pass
-
-##
 
 class WPMConfModifListings (conferences.WPConfModifListings):
 
@@ -699,8 +687,10 @@ class WPMConfModifListings (conferences.WPConfModifListings):
         wc = WMConfModifListings( self._conf )
         return wc.getHTML()
 
+
 class WMConfModifListings (conferences.WConfModifListings):
     pass
+
 
 class WPMConfClone(conferences.WPConfClone):
 

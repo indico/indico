@@ -282,8 +282,7 @@ class RHMarkAsDup(RHAbstractModifBase):
             self._action = "MARK"
             self._comments = params.get("comments", "")
             self._originalId = params.get("id", "")
-            self._original = self._target.getOwner(
-            ).getAbstractById(self._originalId)
+            self._original = self._target.getOwner().getAbstractById(self._originalId)
 
     def _getErrorsInData(self):
         res = []
