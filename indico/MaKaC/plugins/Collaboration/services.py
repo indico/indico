@@ -27,6 +27,9 @@ from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationElectronicAgr
 from MaKaC.plugins.Collaboration.mail import ElectroniAgreementNotification
 from MaKaC.common.mail import GenericMailer
 
+from indico.util.i18n import N_
+
+
 #TODO: Need to verify if the ContributionDisplayBase is the good parent to inherit from
 class SetSpeakerEmailAddress(ContributionDisplayBase):
 

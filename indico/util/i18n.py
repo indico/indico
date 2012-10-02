@@ -37,6 +37,9 @@ try:
 
     L_ = gettext_lazy = forceLazyTranslations.gettext
 
+    # Just a marker for message extraction
+    N_ = lambda text: text
+
 except ImportError:
     # no Babel
     pass

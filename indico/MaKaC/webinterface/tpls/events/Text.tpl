@@ -71,7 +71,7 @@
 ${ conf.getTitle()}
 ${ prettyDate(conf.getAdjustedStartDate()) }
 % if conf.getAdjustedStartDate().date() != conf.getAdjustedEndDate().date():
-   ${ _("to") ${ prettyDate(conf.getAdjustedEndDate()) }
+   ${_("to")} ${prettyDate(conf.getAdjustedEndDate())}
   <br/><br/>
 % endif
 % if conf.getDescription():
@@ -103,5 +103,5 @@ ${ prettyDate(conf.getAdjustedStartDate()) }
        ${printContributionInfo(item)}
     % elif type == "Session":
        ${printSessionInfo(item)}
-        % endif
+    % endif
 % endfor
