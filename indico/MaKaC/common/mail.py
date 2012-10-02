@@ -58,6 +58,7 @@ class GenericMailer:
     @staticmethod
     def _prepare(notification):
         fromAddr=notification.getFromAddr()
+
         for to in notification.getToList() :
             if len(to) == 0 :
                 notification.getToList().remove(to)

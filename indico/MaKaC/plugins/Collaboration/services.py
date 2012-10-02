@@ -124,7 +124,7 @@ class SendElectronicAgreement(ConferenceModifBase):
             for uniqueId in self.uniqueIdList:
                 sw = manager.getSpeakerWrapperByUniqueId(uniqueId)
                 sw.setStatus(SpeakerStatusEnum.PENDING)
-                subject = """[Indico] Electronic Agreement: %s (event id: %s)"""%(self._conf.getTitle(), self._conf.getId())
+                subject = """[Indico] Electronic Agreement: '%s'"""%(self._conf.getTitle())
                 notification = ElectronicAgreementNotification([sw.getObject().getEmail()], self.cc, self.fromEmail, self.fromName, self.processContent(sw), subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
@@ -133,6 +133,16 @@ class SendElectronicAgreement(ConferenceModifBase):
         return report
 
 class RejectElectronicAgreement(ConferenceDisplayBase):
+
+    MESSAGE_REJECT = """Dear manager,
+The speaker {speaker} has rejected the electronic agreement for the event '{title}'.
+
+Event URL: {url}
+
+Best Regards,
+
+CERN Recording Team"""
+
     def _checkParams(self):
         ConferenceDisplayBase._checkParams(self)
         self.authKey = self._params["authKey"]
@@ -151,20 +161,28 @@ class RejectElectronicAgreement(ConferenceDisplayBase):
             spkWrapper.setRejectReason(self.reason)
             spkWrapper.triggerNotification()
             if self.notifyOrganiser:
-                subject = """[Indico] Electronic Agreement Rejected: %s (event id: %s) (speaker : %s)"""%(self._conf.getTitle(), self._conf.getId(), spkWrapper.getSpeakerId())
-                content = """Dear manager,
-                The speaker %s has rejected the electronic agreement for the event %s.
-
-                Best Regards,
-
-                Cern Recording Team """%(spkWrapper.getObject().getFullName(), self._conf.getTitle())
-                notification = ElectronicAgreementOrganiserNotification([self._conf.getCreator()], Config.getInstance().getNoReplyEmail(), content, subject)
+                subject = """[Indico] Electronic Agreement Rejected: '%s' (speaker : %s)""" % (self._conf.getTitle(), spkWrapper.getSpeakerId())
+                content = _(self.MESSAGE_REJECT).format(
+                    speaker=spkWrapper.getObject().getFullName(),
+                    title=self._conf.getTitle(),
+                    url=self._conf.getURL())
+                notification = ElectronicAgreementOrganiserNotification([self._conf.getCreator().getEmail()], Config.getInstance().getNoReplyEmail(), content, subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
                                          "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
                                          None)
 
 class AcceptElectronicAgreement(ConferenceDisplayBase):
+
+    MESSAGE_ACCEPT = """Dear manager,
+The speaker {speaker} has accepted the electronic agreement for the event '{title}'.
+
+Event URL: {url}
+
+Best Regards,
+
+CERN Recording Team"""
+
     def _checkParams(self):
         ConferenceDisplayBase._checkParams(self)
         self.authKey = self._params["authKey"]
@@ -181,14 +199,12 @@ class AcceptElectronicAgreement(ConferenceDisplayBase):
             spkWrapper.setStatus(SpeakerStatusEnum.SIGNED, self._req.get_remote_ip())
             spkWrapper.triggerNotification()
             if self.notifyOrganiser:
-                subject = """[Indico] Electronic Agreement Accepted: %s (event id: %s) (speaker : %s)"""%(self._conf.getTitle(), self._conf.getId(), spkWrapper.getSpeakerId())
-                content = """Dear manager,
-                The speaker %s has accepted the electronic agreement for the event %s.
-
-                Best Regards,
-
-                Cern Recording Team """%(spkWrapper.getObject().getFullName(), self._conf.getTitle())
-                notification = ElectronicAgreementOrganiserNotification([self._conf.getCreator()], Config.getInstance().getNoReplyEmail(), content, subject)
+                subject = """[Indico] Electronic Agreement Accepted: '%s' (speaker : %s)""" % (self._conf.getTitle(), spkWrapper.getSpeakerId())
+                content = _(self.MESSAGE_ACCEPT).format(
+                    speaker=spkWrapper.getObject().getFullName(),
+                    title=self._conf.getTitle(),
+                    url=self._conf.getURL())
+                notification = ElectronicAgreementOrganiserNotification([self._conf.getCreator().getEmail()], Config.getInstance().getNoReplyEmail(), content, subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
                                          "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",

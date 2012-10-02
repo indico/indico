@@ -2561,6 +2561,12 @@ class Conference(CommonObjectBase, Locatable):
     def removeResource( self, res ):
         pass
 
+    def getURL(self):
+        cid = self.getUrlTag()
+        if not cid:
+            cid = self.getId()
+        return Config.getInstance().getShortEventURL() + cid
+
     def setLogo( self, logoFile ):
         logoFile.setOwner( self )
         logoFile.setId( "logo" )
