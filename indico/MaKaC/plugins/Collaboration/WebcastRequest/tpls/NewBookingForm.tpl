@@ -104,9 +104,9 @@
                             % if WebcastCapable:
                 <tr>
                     <td></td>
-                    <td>
-                        <span class="WRNoteTitle">${_("Note:")}</span>
-                        <span class="WRNoteText">
+                    <td class="warning">
+                        <h3>${_("Note")}</h3>
+                        <span>
                             ${_("Some of your talks")} (${ str(NTalks - NWebcastCapableContributions) + _(" out of ") + str(NTalks) }) ${_(" are not in a room capable of webcasting and thus cannot be webcasted.")}
                         </span>
                         <span class='fakeLink' id="webcastTalksText">${_("See list of webcast-able talks")}</span> |
@@ -224,29 +224,49 @@
     var WR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasWebcastCapableTalks) };
 
 % if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable):
+
     function showRooms(){
-    $("#webcastRoomsText").text($T("Hide list of webcast-able rooms."));
-    $("#webcastCapableRoomsDiv").show();
-    if(!$("#webcastCapableTalksDiv").is(":hidden")) hideTalks();
+        $("#webcastRoomsText").text($T("Hide list of webcast-able rooms."));
+        $("#webcastCapableRoomsDiv").show();
+
+        if(!$("#webcastCapableTalksDiv").is(":hidden")) {
+            hideTalks();
+        }
     };
+
     function hideRooms(){
         $("#webcastRoomsText").text($T("See list of webcast-able rooms."));
         $("#webcastCapableRoomsDiv").hide();
     };
+
     function showTalks(){
         $("#webcastTalksText").text($T("Hide list of webcast-able talks."));
         $("#webcastCapableTalksDiv").show();
-        if(!$("#webcastCapableRoomsDiv").is(":hidden")) hideRooms();
+        if(!$("#webcastCapableRoomsDiv").is(":hidden")) {
+            hideRooms();
+        }
     };
+
     function hideTalks(){
         $("#webcastTalksText").text($T("See list of webcast-able talks."));
         $("#webcastCapableTalksDiv").hide();
     };
-    $("#webcastRoomsText").click( function () {
-        $('#webcastCapableRoomsDiv').is(':hidden')?showRooms():hideRooms();
+
+    $("#webcastRoomsText").click(function() {
+        if ($('#webcastCapableRoomsDiv').is(':hidden')) {
+            showRooms();
+        } else {
+            hideRooms();
+        }
     });
-    $("#webcastTalksText").click( function () {
-        $('#webcastCapableTalksDiv').is(':hidden')?showTalks():hideTalks();
+
+    $("#webcastTalksText").click(function() {
+        if ($('#webcastCapableTalksDiv').is(':hidden')) {
+            showTalks();
+        } else {
+            hideTalks();
+        }
     });
+
 % endif
 </script>

@@ -3,8 +3,7 @@
     % if RecordingCapableRooms:
     <table>
         <tr>
-            <td>
-                <span class="RRNoteTitle">${_("Note:")}</span>
+            <td>${_("Note:")}</span>
             </td>
             <td>
                 <span class="RRNoteText">
@@ -104,9 +103,9 @@
                             % if RecordingCapable:
                 <tr>
                     <td></td>
-                    <td>
-                        <span class="RRNoteTitle">${_("Note:")}</span>
-                        <span class="RRNoteText">
+                    <td class="warning">
+                        <h3>${_("Note")}</h3>
+                        <span>
                             ${_("Some of your talks (%d out of %d) are not in a room capable of recording and thus cannot be recorded.") % (NTalks - NRecordingCapableContributions, NTalks)}
                         </span>
                         <span class='fakeLink' id="recordTalksText">${_("See list of record-able talks")} </span> |
@@ -244,29 +243,47 @@
     var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
 
 % if (not RecordingCapable and RecordingCapableRooms) or (NTalks > NRecordingCapableContributions and RecordingCapable):
+
     function showRooms(){
         $("#recordingRoomsText").text($T("Hide list of record-able rooms."));
         $("#recordingCapableRoomsDiv").show();
-        if(!$("#recordCapableTalksDiv").is(":hidden")) hideTalks();
+        if(!$("#recordCapableTalksDiv").is(":hidden")) {
+            hideTalks();
+        }
     };
+
     function hideRooms(){
         $("#recordingRoomsText").text($T("See list of record-able rooms."));
         $("#recordingCapableRoomsDiv").hide();
     };
+
     function showTalks(){
         $("#recordTalksText").text($T("Hide list of record-able talks."));
         $("#recordCapableTalksDiv").show();
-        if(!$("#recordingCapableRoomsDiv").is(":hidden")) hideRooms();
+        if(!$("#recordingCapableRoomsDiv").is(":hidden")) {
+            hideRooms();
+        }
     };
+
     function hideTalks(){
         $("#recordTalksText").text($T("See list of record-able talks."));
         $("#recordCapableTalksDiv").hide();
     };
-    $("#recordingRoomsText").click( function () {
-        $('#recordingCapableRoomsDiv').is(':hidden')?showRooms():hideRooms();
+
+    $("#recordingRoomsText").click(function() {
+        if($('#recordingCapableRoomsDiv').is(':hidden')) {
+            showRooms();
+        } else {
+            hideRooms();
+        }
     });
-    $("#recordTalksText").click( function () {
-        $('#recordCapableTalksDiv').is(':hidden')?showTalks():hideTalks();
+
+    $("#recordTalksText").click(function() {
+        if($('#recordCapableTalksDiv').is(':hidden')){
+            showTalks();
+        } else {
+            hideTalks();
+        }
     });
 % endif
 </script>

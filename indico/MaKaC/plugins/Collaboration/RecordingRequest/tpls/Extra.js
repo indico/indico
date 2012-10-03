@@ -83,8 +83,11 @@ var RRTalkTemplate = function(talk, showCheckbox) {
     // Finally, the id
     label.append(Html.span("RRContributionId", "(id: " + talk.id + ")"));
 
-    if(showCheckbox) return Html.li('', checkBox, label);
-    else return Html.li('', label);
+    if (showCheckbox) {
+        return Html.li('', checkBox, label);
+    } else {
+        return Html.li('', label);
+    }
 
 };
 
