@@ -20,20 +20,20 @@
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-@import url("IndicoMeeting.css");
+@import url("IndicoLecture.css");
 
-div.meetingEventHeader {
-    background: #006699 url('../../../images/picosec_banner.jpg');
+div.lectureEventHeader {
+    background: #FFF url('../../../images/picosec_endotofpet_banner.jpg') no-repeat;
     padding-top: 15px;
     padding-left: 200px;
 }
 
-div.meetingEventHeader .details{
+div.lectureEventHeader .details{
     text-shadow: none !important;
     color: #222 !important;
 }
 
-div.meetingEventHeader h1 {
+div.lectureEventHeader h1 {
     font-weight: bold;
     text-shadow: none;
     color: #555588;

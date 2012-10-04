@@ -29,7 +29,7 @@ div.lectureEventHeader {
 }
 
 div.lectureEventHeader .details{
-    text-shadow: none;
+    text-shadow: none !important;
     color: #222 !important;
 }
 
