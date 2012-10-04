@@ -90,7 +90,7 @@ class MaKaCInfo(Persistent):
         # http api
         self._apiHTTPSRequired = False
         self._apiPersistentAllowed = False
-        self._apiMode = False
+        self._apiMode = 0
         self._apiCacheTTL = 600
         self._apiSignatureTTL = 600
         self._analyticsActive = False
