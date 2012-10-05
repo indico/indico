@@ -26,22 +26,24 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
      {
         draw: function() {
             var self = this;
-
-            var reverseSort = false;
+            var lastSort = 'id';
             var selectAll = Html.span('fakeLink', $T('All'));
             var selectNone = Html.span('fakeLink', $T('None'));
             var sortById = Html.span({className: 'fakeLink', id: 'sortById', style: {fontWeight: 'bold'}}, $T('ID'));
             var sortByTitle = Html.span({className: 'fakeLink', id: 'sortByTitle'}, $T('Title'));
-            var sortBar = Html.div({style: {cssFloat:'left', margin: pixels(3)}}, $T('Sort by: '), sortById, ', ', sortByTitle );
-            var selectBar = Html.div({style: {textAlign:'right', margin: pixels(3)}}, $T('Select: '), selectAll, ', ', selectNone);
+            var toolbar =  Html.div({className: 'toolbar', style: {margin: pixels(3)}},
+                                    $T('Sort by: '), sortById, ', ', sortByTitle, ' ',
+                                    $T('Select: '), selectAll, ', ', selectNone
+                                   );
 
             sortById.observeClick(function(){
-                self._sortList('id');
+                self._sortList('id', lastSort == 'id');
+                lastSort = 'id';
             });
 
             sortByTitle.observeClick(function(){
-
-                self._sortList('title');
+                self._sortList('title', lastSort == 'title');
+                lastSort = 'title';
             });
 
             selectAll.observeClick(function(){
@@ -52,7 +54,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
                 self._clearSelection();
             });
 
-            return [sortBar, selectBar, this.SelectableListWidget.prototype.draw.call(this)];
+            return [toolbar, this.SelectableListWidget.prototype.draw.call(this)];
         },
 
          _drawItem: function(pair) {
@@ -64,59 +66,51 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              }).join(", ");
              var selected = false;
 
-             var id = Html.em({id: elem.get('id'), style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
+             var id = Html.em({'data-id': elem.get('id'), style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
              var item = Html.div({}, id, " - ", elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''));
 
              return item;
          },
 
-         _sortList: function(type){
+         _sortList: function(type, second_click){
              var self = this;
-             var items = {};
-             var selectedItemsID = [];
+             var selected = _(this.getSelectedList().getAll()).map(function(item){return item.get('id');});
+             var initial = _(self.getAll());
 
-             if (type == 'id'){
-                 $('#sortById').css('font-weight', 'bold');
-                 $('#sortByTitle').css('font-weight', '');
+             $('#sortById').css('font-weight', (type == 'id') ? 'bold' : '');
+             $('#sortByTitle').css('font-weight', (type == 'title') ? 'bold' : '');
+
+             var sorted = initial.chain().map(function(value, key) {
+                 return {
+                     key: key,
+                     value: value.get(type)
+                 };
+             }).sortBy(
+                 function(item) {
+                     return item.value;
+                 });
+
+             // reverse order only if second click, else reset order
+             this.reverseState = second_click ? !this.reverseState : false;
+
+             if (this.reverseState) {
+                 sorted = sorted.reverse();
              }
-             if (type == 'title'){
-                 $('#sortById').css('font-weight', '');
-                 $('#sortByTitle').css('font-weight', 'bold');
-             }
 
-             // Get all items
-             each(self.getAll(), function(item) {
-                 if (type == 'id')
-                     items[item.getAll().id] = item;
-                 if (type == 'title')
-                     items[item.getAll().title + item.getAll().id] = item;
-             });
-
-             // Get selected items
-             each(self.getList(), function(item, index) {
-                 selectedItemsID.push(item.getAll().id);
-             });
-
-             // Clear
+             // Clear selection and elements
              self._clearSelection();
              self.clear();
 
-             // Sort
-             var ks = keys(items);
-             ks.sort();
-             if (self.reverseSort)
-                 ks.reverse();
-             self.reverseSort = !self.reverseSort;
-
-             // Add items
-             for (k in ks) {
-                 self.set(k, items[ks[k]]);
-             }
+             // Add sorted items
+             sorted.each(function(item) {
+                 self.set(item.key, initial.value()[item.key]);
+             });
 
              // Reselect items
              each(self.domList, function(listItem) {
-                 if (jQuery.inArray(listItem.dom.children[0].children[0].id, selectedItemsID) != -1)
+                 if (selected.indexOf($(listItem.dom).find('em').data('id') + '') > -1) {
                      listItem.eventObservers.click();
+                 }
              });
          },
 
@@ -137,7 +131,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
          var self = this;
 
          this.selected = new WatchList();
-
+         this.reverseState = false;
          this.SelectableListWidget(observer, false, 'UnscheduledContribList');
 
 

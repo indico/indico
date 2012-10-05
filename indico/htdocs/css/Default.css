@@ -6455,6 +6455,13 @@ div.UnscheduledContribListDiv {
     margin-right: 35px;
 }
 
+div.UnscheduledContribListDiv .toolbar {
+    border-bottom: 1px solid #ccc;
+    text-align: right;
+    color: #999;
+    padding: 2px;
+}
+
 ul.UnscheduledContribList {
     border: none;
     display: block;
@@ -6467,7 +6474,7 @@ ul.UnscheduledContribList {
 ul.UnscheduledContribList li {
     cursor: pointer;
     padding: 5px;
-    border-bottom: 1px solid #DDDDDD;
+    border-bottom: 1px solid #eee;
 }
 
 ul.UnscheduledContribList li.selected {
