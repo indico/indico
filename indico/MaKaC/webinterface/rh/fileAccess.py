@@ -17,21 +17,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import time
-
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
+from indico.web.rh.file import RHFileCommon
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.pages import files
 from MaKaC.common import Config
 from MaKaC.errors import NotFoundError, AccessError
 
-from email.Utils import formatdate
 from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from copy import copy
 
-class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
+class RHFileAccess( RHFileCommon, RHFileBase, RHDisplayBaseProtected ):
     _uh  = urlHandlers.UHFileAccess
 
     def _checkParams( self, params ):
@@ -53,35 +51,14 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
 
     def _process( self ):
         self._notify('materialDownloaded', self._file)
-
         if isinstance(self._file, Link):
             self._redirect(self._file.getURL())
-        elif self._file.getId() != "minutes":
-            #self._req.headers_out["Accept-Ranges"] = "bytes"
-            self._req.headers_out["Content-Length"] = "%s"%self._file.getSize()
-            self._req.headers_out["Last-Modified"] = "%s"%formatdate(time.mktime(self._file.getCreationDate().timetuple()))
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( self._file.getFileType() )
-            self._req.content_type = """%s"""%(mimetype)
-            dispos = "inline"
-
-            try:
-                if self._req.headers_in['User-Agent'].find('Android') != -1:
-                    dispos = "attachment"
-            except KeyError:
-                pass
-
-            self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self._file.getFileName())
-
-            if cfg.getUseXSendFile() and self._req.headers_in['User-Agent'].find('Android') == -1:
-                # X-Send-File support makes it easier, just let the web server
-                # do all the heavy lifting
-                return self._req.send_x_file(self._file.getFilePath())
-            else:
-                return self._file.readBin()
-        else:
+        elif self._file.getId() is "minutes":
             p = files.WPMinutesDisplay(self, self._file )
             return p.display()
+        else:
+            return RHFileCommon._process(self)
+
 
 class RHFileAccessStoreAccessKey( RHFileBase ):
     _uh = urlHandlers.UHFileEnterAccessKey

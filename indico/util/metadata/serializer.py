@@ -25,6 +25,8 @@ class Serializer(object):
 
     def __init__(self, pretty=False, **kwargs):
         self.pretty = pretty
+        self._fileName = None
+        self._lastModified = None
 
     @classmethod
     def register(cls, tag, serializer):

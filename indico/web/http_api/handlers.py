@@ -251,16 +251,14 @@ def handler(req, **params):
         del resultFossil['_fossil']
 
         try:
-
             if error and not serializer.schemaless:
                 # if our serializer has a specific schema (HTML, ICAL, etc...)
                 # use JSON, since it is universal
                 serializer = Serializer.create('json')
-                # set text/plain, so that it is visible in all browsers
-                req.headers_out['Content-Type'] = 'text/plain'
-            else:
-                req.headers_out['Content-Type'] = serializer.getMIMEType()
-            return serializer(resultFossil)
+            data = serializer(resultFossil)
+            req.headers_out['Content-Length'] = "%s" % len(data)
+            req.headers_out['Content-Type'] = serializer.getMIMEType()
+            return data
         except:
             logger.exception('Serialization error in request %s?%s' % (path, query))
             raise

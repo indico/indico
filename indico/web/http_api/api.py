@@ -28,6 +28,8 @@ import pytz
 import re
 import types
 import urllib
+import time as time2
+from email.Utils import formatdate
 from ZODB.POSException import ConflictError
 from datetime import datetime, timedelta, time
 
@@ -40,6 +42,8 @@ from indico.web.http_api.html import HTML4Serializer
 from indico.web.http_api.jsonp import JSONPSerializer
 from indico.web.http_api.ical import ICalSerializer
 from indico.web.http_api.atom import AtomSerializer
+from indico.web.http_api.file import FileSerializer
+from indico.web.rh.file import RHFileCommon
 from indico.web.http_api.fossils import IConferenceMetadataFossil,\
     IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil,\
     IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil,\
@@ -51,6 +55,7 @@ from indico.web.wsgi import webinterface_handler_config as apache
 
 # indico legacy imports
 from MaKaC.common.db import DBMgr
+from MaKaC.common import Config
 from MaKaC.conference import CategoryManager
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
@@ -59,6 +64,8 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.rb_tools import Period, datespan
 
 from indico.web.http_api.util import get_query_parameter
+from MaKaC.conference import Link, LocalFile
+from MaKaC.errors import NoReportError
 
 utc = pytz.timezone('UTC')
 MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
@@ -195,7 +202,9 @@ class HTTPAPIHook(object):
         """Perform the actual exporting"""
         if self.HTTP_POST != (req.method == 'POST'):
             raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), apache.HTTP_METHOD_NOT_ALLOWED)
+        self._req = req
         self._getParams()
+        req = self._req
         if not self.GUEST_ALLOWED and not aw.getUser():
             raise HTTPAPIError('Guest access to this hook is forbidden.', apache.HTTP_FORBIDDEN)
         if not self._hasAccess(aw):
@@ -612,7 +621,64 @@ class ContributionFetcher(SessionContribFetcher):
 
         return self._process(_iterate_objs(idlist))
 
+
+@HTTPAPIHook.register
+class FileHook(HTTPAPIHook, RHFileCommon):
+    """
+    Example: /export/file/conference/1/contribution/2/session/3/subContribution/4/material/Slides/resource/5.file?ak=00000000-0000-0000-0000-000000000000
+    """
+    DEFAULT_DETAIL = 'file'
+    VALID_FORMATS = ('file')
+    GUEST_ALLOWED = False
+    RE = r'(?P<event>[\w\s]+)(/contrib/(?P<contrib>[\w\s]+))?(/session/(?P<session>[\w\s]+))?(/subcontrib/(?P<subcontrib>[\w\s]+))?/material/(?P<material>[^/]+)/res/(?P<res>[\w\s]+)'
+
+    def _getParams(self):
+        super(FileHook, self)._getParams()
+        self._type = 'file'
+        self._event = self._pathParams['event']
+        self._contrib = self._pathParams['contrib']
+        self._session = self._pathParams['session']
+        self._subcontrib = self._pathParams['subcontrib']
+        self._material = self._pathParams['material']
+        self._res = self._pathParams['res']
+        params = {'confId': self._event, 'contribId': self._contrib, 'sessionId': self._session, 'subContId': self._subcontrib, 'materialId': self._material, 'resId': self._res}
+        try:
+            import MaKaC.webinterface.locators as locators
+            l = locators.WebLocator()
+            l.setResource(params)
+            self._file = l.getObject()
+        except (NoReportError, KeyError, AttributeError):
+            raise HTTPAPIError("File not found", apache.HTTP_NOT_FOUND)
+        if not isinstance(self._file, LocalFile):
+            raise HTTPAPIError("Resource is not a file", apache.HTTP_NOT_FOUND)
+        self._binaryData = RHFileCommon._process(self)
+
+    def _hasAccess(self, aw):
+        return self._file.canAccess(aw)
+
+    @classmethod
+    def _matchPath(cls, path):
+        if not hasattr(cls, '_RE'):
+            cls._RE = re.compile(r'/' + cls.PREFIX + '/event/' + cls.RE + r'\.(\w+)$')
+        return cls._RE.match(path)
+
+    def export_file(self, aw):
+        expInt = FileFetcher(aw, self)
+        return expInt.file([Config.getInstance().getFileTypeMimeType(self._file.getFileType()), self._binaryData])
+
+
+class FileFetcher(DataFetcher):
+
+    DETAIL_INTERFACES = {
+        'file': '',
+    }
+
+    def file(self, data):
+        return self._process(data)
+
+
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)
 Serializer.register('ics', ICalSerializer)
 Serializer.register('atom', AtomSerializer)
+Serializer.register('file', FileSerializer)
