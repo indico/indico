@@ -39,9 +39,12 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
     </a>
     <div class="banner_creator">
         % if conf.getCreator():
-            ${ _("Created by %s") % (conf.getCreator().getStraightFullName().strip() or conf.getCreator().getEmail())}
+            ${ _("Created by ")}
+            % if conf.getCreator().getStraightFullName().strip():
+                ${ ("%s -") % conf.getCreator().getStraightFullName().strip()}
+            % endif
+            ${conf.getCreator().getEmail()}
         % endif
-
     </div>
 
 </div>
