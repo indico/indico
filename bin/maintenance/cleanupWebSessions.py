@@ -20,43 +20,48 @@
 from MaKaC.common import DBMgr
 from MaKaC.webinterface.session.sessionManagement import getSessionManager
 
+def deleteSessions(sm, todelete):
+    done = 0
+    for key in todelete:
+        sm.delete_session(key)
+        done += 1
+    try:
+        DBMgr.getInstance().commit()
+    except:
+        DBMgr.getInstance().sync()
+    print "deleted %s of %s sessions" % (done, len(todelete))
+
 DBMgr.getInstance().startRequest()
 websessionDelay = float(24 * 3600)
 sm = getSessionManager()
 print "ok got session manager"
 keys = sm.keys()
 print "ok got keys"
-nbcommit = 100
 done = 0
-deleted = 0
+fresh = 0
 todelete = []
+batchsize = 1000
 
-print "set up list of keys to be deleted"
+print "start deleting"
 for key in keys:
-  value = sm[key]
-  try:
-    if value.get_creation_age() > websessionDelay:
-      todelete.append(key)
-      deleted+=1
-  except:
-    print "cannot delete %s" % key
-  done+=1
-
-print "start deletion"
-while len(todelete) > 0:
-  batch = todelete[:100]
-  todelete = todelete[100:]
-  i = 0
-  while i<10:
-    for key in batch:
-      sm.delete_session(key)
+    value = sm[key]
     try:
-      DBMgr.getInstance().commit()
-      break
+        if value.get_creation_age() > websessionDelay:
+            todelete.append(key)
+        else:
+            fresh += 1
+            if (fresh % batchsize) == 0:
+                print "%s sessions too fresh to delete" % (fresh)
     except:
-      DBMgr.getInstance().sync()
-      i += 1
+        print "cannot delete %s" % key
+    if len(todelete) >= batchsize:
+        deleteSessions(sm, todelete)
+        todelete = []
 
-print "deleted %s of %s sessions" % (deleted, done)
+if len(todelete) > 0:
+    deleteSessions(sm, todelete)
+
+print "%s sessions too fresh to delete" % (fresh)
+
 
 DBMgr.getInstance().endRequest()
