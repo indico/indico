@@ -23,7 +23,7 @@
 @import url("IndicoMeeting.css");
 
 div.meetingEventHeader {
-    background: #006699 url('../../../images/picosec_endotofpet_banner.jpg');
+    background: #fff url('../../../images/picosec_endotofpet_banner.jpg') no-repeat;
     padding-top: 15px;
     padding-left: 200px;
 }

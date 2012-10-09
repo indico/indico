@@ -23,7 +23,7 @@
 @import url("IndicoLecture.css");
 
 div.lectureEventHeader {
-    background: #FFF url('../../../images/picosec_banner.jpg') no-repeat;
+    background: #fff url('../../../images/picosec_banner.jpg') no-repeat;
     padding-top: 15px;
     padding-left: 200px;
 }
