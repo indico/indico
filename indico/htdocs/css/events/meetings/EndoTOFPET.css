@@ -23,9 +23,21 @@
 @import url("IndicoMeeting.css");
 
 div.meetingEventHeader {
-    background: #006699;
+    text-shadow: none !important;
+    background: #fff url('../../../images/Logo-EndoTOFPET.jpg') left top no-repeat;
     padding-top: 15px;
-    padding-left: 300px;
+    padding-left: 180px;
+}
+
+div.meetingEventHeader .details{
+    text-shadow: none !important;
+    color: #222 !important;
+}
+
+div.meetingEventHeader h1 {
+    font-weight: bold;
+    text-shadow: none;
+    color: #555588;
 }
 
 a.logo {
@@ -33,7 +45,4 @@ a.logo {
     left: 26px;
     top: 26px;
     display: block;
-    width: 250px;
-    height: 96px;
-    background: #006699 url('../../../images/Logo-EndoTOFPET.jpg') left top no-repeat;
 }
