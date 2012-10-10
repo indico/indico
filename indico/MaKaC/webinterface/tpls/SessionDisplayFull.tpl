@@ -2,7 +2,7 @@
 <% import MaKaC.common.timezoneUtils as timezoneUtils %>
 <% import MaKaC.webinterface.linking as linking %>
 <% from MaKaC.common.timezoneUtils import DisplayTZ %>
-<% from indico.util.date_time import format_date, format_time %>
+<% from indico.util.date_time import format_date, format_time, format_datetime %>
 <% from pytz import timezone %>
 
 <div id="buttonBar" class="sessionButtonBar">
@@ -72,10 +72,10 @@
                 <% sDate = session.getAdjustedStartDate(tz) %>
                 <% eDate = session.getAdjustedEndDate(tz) %>
                 ${_("Date")}:
-                % if sDate.strftime("%d%b%Y") == eDate.strftime("%d%b%Y"):
-                    <span style="font-weight: bold"> ${format_date(sDate)}, ${format_time(sDate)} - ${format_time(eDate)}</span>
+                % if sDate.date() == eDate.date():
+                    <span style="font-weight: bold"> ${format_datetime(sDate, format='d MMM HH:mm')} - ${format_time(eDate)}</span>
                 % else:
-                    ${_("from")} <span style="font-weight: bold">${format_date(sDate)} ${format_time(sDate)}</span> ${_("to")} <span style="font-weight: bold">${format_date(eDate)} ${format_time(eDate)}</span>
+                    ${_("from")} <span style="font-weight: bold">${format_datetime(sDate, 'd MMM HH:mm')} </span> ${_("to")} <span style="font-weight: bold">${format_datetime(eDate, 'd MMM HH:mm')}</span>
                 % endif
             </div>
         </div>
@@ -91,34 +91,36 @@
             <div class="sessionSection">
                 <h2 class="sessionSectionTitle">${_("Conveners")}</h2>
                 <div class="sessionSectionContent" style="white-space: normal">
-                    <div class="sessionConvenersTable">
+                    <ul class="conveners">
                     % for slot in slotConveners:
-                        <div style="display: table-row">
-                            % if sDate.strftime("%d%b%Y") != eDate.strftime("%d%b%Y"):
-                                <div class="sessionConvenersTableUserCell" style="display: table-cell">
-                                ${format_date(slot['startDate'])}, ${format_time(slot['startDate'])} - ${format_time(slot['endDate'])}
-                                % if slot['title']:
-                                    (${slot['title']})
-                                % endif
-                                </div>
+                      <li>
+                        <span class="time">
+                          % if sDate.date() != eDate.date():
+                            ${format_datetime(slot['startDate'], 'd MMM HH:mm')} - ${format_time(slot['endDate'])}
+                          % endif
+                        </span>
+                        % if slot['title']:
+                          <span class="title">
+                            ${slot['title']}
+                          </span>
+                        % endif
+                        <ul class="names">
+                          % for convener in slot['conveners']:
+                          <li>
+                            % if self_._aw.getUser():
+                              <a href="mailto:${convener['email']}">${convener['fullName']}</a>
+                            % else:
+                              <span>${convener['fullName']}</span>
                             % endif
-                            <div style="display: table-cell">
-                            % for convener in slot['conveners']:
-                                <div style="clear:both">
-                                    % if self_._aw.getUser():
-                                        <a href="mailto:${convener['email']}">${convener['fullName']}</a>
-                                    % else:
-                                        <span>${convener['fullName']}</span>
-                                    % endif
-                                    % if convener['affiliation']:
-                                        <span style="font-size:10px"> (${convener['affiliation']})</span>
-                                    % endif
-                                </div>
-                            % endfor
-                            </div>
-                        </div>
+                            % if convener['affiliation']:
+                              <span class="affiliation"> (${convener['affiliation']})</span>
+                            % endif
+                          </li>
+                          % endfor
+                        </ul>
+                      </li>
                     % endfor
-                    </div>
+                    </ul>
                 </div>
             </div>
         % endif
@@ -146,12 +148,18 @@
                 </div>
                 <div class="clearfix"></div>
             </div>
-            <script type="text/javascript">
-                var ttdata = ${str(ttdata)};
-                var eventInfo = ${eventInfo};
-                var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timeTableDiv'), new BrowserHistoryBroker());
-                $E('timeTableDiv').set(timetable.draw());
-                timetable.postDraw();
+        % endif
+    % endif
+</div>
+
+<script type="text/javascript">
+  var ttdata = ${ttdata | n,j};
+  var eventInfo = ${eventInfo | n,j};
+
+  $(function() {
+    var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timeTableDiv'), new BrowserHistoryBroker());
+    $E('timeTableDiv').set(timetable.draw());
+    timetable.postDraw();
                 $("#timeTableTitle").click(function(){
                     $("#contribListTitle").css('font-weight','normal');
                     $("#timeTableTitle").css('font-weight','bold');
@@ -165,16 +173,13 @@
                     $('#timeTableDiv').hide();
                 });
                 $("#timeTableTitle").click();
-            </script>
-        % endif
-    % endif
-</div>
 
-<script type="text/javascript">
     $("#manageMaterial").click(function(){
-        IndicoUI.Dialogs.Material.editor('${session.getConference().getId()}', '${session.getId()}','','',
-                ${jsonEncode(session.getAccessController().isProtected())}, ${jsonEncode(session.getMaterialRegistry().getMaterialList(session.getConference()))}, ${'Indico.Urls.UploadAction.session'}, true);
+      IndicoUI.Dialogs.Material.editor(${session.getConference().getId() |n,j}, ${session.getId() |n,j},'','',
+                                       ${session.getAccessController().isProtected() |n,j},
+                                       ${session.getMaterialRegistry().getMaterialList(session.getConference()) |n,j},
+                                       'Indico.Urls.UploadAction.session', true);
     });
-
     $('.sessionRightPanel').css('height', $('.sessionMainContent').css('height'));
+  });
 </script>

@@ -63,7 +63,7 @@
             % endif
         </%block>
     </div>
-    <%block name="filterText">
+    <%block name="filterTextInput">
         <div class="contributionListFilteredText">
             ${_("Displaying ")}<span style="font-weight:bold;" id="numberFiltered">${len(contributions)}</span>
             <span id="numberFilteredText">${ _("contribution") if len(contributions) == 1 else _("contributions")}</span>
@@ -179,7 +179,7 @@
           });
     };
 
-    IndicoUI.executeOnLoad(function(){
+    $(function(){
         createMultiselect($("#contribTypeSelector"), "contribution types");
 
         <%block name="sessionSelectorName">

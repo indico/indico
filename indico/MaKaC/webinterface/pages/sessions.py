@@ -193,8 +193,8 @@ class WSessionDisplayBase(WICalExportBase):
 
         eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz = self._tz)
         eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz = self._tz)
-        vars["ttdata"]= json.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz, None, days = None, mgmtMode = False))
-        vars["eventInfo"]= json.dumps(eventInfo)
+        vars["ttdata"]= schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz, None, days = None, mgmtMode = False)
+        vars["eventInfo"]= eventInfo
 
         vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         vars["session"] = vars["target"] = self._session
