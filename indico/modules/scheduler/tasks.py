@@ -32,7 +32,7 @@ from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.date_time import int_timestamp, format_date, format_time
+from indico.util.date_time import int_timestamp, format_date, format_time, format_datetime
 from indico.modules.scheduler.fossils import ITaskFossil, ITaskOccurrenceFossil
 from indico.modules.scheduler import base, TaskDelayed
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
@@ -415,7 +415,7 @@ class SendMailTask(OneShotTask):
         for user in self.toUser:
             addrs.append(smtplib.quoteaddr(user.getEmail()))
 
-        if addrs or ccadrs:
+        if addrs or ccaddrs:
             GenericMailer.send(GenericNotification({"fromAddr": self.fromAddr,
                                                     "toList": addrs,
                                                     "ccList": ccaddrs,
@@ -642,7 +642,8 @@ class AlarmTask(SendMailTask):
                 return False
 
         # Email
-        self.setSubject("Event reminder: %s"%self.conf.getTitle())
+        startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="EEEE d MMMM yyyy 'at' H:mm")
+        self.setSubject( _("Event reminder: %s (%s (%s))") % (self.conf.getTitle(), startDateTime, self.conf.getTimezone()))
         try:
             locationText = self.conf.getLocation().getName()
             if self.conf.getLocation().getAddress() != "":
@@ -652,10 +653,10 @@ class AlarmTask(SendMailTask):
         except:
             locationText = ""
         if locationText != "":
-            locationText = " %s: %s" % (_("Location"), locationText)
+            locationText = " %s: %s" % ( _("Location"), locationText)
 
         if self.getToAllParticipants() :
-            if self.conf.getType()=="conference":
+            if self.conf.getType() == "conference":
                 for r in self.conf.getRegistrantsList():
                     self.addToUser(r)
             else:
@@ -665,7 +666,7 @@ class AlarmTask(SendMailTask):
         if Config.getInstance().getShortEventURL() != "":
             url = "%s%s" % (Config.getInstance().getShortEventURL(),self.conf.getId())
         else:
-            url = urlHandlers.UHConferenceDisplay.getURL( self.conf )
+            url = urlHandlers.UHConferenceDisplay.getURL(self.conf)
         self.setText("""Hello,
     Please note that the event "%s" will start on %s (%s).
     %s
@@ -675,8 +676,8 @@ class AlarmTask(SendMailTask):
 
 Best Regards
 
-"""%(self.conf.getTitle(),\
-                self.conf.getAdjustedStartDate().strftime("%A %d %b %Y at %H:%M"),\
+""" % (self.conf.getTitle(),\
+                startDateTime,\
                 self.conf.getTimezone(),\
                 locationText,\
                 url,\
