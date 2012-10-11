@@ -1452,19 +1452,19 @@ class WConferenceTimeTable(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         sf = schedule.ScheduleToJson.process(self._conf.getSchedule(),
-                                                                          tz, self._aw,
-                                                                          useAttrCache = True,
-                                                                          hideWeekends = True)
+                                             tz, self._aw,
+                                             useAttrCache = True,
+                                             hideWeekends = True)
         # TODO: Move to beginning of file when proved useful
         try:
-            import cjson
-            jsonf = cjson.encode
+            import ujson
+            jsonf = ujson.encode
         except ImportError:
             jsonf = json.dumps
         vars["ttdata"] = jsonf(sf)
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz=tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        vars['eventInfo'] = json.dumps(eventInfo)
+        vars['eventInfo'] = eventInfo
         vars['timetableLayout'] = vars.get('ttLyt','')
         return vars
 
@@ -2182,13 +2182,14 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
         #################################
         vars["editURL"]=quoteattr(str(urlHandlers.UHConfModScheduleDataEdit.getURL(self._conf)))
 
-        vars['ttdata'] = json.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
-                                                                            days = None, mgmtMode = True))
+        vars['ttdata'] = schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
+                                                         days = None, mgmtMode = True)
+
         vars['customLinks'] = self._customLinks
 
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz = tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        vars['eventInfo'] = json.dumps(eventInfo)
+        vars['eventInfo'] = eventInfo
 
         return vars
 
@@ -3025,7 +3026,7 @@ class WConferenceParticipants(wcomponents.WTemplated):
         vars["currentUser"] = self._rh._aw.getUser()
         vars["numberParticipants"] = len(self._conf.getParticipation().getParticipantList())
         vars["conf"] = self._conf
-        vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
+        vars["excelIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
 
         return vars
 

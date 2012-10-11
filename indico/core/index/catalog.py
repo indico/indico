@@ -33,7 +33,7 @@ class Catalog(OOBTree):
         }
 
     @classmethod
-    def initialize(cls, db=None):
+    def initialize(cls, db=None, init_indexes=False):
         if not db:
             db = DBMgr.getInstance().getDBConnection()
 
@@ -41,6 +41,8 @@ class Catalog(OOBTree):
 
         for indexName, clazz in cls._iterIndexes():
             newIdx = clazz()
+            if init_indexes:
+                newIdx.initialize()
             catalog[indexName] = newIdx
 
         db.root()['catalog'] = catalog
@@ -74,10 +76,10 @@ class Catalog(OOBTree):
         root = db.root()
 
         if not 'catalog' in root:
-            cls.initialize(db=db)
-
-        for indexName, clazz in cls._iterIndexes():
-            if indexName not in root['catalog']:
-                newIdx = clazz()
-                root['catalog'][indexName] = newIdx
-                newIdx.initialize(dbi=dbi)
+            cls.initialize(db=db, init_indexes=True)
+        else:
+            for indexName, clazz in cls._iterIndexes():
+                if indexName not in root['catalog']:
+                    newIdx = clazz()
+                    root['catalog'][indexName] = newIdx
+                    newIdx.initialize(dbi=dbi)

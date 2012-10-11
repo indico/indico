@@ -9,8 +9,8 @@
 <script type="text/javascript">
 
 IndicoUI.executeOnLoad(function(){
-  var ttdata = ${ str(ttdata) };
-  var eventInfo = ${ eventInfo };
+  var ttdata = ${ ttdata };
+  var eventInfo = ${ eventInfo | n,j };
 
   var historyBroker = new BrowserHistoryBroker();
   var timetableLayout = ${ "'%s'"%timetableLayout };

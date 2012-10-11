@@ -769,6 +769,7 @@ class CSBookingManager(Persistent, Observer):
                     removeResult = booking._delete()
                     if isinstance(removeResult, CSErrorBase):
                         Logger.get('VideoServ').warning("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getLogMessage() ))
+                booking.unindex_instances()
                 self._unindexBooking(booking)
             except Exception, e:
                 Logger.get('VideoServ').exception("Exception while deleting a booking of type %s after deleting an event: %s" % (booking.getType(), str(e)))
@@ -1952,6 +1953,18 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return
 
+    def index_talk(self, talk):
+        """
+        To be overloaded
+        """
+        return
+
+    def unindex_talk(self, talk):
+        """
+        To be overloaded
+        """
+        return
+
     def getModificationURL(self):
         return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),
                                                            secure = ContextManager.get('currentRH').use_https(),
@@ -2165,6 +2178,20 @@ class CSBookingBase(Persistent, Fossilizable):
             return None
 
         return self._getTalkSelection()
+
+    def _hasTalks(self):
+        """ Returns the attribute if it is defined, None on error. """
+        return self._bookingParams.has_key('talks')
+
+    def isChooseTalkSelected(self):
+        """ Returns if the talks are choosen"""
+        if self._hasTalks():
+            return self._bookingParams.get('talks') == "choose"
+        else:
+            return False
+
+    def __cmp__(self, booking):
+        return cmp(self.getUniqueId(), booking.getUniqueId()) if booking else 1
 
 class WCSTemplateBase(wcomponents.WTemplated):
     """ Base class for Collaboration templates.

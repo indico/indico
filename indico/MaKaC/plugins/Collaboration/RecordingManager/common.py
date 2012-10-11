@@ -742,7 +742,8 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LODBID, LOID, videoFormat, l
                 (CollaborationTools.getOptionValue("RecordingManager", "micalaUploadURL"), e)
         except Exception, e:
             flagSuccess = False
-            result += _("Unknown error occured when submitting micala metadata: ") + e + "\n"
+            Logger.get('RecMan').exception('Error submitting metadata')
+            result += _("Unknown error occured when submitting micala metadata: %s\n") % str(e)
 
     # Update the micala database showing the task has started, but only if
     # the submission actually succeeded.

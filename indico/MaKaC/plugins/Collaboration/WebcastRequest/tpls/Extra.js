@@ -98,6 +98,8 @@ var WRUpdateContributionList = function () {
     } else {
         if (exists($E('contributionList'))) { // we are not in a lecture
             $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting.")));
+            // Hack to send a empty list and not make the server crash
+            $E('contributionList').append(Html.input('checkbox', {style: {display:"none", disabled:"disabled"},name: "talkSelection", id: "noTalks"}));
         }
     }
 }

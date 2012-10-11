@@ -77,6 +77,11 @@ class ITimeActionListener(IListener):
     def timezoneChanged(self, obj, oldTimezone, timezone):
         pass
 
+    def contributionUnscheduled(self, obj):
+        pass
+
+    def contributionScheduled(self, contrib):
+        pass
 
 class IObjectLifeCycleListener(IListener):
 

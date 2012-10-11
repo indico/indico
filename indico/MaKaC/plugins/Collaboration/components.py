@@ -39,7 +39,7 @@ from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionLis
      IMetadataChangeListener
 from indico.core.extpoint.location import ILocationActionListener
 from indico.core.extpoint.index import ICatalogIndexProvider
-
+from indico.core.index import Catalog
 
 class CSBookingInstanceIndexCatalog(Index):
 
@@ -59,6 +59,9 @@ class CSBookingInstanceIndexCatalog(Index):
             if initialize:
                 idx.initialize()
             self._container[index] = idx
+
+    def getIndexes(self):
+        return self._container.values()
 
 
 class CSBookingInstanceIndex(OOIndex):
@@ -80,10 +83,16 @@ class CSBookingInstanceIndex(OOIndex):
     def index_booking(self, bk):
         conf = bk.getConference()
         contribs = bk.getTalkSelectionList()
-        if contribs:
+        choose = bk.isChooseTalkSelected()
+
+        # if contributions chosen individually
+        if choose and contribs:
             for contrib_id in contribs:
-                self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
-        else:
+                # check that contrib is in valid room
+                if CollaborationTools.isAbleToBeWebcastOrRecorded(conf.getContributionById(contrib_id), bk.getType()):
+                    self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
+        # We need to check if it is a lecture with a correct room
+        elif CollaborationTools.isAbleToBeWebcastOrRecorded(conf, bk.getType()) or conf.getType() !="simple_event":
             for day in daysBetween(conf.getStartDate(), conf.getEndDate()):
                 bkw = CSBookingInstanceWrapper(bk, conf,
                                                day.replace(hour=0, minute=0, second=0),
@@ -139,6 +148,17 @@ class CSBookingInstanceIndex(OOIndex):
         for bkw in to_unindex:
             self.unindex_obj(bkw)
 
+    def unindex_talk(self, bk, talk):
+        to_unindex = set()
+        bookingList = self.get(talk.getStartDate(), [])
+        for bkw in bookingList:
+            if bkw.getObject() == talk:
+                to_unindex.add(bkw)
+        for bkw in to_unindex:
+            self.unindex_obj(bkw)
+
+    def index_talk(self, bk, talk):
+        self.index_obj(CSBookingInstanceWrapper(bk, talk))
 
 class CatalogIndexProvider(Component):
     zope.interface.implements(ICatalogIndexProvider)
@@ -212,6 +232,19 @@ class EventCollaborationListener(Component):
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
 
     @classmethod
+    def contributionUnscheduled(self, contrib):
+        if contrib.getStartDate() is not None:
+            csBookingManager = contrib.getCSBookingManager()
+            for booking in csBookingManager.getBookingList():
+                booking.unindex_talk(contrib)
+
+    @classmethod
+    def contributionScheduled(self, contrib):
+        csBookingManager = contrib.getCSBookingManager()
+        for booking in csBookingManager.getBookingList():
+            booking.index_talk(contrib)
+
+    @classmethod
     def eventTitleChanged(cls, obj, oldTitle, newTitle):
 
         obj = obj.getCSBookingManager()
@@ -237,9 +270,27 @@ class EventCollaborationListener(Component):
         if obj.__class__ == Conference:
             obj = obj.getCSBookingManager()
             obj.notifyDeletion()
+        elif obj.__class__ == Contribution:
+            csBookingManager = obj.getCSBookingManager()
+            for booking in csBookingManager.getBookingList():
+                booking.unindex_talk(obj)
 
     # ILocationActionListener
     @classmethod
     def placeChanged(cls, obj):
         obj = obj.getCSBookingManager()
         obj.notifyLocationChange()
+
+    @classmethod
+    def locationChanged(cls, obj, oldLocation, newLocation):
+        csBookingManager = obj.getCSBookingManager()
+        for booking in csBookingManager.getBookingList():
+            booking.unindex_talk(obj)
+            booking.index_talk(obj)
+
+    @classmethod
+    def roomChanged(cls, obj, oldLocation, newLocation):
+        csBookingManager = obj.getCSBookingManager()
+        for booking in csBookingManager.getBookingList():
+            booking.unindex_talk(obj)
+            booking.index_talk(obj)

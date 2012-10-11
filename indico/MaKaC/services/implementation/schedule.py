@@ -393,9 +393,9 @@ class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.Conf
 class ConferenceScheduleDeleteContribution(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
     def _performOperation(self):
-
         contrib = self._schEntry.getOwner()
         logInfo = contrib.getLogInfo()
+        contrib._notify("contributionUnscheduled")
 
         if self._conf.getType() == "meeting":
             logInfo["subject"] =  _("Deleted contribution: %s")%contrib.getTitle()
@@ -567,14 +567,13 @@ class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.S
         contrib = self._schEntry.getOwner()
 
         logInfo = contrib.getLogInfo()
-
+        contrib._notify("contributionUnscheduled")
         if type == "meeting":
             logInfo["subject"] = "Deleted contribution: %s" %contrib.getTitle()
             contrib.delete()
         else:
             logInfo["subject"] = "Unscheduled contribution: %s"%contrib.getTitle()
 
-        self._slot.getSchedule().removeEntry(self._schEntry)
         self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
         self._slot.getSchedule().removeEntry(self._schEntry)
 
@@ -594,7 +593,6 @@ class ModifyStartEndDate(ScheduleOperation):
 
         # if we want to reschedule other entries, let's store the old parameters
         # and the list of entries that will be rescheduled (after this one)
-
         if self._reschedule:
             oldStartDate=copy.copy(self._schEntry.getStartDate())
             oldDuration=copy.copy(self._schEntry.getDuration())
@@ -607,7 +605,6 @@ class ModifyStartEndDate(ScheduleOperation):
                       self._schEntry.getSchedule().getEntries()[j].getAdjustedStartDate().date():
                 j += 1
             entriesList = self._schEntry.getSchedule().getEntries()[i:j]
-
         duration = self._endDate - self._startDate
         owner = self._schEntry.getOwner()
         if isinstance(owner, SessionSlot) and owner.getSession().getScheduleType() == "poster":
@@ -619,7 +616,6 @@ class ModifyStartEndDate(ScheduleOperation):
         # temporarly outside and an exception will be raised.
         self._schEntry.setDuration(dur=duration,check=checkFlag)
         self._schEntry.setStartDate(self._startDate, moveEntries=1, check=checkFlag)
-
         # In case of 'reschedule', calculate the time difference
         if self._reschedule:
             diff = (self._schEntry.getStartDate() - oldStartDate) + (self._schEntry.getDuration() - oldDuration)
@@ -1118,7 +1114,6 @@ class MoveEntryBase(ScheduleOperation):
             oldSch['startDate'] = formatDateTime(oldDate.astimezone(pytz.timezone(owner.getTimezone())))
 
             sessionId,sessionSlotId = self._contribPlace.split(":")
-
             if sessionId != "conf":
                 # Moving inside a session
                 session = self._conf.getSessionById(sessionId)

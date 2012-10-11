@@ -9,6 +9,16 @@
 var videoServiceLaunchInfo = {};
 var bookings = ${dict((b['id'], b) for b in fossilize(bookings))|n,j};
 
+$(function() {
+  $('.collaborationDisplayMoreInfo').click(function() {
+    var newText = ($(this).text() == $T("More Info")) ? $T("Hide info") : $T("More Info");
+    var textNode = $(this);
+    $(this).closest('.videoServiceWrapper').next('.collabInfoInline').slideToggle('fast', function() {
+      textNode.text(newText);
+    });
+  });
+});
+
 </script>
 <tr>
 <td class="leftCol">Video Services</td>

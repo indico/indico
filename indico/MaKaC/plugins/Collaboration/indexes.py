@@ -108,6 +108,12 @@ class CSBookingInstanceWrapper(Persistent):
         else:
             return None
 
+    def __cmp__(self, instance):
+        if instance is None:
+            return 1
+        else:
+            return cmp(self.getUniqueId(), instance.getUniqueId())
+
 
 class CollaborationIndex(Persistent):
 

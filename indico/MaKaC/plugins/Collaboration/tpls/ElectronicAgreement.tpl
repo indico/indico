@@ -3,18 +3,19 @@
 
     % if canShow:
         <span class="RRNoteText" style="float:left;">
-            ${_("""Before any recording can be published, each speaker must sign the %s.<br/>
-                     To do so, two different ways are available:
-                     <ol>
+            ${_("""Before any recording can be published, each speaker must sign a %s.<br/>
+                     This can be done <strong>in two different ways</strong>:
+                     <ul>
                         <li><span style="font-weight:bold;">Electronic signature:</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
                         </li>
+                        <em class="grey">or</em>
                         <li>Ask the speaker to sign the """)%(agreementName)}
 
             ${urlPaperAgreement}
 
              ${_("""<br/>Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
                            </li>
-                        </ol>
+                        </ul>
                 """)}
         </span>
 
@@ -143,7 +144,7 @@ $(function() {
             var uniqueIdList = $('.speakerLine input:checked').map(function(){return this.id;}).toArray();
             var defaultText = "Dear {name},<br />" +
                             "<br />" +
-                            "The organiser asked to record the following event: <strong>"+self.confTitle+"</strong><br />" +
+                            "The organiser asked to record the following event: <strong>${conf.getTitle()}</strong><br />" +
                             "In order to allow us to publish the video recording of your talk <strong>{talkTitle}</strong>, please sign the agreement form at this page:" +
                             "<br/><br/> {url} <br/>"+
                             "<br/>" +

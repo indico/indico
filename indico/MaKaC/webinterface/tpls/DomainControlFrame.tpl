@@ -47,12 +47,18 @@ $(function(){
 
 $('input:checkbox', '.domain_control').live('change', function(){
     $this = $(this);
+   var params = {
+                  targetId: '${target.getId()}',
+                  domainId: $this.val(),
+                  add: $this.is(':checked')
+                };
+
+   % if event is not None:
+       params['confId'] = ${ event.getId() | n,j};
+   % endif
+
     indicoRequest('${method}',
-                  {
-                      targetId: '${target.getId()}',
-                      domainId: $this.val(),
-                      add: $this.is(':checked')
-                  },
+                  params,
                   function(result, error) {
                       if(error) {
                           IndicoUtil.errorReport(error);

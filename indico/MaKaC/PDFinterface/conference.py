@@ -84,10 +84,16 @@ class ProgrammeToPDF(PDFBase):
 
     def firstPage(self, c, doc):
         c.saveState()
-        self._drawLogo(c, False)
-        height=self._drawWrappedString(c, strip_ml_tags(self._conf.getTitle()))
+
+        height = self._drawLogo(c)
+
+        if not height:
+            height = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
+
         c.setFont('Times-Bold', 15)
-        height-=2*cm
+
+        height -= 2 * cm;
+
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"), self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
         if self._conf.getLocation():
             height-=1*cm

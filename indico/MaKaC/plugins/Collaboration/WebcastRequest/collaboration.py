@@ -22,6 +22,7 @@ from MaKaC.plugins.Collaboration.WebcastRequest.mail import NewRequestNotificati
     RequestRejectedNotification, RequestAcceptedNotification,\
     RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin,\
     RequestRescheduledNotification, RequestRelocatedNotification
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.WebcastRequest.common import WebcastRequestException,\
     WebcastRequestError
@@ -190,6 +191,8 @@ class CSBooking(CSBookingBase):
                 return WebcastRequestError('edit', e)
 
     def notifyLocationChange(self):
+        self.unindex_instances()
+        self.index_instances()
         if MailTools.needToSendEmails('WebcastRequest'):
             try:
                 notification = RequestRelocatedNotification(self)
@@ -210,3 +213,15 @@ class CSBooking(CSBookingBase):
         idx = Catalog.getIdx('cs_booking_instance')
         idx['WebcastRequest'].unindex_booking(self)
         idx['All Requests'].unindex_booking(self)
+
+    def index_talk(self, talk):
+        if CollaborationTools.isAbleToBeWebcastOrRecorded(talk, "WebcastRequest") and self.isChooseTalkSelected() \
+        and talk.getId() in self.getTalkSelectionList():
+            idx = Catalog.getIdx('cs_booking_instance')
+            idx['WebcastRequest'].index_talk(self, talk)
+            idx['All Requests'].index_talk(self, talk)
+
+    def unindex_talk(self, talk):
+        idx = Catalog.getIdx('cs_booking_instance')
+        idx['WebcastRequest'].unindex_talk(self, talk)
+        idx['All Requests'].unindex_talk(self, talk)
