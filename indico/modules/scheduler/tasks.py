@@ -642,8 +642,8 @@ class AlarmTask(SendMailTask):
                 return False
 
         # Email
-        startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="EEEE d MMMM yyyy 'at' H:mm")
-        self.setSubject( _("Event reminder: %s (%s (%s))") % (self.conf.getTitle(), startDateTime, self.conf.getTimezone()))
+        startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="short")
+        self.setSubject( _("Event reminder: %s (%s %s)") % (self.conf.getTitle(), startDateTime, self.conf.getTimezone()))
         try:
             locationText = self.conf.getLocation().getName()
             if self.conf.getLocation().getAddress() != "":
