@@ -6111,9 +6111,10 @@ class Session(CommonObjectBase, Locatable):
         return self._conveners
 
     def getAllConvenerList(self):
-        convenerList = []
+        convenerList = set()
         for slot in self.getSlotList():
-            convenerList.extend(slot.getConvenerList())
+            for convener in slot.getConvenerList():
+                convenerList.add(convener)
         return convenerList
 
     def _addConvener(self,newConv):
