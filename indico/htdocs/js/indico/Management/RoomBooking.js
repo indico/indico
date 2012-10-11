@@ -97,7 +97,6 @@ type("RoomBookingWidget", ["IWidget"],
              if (this.oldInfo) {
                  this.info.update(this.oldInfo.getAll());
              }
-
              $B(this.locationChooser, this.info.accessor('location'));
              $B(this.roomChooser, this.info.accessor('room'));
              $B(this.addressArea, this.info.accessor('address'));
@@ -191,11 +190,12 @@ type("RoomBookingWidget", ["IWidget"],
                  if (value) {
                      self.inheritText.dom.className = 'enhanced';
                      self.locationChooser.disable();
-                     self.roomChooser.disable();
+                     if ( rbActive ) {
+                        self.roomChooser.disable();
+                     }
                      self.addressArea.disable();
 
                      self.oldInfo = $O(self.info.getAll());
-
                      self.locationChooser.set(self.parentInfo.get('location'));
                      self.roomChooser.set(self.parentInfo.get('room'));
 
@@ -208,7 +208,9 @@ type("RoomBookingWidget", ["IWidget"],
                  } else {
                      self.inheritText.dom.className = '';
                      self.locationChooser.enable();
-                     self.roomChooser.enable();
+                     if ( rbActive ) {
+                        self.roomChooser.enable();
+                     }
                      self.addressArea.enable();
 
                      self._startBind();
