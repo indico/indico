@@ -211,6 +211,9 @@ class SessionManager:
         """
         return self.sessions.items()
 
+    def iteritems(self):
+        return self.sessions.iteritems()
+
     def get (self, session_id, default=None):
         """get(session_id : string, default : any = None) -> Session
 

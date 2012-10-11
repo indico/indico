@@ -43,6 +43,7 @@ from MaKaC import schedule
 from MaKaC.common.utils import getLocationInfo
 from MaKaC.common.TemplateExec import render
 
+
 """
 Defines base classes for tasks, and some specific tasks as well
 """
