@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -14,17 +14,36 @@ CKEDITOR.plugins.add( 'menu',
 		for ( var i = 0 ; i < groups.length ; i++ )
 			groupsOrder[ groups[ i ] ] = i + 1;
 
+		/**
+		 * Registers an item group to the editor context menu in order to make it
+		 * possible to associate it with menu items later.
+		 * @name CKEDITOR.editor.prototype.addMenuGroup
+		 * @param {String} name Specify a group name.
+		 * @param {Number} [order=100] Define the display sequence of this group
+		 *  	inside the menu. A smaller value gets displayed first.
+		 */
 		editor.addMenuGroup = function( name, order )
 			{
 				groupsOrder[ name ] = order || 100;
 			};
 
+		/**
+		 * Adds an item from the specified definition to the editor context menu.
+		 * @name CKEDITOR.editor.prototype.addMenuItem
+		 * @param {String} name The menu item name.
+		 * @param {CKEDITOR.menu.definition} definition The menu item definition.
+		 */
 		editor.addMenuItem = function( name, definition )
 			{
 				if ( groupsOrder[ definition.group ] )
 					menuItems[ name ] = new CKEDITOR.menuItem( this, name, definition );
 			};
 
+		/**
+		 * Adds one or more items from the specified definition array to the editor context menu.
+		 * @name CKEDITOR.editor.prototype.addMenuItems
+		 * @param {Array} definitions List of definitions for each menu item as if {@link CKEDITOR.editor.addMenuItem} is called.
+		 */
 		editor.addMenuItems = function( definitions )
 			{
 				for ( var itemName in definitions )
@@ -33,9 +52,26 @@ CKEDITOR.plugins.add( 'menu',
 				}
 			};
 
+		/**
+		 * Retrieves a particular menu item definition from the editor context menu.
+		 * @name CKEDITOR.editor.prototype.getMenuItem
+		 * @param {String} name The name of the desired menu item.
+		 * @return {CKEDITOR.menu.definition}
+		 */
 		editor.getMenuItem = function( name )
 			{
 				return menuItems[ name ];
+			};
+
+		/**
+		 * Removes a particular menu item added before from the editor context menu.
+		 * @name CKEDITOR.editor.prototype.removeMenuItem
+		 * @param {String} name The name of the desired menu item.
+		 * @since 3.6.1
+		 */
+		editor.removeMenuItem = function( name )
+			{
+				delete menuItems[ name ];
 			};
 	},
 
@@ -97,7 +133,7 @@ CKEDITOR.plugins.add( 'menu',
 						{
 							var item = this.editor.getMenuItem( itemName );
 
-							if ( item )
+							if ( item && ( !item.command || this.editor.getCommand( item.command ).state ) )
 							{
 								item.state = listenerItems[ itemName ];
 								this.add( item );
@@ -109,7 +145,7 @@ CKEDITOR.plugins.add( 'menu',
 
 			onClick : function( item )
 			{
-				this.hide();
+				this.hide( false );
 
 				if ( item.onClick )
 					item.onClick();
@@ -132,19 +168,18 @@ CKEDITOR.plugins.add( 'menu',
 					parentBlock._.markItem( parentFocusIndex );
 				}
 				else if ( keystroke == 27 )
-				{
 					this.hide();
-					this.editor.focus();
-				}
+
 				return false;
 			},
 
 			onHide : function()
 			{
-				if ( CKEDITOR.env.ie )
+				// Unlock the selection upon first panel closing.
+				if ( CKEDITOR.env.ie && !this.parent )
 				{
 					var selection = this.editor.getSelection();
-					selection && selection.unlock();
+					selection && selection.unlock( true );
 				}
 
 				this.onHide && this.onHide();
@@ -265,8 +300,9 @@ CKEDITOR.plugins.add( 'menu',
 					keys[ 9 ]	= 'next';					// TAB
 					keys[ 38 ]	= 'prev';					// ARROW-UP
 					keys[ CKEDITOR.SHIFT + 9 ]	= 'prev';	// SHIFT + TAB
-					keys[ 32 ]	= 'click';					// SPACE
-					keys[ ( editor.lang.dir == 'rtl' ? 37 : 39 ) ]	= 'click';  // ARROW-RIGHT/ARROW-LEFT(rtl)
+					keys[ ( editor.lang.dir == 'rtl' ? 37 : 39 ) ]= CKEDITOR.env.ie ? 'mouseup' : 'click';  // ARROW-RIGHT/ARROW-LEFT(rtl)
+					keys[ 32 ]	= CKEDITOR.env.ie ? 'mouseup' : 'click';					// SPACE
+					CKEDITOR.env.ie && ( keys[ 13 ] = 'mouseup' );		// Manage ENTER, since onclick is blocked in IE (#8041).
 
 					element = this._.element = block.element;
 					element.addClass( editor.skinClass );
@@ -351,10 +387,10 @@ CKEDITOR.plugins.add( 'menu',
 				this._.listeners.push( listenerFn );
 			},
 
-			hide : function()
+			hide : function( returnFocus )
 			{
 				this._.onHide && this._.onHide();
-				this._.panel && this._.panel.hide();
+				this._.panel && this._.panel.hide( returnFocus );
 			}
 		}
 	});
@@ -444,8 +480,9 @@ CKEDITOR.plugins.add( 'menu',
 				output.push(
 //					' onkeydown="return CKEDITOR.ui.button._.keydown(', index, ', event);"' +
 					' onmouseover="CKEDITOR.tools.callFunction(', menu._.itemOverFn, ',', index, ');"' +
-					' onmouseout="CKEDITOR.tools.callFunction(', menu._.itemOutFn, ',', index, ');"' +
-					' onclick="CKEDITOR.tools.callFunction(', menu._.itemClickFn, ',', index, '); return false;"' +
+					' onmouseout="CKEDITOR.tools.callFunction(', menu._.itemOutFn, ',', index, ');" ' +
+					( CKEDITOR.env.ie ? 'onclick="return false;" onmouseup' : 'onclick' ) +		// #188
+						'="CKEDITOR.tools.callFunction(', menu._.itemClickFn, ',', index, '); return false;"' +
 					'>' +
 						'<span class="cke_icon_wrapper"><span class="cke_icon"' +
 							( this.icon ? ' style="background-image:url(' + CKEDITOR.getUrl( this.icon ) + ');background-position:0 ' + offset + 'px;"'
@@ -478,8 +515,8 @@ CKEDITOR.plugins.add( 'menu',
 
 
 /**
- * The amount of time, in milliseconds, the editor waits before showing submenu
- * options when moving the mouse over options that contains submenus, like the
+ * The amount of time, in milliseconds, the editor waits before displaying submenu
+ * options when moving the mouse over options that contain submenus, like the
  * "Cell Properties" entry for tables.
  * @type Number
  * @default 400
@@ -490,8 +527,8 @@ CKEDITOR.plugins.add( 'menu',
 
 /**
  * A comma separated list of items group names to be displayed in the context
- * menu. The items order will reflect the order in this list if no priority
- * has been definted in the groups.
+ * menu. The order of items will reflect the order specified in this list if
+ * no priority was defined in the groups.
  * @type String
  * @default 'clipboard,form,tablecell,tablecellproperties,tablerow,tablecolumn,table,anchor,link,image,flash,checkbox,radio,textfield,hiddenfield,imagebutton,button,select,textarea'
  * @example

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -117,26 +117,49 @@ CKEDITOR.dom.event.prototype =
 	{
 		var rawNode = this.$.target || this.$.srcElement;
 		return rawNode ? new CKEDITOR.dom.node( rawNode ) : null;
+	},
+
+	/**
+	 * Retrieves the coordinates of the mouse pointer relative to the top-left
+	 * corner of the document, in mouse related event.
+	 * @returns {Object} The object contains the position.
+	 * @example
+	 * element.on( 'mousemouse', function( ev )
+	 *     {
+	 *         var pageOffset = ev.data.getPageOffset();
+	 *         alert( pageOffset.x ); // page offset X
+	 *         alert( pageOffset.y ); // page offset Y
+	 *     });
+	 */
+	getPageOffset : function()
+	{
+		var doc = this.getTarget().getDocument().$;
+		var pageX = this.$.pageX || this.$.clientX + ( doc.documentElement.scrollLeft || doc.body.scrollLeft );
+		var pageY = this.$.pageY || this.$.clientY + ( doc.documentElement.scrollTop || doc.body.scrollTop );
+		return { x : pageX, y : pageY };
 	}
 };
 
-/**
- * CTRL key (1000).
- * @constant
- * @example
- */
-CKEDITOR.CTRL = 1000;
+// For the followind constants, we need to go over the Unicode boundaries
+// (0x10FFFF) to avoid collision.
 
 /**
- * SHIFT key (2000).
+ * CTRL key (0x110000).
  * @constant
  * @example
  */
-CKEDITOR.SHIFT = 2000;
+CKEDITOR.CTRL = 0x110000;
 
 /**
- * ALT key (4000).
+ * SHIFT key (0x220000).
  * @constant
  * @example
  */
-CKEDITOR.ALT = 4000;
+CKEDITOR.SHIFT = 0x220000;
+
+/**
+ * ALT key (0x440000).
+ * @constant
+ * @example
+ */
+CKEDITOR.ALT = 0x440000;

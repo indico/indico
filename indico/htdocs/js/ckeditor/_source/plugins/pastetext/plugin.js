@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -58,12 +58,19 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				// Intercept the default pasting process.
 				editor.on( 'beforeCommandExec', function ( evt )
 				{
-					if ( evt.data.name == 'paste' )
+					var mode = evt.data.commandData;
+					// Do NOT overwrite if HTML format is explicitly requested.
+					if ( evt.data.name == 'paste' && mode != 'html' )
 					{
 						editor.execCommand( 'pastetext' );
 						evt.cancel();
 					}
 				}, null, null, 0 );
+
+				editor.on( 'beforePaste', function( evt )
+				{
+					evt.data.mode = 'text';
+				});
 			}
 
 			editor.on( 'pasteState', function( evt )
@@ -82,6 +89,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
  * Whether to force all pasting operations to insert on plain text into the
  * editor, loosing any formatting information possibly available in the source
  * text.
+ * <strong>Note:</strong> paste from word is not affected by this configuration.
  * @name CKEDITOR.config.forcePasteAsPlainText
  * @type Boolean
  * @default false

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -40,6 +40,8 @@ CKEDITOR.plugins.add( 'sourcearea',
 								});
 							textarea.addClass( 'cke_source' );
 							textarea.addClass( 'cke_enable_context_menu' );
+
+							editor.readOnly && textarea.setAttribute( 'readOnly', 'readonly' );
 
 							var styles =
 							{
@@ -104,7 +106,7 @@ CKEDITOR.plugins.add( 'sourcearea',
 							setTimeout( function()
 							{
 								editor.mode = 'source';
-								editor.fire( 'mode' );
+								editor.fire( 'mode', { previousMode : editor._.previousMode } );
 							},
 							( CKEDITOR.env.gecko || CKEDITOR.env.webkit ) ? 100 : 0 );
 						},
@@ -147,6 +149,17 @@ CKEDITOR.plugins.add( 'sourcearea',
 					});
 			});
 
+		editor.on( 'readOnly', function()
+			{
+				if ( editor.mode == 'source' )
+				{
+					if ( editor.readOnly )
+						editor.textarea.setAttribute( 'readOnly', 'readonly' );
+					else
+						editor.textarea.removeAttribute( 'readOnly' );
+				}
+			});
+
 		editor.addCommand( 'source', sourcearea.commands.source );
 
 		if ( editor.ui.addButton )
@@ -181,7 +194,7 @@ CKEDITOR.plugins.sourcearea =
 		{
 			modes : { wysiwyg:1, source:1 },
 			editorFocus : false,
-
+			readOnly : 1,
 			exec : function( editor )
 			{
 				if ( editor.mode == 'wysiwyg' )

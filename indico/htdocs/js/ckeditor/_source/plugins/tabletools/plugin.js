@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -9,10 +9,6 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 	function getSelectedCells( selection )
 	{
-		// Walker will try to split text nodes, which will make the current selection
-		// invalid. So save bookmarks before doing anything.
-		var bookmarks = selection.createBookmarks();
-
 		var ranges = selection.getRanges();
 		var retval = [];
 		var database = {};
@@ -60,8 +56,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					// So we have to take care to include a td we've entered only when we've
 					// walked into its children.
 
-					var parent = node.getParent();
-					if ( parent && cellNodeRegex.test( parent.getName() ) && !parent.getCustomData( 'selected_cell' ) )
+					var parent = node.getAscendant( 'td' ) || node.getAscendant( 'th' );
+					if ( parent && !parent.getCustomData( 'selected_cell' ) )
 					{
 						CKEDITOR.dom.element.setMarker( database, parent, 'selected_cell', true );
 						retval.push( parent );
@@ -71,9 +67,6 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		}
 
 		CKEDITOR.dom.element.clearAllMarkers( database );
-
-		// Restore selection position.
-		selection.selectBookmarks( bookmarks );
 
 		return retval;
 	}
@@ -135,7 +128,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				width = map[0].length;
 
 		var newRow = doc.createElement( 'tr' );
-		for ( var i = 0; i < width; i++ )
+		for ( var i = 0; cloneRow[ i ] && i < width; i++ )
 		{
 			var cell;
 			// Check whether there's a spanning row here, do not break it.
@@ -215,7 +208,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 			// 1. Into next sibling row if any;
 			// 2. Into previous sibling row if any;
 			// 3. Into table's parent element if it's the very last row.
-			var cursorPosition =  new CKEDITOR.dom.element( rows[ startRowIndex ] || rows[ startRowIndex - 1 ] || table.$.parentNode );
+			var cursorPosition =  new CKEDITOR.dom.element( rows[ endRowIndex + 1 ] || ( startRowIndex > 0 ? rows[  startRowIndex - 1 ] : null ) || table.$.parentNode );
 
 			for ( i = rowsToDelete.length ; i >= 0 ; i-- )
 				deleteRows( rowsToDelete[ i ] );
@@ -282,15 +275,18 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		{
 			cloneCol.push( map[ i ][ colIndex ] );
 			var nextCell = insertBefore ? map[ i ][ colIndex - 1 ] : map[ i ][ colIndex + 1 ];
-			nextCell && nextCol.push( nextCell );
+			nextCol.push( nextCell );
 		}
 
 		for ( i = 0; i < height; i++ )
 		{
 			var cell;
+
+			if ( !cloneCol[ i ] )
+				continue;
+
 			// Check whether there's a spanning column here, do not break it.
 			if ( cloneCol[ i ].colSpan > 1
-				&& nextCol.length
 				&& nextCol[ i ] == cloneCol[ i ] )
 			{
 				cell = cloneCol[ i ];
@@ -341,16 +337,19 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					row = new CKEDITOR.dom.element( table.$.rows[ j ] ),
 					cell = new CKEDITOR.dom.element( mapRow[ i ] );
 
-				if ( cell.$.colSpan == 1 )
-					cell.remove();
-				// Reduce the col spans.
-				else
-					cell.$.colSpan -= 1;
+				if ( cell.$ )
+				{
+					if ( cell.$.colSpan == 1 )
+						cell.remove();
+					// Reduce the col spans.
+					else
+						cell.$.colSpan -= 1;
 
-				j += cell.$.rowSpan - 1;
+					j += cell.$.rowSpan - 1;
 
-				if ( !row.$.cells.length )
-					rowsToDelete.push( row );
+					if ( !row.$.cells.length )
+						rowsToDelete.push( row );
+				}
 			}
 		}
 
@@ -487,21 +486,19 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		return cell.is ? -1 : null;
 	}
 
-	function cellInCol( tableMap, colIndex, cell )
+	function cellInCol( tableMap, colIndex )
 	{
 		var oCol = [];
 		for ( var r = 0; r < tableMap.length; r++ )
 		{
 			var row = tableMap[ r ];
-			if ( typeof cell == 'undefined' )
-				oCol.push( row[ colIndex ] );
-			else if ( cell.is && row[ colIndex ] == cell.$ )
-				return r;
-			else if ( r == cell )
-				return new CKEDITOR.dom.element( row[ colIndex ] );
-		}
+			oCol.push( row[ colIndex ] );
 
-		return ( typeof cell == 'undefined' )? oCol : cell.is ? -1 :  null;
+			// Avoid adding duplicate cells.
+			if ( row[ colIndex ].rowSpan > 1 )
+				r += row[ colIndex ].rowSpan - 1;
+		}
+		return oCol;
 	}
 
 	function mergeCells( selection, mergeDirection, isDetect )
@@ -777,6 +774,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 	CKEDITOR.plugins.tabletools =
 	{
+		requires : [ 'table', 'dialog' ],
+
 		init : function( editor )
 		{
 			var lang = editor.lang.table;

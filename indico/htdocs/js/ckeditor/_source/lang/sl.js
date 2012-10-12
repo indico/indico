@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -14,7 +14,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 /**
- * Constains the dictionary of language entries.
+ * Contains the dictionary of language entries.
  * @namespace
  */
 CKEDITOR.lang['sl'] =
@@ -31,11 +31,12 @@ CKEDITOR.lang['sl'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'Rich text editor, %1, press ALT 0 for help.', // MISSING
+	editorTitle : 'Rich text editor, %1', // MISSING
+	editorHelp : 'Press ALT 0 for help', // MISSING
 
 	// ARIA descriptions.
-	toolbar	: 'Toolbar', // MISSING
-	editor	: 'Rich Text Editor', // MISSING
+	toolbars	: 'Editor toolbars', // MISSING
+	editor		: 'Rich Text Editor', // MISSING
 
 	// Toolbar buttons without dialogs.
 	source			: 'Izvorna koda',
@@ -119,8 +120,13 @@ CKEDITOR.lang['sl'] =
 		alignTop		: 'Na vrh',
 		alignMiddle		: 'V sredino',
 		alignBottom		: 'Na dno',
+		invalidValue	: 'Invalid value.', // MISSING
 		invalidHeight	: 'Višina mora biti število.',
 		invalidWidth	: 'Širina mora biti število.',
+		invalidCssLength	: 'Value specified for the "%1" field must be a positive number with or without a valid CSS measurement unit (px, %, in, cm, mm, em, ex, pt, or pc).', // MISSING
+		invalidHtmlLength	: 'Value specified for the "%1" field must be a positive number with or without a valid HTML measurement unit (px or %).', // MISSING
+		invalidInlineStyle	: 'Value specified for the inline style must consist of one or more tuples with the format of "name : value", separated by semi-colons.', // MISSING
+		cssLengthTooltip	: 'Enter a number for a value in pixels or a number with a valid CSS unit (px, %, in, cm, mm, em, ex, pt, or pc).', // MISSING
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, nedosegljiv</span>'
@@ -201,7 +207,8 @@ CKEDITOR.lang['sl'] =
 		menu		: 'Lastnosti zaznamka',
 		title		: 'Lastnosti zaznamka',
 		name		: 'Ime zaznamka',
-		errorName	: 'Prosim vnesite ime zaznamka'
+		errorName	: 'Prosim vnesite ime zaznamka',
+		remove		: 'Remove Anchor' // MISSING
 	},
 
 	// List style dialog
@@ -237,6 +244,7 @@ CKEDITOR.lang['sl'] =
 		findWhat			: 'Najdi:',
 		replaceWith			: 'Zamenjaj z:',
 		notFoundMsg			: 'Navedeno besedilo ni bilo najdeno.',
+		findOptions			: 'Find Options', // MISSING
 		matchCase			: 'Razlikuj velike in male črke',
 		matchWord			: 'Samo cele besede',
 		matchCyclic			: 'Primerjaj znake v cirilici',
@@ -413,7 +421,6 @@ CKEDITOR.lang['sl'] =
 		upload		: 'Pošlji',
 		alt			: 'Nadomestno besedilo',
 		lockRatio	: 'Zakleni razmerje',
-		unlockRatio	: 'Unlock Ratio', // MISSING
 		resetSize	: 'Ponastavi velikost',
 		border		: 'Obroba',
 		hSpace		: 'Vodoravni razmik',
@@ -715,6 +722,8 @@ CKEDITOR.lang['sl'] =
 	{
 		title		: 'O programu CKEditor',
 		dlgTitle	: 'O programu CKEditor',
+		help	: 'Check $1 for help.', // MISSING
+		userGuide : 'CKEditor User\'s Guide', // MISSING
 		moreInfo	: 'Za informacijo o licenci prostim obiščite našo spletno stran:',
 		copy		: 'Copyright &copy; $1. Vse pravice pridržane.'
 	},
@@ -745,9 +754,64 @@ CKEDITOR.lang['sl'] =
 	toolbarCollapse	: 'Collapse Toolbar', // MISSING
 	toolbarExpand	: 'Expand Toolbar', // MISSING
 
+	toolbarGroups :
+	{
+		document : 'Document', // MISSING
+		clipboard : 'Clipboard/Undo', // MISSING
+		editing : 'Editing', // MISSING
+		forms : 'Forms', // MISSING
+		basicstyles : 'Basic Styles', // MISSING
+		paragraph : 'Paragraph', // MISSING
+		links : 'Links', // MISSING
+		insert : 'Insert', // MISSING
+		styles : 'Styles', // MISSING
+		colors : 'Colors', // MISSING
+		tools : 'Tools' // MISSING
+	},
+
 	bidi :
 	{
 		ltr : 'Text direction from left to right', // MISSING
 		rtl : 'Text direction from right to left' // MISSING
+	},
+
+	docprops :
+	{
+		label : 'Lastnosti dokumenta',
+		title : 'Lastnosti dokumenta',
+		design : 'Design', // MISSING
+		meta : 'Meta podatki',
+		chooseColor : 'Izberi',
+		other : '<drug>',
+		docTitle :	'Naslov strani',
+		charset : 	'Kodna tabela',
+		charsetOther : 'Druga kodna tabela',
+		charsetASCII : 'ASCII', // MISSING
+		charsetCE : 'Srednjeevropsko',
+		charsetCT : 'Tradicionalno Kitajsko (Big5)',
+		charsetCR : 'Cirilica',
+		charsetGR : 'Grško',
+		charsetJP : 'Japonsko',
+		charsetKR : 'Korejsko',
+		charsetTR : 'Turško',
+		charsetUN : 'Unicode (UTF-8)', // MISSING
+		charsetWE : 'Zahodnoevropsko',
+		docType : 'Glava tipa dokumenta',
+		docTypeOther : 'Druga glava tipa dokumenta',
+		xhtmlDec : 'Vstavi XHTML deklaracije',
+		bgColor : 'Barva ozadja',
+		bgImage : 'URL slike za ozadje',
+		bgFixed : 'Nepremično ozadje',
+		txtColor : 'Barva besedila',
+		margin : 'Zamiki strani',
+		marginTop : 'Na vrhu',
+		marginLeft : 'Levo',
+		marginRight : 'Desno',
+		marginBottom : 'Spodaj',
+		metaKeywords : 'Ključne besede (ločene z vejicami)',
+		metaDescription : 'Opis strani',
+		metaAuthor : 'Avtor',
+		metaCopyright : 'Avtorske pravice',
+		previewHtml : '<p>This is some <strong>sample text</strong>. You are using <a href="javascript:void(0)">CKEditor</a>.</p>' // MISSING
 	}
 };

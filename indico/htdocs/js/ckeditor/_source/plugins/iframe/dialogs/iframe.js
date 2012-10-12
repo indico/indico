@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -61,7 +61,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					var iframeNode = editor.restoreRealElement( fakeImage );
 					this.iframeNode = iframeNode;
 
-					this.setupContent( iframeNode, fakeImage );
+					this.setupContent( iframeNode );
 				}
 			},
 			onOk : function()
@@ -123,23 +123,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 									style : 'width:100%',
 									labelLayout : 'vertical',
 									label : commonLang.width,
-									validate : CKEDITOR.dialog.validate.integer( commonLang.invalidWidth ),
-									setup : function( iframeNode, fakeImage )
-									{
-										loadValue.apply( this, arguments );
-										if ( fakeImage )
-										{
-											var fakeImageWidth = parseInt( fakeImage.$.style.width, 10 );
-											if ( !isNaN( fakeImageWidth ) )
-												this.setValue( fakeImageWidth );
-										}
-									},
-									commit : function( iframeNode, extraStyles )
-									{
-										commitValue.apply( this, arguments );
-										if ( this.getValue() )
-											extraStyles.width = this.getValue() + 'px';
-									}
+									validate : CKEDITOR.dialog.validate.htmlLength( commonLang.invalidHtmlLength.replace( '%1', commonLang.width ) ),
+									setup : loadValue,
+									commit : commitValue
 								},
 								{
 									id : 'height',
@@ -147,23 +133,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 									style : 'width:100%',
 									labelLayout : 'vertical',
 									label : commonLang.height,
-									validate : CKEDITOR.dialog.validate.integer( commonLang.invalidHeight ),
-									setup : function( iframeNode, fakeImage )
-									{
-										loadValue.apply( this, arguments );
-										if ( fakeImage )
-										{
-											var fakeImageHeight = parseInt( fakeImage.$.style.height, 10 );
-											if ( !isNaN( fakeImageHeight ) )
-												this.setValue( fakeImageHeight );
-										}
-									},
-									commit : function( iframeNode, extraStyles )
-									{
-										commitValue.apply( this, arguments );
-										if ( this.getValue() )
-											extraStyles.height = this.getValue() + 'px';
-									}
+									validate : CKEDITOR.dialog.validate.htmlLength( commonLang.invalidHtmlLength.replace( '%1', commonLang.height ) ),
+									setup : loadValue,
+									commit : commitValue
 								},
 								{
 									id : 'align',

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -14,7 +14,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 /**
- * Constains the dictionary of language entries.
+ * Contains the dictionary of language entries.
  * @namespace
  */
 CKEDITOR.lang['cy'] =
@@ -31,14 +31,15 @@ CKEDITOR.lang['cy'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'Rich text editor, %1, press ALT 0 for help.', // MISSING
+	editorTitle : 'Golygydd testun cyfoethog, %1',
+	editorHelp : 'Gwasgwch ALT 0 am gymorth',
 
 	// ARIA descriptions.
-	toolbar	: 'Toolbar', // MISSING
-	editor	: 'Rich Text Editor', // MISSING
+	toolbars	: 'Bariau offer golygydd',
+	editor		: 'Golygydd Testun Cyfoethog',
 
 	// Toolbar buttons without dialogs.
-	source			: 'Tarddle',
+	source			: 'HTML',
 	newPage			: 'Tudalen newydd',
 	save			: 'Cadw',
 	preview			: 'Rhagolwg',
@@ -56,7 +57,7 @@ CKEDITOR.lang['cy'] =
 	superscript		: 'Uwchsgript',
 	horizontalrule	: 'Mewnosod Llinell Lorweddol',
 	pagebreak		: 'Mewnosod Toriad Tudalen i Argraffu',
-	pagebreakAlt		: 'Page Break', // MISSING
+	pagebreakAlt		: 'Toriad Tudalen',
 	unlink			: 'Datgysylltu',
 	undo			: 'Dadwneud',
 	redo			: 'Ailadrodd',
@@ -93,34 +94,39 @@ CKEDITOR.lang['cy'] =
 		cssStyle		: 'Arddull',
 		ok				: 'Iawn',
 		cancel			: 'Diddymu',
-		close			: 'Close', // MISSING
-		preview			: 'Preview', // MISSING
+		close			: 'Cau',
+		preview			: 'Rhagolwg',
 		generalTab		: 'Cyffredinol',
 		advancedTab		: 'Uwch',
 		validateNumberFailed : 'Nid yw\'r gwerth hwn yn rhif.',
 		confirmNewPage	: 'Byddwch yn colli unrhyw newidiadau i\'r cynnwys sydd heb eu cadw. A ydych am barhau i lwytho tudalen newydd?',
 		confirmCancel	: 'Mae rhai o\'r opsiynau wedi\'u newid. A ydych wir am gau\'r deialog?',
-		options			: 'Options', // MISSING
-		target			: 'Target', // MISSING
-		targetNew		: 'New Window (_blank)', // MISSING
-		targetTop		: 'Topmost Window (_top)', // MISSING
-		targetSelf		: 'Same Window (_self)', // MISSING
-		targetParent	: 'Parent Window (_parent)', // MISSING
-		langDirLTR		: 'Left to Right (LTR)', // MISSING
-		langDirRTL		: 'Right to Left (RTL)', // MISSING
-		styles			: 'Style', // MISSING
-		cssClasses		: 'Stylesheet Classes', // MISSING
+		options			: 'Opsiynau',
+		target			: 'Targed',
+		targetNew		: 'Ffenest Newydd (_blank)',
+		targetTop		: 'Ffenest ar y Brig (_top)',
+		targetSelf		: 'Yr un Ffenest (_self)',
+		targetParent	: 'Ffenest y Rhiant (_parent)',
+		langDirLTR		: 'Chwith i\'r Dde (LTR)',
+		langDirRTL		: 'Dde i\'r Chwith (RTL)',
+		styles			: 'Arddull',
+		cssClasses		: 'Dosbarthiadau Ffeil Ddiwyg',
 		width			: 'Lled',
 		height			: 'Uchder',
 		align			: 'Alinio',
 		alignLeft		: 'Chwith',
 		alignRight		: 'Dde',
 		alignCenter		: 'Canol',
-		alignTop		: 'Top', // MISSING
+		alignTop		: 'Brig',
 		alignMiddle		: 'Canol',
 		alignBottom		: 'Gwaelod',
+		invalidValue	: 'Gwerth annilys.',
 		invalidHeight	: 'Rhaid i\'r Uchder fod yn rhif.',
 		invalidWidth	: 'Rhaid i\'r Lled fod yn rhif.',
+		invalidCssLength	: 'Mae\'n rhaid i\'r gwerth ar gyfer maes "%1" fod yn rhif positif gyda neu heb uned fesuriad CSS dilys (px, %, in, cm, mm, em, ex, pt, neu pc).',
+		invalidHtmlLength	: 'Mae\'n rhaid i\'r gwerth ar gyfer maes "%1" fod yn rhif positif gyda neu heb uned fesuriad HTML dilys (px neu %).',
+		invalidInlineStyle	: 'Mae\'n rhaid i\'r gwerth ar gyfer arddull mewn-llinell gynnwys un set neu fwy ar y fformat "enw:gwerth", wedi\'u gwahanu gyda hanner colon.',
+		cssLengthTooltip	: 'Rhowch rif ar gyfer gwerth mewn picsel neu rhif gydag uned CSS dilys (px, %, in, cm, mm, em, pt neu pc).',
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, ddim ar gael</span>'
@@ -128,7 +134,7 @@ CKEDITOR.lang['cy'] =
 
 	contextmenu :
 	{
-		options : 'Context Menu Options' // MISSING
+		options : 'Opsiynau Dewislen Cyd-destun'
 	},
 
 	// Special char dialog.
@@ -136,7 +142,7 @@ CKEDITOR.lang['cy'] =
 	{
 		toolbar		: 'Mewnosod Nodau Arbennig',
 		title		: 'Dewis Nod Arbennig',
-		options : 'Special Character Options' // MISSING
+		options : 'Opsiynau Nodau Arbennig'
 	},
 
 	// Link dialog.
@@ -151,7 +157,7 @@ CKEDITOR.lang['cy'] =
 		upload		: 'Lanlwytho',
 		advanced	: 'Uwch',
 		type		: 'Math y Ddolen',
-		toUrl		: 'URL', // MISSING
+		toUrl		: 'URL',
 		toAnchor	: 'Dolen at angor yn y testun',
 		toEmail		: 'E-bost',
 		targetFrame		: '<ffrâm>',
@@ -182,7 +188,7 @@ CKEDITOR.lang['cy'] =
 		cssClasses		: 'Dosbarthiadau Dalen Arddull',
 		charset			: 'Set nodau\'r Adnodd Cysylltiedig',
 		styles			: 'Arddull',
-		rel			: 'Relationship', // MISSING
+		rel			: 'Perthynas',
 		selectAnchor		: 'Dewiswch Angor',
 		anchorName		: 'Gan Enw\'r Angor',
 		anchorId			: 'Gan Id yr Elfen',
@@ -201,31 +207,32 @@ CKEDITOR.lang['cy'] =
 		menu		: 'Golygwch yr Angor',
 		title		: 'Priodweddau\'r Angor',
 		name		: 'Enw\'r Angor',
-		errorName	: 'Teipiwch enw\'r angor'
+		errorName	: 'Teipiwch enw\'r angor',
+		remove		: 'Tynnwch yr Angor'
 	},
 
 	// List style dialog
 	list:
 	{
-		numberedTitle		: 'Numbered List Properties', // MISSING
-		bulletedTitle		: 'Bulleted List Properties', // MISSING
-		type				: 'Type', // MISSING
-		start				: 'Start', // MISSING
-		validateStartNumber				:'List start number must be a whole number.', // MISSING
-		circle				: 'Circle', // MISSING
-		disc				: 'Disc', // MISSING
-		square				: 'Square', // MISSING
-		none				: 'None', // MISSING
-		notset				: '<not set>', // MISSING
-		armenian			: 'Armenian numbering', // MISSING
-		georgian			: 'Georgian numbering (an, ban, gan, etc.)', // MISSING
-		lowerRoman			: 'Lower Roman (i, ii, iii, iv, v, etc.)', // MISSING
-		upperRoman			: 'Upper Roman (I, II, III, IV, V, etc.)', // MISSING
-		lowerAlpha			: 'Lower Alpha (a, b, c, d, e, etc.)', // MISSING
-		upperAlpha			: 'Upper Alpha (A, B, C, D, E, etc.)', // MISSING
-		lowerGreek			: 'Lower Greek (alpha, beta, gamma, etc.)', // MISSING
-		decimal				: 'Decimal (1, 2, 3, etc.)', // MISSING
-		decimalLeadingZero	: 'Decimal leading zero (01, 02, 03, etc.)' // MISSING
+		numberedTitle		: 'Priodweddau Rhestr Rifol',
+		bulletedTitle		: 'Priodweddau Rhestr Fwled',
+		type				: 'Math',
+		start				: 'Dechrau',
+		validateStartNumber				:'Rhaid bod y rhif cychwynnol yn gyfanrif.',
+		circle				: 'Cylch',
+		disc				: 'Disg',
+		square				: 'Sgwâr',
+		none				: 'Dim',
+		notset				: '<heb osod>',
+		armenian			: 'Rhifau Armeneg',
+		georgian			: 'Rhifau Sioraidd (an, ban, gan, ayyb.)',
+		lowerRoman			: 'Rhufeinig Is (i, ii, iii, iv, v, ayyb.)',
+		upperRoman			: 'Rhufeinig Uwch (I, II, III, IV, V, ayyb.)',
+		lowerAlpha			: 'Alffa Is (a, b, c, d, e, ayyb.)',
+		upperAlpha			: 'Alffa Uwch (A, B, C, D, E, ayyb.)',
+		lowerGreek			: 'Groeg Is (alpha, beta, gamma, ayyb.)',
+		decimal				: 'Degol (1, 2, 3, ayyb.)',
+		decimalLeadingZero	: 'Degol â sero arweiniol (01, 02, 03, ayyb.)'
 	},
 
 	// Find And Replace Dialog
@@ -237,6 +244,7 @@ CKEDITOR.lang['cy'] =
 		findWhat			: 'Chwilio\'r term:',
 		replaceWith			: 'Amnewid gyda:',
 		notFoundMsg			: 'Nid oedd y testun wedi\'i ddarganfod.',
+		findOptions			: 'Chwilio Opsiynau',
 		matchCase			: 'Cyfateb i\'r cas',
 		matchWord			: 'Cyfateb gair cyfan',
 		matchCyclic			: 'Cyfateb cylchol',
@@ -256,7 +264,7 @@ CKEDITOR.lang['cy'] =
 		border		: 'Maint yr Ymyl',
 		widthPx		: 'picsel',
 		widthPc		: 'y cant',
-		widthUnit	: 'width unit', // MISSING
+		widthUnit	: 'uned lled',
 		cellSpace	: 'Bylchu\'r gell',
 		cellPad		: 'Padio\'r gell',
 		caption		: 'Pennawd',
@@ -271,8 +279,8 @@ CKEDITOR.lang['cy'] =
 		invalidBorder	: 'Mae\'n rhaid i faint yr ymyl fod yn rhif.',
 		invalidWidth	: 'Mae\'n rhaid i led y tabl fod yn rhif.',
 		invalidHeight	: 'Mae\'n rhaid i uchder y tabl fod yn rhif.',
-		invalidCellSpacing	: 'Mae\'n rhaid i fylchiad y gell fod yn rhif.',
-		invalidCellPadding	: 'Mae\'n rhaid i badiad y gell fod yn rhif.',
+		invalidCellSpacing	: 'Mae\'n rhaid i fylchiad y gell fod yn rhif positif.',
+		invalidCellPadding	: 'Mae\'n rhaid i badiad y gell fod yn rhif positif.',
 
 		cell :
 		{
@@ -413,7 +421,6 @@ CKEDITOR.lang['cy'] =
 		upload		: 'lanlwytho',
 		alt			: 'Testun Amgen',
 		lockRatio	: 'Cloi Cymhareb',
-		unlockRatio	: 'Unlock Ratio', // MISSING
 		resetSize	: 'Ailosod Maint',
 		border		: 'Ymyl',
 		hSpace		: 'BwlchLl',
@@ -422,10 +429,10 @@ CKEDITOR.lang['cy'] =
 		linkTab		: 'Dolen',
 		button2Img	: 'Ydych am drawsffurfio\'r botwm ddelwedd hwn ar ddelwedd syml?',
 		img2Button	: 'Ydych am drawsffurfio\'r ddelwedd hon ar fotwm delwedd?',
-		urlMissing	: 'URL tarddle\'r ddelwedd ar goll.',
-		validateBorder	: 'Border must be a whole number.', // MISSING
-		validateHSpace	: 'HSpace must be a whole number.', // MISSING
-		validateVSpace	: 'VSpace must be a whole number.' // MISSING
+		urlMissing	: 'URL gwreiddiol y ddelwedd ar goll.',
+		validateBorder	: 'Rhaid i\'r ymyl fod yn gyfanrif.',
+		validateHSpace	: 'Rhaid i\'r HSpace fod yn gyfanrif.',
+		validateVSpace	: 'Rhaid i\'r VSpace fod yn gyfanrif.'
 	},
 
 	// Flash Dialog
@@ -497,12 +504,12 @@ CKEDITOR.lang['cy'] =
 	{
 		toolbar	: 'Gwenoglun',
 		title	: 'Mewnosod Gwenoglun',
-		options : 'Smiley Options' // MISSING
+		options : 'Opsiynau Gwenogluniau'
 	},
 
 	elementsPath :
 	{
-		eleLabel : 'Elements path', // MISSING
+		eleLabel : 'Llwybr elfennau',
 		eleTitle : 'Elfen %1'
 	},
 
@@ -528,15 +535,15 @@ CKEDITOR.lang['cy'] =
 		copyError	: 'Nid yw gosodiadau diogelwch eich porwr yn caniatàu\'r golygydd i gynnal \'gweithredoedd copïo\' yn awtomatig. Defnyddiwch y bysellfwrdd (Ctrl/Cmd+C).',
 		pasteMsg	: 'Gludwch i mewn i\'r blwch canlynol gan ddefnyddio\'r bysellfwrdd (<strong>Ctrl/Cmd+V</strong>) a phwyso <strong>Iawn</strong>.',
 		securityMsg	: 'Oherwydd gosodiadau diogelwch eich porwr, nid yw\'r porwr yn gallu ennill mynediad i\'r data ar y clipfwrdd yn uniongyrchol. Mae angen i chi ei ludo eto i\'r ffenestr hon.',
-		pasteArea	: 'Paste Area' // MISSING
+		pasteArea	: 'Ardal Gludo'
 	},
 
 	pastefromword :
 	{
-		confirmCleanup	: 'The text you want to paste seems to be copied from Word. Do you want to clean it before pasting?', // MISSING
+		confirmCleanup	: 'Mae\'r testun rydych chi am ludo wedi\'i gopïo o Word. Ydych chi am ei lanhau cyn ei ludo?',
 		toolbar			: 'Gludo o Word',
 		title			: 'Gludo o Word',
-		error			: 'It was not possible to clean up the pasted data due to an internal error' // MISSING
+		error			: 'Doedd dim modd glanhau y data a ludwyd oherwydd gwall mewnol'
 	},
 
 	pasteText :
@@ -549,7 +556,7 @@ CKEDITOR.lang['cy'] =
 	{
 		button			: 'Templedi',
 		title			: 'Templedi Cynnwys',
-		options : 'Template Options', // MISSING
+		options : 'Opsiynau Templedi',
 		insertOption	: 'Amnewid y cynnwys go iawn',
 		selectPromptMsg	: 'Dewiswch dempled i\'w agor yn y golygydd',
 		emptyListMsg	: '(Dim templedi wedi\'u diffinio)'
@@ -560,7 +567,7 @@ CKEDITOR.lang['cy'] =
 	stylesCombo :
 	{
 		label		: 'Arddulliau',
-		panelTitle	: 'Formatting Styles', // MISSING
+		panelTitle	: 'Arddulliau Fformatio',
 		panelTitle1	: 'Arddulliau Bloc',
 		panelTitle2	: 'Arddulliau Mewnol',
 		panelTitle3	: 'Arddulliau Gwrthrych'
@@ -585,28 +592,28 @@ CKEDITOR.lang['cy'] =
 
 	div :
 	{
-		title				: 'Create Div Container', // MISSING
-		toolbar				: 'Create Div Container', // MISSING
-		cssClassInputLabel	: 'Stylesheet Classes', // MISSING
-		styleSelectLabel	: 'Style', // MISSING
-		IdInputLabel		: 'Id', // MISSING
-		languageCodeInputLabel	: ' Language Code', // MISSING
-		inlineStyleInputLabel	: 'Inline Style', // MISSING
-		advisoryTitleInputLabel	: 'Advisory Title', // MISSING
-		langDirLabel		: 'Language Direction', // MISSING
-		langDirLTRLabel		: 'Left to Right (LTR)', // MISSING
-		langDirRTLLabel		: 'Right to Left (RTL)', // MISSING
-		edit				: 'Edit Div', // MISSING
-		remove				: 'Remove Div' // MISSING
+		title				: 'Creu Cynhwysydd Div',
+		toolbar				: 'Creu Cynhwysydd Div',
+		cssClassInputLabel	: 'Dosbarthiadau Ffeil Ddiwyg',
+		styleSelectLabel	: 'Arddull',
+		IdInputLabel		: 'Id',
+		languageCodeInputLabel	: ' Cod Iaith',
+		inlineStyleInputLabel	: 'Arddull Mewn Llinell',
+		advisoryTitleInputLabel	: 'Teitl Cynghorol',
+		langDirLabel		: 'Cyfeiriad yr Iaith',
+		langDirLTRLabel		: 'Chwith i\'r Dde (LTR)',
+		langDirRTLLabel		: 'Dde i\'r Chwith (RTL)',
+		edit				: 'Golygu Div',
+		remove				: 'Tynnu Div'
   	},
 
 	iframe :
 	{
-		title		: 'IFrame Properties', // MISSING
-		toolbar		: 'IFrame', // MISSING
-		noUrl		: 'Please type the iframe URL', // MISSING
-		scrolling	: 'Enable scrollbars', // MISSING
-		border		: 'Show frame border' // MISSING
+		title		: 'Priodweddau IFrame',
+		toolbar		: 'IFrame',
+		noUrl		: 'Rhowch fath URL yr iframe',
+		scrolling	: 'Galluogi bariau sgrolio',
+		border		: 'Dangos ymyl y ffrâm'
 	},
 
 	font :
@@ -627,7 +634,7 @@ CKEDITOR.lang['cy'] =
 	{
 		textColorTitle	: 'Lliw Testun',
 		bgColorTitle	: 'Lliw Cefndir',
-		panelTitle		: 'Colors', // MISSING
+		panelTitle		: 'Lliwiau',
 		auto			: 'Awtomatig',
 		more			: 'Mwy o Liwiau...'
 	},
@@ -679,7 +686,7 @@ CKEDITOR.lang['cy'] =
 	scayt :
 	{
 		title			: 'Gwirio\'r Sillafu Wrth Deipio',
-		opera_title		: 'Not supported by Opera', // MISSING
+		opera_title		: 'Heb ei gynnal gan Opera',
 		enable			: 'Galluogi SCAYT',
 		disable			: 'Analluogi SCAYT',
 		about			: 'Ynghylch SCAYT',
@@ -693,20 +700,20 @@ CKEDITOR.lang['cy'] =
 		emptyDic		: 'Ni ddylai enw\'r geiriadur fod yn wag.',
 
 		optionsTab		: 'Opsiynau',
-		allCaps			: 'Ignore All-Caps Words', // MISSING
-		ignoreDomainNames : 'Ignore Domain Names', // MISSING
-		mixedCase		: 'Ignore Words with Mixed Case', // MISSING
-		mixedWithDigits	: 'Ignore Words with Numbers', // MISSING
+		allCaps			: 'Anwybyddu Geiriau Nodau Uwch i Gyd',
+		ignoreDomainNames : 'Anwybyddu Enwau Parth',
+		mixedCase		: 'Anwybyddu Geiriau â Chymysgedd Nodau Uwch ac Is',
+		mixedWithDigits	: 'Anwybyddu Geiriau â Rhifau',
 
 		languagesTab	: 'Ieithoedd',
 
 		dictionariesTab	: 'Geiriaduron',
-		dic_field_name	: 'Dictionary name', // MISSING
-		dic_create		: 'Create', // MISSING
-		dic_restore		: 'Restore', // MISSING
-		dic_delete		: 'Delete', // MISSING
-		dic_rename		: 'Rename', // MISSING
-		dic_info		: 'Initially the User Dictionary is stored in a Cookie. However, Cookies are limited in size. When the User Dictionary grows to a point where it cannot be stored in a Cookie, then the dictionary may be stored on our server. To store your personal dictionary on our server you should specify a name for your dictionary. If you already have a stored dictionary, please type its name and click the Restore button.', // MISSING
+		dic_field_name	: 'Enw\'r geiriadur',
+		dic_create		: 'Creu',
+		dic_restore		: 'Adfer',
+		dic_delete		: 'Dileu',
+		dic_rename		: 'Ailenwi',
+		dic_info		: 'Ar y cychwyn, caiff y Geiriadur ei storio mewn Cwci. Er, mae terfyn ar faint cwcis. Pan fydd Gweiriadur Defnyddiwr yn tyfu tu hwnt i gyfyngiadau maint Cwci, caiff y geiriadur ei storio ar ein gweinydd ni. er mwyn storio eich geiriadur poersonol chi ar ein gweinydd, bydd angen i chi osod enw ar gyfer y geiriadur. Os oes geiriadur \'da chi ar ein gweinydd yn barod, teipiwch ei enw a chliciwch y botwm Adfer.',
 
 		aboutTab		: 'Ynghylch'
 	},
@@ -715,6 +722,8 @@ CKEDITOR.lang['cy'] =
 	{
 		title		: 'Ynghylch CKEditor',
 		dlgTitle	: 'Ynghylch CKEditor',
+		help	: 'Gwirio $1 am gymorth.',
+		userGuide : 'Canllawiau Defnyddiwr CKEditor',
 		moreInfo	: 'Am wybodaeth ynghylch trwyddedau, ewch i\'n gwefan:',
 		copy		: 'Hawlfraint &copy; $1. Cedwir pob hawl.'
 	},
@@ -726,8 +735,8 @@ CKEDITOR.lang['cy'] =
 	{
 		anchor		: 'Angor',
 		flash		: 'Animeiddiant Flash',
-		iframe		: 'IFrame', // MISSING
-		hiddenfield	: 'Hidden Field', // MISSING
+		iframe		: 'IFrame',
+		hiddenfield	: 'Maes Cudd',
 		unknown		: 'Gwrthrych Anhysbys'
 	},
 
@@ -736,7 +745,7 @@ CKEDITOR.lang['cy'] =
 	colordialog :
 	{
 		title		: 'Dewis lliw',
-		options	:	'Color Options', // MISSING
+		options	:	'Opsiynau Lliw',
 		highlight	: 'Uwcholeuo',
 		selected	: 'Dewiswyd',
 		clear		: 'Clirio'
@@ -745,9 +754,64 @@ CKEDITOR.lang['cy'] =
 	toolbarCollapse	: 'Cyfangu\'r Bar Offer',
 	toolbarExpand	: 'Ehangu\'r Bar Offer',
 
+	toolbarGroups :
+	{
+		document : 'Dogfen',
+		clipboard : 'Clipfwrdd/Dadwneud',
+		editing : 'Golygu',
+		forms : 'Ffurflenni',
+		basicstyles : 'Arddulliau Sylfaenol',
+		paragraph : 'Paragraff',
+		links : 'Dolenni',
+		insert : 'Mewnosod',
+		styles : 'Arddulliau',
+		colors : 'Lliwiau',
+		tools : 'Offer'
+	},
+
 	bidi :
 	{
-		ltr : 'Text direction from left to right', // MISSING
-		rtl : 'Text direction from right to left' // MISSING
+		ltr : 'Cyfeiriad testun o\'r chwith i\'r dde',
+		rtl : 'Cyfeiriad testun o\'r dde i\'r chwith'
+	},
+
+	docprops :
+	{
+		label : 'Priodweddau Dogfen',
+		title : 'Priodweddau Dogfen',
+		design : 'Cynllunio',
+		meta : 'Tagiau Meta',
+		chooseColor : 'Dewis',
+		other : 'Arall...',
+		docTitle :	'Teitl y Dudalen',
+		charset : 	'Amgodio Set Nodau',
+		charsetOther : 'Amgodio Set Nodau Arall',
+		charsetASCII : 'ASCII',
+		charsetCE : 'Ewropeaidd Canol',
+		charsetCT : 'Tsieinëeg Traddodiadol (Big5)',
+		charsetCR : 'Syrilig',
+		charsetGR : 'Groeg',
+		charsetJP : 'Siapanëeg',
+		charsetKR : 'Corëeg',
+		charsetTR : 'Tyrceg',
+		charsetUN : 'Unicode (UTF-8)',
+		charsetWE : 'Ewropeaidd Gorllewinol',
+		docType : 'Pennawd Math y Ddogfen',
+		docTypeOther : 'Pennawd Math y Ddogfen Arall',
+		xhtmlDec : 'Cynnwys Datganiadau XHTML',
+		bgColor : 'Lliw Cefndir',
+		bgImage : 'URL Delwedd Cefndir',
+		bgFixed : 'Cefndir Sefydlog (Ddim yn Sgrolio)',
+		txtColor : 'Lliw y Testun',
+		margin : 'Ffin y Dudalen',
+		marginTop : 'Brig',
+		marginLeft : 'Chwith',
+		marginRight : 'Dde',
+		marginBottom : 'Gwaelod',
+		metaKeywords : 'Allweddeiriau Indecsio Dogfen (gwahanu gyda choma)',
+		metaDescription : 'Disgrifiad y Ddogfen',
+		metaAuthor : 'Awdur',
+		metaCopyright : 'Hawlfraint',
+		previewHtml : '<p>Dyma ychydig o <strong>destun sampl</strong>. Rydych chi\'n defnyddio <a href="javascript:void(0)">CKEditor</a>.</p>'
 	}
 };

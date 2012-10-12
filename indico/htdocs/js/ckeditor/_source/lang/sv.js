@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -13,7 +13,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 /**
- * Constains the dictionary of language entries.
+ * Contains the dictionary of language entries.
  * @namespace
  */
 CKEDITOR.lang['sv'] =
@@ -30,11 +30,12 @@ CKEDITOR.lang['sv'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'Rich text editor, %1, tryck ALT 0 för hjälp.',
+	editorTitle : 'Rich text editor, %1', // MISSING
+	editorHelp : 'Tryck ALT 0 för hjälp',
 
 	// ARIA descriptions.
-	toolbar	: 'Verktygsfält',
-	editor	: 'Rich Text Editor',
+	toolbars	: 'Editor toolbars', // MISSING
+	editor		: 'Rich Text Editor',
 
 	// Toolbar buttons without dialogs.
 	source			: 'Källa',
@@ -118,8 +119,13 @@ CKEDITOR.lang['sv'] =
 		alignTop		: 'Överkant',
 		alignMiddle		: 'Mitten',
 		alignBottom		: 'Nederkant',
+		invalidValue	: 'Invalid value.', // MISSING
 		invalidHeight	: 'Höjd måste vara ett nummer.',
 		invalidWidth	: 'Bredd måste vara ett nummer.',
+		invalidCssLength	: 'Value specified for the "%1" field must be a positive number with or without a valid CSS measurement unit (px, %, in, cm, mm, em, ex, pt, or pc).', // MISSING
+		invalidHtmlLength	: 'Value specified for the "%1" field must be a positive number with or without a valid HTML measurement unit (px or %).', // MISSING
+		invalidInlineStyle	: 'Value specified for the inline style must consist of one or more tuples with the format of "name : value", separated by semi-colons.', // MISSING
+		cssLengthTooltip	: 'Enter a number for a value in pixels or a number with a valid CSS unit (px, %, in, cm, mm, em, ex, pt, or pc).', // MISSING
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, Ej tillgänglig</span>'
@@ -200,7 +206,8 @@ CKEDITOR.lang['sv'] =
 		menu		: 'Egenskaper för ankarlänk',
 		title		: 'Egenskaper för ankarlänk',
 		name		: 'Ankarnamn',
-		errorName	: 'Var god ange ett ankarnamn'
+		errorName	: 'Var god ange ett ankarnamn',
+		remove		: 'Remove Anchor' // MISSING
 	},
 
 	// List style dialog
@@ -236,6 +243,7 @@ CKEDITOR.lang['sv'] =
 		findWhat			: 'Sök efter:',
 		replaceWith			: 'Ersätt med:',
 		notFoundMsg			: 'Angiven text kunde ej hittas.',
+		findOptions			: 'Find Options', // MISSING
 		matchCase			: 'Skiftläge',
 		matchWord			: 'Inkludera hela ord',
 		matchCyclic			: 'Matcha cykliska',
@@ -412,7 +420,6 @@ CKEDITOR.lang['sv'] =
 		upload		: 'Ladda upp',
 		alt			: 'Alternativ text',
 		lockRatio	: 'Lås höjd/bredd förhållanden',
-		unlockRatio	: 'Lås upp förhållanden',
 		resetSize	: 'Återställ storlek',
 		border		: 'Kant',
 		hSpace		: 'Horis. marginal',
@@ -714,6 +721,8 @@ CKEDITOR.lang['sv'] =
 	{
 		title		: 'Om CKEditor',
 		dlgTitle	: 'Om CKEditor',
+		help	: 'Check $1 for help.', // MISSING
+		userGuide : 'CKEditor User\'s Guide', // MISSING
 		moreInfo	: 'För information av licenciering besök vår hemsida:',
 		copy		: 'Copyright &copy; $1. Alla rättigheter reserverade.'
 	},
@@ -744,9 +753,64 @@ CKEDITOR.lang['sv'] =
 	toolbarCollapse	: 'Dölj verktygsfält',
 	toolbarExpand	: 'Visa verktygsfält',
 
+	toolbarGroups :
+	{
+		document : 'Document', // MISSING
+		clipboard : 'Clipboard/Undo', // MISSING
+		editing : 'Editing', // MISSING
+		forms : 'Forms', // MISSING
+		basicstyles : 'Basic Styles', // MISSING
+		paragraph : 'Paragraph', // MISSING
+		links : 'Links', // MISSING
+		insert : 'Insert', // MISSING
+		styles : 'Styles', // MISSING
+		colors : 'Colors', // MISSING
+		tools : 'Tools' // MISSING
+	},
+
 	bidi :
 	{
 		ltr : 'Text riktning från vänster till höger',
 		rtl : 'Text riktning från höger till vänster'
+	},
+
+	docprops :
+	{
+		label : 'Dokumentegenskaper',
+		title : 'Dokumentegenskaper',
+		design : 'Design', // MISSING
+		meta : 'Metadata',
+		chooseColor : 'Välj',
+		other : '<annan>',
+		docTitle :	'Sidtitel',
+		charset : 	'Teckenuppsättningar',
+		charsetOther : 'Övriga teckenuppsättningar',
+		charsetASCII : 'ASCII', // MISSING
+		charsetCE : 'Central Europa',
+		charsetCT : 'Traditionell Kinesisk (Big5)',
+		charsetCR : 'Kyrillisk',
+		charsetGR : 'Grekiska',
+		charsetJP : 'Japanska',
+		charsetKR : 'Koreanska',
+		charsetTR : 'Turkiska',
+		charsetUN : 'Unicode (UTF-8)', // MISSING
+		charsetWE : 'Väst Europa',
+		docType : 'Sidhuvud',
+		docTypeOther : 'Övriga sidhuvuden',
+		xhtmlDec : 'Inkludera XHTML deklaration',
+		bgColor : 'Bakgrundsfärg',
+		bgImage : 'Bakgrundsbildens URL',
+		bgFixed : 'Fast bakgrund',
+		txtColor : 'Textfärg',
+		margin : 'Sidmarginal',
+		marginTop : 'Topp',
+		marginLeft : 'Vänster',
+		marginRight : 'Höger',
+		marginBottom : 'Botten',
+		metaKeywords : 'Sidans nyckelord',
+		metaDescription : 'Sidans beskrivning',
+		metaAuthor : 'Författare',
+		metaCopyright : 'Upphovsrätt',
+		previewHtml : '<p>This is some <strong>sample text</strong>. You are using <a href="javascript:void(0)">CKEditor</a>.</p>' // MISSING
 	}
 };

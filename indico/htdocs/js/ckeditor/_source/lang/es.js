@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -14,7 +14,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 /**
- * Constains the dictionary of language entries.
+ * Contains the dictionary of language entries.
  * @namespace
  */
 CKEDITOR.lang['es'] =
@@ -31,11 +31,12 @@ CKEDITOR.lang['es'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'Editor de texto, %1, pulse ALT 0 para ayuda.',
+	editorTitle : 'Editor de texto, %1',
+	editorHelp : 'Pulse ALT 0 para ayuda',
 
 	// ARIA descriptions.
-	toolbar	: 'Barra de herramientas',
-	editor	: 'Editor de texto enriquecido',
+	toolbars	: 'Barras de herramientas del editor',
+	editor		: 'Editor de texto enriquecido',
 
 	// Toolbar buttons without dialogs.
 	source			: 'Fuente HTML',
@@ -119,8 +120,13 @@ CKEDITOR.lang['es'] =
 		alignTop		: 'Tope',
 		alignMiddle		: 'Centro',
 		alignBottom		: 'Pie',
+		invalidValue	: 'Invalid value.', // MISSING
 		invalidHeight	: 'Altura debe ser un número.',
 		invalidWidth	: 'Anchura debe ser un número.',
+		invalidCssLength	: 'El valor especificado para el campo "%1" debe ser un número positivo, incluyendo optionalmente una unidad de medida CSS válida (px, %, in, cm, mm, em, ex, pt, o pc).',
+		invalidHtmlLength	: 'El valor especificado para el campo "%1" debe ser un número positivo, incluyendo optionalmente una unidad de medida HTML válida (px o %).',
+		invalidInlineStyle	: 'El valor especificado para el estilo debe consistir en uno o más pares con el formato "nombre: valor", separados por punto y coma.',
+		cssLengthTooltip	: 'Introduca un número para el valor en pixels o un número con una unidad de medida CSS válida (px, %, in, cm, mm, em, ex, pt, o pc).',
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, no disponible</span>'
@@ -173,7 +179,7 @@ CKEDITOR.lang['es'] =
 		langDir			: 'Orientación',
 		langDirLTR		: 'Izquierda a Derecha (LTR)',
 		langDirRTL		: 'Derecha a Izquierda (RTL)',
-		acccessKey		: 'Clave de Acceso',
+		acccessKey		: 'Tecla de Acceso',
 		name			: 'Nombre',
 		langCode			: 'Código idioma',
 		tabIndex			: 'Indice de tabulación',
@@ -201,7 +207,8 @@ CKEDITOR.lang['es'] =
 		menu		: 'Propiedades de Referencia',
 		title		: 'Propiedades de Referencia',
 		name		: 'Nombre de la Referencia',
-		errorName	: 'Por favor, complete el nombre de la Referencia'
+		errorName	: 'Por favor, complete el nombre de la Referencia',
+		remove		: 'Quitar Referencia'
 	},
 
 	// List style dialog
@@ -237,6 +244,7 @@ CKEDITOR.lang['es'] =
 		findWhat			: 'Texto a buscar:',
 		replaceWith			: 'Reemplazar con:',
 		notFoundMsg			: 'El texto especificado no ha sido encontrado.',
+		findOptions			: 'Opciones de búsqueda',
 		matchCase			: 'Coincidir may/min',
 		matchWord			: 'Coincidir toda la palabra',
 		matchCyclic			: 'Buscar en todo el contenido',
@@ -413,7 +421,6 @@ CKEDITOR.lang['es'] =
 		upload		: 'Cargar',
 		alt			: 'Texto Alternativo',
 		lockRatio	: 'Proporcional',
-		unlockRatio	: 'Desbloquear el proporcional',
 		resetSize	: 'Tamaño Original',
 		border		: 'Borde',
 		hSpace		: 'Esp.Horiz',
@@ -715,6 +722,8 @@ CKEDITOR.lang['es'] =
 	{
 		title		: 'Acerca de CKEditor',
 		dlgTitle	: 'Acerca de CKEditor',
+		help	: 'Lea la  $1 para resolver sus dudas.',
+		userGuide : 'Guía de usuario de CKEditor',
 		moreInfo	: 'Para información de licencia, por favor visite nuestro sitio web:',
 		copy		: 'Copyright &copy; $1. Todos los derechos reservados.'
 	},
@@ -745,9 +754,64 @@ CKEDITOR.lang['es'] =
 	toolbarCollapse	: 'Contraer barra de herramientas',
 	toolbarExpand	: 'Expandir barra de herramientas',
 
+	toolbarGroups :
+	{
+		document : 'Documento',
+		clipboard : 'Portapapeles/Deshacer',
+		editing : 'Edición',
+		forms : 'Formularios',
+		basicstyles : 'Estilos básicos',
+		paragraph : 'Párrafo',
+		links : 'Enlaces',
+		insert : 'Insertar',
+		styles : 'Estilos',
+		colors : 'Colores',
+		tools : 'Herramientas'
+	},
+
 	bidi :
 	{
 		ltr : 'Dirección del texto de izquierda a derecha',
 		rtl : 'Dirección del texto de derecha a izquierda'
+	},
+
+	docprops :
+	{
+		label : 'Propiedades del documento',
+		title : 'Propiedades del documento',
+		design : 'Diseño',
+		meta : 'Meta Tags',
+		chooseColor : 'Elegir',
+		other : 'Otro...',
+		docTitle :	'Título de página',
+		charset : 	'Codificación de caracteres',
+		charsetOther : 'Otra codificación de caracteres',
+		charsetASCII : 'ASCII',
+		charsetCE : 'Centro Europeo',
+		charsetCT : 'Chino Tradicional (Big5)',
+		charsetCR : 'Ruso',
+		charsetGR : 'Griego',
+		charsetJP : 'Japonés',
+		charsetKR : 'Koreano',
+		charsetTR : 'Turco',
+		charsetUN : 'Unicode (UTF-8)',
+		charsetWE : 'Europeo occidental',
+		docType : 'Tipo de documento',
+		docTypeOther : 'Otro tipo de documento',
+		xhtmlDec : 'Incluir declaración XHTML',
+		bgColor : 'Color de fondo',
+		bgImage : 'Imagen de fondo',
+		bgFixed : 'Fondo fijo (no se desplaza)',
+		txtColor : 'Color del texto',
+		margin : 'Márgenes',
+		marginTop : 'Superior',
+		marginLeft : 'Izquierdo',
+		marginRight : 'Derecho',
+		marginBottom : 'Inferior',
+		metaKeywords : 'Palabras claves del documento separadas por coma (meta keywords)',
+		metaDescription : 'Descripción del documento',
+		metaAuthor : 'Autor',
+		metaCopyright : 'Copyright',
+		previewHtml : '<p>Este es un <strong>texto de ejemplo</strong>. Usted está usando <a href="javascript:void(0)">CKEditor</a>.</p>'
 	}
 };

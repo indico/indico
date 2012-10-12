@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -11,9 +11,21 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 		init : function( editor )
 		{
-			var specialKeys = editor.specialKeys;
-			specialKeys[ 13 ] = enter;
-			specialKeys[ CKEDITOR.SHIFT + 13 ] = shiftEnter;
+			editor.addCommand( 'enter', {
+				modes : { wysiwyg:1 },
+				editorFocus : false,
+				exec : function( editor ){ enter( editor ); }
+			});
+
+			editor.addCommand( 'shiftEnter', {
+				modes : { wysiwyg:1 },
+				editorFocus : false,
+				exec : function( editor ){ shiftEnter( editor ); }
+			});
+
+			var keystrokes = editor.keystrokeHandler.keystrokes;
+			keystrokes[ 13 ] = 'enter';
+			keystrokes[ CKEDITOR.SHIFT + 13 ] = 'shiftEnter';
 		}
 	});
 
@@ -31,17 +43,51 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 			var doc = range.document;
 
-			// Exit the list when we're inside an empty list item block. (#5376)
-			if ( range.checkStartOfBlock() && range.checkEndOfBlock() )
-			{
-				var path = new CKEDITOR.dom.elementPath( range.startContainer ),
-						block = path.block;
+			var atBlockStart = range.checkStartOfBlock(),
+				atBlockEnd = range.checkEndOfBlock(),
+				path = new CKEDITOR.dom.elementPath( range.startContainer ),
+				block = path.block;
 
+			if ( atBlockStart && atBlockEnd )
+			{
+				// Exit the list when we're inside an empty list item block. (#5376)
 				if ( block && ( block.is( 'li' ) || block.getParent().is( 'li' ) ) )
 				{
 					editor.execCommand( 'outdent' );
 					return;
 				}
+
+				if ( block && block.getParent().is( 'blockquote' ) )
+				{
+					block.breakParent( block.getParent() );
+
+					// If we were at the start of <blockquote>, there will be an empty element before it now.
+					if ( !block.getPrevious().getFirst( CKEDITOR.dom.walker.invisible(1) ) )
+						block.getPrevious().remove();
+
+					// If we were at the end of <blockquote>, there will be an empty element after it now.
+					if ( !block.getNext().getFirst( CKEDITOR.dom.walker.invisible(1) ) )
+						block.getNext().remove();
+
+					range.moveToElementEditStart( block );
+					range.select();
+					return;
+				}
+			}
+			// Don't split <pre> if we're in the middle of it, act as shift enter key.
+			else if ( block && block.is( 'pre' ) )
+			{
+				if ( !atBlockEnd )
+				{
+					enterBr( editor, mode, range, forceMode );
+					return;
+				}
+			}
+			// Don't split caption blocks. (#7944)
+			else if ( block && CKEDITOR.dtd.$captionBlock[ block.getName() ] )
+			{
+				enterBr( editor, mode, range, forceMode );
+				return;
 			}
 
 			// Determine the block element to be used.
@@ -107,12 +153,11 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					// Do not enter this block if it's a header tag, or we are in
 					// a Shift+Enter (#77). Create a new block element instead
 					// (later in the code).
-					if ( previousBlock.is( 'li' ) || !headerTagRegex.test( previousBlock.getName() ) )
+					if ( previousBlock.is( 'li' ) ||
+							! ( headerTagRegex.test( previousBlock.getName() ) || previousBlock.is( 'pre' ) ) )
 					{
 						// Otherwise, duplicate the previous block.
 						newBlock = previousBlock.clone();
-						// Value attribute of list item should not be duplicated (#7330).
-						newBlock.is( 'li' ) && newBlock.removeAttribute( 'value' );
 					}
 				}
 				else if ( nextBlock )
@@ -161,6 +206,10 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 				if ( !newBlock.getParent() )
 					range.insertNode( newBlock );
+
+				// list item start number should not be duplicated (#7330), but we need
+				// to remove the attribute after it's onto the DOM tree because of old IEs (#7581).
+				newBlock.is( 'li' ) && newBlock.removeAttribute( 'value' );
 
 				// This is tricky, but to make the new block visible correctly
 				// we must select it.
@@ -336,14 +385,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		// On SHIFT+ENTER:
 		// 1. We want to enforce the mode to be respected, instead
 		// of cloning the current block. (#77)
-		// 2. Always perform a block break when inside <pre> (#5402).
-		if ( editor.getSelection().getStartElement().hasAscendant( 'pre', true ) )
-		{
-			setTimeout( function() { enterBlock( editor, editor.config.enterMode, null, true ); }, 0 );
-			return true;
-		}
-		else
-			return enter( editor, editor.config.shiftEnterMode, 1 );
+		return enter( editor, editor.config.shiftEnterMode, 1 );
 	}
 
 	function enter( editor, mode, forceMode )
@@ -361,10 +403,13 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		setTimeout( function()
 			{
 				editor.fire( 'saveSnapshot' );	// Save undo step.
-				if ( mode == CKEDITOR.ENTER_BR || editor.getSelection().getStartElement().hasAscendant( 'pre', 1 ) )
+
+				if ( mode == CKEDITOR.ENTER_BR )
 					enterBr( editor, mode, null, forceMode );
 				else
 					enterBlock( editor, mode, null, forceMode );
+
+				editor.fire( 'saveSnapshot' );
 
 			}, 0 );
 

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -14,7 +14,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 /**
- * Constains the dictionary of language entries.
+ * Contains the dictionary of language entries.
  * @namespace
  */
 CKEDITOR.lang['he'] =
@@ -31,11 +31,12 @@ CKEDITOR.lang['he'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'עורך טקסט עשיר, %1, לחץ אלט (ALT) + 0 לעזרה.',
+	editorTitle : 'עורך טקסט עשיר, %1',
+	editorHelp : 'לחץ אלט ALT + 0 לעזרה',
 
 	// ARIA descriptions.
-	toolbar	: 'סרגל הכלים',
-	editor	: 'עורך טקסט עשיר',
+	toolbars	: 'סרגלי כלים של העורך',
+	editor		: 'עורך טקסט עשיר',
 
 	// Toolbar buttons without dialogs.
 	source			: 'מקור',
@@ -119,8 +120,13 @@ CKEDITOR.lang['he'] =
 		alignTop		: 'למעלה',
 		alignMiddle		: 'לאמצע',
 		alignBottom		: 'לתחתית',
+		invalidValue	: 'Invalid value.', // MISSING
 		invalidHeight	: 'הגובה חייב להיות מספר.',
 		invalidWidth	: 'הרוחב חייב להיות מספר.',
+		invalidCssLength	: 'הערך שצוין לשדה "%1" חייב להיות מספר חיובי עם או ללא יחידת מידה חוקית של CSS (px, %, in, cm, mm, em, ex, pt, או pc).',
+		invalidHtmlLength	: 'הערך שצוין לשדה "%1" חייב להיות מספר חיובי עם או ללא יחידת מידה חוקית של HTML (px או %).',
+		invalidInlineStyle	: 'הערך שצויין לשדה הסגנון חייב להכיל זוג ערכים אחד או יותר בפורמט "שם : ערך", מופרדים על ידי נקודה-פסיק.',
+		cssLengthTooltip	: 'יש להכניס מספר המייצג פיקסלים או מספר עם יחידת גליונות סגנון תקינה (px, %, in, cm, mm, em, ex, pt, or pc).',
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, לא זמין</span>'
@@ -201,7 +207,8 @@ CKEDITOR.lang['he'] =
 		menu		: 'מאפייני נקודת עיגון',
 		title		: 'מאפייני נקודת עיגון',
 		name		: 'שם לנקודת עיגון',
-		errorName	: 'יש להקליד שם לנקודת עיגון'
+		errorName	: 'יש להקליד שם לנקודת עיגון',
+		remove		: 'מחיקת נקודת עיגון'
 	},
 
 	// List style dialog
@@ -237,6 +244,7 @@ CKEDITOR.lang['he'] =
 		findWhat			: 'חיפוש מחרוזת:',
 		replaceWith			: 'החלפה במחרוזת:',
 		notFoundMsg			: 'הטקסט המבוקש לא נמצא.',
+		findOptions			: 'אפשרויות חיפוש',
 		matchCase			: 'הבחנה בין אותיות רשיות לקטנות (Case)',
 		matchWord			: 'התאמה למילה המלאה',
 		matchCyclic			: 'התאמה מחזורית',
@@ -271,8 +279,8 @@ CKEDITOR.lang['he'] =
 		invalidBorder	: 'שדה גודל המסגרת חייב להיות מספר.',
 		invalidWidth	: 'שדה רוחב הטבלה חייב להיות מספר.',
 		invalidHeight	: 'שדה גובה הטבלה חייב להיות מספר.',
-		invalidCellSpacing	: 'שדה ריווח התאים חייב להיות מספר.',
-		invalidCellPadding	: 'שדה ריפוד התאים חייב להיות מספר.',
+		invalidCellSpacing	: 'שדה ריווח התאים חייב להיות מספר חיובי.',
+		invalidCellPadding	: 'שדה ריפוד התאים חייב להיות מספר חיובי.',
 
 		cell :
 		{
@@ -413,7 +421,6 @@ CKEDITOR.lang['he'] =
 		upload		: 'העלאה',
 		alt			: 'טקסט חלופי',
 		lockRatio	: 'נעילת היחס',
-		unlockRatio	: 'ביטול נעילת היחס',
 		resetSize	: 'איפוס הגודל',
 		border		: 'מסגרת',
 		hSpace		: 'מרווח אופקי',
@@ -715,6 +722,8 @@ CKEDITOR.lang['he'] =
 	{
 		title		: 'אודות CKEditor',
 		dlgTitle	: 'אודות CKEditor',
+		help	: 'היכנסו ל$1 לעזרה.',
+		userGuide : 'מדריך המשתמש של CKEditor',
 		moreInfo	: 'למידע נוסף בקרו באתרנו:',
 		copy		: 'Copyright &copy; $1. כל הזכויות שמורות.'
 	},
@@ -745,9 +754,64 @@ CKEDITOR.lang['he'] =
 	toolbarCollapse	: 'מזעור סרגל כלים',
 	toolbarExpand	: 'הרחבת סרגל כלים',
 
+	toolbarGroups :
+	{
+		document : 'מסמך',
+		clipboard : 'לוח הגזירים (Clipboard)/צעד אחרון',
+		editing : 'עריכה',
+		forms : 'טפסים',
+		basicstyles : 'עיצוב בסיסי',
+		paragraph : 'פסקה',
+		links : 'קישורים',
+		insert : 'הכנסה',
+		styles : 'עיצוב',
+		colors : 'צבעים',
+		tools : 'כלים'
+	},
+
 	bidi :
 	{
 		ltr : 'כיוון טקסט משמאל לימין (LTR)',
 		rtl : 'כיוון טקסט מימין לשמאל (RTL)'
+	},
+
+	docprops :
+	{
+		label : 'מאפייני מסמך',
+		title : 'מאפייני מסמך',
+		design : 'עיצוב',
+		meta : 'תגי Meta',
+		chooseColor : 'בחירה',
+		other : 'אחר...',
+		docTitle :	'כותרת עמוד',
+		charset : 	'קידוד תווים',
+		charsetOther : 'קידוד תווים אחר',
+		charsetASCII : 'ASCII',
+		charsetCE : 'מרכז אירופאי',
+		charsetCT : 'סיני מסורתי (Big5)',
+		charsetCR : 'קירילי',
+		charsetGR : 'יווני',
+		charsetJP : 'יפני',
+		charsetKR : 'קוריאני',
+		charsetTR : 'טורקי',
+		charsetUN : 'יוניקוד (UTF-8)',
+		charsetWE : 'מערב אירופאי',
+		docType : 'כותר סוג מסמך',
+		docTypeOther : 'כותר סוג מסמך אחר',
+		xhtmlDec : 'כלול הכרזות XHTML',
+		bgColor : 'צבע רקע',
+		bgImage : 'כתובת של תמונת רקע',
+		bgFixed : 'רקע לא נגלל (צמוד)',
+		txtColor : 'צבע טקסט',
+		margin : 'מרווחי עמוד',
+		marginTop : 'עליון',
+		marginLeft : 'שמאלי',
+		marginRight : 'ימני',
+		marginBottom : 'תחתון',
+		metaKeywords : 'מילות מפתח של המסמך (מופרדות בפסיק)',
+		metaDescription : 'תיאור המסמך',
+		metaAuthor : 'מחבר/ת',
+		metaCopyright : 'זכויות יוצרים',
+		previewHtml : '<p>זהו <strong>טקסט הדגמה</strong>. את/ה משתמש/ת ב<a href="javascript:void(0)">CKEditor</a>.</p>'
 	}
 };

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -104,6 +104,9 @@ CKEDITOR.dom.element.clearMarkers = function( database, element, removeFromDatab
 		delete database[id];
 	}
 };
+
+( function()
+{
 
 CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 	/** @lends CKEDITOR.dom.element.prototype */
@@ -429,6 +432,13 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 							name = 'className';
 							break;
 
+						case 'http-equiv':
+							name = 'httpEquiv';
+							break;
+
+						case 'name':
+							return this.$.name;
+
 						case 'tabindex':
 							var tabIndex = standard.call( this, name );
 
@@ -459,6 +469,11 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 						case 'style':
 							// IE does not return inline styles via getAttribute(). See #2947.
 							return this.$.style.cssText;
+
+						case 'contenteditable':
+						case 'contentEditable':
+							return this.$.attributes.getNamedItem( 'contentEditable' ).specified ?
+									this.$.getAttribute( 'contentEditable' ) : null;
 					}
 
 					return standard.call( this, name );
@@ -492,7 +507,10 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 			:
 				function( propertyName )
 				{
-					return this.getWindow().$.getComputedStyle( this.$, '' ).getPropertyValue( propertyName );
+					var style = this.getWindow().$.getComputedStyle( this.$, null );
+
+					// Firefox may return null if we call the above on a hidden iframe. (#9117)
+					return style ? style.getPropertyValue( propertyName ) : '';
 				},
 
 		/**
@@ -573,7 +591,7 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 		 * in the future.
 		 * @returns {String} The text value.
 		 * @example
-		 * var element = CKEDITOR.dom.element.createFromHtml( '&lt;div&gt;Same &lt;i&gt;text&lt;/i&gt;.&lt;/div&gt;' );
+		 * var element = CKEDITOR.dom.element.createFromHtml( '&lt;div&gt;Sample &lt;i&gt;text&lt;/i&gt;.&lt;/div&gt;' );
 		 * alert( <b>element.getText()</b> );  // "Sample text."
 		 */
 		getText : function()
@@ -712,17 +730,33 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 			return false;
 		},
 
-		isEditable : function()
+		/**
+		 * Decide whether one element is able to receive cursor.
+		 * @param {Boolean} [textCursor=true] Only consider element that could receive text child.
+		 */
+		isEditable : function( textCursor )
 		{
-			// Get the element name.
 			var name = this.getName();
 
-			// Get the element DTD (defaults to span for unknown elements).
-			var dtd = !CKEDITOR.dtd.$nonEditable[ name ]
-						&& ( CKEDITOR.dtd[ name ] || CKEDITOR.dtd.span );
+			if ( this.isReadOnly()
+					|| this.getComputedStyle( 'display' ) == 'none'
+					|| this.getComputedStyle( 'visibility' ) == 'hidden'
+				 	|| this.is( 'a' ) && this.data( 'cke-saved-name' ) && !this.getChildCount()
+					|| CKEDITOR.dtd.$nonEditable[ name ]
+					|| CKEDITOR.dtd.$empty[ name ] )
+			{
+				return false;
+			}
 
-			// In the DTD # == text node.
-			return ( dtd && dtd['#'] );
+			if ( textCursor !== false )
+			{
+				// Get the element DTD (defaults to span for unknown elements).
+				var dtd = CKEDITOR.dtd[ name ] || CKEDITOR.dtd.span;
+				// In the DTD # == text node.
+				return ( dtd && dtd[ '#'] );
+			}
+
+			return true;
 		},
 
 		isIdentical : function( otherElement )
@@ -771,7 +805,7 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 		 */
 		isVisible : function()
 		{
-			var isVisible = !!this.$.offsetHeight && this.getComputedStyle( 'visibility' ) != 'hidden',
+			var isVisible = ( this.$.offsetHeight || this.$.offsetWidth ) && this.getComputedStyle( 'visibility' ) != 'hidden',
 				elementWindow,
 				elementWindowFrame;
 
@@ -788,7 +822,7 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 				}
 			}
 
-			return isVisible;
+			return !!isVisible;
 		},
 
 		/**
@@ -884,11 +918,28 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 		 * @param {String} name The attribute name.
 		 * @example
 		 */
-		hasAttribute : function( name )
+		hasAttribute : (function()
 		{
-			var $attr = this.$.attributes.getNamedItem( name );
-			return !!( $attr && $attr.specified );
-		},
+			function standard( name )
+			{
+				var $attr = this.$.attributes.getNamedItem( name );
+				return !!( $attr && $attr.specified );
+			}
+
+			return ( CKEDITOR.env.ie && CKEDITOR.env.version < 8 ) ?
+					function( name )
+					{
+						// On IE < 8 the name attribute cannot be retrieved
+						// right after the element creation and setting the
+						// name with setAttribute.
+						if ( name == 'name' )
+							return !!this.$.name;
+
+						return standard.call( this, name );
+					}
+				:
+					standard;
+		})(),
 
 		/**
 		 * Hides this element (display:none).
@@ -1030,6 +1081,20 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 						this.$.tabIndex = value;
 					else if ( name == 'checked' )
 						this.$.checked = value;
+					else if ( name == 'contenteditable' )
+						standard.call( this, 'contentEditable', value );
+					else
+						standard.apply( this, arguments );
+					return this;
+				};
+			}
+			else if ( CKEDITOR.env.ie8Compat && CKEDITOR.env.secure )
+			{
+				return function( name, value )
+				{
+					// IE8 throws error when setting src attribute to non-ssl value. (#7847)
+					if ( name == 'src' && value.match( /^http:\/\// ) )
+						try { standard.apply( this, arguments ); } catch( e ){}
 					else
 						standard.apply( this, arguments );
 					return this;
@@ -1092,6 +1157,8 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 						name = 'className';
 					else if ( name == 'tabindex' )
 						name = 'tabIndex';
+					else if ( name == 'contenteditable' )
+						name = 'contentEditable';
 					standard.call( this, name );
 				};
 			}
@@ -1123,9 +1190,19 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 		 */
 		removeStyle : function( name )
 		{
-			this.setStyle( name, '' );
-			if ( this.$.style.removeAttribute )
-				this.$.style.removeAttribute( CKEDITOR.tools.cssStyleToDomStyle( name ) );
+			// Removes the specified property from the current style object.
+			var $ = this.$.style;
+
+			// "removeProperty" need to be specific on the following styles.
+			if ( !$.removeProperty && ( name == 'border' || name == 'margin' || name == 'padding' ) )
+			{
+				var names = expandedRules( name );
+				for ( var i = 0 ; i < names.length ; i++ )
+					this.removeStyle( names[ i ] );
+				return;
+			}
+
+			$.removeProperty ? $.removeProperty( name ) : $.removeAttribute( CKEDITOR.tools.cssStyleToDomStyle( name ) );
 
 			if ( !this.$.style.cssText )
 				this.removeAttribute( 'style' );
@@ -1176,7 +1253,7 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 		 */
 		setOpacity : function( opacity )
 		{
-			if ( CKEDITOR.env.ie )
+			if ( CKEDITOR.env.ie && CKEDITOR.env.version < 9 )
 			{
 				opacity = Math.round( opacity * 100 );
 				this.setStyle( 'filter', opacity >= 100 ? '' : 'progid:DXImageTransform.Microsoft.Alpha(opacity=' + opacity + ')' );
@@ -1211,12 +1288,13 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 					if ( CKEDITOR.env.ie || CKEDITOR.env.opera )
 					{
 						var element = this.$,
+							elements = element.getElementsByTagName("*"),
 							e,
 							i = 0;
 
 						element.unselectable = 'on';
 
-						while ( ( e = element.all[ i++ ] ) )
+						while ( ( e = elements[ i++ ] ) )
 						{
 							switch ( e.tagName.toLowerCase() )
 							{
@@ -1249,10 +1327,9 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 		getDocumentPosition : function( refDocument )
 		{
 			var x = 0, y = 0,
-				body = this.getDocument().getBody(),
-				quirks = this.getDocument().$.compatMode == 'BackCompat';
-
-			var doc = this.getDocument();
+				doc = this.getDocument(),
+				body = doc.getBody(),
+				quirks = doc.$.compatMode == 'BackCompat';
 
 			if ( document.documentElement[ "getBoundingClientRect" ] )
 			{
@@ -1347,40 +1424,143 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 			return { x : x, y : y };
 		},
 
-		scrollIntoView : function( alignTop )
+		/**
+		 * Make any page element visible inside the browser viewport.
+		 * @param {Boolean} [alignToTop]
+		 */
+		scrollIntoView : function( alignToTop )
 		{
-			// Get the element window.
-			var win = this.getWindow(),
-				winHeight = win.getViewPaneSize().height;
+			var parent = this.getParent();
+			if ( !parent ) return;
 
-			// Starts from the offset that will be scrolled with the negative value of
-			// the visible window height.
-			var offset = winHeight * -1;
-
-			// Append the view pane's height if align to top.
-			// Append element height if we are aligning to the bottom.
-			if ( alignTop )
-				offset += winHeight;
-			else
+			// Scroll the element into parent container from the inner out.
+			do
 			{
-				offset += this.$.offsetHeight || 0;
+				// Check ancestors that overflows.
+				var overflowed =
+					parent.$.clientWidth && parent.$.clientWidth < parent.$.scrollWidth
+					|| parent.$.clientHeight && parent.$.clientHeight < parent.$.scrollHeight;
 
-				// Consider the margin in the scroll, which is ok for our current needs, but
-				// needs investigation if we will be using this function in other places.
-				offset += parseInt( this.getComputedStyle( 'marginBottom' ) || 0, 10 ) || 0;
+				if ( overflowed )
+					this.scrollIntoParent( parent, alignToTop, 1 );
+
+				// Walk across the frame.
+				if ( parent.is( 'html' ) )
+				{
+					var win = parent.getWindow();
+
+					// Avoid security error.
+					try
+					{
+						var iframe = win.$.frameElement;
+						iframe && ( parent = new CKEDITOR.dom.element( iframe ) );
+					}
+					catch(er){}
+				}
+			}
+			while ( ( parent = parent.getParent() ) );
+		},
+
+		/**
+		 * Make any page element visible inside one of the ancestors by scrolling the parent.
+		 * @param {CKEDITOR.dom.element|CKEDITOR.dom.window} parent The container to scroll into.
+		 * @param {Boolean} [alignToTop] Align the element's top side with the container's
+		 * when <code>true</code> is specified; align the bottom with viewport bottom when
+		 * <code>false</code> is specified. Otherwise scroll on either side with the minimum
+		 * amount to show the element.
+		 * @param {Boolean} [hscroll] Whether horizontal overflow should be considered.
+		 */
+		scrollIntoParent : function( parent, alignToTop, hscroll )
+		{
+			!parent && ( parent = this.getWindow() );
+
+			var doc = parent.getDocument();
+			var isQuirks = doc.$.compatMode == 'BackCompat';
+
+			// On window <html> is scrolled while quirks scrolls <body>.
+			if ( parent instanceof CKEDITOR.dom.window )
+				parent = isQuirks ? doc.getBody() : doc.getDocumentElement();
+
+			// Scroll the parent by the specified amount.
+			function scrollBy( x, y )
+			{
+				// Webkit doesn't support "scrollTop/scrollLeft"
+				// on documentElement/body element.
+				if ( /body|html/.test( parent.getName() ) )
+					parent.getWindow().$.scrollBy( x, y );
+				else
+				{
+					parent.$[ 'scrollLeft' ] += x;
+					parent.$[ 'scrollTop' ] += y;
+				}
 			}
 
-			// Append the offsets for the entire element hierarchy.
-			var elementPosition = this.getDocumentPosition();
-			offset += elementPosition.y;
+			// Figure out the element position relative to the specified window.
+			function screenPos( element, refWin )
+			{
+				var pos = { x: 0, y: 0 };
 
-			// offset value might be out of range(nagative), fix it(#3692).
-			offset = offset < 0 ? 0 : offset;
+				if ( !( element.is( isQuirks ? 'body' : 'html' ) ) )
+				{
+					var box = element.$.getBoundingClientRect();
+					pos.x = box.left, pos.y = box.top;
+				}
 
-			// Scroll the window to the desired position, if not already visible(#3795).
-			var currentScroll = win.getScrollPosition().y;
-			if ( offset > currentScroll || offset < currentScroll - winHeight )
-				win.$.scrollTo( 0, offset );
+				var win = element.getWindow();
+				if ( !win.equals( refWin ) )
+				{
+					var outerPos = screenPos( CKEDITOR.dom.element.get( win.$.frameElement ), refWin );
+					pos.x += outerPos.x, pos.y += outerPos.y;
+				}
+
+				return pos;
+			}
+
+			// calculated margin size.
+			function margin( element, side )
+			{
+				return parseInt( element.getComputedStyle( 'margin-' + side ) || 0, 10 ) || 0;
+			}
+
+			var win = parent.getWindow();
+
+			var thisPos = screenPos( this, win ),
+				parentPos = screenPos( parent, win ),
+				eh = this.$.offsetHeight,
+				ew = this.$.offsetWidth,
+				ch = parent.$.clientHeight,
+				cw = parent.$.clientWidth,
+				lt,
+				br;
+
+			// Left-top margins.
+			lt =
+			{
+				x : thisPos.x - margin( this, 'left' ) - parentPos.x || 0,
+				y : thisPos.y - margin( this, 'top' ) - parentPos.y|| 0
+			};
+
+			// Bottom-right margins.
+			br =
+			{
+				x : thisPos.x + ew + margin( this, 'right' ) - ( ( parentPos.x ) + cw ) || 0,
+				y : thisPos.y + eh + margin( this, 'bottom' ) - ( ( parentPos.y ) + ch ) || 0
+			};
+
+			// 1. Do the specified alignment as much as possible;
+			// 2. Otherwise be smart to scroll only the minimum amount;
+			// 3. Never cut at the top;
+			// 4. DO NOT scroll when already visible.
+			if ( lt.y < 0 || br.y > 0 )
+			{
+				scrollBy( 0,
+						  alignToTop === true ? lt.y :
+						  alignToTop === false ? br.y :
+						  lt.y < 0 ? lt.y : br.y );
+			}
+
+			if ( hscroll && ( lt.x < 0 || br.x > 0 ) )
+				scrollBy( lt.x < 0 ? lt.x : br.x, 0 );
 		},
 
 		setState : function( state )
@@ -1556,7 +1736,13 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 		 */
 		getDirection : function( useComputed )
 		{
-			return useComputed ? this.getComputedStyle( 'direction' ) : this.getStyle( 'direction' ) || this.getAttribute( 'dir' );
+			return useComputed ?
+				this.getComputedStyle( 'direction' )
+					// Webkit: offline element returns empty direction (#8053).
+					|| this.getDirection()
+					|| this.getDocument().$.dir
+					|| this.getDocument().getBody().getDirection( 1 )
+				: this.getStyle( 'direction' ) || this.getAttribute( 'dir' );
 		},
 
 		/**
@@ -1582,12 +1768,34 @@ CKEDITOR.tools.extend( CKEDITOR.dom.element.prototype,
 		}
 	});
 
-( function()
-{
 	var sides = {
 		width : [ "border-left-width", "border-right-width","padding-left", "padding-right" ],
 		height : [ "border-top-width", "border-bottom-width", "padding-top",  "padding-bottom" ]
 	};
+
+	// Generate list of specific style rules, applicable to margin/padding/border.
+	function expandedRules( style )
+	{
+		var sides = [ 'top', 'left', 'right', 'bottom' ], components;
+
+		if ( style == 'border' )
+				components = [ 'color', 'style', 'width' ];
+
+		var styles = [];
+		for ( var i = 0 ; i < sides.length ; i++ )
+		{
+
+			if ( components )
+			{
+				for ( var j = 0 ; j < components.length ; j++ )
+					styles.push( [ style, sides[ i ], components[j] ].join( '-' ) );
+			}
+			else
+				styles.push( [ style, sides[ i ] ].join( '-' ) );
+		}
+
+		return styles;
+	}
 
 	function marginAndPaddingSize( type )
 	{

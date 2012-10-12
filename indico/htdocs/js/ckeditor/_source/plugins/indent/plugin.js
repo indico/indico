@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -15,6 +15,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 	function onSelectionChange( evt )
 	{
+		if ( evt.editor.readOnly )
+			return null;
+
 		var editor = evt.editor,
 			elementPath = evt.data.path,
 			list = elementPath && elementPath.contains( listNodeNames ),
@@ -77,7 +80,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 	function isListItem( node )
 	{
-		return node.type = CKEDITOR.NODE_ELEMENT && node.is( 'li' );
+		return node.type == CKEDITOR.NODE_ELEMENT && node.is( 'li' );
 	}
 
 	indentCommand.prototype = {
@@ -139,8 +142,11 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				{
 					listArray[ i ].indent += indentOffset;
 					// Make sure the newly created sublist get a brand-new element of the same type. (#5372)
-					var listRoot = listArray[ i ].parent;
-					listArray[ i ].parent = new CKEDITOR.dom.element( listRoot.getName(), listRoot.getDocument() );
+					if ( indentOffset > 0 )
+					{
+						var listRoot = listArray[ i ].parent;
+						listArray[ i ].parent = new CKEDITOR.dom.element( listRoot.getName(), listRoot.getDocument() );
+					}
 				}
 
 				for ( i = lastItem.getCustomData( 'listarray_index' ) + 1 ;
@@ -451,7 +457,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
  * and instead the {@link #indentUnit} and {@link #indentOffset} properties will be used.
  * @name CKEDITOR.config.indentClasses
  * @type Array
- * default null
+ * @default null
  * @example
  * // Use the classes 'Indent1', 'Indent2', 'Indent3'
  * config.indentClasses = ['Indent1', 'Indent2', 'Indent3'];

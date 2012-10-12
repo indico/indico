@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -70,6 +70,9 @@ CKEDITOR.ui.prototype =
 			command = item && item.command && this._.editor.getCommand( item.command );
 
 		var result = handler && handler.create.apply( this, item.args );
+
+		// Allow overrides from skin ui definitions..
+		item && ( result = CKEDITOR.tools.extend( result, this._.editor.skin[ item.type ], true ) );
 
 		// Add reference inside command object.
 		if ( command )

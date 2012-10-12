@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -79,8 +79,8 @@ CKEDITOR.STYLE_OBJECT = 3;
 
 (function()
 {
-	var blockElements	= { address:1,div:1,h1:1,h2:1,h3:1,h4:1,h5:1,h6:1,p:1,pre:1 },
-		objectElements	= { a:1,embed:1,hr:1,img:1,li:1,object:1,ol:1,table:1,td:1,tr:1,th:1,ul:1,dl:1,dt:1,dd:1,form:1};
+	var blockElements	= { address:1,div:1,h1:1,h2:1,h3:1,h4:1,h5:1,h6:1,p:1,pre:1,section:1,header:1,footer:1,nav:1,article:1,aside:1,figure:1,dialog:1,hgroup:1,time:1,meter:1,menu:1,command:1,keygen:1,output:1,progress:1,details:1,datagrid:1,datalist:1 },
+		objectElements	= { a:1,embed:1,hr:1,img:1,li:1,object:1,ol:1,table:1,td:1,tr:1,th:1,ul:1,dl:1,dt:1,dd:1,form:1,audio:1,video:1 };
 
 	var semicolonFixRegex = /\s*(?:;\s*|$)/,
 		varRegex = /#\((.+?)\)/g;
@@ -90,6 +90,16 @@ CKEDITOR.STYLE_OBJECT = 3;
 
 	CKEDITOR.style = function( styleDefinition, variablesValues )
 	{
+		// Inline style text as attribute should be converted
+		// to styles object.
+		var attrs = styleDefinition.attributes;
+		if ( attrs && attrs.style )
+		{
+			styleDefinition.styles = CKEDITOR.tools.extend( {},
+				styleDefinition.styles, parseStyleText( attrs.style ) );
+			delete attrs.style;
+		}
+
 		if ( variablesValues )
 		{
 			styleDefinition = CKEDITOR.tools.clone( styleDefinition );
@@ -98,7 +108,9 @@ CKEDITOR.STYLE_OBJECT = 3;
 			replaceVariables( styleDefinition.styles, variablesValues );
 		}
 
-		var element = this.element = ( styleDefinition.element || '*' ).toLowerCase();
+		var element = this.element = styleDefinition.element ?
+				( typeof styleDefinition.element == 'string' ? styleDefinition.element.toLowerCase() : styleDefinition.element )
+				: '*';
 
 		this.type =
 			blockElements[ element ] ?
@@ -107,6 +119,10 @@ CKEDITOR.STYLE_OBJECT = 3;
 				CKEDITOR.STYLE_OBJECT
 			:
 				CKEDITOR.STYLE_INLINE;
+
+		// If the 'element' property is an object with a set of possible element, it will be applied like an object style: only to existing elements
+		if ( typeof this.element == 'object' )
+			this.type = CKEDITOR.STYLE_OBJECT;
 
 		this._ =
 		{
@@ -179,9 +195,12 @@ CKEDITOR.STYLE_OBJECT = 3;
 							  && ( element == elementPath.block || element == elementPath.blockLimit ) )
 							continue;
 
-						if( this.type == CKEDITOR.STYLE_OBJECT
-							 && !( element.getName() in objectElements ) )
+						if( this.type == CKEDITOR.STYLE_OBJECT )
+						{
+							var name = element.getName();
+							if ( !( typeof this.element == 'string' ? name == this.element : name in this.element ) )
 								continue;
+						}
 
 						if ( this.checkElementRemovable( element, true ) )
 							return true;
@@ -209,18 +228,19 @@ CKEDITOR.STYLE_OBJECT = 3;
 			return true;
 		},
 
-		// Checks if an element, or any of its attributes, is removable by the
-		// current style definition.
-		checkElementRemovable : function( element, fullMatch )
+		// Check if the element matches the current style definition.
+		checkElementMatch : function( element, fullMatch )
 		{
-			if ( !element )
+			var def = this._.definition;
+
+			if ( !element || !def.ignoreReadonly && element.isReadOnly() )
 				return false;
 
-			var def = this._.definition,
-				attribs;
+			var attribs,
+				name = element.getName();
 
 			// If the element name is the same as the style name.
-			if ( element.getName() == this.element )
+			if ( typeof this.element == 'string' ? name == this.element : name in this.element )
 			{
 				// If no attributes are defined in the element.
 				if ( !fullMatch && !element.hasAttributes() )
@@ -255,10 +275,23 @@ CKEDITOR.STYLE_OBJECT = 3;
 					return true;
 			}
 
-			// Check if the element can be somehow overriden.
+			return false;
+		},
+
+		// Checks if an element, or any of its attributes, is removable by the
+		// current style definition.
+		checkElementRemovable : function( element, fullMatch )
+		{
+			// Check element matches the style itself.
+			if ( this.checkElementMatch( element, fullMatch ) )
+				return true;
+
+			// Check if the element matches the style overrides.
 			var override = getOverrides( this )[ element.getName() ] ;
 			if ( override )
 			{
+				var attribs, attName;
+
 				// If no attributes have been defined, remove the element.
 				if ( !( attribs = override.attributes ) )
 					return true;
@@ -288,7 +321,7 @@ CKEDITOR.STYLE_OBJECT = 3;
 		},
 
 		// Builds the preview HTML based on the styles definition.
-		buildPreview : function()
+		buildPreview : function( label )
 		{
 			var styleDefinition = this._.definition,
 				html = [],
@@ -315,7 +348,7 @@ CKEDITOR.STYLE_OBJECT = 3;
 			if ( cssStyle )
 				html.push( ' style="', cssStyle, '"' );
 
-			html.push( '>', styleDefinition.name, '</', elementName, '>' );
+			html.push( '>', ( label || styleDefinition.name ), '</', elementName, '>' );
 
 			return html.join( '' );
 		}
@@ -413,7 +446,8 @@ CKEDITOR.STYLE_OBJECT = 3;
 		var isUnknownElement;
 
 		// Indicates that fully selected read-only elements are to be included in the styling range.
-		var includeReadonly = def.includeReadonly;
+		var ignoreReadonly = def.ignoreReadonly,
+			includeReadonly = ignoreReadonly || def.includeReadonly;
 
 		// If the read-only inclusion is not available in the definition, try
 		// to get it from the document data.
@@ -437,19 +471,22 @@ CKEDITOR.STYLE_OBJECT = 3;
 
 		var styleRange;
 
-		// Check if the boundaries are inside non stylable elements.
-		var firstUnstylable = getUnstylableParent( firstNode ),
-			lastUnstylable = getUnstylableParent( lastNode );
+		if ( !ignoreReadonly )
+		{
+			// Check if the boundaries are inside non stylable elements.
+			var firstUnstylable = getUnstylableParent( firstNode ),
+					lastUnstylable = getUnstylableParent( lastNode );
 
-		// If the first element can't be styled, we'll start processing right
-		// after its unstylable root.
-		if ( firstUnstylable )
-			currentNode = firstUnstylable.getNextSourceNode( true );
+			// If the first element can't be styled, we'll start processing right
+			// after its unstylable root.
+			if ( firstUnstylable )
+				currentNode = firstUnstylable.getNextSourceNode( true );
 
-		// If the last element can't be styled, we'll stop processing on its
-		// unstylable root.
-		if ( lastUnstylable )
-			lastNode = lastUnstylable;
+			// If the last element can't be styled, we'll stop processing on its
+			// unstylable root.
+			if ( lastUnstylable )
+				lastNode = lastUnstylable;
+		}
 
 		// Do nothing if the current node now follows the last node to be processed.
 		if ( currentNode.getPosition( lastNode ) == CKEDITOR.POSITION_FOLLOWING )
@@ -776,7 +813,7 @@ CKEDITOR.STYLE_OBJECT = 3;
 			breakNodes();
 
 			// Now, do the DFS walk.
-			var currentNode = startNode.getNext();
+			var currentNode = startNode;
 			while ( !currentNode.equals( endNode ) )
 			{
 				/*
@@ -815,7 +852,7 @@ CKEDITOR.STYLE_OBJECT = 3;
 	{
 		var root = range.getCommonAncestor( true, true ),
 			element = root.getAscendant( this.element, true );
-		element && setupElement( element, this );
+		element && !element.isReadOnly() && setupElement( element, this );
 	}
 
 	function removeObjectStyle( range )
@@ -829,7 +866,6 @@ CKEDITOR.STYLE_OBJECT = 3;
 		var style = this,
 			def = style._.definition,
 			attributes = def.attributes;
-		var styles = CKEDITOR.style.getStyleText( def );
 
 		// Remove all defined attributes.
 		if ( attributes )
@@ -872,8 +908,11 @@ CKEDITOR.STYLE_OBJECT = 3;
 
 		while ( ( block = iterator.getNextParagraph() ) )		// Only one =
 		{
-			var newBlock = getElement( this, doc, block );
-			replaceBlock( block, newBlock );
+			if ( !block.isReadOnly() )
+			{
+				var newBlock = getElement( this, doc, block );
+				replaceBlock( block, newBlock );
+			}
 		}
 
 		range.moveToBookmark( bookmark );
@@ -1115,8 +1154,9 @@ CKEDITOR.STYLE_OBJECT = 3;
 	function removeFromElement( style, element )
 	{
 		var def = style._.definition,
-			attributes = CKEDITOR.tools.extend( {}, def.attributes, getOverrides( style )[ element.getName() ] ),
+			attributes = def.attributes,
 			styles = def.styles,
+			overrides = getOverrides( style )[ element.getName() ],
 			// If the style is only about the element itself, we have to remove the element.
 			removeEmpty = CKEDITOR.tools.isEmpty( attributes ) && CKEDITOR.tools.isEmpty( styles );
 
@@ -1141,6 +1181,9 @@ CKEDITOR.STYLE_OBJECT = 3;
 			removeEmpty = removeEmpty || !!element.getStyle( styleName );
 			element.removeStyle( styleName );
 		}
+
+		// Remove overrides, but don't remove the element if it's a block element
+		removeOverrides( element, overrides, blockElements[ element.getName() ] ) ;
 
 		if ( removeEmpty )
 		{
@@ -1183,8 +1226,9 @@ CKEDITOR.STYLE_OBJECT = 3;
 	 *  Note: Remove the element if no attributes remain.
 	 * @param {Object} element
 	 * @param {Object} overrides
+	 * @param {Boolean} Don't remove the element
 	 */
-	function removeOverrides( element, overrides )
+	function removeOverrides( element, overrides, dontRemove )
 	{
 		var attributes = overrides && overrides.attributes ;
 
@@ -1212,7 +1256,8 @@ CKEDITOR.STYLE_OBJECT = 3;
 			}
 		}
 
-		removeNoAttribsElement( element );
+		if ( !dontRemove )
+			removeNoAttribsElement( element );
 	}
 
 	// If the element has no more attributes, remove it.
@@ -1446,6 +1491,16 @@ CKEDITOR.STYLE_OBJECT = 3;
 		else
 			styleText = unparsedCssText;
 
+		// Normalize font-family property, ignore quotes and being case insensitive. (#7322)
+		// http://www.w3.org/TR/css3-fonts/#font-family-the-font-family-property
+		styleText = styleText.replace( /(font-family:)(.*?)(?=;|$)/, function ( match, prop, val )
+		{
+			var names = val.split( ',' );
+			for ( var i = 0; i < names.length; i++ )
+				names[ i ] = CKEDITOR.tools.trim( names[ i ].replace( /["']/g, '' ) );
+			return prop + names.join( ',' );
+		});
+
 		// Shrinking white-spaces around colon and semi-colon (#4147).
 		// Compensate tail semi-colon.
 		return styleText.replace( /\s*([;:])\s*/, '$1' )
@@ -1497,6 +1552,8 @@ CKEDITOR.STYLE_OBJECT = 3;
 	function applyStyle( document, remove )
 	{
 		var selection = document.getSelection(),
+			// Bookmark the range so we can re-select it after processing.
+			bookmarks = selection.createBookmarks( 1 ),
 			ranges = selection.getRanges(),
 			func = remove ? this.removeFromRange : this.applyToRange,
 			range;
@@ -1505,7 +1562,13 @@ CKEDITOR.STYLE_OBJECT = 3;
 		while ( ( range = iterator.getNextRange() ) )
 			func.call( this, range );
 
-		selection.selectRanges( ranges );
+		if ( bookmarks.length == 1 && bookmarks[ 0 ].collapsed )
+		{
+			selection.selectRanges( ranges );
+			document.getById( bookmarks[ 0 ].startNode ).remove();
+		}
+		else
+			selection.selectBookmarks( bookmarks );
 
 		document.removeCustomData( 'doc_processing_style' );
 	}

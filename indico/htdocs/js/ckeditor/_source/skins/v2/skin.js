@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -8,6 +8,7 @@ CKEDITOR.skins.add( 'v2', (function()
 	return {
 		editor		: { css : [ 'editor.css' ] },
 		dialog		: { css : [ 'dialog.css' ] },
+		separator		: { canGroup: false },
 		templates	: { css : [ 'templates.css' ] },
 		margins		: [ 0, 14, 18, 14 ]
 	};

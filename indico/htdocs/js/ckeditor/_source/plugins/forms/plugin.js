@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -9,6 +9,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 CKEDITOR.plugins.add( 'forms',
 {
+	requires : [ 'dialog' ],
 	init : function( editor )
 	{
 		var lang = editor.lang;
@@ -261,24 +262,28 @@ CKEDITOR.plugins.add( 'forms',
 
 if ( CKEDITOR.env.ie )
 {
-	CKEDITOR.dom.element.prototype.hasAttribute = function( name )
-	{
-		var $attr = this.$.attributes.getNamedItem( name );
-
-		if ( this.getName() == 'input' )
+	CKEDITOR.dom.element.prototype.hasAttribute = CKEDITOR.tools.override( CKEDITOR.dom.element.prototype.hasAttribute,
+		function( original )
 		{
-			switch ( name )
-			{
-				case 'class' :
-					return this.$.className.length > 0;
-				case 'checked' :
-					return !!this.$.checked;
-				case 'value' :
-					var type = this.getAttribute( 'type' );
-					return type == 'checkbox' || type == 'radio' ? this.$.value != 'on' : this.$.value;
-			}
-		}
+			return function( name )
+				{
+					var $attr = this.$.attributes.getNamedItem( name );
 
-		return !!( $attr && $attr.specified );
-	};
+					if ( this.getName() == 'input' )
+					{
+						switch ( name )
+						{
+							case 'class' :
+								return this.$.className.length > 0;
+							case 'checked' :
+								return !!this.$.checked;
+							case 'value' :
+								var type = this.getAttribute( 'type' );
+								return type == 'checkbox' || type == 'radio' ? this.$.value != 'on' : this.$.value;
+						}
+					}
+
+					return original.apply( this, arguments );
+				};
+		});
 }

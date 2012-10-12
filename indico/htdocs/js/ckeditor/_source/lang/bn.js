@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -14,7 +14,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 /**
- * Constains the dictionary of language entries.
+ * Contains the dictionary of language entries.
  * @namespace
  */
 CKEDITOR.lang['bn'] =
@@ -31,11 +31,12 @@ CKEDITOR.lang['bn'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'Rich text editor, %1, press ALT 0 for help.', // MISSING
+	editorTitle : 'Rich text editor, %1', // MISSING
+	editorHelp : 'Press ALT 0 for help', // MISSING
 
 	// ARIA descriptions.
-	toolbar	: 'Toolbar', // MISSING
-	editor	: 'Rich Text Editor', // MISSING
+	toolbars	: 'Editor toolbars', // MISSING
+	editor		: 'Rich Text Editor', // MISSING
 
 	// Toolbar buttons without dialogs.
 	source			: 'সোর্স',
@@ -119,8 +120,13 @@ CKEDITOR.lang['bn'] =
 		alignTop		: 'উপর',
 		alignMiddle		: 'মধ্য',
 		alignBottom		: 'নীচে',
+		invalidValue	: 'Invalid value.', // MISSING
 		invalidHeight	: 'Height must be a number.', // MISSING
 		invalidWidth	: 'Width must be a number.', // MISSING
+		invalidCssLength	: 'Value specified for the "%1" field must be a positive number with or without a valid CSS measurement unit (px, %, in, cm, mm, em, ex, pt, or pc).', // MISSING
+		invalidHtmlLength	: 'Value specified for the "%1" field must be a positive number with or without a valid HTML measurement unit (px or %).', // MISSING
+		invalidInlineStyle	: 'Value specified for the inline style must consist of one or more tuples with the format of "name : value", separated by semi-colons.', // MISSING
+		cssLengthTooltip	: 'Enter a number for a value in pixels or a number with a valid CSS unit (px, %, in, cm, mm, em, ex, pt, or pc).', // MISSING
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, unavailable</span>' // MISSING
@@ -201,7 +207,8 @@ CKEDITOR.lang['bn'] =
 		menu		: 'নোঙর প্রোপার্টি',
 		title		: 'নোঙর প্রোপার্টি',
 		name		: 'নোঙরের নাম',
-		errorName	: 'নোঙরের নাম টাইপ করুন'
+		errorName	: 'নোঙরের নাম টাইপ করুন',
+		remove		: 'Remove Anchor' // MISSING
 	},
 
 	// List style dialog
@@ -237,6 +244,7 @@ CKEDITOR.lang['bn'] =
 		findWhat			: 'যা খুঁজতে হবে:',
 		replaceWith			: 'যার সাথে বদলাতে হবে:',
 		notFoundMsg			: 'আপনার উল্লেখিত টেকস্ট পাওয়া যায়নি',
+		findOptions			: 'Find Options', // MISSING
 		matchCase			: 'কেস মিলাও',
 		matchWord			: 'পুরা শব্দ মেলাও',
 		matchCyclic			: 'Match cyclic', // MISSING
@@ -271,8 +279,8 @@ CKEDITOR.lang['bn'] =
 		invalidBorder	: 'Border size must be a number.', // MISSING
 		invalidWidth	: 'Table width must be a number.', // MISSING
 		invalidHeight	: 'Table height must be a number.', // MISSING
-		invalidCellSpacing	: 'Cell spacing must be a number.', // MISSING
-		invalidCellPadding	: 'Cell padding must be a number.', // MISSING
+		invalidCellSpacing	: 'Cell spacing must be a positive number.', // MISSING
+		invalidCellPadding	: 'Cell padding must be a positive number.', // MISSING
 
 		cell :
 		{
@@ -413,7 +421,6 @@ CKEDITOR.lang['bn'] =
 		upload		: 'আপলোড',
 		alt			: 'বিকল্প টেক্সট',
 		lockRatio	: 'অনুপাত লক কর',
-		unlockRatio	: 'Unlock Ratio', // MISSING
 		resetSize	: 'সাইজ পূর্বাবস্থায় ফিরিয়ে দাও',
 		border		: 'বর্ডার',
 		hSpace		: 'হরাইজন্টাল স্পেস',
@@ -715,6 +722,8 @@ CKEDITOR.lang['bn'] =
 	{
 		title		: 'About CKEditor', // MISSING
 		dlgTitle	: 'About CKEditor', // MISSING
+		help	: 'Check $1 for help.', // MISSING
+		userGuide : 'CKEditor User\'s Guide', // MISSING
 		moreInfo	: 'For licensing information please visit our web site:', // MISSING
 		copy		: 'Copyright &copy; $1. All rights reserved.' // MISSING
 	},
@@ -745,9 +754,64 @@ CKEDITOR.lang['bn'] =
 	toolbarCollapse	: 'Collapse Toolbar', // MISSING
 	toolbarExpand	: 'Expand Toolbar', // MISSING
 
+	toolbarGroups :
+	{
+		document : 'Document', // MISSING
+		clipboard : 'Clipboard/Undo', // MISSING
+		editing : 'Editing', // MISSING
+		forms : 'Forms', // MISSING
+		basicstyles : 'Basic Styles', // MISSING
+		paragraph : 'Paragraph', // MISSING
+		links : 'Links', // MISSING
+		insert : 'Insert', // MISSING
+		styles : 'Styles', // MISSING
+		colors : 'Colors', // MISSING
+		tools : 'Tools' // MISSING
+	},
+
 	bidi :
 	{
 		ltr : 'Text direction from left to right', // MISSING
 		rtl : 'Text direction from right to left' // MISSING
+	},
+
+	docprops :
+	{
+		label : 'ডক্যুমেন্ট প্রোপার্টি',
+		title : 'ডক্যুমেন্ট প্রোপার্টি',
+		design : 'Design', // MISSING
+		meta : 'মেটাডেটা',
+		chooseColor : 'Choose', // MISSING
+		other : '<other>',
+		docTitle :	'পেজ শীর্ষক',
+		charset : 	'ক্যারেক্টার সেট এনকোডিং',
+		charsetOther : 'অন্য ক্যারেক্টার সেট এনকোডিং',
+		charsetASCII : 'ASCII', // MISSING
+		charsetCE : 'Central European', // MISSING
+		charsetCT : 'Chinese Traditional (Big5)', // MISSING
+		charsetCR : 'Cyrillic', // MISSING
+		charsetGR : 'Greek', // MISSING
+		charsetJP : 'Japanese', // MISSING
+		charsetKR : 'Korean', // MISSING
+		charsetTR : 'Turkish', // MISSING
+		charsetUN : 'Unicode (UTF-8)', // MISSING
+		charsetWE : 'Western European', // MISSING
+		docType : 'ডক্যুমেন্ট টাইপ হেডিং',
+		docTypeOther : 'অন্য ডক্যুমেন্ট টাইপ হেডিং',
+		xhtmlDec : 'XHTML ডেক্লারেশন যুক্ত কর',
+		bgColor : 'ব্যাকগ্রাউন্ড রং',
+		bgImage : 'ব্যাকগ্রাউন্ড ছবির URL',
+		bgFixed : 'স্ক্রলহীন ব্যাকগ্রাউন্ড',
+		txtColor : 'টেক্স্ট রং',
+		margin : 'পেজ মার্জিন',
+		marginTop : 'উপর',
+		marginLeft : 'বামে',
+		marginRight : 'ডানে',
+		marginBottom : 'নীচে',
+		metaKeywords : 'ডক্যুমেন্ট ইন্ডেক্স কিওয়ার্ড (কমা দ্বারা বিচ্ছিন্ন)',
+		metaDescription : 'ডক্যূমেন্ট বর্ণনা',
+		metaAuthor : 'লেখক',
+		metaCopyright : 'কপীরাইট',
+		previewHtml : '<p>This is some <strong>sample text</strong>. You are using <a href="javascript:void(0)">CKEditor</a>.</p>' // MISSING
 	}
 };

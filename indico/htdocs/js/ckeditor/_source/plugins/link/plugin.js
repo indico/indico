@@ -1,16 +1,18 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 CKEDITOR.plugins.add( 'link',
 {
+	requires : [ 'fakeobjects', 'dialog' ],
 	init : function( editor )
 	{
 		// Add the link and unlink buttons.
 		editor.addCommand( 'link', new CKEDITOR.dialogCommand( 'link' ) );
 		editor.addCommand( 'anchor', new CKEDITOR.dialogCommand( 'anchor' ) );
 		editor.addCommand( 'unlink', new CKEDITOR.unlinkCommand() );
+		editor.addCommand( 'removeAnchor', new CKEDITOR.removeAnchorCommand() );
 		editor.ui.addButton( 'Link',
 			{
 				label : editor.lang.link.toolbar,
@@ -30,37 +32,54 @@ CKEDITOR.plugins.add( 'link',
 		CKEDITOR.dialog.add( 'anchor', this.path + 'dialogs/anchor.js' );
 
 		// Add the CSS styles for anchor placeholders.
-		var side = editor.lang.dir == 'rtl' ? 'right' : 'left';
+
+		var side = ( editor.lang.dir == 'rtl' ? 'right' : 'left' );
+		var basicCss =
+			'background:url(' + CKEDITOR.getUrl( this.path + 'images/anchor.gif' ) + ') no-repeat ' + side + ' center;' +
+			'border:1px dotted #00f;';
+
 		editor.addCss(
+			'a.cke_anchor,a.cke_anchor_empty' +
+			// IE6 breaks with the following selectors.
+			( ( CKEDITOR.env.ie && CKEDITOR.env.version < 7 ) ? '' :
+				',a[name],a[data-cke-saved-name]' ) +
+			'{' +
+				basicCss +
+				'padding-' + side + ':18px;' +
+				// Show the arrow cursor for the anchor image (FF at least).
+				'cursor:auto;' +
+			'}' +
+			( CKEDITOR.env.ie ? (
+				'a.cke_anchor_empty' +
+				'{' +
+					// Make empty anchor selectable on IE.
+					'display:inline-block;' +
+				'}'
+				) : '' ) +
 			'img.cke_anchor' +
 			'{' +
-				'background-image: url(' + CKEDITOR.getUrl( this.path + 'images/anchor.gif' ) + ');' +
-				'background-position: center center;' +
-				'background-repeat: no-repeat;' +
-				'border: 1px solid #a9a9a9;' +
-				'width: 18px !important;' +
-				'height: 18px !important;' +
-			'}\n' +
-			'a.cke_anchor' +
-			'{' +
-				'background-image: url(' + CKEDITOR.getUrl( this.path + 'images/anchor.gif' ) + ');' +
-				'background-position: ' + side + ' center;' +
-				'background-repeat: no-repeat;' +
-				'border: 1px solid #a9a9a9;' +
-				'padding-' + side + ': 18px;' +
-			'}'
-		   	);
+				basicCss +
+				'width:16px;' +
+				'min-height:15px;' +
+				// The default line-height on IE.
+				'height:1.15em;' +
+				// Opera works better with "middle" (even if not perfect)
+				'vertical-align:' + ( CKEDITOR.env.opera ? 'middle' : 'text-bottom' ) + ';' +
+			'}');
 
 		// Register selection change handler for the unlink button.
 		 editor.on( 'selectionChange', function( evt )
 			{
+				if ( editor.readOnly )
+					return;
+
 				/*
 				 * Despite our initial hope, document.queryCommandEnabled() does not work
 				 * for this in Firefox. So we must detect the state by element paths.
 				 */
 				var command = editor.getCommand( 'unlink' ),
 					element = evt.data.path.lastElement && evt.data.path.lastElement.getAscendant( 'a', true );
-				if ( element && element.getName() == 'a' && element.getAttribute( 'href' ) )
+				if ( element && element.getName() == 'a' && element.getAttribute( 'href' ) && element.getChildCount() )
 					command.setState( CKEDITOR.TRISTATE_OFF );
 				else
 					command.setState( CKEDITOR.TRISTATE_DISABLED );
@@ -73,8 +92,11 @@ CKEDITOR.plugins.add( 'link',
 				if ( !element.isReadOnly() )
 				{
 					if ( element.is( 'a' ) )
-						evt.data.dialog =  ( element.getAttribute( 'name' ) && !element.getAttribute( 'href' ) ) ? 'anchor' : 'link';
-					else if ( element.is( 'img' ) && element.data( 'cke-real-element-type' ) == 'anchor' )
+					{
+						evt.data.dialog = ( element.getAttribute( 'name' ) && ( !element.getAttribute( 'href' ) || !element.getChildCount() ) ) ? 'anchor' : 'link';
+						editor.getSelection().selectElement( element );
+					}
+					else if ( CKEDITOR.plugins.link.tryRestoreFakeAnchor( editor, element ) )
 						evt.data.dialog = 'anchor';
 				}
 			});
@@ -88,7 +110,16 @@ CKEDITOR.plugins.add( 'link',
 					{
 						label : editor.lang.anchor.menu,
 						command : 'anchor',
-						group : 'anchor'
+						group : 'anchor',
+						order : 1
+					},
+
+					removeAnchor :
+					{
+						label : editor.lang.anchor.remove,
+						command : 'removeAnchor',
+						group : 'anchor',
+						order : 5
 					},
 
 					link :
@@ -117,19 +148,20 @@ CKEDITOR.plugins.add( 'link',
 					if ( !element || element.isReadOnly() )
 						return null;
 
-					var isAnchor = ( element.is( 'img' ) && element.data( 'cke-real-element-type' ) == 'anchor' );
+					var anchor = CKEDITOR.plugins.link.tryRestoreFakeAnchor( editor, element );
 
-					if ( !isAnchor )
-					{
-						if ( !( element = CKEDITOR.plugins.link.getSelectedLink( editor ) ) )
+					if ( !anchor && !( anchor = CKEDITOR.plugins.link.getSelectedLink( editor ) ) )
 							return null;
 
-						isAnchor = ( element.getAttribute( 'name' ) && !element.getAttribute( 'href' ) );
-					}
+					var menu = {};
 
-					return isAnchor ?
-							{ anchor : CKEDITOR.TRISTATE_OFF } :
-							{ link : CKEDITOR.TRISTATE_OFF, unlink : CKEDITOR.TRISTATE_OFF };
+					if ( anchor.getAttribute( 'href' ) && anchor.getChildCount() )
+						menu = { link : CKEDITOR.TRISTATE_OFF, unlink : CKEDITOR.TRISTATE_OFF };
+
+					if ( anchor && anchor.hasAttribute( 'name' ) )
+						menu.anchor = menu.removeAnchor = CKEDITOR.TRISTATE_OFF;
+
+					return menu;
 				});
 		}
 	},
@@ -139,7 +171,9 @@ CKEDITOR.plugins.add( 'link',
 		// Register a filter to displaying placeholders after mode change.
 
 		var dataProcessor = editor.dataProcessor,
-			dataFilter = dataProcessor && dataProcessor.dataFilter;
+			dataFilter = dataProcessor && dataProcessor.dataFilter,
+			htmlFilter = dataProcessor && dataProcessor.htmlFilter,
+			pathFilters = editor._.elementsPath && editor._.elementsPath.filters;
 
 		if ( dataFilter )
 		{
@@ -150,15 +184,64 @@ CKEDITOR.plugins.add( 'link',
 						a : function( element )
 						{
 							var attributes = element.attributes;
-							if ( attributes.name && !attributes.href )
+							if ( !attributes.name )
+								return null;
+
+							var isEmpty = !element.children.length;
+
+							if ( CKEDITOR.plugins.link.synAnchorSelector )
+							{
+								// IE needs a specific class name to be applied
+								// to the anchors, for appropriate styling.
+								var ieClass = isEmpty ? 'cke_anchor_empty' : 'cke_anchor';
+								var cls = attributes[ 'class' ];
+								if ( attributes.name && ( !cls || cls.indexOf( ieClass ) < 0 ) )
+									attributes[ 'class' ] = ( cls || '' ) + ' ' + ieClass;
+
+								if ( isEmpty && CKEDITOR.plugins.link.emptyAnchorFix )
+								{
+									attributes.contenteditable = 'false';
+									attributes[ 'data-cke-editable' ] = 1;
+								}
+							}
+							else if ( CKEDITOR.plugins.link.fakeAnchor && isEmpty )
 								return editor.createFakeParserElement( element, 'cke_anchor', 'anchor' );
+
+							return null;
 						}
 					}
 				});
 		}
-	},
 
-	requires : [ 'fakeobjects' ]
+		if ( CKEDITOR.plugins.link.emptyAnchorFix && htmlFilter )
+		{
+			htmlFilter.addRules(
+				{
+					elements :
+					{
+						a : function( element )
+						{
+							delete element.attributes.contenteditable;
+						}
+					}
+				});
+		}
+
+		if ( pathFilters )
+		{
+			pathFilters.push( function( element, name )
+				{
+					if ( name == 'a' )
+					{
+						if ( CKEDITOR.plugins.link.tryRestoreFakeAnchor( editor, element ) ||
+							( element.getAttribute( 'name' ) && ( !element.getAttribute( 'href' ) || !element.getChildCount() ) ) )
+						{
+							return 'anchor';
+						}
+					}
+				});
+		}
+	}
 } );
 
 CKEDITOR.plugins.link =
@@ -196,6 +279,26 @@ CKEDITOR.plugins.link =
 			return root.getAscendant( 'a', true );
 		}
 		catch( e ) { return null; }
+	},
+
+	// Opera and WebKit don't make it possible to select empty anchors. Fake
+	// elements must be used for them.
+	fakeAnchor : CKEDITOR.env.opera || CKEDITOR.env.webkit,
+
+	// For browsers that don't support CSS3 a[name]:empty(), note IE9 is included because of #7783.
+	synAnchorSelector : CKEDITOR.env.ie,
+
+	// For browsers that have editing issue with empty anchor.
+	emptyAnchorFix : CKEDITOR.env.ie && CKEDITOR.env.version < 8,
+
+	tryRestoreFakeAnchor : function( editor, element )
+	{
+		if ( element && element.data( 'cke-real-element-type' ) && element.data( 'cke-real-element-type' ) == 'anchor' )
+		{
+			var link  = editor.restoreRealElement( element );
+			if ( link.data( 'cke-saved-name' ) )
+				return link;
+		}
 	}
 };
 
@@ -233,6 +336,34 @@ CKEDITOR.unlinkCommand.prototype =
 	},
 
 	startDisabled : true
+};
+
+CKEDITOR.removeAnchorCommand = function(){};
+CKEDITOR.removeAnchorCommand.prototype =
+{
+	/** @ignore */
+	exec : function( editor )
+	{
+		var sel = editor.getSelection(),
+			bms = sel.createBookmarks(),
+			anchor;
+		if ( sel && ( anchor = sel.getSelectedElement() ) && ( CKEDITOR.plugins.link.fakeAnchor && !anchor.getChildCount() ? CKEDITOR.plugins.link.tryRestoreFakeAnchor( editor, anchor ) : anchor.is( 'a' ) ) )
+			anchor.remove( 1 );
+		else
+		{
+			if ( ( anchor = CKEDITOR.plugins.link.getSelectedLink( editor ) ) )
+			{
+				if ( anchor.hasAttribute( 'href' ) )
+				{
+					anchor.removeAttributes( { name : 1, 'data-cke-saved-name' : 1 } );
+					anchor.removeClass( 'cke_anchor' );
+				}
+				else
+					anchor.remove( 1 );
+			}
+		}
+		sel.selectBookmarks( bms );
+	}
 };
 
 CKEDITOR.tools.extend( CKEDITOR.config,

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -14,7 +14,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 /**
- * Constains the dictionary of language entries.
+ * Contains the dictionary of language entries.
  * @namespace
  */
 CKEDITOR.lang['fo'] =
@@ -31,11 +31,12 @@ CKEDITOR.lang['fo'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'Rich text editor, %1, trýst ALT og 0 fyri vegleiðing.',
+	editorTitle : 'Rich text editor, %1', // MISSING
+	editorHelp : 'Trýst ALT og 0 fyri vegleiðing',
 
 	// ARIA descriptions.
-	toolbar	: 'Toolbar',
-	editor	: 'Rich Text Editor',
+	toolbars	: 'Editor toolbars',
+	editor		: 'Rich Text Editor',
 
 	// Toolbar buttons without dialogs.
 	source			: 'Kelda',
@@ -119,8 +120,13 @@ CKEDITOR.lang['fo'] =
 		alignTop		: 'Ovast',
 		alignMiddle		: 'Miðja',
 		alignBottom		: 'Botnur',
+		invalidValue	: 'Invalid value.', // MISSING
 		invalidHeight	: 'Hædd má vera eitt tal.',
 		invalidWidth	: 'Breidd má vera eitt tal.',
+		invalidCssLength	: 'Virðið sett í "%1" feltið má vera eitt positivt tal, við ella uttan gyldugum CSS mátieind (px, %, in, cm, mm, em, ex, pt, ella pc).',
+		invalidHtmlLength	: 'Virðið sett í "%1" feltiðield má vera eitt positivt tal, við ella uttan gyldugum CSS mátieind (px ella %).',
+		invalidInlineStyle	: 'Virði specifiserað fyri inline style má hava eitt ella fleiri pør (tuples) skrivað sum "name : value", hvørt parið sundurskilt við semi-colon.',
+		cssLengthTooltip	: 'Skriva eitt tal fyri eitt virði í pixels ella eitt tal við gyldigum CSS eind (px, %, in, cm, mm, em, ex, pt, ella pc).',
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, ikki tøkt</span>'
@@ -182,7 +188,7 @@ CKEDITOR.lang['fo'] =
 		cssClasses		: 'Typografi klassar',
 		charset			: 'Atknýtt teknsett',
 		styles			: 'Typografi',
-		rel			: 'Relationship', // MISSING
+		rel			: 'Relatión',
 		selectAnchor		: 'Vel ein marknastein',
 		anchorName		: 'Eftir navni á marknasteini',
 		anchorId			: 'Eftir element Id',
@@ -201,7 +207,8 @@ CKEDITOR.lang['fo'] =
 		menu		: 'Eginleikar fyri marknastein',
 		title		: 'Eginleikar fyri marknastein',
 		name		: 'Heiti marknasteinsins',
-		errorName	: 'Vinarliga rita marknasteinsins heiti'
+		errorName	: 'Vinarliga rita marknasteinsins heiti',
+		remove		: 'Strika marknastein'
 	},
 
 	// List style dialog
@@ -237,6 +244,7 @@ CKEDITOR.lang['fo'] =
 		findWhat			: 'Finn:',
 		replaceWith			: 'Yvirskriva við:',
 		notFoundMsg			: 'Leititeksturin varð ikki funnin',
+		findOptions			: 'Finn møguleikar',
 		matchCase			: 'Munur á stórum og smáum bókstavum',
 		matchWord			: 'Bert heil orð',
 		matchCyclic			: 'Match cyclic',
@@ -413,7 +421,6 @@ CKEDITOR.lang['fo'] =
 		upload		: 'Send',
 		alt			: 'Alternativur tekstur',
 		lockRatio	: 'Læs lutfallið',
-		unlockRatio	: 'Lutfallið ikki læst',
 		resetSize	: 'Upprunastødd',
 		border		: 'Bordi',
 		hSpace		: 'Høgri breddi',
@@ -486,10 +493,10 @@ CKEDITOR.lang['fo'] =
 		btnUndo			: 'Angra',
 		noSuggestions	: '- Einki uppskot -',
 		progress		: 'Rættstavarin arbeiðir...',
-		noMispell		: 'Rættstavarain liðugur: Eingin feilur funnin',
-		noChanges		: 'Rættstavarain liðugur: Einki orð varð broytt',
-		oneChange		: 'Rættstavarain liðugur: Eitt orð er broytt',
-		manyChanges		: 'Rættstavarain liðugur: %1 orð broytt',
+		noMispell		: 'Rættstavarin liðugur: Eingin feilur funnin',
+		noChanges		: 'Rættstavarin liðugur: Einki orð varð broytt',
+		oneChange		: 'Rættstavarin liðugur: Eitt orð er broytt',
+		manyChanges		: 'Rættstavarin liðugur: %1 orð broytt',
 		ieSpellDownload	: 'Rættstavarin er ikki tøkur í tekstviðgeranum. Vilt tú heinta hann nú?'
 	},
 
@@ -706,7 +713,7 @@ CKEDITOR.lang['fo'] =
 		dic_restore		: 'Endurskapa',
 		dic_delete		: 'Strika',
 		dic_rename		: 'Broyt',
-		dic_info		: 'Upprunaliga er brúkara-orðabókin goymd í eini cookie í tínum egna kaga. Men hesar eru avmarkaðar í stødd. Tá brúkara-orðabókin veksur seg ov stóra til eina cookie, so er møguligt at goyma hana á ambætara okkara. Fyri at goyma persónligu orðabókina á ambætaranum eigur tú at velja eitt navn til tína skuffu. Hevur tú longu goymt eina orðabók, so vinarliga skriva navnið og klikk á knøttin Endurskapa.',
+		dic_info		: 'Upprunaliga er brúkara-orðabókin goymd í eini cookie í tínum egna kaga. Men hesar cookies eru avmarkaðar í stødd. Tá brúkara-orðabókin veksur seg ov stóra til eina cookie, so er møguligt at goyma hana á ambætara okkara. Fyri at goyma persónligu orðabókina á ambætaranum eigur tú at velja eitt navn til tína skuffu. Hevur tú longu goymt eina orðabók, so vinarliga skriva navnið og klikk á knøttin Endurskapa.',
 
 		aboutTab		: 'Um'
 	},
@@ -715,6 +722,8 @@ CKEDITOR.lang['fo'] =
 	{
 		title		: 'Um CKEditor',
 		dlgTitle	: 'Um CKEditor',
+		help	: 'Kekka $1 fyri hjálp.',
+		userGuide : 'CKEditor Brúkaravegleiðing',
 		moreInfo	: 'Licens upplýsingar finnast á heimasíðu okkara:',
 		copy		: 'Copyright &copy; $1. All rights reserved.'
 	},
@@ -745,9 +754,64 @@ CKEDITOR.lang['fo'] =
 	toolbarCollapse	: 'Lat Toolbar aftur',
 	toolbarExpand	: 'Vís Toolbar',
 
+	toolbarGroups :
+	{
+		document : 'Dokument',
+		clipboard : 'Clipboard/Undo',
+		editing : 'Editering',
+		forms : 'Formar',
+		basicstyles : 'Grundleggjandi Styles',
+		paragraph : 'Reglubrot',
+		links : 'Leinkjur',
+		insert : 'Set inn',
+		styles : 'Styles',
+		colors : 'Litir',
+		tools : 'Tól'
+	},
+
 	bidi :
 	{
 		ltr : 'Tekstkós frá vinstru til høgru',
 		rtl : 'Tekstkós frá høgru til vinstru'
+	},
+
+	docprops :
+	{
+		label : 'Eginleikar fyri dokument',
+		title : 'Eginleikar fyri dokument',
+		design : 'Design',
+		meta : 'META-upplýsingar',
+		chooseColor : 'Vel',
+		other : '<annað>',
+		docTitle :	'Síðuheiti',
+		charset : 	'Teknsett koda',
+		charsetOther : 'Onnur teknsett koda',
+		charsetASCII : 'ASCII',
+		charsetCE : 'Miðeuropa',
+		charsetCT : 'Kinesiskt traditionelt (Big5)',
+		charsetCR : 'Cyrilliskt',
+		charsetGR : 'Grikst',
+		charsetJP : 'Japanskt',
+		charsetKR : 'Koreanskt',
+		charsetTR : 'Turkiskt',
+		charsetUN : 'Unicode (UTF-8)',
+		charsetWE : 'Vestureuropa',
+		docType : 'Dokumentslag yvirskrift',
+		docTypeOther : 'Annað dokumentslag yvirskrift',
+		xhtmlDec : 'Viðfest XHTML deklaratiónir',
+		bgColor : 'Bakgrundslitur',
+		bgImage : 'Leið til bakgrundsmynd (URL)',
+		bgFixed : 'Læst bakgrund (rullar ikki)',
+		txtColor : 'Tekstlitur',
+		margin : 'Síðubreddar',
+		marginTop : 'Ovast',
+		marginLeft : 'Vinstra',
+		marginRight : 'Høgra',
+		marginBottom : 'Niðast',
+		metaKeywords : 'Dokument index lyklaorð (sundurbýtt við komma)',
+		metaDescription : 'Dokumentlýsing',
+		metaAuthor : 'Høvundur',
+		metaCopyright : 'Upphavsrættindi',
+		previewHtml : '<p>Hetta er ein <strong>royndartekstur</strong>. Tygum brúka <a href="javascript:void(0)">CKEditor</a>.</p>'
 	}
 };

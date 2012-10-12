@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -680,12 +680,41 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		 */
 		cssLength : (function()
 		{
-			var decimalRegex = /^\d+(?:\.\d+)?$/;
 			return function( length )
 			{
-				return length + ( decimalRegex.test( length ) ? 'px' : '' );
+				return length + ( !length || isNaN( Number( length ) ) ? '' : 'px' );
 			};
 		})(),
+
+		/**
+		 * Convert the specified CSS length value to the calculated pixel length inside this page.
+		 * <strong>Note:</strong> Percentage based value is left intact.
+		 * @param {String} cssLength CSS length value.
+		 */
+		convertToPx : ( function ()
+			{
+				var calculator;
+
+				return function( cssLength )
+				{
+					if ( !calculator )
+					{
+						calculator = CKEDITOR.dom.element.createFromHtml(
+								'<div style="position:absolute;left:-9999px;' +
+								'top:-9999px;margin:0px;padding:0px;border:0px;"' +
+								'></div>', CKEDITOR.document );
+						CKEDITOR.document.getBody().append( calculator );
+					}
+
+					if ( !(/%$/).test( cssLength ) )
+					{
+						calculator.setStyle( 'width', cssLength );
+						return calculator.$.clientWidth;
+					}
+
+					return cssLength;
+				};
+			} )(),
 
 		/**
 		 * String specified by {@param str} repeats {@param times} times.
@@ -727,7 +756,82 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		genKey : function()
 		{
 			return Array.prototype.slice.call( arguments ).join( '-' );
+		},
+
+		/**
+		 * Try to avoid differences in the style attribute.
+		 *
+		 * @param {String} styleText The style data to be normalized.
+		 * @param {Boolean} [nativeNormalize=false] Parse the data using the browser.
+		 * @returns {String} The normalized value.
+		 */
+		normalizeCssText: function( styleText, nativeNormalize ) {
+			var props = [],
+				name,
+				parsedProps = CKEDITOR.tools.parseCssText( styleText, true, nativeNormalize );
+
+			for ( name in parsedProps )
+				props.push( name + ':' + parsedProps[ name ] );
+
+			props.sort();
+
+			return props.length ? ( props.join( ';' ) + ';' ) : '';
+		},
+
+		/**
+		 * Find and convert <code>rgb(x,x,x)</code> colors definition to hexadecimal notation.
+		 * @param {String} styleText The style data (or just a string containing rgb colors) to be converted.
+		 * @returns {String} The style data with rgb colors converted to hexadecimal equivalents.
+		 */
+		convertRgbToHex: function( styleText ) {
+			return styleText.replace( /(?:rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\))/gi, function( match, red, green, blue ) {
+				var color = [ red, green, blue ];
+				// Add padding zeros if the hex value is less than 0x10.
+				for ( var i = 0; i < 3; i++ )
+					color[ i ] = ( '0' + parseInt( color[ i ], 10 ).toString( 16 ) ).slice( -2 );
+				return '#' + color.join( '' );
+			});
+		},
+
+		/**
+		 * Turn inline style text properties into one hash.
+		 *
+		 * @param {String} styleText The style data to be parsed.
+		 * @param {Boolean} [normalize=false] Normalize properties and values
+		 * (e.g. trim spaces, convert to lower case).
+		 * @param {Boolean} [nativeNormalize=false] Parse the data using the browser.
+		 * @returns {String} The object containing parsed properties.
+		 */
+		parseCssText: function( styleText, normalize, nativeNormalize ) {
+			var retval = {};
+
+			if ( nativeNormalize ) {
+				// Injects the style in a temporary span object, so the browser parses it,
+				// retrieving its final format.
+				var temp = new CKEDITOR.dom.element( 'span' );
+				temp.setAttribute( 'style', styleText );
+				styleText = CKEDITOR.tools.convertRgbToHex( temp.getAttribute( 'style' ) || '' );
+			}
+
+			// IE will leave a single semicolon when failed to parse the style text. (#3891)
+			if ( !styleText || styleText == ';' )
+				return retval;
+
+			styleText.replace( /&quot;/g, '"' ).replace( /\s*([^:;\s]+)\s*:\s*([^;]+)\s*(?=;|$)/g, function( match, name, value ) {
+				if ( normalize ) {
+					name = name.toLowerCase();
+					// Normalize font-family property, ignore quotes and being case insensitive. (#7322)
+					// http://www.w3.org/TR/css3-fonts/#font-family-the-font-family-property
+					if ( name == 'font-family' )
+						value = value.toLowerCase().replace( /["']/g, '' ).replace( /\s*,\s*/g, ',' );
+					value = CKEDITOR.tools.trim( value );
+				}
+
+				retval[ name ] = value;
+			});
+			return retval;
 		}
+
 	};
 })();
 

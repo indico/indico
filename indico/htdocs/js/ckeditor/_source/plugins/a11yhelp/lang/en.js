@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -19,8 +19,8 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'en',
 								name : 'Editor Toolbar',
 								legend:
 									'Press ${toolbarFocus} to navigate to the toolbar. ' +
-									'Move to next toolbar button with TAB or RIGHT ARROW. ' +
-									'Move to previous button with SHIFT+TAB or LEFT ARROW. ' +
+									'Move to the next and previous toolbar group with TAB and SHIFT-TAB. ' +
+									'Move to the next and previous toolbar button with RIGHT ARROW or LEFT ARROW. ' +
 									'Press SPACE or ENTER to activate the toolbar button.'
 							},
 
@@ -39,9 +39,9 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'en',
 								legend :
 									'Press ${contextMenu} or APPLICATION KEY to open context-menu. ' +
 									'Then move to next menu option with TAB or DOWN ARROW. ' +
-									'Move to previous option with  SHIFT+TAB or UP ARROW. ' +
+									'Move to previous option with SHIFT+TAB or UP ARROW. ' +
 									'Press SPACE or ENTER to select the menu option. ' +
-									'Open sub-menu of current option wtih SPACE or ENTER or RIGHT ARROW. ' +
+									'Open sub-menu of current option with SPACE or ENTER or RIGHT ARROW. ' +
 									'Go back to parent menu item with ESC or LEFT ARROW. ' +
 									'Close context menu with ESC.'
 							},

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -31,7 +31,7 @@ CKEDITOR.dialog.add( 'checkspell', function( editor )
 		'</iframe>';
 
 	var wscCoreUrl = editor.config.wsc_customLoaderScript || ( protocol +
-			'//loader.spellchecker.net/sproxy_fck/sproxy.php'
+			'//loader.webspellchecker.net/sproxy_fck/sproxy.php'
 			+ '?plugin=fck2'
 			+ '&customerid=' + editor.config.wsc_customerId
 			+ '&cmd=script&doc=wsc&schema=22'

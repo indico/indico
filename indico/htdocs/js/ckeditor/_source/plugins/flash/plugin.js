@@ -1,13 +1,11 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
 (function()
 {
 	var flashFilenameRegex = /\.swf(?:$|\?)/i;
-
-	var cssifyLength = CKEDITOR.tools.cssLength;
 
 	function isFlashEmbed( element )
 	{
@@ -18,19 +16,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 	function createFakeElement( editor, realElement )
 	{
-		var fakeElement = editor.createFakeParserElement( realElement, 'cke_flash', 'flash', true ),
-			fakeStyle = fakeElement.attributes.style || '';
-
-		var width = realElement.attributes.width,
-			height = realElement.attributes.height;
-
-		if ( typeof width != 'undefined' )
-			fakeStyle = fakeElement.attributes.style = fakeStyle + 'width:' + cssifyLength( width ) + ';';
-
-		if ( typeof height != 'undefined' )
-			fakeStyle = fakeElement.attributes.style = fakeStyle + 'height:' + cssifyLength( height ) + ';';
-
-		return fakeElement;
+		return editor.createFakeParserElement( realElement, 'cke_flash', 'flash', true );
 	}
 
 	CKEDITOR.plugins.add( 'flash',

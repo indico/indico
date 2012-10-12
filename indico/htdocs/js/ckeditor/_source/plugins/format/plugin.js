@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -45,7 +45,7 @@ CKEDITOR.plugins.add( 'format',
 						var label = lang[ 'tag_' + tag ];
 
 						// Add the tag entry to the panel list.
-						this.add( tag, '<' + tag + '>' + label + '</' + tag + '>', label );
+						this.add( tag, styles[tag].buildPreview( label ), label );
 					}
 				},
 
