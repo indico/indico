@@ -91,7 +91,7 @@ type("RichTextEditor", ["IWidget", "Accessor"],
          this.callbacks = new WatchList();
          this.width = width;
          this.height = height;
-         this.toolbarSet = toolbarSet?toolbarSet:'IndicoMinimum';
+         this.toolbarSet = toolbarSet?toolbarSet:'IndicoMinimal';
 
          this.divId = Html.generateId();
      });

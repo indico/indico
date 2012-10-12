@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -26,10 +26,10 @@ CKEDITOR.editorConfig = function( config )
     config.toolbar_IndicoMinimal =
      [
         ['Source','-','Preview','Templates'],
-         ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
-         ['Outdent', 'Indent', '-', 'NumberedList','BulletedList','Blockquote','-','Link','Unlink','Anchor'],
-         ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-         ['SpecialChar','-','About']
+        ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
+        ['Outdent', 'Indent', '-', 'NumberedList','BulletedList','Blockquote','-','Link','Unlink','Anchor'],
+        ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+        ['SpecialChar','-','About']
      ] ;
 
     config.contentsCss = CKEDITOR.basePath + '../../css/Default.css';
