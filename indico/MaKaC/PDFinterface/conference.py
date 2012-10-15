@@ -44,7 +44,7 @@ from MaKaC.badge import BadgeTemplateItem
 from MaKaC.poster import PosterTemplateItem
 from MaKaC.registration import Registrant
 from MaKaC.PDFinterface.base import PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, Preformatted, FileDummy, setTTFonts, PDFSizes, modifiedFontSize, SimpleParagraph
-from MaKaC.webinterface.pages.tracks import AbstractStatusTrackViewFactory, _ASTrackViewPFOT, _ASTrackViewPA, _ASTrackViewDuplicated, _ASTrackViewMerged,_ASTrackViewAccepted
+from MaKaC.webinterface.pages.tracks import AbstractStatusTrackViewFactory, _ASTrackViewPFOT, _ASTrackViewPA, _ASTrackViewDuplicated, _ASTrackViewMerged,_ASTrackViewAccepted, _ASTrackViewIC
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
@@ -587,6 +587,8 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
                         l.append( "%s ( %s )"%( jud.getTrack().getTitle(), \
                                 escape(jud.getResponsible().getFullName()) ) )
                 conflictText = ",\n".join(l)
+        elif isinstance(status, _ASTrackViewIC):
+            st = self.htmlText(status.getLabel().upper())
         elif isinstance(status, _ASTrackViewDuplicated):
             orig = status.getOriginal()
             st =  "%s (%s : %s)"%(status.getLabel().upper(), orig.getId(), orig.getTitle())

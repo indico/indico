@@ -167,6 +167,8 @@ class WUserAbstracts( wcomponents.WTemplated ):
             return _("Merged")
         elif isinstance(status, (review.AbstractStatusProposedToAccept, review.AbstractStatusProposedToReject)):
             return _("Under Review")
+        elif isinstance(status, (review.AbstractInConflict)):
+            return _("In Conflict")
         return _("Submitted")
 
     def getVars( self ):
@@ -561,7 +563,9 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 cTypeCaption=""
                 if jud.getContribType() is not None:
                     cTypeCaption=jud.getContribType().getName()
-                st = i18nformat(""" - _("Proposed to accept") (%s)""")%(self.htmlText(cTypeCaption))
+                st = i18nformat(""" - _("Proposed to accept")""")
+                if cTypeCaption:
+                    st += self.htmlText(cTypeCaption)
                 color = """ color="#009933" """
             elif jud.__class__ == review.AbstractRejection:
                 st = i18nformat("""- _("Proposed to reject")""")
@@ -569,6 +573,9 @@ class WAbstractManagment( wcomponents.WTemplated ):
             elif jud.__class__ == review.AbstractReallocation:
                 st = i18nformat("""- _("Proposed for other tracks")""")
                 color = """ color="black" """
+            elif jud.__class__ == review.AbstractInConflict:
+                st = i18nformat("""- _("Conflict")""")
+                color = """ color="red" """
             else:
                 st = ""
                 color = ""
@@ -1037,6 +1044,8 @@ class WConfModAbstractPropToAcc(wcomponents.WTemplated):
                 legend="[PR]"
             elif isinstance(jud,review.AbstractReallocation):
                 legend="[PM]"
+            elif isinstance(jud,review.AbstractInConflict):
+                legend="[C]"
             caption="%s%s"%(legend,self.htmlText(track.getTitle()))
             res.append("""<option value=%s>%s</option>"""%(id,caption))
         return "".join(res)

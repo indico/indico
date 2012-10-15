@@ -2215,15 +2215,13 @@ class Abstract(Persistent):
         self._notifyModification()
 
     def getTrackJudgement( self, track ):
-        """
-        """
-        if self.getTrackAcceptances().has_key( track.getId() ):
-            return self.getTrackAcceptances()[ track.getId() ]
-        elif self.getTrackRejections().has_key( track.getId() ):
-            return self.getTrackRejections()[ track.getId() ]
-        elif self.getTrackReallocations().has_key( track.getId() ):
-            return self.getTrackReallocations()[ track.getId() ]
-        return None
+        if not self.getJudgementHistoryByTrack(track):
+            return None
+        firstJud = self.getJudgementHistoryByTrack(track)[0]
+        # check if judgements for specified trak are the same. If not there is a conflict.
+        if all(jud.__class__ == firstJud.__class__ for jud in self.getJudgementHistoryByTrack(track)):
+            return firstJud
+        return AbstractInConflict(track)
 
     def getTrackAcceptances( self ):
         try:
@@ -2516,6 +2514,14 @@ class Abstract(Persistent):
             if (jud.getResponsible() == user):
                 return jud.getJudValue()
 
+    def getLastJudgementPerReviewer(self, user, track):
+        """
+        Get the last judgement of the user for the abstract in the track given.
+        """
+        for jud in self.getJudgementHistoryByTrack(track):
+            if (jud.getResponsible() == user):
+                return jud
+
     def _getAttachmentsCounter(self):
         try:
             if self._attachmentsCounter:
@@ -2680,6 +2686,15 @@ class AbstractReallocation( AbstractJudgement ):
     def getProposedTrackList( self ):
         return self._proposedTracks
 
+class AbstractInConflict( AbstractJudgement ):
+
+    def __init__( self, track ):
+        AbstractJudgement.__init__( self, track, None, '' )
+
+    def clone(self, track):
+        aic = AbstractInConflict(track, None, '')
+        return aic
+
 class AbstractMarkedAsDuplicated( AbstractJudgement ):
 
     def __init__( self, track, responsible, originalAbst, answers ):
@@ -2751,22 +2766,21 @@ class AbstractStatus( Persistent ):
         numAccepts = self._abstract.getNumProposedToAccept() # number of tracks that have at least one proposal to accept
         numReallocate = self._abstract.getNumProposedToReallocate() # number of tracks that have at least one proposal to reallocate
         numJudgements = self._abstract.getNumJudgements() # number of tracks that have at least one judgement
-        if numJudgements>0:
+        if numJudgements > 0:
+            # If at least one track status is in conflict the abstract status is in conflict too.
+            if any(isinstance(self._abstract.getTrackJudgement(track), AbstractInConflict) for track in self._abstract.getTrackList()):
+                return AbstractStatusInConflict
             numTracks = self._abstract.getNumTracks() # number of tracks that this abstract has assigned
             if numTracks == numJudgements: # Do we have judgements for all tracks?
                 if numReallocate == numTracks:
-                    s = AbstractStatusInConflict
+                    return AbstractStatusInConflict
                 elif numAccepts == 1:
-                    s = AbstractStatusProposedToAccept
+                    return AbstractStatusProposedToAccept
                 elif numAccepts == 0:
-                    s = AbstractStatusProposedToReject
-                else:
-                    s = AbstractStatusInConflict
-            else:
-                s=AbstractStatusUnderReview
-        else:
-            s=AbstractStatusSubmitted
-        return s
+                    return AbstractStatusProposedToReject
+                return AbstractStatusInConflict
+            return AbstractStatusUnderReview
+        return AbstractStatusSubmitted
 
 
     def update( self ):

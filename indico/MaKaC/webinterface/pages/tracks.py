@@ -321,6 +321,12 @@ class _ASTrackViewPR( _AbstractStatusTrackView ):
         return jud.getDate()
 
 
+class _ASTrackViewIC( _AbstractStatusTrackView ):
+    _color = "white"
+    _id = "c"
+    _icon = "as_conflict"
+    _label = "in conflict"
+
 class _ASTrackViewPFOT( _AbstractStatusTrackView ):
     _color = "white"
     _id = "pfot"
@@ -408,6 +414,7 @@ class AbstractStatusTrackViewFactory:
             _ASTrackViewRejected.getId(): _ASTrackViewRejected, \
             _ASTrackViewPA.getId(): _ASTrackViewPA, \
             _ASTrackViewPR.getId(): _ASTrackViewPR, \
+            _ASTrackViewIC.getId(): _ASTrackViewIC, \
             _ASTrackViewPFOT.getId(): _ASTrackViewPFOT, \
             _ASTrackViewWithdrawn.getId(): _ASTrackViewWithdrawn,\
             _ASTrackViewDuplicated.getId(): _ASTrackViewDuplicated, \
@@ -441,6 +448,8 @@ class AbstractStatusTrackViewFactory:
                 return _ASTrackViewPR( track, abstract )
             elif jud.__class__ == review.AbstractReallocation:
                 return _ASTrackViewPFOT( track, abstract )
+            elif jud.__class__ == review.AbstractInConflict:
+                return _ASTrackViewIC( track, abstract )
         #If no judgement exists for the current track the abstract is in
         #   SUBMITTED status for the track
         return _ASTrackViewSubmitted( track, abstract )
@@ -789,11 +798,6 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         return tmp
 
     def _getStatusDetailsHTML( self, status ):
-        details = ""
-        if status.getResponsible():
-            details= i18nformat("""<font size="-1">_("by") <i>%s</i></font>""")%( self._getAuthorHTML( status.getResponsible() ) )
-        if status.getDate():
-            details = i18nformat("""%s <font size="-1">_("on") %s</font> """)%( details, status.getDate().strftime( "%d %B %Y %H:%M" ) )
         res = "%s"%self.htmlText( status.getLabel().upper() )
         if isinstance(status, _ASTrackViewPFOT):
             l = []
@@ -804,7 +808,8 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
             ct=""
             if status.getContribType() is not None:
                 ct=" (%s)"%self.htmlText(status.getContribType().getName())
-            res = "%s%s"%(self.htmlText( status.getLabel().upper()),ct)
+        elif isinstance(status, _ASTrackViewIC):
+            res = self.htmlText(status.getLabel().upper())
         elif isinstance(status, _ASTrackViewDuplicated):
             orig=status.getOriginal()
             url=urlHandlers.UHAbstractManagment.getURL(orig)
@@ -838,9 +843,21 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
                                             status.getContribType()!="":
                 res = "%s as %s"%(self.htmlText(status.getLabel().upper()), \
                              self.htmlText(status.getContribType().getName()))
-        if details != "":
-            res = """%s <br><font size="-1">%s</font>"""%( res, details )
         return res
+
+    def _getLastJudgement(self):
+        jud = self._abstract.getLastJudgementPerReviewer(self._rh.getAW().getUser(), self._track)
+        if jud.__class__ == review.AbstractAcceptance:
+            return "Proposed to be accepted"
+        elif jud.__class__ == review.AbstractRejection:
+            return "Proposed to be rejected"
+        elif jud.__class__ == review.AbstractReallocation:
+            return "Proposed to for other tracks"
+        elif jud.__class__ == review.AbstractMarkedAsDuplicated:
+            return "Marked as duplicated"
+        elif jud.__class__ == review.AbstractUnMarkedAsDuplicated:
+            return "Unmarked as duplicated"
+        return None
 
     def _getStatusCommentsHTML( self, status ):
         comment = ""
@@ -956,6 +973,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
             vars["rating"] = ""
         else:
             vars["rating"] = "%.2f" % rating
+        vars["lastJudgement"] = self._getLastJudgement()
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
         vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)

@@ -53,6 +53,16 @@
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
                 <tr>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Your last proposition") }</span></td>
+                    <td bgcolor="white" valign="top">
+                        % if lastJudgement:
+                            ${ lastJudgement }
+                        % else:
+                            ${ _("No proposition yet") }
+                        % endif
+                    </td>
+                </tr>
+                <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Status")}</span></td>
                     <td colspan="2" valign="top" bgcolor="${ statusColor }">
                         <table width="100%">

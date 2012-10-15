@@ -869,16 +869,48 @@ You will need to fill in the form and click on *submit* .
 You can also access each abstract by clicking on its name (`see Abstracts <#abstracts>`_).
 An abstract can be in one of 10 states:
 
-* Accepted |image26|
-* Rejected |image27|
-* Proposed Rejection |image28|
-* Withdrawn |image29|
-* Merged |image30|
 * Submitted |image31|
+
+	- Abstract has no judgement yet.
+
 * Under Review |image32|
-* Duplicated |image33|
+
+	- Abstract has at least one judgement but not for all tracks.
+
 * Proposed Acceptation |image34|
+
+	- Abstract has at least one judgement for each track and exectly one track has all proposals for acceptance.
+
+* Proposed Rejection |image28|
+
+	- Abstract has at least one judgement for each track and there is proposal for reject and there are no proposals for acceptance.
+
+* Accepted |image26|
+
+	- Abstract has been accepted.
+
+* Rejected |image27|
+
+	- Abstract has been rejected.
+
+
+* Withdrawn |image29|
+
+	- Abstract has been withdrawn.
+
+* Duplicated |image33|
+
+	- Abstract has been marked as duplicated.
+
+* Merged |image30|
+
+	- Abstract has been merged with another.
+
 * Conflict |image35|
+
+	- Abstract has at least one judgement for each track and there is more then one track proposed for acceptance.
+	- Abstract has different judgments within at least one track (e.g one reviewer proposed to accept abstract and another proposed to reject it).
+	- Reallocation proposals are in conflict for the abstract.
 
 -------------
 
