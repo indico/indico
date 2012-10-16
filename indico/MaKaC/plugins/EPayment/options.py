@@ -26,6 +26,6 @@ globalOptions = [
                             "type": 'currency',
                             "defaultValue": [{'name': 'Swiss Franc', 'abbreviation': 'CHF'},  {'name': 'Euro', 'abbreviation': 'EUR'}, {'name': 'US dollar', 'abbreviation': 'USD'}],
                             "editable": True,
-                            "visible": True}),
+                            "visible": False}),
 
 ]

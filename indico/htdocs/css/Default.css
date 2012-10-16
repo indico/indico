@@ -8457,3 +8457,18 @@ span#sdlw-progress {
     padding-left: 10px;
     display: inline-block;
 }
+
+table#currencies {
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+}
+
+table#currencies tr {
+    border: 1px solid #ddd;
+    border-spacing: 5x;
+}
+
+table#currencies td, table#currencies th {
+    border: 1px solid #ddd;
+    padding: 5px;
+}

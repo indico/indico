@@ -196,178 +196,6 @@
 
                         $E('links${name}').append(addButton);
                     </script>
-                % elif option.getType() == "currency":
-                    <div id="currencies${name}" style="margin-bottom: 10px;">
-                      <div id="currenciesContainer${name}" style="margin-bottom: 10px;"></div>
-                    </div>
-                    <script type="text/javascript">
-                        var addCurrencyText = $T('Add new currency');
-                        var nocurrenciesMsg = $T('No currency created yet. Click in Add add currency if you want to do so!');
-                        var popupTitle = $T('Enter the currency full name and the abreviation');
-                        var currencyNameLabel = $T('Currency name');
-                        var currencyNameHeader = $T('Currency name');
-                        var info = '';
-                        var example = $T('Exemple: Euro and EUR');
-
-                        <!-- Edit currency popup--!>
-                        var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
-                        var currencyName = new AutocheckTextBox({name: 'name', id:"currencyName"}, errorLabel);
-                        var currencyAbbreviation = Html.input("text", {});
-                        var div = Html.div({},IndicoUtil.createFormFromMap([
-                                                                [currencyNameLabel, Html.div({}, currencyName.draw(), errorLabel)],
-                                                                [$T('Currency abbreviation'), Html.div({}, currencyAbbreviation)]]),
-                                              Html.div({},
-                                (info)),
-                                 Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
-
-                        function currenciesEditPopup(oldName,oldAbbreviation){
-                            var EditPopup = new ConfirmPopupWithPM(popupTitle,
-                                    div,
-                                                                        function(value){
-                                                                            if(value){
-                                                                                var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of currency..."));
-                                                                                indicoRequest(
-                                                                                        'plugins.editCurrency',
-                                                                                    {
-                                                                                        optionName: "${ name }",
-                                                                                        name: currencyName.get(),
-                                                                                        oldName: oldName,
-                                                                                        abbreviation: currencyAbbreviation.dom.value
-                                                                                    },
-                                                                                    function(result,error) {
-                                                                                        if (!error && result.success) {
-                                                                                            killProgress();
-                                                                                            EditPopup.close();
-                                                                                            renderCurrencyTable(result.table);
-                                                                                        } else if(!error && !result.success){
-                                                                                            killProgress();
-                                                                                            currencyName.startWatching(true);
-                                                                                        }
-                                                                                        else{
-                                                                                            killProgress();
-                                                                                            EditPopup.close();
-                                                                                            IndicoUtil.errorReport(error);
-                                                                                        }
-                                                                                    }
-                                                                                );
-                                                                            }
-                                                                        }
-                                                                );
-                            EditPopup.parameterManager.add(currencyName, 'text', false);
-                            EditPopup.parameterManager.add(currencyAbbreviation, 'text', false);
-                            currencyName.set(oldName);
-                            currencyAbbreviation.set(oldAbbreviation);
-                            EditPopup.open();
-                        }
-
-                        <!-- End edit currency popup--!>
-
-
-                        var renderCurrencyTable = function(table) {
-                            if(table.length > 0){
-                                var currenciesBody = Html.tbody();
-                                var currenciesTable = Html.table({style:{border:"1px dashed #CCC"}}, currenciesBody);
-                                currenciesBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold", paddingRight:pixels(10)}}, currencyNameHeader),
-                                                                                            Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('Currency Abbreviation'))) );
-                                each(table, function(currency){
-
-                                        var removeButton = Widget.link(command(function(){
-                                            var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing Currency..."));
-                                            indicoRequest(
-                                                    'plugins.removeCurrency',
-                                                {
-                                                    optionName: "${ name }",
-                                                    name: currency.name
-                                                },
-                                                function(result,error) {
-                                                    if (!error){
-                                                        killProgress();
-                                                        self.close();
-                                                        renderCurrencyTable(result.table);
-                                                    }
-                                                    else{
-                                                        killProgress();
-                                                        IndicoUtil.errorReport(error);
-                                                    }
-                                                }
-                                            );
-                                        }, IndicoUI.Buttons.removeButton()));
-
-                                        var editButton = Widget.link(command(function(){
-                                            currenciesEditPopup(currency.name,currency.abbreviation);
-
-                                        }, IndicoUI.Buttons.editButton()));
-
-                                        var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(20)}},currency.name),
-                                                                                               Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(10)}},currency.abbreviation),
-                                                                                               Html.td({style:{whiteSpace: "nowrap"}},editButton),
-                                                                                               Html.td({style:{whiteSpace: "nowrap"}},removeButton));
-                                        currenciesBody.append(newRow);
-
-
-                                    });
-                                    $E('currenciesContainer${name}').clear();
-                                    $E('currenciesContainer${name}').append(currenciesTable);
-                            }
-                            else{
-                                $E('currenciesContainer${name}').clear();
-                                $E('currenciesContainer${name}').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, nocurrenciesMsg));
-                            }
-                        };
-
-                        var optVal = ${ option.getValue() };
-                        renderCurrencyTable(optVal);
-                        var addButton = Html.input("button", {style:{marginTop: pixels(5)}}, addCurrencyText);
-
-                        addButton.observeClick(function() {
-                            var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
-                            var currencyName = new AutocheckTextBox({name: 'name', id:"currencyName"}, errorLabel);
-                            var currencyStructure = Html.input("text", {});
-                            var div = Html.div({},IndicoUtil.createFormFromMap([
-                                                                    [currencyNameLabel, Html.div({}, currencyName.draw(), errorLabel)],
-                                                                    [$T('Currency abbreviation'), Html.div({}, currencyStructure)]]),
-                                                  Html.div({},
-                                    (info)),
-                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
-                            var currenciesPopup = new ConfirmPopupWithPM(popupTitle,
-                                    div,
-                                                                        function(value){
-                                                                            if(value){
-                                                                                var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of currency..."));
-                                                                                indicoRequest(
-                                                                                        'plugins.addCurrency',
-                                                                                    {
-                                                                                        optionName: "${ name }",
-                                                                                        name: currencyName.get(),
-                                                                                        abbreviation: currencyStructure.dom.value
-                                                                                    },
-                                                                                    function(result,error) {
-                                                                                        if (!error && result.success) {
-                                                                                            killProgress();
-                                                                                            currenciesPopup.close();
-                                                                                            renderCurrencyTable(result.table);
-                                                                                        } else if(!error && !result.success){
-                                                                                            killProgress();
-                                                                                            currencyName.startWatching(true);
-                                                                                        }
-                                                                                        else{
-                                                                                            killProgress();
-                                                                                            currenciesPopup.close();
-                                                                                            IndicoUtil.errorReport(error);
-                                                                                        }
-                                                                                    }
-                                                                                );
-                                                                            }
-                                                                        }
-                                                                );
-                            currenciesPopup.parameterManager.add(currencyName, 'text', false);
-                            currenciesPopup.parameterManager.add(currencyStructure, 'text', false);
-                            console.log(currenciesPopup.parameterManager);
-                            currenciesPopup.open();
-                        });
-
-                        $E('currencies${name}').append(addButton);
-                </script>
                 % elif option.getType() == "paymentmethods":
                     <div id="paymentMethods${name}" style="margin-bottom: 10px;">
                       <div id="paymentMethodsContainer${name}" style="margin-bottom: 10px;"></div>
@@ -743,10 +571,12 @@
             </td>
         </tr>
         % endif
+        % if len(Object.getOptionList(includeOnlyEditable=True, includeOnlyVisible=True)) > 0:
         <tr>
             <td colspan="2" style="text-align: right;">
                 <input type="submit" name="Save" value="${ _("Save settings") }" onclick="fillText(editor.get());"/>
             </td>
         </tr>
+        % endif
     </table>
     </form>

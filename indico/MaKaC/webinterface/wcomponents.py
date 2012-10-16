@@ -103,19 +103,25 @@ class WTemplated(OldObservable):
         return tplobj
 
     def __init__( self, tpl_name = None):
+        db_connected = DBMgr.getInstance().isConnected()
+
         if tpl_name != None:
             self.tplId = tpl_name
 
         self._rh = ContextManager.get('currentRH', None)
 
         cfg = Configuration.Config.getInstance()
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        if db_connected:
+            debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
+        else:
+            debug = False
 
         self._dir = cfg.getTPLDir()
         self._asset_env = Environment(os.path.join(cfg.getHtdocsDir(), 'css'), 'css/')
-        self._asset_env.debug = info.isDebugActive()
+        self._asset_env.debug = debug
 
-        if DBMgr.getInstance().isConnected():
+        if db_connected:
             css_file = cfg.getCssStylesheetName()
         else:
             css_file = 'Default.css'
