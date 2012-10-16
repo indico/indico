@@ -2038,11 +2038,17 @@ class Abstract(Persistent):
                 pass
             if type(self._trackJudgementsHistorical) == tuple:
                 self._trackJudgementsHistorical={}
-        except AttributeError, e:
+        except AttributeError:
             self._trackJudgementsHistorical={}
             for track in self.getTrackList():
-                if self.getTrackJudgement(track) is not None:
-                    self._trackJudgementsHistorical[track.getId()]= [self.getTrackJudgement(track)]
+                judgement = None
+                if self.getTrackAcceptances().has_key( track.getId() ):
+                    judgement = self.getTrackAcceptances()[ track.getId() ]
+                elif self.getTrackRejections().has_key( track.getId() ):
+                    judgement = self.getTrackRejections()[ track.getId() ]
+                elif self.getTrackReallocations().has_key( track.getId() ):
+                    judgement = self.getTrackReallocations()[ track.getId() ]
+                self._trackJudgementsHistorical[track.getId()] = [judgement]
             self._notifyModification()
         return self._trackJudgementsHistorical
 
@@ -2217,10 +2223,10 @@ class Abstract(Persistent):
     def getTrackJudgement( self, track ):
         if not self.getJudgementHistoryByTrack(track):
             return None
-        firstJud = self.getJudgementHistoryByTrack(track)[0]
+        lastJud = self.getJudgementHistoryByTrack(track)[0]
         # check if judgements for specified trak are the same. If not there is a conflict.
-        if all(jud.__class__ == firstJud.__class__ for jud in self.getJudgementHistoryByTrack(track)):
-            return firstJud
+        if all(jud.__class__ == lastJud.__class__ for jud in self.getJudgementHistoryByTrack(track)):
+            return lastJud
         return AbstractInConflict(track)
 
     def getTrackAcceptances( self ):

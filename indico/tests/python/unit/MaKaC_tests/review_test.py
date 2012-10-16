@@ -49,7 +49,7 @@ class TestCFADirectives(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -114,7 +114,7 @@ class TestAbstractSubmission(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -170,7 +170,7 @@ class TestAbstractModification(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -231,7 +231,7 @@ class TestAbstractAcceptation(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -351,7 +351,7 @@ class TestAbstractDisplay(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -396,7 +396,7 @@ class TestAbstractWithdrawal(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -463,7 +463,7 @@ class TestAbstractWithdrawal(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -521,7 +521,7 @@ class TestAbstractReallocation(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -580,7 +580,7 @@ class TestNotification(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -723,7 +723,7 @@ class TestAuthorSearch(IndicoTestCase):
 
         self._startDBReq()
 
-        # Create few users
+        # Get dummy user
         ah = AvatarHolder()
         avatar = ah.getById(0)
         setattr(self, '_avatar', avatar)
@@ -773,3 +773,129 @@ class TestAuthorSearch(IndicoTestCase):
         self.assertNotIn(abs1, absMgr.getAbstractsMatchingAuth("a"))
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("B")), 0)
         self.assertNotIn(abs1, absMgr.getAbstractsMatchingAuth("b"))
+
+class TestAbstractJudgements(IndicoTestCase):
+    """Tests different abstract judgements scenarios
+    """
+
+    _requires = ['db.Database', 'db.DummyUser']
+
+    def setUp(self):
+        super(TestAbstractJudgements, self).setUp()
+
+        self._startDBReq()
+
+        # Get dummy user and create another one
+        ah = AvatarHolder()
+        avatar1 = ah.getById(0)
+        avatar2 = Avatar()
+        avatar2.setName("fake-2")
+        avatar2.setSurName("fake")
+        avatar2.setOrganisation("fake")
+        avatar2.setLang("en_GB")
+        avatar2.setEmail("fake2@fake.fake")
+        avatar2.setId("fake-2")
+        ah.add(avatar2)
+        setattr(self, '_avatar1', avatar1)
+        setattr(self, '_avatar2', avatar2)
+
+        # Create a conference
+        category = conference.CategoryManager().getById('0')
+        self._conf = category.newConference(self._avatar1)
+        self._conf.setTimezone('UTC')
+        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
+        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
+        self._conf.setDates(sd, ed)
+        ch = ConferenceHolder()
+        ch.add(self._conf)
+
+        self._ctOral = conference.ContributionType("oral", "", self._conf)
+        self._conf.addContribType(self._ctOral)
+
+        self._track1 = self._conf.newTrack()
+        self._track2 = self._conf.newTrack()
+        self._track3 = self._conf.newTrack()
+
+        self._abstract1 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
+        self._abstract2 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
+        self._abstract3 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
+        self._abstract4 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
+        self._abstract5 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
+
+        self._abstract1.setTracks([self._track1, self._track2, self._track3])
+        self._abstract2.setTracks([self._track1, self._track2])
+        self._abstract3.setTracks([self._track1])
+        self._abstract4.setTracks([self._track2, self._track3])
+        self._abstract5.setTracks([self._track3])
+
+        self._stopDBReq()
+
+    @with_context('database')
+    def testJudgementStatus(self):
+        self.assertIsNone(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1))
+        self.assertIsNone(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1))
+        self.assertIsNone(self._abstract1.getTrackJudgement(self._track1))
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusSubmitted)
+
+        self._abstract1.proposeToAccept(self._avatar1, self._track1, "oral")
+
+        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance)
+        self.assertIsNone(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1))
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview)
+
+        self._abstract1.proposeToReject(self._avatar2, self._track1, "oral")
+
+        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractInConflict)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusInConflict)
+
+        self._abstract1.proposeToAccept(self._avatar2, self._track1, "oral")
+
+        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview)
+
+        self._abstract1.proposeToReject(self._avatar1, self._track1, "oral")
+        self._abstract1.proposeToReject(self._avatar2, self._track1, "oral")
+
+        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview)
+
+        self._abstract1.proposeToReject(self._avatar1, self._track2, "oral")
+        self._abstract1.proposeToReject(self._avatar1, self._track3, "oral")
+
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track3), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToReject)
+
+        self._abstract1.proposeToAccept(self._avatar1, self._track1, "oral")
+        self._abstract1.proposeToAccept(self._avatar2, self._track1, "oral")
+
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept)
+
+        self._abstract1.proposeToAccept(self._avatar1, self._track2, "oral")
+
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusInConflict)
+
+        self._abstract1.proposeToReject(self._avatar1, self._track2, "oral")
+
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept)
+
+        self._abstract1.proposeForOtherTracks(self._avatar1, self._track2, comment="", propTracks=[self._track1])
+        self._abstract1.proposeForOtherTracks(self._avatar2, self._track2, comment="", propTracks=[self._track3])
+
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractReallocation)
+        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track3), review.AbstractRejection)
+        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept)
