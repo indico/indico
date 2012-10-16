@@ -4086,16 +4086,16 @@ class Conference(CommonObjectBase, Locatable):
         for material in child.getAllMaterialList():
             files = self._getMaterialFiles(material)
 
-            for file in files:
+            for f in files:
                 materialNode = {}
                 materialNode['type'] = 'material'
                 materialNode['title'] = material.getTitle()
 
                 if material.getTitle() != 'Minutes':
-                    materialNode['title'] += ' - ' + file['title']
+                    materialNode['title'] += ' - ' + f['title']
 
-                materialNode['materialType'] = file['type']
-                materialNode['url'] = str(file['url'])
+                materialNode['materialType'] = f['type']
+                materialNode['url'] = str(f['url'])
 
                 node['material'].append(materialNode)
 
