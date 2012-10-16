@@ -37,6 +37,15 @@ globalOptions = [
                   "type": list,
                   "defaultValue": ["Videoconferencing", "Recording Request", "Webcast Request"]
                   }),
+    ("ravemAPIURL", {"description" : "RAVEM API server",
+                       "type": str,
+                       "defaultValue": "http://ravem.cern.ch//api/services/"}),
+    ("ravemUsername" , {"description" : "Username for RAVEM API",
+                      "type": str,
+                      "defaultValue": "indico"}),
+    ("ravemPassword" , {"description" : "Password for RAVEM API",
+                      "type": str,
+                      "defaultValue": ""}),
     ("pluginsPerEventType", {"description": "Plugins allowed for each event type",
                             "type": dict, #key: a string: conference, simple_event or meeting. Value: list of Plugin objects
                             "editable": False,

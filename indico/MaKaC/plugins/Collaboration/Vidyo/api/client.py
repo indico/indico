@@ -20,9 +20,6 @@
 from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue
 from MaKaC.common.logger import Logger
 import suds
-from requests.auth import HTTPDigestAuth
-import requests
-
 
 class ClientBase(object):
     """ Base class for AdminClient and UserClient
@@ -99,40 +96,4 @@ class UserClient(ClientBase):
                 Logger.get("Vidyo").exception("Problem building UserClient")
                 raise
 
-        return cls._instance
-
-class RavemClient(object):
-    """ Singleton for the client for RAVEM API
-    """
-    _instance = None
-
-    def __init__(self, client, url):
-        self._client = client
-        self._url = url
-
-    def performOperation(self, operation):
-        try:
-            return self._client.get(self._url + operation)
-        except Exception:
-            Logger.get("Vidyo").exception("Problem making request to RavemClient")
-            raise
-
-    @classmethod
-    def getInstance(cls, ravemAPIUrl = None, username = None, password = None):
-
-        if cls._instance is None or (ravemAPIUrl is not None or username is not None or password is not None):
-
-            if ravemAPIUrl is None:
-                ravemAPIUrl = getVidyoOptionValue('ravemAPIURL')
-            if username is None:
-                username = getVidyoOptionValue('ravemUsername')
-            if password is None:
-                password = getVidyoOptionValue('ravemPassword')
-
-            try:
-                client = requests.session(auth=HTTPDigestAuth(username, password), verify=False)
-                cls._instance = RavemClient(client, ravemAPIUrl)
-            except Exception:
-                Logger.get("Vidyo").exception("Problem building RavemClient")
-                raise
         return cls._instance

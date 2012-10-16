@@ -18,7 +18,8 @@
 
 from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue, VidyoError, VidyoTools
 from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
-from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi, RavemApi
+from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi
+from MaKaC.plugins.Collaboration.ravem import RavemApi
 from suds import WebFault
 from MaKaC.plugins.Collaboration.base import CollaborationException
 from MaKaC.common.logger import Logger
@@ -285,20 +286,24 @@ class VidyoOperations(object):
                 raise
 
     @classmethod
-    def disconnectRoom(cls, roomIp, serviceType):
+    def disconnectRoom(cls, booking, roomIp, serviceType):
         try:
             answer = RavemApi.disconnectRoom(roomIp, serviceType)
             if not answer.ok or answer.json.has_key("error"):
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Ravem API's disconnectRoom operation not successfull: %s""" %
+                        (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
         except Exception:
             return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
 
 
     @classmethod
-    def isRoomConnected(cls, roomIp):
+    def isRoomConnected(cls, booking, roomIp):
         try:
             answer =  RavemApi.isRoomConnected(roomIp)
             if not answer.ok or answer.json.has_key("error"):
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Ravem API's isRoomConnected operation not successfull: %s""" %
+                        (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())
             result = {"roomName": None, "isConnected": False, "service": None}
             answer =  answer.json

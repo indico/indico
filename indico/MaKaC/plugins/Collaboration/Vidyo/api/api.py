@@ -17,7 +17,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.logger import Logger
-from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient, UserClient, RavemClient
+from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient, UserClient
 from suds import WebFault
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoConnectionException
 from urllib2 import URLError
@@ -216,34 +216,5 @@ class UserApi(ApiBase):
                                     (confId, bookingId, e.fault.faultstring))
             raise
 
-        except Exception, e:
-            cls._handleServiceCallException(e)
-
-class RavemApi(ApiBase):
-    """ This class performs low-level operations by getting the corresponding
-        client and calling a service.
-    """
-
-
-    @classmethod
-    def isRoomConnected(cls, roomIp):
-        try:
-            ravemClient = RavemClient.getInstance()
-        except Exception, e:
-            raise VidyoConnectionException(e)
-        try:
-            return ravemClient.performOperation("/getstatus?where=vc_endpoint_ip&value=%s"%roomIp)
-        except Exception, e:
-            cls._handleServiceCallException(e)
-
-
-    @classmethod
-    def disconnectRoom(cls, roomIp, serviceType):
-        try:
-            ravemClient = RavemClient.getInstance()
-        except Exception, e:
-            raise VidyoConnectionException(e)
-        try:
-            return ravemClient.performOperation("/videoconference/disconnect?type=%s&where=vc_endpoint_ip&value=%s"%(serviceType, roomIp))
         except Exception, e:
             cls._handleServiceCallException(e)

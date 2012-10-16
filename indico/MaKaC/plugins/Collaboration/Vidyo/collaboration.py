@@ -235,7 +235,7 @@ class CSBooking(CSBookingBase):
         self._checksDone = checksDone
 
     def connectionStatus(self):
-        return ExternalOperationsManager.execute(self, "isRoomConnected", VidyoOperations.isRoomConnected, VidyoTools.getLinkRoomIp(self.getLinkObject()))
+        return ExternalOperationsManager.execute(self, "isRoomConnected", VidyoOperations.isRoomConnected, self, VidyoTools.getLinkRoomIp(self.getLinkObject()))
 
     def getBookingInformation(self):
         """ For retreiving the ServiceInformation sections dict built for the
@@ -417,7 +417,7 @@ class CSBooking(CSBookingBase):
                 return connectionStatus
             if not connectionStatus.get("isConnected"):
                 return VidyoError("alreadyDisconnected", "disconnect", _("It seems that the room has been already disconnected."))
-            result = ExternalOperationsManager.execute(self, "disconnectRoom", VidyoOperations.disconnectRoom, confRoomIp, connectionStatus.get("service"))
+            result = ExternalOperationsManager.execute(self, "disconnectRoom", VidyoOperations.disconnectRoom, self, confRoomIp, connectionStatus.get("service"))
             if isinstance(result, VidyoError):
                 return result
             return self
