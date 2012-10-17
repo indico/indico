@@ -19,13 +19,23 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # system lib imports
-import os
+import os.path
+
+from MaKaC.errors import NotFoundError
+
+from indico.web.wsgi.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
+
 
 class RH(object):
     pass
+
 
 class RHHtdocs(RH):
 
     @classmethod
     def calculatePath(cls, filepath):
-        return os.path.join(cls._local_path, filepath)
+        f_abspath = os.path.abspath(os.path.join(cls._local_path, filepath))
+        if f_abspath.startswith(cls._local_path):
+            return f_abspath
+        else:
+            raise SERVER_RETURN, HTTP_NOT_FOUND
