@@ -419,6 +419,7 @@ class CollaborationTools(object):
         - List of talks (Contribution objects which are not in a Poster session)
         - List of webcast capable rooms, as a list of "locationName:roomName" strings
         - List of webcast-able talks (list of Contribution objects who take place in a webcast capable room)
+        - List of not webcast-able talks (list of Contribution objects who do not take place in a webcast capable room)
         """
 
         #a talk is defined as a non-poster contribution
@@ -433,13 +434,16 @@ class CollaborationTools(object):
 
         #a webcast-able talk is defined as a talk talking place in a webcast-able room
         ableTalks = []
+        unableTalks = []
         for t in talks:
             location = t.getLocation()
             room = t.getRoom()
             if location and room and (location.getName() + ":" + room.getName() in roomNames) and t.isScheduled():
                 ableTalks.append(t)
+            else:
+                unableTalks.append(t)
 
-        return (talks, roomFullNames, roomNames, ableTalks)
+        return (talks, roomFullNames, roomNames, ableTalks, unableTalks)
 
     @classmethod
     def isAbleToBeWebcastOrRecorded(cls, obj, plugin_name):

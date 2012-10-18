@@ -36,10 +36,7 @@
     },
 
     onLoad : function() {
-        RRUpdateContributionList('contributionList', true);
-        if (NTalks != NRecordingCapableContributions){
-            RRUpdateContributionList('contributionRecordedList', false);
-        }
+        RRUpdateContributionList('contributionList');
 
         IndicoUtil.enableDisableForm($E("RRForm"), RRRecordingCapable);
 

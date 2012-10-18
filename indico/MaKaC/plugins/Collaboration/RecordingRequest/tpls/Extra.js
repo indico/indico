@@ -5,18 +5,18 @@ var RR_confStartDate = IndicoUtil.parseJsonDate(${ jsonEncode(ConfStartDate) });
 var RR_confLocation = ${ jsonEncode(ConfLocation) }
 var RR_confRoom = ${ jsonEncode(ConfRoom) }
 
-var RRSpeakersTemplate = function(speakerList) {
+var RRSpeakersTemplate = function(presenters) {
     var speakers = ", by "
-    enumerate(speakerList, function(speaker, index) {
+    enumerate(presenters, function(speaker, index) {
         if (index > 0) {
             speakers += " and ";
         }
-        speakers += speaker.fullName;
+        speakers += speaker.name;
     });
     return speakers;
 }
 
-var RRTalkTemplate = function(talk, showCheckbox) {
+var RRTalkTemplate = function(talk) {
 
     // Checkbox
     var checkBox = Html.input('checkbox', {name: "talkSelection", id: "talk" + talk.id + "CB"});
@@ -55,8 +55,8 @@ var RRTalkTemplate = function(talk, showCheckbox) {
     label.dom.htmlFor = "talk" + talk.id + "CB";
 
     // After the label, the speakers (optionally)
-    if (talk.speakerList.length > 0) {
-        label.append(Html.span("RRSpeakers", RRSpeakersTemplate(talk.speakerList)))
+    if (talk.presenters.length > 0) {
+        label.append(Html.span("RRSpeakers", RRSpeakersTemplate(talk.presenters)))
     }
 
     // And after the speakers, the location and room (optionally)
@@ -83,20 +83,15 @@ var RRTalkTemplate = function(talk, showCheckbox) {
     // Finally, the id
     label.append(Html.span("RRContributionId", "(id: " + talk.id + ")"));
 
-    if (showCheckbox) {
-        return Html.li('', checkBox, label);
-    } else {
-        return Html.li('', label);
-    }
-
+    return Html.li('', checkBox, label);
 };
 
-var RRUpdateContributionList = function (targetId, showCheckbox) {
+var RRUpdateContributionList = function (targetId) {
     if (RR_contributions.length > 0) {
         $E(targetId).set('');
         for (i in RR_contributions) {
             contribution = RR_contributions[i];
-            $E(targetId).append(RRTalkTemplate(contribution, showCheckbox));
+            $E(targetId).append(RRTalkTemplate(contribution));
         }
     } else {
         if (exists($E(targetId))) { // we are not in a lecture
@@ -119,13 +114,13 @@ var RR_loadTalks = function () {
             var label = Html.label({}, talkId, talkName);
             label.dom.htmlFor = "talk" + talk.id + "CB";
 
-            if (talk.speakerList.length > 0) {
+            if (talk.presenters.length > 0) {
                 var speakers = ", by "
-                enumerate(talk.speakerList, function(speaker, index) {
+                enumerate(talk.presenters, function(speaker, index) {
                     if (index > 0) {
                         speakers += " and ";
                     }
-                    speakers += speaker.fullName;
+                    speakers += speaker.name;
                 });
                 label.append(Html.span("RRSpeakers", speakers))
             }

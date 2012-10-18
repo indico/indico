@@ -27,6 +27,14 @@ class IContributionFossil(IFossil):
     def getId(self):
         pass
 
+    def getContributionId(self):
+        pass
+    getContributionId.produce = lambda l: l.getId()
+
+    def getConferenceId(self):
+        pass
+    getConferenceId.produce = lambda l: l.getConference().getId()
+
     def getTitle(self):
         pass
 
@@ -100,8 +108,12 @@ class IContributionParticipationMinimalFossil(IFossil):
     def getId(self):
         pass
 
-    def getFullName(self):
+    def getAffiliation(self):
         pass
+
+    def getDirectFullName(self):
+        pass
+    getDirectFullName.name = "name"
 
 class IContributionParticipationFossil(IContributionParticipationMinimalFossil):
 
@@ -135,6 +147,7 @@ class IContributionWithSpeakersFossil(IContributionFossil):
     def getSpeakerList(self):
         pass
     getSpeakerList.result = IContributionParticipationMinimalFossil
+    getSpeakerList.name = "presenters"
 
 class IContributionWithSubContribsFossil(IContributionFossil):
 

@@ -107,17 +107,12 @@
                     <td class="warning">
                         <h3>${_("Note")}</h3>
                         <span>
-                            ${_("Some of your talks")} (${ str(NTalks - NWebcastCapableContributions) + _(" out of ") + str(NTalks) }) ${_(" are not in a room capable of webcasting and thus cannot be webcasted.")}
+                            ${_("There are {0} talks in the event. ").format(str(NTalks))}
+                            ${_("Some of them ")}
+                            (<span class='fakeLink' id="webcastTalksUnableText">${str(NTalks - NWebcastCapableContributions)}</span>) ${_(" are not in a room capable of webcasting and thus cannot be webcasted while the remaining ")}
+                            (<span class='fakeLink' id="webcastTalksAbleText">${str(NWebcastCapableContributions)}</span>) ${_(" are goint to be webcasted.")}
                         </span>
-                        <span class='fakeLink' id="webcastTalksText">${_("See list of webcast-able talks")}</span> |
                         <span class='fakeLink' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
-                        <div id="webcastCapableTalksDiv" style="display:none;">
-                            <div style="padding-top:15px;padding-bottom:15px;">
-                                <span class="WRNoteText">${_("These are the talks capable of being webcasted:")} </span>
-                                <ul class="WROptionList" style="margin-left: 18px; font-size: 13px" id="contributionWebcastedList">
-                                </ul>
-                            </div>
-                         </div>
                         <div id="webcastCapableRoomsDiv" style="display:none;">
                             <div style="padding-top:15px;padding-bottom:15px;">
                                 <span class="WRNoteText">${_("These are the rooms capable of webcasting:")} </span>
@@ -219,6 +214,7 @@
     var isLecture = ${ jsBoolean(IsLecture) };
     var WRWebcastCapable = ${ jsBoolean(WebcastCapable) };
     var WR_contributions = ${ jsonEncode(Contributions) };
+    var WR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
     var NWebcastCapableContributions = ${NWebcastCapableContributions};
     var NTalks = ${NTalks};
     var WR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasWebcastCapableTalks) };
@@ -228,28 +224,11 @@
     function showRooms(){
         $("#webcastRoomsText").text($T("Hide list of webcast-able rooms."));
         $("#webcastCapableRoomsDiv").show();
-
-        if(!$("#webcastCapableTalksDiv").is(":hidden")) {
-            hideTalks();
-        }
     };
 
     function hideRooms(){
         $("#webcastRoomsText").text($T("See list of webcast-able rooms."));
         $("#webcastCapableRoomsDiv").hide();
-    };
-
-    function showTalks(){
-        $("#webcastTalksText").text($T("Hide list of webcast-able talks."));
-        $("#webcastCapableTalksDiv").show();
-        if(!$("#webcastCapableRoomsDiv").is(":hidden")) {
-            hideRooms();
-        }
-    };
-
-    function hideTalks(){
-        $("#webcastTalksText").text($T("See list of webcast-able talks."));
-        $("#webcastCapableTalksDiv").hide();
     };
 
     $("#webcastRoomsText").click(function() {
@@ -260,12 +239,11 @@
         }
     });
 
-    $("#webcastTalksText").click(function() {
-        if ($('#webcastCapableTalksDiv').is(':hidden')) {
-            showTalks();
-        } else {
-            hideTalks();
-        }
+    $("#webcastTalksAbleText").click(function() {
+        new ContributionsPopup($T('Contributions webcast-able'),WR_contributions, false, function() {self.popupAllowClose = true; return true;}).open();
+    });
+    $("#webcastTalksUnableText").click(function() {
+        new ContributionsPopup($T('Contributions not webcast-able'),WR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}).open();
     });
 
 % endif

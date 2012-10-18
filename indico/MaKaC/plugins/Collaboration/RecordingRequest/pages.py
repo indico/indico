@@ -49,7 +49,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["InitialChoose"] = initialChoose
         vars["DisplayTalks"] = initialDisplay
 
-        talks, rRoomFullNames, rRoomNames, recordingAbleTalks = getCommonTalkInformation(self._conf)
+        talks, rRoomFullNames, rRoomNames, recordingAbleTalks, recordingUnableTalks = getCommonTalkInformation(self._conf)
         nTalks = len(talks)
         nRecordingCapable = len(recordingAbleTalks)
 
@@ -79,8 +79,13 @@ class WNewBookingForm(WCSPageTemplateBase):
                                           tz = self._conf.getTimezone(),
                                           units = '(hours)_minutes',
                                           truncate = True)
+            vars["ContributionsUnable"] = fossilize(recordingUnableTalks, IContributionWithSpeakersFossil,
+                                          tz = self._conf.getTimezone(),
+                                          units = '(hours)_minutes',
+                                          truncate = True)
         else:
             vars["Contributions"] = []
+            vars["ContributionsUnable"] = []
 
         vars["PostingUrgency"] = postingUrgency
         vars["linkToEA"] = collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(self._conf)

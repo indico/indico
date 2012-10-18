@@ -898,7 +898,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     contribs.push(value);
                 }
             });
-            var popup = new ContributionsPopup(self.eventData, contribs, function() {self.popupAllowClose = true; return true;});
+            var popup = new ContributionsPopup(("Contribution details"),contribs, self.eventData.isPoster, false, function() {self.popupAllowClose = true; return true;});
             popup.open();
         });
 
@@ -1316,93 +1316,6 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
          this.timetableData = timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData();
          this.TimetableBlockPopup(timetable, eventData, blockDiv, closeHandler);
      });
-
-type("ContributionsPopup", ["ExclusivePopup"], {
-
-    draw: function() {
-        var self = this;
-        var table = Html.tbody({});
-        each(this.contributions, function(contrib) {
-            var time = Html.div({style: {paddingTop: pixels(7), marginRight: pixels(3), fontSize: '12px', fontWeight: 'bold'}}, self.eventData.isPoster ? '' : contrib.startDate.time.substr(0,5));
-            var link = Html.a({href: Indico.Urls.ContributionDisplay + '?sessionId=' + contrib.sessionId + '&contribId=' + contrib.contributionId + '&confId=' + contrib.conferenceId}, contrib.title);
-            var title = Html.div({style: {color: '#444444', width: pixels(self.width), padding: pixels(5), fontSize: '15px'}}, link);
-
-            var infoDiv = Html.div({style: {width: pixels(self.width), border: '1px solid rgb(234, 234, 234)', marginBottom: pixels(10), marginLeft: pixels(5), padding: pixels(5), backgroundColor: 'rgb(248, 248, 248)',color: '#444444', fontSize: '12px'}});
-
-            var showFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', fontStyle: 'italic'}}, ' Show full description');
-            var hideFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', fontStyle: 'italic'}}, ' Hide full description');
-            var shortDesc = Html.span({style: {display: 'block'}}, contrib.description.substr(0, 250) + '... ', showFullDescLink);
-            var longDesc = Html.span({style: {display: 'none'}}, contrib.description, hideFullDescLink);
-
-            if (contrib.description && contrib.description !== '') {
-                if (contrib.description.length <= 250) {
-                    longDesc.setStyle('display', 'block');
-                    hideFullDescLink.setStyle('display', 'none');
-                    infoDiv.append(longDesc);
-                } else {
-                    infoDiv.append(longDesc);
-                    infoDiv.append(shortDesc);
-                }
-            }
-
-            if (contrib.presenters.length > 0) {
-                var speakers = Html.span({style: {marginTop: pixels(5), display: 'block'}}, Html.strong({}, 'Presenter(s): '));
-
-                var i = 0;
-                each(contrib.presenters, function(p) {
-                    speakers.append(i++ > 0 ? ', ' : '' + p.name);
-                    if (p.affiliation && p.affiliation !== '') {
-                        speakers.append(Html.em({style: {fontSize: '12px'}}, ' (' + p.affiliation + ')'));
-                    }
-                });
-
-                infoDiv.append(speakers);
-            }
-
-            if (contrib.room && contrib.room !== '') {
-                var room = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Room: '), contrib.room);
-                infoDiv.append(room);
-            }
-
-            if (contrib.location && contrib.location !== '') {
-                var location = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Location: '), contrib.location);
-                infoDiv.append(location);
-            }
-
-            showFullDescLink.observeClick(function(e) {
-                shortDesc.setStyle('display', 'none');
-                longDesc.setStyle('display', 'block');
-            });
-            hideFullDescLink.observeClick(function(e) {
-                shortDesc.setStyle('display', 'block');
-                longDesc.setStyle('display', 'none');
-            });
-
-            // Hide the infoDiv if it's empty
-            if (infoDiv.dom.innerHTML === "") {
-                infoDiv.dom.style.display = 'none';
-            }
-
-            table.append(Html.tr({}, Html.td({style:{verticalAlign: 'top'}}, time), Html.td({}, title, infoDiv)));
-        });
-        this.innerHTML = Html.table({style: {marginBottom: pixels(10)}}, table).dom.innerHTML;
-        return this.ExclusivePopup.prototype.draw.call(this, Html.table({style: {marginBottom: pixels(10)}}, table));
-    },
-    postDraw: function(){
-        this.ExclusivePopup.prototype.postDraw.call(this);
-    }
-    },
-     function(eventData, contributions, closeHandler) {
-
-         this.contributions = $L(contributions);
-         this.contributions.sort(IndicoSortCriteria.StartTime);
-
-         this.eventData = eventData;
-         this.width = 500;
-
-         this.ExclusivePopup('Contribution details', closeHandler, true, true);
-     }
-    );
 
 /*
  * An exclusive popup for showing the timetable of a session.

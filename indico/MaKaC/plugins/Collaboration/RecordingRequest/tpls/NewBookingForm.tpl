@@ -106,17 +106,12 @@
                     <td class="warning">
                         <h3>${_("Note")}</h3>
                         <span>
-                            ${_("Some of your talks (%d out of %d) are not in a room capable of recording and thus cannot be recorded.") % (NTalks - NRecordingCapableContributions, NTalks)}
+                            ${_("There are {0} talks in the event. ").format(str(NTalks))}
+                            ${_("Some of them ")}
+                            (<span class='fakeLink' id="recordTalksUnableText">${str(NTalks - NRecordingCapableContributions)}</span>) ${_(" are not in a room capable of recording and thus cannot be recorded while the remaining ")}
+                            (<span class='fakeLink' id="recordTalksAbleText">${str(NRecordingCapableContributions)}</span>) ${_(" are goint to be recorded.")}
                         </span>
-                        <span class='fakeLink' id="recordTalksText">${_("See list of record-able talks")} </span> |
                         <span class='fakeLink' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
-                        <div id="recordCapableTalksDiv" style="display:none;">
-                            <div style="padding-top:15px;padding-bottom:15px;">
-                                <span class="RRNoteText">${_("These are the talks capable of being recorded:")} </span>
-                                <ul class="RROptionList" style="margin-left: 18px; font-size: 13px" id="contributionRecordedList">
-                                </ul>
-                            </div>
-                         </div>
                         <div id="recordingCapableRoomsDiv" style="display:none;">
                             <div style="padding-top:15px;padding-bottom:15px;">
                                 <span class="RRNoteText">${_("These are the rooms capable of recording:")} </span>
@@ -238,6 +233,7 @@
     var isLecture = ${ jsBoolean(IsLecture) };
     var RRRecordingCapable = ${ jsBoolean(RecordingCapable) };
     var RR_contributions = ${ jsonEncode(Contributions) };
+    var RR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
     var NRecordingCapableContributions = ${NRecordingCapableContributions};
     var NTalks = ${NTalks};
     var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
@@ -247,27 +243,11 @@
     function showRooms(){
         $("#recordingRoomsText").text($T("Hide list of record-able rooms."));
         $("#recordingCapableRoomsDiv").show();
-        if(!$("#recordCapableTalksDiv").is(":hidden")) {
-            hideTalks();
-        }
     };
 
     function hideRooms(){
         $("#recordingRoomsText").text($T("See list of record-able rooms."));
         $("#recordingCapableRoomsDiv").hide();
-    };
-
-    function showTalks(){
-        $("#recordTalksText").text($T("Hide list of record-able talks."));
-        $("#recordCapableTalksDiv").show();
-        if(!$("#recordingCapableRoomsDiv").is(":hidden")) {
-            hideRooms();
-        }
-    };
-
-    function hideTalks(){
-        $("#recordTalksText").text($T("See list of record-able talks."));
-        $("#recordCapableTalksDiv").hide();
     };
 
     $("#recordingRoomsText").click(function() {
@@ -278,12 +258,11 @@
         }
     });
 
-    $("#recordTalksText").click(function() {
-        if($('#recordCapableTalksDiv').is(':hidden')){
-            showTalks();
-        } else {
-            hideTalks();
-        }
+    $("#recordTalksAbleText").click(function() {
+        new ContributionsPopup($T('Contributions record-able'), RR_contributions, false, function() {self.popupAllowClose = true; return true;}).open();
+    });
+    $("#recordTalksUnableText").click(function() {
+        new ContributionsPopup($T('Contributions not record-able'), RR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}).open();
     });
 % endif
 </script>
