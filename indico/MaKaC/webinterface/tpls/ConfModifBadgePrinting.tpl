@@ -21,10 +21,13 @@
             <input name="New Template Button" value="${ _('Create New Template')}" type="submit">
             </form>
           </td>
-     </tr>
-
-      % if templateList:
-      <form action='${CreatePDFURL}' method='post' target='_blank'>
+      </tr>
+    </tbody>
+  </table>
+  % if templateList:
+  <form action='${CreatePDFURL}' method='post' target='_blank'>
+  <table class="groupTable" cellpadding="0">
+    <tbody>
       <tr>
         <td colspan="2" class="groupTitle">
             ${ _("Available Templates")}
@@ -77,13 +80,9 @@
           </table>
         </td>
       </tr>
-      % endif
-
     </tbody>
   </table>
-
-  % if templateList:
-  <div style="visibility:hidden;">
+  <div >
     <div id="badgePDFOptions" title="PDF Options">
       ${PDFOptions}
     </div>

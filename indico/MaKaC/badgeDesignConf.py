@@ -23,6 +23,7 @@ from badge import BadgeTemplateItem
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.i18n import _
 from indico.util.date_time import format_date
+from indico.util.i18n import i18nformat
 
 
 class RegistrantBadge:
