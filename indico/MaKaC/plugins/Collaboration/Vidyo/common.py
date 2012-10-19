@@ -58,11 +58,11 @@ class VidyoTools(object):
         title = re.compile(ur"^[\W\d]$", re.UNICODE).sub('_', title)
         # Get rid of everything else that's not allowed
         title = re.compile(ur"[^\w._\- ]|'$", re.UNICODE).sub('_', title)
-        return cls.replaceSpacesInName(title)[:cls.maxRoomNameLength(conf)]
+        return cls.replaceSpacesInName(title)[:cls.maxRoomNameLength(conf.getId())]
 
     @classmethod
-    def maxRoomNameLength(cls, conf):
-        suffix = cls.roomNameForVidyo('', conf.getId())
+    def maxRoomNameLength(cls, confId):
+        suffix = cls.roomNameForVidyo('', confId)
         return 61 - len(suffix)
 
     @classmethod

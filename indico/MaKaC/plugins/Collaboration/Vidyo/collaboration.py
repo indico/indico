@@ -228,6 +228,14 @@ class CSBooking(CSBookingBase):
     def setChecksDone(self, checksDone):
         self._checksDone = checksDone
 
+    def getOriginalConferenceId(self):
+        if not hasattr(self, "_originalConferenceId"):
+            self._originalConferenceId = self.getConference().getId()
+        return self._originalConferenceId
+
+    def setOriginalConferenceId(self, confId):
+        self._originalConferenceId = confId
+
     def getBookingInformation(self):
         """ For retreiving the ServiceInformation sections dict built for the
             Event Header, delegated here for use with Vidyo only at this time.
@@ -251,7 +259,7 @@ class CSBooking(CSBookingBase):
 
         if len(self._bookingParams["roomName"].strip()) == 0:
             raise VidyoException("roomName parameter (" + str(self._bookingParams["roomName"]) + " ) is empty for Vidyo booking with id: " + str(self._id))
-        elif unicodeLength(self._bookingParams["roomName"]) > VidyoTools.maxRoomNameLength(self._conf):
+        elif unicodeLength(self._bookingParams["roomName"]) > VidyoTools.maxRoomNameLength(self.getOriginalConferenceId()):
             return VidyoError("nameTooLong")
         else:
             if not VidyoTools.verifyRoomName(self._bookingParams["roomName"]):
@@ -617,4 +625,5 @@ class CSBooking(CSBookingBase):
         cs.setChecksDone(self.getChecksDone())
         cs.setCreated(self.isCreated())
         cs.setLinkType(self.getLinkIdDict())
+        cs.setOriginalConferenceId(self.getOriginalConferenceId())
         return cs

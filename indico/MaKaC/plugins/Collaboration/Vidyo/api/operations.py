@@ -44,7 +44,9 @@ class VidyoOperations(object):
             :type booking: MaKaC.plugins.Collaboration.Vidyo.collaboration.CSBooking
         """
         #we extract the different parameters
-        confId = booking.getConference().getId()
+        #We set the original conference id because the bookings can belong to more than one conference and being cloned
+        #and it is used for the long name, we need to keep always the same confId
+        confId = booking.getOriginalConferenceId()
         bookingId = booking.getId()
         roomName = booking.getBookingParamByName("roomName")
         description = booking.getBookingParamByName("roomDescription")
@@ -120,7 +122,9 @@ class VidyoOperations(object):
     def modifyRoom(cls, booking, oldBookingParams):
 
         #we extract the different parameters
-        confId = booking.getConference().getId()
+        #We set the original conference id because the bookings can belong to more than one conference and being cloned
+        #and it is used for the long name, we need to keep always the same confId
+        confId = booking.getOriginalConferenceId()
         bookingId = booking.getId()
         roomId = booking.getRoomId()
         roomName = booking.getBookingParamByName("roomName")
