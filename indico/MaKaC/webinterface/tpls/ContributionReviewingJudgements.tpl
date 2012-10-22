@@ -32,8 +32,12 @@
 </table>
 % else:
 <!-- Judgement of the editor -->
-% if ConferenceChoice == 3 or ConferenceChoice == 4:
+
 <table width="90%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
+
+% if ConferenceChoice == 3 or ConferenceChoice == 4:
+<tr><td>
+<table width="100%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
     <tr>
         <td id="editingJudgementHelp" colspan="5" class="groupTitle" style="border-bottom: none">${ _("Layout assessment details")}
             ${inlineContextHelp(_('Here is displayed the assessment given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.'))}
@@ -49,11 +53,13 @@
         </td>
     </tr>
 </table>
+</td></tr>
 % endif
 
 <!-- List of advices from the reviewers -->
 % if ConferenceChoice == 2 or ConferenceChoice == 4:
-<table width="90%" align="center" border="0" style="margin-bottom: 1em">
+<tr><td>
+<table width="100%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px; border-bottom: none">${ _("Content assessment details")}
             ${inlineContextHelp(_('Here is displayed the assessment given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective assessments.'))}
@@ -75,11 +81,13 @@
         </td>
     </tr>
 </table>
+</td></tr>
 % endif
 
 <!-- Final reviewing of the referee -->
 % if ConferenceChoice == 2 or ConferenceChoice == 4:
-<table width="90%" align="center" border="0" style="margin-bottom: 1em">
+<tr><td>
+<table width="100%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a>${ _("Final Assessment")}
             ${inlineContextHelp(_('Here is displayed the assessment given by the Referee.<br/>If you are the Referee of this contribution, you can change this.'))}
@@ -97,6 +105,7 @@
                 </tr>
             % endif
         % endif
+        % if len (ConfReview.getReviewingQuestions()) > 0 :
         <tr>
             <td class="dataCaptionTD" style="white-space: nowrap; width: 50px">
                 <span class="titleCellFormat">${ _("Reviewing questions:")}</span>
@@ -104,6 +113,7 @@
             <td id="questionListDisplay">
             </td>
         </tr>
+        % endif
         <tr>
             <td class="dataCaptionTD" style="white-space: nowrap; width: 50px"><span class="titleCellFormat">${ _("Comments")}:</span></td>
             <td>
@@ -134,7 +144,11 @@
         </tr>
         % endif
 </table>
+</td></tr>
 % endif
+</table>
+
+
 
 <script type="text/javascript">
 
@@ -165,9 +179,7 @@ var showWidgets = function(firstLoad) {
              current: 'refereeJudgement'},initialValue).draw());
 
 
-    % if len (ConfReview.getReviewingQuestions()) == 0 :
-        $E('questionListDisplay').set($T("No reviewing questions proposed for this conference."));
-    % else:
+    % if len (ConfReview.getReviewingQuestions()) > 0 :
         $E("questionListDisplay").set('');
         % for q in ConfReview.getReviewingQuestions():
             var newDiv = Html.div({style:{paddingLeft:'5px', marginLeft:'10px'}});
@@ -227,9 +239,7 @@ var showValues = function() {
             },
             function(result, error){
                 if (!error) {
-                    if (result.length == 0) {
-                        $E('questionListDisplay').set($T('No reviewing questions proposed for this conference.'));
-                    } else {
+                    if (result.length > 0) {
                         $E('questionListDisplay').set('');
                         for (var i = 0; i<result.length; i++) {
                             $E('questionListDisplay').append(result[i]);

@@ -30,11 +30,13 @@
             ${inlineContextHelp(_('Here is displayed the assessment given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.'))}
         </td>
     </tr>
+     % if len (ConfReview.getLayoutQuestions()) > 0 :
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Reviewing questions")}:</span></td>
         <td width="60%" id="criteriaListDisplay">
         </td>
     </tr>
+    % endif
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Comments")}:</span></td>
         <td>
@@ -96,9 +98,7 @@ var showWidgets = function(firstLoad) {
              current: 'editorJudgement'},initialValue).draw());
 
 
-    % if len (ConfReview.getLayoutQuestions()) == 0 :
-        $E('criteriaListDisplay').set("No form criteria proposed for this conference.");
-    % else:
+    % if len (ConfReview.getLayoutQuestions()) > 0 :
         $E("criteriaListDisplay").set('');
 
         % for c in ConfReview.getLayoutQuestions():
@@ -176,9 +176,7 @@ var showValues = function() {
             },
             function(result, error){
                 if (!error) {
-                    if (result.length == 0) {
-                        $E('criteriaListDisplay').set('No form criteria proposed for this conference.');
-                    } else {
+                    if (result.length > 0) {
                         $E('criteriaListDisplay').set('');
                         for (var i = 0; i<result.length; i++) {
                             $E('criteriaListDisplay').append(result[i]);

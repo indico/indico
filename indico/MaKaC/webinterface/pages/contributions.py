@@ -123,7 +123,6 @@ class WContributionDisplayBase(WICalExportBase):
         vars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._contrib.getConference()).getDisplayTZ()))
         vars["accessWrapper"] = self._aw
         statusReviewing = self._getStatusReviewing()
-        vars["statusReviewing"] = statusReviewing
         vars["showSubmit"] = statusReviewing not in ["Accept", "Reject", "Submitted"]
         vars["showMaterial"] = statusReviewing is not None
         vars["showHistory"] = statusReviewing is not None

@@ -441,18 +441,14 @@ Please see the comments below from the reviewing team:
         authorList = list(set(self.getReviewManager().getContribution().getSpeakerList()+list(self.getReviewManager().getContribution().getAuthorList())))
         referee = self.getReviewManager().getReferee()
         for author in authorList:
-            if withdrawn:
-                if (isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif()) \
-                or (isinstance(self, EditorJudgement) and (self._review.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or not self.getJudgement() in ["Accept", "Reject"]) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif()) \
-                or (isinstance(self, ReviewerJudgement) and not self.getJudgement() in ["Accept", "Reject"] and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif()):
+            if (isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif()) \
+            or (isinstance(self, EditorJudgement) and (self._review.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or not self.getJudgement() in ["Accept", "Reject"]) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif()) \
+            or (isinstance(self, ReviewerJudgement) and not self.getJudgement() in ["Accept", "Reject"] and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif()):
+                if withdrawn:
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-            else:
-                if (isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif()) \
-                or (isinstance(self, EditorJudgement) and (self._review.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or not self.getJudgement() in ["Accept", "Reject"]) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif()) \
-                or (isinstance(self, ReviewerJudgement) and not self.getJudgement() in ["Accept", "Reject"] and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif()):
+                else:
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
+                GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
 
         # We send an email to the Referee if the layout or the content reviewer has sent a judgement
 
@@ -524,7 +520,8 @@ class EditorJudgement(Judgement):
         if (not self._submitted):
             # Check if it is necessary to purge some answers
             self.purgeAnswers()
-        if self.getReviewManager().getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING and self._judgement.getId() == "2":
+        # 1 --> Accepted, 2 --> To be corrected, 3 --> Rejected, >3 --> Custom, same behavour as To be corrected.
+        if self.getReviewManager().getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING and (self._judgement.getId() == "2" or int(self._judgement.getId()) > 3):
             matReviewing = self.getReviewManager().getContribution().getReviewing()
             self.getReview().copyMaterials(matReviewing)
             self.getReviewManager().newReview()
@@ -996,7 +993,8 @@ Indico on behalf of "%s"
 The assigned %s Reviewer has partially reviewed your paper entitled "%s" (id: %s) submitted for "%s".
 The assessment is as follows: %s.
 %s
-You may then apply the requested modifications to your paper and submit the modified version for review. In order to do so, please proceed to your paper page:
+
+Note that this is a partial review, a final assessment will be done by the referee. In the meanwhile, you may access all the information about your paper from the following page:
 
 %s
 

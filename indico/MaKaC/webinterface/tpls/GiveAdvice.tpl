@@ -30,11 +30,13 @@
             ${inlineContextHelp(_('Here is displayed the assessment given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective assessments.'))}
         </td>
     </tr>
+    % if len (ConfReview.getReviewingQuestions()) > 0 :
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Reviewing questions")}</span></td>
         <td width="60%" id="questionListDisplay">
         </td>
     </tr>
+    % endif
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Comments")}</span></td>
         <td>
@@ -92,9 +94,7 @@ var showWidgets = function(firstLoad) {
              current: 'reviewerJudgement'},initialValue).draw());
 
 
-    % if len (ConfReview.getReviewingQuestions()) == 0 :
-        $E('questionListDisplay').set("No reviewing questions proposed for this conference.");
-    % else:
+    % if len (ConfReview.getReviewingQuestions()) > 0 :
         $E("questionListDisplay").set('');
         % for q in ConfReview.getReviewingQuestions():
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
@@ -170,9 +170,7 @@ var showValues = function() {
             },
             function(result, error){
                 if (!error) {
-                    if (result.length == 0) {
-                        $E('questionListDisplay').set('No reviewing questions proposed for this conference.');
-                    } else {
+                    if (result.length > 0) {
                         $E('questionListDisplay').set('');
                         for (var i = 0; i<result.length; i++) {
                             $E('questionListDisplay').append(result[i]);
