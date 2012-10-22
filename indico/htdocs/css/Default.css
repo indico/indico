@@ -8474,3 +8474,10 @@ table#currencies td, table#currencies th {
     border: 1px solid #ddd;
     padding: 5px;
 }
+
+.specialHide {
+  padding: 0;
+  margin: 0;
+  height: 0;
+  border: 0;
+}

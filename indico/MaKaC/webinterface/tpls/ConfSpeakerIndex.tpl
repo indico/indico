@@ -2,20 +2,21 @@
     include(ScriptRoot + "indico/Timetable/Loader.js");
 
     $(function(){
-
         var resultCache = [];
-        var allItems = $(".speakerIndex").children();
+        var allItems = $(".speakerIndexItem");
 
         $("#filterSpeakers").keyup(function(){
             var searchString = $("#filterSpeakers").attr('value');
-            allItems.css('display', 'none');
+            allItems.css('visibility', 'hidden');
+            allItems.addClass('specialHide');
             if (resultCache[searchString] == undefined) {
                 var items = $(".speakerIndexItemText:contains('"+ searchString +"')").parent().parent();
                 resultCache[searchString] = items;
             } else {
                 var items = resultCache[searchString];
             }
-            items.css('display', 'block');
+            items.css('visibility', '');
+            items.removeClass('specialHide');
             $("#numberFiltered").text(items.length);
             items.length == 1 ? $("#numberFilteredText").text($T("speaker")) : $("#numberFilteredText").text($T("speakers"));
         });
@@ -24,7 +25,6 @@
 <div class="speakerIndexFiltersContainer">
     <div>
         <input type="text" id="filterSpeakers" value="" placeholder="${ _('Search in speakers') }">
-        <img id="spinner" src="./images/spinner.gif" width=12 height=12 style="display: none" />
     </div>
     <div class="speakerIndexFilteredText">
         ${_("Displaying ")}<span style="font-weight:bold;" id="numberFiltered">${len(items)}</span>

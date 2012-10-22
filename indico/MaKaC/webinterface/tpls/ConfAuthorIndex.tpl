@@ -2,20 +2,21 @@
     include(ScriptRoot + "indico/Timetable/Loader.js");
 
     $(function(){
-
         var resultCache = [];
-        var allItems = $(".authorIndex").children();
+        var allItems = $(".authorIndexItem");
 
         $("#filterAuthors").keyup(function(){
             var searchString = $("#filterAuthors").attr('value');
-            allItems.css('display', 'none');
+            allItems.css('visibility', 'hidden');
+            allItems.addClass('specialHide');
             if (resultCache[searchString] == undefined) {
                 var items = $(".authorIndexItemText:contains('"+ searchString +"')").parent().parent();
                 resultCache[searchString] = items;
             } else {
                 var items = resultCache[searchString];
             }
-            items.css('display', 'block');
+            items.css('visibility', '');
+            items.removeClass('specialHide');
             $("#numberFiltered").text(items.length);
             items.length == 1 ? $("#numberFilteredText").text($T("author")) : $("#numberFilteredText").text($T("authors"));
         });
@@ -24,7 +25,6 @@
 <div class="authorIndexFiltersContainer">
     <div>
         <input type="text" id="filterAuthors" value="" placeholder="${ _('Search in authors') }">
-        <img id="spinner" src="./images/spinner.gif" width=12 height=12 style="display: none" />
     </div>
     <div class="authorIndexFilteredText">
         ${_("Displaying ")}<span style="font-weight:bold;" id="numberFiltered">${len(items)}</span>
