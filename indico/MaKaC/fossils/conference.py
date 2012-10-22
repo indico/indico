@@ -124,6 +124,9 @@ class IResourceMinimalFossil(IFossil):
     def getName(self):
         """ Name of the Resource """
 
+    def getDescription(self):
+        """ Resource Description """
+
 class ILinkMinimalFossil(IResourceMinimalFossil):
 
     def getURL(self):
@@ -203,6 +206,9 @@ class IMaterialMinimalFossil(IFossil):
 
     def getTitle( self ):
         """ Material Title """
+
+    def getDescription( self ):
+        """ Material Description """
 
     def getResourceList(self):
         """ Material Resource List """

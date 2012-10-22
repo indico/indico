@@ -870,10 +870,8 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         });
 
         var menu = {
-            '' : {
-                'Create a new session': function() { self.managementActions.addSession(); }
-            },
-            'Add another block to:': sessions
+            '' : {content: {'Create a new session': function() { self.managementActions.addSession(); }}, description: ''},
+            'Add another block to:': {content: sessions, description: ''}
         };
 
         var te = new Html(triggerElement.find('a').get(0));

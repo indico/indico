@@ -96,12 +96,12 @@
                            continue
                      %>
 
-                    <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink">
+                    <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink" title="${material.getDescription()}">
                         ${material.getTitle()}
                         </a>
                      <ul class="subList">
                      % for resource in material.getResourceList():
-                     <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank">
+                     <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" title="${resource.getDescription()}">
                             ${getResourceName(resource)}
                         </a>
                         </li>

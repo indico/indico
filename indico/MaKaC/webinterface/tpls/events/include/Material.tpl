@@ -1,7 +1,7 @@
 <%page args="material, sessionId='', contribId='', subContId=''"/>
 
 <span class="materialGroup">
-    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="material materialGroup">
+    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="material materialGroup" title="${material.description}">
         ${material.type}
         ${material.title}
         % if material.isItselfProtected():
@@ -14,7 +14,7 @@
         filesWithType = [f for f in getMaterialFiles(material) if f['type'] == typeName]
         %>
         % if len(filesWithType) == 1:
-            <a href="${filesWithType[0]['url']}" class="material" title="${filesWithType[0]['name']}">
+                <a href="${filesWithType[0]['url']}" class="material" title="${filesWithType[0]['name']} ${ '- ' + filesWithType[0]['description'] if filesWithType[0]['description'] else ''}">
             <img src="${typeInfo['imgURL']}" border="0" alt="${typeInfo['imgAlt']}"/></a>
         % elif len(filesWithType) > 1:
             <% materialMenuName = 'materialMenu%s%s%s%s%s' % (material.getId(), typeName, sessionId, contribId, subContId) %>
@@ -29,7 +29,7 @@
                 );
                 var menuItems = {};
                 % for f in filesWithType:
-                    menuItems["${f['name']+f['id']}"] = {action: "${f['url']}", display: "${f['name']}"}
+                    menuItems["${f['name']+f['id']}"] = {action: "${f['url']}", display: "${f['name']}", description: "${f['description']}"}
                 % endfor
                 var ${materialMenuName} = new PopupMenu(menuItems, [$E("${materialMenuName}")], 'materialMenuPopupList', false, false);
             </script>

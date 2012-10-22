@@ -5891,7 +5891,8 @@ ul.sectionPopupList li a:hover {
 
 ul.sectionPopupList li.section {
     height: 25px;
-    display:block;
+    display: block;
+    cursor: pointer;
 }
 
 ul.sectionPopupList li.section .line {
@@ -8151,6 +8152,12 @@ a.lightGreyLink:hover {
     margin-bottom: 10px;
     padding-bottom: 3px;
     margin-top: 0;
+}
+
+.materialDescription {
+    color: #888;
+    font-size: 12px;
+    font-weight: normal;
 }
 
 .contributionMainContent, .subContributionMainContent, .materialMainContent, .abstractMainContent {

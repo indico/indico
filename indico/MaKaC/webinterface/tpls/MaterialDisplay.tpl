@@ -9,15 +9,11 @@
 
 <h1 class="materialTitle">
     ${material.getTitle()}
+    <div class="materialDescription">${material.getDescription()}</div>
 </h2>
 <div>
     <div class="materialMainContent">
         <div class="materialDetail">
-            % if material.getDescription():
-                <div class="materialSection">
-                    <div class="materialSectionContent">${material.getDescription()}</div>
-                </div>
-            % endif
             % if material.getResourceList() and material.canView(accessWrapper):
             <div class="materialSection">
                 <div>
@@ -27,6 +23,9 @@
                     % if isinstance(resource, Link):
                         <img src="${Config.getInstance().getSystemIconURL('link')}" style="vertical-align: middle; border: 0;">
                         <a href="${getURL(resource)}">${resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()}</a>
+                        <ul class="resourceDetail">
+                            <li>${resource.getDescription()}</li>
+                        </ul>
                         % if resource.isProtected():
                             <img src="${Config.getInstance().getSystemIconURL('protected')}" style="vertical-align: middle; border: 0;">
                         % endif
@@ -38,9 +37,10 @@
                             <img src="${Config.getInstance().getSystemIconURL('protected')}" style="vertical-align: middle; border: 0;">
                         % endif
                         <ul class="resourceDetail">
-                        <li><span style="font-weight: bold">${_("File name")}: </span>${resource.getFileName()}</li>
-                        <li><span style="font-weight: bold">${_("File size")}: </span>${strfFileSize(resource.getSize())}</li>
-                        <li><span style="font-weight: bold">${_("File creation date")}: </span>${resource.getCreationDate().strftime("%d %b %Y %H:%M")}</li>
+                            <li>${resource.getDescription()}</li>
+                            <li><span style="font-weight: bold">${_("File name")}: </span>${resource.getFileName()}</li>
+                            <li><span style="font-weight: bold">${_("File size")}: </span>${strfFileSize(resource.getSize())}</li>
+                            <li><span style="font-weight: bold">${_("File creation date")}: </span>${resource.getCreationDate().strftime("%d %b %Y %H:%M")}</li>
                         </ul>
                     % endif
                     </li>

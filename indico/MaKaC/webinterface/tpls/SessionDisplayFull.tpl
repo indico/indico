@@ -52,10 +52,10 @@
                     <% if not material.canView(self_._aw):
                         continue
                     %>
-                    <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink">${material.getTitle()}</a>
+                    <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink" title="${material.getDescription()}">${material.getTitle()}</a>
                         <ul class="subList">
                          % for resource in material.getResourceList():
-                            <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank">${getResourceName(resource)}</a></li>
+                            <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" title="${resource.getDescription()}">${getResourceName(resource)}</a></li>
                          % endfor
                         </ul>
                     </li>

@@ -100,6 +100,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
             var value = pair.get();
             var link = Html.a('fakeLink', value.display);
             link.setAttribute("id", pair.key);
+            link.setAttribute("title", value.description);
 
             if(typeof value.action == "string" ) {
                 link.setAttribute('href', value.action);
@@ -203,10 +204,11 @@ type("SectionPopupMenu", ["PopupMenu"], {
                 var section = null;
                 if (key !== ""){
                     section = Html.li('section', Html.div('line', Html.div('name', key)));
+                    section.setAttribute('title', item['description']);
                 }
 
                 // add the menu items
-                var tmp = $B(Html.ul('subPopupList'), item, _.bind(self._processItem, self));
+                var tmp = $B(Html.ul('subPopupList'), item['content'], _.bind(self._processItem, self));
                 sectionContent.append(Html.li({}, section, tmp));
             });
 
