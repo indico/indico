@@ -6,7 +6,7 @@
 
 % if ConfReview.getReviewedContributions(User):
 
-<table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
+<table class="Revtab" width="90%" cellspacing="0" cellpadding="10px" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
         <td nowrap class="groupTitle" colspan=4>${ _("Give advice on content of the paper")}</td>
     </tr>
@@ -40,11 +40,27 @@
                    % endif
             <td style="padding-right:5px;padding-left:5px;">
                 % if c.getReviewManager().getLastReview().hasGivenAdvice(User):
-                    <span>${ _("Advice given")}</span>
+                    <% advice = c.getReviewManager().getLastReview().getAdviceFrom(User).getJudgement() %>
+                    <%
+                        if advice == 'Accept':
+                            advice_color = '#118822'
+                        elif advice == 'Reject':
+                            advice_color = '#881122'
+                        else:
+                            advice_color = 'orange'
+                    %>
+                    <span>${ _("Advice given")}:</span><span style="color:${advice_color}"> ${ advice }</span>
+                % elif not c.getReviewManager().getLastReview().isAuthorSubmitted():
+                    % if len(c.getReviewManager().getVersioning()) > 1:
+                        <span>${ _("Author has yet to re-submit paper") }</span>
+                    % else:
+                        <span>${ _("Paper not submitted yet")}</span>
+                    % endif
                 % else:
-                    <span>${ _("Advice not given yet")}</span>
-                    % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                    <span><br>${ _("but Referee already assessed contribution")}</span>
+                    <% referee_did = c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() %>
+                    <span ${ "style='font-weight: bold;'" if not referee_did else "" }>${ _("Advice not given yet")}</span>
+                    % if referee_did:
+                    <span style="color:#3F4C6B;">${ _("but Referee already assessed contribution")}</span>
                     % endif
                 % endif
             </td>

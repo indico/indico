@@ -48,7 +48,6 @@ class IReviewFossil(IFossil):
     def getReviewingStatus(self):
         pass
 
-
 class IReviewManagerFossil(IFossil):
     """
     Fossil for review manager
@@ -69,6 +68,9 @@ class IReviewManagerFossil(IFossil):
     def getLastReview(self):
         pass
     getLastReview.result = IReviewFossil
+
+    def getVersioningLen(self):
+        pass
 
 
 class IReviewingQuestionFossil(IFossil):

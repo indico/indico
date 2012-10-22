@@ -6,7 +6,7 @@
 <% dueDateFormat = "%a %d %b %Y" %>
 
 % if ConfReview.getEditedContributions(User):
-<table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
+<table class="Revtab" width="90%" cellspacing="0" cellpadding='10px' align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
         <td nowrap class="groupTitle" colspan=4>${ _("Judge editing of the contribution")}</td>
     </tr>
@@ -43,11 +43,27 @@
             % endif
             <td style="padding-right:5px;padding-left:5px;">
                 % if c.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():
-                    <span>${ _("Layout assessment given")}</span>
+                    <% assessment = c.getReviewManager().getLastReview().getEditorJudgement().getJudgement() %>
+                    <%
+                        if assessment == 'Accept':
+                            assessment_color = '#118822'
+                        elif assessment == 'Reject':
+                            assessment_color = '#881122'
+                        else:
+                            assessment_color = 'orange'
+                    %>
+                    <span>${ _("Layout assessment given")}:</span><span style="color:${assessment_color}"> ${ assessment }</span>
+                % elif not c.getReviewManager().getLastReview().isAuthorSubmitted():
+                    % if len(c.getReviewManager().getVersioning()) > 1:
+                        <span>${ _("Author has yet to re-submit paper") }</span>
+                    % else:
+                        <span>${ _("Paper not submitted yet")}</span>
+                    % endif
                 % else:
-                    <span>${ _("Layout assessment not given yet")}</span>
+                    <% referee_did = c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() %>
+                    <span ${ "style='font-weight: bold;'" if not referee_did else "" }>${ _("Layout assessment not given yet")}</span>
                     % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING:
-                    <span><br>${ _("but Referee already judged contribution")}</span>
+                    <span style="color:#3F4C6B;">${ _("but Referee already judged contribution")}</span>
                     % endif
                 % endif
             </td>

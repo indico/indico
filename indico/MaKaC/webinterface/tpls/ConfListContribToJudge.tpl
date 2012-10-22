@@ -5,7 +5,7 @@
 <% dueDateFormat = "%a %d %b %Y" %>
 
 % if ConfReview.getJudgedContributions(User):
-<table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
+<table class="Revtab" width="90%" cellspacing="0" cellpadding="10px" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
         <td nowrap class="groupTitle" colspan=4 style="">${ _("Contributions to judge as Referee")}</td>
     </tr>
@@ -23,9 +23,12 @@
             <td style="padding-right:5px;padding-left:5px;"><a href="${ urlHandlers.UHContributionModifReviewing.getURL(c) }">${ c.getTitle() }</a></td>
             <td style="padding-right:5px;padding-left:5px;">
             % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                <span>${ _("Assessed:")}</span> ${ c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() }
+                <% assessment = c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() %>
+                <span>${ _("Assessed:")}</span><span style="color:${'#118822' if assessment == 'Accept' else '#881122'}"> ${ assessment }</span>
+            % elif len(c.getReviewManager().getVersioning()) > 1:
+                <span style="color:orange;">${ c.getReviewManager().getVersioning()[-2].getEditorJudgement().getJudgement() }</span><br>
             % else:
-                <span>${ _("Not assessed yet")}</span><br>
+                <span style="color:#3F4C6B;">${ _("Referee has not yet given an assessment")}</span><br>
                 ${ "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = False)) }
             % endif
             </td>

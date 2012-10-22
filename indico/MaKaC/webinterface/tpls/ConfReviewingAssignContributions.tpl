@@ -521,21 +521,33 @@ var contributionTemplate = function(contribution) {
         cell7.set(span);
 
     } else {
+
         var ul = Html.ul();
-        ul.dom.style.color = '#3F4C6B';
         ul.dom.style.listStyleType = 'none';
         ul.dom.style.padding = 0;
         ul.dom.style.marginLeft = '5px';
 
-        var li = Html.li();
-        li.set($T("Not assessed yet:"));
-        ul.append(li);
+        /* if there is more than 1 version, it means that it is 'To be corrected' */
+        if (contribution.reviewManager.versioningLen > 1) {
+            ul.dom.style.color = 'orange';
 
-        statusList = contribution.reviewManager.lastReview.reviewingStatus;
-        for (j in statusList) {
             var li = Html.li();
-            li.set(statusList[j])
-            ul.append(li)
+            li.set($T("To be corrected"));
+            ul.append(li);
+        /* else, it is still 'submitted' */
+        }else {
+            ul.dom.style.color = '#3F4C6B';
+
+            var li = Html.li();
+            li.set($T("Referee has not yet given an assessment:"));
+            ul.append(li);
+
+            statusList = contribution.reviewManager.lastReview.reviewingStatus;
+            for (j in statusList) {
+                var li = Html.li();
+                li.set(statusList[j])
+                ul.append(li)
+            }
         }
 
         cell7.set(ul);

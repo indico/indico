@@ -95,6 +95,9 @@ class ReviewManager(Persistent, Fossilizable):
         """
         return self._versioning
 
+    def getVersioningLen(self):
+        return len(self._versioning)
+
     def getReviewById(self, reviewId):
         for i in self._versioning:
             if i.getId() == int(reviewId):
