@@ -39,7 +39,8 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["IsLecture"] = isLecture
 
         underTheLimit = self._conf.getNumberOfContributions() <= self._WebcastRequestOptions["contributionLoadLimit"].getValue()
-        booking = self._conf.getCSBookingManager().getSingleBooking('WebcastRequest')
+        manager = self._conf.getCSBookingManager()
+        booking = manager.getSingleBooking('WebcastRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
 
@@ -66,8 +67,9 @@ class WNewBookingForm(WCSPageTemplateBase):
         else:
             topLevelWebcastCapable = False
 
-        #Finally, this event is webcast capable if the event itself or one of its talks are
-        vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0
+        #Finally, this event is webcast capable if the event itself or one of its talks are capable or user is admin, video services manager or webcast manager
+        user = self._rh._getUser()
+        vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or user.isAdmin() or manager.isVideoServicesManager(user) or manager.isPluginManager('WebcastRequest', user)
 
         if initialDisplay:
             webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
