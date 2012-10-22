@@ -119,17 +119,6 @@ var beforeNow = function(date) {
     return date < eventNow;
 };
 
-var getDisconnectMessage = function(result, booking){
-    if(result.service.toLowerCase() != booking.type.toLowerCase()){
-        return $T("The device of the room " + booking.linkVideoRoomLocation + " is connected to another system different. Are you sure to disconnect the room?");
-    }
-    else if(result.roomName == booking.bookingParams.roomName){
-        return $T("Are you sure to disconnect the room "+ booking.linkVideoRoomLocation +" from the current meeting?");
-    } else{
-        return $T("The device of the room "+ booking.linkVideoRoomLocation +" is connected to another " + booking.type + " room different. Are you sure to disconnect the room?");
-    }
-};
-
 /**
  * Builds a parameter manager to verify a form's parameter
  * @param {String} pluginName The name of the plugin that the form belongs to.
@@ -340,7 +329,7 @@ var refreshStartAllStopAllButtons = function() {
  */
 var bookingTemplateM = function(booking) {
 
-    var row = Html.tr({id: "bookingRow" + booking.id});
+    var row = Html.tr({className: "booking", 'data-booking-id': booking.id, id: "bookingRow" + booking.id});
 
     var cellShowInfo;
     if (pluginHasFunction(booking.type, "showInfo")) {
@@ -375,7 +364,7 @@ var bookingTemplateM = function(booking) {
     statusCell.append(statusSpan);
     if (booking.hasCheckStatus) {
         var checkStatusButton = Widget.link(command(
-            function() {checkStatus(booking);} ,
+            function() {checkBookingStatus(booking, confId);} ,
             Html.img({
                 alt: "Check Booking Status",
                 title: "Check Booking Status",
@@ -412,12 +401,11 @@ var bookingTemplateM = function(booking) {
 
     var cellButtons = Html.td({className : "collaborationCellNarrow"});;
 
-
     if (booking.hasStart) {
         if (booking.canBeStarted) {
             if(booking.hasConnect || booking.hasDisconnect){
                 var align="";
-                if (booking.canBeConnected || booking.canBeDisconnected){
+                if (booking.type == "Vidyo"){
                     align = "left";
                 }
                 var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButtonText($T("Start desktop"), align) ) );
@@ -431,40 +419,11 @@ var bookingTemplateM = function(booking) {
         cellButtons.append(playButton);
     }
 
-    if (booking.hasConnect || booking.hasDisconnect){
-        if (booking.canBeConnected || booking.canBeDisconnected) {
-            var connectContainer = Html.div({style: {display: "inline"}});
-            cellButtons.append(connectContainer);
-            connectContainer.set(progressIndicator(true, true));
-            var successHandler = function(result, success){
-                connectContainer.set("");
-                if(success){
-                    var connectButton = null;
-                    if(result.isConnected){
-                        var connectButton = Widget.link( command(function(){
-                            new ConfirmPopup($T("Disconnect room"), getDisconnectMessage(result, booking), function(value){if(value){disconnect(booking);}}).open();
-                        },IndicoUI.Buttons.playButtonText($T("Disconnect ") + booking.linkVideoRoomLocation, "right" )) );
-
-                    } else {
-                        var connectButton = Widget.link( command(function(){connect(booking);}
-                        ,IndicoUI.Buttons.playButtonText($T("Connect ") + booking.linkVideoRoomLocation, "right" )) );
-                    }
-                    connectContainer.replaceWith(connectButton);
-                }
-            }
-            checkConnection(booking, successHandler);
-        }
+    if (booking.type == "Vidyo"){
+        var connectContainer = $('<a href="#" data-location="' + booking.linkVideoRoomLocation + '"/>');
+        $(cellButtons.dom).append(connectContainer, $('<span class="progress"/>'));
+        new ManagementConnectButton(connectContainer, booking, confId);
     }
-
-    if (booking.hasDisconnect){
-        if (booking.canBeDisconnected && booking.isConnected) {
-            var disconnectButton = Widget.link( command(function(){
-                new ConfirmPopup($T("Disconnect room"), $T("Are you sure to disconnect the room?"), function(value){if(value){disconnect(booking);}}).open();
-            },IndicoUI.Buttons.playButtonText($T("Disconnect ") + booking.linkVideoRoomLocation, "left" )) );
-            cellButtons.append(disconnectButton);
-        }
-    }
-
 
     if (booking.hasStop) {
         var cellStop = Html.td({className : "collaborationCellNarrow"});
@@ -477,7 +436,6 @@ var bookingTemplateM = function(booking) {
     }
 
     row.append(cellButtons);
-
 
     //var cellMail = Html.td({className : "collaborationCellNarrow"});
     //cellMail.set(Html.img({src: imageSrc("mail_big"), style: {'verticalAlign': 'middle', marginLeft: '3px', marginRight: '3px'}}));
@@ -531,7 +489,7 @@ var bookingTemplateS = function(booking) {
     liState.append(span);
     if (booking.hasCheckStatus) {
         var checkStatusButton = Widget.link(command(
-            function() {checkStatus(booking);} ,
+            function() {checkBookingStatus(booking, confId);} ,
             Html.img({
                 alt: "Check Booking Status",
                 title: "Check Booking Status",
@@ -746,40 +704,6 @@ var stopBookingLocal = function(booking) {
  * -The "connectBookingLocal" function will be called in any case (this function will verify if there should be a local action).
  * @param {object} booking The booking object corresponding to the "connect" button that was pressed.
  */
-var connectBooking = function(booking, conferenceId, successHandler) {
-
-    if (!pluginHasFunction(booking.type, "checkConnect") || codes[booking.type].checkConnect(booking)) {
-
-        if (booking.requiresServerCallForConnect) {
-            var killProgress = IndicoUI.Dialogs.Util.progress("Connecting...");
-            indicoRequest(
-                'collaboration.connectCSBooking',
-                {
-                    conference: conferenceId,
-                    bookingId: booking.id
-                },
-                function(result,error) {
-                    if (!error) {
-                        if (result.error){
-                            killProgress();
-                            codes[booking.type].errorHandler('connect', result, booking);
-                        }
-                        else {
-                            connectBookingLocal(result);
-                            killProgress();
-                            new AlertPopup($T("Success"), $T("The connection of the room ") + booking.linkVideoRoomLocation  + $T(" to the ") + booking.type + $T(" room has been requested. Please check that the device is already connected and also do not forget to disconnect the room when the meeting ends."), function(){refreshBooking(result);}).open();
-                        }
-                    } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-            );
-        } else {
-            connectBookingLocal(booking);
-        }
-    }
-};
 
 /**
  * Function called to execute the local action when connecting a booking.
@@ -794,54 +718,6 @@ var connectBookingLocal = function(booking) {
     }
 };
 
-
-
-/**
- * -Function that will be called when the user presses the "Connect" button of a booking.
- * -If the booking's plugin has defined a "checkConnect" function, it will be called to verify (locally)
- * that the booking can be connected. If the booking cannot connect, nothing happens (other than what
- * the "checkConnect" function wants to do in that case, like popping up an alert).
- * -If the booking's plugin has set "requiresServerCallForConnect" to true, the server is notified
- * of the booking connect. The server can then take appropiate actions, or change the booking object.
- * -The "connectBookingLocal" function will be called in any case (this function will verify if there should be a local action).
- * @param {object} booking The booking object corresponding to the "connect" button that was pressed.
- */
-var disconnectBooking = function(booking, conferenceId) {
-
-    if (!pluginHasFunction(booking.type, "checkDisconnect") || codes[booking.type].checkDisconnect(booking)) {
-
-        if (booking.requiresServerCallForDisconnect) {
-            var killProgress = IndicoUI.Dialogs.Util.progress("Disconnecting...");
-            indicoRequest(
-                'collaboration.disconnectCSBooking',
-                {
-                    conference: conferenceId,
-                    bookingId: booking.id
-                },
-                function(result,error) {
-                    if (!error) {
-                        if (result.error){
-                            killProgress();
-                            codes[booking.type].errorHandler('disconnect', result, booking);
-                            checkStatus(booking);
-                        }
-                        else {
-                            disconnectBookingLocal(result);
-                            killProgress();
-                            new AlertPopup($T("Success"), $T("The disconnection of the room ") + booking.linkVideoRoomLocation  + $T(" to the ") + booking.type + $T(" room has been requested. Please verify that the deviced has been disconnected."), function(){ refreshBooking(result); } ).open();
-                        }
-                    } else {
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-            );
-        } else {
-            disconnectBookingLocal(booking);
-        }
-    }
-};
-
 /**
  * Function called to execute the local action when disconnecting a booking.
  * It will verify that the booking's plugin has an actual client-side action configured,
@@ -853,33 +729,6 @@ var disconnectBookingLocal = function(booking) {
     if (booking.requiresClientCallForDisconnect && booking.permissionToDisconnect) {
         codes[booking.type].disconnect(booking, frames["iframeTarget" + booking.id]);
     }
-};
-
-/**
- * Function called when the user presses the "Check Status" button of a booking.
- * The booking will be refreshed after its status has been updated.
- */
-var checkBookingConnection = function(booking, conferenceId, successHandler) {
-
-    indicoRequest(
-        'collaboration.checkCSBookingConnection',
-        {
-            conference: conferenceId,
-            bookingId: booking.id
-        },
-        function(result,error) {
-            if (!error) {
-                if (result.error) {
-                    codes[booking.type].errorHandler('roomConnected', result, booking);
-                    successHandler(result, false);
-                } else {
-                    successHandler(result, true);
-                }
-            } else {
-                IndicoUtil.errorReport(error);
-            }
-        }
-    );
 };
 
 
@@ -2050,86 +1899,11 @@ var successMakeEventModerator = function(videoLink, result){
     $(videoLink).parent().parent().html(Html.div({}, result.bookingParams.owner["name"]).dom);
 };
 
-var connectBookingRoom = function(booking, confId) {
-    var $this = $(this);
-
-    $this.siblings(".progress").html(progressIndicator(true, true).dom);
-    jsonRpc(Indico.Urls.JsonRpcService, "collaboration.connectCSBooking",
-            {
-                confId: confId,
-                bookingId: booking.id
-            },
-            function(result, error){
-                $this.siblings(".progress").html("");
-                if (!error) {
-                    if (result.error){
-                        new WarningPopup($T("Cannot be connected"), result.userMessage).open();
-                    }
-                    else {
-                        new AlertPopup($T("Success"),$T("The connection of the room ") + booking.linkVideoRoomLocation  + $T(" to the ") + booking.type + $T(" room has been requested. Please check that the device is already connected and also do not forget to disconnect the room when the meeting ends."), function(){checkBookingRoomConnection(booking, confId);} ).open();
-                    }
-                } else {
-                    IndicoUtil.errorReport(error);
-                }
-            });
-};
 
 /**
  * Function called when the user presses the "Check Status" button of a booking.
  * The booking will be refreshed after its status has been updated.
  */
-var checkBookingRoomConnection = function(booking, conferenceId) {
-    var connectLink =  $('[data-booking-id='+booking.id+']');
-    connectLink.siblings(".progress").html(progressIndicator(true, true).dom);
-
-    indicoRequest(
-        'collaboration.checkCSBookingConnection',
-        {
-            conference: conferenceId,
-            bookingId: booking.id
-        },
-        function(result,error) {
-            connectLink.siblings(".progress").html("");
-            if (!error) {
-                if (result.error) {
-                    new WarningPopup($T("Cannot get the status")).open();
-                } else {
-                    if(result.isConnected){
-                        connectLink.addClass("disconnect_room").attr('data-disconnect-msg', getDisconnectMessage(result, booking)).text("Disconnect " + booking.linkVideoRoomLocation)
-                    }else{
-                        connectLink.addClass("connect_room").text("Connect " + booking.linkVideoRoomLocation)
-                    }
-                }
-            } else {
-                IndicoUtil.errorReport(error);
-            }
-        }
-    );
-};
-
-var disconnectBookingRoom = function(booking, confId, msg) {
-    var $this = $(this);
-
-    $this.siblings(".progress").html(progressIndicator(true, true).dom);
-    jsonRpc(Indico.Urls.JsonRpcService, "collaboration.disconnectCSBooking",
-            {
-                confId: confId,
-                bookingId: booking.id
-            },
-            function(result, error){
-                $this.siblings(".progress").html("");
-                if (!error) {
-                    if (result.error){
-                        new WarningPopup($T("Cannot be disconnected"), result.userMessage).open();
-                    }
-                    else {
-                        new AlertPopup($T("Success"), $T("The disconnection of the room ") + booking.linkVideoRoomLocation  + $T(" to the ") + booking.type + $T(" room has been requested. Please verify that the deviced has been disconnected."), function() {checkBookingRoomConnection(booking, confId);} ).open();
-                    }
-                } else {
-                    IndicoUtil.errorReport(error);
-                }
-            });
-};
 
 var drawBookingPopup = function (videoInformation, confId, bookingId, displayModeratorLink) {
     var divWrapper = Html.div({className:"videoServiceInlinePopup"});
@@ -2215,19 +1989,3 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
 
     popup.open();
 };
-
-
-$(function() {
-    $('body').on("click",".connect_room",function() {
-        connectBookingRoom.call(this, bookings[$(this).attr('data-booking-id')], $(this).attr('data-event'));
-        return false;
-    });
-    $('body').on("click",".disconnect_room", function() {
-        var self = this;
-        new ConfirmPopup($T("Disconnect room"), $(self).attr('data-disconnect-msg') , function(confirmed){
-            if(confirmed){
-                disconnectBookingRoom.call(self, bookings[$(self).attr('data-booking-id')], $(self).attr('data-event'));
-            }}).open();
-       return false;
-    });
-});

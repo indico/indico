@@ -56,3 +56,54 @@ form.EAChoiceButton{
 .grey {
     color: #aaa;
 }
+
+.collaborationCellNarrow .progress {
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.buttonWithPlay{
+    background: url(../images/green_arrow.png) no-repeat scroll left center #ECECEC;
+    padding: 5px 20px;
+    border: 1px solid #dcdcdc;
+    color: #555555;
+    border-radius: 5px;
+    display: inline;
+}
+
+.buttonWithPlay:hover{
+    color: #333;
+    border-color: #999;
+}
+
+.buttonWithStop{
+    background: url(../images/red_square.png) no-repeat scroll left center #ECECEC;
+    padding: 5px 20px;
+    border: 1px solid #dcdcdc;
+    color: #555555;
+    border-radius: 5px;
+    display: inline;
+}
+
+.buttonWithStop:hover{
+    color: #333;
+    border-color: #999;
+}
+
+.left {
+    -webkit-border-top-right-radius: 0;
+    -moz-border-radius-topright: 0;
+    border-top-right-radius: 0;
+    -webkit-border-bottom-right-radius: 0;
+    -moz-border-radius-bottomright: 0;
+    border-bottom-right-radius: 0;
+}
+
+.right {
+    -webkit-border-top-left-radius: 0;
+    -moz-border-radius-topleft: 0;
+    border-top-left-radius: 0;
+    -webkit-border-bottom-left-radius: 0;
+    -moz-border-radius-bottomleft: 0;
+    border-bottom-left-radius: 0;
+}

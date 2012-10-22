@@ -5,21 +5,9 @@
 %>
 % if event_bookings:
 <script type="text/javascript">
-## Move this into js folder
-var videoServiceLaunchInfo = {};
-var bookings = ${dict((b['id'], b) for b in fossilize(bookings))|n,j};
-
-$(function() {
-  $('.collaborationDisplayMoreInfo').click(function() {
-    var newText = ($(this).text() == $T("More Info")) ? $T("Hide info") : $T("More Info");
-    var textNode = $(this);
-    $(this).closest('.videoServiceWrapper').next('.collabInfoInline').slideToggle('fast', function() {
-      textNode.text(newText);
-    });
-  });
-});
-
+  var bookings = ${dict((b['id'], b) for b in fossilize(bookings))|n,j};
 </script>
+<script src="${collaboration_htdocs}/bookings.js" type="text/javascript"></script>
 <tr>
 <td class="leftCol">Video Services</td>
 <td>
@@ -93,12 +81,8 @@ $(function() {
           % if conf.canModify(self_._rh._aw) or booking.getOwner()["id"] == self_._rh._getUser().getId() or \
                (self_._rh.getHostIP() == VidyoTools.getLinkRoomIp(booking.getLinkObject(), ipAttName='IP')):
             <span style="margin-left:3px;margin-right:3px;">|</span>
-            <script type="text/javascript">
-              $(function() {
-                checkBookingRoomConnection(${jsonEncode(fossilize(booking))}, ${conf.getId()});
-              });
-            </script>
-            <a href="#" style="font-size:12px; font-weight: bold" class="connect_room" data-booking-id="${booking.getId()}" data-event="${conf.getId()}">${_("Connect")} ${booking.getLinkVideoRoomLocation()}</a>
+            <a href="#" style="font-size:12px; font-weight: bold;" class="connect_room" data-booking-id="${booking.getId()}"
+               data-event="${conf.getId()}" data-location="${booking.getLinkVideoRoomLocation()}">${_("Connect")} ${booking.getLinkVideoRoomLocation()}</a>
             <span style="display:inline; vertical-align:middle" class="progress"></span>
           % endif
         % endif

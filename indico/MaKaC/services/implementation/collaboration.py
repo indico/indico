@@ -80,12 +80,13 @@ class CollaborationBookingModifBase(CollaborationBase):
         CollaborationBase._checkParams(self)
         if self._params.has_key('bookingId'):
             self._bookingId = self._params['bookingId']
-            booking = self._CSBookingManager.getBooking(self._bookingId)
-            if booking == None:
+            self._booking = self._CSBookingManager.getBooking(self._bookingId)
+            if self._booking == None:
                 raise NoReportError(_("The booking that you are trying to modify does not exist. Maybe it was already deleted, please refresh the page."))
 
-            self._bookingType = booking.getType()
-            self._bookingPlugin = booking.getPlugin()
+            self._bookingType = self._booking.getType()
+            self._bookingPlugin = self._booking.getPlugin()
+            self._pm = ParameterManager(self._params)
         else:
             raise CollaborationException(_("Booking id not set when trying to modify a booking on meeting ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
 
@@ -100,15 +101,6 @@ class CollaborationAdminBookingModifBase(CollaborationBookingModifBase):
     def _checkProtection(self):
         if not RCCollaborationAdmin.hasRights(self) and not RCCollaborationPluginAdmin.hasRights(self, None, [self._bookingPlugin]):
             raise CollaborationException(_("You don't have the rights to perform this operation on this booking"))
-
-class CollaborationConnectCSBookingBase(CollaborationBookingModifBase):
-    """ Base class for services on booking objects for connect/disconnect
-    """
-
-    def _checkProtection(self):
-        booking = self._CSBookingManager.getBooking(self._bookingId)
-        if not hasattr(booking, "getOwnerObject") or booking.getOwnerObject() != self.getAW().getUser():
-            CollaborationBookingModifBase._checkProtection(self)
 
 class AdminCollaborationBase(AdminService):
     """ Base class for admin services in the Video Services Overview page, not directed towards a specific booking.
@@ -199,29 +191,6 @@ class CollaborationStopCSBooking(CollaborationBookingModifBase):
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.stopBooking(self._bookingId),
                                   timezone = self._conf.getTimezone())
-
-class CollaborationConnectCSBooking(CollaborationConnectCSBookingBase):
-    """ Performs server-side actions when a booking is connected
-    """
-
-    def _getAnswer(self):
-        return fossilize(self._CSBookingManager.connectBooking(self._bookingId),
-                                  timezone = self._conf.getTimezone())
-
-class CollaborationDisconnectCSBooking(CollaborationConnectCSBookingBase):
-    """ Performs server-side actions when a booking is disconnected
-    """
-
-    def _getAnswer(self):
-        return fossilize(self._CSBookingManager.disconnectBooking(self._bookingId),
-                                  timezone = self._conf.getTimezone())
-
-class CollaborationCheckCSBookingConnection(CollaborationBookingModifBase):
-    """ Performs server-side actions when a booking's status is checked
-    """
-    def _getAnswer(self):
-        return fossilize(self._CSBookingManager.checkBookingConnection(self._bookingId),
-                         None, tz = self._conf.getTimezone())
 
 class CollaborationCheckCSBookingStatus(CollaborationBookingModifBase):
     """ Performs server-side actions when a booking's status is checked
@@ -495,9 +464,6 @@ methodMap = {
     "editCSBooking": CollaborationEditCSBooking,
     "startCSBooking": CollaborationStartCSBooking,
     "stopCSBooking": CollaborationStopCSBooking,
-    "connectCSBooking": CollaborationConnectCSBooking,
-    "disconnectCSBooking": CollaborationDisconnectCSBooking,
-    "checkCSBookingConnection": CollaborationCheckCSBookingConnection,
     "checkCSBookingStatus": CollaborationCheckCSBookingStatus,
     "acceptCSBooking": CollaborationAcceptCSBooking,
     "rejectCSBooking": CollaborationRejectCSBooking,

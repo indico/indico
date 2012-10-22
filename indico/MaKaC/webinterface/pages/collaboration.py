@@ -242,10 +242,11 @@ class WPConfModifCollaboration(WPConfModifCSBase):
     def getCSSFiles(self):
         for plugin in self._tabPlugins:
             return WPConfModifCSBase.getCSSFiles(self) + \
-                   ['Collaboration/%s/Style.css' % plugin.getId()]
+                   ['Collaboration/%s/Style.css' % plugin.getId(), 'Collaboration/Style.css']
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + self._includeJSPackage("Display") + self._includeJSPackage('Collaboration') + self._includeJSPackage("Management")
+        return WPConfModifCSBase.getJSFiles(self) + \
+               ['/Collaboration/bookings.js'] + self._includeJSPackage("Display") + self._includeJSPackage('Collaboration') + self._includeJSPackage("Management")
 
     ######### private methods ###############
     def _buildExtraJS(self):
@@ -411,6 +412,10 @@ class WPCollaborationDisplay(WPConferenceDefaultDisplayBase):
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._collaborationOpt)
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+               ['/Collaboration/bookings.js']
 
     def _getBody(self, params):
 

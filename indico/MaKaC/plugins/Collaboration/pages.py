@@ -28,6 +28,7 @@ from MaKaC.common.utils import formatTwoDates
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.output import OutputGenerator
+from MaKaC.plugins.Collaboration.handlers import UHCollaborationHtdocs
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
 from MaKaC.webinterface.pages.collaboration import WPConfModifCollaboration
@@ -77,6 +78,7 @@ class WEventDetailBanner(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
 
+        vars["collaboration_htdocs"] = UHCollaborationHtdocs.getURL()
         vars["getBookingType"] = WEventDetailBanner.getBookingType
         vars["formatTwoDates"] = formatTwoDates
         vars["conf"] = self._rh._conf

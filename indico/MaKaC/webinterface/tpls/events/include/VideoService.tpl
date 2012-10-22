@@ -13,7 +13,7 @@
         <span style="margin-left:3px;margin-right:3px;">|</span>
         <script type="text/javascript">
         $(function() {
-            checkBookingRoomConnection(${jsonEncode(fossilize(video))}, ${conf.getId()});
+            check_room_connection(${jsonEncode(fossilize(video))}, ${conf.getId()});
         });
         </script>
         <a href="#" style="font-size:12px" data-booking-id=${video.getId()|n,j} data-event="${conf.getId()}"></a>

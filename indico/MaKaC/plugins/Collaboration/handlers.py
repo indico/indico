@@ -31,6 +31,7 @@ from indico.util import json
 from indico.web.rh import RHHtdocs
 from MaKaC.webinterface.rh.collaboration import RHConfModifCSBookings
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from MaKaC.plugins import Collaboration
 from MaKaC.plugins.Collaboration.pages import *
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.plugins.base import PluginsHolder
@@ -38,6 +39,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.conference import LocalFile
 import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from MaKaC.webinterface.urlHandlers import URLHandler
 
 
 class RHElectronicAgreement(RHConfModifCSBookings):
@@ -157,6 +159,13 @@ class RHElectronicAgreementForm(RHConferenceBaseDisplay):
             return WPElectronicAgreementForm(self, self._conf, self.authKey).display()
         else:# Event: Conference
             return WPElectronicAgreementFormConference(self, self._conf, self.authKey).display()
+
+
+class UHCollaborationHtdocs(URLHandler):
+    """
+    URL handler for epayment status
+    """
+    _relativeURL = "Collaboration"
 
 
 class RHCollaborationHtdocs(RHHtdocs):

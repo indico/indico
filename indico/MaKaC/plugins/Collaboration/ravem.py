@@ -33,7 +33,8 @@ class RavemClient(object):
         self._url = url
 
     def performOperation(self, operation):
-        return self._client.get(self._url + operation)
+        data = self._client.get(self._url + operation)
+        return data
 
     @classmethod
     def getInstance(cls, ravemAPIUrl = None, username = None, password = None):

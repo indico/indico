@@ -101,7 +101,7 @@ IndicoUI.Buttons = {
      * Returns a text with a 'play' icon
      */
     playButtonText: function(text, position){
-        return Html.div({className: 'buttonWithPlay ' + position + 'ButtonWithPlay' }, text);
+        return Html.div({className: 'buttonWithPlay ' + position }, text);
     },
     /**
      * Returns an image with an 'stop' icon
@@ -121,6 +121,13 @@ IndicoUI.Buttons = {
                 'verticalAlign': 'middle'
             }
         });
+    },
+
+    /**
+     * Returns a text with a 'play' icon
+     */
+    stopButtonText: function(text, position){
+        return Html.div({className: 'buttonWithStop ' + position}, text);
     },
 
     /**

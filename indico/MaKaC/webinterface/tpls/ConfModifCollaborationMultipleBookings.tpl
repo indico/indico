@@ -88,7 +88,7 @@ ${ ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm)
   *     -hasDisconnect : true if the plugin has a "disconnect" concept. Otherwise, the "disconnect" button will not appear, etc.
   *     -requiresServerCallForStart: true if we should notify the server when the user presses the "start" button.
   *     -requiresServerCallForStop: true if we should notify the server when the user presses the "stop" button.
-  *     -requiresClientCallForStart: true if the browser should execute some JS action when the user presses the "start" button.
+[  *     -requiresClientCallForStart: true if the browser should execute some JS action when the user presses the "start" button.
   *     -requiresClientCallForStop: true if the browser should execute some JS action when the user presses the "stop" button.
   * Other flags that depend on the booking object:
   *     -canBeStarted : If its value is true, the "start" button for the booking will be able to be pushed.
@@ -165,7 +165,7 @@ var edit = function(booking) {
 
 /* ------------------------------ STUFF THAT HAPPENS WHEN PAGE IS LOADED -------------------------------*/
 
-IndicoUI.executeOnLoad(function(){
+$(function(){
     // This is strictly necessary in this page because the progress dialog touches the body element of the page,
     // and IE doesn't like when this is done at page load by a script that is not inside the body element.
 
@@ -196,7 +196,7 @@ IndicoUI.executeOnLoad(function(){
 });
 
 % if MultipleBookingPlugins:
-IndicoUI.executeOnLoad(function(){
+$(function(){
     % for plugin in MultipleBookingPlugins:
     if (pluginHasFunction("${plugin.getName()}", "onLoad")) {
         codes["${plugin.getName()}"]["onLoad"]();
