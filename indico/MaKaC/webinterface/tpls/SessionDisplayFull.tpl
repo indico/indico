@@ -127,28 +127,26 @@
     </div>
 </div>
 <div class="sessionContributionsSection">
-    % if session.getContributionList():
-        <div class="sessionContributionsSectionTitle">
-            <h2 class="sessionSectionTitle">
-                % if session.getScheduleType() == "poster":
-                    ${_("Contribution List")}
-                % else:
-                    <span id="timeTableTitle" class="fakeLink">${_("Time Table")}</span><span> | </span><span id="contribListTitle" class="fakeLink">${_("Contribution List")}</span>
-                % endif
-            </h2>
-        </div>
+    <div class="sessionContributionsSectionTitle">
+        <h2 class="sessionSectionTitle">
+            % if session.getScheduleType() == "poster":
+                ${_("Contribution List")}
+            % else:
+                <span id="timeTableTitle" class="fakeLink">${_("Time Table")}</span><span> | </span><span id="contribListTitle" class="fakeLink">${_("Contribution List")}</span>
+            % endif
+        </h2>
+    </div>
 
-        <div id="contributionListDiv">
-            <%include file="SessionContributionList.tpl" args="accessWrapper=self_._aw"/>
-        </div>
-        % if session.getScheduleType() != "poster":
-            <div id="timeTableDiv">
-                <div class="timetablePreLoading" style="width: 700px; height: 300px">
-                    <div class="text" style="padding-top: 200px">${_("Building timetable...")}</div>
-                </div>
-                <div class="clearfix"></div>
+    <div id="contributionListDiv">
+        <%include file="SessionContributionList.tpl" args="accessWrapper=self_._aw"/>
+    </div>
+    % if session.getScheduleType() != "poster":
+        <div id="timeTableDiv">
+            <div class="timetablePreLoading" style="width: 700px; height: 300px">
+                <div class="text" style="padding-top: 200px">${_("Building timetable...")}</div>
             </div>
-        % endif
+            <div class="clearfix"></div>
+        </div>
     % endif
 </div>
 
@@ -160,25 +158,25 @@
     var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timeTableDiv'), new BrowserHistoryBroker());
     $E('timeTableDiv').set(timetable.draw());
     timetable.postDraw();
-                $("#timeTableTitle").click(function(){
-                    $("#contribListTitle").css('font-weight','normal');
-                    $("#timeTableTitle").css('font-weight','bold');
-                    $('#contributionListDiv').hide();
-                    $('#timeTableDiv').show();
-                });
-                $("#contribListTitle").click(function(){
-                    $("#contribListTitle").css('font-weight','bold');
-                    $("#timeTableTitle").css('font-weight','normal');
-                    $('#contributionListDiv').show();
-                    $('#timeTableDiv').hide();
-                });
-                $("#timeTableTitle").click();
+    $("#timeTableTitle").click(function(){
+        $("#contribListTitle").css('font-weight','normal');
+        $("#timeTableTitle").css('font-weight','bold');
+        $('#contributionListDiv').hide();
+        $('#timeTableDiv').show();
+    });
+    $("#contribListTitle").click(function(){
+        $("#contribListTitle").css('font-weight','bold');
+        $("#timeTableTitle").css('font-weight','normal');
+        $('#contributionListDiv').show();
+        $('#timeTableDiv').hide();
+    });
+    $("#timeTableTitle").click();
 
     $("#manageMaterial").click(function(){
       IndicoUI.Dialogs.Material.editor(${session.getConference().getId() |n,j}, ${session.getId() |n,j},'','',
                                        ${session.getAccessController().isProtected() |n,j},
                                        ${session.getMaterialRegistry().getMaterialList(session.getConference()) |n,j},
-                                       'Indico.Urls.UploadAction.session', true);
+                                       ${'Indico.Urls.UploadAction.session'}, true);
     });
     $('.sessionRightPanel').css('height', $('.sessionMainContent').css('height'));
   });
