@@ -441,9 +441,13 @@ Please see the comments below from the reviewing team:
         """ Sends an email to the contribution's authors when the referee, editor or reviewer
             pass a judgement on the contribution and only if the manager has enabled the option in 'Automatic e-mails' section.
         """
-        authorList = list(set(self.getReviewManager().getContribution().getSpeakerList()+list(self.getReviewManager().getContribution().getAuthorList())))
-        referee = self.getReviewManager().getReferee()
+        authorList = self.getReviewManager().getContribution().getSpeakerList() + list(self.getReviewManager().getContribution().getAuthorList())
+        filteredAuthorList = {}
         for author in authorList:
+            filteredAuthorList[author.getEmail()] = author
+        referee = self.getReviewManager().getReferee()
+        for author_email in filteredAuthorList:
+            author = filteredAuthorList[author_email]
             if (isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif()) \
             or (isinstance(self, EditorJudgement) and (self._review.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or not self.getJudgement() in ["Accept", "Reject"]) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif()) \
             or (isinstance(self, ReviewerJudgement) and not self.getJudgement() in ["Accept", "Reject"] and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif()):
@@ -922,7 +926,7 @@ class ContributionReviewingNotification(GenericNotification):
     def __init__(self, user, role, contribution):
         GenericNotification.__init__(self)
         conference = contribution.getConference()
-        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
+        self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""You have been chosen as a %s for "%s" """% (role, conference.getTitle()))
 
@@ -952,7 +956,7 @@ class ContributionReviewingRemoveNotification(GenericNotification):
     def __init__(self, user, role, contribution):
         GenericNotification.__init__(self)
         conference = contribution.getConference()
-        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
+        self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""You are no longer a %s of a paper for "%s" """ % (role, conference.getTitle()))
         self.setBody("""Dear %s,
@@ -969,6 +973,28 @@ class ContributionReviewingJudgementNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
         once the contribution has been judged
     """
+
+    def __init__(self, user, judgement, contribution):
+        GenericNotification.__init__(self)
+        conference = contribution.getConference()
+        self.setFromAddr("Indico <%s>"%Config.getInstance().getNoReplyEmail())
+        self.setToList([user.getEmail()])
+
+        if isinstance(judgement, EditorJudgement):
+            if conference.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
+                if judgement.getJudgement() in ["Accept", "Reject"]:
+                    self.setAcceptedRejected(user, judgement, contribution, conference, "Layout Reviewer")
+                else:
+                    self.setFullyReviewed(user, judgement, contribution, conference, "Layout Reviewer")
+            elif not judgement.getJudgement() in ["Accept", "Reject"]:
+                self.setPartiallyReviewed(user, judgement, contribution, conference, "Layout")
+        elif isinstance(judgement, ReviewerJudgement) and not judgement.getJudgement() in ["Accept", "Reject"]:
+                self.setPartiallyReviewed(user, judgement, contribution, conference, "Content")
+        elif isinstance(judgement, RefereeJudgement):
+            if judgement.getJudgement() in ["Accept", "Reject"]:
+                self.setAcceptedRejected(user, judgement, contribution, conference, "Referee")
+            else:
+                self.setFullyReviewed(user, judgement, contribution, conference, "Referee")
 
     def setFullyReviewed(self, user, judgement, contribution, conference, role):
         self.setSubject("""Your paper "%s" for "%s" has been completely reviewed """
@@ -1026,28 +1052,6 @@ Indico on behalf of "%s"
 """ % ( user.getDirectFullNameNoTitle(upper=False), role, judgementText, contribution.getTitle(), str(contribution.getId()),
          conference.getTitle(), judgement.getCommentsVerbose(), UHContributionDisplay.getURL(contribution), conference.getTitle()))
 
-    def __init__(self, user, judgement, contribution):
-        GenericNotification.__init__(self)
-        conference = contribution.getConference()
-        self.setFromAddr("Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail())
-        self.setToList([user.getEmail()])
-
-        if isinstance(judgement, EditorJudgement):
-            if conference.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
-                if judgement.getJudgement() in ["Accept", "Reject"]:
-                    self.setAcceptedRejected(user, judgement, contribution, conference, "Layout Reviewer")
-                else:
-                    self.setFullyReviewed(user, judgement, contribution, conference, "Layout Reviewer")
-            elif not judgement.getJudgement() in ["Accept", "Reject"]:
-                self.setPartiallyReviewed(user, judgement, contribution, conference, "Layout")
-        elif isinstance(judgement, ReviewerJudgement) and not judgement.getJudgement() in ["Accept", "Reject"]:
-                self.setPartiallyReviewed(user, judgement, contribution, conference, "Content")
-        elif isinstance(judgement, RefereeJudgement):
-            if judgement.getJudgement() in ["Accept", "Reject"]:
-                self.setAcceptedRejected(user, judgement, contribution, conference, "Referee")
-            else:
-                self.setFullyReviewed(user, judgement, contribution, conference, "Referee")
-
 class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
         once the judgement of the contribution has been withdrawn.
@@ -1056,7 +1060,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
         conference = contribution.getConference()
-        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
+        self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         if isinstance(judgement, RefereeJudgement):
             typeR = "Referee"
@@ -1085,7 +1089,7 @@ class ContributionReviewingJudgementRefereeNotification(GenericNotification):
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
         conference = contribution.getConference()
-        self.setFromAddr("Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail())
+        self.setFromAddr("Indico <%s>"%Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         if isinstance(judgement, EditorJudgement):
             typeR = "Layout"
@@ -1116,7 +1120,7 @@ class ContributionReviewingJudgementRefereeWithdrawalNotification(GenericNotific
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
         conference = contribution.getConference()
-        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
+        self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
@@ -1140,7 +1144,7 @@ class MaterialsSubmittedNotification(GenericNotification):
     def __init__(self, user, role, contribution):
         conference = contribution.getConference()
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
+        self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""An author has submitted a paper for "%s" """%  conference.getTitle())
 

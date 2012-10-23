@@ -724,19 +724,19 @@ $E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOption
 $E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Referee'},
-                                            $T('Referee'),
+                                            $T('Referee (for any assessment)'),
                                             'message8'
 ));
 $E('reviewerJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Reviewer'},
-                                            $T('Content Reviewer'),
+                                            $T('Content Reviewer (for assessments that imply corrections)'),
                                             'message9'
 ));
 $E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailJudgementNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Editor'},
-                                            $T('Layout Reviewer'),
+                                            $T('Layout Reviewer') + ${ _("' (for assessments that imply corrections)'") if ConferencePaperReview.reviewingModes[choice]!=ConferencePaperReview.reviewingModes[3] else "''"},
                                             'message10'
 ));
 $E('authorSubmittedMatRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif',
@@ -761,13 +761,13 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
 $E('editorSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorSubmittedRefereeNotif',
         {conference: '${ ConfReview.getConference().getId() }',
         AutoEmailsToChange: 'Referee'},
-        $T('a editor submits an assesment'),
+        $T('a layout reviewer submits an assesment'),
         'message14'
 ));
 $E('reviewerSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerSubmittedRefereeNotif',
         {conference: '${ ConfReview.getConference().getId() }',
     AutoEmailsToChange: 'Referee'},
-    $T('a reviewer submits an assesment'),
+    $T('a content reviewer submits an assesment'),
     'message15'
 ));
 
