@@ -81,7 +81,7 @@
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Building")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><a href="http://building.web.cern.ch/map/building?bno=${ room.building }" title=" ${ _("Show on map")}">${ room.building }</a></td>
+                                            <td align="left" class="blacktext"><a href="https://maps.cern.ch/mapsearch/mapsearch.htm?no=[${ room.building }]" title=" ${ _("Show on map")}">${ room.building }</a></td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Floor")}&nbsp;&nbsp;</small></td>

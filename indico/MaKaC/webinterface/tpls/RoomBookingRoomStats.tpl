@@ -31,7 +31,7 @@
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small>Building&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><a href="http://building.web.cern.ch/map/building?bno=${ room.building }" title="Show on map">${ room.building }</a></td>
+                                            <td align="left" class="blacktext"><a href="https://maps.cern.ch/mapsearch/mapsearch.htm?no=[${ room.building }]" title="Show on map">${ room.building }</a></td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small>Floor&nbsp;&nbsp;</small></td>
