@@ -1128,7 +1128,12 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                 fileURL = urlHandlers.UHFileAccess.getURL(res)
             else:
                 filename, fileType, fileURL = str(res.getName() or res.getURL()), "link", str(res.getURL())
-            files.append({'id': res.getId(), 'name': filename, 'description': res.getDescription(), 'type': fileType, 'url': fileURL, "pdfConversionStatus": res.getPDFConversionStatus()})
+            files.append({'id': res.getId(),
+                          'name': filename,
+                          'description': res.getDescription(),
+                          'type': fileType,
+                          'url': fileURL,
+                          'pdfConversionStatus': res.getPDFConversionStatus()})
         return files
 
     def _getItemType(self, item):

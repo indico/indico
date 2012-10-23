@@ -132,7 +132,7 @@
             % if session.getScheduleType() == "poster":
                 ${_("Contribution List")}
             % else:
-                <span id="timeTableTitle" class="fakeLink">${_("Time Table")}</span><span> | </span><span id="contribListTitle" class="fakeLink">${_("Contribution List")}</span>
+                <span id="timeTableTitle" class="fakeLink">${_("Timetable")}</span><span> | </span><span id="contribListTitle" class="fakeLink">${_("Contribution List")}</span>
             % endif
         </h2>
     </div>

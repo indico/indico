@@ -73,7 +73,10 @@ type("TimetableBlockBase", [],
                  each(value.resources, function(item) {
                      var name = item.name;
                      // set the URL instead of the title, if there's no title
-                     menuItems["material"+item.url] = {action: item.url, display: name ? name : item.url, description: item.description};
+                     menuItems["material" + item.url] = {
+                         action: item.url,
+                         display: name ? name : item.url,
+                         description: item.description};
                  });
              });
 

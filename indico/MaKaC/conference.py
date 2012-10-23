@@ -4053,8 +4053,10 @@ class Conference(CommonObjectBase, Locatable):
                 # If we are here then the resource is a Link object.
                 fname, ftype, furl = str(res.getURL()), "link", str(res.getURL())
             fdesc = res.getDescription()
-            files.append({'title': fname, 'description': fdesc, 'type': ftype, 'url': furl})
-
+            files.append({'title': fname,
+                          'description': fdesc,
+                          'type': ftype,
+                          'url': furl})
         return files
 
     def getAllMaterialDict(self, child=None):
