@@ -5,10 +5,10 @@
 
         if(choice == "accept"){
             // Update and store info, popup confirmation and redirect to event page.
-            acceptElectronicAgreement(${conf.getId() |n,j}, "${authKey}", "${linkToEvent}", $('input[name="notifyOrganiser"]')[0].checked);
+            acceptElectronicAgreement(${conf.getId() |n,j}, "${authKey}", "${linkToEvent}");
         }else if(choice == "refuse"){
             // Popup window asking for the rejection reason...
-            rejectElectronicAgreement(${conf.getId() |n,j}, "${authKey}", "${linkToEvent}", $('input[name="notifyOrganiser"]')[0].checked);
+            rejectElectronicAgreement(${conf.getId() |n,j}, "${authKey}", "${linkToEvent}");
         }else{
             var dialog = new WarningPopup($T("Warning"), $T("No choice selected! Please select one."));
             dialog.open();
@@ -84,7 +84,6 @@ matters of attribution.</p>
                   <div><input type="radio" name="EAChoice" value="refuse">I <strong>disagree</strong> (my talk will not be published).</input></div>
                   <div style="margin-top: 30px">
                     <input type="button" name="sendChoice" value="Submit" onclick="return signEA()"/>
-                    <input type="checkbox" checked="checked" name="notifyOrganiser">${_("Notify event organiser")}
                   </div>
                 </form>
               </div>

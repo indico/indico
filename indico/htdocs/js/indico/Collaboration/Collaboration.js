@@ -1915,14 +1915,13 @@ var drawBookingPopup = function (videoInformation, confId, bookingId, displayMod
     return $(divWrapper.dom).wrap("<div/>").parent().html();
 };
 
-var acceptElectronicAgreement = function(confId, authKey, redirectionLink, notifyOrganiser) {
+var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
     var killProgress = IndicoUI.Dialogs.Util.progress($T("Accepting Electronic Agreement..."));
     indicoRequest(
             'collaboration.acceptElectronicAgreement',
             {
                 confId: confId,
                 authKey: authKey,
-                notifyOrganiser: notifyOrganiser
             },
             function(result,error) {
                 if (!error) {
@@ -1936,7 +1935,7 @@ var acceptElectronicAgreement = function(confId, authKey, redirectionLink, notif
         );
 };
 
-var rejectElectronicAgreement = function(confId, authKey, redirectionLink, notifyOrganiser) {
+var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
     var popup = new ExclusivePopupWithButtons($T('Reason for rejection'), positive, false, false, true);
 
     popup._getButtons = function() {
@@ -1952,7 +1951,6 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink, notif
                         confId: confId,
                         reason: reason,
                         authKey: authKey,
-                        notifyOrganiser: notifyOrganiser
                     },
                     function(result,error) {
                         killProgress();

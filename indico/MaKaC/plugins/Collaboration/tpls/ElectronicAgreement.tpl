@@ -2,22 +2,30 @@
         <div class="groupTitle">Electronic Agreement</div>
 
     % if canShow:
-        <span class="RRNoteText" style="float:left;">
-            ${_("""Before any recording can be published, each speaker must sign a %s.<br/>
-                     This can be done <strong>in two different ways</strong>:
-                     <ul>
-                        <li><span style="font-weight:bold;">Electronic signature:</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
-                        </li>
-                        <em class="grey">or</em>
-                        <li>Ask the speaker to sign the """)%(agreementName)}
+        <div>
+            <div class="optionsBlock">
+                <div>
+                    <img src="${emailIconURL}" style="vertical-align:middle; width:24px">
+                    <span style="vertical-align:middle" class="subtitle">Email notification</span>
+                </div>
+                <div id="inPlaceEditNotifyElectronicAgreement"></div>
+            </div>
+            <div class="RRNoteText">
+                ${_("""Before any recording can be published, each speaker must sign the %s.<br/>
+                         To do so, two different ways are available:
+                         <ul>
+                            <li><span style="font-weight:bold;">Electronic signature:</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
+                            </li>
+                            <li>Ask the speaker to sign the """)%(agreementName)}
 
-            ${urlPaperAgreement}
+                ${urlPaperAgreement}
 
-             ${_("""<br/>Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
-                           </li>
-                        </ul>
-                """)}
-        </span>
+                 ${_("""<br/>Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
+                               </li>
+                            </ul>
+                    """)}
+            </div>
+        </div>
 
         <!-- Decide if keep or not... (if T. notice or not) -->
         <!-- <div align="right">
@@ -27,9 +35,6 @@
                 <label style="background-color:red;">${_("Some contributions cannot be published")}</label>
             % endif
         </div> -->
-        <br/>
-        <br/>
-        <br/>
 
         <div id="tooltipPool1" style="display: none">
           <div id="requestType" class="tip">
@@ -130,6 +135,8 @@
 <script type="text/javascript">
 
 $(function() {
+    $("#inPlaceEditNotifyElectronicAgreement").append($(new SwitchOptionButton("collaboration.toggleNotifyElectronicAgreementAnswer",{confId:${conf.getId()}}, $T("Notify managers when Electronic Agreement is accepted/rejected"), "message", null).draw().dom));
+
     $('.speakerLine input').change(function() {
         if (this.checked) {
             $(this).parents('.speakerLine').addClass('selected');

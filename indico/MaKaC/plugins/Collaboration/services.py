@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
+from indico.MaKaC.services.implementation.base import TextModificationBase
 """
 Services for Collaboration plugins
 """
@@ -147,7 +148,6 @@ CERN Recording Team"""
         ConferenceDisplayBase._checkParams(self)
         self.authKey = self._params["authKey"]
         self.reason = self._params["reason"]
-        self.notifyOrganiser = self._params["notifyOrganiser"]
 
     def _getAnswer(self):
         spkWrapper = None
@@ -160,13 +160,16 @@ CERN Recording Team"""
             spkWrapper.setStatus(SpeakerStatusEnum.REFUSED)
             spkWrapper.setRejectReason(self.reason)
             spkWrapper.triggerNotification()
-            if self.notifyOrganiser:
+            if manager.notifyElectronicAgreementAnswer():
                 subject = """[Indico] Electronic Agreement Rejected: '%s' (speaker : %s)""" % (self._conf.getTitle(), spkWrapper.getSpeakerId())
                 content = _(self.MESSAGE_REJECT).format(
                     speaker=spkWrapper.getObject().getFullName(),
                     title=self._conf.getTitle(),
                     url=self._conf.getURL())
-                notification = ElectronicAgreementOrganiserNotification([self._conf.getCreator().getEmail()], Config.getInstance().getNoReplyEmail(), content, subject)
+                emailToList = [self._conf.getCreator().getEmail()]
+                for event_manager in self._conf.getManagerList():
+                    emailToList.append(event_manager.getEmail())
+                notification = ElectronicAgreementOrganiserNotification(emailToList, Config.getInstance().getNoReplyEmail(), content, subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
                                          "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
@@ -186,7 +189,6 @@ CERN Recording Team"""
     def _checkParams(self):
         ConferenceDisplayBase._checkParams(self)
         self.authKey = self._params["authKey"]
-        self.notifyOrganiser = self._params["notifyOrganiser"]
 
     def _getAnswer(self):
         spkWrapper = None
@@ -198,18 +200,33 @@ CERN Recording Team"""
         if spkWrapper:
             spkWrapper.setStatus(SpeakerStatusEnum.SIGNED, self._req.get_remote_ip())
             spkWrapper.triggerNotification()
-            if self.notifyOrganiser:
+            if manager.notifyElectronicAgreementAnswer():
                 subject = """[Indico] Electronic Agreement Accepted: '%s' (speaker : %s)""" % (self._conf.getTitle(), spkWrapper.getSpeakerId())
                 content = _(self.MESSAGE_ACCEPT).format(
                     speaker=spkWrapper.getObject().getFullName(),
                     title=self._conf.getTitle(),
                     url=self._conf.getURL())
-                notification = ElectronicAgreementOrganiserNotification([self._conf.getCreator().getEmail()], Config.getInstance().getNoReplyEmail(), content, subject)
+                emailToList = [self._conf.getCreator().getEmail()]
+                for event_manager in self._conf.getManagerList():
+                    emailToList.append(event_manager.getEmail())
+                notification = ElectronicAgreementOrganiserNotification(emailToList, Config.getInstance().getNoReplyEmail(), content, subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
                                          "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
                                          None)
 
+
+class ToggleNotifyElectronicAgreementAnswer(TextModificationBase, ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        self._CSManager = self._conf.getCSBookingManager()
+
+    def _handleSet(self):
+        self._CSManager.setNotifyElectronicAgreementAnswer(self._value)
+
+    def _handleGet(self):
+        return self._CSManager.notifyElectronicAgreementAnswer()
 
 
 methodMap = {
@@ -218,5 +235,6 @@ methodMap = {
     "collaboration.sendElectronicAgreement": SendElectronicAgreement,
     "collaboration.getSpeakerEmailList": GetSpeakerEmailListByCont,
     "collaboration.rejectElectronicAgreement": RejectElectronicAgreement,
-    "collaboration.acceptElectronicAgreement": AcceptElectronicAgreement
+    "collaboration.acceptElectronicAgreement": AcceptElectronicAgreement,
+    "collaboration.toggleNotifyElectronicAgreementAnswer": ToggleNotifyElectronicAgreementAnswer
 }

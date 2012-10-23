@@ -134,7 +134,7 @@ type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
                      self._error(self.source.error.get());
                  } else if (state == SourceState.Committing) {
                      self.ready.set(true);
-                     message.set('Saved');
+                     message.set(self.savedMessage);
                      message.dom.style.color='green';
                      to = setTimeout("$E(\""+self.messageId + "\").set(\'\u00A0\')", 2000);
                  } else if (state == SourceState.Loaded) {
@@ -148,7 +148,8 @@ type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
          }
 
      },
-     function(method, attributes) {
+     function(method, attributes, savedMessage) {
+         this.savedMessage = savedMessage;
          this.ready = new WatchValue();
          this.ready.set(false);
          this.source = indicoSource(method, attributes);
@@ -168,10 +169,10 @@ type("SwitchOptionButton", ["InlineRemoteWidgetForOptionButton"],
 
          }
      },
-     function(method, attributes, caption, messageId) {
-         this.InlineRemoteWidgetForOptionButton(method, attributes);
+     function(method, attributes, caption, messageId, showSavedMessage) {
+         this.InlineRemoteWidgetForOptionButton(method, attributes, showSavedMessage);
          this.caption = caption;
-         this.checkbox = Html.checkbox({});
+         this.checkbox = Html.checkbox({style:{verticalAlign:"middle"}});
          this.messageId = messageId;
 
          $B(this.checkbox, this.source);

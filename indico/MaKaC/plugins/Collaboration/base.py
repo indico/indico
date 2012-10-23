@@ -89,6 +89,9 @@ class CSBookingManager(Persistent, Observer):
         self._speakerWrapperList = []
         self.updateSpeakerWrapperList()
 
+        # Send email to managers when Electronic Agreement accepted
+        self._notifyElectronicAgreementAnswer = True
+
     def getOwner(self):
         """ Returns the Conference (the meeting) that owns this CSBookingManager object.
         """
@@ -1087,6 +1090,16 @@ class CSBookingManager(Persistent, Observer):
 
         #The list has to have at least one spkWrap with the given contId
         return exists
+
+    def notifyElectronicAgreementAnswer(self):
+        if not hasattr(self, "_notifyElectronicAgreementAnswer"):
+            self._notifyElectronicAgreementAnswer = True
+        return self._notifyElectronicAgreementAnswer
+
+    def setNotifyElectronicAgreementAnswer(self, notifyElectronicAgreementAnswer):
+        self._notifyElectronicAgreementAnswer = notifyElectronicAgreementAnswer
+
+
 
 class CSBookingBase(Persistent, Fossilizable):
     fossilizes(ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil)

@@ -336,4 +336,6 @@ class WElectronicAgreement(wcomponents.WTemplated):
         vars['collaborationUrlHandlers'] = collaborationUrlHandlers
         vars['urlPaperAgreement'] = self.getPaperAgreementURL()
         vars['agreementName'] = CollaborationTools.getOptionValue("RecordingRequest", "AgreementName")
+        vars["notifyElectronicAgreementAnswer"] = manager.notifyElectronicAgreementAnswer()
+        vars["emailIconURL"]=(str(Config.getInstance().getSystemIconURL("mail_grey")))
         return vars

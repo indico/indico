@@ -323,7 +323,7 @@ IndicoUI.Widgets = {
         },
 
         switchOptionButton: function(method, attributes, caption, messageId) {
-            var button = new SwitchOptionButton(method, attributes, caption, messageId);
+            var button = new SwitchOptionButton(method, attributes, caption, messageId, $T("Saved"));
             return button.draw();
         },
 

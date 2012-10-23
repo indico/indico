@@ -94,6 +94,7 @@ class Config:
                  "ats_prop_other_track": "ats_prop_other_track.png",
                  "mail": "mail.png",
                  "mail_big": "mail_big.png",
+                 "mail_grey": "mail_grey.png",
                  "comments": "comments.png",
                  "day": "pict_day_orange.png",
                  "year": "pict_year_orange.png",
