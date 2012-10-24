@@ -216,6 +216,41 @@ class VidyoOperations(object):
 
         return modifiedRoom
 
+    @classmethod
+    def setAutomute(cls, booking):
+        confId = booking.getConference().getId()
+        bookingId = booking.getId()
+        roomId = booking.getRoomId()
+        autoMute = booking.getBookingParamByName("autoMute")
+
+        try:
+            if autoMute:
+                AdminApi.enableAutomute(roomId, confId, bookingId)
+            else:
+                AdminApi.disableAutomute(roomId, confId, bookingId)
+        except WebFault, e:
+            faultString = e.fault.faultstring
+            if faultString.startswith('Room not found for roomID'):
+                return VidyoError("unknownRoom", "setAutomute")
+            else:
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's setAutomute operation got WebFault: %s""" %
+                            (confId, bookingId, e.fault.faultstring))
+
+    @classmethod
+    def getAutomute(cls, booking):
+        confId = booking.getConference().getId()
+        bookingId = booking.getId()
+        roomId = booking.getRoomId()
+
+        try:
+            return AdminApi.getAutomute(roomId, confId, bookingId)
+        except WebFault, e:
+            faultString = e.fault.faultstring
+            if faultString.startswith('Room not found for roomID'):
+                return VidyoError("unknownRoom", "getAutomute")
+            else:
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getAutomute operation got WebFault: %s""" %
+                            (confId, bookingId, e.fault.faultstring))
 
     @classmethod
     def queryRoom(cls, booking, roomId):
@@ -271,6 +306,8 @@ class VidyoOperations(object):
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s""" %
                             (confId, bookingId, e.fault.faultstring))
                 raise
+
+
 
     @classmethod
     def connectRoom(cls, booking, roomId, extension):

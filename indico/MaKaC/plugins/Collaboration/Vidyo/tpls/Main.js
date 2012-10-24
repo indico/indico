@@ -212,6 +212,10 @@
             Html.td({}, booking.bookingParams.hidden? $T("Hidden") : $T("Visible"))));
 
         infoTbody.append(Html.tr({},
+                Html.td("collaborationInfoLeftCol", $T('Auto-Mute:')),
+                Html.td({}, booking.bookingParams.autoMute? $T("Enabled") : $T("Disabled"))));
+
+        infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Created on:')),
             Html.td({}, formatDateTimeCS(booking.creationDate))));
 
@@ -291,6 +295,7 @@
                 params, function() {
                         ajaxPending["contribution"].resolve();
                 }, 'videoLinkContribution', "No contributions"),
+            autoMuteField : new Html.checkbox({style: {verticalAlign:"middle"},name:"autoMute", id:"autoMute", value:"yes"}, true).dom,
             dummy : "",
             changed : false
         };
@@ -313,10 +318,12 @@
         $E('PINField').set(vidyoComponents["pinField"].draw());
         $E('moderatorPINField').set(vidyoComponents["moderatorPinField"].draw());
         $E('videoEventLinkType').set(vidyoComponents["link"].draw());
+        $E('autoMuteField').set(vidyoComponents["autoMuteField"]);
 
         bookingPopup.addComponent(vidyoComponents["ownerField"]);
         bookingPopup.addComponent(vidyoComponents["pinField"]);
         bookingPopup.addComponent(vidyoComponents["moderatorPinField"]);
+        bookingPopup.addComponent(vidyoComponents["autoMuteField"]);
         bookingPopup.addComponent(vidyoComponents["session"]);
         bookingPopup.addComponent(vidyoComponents["contribution"]);
         bookingPopup.addComponent(vidyoComponents["link"]); /* This must be the last component added. */

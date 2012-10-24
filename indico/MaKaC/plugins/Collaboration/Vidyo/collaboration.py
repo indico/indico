@@ -70,7 +70,8 @@ class CSBooking(CSBookingBase):
         "displayPhoneNumbers": (bool, True),
         "videoLinkType": (str, 'event'),
         "videoLinkContribution": (str, ''),
-        "videoLinkSession": (str, '')}
+        "videoLinkSession": (str, ''),
+        "autoMute": (bool, True)}
 
     _complexParameters = ["pin", "hasPin","moderatorPin", "hasModeratorPin", "owner"]
 
@@ -367,6 +368,12 @@ class CSBooking(CSBookingBase):
             VidyoTools.getEventEndDateIndex().indexBooking(self)
             VidyoTools.getIndexByVidyoRoom().indexBooking(self)
 
+            automute_result = ExternalOperationsManager.execute(self, "setAutomute", VidyoOperations.setAutomute, self)
+            if isinstance(automute_result, VidyoError):
+                if automute_result.getErrorType() == 'unknownRoom':
+                    self.setBookingNotPresent()
+                return automute_result
+
 
     def _modify(self, oldBookingParams):
         """ Modifies the Vidyo public room in the remote system
@@ -384,6 +391,13 @@ class CSBooking(CSBookingBase):
 
             if oldBookingParams["owner"]["id"] != self.getOwnerObject().getId():
                 self._sendNotificationToOldNewOwner(oldBookingParams["owner"])
+
+            automute_result = ExternalOperationsManager.execute(self, "setAutomute", VidyoOperations.setAutomute, self)
+            if isinstance(automute_result, VidyoError):
+                if automute_result.getErrorType() == 'unknownRoom':
+                    self.setBookingNotPresent()
+                return automute_result
+
             self._updateRelatedBookings()
 
     def _notifyOnView(self):
@@ -406,6 +420,7 @@ class CSBooking(CSBookingBase):
             booking.setBookingOK()
             booking._bookingParams["roomName"] = self._bookingParams["roomName"]
             booking._bookingParams["roomDescription"] = self._bookingParams["roomDescription"]
+            booking._bookingParams["autoMute"] = self._bookingParams["autoMute"]
 
 
     def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
@@ -525,8 +540,14 @@ class CSBooking(CSBookingBase):
             #if str(adminApiResult.groupName) != getVidyoOptionValue("indicoGroup"):
             #    return VidyoError("invalidGroup", "checkStatus")
 
-            self._updateRelatedBookings()
+            automute_result = ExternalOperationsManager.execute(self, "getAutomute", VidyoOperations.getAutomute, self)
+            if isinstance(automute_result, VidyoError):
+                if automute_result.getErrorType() == 'unknownRoom':
+                    self.setBookingNotPresent()
+                return automute_result
+            self._bookingParams["autoMute"] = automute_result
 
+            self._updateRelatedBookings()
 
     def _delete(self, fromDeleteOld = False):
         """ Deletes the Vidyo Public room associated to this CSBooking, based on the roomId

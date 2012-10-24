@@ -22,6 +22,7 @@ from suds import WebFault
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoConnectionException
 from urllib2 import URLError
 
+AUTOMUTE_API_PROFILE = "NoAudioAndVideo"
 
 class ApiBase(object):
     """ Provides the _handleServiceCallException method
@@ -169,6 +170,49 @@ class AdminApi(ApiBase):
         except Exception, e:
             cls._handleServiceCallException(e)
 
+    @classmethod
+    def enableAutomute(cls, roomId, confId, bookingId):
+        try:
+            vidyoClient = AdminClient.getInstance()
+        except Exception, e:
+            raise VidyoConnectionException(e)
+        try:
+            answer = vidyoClient.service.setRoomProfile(roomId, AUTOMUTE_API_PROFILE)
+            return answer
+        except WebFault, e:
+            raise
+        except Exception, e:
+            cls._handleServiceCallException(e)
+
+    @classmethod
+    def disableAutomute(cls, roomId, confId, bookingId):
+        try:
+            vidyoClient = AdminClient.getInstance()
+        except Exception, e:
+            raise VidyoConnectionException(e)
+        try:
+            answer = vidyoClient.service.removeRoomProfile(roomId)
+            return answer
+        except WebFault, e:
+            raise
+        except Exception, e:
+            cls._handleServiceCallException(e)
+
+    @classmethod
+    def getAutomute(cls, roomId, confId, bookingId):
+        try:
+            vidyoClient = AdminClient.getInstance()
+        except Exception, e:
+            raise VidyoConnectionException(e)
+        try:
+            answer = vidyoClient.service.getRoomProfile(roomId)
+            if answer is None or answer == "":
+                return False
+            return answer.roomProfileName == AUTOMUTE_API_PROFILE
+        except WebFault, e:
+            raise
+        except Exception, e:
+            cls._handleServiceCallException(e)
 
     @classmethod
     def connectRoom(cls, roomId, confId, bookingId, legacyMember):
