@@ -29,7 +29,7 @@ class SOAPObjectFactory(object):
     """
 
     @classmethod
-    def createRoom(cls, name, description, ownerName, extension, pin):
+    def createRoom(cls, name, description, ownerName, extension, pin, moderatorPin):
         """ Creates a SOAP room object
         """
         vidyoClient = AdminClient.getInstance()
@@ -43,10 +43,16 @@ class SOAPObjectFactory(object):
         newRoom.description = description
         newRoom.RoomMode.isLocked = False
         if pin:
-            newRoom.RoomMode.hasPin = True
+            newRoom.RoomMode.hasPIN = True
             newRoom.RoomMode.roomPIN = pin
         else:
-            newRoom.RoomMode.hasPin = False
+            newRoom.RoomMode.hasPIN = False
+
+        if moderatorPin:
+            newRoom.RoomMode.hasModeratorPIN = True
+            newRoom.RoomMode.moderatorPIN = moderatorPin
+        else:
+            newRoom.RoomMode.hasModeratorPIN = False
 
         return newRoom
 

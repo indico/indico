@@ -53,6 +53,8 @@ var VidyoDisplayURLHelpPopup = function(event) {
 var vidyoDrawContextHelpIcons = function() {
     $('#PINHelpImg').qtip({
         content : $T('If you want to <strong>protect<\/strong> your Vidyo room with a PIN, please input it here. Otherwise, leave this field empty.')});
+    $('#moderatorPINHelpImg').qtip({
+        content : $T('This is a moderator PIN. Users that know this PIN will be able to moderate the meeting')});
     $('#displayURLHelpImg').qtip({
         content : $T('Please note that regardless of this option, a <em>Join Now!</em> link will appear.')});
     $('#hiddenHelpImg').qtip({

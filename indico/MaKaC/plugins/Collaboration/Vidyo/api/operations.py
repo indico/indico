@@ -54,6 +54,7 @@ class VidyoOperations(object):
         description = booking.getBookingParamByName("roomDescription")
         owner = booking.getOwnerObject()
         pin = booking.getPin()
+        moderatorPin = booking.getModeratorPin()
 
         #we obtain the unicode object with the proper format for the room name
         roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName, originalId)
@@ -78,10 +79,11 @@ class VidyoOperations(object):
 
         roomCreated = False
         loginToUse = 0
+
         while not roomCreated and loginToUse < len(possibleLogins):
             #we loop changing the ownerName and the extension until room is created
 
-            newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, possibleLogins[loginToUse], extension, pin)
+            newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, possibleLogins[loginToUse], extension, pin, moderatorPin)
             try:
                 AdminApi.addRoom(newRoom, confId, bookingId)
                 roomCreated = True
@@ -136,6 +138,7 @@ class VidyoOperations(object):
         ownerAccountName = booking.getOwnerAccount() #a str
         oldOwner = oldBookingParams["owner"] #an IAvatarFossil fossil
         pin = booking.getPin()
+        moderatorPin = booking.getModeratorPin()
 
         #we obtain the unicode object with the proper format for the room name
         roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName, originalId)
@@ -167,7 +170,7 @@ class VidyoOperations(object):
             if not useOldAccountName:
                 ownerAccountName = possibleLogins[loginToUse]
 
-            newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, ownerAccountName, booking.getExtension(), pin)
+            newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, ownerAccountName, booking.getExtension(), pin, moderatorPin)
             try:
                 AdminApi.updateRoom(roomId, newRoom, confId, bookingId)
                 roomModified = True

@@ -37,6 +37,7 @@
             }],
             'roomDescription' : ['text', false],
             'pin': ['non_negative_int', true],
+            'moderatorPin': ['non_negative_int', true],
             'videoLinkSession': ['text', false, function(option, values){
                 var errors = [];
                 if(self.vidyoComponents["link"].get()=="session" && option == "None"){
@@ -184,8 +185,19 @@
         }
 
         infoTbody.append(Html.tr({},
-            Html.td("collaborationInfoLeftCol", $T('PIN:')),
-            Html.td({}, pinInfo)));
+                Html.td("collaborationInfoLeftCol", $T('PIN:')),
+                Html.td({}, pinInfo)));
+
+        var moderatorPinInfo;
+        if (booking.bookingParams.hasModeratorPin) {
+            moderatorPinInfo = new HiddenText(booking.bookingParams.moderatorPin, Html.span("VidyoHiddenModeratorPIN", "********"), false).draw();
+        } else {
+            moderatorPinInfo = $T("No moderator PIN was defined");
+        }
+
+        infoTbody.append(Html.tr({},
+                Html.td("collaborationInfoLeftCol", $T('Moderator PIN:')),
+                Html.td({}, moderatorPinInfo)));
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Description:')),
@@ -265,6 +277,7 @@
                 false, false,
                 singleUserNothing, singleUserNothing),
             pinField : new ShowablePasswordField('pin', '', false),
+            moderatorPinField : new ShowablePasswordField('moderatorPin', '', false),
             link : new RadioFieldWidget([
                  ['event', $T("Leave default Vidyo association")],
                  ['contribution', $T("Link to a contribution")],
@@ -298,10 +311,12 @@
 
         $E('owner').set(vidyoComponents["ownerField"].draw());
         $E('PINField').set(vidyoComponents["pinField"].draw());
+        $E('moderatorPINField').set(vidyoComponents["moderatorPinField"].draw());
         $E('videoEventLinkType').set(vidyoComponents["link"].draw());
 
         bookingPopup.addComponent(vidyoComponents["ownerField"]);
         bookingPopup.addComponent(vidyoComponents["pinField"]);
+        bookingPopup.addComponent(vidyoComponents["moderatorPinField"]);
         bookingPopup.addComponent(vidyoComponents["session"]);
         bookingPopup.addComponent(vidyoComponents["contribution"]);
         bookingPopup.addComponent(vidyoComponents["link"]); /* This must be the last component added. */

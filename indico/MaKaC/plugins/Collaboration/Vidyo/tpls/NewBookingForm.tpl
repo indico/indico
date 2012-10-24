@@ -53,4 +53,13 @@ ${_(" Please be aware that if you modify any sensitive data such as the room nam
             <img id="PINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
+    <tr>
+        <td class="bookingFormFieldName" nowrap>
+            <span>${_("Moderator PIN")}</span>
+        </td>
+        <td>
+            <span id="moderatorPINField"></span>
+            <img id="moderatorPINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
+        </td>
+    </tr>
 </table>

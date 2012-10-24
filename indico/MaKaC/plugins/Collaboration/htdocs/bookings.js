@@ -93,7 +93,7 @@ type("ConnectButton", [], {
             function(result,error) {
                 if (!error) {
                     if (result.error) {
-                        new WarningPopup($T("Cannot get the status")).open();
+                        new WarningPopup($T("Warning"), $T("Cannot get the status")).open();
                     } else {
                         // store connection data/status
                         self.connection = result;

@@ -72,12 +72,13 @@ class CSBooking(CSBookingBase):
         "videoLinkContribution": (str, ''),
         "videoLinkSession": (str, '')}
 
-    _complexParameters = ["pin", "hasPin", "owner"]
+    _complexParameters = ["pin", "hasPin","moderatorPin", "hasModeratorPin", "owner"]
 
 
     def __init__(self, bookingType, conf):
         CSBookingBase.__init__(self, bookingType, conf)
         self._pin = None
+        self._moderatorPin = None
         self._owner = None
         self._ownerVidyoAccount = None
         self._roomId = None
@@ -120,6 +121,26 @@ class CSBooking(CSBookingBase):
         return self._pin is not None and len(self._pin) > 0
 
     def setHasPin(self, value):
+        #ignore, will be called only on rollback
+        pass
+
+    def getModeratorPin(self):
+        """ This method returns the moderator PIN
+        """
+        if not hasattr(self, "_moderatorPin"):
+            self._moderatorPin = None
+        return self._moderatorPin
+
+    def setModeratorPin(self, pin):
+        if not pin or pin.strip() == "":
+            self._moderatorPin = ""
+        else:
+            self._moderatorPin = pin
+
+    def getHasModeratorPin(self):
+        return self.getModeratorPin() is not None and len(self.getModeratorPin()) > 0
+
+    def setHasModeratorPin(self, value):
         #ignore, will be called only on rollback
         pass
 
@@ -276,6 +297,12 @@ class CSBooking(CSBookingBase):
             except ValueError:
                 raise VidyoException("pin parameter (" + str(self._pin) + ") is not an integer for Vidyo booking with id: " + str(self._id))
 
+        if self._moderatorPin:
+            try:
+                int(self._moderatorPin)
+            except ValueError:
+                raise VidyoException("moderator pin parameter (" + str(self._moderatorPin) + ") is not an integer for Vidyo booking with id: " + str(self._id))
+
         return False
 
     def getLinkObject(self):
@@ -373,6 +400,7 @@ class CSBooking(CSBookingBase):
         for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(self.getRoomId()):
             booking.setExtension(self.getExtension())
             booking.setPin(self.getPin())
+            booking.setModeratorPin(self.getModeratorPin())
             booking.setURL(self.getURL())
             booking.setOwnerAccount(self.getOwnerAccount(), True)
             booking.setBookingOK()
@@ -474,10 +502,15 @@ class CSBooking(CSBookingBase):
                 self._warning = "invalidName"
             self._extension = str(adminApiResult.extension)
 
-            if bool(adminApiResult.RoomMode.hasPin):
+            if bool(adminApiResult.RoomMode.hasPIN):
                 self._pin = str(adminApiResult.RoomMode.roomPIN)
             else:
                 self._pin = ""
+
+            if bool(adminApiResult.RoomMode.hasModeratorPIN):
+                self._moderatorPin = str(adminApiResult.RoomMode.moderatorPIN)
+            else:
+                self._moderatorPin = ""
 
             self._url = str(adminApiResult.RoomMode.roomURL)
             self.setOwnerAccount(str(adminApiResult.ownerName), updateAvatar = True)
@@ -678,6 +711,7 @@ class CSBooking(CSBookingBase):
         cs.setCanBeDeleted(self.canBeDeleted())
         cs.setHidden(self.isHidden())
         cs.setPin(self.getPin())
+        cs.setModeratorPin(self.getModeratorPin())
         cs.setOwnerAccount(self.getOwnerAccount())
         cs.setRoomId(self.getRoomId())
         cs.setExtension(self.getExtension())
