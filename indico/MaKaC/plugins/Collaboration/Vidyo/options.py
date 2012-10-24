@@ -80,9 +80,17 @@ globalOptions = [
                          "type": str,
                          "defaultValue": "http://vidyoportal2.cern.ch/services/VidyoPortalAdminService?wsdl"}),
 
+    ("adminAPIService", {"description" : "Admin API Service",
+                         "type": str,
+                         "defaultValue": "VidyoPortalAdminService"}),
+
     ("userAPIURL", {"description" : "User API WSDL URL",
                        "type": str,
                        "defaultValue": "http://vidyoportal2.cern.ch/services/VidyoPortalUserService?wsdl"}),
+
+    ("userAPIService", {"description" : "User API Service",
+                         "type": str,
+                         "defaultValue": "VidyoPortalUserService"}),
 
     ("ravemAPIURL", {"description" : "RAVEM API server",
                      "type": str,

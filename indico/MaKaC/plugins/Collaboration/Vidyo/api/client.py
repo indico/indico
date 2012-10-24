@@ -37,7 +37,7 @@ class ClientBase(object):
 #        if url.startswith('https'):
 #            return suds.transport.https.HttpAuthenticated(username=username, password=password, timeout = 30.0)
 #        else:
-        return suds.transport.http.HttpAuthenticated(username=username, password=password, timeout = 30.0)
+        return suds.transport.https.HttpAuthenticated(username=username, password=password, timeout = 30.0)
 
 
 
@@ -61,9 +61,11 @@ class AdminClient(ClientBase):
             if password is None:
                 password = getVidyoOptionValue('indicoPassword')
 
+            location = getVidyoOptionValue('baseAPILocation') + getVidyoOptionValue('adminAPIService')
+
             try:
                 cls._instance = suds.client.Client(adminAPIUrl,
-                                                   transport = ClientBase.getTransport(adminAPIUrl, username , password))
+                                                   transport = ClientBase.getTransport(adminAPIUrl, username , password), location = location)
             except Exception:
                 Logger.get("Vidyo").exception("Problem building AdminClient")
                 raise
@@ -89,9 +91,10 @@ class UserClient(ClientBase):
             if password is None:
                 password = getVidyoOptionValue('indicoPassword')
 
+            location = getVidyoOptionValue('baseAPILocation') + getVidyoOptionValue('userAPIService')
             try:
                 cls._instance = suds.client.Client(userAPIUrl,
-                                                   transport = ClientBase.getTransport(userAPIUrl, username , password))
+                                                   transport = ClientBase.getTransport(userAPIUrl, username , password), location=location)
             except Exception:
                 Logger.get("Vidyo").exception("Problem building UserClient")
                 raise
