@@ -106,10 +106,7 @@
                     <td class="warning">
                         <h3>${_("Note")}</h3>
                         <span>
-                            ${_("There are {0} talks in the event. ").format(str(NTalks))}
-                            ${_("Some of them ")}
-                            (<span class='fakeLink' id="recordTalksUnableText">${str(NTalks - NRecordingCapableContributions)}</span>) ${_(" are not in a room capable of recording and thus cannot be recorded while the remaining ")}
-                            (<span class='fakeLink' id="recordTalksAbleText">${str(NRecordingCapableContributions)}</span>) ${_(" are goint to be recorded.")}
+                            ${_("""There are {0} talks in the event. <a class="uncapable">Some of them ({1})</a> are not in a room capable of recording and thus cannot be recorded while <a class="capable">the remaining ({2})</a> are going to be recorded.""").format(str(NTalks), str(NTalks - NRecordingCapableContributions),str(NRecordingCapableContributions))}
                         </span>
                         <span class='fakeLink' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
                         <div id="recordingCapableRoomsDiv" style="display:none;">
@@ -258,11 +255,11 @@
         }
     });
 
-    $("#recordTalksAbleText").click(function() {
-        new ContributionsPopup($T('Contributions record-able'), RR_contributions, false, function() {self.popupAllowClose = true; return true;}).open();
+    $(".warning .capable").click(function() {
+        new ContributionsPopup($T('Contributions record-able'), RR_contributions, false, function() {self.popupAllowClose = true; return true;}, true).open();
     });
-    $("#recordTalksUnableText").click(function() {
-        new ContributionsPopup($T('Contributions not record-able'), RR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}).open();
+    $(".warning .uncapable").click(function() {
+        new ContributionsPopup($T('Contributions not record-able'), RR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
     });
 % endif
 </script>

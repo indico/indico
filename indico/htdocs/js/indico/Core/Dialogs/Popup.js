@@ -839,7 +839,7 @@ type("ContributionsPopup", ["ExclusivePopup"], {
         var self = this;
         var table = Html.tbody({});
         each(this.contributions, function(contrib) {
-            var time = Html.div({style: {paddingTop: pixels(7), marginRight: pixels(3), fontSize: '12px', fontWeight: 'bold'}}, self.isPoster ? '' : contrib.startDate.time.substr(0,5));
+            var time = Html.div({style: {paddingTop: pixels(7), marginRight: pixels(3), fontSize: '12px', fontWeight: 'bold'}}, self.isPoster || contrib.startDate == null ? '' : contrib.startDate.time.substr(0,5));
             var link = Html.a({href: self._generateUrl(contrib)}, contrib.title);
             var title = Html.div({style: {color: '#444444', width: pixels(self.width), padding: pixels(5), fontSize: '15px'}}, link);
 
@@ -908,10 +908,12 @@ type("ContributionsPopup", ["ExclusivePopup"], {
         this.ExclusivePopup.prototype.postDraw.call(this);
     }
     },
-     function(title, contributions, isPoster, urlModif, closeHandler) {
+     function(title, contributions, isPoster, urlModif, closeHandler, sort) {
 
          this.contributions = $L(contributions);
-         this.contributions.sort(IndicoSortCriteria.StartTime);
+         if(sort){
+             this.contributions.sort(IndicoSortCriteria.StartTime);
+         }
          this.urlModif = urlModif;
 
          this.isPoster = isPoster;

@@ -898,7 +898,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     contribs.push(value);
                 }
             });
-            var popup = new ContributionsPopup(("Contribution details"),contribs, self.eventData.isPoster, false, function() {self.popupAllowClose = true; return true;});
+            var popup = new ContributionsPopup(("Contribution details"),contribs, self.eventData.isPoster, false, function() {self.popupAllowClose = true; return true;}, true);
             popup.open();
         });
 

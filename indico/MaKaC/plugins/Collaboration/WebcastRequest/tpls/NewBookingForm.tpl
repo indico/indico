@@ -107,10 +107,7 @@
                     <td class="warning">
                         <h3>${_("Note")}</h3>
                         <span>
-                            ${_("There are {0} talks in the event. ").format(str(NTalks))}
-                            ${_("Some of them ")}
-                            (<span class='fakeLink' id="webcastTalksUnableText">${str(NTalks - NWebcastCapableContributions)}</span>) ${_(" are not in a room capable of webcasting and thus cannot be webcasted while the remaining ")}
-                            (<span class='fakeLink' id="webcastTalksAbleText">${str(NWebcastCapableContributions)}</span>) ${_(" are goint to be webcasted.")}
+                            ${_("""There are {0} talks in the event. <a class="uncapable">Some of them ({1})</a> are not in a room capable of webcasting and thus cannot be webcasted while <a class="capable">the remaining ({2})</a> are going to be webcasted.""").format(str(NTalks), str(NTalks - NWebcastCapableContributions),str(NWebcastCapableContributions))}
                         </span>
                         <span class='fakeLink' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
                         <div id="webcastCapableRoomsDiv" style="display:none;">
@@ -239,11 +236,11 @@
         }
     });
 
-    $("#webcastTalksAbleText").click(function() {
-        new ContributionsPopup($T('Contributions webcast-able'),WR_contributions, false, function() {self.popupAllowClose = true; return true;}).open();
+    $(".warning .capable").click(function() {
+        new ContributionsPopup($T('Contributions webcast-able'),WR_contributions, false, function() {self.popupAllowClose = true; return true;}, true).open();
     });
-    $("#webcastTalksUnableText").click(function() {
-        new ContributionsPopup($T('Contributions not webcast-able'),WR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}).open();
+    $(".warning .uncapable").click(function() {
+        new ContributionsPopup($T('Contributions not webcast-able'),WR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
     });
 
 % endif
