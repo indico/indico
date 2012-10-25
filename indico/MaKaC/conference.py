@@ -7653,6 +7653,9 @@ class AuthorIndex(Persistent):
         self._idx._p_changed = 1
         self._p_changed = 1
 
+    def iteritems(self):
+        return self._idx.iteritems()
+
     def match(self, criteria, exact=0):
         self._options = ['organisation', 'surName', 'name', 'email']
         l = []

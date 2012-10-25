@@ -41,7 +41,10 @@ class WAuthorDisplay( wcomponents.WTemplated ):
         for material in contrib.getAllMaterialList():
             resources = []
             for resource in material.getResourceList():
-                resources.append({'name': resource.getName(), 'url': str(urlHandlers.UHMaterialDisplay.getURL(resource)) if isinstance(resource, Link) else str(urlHandlers.UHFileAccess.getURL(resource))})
+                resources.append({
+                        'name': resource.getName(),
+                        'url': str(urlHandlers.UHMaterialDisplay.getURL(resource)) if isinstance(resource, Link) \
+                            else str(urlHandlers.UHFileAccess.getURL(resource))})
             materials.append({'title': material.getTitle(), 'resources': resources})
         return materials
 
@@ -60,7 +63,9 @@ class WAuthorDisplay( wcomponents.WTemplated ):
         for auth in authorList:
             contrib = auth.getContribution()
             if contrib is not None:
-                contribList.append({'title': contrib.getTitle(), 'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())), 'materials': fossilize(contrib.getAllMaterialList())})
+                contribList.append({'title': contrib.getTitle(),
+                                    'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
+                                    'materials': fossilize(contrib.getAllMaterialList())})
         vars["contributions"] = contribList
         vars["fullName"] = author.getFullName()
         if self._aw.getUser() is not None:
@@ -79,6 +84,10 @@ class WPAuthorDisplay(WPConferenceDefaultDisplayBase):
         WPConferenceDefaultDisplayBase.__init__(self, rh, contrib.getConference())
         self._authorId = authId
         self._contrib = contrib
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+            self._asset_env['indico_authors'].urls()
 
     def _getBody(self, params):
         wc = WAuthorDisplay(self._getAW(), self._contrib, self._authorId)

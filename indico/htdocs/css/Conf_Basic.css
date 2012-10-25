@@ -408,3 +408,8 @@ pre {
     background: #424242;
 }
 
+ul.chair_list {
+    padding: 0px;
+    margin: 0px;
+    list-style-type: none;
+}

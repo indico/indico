@@ -84,36 +84,20 @@ type("TimetableBlockBase", [],
              return menu;
          },
 
-         getMaterialMenu: function (material) {
-                 var sections = [];
-                 each(material, function(section) {
-                     var sectionItems = [];
-                     each(section.resources, function(material) {
-                         sectionItems.push(Html.li({}, Html.a({className:"fakeLink", href: material.url}, material.name ? material.name : material.url)));
-                     });
-                     sections.push(Html.li({}, Html.li({className:'section'}, Html.div({className:'line'}, Html.div({className:'name', style: {background: '#F0F0F0'}}, section.title))), Html.ul({className:'subPopupList'}, sectionItems)));
+         getMaterialMenu: function (materials) {
+             var root = $('<ul class="material_list"/>');
+             each(materials, function(material) {
+                 var resources = $('<ul class="resource_list"/>');
+                 each(material.resources, function(resource) {
+                     var resource_html = $('<li/>').append(
+                         $('<a/>').attr('href', resource.url).text(
+                             resource.name ? resource.name : resource.url));
+                     resources.append(resource_html);
                  });
-                 var materialMenu = (Html.ul({className:'popupListNoShadows popupList sectionPopupList', style: {background: '#F0F0F0', border: 'none'}}, sections));
-                 return materialMenu;
-         },
-
-         createMaterialMenuQtip: function (selector, material) {
-             var self = this;
-             selector.qtip({
-                 content: {
-                     text: self.getMaterialMenu(material).dom.outerHTML,
-                 },
-                 show: {
-                     event: 'click'
-                 },
-                 hide: {
-                     event: 'unfocus'
-                 },
-                 position: {
-                     my: 'top right',
-                     at: 'bottom left',
-                 }
+                 var material_html = $('<li/>').append($('<h3/>').append(material.title), resources);
+                 root.append(material_html);
              });
+             return root;
          },
 
          createMaterialButton: function(material) {
@@ -122,14 +106,13 @@ type("TimetableBlockBase", [],
              var button = Html.div('timetableBlockMaterial');
              button.observeClick(function(e) {
                  e.stopPropagation();
-
                  self.closePopup();
 
                  // use this style as long as the menu is open
                  button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
                  $(".timetableBlockMaterialActive").qtip({
                          content: {
-                             text: self.getMaterialMenu(material).dom.outerHTML,
+                             text: self.getMaterialMenu(material)
                          },
                          show: {
                              event: 'click'
@@ -147,6 +130,9 @@ type("TimetableBlockBase", [],
                                  button.dom.className = "timetableBlockMaterial";
                              }
                          },
+                         style: {
+                             classes: 'material_tip'
+                         }
                  });
                  $(".timetableBlockMaterialActive").qtip().show();
              });
@@ -847,7 +833,6 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         }
         var viewLink = Html.a({'href': url}, "View details");
         bar.append(viewLink);
-
 
         if (self.eventData.material && self.eventData.material.length > 0) {
             var materialLink = Html.a('dropDownMenu fakeLink', "Material");

@@ -1,27 +1,3 @@
-<script type="text/javascript">
-    include(ScriptRoot + "indico/Timetable/Loader.js");
-
-    $(function(){
-        var resultCache = [];
-        var allItems = $(".authorIndexItem");
-
-        $("#filterAuthors").keyup(function(){
-            var searchString = $("#filterAuthors").attr('value');
-            allItems.css('visibility', 'hidden');
-            allItems.addClass('specialHide');
-            if (resultCache[searchString] == undefined) {
-                var items = $(".authorIndexItemText:contains('"+ searchString +"')").parent().parent();
-                resultCache[searchString] = items;
-            } else {
-                var items = resultCache[searchString];
-            }
-            items.css('visibility', '');
-            items.removeClass('specialHide');
-            $("#numberFiltered").text(items.length);
-            items.length == 1 ? $("#numberFilteredText").text($T("author")) : $("#numberFilteredText").text($T("authors"));
-        });
-     });
-</script>
 <div class="authorIndexFiltersContainer">
     <div>
         <input type="text" id="filterAuthors" value="" placeholder="${ _('Search in authors') }">
@@ -37,26 +13,22 @@
     % for key, item in items.iteritems():
         <div class="authorIndexItem">
             <div style="padding-bottom: 10px">
-                <a class="authorIndexItemText" href="${item[0]['authorURL']}">${item[0]['fullName']}</a>
-                % if item[0]['affiliation']:
-                    <span style="color: #888">(${item[0]['affiliation']})</span>
+                <a class="authorIndexItemText" href="${item['authorURL']}">${item['fullName']}</a>
+                % if item['affiliation']:
+                    <span style="color: #888">(${item['affiliation']})</span>
                 % endif
             </div>
-            % for i in range(1, len(item)):
+            % for i, contrib in enumerate(item['contributions']):
                 <div class="contribItem">
-                    <a href="${item[i]['url']}">${item[i]['title']}</a>
-                    % if item[i]['materials']:
-                        <img id="materialMenuIcon${key}${i}" title="${_('materials')}" src="./images/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
-                        <script type="text/javascript">
-                        $("#materialMenuIcon${key}${i}").click(function() {
-                            var timetable = new TimetableBlockBase();
-                            timetable.createMaterialMenuQtip($(this), ${item[i]['materials']});
-                            $(this).qtip().show();
-                        });
-                        </script>
+                    <a href="${contrib['url']}">${contrib['title']}</a>
+
+                    % if contrib['materials']:
+                        <img class="material_icon" title="${_('materials')}" src="./images/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
+                        <%include file="MaterialListPopup.tpl" args="materials=contrib['materials']"/>
                     % endif
                 </div>
             % endfor
+
         </div>
     % endfor
 </div>

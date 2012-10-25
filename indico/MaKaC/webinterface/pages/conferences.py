@@ -705,34 +705,6 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         self._conf = conf
         self._aw = aw
 
-    def _getChairsHTML(self):
-        l = []
-        for chair in self._conf.getChairList():
-            if chair.getEmail() and self._aw.getUser() is not None:
-                l.append("""<a href=mailto:%s>%s</a>""" % (quoteattr(chair.getEmail()), self.htmlText(chair.getFullName())))
-            elif chair.getEmail():
-                l.append("""
-    <a href=# class="chairs" style="cursor: pointer">%s</a>
-    <script type="text/javascript">
-        $('.chairs').qtip({
-             content: {
-                 text: $T("Login to send an email"),
-             },
-         });
-    </script>
-                """ % (self.htmlText(chair.getFullName())))
-            else:
-                l.append(self.htmlText(chair.getFullName()))
-        res = ""
-        if len(l) > 0:
-            res = i18nformat("""
-    <tr>
-        <td align="right" valign="top" class="displayField"><b> _("Chairs"):</b></td>
-        <td>%s</td>
-    </tr>
-                """)%"<br>".join(l)
-        return res
-
     def _getMaterialHTML( self ):
         l = []
         for mat in self._conf.getAllMaterialList():
@@ -817,7 +789,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
             if room and room.getName():
                 roomLink = linking.RoomLinker().getHTMLLink( room, location )
                 vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
-        vars["chairs"] = self._getChairsHTML()
+        vars["chairs"] = self._conf.getChairList()
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
         vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
@@ -6761,26 +6733,43 @@ class WConfAuthorIndex( wcomponents.WTemplated ):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        res = collections.defaultdict(list)
-        for index, key in enumerate(self._conf.getAuthorIndex().getParticipationKeys()):
-            pl = self._conf.getAuthorIndex().getById(key)
-            try:
-                auth = pl[0]
-            except IndexError:
+        res = []
+        for key, authors in self._conf.getAuthorIndex().iteritems():
+
+            # get the first identity that matches the author
+            if len(authors) == 0:
                 continue
-            authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution())
-            authorURL.addParam("authorId", auth.getId())
-            res[index].append({'fullName': auth.getFullNameNoTitle(), 'affiliation': auth.getAffiliation(), 'authorURL': authorURL })
-            for auth in pl:
+            else:
+                auth = authors[0]
+
+            authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution(),
+                                                                  authorId=auth.getId())
+            contribs = []
+            res.append({'fullName': auth.getFullNameNoTitle(),
+                        'affiliation': auth.getAffiliation(),
+                        'authorURL': authorURL,
+                        'contributions': contribs
+                        })
+
+            for auth in authors:
                 contrib = auth.getContribution()
                 if contrib is not None:
-                    res[index].append({'title': contrib.getTitle(), 'url': str(urlHandlers.UHContributionDisplay.getURL( auth.getContribution())), 'materials': fossilize(contrib.getAllMaterialList())})
-        vars["items"] = res
+                    contribs.append({
+                            'title': contrib.getTitle(),
+                            'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
+                            'materials': fossilize(contrib.getAllMaterialList())
+                            })
+
+        vars["items"] = dict(enumerate(res))
         return vars
 
 
 class WPAuthorIndex( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAuthorIndex
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+            self._asset_env['indico_authors'].urls()
 
     def _getBody(self,params):
         wc = WConfAuthorIndex(self._conf)
@@ -6789,6 +6778,7 @@ class WPAuthorIndex( WPConferenceDefaultDisplayBase ):
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
+
 
 class WConfSpeakerIndex( wcomponents.WTemplated ):
 

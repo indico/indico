@@ -106,6 +106,9 @@ indico_jquery = Bundle('js/indico/jquery/defaults.js',
                        'js/indico/jquery/global.js',
                         filters='jsmin', output='indico_jquery_%(version)s.min.js')
 
+indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
+                               filters='jsmin', output='indico_jquery_authors_%(version)s.min.js')
+
 jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.js',
                 'js/jquery/jquery-ui.js',
@@ -180,6 +183,7 @@ def register_all_js(env):
     env.register('indico_materialeditor', indico_materialeditor)
     env.register('indico_display', indico_display)
     env.register('indico_jquery', indico_jquery)
+    env.register('indico_authors', indico_jquery_authors)
     env.register('base_js', base_js)
 
 

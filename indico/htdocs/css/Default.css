@@ -5362,6 +5362,7 @@ div.timetableBlockPresenters {
 }
 
 div.timetableBlockMaterial {
+    cursor: pointer;
     padding: 2px;
     margin: 2px;
     float: right;
@@ -5827,13 +5828,6 @@ ul.popupList {
     -moz-box-shadow: 2px 2px 2px #444;
     -webkit-box-shadow: 2px 2px 2px #444;
     box-shadow: 2px 2px 2px #444;
-}
-
-ul.popupListNoShadows {
-    border: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    box-shadow: none;
 }
 
 /* When it's in a popuplist chain then make the box shadow
@@ -8083,12 +8077,6 @@ div#sdlw-actions {
     z-index:999;
 }
 
-.contributionListFiltersContainer {
-    border-bottom: 1px solid #EBEBEB;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-}
-
 div.domain_control .strong {
     font-weight: bold;
 }
@@ -8475,9 +8463,49 @@ table#currencies td, table#currencies th {
     padding: 5px;
 }
 
-.specialHide {
-  padding: 0;
-  margin: 0;
-  height: 0;
-  border: 0;
+.material_tip {
+    border-color: #ddd !important;
+    box-shadow: 1px 1px 5px rgba(100, 100, 100, 0.2);
+}
+
+.material_tip .ui-tooltip-content {
+    background: #f8f8f8;
+}
+
+ul.material_list {
+    min-width: 150px;
+    max-width: 250px;
+    overflow: hidden;
+    margin: 0;
+    padding-left: 0;
+}
+
+ul.material_list h3 {
+    margin-top: 0;
+    text-align: right;
+    color: #999;
+    padding-bottom: 5px;
+    border-bottom: 1px dotted #bbb;
+    font-weight: normal;
+    text-shadow: 1px 1px #fff;
+}
+
+ul.material_list ul {
+    padding-left: 0px;
+    margin: 2px 0 10px 0;
+}
+
+ul.material_list ul li {
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.visibility_hidden {
+    visibility: none;
+    padding: 0;
+    height: 0;
+    margin: 0;
+    border: 0;
 }

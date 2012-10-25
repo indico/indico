@@ -47,13 +47,6 @@
                     <a href="${item[i]['url']}">${item[i]['title']}</a>
                     % if item[i]['materials']:
                         <img id="materialMenuIcon${key}${i}" title="${_('materials')}" src="./images/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
-                        <script type="text/javascript">
-                        $("#materialMenuIcon${key}${i}").click(function() {
-                            var timetable = new TimetableBlockBase();
-                            timetable.createMaterialMenuQtip($(this), ${item[i]['materials']});
-                            $(this).qtip().show();
-                        });
-                        </script>
                     % endif
                 </div>
             % endfor
