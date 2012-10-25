@@ -122,7 +122,7 @@ else:
                         </td>
                         <form action=${ contribSelectionAction } method="post" name="contribsForm" id="contribsForm">
                         <td>
-                           <input type="submit" onclick="deleteContributions(); return false;" class="btn" name="" value="${ _("Delete")}">
+                           <input type="submit" class="btn" name="delete" value="${ _("Delete")}">
                         </td>
                         <td valign="bottom" align="left" class="eventModifButtonBar">
                            <input type="submit" class="btn" name="move" value="${ _("Move")}">
@@ -188,7 +188,7 @@ else:
                     <table>
                         <tbody>
                                 <td>
-                                   <input type="submit" onclick="deleteContributions(); return false;" class="btn" name="" value="${ _("Delete")}">
+                                   <input type="submit" class="btn" name="delete" value="${ _("Delete")}">
                                 </td>
                                 <td valign="bottom" align="left" class="eventModifButtonBar">
                                     <input type="submit" class="btn" name="move" value="${ _("Move")}">
@@ -268,8 +268,9 @@ var addContribution = function() {
     dialog.execute();
 };
 
-var deleteContributions = function() {
-    if (atLeastOneContribSelected()) {
+$("input[name=delete]").click(function(event){
+    event.preventDefault();
+    if (atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'))) {
         var listContribsToDelete = $('input:checked[name=contributions]').map(function(){return this.value;}).toArray();
         if (confirm('${ _("Are you sure you wish to delete the selected contributions?\\nNote that you cannot undo this action.")}')){
             var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting the contributions..."));
@@ -288,7 +289,7 @@ var deleteContributions = function() {
                 );
         }
     }
-};
+});
 
 $("#contribsForm").submit(function(event){
     return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));
