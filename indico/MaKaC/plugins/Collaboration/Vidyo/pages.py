@@ -55,7 +55,7 @@ class WMain (WJSBase):
         variables = WJSBase.getVars(self)
 
         variables["LoggedInUser"] = self._user.fossilize(IAvatarFossil)
-        variables["MaxNameLength"] = VidyoTools.maxRoomNameLength(self._conf)
+        variables["MaxNameLength"] = VidyoTools.maxRoomNameLength(self._conf.getId())
 
         return variables
 

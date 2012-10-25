@@ -43,8 +43,12 @@ class VidyoOperations(object):
             :param booking: the CSBooking object inside which we try to create the room
             :type booking: MaKaC.plugins.Collaboration.Vidyo.collaboration.CSBooking
         """
-        #we extract the different parameters
-        confId = booking.getConference().getId()
+        # we extract the different parameters
+        # We set the original conference id because the bookings can belong to more than one conference and being cloned
+        # and it is used for the long name, we need to keep always the same confId
+        originalId = confId = booking.getConference().getId()
+        booking.setOriginalConferenceId(originalId)
+
         bookingId = booking.getId()
         roomName = booking.getBookingParamByName("roomName")
         description = booking.getBookingParamByName("roomDescription")
@@ -52,7 +56,7 @@ class VidyoOperations(object):
         pin = booking.getPin()
 
         #we obtain the unicode object with the proper format for the room name
-        roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName, confId)
+        roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName, originalId)
         if isinstance(roomNameForVidyo, VidyoError):
             return roomNameForVidyo
 
@@ -63,7 +67,7 @@ class VidyoOperations(object):
 
         #we obtain the most probable extension
         #TODO: there's a length limit for extensions, check this
-        baseExtension = getVidyoOptionValue("prefix") + confId
+        baseExtension = getVidyoOptionValue("prefix") + originalId
         extension = baseExtension
         extensionSuffix = 1
 
@@ -119,7 +123,10 @@ class VidyoOperations(object):
     @classmethod
     def modifyRoom(cls, booking, oldBookingParams):
 
-        #we extract the different parameters
+        # we extract the different parameters
+        # We set the original conference id because the bookings can belong to more than one conference and being cloned
+        # and it is used for the long name, we need to keep always the same confId
+        originalId = booking.getOriginalConferenceId()
         confId = booking.getConference().getId()
         bookingId = booking.getId()
         roomId = booking.getRoomId()
@@ -131,7 +138,7 @@ class VidyoOperations(object):
         pin = booking.getPin()
 
         #we obtain the unicode object with the proper format for the room name
-        roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName, confId)
+        roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName, originalId)
         if isinstance(roomNameForVidyo, VidyoError):
             return roomNameForVidyo
 
