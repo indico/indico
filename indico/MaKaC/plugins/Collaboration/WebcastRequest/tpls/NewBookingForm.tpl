@@ -92,7 +92,7 @@
             <table>
                 <tr>
                     <td>
-                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="WR_hideTalks()" checked />
+                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="WR_hideTalks();" checked />
                     </td>
                     <td>
                         % if NTalks == NWebcastCapableContributions:
@@ -101,7 +101,7 @@
                         <label for="allTalksRB" id="allTalksRBLabel">${_("All webcastable talks.")}</label>
                     </td>
                 </tr>
-                            % if WebcastCapable:
+                % if WebcastCapable:
                 <tr>
                     <td></td>
                     <td class="warning">
@@ -134,13 +134,12 @@
                                 </span>
                             </div>
                         </div>
-                            % endif
                     </td>
                 </tr>
-                        % endif
+                % endif
                 <tr>
                     <td>
-                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="WR_loadTalks()" />
+                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="WR_loadTalks(${isManager | n,j})" />
                     </td>
                     <td>
                         % if NTalks == NWebcastCapableContributions:

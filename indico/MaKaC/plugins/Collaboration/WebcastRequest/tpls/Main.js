@@ -48,5 +48,11 @@
         if(!singleBookings['WebcastRequest']) {
             callFunction('WebcastRequest', 'clearForm');
         }
+    },
+
+    afterLoad : function() {
+        if ($("#chooseTalksRB").is(":checked")) {
+            $("#chooseTalksRB").click();
+        }
     }
 }

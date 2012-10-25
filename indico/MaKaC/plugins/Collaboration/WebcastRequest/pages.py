@@ -23,6 +23,7 @@ from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInfor
 from MaKaC.conference import Contribution
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
+from MaKaC.plugins.Collaboration.WebcastRequest.fossils import IContributionWRFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.timezoneUtils import isSameDay
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
@@ -40,19 +41,23 @@ class WNewBookingForm(WCSPageTemplateBase):
 
         underTheLimit = self._conf.getNumberOfContributions() <= self._WebcastRequestOptions["contributionLoadLimit"].getValue()
         manager = self._conf.getCSBookingManager()
+        user = self._rh._getUser()
+        isManager = manager.isVideoServicesManager(user) or manager.isPluginManager('WebcastRequest', user)
+
         booking = manager.getSingleBooking('WebcastRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
 
         vars["DisplayTalks"] = initialDisplay
         vars["InitialChoose"] = initialChoose
+        vars["isManager"] = isManager
 
         talks, wcRoomFullNames, wcRoomNames, webcastAbleTalks, webcastUnableTalks = getCommonTalkInformation(self._conf)
         nTalks = len(talks)
         nWebcastCapable = len(webcastAbleTalks)
 
         vars["HasWebcastCapableTalks"] = nWebcastCapable > 0
-        vars["NTalks"] = nTalks
+        vars["NTalks"] = len(talks)
 
         #list of "locationName:roomName" strings
         vars["WebcastCapableRooms"] = wcRoomFullNames
@@ -68,8 +73,7 @@ class WNewBookingForm(WCSPageTemplateBase):
             topLevelWebcastCapable = False
 
         #Finally, this event is webcast capable if the event itself or one of its talks are capable or user is admin, video services manager or webcast manager
-        user = self._rh._getUser()
-        vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or user.isAdmin() or manager.isVideoServicesManager(user) or manager.isPluginManager('WebcastRequest', user)
+        vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or user.isAdmin() or isManager
 
         if initialDisplay:
             webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)

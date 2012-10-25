@@ -85,6 +85,7 @@ var WRTalkTemplate = function(talk) {
     label.append(Html.span("WRContributionId", "(id: " + talk.id + ")"));
 
     return Html.li('', checkBox, label);
+
 };
 
 var WRUpdateContributionList = function (targetId) {
@@ -103,7 +104,7 @@ var WRUpdateContributionList = function (targetId) {
     }
 }
 
-var WR_loadTalks = function () {
+var WR_loadTalks = function (isManager) {
 
     var fetchContributions = function() {
 
@@ -164,7 +165,24 @@ var WR_loadTalks = function () {
     };
 
     if (WR_contributionsLoaded) {
+        // Hide talks that are not capable and not choosed by administrator
+        if (isManager) {
+            $("#contributionList li").each(function() {
+                if ($(this).attr('data-webcastCapable') == 'false') {
+                    $(this).find('input').attr('disabled', 'disabled');
+                    if (!$(this).find('input').is(':checked')) {
+                        $(this).hide();
+                    }
+                }
+            });
+        }
         IndicoUI.Effect.appear($E('contributionsDiv'));
+        //Hide list if there are no displayed talks
+        if ($("#contributionList li:not(:hidden)").size() == 0) {
+            WR_hideTalks();
+        }
+
+
     } else {
         fetchContributions();
     }
@@ -179,11 +197,15 @@ var WR_hideTalks = function () {
 
 var WRSelectAllContributions = function() {
     each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = true;
+        if (!checkbox.dom.disabled) {
+            checkbox.dom.checked = true;
+        }
     });
 }
 var WRUnselectAllContributions = function() {
     each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = false;
+        if (!checkbox.dom.disabled) {
+            checkbox.dom.checked = false;
+        }
     });
 }

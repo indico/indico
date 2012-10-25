@@ -22,6 +22,7 @@ from MaKaC.fossils.subcontribution import ISubContributionWithSpeakersFossil
 from MaKaC.common.fossilize import addFossil
 from MaKaC.conference import Contribution
 from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil
+from MaKaC.plugins.Collaboration.base import CollaborationTools
 
 
 class IContributionWRFossil(IContributionWithSpeakersFossil):
@@ -32,6 +33,10 @@ class IContributionWRFossil(IContributionWithSpeakersFossil):
     def getSubContributionList(self):
         pass
     getSubContributionList.result = ISubContributionWithSpeakersFossil
+
+    def getWebcastCapable(self):
+        pass
+    getWebcastCapable.produce = lambda self: CollaborationTools.isAbleToBeWebcastOrRecorded(self, "WebcastRequest")
 
 # We cannot include this fossil in the Contribution class directly because it belongs to a plugin
 addFossil(Contribution, IContributionWRFossil)
