@@ -126,7 +126,7 @@ class WContributionDisplayBase(WICalExportBase):
         vars["showSubmit"] = statusReviewing not in ["Accept", "Reject", "Submitted"]
         vars["showMaterial"] = statusReviewing is not None
         vars["showHistory"] = statusReviewing is not None
-        vars["reviewingActive"] = self._contrib.getConference() and self._contrib.getConference().hasEnabledSection('paperReviewing') and self._contrib.getConference().getConfPaperReview().hasReviewing() \
+        vars["reviewingActive"] = self._contrib.getConference() and self._contrib.getConference().getConfPaperReview().hasReviewing() \
                                     and not isinstance(self._contrib.getCurrentStatus(),conference.ContribStatusWithdrawn) \
                                     and (self._contrib.canUserSubmit(self._aw.getUser()) or self._contrib.canModify(self._aw))
         if statusReviewing == "Submitted":
