@@ -125,12 +125,14 @@ type("TimetableLayoutManager", [],
                  assigned[block.assigned] = null;
                  block.assigned = col;
                  assigned[col] = block;
+                 lastAssign(block, col);
+             };
 
-                 if (!exists(block.sessionId)) {
-                     lastAssign(block, col);
-                 }
-
-                 lastAssigned[block.sessionId].col = col;
+             var swap_columns = function(block1, block2) {
+                 var block1_old_col = block1.assigned;
+                 reassign(block1, block2.assigned);
+                 reassign(block2, block1_old_col);
+                 assigned[block1.assigned] = block1;
              };
 
              for (key in currentGroup) {
@@ -176,8 +178,7 @@ type("TimetableLayoutManager", [],
                      // otherwise there might be overlapping blocks. Is there a better way
                      // to handle this so that this check is not needed?
                      if (existingBlock.start == block.start) {
-                         reassign(existingBlock, block.assigned);
-                         reassign(block, preferedCol);
+                         swap_columns(existingBlock, block)
                      }
                  }
              }
