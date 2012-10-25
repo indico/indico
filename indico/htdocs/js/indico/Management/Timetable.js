@@ -383,9 +383,9 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             // to make the request for the session timetable or the top level timetable
             if(exists(self.timetable.parentTimetable)){
                 if(self.previousDate.substr(0,10) != self.dateArgs.selectedDay) {
-                    self.timeStartMethod = self.timetable.managementActions.methods.Event.getDayEndDate;
+                    self.timeStartMethod = self.timetable.managementActions.methods.Event.dayEndDate;
                 } else {
-                    self.timeStartMethod = self.timetable.managementActions.methods.SessionSlot.getDayEndDate;
+                    self.timeStartMethod = self.timetable.managementActions.methods.SessionSlot.dayEndDate;
                 }
             }
 
