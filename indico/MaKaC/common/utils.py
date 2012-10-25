@@ -34,6 +34,7 @@ from MaKaC import user, errors
 from MaKaC.common.db import DBMgr
 from MaKaC.webinterface.linking import RoomLinker
 from MaKaC.rb_location import CrossLocationQueries
+from MaKaC.common.Configuration import Config
 
 # indico imports
 from indico.util.i18n import currentLocale
@@ -724,3 +725,17 @@ def getProtectionText(target):
         else:
             return getProtectionText(target.getOwner())
     return ""
+
+
+def getReportNumberItems(obj):
+    rns = obj.getReportNumberHolder().listReportNumbers()
+    reportCodes = []
+
+    for rn in rns:
+        key = rn[0]
+        if key in Config.getInstance().getReportNumberSystems().keys():
+            number = rn[1]
+            reportNumberId="s%sr%s"%(key, number)
+            name = Config.getInstance().getReportNumberSystems()[key]["name"]
+            reportCodes.append({"id" : reportNumberId, "number": number, "system": key, "name": name})
+    return reportCodes

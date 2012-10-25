@@ -233,8 +233,12 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
     getContributionType.produce = lambda x: x.getOwner().getType().getId() if x.getOwner().getType() else None
 
     def getFields(self):
-        """ Entry type """
+        """ Entry fields """
     getFields.produce = lambda x: x.getOwner().getFields()
+
+    def getReportNumbers(self):
+        """ Entry report numbers """
+    getReportNumbers.produce = lambda x: Conversion.getReportNumbers(x.getOwner())
 
 
 class ILinkedTimeSchEntryFossil(ISchEntryFossil):

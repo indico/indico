@@ -23,7 +23,6 @@ Conversion functions for fossils
 
 import pytz
 
-
 class Conversion(object):
 
     @classmethod
@@ -208,3 +207,8 @@ class Conversion(object):
             name = categ.getTitle()
         return {'id': id,
                 'name': name}
+
+    @classmethod
+    def getReportNumbers(cls, obj):
+        from MaKaC.common import utils
+        return utils.getReportNumberItems(obj)

@@ -17,10 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.base import ParameterManager
+from MaKaC.services.implementation.base import ParameterManager, LoggedOnlyService
 from MaKaC.services.implementation.contribution import ContributionModifBase
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.common import Config
+
+class GetReportNumberSystems(LoggedOnlyService):
+
+    def _getAnswer(self):
+        systems = Config.getInstance().getReportNumberSystems()
+        return dict([(system, systems[system]["name"]) for system in systems])
 
 class ReportNumberBase:
 
@@ -95,6 +101,7 @@ class SubContributionRemoveReportNumber(ReportNumberRemove, ContributionModifBas
 
 
 methodMap = {
+    "get": GetReportNumberSystems,
     "conference.addReportNumber": ConferenceAddReportNumber,
     "conference.removeReportNumber": ConferenceRemoveReportNumber,
     "contribution.addReportNumber": ContributionAddReportNumber,

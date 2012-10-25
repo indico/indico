@@ -157,7 +157,18 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
             if str(person.getId()) not in peopleIds:
                 deleteMethod(contribution, person)
 
+    def _addReportNumbers(self):
+        reportNumbersSet = []
+        if self._reportNumbers:
+            for reportNumber in self._reportNumbers:
+                if not self._contribution.getReportNumberHolder().hasReportNumberOnSystem(reportNumber["system"], reportNumber["number"]):
+                    self._contribution.getReportNumberHolder().addReportNumber(reportNumber["system"], reportNumber["number"])
+                reportNumbersSet.append("""s%sr%s"""%(reportNumber["system"], reportNumber["number"]))
 
+        for system in self._contribution.getReportNumberHolder().getReportNumberKeys():
+            for number in self._contribution.getReportNumberHolder().getReportNumbersBySystem(system):
+                if """s%sr%s"""%(system, number) not in reportNumbersSet:
+                    self._contribution.getReportNumberHolder().removeReportNumber(system, number)
 
     def _checkParams(self):
         self._pManager = ParameterManager(self._params)
@@ -179,24 +190,20 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
         for field in self._target.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
             self._fields[field.getId()] = self._pManager.extract("field_%s"%field.getId(), pType=str,
                                                      allowEmpty=True, defaultValue='')
-        self._privileges = self._pManager.extract("privileges", pType=dict,                                                  allowEmpty=True)
+        self._privileges = self._pManager.extract("privileges", pType=dict, allowEmpty=True)
         self._contribTypeId = self._pManager.extract("contributionType", pType=str, allowEmpty=True)
         self._materials = self._pManager.extract("materials", pType=dict, allowEmpty=True)
 
 
     def _performOperation(self):
-
         self._contribution.setTitle(self._title, notify = False)
 
         self._contribution.setKeywords('\n'.join(self._keywords))
 
         self._contribution.setBoardNumber(self._boardNumber)
         self._contribution.setDuration(self._duration/60, self._duration%60)
+        self._addReportNumbers()
 
-        if self._reportNumbers:
-            for reportTuple in self._reportNumbers:
-                for recordNumber in reportTuple[1]:
-                    self._contribution.getReportNumberHolder().addReportNumber(reportTuple[0], recordNumber)
 
         if self._needsToBeScheduled:
             checkFlag = self._getCheckFlag()

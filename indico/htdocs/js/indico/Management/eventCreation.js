@@ -317,25 +317,18 @@ type("CategoryChooser", ["ExclusivePopup"], {
 
 );
 
-
-type("AddReportNumberPopup", ["ServiceDialogWithButtons"], {
+type("AddReportNumberPopupBase", [], {
 
     _success: function(response) {
         this.onSuccess(response);
-    },
-
-    _save: function(response) {
-        var self = this;
-        if(self.parameterManager.check()){
-            self.request(self.reportNumberData);
-        }
+        this.close();
     },
 
     _getButtons: function(){
         var self = this;
         return [
             [$T('Add report number'), function() {
-                self._save();
+                self._addReportNumber();
             }, true],
             [$T('Cancel'), function(){
                 self.close();
@@ -351,55 +344,111 @@ type("AddReportNumberPopup", ["ServiceDialogWithButtons"], {
         return Html.select({}, options);
     },
 
-    draw: function() {
+    _drawContent: function(){
         var self = this;
-
-        var content = IndicoUtil.createFormFromMap(
+        return IndicoUtil.createFormFromMap(
                 [
                  [$T('Report Number System'), $B(self.parameterManager.add(self._drawSelectReportNumberSystems()), self.reportNumberData.accessor('reportNumberSystem'))],
                  [$T('Report Number'), $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'text', false), self.reportNumberData.accessor('reportNumber'))]
              ]);
-        return this.ServiceDialogWithButtons.prototype.draw.call(this, content);
+    }
+    },
+     function(reportNumberSystems, onSuccess, params) {
+         this.reportNumberData = $O(params);
+         this.onSuccess = onSuccess;
+         this.reportNumberSystems = reportNumberSystems;
+         this.parameterManager = new IndicoUtil.parameterManager();
+     }
+);
+
+type("AddReportNumberPopup", ["AddReportNumberPopupBase", "ServiceDialogWithButtons"], {
+
+    _addReportNumber: function() {
+        var self = this;
+        if(self.parameterManager.check()){
+            self.request(self.reportNumberData);
+        }
+    },
+
+    draw: function() {
+        var self = this;
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, self._drawContent());
 
     },
     },
      function(uploadAction, reportNumberSystems, onSuccess, params) {
-         this.reportNumberData = $O(params);
          this.uploadAction = uploadAction;
-         this.onSuccess = onSuccess;
-         this.reportNumberSystems = reportNumberSystems;
-         this.parameterManager = new IndicoUtil.parameterManager();
-         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, uploadAction, this.reportNumberData, "Add report number", function() {self.close();});
+         this.AddReportNumberPopupBase(reportNumberSystems, onSuccess, params);
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, uploadAction, this.reportNumberData, $T("Add report number"), function() {self.close();});
      }
+);
 
+
+type("AddReportNumberPopupForForm", ["AddReportNumberPopupBase", "ExclusivePopupWithButtons"], {
+
+    _addReportNumber: function() {
+        var self = this;
+        if(self.parameterManager.check()){
+            var reportNumber = { id: "s{0}r{1}".format(self.reportNumberData.get("reportNumberSystem"), self.reportNumberData.get("reportNumber")),
+                    number: self.reportNumberData.get("reportNumber"),
+                    name: self.reportNumberSystems[self.reportNumberData.get("reportNumberSystem")],
+                    system: self.reportNumberData.get("reportNumberSystem")
+            };
+            self._success(reportNumber);
+        }
+    },
+
+    draw: function() {
+        var self = this;
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, self._drawContent());
+
+    },
+    },
+     function(reportNumberSystems, onSuccess, params) {
+         this.AddReportNumberPopupBase(reportNumberSystems, onSuccess, params);
+         this.ExclusivePopupWithButtons($T("Add report number"), function() {self.close();});
+     }
 );
 
 type("ReportNumberList", ["ListWidget"], {
 
+    _removeElement: function(key){
+        this.set(key, null);
+    },
+
+    _callRemoveService: function(reportNumber) {
+        var self = this;
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing report number..."));
+        var args = self.params;
+        args["reportNumberSystem"] = reportNumber.get().system;
+        args["reportNumber"] = reportNumber.get().number;
+
+        indicoRequest(
+                self.removeAction,
+                args,
+            function(result,error) {
+                if (!error){
+                    killProgress();
+                    self._removeElement(reportNumber.key);
+                }
+                else{
+                    killProgress();
+                    IndicoUtil.errorReport(error);
+                }
+            }
+        );
+    },
+
     _createRemoveButton: function(reportNumber){
         var self = this;
         return Widget.link(command(function(){
-            var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing report number..."));
-            var args = self.params;
-            args["reportNumberSystem"] = reportNumber.get().system;
-            args["reportNumber"] = reportNumber.get().number;
+            if(self.removeAction != null){
+                self._callRemoveService(reportNumber);
+            }else {
+                self._removeElement(reportNumber.key);
+            }
 
-            indicoRequest(
-                    self.removeAction,
-                    args,
-                function(result,error) {
-                    if (!error){
-                        killProgress();
-                        self.set(reportNumber.key, null);
-                    }
-                    else{
-                        killProgress();
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-            );
         }, IndicoUI.Buttons.removeButton()));
-
     },
 
     _drawItem: function(reportNumber){
@@ -421,23 +470,39 @@ type("ReportNumberList", ["ListWidget"], {
 
 type("ReportNumberEditor", ["IWidget"], {
 
-    draw: function() {
+    _addReportNumber: function() {
         var self = this;
-        var container = $("<div/>");
+        var onSuccess = function(response){
+            if(response){
+                self.reportNumberList.set(response.id, response);
+            }
+        }
+        new AddReportNumberPopup(self.uploadAction, self.reportNumberSystems, onSuccess, self.params).open();
+    },
+
+    _createAddButton: function (){
+        var self = this;
         var buttonDiv = $("<div/>").css("margin-top", "10px");
         var addNewUserButton =  $("<input/>").attr({type:"button", value:"Add New"}).css("margin-right", "10px");
         buttonDiv.append(addNewUserButton);
         buttonDiv.click(function(){
-            var onSuccess = function(response){
-                if(response){
-                    self.reportNumberList.set(response.id, response);
-                }
-            }
-            new AddReportNumberPopup(self.uploadAction, self.reportNumberSystems, onSuccess, self.params).open();
+            self._addReportNumber();
         });
+        return buttonDiv;
+    },
+
+    getReportNumbers: function(){
+        return $L(this.reportNumberList);
+    },
+
+    draw: function() {
+        var self = this;
+        var container = $("<div/>");
+        var buttonDiv = self._createAddButton();
         container.append($("<div/>").addClass("PluginOptionPeopleListDiv").css("width", "300px").html(this.reportNumberList.draw().dom));
         container.append(buttonDiv);
-        return container;
+        //return container;
+        return this.IWidget.prototype.draw.call(this, container);
    }
     },
      function(uploadAction, removeAction, reportNumbers, reportNumberSystems, params) {
@@ -452,5 +517,20 @@ type("ReportNumberEditor", ["IWidget"], {
          this.reportNumberSystems = reportNumberSystems;
          this.params = params;
      }
+);
 
+type("ReportNumberEditorForForm", ["ReportNumberEditor"], {
+    _addReportNumber: function() {
+        var self = this;
+        var onSuccess = function(response){
+            if(response){
+                self.reportNumberList.set(response.id, response);
+            }
+        }
+        new AddReportNumberPopupForForm(self.reportNumberSystems, onSuccess, self.params).open();
+    },
+},
+     function(reportNumbers, reportNumberSystems, params) {
+         this.ReportNumberEditor(null, null, reportNumbers, reportNumberSystems, params)
+     }
 );

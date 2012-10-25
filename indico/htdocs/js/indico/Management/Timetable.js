@@ -351,6 +351,24 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 // if it's a meeting, don't bother getting the fields
                 hook.set(true);
             }
+        },
+
+        function(hook) {
+            var self = this;
+
+            var parameterManager = new IndicoUtil.parameterManager();
+            this.parameterManager = parameterManager;
+            indicoRequest('reportNumbers.get', {} ,
+                          function(result, error){
+                              if (error) {
+                                  IndicoUtil.errorReport(error);
+                              }
+                              else {
+                                  self.reportNumberSystems = result;
+                                  hook.set(true);
+                              }
+                          }
+                         );
         }
     ],
 
@@ -451,6 +469,10 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         $B(info.accessor('presenters'), presListWidget.getUsers());
         info.set('privileges', presListWidget.getPrivileges());
 
+        var reportNumbersEditor = new ReportNumberEditorForForm(self.info.get("reportNumbers"), self.reportNumberSystems, {});
+        $B(info.accessor('reportNumbers'), reportNumbersEditor.getReportNumbers());
+
+
         var startTimeLine, daySelect, datecomponent;
 
         // in case of poster sessions
@@ -475,7 +497,6 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             startTimeLine = [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
                                                         $T(' Duration '), this.timeField, $T('min'))];
             daySelect = self._configureDaySelect(conferenceDays);
-            //$B(info.accessor('startDate'), self.startTimeField, timeTranslation);
             invertableBind(info.accessor('startDate'),
                     this.startTimeField,
                     this.isEdit,
@@ -503,7 +524,8 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
                 daySelect,
                 startTimeLine,
-                [$T('Presenter(s)'), presListWidget.draw()]
+                [$T('Presenter(s)'), presListWidget.draw()],
+                [$T('Report numbers'), reportNumbersEditor.draw()]
             ]);
     },
 

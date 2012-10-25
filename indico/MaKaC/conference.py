@@ -1941,7 +1941,7 @@ class ReportNumberHolder(Persistent):
             self.notifyModification()
 
     def removeReportNumber(self, system, number):
-        if self.hasReportNumber(system):
+        if self.hasReportNumbersBySystem(system):
             if number in self._reports[system]:
                 self._reports[system].remove(number)
                 self.notifyModification()
@@ -1953,11 +1953,11 @@ class ReportNumberHolder(Persistent):
         except:
             pass
 
-    def hasReportNumber(self, system):
+    def hasReportNumbersBySystem(self, system):
         return self._reports.has_key(system)
 
-    def getReportNumber(self, system):
-        if self.hasReportNumber(system):
+    def getReportNumbersBySystem(self, system):
+        if self.hasReportNumbersBySystem(system):
             return self._reports[system]
         return None
 
@@ -1973,6 +1973,12 @@ class ReportNumberHolder(Persistent):
             for number in self._reports[key]:
                 reports.append([key, number])
         return reports
+
+    def hasReportNumberOnSystem(self, system, number):
+        if self.hasReportNumbersBySystem(system):
+            if number in self._reports[system]:
+                return True
+        return False
 
     def listReportNumbers(self):
         reports=[]
