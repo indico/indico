@@ -456,7 +456,8 @@ class CSBooking(CSBookingBase):
         result = VidyoOperations.queryRoom(self, self._roomId)
 
         if isinstance(result, VidyoError):
-            self.setBookingNotPresent()
+            if result.getErrorType() == 'unknownRoom':
+                self.setBookingNotPresent()
             return result
 
         else:
@@ -478,16 +479,18 @@ class CSBooking(CSBookingBase):
             self._url = str(adminApiResult.RoomMode.roomURL)
             self.setOwnerAccount(str(adminApiResult.ownerName), updateAvatar = True)
 
-            # no description returned in User API and Admin API's getRoom returns a bad value. Great
-            #recoveredDescription = VidyoTools.recoverVidyoDescription(adminApiResult.description)
-            #if recoveredDescription:
-            #    self._bookingParams["roomDescription"] = recoveredDescription
-            #else:
-            #    self._warning = "invalidDescription"
+            recoveredDescription = VidyoTools.recoverVidyoDescription(adminApiResult.description)
+            if recoveredDescription:
+                self._bookingParams["roomDescription"] = recoveredDescription
+            else:
+                self._warning = "invalidDescription"
 
-            # no groupName returned in User API and Admin API's getRoom returns a bad value. Great
-            # if str(adminApiResult.groupName) != getVidyoOptionValue("indicoGroup"):
-            #     return VidyoError("invalidGroup", "checkStatus")
+            # what to do if the Vidyo group is not Indico?
+            #if str(adminApiResult.groupName) != getVidyoOptionValue("indicoGroup"):
+            #    return VidyoError("invalidGroup", "checkStatus")
+
+            self._updateRelatedBookings()
+
 
     def _delete(self, fromDeleteOld = False):
         """ Deletes the Vidyo Public room associated to this CSBooking, based on the roomId
@@ -543,6 +546,9 @@ class CSBooking(CSBookingBase):
         self._created = False
         #booking is not present remotely so no need to delete it later
         VidyoTools.getEventEndDateIndex().unindexBooking(self)
+        for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(self.getRoomId()):
+            VidyoTools.getIndexByVidyoRoom().unindexBooking(booking)
+            booking.setCreated(False)
 
     def _sendNotificationToOldNewOwner(self, oldOwner):
 
