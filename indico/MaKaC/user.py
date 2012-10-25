@@ -994,11 +994,9 @@ class Avatar(Persistent, Fossilizable):
             surName = "%s, " % self.getSurName().decode('utf-8').upper().encode('utf-8')
         return "%s%s"%(surName, self.getName())
 
-    def getStraightFullName(self):
-        name = ""
-        if self.getName() != "":
-            name = "%s "%self.getName()
-        return "%s%s"%(name, self.getSurName())
+    def getStraightFullName( self, upper = True ):
+        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper() if upper else self.getFamilyName())).strip()
+    getDirectFullNameNoTitle = getStraightFullName
 
     def getAbrName(self):
         res = self.getSurName()

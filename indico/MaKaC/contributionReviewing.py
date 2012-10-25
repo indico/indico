@@ -441,13 +441,9 @@ Please see the comments below from the reviewing team:
         """ Sends an email to the contribution's authors when the referee, editor or reviewer
             pass a judgement on the contribution and only if the manager has enabled the option in 'Automatic e-mails' section.
         """
-        authorList = self.getReviewManager().getContribution().getSpeakerList() + list(self.getReviewManager().getContribution().getAuthorList())
-        filteredAuthorList = {}
-        for author in authorList:
-            filteredAuthorList[author.getEmail()] = author
+        authorList = self.getReviewManager().getContribution().getSubmitterList()
         referee = self.getReviewManager().getReferee()
-        for author_email in filteredAuthorList:
-            author = filteredAuthorList[author_email]
+        for author in authorList:
             if (isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif()) \
             or (isinstance(self, EditorJudgement) and (self._review.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or not self.getJudgement() in ["Accept", "Reject"]) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif()) \
             or (isinstance(self, ReviewerJudgement) and not self.getJudgement() in ["Accept", "Reject"] and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif()):
