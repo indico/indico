@@ -428,7 +428,7 @@ class Judgement(Persistent, Fossilizable):
         """ Sends an email to the contribution's authors when the referee, editor or reviewer
             pass a judgement on the contribution and only if the manager has enabled the option in 'Automatic e-mails' section.
         """
-        authorList = self.getReviewManager().getContribution().getAuthorList()
+        authorList = self.getReviewManager().getContribution().getSubmitterList()
         for author in authorList:
             if widthdrawn:
                 if isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif():
