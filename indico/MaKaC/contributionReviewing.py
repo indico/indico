@@ -975,6 +975,7 @@ class ContributionReviewingJudgementNotification(GenericNotification):
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
+        self.setCCList([judgement.getAuthor().getEmail()])
 
         if isinstance(judgement, EditorJudgement):
             if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
@@ -1050,6 +1051,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
+        self.setCCList([judgement.getAuthor().getEmail()])
 
         if isinstance(judgement, EditorJudgement):
             if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
