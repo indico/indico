@@ -49,5 +49,11 @@
         if(!singleBookings['RecordingRequest']) {
             callFunction('RecordingRequest', 'clearForm');
         }
+    },
+
+    afterLoad : function() {
+        if ($("#chooseTalksRB").is(":checked")) {
+            $("#chooseTalksRB").click();
+        }
     }
 }

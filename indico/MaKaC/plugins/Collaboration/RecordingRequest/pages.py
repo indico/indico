@@ -26,6 +26,7 @@ from MaKaC.common.timezoneUtils import isSameDay
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
+from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IContributionRRFossil
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
 from MaKaC.plugins.Collaboration.RecordingRequest.common import getCommonTalkInformation
 
@@ -43,23 +44,30 @@ class WNewBookingForm(WCSPageTemplateBase):
 
         underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
         manager = self._conf.getCSBookingManager()
+        user = self._rh._getUser()
+        isManager = manager.isVideoServicesManager(user) or manager.isPluginManager('RecordingRequest', user)
         booking = manager.getSingleBooking('RecordingRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
 
+
         vars["InitialChoose"] = initialChoose
         vars["DisplayTalks"] = initialDisplay
+        vars["isManager"] = isManager
 
         talks, rRoomFullNames, rRoomNames, recordingAbleTalks, recordingUnableTalks = getCommonTalkInformation(self._conf)
-        nTalks = len(talks)
         nRecordingCapable = len(recordingAbleTalks)
 
         vars["HasRecordingCapableTalks"] = nRecordingCapable > 0
-        vars["NTalks"] = nTalks
+        vars["NTalks"] = len(talks)
 
         #list of "locationName:roomName" strings
         vars["RecordingCapableRooms"] = rRoomFullNames
 
+        if user.isAdmin() or isManager:
+            recordingAbleTalks = talks
+        nRecordingCapable = len(recordingAbleTalks)
+        vars["HasRecordingCapableTalks"] = nRecordingCapable > 0
         vars["NRecordingCapableContributions"] = nRecordingCapable
 
         #we see if the event itself is webcast capable (depends on event's room)
@@ -71,8 +79,7 @@ class WNewBookingForm(WCSPageTemplateBase):
             topLevelRecordingCapable = False
 
         #Finally, this event is webcast capable if the event itself or one of its talks are capable or user is admin, video services manager or reording manager
-        user = self._rh._getUser()
-        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or user.isAdmin() or manager.isVideoServicesManager(user) or manager.isPluginManager('RecordingRequest', user)
+        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or user.isAdmin() or isManager
 
         if initialDisplay:
             recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)

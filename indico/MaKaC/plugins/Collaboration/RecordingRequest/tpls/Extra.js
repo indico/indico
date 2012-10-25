@@ -83,7 +83,8 @@ var RRTalkTemplate = function(talk) {
     // Finally, the id
     label.append(Html.span("RRContributionId", "(id: " + talk.id + ")"));
 
-    return Html.li('', checkBox, label);
+    return Html.li({"data-recordingCapable": talk.recordingCapable}, checkBox, label);
+
 };
 
 var RRUpdateContributionList = function (targetId) {
@@ -102,7 +103,7 @@ var RRUpdateContributionList = function (targetId) {
     }
 }
 
-var RR_loadTalks = function () {
+var RR_loadTalks = function (isManager) {
 
     var fetchContributions = function() {
 
@@ -133,7 +134,6 @@ var RR_loadTalks = function () {
                 locationText += ')';
                 label.append(Html.span("RRSpeakers", locationText))
             }
-
             return Html.li('', checkBox, label);
         };
 
@@ -161,7 +161,23 @@ var RR_loadTalks = function () {
     };
 
     if (RR_contributionsLoaded) {
+        // Hide talks that are not capable and not choosed by administrator
+        if (isManager) {
+            $("#contributionList li").each(function() {
+                if ($(this).attr('data-recordingCapable') == 'false') {
+                    $(this).find('input').attr('disabled', 'disabled');
+                    if (!$(this).find('input').is(':checked')) {
+                        $(this).hide();
+                    }
+                }
+            });
+        }
         IndicoUI.Effect.appear($E('contributionsDiv'));
+
+        //Hide list if there are no displayed talks
+        if ($("#contributionList li:not(:hidden)").size() == 0) {
+            RR_hideTalks();
+        }
 
     } else {
         fetchContributions();
@@ -174,12 +190,16 @@ var RR_hideTalks = function (){
 
 var RRSelectAllContributions = function() {
     each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = true;
+        if (!checkbox.dom.disabled) {
+            checkbox.dom.checked = true;
+        }
     });
 }
 
 var RRUnselectAllContributions = function() {
     each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = false;
+        if (!checkbox.dom.disabled) {
+            checkbox.dom.checked = false;
+        }
     });
 }

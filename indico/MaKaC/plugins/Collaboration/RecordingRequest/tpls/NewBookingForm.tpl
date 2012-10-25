@@ -91,16 +91,17 @@
              <table>
                 <tr>
                     <td>
-                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="RR_hideTalks()" checked />
+                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="RR_hideTalks();" checked />
                     </td>
                     <td>
                         % if NTalks == NRecordingCapableContributions:
                         <label for="allTalksRB" id="allTalksRBLabel" >${_("All talks") }</label>
                         % else:
                         <label for="allTalksRB" id="allTalksRBLabel">${_("All recordable talks.")}</label>
+                        % endif
                     </td>
                 </tr>
-                            % if RecordingCapable:
+                % if RecordingCapable:
                 <tr>
                     <td></td>
                     <td class="warning">
@@ -133,10 +134,9 @@
                                 </span>
                             </div>
                         </div>
-                            % endif
                     </td>
                 </tr>
-                        % endif
+                % endif
                 <tr>
                     <td>
                         <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="RR_loadTalks()" />
@@ -235,6 +235,7 @@
     var NRecordingCapableContributions = ${NRecordingCapableContributions};
     var NTalks = ${NTalks};
     var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
+</script>
 
 % if (not RecordingCapable and RecordingCapableRooms) or (NTalks > NRecordingCapableContributions and RecordingCapable):
 

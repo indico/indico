@@ -58,6 +58,12 @@ IndicoUI.executeOnLoad(function(){
 % endif
 
 loadBookings();
+
+% for plugin in SingleBookingPlugins:
+if (pluginHasFunction("${ pluginId }", "afterLoad")) {
+    codes["${ pluginId }"]["afterLoad"]();
+}
+% endfor
 });
 
 </script>
