@@ -22,11 +22,12 @@
             </tr>
         </table>
     </td>
-    <td class="itemTopAlign itemRightAlign"">
+    <td class="itemTopAlign itemRightAlign">
         % if item.getSpeakerList() or item.getSpeakerText():
             ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText())}
             <br/>
         % endif
+        <span class="materialDisplayName">
         % if not allMaterial:
             <% materialDocuments = False %>
             % for material in item.getAllMaterialList():
@@ -64,6 +65,7 @@
                 % endfor
             % endif
         % endif
+        </span>
     </td>
 
     <td class="itemTopAlign">

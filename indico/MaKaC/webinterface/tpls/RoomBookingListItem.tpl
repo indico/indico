@@ -3,7 +3,7 @@
     function confirm_reject_occurrence(element, date)
     {
         var reason = prompt( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
-        if ( reason == null )
+        if ( !reason )
             return false;
 
         element.href = element.href + '&reason=' + encodeURI( reason );
@@ -13,7 +13,7 @@
     function confirm_reject_reservation(element, date)
     {
         var reason = prompt( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
-        if ( reason == null )
+        if ( !reason )
             return false;
 
         element.href = element.href + '&reason=' + encodeURI( reason );

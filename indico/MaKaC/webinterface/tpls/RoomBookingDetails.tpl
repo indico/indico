@@ -18,7 +18,7 @@
         function submit_reject()
         {
             reason = prompt(  "${ _('Are you sure you want to REJECT THE _WHOLE_ BOOKING? If so, please give a reason:')}", '' );
-            if ( reason == null )
+            if ( !reason )
                 return;
             var frm = document.forms['submits'];
             frm.action = '${ urlHandlers.UHRoomBookingRejectBooking.getURL( reservation ) }' + '&reason=' + encodeURI( reason );
@@ -27,7 +27,7 @@
         function submit_reject_occurrence( action )
         {
             reason = prompt(  "${ _('Are you sure you want to REJECT the booking for the selected date? If so, please give a reason:')}", '' );
-            if ( reason == null )
+            if ( !reason )
                 return;
             var frm = document.forms['submits'];
             frm.action = action + '&reason=' + encodeURI( reason );
