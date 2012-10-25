@@ -698,3 +698,7 @@ span.description pre, p {
     margin-left: 0;
     overflow: hidden;
 }
+
+.materialDisplayName {
+    white-space: nowrap;
+}

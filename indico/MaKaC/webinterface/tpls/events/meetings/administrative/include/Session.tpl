@@ -22,6 +22,7 @@
         <br/>
     </td>
     <td class="itemRightAlign" >
+        <span class="materialDisplayName">
         % if len(session.getAllMaterialList()) > 0 and allMaterial:
             % for material in session.getAllMaterialList():
                 % if material.canView(accessWrapper):
@@ -37,6 +38,7 @@
                 % endif
             % endfor
         % endif
+        </span>
     </td>
 
 </tr>

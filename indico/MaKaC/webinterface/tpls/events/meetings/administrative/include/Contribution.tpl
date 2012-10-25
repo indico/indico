@@ -40,6 +40,7 @@
             </span>
             <br/>
         % endif
+        <span class="materialDisplayName">
         % if not allMaterial:
             <% materialDocuments = False %>
             % for material in item.getAllMaterialList():
@@ -79,6 +80,7 @@
                 % endfor
             % endif
         % endif
+        </span>
     </td>
     <td class="itemTopAlign">
         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
