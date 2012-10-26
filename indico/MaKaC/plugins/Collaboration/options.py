@@ -42,7 +42,7 @@ globalOptions = [
                        "defaultValue": "http://ravem.cern.ch//api/services/"}),
     ("ravemUsername" , {"description" : "Username for RAVEM API",
                       "type": str,
-                      "defaultValue": "indico"}),
+                      "defaultValue": "ravem"}),
     ("ravemPassword" , {"description" : "Password for RAVEM API",
                       "type": str,
                       "defaultValue": ""}),

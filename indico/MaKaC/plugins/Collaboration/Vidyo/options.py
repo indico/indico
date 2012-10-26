@@ -92,18 +92,6 @@ globalOptions = [
                          "type": str,
                          "defaultValue": "VidyoPortalUserService"}),
 
-    ("ravemAPIURL", {"description" : "RAVEM API server",
-                     "type": str,
-                     "defaultValue": "http://ravem.cern.ch/api/services/"}),
-
-    ("ravemUsername" , {"description" : "Username for RAVEM API",
-                        "type": str,
-                        "defaultValue": "indico"}),
-
-    ("ravemPassword" , {"description" : "Password for RAVEM API",
-                        "type": str,
-                        "defaultValue": ""}),
-
     ("prefix", {"description": "Prefix for rooms created by Indico",
                        "type": str,
                        "editable": True,
