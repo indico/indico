@@ -295,6 +295,10 @@ type("DisplayTimeTable", ["TimeTable"], {
             var timetableDiv = Html.div({style: {width:pixels(self.timetableDrawer.width), paddingTop: pixels(20), position: 'relative'}}, timetableElements);
             $E(document.body).set(header, timetableDiv);
             $E(document.body).setStyle('padding', pixels(30));
+
+            $(".timetableHeader").after(self._getLegend());
+            self._toggleLegend(true);
+            $("#legendMainToggle").remove();
         }, 50);
     },
 
