@@ -22,6 +22,9 @@ IndicoUI.executeOnLoad(function(){
   timetable.postDraw();
 });
 
-$.ui.sticky();
+$.ui.sticky({
+    sticky: nothing,
+    normal: nothing
+});
 
 </script>
