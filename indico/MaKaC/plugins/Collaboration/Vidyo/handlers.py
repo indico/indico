@@ -21,6 +21,7 @@
 from indico.util.fossilize import fossilize
 
 # legacy MaKaC imports
+from MaKaC.services.implementation.base import ServiceError
 from MaKaC.services.implementation.collaboration import CollaborationBookingModifBase
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 
@@ -30,19 +31,24 @@ class ConnectVidyoBookingBase(CollaborationBookingModifBase):
     """
 
     def _checkProtection(self):
-        booking = self._CSBookingManager.getBooking(self._bookingId)
-
-        if self.getAW().getUser() and self.getHostIP() == VidyoTools.getLinkRoomIp(booking.getLinkObject(), ipAttName='IP'):
+        if self.getAW().getUser() and self.getHostIP() == VidyoTools.getLinkRoomIp(self._booking.getLinkObject(), ipAttName='IP'):
             return
-        elif not hasattr(booking, "getOwnerObject") or booking.getOwnerObject() != self.getAW().getUser():
+        elif not hasattr(self._booking, "getOwnerObject") or self._booking.getOwnerObject() != self.getAW().getUser():
             CollaborationBookingModifBase._checkProtection(self)
+
+    def _getAnswer(self):
+        if self._booking.isLinkedToEquippedRoom():
+            return self._operation()
+        else:
+            raise ServiceError("", _("Booking is not linked to conference-enabled room"))
+
 
 
 class ConnectVidyoBooking(ConnectVidyoBookingBase):
     """ Performs server-side actions when a booking is connected
     """
 
-    def _getAnswer(self):
+    def _operation(self):
         self._force = self._pm.extract("force", pType=bool, allowEmpty=True)
         return fossilize(self._booking._connect(force=self._force), timezone=self._conf.getTimezone())
 
@@ -51,14 +57,14 @@ class CollaborationDisconnectVidyoBooking(ConnectVidyoBookingBase):
     """ Performs server-side actions when a booking is disconnected
     """
 
-    def _getAnswer(self):
+    def _operation(self):
         return fossilize(self._booking._disconnect(), timezone=self._conf.getTimezone())
 
 
 class CollaborationCheckVidyoBookingConnection(ConnectVidyoBookingBase):
     """ Performs server-side actions when a booking's status is checked
     """
-    def _getAnswer(self):
+    def _operation(self):
         return fossilize(self._booking.connectionStatus(), timezone=self._conf.getTimezone())
 
 

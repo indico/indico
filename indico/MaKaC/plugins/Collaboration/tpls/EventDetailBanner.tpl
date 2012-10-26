@@ -77,7 +77,7 @@
         </script>
         % endif
 
-        % if (bookingInfo or launchInfo) and booking.getType() == "Vidyo" and self_._rh._getUser():
+        % if (bookingInfo or launchInfo) and booking.getType() == "Vidyo" and self_._rh._getUser() and booking.isLinkedToEquippedRoom():
           % if conf.canModify(self_._rh._aw) or booking.getOwner()["id"] == self_._rh._getUser().getId() or \
                (self_._rh.getHostIP() == VidyoTools.getLinkRoomIp(booking.getLinkObject(), ipAttName='IP')):
             <span style="margin-left:3px;margin-right:3px;">|</span>
