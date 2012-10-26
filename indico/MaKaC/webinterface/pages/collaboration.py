@@ -35,6 +35,7 @@ from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.services.implementation.user import UserComparator
 from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil
 
+
 #from MaKaC.fossils.contribution import IContributionWithSpeakersMinimalFossil
 
 ################################################### Server Wide pages #########################################

@@ -105,6 +105,9 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
     def hasCheckStatus(self):
         """ Returns if this booking belongs to a plugin who has a "check status" concept. """
 
+    def isLinkedToEquippedRoom(self):
+        pass
+
     def hasAcceptReject(self):
         """ Returns if this booking belongs to a plugin who has a "accept or reject" concept. """
 

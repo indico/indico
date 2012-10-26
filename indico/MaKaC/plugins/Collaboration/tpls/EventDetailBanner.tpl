@@ -1,13 +1,13 @@
+<script type="text/javascript">
+  var bookings = ${dict((b['id'], b) for b in fossilize(bookings))|n,j};
+</script>
+
 <% from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools %>
 <%
     ## Only show event-level video services.
     event_bookings = filter(lambda x: x.hasSessionOrContributionLink() != True, bookings)
 %>
 % if event_bookings:
-<script type="text/javascript">
-  var bookings = ${dict((b['id'], b) for b in fossilize(bookings))|n,j};
-</script>
-<script src="${collaboration_htdocs}/bookings.js" type="text/javascript"></script>
 <tr>
 <td class="leftCol">Video Services</td>
 <td>

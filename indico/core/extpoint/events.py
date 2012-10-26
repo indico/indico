@@ -221,6 +221,11 @@ class IEventDisplayContributor(IContributor):
         <head></head> block
         """
 
+    def injectJSFiles(self, obj):
+        """
+        Observers should contribute with JS files they wish to add
+        """
+
     def eventDetailBanner(self, obj, conf):
         """
         Returns the info that the plugins want to add after the header (where description is)

@@ -131,11 +131,12 @@ class WPConferenceBase( base.WPDecorated ):
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
 
+
 class WPConferenceDisplayBase( WPConferenceBase, OldObservable ):
 
     def getJSFiles(self):
         return WPConferenceBase.getJSFiles(self) + \
-               self._includeJSPackage('MaterialEditor')
+               self._includeJSPackage('MaterialEditor') + sum(self._notify('injectJSFiles'), [])
 
     def getCSSFiles(self):
         # flatten returned list
@@ -1282,6 +1283,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         modules += self._includeJSPackage('MaterialEditor')
         modules += self._includeJSPackage('Display')
         modules += self._includeJSPackage('Collaboration')
+        modules += sum(self._notify('injectJSFiles'), [])
         return modules
 
     def _applyDecoration( self, body ):

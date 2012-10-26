@@ -92,7 +92,7 @@ class CSBooking(CSBookingBase):
         return self._created
 
     def isLinkedToEquippedRoom(self):
-        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject())!=""
+        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject()) != ""
 
     def __conform__(self, proto):
         if proto == IIndexableByVidyoRoom:

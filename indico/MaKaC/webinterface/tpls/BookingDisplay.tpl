@@ -92,12 +92,12 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
             }
         </script>
     % endif
-    % if displayInfo and Booking.getType() == "Vidyo" and (Booking.hasConnect() or Booking.hasDisconnect()) and (Booking.canBeConnected() or Booking.canBeDisconnected()) and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or Booking.getOwner()["id"] == self_._rh._getUser().getId()):
+    % if displayInfo and Booking.getType() == "Vidyo" and (Booking.hasConnect() or Booking.hasDisconnect()) and Booking.isLinkedToEquippedRoom() and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or Booking.getOwner()["id"] == self_._rh._getUser().getId()):
         <span style="margin-left:3px;margin-right:3px;">|</span>
 
         <a href="#" style="font-size:12px" data-booking-id="${Booking.getId()}" data-location="${Booking.getLinkVideoRoomLocation()}" data-event="${conf.getId()}" class="connect_room">${_("Connect")} ${Booking.getLinkVideoRoomLocation()}</a>
         <div style="display:inline; vertical-align:middle" class="progress"></div>
-        % endif
+    % endif
 
     </div>
 

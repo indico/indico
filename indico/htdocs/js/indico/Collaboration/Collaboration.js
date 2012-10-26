@@ -405,7 +405,7 @@ var bookingTemplateM = function(booking) {
         if (booking.canBeStarted) {
             if(booking.hasConnect || booking.hasDisconnect){
                 var align="";
-                if (booking.type == "Vidyo"){
+                if (booking.type == "Vidyo"  && booking.isLinkedToEquippedRoom){
                     align = "left";
                 }
                 var playButton = Widget.link( command(function(){start(booking);} , IndicoUI.Buttons.playButtonText($T("Start desktop"), align) ) );
@@ -419,7 +419,7 @@ var bookingTemplateM = function(booking) {
         cellButtons.append(playButton);
     }
 
-    if (booking.type == "Vidyo"){
+    if (booking.type == "Vidyo" && booking.isLinkedToEquippedRoom){
         var connectContainer = $('<a href="#" data-location="' + booking.linkVideoRoomLocation + '"/>');
         $(cellButtons.dom).append(connectContainer, $('<span class="progress"/>'));
         new ManagementConnectButton(connectContainer, booking, confId);

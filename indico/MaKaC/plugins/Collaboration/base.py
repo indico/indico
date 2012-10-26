@@ -1777,6 +1777,9 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return self._hasCheckStatus
 
+    def isLinkedToEquippedRoom(self):
+        return None
+
     def hasAcceptReject(self):
         """ Returns if this booking belongs to a plugin who has a "accept or reject" concept.
             This attribute will be available in Javascript with the "hasAcceptReject" attribute
