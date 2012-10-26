@@ -499,7 +499,7 @@ class CSBooking(CSBookingBase):
             so that it is caught by Main.js's postDelete function.
         """
         result = None
-        if len(VidyoTools.getIndexByVidyoRoom().getBookingList(self._roomId)) == 1 or fromDeleteOld:
+        if len(VidyoTools.getIndexByVidyoRoom().getBookingList(self._roomId)) == 1:
             result = ExternalOperationsManager.execute(self, "deleteRoom", VidyoOperations.deleteRoom, self, self._roomId)
 
         if isinstance(result, VidyoError):
