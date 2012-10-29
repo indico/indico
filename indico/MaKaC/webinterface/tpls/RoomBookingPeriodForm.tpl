@@ -59,7 +59,7 @@
                                         <tr id="sdatesTR" >
                                             <td class="subFieldWidth" align="right" valign="top" ><small>${ _("Unavailability") }</small></td>
                                             <td class="blacktext">
-                                            <span style="color:#881122">${ _("This room cannot be booked during the following dates due to maintenance reasons") }:<ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), unavailableDates )) }</li></ul></span>
+                                            <span style="color:#881122">${ _("This room cannot be booked during the following dates") }:<ul><li>${ "</li><li>".join(map(lambda x: _('from %s to %s') % (x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), unavailableDates )) }</li></ul></span>
                                             </td>
                                         </tr>
                                         % endif
