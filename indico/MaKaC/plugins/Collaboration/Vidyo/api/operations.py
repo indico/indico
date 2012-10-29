@@ -121,7 +121,6 @@ class VidyoOperations(object):
 
         return None
 
-
     @classmethod
     def modifyRoom(cls, booking, oldBookingParams):
 
@@ -224,10 +223,7 @@ class VidyoOperations(object):
         autoMute = booking.getBookingParamByName("autoMute")
 
         try:
-            if autoMute:
-                AdminApi.enableAutomute(roomId, confId, bookingId)
-            else:
-                AdminApi.disableAutomute(roomId, confId, bookingId)
+            AdminApi.setAutomute(roomId, autoMute, confId, bookingId)
         except WebFault, e:
             faultString = e.fault.faultstring
             if faultString.startswith('Room not found for roomID'):
@@ -290,7 +286,6 @@ class VidyoOperations(object):
 
         return (adminApiRoom, userApiRoom)
 
-
     @classmethod
     def deleteRoom(cls, booking, roomId):
         confId = booking.getConference().getId()
@@ -306,8 +301,6 @@ class VidyoOperations(object):
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s""" %
                             (confId, bookingId, e.fault.faultstring))
                 raise
-
-
 
     @classmethod
     def connectRoom(cls, booking, roomId, extension):

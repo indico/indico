@@ -292,17 +292,11 @@ class CSBooking(CSBookingBase):
         if len(self._bookingParams["roomDescription"].strip()) == 0:
             raise VidyoException("roomDescription parameter (" + str(self._bookingParams["roomDescription"]) + " ) is empty for Vidyo booking with id: " + str(self._id))
 
-        if self._pin:
-            try:
-                int(self._pin)
-            except ValueError:
-                raise VidyoException("pin parameter (" + str(self._pin) + ") is not an integer for Vidyo booking with id: " + str(self._id))
+        if self._pin and not isinstance(self._pin, int):
+            raise VidyoException("pin parameter ({0}) is not an integer for Vidyo booking with id: {1}".format(self._pin, self._id))
 
-        if self._moderatorPin:
-            try:
-                int(self._moderatorPin)
-            except ValueError:
-                raise VidyoException("moderator pin parameter (" + str(self._moderatorPin) + ") is not an integer for Vidyo booking with id: " + str(self._id))
+        if self._pin and not isinstance(self._moderatorPin, int):
+            raise VidyoException("moderator pin parameter ({0}) is not an integer for Vidyo booking with id: {1}".format(self._moderatorPin, self._id))
 
         return False
 
@@ -347,6 +341,21 @@ class CSBooking(CSBookingBase):
 
         return linkVideoText
 
+    def _automute_op(self, op):
+        op_name = "{0}Automute".format(op)
+        result = ExternalOperationsManager.execute(self, op_name, getattr(VidyoOperations, op_name), self)
+
+        if isinstance(result, VidyoError):
+            if result.getErrorType() == 'unknownRoom':
+                self.setBookingNotPresent()
+            raise automute_result
+
+    def _setAutomute(self):
+        return self._automute_op('set')
+
+    def _getAutomute(self):
+        return self._automute_op('get')
+
     def _create(self):
         """ Creates the Vidyo public room that will be associated to this CSBooking,
             based on the booking params.
@@ -368,12 +377,7 @@ class CSBooking(CSBookingBase):
             VidyoTools.getEventEndDateIndex().indexBooking(self)
             VidyoTools.getIndexByVidyoRoom().indexBooking(self)
 
-            automute_result = ExternalOperationsManager.execute(self, "setAutomute", VidyoOperations.setAutomute, self)
-            if isinstance(automute_result, VidyoError):
-                if automute_result.getErrorType() == 'unknownRoom':
-                    self.setBookingNotPresent()
-                return automute_result
-
+            self._setAutomute()
 
     def _modify(self, oldBookingParams):
         """ Modifies the Vidyo public room in the remote system
@@ -392,13 +396,7 @@ class CSBooking(CSBookingBase):
             if oldBookingParams["owner"]["id"] != self.getOwnerObject().getId():
                 self._sendNotificationToOldNewOwner(oldBookingParams["owner"])
 
-            automute_result = ExternalOperationsManager.execute(self, "setAutomute", VidyoOperations.setAutomute, self)
-            if isinstance(automute_result, VidyoError):
-                if automute_result.getErrorType() == 'unknownRoom':
-                    self.setBookingNotPresent()
-                return automute_result
-
-            self._updateRelatedBookings()
+            self._setAutomute()
 
     def _notifyOnView(self):
         """ Will get called when manager sees list of bookings in management interface,
@@ -540,13 +538,7 @@ class CSBooking(CSBookingBase):
             #if str(adminApiResult.groupName) != getVidyoOptionValue("indicoGroup"):
             #    return VidyoError("invalidGroup", "checkStatus")
 
-            automute_result = ExternalOperationsManager.execute(self, "getAutomute", VidyoOperations.getAutomute, self)
-            if isinstance(automute_result, VidyoError):
-                if automute_result.getErrorType() == 'unknownRoom':
-                    self.setBookingNotPresent()
-                return automute_result
-            self._bookingParams["autoMute"] = automute_result
-
+            self._bookingParams["autoMute"] = self._getAutomute()
             self._updateRelatedBookings()
 
     def _delete(self, fromDeleteOld = False):
