@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from indico.MaKaC.services.implementation.base import TextModificationBase
+from MaKaC.common.utils import setValidEmailSeparators
 """
 Services for Collaboration plugins
 """
@@ -72,17 +73,6 @@ class GetSpeakerEmailListByCont(ConferenceModifBase):
 
 class SendElectronicAgreement(ConferenceModifBase):
 
-    def _buildEmailList(self, value):
-        emailList = []
-        if not value:
-            return emailList
-        else:
-            # replace to have only one separator
-            value = value.replace(" ",",")
-            value = value.replace(";",",")
-            emailList = value.split(",")
-            return emailList
-
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
 
@@ -93,7 +83,8 @@ class SendElectronicAgreement(ConferenceModifBase):
         self.fromEmail = self._params['from']['email']
         self.fromName = self._params['from']['name']
         self.content = self._params['content']
-        self.cc = self._buildEmailList(self._params['cc'])
+        p_cc = self._params.get('cc').strip()
+        self.cc = setValidEmailSeparators(p_cc).split(',') if p_cc else []
         manager = self._conf.getCSBookingManager()
         for uniqueId in self.uniqueIdList:
             spk = manager.getSpeakerWrapperByUniqueId(uniqueId)
