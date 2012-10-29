@@ -110,4 +110,70 @@
         }
     });
 
+    $.widget('cern.disabledElementWithTooltip', {
+        // Default options
+        options: {
+            disabled: null,
+            tooltip: null,
+            tooltipClass: 'tooltipError',
+            elementClass: 'ui-disabled-element'
+        },
+
+        _create: function() {
+            var self = this;
+            if(this.options.disabled === null) {
+                this.options.disabled = false;
+            }
+            // Wrap the element in a span and create an overlay so we can get mouse events for the disabled button
+            this.element.addClass(this.options.elementClass).wrap('<span/>');
+            var wrapper = this.element.closest('span');
+            wrapper.css({
+                display: 'inline-block',
+                position: 'relative'
+            });
+            this.overlay = $('<div/>').css({
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                height: '100%',
+                width: '100%'
+            }).appendTo(wrapper);
+
+            this.overlay.qtip({
+                content: {
+                    text: self.options.tooltip
+                },
+                position: {
+                    target: this.element
+                }
+            });
+            this._update();
+        },
+
+        _update: function() {
+            this.element.prop('disabled', "disabled");
+            this.overlay.toggle(this.options.disabled);
+        },
+
+        destroy: function() {
+            if(!this.element.hasClass(this.options.elementClass)) {
+                return;
+            }
+            this.overlay.remove();
+            this.element.removeClass(this.options.elementClass).unwrap();
+            $.Widget.prototype.destroy.apply(this, arguments);
+        },
+
+        _setOption: function(key, value) {
+            if(key == 'disabled') {
+                this.options.disabled = value;
+                this._update();
+            }
+            else {
+                $.Widget.prototype._setOption.apply(this, arguments);
+            }
+        }
+    });
+
+
 })(jQuery);

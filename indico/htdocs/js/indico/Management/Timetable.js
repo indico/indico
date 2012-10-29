@@ -669,13 +669,20 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             tabs = [[$T("Basic"), self._drawMainTab(self.info)]];
         }
 
+        // We need to disable the select if we are inside a session.
+        if(self.isEdit && exists(self.timetable.parentTimetable)){
+            $(self.conferenceDays.dom).disabledElementWithTooltip({
+                disabled: true,
+                tooltip: $T("You cannot change the day because you are inside a session.")
+            });
+        }
+
         if (this.isConference) {
             tabs.push([$T("Authors"), self._drawAuthorsTab(self.info)]);
         }
 
         tabs.push([$T("Advanced"), self._drawAdvancedTab(self.info)]);
         var tabWidget = new JTabWidget(tabs, 600, 400);
-
         return tabWidget.draw();
     }
 },
