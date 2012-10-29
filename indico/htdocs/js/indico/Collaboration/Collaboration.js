@@ -1792,7 +1792,7 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
         var self = this;
         var ccField = Html.tr({},
                 Html.td({width:"15%"}, Html.span({}, $T("CC:"))),
-                Html.td({width:"85%"}, $B(self.parameterManager.add(Html.edit({style: {width: '100%'}}), 'emaillist', false), self.cc.accessor()))
+                Html.td({width:"85%"}, $B(self.parameterManager.add(Html.edit({style: {width: '100%'}}), 'emaillist', true), self.cc.accessor()))
         );
 
         return Html.table({width:"688px"}, ccField);
@@ -1807,13 +1807,12 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
     }
 
 },
-    function(confTitle, confId, uniqueIdList, fromList, ccList, subject, defaultText, legends){
+    function(confTitle, confId, uniqueIdList, fromList, subject, defaultText, legends){
         var self = this;
         self.uniqueIdList = uniqueIdList;
         self.fromList = fromList;
         self.cc = new WatchObject();
         self.parameterManager = new IndicoUtil.parameterManager();
-        $B(self.cc.accessor(), _.values(ccList).join(', '));
         self.sendFunction=function(){
             var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending..."));
             indicoRequest(

@@ -71,9 +71,10 @@ class GetSpeakerEmailListByCont(ConferenceModifBase):
         return resultList
 
 class SendElectronicAgreement(ConferenceModifBase):
+
     def _buildEmailList(self, value):
         emailList = []
-        if (value == ""):
+        if not value:
             return emailList
         else:
             # replace to have only one separator
@@ -95,7 +96,9 @@ class SendElectronicAgreement(ConferenceModifBase):
         self.cc = self._buildEmailList(self._params['cc'])
         manager = self._conf.getCSBookingManager()
         for uniqueId in self.uniqueIdList:
-            self.emailToList.extend(manager.getSpeakerEmailByUniqueId(uniqueId, self._aw.getUser()))
+            spk = manager.getSpeakerWrapperByUniqueId(uniqueId)
+            if spk.getStatus() not in [SpeakerStatusEnum.SIGNED, SpeakerStatusEnum.FROMFILE]:
+                self.emailToList.extend(manager.getSpeakerEmailByUniqueId(uniqueId, self._aw.getUser()))
 
     def processContent(self, speakerWrapper):
         fullUrl = UHCollaborationElectronicAgreementForm().getURL(self._conf.getId(), speakerWrapper.getUniqueIdHash())
@@ -124,19 +127,22 @@ class SendElectronicAgreement(ConferenceModifBase):
             manager = self._conf.getCSBookingManager()
             for uniqueId in self.uniqueIdList:
                 sw = manager.getSpeakerWrapperByUniqueId(uniqueId)
-                sw.setStatus(SpeakerStatusEnum.PENDING)
-                subject = """[Indico] Electronic Agreement: '%s'"""%(self._conf.getTitle())
-                notification = ElectronicAgreementNotification([sw.getObject().getEmail()], self.cc, self.fromEmail, self.fromName, self.processContent(sw), subject)
+                if sw.getStatus() not in [SpeakerStatusEnum.SIGNED, SpeakerStatusEnum.FROMFILE]:
+                    sw.setStatus(SpeakerStatusEnum.PENDING)
+                    subject = """[Indico] Electronic Agreement: '%s'"""%(self._conf.getTitle())
+                    notification = ElectronicAgreementNotification([sw.getObject().getEmail()], self.cc, self.fromEmail, self.fromName, self.processContent(sw), subject)
 
-                GenericMailer.sendAndLog(notification, self._conf,
-                                         "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                         None)
+                    GenericMailer.sendAndLog(notification, self._conf,
+                                             "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
+                                             None)
         return report
 
 class RejectElectronicAgreement(ConferenceDisplayBase):
 
     MESSAGE_REJECT = """Dear manager,
+
 The speaker {speaker} has rejected the electronic agreement for the event '{title}'.
+Reason: {reason}
 
 Event URL: {url}
 
@@ -161,10 +167,11 @@ CERN Recording Team"""
             spkWrapper.setRejectReason(self.reason)
             spkWrapper.triggerNotification()
             if manager.notifyElectronicAgreementAnswer():
-                subject = """[Indico] Electronic Agreement Rejected: '%s' (speaker : %s)""" % (self._conf.getTitle(), spkWrapper.getSpeakerId())
+                subject = """[Indico] Electronic Agreement Rejected: '%s'""" % (self._conf.getTitle())
                 content = _(self.MESSAGE_REJECT).format(
-                    speaker=spkWrapper.getObject().getFullName(),
+                    speaker=spkWrapper.getObject().getDirectFullName(),
                     title=self._conf.getTitle(),
+                    reason=self.reason,
                     url=self._conf.getURL())
                 emailToList = [self._conf.getCreator().getEmail()]
                 for event_manager in self._conf.getManagerList():
@@ -178,6 +185,7 @@ CERN Recording Team"""
 class AcceptElectronicAgreement(ConferenceDisplayBase):
 
     MESSAGE_ACCEPT = """Dear manager,
+
 The speaker {speaker} has accepted the electronic agreement for the event '{title}'.
 
 Event URL: {url}
@@ -201,9 +209,9 @@ CERN Recording Team"""
             spkWrapper.setStatus(SpeakerStatusEnum.SIGNED, self._req.get_remote_ip())
             spkWrapper.triggerNotification()
             if manager.notifyElectronicAgreementAnswer():
-                subject = """[Indico] Electronic Agreement Accepted: '%s' (speaker : %s)""" % (self._conf.getTitle(), spkWrapper.getSpeakerId())
+                subject = """[Indico] Electronic Agreement Accepted: '%s'""" % (self._conf.getTitle())
                 content = _(self.MESSAGE_ACCEPT).format(
-                    speaker=spkWrapper.getObject().getFullName(),
+                    speaker=spkWrapper.getObject().getDirectFullName(),
                     title=self._conf.getTitle(),
                     url=self._conf.getURL())
                 emailToList = [self._conf.getCreator().getEmail()]
