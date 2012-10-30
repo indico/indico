@@ -139,7 +139,7 @@
                 % endif
                 <tr>
                     <td>
-                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="RR_loadTalks()" />
+                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="RR_loadTalks(${isManager | n,j});" />
                     </td>
                     <td>
                         % if NTalks == NRecordingCapableContributions:
@@ -267,4 +267,3 @@
     });
 % endif
 </script>
-

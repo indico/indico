@@ -45,7 +45,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
         manager = self._conf.getCSBookingManager()
         user = self._rh._getUser()
-        isManager = manager.isVideoServicesManager(user) or manager.isPluginManager('RecordingRequest', user)
+        isManager = user.isAdmin() or manager.isVideoServicesManager(user) or manager.isPluginManager('RecordingRequest', user)
         booking = manager.getSingleBooking('RecordingRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
@@ -64,13 +64,13 @@ class WNewBookingForm(WCSPageTemplateBase):
         #list of "locationName:roomName" strings
         vars["RecordingCapableRooms"] = rRoomFullNames
 
-        if user.isAdmin() or isManager:
+        if isManager or self._conf.canModify(self._rh._aw):
             recordingAbleTalks = talks
         nRecordingCapable = len(recordingAbleTalks)
         vars["HasRecordingCapableTalks"] = nRecordingCapable > 0
         vars["NRecordingCapableContributions"] = nRecordingCapable
 
-        #we see if the event itself is webcast capable (depends on event's room)
+        #we see if the event itself is recoring capable (depends on event's room)
         confLocation = self._conf.getLocation()
         confRoom = self._conf.getRoom()
         if confLocation and confRoom and (confLocation.getName() + ":" + confRoom.getName() in rRoomNames):
@@ -78,8 +78,8 @@ class WNewBookingForm(WCSPageTemplateBase):
         else:
             topLevelRecordingCapable = False
 
-        #Finally, this event is webcast capable if the event itself or one of its talks are capable or user is admin, video services manager or reording manager
-        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or user.isAdmin() or isManager
+        #Finally, this event is recoring capable if the event itself or one of its talks are capable or user is admin, video services manager, reording manager or event meneger
+        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or isManager or self._conf.canModify(self._rh._aw)
 
         if initialDisplay:
             recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)

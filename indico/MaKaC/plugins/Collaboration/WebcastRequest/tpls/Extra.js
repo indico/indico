@@ -165,8 +165,8 @@ var WR_loadTalks = function (isManager) {
     };
 
     if (WR_contributionsLoaded) {
-        // Hide talks that are not capable and not choosed by administrator
-        if (isManager) {
+        // Hide talks that are not capable and not choosen by managers
+        if (!isManager) {
             $("#contributionList li").each(function() {
                 if ($(this).attr('data-webcastCapable') == 'false') {
                     $(this).find('input').attr('disabled', 'disabled');

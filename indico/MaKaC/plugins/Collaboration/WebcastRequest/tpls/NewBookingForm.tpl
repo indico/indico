@@ -98,7 +98,8 @@
                         % if NTalks == NWebcastCapableContributions:
                         <label for="allTalksRB" id="allTalksRBLabel" >All talks</label>
                         % else:
-                        <label for="allTalksRB" id="allTalksRBLabel">${_("All webcastable talks.")}</label>
+                        <label for="allTalksRB" id="allTalksRBLabel">${_("All webcast-able talks.")}</label>
+                        % endif
                     </td>
                 </tr>
                 % if WebcastCapable:

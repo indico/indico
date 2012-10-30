@@ -42,7 +42,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         underTheLimit = self._conf.getNumberOfContributions() <= self._WebcastRequestOptions["contributionLoadLimit"].getValue()
         manager = self._conf.getCSBookingManager()
         user = self._rh._getUser()
-        isManager = manager.isVideoServicesManager(user) or manager.isPluginManager('WebcastRequest', user)
+        isManager = user.isAdmin() or manager.isVideoServicesManager(user) or manager.isPluginManager('WebcastRequest', user)
 
         booking = manager.getSingleBooking('WebcastRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
@@ -53,15 +53,17 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["isManager"] = isManager
 
         talks, wcRoomFullNames, wcRoomNames, webcastAbleTalks, webcastUnableTalks = getCommonTalkInformation(self._conf)
-        nTalks = len(talks)
         nWebcastCapable = len(webcastAbleTalks)
 
-        vars["HasWebcastCapableTalks"] = nWebcastCapable > 0
         vars["NTalks"] = len(talks)
 
         #list of "locationName:roomName" strings
         vars["WebcastCapableRooms"] = wcRoomFullNames
 
+        if isManager or self._conf.canModify(self._rh._aw):
+            webcastAbleTalks = talks
+        nWebcastCapable = len(webcastAbleTalks)
+        vars["HasWebcastCapableTalks"] = nWebcastCapable > 0
         vars["NWebcastCapableContributions"] = nWebcastCapable
 
         #we see if the event itself is webcast capable (depends on event's room)
@@ -72,8 +74,8 @@ class WNewBookingForm(WCSPageTemplateBase):
         else:
             topLevelWebcastCapable = False
 
-        #Finally, this event is webcast capable if the event itself or one of its talks are capable or user is admin, video services manager or webcast manager
-        vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or user.isAdmin() or isManager
+        #Finally, this event is webcast capable if the event itself or one of its talks are capable or user is admin, video services manager, webcast manager or event meneger
+        vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or isManager or self._conf.canModify(self._rh._aw)
 
         if initialDisplay:
             webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
