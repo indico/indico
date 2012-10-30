@@ -59,6 +59,7 @@ class GenericMailer:
     @staticmethod
     def _prepare(notification):
         fromAddr=notification.getFromAddr()
+        # what are these two loops for??
         for to in notification.getToList() :
             if len(to) == 0 :
                 notification.getToList().remove(to)
@@ -83,10 +84,15 @@ class GenericMailer:
                 to,cc,subject,body)
         toList = notification.getToList()
         ccList = notification.getCCList()
+        if hasattr(notification, 'getBCCList'):
+            bccList = notification.getBCCList()
+        else:
+            bccList = []
         return {
             'msg': msg,
             'toList': toList,
             'ccList': ccList,
+            'bccList': bccList,
             'fromAddr': fromAddr,
             'to': to
         }
@@ -108,7 +114,7 @@ class GenericMailer:
 
         try:
             Logger.get('mail').info("Mailing %s  CC: %s" % (msgData['toList'], msgData['ccList']))
-            server.sendmail(msgData['fromAddr'], msgData['toList'] + msgData['ccList'], msgData['msg'])
+            server.sendmail(msgData['fromAddr'], msgData['toList'] + msgData['ccList'] + msgData['bccList'], msgData['msg'])
         except smtplib.SMTPRecipientsRefused,e:
             server.quit()
             raise MaKaCError("Email address is not valid: %s" % e.recipients)
