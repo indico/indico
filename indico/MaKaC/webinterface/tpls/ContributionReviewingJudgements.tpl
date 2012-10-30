@@ -46,7 +46,7 @@
     <tr>
         <td align="left">
                 % if Editing.isSubmitted():
-                    <%include file="EditingJudgementDisplay.tpl" args="Editing = Editing, ShowEditor = True, format=format"/>
+                    <%include file="EditingJudgementDisplay.tpl" args="Editing = Editing, ShowEditor = True, format=format, showTitle=False"/>
                 % else:
                     <span>${ _("Warning: the layout reviewer has not given his assessment yet.")}</span>
                 % endif
@@ -71,7 +71,7 @@
                     <table cellspacing="0" cellpadding="5" width="100%">
                     % for advice in AdviceList:
                     <tr><td>
-                        <%include file="AdviceJudgementDisplay.tpl" args="Advice = advice, ShowReviewer = True, format=format"/>
+                        <%include file="AdviceJudgementDisplay.tpl" args="Advice = advice, ShowReviewer = True, format=format, showTitle=False"/>
                     </td></tr>
                     % endfor
                     </table>
@@ -89,12 +89,16 @@
 <tr><td>
 <table width="100%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a>${ _("Final Assessment")}
+        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none; font-weight: bold"><a name="FinalReviewing"></a>${ _("Final Assessment")}
             ${inlineContextHelp(_('Here is displayed the assessment given by the Referee.<br/>If you are the Referee of this contribution, you can change this.'))}
         </td>
     </tr>
-        % if not IsReferee:
-            % if not Review.getRefereeJudgement().isSubmitted():
+        % if Review.getRefereeJudgement().isSubmitted():
+             <tr><td>
+            <%include file="FinalJudgementDisplay.tpl" args="Review = Review.getRefereeJudgement(), ShowReferee = True, format='%a %d %b %Y at %H\x3a%M', showTitle=False"/>
+            </td></tr>
+        % else:
+            % if not IsReferee:
                 <tr>
                     <td colspan="2" align="left">
                         <span>
@@ -104,44 +108,42 @@
                     </td>
                 </tr>
             % endif
+            % if len (ConfReview.getReviewingQuestions()) > 0 :
+            <tr>
+                <td class="dataCaptionTD" style="white-space: nowrap; width: 50px">
+                    <span class="titleCellFormat">${ _("Reviewing questions:")}</span>
+                </td>
+                <td id="questionListDisplay">
+                </td>
+            </tr>
+            % endif
+            <tr>
+                <td class="dataCaptionTD" style="white-space: nowrap; width: 50px"><span class="titleCellFormat">${ _("Comments")}:</span></td>
+                <td>
+                    <div id="inPlaceEditComments">${Review.getRefereeJudgement().getComments() | h, html_breaks}</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="dataCaptionTD" style="white-space: nowrap; width: 50px"><span class="titleCellFormat"><strong>${ _("Assessment")}:</strong></span></td>
+                <td>
+                    <div id="statusDiv">
+                        <div id="initialStatus" style="display:inline">${ Review.getRefereeJudgement().getJudgement() }</div>
+                        <div id="inPlaceEditJudgement" style="display:inline"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr><td colspan=4>
+
+            </tr>
         % endif
-        % if len (ConfReview.getReviewingQuestions()) > 0 :
-        <tr>
-            <td class="dataCaptionTD" style="white-space: nowrap; width: 50px">
-                <span class="titleCellFormat">${ _("Reviewing questions:")}</span>
-            </td>
-            <td id="questionListDisplay">
-            </td>
-        </tr>
-        % endif
-        <tr>
-            <td class="dataCaptionTD" style="white-space: nowrap; width: 50px"><span class="titleCellFormat">${ _("Comments")}:</span></td>
-            <td>
-                <div id="inPlaceEditComments">${Review.getRefereeJudgement().getComments() | h, html_breaks}</div>
-            </td>
-        </tr>
-        <tr>
-            <td class="dataCaptionTD" style="white-space: nowrap; width: 50px"><span class="titleCellFormat"><strong>${ _("Assessment")}:</strong></span></td>
-            <td>
-                <div id="statusDiv">
-                    <div id="initialStatus" style="display:inline">${ Review.getRefereeJudgement().getJudgement() }</div>
-                    <div id="inPlaceEditJudgement" style="display:inline"></div>
-                </div>
-            </td>
-        </tr>
         % if IsReferee:
-        % if not FinalJudge:
-        <% display = 'span' %>
-        % else:
-            <% display = 'none' %>
-        % endif
-        <tr>
-            <td colspan="3" style="padding-top: 20px">
-                <span id="submitbutton" align="right"></span>
-                <span id="submitHelpPopUp" style="display:${display}" align="right"></span>
-                <span id="submittedmessage"></span>
-            </td>
-        </tr>
+            <tr>
+                <td colspan="3" style="padding-top: 20px">
+                    <span id="submitbutton" align="right"></span>
+                    <span id="submitHelpPopUp" style="display:${'span' if not FinalJudge else 'none'}" align="right"></span>
+                    <span id="submittedmessage"></span>
+                </td>
+            </tr>
         % endif
 </table>
 </td></tr>
@@ -226,7 +228,9 @@ var showValues = function() {
             },
             function(result, error){
                 if (!error) {
-                    $E('inPlaceEditJudgement').set(result);
+                    if(!submitted){
+                        $E('inPlaceEditJudgement').set(result);
+                    }
                 }
             }
         )
@@ -253,12 +257,7 @@ var showValues = function() {
 }
 
 
-% if Review.getRefereeJudgement().isSubmitted() or not IsReferee:
-var submitted = true;
-% else:
-var submitted = false;
-% endif
-
+var submitted = ${jsonEncode(Review.getRefereeJudgement().isSubmitted() or not IsReferee)};
 
 var updatePage = function (){
     if (submitted) {
@@ -301,20 +300,16 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
         },
         function(result, error){
             if (!error) {
-                submitted = !submitted;
-                /*updatePage(false)*/
-                location.href = "${ urlHandlers.UHContributionModifReviewing.getURL(Contribution) }#FinalReviewing"
                 location.reload(true)
             } else {
                 alert (error.message);
-                //IndicoUtil.errorReport(error);
             }
         },
         $T('Send')
 );
 % endif
 
-updatePage(true);
+updatePage();
 
 </script>
 % endif

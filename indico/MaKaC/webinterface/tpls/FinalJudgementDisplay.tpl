@@ -1,11 +1,13 @@
-<%page args="Review=None, ShowReferee=None, format=None"/>
+<%page args="Review=None, ShowReferee=None, format=None, showTitle=True"/>
 
 <div class="historyReviewJudgment">
     <table>
         <tr>
+            % if showTitle:
             <td class="dataCaptionTD" style="white-space: nowrap; width: 50px">
                 <span class="titleCellFormat" style="font-size: 12px; font-weight: bold">${ _("Referee:")}</span>
             </td>
+            % endif
             <td>
                 <div class="contributionReviewingStatus ${getStatusClass(Review.getJudgement())}" style="margin-top: 0">
                     ${getStatusText(Review.getJudgement())}
