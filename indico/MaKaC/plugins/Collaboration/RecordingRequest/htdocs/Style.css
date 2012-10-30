@@ -78,3 +78,7 @@ span.RRContributionName {
 span.RRSpeakers {
 	overflow: auto;
 }
+
+#contributionsDiv {
+    padding-left: 20px;
+}

@@ -8,7 +8,7 @@
             <td>
                 <span class="RRNoteText">
                     ${_("In order to send a Recording request, you need to select a room capable of recording. ")}
-                    <span class='fakeLink' onclick='toggleRecordingCapableRooms();' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
+                    <span class='fakeLink' onclick='toggleRecordingCapableRooms();' id="recordingRoomsText">${_("See list of recordable rooms")}</span>
                 </span>
             </td>
         </tr>
@@ -97,7 +97,7 @@
                         % if NTalks == NRecordingCapableContributions:
                         <label for="allTalksRB" id="allTalksRBLabel" >${_("All talks") }</label>
                         % else:
-                        <label for="allTalksRB" id="allTalksRBLabel">${_("All record-able talks.")}</label>
+                        <label for="allTalksRB" id="allTalksRBLabel">${_("All recordable talks.")}</label>
                     </td>
                 </tr>
                             % if RecordingCapable:
@@ -105,10 +105,13 @@
                     <td></td>
                     <td class="warning">
                         <h3>${_("Note")}</h3>
-                        <span>
-                            ${_("""There are {0} talks in the event. <a class="uncapable">Some of them ({1})</a> are not in a room capable of recording and thus cannot be recorded while <a class="capable">the remaining ({2})</a> are going to be recorded.""").format(str(NTalks), str(NTalks - NRecordingCapableContributions),str(NRecordingCapableContributions))}
-                        </span>
-                        <span class='fakeLink' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
+                        <p>
+                            ${_('<a class="uncapable">{1} of {0}</a> talks are not in a room capable of recording and thus cannot be recorded.').format(NTalks, NTalks - NRecordingCapableContributions)}
+                            % if NRecordingCapableContributions:
+                              ${_('<a class="capable">The remaining {0}</a> will be recorded').format(NRecordingCapableContributions)}
+                            % endif
+                        </p>
+                        <p><a class="fakeLink" id="recordingRoomsText">${_("See list of recordable rooms")}</a></p>
                         <div id="recordingCapableRoomsDiv" style="display:none;">
                             <div style="padding-top:15px;padding-bottom:15px;">
                                 <span class="RRNoteText">${_("These are the rooms capable of recording:")} </span>
@@ -142,7 +145,7 @@
                         % if NTalks == NRecordingCapableContributions:
                         <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose talks.")}</label>
                         % else:
-                        <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among record-able talks.")}</label>
+                        <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among recordable talks.")}</label>
                         % endif
                     </td>
                 </tr>
@@ -151,12 +154,10 @@
 
         <% displayText = ('none', 'block')[DisplayTalks and InitialChoose] %>
         <div id="contributionsDiv" class="RRFormSubsection" style="display: ${ displayText };">
-            <span class="WRQuestion">${_("Please choose among the record-able contributions below:")}</span>
-
             % if HasRecordingCapableTalks:
-            <span class="fakeLink" style="margin-left: 20px;" onclick="RRSelectAllContributions()">${_("Select all")}</span>
-            <span class="horizontalSeparator">|</span>
-            <span class="fakeLink" onclick="RRUnselectAllContributions()">${_("Select none")}</span>
+              <span class="fakeLink" style="margin-left: 20px;" onclick="RRSelectAllContributions()">${_("Select all")}</span>
+              <span class="horizontalSeparator">|</span>
+              <span class="fakeLink" onclick="RRUnselectAllContributions()">${_("Select none")}</span>
             % endif
 
             <div class="RRContributionListDiv">
@@ -238,12 +239,12 @@
 % if (not RecordingCapable and RecordingCapableRooms) or (NTalks > NRecordingCapableContributions and RecordingCapable):
 
     function showRooms(){
-        $("#recordingRoomsText").text($T("Hide list of record-able rooms."));
+        $("#recordingRoomsText").text($T("Hide list of recordable rooms."));
         $("#recordingCapableRoomsDiv").show();
     };
 
     function hideRooms(){
-        $("#recordingRoomsText").text($T("See list of record-able rooms."));
+        $("#recordingRoomsText").text($T("See list of recordable rooms."));
         $("#recordingCapableRoomsDiv").hide();
     };
 
@@ -255,11 +256,13 @@
         }
     });
 
-    $(".warning .capable").click(function() {
-        new ContributionsPopup($T('Contributions record-able'), RR_contributions, false, function() {self.popupAllowClose = true; return true;}, true).open();
+    $(".warning .capable").attr('href', '#').click(function() {
+        new ContributionsPopup($T("Contributions that can be recorded"), RR_contributions, false, function() {self.popupAllowClose = true; return true;}, true).open();
+        return false;
     });
-    $(".warning .uncapable").click(function() {
-        new ContributionsPopup($T('Contributions not record-able'), RR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
+    $(".warning .uncapable").attr('href', '#').click(function() {
+        new ContributionsPopup($T("Contributions that can't be recorded"), RR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
+        return false;
     });
 % endif
 </script>

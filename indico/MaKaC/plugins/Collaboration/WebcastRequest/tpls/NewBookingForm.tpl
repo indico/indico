@@ -9,7 +9,7 @@
             <td>
                 <span class="WRNoteText">
                     ${_("In order to send a Webcast request, you need to select a room capable of webcasting. ")}
-                    <span class='fakeLink' onclick='toggleWebcastCapableRooms();' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
+                    <span class='fakeLink' onclick='toggleWebcastCapableRooms();' id="webcastRoomsText">${_("See list of webcastable rooms")}</span>
                 </span>
             </td>
         </tr>
@@ -98,7 +98,7 @@
                         % if NTalks == NWebcastCapableContributions:
                         <label for="allTalksRB" id="allTalksRBLabel" >All talks</label>
                         % else:
-                        <label for="allTalksRB" id="allTalksRBLabel">${_("All webcast-able talks.")}</label>
+                        <label for="allTalksRB" id="allTalksRBLabel">${_("All webcastable talks.")}</label>
                     </td>
                 </tr>
                             % if WebcastCapable:
@@ -106,10 +106,13 @@
                     <td></td>
                     <td class="warning">
                         <h3>${_("Note")}</h3>
-                        <span>
-                            ${_("""There are {0} talks in the event. <a class="uncapable">Some of them ({1})</a> are not in a room capable of webcasting and thus cannot be webcasted while <a class="capable">the remaining ({2})</a> are going to be webcasted.""").format(str(NTalks), str(NTalks - NWebcastCapableContributions),str(NWebcastCapableContributions))}
-                        </span>
-                        <span class='fakeLink' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
+                        <p>
+                            ${_('<a class="uncapable">{1} of {0}</a> talks are not in a room capable of webcasting and thus cannot be webcasted.').format(NTalks, NTalks - NWebcastCapableContributions)}
+                            % if NWebcastCapableContributions:
+                              ${_('<a class="capable">The remaining {0}</a> will be webcasted').format(NWebcastCapableContributions)}
+                            % endif
+                        </p>
+                        <p><a href="#" class='fakeLink' id="webcastRoomsText">${_("See list of webcastable rooms")}</a></p>
                         <div id="webcastCapableRoomsDiv" style="display:none;">
                             <div style="padding-top:15px;padding-bottom:15px;">
                                 <span class="WRNoteText">${_("These are the rooms capable of webcasting:")} </span>
@@ -143,7 +146,7 @@
                         % if NTalks == NWebcastCapableContributions:
                         <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose talks.")}</label>
                         % else:
-                        <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among webcast-able talks.")}</label>
+                        <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among webcastable talks.")}</label>
                         % endif
                     </td>
                 </tr>
@@ -152,8 +155,6 @@
 
         <% displayText = ('none', 'block')[DisplayTalks and InitialChoose] %>
         <div id="contributionsDiv" class="WRFormSubsection" style="display: ${ displayText };">
-            <span class="WRQuestion">${_("Please choose among the webcast-able contributions below:")}</span>
-
             % if HasWebcastCapableTalks:
             <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
             <span class="horizontalSeparator">|</span>
@@ -219,12 +220,12 @@
 % if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable):
 
     function showRooms(){
-        $("#webcastRoomsText").text($T("Hide list of webcast-able rooms."));
+        $("#webcastRoomsText").text($T("Hide list of webcastable rooms."));
         $("#webcastCapableRoomsDiv").show();
     };
 
     function hideRooms(){
-        $("#webcastRoomsText").text($T("See list of webcast-able rooms."));
+        $("#webcastRoomsText").text($T("See list of webcastable rooms."));
         $("#webcastCapableRoomsDiv").hide();
     };
 
@@ -236,11 +237,13 @@
         }
     });
 
-    $(".warning .capable").click(function() {
-        new ContributionsPopup($T('Contributions webcast-able'),WR_contributions, false, function() {self.popupAllowClose = true; return true;}, true).open();
+    $(".warning .capable").attr('href', '#').click(function() {
+        new ContributionsPopup($T("Contributions that can be Webcasted"),WR_contributions, false, function() {self.popupAllowClose = true; return true;}, true).open();
+        return false;
     });
-    $(".warning .uncapable").click(function() {
-        new ContributionsPopup($T('Contributions not webcast-able'),WR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
+    $(".warning .uncapable").attr('href', '#').click(function() {
+        new ContributionsPopup($T("Contributions that can't be Webcasted"),WR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
+        return false;
     });
 
 % endif
