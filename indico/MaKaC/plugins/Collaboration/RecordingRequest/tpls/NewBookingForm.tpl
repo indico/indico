@@ -231,11 +231,11 @@
     var isLecture = ${ jsBoolean(IsLecture) };
     var RRRecordingCapable = ${ jsBoolean(RecordingCapable) };
     var RR_contributions = ${ jsonEncode(Contributions) };
+    var RR_contributions_able = ${ jsonEncode(ContributionsAble) };
     var RR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
     var NRecordingCapableContributions = ${NRecordingCapableContributions};
     var NTalks = ${NTalks};
     var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
-</script>
 
 % if (not RecordingCapable and RecordingCapableRooms) or (NTalks > NRecordingCapableContributions and RecordingCapable):
 
@@ -258,7 +258,7 @@
     });
 
     $(".warning .capable").attr('href', '#').click(function() {
-        new ContributionsPopup($T("Contributions that can be recorded"), RR_contributions, false, function() {self.popupAllowClose = true; return true;}, true).open();
+        new ContributionsPopup($T("Contributions that can be recorded"), RR_contributions_able, false, function() {self.popupAllowClose = true; return true;}, true).open();
         return false;
     });
     $(".warning .uncapable").attr('href', '#').click(function() {

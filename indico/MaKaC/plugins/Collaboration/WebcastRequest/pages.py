@@ -55,15 +55,13 @@ class WNewBookingForm(WCSPageTemplateBase):
         talks, wcRoomFullNames, wcRoomNames, webcastAbleTalks, webcastUnableTalks = getCommonTalkInformation(self._conf)
         nWebcastCapable = len(webcastAbleTalks)
 
+
+
+        vars["HasWebcastCapableTalks"] = nWebcastCapable > 0
         vars["NTalks"] = len(talks)
 
         #list of "locationName:roomName" strings
         vars["WebcastCapableRooms"] = wcRoomFullNames
-
-        if isManager or self._conf.canModify(self._rh._aw):
-            webcastAbleTalks = talks
-        nWebcastCapable = len(webcastAbleTalks)
-        vars["HasWebcastCapableTalks"] = nWebcastCapable > 0
         vars["NWebcastCapableContributions"] = nWebcastCapable
 
         #we see if the event itself is webcast capable (depends on event's room)
@@ -80,17 +78,16 @@ class WNewBookingForm(WCSPageTemplateBase):
         if initialDisplay:
             webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
 
-            vars["Contributions"] = fossilize(webcastAbleTalks, IContributionWithSpeakersFossil,
-                                                                tz = self._conf.getTimezone(),
-                                                                units = '(hours)_minutes',
-                                                                truncate = True)
+            fossil_args = dict(tz=self._conf.getTimezone(),
+                               units='(hours)_minutes',
+                               truncate=True)
 
-            vars["ContributionsUnable"] = fossilize(webcastUnableTalks, IContributionWithSpeakersFossil,
-                                                                tz = self._conf.getTimezone(),
-                                                                units = '(hours)_minutes',
-                                                                truncate = True)
+            vars["Contributions"] = fossilize(talks, IContributionWRFossil, **fossil_args)
+            vars["ContributionsAble"] = fossilize(webcastAbleTalks, IContributionWRFossil, **fossil_args)
+            vars["ContributionsUnable"] = fossilize(webcastUnableTalks, IContributionWRFossil, **fossil_args)
         else:
             vars["Contributions"] = []
+            vars["ContributionsAble"] = []
             vars["ContributionsUnable"] = []
 
         vars["Audiences"] = CollaborationTools.getOptionValue('WebcastRequest', "webcastAudiences")

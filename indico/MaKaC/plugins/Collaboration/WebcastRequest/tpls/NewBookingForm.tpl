@@ -212,6 +212,7 @@
     var isLecture = ${ jsBoolean(IsLecture) };
     var WRWebcastCapable = ${ jsBoolean(WebcastCapable) };
     var WR_contributions = ${ jsonEncode(Contributions) };
+    var WR_contributions_able = ${ jsonEncode(ContributionsAble) };
     var WR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
     var NWebcastCapableContributions = ${NWebcastCapableContributions};
     var NTalks = ${NTalks};
@@ -238,7 +239,7 @@
     });
 
     $(".warning .capable").attr('href', '#').click(function() {
-        new ContributionsPopup($T("Contributions that can be Webcasted"),WR_contributions, false, function() {self.popupAllowClose = true; return true;}, true).open();
+        new ContributionsPopup($T("Contributions that can be Webcasted"),WR_contributions_able, false, function() {self.popupAllowClose = true; return true;}, true).open();
         return false;
     });
     $(".warning .uncapable").attr('href', '#').click(function() {

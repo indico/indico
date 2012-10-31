@@ -61,16 +61,11 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["HasRecordingCapableTalks"] = nRecordingCapable > 0
         vars["NTalks"] = len(talks)
 
-        #list of "locationName:roomName" strings
+        # list of "locationName:roomName" strings
         vars["RecordingCapableRooms"] = rRoomFullNames
-
-        if isManager or self._conf.canModify(self._rh._aw):
-            recordingAbleTalks = talks
-        nRecordingCapable = len(recordingAbleTalks)
-        vars["HasRecordingCapableTalks"] = nRecordingCapable > 0
         vars["NRecordingCapableContributions"] = nRecordingCapable
 
-        #we see if the event itself is recoring capable (depends on event's room)
+        # we check if the event itself is recoring capable (depends on event's room)
         confLocation = self._conf.getLocation()
         confRoom = self._conf.getRoom()
         if confLocation and confRoom and (confLocation.getName() + ":" + confRoom.getName() in rRoomNames):
@@ -78,22 +73,23 @@ class WNewBookingForm(WCSPageTemplateBase):
         else:
             topLevelRecordingCapable = False
 
-        #Finally, this event is recoring capable if the event itself or one of its talks are capable or user is admin, video services manager, reording manager or event meneger
-        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or isManager or self._conf.canModify(self._rh._aw)
+        # Finally, this event is recoring capable if the event itself
+        # or one of its talks are capable or user is admin, video services manager or recording manager
+        vars["RecordingCapable"] = (topLevelRecordingCapable and nRecordingCapable > 0) or isManager
 
         if initialDisplay:
             recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)
 
-            vars["Contributions"] = fossilize(recordingAbleTalks, IContributionWithSpeakersFossil,
-                                          tz = self._conf.getTimezone(),
-                                          units = '(hours)_minutes',
-                                          truncate = True)
-            vars["ContributionsUnable"] = fossilize(recordingUnableTalks, IContributionWithSpeakersFossil,
-                                          tz = self._conf.getTimezone(),
-                                          units = '(hours)_minutes',
-                                          truncate = True)
+            fossil_args = dict(tz=self._conf.getTimezone(),
+                               units='(hours)_minutes',
+                               truncate=True)
+
+            vars["Contributions"] = fossilize(talks, IContributionRRFossil, **fossil_args)
+            vars["ContributionsAble"] = fossilize(recordingAbleTalks, IContributionRRFossil, **fossil_args)
+            vars["ContributionsUnable"] = fossilize(recordingUnableTalks, IContributionRRFossil, **fossil_args)
         else:
             vars["Contributions"] = []
+            vars["ContributionsAble"] = []
             vars["ContributionsUnable"] = []
 
         vars["PostingUrgency"] = postingUrgency

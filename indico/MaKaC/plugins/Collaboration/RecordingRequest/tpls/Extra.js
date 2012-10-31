@@ -87,7 +87,7 @@ var RRTalkTemplate = function(talk) {
 
 };
 
-var RRUpdateContributionList = function (targetId) {
+var RRUpdateContributionList = function (targetId, isManager) {
     if (RR_contributions.length > 0) {
         $E(targetId).set('');
         for (i in RR_contributions) {
@@ -104,7 +104,6 @@ var RRUpdateContributionList = function (targetId) {
 }
 
 var RR_loadTalks = function (isManager) {
-
     var fetchContributions = function() {
 
         var talkTemplate = function(talk) {

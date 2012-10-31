@@ -84,7 +84,7 @@ var WRTalkTemplate = function(talk) {
     // Finally, the id
     label.append(Html.span("WRContributionId", "(id: " + talk.id + ")"));
 
-    return Html.li('', checkBox, label);
+    return Html.li({"data-webcastCapable": talk.webcastCapable}, checkBox, label);
 
 };
 
