@@ -16,19 +16,20 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
-from indico.MaKaC.services.implementation.base import TextModificationBase
-from MaKaC.common.utils import setValidEmailSeparators
 """
 Services for Collaboration plugins
 """
 
 from MaKaC.services.implementation.contribution import ContributionDisplayBase
 from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase
+from MaKaC.services.implementation.base import TextModificationBase
+from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationElectronicAgreementForm
 from MaKaC.plugins.Collaboration.mail import ElectronicAgreementNotification, ElectronicAgreementOrganiserNotification
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.Configuration import Config
+from MaKaC.common.utils import setValidEmailSeparators
+
 
 from indico.util.i18n import N_
 
