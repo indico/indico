@@ -448,27 +448,17 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
                 if status.getContribType() is not None:
                     contribType = "(%s)"%status.getContribType().getName()
                 st = i18nformat(""" _("Proposed to accept") %s""")%(contribType)
-                modifDate = status.getDate().strftime("%d %B %Y %H:%M")
-                modifier = status.getResponsible().getFullName()
-                comments = escape(status.getComment())
             elif status.__class__ == review.AbstractRejection:
                 st = _("Proposed to reject")
-                modifDate = status.getDate().strftime("%d %B %Y %H:%M")
-                modifier = status.getResponsible().getFullName()
-                comments = escape(status.getComment())
+            elif status.__class__ == review.AbstractInConflict:
+                st = _("Conflict")
             elif status.__class__ == review.AbstractReallocation:
                 l = []
                 for track in status.getProposedTrackList():
                     l.append( track.getTitle() )
                 st = i18nformat(""" _("Proposed for other tracks") (%s)""")%", ".join(l)
-                modifDate = status.getDate().strftime("%d %B %Y %H:%M")
-                modifier = status.getResponsible().getFullName()
-                comments = escape(status.getComment())
             else:
                 st = ""
-                modifDate = ""
-                modifier = ""
-                comments = ""
 
             story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
 
@@ -491,41 +481,6 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             p = SimpleParagraph(text, indent = 80)
             story.append(p)
-
-            #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
-
-            status = self._abstract.getCurrentStatus()
-            #style = ParagraphStyle({})
-            #style.firstLineIndent = -90
-            #style.leftIndent = 170
-            text = i18nformat("""_("Judged by") : %s""")%modifier
-            #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-            p = SimpleParagraph(text, indent = 80)
-            story.append(p)
-
-            #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
-
-            status = self._abstract.getCurrentStatus()
-            #style = ParagraphStyle({})
-            #style.firstLineIndent = -90
-            #style.leftIndent = 170
-            text = i18nformat("""_("Date") : %s""")%modifDate
-            #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-            p = SimpleParagraph(text, indent = 80)
-            story.append(p)
-
-            #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
-
-            status = self._abstract.getCurrentStatus()
-            style = ParagraphStyle({})
-            style.firstLineIndent = -55
-            style.leftIndent = 135
-            style.alignment = TA_JUSTIFY
-            text = i18nformat("""_("Comments") : \"<i>%s</i>\"""")%comments
-            p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-            #p = SimpleParagraph(text)
-            story.append(p)
-
 
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
@@ -602,12 +557,6 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
                 if status.getContribType() is not None:
                     contribType = "(%s)"%status.getContribType().getName()
                 st = "%s %s"%(status.getLabel().upper(),contribType)
-        modifier = ""
-        if status.getResponsible():
-            modifier = escape(status.getResponsible().getFullName())
-        modifDate = ""
-        if status.getDate():
-            modifDate = status.getDate().strftime( "%d %B %Y %H:%M" )
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
         status = self._abstract.getCurrentStatus()
         #style = ParagraphStyle({})
@@ -615,9 +564,6 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
         #style.leftIndent = 90
         if st:
             text = i18nformat("""_("Status") : %s""")%st
-            if modifier or modifDate:
-                text += " (%s)"%" - ".join( [modifier, modifDate])
-
         else:
             text = i18nformat("""_("Status") : _("SUBMITTED")""")
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))

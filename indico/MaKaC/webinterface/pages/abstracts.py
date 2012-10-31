@@ -772,6 +772,7 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
             #   [*] -> suggested for that track
             #   [A] -> track proposed to accept
             #   [R] -> track proposed to reject
+            #   [C] -> track in conflict
             indicator, selected = "", ""
             if self._abstract.hasTrack( track ):
                 indicator = "[*] "
@@ -782,6 +783,8 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
                     indicator = "[A] "
                 elif isinstance(jud, review.AbstractRejection):
                     indicator = "[R] "
+                elif isinstance(jud, review.AbstractInConflict):
+                    indicator = "[C] "
             items.append("""<option value="%s"%s>%s%s</option>"""%(track.getId(), selected, indicator, track.getTitle()))
         return items
 
@@ -1098,6 +1101,8 @@ class WConfModAbstractPropToRej(wcomponents.WTemplated):
                 legend="[PR]"
             elif isinstance(jud,review.AbstractReallocation):
                 legend="[PM]"
+            elif isinstance(jud,review.AbstractInConflict):
+                legend="[C]"
             caption="%s%s"%(legend,self.htmlText(track.getTitle()))
             res.append("""<option value=%s>%s</option>"""%(id,caption))
         return "".join(res)
