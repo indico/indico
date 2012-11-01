@@ -22,6 +22,7 @@ import MaKaC.webinterface.pages.base as base
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.accessControl as accessControl
 from MaKaC.common import timezoneUtils
+import MaKaC.common.info as info
 from MaKaC.common.utils import formatTime, formatDateTime
 from MaKaC.i18n import _
 from pytz import timezone
@@ -207,6 +208,7 @@ class WMainBase(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
         vars['body'] = self._escapeChars(self._page)
         vars["isFrontPage"] = self._isFrontPage
@@ -232,6 +234,7 @@ class WMainBase(wcomponents.WTemplated):
             vars["navigation"] = self._navigation.getHTML(vars)
 
         vars["timezone"] = self._timezone
+        vars["isNewsActive"] = minfo.isNewsActive()
 
         return vars
 
