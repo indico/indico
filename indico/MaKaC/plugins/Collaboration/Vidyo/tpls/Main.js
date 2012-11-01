@@ -177,17 +177,6 @@
             Html.td("collaborationInfoLeftCol", $T('Room moderator:')),
             Html.td({}, booking.bookingParams.owner.name)));
 
-        var pinInfo;
-        if (booking.bookingParams.hasPin) {
-            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("VidyoHiddenPIN", "********"), false).draw();
-        } else {
-            pinInfo = $T("No PIN was defined");
-        }
-
-        infoTbody.append(Html.tr({},
-                Html.td("collaborationInfoLeftCol", $T('PIN:')),
-                Html.td({}, pinInfo)));
-
         var moderatorPinInfo;
         if (booking.bookingParams.hasModeratorPin) {
             moderatorPinInfo = new HiddenText(booking.bookingParams.moderatorPin, Html.span("VidyoHiddenModeratorPIN", "********"), false).draw();
@@ -198,6 +187,17 @@
         infoTbody.append(Html.tr({},
                 Html.td("collaborationInfoLeftCol", $T('Moderator PIN:')),
                 Html.td({}, moderatorPinInfo)));
+
+        var pinInfo;
+        if (booking.bookingParams.hasPin) {
+            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("VidyoHiddenPIN", "********"), false).draw();
+        } else {
+            pinInfo = $T("No meeting PIN was defined");
+        }
+
+        infoTbody.append(Html.tr({},
+                Html.td("collaborationInfoLeftCol", $T('Meeting PIN:')),
+                Html.td({}, pinInfo)));
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Description:')),

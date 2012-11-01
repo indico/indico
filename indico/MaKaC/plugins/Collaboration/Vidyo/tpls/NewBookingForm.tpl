@@ -46,15 +46,6 @@ ${_(" Please be aware that if you modify any sensitive data such as the room nam
 
     <tr>
         <td class="bookingFormFieldName" nowrap>
-            <span>${_("PIN")}</span>
-        </td>
-        <td>
-            <span id="PINField"></span>
-            <img id="PINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
-        </td>
-    </tr>
-    <tr>
-        <td class="bookingFormFieldName" nowrap>
             <span>${_("Moderator PIN")}</span>
         </td>
         <td>
@@ -62,7 +53,18 @@ ${_(" Please be aware that if you modify any sensitive data such as the room nam
             <img id="moderatorPINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
-        <tr>
+
+    <tr>
+        <td class="bookingFormFieldName" nowrap>
+            <span>${_("Meeting PIN")}</span>
+        </td>
+        <td>
+            <span id="PINField"></span>
+            <img id="PINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
+        </td>
+    </tr>
+
+    <tr>
         <td class="bookingFormFieldName" nowrap>
             <span>${_("Auto-mute")}</span>
         </td>

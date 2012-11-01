@@ -19,7 +19,7 @@
         % if Booking.getHasPin():
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('PIN')}
+                ${ _('Meeting PIN')}
             </td>
             % if Booking.getBookingParamByName("displayPin"):
             <td class="collaborationConfDisplayInfoRightCol">

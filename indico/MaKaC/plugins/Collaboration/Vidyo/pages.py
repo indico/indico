@@ -129,7 +129,7 @@ class XMLGenerator(object):
 
         if booking.getHasPin():
             out.openTag("section")
-            out.writeTag("title", _('PIN:'))
+            out.writeTag("title", _('Meeting PIN:'))
             if booking.getBookingParamByName("displayPin"):
                 out.writeTag("line", booking.getPin())
             else:
@@ -196,7 +196,7 @@ class ServiceInformation(object):
         })
         if booking.getHasPin():
             pinSection = {}
-            pinSection['title'] = _('PIN')
+            pinSection['title'] = _('Meeting PIN')
             if booking.getBookingParamByName("displayPin"):
                 pinSection['lines'] = [booking.getPin()]
             else:
