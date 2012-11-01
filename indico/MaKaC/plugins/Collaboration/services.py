@@ -84,7 +84,7 @@ class SendElectronicAgreement(ConferenceModifBase):
         self.fromEmail = self._params['from']['email']
         self.fromName = self._params['from']['name']
         self.content = self._params['content']
-        p_cc = self._params.get('cc').strip()
+        p_cc = self._params.get('cc', '').strip()
         self.cc = setValidEmailSeparators(p_cc).split(',') if p_cc else []
         manager = self._conf.getCSBookingManager()
         for uniqueId in self.uniqueIdList:

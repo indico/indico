@@ -313,14 +313,17 @@ class TestElectronicAgreement(IndicoTestCase):
         service._getAnswer()
 
     def sendEmailService(self, uniqueId):
-        fromField = "no-reply@test.ch"
+        fromField = {
+            "name": "No-reply",
+            "email": "no-reply@test.ch"
+            }
         content = "This is a test {url} {talkTitle}..."
 
         params = {
-                  'from':fromField,
-                  'content':content,
-                  'uniqueIdList':uniqueId,
-                  'confId':self._conf.getId()
+                  'from': fromField,
+                  'content': content,
+                  'uniqueIdList': uniqueId,
+                  'confId': self._conf.getId()
                   }
         service = SendElectronicAgreement(params, self.falseSession, self.falseSession)
         service._checkParams()
