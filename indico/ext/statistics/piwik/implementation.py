@@ -24,6 +24,7 @@ from indico.ext.statistics.base.implementation import BaseStatisticsImplementati
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.i18n import _
 from MaKaC.webinterface.urlHandlers import UHFileAccess
+from MaKaC.conference import LocalFile
 
 
 class PiwikStatisticsImplementation(BaseStatisticsImplementation):
@@ -194,8 +195,8 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         from indico.ext.statistics.piwik.queries import PiwikQueryTrackDownload
         tracker = PiwikQueryTrackDownload()
 
-        downloadLink = str(UHFileAccess().getURL(material))
-        downloadTitle = _('Download') + ' - ' + material.getFileName()
+        downloadLink = str(UHFileAccess().getURL(material)) if isinstance(material, LocalFile) else material.getURL()
+        downloadTitle = _('Download') + ' - ' + (material.getFileName() if isinstance(material, LocalFile) else material.getURL())
 
         tracker.trackDownload(downloadLink, downloadTitle)
 
