@@ -92,7 +92,7 @@
     <table width="100%">
         <tr>
             <td align="left" style="border-bottom: 2px solid rgb(119, 119, 119);">
-                <table cellspacing="0" cellpadding="0" align="left">
+                <table cellspacing="0" cellpadding="0" align="left" style="width: 100%">
                     <tr>
                         <td align="left" valign="bottom">
                             <input type="submit" class="btn" value="${ _("add subcateg")}" onClick="this.form.action='${ addSubCategoryURL }';">
@@ -115,7 +115,7 @@
         <tr><td></td></tr>
         <tr>
             <td align="left" style="border-top: 2px solid rgb(119, 119, 119); padding-bottom: 5px;">
-                <table cellspacing="0" cellpadding="0" align="left">
+                <table cellspacing="0" cellpadding="0" align="left" style="width: 100%">
                     <tr>
                         <td align="left" valign="bottom">
                             <input type="submit" class="btn" value="${ _("add subcateg")}" onClick="this.form.action='${ addSubCategoryURL }';">
