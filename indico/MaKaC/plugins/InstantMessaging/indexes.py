@@ -108,7 +108,7 @@ class IndexByUser(IMIndex):
 
     def unindex(self, userId, element):
         key = element if isinstance(element, str) else element.getTitle()
-        self.get()[userId].pop(key)
+        self.get()[userId].pop(key.lower())
         self._indexCheckDelete(userId)
 
     def reindex(self, userId, element, oldKey=None):
