@@ -247,6 +247,7 @@ type("ManagementConnectButton", ["ConnectButton"], {
     this.tpl = TPL_MANAGEMENT_BUTTON;
 });
 
+
 $(function() {
     $('.collaborationDisplayMoreInfo').click(function() {
         var newText = ($(this).text() == $T("More Info")) ? $T("Hide info") : $T("More Info");

@@ -34,6 +34,7 @@ class RavemClient(object):
 
     def performOperation(self, operation):
         data = self._client.get(self._url + operation)
+        print data.text
         return data
 
     @classmethod
