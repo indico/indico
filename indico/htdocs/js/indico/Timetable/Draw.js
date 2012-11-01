@@ -1161,6 +1161,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
                 editLink.observeClick(function() {
                     self.managementActions.editEntry(self.eventData);
+                    self.close();
                     return false;
                 });
             }
