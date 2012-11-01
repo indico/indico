@@ -351,7 +351,7 @@ class UserPersonalDataBase(UserModifyBase):
         userId = self._pm.extract("userId", None)
         if userId is not None:
             ah = user.AvatarHolder()
-            self._user = self._avatar = ah.getById(userId)
+            self._user = self._avatar = self._target = ah.getById(userId)
         else:
             raise ServiceError("ERR-U5", _("User id not specified"))
         self._dataType = self._pm.extract("dataType", pType=str, allowEmpty=False)
