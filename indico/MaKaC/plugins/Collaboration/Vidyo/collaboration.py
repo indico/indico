@@ -278,7 +278,6 @@ class CSBooking(CSBookingBase):
 
 
     def _checkBookingParams(self):
-
         if len(self._bookingParams["roomName"].strip()) == 0:
             raise VidyoException("roomName parameter (" + str(self._bookingParams["roomName"]) + " ) is empty for Vidyo booking with id: " + str(self._id))
         elif unicodeLength(self._bookingParams["roomName"]) > VidyoTools.maxRoomNameLength(self.getOriginalConferenceId()):
@@ -292,10 +291,10 @@ class CSBooking(CSBookingBase):
         if len(self._bookingParams["roomDescription"].strip()) == 0:
             raise VidyoException("roomDescription parameter (" + str(self._bookingParams["roomDescription"]) + " ) is empty for Vidyo booking with id: " + str(self._id))
 
-        if self._pin and not isinstance(self._pin, int):
+        if self._pin and not self._pin.isdigit():
             raise VidyoException("pin parameter ({0}) is not an integer for Vidyo booking with id: {1}".format(self._pin, self._id))
 
-        if self._pin and not isinstance(self._moderatorPin, int):
+        if self._moderatorPin and not self._moderatorPin.isdigit():
             raise VidyoException("moderator pin parameter ({0}) is not an integer for Vidyo booking with id: {1}".format(self._moderatorPin, self._id))
 
         return False
