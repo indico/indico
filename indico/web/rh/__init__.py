@@ -20,8 +20,11 @@
 # system lib imports
 import os.path
 
+# legacy imports
+from MaKaC.common.Configuration import Config
 from MaKaC.errors import NotFoundError
 
+# indico imports
 from indico.web.wsgi.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
 
 
@@ -31,10 +34,26 @@ class RH(object):
 
 class RHHtdocs(RH):
 
+    # the path where source files can be retrieved from
+    _local_path = None
+
+    # if available, tells the web app that minimized versions
+    # of files may be retrieved from {indico_htdocs}/build/{_min_dir}
+    _min_dir = None
+
     @classmethod
-    def calculatePath(cls, filepath):
-        f_abspath = os.path.abspath(os.path.join(cls._local_path, filepath))
-        if f_abspath.startswith(cls._local_path):
+    def calculatePath(cls, filepath, local_path=None):
+        config = Config.getInstance()
+
+        # get compiled files from htdocs/build/{_min_dir}
+        if '.min.' in filepath and cls._min_dir:
+            local_path = os.path.join(config.getHtdocsDir(),
+                                      'build', cls._min_dir)
+        else:
+            local_path = local_path or cls._local_path
+
+        f_abspath = os.path.abspath(os.path.join(local_path, filepath))
+        if f_abspath.startswith(local_path):
             return f_abspath
         else:
             raise SERVER_RETURN, HTTP_NOT_FOUND

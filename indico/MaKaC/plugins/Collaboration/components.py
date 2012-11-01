@@ -41,6 +41,7 @@ from indico.core.extpoint.location import ILocationActionListener
 from indico.core.extpoint.index import ICatalogIndexProvider
 from indico.core.index import Catalog
 
+
 class CSBookingInstanceIndexCatalog(Index):
 
     def __init__(self):
@@ -159,6 +160,7 @@ class CSBookingInstanceIndex(OOIndex):
 
     def index_talk(self, bk, talk):
         self.index_obj(CSBookingInstanceWrapper(bk, talk))
+
 
 class CatalogIndexProvider(Component):
     zope.interface.implements(ICatalogIndexProvider)

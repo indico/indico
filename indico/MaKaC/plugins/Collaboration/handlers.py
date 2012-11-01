@@ -177,14 +177,16 @@ class RHCollaborationHtdocs(RHHtdocs):
 
     @classmethod
     def calculatePath(cls, plugin, filepath):
-        ''' Changed this function to accept also the case where no <plugin>
-        '''
+
         if plugin:
             module = CollaborationTools.getModule(plugin)
             if module:
-                return os.path.join(module.__path__[0],
-                                    'htdocs', filepath)
+                local_path = module.__path__[0]
             else:
                 return None
         else:
-            return os.path.join(Collaboration.__path__[0], 'htdocs', filepath)
+            local_path = Collaboration.__path__[0]
+
+        return super(RHCollaborationHtdocs, cls).calculatePath(
+            filepath,
+            local_path=os.path.join(local_path, 'htdocs'))

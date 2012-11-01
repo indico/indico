@@ -42,6 +42,7 @@ class RHInstantMessagingHtdocs(RHHtdocs):
 
     _url = r"^/InstantMessaging/(?P<filepath>.*)$"
     _local_path = os.path.join(InstantMessaging.__path__[0], 'htdocs')
+    _min_dir = 'InstantMessaging'
 
 
 class RHChatModifBase(RHConferenceModifBase):

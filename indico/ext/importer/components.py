@@ -18,16 +18,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+# stdlib imports
 import os
 import zope.interface
-from webassets import Bundle, Environment
+from webassets import Bundle
 
-from indico.core.extpoint import Component
-from indico.core.extpoint.events import ITimetableContributor
+# legacy imports
 from MaKaC.plugins.base import Observable
 from MaKaC.common.Configuration import Config
-from indico.ext.importer.handlers import RHImporterHtdocs
 from MaKaC.common.info import HelperMaKaCInfo
+
+# indico imports
+from indico.web.assets import PluginEnvironment
+from indico.core.extpoint import Component
+from indico.core.extpoint.events import ITimetableContributor
+
 
 class ImporterContributor(Component, Observable):
     """
@@ -42,7 +47,7 @@ class ImporterContributor(Component, Observable):
         Includes additional javascript file.
         """
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        asset_env = Environment( RHImporterHtdocs._local_path, '/importer')
+        asset_env = PluginEnvironment('importer', os.path.dirname(__file__), '/importer')
         asset_env.debug = info.isDebugActive()
 
         asset_env.register('importer', Bundle('js/importer.js',

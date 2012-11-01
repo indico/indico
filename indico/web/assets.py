@@ -21,8 +21,24 @@
 """
 This file declares all core JS/CSS assets used by Indico
 """
+# stdlib imports
+import os
 
-from webassets import Bundle
+# 3rd party libs
+from webassets import Bundle, Environment
+
+# legacy imports
+from MaKaC.common.Configuration import Config
+
+
+class PluginEnvironment(Environment):
+    def __init__(self, plugin_name, plugin_dir, url_path):
+        config = Config.getInstance()
+        output_dir = os.path.join(config.getHtdocsDir(), 'build', plugin_name)
+
+        super(PluginEnvironment, self).__init__(output_dir, url_path)
+
+        self.append_path(os.path.join(plugin_dir, 'htdocs'), url=url_path)
 
 
 indico_core = Bundle('js/indico/Core/Presentation.js',

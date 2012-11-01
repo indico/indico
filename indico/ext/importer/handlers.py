@@ -17,13 +17,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+# stdlib imports
+import os
+
+# legacy imports
 from MaKaC.services.implementation.base import ServiceBase
 from MaKaC.plugins.base import PluginsHolder
 
-import os
+# indico imports
 from indico.web.rh import RHHtdocs
 from indico.ext.importer.helpers import ImporterHelper
 import indico.ext.importer
+
 
 class RHImporterHtdocs(RHHtdocs):
     """
@@ -32,6 +37,7 @@ class RHImporterHtdocs(RHHtdocs):
 
     _url = r"^/importer/(?P<filepath>.*)$"
     _local_path = os.path.join(indico.ext.importer.__path__[0], 'htdocs')
+    _min_dir = 'importer'
 
 
 class DataImportService(ServiceBase):
@@ -63,6 +69,7 @@ class GetImportersService(ServiceBase):
         for plugin in PluginsHolder().getPluginType('importer').getPluginList():
             importers[plugin.getId()] = plugin.getName()
         return importers
+
 
 methodMap = {
              "importer.import" : DataImportService,

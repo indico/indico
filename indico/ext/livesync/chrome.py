@@ -29,6 +29,7 @@ import zope.interface
 from webassets import Bundle, Environment
 
 # plugin imports
+from indico.web.assets import PluginEnvironment
 from indico.ext.livesync import SyncManager
 from indico.ext.livesync.struct import EmptyTrackException
 from indico.ext.livesync.handlers import AgentTypeInspector
@@ -71,6 +72,7 @@ class RHLiveSyncHtdocs(RHHtdocs):
 
     _url = r"^/livesync/(?P<filepath>.*)$"
     _local_path = os.path.join(indico.ext.livesync.__path__[0], 'htdocs')
+    _min_dir = 'livesync'
 
 
 class RHAdminLiveSyncManagement(RHAdminBase):
@@ -133,7 +135,7 @@ class WPLiveSyncAdmin(WPAdminPlugins):
         WPAdminPlugins.__init__(self, rh, 'livesync', '')
         self._templateClass = templateClass
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._plugin_asset_env = Environment(RHLiveSyncHtdocs._local_path, '/livesync')
+        self._plugin_asset_env = PluginEnvironment('livesync', os.path.dirname(__file__), '/livesync')
         self._plugin_asset_env.debug = info.isDebugActive()
         self._plugin_asset_env.register('livesync', Bundle('js/livesync.js',
                                                            filters='jsmin',

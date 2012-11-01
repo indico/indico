@@ -19,7 +19,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
-from webassets import Bundle, Environment
+from webassets import Bundle
+from indico.web.assets import PluginEnvironment
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.wcomponents import WTemplated
@@ -51,9 +52,8 @@ class WPConfModifChat(WPConferenceModifBase):
 
         self._tabCtrl = wcomponents.TabControl()
 
-        plugin_htdocs = os.path.join(os.path.dirname(__file__), 'htdocs')
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._plugin_asset_env = Environment(plugin_htdocs, '/InstantMessaging')
+        self._plugin_asset_env = PluginEnvironment('InstantMessaging', os.path.dirname(__file__), '/InstantMessaging')
         self._plugin_asset_env.debug = info.isDebugActive()
         self._plugin_asset_env.register('instant_messaging', Bundle('js/InstantMessaging.js',
                                                                     filters='jsmin',
