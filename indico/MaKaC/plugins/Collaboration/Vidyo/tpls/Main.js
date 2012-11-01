@@ -295,7 +295,7 @@
                 params, function() {
                         ajaxPending["contribution"].resolve();
                 }, 'videoLinkContribution', "No contributions"),
-            autoMuteField : new Html.checkbox({style: {verticalAlign:"middle"},name:"autoMute", id:"autoMute", value:"yes"}, true).dom,
+            autoMuteField : $("<input/>").attr({type:"checkbox",name:"autoMute", id:"autoMute", value:"yes", "checked":true}).css("vertical-align", "middle")[0],
             dummy : "",
             changed : false
         };
