@@ -84,6 +84,7 @@ indico_room_booking = Bundle('js/indico/RoomBooking/MapOfRooms.js',
                              filters='jsmin', output='indico_room_booking_%(version)s.min.js')
 
 indico_admin = Bundle('js/indico/Admin/News.js',
+                      'js/indico/Admin/Scheduler.js',
                       'js/indico/Admin/Upcoming.js',
                       filters='jsmin', output='indico_admin_%(version)s.min.js')
 
