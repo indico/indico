@@ -237,7 +237,7 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                                  }, $T("Create a new chat room")))),
                              Html.li({},
                                  $T("Re-use one (or more) created by you"),
-                                 Html.div({id: 'chatListDiv', class: 'chatListDiv'},
+                                 Html.div({id: 'chatListDiv', className: 'chatListDiv'},
                                  this.chatroomList.draw())
                                  )));
 
