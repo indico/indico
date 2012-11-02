@@ -357,7 +357,7 @@ type("AddReportNumberPopup", ["ServiceDialogWithButtons"], {
         var content = IndicoUtil.createFormFromMap(
                 [
                  [$T('Report Number System'), $B(self.parameterManager.add(self._drawSelectReportNumberSystems()), self.reportNumberData.accessor('reportNumberSystem'))],
-                 [$T('Report Number'), $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'text', false), self.reportNumberData.accessor('reportNumber'))],
+                 [$T('Report Number'), $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'text', false), self.reportNumberData.accessor('reportNumber'))]
              ]);
         return this.ServiceDialogWithButtons.prototype.draw.call(this, content);
 
