@@ -104,7 +104,7 @@ class RHSetDefaultPDFOptions( RHTemplatesBase ):
         self.__defaultConferencePDFOptions.setPagesize(self.__pagesize)
         self.__defaultConferencePDFOptions.setDrawDashedRectangles(self.__drawDashedRectangles)
 
-        self._redirect(urlHandlers.UHTemplates.getURL())
+        self._redirect(urlHandlers.UHBadgeTemplates.getURL())
 
 class RHTemplateModifBase( RHConferenceBase, RHModificationBaseProtected ):
 
