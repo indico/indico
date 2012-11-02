@@ -30,6 +30,7 @@ from indico.util.i18n import i18nformat
 import os
 
 from MaKaC.plugins.base import OldObservable
+from MaKaC.common.db import DBMgr
 
 
 class WPBase(OldObservable):
@@ -44,10 +45,13 @@ class WPBase(OldObservable):
         config = Config.getInstance()
         self._rh = rh
         self._locTZ = ""
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
 
         self._asset_env = Environment(config.getHtdocsDir(), '/')
-        self._asset_env.debug = info.isDebugActive()
+
+        # This is done in order to avoid the problem sending the error report because the DB is not connected.
+        if DBMgr.getInstance().isConnected():
+            info = HelperMaKaCInfo.getMaKaCInfoInstance()
+            self._asset_env.debug = info.isDebugActive()
 
         # register existing assets
         assets.register_all_js(self._asset_env)
