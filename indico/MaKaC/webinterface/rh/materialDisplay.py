@@ -58,6 +58,8 @@ class RHMaterialDisplayCommon:
         if len(self._material.getResourceList()) == 1:
             res = self._material.getResourceList()[0]
 
+            self._notify('materialDownloaded', res)
+
             if isinstance(res, conference.Link):
                 url = res.getURL()
                 if url.find(".wmv") != -1:
@@ -69,7 +71,6 @@ class RHMaterialDisplayCommon:
                 else:
                     self._redirect( res.getURL(), noCache=True )
             elif isinstance(res, conference.LocalFile):
-                self._notify('materialDownloaded', res)
                 self._redirect( urlHandlers.UHFileAccess.getURL( res ), noCache=True )
         else:
             return self._processManyMaterials()
