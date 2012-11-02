@@ -910,9 +910,9 @@ class RHContribsParticipantList(RHTrackAbstractsBase):
         speakers = OOBTree()
         primaryAuthors = OOBTree()
         coAuthors = OOBTree()
-        speakerEmails = Set()
-        primaryAuthorEmails = Set()
-        coAuthorEmails = Set()
+        speakerEmails = set()
+        primaryAuthorEmails = set()
+        coAuthorEmails = set()
 
         self._setGroupsToDisplay()
         for contribId in self._contribIds:
