@@ -2,14 +2,14 @@
 
 <%def name="printRecipientList(alarm)">
     <% addr = "" %>
-    % if len(alarm.getToAddrList()) > 0 :
-          <% addr = " <br> ".join(alarm.getToAddrList()) + " <br> " %>
-    % endif
     % for user in alarm.getToUserList():
           <% addr = addr + user.getEmail() + " <br> " %>
     % endfor
     % if alarm.getToAllParticipants() :
-          <% addr = "to all participants" %>
+          <% addr = "to all participants" + "<br>" %>
+    % endif
+    % if len(alarm.getToAddrList()) > 0 :
+          <% addr = addr + " <br> ".join(alarm.getToAddrList()) + "<br> " %>
     % endif
     ${addr}
 </%def>
