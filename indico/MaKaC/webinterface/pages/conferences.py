@@ -1219,10 +1219,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         # Then the common event display stylesheet
         if os.path.exists("%s/css/events/common.css" % htdocs):
             styleText += """        <link rel="stylesheet" href="%s/css/events/common.css?%d">\n""" % (baseurl, timestamp)
-        if self._type == "simple_event":
-            lectureStyle = styleMgr.getDefaultStyleForEventType("simple_event")
-            cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(lectureStyle))
-            styleText += """        <link rel="stylesheet" href="%s?%d">\n""" % (cssPath, timestamp)
         # And finally the specific display stylesheet
         if styleMgr.existsCSSFile(self._view):
             cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
