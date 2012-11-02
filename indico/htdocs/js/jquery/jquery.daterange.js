@@ -44,7 +44,7 @@
             }
 
             // Create the markup for the inline widget
-            self.container = $('<div/>', { style: 'display: table; width: 100%;' });
+            self.container = $('<div/>', { style: 'display: inline-block; width: 100%;' });
             self.startDateContainer = $('<div/>', { style: 'float: left', align: 'center' }).appendTo(self.container);
             self.endDateContainer = $('<div/>', { style: 'float: left; margin-left: 10px;', align: 'center' }).appendTo(self.container);
             $('<span/>', self.options.labelAttrs).html(self.options.labels[0]).appendTo(self.startDateContainer);
