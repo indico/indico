@@ -325,7 +325,7 @@ class WPModCFANotifTplEdit(WPModCFANotifTplBase):
 
     def getJSFiles(self):
         return WPConferenceModifAbstractBase.getJSFiles(self) + \
-            self._includeJSPackage('Abstracts')
+            self._includeJSPackage('Management')
 
 
 
