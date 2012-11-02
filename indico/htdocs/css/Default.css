@@ -8203,7 +8203,7 @@ a.lightGreyLink:hover {
     padding-bottom: 5px;
 }
 
-.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .sessionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul {
+.contributionRightPanelSection ul, .subContributionRightPanelSection ul, .sessionRightPanelSection ul, .materialSection ul, .abstractRightPanelSection ul, .subContributionListSection ul {
     list-style: none inside none;
     margin: 5px 0px 0px;
     padding: 0px;

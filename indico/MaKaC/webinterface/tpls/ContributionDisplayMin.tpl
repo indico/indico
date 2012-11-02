@@ -49,16 +49,19 @@
             % if Contribution.getSubContributionList():
             <div class="contributionSection">
                 <h2 class="contributionSectionTitle">Subcontributions</h2>
-                <div class="contributionSectionContent">
+                <div class="subContributionListSection">
+                <ul>
                 % for subcontrib in Contribution.getSubContributionList():
+                    <li>
                     % if subcontrib.canModify(accessWrapper):
                         <a href="${str(urlHandlers.UHSubContributionModification.getURL(subcontrib))}">
                             <img  style="vertical-align: middle" src="${Config.getInstance().getSystemIconURL('edit')}" alt='${_("Modify subcontribution")}'>
                         </a>
                     % endif
                     <a href="${str(urlHandlers.UHSubContributionDisplay.getURL(subcontrib))}">${subcontrib.getTitle()}</a>
-                    <br/>
+                    </li>
                 % endfor
+                </ul>
                 </div>
             </div>
             % endif
