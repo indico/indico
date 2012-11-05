@@ -2845,6 +2845,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
 
     def _process(self):
         errorList = []
+
         if self._action == "CANCEL":
             self._redirect(
                 urlHandlers.UHConfAbstractManagment.getURL(self._target))
@@ -2857,11 +2858,11 @@ class RHAbstractsMerge(RHConfModifCFABase):
             else:
                 self._abstracts = []
                 for id in self._abstractIds:
-                    abs = absMgr.getAbstractById(id)
-                    if abs is None:
+                    abst = absMgr.getAbstractById(id)
+                    if abst is None:
                         errorList.append(_("ABSTRACT TO BE MERGED ID '%s' is not valid") % (id))
                     else:
-                        statusKlass = abs.getCurrentStatus().__class__
+                        statusKlass = abst.getCurrentStatus().__class__
                         if statusKlass in (review.AbstractStatusAccepted,
                                            review.AbstractStatusRejected,
                                            review.AbstractStatusWithdrawn,
@@ -2869,8 +2870,8 @@ class RHAbstractsMerge(RHConfModifCFABase):
                                            review.AbstractStatusMerged):
                             label = AbstractStatusList.getInstance(
                             ).getCaption(statusKlass)
-                            errorList.append(_("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)") % (abs.getId(), label.upper()))
-                        self._abstracts.append(abs)
+                            errorList.append(_("ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)") % (abst.getId(), label.upper()))
+                        self._abstracts.append(abst)
             if self._targetAbsId == "":
                 errorList.append(_("Invalid TARGET ABSTRACT ID"))
             else:
