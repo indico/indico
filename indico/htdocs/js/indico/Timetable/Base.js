@@ -962,11 +962,14 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
 
-        this.menu = $('<ul class="button-menu"/>').append(
-            this.addMenuLink);
+        this.menu = $('<ul class="button-menu"/>');
+
 
         if (this.isSessionTimetable) {
-            this.menu.prepend(this.addIntervalLink)
+            this.menu.append(this.addIntervalLink)
+        }
+        else {
+            this.menu.append(this.addMenuLink);
         }
 
         if (!this.contextInfo.isPoster) {
@@ -987,7 +990,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.menu.children('li:first-child').removeClass('middle').addClass('left');
         this.menu.children('li:last-child').removeClass('middle').addClass('right');
 
-        if (!this.contextInfo.isPoster) {
+        if (!this.contextInfo.isPoster && !this.isSessionTimetable) {
             this._createAddMenu(this.addMenuLink.parent());
         }
 
