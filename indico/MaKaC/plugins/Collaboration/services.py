@@ -22,7 +22,7 @@ Services for Collaboration plugins
 
 from MaKaC.services.implementation.contribution import ContributionDisplayBase
 from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase
-from MaKaC.services.implementation.base import TextModificationBase
+from MaKaC.services.implementation.base import TextModificationBase, ParameterManager
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationElectronicAgreementForm
 from MaKaC.plugins.Collaboration.mail import ElectronicAgreementNotification, ElectronicAgreementOrganiserNotification
@@ -77,15 +77,15 @@ class SendElectronicAgreement(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
 
-        self.uniqueIdList = self._params['uniqueIdList']
-
-        self.emailToList = []
-
-        self.fromEmail = self._params['from']['email']
-        self.fromName = self._params['from']['name']
-        self.content = self._params['content']
-        p_cc = self._params.get('cc', '').strip()
+        self._pm = ParameterManager(self._params)
+        self.uniqueIdList = self._pm.extract("uniqueIdList", list, False, [])
+        fromMail = self._pm.extract("from", dict, False, {})
+        self.fromEmail = fromMail['email']
+        self.fromName = fromMail['name']
+        self.content = self._pm.extract("content", str, False, "")
+        p_cc = self._pm.extract("cc", str, True, "").strip()
         self.cc = setValidEmailSeparators(p_cc).split(',') if p_cc else []
+        self.emailToList = []
         manager = self._conf.getCSBookingManager()
         for uniqueId in self.uniqueIdList:
             spk = manager.getSpeakerWrapperByUniqueId(uniqueId)
