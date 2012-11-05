@@ -43,8 +43,7 @@ type("ChainedPopupWidget", ["PopupWidget"],
 
              this.PopupWidget.prototype.open.call(this, x, y);
 
-             // define a handler for onclick events
-             $('html').on('click.chained_menu', function(event) {
+             var handler = function(event) {
                  if (self.clickTriggersClose($E(eventTarget(event)))) {
                      // if the click should be followed by a
                      // closing action (out of the chain)
@@ -57,7 +56,11 @@ type("ChainedPopupWidget", ["PopupWidget"],
                          }
                      });
                  }
-             });
+             };
+
+             // define a handler for onclick events
+             $('html').on('click.chained_menu', handler);
+             this.handler = handler;
          },
 
          postDraw: function () {
@@ -82,7 +85,7 @@ type("ChainedPopupWidget", ["PopupWidget"],
          close: function() {
              // close() cleans up the onclick handler too
              this.active = false;
-             $('html').off('click.chained_menu');
+             $('html').off('click.chained_menu', this.handler);
              this.PopupWidget.prototype.close.call(this);
          }
      },
