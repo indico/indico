@@ -75,8 +75,9 @@ class WNewBookingForm(WCSPageTemplateBase):
             topLevelRecordingCapable = False
 
         # Finally, this event is recoring capable if the event itself
-        # or one of its talks are capable or user is admin, collaboration manager, recording plugin manager, video services manager or recording manager
-        vars["RecordingCapable"] = (topLevelRecordingCapable and nRecordingCapable > 0) or isManager or manager.isVideoServicesManager(user) or manager.isPluginManager('RecordingRequest', user)
+        # or one of its talks are capable or user is admin, collaboration
+        # manager or recording plugin manager
+        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or isManager
 
         if initialDisplay:
             recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)

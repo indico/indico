@@ -73,8 +73,9 @@ class WNewBookingForm(WCSPageTemplateBase):
             topLevelWebcastCapable = False
 
         # Finally, this event is webcast capable if the event itself or
-        # or one of its talks are capable or user is admin, collaboration manager, webcast plugin manager, video services manager or webcast manager
-        vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or isManager or manager.isVideoServicesManager(user) or manager.isPluginManager('WebcastRequest', user)
+        # or one of its talks are capable or user is admin, collaboration
+        # manager or webcast plugin manager
+        vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or isManager
 
         if initialDisplay:
             webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
