@@ -364,7 +364,7 @@ var bookingTemplateM = function(booking) {
     statusCell.append(statusSpan);
     if (booking.hasCheckStatus) {
         var checkStatusButton = Widget.link(command(
-            function() {checkBookingStatus(booking, confId);} ,
+            function() {checkBookingStatus(booking, booking.conference.id);} ,
             Html.img({
                 alt: "Check Booking Status",
                 title: "Check Booking Status",
@@ -489,7 +489,7 @@ var bookingTemplateS = function(booking) {
     liState.append(span);
     if (booking.hasCheckStatus) {
         var checkStatusButton = Widget.link(command(
-            function() {checkBookingStatus(booking, confId);} ,
+            function() {checkBookingStatus(booking, booking.conference.id);} ,
             Html.img({
                 alt: "Check Booking Status",
                 title: "Check Booking Status",

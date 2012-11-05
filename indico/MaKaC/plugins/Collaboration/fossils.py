@@ -26,7 +26,7 @@
 
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.fossils.conference import IConferenceFossil
+from MaKaC.fossils.conference import IConferenceFossil, IConferenceMinimalFossil
 from MaKaC.fossils.contribution import IContributionFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.plugins import Collaboration
@@ -80,6 +80,10 @@ class ICSBookingBaseFossil(IFossil):
 
 
 class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
+
+    def getConference(self):
+        """ Returns the assocaited event id """
+    getConference.result = IConferenceMinimalFossil
 
     def getWarning(self):
         """ Returns a warning object attached to this booking. (self._warning) """
