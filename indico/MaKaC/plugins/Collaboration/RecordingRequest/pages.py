@@ -29,6 +29,7 @@ from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IContributionRRFossil
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
 from MaKaC.plugins.Collaboration.RecordingRequest.common import getCommonTalkInformation
+from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
 
 
 class WNewBookingForm(WCSPageTemplateBase):
@@ -45,7 +46,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
         manager = self._conf.getCSBookingManager()
         user = self._rh._getUser()
-        isManager = user.isAdmin() or manager.isVideoServicesManager(user) or manager.isPluginManager('RecordingRequest', user)
+        isManager = user.isAdmin() or RCCollaborationAdmin.hasRights(user=user) or RCCollaborationPluginAdmin.hasRights(user=user, plugins=['RecordingRequest'])
         booking = manager.getSingleBooking('RecordingRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
@@ -74,8 +75,8 @@ class WNewBookingForm(WCSPageTemplateBase):
             topLevelRecordingCapable = False
 
         # Finally, this event is recoring capable if the event itself
-        # or one of its talks are capable or user is admin, video services manager or recording manager
-        vars["RecordingCapable"] = (topLevelRecordingCapable and nRecordingCapable > 0) or isManager
+        # or one of its talks are capable or user is admin, collaboration manager, recording plugin manager, video services manager or recording manager
+        vars["RecordingCapable"] = (topLevelRecordingCapable and nRecordingCapable > 0) or isManager or manager.isVideoServicesManager(user) or manager.isPluginManager('RecordingRequest', user)
 
         if initialDisplay:
             recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)
