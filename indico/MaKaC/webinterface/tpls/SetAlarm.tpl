@@ -24,11 +24,11 @@
     </td>
     <td nowrap class="contentCellTD">
                 <span id="datePlace"></span>
-                <input type="hidden" id="day" name="day" value="${ day }">
-                <input type="hidden" id="month"  name="month" value="${ month }">
-                <input type="hidden" id="year" name="year" value="${ year }">
-                <input type="hidden" id="hour" name="hour" value="${ hour }">
-                <input type="hidden" id="minute" name="minute" value="${ minute }">
+                <input type="hidden" id="day" name="day" value="${ alarm_date.day }">
+                <input type="hidden" id="month"  name="month" value="${ alarm_date.month }">
+                <input type="hidden" id="year" name="year" value="${ alarm_date.year }">
+                <input type="hidden" id="hour" name="hour" value="${ alarm_date.hour }">
+                <input type="hidden" id="minute" name="minute" value="${ alarm_date.minute }">
         (${ timezone })
     </td>
 </tr>
@@ -156,8 +156,8 @@ IndicoUI.executeOnLoad(function()
     });
     var dateAlarm = IndicoUI.Widgets.Generic.dateField(true,null,['day', 'month', 'year','hour', 'minute']);
     $('#datePlace').append($(dateAlarm.dom));
-    % if day != '':
-        dateAlarm.set('${ day }/${ month }/${ year } ${ hour }:${ minute }');
+    % if alarm_date != '':
+        dateAlarm.set('${alarm_date.strftime(date_format)}');
     % endif
     var checkRecipients = function(){
         if((!$('#toAllParticipants').attr('checked') && !$('#defineRecipients').attr('checked')) || ($('#defineRecipients').attr('checked') && !Util.Validation.isEmailList($("#email").val())) ){

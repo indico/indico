@@ -26,7 +26,7 @@
     </form>
     <tr>
       <td>
-        <input type="button" value="${ _("Log me as ...")}" onclick="loginAs();">
+        <input type="button" value="${ _("Log in as ...")}" onclick="loginAs();">
       </td>
     </tr>
     </table>

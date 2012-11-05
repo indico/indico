@@ -3869,6 +3869,13 @@ class WSetAlarm(wcomponents.WTemplated):
         vars["conference"] = self.__conf
         vars["today"] = datetime.today()
         vars["fromList"] = self._getFromList()
+        vars["date_format"] = '%d/%m/%Y %H:%M'
+
+        try:
+            vars["alarm_date"] = datetime(vars['year'], vars['month'], vars['day'],
+                                          int(vars['hour']), int(vars['minute']))
+        except ValueError:
+            vars["alarm_date"] = self.__conf.getAdjustedStartDate()
         return vars
 
 class WPConfAddAlarm( WPConfModifToolsBase ):
