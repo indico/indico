@@ -56,7 +56,7 @@ class WPConfModifChat(WPConferenceModifBase):
         self._plugin_asset_env = PluginEnvironment('InstantMessaging', os.path.dirname(__file__), '/InstantMessaging')
         self._plugin_asset_env.debug = info.isDebugActive()
         self._plugin_asset_env.register('instant_messaging', Bundle('js/InstantMessaging.js',
-                                                                    filters='jsmin',
+                                                                    filters='rjsmin',
                                                                     output="InstantMessaging_%(version)s.min.js"))
 
     def getJSFiles(self):

@@ -138,7 +138,7 @@ class WPLiveSyncAdmin(WPAdminPlugins):
         self._plugin_asset_env = PluginEnvironment('livesync', os.path.dirname(__file__), '/livesync')
         self._plugin_asset_env.debug = info.isDebugActive()
         self._plugin_asset_env.register('livesync', Bundle('js/livesync.js',
-                                                           filters='jsmin',
+                                                           filters='rjsmin',
                                                            output="livesync__%(version)s.min.js"))
 
     def getJSFiles(self):

@@ -51,7 +51,7 @@ class ImporterContributor(Component, Observable):
         asset_env.debug = info.isDebugActive()
 
         asset_env.register('importer', Bundle('js/importer.js',
-                                                           filters='jsmin',
+                                                           filters='rjsmin',
                                                            output="importer__%(version)s.min.js"))
         params['paths'].extend(asset_env['importer'].urls())
 
