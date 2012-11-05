@@ -372,7 +372,7 @@ class WebLocator:
             obj = obj.getReviewManager().getReviewById(self.__reviewId)
             if obj == None:
                 raise errors.NoReportError("The review you are tring to access does not exist or has been deleted")
-        if self.__subContribId:
+        if self.__subContribId and self.__contribId:
             obj = obj.getSubContributionById( self.__subContribId )
             fr = materialFactories.ContribMFRegistry
             if obj == None:
