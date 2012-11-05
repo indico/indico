@@ -1283,7 +1283,11 @@ In the *Basic* tab, you should fill in the following fields:
 
 - *Moderator* : The moderator will be the room responsible and will own the rights to moderate the vidyo room
 
-- *PIN* : this is the code to protect the room
+- *Moderator PIN* : this is the code to grant moderator rights
+
+- *Meeting PIN* : this is the code to protect the room
+
+- *Automute* : enabling automute forces that the VidyoDesktop clients will join the meeting muted by default (audio and video)
 
 In the *Advanced tab*, there are three options:
 
@@ -1326,9 +1330,11 @@ The details given are:
 
 - *Extension* : this is the numeric extension of the room, that gives another possibility of joining it. If one is logged in the Vidyo portal, one can join a room by entering the extension in the field "Select from list or Enter name to call"
 
-- *Room moderator* : this is the owner of the room, which has moderation rights.
+- *Room moderator* : this is the owner of the room, which has moderation rights
 
-- *PIN* : this is the code to protect the room
+- *Moderator PIN* : this is the code to grant moderator rights
+
+- *Meeting PIN* : this is the code to protect the room
 
 - *Description*: this is the description of the room
 
@@ -1339,6 +1345,8 @@ The details given are:
   PIN if an access PIN was set up.
 
 - *Visibility* :  if visible, your booking will appear on the public display page of your event
+
+- *Automute* : enabling automute forces that the VidyoDesktop clients will join the meeting muted by default (audio and video)
 
 - *Created on* : this shows when the booking was created.
 
@@ -1370,6 +1378,9 @@ automatically.
 
 8. |figure81| button (*connect room* ). Press this button
 to launch the Vidyo client in the conferences/session/contribution physical room. In order to have this button enabled the room has to be a capable Vidyo room.
+
+9. |figure82| button (*disconnect room* ). Press this button
+to stop the Vidyo client in the conferences/session/contribution physical room. In order to have this button enabled the room has to be a capable Vidyo room.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Problems when creating or modifying a Vidyo booking
@@ -2044,3 +2055,4 @@ Once the file submited, the page will refresh and a pdf icon will appear. Clicki
 .. |figure79| image:: images/fig79.png
 .. |figure80| image:: images/fig80.png
 .. |figure81| image:: images/fig81.png
+.. |figure82| image:: images/fig82.png

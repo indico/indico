@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Indico’s Admin Guide &mdash; Indico 0.98 documentation</title>
+    <title>1. Statistics Introduction &mdash; Indico 0.98 documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -26,8 +26,9 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="Indico 0.98 documentation" href="../index.html" />
-    <link rel="next" title="1. Starting with Indico" href="AdminGuide.html" />
-    <link rel="prev" title="3. Using Piwik" href="../Statistics/piwik_user.html" />
+    <link rel="up" title="Indico’s Event Statistics" href="index.html" />
+    <link rel="next" title="2. Configuring Piwik" href="piwik_admin.html" />
+    <link rel="prev" title="Indico’s Event Statistics" href="index.html" />
    <link type="text/css" href="../_static/indico.css" rel="stylesheet"/> 
 
   </head>
@@ -39,15 +40,16 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="AdminGuide.html" title="1. Starting with Indico"
+          <a href="piwik_admin.html" title="2. Configuring Piwik"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../Statistics/piwik_user.html" title="3. Using Piwik"
+          <a href="index.html" title="Indico’s Event Statistics"
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
         <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
- 
+
+          <li><a href="index.html" accesskey="U">Indico&#8217;s Event Statistics</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,24 +58,21 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="indico-s-admin-guide">
-<h1>Indico&#8217;s Admin Guide<a class="headerlink" href="#indico-s-admin-guide" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="AdminGuide.html">1. Starting with Indico</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="AdminGuide.html#creating-an-administration-account">1.1. Creating an Administration Account</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdminGuide.html#accounts-created-by-a-user">1.2. Accounts Created by a User</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="AdminGuide.html#id1">2. Administration Area</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="AdminGuide.html#general-settings">2.1. General settings</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdminGuide.html#users">2.2. Users</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdminGuide.html#groups">2.3. Groups</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdminGuide.html#ip-domains">2.4. IP Domains</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AdminGuide.html#maintenance">2.5. Maintenance</a></li>
-</ul>
-</li>
+  <div class="section" id="statistics-introduction">
+<h1>1. Statistics Introduction<a class="headerlink" href="#statistics-introduction" title="Permalink to this headline">¶</a></h1>
+<p>Indico includes a plugin which deals exclusively with the tracking of statistics for event page views and material downloads. When installed and activated, the plugin injects JavaScript code into the pages for Conferences, Meetings &amp; Contributions allowing specific tracking of those requests separately.</p>
+<p>Furthermore, the downloading of material can also be tracked separately.</p>
+<div class="section" id="plugin-administration-and-configuration">
+<h2>1.1. Plugin Administration and Configuration<a class="headerlink" href="#plugin-administration-and-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Navigate to Server Administration in the usual manner, from here select the Plugins option from the left-hand menu. If this is your first encounter with the Statistics plugin, it would be a good idea to refresh all plugins here before you begin, to ensure that all handlers are correctly registered.</p>
+<p>From here, click on the &#8216;Statistics&#8217; tab, usually located on the right of the plugin tabs (installation specific configuration may cause this order to be altered), you will be presented with the following global plugin options:</p>
+<p><img alt="image01" src="../_images/global_settings.png" /></p>
+<ul class="simple">
+<li>Enable report caching - If checked, this means that all reports generated via the
+Statistics module are cached upon creation and have a life defined by the following
+option.</li>
+<li>Report caching TTL - This represents the time to live for the caching of reports if
+enabled.</li>
 </ul>
 </div>
 </div>
@@ -86,12 +85,20 @@
         <div class="sphinxsidebarwrapper">
    <img src="../_static/indico_logo.png" width="200px"/> 
 
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Statistics Introduction</a><ul>
+<li><a class="reference internal" href="#plugin-administration-and-configuration">1.1. Plugin Administration and Configuration</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../Statistics/piwik_user.html"
-                        title="previous chapter">3. Using Piwik</a></p>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Indico&#8217;s Event Statistics</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="AdminGuide.html"
-                        title="next chapter">1. Starting with Indico</a></p>
+  <p class="topless"><a href="piwik_admin.html"
+                        title="next chapter">2. Configuring Piwik</a></p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
@@ -116,15 +123,16 @@
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="AdminGuide.html" title="1. Starting with Indico"
+          <a href="piwik_admin.html" title="2. Configuring Piwik"
              >next</a> |</li>
         <li class="right" >
-          <a href="../Statistics/piwik_user.html" title="3. Using Piwik"
+          <a href="index.html" title="Indico’s Event Statistics"
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
         <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
- 
+
+          <li><a href="index.html" >Indico&#8217;s Event Statistics</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

@@ -17,6 +17,7 @@ Contents:
    ./Chat/index.rst
    ./PaperReviewingGuides/index.rst
    ./Importer/Importer.rst
+   ./Statistics/index.rst
    ./AdminGuide/index.rst
    ./ExportAPI/index.rst
    ./Glossary/Glossary.rst

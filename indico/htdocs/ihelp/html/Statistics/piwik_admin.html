@@ -1,0 +1,168 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2. Configuring Piwik &mdash; Indico 0.98 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.98',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Indico 0.98 documentation" href="../index.html" />
+    <link rel="up" title="Indico’s Event Statistics" href="index.html" />
+    <link rel="next" title="3. Using Piwik" href="piwik_user.html" />
+    <link rel="prev" title="1. Statistics Introduction" href="configuration.html" />
+   <link type="text/css" href="../_static/indico.css" rel="stylesheet"/> 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="piwik_user.html" title="3. Using Piwik"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="configuration.html" title="1. Statistics Introduction"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Indico&#8217;s Event Statistics</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="configuring-piwik">
+<h1>2. Configuring Piwik<a class="headerlink" href="#configuring-piwik" title="Permalink to this headline">¶</a></h1>
+<p>Provided with the Statistics plugin is an implementation which wraps around the Piwik statistics platform. This guide explains how to configure your Indico instance to interface with your Piwik installation of choice. It assumes that you have access to a Piwik server and the ability to login and retrieve both the <tt class="docutils literal"><span class="pre">siteId</span></tt> and <tt class="docutils literal"><span class="pre">token_auth</span></tt> variables which the Piwik API provides. For more information on how to obtain these values, please refer to the current Piwik documentation.</p>
+<p>The Piwik implementation provided wraps around the native Piwik API providing methods for serverside tracking and retrieval of information relative to the current request. It consists of two components:</p>
+<ul class="simple">
+<li>Pageview Tracking</li>
+</ul>
+<div class="section" id="configuration">
+<h2>2.1. Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Underneath the global plugin options you will see each implementation has a tab for its unique configuration specifics. Piwik exposes the following options:</p>
+<p><img alt="image0" src="../_images/piwik_config.png" /></p>
+<ul class="simple">
+<li>Enable Conference &amp; Contribution View Tracking: if enabled, the Page Tracking
+Component is enabled, injecting JavaScript hooks into the Conference, Meeting and Contribution display pages, along with the Conference ID and/or Contribution ID depending on the page itself.</li>
+<li>Enable Material Download Tracking: if enabled, the File Download Tracking Component
+is active, a listener on Material downloads will then track the download in the Piwik instance.</li>
+<li>Piwik Server URL: The URL to your Piwik instance in format <cite>xxx.xxx.xxx.xxx/$path</cite> (
+<cite>$path</cite> is optional, the URL should be the directory where <cite>piwik.php</cite> is located).</li>
+<li>Piwik API Server URL: If your configuration requires a separate URL for API queries (targetting index.php), you may specify the address here in the same format as the Piwik Server URL here.</li>
+<li>Use Only General URL: If this is enabled, only the first URL (Piwik Server URL) is used for <em>all</em> requests. If disabled, the plugin will use the latter URL (Piwik API Server URL) for all API requests.</li>
+<li>Piwik API Token: The full API token provided by Piwik for your username &amp; site ID
+combination.</li>
+<li>Piwik Site ID: The integer ID assigned to each site in Piwik as a method of internal
+tracking. This information is also available in Piwik.</li>
+</ul>
+<p><em>NOTE:</em> It is recommended that you create a separate site specifically for Indico statistics tracking in Piwik if you are also using Piwik for general analytics also as having both general analytics and these specific statistics utilising the site ID will result in duplicated, non-sensical results.</p>
+<p>The two components provided are mutually excluse and, therefore, may be enabled / disabled independently at your convenience. A server restart is not required for the change to go into effect, it is instantaneous upon saving settings.</p>
+<div class="section" id="page-tracking-component">
+<h3>2.1.1. Page Tracking Component<a class="headerlink" href="#page-tracking-component" title="Permalink to this headline">¶</a></h3>
+<p><em>IMPORTANT:</em> By design, the scope of this implementation extends only into injecting the tracking code into Conference, Material and Contribution display pages. It is <em>not</em> a general purpose, site-wide tracking utility. If this is the functionality that you seek, please refer to the Analytics options offered by Indico.</p>
+<p>This component determines if the page being viewed is a Conference, Meeting or Contribution and dyanmically creates the relevant JavaScript required to track remotely with the unique identifiers associated with the Conference and/or Contribution. The code is based on the asynchronous version provided in the Piwik documentation to ensure compatibility amongst browsers in testing.</p>
+<p><em>NOTE:</em> To modify the JavaScript hook, modify the contents of <tt class="docutils literal"><span class="pre">piwik/tpls/JSHook.tpl</span></tt></p>
+</div>
+<div class="section" id="file-download-tracking-component">
+<h3>2.1.2. File Download Tracking Component<a class="headerlink" href="#file-download-tracking-component" title="Permalink to this headline">¶</a></h3>
+<p>This component consists of a listener which sends a tracking REST query to the Piwik instance on every file download or material display. It is entirely serverside and, therefore, is subject to a timeout condition as it relies on the Piwik instance defined in the plugin configuration being available.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+   <img src="../_static/indico_logo.png" width="200px"/> 
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. Configuring Piwik</a><ul>
+<li><a class="reference internal" href="#configuration">2.1. Configuration</a><ul>
+<li><a class="reference internal" href="#page-tracking-component">2.1.1. Page Tracking Component</a></li>
+<li><a class="reference internal" href="#file-download-tracking-component">2.1.2. File Download Tracking Component</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="configuration.html"
+                        title="previous chapter">1. Statistics Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="piwik_user.html"
+                        title="next chapter">3. Using Piwik</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="piwik_user.html" title="3. Using Piwik"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="configuration.html" title="1. Statistics Introduction"
+             >previous</a> |</li>
+    <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
+    
+        <li><a href="../index.html">Indico 0.98 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Indico&#8217;s Event Statistics</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
