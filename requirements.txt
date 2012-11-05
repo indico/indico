@@ -28,4 +28,4 @@ zdaemon==3.0.1
 zope.event==4.0.0
 zope.index==3.6.4
 zope.interface==4.0.1
-webassets==dev
+
