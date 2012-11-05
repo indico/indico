@@ -151,7 +151,7 @@
 </table>
 
 <div id="RMlowerPane" class="RMHolderPaneDefaultVisible" style="margin-left: 150px;">
-    <span>
+    <div>
         <br />
         <strong>4. ${ _("Select language(s) in which the talk was given") }</strong>
         <br />
@@ -182,8 +182,8 @@
         <!--  Javascript button here -->
         </span>
         % endif
-    </span>
-    <span>
+    </div>
+    <div>
         <br />
         <strong>5. ${ _("Create CDS record (and update micala database)") }</strong>
         <br />
@@ -192,7 +192,7 @@
         </span>
         <span id="RMMatchSummaryMessage">
         </span>
-    </span>
+    </div>
     <br />
     <br />
     <br />

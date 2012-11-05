@@ -195,6 +195,7 @@ div.RMcolumnStatusIndicoDone {
 
 div.RMlowerPane {
     width: 100%;
+    overflow: auto;
 }
 
 span.RMButtonCreateCDSRecord {
