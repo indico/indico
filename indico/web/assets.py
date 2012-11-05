@@ -65,7 +65,7 @@ indico_core = Bundle('js/indico/Core/Presentation.js',
                      'js/indico/Core/Util.js',
                      'js/indico/Core/Login.js',
                      'js/indico/Core/Dragndrop.js',
-                     filters='jsmin', output='indico_core_%(version)s.min.js')
+                     filters='rjsmin', output='indico_core_%(version)s.min.js')
 
 indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
                            'js/indico/Management/RoomBooking.js',
@@ -78,16 +78,16 @@ indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
                            'js/indico/Management/Sessions.js',
                            'js/indico/Management/CFA.js',
                            'js/indico/Management/RoomBookingMapOfRooms.js',
-                           filters='jsmin', output='indico_management_%(version)s.min.js')
+                           filters='rjsmin', output='indico_management_%(version)s.min.js')
 
 indico_room_booking = Bundle('js/indico/RoomBooking/MapOfRooms.js',
                              'js/indico/RoomBooking/RoomBookingCalendar.js',
-                             filters='jsmin', output='indico_room_booking_%(version)s.min.js')
+                             filters='rjsmin', output='indico_room_booking_%(version)s.min.js')
 
 indico_admin = Bundle('js/indico/Admin/News.js',
                       'js/indico/Admin/Scheduler.js',
                       'js/indico/Admin/Upcoming.js',
-                      filters='jsmin', output='indico_admin_%(version)s.min.js')
+                      filters='rjsmin', output='indico_admin_%(version)s.min.js')
 
 indico_timetable = Bundle('js/indico/Timetable/Filter.js',
                           'js/indico/Timetable/Layout.js',
@@ -96,15 +96,15 @@ indico_timetable = Bundle('js/indico/Timetable/Filter.js',
                           'js/indico/Timetable/DragAndDrop.js',
                           'js/indico/Timetable/Draw.js',
                           'js/indico/Timetable/Management.js',
-                          filters='jsmin', output='indico_timetable_%(version)s.min.js')
+                          filters='rjsmin', output='indico_timetable_%(version)s.min.js')
 
 indico_collaboration = Bundle('js/indico/Collaboration/Collaboration.js',
-                              filters='jsmin', output='indico_collaboration_%(version)s.min.js')
+                              filters='rjsmin', output='indico_collaboration_%(version)s.min.js')
 
 indico_legacy = Bundle('js/indico/Legacy/Widgets.js',
                        'js/indico/Legacy/Dialogs.js',
                        'js/indico/Legacy/Util.js',
-                       filters='jsmin', output='indico_legacy_%(version)s.min.js')
+                       filters='rjsmin', output='indico_legacy_%(version)s.min.js')
 
 indico_common = Bundle('js/indico/Common/Export.js',
                        'js/indico/Common/TimezoneSelector.js',
@@ -112,20 +112,20 @@ indico_common = Bundle('js/indico/Common/Export.js',
                        'js/indico/Common/Social.js',
                        'js/indico/Common/Export.js',
                        'js/indico/Common/htmlparser.js',
-                       filters='jsmin', output='indico_common_%(version)s.min.js')
+                       filters='rjsmin', output='indico_common_%(version)s.min.js')
 
 indico_materialeditor = Bundle('js/indico/MaterialEditor/Editor.js',
-                               filters='jsmin', output='indico_materialeditor_%(version)s.min.js')
+                               filters='rjsmin', output='indico_materialeditor_%(version)s.min.js')
 
 indico_display = Bundle('js/indico/Display/Dialogs.js',
-                        filters='jsmin', output='indico_display_%(version)s.min.js')
+                        filters='rjsmin', output='indico_display_%(version)s.min.js')
 
 indico_jquery = Bundle('js/indico/jquery/defaults.js',
                        'js/indico/jquery/global.js',
-                        filters='jsmin', output='indico_jquery_%(version)s.min.js')
+                        filters='rjsmin', output='indico_jquery_%(version)s.min.js')
 
 indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
-                               filters='jsmin', output='indico_jquery_authors_%(version)s.min.js')
+                               filters='rjsmin', output='indico_jquery_authors_%(version)s.min.js')
 
 jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.js',
@@ -140,7 +140,7 @@ jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.menu.js',
                 'js/jquery/date.js',
                 'js/jquery/jquery.multiselect.js',
-                filters='jsmin', output='jquery_code_%(version)s.min.js')
+                filters='rjsmin', output='jquery_code_%(version)s.min.js')
 
 presentation = Bundle('js/jquery/underscore.js',
                       'js/presentation/Core/Primitives.js',
@@ -180,7 +180,7 @@ presentation = Bundle('js/jquery/underscore.js',
                       'js/presentation/Ui/Widgets/WidgetEditable.js',
                       'js/presentation/Ui/Widgets/WidgetMenu.js',
                       'js/presentation/Ui/Widgets/WidgetGrid.js',
-                      filters='jsmin', output='presentation_%(version)s.min.js')
+                      filters='rjsmin', output='presentation_%(version)s.min.js')
 
 
 base_js = Bundle(jquery, presentation, indico_core,

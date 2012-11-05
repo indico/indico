@@ -7,7 +7,6 @@ argparse==1.2.1
 cds-indico-extras==0.2
 cssmin==0.1.4
 icalendar==3.0.1b2
-jsmin==2.0.2
 lxml==2.3.4
 pojson==0.4
 polib==1.0.0
