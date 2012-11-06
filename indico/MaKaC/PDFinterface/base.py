@@ -532,10 +532,10 @@ class PDFBase:
 
                     # draw horizontally centered, with recalculated width and height
                     c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height)
+                    return startHeight
                 except IOError:
                     if drawTitle:
                         self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
-                return startHeight
         return 0
 
 
