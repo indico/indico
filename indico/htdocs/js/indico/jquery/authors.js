@@ -1,13 +1,13 @@
 $(function() {
     var resultCache = [];
-    var allItems = $(".authorIndexItem");
+    var allItems = $(".index .item");
 
-    $("#filterAuthors").keyup(function(){
-        var searchString = $("#filterAuthors").attr('value');
+    $("#filter_text").keyup(function(){
+        var searchString = $(this).attr('value');
 
         allItems.addClass('visibility_hidden');
         if (resultCache[searchString] == undefined) {
-            var items = $(".authorIndexItemText:contains('"+ searchString +"')").parent().parent();
+            var items = $(".index .item .text:contains('"+ searchString +"')").parent().parent();
             resultCache[searchString] = items;
         } else {
             var items = resultCache[searchString];

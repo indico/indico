@@ -1,6 +1,6 @@
 <div class="authorIndexFiltersContainer">
     <div>
-        <input type="text" id="filterAuthors" value="" placeholder="${ _('Search in authors') }">
+        <input type="text" id="filter_text" value="" placeholder="${ _('Search in authors') }">
     </div>
     <div class="authorIndexFilteredText">
         ${_("Displaying ")}<span style="font-weight:bold;" id="numberFiltered">${len(items)}</span>
@@ -9,11 +9,11 @@
         <span style="font-weight:bold;">${len(items)}</span>
     </div>
 </div>
-<div class="authorIndex">
+<div class="authorIndex index">
     % for key, item in items.iteritems():
-        <div class="authorIndexItem">
+        <div class="authorIndexItem item">
             <div style="padding-bottom: 10px">
-                <a class="authorIndexItemText" href="${item['authorURL']}">${item['fullName']}</a>
+                <a class="authorIndexItemText text" href="${item['authorURL']}">${item['fullName']}</a>
                 % if item['affiliation']:
                     <span style="color: #888">(${item['affiliation']})</span>
                 % endif

@@ -6822,6 +6822,10 @@ class WPSpeakerIndex( WPConferenceDefaultDisplayBase ):
         wc=WConfSpeakerIndex(self._conf)
         return wc.getHTML()
 
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+            self._asset_env['indico_authors'].urls()
+
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._speakerIndexOpt)
