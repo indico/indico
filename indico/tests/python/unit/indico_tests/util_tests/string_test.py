@@ -22,9 +22,9 @@ Tests for `indico.util.string` module
 """
 
 import unittest
-from indico.util.string import formatParentheses
+from indico.util.string import permissive_format
 
-class TestFormatParentheses(unittest.TestCase):
+class TestPermissiveFormat(unittest.TestCase):
 
     def testTextParenthesesFormatting(self):
         params = dict(url="www.cern.ch", name="My Name", other="Nothing")
@@ -44,4 +44,4 @@ class TestFormatParentheses(unittest.TestCase):
                    ]
 
         for text, result in zip(texts, results):
-            self.assertEqual(formatParentheses(text, params), result)
+            self.assertEqual(permissive_format(text, params), result)

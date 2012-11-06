@@ -59,7 +59,7 @@ def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
 
     return text
 
-def formatParentheses(text, params):
+def permissive_format(text, params):
     """
     Format text using params from dictionary. Function is resistant to missing parentheses
     """
