@@ -20,7 +20,7 @@ reportlab==2.5
 simplejson==2.5.2
 termcolor==1.1.0
 transaction==1.3.0
-webassets==0.7.1
+webassets==dev
 wsgiref==0.1.2
 zc.lockfile==1.0.0
 zc.queue==1.3
@@ -28,4 +28,3 @@ zdaemon==3.0.1
 zope.event==4.0.0
 zope.index==3.6.4
 zope.interface==4.0.1
-
