@@ -29,6 +29,7 @@ from MaKaC.plugins.Collaboration.mail import ElectronicAgreementNotification, El
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import setValidEmailSeparators
+from indico.util.string import permissive_format
 
 
 from indico.util.i18n import N_
@@ -98,7 +99,8 @@ class SendElectronicAgreement(ConferenceModifBase):
 
         talkTitle = speakerWrapper.getContribution().getTitle() if speakerWrapper.getContribution() else self._conf.getTitle()
 
-        return self.content.format(url=url, talkTitle = talkTitle, name= speakerWrapper.getObject().getDirectFullName())
+        mailEnv = dict(url=url, talkTitle = talkTitle, name= speakerWrapper.getObject().getDirectFullName())
+        return permissive_format(self.content, mailEnv)
 
     def _getAnswer(self):
         report = ""
