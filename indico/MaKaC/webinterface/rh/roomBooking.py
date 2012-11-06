@@ -1850,9 +1850,9 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
     def _checkProtection( self ):
         RHRoomBookingBase._checkProtection(self)
         user = self._getUser()
-        # Only user/admin can cancell a booking occurrence
+        # Only owner (the one who created), the requestor(booked for) and admin can CANCEL
         # (Owner can not reject his own booking, he should cancel instead)
-        if self._resv.createdBy != user.getId() and (not user.isRBAdmin()):
+        if not self._resv.canCancel(user):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
