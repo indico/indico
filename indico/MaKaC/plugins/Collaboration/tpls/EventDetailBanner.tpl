@@ -81,7 +81,7 @@
           % if conf.canModify(self_._rh._aw) or booking.getOwner()["id"] == self_._rh._getUser().getId() or \
                (self_._rh.getHostIP() == VidyoTools.getLinkRoomIp(booking.getLinkObject(), ipAttName='IP')):
             <span style="margin-left:3px;margin-right:3px;">|</span>
-            <a href="#" style="font-size:12px; font-weight: bold;" class="connect_room" data-booking-id="${booking.getId()}"
+            <a href="#" class="connect_room" data-booking-id="${booking.getId()}"
                data-event="${conf.getId()}" data-location="${booking.getLinkVideoRoomLocation()}">${_("Connect")} ${booking.getLinkVideoRoomLocation()}</a>
             <span style="display:inline; vertical-align:middle" class="progress"></span>
           % endif

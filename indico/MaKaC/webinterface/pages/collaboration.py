@@ -406,13 +406,13 @@ class WConfModifCollaborationProtection(wcomponents.WTemplated):
 ################################################### Event Display pages ###############################################
 class WPCollaborationDisplay(WPConferenceDefaultDisplayBase):
 
-
-    def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Display') + self._includeJSPackage('Collaboration')
-
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._collaborationOpt)
+
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+                   ['Collaboration/Style.css']
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \

@@ -2,14 +2,28 @@ var videoServiceLaunchInfo = {};
 
 var TPL_DISPLAY_BUTTON = {
     'disconnect': function(elem) {
-        elem.show()
+        elem.show();
         elem.text(format($T('Disconnect {0}'), [elem.data('location')]));
         elem.removeClass('connect_room').addClass('disconnect_room');
     },
     'connect': function(elem) {
-        elem.show()
+        elem.show();
         elem.text(format($T('Connect {0}'), [elem.data('location')]));
         elem.removeClass('disconnect_room').addClass('connect_room');
+    },
+    'error' : function(elem) {
+        elem.css('display', 'inline-block');
+        elem.text('');
+        elem.addClass('error');
+        elem.qtip({
+            content: {
+                text: $T("Indico cannot reach this room right now. Please reload the page to try again.")
+            },
+            position: {
+                my: 'top center',
+                at: 'bottom center'
+            }
+        });
     }
 }
 
@@ -23,13 +37,15 @@ var TPL_MANAGEMENT_BUTTON = {
         elem.html(IndicoUI.Buttons.playButtonText(format(
             $T("Connect {0}"), [elem.data('location')]), "right").dom);
         elem.removeClass('disconnect_room').addClass('connect_room');
-    }
+    },
+    'error': TPL_DISPLAY_BUTTON.error
 };
 
 
 type("ConnectButton", [], {
     initialize: function(elem, booking, conf_id) {
         this.connected = true;
+        this.error = false;
         this.$el = elem;
 
         this.booking = booking;
@@ -52,10 +68,14 @@ type("ConnectButton", [], {
     render: function() {
         this.hide_progress();
 
-        if(this.connected){
-            this.tpl['disconnect'](this.$el);
+        if (this.error) {
+            this.tpl['error'](this.$el);
         } else {
-            this.tpl['connect'](this.$el);
+            if(this.connected){
+                this.tpl['disconnect'](this.$el);
+            } else {
+                this.tpl['connect'](this.$el);
+            }
         }
     },
 
@@ -72,12 +92,16 @@ type("ConnectButton", [], {
     },
 
     on_click: function() {
-        this.set_progress();
-
-        if (this.connected) {
-            this.disconnect_room();
+        if (this.error) {
+            return;
         } else {
-            this.connect_room();
+            this.set_progress();
+
+            if (this.connected) {
+                this.disconnect_room();
+            } else {
+                this.connect_room();
+            }
         }
 
         return false;
@@ -93,7 +117,8 @@ type("ConnectButton", [], {
             function(result,error) {
                 if (!error) {
                     if (result.error) {
-                        new WarningPopup($T("Warning"), $T("Cannot get the status")).open();
+                        self.error = true;
+                        self.render()
                     } else {
                         // store connection data/status
                         self.connection = result;
@@ -115,7 +140,8 @@ type("ConnectButton", [], {
                         }
                     }
                 } else {
-                    IndicoUtil.errorReport(error);
+                    self.error = true;
+                    self.render()
                 }
             });
     },

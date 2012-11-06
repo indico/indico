@@ -107,3 +107,12 @@ form.EAChoiceButton{
     -moz-border-radius-bottomleft: 0;
     border-bottom-left-radius: 0;
 }
+
+.error {
+    background: url(../images/warning_small.png);
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-left: 5px;
+}
