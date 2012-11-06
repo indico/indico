@@ -94,12 +94,12 @@ class ConferenceDates:
     def getValue(cls, conf):
         adjusted_sDate = conf.getAdjustedStartDate()
         adjusted_eDate = conf.getAdjustedEndDate()
-        confDateInterval = i18nformat("""%s _("to") %s""")%(format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'))
+        confDateInterval = _("%s to %s") % (format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'))
         if adjusted_sDate.strftime("%d%B%Y") == \
                 adjusted_eDate.strftime("%d%B%Y"):
             confDateInterval = format_date(adjusted_sDate, format='long')
         elif adjusted_sDate.strftime("%B%Y") == adjusted_eDate.strftime("%B%Y"):
-            confDateInterval = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'))
+            confDateInterval = "%s-%s %s" % (adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'))
         return confDateInterval
 
 
