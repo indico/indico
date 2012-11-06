@@ -20,15 +20,15 @@
 class TplVar:
     _name=""
     _description=""
-    
+
     def getName(cls):
         return cls._name
     getName=classmethod(getName)
-    
+
     def getDescription(cls):
         return cls._description
     getDescription=classmethod(getDescription)
-    
+
     def getLabel(cls):
         return "%%(%s)s"%cls.getName()
     getLabel=classmethod(getLabel)
@@ -38,7 +38,7 @@ class TplVar:
     getValue=classmethod(getValue)
 
 class Notification:
-    
+
     def __init__(self,subject="",body="",toList=[],fromAddr="",ccList=[]):
         self.setSubject(subject)
         self.setBody(body)

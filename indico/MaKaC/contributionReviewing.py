@@ -971,7 +971,7 @@ class ContributionReviewingJudgementNotification(GenericNotification):
         conference = contribution.getConference()
         self.setFromAddr("Indico <%s>"%Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setCCList([judgement.getAuthor().getEmail()])
+        self.setBCCList([judgement.getAuthor().getEmail()])
 
         if isinstance(judgement, EditorJudgement):
             if conference.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
@@ -1055,7 +1055,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
         conference = contribution.getConference()
         self.setFromAddr("Indico <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setCCList([judgement.getAuthor().getEmail()])
+        self.setBCCList([judgement.getAuthor().getEmail()])
         if isinstance(judgement, RefereeJudgement):
             typeR = "Referee"
         elif isinstance(judgement, EditorJudgement):

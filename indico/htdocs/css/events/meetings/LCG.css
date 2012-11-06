@@ -29,7 +29,7 @@ body {
 
 div.meetingEventHeader {
     background: white url('../../../images/LCGlogo.png') left top no-repeat;
-    background-position: 45px 45px;
+    background-position: 5px 5px;
     border-top: 1px #AAA solid;
     border-right: 1px #AAA solid;
     border-left: 1px #AAA solid;
@@ -38,7 +38,7 @@ div.meetingEventHeader {
 
     color: #333333;
 
-    padding-left: 180px;
+    padding-left: 165px;
 }
 
 div.meetingEventSubHeader {
@@ -59,7 +59,14 @@ div.meetingEventHeader a:hover {
 }
 
 div.meetingEventHeader h1 {
-    color: #333333;
+    color: #b13445;
+    text-shadow: none !important;
+    font-weight: bold;
+}
+
+div.meetingEventHeader .details {
+    color: #555;
+    text-shadow: none !important;
 }
 
 div.meetingEventHeader h2 {
