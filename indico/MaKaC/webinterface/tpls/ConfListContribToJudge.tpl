@@ -25,8 +25,12 @@
             % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                 <% assessment = c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() %>
                 <span>${ _("Assessed:")}</span><span style="color:${'#118822' if assessment == 'Accept' else '#881122'}"> ${ assessment }</span>
-            % elif len(c.getReviewManager().getVersioning()) > 1:
-                <span style="color:orange;">${ c.getReviewManager().getVersioning()[-2].getEditorJudgement().getJudgement() }</span><br>
+            % elif not c.getReviewManager().getLastReview().isAuthorSubmitted():
+                % if len(c.getReviewManager().getVersioning()) > 1:
+                    <span>${ _("Author has yet to re-submit paper") }</span>
+                % else:
+                    <span>${ _("Paper not submitted yet")}</span>
+                % endif
             % else:
                 <span style="color:#3F4C6B;">${ _("Referee has not yet given an assessment")}</span><br>
                 ${ "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = False)) }
