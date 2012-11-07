@@ -1497,7 +1497,7 @@ type("PopupWidget", [], {
          * call the constructor.
          */
         if(!exists(this.canvas)) {
-            this.canvas = Html.div();
+            this.canvas = Html.div({});
         }
 
         styles = any(styles, {
@@ -1512,10 +1512,7 @@ type("PopupWidget", [], {
             styles.width = pixels(width);
         }
 
-        each(styles, function(value, key) {
-                self.canvas.setStyle(key, value);
-        });
-        this.canvas.setContent(content);
+        $(this.canvas.dom).css(styles).html(content.dom);
 
         IndicoUI.assignLayerLevel(this.canvas);
 
@@ -1525,7 +1522,7 @@ type("PopupWidget", [], {
          * Related bug report: http://code.google.com/p/chromium/issues/detail?id=72568
          */
         if(!addedWebkitJqueryFixDiv && navigator.userAgent.indexOf('WebKit') != -1) {
-            $E(document.body).append(Html.div());
+            $('body').append('<div/>');
         }
         addedWebkitJqueryFixDiv = true; // also set to true if we do not have a webkit browser so we don't check again
 
@@ -1538,7 +1535,9 @@ type("PopupWidget", [], {
      * @param {Integer} y The vertical position of the top left corner.
      */
     open: function(x, y) {
-        $E(document.body).append(this.draw(x,y));
+        //$E(document.body).append(this.draw(x,y));
+        var stuff = this.draw(x, y).dom;
+        $('body').append(stuff);
         this.isopen = true;
         this.postDraw();
     },
@@ -1548,16 +1547,6 @@ type("PopupWidget", [], {
     },
 
     postDraw: function() {
-        if (Browser.IE) {
-            this.canvas.dom.style.display = '';
-        }
-    },
-
-    openRelative: function(x, y) {
-        var iebody=(document.compatMode && document.compatMode != "BackCompat")? document.documentElement : document.body;
-        var dsocleft=document.all? iebody.scrollLeft : pageXOffset;
-        var dsoctop=document.all? iebody.scrollTop : pageYOffset;
-        this.open(x+dsocleft, y+dsoctop);
     },
 
     getCanvas: function() {

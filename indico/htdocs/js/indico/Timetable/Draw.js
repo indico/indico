@@ -65,7 +65,6 @@ type("TimetableBlockBase", [],
 
          createMaterialMenu: function(material, triggerElement, closeHandler) {
              var sections = {};
-
              each(material, function(value) {
                  var section = value.title;
                  var menuItems = {};

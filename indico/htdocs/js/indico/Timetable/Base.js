@@ -874,16 +874,18 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         });
 
         var menu = {
-            '' : {content: {'Create a new session': function() { self.managementActions.addSession(); }}, description: ''},
+            '' : {content: {'Create a new session': function() { 
+                self.managementActions.addSession();
+                $('.button-menu').dropdown('close');
+            }}, description: ''},
             'Add another block to:': {content: sessions, description: ''}
         };
 
         var te = new Html(triggerElement.find('a').get(0));
-        var sessMenu = new SessionSectionPopupMenu(menu, te, 'timetableSectionPopupList popupListChained', true, true);
+        var sessMenu = new SessionSectionPopupMenu(menu, [te], 'timetableSectionPopupList popupListChained', true, true);
 
-        var pos = triggerElement.position();
+        var pos = triggerElement.offset();
         sessMenu.open(pos.left, pos.top - 1);
-        parent.append($('.timetableSectionPopupList').parent());
     },
 
     _createAddMenu: function(elem) {

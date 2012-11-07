@@ -18,7 +18,6 @@
 type("ChainedPopupWidget", ["PopupWidget"],
      {
          clickTriggersClose: function(target) {
-
              var result = true;
 
              // check chain
@@ -48,7 +47,6 @@ type("ChainedPopupWidget", ["PopupWidget"],
                      // if the click should be followed by a
                      // closing action (out of the chain)
                      self.close();
-
                      // call close() over the whole chain
                      each(self.chainElements, function(element) {
                          if (element.ChainedPopupWidget) {
