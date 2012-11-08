@@ -287,7 +287,7 @@ function onsubmitDisplayActions() {
 
 % if attachedFilesAllowed:
 // attached files
-var initialFiles = ${ jsonEncode(attachments) };
+var initialFiles = ${ attachments | n,j };
 var attachedFilesManager = new AbstractFilesManager($E('inPlaceMaterial'), $E('inPlaceExistingMaterial'), $E('uploadFileLink'), $E('sizeError'), initialFiles);
 % endif
 
