@@ -215,6 +215,9 @@
                 ${ _("Session")}
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+                ${ _("Review #") }
+            </td>
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 ${ _("Status") }
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
@@ -225,7 +228,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="9" style="border-bottom: 1px solid grey"></td>
+            <td colspan="10" style="border-bottom: 1px solid grey"></td>
         </tr>
         <tr>
             <td id="noFilteredContribution" colspan="8" style="padding:15px 0px 15px 15px; display:none;">
@@ -506,8 +509,13 @@ var contributionTemplate = function(contribution) {
     cell6.set(contribution.session ? contribution.session : "")
     row.append(cell6);
 
-    // Cell7: contribution status
+    // Cell7: Review number
     var cell7 = Html.td({className:'contributionDataCell',style:{"marginLeft":"5px"}});
+    cell7.set($T("Review {0}").format(contribution.reviewManager.versioningLen))
+    row.append(cell7);
+
+    // Cell8: contribution status
+    var cell8 = Html.td({className:'contributionDataCell',style:{"marginLeft":"5px"}});
 
     if (contribution.reviewManager.lastReview.refereeJudgement.isSubmitted) {
         var span = Html.span();
@@ -518,45 +526,47 @@ var contributionTemplate = function(contribution) {
         else if (judgement == "Accept")
             span.dom.style.color = '#118822';
         span.set($T("Assessed") + ": " + judgement);
-        cell7.set(span);
+        cell8.set(span);
 
+    } else if(!contribution.reviewManager.lastReview.isAuthorSubmitted){
+        var span = Html.span();
+        if (contribution.reviewManager.versioningLen > 1){
+            span.dom.style.color = 'orange';
+            span.set($T("Author has yet to re-submit paper"));
+        }
+        else {
+            span.set($T("Paper not submitted yet"));
+        }
+        cell8.set(span);
     } else {
+        if (contribution.reviewManager.versioningLen > 1) {
+            var span = Html.span();
+            span.dom.style.color ='#D18700';
+            span.append($T("Author has re-submitted paper. "));
+            cell8.append(span);
+            cell8.append(Html.br());
+        }
+        var span = Html.span();
+        span.dom.style.fontWeight ='bold';
+        span.append($T("Referee has not yet given an assessment."));
 
         var ul = Html.ul();
-        ul.dom.style.listStyleType = 'none';
-        ul.dom.style.padding = 0;
-        ul.dom.style.marginLeft = '5px';
-
-        /* if there is more than 1 version, it means that it is 'To be corrected' */
-        if (contribution.reviewManager.versioningLen > 1) {
-            ul.dom.style.color = 'orange';
-
+        ul.dom.style.paddingLeft = '30px';
+        ul.dom.style.margin = '0px';
+        statusList = contribution.reviewManager.lastReview.reviewingStatus;
+        for (j in statusList) {
             var li = Html.li();
-            li.set($T("To be corrected"));
-            ul.append(li);
-        /* else, it is still 'submitted' */
-        }else {
-            ul.dom.style.color = '#3F4C6B';
-
-            var li = Html.li();
-            li.set($T("Referee has not yet given an assessment:"));
-            ul.append(li);
-
-            statusList = contribution.reviewManager.lastReview.reviewingStatus;
-            for (j in statusList) {
-                var li = Html.li();
-                li.set(statusList[j])
-                ul.append(li)
-            }
+            li.set(statusList[j])
+            ul.append(li)
         }
-
-        cell7.set(ul);
+        cell8.append(span);
+        cell8.append(ul);
     }
 
-    row.append(cell7);
+    row.append(cell8);
 
-    // Cell8: reviewing team assigned to the contribution
-    var cell8 = Html.td({className:'contributionDataCell'});
+    // Cell9: reviewing team assigned to the contribution
+    var cell9 = Html.td({className:'contributionDataCell'});
 
     var ul = Html.ul();
     ul.dom.style.listStyleType = 'none';
@@ -604,20 +614,20 @@ var contributionTemplate = function(contribution) {
     ul.append(li3);
     % endif
 
-    cell8.set(ul);
-    row.append(cell8);
+    cell9.set(ul);
+    row.append(cell9);
 
-    // Cell9: due date of the contribution
-    var cell9 = Html.td({className:'contributionDataCell'});
+    // Cell10: due date of the contribution
+    var cell10 = Html.td({className:'contributionDataCell'});
     if (contribution.reviewManager.lastReview.refereeDueDate == null) {
-        cell9.set("");
+        cell10.set("");
     }
     else {
         var date = contribution.reviewManager.lastReview.refereeDueDate.date;
         var newDate = date.split('-')[2] + '-' + date.split('-')[1] + '-' + date.split('-')[0];
-        cell9.set(newDate);
+        cell10.set(newDate);
     }
-    row.append(cell9);
+    row.append(cell10);
 
     return row;
 }
@@ -1112,7 +1122,7 @@ var userSelected = function(user, contrPerAttribute){
  */
 var fetchContributions = function() {
 
-    var killProgress = IndicoUI.Dialogs.Util.progress("Loading papers to assign...");
+    var killProgress = IndicoUI.Dialogs.Util.progress("Loading papers...");
 
     if (appliedFilter) {
         $E('resetFilters').dom.style.display = '';
