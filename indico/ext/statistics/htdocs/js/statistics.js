@@ -91,7 +91,7 @@ $(function() {
                 },
                 yaxis: {
                     min: 0,
-                    tickInterval: 1
+                    numberTicks: 10
                 }
             },
             cursor: {
@@ -112,10 +112,12 @@ $(function() {
                 shadow: false
             },
             series: [{
+                showMarker:false,
                 lineWidth: 1,
                 color: '#CCCCCC',
                 label: $T('Total Hits')
             }, {
+                showMarker:false,
                 lineWidth: 1,
                 color: '#0B63A5',
                 label: $T('Unique Hits')
