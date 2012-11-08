@@ -42,10 +42,12 @@
 
 <%block name="detail">
     % if not self_._rh._target.getConference().getAbstractMgr().isActive() or not self_._rh._target.getConference().hasEnabledSection("cfa") or not self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-    <div class="contributionSection">
-        <h2 class="contributionSectionTitle">Description</h2>
-        <div class="contributionSectionContent">${Contribution.getDescription()}</div>
-    </div>
+        % if Contribution.getDescription().strip()!="":
+        <div class="contributionSection">
+            <h2 class="contributionSectionTitle">Description</h2>
+            <div class="contributionSectionContent">${Contribution.getDescription()}</div>
+        </div>
+        % endif
     % else:
         % for f in Contribution.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             % if Contribution.getField(f.getId()):
