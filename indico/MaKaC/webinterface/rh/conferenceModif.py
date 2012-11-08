@@ -48,7 +48,7 @@ from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, 
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from MaKaC.common import Config
 from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
-    ConferenceClosedError, NoReportError
+    ConferenceClosedError, NoReportError, NotFoundError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
 from MaKaC.webinterface import locators
@@ -3412,6 +3412,8 @@ class RHConfModifDisplayRemoveLink( RHConferenceModifBase ):
         else:
             menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
             link = menu.getLinkById(self._linkId)
+            if link is None:
+                raise NotFoundError( _("The link you are trying to delete no longer exists"))
             if isinstance(link, displayMgr.SystemLink):
                 raise MaKaCError( _("You cannot remove a system link"))
             p = conferences.WPConfModifDisplayRemoveLink(self, self._target, link )
