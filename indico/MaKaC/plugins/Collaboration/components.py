@@ -36,7 +36,7 @@ from indico.core.index import OOIndex, Index
 from indico.core.index.adapter import IIndexableByStartDateTime
 from indico.core.extpoint import Component, IListener
 from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, \
-     IMetadataChangeListener
+     IMetadataChangeListener, INavigationContributor
 from indico.core.extpoint.location import ILocationActionListener
 from indico.core.extpoint.index import ICatalogIndexProvider
 from indico.core.index import Catalog
@@ -174,7 +174,8 @@ class EventCollaborationListener(Component):
     zope.interface.implements(IObjectLifeCycleListener,
                               ITimeActionListener,
                               ILocationActionListener,
-                              IMetadataChangeListener)
+                              IMetadataChangeListener,
+                              INavigationContributor)
 
     """In this case, obj is a conference object. Since all we
        need is already programmed in CSBookingManager, we get the
@@ -296,3 +297,14 @@ class EventCollaborationListener(Component):
         for booking in csBookingManager.getBookingList():
             booking.unindex_talk(obj)
             booking.index_talk(obj)
+
+    @classmethod
+    def cloneEvent(cls, confToClone, params):
+        """ we'll clone the collaboration managers"""
+        conf = params['conf']
+        options = params['options']
+
+        if options.get("access", True):
+            for plugin, managers in confToClone.getCSBookingManager().getManagers().iteritems():
+                for manager in managers:
+                    conf.getCSBookingManager().addPluginManager(plugin, manager)
