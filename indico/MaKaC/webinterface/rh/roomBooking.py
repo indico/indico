@@ -1445,7 +1445,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
         for nbd in self._candResv.room.getNonBookableDates():
             if (doesPeriodsOverlap(nbd.getStartDate(),nbd.getEndDate(),self._candResv.startDT,self._candResv.endDT)):
-                raise FormValuesError("You cannot book this room during the following periods due to maintenance reasons: %s"%("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
+                raise FormValuesError("You cannot book this room during the following periods: %s"%("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
 
         user = self._getUser()
         days = self._candResv.room.maxAdvanceDays
@@ -1850,9 +1850,9 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
     def _checkProtection( self ):
         RHRoomBookingBase._checkProtection(self)
         user = self._getUser()
-        # Only user/admin can cancell a booking occurrence
+        # Only owner (the one who created), the requestor(booked for) and admin can CANCEL
         # (Owner can not reject his own booking, he should cancel instead)
-        if self._resv.createdBy != user.getId() and (not user.isRBAdmin()):
+        if not self._resv.canCancel(user):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):

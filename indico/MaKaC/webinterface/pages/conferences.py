@@ -1109,7 +1109,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                 except KeyError:
                     fileType = "other"
                 filename = res.getName() or res.getFileName()
-                fileURL = urlHandlers.UHFileAccess.getURL(res)
+                fileURL = str(urlHandlers.UHFileAccess.getURL(res))
             else:
                 filename, fileType, fileURL = str(res.getName() or res.getURL()), "link", str(res.getURL())
             files.append({'id': res.getId(),
@@ -6821,6 +6821,10 @@ class WPSpeakerIndex( WPConferenceDefaultDisplayBase ):
     def _getBody(self, params):
         wc=WConfSpeakerIndex(self._conf)
         return wc.getHTML()
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+            self._asset_env['indico_authors'].urls()
 
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )

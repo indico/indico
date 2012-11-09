@@ -24,6 +24,8 @@ Asynchronous request handlers for conference-related data modification.
 
 # 3rd party imports
 from email.utils import formataddr
+from indico.util.string import permissive_format
+
 import datetime
 from pytz import timezone
 
@@ -746,8 +748,8 @@ class ConferenceParticipantBase:
                            url=urlHandlers.UHConferenceDisplay.getURL( self._conf ),
                            urlRefusal=urlRefusal, urlInvitation=urlInvitation)
 
-            data["body"] = data["body"].format(**mailEnv)
-            data["subject"] = data["subject"].format(**mailEnv)
+            data["body"] = permissive_format(data["body"], mailEnv)
+            data["subject"] = permissive_format(data["subject"], mailEnv)
             GenericMailer.sendAndLog(GenericNotification(data),self._conf,"participants", self._getUser())
 
 class ConferenceAddEditParticipantBase(ConferenceParticipantBase):

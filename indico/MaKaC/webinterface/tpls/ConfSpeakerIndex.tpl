@@ -1,30 +1,6 @@
-<script type="text/javascript">
-    include(ScriptRoot + "indico/Timetable/Loader.js");
-
-    $(function(){
-        var resultCache = [];
-        var allItems = $(".speakerIndexItem");
-
-        $("#filterSpeakers").keyup(function(){
-            var searchString = $("#filterSpeakers").attr('value');
-            allItems.css('visibility', 'hidden');
-            allItems.addClass('specialHide');
-            if (resultCache[searchString] == undefined) {
-                var items = $(".speakerIndexItemText:contains('"+ searchString +"')").parent().parent();
-                resultCache[searchString] = items;
-            } else {
-                var items = resultCache[searchString];
-            }
-            items.css('visibility', '');
-            items.removeClass('specialHide');
-            $("#numberFiltered").text(items.length);
-            items.length == 1 ? $("#numberFilteredText").text($T("speaker")) : $("#numberFilteredText").text($T("speakers"));
-        });
-     });
-</script>
 <div class="speakerIndexFiltersContainer">
     <div>
-        <input type="text" id="filterSpeakers" value="" placeholder="${ _('Search in speakers') }">
+        <input type="text" id="filter_text" value="" placeholder="${ _('Search in speakers') }" />
     </div>
     <div class="speakerIndexFilteredText">
         ${_("Displaying ")}<span style="font-weight:bold;" id="numberFiltered">${len(items)}</span>
@@ -33,11 +9,11 @@
         <span style="font-weight:bold;">${len(items)}</span>
     </div>
 </div>
-<div class="speakerIndex">
+<div class="speakerIndex index">
     % for key, item in items.iteritems():
-        <div class="speakerIndexItem">
+        <div class="speakerIndexItem item">
             <div style="padding-bottom: 10px">
-                <span class="speakerIndexItemText">${item[0]['fullName']}</span>
+                <span class="speakerIndexItemText text">${item[0]['fullName']}</span>
                 % if item[0]['affiliation']:
                     <span style="color: #888">(${item[0]['affiliation']})</span>
                 % endif

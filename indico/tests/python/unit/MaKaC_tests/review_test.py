@@ -143,8 +143,8 @@ class TestAbstractSubmission(IndicoTestCase):
         a.setTracks([self._track1, self._track2])
         #checking that the abstract is in the conference and its status is
         # submitted
-        self.assertIn(a, self._conf.getAbstractMgr().getAbstractList())
-        self.assertIsInstance(a.getCurrentStatus(), review.AbstractStatusSubmitted)
+        self.assertTrue(a in self._conf.getAbstractMgr().getAbstractList())
+        self.assertTrue(isinstance(a.getCurrentStatus(), review.AbstractStatusSubmitted))
         #checking that the abstract tracks are correctly set up
         self.assertTrue(a.isProposedForTrack(self._track1))
         self.assertTrue(a.isProposedForTrack(self._track2))
@@ -210,7 +210,7 @@ class TestAbstractModification(IndicoTestCase):
         self._abstract.removeTrack(self._track2)
         self.assertFalse(self._abstract.isProposedForTrack(self._track1))
         self.assertFalse(self._abstract.isProposedForTrack(self._track2))
-        self.assertIn(self._track3, self._abstract.getTrackList())
+        self.assertTrue(self._track3 in self._abstract.getTrackList())
         #adding single tracks
         self._abstract.addTrack(self._track3)
         self.assertEqual(len(self._abstract.getTrackList()), 1)
@@ -279,7 +279,7 @@ class TestAbstractAcceptation(IndicoTestCase):
         self._abstract.accept(res1, self._track1, self._ctOral)
         #check the status is changed to accept
         status = self._abstract.getCurrentStatus()
-        self.assertIsInstance(status, review.AbstractStatusAccepted)
+        self.assertTrue(isinstance(status, review.AbstractStatusAccepted))
         #check the track
         self.assertEqual(status.getTrack(), self._track1)
         #check that a contribution has been created and has exactly the same
@@ -288,7 +288,7 @@ class TestAbstractAcceptation(IndicoTestCase):
         self.assertEqual(contrib.getId(), self._abstract.getId())
         self.assertEqual(contrib.getConference(), self._conf)
         self.assertEqual(contrib.getAbstract(), self._abstract)
-        self.assertIn(contrib, self._conf.getContributionList())
+        self.assertTrue(contrib in self._conf.getContributionList())
         self.assertEqual(contrib.getTrack(), status.getTrack())
         self.assertEqual(contrib.getTitle(), "test_title")
         self.assertEqual(contrib.getDescription(), "test_content")
@@ -333,7 +333,7 @@ class TestAbstractAcceptation(IndicoTestCase):
         self._abstract.accept(res1, self._track3, self._ctOral)
         #check the status is changed to accept
         status = self._abstract.getCurrentStatus()
-        self.assertIsInstance(status, review.AbstractStatusAccepted)
+        self.assertTrue(isinstance(status, review.AbstractStatusAccepted))
         #check the track
         self.assertEqual(status.getTrack(), self._track3)
         #check the track list contains the track for which it was accepted
@@ -424,7 +424,7 @@ class TestAbstractWithdrawal(IndicoTestCase):
     def testNormal(self):
         #tests the normal flow of events of the withdrawal TC
         self._abstract.withdraw(self._avatar, "hola")
-        self.assertIsInstance(self._abstract.getCurrentStatus(), review.AbstractStatusWithdrawn)
+        self.assertTrue(isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusWithdrawn))
 
     @with_context('database')
     def testCannotAccWithdrawn(self):
@@ -444,22 +444,22 @@ class TestAbstractWithdrawal(IndicoTestCase):
         #   provokes the withdrawal of the associated contribution
         self._abstract.accept(self._avatar, self._track1, self._ctOral)
         contrib = self._abstract.getContribution()
-        self.assertNotIsInstance(contrib, conference.ContribStatusWithdrawn)
+        self.assertFalse(isinstance(contrib, conference.ContribStatusWithdrawn))
         self._abstract.withdraw(self._avatar, "hola")
         absStatus = self._abstract.getCurrentStatus()
         contribStatus = contrib.getCurrentStatus()
-        self.assertIsInstance(absStatus, review.AbstractStatusWithdrawn)
-        self.assertIsInstance(contribStatus, conference.ContribStatusWithdrawn)
+        self.assertTrue(isinstance(absStatus, review.AbstractStatusWithdrawn))
+        self.assertTrue(isinstance(contribStatus, conference.ContribStatusWithdrawn))
 
 
-class TestAbstractWithdrawal(IndicoTestCase):
+class TestAbstractRecovery(IndicoTestCase):
     """tests different abstract recovery scenarios.
     """
 
     _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
-        super(TestAbstractWithdrawal, self).setUp()
+        super(TestAbstractRecovery, self).setUp()
 
         self._startDBReq()
 
@@ -493,7 +493,7 @@ class TestAbstractWithdrawal(IndicoTestCase):
         #tests the abstract recovery normal flow
         self._abstract.withdraw(self._avatar)
         self._abstract.recover()
-        self.assertIsInstance(self._abstract.getCurrentStatus(), review.AbstractStatusSubmitted)
+        self.assertTrue(isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusSubmitted))
 
     @with_context('database')
     def testTackJudgementClearing(self):
@@ -554,19 +554,19 @@ class TestAbstractReallocation(IndicoTestCase):
         self.assertTrue(self._abstract.hasTrack(self._track3))
         self.assertEqual(self._abstract.getNumJudgements(), 1)
         t1jud = self._abstract.getTrackJudgement(self._track1)
-        self.assertIsInstance(t1jud, review.AbstractReallocation)
+        self.assertTrue(isinstance(t1jud, review.AbstractReallocation))
         self.assertEqual(t1jud.getResponsible(), self._avatar)
-        self.assertIn(self._track2, t1jud.getProposedTrackList())
-        self.assertIn(self._track3, t1jud.getProposedTrackList())
-        self.assertNotIn(self._track1, t1jud.getProposedTrackList())
+        self.assertTrue(self._track2 in t1jud.getProposedTrackList())
+        self.assertTrue(self._track3 in t1jud.getProposedTrackList())
+        self.assertFalse(self._track1 in t1jud.getProposedTrackList())
         status = self._abstract.getCurrentStatus()
-        self.assertIsInstance(status, review.AbstractStatusUnderReview)
+        self.assertTrue(isinstance(status, review.AbstractStatusUnderReview))
         t2_tl = self._abstract.getReallocationTargetedList(self._track2)
-        self.assertIn(t1jud, t2_tl)
+        self.assertTrue(t1jud in t2_tl)
         t3_tl = self._abstract.getReallocationTargetedList(self._track3)
-        self.assertIn(t1jud, t3_tl)
+        self.assertTrue(t1jud in t3_tl)
         t1_tl = self._abstract.getReallocationTargetedList(self._track1)
-        self.assertNotIn(t1jud, t1_tl)
+        self.assertFalse(t1jud in t1_tl)
 
 
 class TestNotification(IndicoTestCase):
@@ -603,13 +603,6 @@ class TestNotification(IndicoTestCase):
         self._contribTypePoster = "poster"
 
         self._stopDBReq()
-        #absMgr.addContribType(self._contribTypeOral)
-        #absMgr.addContribType(self._contribTypePoster)
-        #from MaKaC.user import Avatar
-        #self._submitter = Avatar()
-        #self._submitter.setId( "submitter" )
-        #self._abstract=self._conf.getAbstractMgr().newAbstract(self._submitter)
-        #self._abstract.addTrack(self._track1)
 
     @with_context('database')
     def testBasicManagement(self):
@@ -617,12 +610,14 @@ class TestNotification(IndicoTestCase):
         tpl1 = NotificationTemplate()
         absMgr = self._conf.getAbstractMgr()
         absMgr.addNotificationTpl(tpl1)
-        self.assertIn(tpl1, absMgr.getNotificationTplList())
+        self.assertTrue(tpl1 in absMgr.getNotificationTplList())
         tpl2 = NotificationTemplate()
         absMgr.addNotificationTpl(tpl2)
         absMgr.removeNotificationTpl(tpl1)
-        self.assertIn(tpl2, absMgr.getNotificationTplList())
-        self.assertNotIn(tpl1, absMgr.getNotificationTplList())
+        self.assertTrue(tpl2 in absMgr.getNotificationTplList())
+        self.assertFalse(tpl1 in absMgr.getNotificationTplList())
+        self.assertTrue(tpl2 in absMgr.getNotificationTplList())
+        self.assertFalse(tpl1 in absMgr.getNotificationTplList())
         self.assertNotEqual(tpl1, absMgr.getNotificationTplById(tpl1.getId()))
         self.assertEqual(tpl2, absMgr.getNotificationTplById(tpl2.getId()))
 
@@ -643,7 +638,7 @@ class TestNotification(IndicoTestCase):
         from MaKaC.user import Avatar
         abs1 = absMgr.newAbstract(self._avatar)
         tplRes = absMgr.getNotifTplForAbstract(abs1)
-        self.assertIsNone(tplRes)
+        self.assertTrue(tplRes is None)
         abs1.accept(self._avatar, self._track1, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs1), tpl1)
         abs2 = absMgr.newAbstract(self._avatar)
@@ -667,10 +662,10 @@ class TestNotification(IndicoTestCase):
         self.assertEqual(absMgr.getNotifTplForAbstract(abs1), tpl1)
         abs2 = absMgr.newAbstract(self._avatar)
         abs2.accept(self._avatar, self._track1, self._contribTypePoster)
-        self.assertIsNone(absMgr.getNotifTplForAbstract(abs2))
+        self.assertTrue(absMgr.getNotifTplForAbstract(abs2) is None)
         abs3 = absMgr.newAbstract(self._avatar)
         abs3.accept(self._avatar, self._track2, self._contribTypeOral)
-        self.assertIsNone(absMgr.getNotifTplForAbstract(abs3))
+        self.assertTrue(absMgr.getNotifTplForAbstract(abs3) is None)
 
     @with_context('database')
     def testTplCondAccAnyTrack(self):
@@ -686,7 +681,7 @@ class TestNotification(IndicoTestCase):
         self.assertEqual(absMgr.getNotifTplForAbstract(abs1), tpl1)
         abs2 = absMgr.newAbstract(self._avatar)
         abs2.accept(self._avatar, self._track1, self._contribTypePoster)
-        self.assertIsNone(absMgr.getNotifTplForAbstract(abs2))
+        self.assertTrue(absMgr.getNotifTplForAbstract(abs2) is None)
         abs3 = absMgr.newAbstract(self._avatar)
         abs3.accept(self._avatar, self._track2, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs3), tpl1)
@@ -705,10 +700,10 @@ class TestNotification(IndicoTestCase):
         tpl1.addCondition(cond1)
         abs1 = absMgr.newAbstract(self._avatar)
         abs1.accept(self._avatar, self._track1, self._contribTypeOral)
-        self.assertIsNone(absMgr.getNotifTplForAbstract(abs1))
+        self.assertTrue(absMgr.getNotifTplForAbstract(abs1) is None)
         abs2 = absMgr.newAbstract(self._avatar)
         abs2.accept(self._avatar, self._track1, self._contribTypePoster)
-        self.assertIsNone(absMgr.getNotifTplForAbstract(abs2))
+        self.assertTrue(absMgr.getNotifTplForAbstract(abs2) is None)
         abs3 = absMgr.newAbstract(self._avatar)
         abs3.accept(self._avatar, None, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs3), tpl1)
@@ -750,29 +745,30 @@ class TestAuthorSearch(IndicoTestCase):
         abs2 = absMgr.newAbstract(self._avatar)
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("")), 2)
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("a")), 1)
-        self.assertIn(abs1, absMgr.getAbstractsMatchingAuth("a"))
+        self.assertTrue(abs1 in absMgr.getAbstractsMatchingAuth("a"))
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("B")), 1)
-        self.assertIn(abs1, absMgr.getAbstractsMatchingAuth("b"))
-        self.assertNotIn(auth3, absMgr.getAbstractsMatchingAuth("b"))
+        self.assertTrue(abs1 in absMgr.getAbstractsMatchingAuth("b"))
+        self.assertFalse(auth3 in absMgr.getAbstractsMatchingAuth("b"))
         auth1.setSurName("c")
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("a")), 1)
-        self.assertIn(abs1, absMgr.getAbstractsMatchingAuth("a"))
+        self.assertTrue(abs1 in absMgr.getAbstractsMatchingAuth("a"))
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("B")), 1)
-        self.assertIn(abs1, absMgr.getAbstractsMatchingAuth("b"))
+        self.assertTrue(abs1 in absMgr.getAbstractsMatchingAuth("b"))
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("c")), 1)
-        self.assertIn(abs1, absMgr.getAbstractsMatchingAuth("C"))
+        self.assertTrue(abs1 in absMgr.getAbstractsMatchingAuth("C"))
         abs1._removePrimaryAuthor(auth1)
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("")), 2)
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("a")), 0)
-        self.assertNotIn(abs1, absMgr.getAbstractsMatchingAuth("a"))
+        self.assertFalse(abs1 in absMgr.getAbstractsMatchingAuth("a"))
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("B")), 1)
-        self.assertIn(abs1, absMgr.getAbstractsMatchingAuth("b"))
+        self.assertTrue(abs1 in absMgr.getAbstractsMatchingAuth("b"))
         abs1.clearAuthors()
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("")), 2)
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("a")), 0)
-        self.assertNotIn(abs1, absMgr.getAbstractsMatchingAuth("a"))
+        self.assertFalse(abs1 in absMgr.getAbstractsMatchingAuth("a"))
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("B")), 0)
-        self.assertNotIn(abs1, absMgr.getAbstractsMatchingAuth("b"))
+        self.assertFalse(abs1 in absMgr.getAbstractsMatchingAuth("b"))
+
 
 class TestAbstractJudgements(IndicoTestCase):
     """Tests different abstract judgements scenarios
@@ -832,70 +828,70 @@ class TestAbstractJudgements(IndicoTestCase):
 
     @with_context('database')
     def testJudgementStatus(self):
-        self.assertIsNone(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1))
-        self.assertIsNone(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1))
-        self.assertIsNone(self._abstract1.getTrackJudgement(self._track1))
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusSubmitted)
+        self.assertTrue(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1) is None)
+        self.assertTrue(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1) is None)
+        self.assertTrue(self._abstract1.getTrackJudgement(self._track1) is None)
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusSubmitted))
 
         self._abstract1.proposeToAccept(self._avatar1, self._track1, "oral")
 
-        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance)
-        self.assertIsNone(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1))
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview)
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance))
+        self.assertTrue(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1) is None)
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview))
 
         self._abstract1.proposeToReject(self._avatar2, self._track1, "oral")
 
-        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractInConflict)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusInConflict)
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractInConflict))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusInConflict))
 
         self._abstract1.proposeToAccept(self._avatar2, self._track1, "oral")
 
-        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview)
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview))
 
         self._abstract1.proposeToReject(self._avatar1, self._track1, "oral")
         self._abstract1.proposeToReject(self._avatar2, self._track1, "oral")
 
-        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview)
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview))
 
         self._abstract1.proposeToReject(self._avatar1, self._track2, "oral")
         self._abstract1.proposeToReject(self._avatar1, self._track3, "oral")
 
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track3), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToReject)
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track3), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToReject))
 
         self._abstract1.proposeToAccept(self._avatar1, self._track1, "oral")
         self._abstract1.proposeToAccept(self._avatar2, self._track1, "oral")
 
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept)
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept))
 
         self._abstract1.proposeToAccept(self._avatar1, self._track2, "oral")
 
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusInConflict)
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusInConflict))
 
         self._abstract1.proposeToReject(self._avatar1, self._track2, "oral")
 
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept)
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept))
 
         self._abstract1.proposeForOtherTracks(self._avatar1, self._track2, comment="", propTracks=[self._track1])
         self._abstract1.proposeForOtherTracks(self._avatar2, self._track2, comment="", propTracks=[self._track3])
 
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractReallocation)
-        self.assertIsInstance(self._abstract1.getTrackJudgement(self._track3), review.AbstractRejection)
-        self.assertIsInstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept)
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractReallocation))
+        self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track3), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept))

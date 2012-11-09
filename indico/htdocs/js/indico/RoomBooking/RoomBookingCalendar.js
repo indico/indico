@@ -396,7 +396,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 if (date.getDay() == 0 || date.getDay() == 6)
                     dateClass = "weekend";
                 if (this.room.nonBookableDates) {
-                    return Html.span({title: $T("This room cannot be booked for this date due to maintenance reasons"), className: "unavailable"}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
+                    return Html.span({title: $T("This room cannot be booked for this date"), className: "unavailable"}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
                 } else {
                     if(this.data.getDayClass(day)) {
                         dateClass = this.data.getDayClass(day);

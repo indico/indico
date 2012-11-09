@@ -57,16 +57,18 @@ class GenericNotification :
             self._fromAddr = ""
             self._toList = []
             self._ccList = []
+            self._bccList = []
             self._subject = ""
             self._body = ""
             self._contenttype = "text/plain"
         else :
-            self._fromAddr = data.get("fromAddr","")
-            self._toList = data.get("toList",[])
-            self._ccList = data.get("ccList",[])
-            self._subject = data.get("subject","")
-            self._body = data.get("body","")
-            self._contenttype = data.get("content-type","text/plain")
+            self._fromAddr = data.get("fromAddr", "")
+            self._toList = data.get("toList", [])
+            self._ccList = data.get("ccList", [])
+            self._bccList = data.get("bccList", [])
+            self._subject = data.get("subject", "")
+            self._body = data.get("body", "")
+            self._contenttype = data.get("content-type", "text/plain")
 
     def getContentType(self):
         return self._contenttype
@@ -100,6 +102,15 @@ class GenericNotification :
             return False
         self._ccList = ccList
         return True
+
+    def setBCCList(self, bccList):
+        if bccList is None :
+            return False
+        self._bccList = bccList
+        return True
+
+    def getBCCList(self):
+        return self._bccList
 
     def getSubject(self):
         return self._subject

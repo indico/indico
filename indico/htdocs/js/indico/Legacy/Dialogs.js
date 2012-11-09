@@ -804,6 +804,9 @@ extend(IndicoUI.Dialogs,
                                                [],
                                                null)
                                    }
+                                   else{
+                                       new AlertPopup($T("Error"), error.message).open();
+                                   }
                                });
            }
        });

@@ -388,14 +388,9 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         return data
 
 
-class RHUserAbstractsPDF(RHConferenceBaseDisplay):
+class RHUserAbstractsPDF(RHAbstractSubmissionBase):
 
-    def _checkProtection( self ):
-        RHConferenceBaseDisplay._checkProtection(self)
-        if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
-            raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
-
-    def _process( self ):
+    def _processIfActive( self ):
         tz = timezoneUtils.DisplayTZ(self._aw,self._conf).getDisplayTZ()
         cfaMgr = self._conf.getAbstractMgr()
         abstracts = cfaMgr.getAbstractListForAvatar( self._aw.getUser() )

@@ -7573,6 +7573,8 @@ div#social img#social_button:hover{
 }
 
 #fb-like {
+    height: 25px;
+    overflow: hidden;
     visibility: hidden;
 }
 
