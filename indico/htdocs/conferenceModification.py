@@ -64,21 +64,6 @@ def screenDates( req, **params ):
 def dataPerform( req, **params ):
     return conferenceModif.RHConfPerformDataModif( req ).process( params )
 
-def newChair(req,**params):
-    return conferenceModif.RHChairNew( req ).process( params)
-
-def removeChairs(req, **args):
-    return conferenceModif.RHConfRemoveChairs( req ).process( args )
-
-def editChair(req,**params):
-    return conferenceModif.RHChairEdit( req ).process( params)
-
-def selectChairs(req, **args):
-    return conferenceModif.RHConfModifSelectChairs( req ).process( args )
-
-def addChairs(req,**params):
-    return conferenceModif.RHConfModifAddChairs( req ).process( params)
-
 def sessionSlots( req, **params ):
     return conferenceModif.RHConfSessionSlots( req ).process( params )
 
