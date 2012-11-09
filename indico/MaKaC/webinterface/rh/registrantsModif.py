@@ -29,7 +29,7 @@ from MaKaC.errors import FormValuesError
 from MaKaC.common import utils
 from MaKaC.registration import SocialEvent, MiscellaneousInfoGroup
 from MaKaC.webinterface.common import registrantNotificator
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC import epayment
 from MaKaC.i18n import _
 import MaKaC.webinterface.pages.registrationForm as registrationForm
@@ -458,7 +458,12 @@ class RHRegistrantModifBase( conferenceModif.RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         conferenceModif.RHConferenceModifBase._checkParams(self, params)
-        self._registrant = self._conf.getRegistrantById(params.get("registrantId",""))
+        regId=params.get("registrantId",None)
+        if regId is None:
+            raise MaKaCError(_("registrant id not set"))
+        self._registrant=self._conf.getRegistrantById(regId)
+        if self._registrant is None:
+            raise NotFoundError(_("The registrant with id %s does not exist or has been deleted")%regId)
 
 class RHRegistrantModification( RHRegistrantModifBase ):
 
