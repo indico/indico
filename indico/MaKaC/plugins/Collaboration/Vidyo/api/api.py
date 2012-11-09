@@ -92,7 +92,17 @@ class AdminApi(ApiBase):
 
     @classmethod
     def getAutomute(cls, roomId, confId, bookingId):
-        return cls._api_operation('getRoomProfile', roomId)
+        answer = cls._api_operation('getRoomProfile', roomId)
+        if answer is None or answer == "":
+            return False
+        return answer.roomProfileName == AUTOMUTE_API_PROFILE
+
+    @classmethod
+    def setModeratorPIN(cls, roomId, moderatorPIN, confId, bookingId):
+        if moderatorPIN:
+            return cls._api_operation('createModeratorPIN', roomId, moderatorPIN)
+        else:
+            return cls._api_operation('removeModeratorPIN', roomId)
 
     @classmethod
     def connectRoom(cls, roomId, confId, bookingId, legacyMember):
