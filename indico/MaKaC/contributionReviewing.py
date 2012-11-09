@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
+
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import urlHandlers
@@ -638,17 +640,16 @@ class Review(Persistent, Fossilizable):
     def getReviewerJudgement(self, reviewer):
         return self._reviewerJudgements[reviewer]
 
-    def _getRevieweStatus(self, status):
+    def _getReviewerStatus(self, status):
         if self.anyReviewerHasGivenAdvice():
-            advices = {}
+            advices = defaultdict(int)
             for reviewer in self._reviewManager.getReviewersList():
-                jugdement = self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()
-                if (jugdement != None):
-                    if jugdement not in advices:
-                        advices[jugdement] = 0
-                    advices[jugdement] += 1
-            resume = ("(%s)")%" / ".join(["%s: %s"%(k, v) for k, v in advices.iteritems()])
-            status.append(_("""Content assessed by %s %s %s""")%(sum(advices.values()), ngettext("reviewer", "reviewers", sum(advices.values())), resume))
+                judgement = self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()
+                if judgement != None:
+                    advices[judgement] += 1
+            resume = "(%s)" % ", ".join("%s %s" % (v, k.lower()) for k, v in advices.iteritems())
+            status.append(_("Content assessed by %s %s %s") % (
+                    sum(advices.values()), ngettext("reviewer", "reviewers", sum(advices.values())), resume))
         else:
             status.append(_("No content reviewers have decided yet"))
 
@@ -674,9 +675,9 @@ class Review(Persistent, Fossilizable):
                             status.append(_("Layout assessed by ") + str(self._reviewManager.getEditor().getFullName())+ _(" as: ") + str(self._editorJudgement.getJudgement()))
                         else:
                             status.append(_("Pending layout reviewer decision"))
-                        self._getRevieweStatus(status)
+                        self._getReviewerStatus(status)
                     if self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING:
-                        self._getRevieweStatus(status)
+                        self._getReviewerStatus(status)
         else:
             status.append(_("Materials not submitted yet"))
         return status

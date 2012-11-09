@@ -3397,8 +3397,6 @@ class RHConfModifDisplayRemoveLink( RHConferenceModifBase ):
             link = menu.getLinkById(self._linkId)
             self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
         elif self._confirm:
-            #create the link
-
             menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
             link = menu.getLinkById(self._linkId)
             if isinstance(link, displayMgr.SystemLink):

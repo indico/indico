@@ -317,7 +317,7 @@ class WebLocator:
             return obj
         if self.__categId:
             if not conference.CategoryManager().hasKey(self.__categId):
-                raise errors.NoReportError(_("""The specified category  with id "%s" does not exist or has been deleted""")%self.__categId)
+                raise errors.NoReportError(_("There is no category with id '%s', or it has been deleted") % self.__categId)
             obj = conference.CategoryManager().getById(self.__categId)
             if self.__materialId:
                 obj=obj.getMaterialById(self.__materialId)

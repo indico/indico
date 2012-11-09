@@ -528,7 +528,7 @@ var contributionTemplate = function(contribution) {
         span.set($T("Assessed") + ": " + judgement);
         cell8.set(span);
 
-    } else if(!contribution.reviewManager.lastReview.isAuthorSubmitted){
+    } else if (!contribution.reviewManager.lastReview.isAuthorSubmitted) {
         var span = Html.span();
         if (contribution.reviewManager.versioningLen > 1){
             span.dom.style.color = 'orange';
