@@ -115,10 +115,7 @@ else:
             <table>
                 <tbody>
                         <td>
-                          <form action="${ newContribURL }" method="POST" style="padding:0px;margin:0px; display:inline">
-                            <input type="hidden" name="contributionCreatedFrom" value="contributionList"/>
-                            <input type="button" onclick="addContribution()" class="btn" name="" value="${ _("Add new")}">
-                          </form>
+                           <input type="button" onclick="addContribution()" class="btn" name="" value="${ _("Add new")}">
                         </td>
                         <form action=${ contribSelectionAction } method="post" name="contribsForm" id="contribsForm">
                         <td>

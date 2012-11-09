@@ -381,51 +381,6 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHSessionModCoordinationBase):
         RHSubmitMaterialBase._checkParams(self, params)
 
 
-class RHReducedSessionScheduleAction(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHReducedSessionScheduleAction
-
-    def _checkParams(self,params):
-        RHSessionModCoordinationBase._checkParams(self,params)
-        if "confId" not in params :
-            raise MaKaCError( _("confId parameter value not set - cannot procede"))
-        if "sessionId" not in params :
-            raise MaKaCError( _("sessionId parameter value not set - cannot procede"))
-        if "slotId" not in params :
-            raise MaKaCError( _("slotId parameter value not set - cannot procede"))
-
-    def _process( self ):
-        if self._session.isClosed():
-            p = sessions.WPSessionModificationClosed( self, self._session )
-        else:
-            params = self._getRequestParams()
-            url = ""
-            if "newContrib" in params :
-                orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
-                orginURL.addParam("sessionId", self._session.getId())
-                url = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
-                url.addParam("sessionId", self._session.getId())
-                url.addParam("orginURL",orginURL)
-                url.addParam("eventType","meeting")
-                url.addParam("slotId",params["slotId"])
-                self._redirect(url)
-            elif "newBreak" in params :
-                url = urlHandlers.UHSessionAddBreak.getURL(self._session.getOwner())
-                url.addParam("sessionId",params["sessionId"])
-                url.addParam("slotId",params["slotId"])
-                self._redirect(url)
-            elif "reschedule" in params :
-                url = urlHandlers.UHSessionModSlotCalc.getURL(self._session.getOwner())
-                url.addParam("sessionId",params["sessionId"])
-                url.addParam("slotId",params["slotId"])
-                self._redirect(url)
-            else :
-                url = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
-                url.addParam("sessionId", self._session.getId())
-                url.addParam("slotId",params["slotId"])
-                self._redirect(url)
-
-
-
 class RHSessionModifSchedule(RoomBookingDBMixin, RHSessionModCoordinationBase):
     _uh = urlHandlers.UHSessionModifSchedule
 
@@ -450,126 +405,12 @@ class RHSessionModifSchedule(RoomBookingDBMixin, RHSessionModCoordinationBase):
             p = sessions.WPSessionModifSchedule(self,self._session)
             wf = self.getWebFactory()
             if wf != None:
-                p = wf.getSessionModifSchedule(self,self._session)
+               p = wf.getSessionModifSchedule(self,self._session)
 
         params = self._getRequestParams()
         params['view'] = self._view
 
         return p.display(**params)
-
-
-class RHScheduleAddContrib(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHSessionModScheduleAddContrib
-
-    def _checkParams(self,params):
-        RHSessionModCoordinationBase._checkParams(self,params)
-        self._slot=None
-        if params.has_key("slotId"):
-            self._slot=self._target.getSlotById(params["slotId"])
-        else:
-            raise MaKaCError( _("Slot ID is not specified"), _("Contribution Addition"))
-        self._action=""
-        if params.has_key("OK"):
-            self._action="ADD"
-            self._selContribIdList=params.get("selContribs","").split(",")
-            self._selContribIdList+=self._normaliseListParam(params.get("manSelContribs",[]))
-        elif params.has_key("CANCEL"):
-            self._action="CANCEL"
-
-    def _process( self ):
-        if self._action=="ADD":
-            for contribId in self._selContribIdList:
-                if contribId.strip()=="":
-                    continue
-                contrib=self._target.getConference().getContributionById(contribId)
-                if contrib is None:
-                    continue
-                if self._slot.getSession().getScheduleType() == "poster":
-                    contrib.setStartDate(self._slot.getStartDate())
-                schedule=self._slot.getSchedule()
-                schedule.addEntry(contrib.getSchEntry())
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-        elif self._action=="CANCEL":
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-        p=sessions.WPModScheduleAddContrib(self,self._target)
-        return p.display(slot=self._slot)
-
-
-#class RHSessionAddContribution( RHSessionModifBase ):
-#    pass
-
-
-#class RHSessionPerformAddContribution( RHSessionModifBase ):
-#    pass
-
-
-class RHSessionAddBreak( RoomBookingDBMixin, RHSessionModCoordinationBase ):
-    _uh = urlHandlers.UHSessionAddBreak
-
-    def _checkParams( self, params ):
-        self._check = int(params.get("check",1))
-        RHSessionModifBase._checkParams( self, params )
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._action=""
-        if params.has_key("CANCEL"):
-            self._action="CANCEL"
-        elif params.has_key("OK"):
-            self._action="ADD"
-
-        self._evt = None
-
-    def _process( self ):
-        if self._action=="CANCEL":
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-        elif self._action=="ADD":
-            params = self._getRequestParams()
-            if params["locationAction"] == "inherit":
-                params["locationName"] = ""
-            if params["roomAction"] == "inherit":
-                params["roomName"] = ""
-            b=schedule.BreakTimeSchEntry()
-            b.setValues(self._getRequestParams(), tz = self._conf.getTimezone())
-            self._slot.getSchedule().addEntry(b,self._check)
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-        else:
-            p=sessions.WPSessionAddBreak(self,self._slot)
-            wf = self.getWebFactory()
-            if wf != None:
-                p = wf.getSessionAddBreak(self,self._slot)
-            return p.display()
-
-
-
-
-
-class RHSessionDelSchItems(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHSessionDelSchItems
-
-    def _checkParams( self, params ):
-        RHSessionModCoordinationBase._checkParams( self, params )
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._entries=[]
-        for id in self._normaliseListParam(params.get("schEntryId",[])):
-            entry=self._slot.getSchedule().getEntryById(id)
-            if entry is not None:
-                self._entries.append(entry)
-
-    def _process( self ):
-        type = self._conf.getType()
-        for e in self._entries:
-            if type == "meeting":
-                logInfo = e.getOwner().getLogInfo()
-                logInfo["subject"] = "Deleted contribution: %s"%e.getOwner().getTitle()
-                self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
-                if not isinstance(e, schedule.BreakTimeSchEntry):
-                    e.getOwner().delete()
-                self._slot.getSchedule().removeEntry(e)
-            else:
-                logInfo = e.getOwner().getLogInfo()
-                logInfo["subject"] = "Unscheduled contribution: %s"%e.getOwner().getTitle()
-                self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
-                self._slot.getSchedule().removeEntry(e)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
 
 
 class RHSessionModifAC( RHSessionModifBase ):
@@ -674,17 +515,19 @@ class RHSessionDeletion( RHSessionModifBase ):
         else:
             return sessions.WPSessionDeletion( self, self._session ).display()
 
-
-class RHFitSession(RHSessionModCoordinationBase):
+class RHFitSlot(RHSessionModCoordinationBase):
 
     def _checkParams(self, params):
         RHSessionModCoordinationBase._checkParams(self, params)
+        self._slotID = params.get("slotId","")
+        self._slot=self._target.getSlotById(self._slotID)
+        self._sessionID = params.get("sessionId","")
+        self._targetDay=params.get("day","")
 
     def _process(self):
-        if self._target is not None:
-            self._target.fit()
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-
+        if self._slot is not None:
+            self._slot.fit()
+        self._redirect("%s#%s.s%sl%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay, self._sessionID, self._slotID))
 
 class RHSlotCalc(RHSessionModCoordinationBase):
 
@@ -711,7 +554,7 @@ class RHSlotCalc(RHSessionModCoordinationBase):
     def _formatRedirectURL(self, baseURL):
         target = "".join([str(baseURL),
                         "#",
-                        self._currentDay,
+                       self._currentDay,
                         ".s",
                         self._session.getId(),
                         "l",
@@ -733,99 +576,6 @@ class RHSlotCalc(RHSessionModCoordinationBase):
             self._redirect(self._formatRedirectURL(urlHandlers.UHSessionModifSchedule.getURL(self._session)))
         else:
             self._redirect(self._formatRedirectURL(urlHandlers.UHConfModifSchedule.getURL(self._conf)))
-
-
-class RHSlotCompact(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-
-    def _process(self):
-        if self._slot is not None:
-            self._slot.getSchedule().compact()
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-
-
-class RHFitSlot(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slotID = params.get("slotId","")
-        self._slot=self._target.getSlotById(self._slotID)
-        self._sessionID = params.get("sessionId","")
-        self._targetDay=params.get("day","")
-
-    def _process(self):
-        if self._slot is not None:
-            self._slot.fit()
-        self._redirect("%s#%s.s%sl%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay, self._sessionID, self._slotID))
-
-
-class RHSlotMoveUpEntry(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._entry=self._slot.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process(self):
-        if self._slot is not None and self._entry is not None:
-            self._slot.getSchedule().moveUpEntry(self._entry)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-
-
-class RHSlotMoveDownEntry(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._entry=self._slot.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process(self):
-        if self._slot is not None and self._entry is not None:
-            self._slot.getSchedule().moveDownEntry(self._entry)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-
-
-class RHSessionModifyBreak( RoomBookingDBMixin, RHSessionModCoordinationBase ):
-    _uh=urlHandlers.UHSessionModifyBreak
-
-    def _checkParams(self,params):
-        RHSessionModCoordinationBase._checkParams(self,params)
-        if params.get("schEntryId","").strip()=="":
-           raise Exception("schedule entry order number not set")
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._break=self._slot.getSchedule().getEntryById(params.get("schEntryId",""))
-
-        self._evt = None
-
-        params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
-            del params["day"]
-
-    def _process(self):
-        p=sessions.WPSessionModifyBreak(self,self._session,self._break)
-        return p.display(**self._getRequestParams())
-
-
-class RHSessionPerformModifyBreak(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHSessionPerformModifyBreak
-
-    def _checkParams( self, params ):
-        self._check = int(params.get("check",1))
-        self._moveEntries = int(params.get("moveEntries",0))
-        RHSessionModCoordinationBase._checkParams( self, params )
-        if params.get( "schEntryId", "" ).strip() == "":
-            raise Exception( _("schedule entry order number not set"))
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._break=self._slot.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "CANCEL" not in params:
-            self._break.setValues( params, self._check, self._moveEntries, tz=self._conf.getTimezone() )
-        self._redirect( urlHandlers.UHSessionModifSchedule.getURL( self._session ) )
 
 
 class ContribFilterCrit(filters.FilterCriteria):

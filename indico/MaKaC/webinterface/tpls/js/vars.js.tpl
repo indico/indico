@@ -116,8 +116,6 @@ var Indico = {
         ConfTimeTableCustomPDF: "${ urlHandlers.UHConfTimeTableCustomizePDF.getURL() }",
 
         SessionModification: "${ urlHandlers.UHSessionModification.getURL() }",
-        ContributionModification: "${ urlHandlers.UHContributionModification.getURL() }",
-        BreakModification: "${ urlHandlers.UHConfModifyBreak.getURL() }",
         SessionProtection: "${ urlHandlers.UHSessionModifAC.getURL() }",
         ContributionProtection: "${ urlHandlers.UHContribModifAC.getURL() }",
 

@@ -632,21 +632,6 @@ class ContainerIndex:
         return 0
 
 
-class WPSessionModifyBreak( WPSessionModifSchedule ):
-
-    def __init__(self,rh,conf,schBreak):
-        WPSessionModifSchedule.__init__(self,rh,conf)
-        self._break=schBreak
-
-    def _getScheduleContent(self,params):
-        sch=self._conf.getSchedule()
-        wc=wcomponents.WBreakDataModification(sch,self._break,conf=self._conf)
-        pars = { "postURL": urlHandlers.UHSessionPerformModifyBreak.getURL(self._break) }
-        params["body"] = wc.getHTML( pars )
-        return wcomponents.WBreakModifHeader( self._break, self._getAW() ).getHTML( params )
-
-
-
 class WPModSchEditContrib(WPSessionModifSchedule):
 
     def __init__(self,rh,contrib):
@@ -660,71 +645,6 @@ class WPModSchEditContrib(WPSessionModifSchedule):
             wc=wcomponents.WSchEditContrib(self._contrib)
         pars={"postURL":urlHandlers.UHSessionModSchEditContrib.getURL(self._contrib)}
         return wc.getHTML(pars)
-
-
-class WSchModifRecalculate(wcomponents.WTemplated):
-
-    def __init__(self, entry):
-        self._entry = entry
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["entryType"]="slot"
-        vars["title"]=""
-        if self._entry.getTitle().strip() != "":
-            vars["title"]= i18nformat("""
-                            <tr>
-                                <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Title")</span></td>
-                                <td bgcolor="white" width="100%%">&nbsp;%s</td>
-                            </tr>
-                            """)%self._entry.getTitle()
-        return vars
-
-
-class WPModSlotCalc(WPConferenceModifBase):
-
-    def __init__(self,rh, slot):
-        WPConferenceModifBase.__init__(self,rh,slot.getSession().getConference())
-        self._slot=slot
-
-    def _setActiveSideMenuItem(self):
-        self._timetableMenuItem.setActive()
-
-    def _getPageContent( self, params ):
-        wc=WSchModifRecalculate(self._slot)
-        p={"postURL":quoteattr(str(urlHandlers.UHSessionModSlotCalc.getURL(self._slot)))}
-        return wc.getHTML(p)
-
-
-class WPModScheduleAddContrib(WPSessionModifSchedule):
-
-    def _getTabContent( self, params ):
-        target=self._session
-        if params.get("slot",None) is not None:
-            target=params["slot"]
-        l=[]
-        for contrib in self._session.getContributionList():
-            if contrib.isScheduled() or isinstance(contrib.getCurrentStatus(),conference.ContribStatusWithdrawn):
-                continue
-            l.append(contrib)
-        p=wcomponents.WScheduleAddContributions(l)
-        pars={"postURL":urlHandlers.UHSessionModScheduleAddContrib.getURL(target)}
-        return p.getHTML(pars)
-
-
-class WPSessionAddBreak(WPSessionModifSchedule):
-
-    def __init__(self,rh,slot):
-        WPSessionModifSchedule.__init__(self,rh,slot.getSession())
-        self._slot=slot
-
-    def _getTabContent( self, params ):
-        s = self._slot.getSchedule()
-        day = self._slot.getAdjustedStartDate()
-        p=wcomponents.WBreakDataModification(self._slot.getSchedule(),conf=self._slot.getConference(),targetDay=day)
-        pars = {"postURL":urlHandlers.UHSessionAddBreak.getURL(self._slot)}
-        return p.getHTML(pars)
-
 
 
 class WSessionModifAC(wcomponents.WTemplated):

@@ -314,13 +314,6 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
 class WSEConfModifTools (conferences.WConfModifTools):
     pass
 
-class WPSEConfModifBookings (conferences.WPConfModifBookings):
-    pass
-
-class WSEConfModifBookings (conferences.WConfModifBookings):
-    pass
-
-
 #################### Material Modif #####################################
 
 #class WPSEMaterialDataModif (material.WPMaterialDataModification):

@@ -171,10 +171,6 @@ class WebFactory(WebFactory):
 
 ############Session Modificiations###########################################
 
-    def getSessionAddBreak(rh, slot):
-        return WPMSessionAddBreak(rh,slot)
-    getSessionAddBreak = staticmethod(getSessionAddBreak)
-
     def getSessionDataModification(self, session):
         return WPMSessionDataModification (self,session)
     getSessionDataModification = staticmethod(getSessionDataModification)
@@ -681,10 +677,6 @@ class WPMSessionAddMaterial(sessions.WPSessionAddMaterial):
         self._tabContribs.disable()
 
 class WPMSessionDataModification(sessions.WPSessionDataModification):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMSessionAddBreak(sessions.WPSessionAddBreak):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
 

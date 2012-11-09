@@ -1095,18 +1095,8 @@ class UHConfModifSchedule( URLHandler ):
 class UHConfModifScheduleCustomizePDF( URLHandler ):
     _relativeURL = "confModifSchedule.py/customizePdf"
 
-class UHConfModifScheduleRelocate( URLHandler ):
-    _relativeURL = "confModifSchedule.py/relocate"
-
-
 class UHConfDelSchItems( URLHandler ):
     _relativeURL = "confModifSchedule.py/deleteItems"
-
-class UHConfModSchEditContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/editContrib"
-
-class UHConfModSchEditSlot(URLHandler):
-    _relativeURL = "confModifSchedule.py/editSlot"
 
 class UHContribConfSelectionAction( URLHandler ):
     _relativeURL = "confModifContribList.py/contribsActions"
@@ -1128,28 +1118,6 @@ class UHContribsConfManagerDisplayParticipantList( URLHandler ):
 
 #class UHContribsConfManagerDisplayXML( URLHandler ):
 #    _relativeURL = "abstractsManagment.py/abstractsToXML"
-
-class UHConfAddBreak( URLHandler ):
-    _relativeURL = "confModifSchedule.py/addBreak"
-
-
-class UHConfPerformAddBreak( URLHandler ):
-    _relativeURL = "confModifSchedule.py/performAddBreak"
-
-
-class UHConfModifyBreak( URLHandler ):
-    _relativeURL = "confModifSchedule.py/modifyBreak"
-
-class UHSessionModifyBreak( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/modifyBreak"
-
-
-class UHConfPerformModifyBreak( URLHandler ):
-    _relativeURL = "confModifSchedule.py/performModifyBreak"
-
-class UHSessionPerformModifyBreak( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/performModifyBreak"
-
 
 class UHSessionClose( URLHandler ):
     _relativeURL = "sessionModification.py/close"
@@ -1254,15 +1222,8 @@ class UHContributionDataModification( URLHandler ):
 class UHContributionCreation( URLHandler ):
     _relativeURL = "contributionCreation.py"
 
-
-
 class UHSubContributionCreation( URLHandler ):
     _relativeURL = "subContributionCreation.py"
-
-
-class UHBreakCreation( URLHandler ):
-    _relativeURL = "confModifSchedule.py"
-
 
 class UHConfModifAC( URLHandler ):
     _relativeURL = "confModifAC.py"
@@ -2016,7 +1977,6 @@ class UHSessionDatesModification( URLHandler ):
 class UHSessionModSlotConvenerNew( URLHandler ):
     _relativeURL = "sessionModification.py/newSlotConvener"
 
-
 class UHSessionModSlotConvenersRem( URLHandler ):
     _relativeURL = "sessionModification.py/remSlotConveners"
 
@@ -2024,17 +1984,8 @@ class UHSessionModSlotConvenersRem( URLHandler ):
 class UHSessionModSlotConvenerEdit( URLHandler ):
     _relativeURL = "sessionModification.py/editSlotConvener"
 
-
 class UHSessionFitSlot( URLHandler ):
     _relativeURL = "sessionModifSchedule.py/fitSlot"
-
-
-class UHReducedSessionScheduleAction( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/reducedScheduleAction"
-
-
-class UHSessionModifScheduleRelocate( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/relocate"
 
 # <Deprecated>
 class UHSessionAddMaterial( URLHandler ):
@@ -2055,57 +2006,11 @@ class UHSessionModifAddMaterials( URLHandler ):
 class UHSessionImportContrib( URLHandler ):
     _relativeURL = "sessionModification.py/importContrib"
 
-
 class UHSessionModifSchedule( URLHandler ):
     _relativeURL = "sessionModifSchedule.py"
 
-
-class UHSessionModFit( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/fitSession"
-
-
-class UHSessionModSchEditContrib(URLHandler):
-    _relativeURL = "sessionModifSchedule.py/editContrib"
-
 class UHSessionModSlotCalc( URLHandler ):
     _relativeURL = "sessionModifSchedule.py/slotCalc"
-
-class UHSessionModSlotCompact( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotCompact"
-
-
-class UHSessionModSlotMoveUpEntry( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/moveUpEntry"
-
-
-class UHSessionModSlotMoveDownEntry( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/moveDownEntry"
-
-
-class UHSessionModScheduleDataEdit( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/editData"
-
-
-class UHSessionModScheduleAddContrib( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/addContrib"
-
-class UHSessionModScheduleNewContrib( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/newContrib"
-
-class UHSessionAddContribution( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/addContrib"
-
-
-class UHSessionPerformAddContribution( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/performAddContrib"
-
-
-class UHSessionAddBreak( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/addBreak"
-
-class UHSessionDelSchItems( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/delItems"
-
 
 class UHSessionModifAC( URLHandler ):
     _relativeURL = "sessionModifAC.py"
@@ -2370,18 +2275,6 @@ class UHSessionModContribList( URLHandler ):
 
 class UHSessionModContribListEditContrib( URLHandler ):
     _relativeURL = "sessionModification.py/editContrib"
-
-class UHConfModScheduleNewContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/newContrib"
-
-class UHConfModScheduleAddContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/addContrib"
-
-class UHConfModScheduleMoveEntryUp( URLHandler ):
-    _relativeURL = "confModifSchedule.py/moveEntryUp"
-
-class UHConfModScheduleMoveEntryDown( URLHandler ):
-    _relativeURL = "confModifSchedule.py/moveEntryDown"
 
 class UHConfModifReschedule( URLHandler ):
     _relativeURL = "confModifSchedule.py/reschedule"
