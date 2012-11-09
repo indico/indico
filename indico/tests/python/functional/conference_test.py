@@ -53,7 +53,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(xpath="(//button[@type='button'])[3]")
         self.click(xpath="//button[@type='button']")
         self.click(name="contributions")
-        self.click(xpath="(//input[@name=''])[2]")
+        self.click(xpath="(//input[@name='delete'])[2]")
         alert = self.get_alert()
         self.assertEqual("Are you sure you wish to delete the selected contributions?\nNote that you cannot undo this action.", alert.text)
         alert.accept()
@@ -62,13 +62,14 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
     def test_programme(self):
         self.go("/confModifProgram.py?confId=0")
         self.click(css="input.btn")
-        self.type(name="description", text="gfedger")
-        self.click(name="Save")
+        self.click(css="#inPlaceEditDescription > div > div > span > div > a")
+        self.type(css="textarea", text="description text")
+        self.click(xpath="//button[contains(text(), 'Save')]")
         self.click(xpath="//input[@value='add track']")
         self.type(name="title", text="track 1")
-        self.click(css="input.btn")
+        self.click(xpath="//input[@value='ok']")
         self.click(name="selTracks")
-        self.click(css="td > input.btn")
+        self.click(xpath="//input[@value='remove selected']")
 
     def test_call_for_abstracts(self):
         self.go("/confModifCFA.py?confId=0")
