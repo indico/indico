@@ -31,7 +31,7 @@ from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
 from MaKaC.webinterface.user import UserModificationBase, UserListModificationBase
 from MaKaC.services.implementation.base import ListModificationBase
 from MaKaC import user
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.i18n import _
 from MaKaC.errors import MaKaCError
 import datetime
@@ -858,6 +858,14 @@ class ContributionReviewingSetSubmitted(ContributionReviewingBase):
             judgementObject.sendNotificationEmail(withdrawn = not judgementObject.isSubmitted())
         return self.getJudgementObject().isSubmitted()
 
+class ContributionReviewingSubmitPaper(ContributionReviewingBase):
+
+    def _getAnswer( self ):
+        if len(self._target.getReviewing().getResourceList()) == 0:
+            raise NoReportError(_("You cannot submit for reviewing because you did not attach any paper."))
+        self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
+        return True
+
 class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
 
     def _getAnswer( self ):
@@ -1089,6 +1097,7 @@ methodMap = {
     "contribution.changeCriteria": ContributionReviewingCriteriaModification,
     "contribution.getCriteria": ContributionReviewingCriteriaDisplay,
     "contribution.setSubmitted": ContributionReviewingSetSubmitted,
+    "contribution.submitPaper": ContributionReviewingSubmitPaper,
 
     "paperReviewing.getContentQuestions": PaperReviewingGetContentQuestions,
     "paperReviewing.addContentQuestion": PaperReviewingAddContentQuestion,

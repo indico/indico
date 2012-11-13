@@ -167,7 +167,7 @@
                     if (exists(error)) {
                         IndicoUtil.errorReport(error);
                     } else {
-                        var popupMaterial = new UploadedPaperPopup($T("Submitted paper"), result.reviewing.resources);
+                        var popupMaterial = new UploadedPaperPopup($T("Submitted paper"), result.reviewing?result.reviewing.resources:{});
                         popupMaterial.open();
                     }
         });
