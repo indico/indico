@@ -26,6 +26,7 @@ from MaKaC import conference
 
 UID_RE = re.compile(r'^(?P<event>\w+)(?:\.s(?P<session>\w+))?(?:\.(?P<contrib>\w+))?(?:\.(?P<subcont>\w+))?$')
 
+
 def uniqueId(obj):
     ret = obj.getId()
 
@@ -39,6 +40,11 @@ def uniqueId(obj):
     elif isinstance(obj, conference.SessionSlot):
         ret = "%s.s%s.%s" % (obj.getConference().getId(),
                              obj.getSession().getId(), ret)
+    elif isinstance(obj, conference.Material):
+        ret = "%sm%s" % (uniqueId(obj.getOwner()), ret)
+    elif isinstance(obj, conference.Resource):
+        ret = "%s.%s" % (uniqueId(obj.getOwner()), ret)
+
     return ret
 
 

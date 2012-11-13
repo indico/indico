@@ -50,6 +50,8 @@ from MaKaC.plugins.base import Observable
 from MaKaC.user import Avatar, CERNGroup
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
+from indico.util.event import uniqueId
+
 
 # TODO This really needs to be fixed... no i18n and strange implementation using month names as keys
 def stringToDate( str ):
@@ -80,7 +82,7 @@ class outputGenerator(Observable):
     (getFormattedOutput method)
     """
 
-    def __init__(self, aw, XG = None, dataInt=None):
+    def __init__(self, aw, XG = None):
         self.__aw = aw
         if XG != None:
             self._XMLGen = XG
@@ -88,14 +90,9 @@ class outputGenerator(Observable):
             self._XMLGen = XMLGen()
         self._config = Config.getInstance()
         self.text = ""
-        self.dataInt = dataInt
         self.time_XML = 0
         self.time_HTML = 0
-
-        if dataInt:
-            self.cache = ProtectedXMLCache(dataInt)
-        else:
-            self.cache = XMLCache()
+        self.cache = XMLCache()
 
         from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
         self.webFactory = WebFactoryRegistry()
@@ -243,7 +240,7 @@ class outputGenerator(Observable):
         allowed_logins = []
         allowed_groups = []
 
-        objId = self.dataInt.objToId(obj) if specifyId else None
+        objId = uniqueId(obj) if specifyId else None
 
         for user_obj in allowed_users:
             if isinstance(user_obj, Avatar):
@@ -1287,7 +1284,7 @@ class outputGenerator(Observable):
         out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","9"]])
         out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(ed.year, string.zfill(ed.month,2), string.zfill(ed.day,2), string.zfill(ed.hour,2), string.zfill(ed.minute,2)),[["code","z"]])
 
-        out.writeTag("subfield", self.dataInt.objToId(conf),[["code","g"]])
+        out.writeTag("subfield", uniqueId(conf),[["code","g"]])
         out.closeTag("datafield")
 
         for path in conf.getCategoriesPath():
@@ -1361,7 +1358,7 @@ class outputGenerator(Observable):
         #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         matList = conf.getAllMaterialList()
         for mat in matList:
-            if self.dataInt.isPrivateDataInt() or mat.canView(self.__aw):
+            if mat.canView(self.__aw):
                 if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
         #out.closeTag("datafield")
@@ -1396,125 +1393,13 @@ class outputGenerator(Observable):
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","INDICO." + self.dataInt.objToId(conf),[["code","a"]])
+        out.writeTag("subfield","INDICO." + uniqueId(conf),[["code","a"]])
         out.closeTag("datafield")
 
         self._generateLinkField(urlHandlers.UHConferenceDisplay, conf,
                                 "Event details", out)
 
         self._generateAccessList(conf, out, specifyId=False)
-
-    ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, overrideCache=False):
-    ##     if not out:
-    ##         out = self._XMLGen
-    ##     #try to get a cache
-    ##     version = "MARC21_mat-%s"%(includeMaterial)
-    ##     xml = ""
-    ##     if not xml:
-    ##         # No cache, build the XML
-    ##         temp = XMLGen(init=False)
-    ##         self._sessionToXMLMarc21(session,includeMaterial, out=temp)
-    ##         xml = temp.getXml()
-    ##     out.writeXML(xml)
-
-
-    ## def _sessionToXMLMarc21(self,session,includeMaterial=1, out=None):
-    ##     if not out:
-    ##         out = self._XMLGen
-
-    ##     out.writeTag("leader", "00000nmm  2200000uu 4500")
-    ##     out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("subfield","INDICO%s"%(self.dataInt.objToId(session, separator="."), session.getId()),[["code","a"]])
-    ##     out.closeTag("datafield")
-
-    ##     out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("subfield",self.dataInt.objToId(session, separator="."),[["code","a"]])
-    ##     out.writeTag("subfield","Indico",[["code","9"]])
-    ##     out.closeTag("datafield")
-
-    ##     out.openTag("datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("subfield",session.getTitle(),[["code","a"]])
-    ##     out.closeTag("datafield")
-
-    ##     out.openTag("datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("subfield",session.getDuration(),[["code","a"]])
-    ##     out.closeTag("datafield")
-
-    ##     out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("subfield", self.dataInt.objToId(session.getConference()),[["code","g"]])
-    ##     out.closeTag("datafield")
-
-    ##     for path in session.getConference().getCategoriesPath():
-    ##         out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
-    ##         out.writeTag("subfield", ":".join(path), [["code","a"]])
-    ##         out.closeTag("datafield")
-
-    ##     l=session.getLocation()
-    ##     if (l and l.getName() != "") or session.getStartDate() is not None:
-    ##         out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
-    ##         if l:
-    ##             if l.getName() != "":
-    ##                 out.writeTag("subfield",l.getName(),[["code","r"]])
-    ##         if session.getStartDate() is not None:
-    ##             out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(session.getStartDate().year, string.zfill(session.getStartDate().month,2), string.zfill(session.getStartDate().day,2), string.zfill(session.getStartDate().hour,2), string.zfill(session.getStartDate().minute,2)),[["code","d"]])
-    ##             out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(session.getEndDate().year, string.zfill(session.getEndDate().month,2), string.zfill(session.getEndDate().day,2), string.zfill(session.getEndDate().hour,2), string.zfill(session.getEndDate().minute,2)),[["code","h"]])
-    ##         out.closeTag("datafield")
-    ## #
-    ##     out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("subfield",session.getDescription(),[["code","a"]])
-    ##     out.closeTag("datafield")
-
-    ##     out.openTag("datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
-    ##     out.writeTag("subfield",session.getConference().getTitle(),[["code","a"]])
-    ##     out.closeTag("datafield")
-    ##     out.openTag("datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
-    ##     out.writeTag("subfield","SzGeCERN",[["code","2"]])
-    ##     out.closeTag("datafield")
-
-
-    ##     # tag 100/700 Convener name
-    ##     cList = session.getConvenerList()
-
-    ##     for user in cList:
-    ##         if user == cList[0]:
-    ##             code = "100"
-    ##         else:
-    ##             code = "700"
-    ##         out.openTag("datafield",[["tag",code],["ind1"," "],["ind2"," "]])
-    ##         fullName = user.getFamilyName() + " " + user.getFirstName()
-    ##         out.writeTag("subfield",fullName,[["code","a"]])
-    ##         out.writeTag("subfield","Convener",[["code","e"]])
-    ##         out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
-    ##         out.closeTag("datafield")
-
-    ##     matList = session.getAllMaterialList()
-    ##     for mat in matList:
-    ##         if mat.canView(self.__aw):
-    ##             if includeMaterial:
-    ##                 self.materialToXMLMarc21(mat, out=out)
-
-    ##     out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("subfield","INDICO.%s"%self.dataInt.objToId(session.getConference()),[["code","b"]])
-    ##     out.closeTag("datafield")
-
-    ##     out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-    ##     confses = "INDICO." + self.dataInt.objToId(session.getConference(), separator=".")
-    ##     out.writeTag("subfield",confses,[["code","a"]])
-    ##     out.closeTag("datafield")
-
-    ##     out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
-    ##     confcont = "INDICO." + self.dataInt.objToId(session.getConference())
-    ##     out.writeTag("subfield",confcont,[["code","a"]])
-    ##     out.closeTag("datafield")
-
-    ##     out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-    ##     url = str(urlHandlers.UHSessionDisplay.getURL(session))
-    ##     out.writeTag("subfield",url,[["code","u"]])
-    ##     out.writeTag("subfield", "Session details", [["code","y"]])
-    ##     out.closeTag("datafield")
-
-
-    #fb
 
     def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, overrideCache=False):
         if not out:
@@ -1543,11 +1428,11 @@ class outputGenerator(Observable):
         #out.writeTag("controlfield","SzGeCERN",[["tag","003"]])
         out.writeTag("leader", "00000nmm  2200000uu 4500")
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","INDICO.%s"%self.dataInt.objToId(cont, separator="."),[["code","a"]])
+        out.writeTag("subfield","INDICO.%s" % uniqueId(cont), [["code","a"]])
         out.closeTag("datafield")
     #
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield",self.dataInt.objToId(cont, separator="t"),[["code","a"]])
+        out.writeTag("subfield", uniqueId(cont), [["code","a"]])
         out.writeTag("subfield","Indico",[["code","9"]])
         out.closeTag("datafield")
 
@@ -1560,7 +1445,7 @@ class outputGenerator(Observable):
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", self.dataInt.objToId(cont.getConference()),[["code","g"]])
+        out.writeTag("subfield", uniqueId(cont.getConference()),[["code","g"]])
         out.closeTag("datafield")
 
         for path in cont.getConference().getCategoriesPath():
@@ -1652,31 +1537,18 @@ class outputGenerator(Observable):
             out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
             out.closeTag("datafield")
 
-
-
-
-
         matList = cont.getAllMaterialList()
         for mat in matList:
-            #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-            if self.dataInt.isPrivateDataInt() or mat.canView(self.__aw):
+            if mat.canView(self.__aw):
                 if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
-            #   else:
-            #       out.writeTag("material",out.writeTag("id",mat.id))
-        # no subContibution
-        #for subC in cont.getSubContributionList():
-        #    self.subContributionToXML(subC,includeMaterial)
-            #out.closeTag("datafield")
-
-
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","INDICO.%s"%self.dataInt.objToId(cont.getConference()),[["code","b"]])
+        out.writeTag("subfield","INDICO.%s"%uniqueId(cont.getConference()),[["code","b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        confcont = "INDICO." + self.dataInt.objToId(cont, separator=".")
+        confcont = "INDICO." + uniqueId(cont)
         out.writeTag("subfield",confcont,[["code","a"]])
         out.closeTag("datafield")
 
@@ -1721,11 +1593,11 @@ class outputGenerator(Observable):
         #out.writeTag("controlfield","SzGeCERN",[["tag","003"]])
         out.writeTag("leader", "00000nmm  2200000uu 4500")
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","INDICO.%s"%(self.dataInt.objToId(subCont, separator=".")),[["code","a"]])
+        out.writeTag("subfield","INDICO.%s" % (uniqueId(subCont)), [["code","a"]])
         out.closeTag("datafield")
     #
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield",self.dataInt.objToId(subCont, separator=["t","sc"]),[["code","a"]])
+        out.writeTag("subfield",uniqueId(subCont), [["code","a"]])
         out.writeTag("subfield","Indico",[["code","9"]])
         out.closeTag("datafield")
 
@@ -1738,7 +1610,7 @@ class outputGenerator(Observable):
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", self.dataInt.objToId(subCont.getConference(), separator="."),[["code","g"]])
+        out.writeTag("subfield", uniqueId(subCont.getConference()), [["code","g"]])
         out.closeTag("datafield")
 
         if subCont.getReportNumberHolder().listReportNumbers():
@@ -1835,7 +1707,7 @@ class outputGenerator(Observable):
         matList = subCont.getAllMaterialList()
         for mat in matList:
             #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-            if self.dataInt.isPrivateDataInt() or mat.canView(self.__aw):
+            if mat.canView(self.__aw):
                 if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
             #    else:
@@ -1845,11 +1717,11 @@ class outputGenerator(Observable):
 
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","INDICO.%s"%self.dataInt.objToId(subCont.getConference()),[["code","b"]])
+        out.writeTag("subfield","INDICO.%s"%uniqueId(subCont.getConference()),[["code","b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        confcont = "INDICO." + self.dataInt.objToId(subCont, separator=".")
+        confcont = "INDICO." + uniqueId(subCont)
         out.writeTag("subfield",confcont,[["code","a"]])
         out.closeTag("datafield")
 
@@ -1882,7 +1754,7 @@ class outputGenerator(Observable):
             out = self._XMLGen
 
         for res in rList:
-            if self.dataInt.isPrivateDataInt() or res.canAccess(self.__aw):
+            if res.canAccess(self.__aw):
                 self.resourceToXMLMarc21(res, out=out)
                 self._generateAccessList(res, out)
 
@@ -1905,7 +1777,7 @@ class outputGenerator(Observable):
         #out.writeTag("url",res.getURL())
         out.writeTag("subfield",res.getURL(),[["code","u"]])
         out.writeTag("subfield", "INDICO.%s" % \
-                     self.dataInt.objToId(res), [["code", "3"]])
+                     uniqueId(res), [["code", "3"]])
         out.writeTag("subfield", "resource", [["code","x"]])
         out.writeTag("subfield", "external", [["code","z"]])
         out.writeTag("subfield", res.getOwner().getTitle(), [["code","y"]])
@@ -1930,7 +1802,7 @@ class outputGenerator(Observable):
         url = str(urlHandlers.UHFileAccess.getURL( res ))
         out.writeTag("subfield",url,[["code","u"]])
         out.writeTag("subfield", "INDICO.%s" % \
-                     self.dataInt.objToId(res), [["code", "3"]])
+                     uniqueId(res), [["code", "3"]])
         out.writeTag("subfield", res.getFileName(), [["code","y"]])
         out.writeTag("subfield", "stored", [["code","z"]])
         out.writeTag("subfield", "resource", [["code","x"]])
@@ -1964,8 +1836,6 @@ class XMLCache(MultiLevelCache):
 
 
     def isDirty(self, mtime, object):
-
-        # get event OAI date
         modDate = resolveHierarchicalId(object.getId())._modificationDS
         fileModDate = timezone("UTC").localize(
             datetime.utcfromtimestamp(mtime))
@@ -1982,30 +1852,3 @@ class XMLCache(MultiLevelCache):
 
         tree = entry.getId().split('.')
         return [tree[0][0], tree[0][0:2]] + tree
-
-
-class ProtectedXMLCache(XMLCache):
-    """
-    XMLCache that is content protection-aware
-    It uses a DataInt, in order to map object to their
-    corresponding ids (rXXX, pXXX)
-    """
-
-
-    def __init__(self, dataInt):
-        XMLCache.__init__(self)
-        self.dataInt = dataInt
-
-    def _getRecordId(self, obj):
-        return self.dataInt.objToId(obj, separator='.')
-
-    def generatePath(self, obj):
-        """
-        Generate the actual hierarchical location
-        """
-
-        # by default, use the dots and first char
-        # pa205.0 -> /cachedir/p/a/a205/0
-
-        tree = self._getRecordId(obj).split('.')
-        return [tree[0][0]]+[tree[0][1]]+[tree[0][1:]]+tree[1:]

@@ -19,13 +19,11 @@
 
 # plugin imports
 from indico.ext.livesync.agent import PushSyncAgent
+from indico.ext.livesync.metadata import MARCXMLGenerator
 
 # legacy indico
 from MaKaC import conference
 from MaKaC.accessControl import AccessWrapper
-
-# legacy OAI/XML libs - this should be replaced soon
-from MaKaC.export.oai2 import DataInt
 from MaKaC.common.xmlGen import XMLGen
 
 # some useful constants
@@ -168,9 +166,9 @@ class BistateBatchUploaderAgent(PushSyncAgent):
         Retrieves the MARCXML metadata for the record
         """
         xg = XMLGen()
-        di = DataInt(xg)
+        mg = MARCXMLGenerator(xg)
         # set the permissions
-        di.setPermissionsOf(self._access)
+        mg.setPermissionsOf(self._access)
 
         xg.initXml()
         xg.openTag("collection", [["xmlns", "http://www.loc.gov/MARC21/slim"]])
@@ -179,14 +177,14 @@ class BistateBatchUploaderAgent(PushSyncAgent):
             deleted = operation & STATUS_DELETED
             try:
                 if deleted:
-                    di.toMarc(recId, overrideCache=True, deleted=True)
+                    mg.generate(recId, overrideCache=True, deleted=True)
                 else:
                     if record.getOwner():
                         # caching is disabled because ACL changes do not trigger
                         # notifyModification, and consequently can be classified as a hit
                         # even if they were changed
                         # TODO: change overrideCache to False when this problem is solved
-                        di.toMarc(record, overrideCache=True, deleted=False)
+                        mg.generate(record, overrideCache=True, deleted=False)
                     else:
                         logger.warning('%s (%s) is marked as non-deleted and has no owner' % \
                                        (record, recId))
@@ -195,7 +193,7 @@ class BistateBatchUploaderAgent(PushSyncAgent):
                     logger.exception("Something went wrong while processing '%s' (recId=%s) (owner=%s)! Possible metadata errors." %
                                      (record, recId, record.getOwner()))
                     # avoid duplicate record
-                self._removeUnfinishedRecord(di._XMLGen)
+                self._removeUnfinishedRecord(mg._XMLGen)
 
         xg.closeTag("collection")
 
