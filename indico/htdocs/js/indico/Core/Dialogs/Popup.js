@@ -741,6 +741,7 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
                 self.args,
                 function(response,error) {
                     if (exists(error)) {
+                        self.postDraw();
                         killProgress();
                         IndicoUtil.errorReport(error);
                     } else {
