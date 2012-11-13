@@ -860,6 +860,10 @@ class ContributionReviewingSetSubmitted(ContributionReviewingBase):
 
 class ContributionReviewingSubmitPaper(ContributionReviewingBase):
 
+    def _checkProtection(self):
+        if not self._target.canUserSubmit(self.getAW().getUser()):
+            ContributionReviewingBase._checkProtection(self)
+
     def _getAnswer( self ):
         if len(self._target.getReviewing().getResourceList()) == 0:
             raise NoReportError(_("You need to attach a paper before submitting a revision."))
