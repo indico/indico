@@ -6,7 +6,7 @@
 <% dueDateFormat = "%a %d %b %Y" %>
 <% color = '' %>
 % if not ConfReview.hasReviewing():
-<p style="padding-left: 25px; color:gray;">${ _("Type of reviewing has not been chosen yet. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></p>
+<p style="padding-left: 25px; color:gray;">${ _("Type of reviewing has not yet been chosen. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></p>
 % else:
 % if len(Conference.getContributionListSortedById()) == 0:
 <p style="padding-left: 25px;"><font color="gray">${ _("There are no papers to assign.")}</font></p>
@@ -234,7 +234,7 @@
             <td id="noFilteredContribution" colspan="8" style="padding:15px 0px 15px 15px; display:none;">
                 <span>${ _("There are no papers with the selected filters criteria.")}</span>
                 % if IsOnlyReferee:
-                    <span>${ _("It is also possible you do not have any assigned paper for the review yet.")}</span>
+                    <span>${ _("It is also possible that you do not yet have any assigned paper for the review.")}</span>
                 % endif
             </td>
         </tr>
@@ -535,7 +535,7 @@ var contributionTemplate = function(contribution) {
             span.set($T("Author has yet to re-submit paper"));
         }
         else {
-            span.set($T("Paper not submitted yet"));
+            span.set($T("Paper not yet submitted"));
         }
         cell8.set(span);
     } else {

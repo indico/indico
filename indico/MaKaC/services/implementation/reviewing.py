@@ -862,7 +862,7 @@ class ContributionReviewingSubmitPaper(ContributionReviewingBase):
 
     def _getAnswer( self ):
         if len(self._target.getReviewing().getResourceList()) == 0:
-            raise NoReportError(_("You cannot submit for reviewing because you did not attach any paper."))
+            raise NoReportError(_("You need to attach a paper before submitting a revision."))
         self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
         return True
 

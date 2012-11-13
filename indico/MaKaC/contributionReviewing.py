@@ -495,9 +495,10 @@ class RefereeJudgement(Judgement):
 
         # 2 --> to be corrected, > 3 has the same behaviour as 'to be corrected'
         if int(self._judgement.getId()) == 2 or int(self._judgement.getId()) > 3:
-            self.getReviewManager().newReview()
+            rm = self.getReviewManager()
+            rm.newReview()
             # remove reviewing materials from the contribution
-            self.getReviewManager().getContribution().removeMaterial(matReviewing)
+            rm.getContribution().removeMaterial(matReviewing)
 
 
     def getAnswers(self):
@@ -530,9 +531,10 @@ class EditorJudgement(Judgement):
         if self.getReviewManager().getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING and (self._judgement.getId() == "2" or int(self._judgement.getId()) > 3):
             matReviewing = self.getReviewManager().getContribution().getReviewing()
             self.getReview().copyMaterials(matReviewing)
-            self.getReviewManager().newReview()
+            rm = self.getReviewManager()
+            rm.newReview()
             # remove reviewing materials from the contribution
-            self.getReviewManager().getContribution().removeMaterial(matReviewing)
+            rm.getContribution().removeMaterial(matReviewing)
 
     def purgeAnswers(self):
         """ Remove the answers of the questions that were sent but we don't need anymory because
@@ -683,7 +685,7 @@ class Review(Persistent, Fossilizable):
                     if self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING:
                         self._getReviewerStatus(status)
         else:
-            status.append(_("Materials not submitted yet"))
+            status.append(_("Materials not yet submitted"))
         return status
 
     def isAuthorSubmitted(self):

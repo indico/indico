@@ -58,7 +58,7 @@
                     % if len(c.getReviewManager().getVersioning()) > 1:
                         <span style="color:orange;">${ _("Author has yet to re-submit paper") }</span>
                     % else:
-                        <span>${ _("Paper not submitted yet")}</span>
+                        <span>${ _("Paper not yet submitted")}</span>
                     % endif
                 % else:
                     % if len(c.getReviewManager().getVersioning()) > 1:
@@ -68,7 +68,7 @@
                     % endif
                     <% referee_did = c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() %>
                     <span ${ "style='font-weight: bold;'" if not referee_did else "" }>
-                    ${ _("Advice not given yet")}
+                    ${ _("Advice not yet given")}
                     </span>
                     % if referee_did:
                     <span style="color:#3F4C6B;">${ _("but Referee already assessed contribution")}</span>
@@ -90,5 +90,5 @@
 </table>
 % endif
 % if not ConfReview.getReviewedContributions(User):
-<p style="padding-left: 25px;"><font color="gray">${ _("There are no contributions assigned to you to assess yet.")}</font></p>
+<p style="padding-left: 25px;"><font color="gray">${ _("No contributions have so far been assigned to you for judgement.")}</font></p>
 % endif

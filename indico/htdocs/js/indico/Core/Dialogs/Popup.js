@@ -737,8 +737,7 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
         var self = this;
         var killProgress = IndicoUI.Dialogs.Util.progress($T('Submitting paper for reviewing...'));
 
-        jsonRpc(Indico.Urls.JsonRpcService,
-                'reviewing.contribution.submitPaper',
+        indicoRequest('reviewing.contribution.submitPaper',
                 self.args,
                 function(response,error) {
                     if (exists(error)) {

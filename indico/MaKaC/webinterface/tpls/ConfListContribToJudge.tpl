@@ -41,7 +41,7 @@
                 % if len(c.getReviewManager().getVersioning()) > 1:
                     <span style="color:orange;">${ _("Author has yet to re-submit paper") }</span>
                 % else:
-                    <span>${ _("Paper not submitted yet")}</span>
+                    <span>${ _("Paper not yet submitted")}</span>
                 % endif
             % else:
                 % if len(c.getReviewManager().getVersioning()) > 1:
@@ -75,5 +75,5 @@
 <br>
 % endif
 % if not ConfReview.getJudgedContributions(User):
-<p style="padding-left: 25px;"><font color="gray">${ _("There are no contributions assigned to you to judge yet.")}</font></p>
+<p style="padding-left: 25px;"><font color="gray">${ _("No contributions have so far been assigned to you for judgement.")}</font></p>
 % endif
