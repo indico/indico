@@ -217,6 +217,7 @@ type("DisplayTimeTable", ["TimeTable"], {
     print: function() {
         var self = this;
 
+        self.timetableDrawer.setPrintableVersion(true);
         var bodyPadding = $E(document.body).dom.style.padding;
         var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
         var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
@@ -241,7 +242,6 @@ type("DisplayTimeTable", ["TimeTable"], {
         printLink.observeClick(function(e) {
             window.print();
         });
-
         var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
         $E(document.body).set(header, timetableDiv);
 
@@ -255,51 +255,55 @@ type("DisplayTimeTable", ["TimeTable"], {
     fullScreen: function() {
         var self = this;
 
-        //self.timetableDrawer.setPrintableVersion(true);
-
-        var bodyPadding = $E(document.body).dom.style.padding;
-        var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
         IndicoUI.Dialogs.Util.progress($T("Switching to full screen mode..."));
-
-        var goBackLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Go back'));
-
-        var links = Html.span({style: {cssFloat: 'right'}}, goBackLink);
-
-        self.previousWidth = self.timetableDrawer.width;
-
-        goBackLink.observeClick(function(e) {
-            IndicoUI.Dialogs.Util.progress($T("Switching to normal mode..."));
-            // This timeout is needed in order to give time to the progress indicator to be rendered
-            setTimeout(function(){
-                self.timetableDrawer.width = self.previousWidth;
-                self.timetableDrawer.setPrintableVersion(false);
-                $E(document.body).setStyle('padding', bodyPadding);
-                $E(document.body).set(elements);
-                self.timetableDrawer.redraw(self.currentDay);
-            }, 50);
-        });
-
-     // This timeout is needed in order to give time to the progress indicator to be rendered
+        // This timeout is needed in order to give time to the progress indicator to be rendered
         setTimeout(function(){
             self.timetableDrawer.width = $E(document.body).dom.clientWidth - 50; // 50 is a width offset.
 
-            var headerStyle = {padding: '0px 5px 5px 5px',
+            var headerStyle = {padding: '5px 5px 5px 5px',
                     borderBottom: '1px solid black',
                     textAlign: 'center',
                     width: pixels(self.timetableDrawer.width)};
-            var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
-                Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+            var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
 
             self.timetableDrawer.redraw(self.currentDay);
-            var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
-            var timetableDiv = Html.div({style: {width:pixels(self.timetableDrawer.width), paddingTop: pixels(20), position: 'relative'}}, timetableElements);
-            $E(document.body).set(header, timetableDiv);
+            var timetableCanvas = $('#timetable_canvas');
+            $('#timetable_canvas').width('width', self.timetableDrawer.width);
+            $E(document.body).set(header);
             $E(document.body).setStyle('padding', pixels(30));
+            $(".timetableHeader").before(self._getExtraButtons());
+            $(".timetableHeader").before(self.legend);
+            $(".timetableHeader").after(timetableCanvas);
 
-            $(".timetableHeader").after(self._getLegend());
-            self._toggleLegend(true);
-            $("#legendMainToggle").remove();
+            self._filterSetup();
+            if (self.timetableDrawer.detail.get() == 'contribution') {
+                var newDetailLevel = self.timetableDrawer.detail.get() == 'contribution' ? 'session' : 'contribution';
+                self.timetableDrawer.detail.set(newDetailLevel);
+                self.toggleDetailedView();
+            }
         }, 50);
+    },
+
+    _getExtraButtons: function() {
+        var self = this;
+        var container = $('<div class="tabExtraButtons"/>');
+        var goBackButton = {'btn': Html.div('buttonWhite', $T('Exit Full Screen')),
+            'onclick': function(btnContainer) {
+                location.reload();
+            }
+        };
+        var buttons = self._functionButtons();
+        buttons[2] = goBackButton;
+        $.each(buttons, function(i, btnData) {
+            var btn = $('<div class="buttonContainer"/>').append(btnData.btn.dom || btnData.btn).click(function() {
+                btnData.onclick(btn);
+            });
+            container.append(btn);
+        });
+        container.children(':first').addClass('buttonContainerLeft');
+        container.children(':last').addClass('buttonContainerRight');
+        goBackButton.btn.getParent().dom.style.background ="#9F883B";
+        return container;
     },
 
     _filterSetup: function() {
@@ -313,7 +317,7 @@ type("DisplayTimeTable", ["TimeTable"], {
     },
 
     toggleDetailedView: function() {
-        var self = this
+        var self = this;
         var detailLevel = this.timetableDrawer.detail.get();
         var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
         this.timetableDrawer.detail.set(newDetailLevel);
@@ -358,15 +362,15 @@ type("DisplayTimeTable", ["TimeTable"], {
         };
 
         this.pdfButton = {'btn': Html.div('buttonWhite', $T('PDF')),
-                'onclick': function(btnContainer) {
-                    self.pdf();
-                }
+            'onclick': function(btnContainer) {
+                self.pdf();
+            }
         };
 
         this.fullScreenButton = {'btn': Html.div('buttonWhite', $T('Full screen')),
-                'onclick': function(btnContainer) {
-                    self.fullScreen();
-                }
+            'onclick': function(btnContainer) {
+                self.fullScreen();
+            }
         };
 
         // TODO: Needs to be implemented

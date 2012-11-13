@@ -4223,7 +4223,9 @@ div.timetableHeader {
     padding: 20px 5px 10px 5px;
     margin-top: 20px;
     border-bottom: 2px solid #777777;
-    font-size: 20px; color: rgb(68, 68, 68);
+    font-size: 20px;
+    color: rgb(68, 68, 68);
+    background: white;
     behavior: url(css/border-radius.htc);
 }
 
