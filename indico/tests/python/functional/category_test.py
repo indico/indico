@@ -50,6 +50,7 @@ class CategoryTests(LoggedInSeleniumTestCase):
         self.click(xpath="//input[@value='Search']")
         self.click(id="_GID1_existingAv0")
         self.click(css="button.ui-button")
+        time.sleep(1)
         self.click(name="changeToPublic")
         self.click(name="changeToPrivate")
         self.click(name="changeToInheriting")

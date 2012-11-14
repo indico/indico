@@ -97,7 +97,6 @@ class OptionProxy(object):
         """
         Initializes the options based on command line parameters
         """
-
         for optName, optClass  in self._optionTable.iteritems():
             if optName in kwargs:
                 self._options[optName] = optClass(kwargs[optName])
@@ -109,12 +108,12 @@ class OptionProxy(object):
                 raise TestOptionException("Option '%s' not allowed here!" %
                                           optName)
 
-
     def valueOf(self, optName, default=None):
         """
         Returns the direct value of an option
         """
-        if optName in self._options:
+        if optName in self._options and \
+                self._options[optName].value is not None:
             return self._options[optName].value
         else:
             return default

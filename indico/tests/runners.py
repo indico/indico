@@ -236,6 +236,7 @@ class FunctionalTestRunner(NoseTestRunner):
         """
         test_config = TestConfig.getInstance()
 
+
         mode = self.options.valueOf('mode', test_config.getRunMode())
 
         browser = self.options.valueOf('browser')

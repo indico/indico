@@ -108,7 +108,6 @@ class SeleniumTestCase(IndicoTestCase):
     @classmethod
     def go(cls, rel_url):
         webd.get("%s%s" % (Config.getInstance().getBaseURL(), rel_url))
-        time.sleep(3)
 
     @classmethod
     def failUnless(cls, func, *args):

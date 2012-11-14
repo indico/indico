@@ -28,6 +28,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
 
     def test_general_settings(self):
         super(ConferenceTests, self).test_general_settings()
+        time.sleep(1)
         self.click(css="#inPlaceEditAdditionalInfo > div > div > span > div > a")
         self.type(css="textarea", text="some additional info")
         self.click(css="button")
