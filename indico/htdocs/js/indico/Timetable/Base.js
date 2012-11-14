@@ -260,20 +260,17 @@ type("DisplayTimeTable", ["TimeTable"], {
         setTimeout(function(){
             self.timetableDrawer.width = $E(document.body).dom.clientWidth - 50; // 50 is a width offset.
 
-            var headerStyle = {padding: '5px 5px 5px 5px',
-                    borderBottom: '1px solid black',
-                    textAlign: 'center',
-                    width: pixels(self.timetableDrawer.width)};
-            var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+            var headerStyle = {width: pixels(self.timetableDrawer.width)};
+            var header = Html.div({className: 'timetableFullScreenHeader clearfix', style: headerStyle}, Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
 
             self.timetableDrawer.redraw(self.currentDay);
             var timetableCanvas = $('#timetable_canvas');
             $('#timetable_canvas').width('width', self.timetableDrawer.width);
             $E(document.body).set(header);
             $E(document.body).setStyle('padding', pixels(30));
-            $(".timetableHeader").before(self._getExtraButtons());
-            $(".timetableHeader").before(self.legend);
-            $(".timetableHeader").after(timetableCanvas);
+            $(".timetableFullScreenHeader").before(self._getExtraButtons());
+            $(".timetableFullScreenHeader").before(self.legend);
+            $(".timetableFullScreenHeader").after(timetableCanvas);
 
             self._filterSetup();
             if (self.timetableDrawer.detail.get() == 'contribution') {

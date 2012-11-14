@@ -4229,6 +4229,16 @@ div.timetableHeader {
     behavior: url(css/border-radius.htc);
 }
 
+div.timetableFullScreenHeader {
+    padding: 5px 5px 5px 5px;
+    margin-top: 20px;
+    border-bottom: 1px solid black;
+    font-size: 20px;
+    color: rgb(68, 68, 68);
+    text-align: center;
+    background: white;
+}
+
 ul.keywordList
 {
     margin: 5px;
