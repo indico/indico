@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import sys, getopt, logging, argparse, urlparse, re
+import sys, getopt, logging, argparse, urlparse, re, socket
 
 from wsgiref.simple_server import make_server, WSGIServer, WSGIRequestHandler
 from wsgiref.util import shift_path_info
@@ -26,6 +26,7 @@ from SocketServer import ThreadingMixIn
 
 from indico.web.wsgi.indico_wsgi_handler import application
 from indico.core.index import Catalog
+from indico.util.network import resolve_host
 
 ## indico legacy imports
 import MaKaC
@@ -69,12 +70,16 @@ def add(namespace, element, name=None, doc=None):
 
 
 class ThreadedWSGIServer(ThreadingMixIn, WSGIServer):
-     pass
+    pass
+
+
+class ThreadedWSGIServerIPV6(ThreadedWSGIServer):
+    address_family = socket.AF_INET6
 
 
 class RefServer(object):
 
-    def __init__(self, host='localhost', port=8000):
+    def __init__(self, host='localhost', port=8000, enable_ipv6=False):
         """
         Run an Indico WSGI ref server instance
         Very simple dispatching app
@@ -97,13 +102,19 @@ class RefServer(object):
                 start_response("404 NOT FOUND", [])
                 yield 'Not found'
 
+        # if there is an IPv6 address, use it
+        if enable_ipv6 and (socket.AF_INET6 in resolve_host(host, per_family=True)):
+            server = ThreadedWSGIServerIPV6
+        else:
+            server = ThreadedWSGIServer
+
         self.httpd = make_server(host, port, fake_app,
-                                 server_class=ThreadedWSGIServer,
+                                 server_class=server,
                                  handler_class=WSGIRequestHandler)
-        self.addr = self.httpd.socket.getsockname()
+        self.addr = self.httpd.socket.getsockname()[:2]
 
     def run(self):
-        print "Serving at %s:%s..." % self.addr
+        print "Serving at %s : %s..." % self.addr
         # Serve until process is killed
         self.httpd.serve_forever()
 
@@ -138,6 +149,10 @@ def main():
     parser.add_argument('--web-server', action='store_true',
                         help='run a standalone WSGI web server with Indico')
 
+    parser.add_argument('--with-ipv6', action='store_true',
+                        help='enable ipv6 support for web server')
+
+
     args, remainingArgs = parser.parse_known_args()
 
     if 'logging' in args and args.logging:
@@ -149,7 +164,7 @@ def main():
 
     if 'web_server' in args and args.web_server:
         config = Config.getInstance()
-        refserver = RefServer(config.getHostNameURL(), int(config.getPortURL()))
+        refserver = RefServer(config.getHostNameURL(), int(config.getPortURL()), enable_ipv6=args.with_ipv6)
         refserver.run()
     else:
         dbi = DBMgr.getInstance()

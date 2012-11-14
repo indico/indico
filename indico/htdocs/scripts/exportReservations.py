@@ -33,6 +33,8 @@ from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.utils import parseDate
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
+from indico.util.network import get_remote_ip
+
 """
 TODO: This must be refactor to be done with RH???
 """
@@ -44,28 +46,9 @@ def index(req, **params):
 
     ################### checking protection ###################
 
-    def getHostIP(req):
-        import socket
-
-        host = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-
-        try:
-            hostIP = socket.gethostbyname(host)
-            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.useProxy():
-                # if we're behind a proxy, use X-Forwarded-For
-                xff = req.headers_in.get("X-Forwarded-For",hostIP).split(", ")[-1]
-                return socket.gethostbyname(xff)
-            else:
-                return hostIP
-        except socket.gaierror, e:
-            # in case host resolution fails
-            raise HostnameResolveError("Error resolving host '%s' : %s" % (host, e))
-
-
     # check if it is a machine that belongs to the CERN domain
     cernDomain = DomainHolder().getById(0) # id 0 means CERN
-    if not cernDomain.belongsTo(getHostIP(req)):
+    if not cernDomain.belongsTo(get_remote_ip(req)):
         return "Only CERN users can access to this export resource"
 
     ################### checking params ###################

@@ -21,6 +21,9 @@
 Network-related utility functions
 """
 
+import socket
+from collections import defaultdict
+
 from MaKaC.common.info import HelperMaKaCInfo
 
 
@@ -33,3 +36,16 @@ def _get_remote_ip(req):
         return req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
     else:
         return hostIP
+
+
+def resolve_host(host, per_family=False):
+    result = socket.getaddrinfo(host, None)
+
+    if per_family:
+        families = defaultdict(list)
+        for tup in result:
+            families[tup[0]].append(tup[-1][0])
+        return families
+    else:
+        return set(tup[-1][0] for tup in result)
+

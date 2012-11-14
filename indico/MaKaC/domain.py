@@ -92,19 +92,11 @@ class Domain(Persistent):
             return
         self.filterList.remove(f)
 
-    def _passesFilter( self, IP, filter ):
-        fItems = filter.split(".")
-        iItems = IP.split(".")
-        for i in range(0, len(fItems)):
-            if iItems[i] != fItems[i]:
-                return False
-        return True
-
     def belongsTo( self, IP ):
         ip = IP.strip()
         #ToDo: check that the IP is in the correct format
-        for filter in self.getFilterList():
-            if self._passesFilter( ip, filter ):
+        for filt in self.getFilterList():
+            if ip.startswith(filt):
                 return True
         return False
 
@@ -112,7 +104,7 @@ class Domain(Persistent):
 class _DomainFFName(filters.FilterField):
     _id="name"
 
-    def satisfies(self,dom):  
+    def satisfies(self, dom):
         for value in self._values:
             if str(dom.getName()).lower().find((str(value).strip().lower()))!=-1:
                 return True
