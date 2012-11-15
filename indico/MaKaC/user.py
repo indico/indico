@@ -1876,6 +1876,7 @@ class PersonalInfo(Persistent, Fossilizable):
     def __init__(self):
         self._basket = PersonalBasket()
         self._showPastEvents = False #determines if past events in category overview will be shown
+
         self._p_changed = 1
 
     def getShowPastEvents(self):

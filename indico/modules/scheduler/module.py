@@ -201,15 +201,16 @@ class SchedulerModule(Module):
             self._indexTask(task)
 
         # get an int timestamp
-        timestamp = int_timestamp(task.getStartOn())
+        if task.getStartOn():
+            timestamp = int_timestamp(task.getStartOn())
 
-        self._waitingQueue.enqueue(timestamp, task)
+            self._waitingQueue.enqueue(timestamp, task)
 
-        # make it "officially" queued
-        task.setStatus(base.TASK_STATUS_QUEUED)
+            # make it "officially" queued
+            task.setStatus(base.TASK_STATUS_QUEUED)
 
-        logging.getLogger('scheduler').debug(
-            'Added %s to waitingQueue..' % task)
+            logging.getLogger('scheduler').debug(
+                'Added %s to waitingQueue..' % task)
 
     def popNextWaitingTask(self):
         return self._waitingQueue.pop()

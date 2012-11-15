@@ -274,7 +274,6 @@ class UserHidePastEvents(UserModifyBase):
         self._target.getPersonalInfo().setShowPastEvents(False)
         return True
 
-
 class UserGetLanguages(UserBaseService):
 
     def _getAnswer( self):

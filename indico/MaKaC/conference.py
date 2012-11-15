@@ -3188,7 +3188,9 @@ class Conference(CommonObjectBase, Locatable):
 
     def setDescription(self, desc):
         """changes the current description of the conference"""
+        oldDescription = self.description
         self.description = desc
+        self._notify('eventDescriptionChanged', oldDescription, desc)
         self.notifyModification()
 
     def getSupportInfo(self):
@@ -4744,10 +4746,11 @@ class Conference(CommonObjectBase, Locatable):
             self._registrantGenerator = Counter()
             return self._registrantGenerator
 
-    def addRegistrant(self, rp):
+    def addRegistrant(self, rp, user):
         rp.setId( str(self._getRegistrantGenerator().newCount()) )
         rp.setOwner( self )
         self.getRegistrants()[rp.getId()] = rp
+        self._notify('registrantAdded', user)
         self.notifyModification()
 
     def updateRegistrantIndexByEmail(self, rp, newEmail):
@@ -4773,6 +4776,7 @@ class Conference(CommonObjectBase, Locatable):
         del self.getRegistrants()[id]
         if part.getAvatar() is not None:
             part.getAvatar().removeRegistrant(part)
+        self._notify('registrantRemoved', part)
         TrashCanManager().add(part)
         self.notifyModification()
 

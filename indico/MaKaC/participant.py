@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.plugins import Observable
 from persistent import Persistent
 from datetime import timedelta, datetime
 from MaKaC.common.timezoneUtils import nowutc
@@ -33,7 +34,7 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
 from indico.util.contextManager import ContextManager
 
-class Participation(Persistent):
+class Participation(Persistent, Observable):
 
     def __init__(self, conference):
         self._conference = conference
@@ -336,7 +337,6 @@ class Participation(Persistent):
             return None
 
     def addParticipant(self, participant, eventManager = None):
-
         # check if it's worth to add the participant
         if participant.getConference().getId() != self._conference.getId() :
             return False
@@ -428,25 +428,25 @@ class Participation(Persistent):
         avatar = participant.getAvatar()
         if avatar:
             avatar.unlinkTo(self._conference,"participant")
-
+        self._notify('participantRemoved', self._conference, participant)
         self.notifyModification()
         return True
 
-    def setParticipantRefused(self, participantId):
-        return self._participantList[participantId].setStatusRefused()
-        self.notifyModification()
-
-    def setParticipantExcused(self, participantId):
-        return self._participantList[participantId].setStatusExcused()
-        self.notifyModification()
-
     def setParticipantAccepted(self, participantId):
-        return self._participantList[participantId].setStatusAccepted()
-        self.notifyModification()
+        participant = self.getParticipantById(participantId)
+        if participant:
+            status = participant.setStatusAccepted()
+            self.notifyModification()
+            return status
+        return None
 
     def setParticipantRejected(self, participantId):
-        return self._participantList[participantId].setStatusRejected()
-        self.notifyModification()
+        participant = self.getParticipantById(participantId)
+        if participant:
+            status = participant.setStatusRejected()
+            self.notifyModification()
+            return status
+        return None
 
     def addPendingParticipant(self, participant):
         if participant.getConference().getId() != self._conference.getId() :
@@ -999,6 +999,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
         #    logData["subject"] = _("%s : status set to ADDED")%self.getWholeName()
         #    self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
 
+        self._participation._notify('participantAdded', self.getConference(), self)
         logData = self.getParticipantData()
         logData["subject"] = "%s : status set to ADDED"%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
@@ -1010,6 +1011,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
             return False
         self._status = "refused"
 
+        self._participation._notify('participantRemoved', self.getConference(), self)
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REFUSED")%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
@@ -1043,6 +1045,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
             return False
         self._status = "accepted"
 
+        self._participation._notify('participantAdded', self.getConference(), self)
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to ACCEPTED")%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
@@ -1054,6 +1057,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
             return False
         self._status = "rejected"
 
+        self._participation._notify('participantRemoved', self.getConference(), self)
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REJECTED")%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)

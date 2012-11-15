@@ -1024,17 +1024,13 @@ class RHConfParticipantsInvitation(RHConferenceBaseDisplay):
         params = self._getRequestParams()
         participantId = params["participantId"]
         if self._cancel:
-            participant = self._conf.getParticipation().getParticipantById(participantId)
-            if participant == None:
+            if not self._conf.getParticipation().setParticipantRejected(participantId):
                 raise NoReportError("It seems you have been withdrawn from the list of invited participants")
-            participant.setStatusRejected()
             url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
             self._redirect( url )
         elif self._confirm:
-            participant = self._conf.getParticipation().getParticipantById(participantId)
-            if participant == None:
+            if not self._conf.getParticipation().setParticipantAccepted(participantId):
                 raise NoReportError("It seems you have been withdrawn from the list of invited participants")
-            participant.setStatusAccepted()
             url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
             self._redirect( url )
         else:

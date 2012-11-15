@@ -175,7 +175,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
                     raise FormValuesError("You have already registered with the email address \"%s\". If you need to modify your registration, please contact the managers of the conference."%email)
 
         rp = registration.Registrant()
-        self._conf.addRegistrant(rp)
+        self._conf.addRegistrant(rp, user)
         rp.setValues(self._getRequestParams(), user)
         rp.setSessionBillingEnabled(self._regForm.getSessionsForm().getType() != "2priorities")
         if user is not None:

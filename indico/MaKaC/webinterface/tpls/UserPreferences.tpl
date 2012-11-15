@@ -17,7 +17,10 @@
         <td class="blacktext spaceLeft" nowrap><div id="tabShowPastEvents"></div></td>
     </tr>
 </table>
-
+% if pluginUserPreferences:
+    <h2 class="formTitle">${ _("Plugins Preferences")}</h2>
+    <table style="margin-left: 100px;">${pluginUserPreferences}</table>
+% endif
 
 <script type="text/javascript">
 
