@@ -29,7 +29,17 @@ def _get_remote_ip(req):
 
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     if minfo.useProxy():
-        # if we're behind a proxy, use X-Forwarded-For
+
+        # A little background here...
+        # * X-Forwarded-For should never be used to resolve the user's real IP
+        # as the client may forge it
+        # * So, we are only paying any attention to it if we know we are in a
+        # load-balanced setup
+        # * We're getting the last host in the chain because we are sure it
+        # has been set by our load balancer
+        # * Using the first value would be theoretically better, but since it
+        # could be easily spoofed, we have to play with what we know is safe.
+
         return req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
     else:
         return hostIP

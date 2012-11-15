@@ -43,7 +43,12 @@ subclass SessionManager if you want to implement persistent sessions.
 DEFAULT_SESSION_COOKIE_NAME = "MAKACSESSION"
 DEFAULT_SESSION_COOKIE_DOMAIN = None
 DEFAULT_SESSION_COOKIE_PATH = "/"
-DEFAULT_CHECK_SESSION_ADDR = True
+
+# We're keeping IP checking off, since users behind
+# NAT proxies would be affected
+
+DEFAULT_CHECK_SESSION_ADDR = False
+
 DEFAULT_SESSION_VALIDITY = float(24 * 3600)
 
 import sys, string, re

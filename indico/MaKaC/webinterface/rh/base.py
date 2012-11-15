@@ -62,6 +62,8 @@ from MaKaC.accessControl import AdminList
 
 from MaKaC.plugins.base import OldObservable
 
+from indico.util.network import _get_remote_ip
+
 
 class RequestHandlerBase(OldObservable):
 
@@ -156,14 +158,8 @@ class RequestHandlerBase(OldObservable):
         setLocale(lang)
 
     def getHostIP(self):
-        hostIP = str(self._req.get_remote_ip())
+        return _get_remote_ip(self._req)
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.useProxy():
-            # if we're behind a proxy, use X-Forwarded-For
-            return self._req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
-        else:
-            return hostIP
 
     def _getTruncatedParams(self):
         """ Truncates params, so that file objects do not show up in the logs """
