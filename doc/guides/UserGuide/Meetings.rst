@@ -431,9 +431,11 @@ on the top left of the page:
 |image142| This will let you set filters to focus on events depending on
 their date or the session they are included in.
 
+|image164| Opens the popup with all the options to export the agenda to your calendar.
+
 |image140| This button allows you to use the following additional features:
 
-* Export to ICalendar of PDF formats
+* Export to PDF format
 * Download a package with all the material linked to the meeting
 * Change the style of the display. The following sections give you some examples
   of available styles.
@@ -583,3 +585,4 @@ The Parellel style:
 .. |image161| image:: UserGuidePics/particip9.png
 .. |image162| image:: UserGuidePics/manage.png
 .. |image163| image:: UserGuidePics/minutes.png
+.. |image164| image:: UserGuidePics/ical.png
