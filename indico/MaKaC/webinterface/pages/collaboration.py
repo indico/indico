@@ -416,7 +416,8 @@ class WPCollaborationDisplay(WPConferenceDefaultDisplayBase):
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-               ['/Collaboration/bookings.js']
+               ['/Collaboration/bookings.js'] + self._includeJSPackage(['Display', 'Collaboration'])
+
 
     def _getBody(self, params):
 
@@ -438,14 +439,18 @@ class WCollaborationDisplay(wcomponents.WTemplated):
         bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
         bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
 
+        timeless_bookings = []
         ongoingBookings = []
         scheduledBookings = {} #date, list of bookings
 
         for b in bookings:
-            if b.isHappeningNow():
-                ongoingBookings.append(b)
-            if b.getStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
-                scheduledBookings.setdefault(b.getAdjustedStartDate(self._tz).date(), []).append(b)
+            if not b.hasStartDate():
+                timeless_bookings.append(b)
+            else:
+                if b.isHappeningNow():
+                    ongoingBookings.append(b)
+                elif b.getStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
+                    scheduledBookings.setdefault(b.getAdjustedStartDate(self._tz).date(), []).append(b)
 
         keys = scheduledBookings.keys()
         keys.sort()
@@ -453,6 +458,7 @@ class WCollaborationDisplay(wcomponents.WTemplated):
 
         vars["OngoingBookings"] = ongoingBookings
         vars["ScheduledBookings"] = scheduledBookings
+        vars["timeless_bookings"] = timeless_bookings
         vars["all_bookings"] = fossilize(bookings)
         vars["Timezone"] = self._tz
         vars["conf"] = self._conf
