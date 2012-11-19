@@ -306,8 +306,7 @@ class BaseStatisticsImplementation(Component):
         """
         Returns the expected path for the JSHook file.
         """
-
-        return self._FSPath + '/tpls/' + self.PLUGIN_HOOKFILE
+        return "/statistics/%s/"%self._name.lower() + self.PLUGIN_HOOKFILE
 
     def getAPIParams(self):
         """

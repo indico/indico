@@ -938,9 +938,9 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
     def _getVariables(self, conf):
         vars = {}
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        vars['INCLUDE'] = os.path.join(styleMgr.getBaseTPLPath(), 'include')
-        vars['INCLUDEADM'] = os.path.join(styleMgr.getBaseTPLPath(),'meetings', 'administrative', 'include')
-        vars['INCLUDECDS'] = os.path.join(styleMgr.getBaseTPLPath(),'meetings', 'cdsagenda', 'include')
+        vars['INCLUDE'] ='../include'
+        vars['INCLUDEADM'] = os.path.join('meetings', 'administrative', 'include')
+        vars['INCLUDECDS'] = os.path.join('meetings', 'cdsagenda', 'include')
 
         vars['accessWrapper'] = accessWrapper = self._rh._aw
         vars['conf'] = conf

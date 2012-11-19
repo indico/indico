@@ -64,7 +64,7 @@ class RHTemplateContentJS(base.RH):
         self._modifiedSince = self._req.headers_in.get("If-Modified-Since", None)
 
         cfg = Config.getInstance()
-        dirName = os.path.join(cfg.getTPLDir(),"js")
+        dirName = "js"
         fileName = cfg.getTPLFile( self._tplName )
 
         if fileName == "":
@@ -100,7 +100,7 @@ class RHTemplateContentJS(base.RH):
             self._dict["__rh__"] = self
             self._dict["user"] = None
 
-            self._htmlData = templateEngine.render(self._tplFile, self._dict)
+            self._htmlData = templateEngine.render(self._tplFile, None, self._dict)
             fh = open(self._htmlPath, "w")
             fh.write(self._htmlData)
             fh.close()

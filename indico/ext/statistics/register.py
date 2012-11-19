@@ -159,7 +159,7 @@ class StatisticsRegister():
         events.
         """
         filename = 'StatisticsHookInjection.tpl'
-        return self._getPluginOSPath() + 'tpls/' + filename
+        return "/statistics/" + filename
 
     def getPluginByName(self, plugin, instantiate=True):
         """

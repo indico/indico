@@ -166,13 +166,13 @@ class WTemplated(OldObservable):
 
         if file == "":
             file = self._getSpecificTPL(tplDir,self.tplId)
-        self.tplFile = os.path.join(tplDir, file)
+        self.tplFile = file
 
         hfile = self._getSpecificTPL(os.path.join(tplDir,'chelp'),
                                               self.tplId,
                                               extension='wohl')
 
-        self.helpFile = os.path.join(tplDir,'chelp',hfile)
+        self.helpFile = os.path.join('chelp',hfile)
 
 
     def getVars( self ):
@@ -223,7 +223,7 @@ class WTemplated(OldObservable):
         vars['__rh__'] = self._rh
         vars['self_'] = self
 
-        tempHTML = templateEngine.render(self.tplFile, vars)
+        tempHTML = templateEngine.render(self.tplFile, self, vars)
 
         if self._rh and self._rh._req.is_https():
             imagesBaseURL = Config.getInstance().getImagesBaseURL()

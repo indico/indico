@@ -20,11 +20,13 @@
 """Template engine."""
 
 import os.path
+import posixpath, re
 from MaKaC.common import DBMgr
 from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.user import Avatar
 from mako.lookup import TemplateLookup
+import mako.exceptions as exceptions
 import MaKaC
 import MaKaC.common.info as info
 import xml.sax.saxutils
@@ -32,14 +34,75 @@ import xml.sax.saxutils
 from indico.util.date_time import format_number
 from indico.util.i18n import ngettext
 
+from MaKaC.plugins.base import PluginsHolder
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
 FILTER_IMPORTS = ['from indico.util.json import dumps as j',
                   'from indico.util.string import html_line_breaks as html_breaks']
 
 
+class IndicoTemplateLookup(TemplateLookup):
+
+    def getPluginTPlDir(self, pTypeName, pluginName=None):
+        pType = PluginsHolder().getPluginType(pTypeName)
+        if pType == None:
+            raise Exception(_("The plugin type does not exist"))
+        if pluginName != None:
+            plugin = pType.getPlugin(pluginName)
+            if plugin == None:
+                raise Exception(_("The plugin does not exist"))
+            return os.path.join(plugin.getModule().__path__[0], "tpls")
+        return os.path.join(pType.getModule().__path__[0], "tpls")
+
+
+    def get_template(self, uri, module=None):
+        """Return a :class:`.Template` object corresponding to the given
+        URL.
+
+        Note the "relativeto" argument is not supported here at the moment.
+
+        """
+
+        try:
+            if self.filesystem_checks:
+                return self._check(uri, self._collection[uri])
+            else:
+                return self._collection[uri]
+        except KeyError:
+
+            if uri[0] == "/" and os.path.isfile(uri):
+                return self._load(uri, uri)
+
+            # Case 1: Used with Template.forModule
+            if module != None and hasattr(module,"_dir"):
+                srcfile = posixpath.normpath(posixpath.join(module._dir, uri))
+                if os.path.isfile(srcfile):
+                    return self._load(srcfile, srcfile)
+
+            # Case 2: We look through the dirs in the TemplateLookup
+            u = re.sub(r'^\/+', '', uri)
+            for dir in self.directories:
+                srcfile = posixpath.normpath(posixpath.join(dir, u))
+                if os.path.isfile(srcfile):
+                    return self._load(srcfile, uri)
+            else:
+            #Case 3: we look into the plugins
+                uri_split = u.split("/")
+                if len(uri_split) == 2:
+                    srcfile = posixpath.normpath(posixpath.join( self.getPluginTPlDir(pTypeName=uri_split[0]), uri_split[1]))
+                    if os.path.isfile(srcfile):
+                        return self._load(srcfile, uri)
+                if len(uri_split) == 3:
+                    srcfile = posixpath.normpath(posixpath.join( self.getPluginTPlDir(pTypeName=uri_split[0], pluginName=uri_split[1]), uri_split[2]))
+                    if os.path.isfile(srcfile):
+                        return self._load(srcfile, uri)
+
+                # We do not find anything, so we raise the Exception
+                raise exceptions.TopLevelLookupException(
+                                "Cant locate template for uri %r" % uri)
+
 def _define_lookup():
-    return TemplateLookup(directories=["/"],
+    return IndicoTemplateLookup(directories=[TEMPLATE_DIR],
                           module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
                           disable_unicode=True,
                           filesystem_checks=True,
@@ -49,9 +112,9 @@ def _define_lookup():
 mako = _define_lookup()
 
 
-def render(tplPath, params):
+def render(tplPath, module, params):
     """Render the template."""
-    template = mako.get_template(tplPath)
+    template = mako.get_template(tplPath, module)
     registerHelpers(params)
 
     # This parameter is needed when a template which is stored
