@@ -479,6 +479,12 @@
                     </script>
                 % elif option.getType() == "password":
                         <input name="${ name }" type="password" size="50" value="${ option.getValue() }">
+                % elif option.getType() == "select":
+                        <select name="${ name }">
+                        % for value in option.getOptions():
+                           <option value="${value}" ${"selected" if option.getValue() == value else ""}>${value}</option>
+                        % endfor
+                        </select>
                 % else:
                     % if option.getType() == list:
                         <% value=  ", ".join([str(v) for v in option.getValue()]) %>

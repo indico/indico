@@ -521,7 +521,8 @@ class PluginBase(Persistent):
                 "defaultValue": attributes.get("defaultValue", None),
                 "editable": attributes.get("editable", True),
                 "visible": attributes.get("visible", True),
-                "mustReload": attributes.get("mustReload", False)
+                "mustReload": attributes.get("mustReload", False),
+                "options": attributes.get("options", [])
                 }
 
 
@@ -590,7 +591,8 @@ class PluginBase(Persistent):
         """
         self.__options[name] = PluginOption(name, attributes["description"], attributes["type"],
                                             attributes["defaultValue"], attributes["editable"], attributes["visible"],
-                                            attributes["mustReload"], True, order, attributes["subType"], attributes["note"])
+                                            attributes["mustReload"], True, order, attributes["subType"], attributes["note"],
+                                            attributes["options"])
         self._notifyModification()
 
     def updateOption(self, name, attributes, order):
@@ -611,6 +613,7 @@ class PluginBase(Persistent):
         if option.isMustReload():
             option.setValue(attributes["defaultValue"])
         option.setOrder(order)
+        option.setOptions(attributes["options"])
 
     def hasOption(self, name):
         """ Returns if this Plugin / PluginType object has an option given this name
@@ -1162,6 +1165,7 @@ class PluginOption(Persistent):
                     this is the only way to change values of a non-editable option without accessing the DB directly
         present: this will be false if the option is still in the DB, but not anymore in the __init__.py file of the plugin
         order: an integer so that the options can be displayed in a given order (ascending order)
+        options: a list of options when the type is select
     """
     _extraTypes = {
         'users': list,
@@ -1173,11 +1177,12 @@ class PluginOption(Persistent):
         'list_multiline': list,
         'links': list,
         'currency': list,
-        'paymentmethods': list
+        'paymentmethods': list,
+        'select': str,
 
     }
 
-    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None, note=None):
+    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None, note=None, options=[]):
         self.__name = name
         self.__description = description
         self.__note = note
@@ -1193,6 +1198,7 @@ class PluginOption(Persistent):
             self.setValue(value)
         self.__associatedActions = []
         self.__order = order
+        self.__options = options
 
     def getName(self):
         return self.__name
@@ -1293,6 +1299,14 @@ class PluginOption(Persistent):
 
     def setOrder(self, order):
         self.__order = order
+
+    def getOptions(self):
+        if not hasattr(self, "_PluginOption__options"): #TODO: remove when safe
+            self.__options = []
+        return self.__options
+
+    def setOptions(self, options):
+        self.__options = options
 
     def _notifyModification(self):
         self._p_changed = 1
