@@ -152,7 +152,7 @@ var WR_loadTalks = function (isManager) {
             function(result, error){
                 if (!error) {
                     WR_contributions = result;
-                    WRUpdateContributionList();
+                    WRUpdateContributionList('contributionsList');
                     IndicoUI.Effect.appear($E('contributionsDiv'));
                     WR_contributionsLoaded = true;
                     killProgress();

@@ -147,7 +147,7 @@ var RR_loadTalks = function (isManager) {
             function(result, error){
                 if (!error) {
                     RR_contributions = result;
-                    RRUpdateContributionList();
+                    RRUpdateContributionList('contributionList');
                     IndicoUI.Effect.appear($E('contributionsDiv'));
                     RR_contributionsLoaded = true;
                     killProgress();
