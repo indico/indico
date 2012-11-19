@@ -24,8 +24,8 @@ var currentLanguage = null;
  * @return {String} text
  */
 function $T(key){
-    if (json_locale_data['messages-js'] && json_locale_data['messages-js'][key]) {
-        return json_locale_data['messages-js'][key][1];
+    if (json_locale_data[key]) {
+        return json_locale_data[key][1];
     } else {
         return key;
     }
