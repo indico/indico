@@ -5890,6 +5890,7 @@ class RHReschedule(RHConferenceModifBase):
         self._action=params.get("action","duration")
         self._fit= params.get("fit","noFit") == "doFit"
         self._targetDay=params.get("targetDay",None) #comes in format YYYYMMDD, ex: 20100317
+        self._sessionId = (params.get("sessionId", ""))
         if self._targetDay is None:
             raise MaKaCError( _("Error while rescheduling timetable: not target day"))
         else:
@@ -5908,12 +5909,17 @@ class RHReschedule(RHConferenceModifBase):
     def _process(self):
         if not self._cancel:
             if not self._ok:
-                p=conferences.WPConfModifReschedule(self,self._conf, self._targetDay)
+                p = conferences.WPConfModifReschedule(self, self._conf, self._targetDay)
                 return p.display()
             else:
-                t=timedelta(hours=int(self._hour), minutes=int(self._minute))
-                self._conf.getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
-        self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
+                t = timedelta(hours=int(self._hour), minutes=int(self._minute))
+        if self._sessionId:
+            self._conf.getSessionById(self._sessionId).getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
+            self._redirect("%s#%s" % (urlHandlers.UHSessionModifSchedule.getURL(self._conf.getSessionById(self._sessionId)), self._targetDay))
+        else :
+            self._conf.getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
+            self._redirect("%s#%s" % (urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
+
 
 class RHRelocate(RHConferenceModifBase):
 
