@@ -74,6 +74,7 @@ from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import OldObservable
+from MaKaC.plugins.base import extension_point
 from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
@@ -506,10 +507,9 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
 
-        if (Config.getInstance().getIndicoSearchServer() != '') and dm.getSearchEnabled():
-            vars["searchBox"] = wcomponents.WMiniSearchBox(self._conf.getId()).getHTML()
-        else:
-            vars["searchBox"] = ""
+        vars['searchBox']= ""
+        vars["confId"] = self._conf.getId()
+        extension_point("fillConferenceHeader", vars)
         return vars
 
 

@@ -108,7 +108,6 @@ indico_legacy = Bundle('js/indico/Legacy/Widgets.js',
 
 indico_common = Bundle('js/indico/Common/Export.js',
                        'js/indico/Common/TimezoneSelector.js',
-                       'js/indico/Common/IntelligentSearchBox.js',
                        'js/indico/Common/Social.js',
                        'js/indico/Common/Export.js',
                        'js/indico/Common/htmlparser.js',

@@ -502,6 +502,7 @@ if __name__ == '__main__':
             livesync = indico.ext.livesync
             importer = indico.ext.importer
             calendaring = indico.ext.calendaring
+            search = indico.ext.search
 
             [indico.ext]
 
@@ -528,6 +529,8 @@ if __name__ == '__main__':
             InstantMessaging.XMPP = MaKaC.plugins.InstantMessaging.XMPP
 
             calendaring.outlook = indico.ext.calendaring.outlook
+
+            search.invenio = indico.ext.search.invenio
 
             """,
           zip_safe = False,

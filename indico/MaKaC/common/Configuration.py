@@ -247,6 +247,7 @@ class Config:
                  "defaultConferenceLogo":"lecture3.png",
                  "breadcrumbArrow": "breadcrumb_arrow.png",
                  "invenio": "invenio.png",
+                 "cern_search": "cernsearch.png",
                  "heart": "heart.png",
                  "star": "star.png",
                  "starGrey": "starGrey.png",

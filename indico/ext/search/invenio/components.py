@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##
+## $id$
 ##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
@@ -17,19 +18,27 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+# stdlib imports
+import zope.interface
 
-from indico.core.extpoint import IContributor
+# legacy imports
+from MaKaC.plugins.base import Observable
+
+# indico imports
+from indico.core.extpoint import Component
+from indico.core.extpoint.plugins import IPluginImplementationContributor
+from indico.ext.search.invenio.implementation import InvenioSEA, InvenioRedirectSEA
+from MaKaC.plugins.base import PluginsHolder
 
 
-class IPluginSettingsContributor(IContributor):
+class PluginImplementationContributor(Component, Observable):
+    """
+    Adds interface extension to plugins's implementation.
+    """
 
-    def hasPluginSettings(self, obj, ptype, plugin):
-        pass
-
-    def getPluginSettingsHTML(self, obj, ptype, plugin):
-        pass
-
-class IPluginImplementationContributor(IContributor):
+    zope.interface.implements(IPluginImplementationContributor)
 
     def getPluginImplementation(self, obj):
-        pass
+        plugin = PluginsHolder().getPluginType('search').getPlugin("invenio")
+        typeSearch = plugin.getOptions()["type"].getValue()
+        return ("invenio", InvenioRedirectSEA if typeSearch == "redirect" else InvenioSEA)

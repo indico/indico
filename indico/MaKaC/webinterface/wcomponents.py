@@ -21,6 +21,7 @@ from webassets import Environment
 from indico.web import assets
 
 from MaKaC.plugins import PluginsHolder, OldObservable
+from MaKaC.plugins.base import extension_point
 
 import os,types,string
 from xml.sax.saxutils import escape, quoteattr
@@ -379,15 +380,9 @@ class WHeader(WTemplated):
             vars["title"] = "Indico"
             vars["organization"] = ""
 
-
-        # Search box, in case search is active
-        if Config.getInstance().getIndicoSearchServer() != '' :
-            categId = 0
-            if self.__currentCategory:
-                categId = self.__currentCategory.getId()
-            vars['searchBox'] = WCategorySearchBox(categId=categId).getHTML()
-        else:
-            vars['searchBox'] = ""
+        vars['searchBox']= ""
+        vars["categId"] = self.__currentCategory.getId() if self.__currentCategory else 0
+        extension_point("fillCategoryHeader", vars)
 
         # Check if room booking module is active
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()

@@ -17,19 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-
-from indico.core.extpoint import IContributor
-
-
-class IPluginSettingsContributor(IContributor):
-
-    def hasPluginSettings(self, obj, ptype, plugin):
-        pass
-
-    def getPluginSettingsHTML(self, obj, ptype, plugin):
-        pass
-
-class IPluginImplementationContributor(IContributor):
-
-    def getPluginImplementation(self, obj):
-        pass
+__metadata__ = {
+    'name': 'Invenio',
+    'type': 'search',
+    'description': 'Invenio Search Engine Agent.'
+    }

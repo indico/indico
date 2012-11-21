@@ -255,6 +255,11 @@ class WPDecorated( WPBase ):
         """
         return None
 
+    def getJSFiles(self):
+        pluginJSFiles = {"paths" : []}
+        self._notify("includeMainJSFiles", pluginJSFiles)
+        return WPBase.getJSFiles(self) + pluginJSFiles['paths']
+
 class WPNotDecorated( WPBase ):
 
     def getLoginURL( self ):
