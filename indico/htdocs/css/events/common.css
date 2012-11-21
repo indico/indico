@@ -699,5 +699,5 @@ span.description pre, p {
 }
 
 .materialDisplayName {
-    white-space: nowrap;
+    font-size: 14px;
 }
