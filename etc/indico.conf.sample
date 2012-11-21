@@ -137,25 +137,6 @@ ApacheUser = "nobody"
 ApacheGroup = "nogroup"
 
 #------------------------------------------------------------------------------
-# INDICO SEARCH
-#------------------------------------------------------------------------------
-# Indico doesn't come with a search engine. The only supported search server at
-# this time is CDS Invenio. If you have a running instance of CDS Invenio you
-# can write its hostname in IndicoSearchServer and Indico will then provide
-# search capabilities for it.
-#
-# You can download CDS Invenio at:
-#
-#    http://cdsware.cern.ch/invenio/
-#
-#
-# If you want to write your own adapter for another search engine you can
-# use indico/MaKaC/search/invenioSEA.py as a starting point.
-#
-# IndicoSearchServer   = ""
-# IndicoSearchClass    = "MaKaC.search.invenioSEA.InvenioSEA"
-
-#------------------------------------------------------------------------------
 # FILE UPLOAD
 #------------------------------------------------------------------------------
 # Here you can limit the maximum size of all the uploaded files (in MB) in a

@@ -710,11 +710,6 @@ class WMenuMeetingHeader( WConferenceHeader ):
                     hideContributions = ""
         vars["hideContributions"] = hideContributions;
 
-        if Config.getInstance().getIndicoSearchServer() != '' :
-            vars["searchBox"] = WCategorySearchBox(optionsClass='meetingHeaderSearchBox').getHTML()
-        else:
-            vars["searchBox"] = ""
-
         urlCustPrint = urlHandlers.UHConferenceOtherViews.getURL(self._conf)
         urlCustPrint.addParam("showDate", vars.get("selectedDate", "all"))
         urlCustPrint.addParam("showSession", vars.get("selectedSession", "all"))
@@ -5948,55 +5943,6 @@ class WRoomBookingBlockingForm(WTemplated):
         vars = WTemplated.getVars(self)
         vars['block'] = self._block
         vars['hasErrors'] = self._hasErrors
-        return vars
-
-class WBaseSearchBox(WTemplated):
-
-    def __init__(self, template='SearchBox', targetId=0):
-        # overload the template
-        WTemplated.__init__(self,template)
-        self._targetId = targetId
-
-    def getVars(self):
-        vars = WTemplated.getVars( self )
-        vars["searchAction"] = urlHandlers.UHSearch.getURL();
-        vars['targetId'] = self._targetId
-        vars['searchImg'] =  imgLogo=Configuration.Config.getInstance().getSystemIconURL( "search" )
-        vars['categId'] = 0
-        return vars
-
-class WMiniSearchBox(WBaseSearchBox):
-
-    def __init__(self, confId):
-        WBaseSearchBox.__init__(self, template='MiniSearchBox',targetId = confId)
-
-    def getVars(self):
-        vars = WBaseSearchBox.getVars( self )
-        return vars
-
-class WCategorySearchBox(WBaseSearchBox):
-
-    def __init__(self, categId = 0, optionsClass='arrowExpandIcon'):
-        WBaseSearchBox.__init__(self, targetId = categId)
-        self._categId = categId
-        self._moreOptionsClass = optionsClass
-
-    def getVars(self):
-        vars = WBaseSearchBox.getVars( self )
-        vars["categId"] = self._categId
-        vars["categName"] = CategoryManager().getById(self._categId).getTitle()
-        vars['moreOptionsClass'] = self._moreOptionsClass
-        return vars
-
-class WRootSearchBox(WBaseSearchBox):
-
-    def __init__(self):
-        # overload the template
-        WBaseSearchBox.__init__(self,'RootSearchBox')
-
-    def getVars(self):
-        vars = WBaseSearchBox.getVars( self )
-        vars["innerBox"] = WBaseSearchBox().getHTML()
         return vars
 
 class WUtils:

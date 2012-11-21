@@ -203,9 +203,6 @@ class UHIndicoNews( URLHandler ):
 class UHConferenceHelp(URLHandler):
     _relativeURL ="help.py"
 
-class UHSearch(URLHandler):
-    _relativeURL ="search.py"
-
 class UHCalendar( URLHandler ):
     _relativeURL = "wcalendar.py"
 
