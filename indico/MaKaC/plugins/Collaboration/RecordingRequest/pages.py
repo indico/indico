@@ -79,20 +79,15 @@ class WNewBookingForm(WCSPageTemplateBase):
         # manager or recording plugin manager
         vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or isManager
 
-        if initialDisplay:
-            recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)
+        recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)
 
-            fossil_args = dict(tz=self._conf.getTimezone(),
-                               units='(hours)_minutes',
-                               truncate=True)
+        fossil_args = dict(tz=self._conf.getTimezone(),
+                           units='(hours)_minutes',
+                           truncate=True)
 
-            vars["Contributions"] = fossilize(talks, IContributionRRFossil, **fossil_args)
-            vars["ContributionsAble"] = fossilize(recordingAbleTalks, IContributionRRFossil, **fossil_args)
-            vars["ContributionsUnable"] = fossilize(recordingUnableTalks, IContributionRRFossil, **fossil_args)
-        else:
-            vars["Contributions"] = []
-            vars["ContributionsAble"] = []
-            vars["ContributionsUnable"] = []
+        vars["Contributions"] = fossilize(talks, IContributionRRFossil, **fossil_args)
+        vars["ContributionsAble"] = fossilize(recordingAbleTalks, IContributionRRFossil, **fossil_args)
+        vars["ContributionsUnable"] = fossilize(recordingUnableTalks, IContributionRRFossil, **fossil_args)
 
         vars["PostingUrgency"] = postingUrgency
         vars["linkToEA"] = collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(self._conf)

@@ -77,20 +77,15 @@ class WNewBookingForm(WCSPageTemplateBase):
         # manager or webcast plugin manager
         vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or isManager
 
-        if initialDisplay:
-            webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
+        webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
 
-            fossil_args = dict(tz=self._conf.getTimezone(),
-                               units='(hours)_minutes',
-                               truncate=True)
+        fossil_args = dict(tz=self._conf.getTimezone(),
+                           units='(hours)_minutes',
+                           truncate=True)
 
-            vars["Contributions"] = fossilize(talks, IContributionWRFossil, **fossil_args)
-            vars["ContributionsAble"] = fossilize(webcastAbleTalks, IContributionWRFossil, **fossil_args)
-            vars["ContributionsUnable"] = fossilize(webcastUnableTalks, IContributionWRFossil, **fossil_args)
-        else:
-            vars["Contributions"] = []
-            vars["ContributionsAble"] = []
-            vars["ContributionsUnable"] = []
+        vars["Contributions"] = fossilize(talks, IContributionWRFossil, **fossil_args)
+        vars["ContributionsAble"] = fossilize(webcastAbleTalks, IContributionWRFossil, **fossil_args)
+        vars["ContributionsUnable"] = fossilize(webcastUnableTalks, IContributionWRFossil, **fossil_args)
 
         vars["Audiences"] = CollaborationTools.getOptionValue('WebcastRequest', "webcastAudiences")
         vars["linkToEA"] = collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(self._conf)
