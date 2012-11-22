@@ -246,8 +246,6 @@ class Config:
                  "roomwidgetArrow":"roomwidget_arrow.png",
                  "defaultConferenceLogo":"lecture3.png",
                  "breadcrumbArrow": "breadcrumb_arrow.png",
-                 "invenio": "invenio.png",
-                 "cern_search": "cernsearch.png",
                  "heart": "heart.png",
                  "star": "star.png",
                  "starGrey": "starGrey.png",
@@ -806,6 +804,8 @@ class Config:
             return "%s/%s"%(self.getImagesBaseURL(), id )
         return "%s/%s"%(self.getImagesBaseURL(), self.__systemIcons[ id ])
 
+    def getPluginIconURL( self, pluginName, iconId ):
+        return "%s/%s/images/%s.png"%(self.getBaseURL(), pluginName, iconId)
 
     def getSystemIconFileName(self, id):
         if id not in self.__systemIcons:

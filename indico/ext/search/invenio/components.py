@@ -19,7 +19,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # stdlib imports
-import zope.interface
+import zope.interface, os
 
 # legacy imports
 from MaKaC.plugins.base import Observable
@@ -28,7 +28,9 @@ from MaKaC.plugins.base import Observable
 from indico.core.extpoint import Component
 from indico.core.extpoint.plugins import IPluginImplementationContributor
 from indico.ext.search.invenio.implementation import InvenioSEA, InvenioRedirectSEA
+import indico.ext.search.invenio
 from MaKaC.plugins.base import PluginsHolder
+from indico.web.rh import RHHtdocs
 
 
 class PluginImplementationContributor(Component, Observable):
@@ -42,3 +44,10 @@ class PluginImplementationContributor(Component, Observable):
         plugin = PluginsHolder().getPluginType('search').getPlugin("invenio")
         typeSearch = plugin.getOptions()["type"].getValue()
         return ("invenio", InvenioRedirectSEA if typeSearch == "redirect" else InvenioSEA)
+
+
+class RHSearchHtdocsInvenio(RHHtdocs):
+
+    _url = r"^/invenio/(?P<filepath>.*)$"
+    _local_path = os.path.join(indico.ext.search.invenio.__path__[0], 'htdocs')
+    _min_dir = 'invenio'

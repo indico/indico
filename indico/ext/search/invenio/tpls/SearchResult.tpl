@@ -1,6 +1,6 @@
 <%inherit file="/search/SearchResultBase.tpl"/>
 <%block name="banner">
-    <a href="http://invenio-software.org"><img src="${ systemIcon('invenio') }" alt="CDS Invenio" title="${ _("IndicoSearch is powered by CDS Invenio")}" style="vertical-align: middle; border: 0px;" /></a>
+    <a href="http://invenio-software.org"><img src="${searchIcon}" alt="CDS Invenio" title="${ _("IndicoSearch is powered by CDS Invenio")}" style="vertical-align: middle; border: 0px;" /></a>
 </%block>
 
 <%block name="searchCollection">

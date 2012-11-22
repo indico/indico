@@ -147,6 +147,7 @@ class WSearchResult(WTemplated):
     def getVars(self):
         vars = WTemplated.getVars(self)
         vars["searchAction"] = UHSearch.getURL()
+        vars["searchIcon"] = Config.getInstance().getPluginIconURL(self._seAdapter.getId(), self._seAdapter.getId())
         return vars
 
 class WPSearchResult:
