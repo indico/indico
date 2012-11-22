@@ -61,7 +61,8 @@ class VidyoContributor(Component):
                 if (options.get('sessions', False) and options.get('contributions', False)) or not vs.hasSessionOrContributionLink():
                     newBooking = vs.clone(conf)
                     conf.getCSBookingManager().addBooking(newBooking)
-                    VidyoTools.getIndexByVidyoRoom().index_obj(newBooking)
+                    VidyoTools.getIndexByVidyoRoom().indexBooking(newBooking)
+                    VidyoTools.getEventEndDateIndex().indexBooking(newBooking)
 
 class CatalogIndexProvider(Component):
     implements(ICatalogIndexProvider)
