@@ -265,6 +265,44 @@ From here you are able to:
 You will be asked to confirm the deletion of temporary files and
 websessions as well as packing of the database.
 
+--------------
+
+Plugins
+-----------
+
+The plugins area is accessible from the *Plugins* menu.
+From here you are able to:
+
+-
+   Load the plugin types that are installed in the disk. This can be done
+   manually by clicking in *Reload the plugins manually* button or
+   automatically when you enter in the page by activating the checkbox
+   *Reload all plugins every time you open*.
+
+-
+   Enable and disable the plugin types by clicking in the red/green square.
+
+|image12|
+
+
+Search plugin
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to search content through Indico this plugin has been implemented.
+Here you can activate the different search engine adapters and choose the one to use
+by default if there are more than one active.
+
+Currently, the only search engine plugin is developed for *Invenio*. You need
+to setup the server of the search engine and select the mode, that can be redirect to
+the server or calling to the server API getting private or public content only.
+
+You also will need to activate the corresponding Livesync plugin in `Livesync plugin <#livesync-plugin>`_.
+
+|image13|
+
+Livesync plugin
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 Administration scripts
 ====================
@@ -297,3 +335,5 @@ For more information type in console:
 .. |image9| image:: AdminGuidePics/admin7.png
 .. |image10| image:: AdminGuidePics/admin8.png
 .. |image11| image:: AdminGuidePics/admin9.png
+.. |image12| image:: AdminGuidePics/admin10.png
+.. |image13| image:: AdminGuidePics/admin11.png
