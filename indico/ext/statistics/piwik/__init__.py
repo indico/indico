@@ -20,5 +20,5 @@
 __metadata__ = {
     'name': 'Piwik',
     'type': 'statistics',
-    'description': 'Enables Piwik integration.'
+    'description': 'Enables Piwik integration'
     }
