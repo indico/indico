@@ -77,9 +77,6 @@ def webcastAddOnAir(req, **params):
 def webcastRemoveFromAir(req, **params):
     return services.RHWebcastRemoveFromAir(req).process(params)
 
-def recording(req, **params):
-    return services.RHRecording(req).process(params)
-
 def oaiPrivateConfig(req, **params):
     return services.RHOAIPrivateConfig(req).process(params)
 

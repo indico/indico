@@ -32,17 +32,6 @@ from MaKaC.errors import MaKaCError
 class RHServicesBase(admins.RHAdminBase):
     pass
 
-class RHRecording( RHServicesBase ):
-    _uh = urlHandlers.UHRecording
-
-    def _checkParams( self, params ):
-        admins.RHAdminBase._checkParams( self, params )
-        self._params = params
-
-    def _process( self ):
-        p = adminPages.WPRecording(self)
-        return p.display()
-
 class RHWebcastBase( RHServicesBase ):
 
     def _checkProtection( self ):

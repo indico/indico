@@ -461,8 +461,6 @@ class WPServicesCommon( WPAdminsBase ):
                 urlHandlers.UHWebcastArchive.getURL() )
         self._subTabWebcast_Setup = self._subTabWebcast.newSubTab( "setup", _("Setup"), \
                 urlHandlers.UHWebcastSetup.getURL() )
-        self._subTabRecording = self._tabCtrl.newTab( "recording", _("Recording"), \
-                urlHandlers.UHRecording.getURL() )
         self._subTabOAIPrivateConfig = self._tabCtrl.newTab( "oai-private", _("OAI Private Gateway"), \
                 urlHandlers.UHOAIPrivateConfig.getURL() )
         self._subTabHTTPAPI = self._tabCtrl.newTab( "http_api", _("HTTP API"), \
@@ -476,21 +474,6 @@ class WPServicesCommon( WPAdminsBase ):
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
-class WPRecording( WPServicesCommon ):
-
-    pageURL = "adminServices.py/recording"
-
-    def __init__(self, rh):
-        WPServicesCommon.__init__(self, rh)
-
-    def _getTabContent( self, params ):
-        return "under construction"
-        #wp = WRecording()
-        #return wp.getHTML(params)
-
-    def _setActiveTab( self ):
-        self._subTabRecording.setActive()
 
 class WPWebcast( WPServicesCommon ):
 

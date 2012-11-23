@@ -2513,9 +2513,6 @@ class UHTemplatesSetDefaultPDFOptions( URLHandler ):
 class UHServices( URLHandler ):
     _relativeURL = "adminServices.py"
 
-class UHRecording( URLHandler ):
-    _relativeURL = "adminServices.py/recording"
-
 class UHWebcast( URLHandler ):
     _relativeURL = "adminServices.py/webcast"
 
