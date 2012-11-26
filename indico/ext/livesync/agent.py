@@ -205,7 +205,7 @@ class PushSyncAgent(SyncAgent):
         self._lastTry = None
         self._access = access
 
-    def _run(self, data, logger=None, monitor=None, dbi=None):
+    def _run(self, data, logger=None, monitor=None, dbi=None, task=None):
         """
         Overloaded - will contain the specific agent code
         """
@@ -226,7 +226,7 @@ class PushSyncAgent(SyncAgent):
         Overloaded by agents
         """
 
-    def run(self, currentTS, logger=None, monitor=None, dbi=None):
+    def run(self, currentTS, logger=None, monitor=None, dbi=None, task=None):
         """
         Main method, called when agent needs to be run
         """
@@ -251,7 +251,7 @@ class PushSyncAgent(SyncAgent):
         try:
             records = self._generateRecords(data, till, dbi=dbi)
             # run agent-specific cycle
-            result = self._run(records, logger=logger, monitor=monitor, dbi=dbi)
+            result = self._run(records, logger=logger, monitor=monitor, dbi=dbi, task=task)
         except:
             if logger:
                 logger.exception("Problem running agent %s" % self.getId())

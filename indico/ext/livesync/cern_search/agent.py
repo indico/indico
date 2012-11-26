@@ -33,6 +33,8 @@ from lxml import etree
 from indico.ext.livesync.agent import AgentProviderComponent, RecordUploader
 from indico.ext.livesync.bistate import BistateBatchUploaderAgent
 
+from indico.util.date_time import nowutc
+
 
 class CERNSearchUploadAgent(BistateBatchUploaderAgent):
 
@@ -48,15 +50,13 @@ class CERNSearchUploadAgent(BistateBatchUploaderAgent):
         self._username = username
         self._password = password
 
-    def _run(self, records, logger=None, monitor=None, dbi=None):
+    def _run(self, records, logger=None, monitor=None, dbi=None, task=None):
 
         self._v_logger = logger
 
         # the uploader will manage everything for us...
-
         uploader = CERNSearchRecordUploader(logger, self, self._url,
-                                            self._username, self._password)
-
+                                            self._username, self._password, task)
         if self._v_logger:
             self._v_logger.info('Starting metadata/upload cycle')
 
@@ -69,11 +69,12 @@ class CERNSearchRecordUploader(RecordUploader):
     A worker that uploads data using HTTP
     """
 
-    def __init__(self, logger, agent, url, username, password):
+    def __init__(self, logger, agent, url, username, password, task):
         super(CERNSearchRecordUploader, self).__init__(logger, agent)
         self._url = url
         self._username = username
         self._password = password
+        self._task = task
 
     def _postRequest(self, batch):
 
@@ -124,6 +125,9 @@ class CERNSearchRecordUploader(RecordUploader):
 
         # right now there is nothing else to pay attention to
         booleanResult = etree.tostring(xmlDoc, method="text")
+
+        if self._task:
+            self._task.setOnRunningListSince(nowutc())
 
         if result.code == 200 and booleanResult == 'true':
             self._logger.info('Batch of %d records stored in server'

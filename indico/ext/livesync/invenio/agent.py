@@ -28,11 +28,12 @@ import time
 from indico.ext.livesync.agent import AgentProviderComponent, RecordUploader
 from indico.ext.livesync.bistate import BistateBatchUploaderAgent
 from indico.ext.livesync.invenio.invenio_connector import InvenioConnector
+from indico.util.date_time import nowutc
 
 
 class InvenioBatchUploaderAgent(BistateBatchUploaderAgent):
 
-    def _run(self, records, logger=None, monitor=None, dbi=None):
+    def _run(self, records, logger=None, monitor=None, dbi=None, task=None):
 
         self._v_logger = logger
 
@@ -40,7 +41,7 @@ class InvenioBatchUploaderAgent(BistateBatchUploaderAgent):
 
         # the uploader will manage everything for us...
 
-        uploader = InvenioRecordUploader(logger, self, server)
+        uploader = InvenioRecordUploader(logger, self, server, task)
 
         if self._v_logger:
             self._v_logger.info('Starting metadata/upload cycle')
@@ -54,9 +55,10 @@ class InvenioRecordUploader(RecordUploader):
     A worker that uploads data using HTTP
     """
 
-    def __init__(self, logger, agent, server):
+    def __init__(self, logger, agent, server, task):
         super(InvenioRecordUploader, self).__init__(logger, agent)
         self._server = server
+        self._task = task
 
     def _uploadBatch(self, batch):
         """
@@ -77,6 +79,9 @@ class InvenioRecordUploader(RecordUploader):
         result = self._server.upload_marcxml(data, "-ir").read()
 
         tupload = time.time() - (tstart + tgen)
+
+        if self.task:
+            self._task.setOnRunningListSince(nowutc())
 
         self._logger.debug('rec %s result: %s' % (batch, result))
 

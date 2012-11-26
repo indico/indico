@@ -52,7 +52,7 @@ class TestAgent(PushSyncAgent):
 
         return data
 
-    def _run(self, data, logger=None, monitor=None, dbi=None):
+    def _run(self, data, logger=None, monitor=None, dbi=None, task=None):
 
         ts = None
 

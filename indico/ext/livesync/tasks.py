@@ -50,7 +50,7 @@ class LiveSyncUpdateTask(PeriodicTask):
             try:
                 dbi = DBMgr.getInstance()
                 # pass the current time and a logger
-                result = agent.run(int_timestamp(nowutc()), logger=logger, dbi=dbi)
+                result = agent.run(int_timestamp(nowutc()), logger=logger, dbi=dbi, task=self)
             except:
                 logger.exception("Problem running agent '%s'" % agtName)
                 return
@@ -62,3 +62,8 @@ class LiveSyncUpdateTask(PeriodicTask):
             else:
                 logger.info("'Acknowledge' not done - no records?")
             logger.info("Agent '%s' finished" % agtName)
+
+    def setOnRunningListSince(self, sometime):
+        dbi = DBMgr.getInstance()
+        self.onRunningListSince = sometime
+        dbi.commit()
