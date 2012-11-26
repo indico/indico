@@ -1,7 +1,7 @@
 var vidyoOwnerField = null;
 
 var vidyoMarkBookingNotPresent = function(booking) {
-        booking.statusMessage = $T("Room no longer exists");
+        booking.statusMessage = $T("Booking no longer exists");
         booking.statusClass = "statusMessageOther";
         booking.canBeStarted = false;
         refreshBookingM(booking, false);

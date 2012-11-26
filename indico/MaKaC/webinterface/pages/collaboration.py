@@ -444,13 +444,14 @@ class WCollaborationDisplay(wcomponents.WTemplated):
         scheduledBookings = {} #date, list of bookings
 
         for b in bookings:
-            if not b.hasStartDate():
-                timeless_bookings.append(b)
-            else:
-                if b.isHappeningNow():
-                    ongoingBookings.append(b)
-                elif b.getStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
-                    scheduledBookings.setdefault(b.getAdjustedStartDate(self._tz).date(), []).append(b)
+            if b.canBeDisplayed():
+                if not b.hasStartDate():
+                    timeless_bookings.append(b)
+                else:
+                    if b.isHappeningNow():
+                        ongoingBookings.append(b)
+                    elif b.getStartDate() and b.getAdjustedStartDate('UTC') > nowutc():
+                        scheduledBookings.setdefault(b.getAdjustedStartDate(self._tz).date(), []).append(b)
 
         keys = scheduledBookings.keys()
         keys.sort()

@@ -114,15 +114,6 @@ class EventEndDateIndex(Persistent):
             for b in bookingList.iterbookings():
                 yield b
 
-    def iterBookingsPerConf(self, minDate = None, maxDate = None):
-        """ Will return an iterator over tuples (date, {Conference: nBookings}) for
-            events whose ending date is between minDate and maxDate
-        """
-        minKey = EventEndDateIndex._dateToKey(minDate)
-        maxKey = EventEndDateIndex._dateToKey(maxDate)
-        for key, bookingList in self._tree.iteritems(min = minKey, max = maxKey):
-            yield (key, bookingList.getBookingsPerConf())
-
     def deleteKeys(self, minDate = None, maxDate = None):
         """
         """
@@ -160,15 +151,6 @@ class DateBookingList(Persistent):
         """ Iterator over the bookings
         """
         return self._bookings.__iter__()
-
-    def getBookingsPerConf(self):
-        """ Returns a dictionary where the keys are Conference objects
-            and the values are the number of Vidyo bookings of that conference.
-        """
-        result = {}
-        for b in self._bookings:
-            result[b.getConference()] = result.setdefault(b.getConference(), 0) + 1
-        return result
 
 class IIndexableByVidyoRoom(Interface):
     pass

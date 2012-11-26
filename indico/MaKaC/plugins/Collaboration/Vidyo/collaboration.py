@@ -60,6 +60,8 @@ class CSBooking(CSBookingBase):
 
     _hasEventDisplay = True
 
+    _keepForever = True
+
     _commonIndexes = ["All Videoconference"]
 
     _simpleParameters = {
@@ -238,6 +240,9 @@ class CSBooking(CSBookingBase):
         """ Set if the room exists in Vidyo or not
         """
         self._created = created
+
+    def canBeDisplayed(self):
+        return self.isCreated()
 
     def getChecksDone(self):
         if not hasattr(self, "_checksDone"):
@@ -549,26 +554,46 @@ class CSBooking(CSBookingBase):
             self._bookingParams["autoMute"] = self._getAutomute()
             self._updateRelatedBookings()
 
-    def _delete(self, fromDeleteOld = False):
+    def _hasRecentClones(self, date):
+        for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(self._roomId):
+            if booking.getEndDate() > date:
+                return True
+        return False
+
+    def hasToBeDeleted(self, fromDeleteOld, maxDate):
+        return len(VidyoTools.getIndexByVidyoRoom().getBookingList(self._roomId)) == 1 or (fromDeleteOld and not self._hasRecentClones(maxDate))
+
+    def _delete(self, fromDeleteOld = False, maxDate = None):
         """ Deletes the Vidyo Public room associated to this CSBooking, based on the roomId
             Returns None if success.
             If trying to delete a non existing room, there will be a message in self._warning
             so that it is caught by Main.js's postDelete function.
         """
-        result = None
-        if len(VidyoTools.getIndexByVidyoRoom().getBookingList(self._roomId)) == 1:
-            result = ExternalOperationsManager.execute(self, "deleteRoom", VidyoOperations.deleteRoom, self, self._roomId)
 
-        if isinstance(result, VidyoError):
-            if result.getErrorType() == "unknownRoom" and result.getOperation() == "delete":
-                if not fromDeleteOld:
-                    self._warning = "cannotDeleteNonExistant"
-            else:
-                return result
+        if self.isCreated():
+            deleteRemote = unindexBooking = False
 
-        if not fromDeleteOld:
-            VidyoTools.getEventEndDateIndex().unindexBooking(self)
-            VidyoTools.getIndexByVidyoRoom().unindexBooking(self)
+            if self.hasToBeDeleted(fromDeleteOld, maxDate):
+                self.setCreated(False)
+                deleteRemote = unindexBooking = True
+            elif not fromDeleteOld:
+                unindexBooking = True
+
+            if deleteRemote:
+                result = ExternalOperationsManager.execute(self, "deleteRoom", VidyoOperations.deleteRoom, self, self._roomId)
+
+                if isinstance(result, VidyoError):
+                    if result.getErrorType() == "unknownRoom" and result.getOperation() == "delete":
+                        if not fromDeleteOld:
+                            self._warning = "cannotDeleteNonExistant"
+                    else:
+                        return result
+
+            if unindexBooking:
+                VidyoTools.getEventEndDateIndex().unindexBooking(self)
+                VidyoTools.getIndexByVidyoRoom().unindexBooking(self)
+
+
 
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),
@@ -581,7 +606,7 @@ class CSBooking(CSBookingBase):
         """
         status = self.getPlayStatus()
         if not self._created:
-            return _("Room no longer exists")
+            return _("Booking no longer exists")
         elif status == None:
                 return _("Public room created")
         elif status:

@@ -471,7 +471,7 @@ class CSBookingManager(Persistent, Observer):
             return booking
 
     def _unindexBooking(self, booking):
-        if booking.shouldBeIndexed():
+        if booking.shouldBeIndexed() and not booking.keepForever():
             indexes = self._getIndexList(booking)
             for index in indexes:
                 index.unindexBooking(booking)
@@ -1127,6 +1127,7 @@ class CSBookingBase(Persistent, Fossilizable):
             _canBeNotifiedOfEventDateChanges: True if bookings of this type should be able to be notified
                                               of their owner Event changing start date, end date or timezone.
             _allowMultiple: True if this booking type allows more than 1 booking per event.
+            _keepForever: True if this booking has to be in the Video Services Overview indexes forever
     """
 
     _hasStart = False
@@ -1151,6 +1152,7 @@ class CSBookingBase(Persistent, Fossilizable):
     _complexParameters = []
     _linkVideoType = None
     _linkVideoId = None
+    _keepForever = False
 
     def __init__(self, bookingType, conf):
         """ Constructor for the CSBookingBase class.
@@ -1982,6 +1984,17 @@ class CSBookingBase(Persistent, Fossilizable):
             an event display page
         """
         return self._hasEventDisplay
+
+    def keepForever(self):
+        """ Returns if this booking has to be in the Video Services Overview indexes forever
+        """
+        return self._keepForever
+
+    def canBeDisplayed(self):
+        """ Returns if this booking can be displayed in the event page.
+            By default is True and it will be shown as "Active" but can be overriden
+        """
+        return True
 
     def isAdminOnly(self):
         """ Returns if this booking / this booking's plugin pages should only be displayed

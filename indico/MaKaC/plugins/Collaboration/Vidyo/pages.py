@@ -26,6 +26,7 @@ from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools,\
     getVidyoOptionValue
 from datetime import timedelta
 from MaKaC.common import info
+from MaKaC.plugins.Collaboration.Vidyo.indexes import EventEndDateIndex
 
 
 
@@ -234,16 +235,34 @@ class WShowOldRoomIndexActionResult(WCSPageTemplateBase):
         WCSPageTemplateBase.__init__(self, None, "Vidyo", None)
         self._maxDate = maxDate
 
+    def _postProcessingClones(self, oldBookingsPerConfIterator, newBookingsPerConfIterator):
+        oldBookingsPerConf = {}
+        newBookingsPerConf = {}
+
+        for booking in newBookingsPerConfIterator:
+            key = EventEndDateIndex._bookingToKey(booking)
+            newBookingsPerConf[key][booking.getConference()] = newBookingsPerConf.setdefault(key,{}).setdefault(booking.getConference(), 0) + 1
+
+        for booking in oldBookingsPerConfIterator:
+            key = EventEndDateIndex._bookingToKey(booking)
+            if booking.hasToBeDeleted(True, self._maxDate):
+                oldBookingsPerConf[key][booking.getConference()] = oldBookingsPerConf.setdefault(key,{}).setdefault(booking.getConference(), 0) + 1
+            else:
+                newBookingsPerConf[key][booking.getConference()] = newBookingsPerConf.setdefault(key,{}).setdefault(booking.getConference(), 0) + 1
+
+        return oldBookingsPerConf, newBookingsPerConf
+
     def getVars(self):
         variables = WCSPageTemplateBase.getVars(self)
 
         variables["MaxDate"] = self._maxDate
         variables["TotalRoomCount"] = VidyoTools.getEventEndDateIndex().getCount()
+        oldBookingsPerConfIterator = VidyoTools.getEventEndDateIndex().iterbookings(maxDate = self._maxDate)
+        newBookingsPerConfIterator = VidyoTools.getEventEndDateIndex().iterbookings(minDate = self._maxDate + timedelta(seconds = 1))
+        oldBookingsPerConf, newBookingsPerConf = self._postProcessingClones(oldBookingsPerConfIterator, newBookingsPerConfIterator)
 
-        oldBookingsPerConfIterator = VidyoTools.getEventEndDateIndex().iterBookingsPerConf(maxDate = self._maxDate)
-        newBookingsPerConfIterator = VidyoTools.getEventEndDateIndex().iterBookingsPerConf(minDate = self._maxDate + timedelta(seconds = 1))
-        variables["OldBookings"] = WBookingsList(oldBookingsPerConfIterator).getHTML()
-        variables["NewBookings"] = WBookingsList(newBookingsPerConfIterator).getHTML()
+        variables["OldBookings"] = WBookingsList(oldBookingsPerConf).getHTML()
+        variables["NewBookings"] = WBookingsList(newBookingsPerConf).getHTML()
         variables["ServerTZ"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
 
         return variables

@@ -4,7 +4,7 @@
 
 <% isEmpty = True %>
 <% totalCount = 0 %>
-% for key, bookingsList in BookingsPerConfIterator:
+% for key, bookingsList in BookingsPerConfIterator.iteritems():
     <% isEmpty = False %>
     <li>
         ${ _("Ending on: ") + formatDateTime(unixTimeToDatetime(key, tz=ServerTZ), showWeek = True) }

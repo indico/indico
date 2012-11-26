@@ -5,7 +5,7 @@
 <% from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools %>
 <%
     ## Only show event-level video services.
-    event_bookings = filter(lambda x: x.hasSessionOrContributionLink() != True, bookings)
+    event_bookings = filter(lambda x: x.hasSessionOrContributionLink() != True and x.canBeDisplayed(), bookings)
 %>
 % if event_bookings:
 <tr>

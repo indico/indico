@@ -26,7 +26,9 @@
         % endif
         % if conf.getCSBookingManager() and conf.getCSBookingManager().hasVideoService(item.getUniqueId()):
             % for video in conf.getCSBookingManager().getVideoServicesById(item.getUniqueId()):
-                <%include file="VideoService.tpl" args="video=video"/>
+                % if video.canBeDisplayed():
+                    <%include file="VideoService.tpl" args="video=video"/>
+                % endif
             % endfor
         % endif
     </span>

@@ -63,8 +63,8 @@ class DeleteOldRoomsAction(ActionBase):
         error = False
         attainedDate = None
         try:
-            for booking in VidyoTools.getEventEndDateIndex().iterbookings(maxDate = maxDate):
-                result = booking._delete(fromDeleteOld = True)
+            for booking in list(VidyoTools.getEventEndDateIndex().iterbookings(maxDate = maxDate)):
+                result = booking._delete(fromDeleteOld = True, maxDate = maxDate)
                 if isinstance(result, VidyoError):
                     error = result
                     attainedDate = booking.getConference().getAdjustedEndDate(tz = 'UTC')
@@ -93,11 +93,6 @@ class DeleteOldRoomsAction(ActionBase):
             previousTotal = VidyoTools.getEventEndDateIndex().getCount()
 
             error, attainedDate = DeleteOldRoomsAction._deleteRemoteRooms(maxDate)
-
-            if error:
-                VidyoTools.getEventEndDateIndex().deleteKeys(maxDate = attainedDate - timedelta(seconds = 1))
-            else:
-                VidyoTools.getEventEndDateIndex().deleteKeys(maxDate = maxDate)
 
             newTotal = VidyoTools.getEventEndDateIndex().getCount()
 
