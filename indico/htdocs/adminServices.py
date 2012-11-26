@@ -77,14 +77,14 @@ def webcastAddOnAir(req, **params):
 def webcastRemoveFromAir(req, **params):
     return services.RHWebcastRemoveFromAir(req).process(params)
 
-def oaiPrivateConfig(req, **params):
-    return services.RHOAIPrivateConfig(req).process(params)
+def ipbasedacl(req, **params):
+    return services.RHIPBasedACL(req).process(params)
 
-def oaiPrivateConfigAddIP(req, **params):
-    return services.RHOAIPrivateConfigAddIP(req).process(params)
+def ipbasedacl_fagrant(req, **params):
+    return services.RHIPBasedACLFullAccessGrant(req).process(params)
 
-def oaiPrivateConfigRemoveIP(req, **params):
-    return services.RHOAIPrivateConfigRemoveIP(req).process(params)
+def ipbasedacl_farevoke(req, **params):
+    return services.RHIPBasedACLFullAccessRevoke(req).process(params)
 
 def apiOptions(req, **params):
     return api.RHAdminAPIOptions(req).process(params)

@@ -84,8 +84,7 @@ class MaKaCInfo(Persistent):
         # /afs/cern.ch/project/indico/2008/...
         self._archivingVolume = ""
 
-        # list of IPs that can access the private OAI gateway
-        self._oaiPrivateHarvesterList = []
+        self._ip_based_acl_mgr = IPBasedACLMgr()
 
         # http api
         self._apiHTTPSRequired = False
@@ -389,18 +388,8 @@ class MaKaCInfo(Persistent):
             self._archivingVolume = ""
         return self._archivingVolume
 
-    def getOAIPrivateHarvesterList(self):
-        """ Returns the list of allowed IPs of harvesters
-        for the private OAI gateway """
-
-        try:
-            self._oaiPrivateHarvesterList
-        except:
-            self._oaiPrivateHarvesterList = []
-        return self._oaiPrivateHarvesterList
-
-    def setOAIPrivateHarvesterList(self, harvList):
-        self._oaiPrivateHarvesterList = harvList
+    def getIPBasedACLMgr(self):
+        return self._ip_based_acl_mgr
 
     def isAPIHTTPSRequired(self):
         if hasattr(self, '_apiHTTPSRequired'):
@@ -758,5 +747,23 @@ class StyleManager(Persistent):
         else:
             return False
 
+class IPBasedACLMgr(Persistent):
 
+    def __init(self):
+        self._full_access_acl = set()
+
+    def get_full_access_acl(self):
+        return self._full_access_acl
+
+    def grant_full_access(self, ip):
+        self._full_access_acl.add(ip)
+        self.notify_modification()
+
+    def revoke_full_access(self, ip):
+        if ip in self._full_access_acl:
+            self._full_access_acl.remove(ip)
+        self.notify_modification()
+
+    def notify_modification(self):
+        self._p_changed = 1
 

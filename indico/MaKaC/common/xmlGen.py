@@ -21,7 +21,7 @@ from xml.sax import saxutils
 from MaKaC.common.utils import encodeUnicode
 
 class XMLGen:
-    
+
     def __init__(self, init=True):
         self.setSourceEncoding( "utf-8" )
         if init:
@@ -34,7 +34,6 @@ class XMLGen:
         self._sourceEncoding = newEnc
 
     def initXml(self):
-        #init the OAI response
         self.xml=["""<?xml version="1.0" encoding="UTF-8"?>\n"""]
 
     def getXml(self):
@@ -80,7 +79,7 @@ class XMLGen:
         self.openTag(name,ListAttrib,True)
         self.writeText(value,True)
         self.closeTag(name,True)
-        
+
     def writeComment(self, commentText):
         self.xml.append("<!-- ")
         self.writeText(commentText, True)

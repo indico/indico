@@ -461,8 +461,8 @@ class WPServicesCommon( WPAdminsBase ):
                 urlHandlers.UHWebcastArchive.getURL() )
         self._subTabWebcast_Setup = self._subTabWebcast.newSubTab( "setup", _("Setup"), \
                 urlHandlers.UHWebcastSetup.getURL() )
-        self._subTabOAIPrivateConfig = self._tabCtrl.newTab( "oai-private", _("OAI Private Gateway"), \
-                urlHandlers.UHOAIPrivateConfig.getURL() )
+        self._subTabIPBasedACL = self._tabCtrl.newTab( "ip_based_acl", _("IP Based ACL"), \
+                urlHandlers.UHIPBasedACL.getURL() )
         self._subTabHTTPAPI = self._tabCtrl.newTab( "http_api", _("HTTP API"), \
                 urlHandlers.UHAdminAPIOptions.getURL() )
         self._subTabHTTPAPI_Options = self._subTabHTTPAPI.newSubTab( "api_options", _("Options"), \
@@ -2579,26 +2579,24 @@ class WPConfirmDelete(WPTaskManagerBase):
         postURL = urlHandlers.UHRemoveTask.getURL()
         return wc.getHTML( msg, postURL, {"taskId":self._taskId} )
 
-class WPOAIPrivateConfig( WPServicesCommon ):
+class WPIPBasedACL( WPServicesCommon ):
 
-    def __init__( self, rh, addedIP=None ):
+    def __init__( self, rh ):
         WPServicesCommon.__init__( self, rh )
-        self._addedIP = addedIP
 
     def _getTabContent( self, params ):
-        wc = WOAIPrivateConfig()
-        params["addedIP"] = self._addedIP
+        wc = WIPBasedACL()
         return wc.getHTML( params )
 
     def _setActiveTab( self ):
-        self._subTabOAIPrivateConfig.setActive()
+        self._subTabIPBasedACL.setActive()
 
-class WOAIPrivateConfig(wcomponents.WTemplated):
+class WIPBasedACL(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["ipList"] = minfo.getOAIPrivateHarvesterList()
+        vars["ipList"] = minfo.getIPBasedACLMgr().get_full_access_acl()
         vars["removeIcon"] = Config.getInstance().getSystemIconURL( "remove" )
         return vars
 

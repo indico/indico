@@ -15,8 +15,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.user import AvatarHolder
-from MaKaC.rb_location import CrossLocationQueries
 
 """
 Migration script
@@ -46,6 +44,8 @@ from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 from MaKaC.plugins.RoomBooking.default.room import Room
 from MaKaC.plugins.RoomBooking.tasks import RoomReservationTask
 from MaKaC.webinterface import displayMgr
+from MaKaC.user import AvatarHolder
+from MaKaC.rb_location import CrossLocationQueries
 
 from indico.core.index import Catalog
 from indico.ext import livesync
@@ -500,7 +500,7 @@ def collaborationRequestIndexCreate(dbi, withRBDB, prevVersion):
 
 
 @since('0.99')
-def chatroomIndexMigration(dbi, withRBDB, prevVersio):
+def chatroomIndexMigration(dbi, withRBDB, prevVersion):
     """
     Migrating Chat Room index to new structure
     """
@@ -545,7 +545,7 @@ def chatroomIndexMigration(dbi, withRBDB, prevVersio):
 
 
 @since('0.99')
-def timedLinkedEventListRemoval(dbi, withRBDB, prevVersio):
+def timedLinkedEventListRemoval(dbi, withRBDB, prevVersion):
     """
     Removing TimedLinkedEvents
     """
@@ -556,6 +556,20 @@ def timedLinkedEventListRemoval(dbi, withRBDB, prevVersio):
         i += 1
         if i % 100 == 0:
             dbi.commit()
+
+@since('1.0')
+def ip_based_acl(dbi, withRBDB, prevVersion):
+    """
+    Moving from OAI Private Harvesting to a more general IP-based ACL.
+    """
+    from MaKaC.common.info import IPBasedACLMgr
+    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+    ip_set = set(minfo._oaiPrivateHarvesterList)
+    ip_acl_mgr = minfo._ip_based_acl_mgr = IPBasedACLMgr()
+    ip_acl_mgr._full_access_acl = ip_set
+    dbi.commit()
+
+
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),

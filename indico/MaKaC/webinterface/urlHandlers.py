@@ -2570,14 +2570,14 @@ class UHWebcastAddOnAir( URLHandler ):
 class UHWebcastRemoveFromAir( URLHandler ):
     _relativeURL = "adminServices.py/webcastRemoveFromAir"
 
-class UHOAIPrivateConfig( URLHandler ):
-    _relativeURL = "adminServices.py/oaiPrivateConfig"
+class UHIPBasedACL( URLHandler ):
+    _relativeURL = "adminServices.py/ipbasedacl"
 
-class UHOAIPrivateConfigAddIP( URLHandler ):
-    _relativeURL = "adminServices.py/oaiPrivateConfigAddIP"
+class UHIPBasedACLFullAccessGrant( URLHandler ):
+    _relativeURL = "adminServices.py/ipbasedacl_fagrant"
 
-class UHOAIPrivateConfigRemoveIP( URLHandler ):
-    _relativeURL = "adminServices.py/oaiPrivateConfigRemoveIP"
+class UHIPBasedACLFullAccessRevoke( URLHandler ):
+    _relativeURL = "adminServices.py/ipbasedacl_farevoke"
 
 class UHAdminAPIOptions( URLHandler ):
     _relativeURL = "adminServices.py/apiOptions"

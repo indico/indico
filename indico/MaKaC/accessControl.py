@@ -190,7 +190,7 @@ class AccessController( Persistent, Observable ):
     @classmethod
     def isHarvesterIP( cls, ip ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        ipList = minfo.getOAIPrivateHarvesterList()[:]
+        ipList = minfo.getIPBasedACLMgr().get_full_access_acl()
 
         if ip in ipList:
             # let Private OAI harvesters access protected (display) pages

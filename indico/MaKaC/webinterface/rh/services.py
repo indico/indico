@@ -317,20 +317,18 @@ class RHWebcastRemoveFromAir( RHWebcastBase ):
             self._wm.removeFromAir(self._chname)
         self._redirect(urlHandlers.UHWebcast.getURL())
 
-class RHOAIPrivateConfig( RHServicesBase ):
-    """ OAI Private Gateway Configuration Interface """
+class RHIPBasedACL( RHServicesBase ):
+    """ IP Based ACL Configuration Interface """
 
-    _uh = urlHandlers.UHOAIPrivateConfig
+    _uh = urlHandlers.UHIPBasedACL
 
     def _process( self ):
-        p = adminPages.WPOAIPrivateConfig(self)
+        p = adminPages.WPIPBasedACL(self)
         return p.display()
 
-class RHOAIPrivateConfigAddIP( RHServicesBase ):
-    """ OAI Private Gateway Configuration Interface
-        (Add an IP Address) """
+class RHIPBasedACLFullAccessGrant( RHServicesBase ):
 
-    _uh = urlHandlers.UHOAIPrivateConfigAddIP
+    _uh = urlHandlers.UHIPBasedACLFullAccessGrant
 
     def _checkParams( self, params ):
         RHServicesBase._checkParams( self, params )
@@ -345,17 +343,14 @@ class RHOAIPrivateConfigAddIP( RHServicesBase ):
                 raise MaKaCError("IP Address %s is  not valid!" % ipAddress)
             else:
                 minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-                ipList = minfo.getOAIPrivateHarvesterList()
-                ipList.append(ipAddress)
-                minfo.setOAIPrivateHarvesterList(ipList)
+                ip_acl_mgr = minfo.getIPBasedACLMgr()
+                ip_acl_mgr.grant_full_access(ipAddress)
 
-        self._redirect(urlHandlers.UHOAIPrivateConfig.getURL())
+        self._redirect(urlHandlers.UHIPBasedACL.getURL())
 
-class RHOAIPrivateConfigRemoveIP( RHServicesBase ):
-    """ OAI Private Gateway Configuration Interface
-        (Add an IP Address) """
+class RHIPBasedACLFullAccessRevoke( RHServicesBase ):
 
-    _uh = urlHandlers.UHOAIPrivateConfigRemoveIP
+    _uh = urlHandlers.UHIPBasedACLFullAccessRevoke
 
     def _checkParams( self, params ):
         RHServicesBase._checkParams( self, params )
@@ -367,11 +362,10 @@ class RHOAIPrivateConfigRemoveIP( RHServicesBase ):
 
         if ipAddress:
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            ipList = minfo.getOAIPrivateHarvesterList()
-            ipList.remove(ipAddress)
-            minfo.setOAIPrivateHarvesterList(ipList)
+            ip_acl_mgr = minfo.getIPBasedACLMgr()
+            ip_acl_mgr.revoke_full_access(ipAddress)
 
-        self._redirect(urlHandlers.UHOAIPrivateConfig.getURL())
+        self._redirect(urlHandlers.UHIPBasedACL.getURL())
 
 class RHAnalytics( RHServicesBase ):
     _uh = urlHandlers.UHAnalytics
