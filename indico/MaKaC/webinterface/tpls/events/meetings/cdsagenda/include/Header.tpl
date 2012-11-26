@@ -152,7 +152,7 @@
                                     </td>
                                     <% bgcolor="#E4E4E4" if contSessions % 2 == 1 else "#F6F6F6" %>
                                     <td valign="top" bgcolor=${bgcolor}>
-                                    <a href="#session.getId()">
+                                    <a href="#${session.getId()}">
                                         <span style="font-size:x-small">
                                             ${session.getTitle() if session.getTitle!='' else "no title"}
                                         </span>
