@@ -46,8 +46,7 @@ class VidyoOperations(object):
         # we extract the different parameters
         # We set the original conference id because the bookings can belong to more than one conference and being cloned
         # and it is used for the long name, we need to keep always the same confId
-        originalId = confId = booking.getConference().getId()
-        booking.setOriginalConferenceId(originalId)
+        confId = booking.getConference().getId()
 
         bookingId = booking.getId()
         roomName = booking.getBookingParamByName("roomName")
@@ -57,7 +56,7 @@ class VidyoOperations(object):
         moderatorPin = booking.getModeratorPin()
 
         #we obtain the unicode object with the proper format for the room name
-        roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName, originalId)
+        roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName)
         if isinstance(roomNameForVidyo, VidyoError):
             return roomNameForVidyo
 
@@ -68,7 +67,7 @@ class VidyoOperations(object):
 
         #we obtain the most probable extension
         #TODO: there's a length limit for extensions, check this
-        baseExtension = getVidyoOptionValue("prefix") + originalId
+        baseExtension = getVidyoOptionValue("prefix") + confId
         extension = baseExtension
         extensionSuffix = 1
 
@@ -127,7 +126,6 @@ class VidyoOperations(object):
         # we extract the different parameters
         # We set the original conference id because the bookings can belong to more than one conference and being cloned
         # and it is used for the long name, we need to keep always the same confId
-        originalId = booking.getOriginalConferenceId()
         confId = booking.getConference().getId()
         bookingId = booking.getId()
         roomId = booking.getRoomId()
@@ -140,7 +138,7 @@ class VidyoOperations(object):
         moderatorPin = booking.getModeratorPin()
 
         #we obtain the unicode object with the proper format for the room name
-        roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName, originalId)
+        roomNameForVidyo = VidyoTools.roomNameForVidyo(roomName)
         if isinstance(roomNameForVidyo, VidyoError):
             return roomNameForVidyo
 
@@ -289,18 +287,7 @@ class VidyoOperations(object):
                             (confId, bookingId, e.fault.faultstring))
                 raise
 
-        extension = str(adminApiRoom.extension)
-
-        searchFilter = SOAPObjectFactory.createFilter('user', extension)
-        userApiAnswer = UserApi.search(searchFilter, confId, bookingId)
-        foundEntities = userApiAnswer.Entity
-
-        userApiRoom = None
-        for entity in foundEntities:
-            if str(entity.extension) == extension and str(entity.entityID) == roomId:
-                userApiRoom = entity
-
-        return (adminApiRoom, userApiRoom)
+        return adminApiRoom
 
     @classmethod
     def deleteRoom(cls, booking, roomId):

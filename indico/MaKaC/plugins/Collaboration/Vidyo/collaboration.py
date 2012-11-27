@@ -252,14 +252,6 @@ class CSBooking(CSBookingBase):
     def setChecksDone(self, checksDone):
         self._checksDone = checksDone
 
-    def getOriginalConferenceId(self):
-        if not hasattr(self, "_originalConferenceId"):
-            self._originalConferenceId = self.getConference().getId()
-        return self._originalConferenceId
-
-    def setOriginalConferenceId(self, confId):
-        self._originalConferenceId = confId
-
     def connectionStatus(self):
         return VidyoOperations.isRoomConnected(self, VidyoTools.getLinkRoomIp(self.getLinkObject()))
 
@@ -285,7 +277,7 @@ class CSBooking(CSBookingBase):
     def _checkBookingParams(self):
         if len(self._bookingParams["roomName"].strip()) == 0:
             raise VidyoException("roomName parameter (" + str(self._bookingParams["roomName"]) + " ) is empty for Vidyo booking with id: " + str(self._id))
-        elif unicodeLength(self._bookingParams["roomName"]) > VidyoTools.maxRoomNameLength(self.getOriginalConferenceId()):
+        elif unicodeLength(self._bookingParams["roomName"]) > VidyoTools.maxRoomNameLength():
             return VidyoError("nameTooLong")
         else:
             if not VidyoTools.verifyRoomName(self._bookingParams["roomName"]):
@@ -507,25 +499,22 @@ class CSBooking(CSBookingBase):
     def _checkStatus(self):
         """ Queries the data for the Vidyo Public room associated to this CSBooking
             and updates the locally stored data.
-            When API problems are solved, uncomment and test the commented code.
-            The User API call of VidyoOperations.queryRoom will not be necessary any more.
         """
-        result = VidyoOperations.queryRoom(self, self._roomId)
+        adminApiResult = VidyoOperations.queryRoom(self, self._roomId)
 
-        if isinstance(result, VidyoError):
-            if result.getErrorType() == 'unknownRoom':
+        if isinstance(adminApiResult, VidyoError):
+            if adminApiResult.getErrorType() == 'unknownRoom':
                 self.setBookingNotPresent()
-            return result
+            return adminApiResult
 
         else:
-            adminApiResult = result[0]
-            userApiResult = result[1]
 
-            recoveredVidyoName = VidyoTools.recoverVidyoName(userApiResult.displayName)
+            recoveredVidyoName = VidyoTools.recoverVidyoName(adminApiResult.name)
             if recoveredVidyoName:
                 self._bookingParams["roomName"] = recoveredVidyoName
             else:
                 self._warning = "invalidName"
+
             self._extension = str(adminApiResult.extension)
 
             if bool(adminApiResult.RoomMode.hasPIN):
@@ -765,5 +754,4 @@ class CSBooking(CSBookingBase):
         cs.setChecksDone(self.getChecksDone())
         cs.setCreated(self.isCreated())
         cs.setLinkType(self.getLinkIdDict())
-        cs.setOriginalConferenceId(self.getOriginalConferenceId())
         return cs

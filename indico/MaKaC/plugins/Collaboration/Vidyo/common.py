@@ -57,23 +57,22 @@ class VidyoTools(object):
         title = re.compile(ur"^[\W\d]$", re.UNICODE).sub('_', title)
         # Get rid of everything else that's not allowed
         title = re.compile(ur"[^\w._\- ]|'$", re.UNICODE).sub('_', title)
-        return cls.replaceSpacesInName(title)[:cls.maxRoomNameLength(conf.getId())]
+        return cls.replaceSpacesInName(title)[:cls.maxRoomNameLength()]
 
     @classmethod
-    def maxRoomNameLength(cls, confId):
-        suffix = cls.roomNameForVidyo('', confId)
+    def maxRoomNameLength(cls):
+        suffix = cls.roomNameForVidyo('')
         return 61 - len(suffix)
 
     @classmethod
-    def roomNameForVidyo(cls, roomName, confId):
+    def roomNameForVidyo(cls, roomName):
         """ We apply the _indico_ suffix
             and we turn the name into an unicode object, since suds
             works with either ascii-encoded str objects or unicode objects
             (not utf-8 encoded str objects), and the name may have unicode chars
         """
-        strName = roomName + '_indico_' + confId
         try:
-            return strName.decode('utf-8')
+            return roomName.decode('utf-8')
         except UnicodeDecodeError:
             return VidyoError("invalidName")
 
@@ -118,19 +117,13 @@ class VidyoTools(object):
             This function turns "Hello_Kitty_indico_5423" back into "Hello_Kitty" (note: the _ are not turned back into spaces).
             The value returned is always a utf-8 encoded str object.
         """
-        if not cls.__vidyoRecoverNameRE:
-            cls.__vidyoRecoverNameRE = re.compile("_indico_[\d]+$")
-
         try:
             name = str(name)
+            name = unicode(name)
+            name = name.encode('utf-8')
         except UnicodeEncodeError:
-            try:
-                name = unicode(name)
-                name = name.encode('utf-8')
-            except UnicodeEncodeError:
-                return None
-
-        return cls.__vidyoRecoverNameRE.sub("", name)
+            return None
+        return name
 
     @classmethod
     def recoverVidyoDescription(cls, description):

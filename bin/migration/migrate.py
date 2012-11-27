@@ -43,6 +43,7 @@ from MaKaC.registration import RegistrantSession, RegistrationSession
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 from MaKaC.plugins.RoomBooking.default.room import Room
 from MaKaC.plugins.RoomBooking.tasks import RoomReservationTask
+from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 from MaKaC.webinterface import displayMgr
 from MaKaC.user import AvatarHolder
 from MaKaC.rb_location import CrossLocationQueries
@@ -559,6 +560,21 @@ def timedLinkedEventListRemoval(dbi, withRBDB, prevVersion):
         if i % 100 == 0:
             dbi.commit()
 
+
+@since('1.0')
+def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
+    """
+    Removing TimedLinkedEvents
+    """
+    i = 0
+    for booking in VidyoTools.getIndexByVidyoRoom().itervalues():
+        if hasattr(booking, '_originalConferenceId'):
+            roomName = booking["roomName"] + '_indico_' + booking._originalConferenceId
+            booking["roomName"] = roomName.decode("utf-8")
+            del booking._originalConferenceId
+        i += 1
+        if i % 100 == 0:
+            dbi.commit()
 
 @since('1.0')
 def ip_based_acl(dbi, withRBDB, prevVersion):
