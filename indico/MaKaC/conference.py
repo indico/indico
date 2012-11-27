@@ -7347,6 +7347,9 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
             res=self.getSession().getTextColor()
         return res
 
+    def getAllMaterialList(self):
+        return self.getSession().getAllMaterialList()
+
 
 class ContributionParticipation(Persistent, Fossilizable):
 
