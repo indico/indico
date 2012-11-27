@@ -77,6 +77,8 @@ class ICSBookingBaseFossil(IFossil):
     def getBookingParams(self):
         """ Returns a dictionary with the booking params. """
 
+    def hasAcceptReject(self):
+        """ Returns if this booking belongs to a plugin who has a "accept or reject" concept. """
 
 
 class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
@@ -111,9 +113,6 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
 
     def isLinkedToEquippedRoom(self):
         pass
-
-    def hasAcceptReject(self):
-        """ Returns if this booking belongs to a plugin who has a "accept or reject" concept. """
 
     def requiresServerCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a server call when the start button is pressed."""

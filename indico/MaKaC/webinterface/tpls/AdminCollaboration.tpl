@@ -132,11 +132,11 @@
 </div>
 <script type="text/javascript">
 
-var STATUS_MESSAGE = {
-  null: $T('Pending approval'),
-  true: $T('Accepted'),
-  false: $T('Rejected')
-};
+//hack for IE
+var STATUS_MESSAGE = {};
+STATUS_MESSAGE[null] = $T('Pending approval');
+STATUS_MESSAGE[true] = $T('Accepted');
+STATUS_MESSAGE[false] = $T('Rejected');
 
 var bookings = ${ jsonEncode (InitialBookings) };
 var nBookings = ${ InitialNumberOfBookings }
@@ -459,7 +459,7 @@ var confTitleBookingTemplate = function(booking) {
     var cell = Html.td('ACBookingFirstCell', Html.span('', booking.type));
     row.append(cell);
 
-    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, STATUS_MESSAGE[booking.acceptRejectStatus]));
+    var cell = Html.td('ACBookingCellNoWrap', Html.span(booking.statusClass, booking.hasAcceptReject?STATUS_MESSAGE[booking.acceptRejectStatus]:""));
     row.append(cell);
 
     var cell = Html.td('ACBookingCellNoWrap', $T("Last modification:") + formatDateTimeCS(booking.modificationDate) );
@@ -499,9 +499,9 @@ var dateBookingTemplate = function(booking, viewBy) {
     row.append($('<td class="ACBookingFirstCell ACBookingTime"></td>').html(time)).
         append($('<td class="ACBookingCellNoWrap"><span>' + booking.type + '</span></td>')).
         append($('<td class="ACBookingCellNoWrap"></td>').append($('<span/>').
-               addClass(booking.statusClass).html(STATUS_MESSAGE[booking.acceptRejectStatus]))).
+               addClass(booking.statusClass).html(booking.hasAcceptReject?STATUS_MESSAGE[booking.acceptRejectStatus]:""))).
         append($('<td class="ACBookingCell"></td>').html(booking.talk ? booking.talk.room : booking.conference.room)).
-        append($('<td class="ACBookingCell"></td>').append($('<span/>').html(booking.conference.title + 
+        append($('<td class="ACBookingCell"></td>').append($('<span/>').html(booking.conference.title +
                                                           (booking.talk ? (': <em>' + booking.talk.title + '</em>') : ''))));
 
     if (pluginHasFunction(booking.type, 'customText')) {
