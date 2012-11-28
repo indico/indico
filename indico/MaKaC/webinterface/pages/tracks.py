@@ -859,9 +859,13 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
             return "Unmarked as duplicated"
         return None
 
+    def _getLastJudgementComment(self):
+        jud = self._abstract.getLastJudgementPerReviewer(self._rh.getAW().getUser(), self._track)
+        return self.htmlText(jud.getComment()) if jud else None
+
     def _getStatusCommentsHTML( self, status ):
         comment = ""
-        if status.getComment() != "":
+        if status.__class__ in [_ASTrackViewAccepted, _ASTrackViewAcceptedForOther, _ASTrackViewRejected, _ASTrackViewWithdrawn, _ASTrackViewDuplicated]:
             comment = self.htmlText( status.getComment() )
         if status.__class__ == _ASTrackViewPA:
             conflicts = status.getConflicts()
@@ -938,7 +942,6 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         aStatus = AbstractStatusTrackViewFactory().getStatus( self._track, self._abstract )
         vars["statusDetails"] = self._getStatusDetailsHTML( aStatus )
         vars["statusComment"] = self._getStatusCommentsHTML( aStatus )
-        vars["statusColor"] = aStatus.getColor()
         vars["modifyStatusURL"],vars["modifyStatusBtn"] = quoteattr(""),""
         vars["PA_defaults"] = ""
 
@@ -974,6 +977,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         else:
             vars["rating"] = "%.2f" % rating
         vars["lastJudgement"] = self._getLastJudgement()
+        vars["lastJudgementComment"] = self._getLastJudgementComment()
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
         vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
