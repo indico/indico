@@ -116,3 +116,12 @@ form.EAChoiceButton{
     vertical-align: middle;
     margin-left: 5px;
 }
+
+.optionsBlock {
+    float: right;
+    width: 500px;
+    background: #F0F0F0;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px;
+}

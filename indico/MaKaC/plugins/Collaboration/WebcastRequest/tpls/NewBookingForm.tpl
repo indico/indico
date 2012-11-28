@@ -102,7 +102,7 @@
                         % endif
                     </td>
                 </tr>
-                % if WebcastCapable:
+                % if WebcastCapable and (NWebcastCapableContributions < NTalks):
                 <tr>
                     <td></td>
                     <td class="warning">

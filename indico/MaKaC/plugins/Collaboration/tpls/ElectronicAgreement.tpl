@@ -11,19 +11,19 @@
                 <div id="inPlaceEditNotifyElectronicAgreement"></div>
             </div>
             <div class="RRNoteText">
-                ${_("""Before any recording can be published, each speaker must sign the %s.<br/>
-                         To do so, two different ways are available:
+                ${_("""<p>Before any recording can be published, each speaker must sign the {0}.
+                         There are two ways of doing so:</p>
+                         <p>Either:</p>
                          <ul>
-                            <li><span style="font-weight:bold;">Electronic signature:</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
+                            <li><span style="font-weight:bold;">Electronic signature (<strong>recommended</strong>):</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
                             </li>
-                            <li>Ask the speaker to sign the """)%(agreementName)}
-
-                ${urlPaperAgreement}
-
-                 ${_("""<br/>Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
-                               </li>
-                            </ul>
-                    """)}
+                         </ul>
+                         <p><em>or</em></p>
+                         <ul>
+                            <li>
+                              Ask the speaker to sign the {1}. Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
+                            </li>
+                         </ul>""").format(agreementName, urlPaperAgreement)}
             </div>
         </div>
 

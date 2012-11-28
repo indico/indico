@@ -40,6 +40,7 @@ from MaKaC.conference import LocalFile
 import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.webinterface.urlHandlers import URLHandler
+from MaKaC.common.logger import Logger
 
 
 class RHElectronicAgreement(RHConfModifCSBookings):
@@ -80,7 +81,8 @@ class RHElectronicAgreement(RHConfModifCSBookings):
         # We save the file
         try:
             f = LocalFile()
-            f.setFileName("EAForm-%s"%self.spkUniqueId)
+            __, extension = os.path.splitext(self.file.filename)
+            f.setFileName("EAForm-{0}{1}".format(self.spkUniqueId, extension))
             f.setFilePath(self.filePath)
             f.setId(self.spkUniqueId)
             # Update status for speaker wrapper
@@ -95,6 +97,7 @@ class RHElectronicAgreement(RHConfModifCSBookings):
             spkWrapper.setLocalFile(f) # set path to file
             spkWrapper.triggerNotification() # trigger notification task
         except:
+            Logger.get('file_upload').exception("Error uploading file")
             raise MaKaCError("Unexpected error while uploading file")
 
 
@@ -109,11 +112,11 @@ class RHElectronicAgreement(RHConfModifCSBookings):
             p = WPElectronicAgreement(self, self._conf)
             return p.display(sortCriteria = self.sortCriteria, order = self.order)
 
-class RHElectronicAgreementGetFile(RHConferenceBaseDisplay):
+class RHElectronicAgreementGetFile(RHConfModifCSBookings):
     _url = r'^/Collaboration/getPaperAgree/?$'
 
     def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams( self, params )
+        RHConfModifCSBookings._checkParams( self, params )
         self.spkUniqueId = params.get("spkId","")
 
     def _process(self):
@@ -125,6 +128,7 @@ class RHElectronicAgreementGetFile(RHConferenceBaseDisplay):
             self._req.headers_out["Last-Modified"] = "%s"%time.mktime(self.file.getCreationDate().timetuple())
             cfg = Config.getInstance()
             mimetype = cfg.getFileTypeMimeType( self.file.getFileType() )
+            print self.file.getFilePath()
             self._req.content_type = """%s"""%(mimetype)
             dispos = "inline"
             try:

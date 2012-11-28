@@ -101,7 +101,7 @@
                         % endif
                     </td>
                 </tr>
-                % if RecordingCapable:
+                % if RecordingCapable and (NRecordingCapableContributions < NTalks):
                 <tr>
                     <td></td>
                     <td class="warning">
