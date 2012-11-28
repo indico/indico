@@ -54,37 +54,36 @@
                 </tr>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Your last proposition") }</span></td>
-                    <td bgcolor="white" valign="top">
-                        ${lastJudgement if lastJudgement else _("No proposition yet")}
-                        <br>
-                        ${lastJudgementComment if lastJudgementComment else ""}
+                    <td>
+                        <span>${lastJudgement if lastJudgement else _("No proposition yet")}</span>
+                        <p class="quotation">${lastJudgementComment if lastJudgementComment else ""}</p>
                     </td>
-                    <td align="right" valign="top" rowspan="3">
-                        <table align="right">
+                    <td rowspan="3">
+                        <table>
                             <tr>
                                 <form action=${ proposeToAccURL } method="POST">
-                                <td align="right">
+                                <td>
                                         ${ proposeToAcceptButton }
                                 </td>
                                 </form>
                             </tr>
                             <tr>
                                 <form action=${ proposeToRejURL } method="POST">
-                                <td align="right">
+                                <td>
                                         ${ proposeToRejectButton }
                                 </td>
                                 </form>
                             </tr>
                             <tr>
                                 <form action=${ proposeForOtherTracksURL } method="POST">
-                                <td align="right">
+                                <td>
                                         ${ proposeForOtherTracksButton }
                                 </td>
                                 </form>
                             </tr>
                             <tr>
                                 <form action=${ duplicatedURL } method="POST">
-                                <td align="right">
+                                <td>
                                         ${ duplicatedButton }
                                 </td>
                                 </form>

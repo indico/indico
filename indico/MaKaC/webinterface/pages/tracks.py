@@ -865,9 +865,10 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
 
     def _getStatusCommentsHTML( self, status ):
         comment = ""
-        if status.__class__ in [_ASTrackViewAccepted, _ASTrackViewAcceptedForOther, _ASTrackViewRejected, _ASTrackViewWithdrawn, _ASTrackViewDuplicated]:
+        if status._id in ["accepted", "accepted_other", "rejected",
+                          "withdrawn", "duplicated"]:
             comment = self.htmlText( status.getComment() )
-        if status.__class__ == _ASTrackViewPA:
+        elif status._id == 'pa':
             conflicts = status.getConflicts()
             if conflicts:
                 if comment != "":

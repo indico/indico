@@ -8525,3 +8525,10 @@ ul.material_list ul li {
     margin: 0;
     border: 0;
 }
+
+.quotation {
+    padding-left: 10px;
+    white-space: pre;
+    color: #aaa;
+    border-left: 4px solid #999;
+}
