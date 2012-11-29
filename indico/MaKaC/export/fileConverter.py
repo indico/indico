@@ -28,6 +28,8 @@ from MaKaC.common.Configuration import Config
 from MaKaC import conference
 from MaKaC.conference import LocalFile
 
+from indico.util.network import resolve_host
+
 #URL_RESPONSE = "http://pcdh20.cern.ch/indico/getConvertedFile.py"
 #SERVER = 'http://pcdh20.cern.ch/getSegFile.py'#'http://pcuds01.cern.ch/getSegFile.py'
 
@@ -246,9 +248,10 @@ class CDSConvFileConverter(FileConverter):
         # extract the server name from the url
         serverURL = Config.getInstance().getFileConverterServerURL()
         up = urlparse.urlparse(serverURL)
+        ip_addrs = resolve_host(up[1])
 
         # check that the request comes from the conversion server
-        if socket.gethostbyname(up[1]) != requestIP:
+        if requestIP not in ip_addrs:
             return
 
         if params["status"] == '1':
