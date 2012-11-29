@@ -2243,14 +2243,12 @@ class WConfModifAC:
 
     def getHTML( self, params ):
         ac = wcomponents.WConfAccessControlFrame().getHTML( self.__conf,\
-                                            params["setVisibilityURL"],\
-                                            params["setAccessKeyURL"] )
+                                            params["setVisibilityURL"])
         dc = ""
         if not self.__conf.isProtected():
             dc = "<br>%s"%wcomponents.WDomainControlFrame( self.__conf ).getHTML()
 
-        mc = wcomponents.WConfModificationControlFrame().getHTML( self.__conf,
-                                                  params["setModifKeyURL"] ) + "<br>"
+        mc = wcomponents.WConfModificationControlFrame().getHTML( self.__conf) + "<br>"
 
         if self._eventType == "conference":
             rc = wcomponents.WConfRegistrarsControlFrame().getHTML( self.__conf) + "<br>"
@@ -2283,10 +2281,8 @@ class WPConfModifAC( WPConferenceModifBase ):
         wc = WConfModifAC( self._conf, self._eventType, self._user )
         import MaKaC.webinterface.rh.conferenceModif as conferenceModif
         p = {
-            "setVisibilityURL": urlHandlers.UHConfSetVisibility.getURL(),
-            "setAccessKeyURL": urlHandlers.UHConfSetAccessKey.getURL(),
-            "setModifKeyURL": urlHandlers.UHConfSetModifKey.getURL(),
-        }
+            "setVisibilityURL": urlHandlers.UHConfSetVisibility.getURL()
+            }
         return wc.getHTML( p )
 
 #---------------------------------------------------------------------------

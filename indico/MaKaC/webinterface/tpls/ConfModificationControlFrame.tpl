@@ -32,7 +32,7 @@
                         if(confirmed && modifKey){
                             indicoRequest('event.protection.setModifKey', {
                                 confId: ${target.getId()},
-                                accessKey: modifKey
+                                modifKey: modifKey
                             },
                             function(result, error) {
                                 if(error) {

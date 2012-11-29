@@ -633,7 +633,7 @@ class WConfModifEvaluationEditQuestionView( wcomponents.WTemplated ):
         vars["removeQuestionUrl"] = url
         vars["removeQuestionInput"] = WUtils.createInput(type="image",
                                                          name="remove",
-                                                         id="questionRemove%s"%self._question.getPosition(),
+                                                         id="questionRemove%s" % self._question.getPosition(),
                                                          alt="remove",
                                                          src=Config.getInstance().getSystemIconURL("remove"))
         #return

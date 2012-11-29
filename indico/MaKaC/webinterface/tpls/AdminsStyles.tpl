@@ -86,7 +86,7 @@
   </table>
 
 <script type="text/javascript">
-$(".deleteStyle").click(function(cosa){
+$(".deleteStyle").click(function(){
     var self = this;
     new ConfirmPopup($T("Delete style"), $T("Are you sure you want to delete this style?"), function(confirmed){
         if(confirmed){

@@ -1982,11 +1982,10 @@ class WAccessControlFrame(WTemplated):
 
 class WConfAccessControlFrame(WTemplated):
 
-    def getHTML( self, target, setVisibilityURL, setAccessKeyURL):
+    def getHTML( self, target, setVisibilityURL):
         self.__target = target
         params = { "target": target,\
                    "setPrivacyURL": setVisibilityURL,\
-                   "setAccessKeyURL": setAccessKeyURL,\
                    "type": "Event" }
         return  WTemplated.getHTML( self, params )
 
@@ -2215,10 +2214,9 @@ class WConfModificationControlFrame(WTemplated):
             result.append(pendingUser)
         return result
 
-    def getHTML( self, target, setModifKeyURL ):
+    def getHTML(self, target):
         self.__target = target
-        params = { "setModifKeyURL": setModifKeyURL,
-                   "target": target }
+        params = { "target": target }
         return  WTemplated.getHTML( self, params )
 
     def getVars( self ):

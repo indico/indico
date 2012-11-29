@@ -84,10 +84,10 @@
 % endif
 
 <script type="text/javascript">
-$(".togglePluginType").click(function(cosa){
+$(".togglePluginType").click(function(){
     var self = this;
     new ConfirmPopup($T("Toggle Plugin Type"), $T("This will reload all the plugins too. Do you want to continue?"), function(confirmed){
-        if(confirmed){
+        if (confirmed) {
             window.location = self.getAttribute("href");
         }
     }).open();
