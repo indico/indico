@@ -480,7 +480,9 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
        },
      }, function(timetable) {
          this.TimeDisplacementManager(this.timetable)
-         this._shiftKeyListener();
+         if (this.managementMode) {
+             this._shiftKeyListener();
+         }
          this._grid = _(this.grid);
      });
 
