@@ -407,6 +407,7 @@ class TimeSchedule(Schedule, Persistent):
         """
         recalculate and reschedule the entries of the event with a time "diff" of separation.
         """
+
         from MaKaC.conference import SessionSlot
         entries = self.getEntriesOnDay(day)
         if type == "duration":

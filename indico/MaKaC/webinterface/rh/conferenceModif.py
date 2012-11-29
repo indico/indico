@@ -5890,7 +5890,7 @@ class RHReschedule(RHConferenceModifBase):
         self._action=params.get("action","duration")
         self._fit= params.get("fit","noFit") == "doFit"
         self._targetDay=params.get("targetDay",None) #comes in format YYYYMMDD, ex: 20100317
-        self._sessionId = (params.get("sessionId", ""))
+        self._sessionId = params.get("sessionId", "")
         if self._targetDay is None:
             raise MaKaCError( _("Error while rescheduling timetable: not target day"))
         else:
