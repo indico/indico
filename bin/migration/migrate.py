@@ -564,8 +564,12 @@ def timedLinkedEventListRemoval(dbi, withRBDB, prevVersion):
 @since('1.0')
 def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
     """
-    Removing TimedLinkedEvents
+    Change Vidyo Room Names
     """
+    ph = PluginsHolder()
+    collaboration_pt = ph.getPluginType("Collaboration")
+    if not collaboration_pt.isActive() or not collaboration_pt.getPlugin("Vidyo").isActive():
+        return
     i = 0
     for booking in VidyoTools.getIndexByVidyoRoom().itervalues():
         if hasattr(booking, '_originalConferenceId'):
@@ -575,6 +579,17 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
         i += 1
         if i % 100 == 0:
             dbi.commit()
+
+@since('1.0')
+def reindexVidyoEventEndDateIndex(dbi, withRBDB, prevVersion):
+    """
+    Reindexing of the VidyoEventEndDateIndex used for delete old rooms
+    """
+    ph = PluginsHolder()
+    collaboration_pt = ph.getPluginType("Collaboration")
+    if not collaboration_pt.isActive() or not collaboration_pt.getPlugin("Vidyo").isActive():
+        return
+    VidyoTools.getEventEndDateIndex().initialize(dbi)
 
 @since('1.0')
 def ip_based_acl(dbi, withRBDB, prevVersion):
