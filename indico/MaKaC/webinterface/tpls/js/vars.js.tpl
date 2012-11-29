@@ -3,7 +3,7 @@
 <% from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr %>
 <% import MaKaC.common.info as info %>
 <% from MaKaC.rb_location import Location %>
-<% import simplejson %>
+<% from indico.util import json %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
 <% from MaKaC.export import fileConverter %>
 <%
@@ -90,7 +90,7 @@ var Indico = {
         tt_time: "${ iconFileName("tt_time") }"
     },
     FileTypeIcons:
-        ${ simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) }
+        ${ json.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) }
     ,
     Urls: {
         JsonRpcService: window.location.protocol == "https:"?"${ urlHandlers.UHJsonRpcService.getURL(secure=True) }":"${ urlHandlers.UHJsonRpcService.getURL() }",
@@ -140,10 +140,10 @@ var Indico = {
     },
 
     Data: {
-        MaterialTypes: { meeting : ${ simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['meeting'])) },
-        simple_event: ${ simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['simple_event'])) },
-        conference: ${ simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) },
-        category: ${ simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) }},
+        MaterialTypes: { meeting : ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['meeting'])) },
+        simple_event: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['simple_event'])) },
+        conference: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) },
+        category: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) }},
         WeekDays: ${ [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] },
         DefaultLocation: '${ str(defaultLocation) }',
         Locations: ${ jsonEncode(locationList) }

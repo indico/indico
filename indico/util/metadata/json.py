@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-simplejson-based fossil serializer
+json-based fossil serializer
 """
 # indico imports
 from indico.util import json

@@ -26,12 +26,6 @@ from persistent.dict import PersistentDict
 from datetime import datetime
 from indico.util.i18n import LazyProxy
 
-# Test if simplejson escapes forward slashes. It changed its behaviour im some version.
-if '\\/' in _json.dumps('/'):
-    _json_dumps = simplejson.dumps
-else:
-    def _json_dumps(*args, **kwargs):
-        return _json.dumps(*args, **kwargs).replace('/', '\\/')
 
 class _JSONEncoder(_json.JSONEncoder):
     """
@@ -56,7 +50,8 @@ def dumps(obj, **kwargs):
     if kwargs.pop('pretty', False):
         kwargs['indent'] = 4 * ' '
     textarea = kwargs.pop('textarea', False)
-    ret = _json_dumps(obj, cls=_JSONEncoder, **kwargs)
+    ret = _json.dumps(obj, cls=_JSONEncoder, **kwargs).replace('/', '\\/')
+
     if textarea:
         return '<html><head></head><body><textarea>%s</textarea></body></html>' % ret
     else:
