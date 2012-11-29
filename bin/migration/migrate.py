@@ -557,6 +557,7 @@ def timedLinkedEventListRemoval(dbi, withRBDB, prevVersion):
         if i % 100 == 0:
             dbi.commit()
 
+
 @since('1.0')
 def ip_based_acl(dbi, withRBDB, prevVersion):
     """
@@ -568,8 +569,6 @@ def ip_based_acl(dbi, withRBDB, prevVersion):
     ip_acl_mgr = minfo._ip_based_acl_mgr = IPBasedACLMgr()
     ip_acl_mgr._full_access_acl = ip_set
     dbi.commit()
-
-
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
