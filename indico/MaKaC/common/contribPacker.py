@@ -153,7 +153,7 @@ class ConferencePacker:
                 # either "other" was selected, or this type is in the list of desired ones
                 resources = []
                 if "other" in materialTypes or mat.getTitle().lower() in materialTypes:
-                        resources = [mat.getMainResource()] if mainResource else mat.getResourceList()
+                    resources = [mat.getMainResource()] if mainResource else mat.getResourceList()
                 for resource in resources:
                     # URLs cannot be packed, only local files
                     if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
@@ -177,9 +177,10 @@ class ConferencePacker:
         confED = self._conf.getSchedule().getAdjustedEndDate()
         ed = confED.replace(hour=23, minute=59, second=59)
         while di <= ed:
-            if len(self._conf.getSchedule().getEntriesOnDay(di)) > 0:
+            entries = self._conf.getSchedule().getEntriesOnDay(di)
+            if len(entries) > 0:
                 dirName = "%s" % di.strftime("%Y%m%d_%A")
-                for entry in self._conf.getSchedule().getEntriesOnDay(di):
+                for entry in entries:
                     if isinstance(entry, schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(), conference.Contribution):
                         if di.strftime("%d%B%Y") in days:
                             contrib = entry.getOwner()

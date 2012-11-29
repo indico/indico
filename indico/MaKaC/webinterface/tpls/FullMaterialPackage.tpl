@@ -47,8 +47,17 @@ function deselectAll()
                   <tr>
                     <td class="groupTitle"> ${ _("Material type")}</td>
                   </tr>
-                  ${ materialType }
-                  </table>
+                  <tr>
+                    <td>
+                      % for materialTypeName in materialTypes:
+                      <div>
+                        <input name="materialType" type="checkbox" value="${materialTypeName}" checked="checked"/>${_(materialTypeName.capitalize())}
+                      </div>
+                      % endfor
+                      <input name="materialType" type="checkbox" value="other" checked="checked"/>${_("Other types")}
+                    </td>
+                  </tr>
+                </table>
                 </td>
                 <td valign="top" width="100%">
                   <table width="100%"e>

@@ -7076,11 +7076,8 @@ class WFullMaterialPackage(wcomponents.WTemplated):
         for session in self._conf.getSessionList():
             vars["sessionList"] += i18nformat("""
                  <input name="sessionList" type="checkbox" value="%s" checked="checked">%s _("(last modified: %s)")<br>""") % (session.getId(),session.getTitle(), format_datetime(session.getModificationDate(), format='d MMMM yyyy H:mm'))
-            materialTypeList = '<tr><td>'
-            for materialTypeName in MaterialFactoryRegistry.getAllowed(self._conf):
-                materialTypeList += ("""<input name="materialType" type="checkbox" value="%s" checked="checked">%s<br>""" % (materialTypeName, _(materialTypeName.capitalize())))
-            materialTypeList += i18nformat("""<input name="materialType" type="checkbox" value="other" checked="checked">_("Other types")</td></tr>""")
-        vars["materialType"] = materialTypeList
+
+        vars["materialTypes"] = MaterialFactoryRegistry.getAllowed(self._conf)
         return vars
 
 # ------------------ Static web pages ------------------
