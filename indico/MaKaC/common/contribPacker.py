@@ -151,14 +151,9 @@ class ConferencePacker:
         if element.getAllMaterialList() is not None:
             for mat in element.getAllMaterialList():
                 # either "other" was selected, or this type is in the list of desired ones
+                resources = []
                 if "other" in materialTypes or mat.getTitle().lower() in materialTypes:
-                    if mainResource:
-                        resources = [mat.getMainResource()]
-                    else:
-                        resources = mat.getResourceList()
-                else:
-                    resources = []
-
+                        resources = [mat.getMainResource()] if mainResource else mat.getResourceList()
                 for resource in resources:
                     # URLs cannot be packed, only local files
                     if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
@@ -182,19 +177,18 @@ class ConferencePacker:
         confED=self._conf.getSchedule().getAdjustedEndDate()
         ed = confED.replace(hour=23,minute=59,second=59)
         while di<=ed:
-            if days == [] or days is None or di.strftime("%d%B%Y") in days:
-                if len(self._conf.getSchedule().getEntriesOnDay(di)) > 0:
-                    dirName = "%s"%di.strftime("%Y%m%d_%A")
-                    #fileHandler.addDir("%s/%s"%(self._confDirName,dirName))
-                    for entry in self._conf.getSchedule().getEntriesOnDay(di):
-                        if isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.Contribution):
+            if len(self._conf.getSchedule().getEntriesOnDay(di)) > 0:
+                dirName = "%s"%di.strftime("%Y%m%d_%A")
+                for entry in self._conf.getSchedule().getEntriesOnDay(di):
+                    if isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.Contribution):
+                        if di.strftime("%d%B%Y") in days:
                             contrib=entry.getOwner()
                             self._packContrib(contrib, dirName, "", materialTypes,days,mainResource,fromDate,fileHandler)
                             for subcontrib in contrib.getSubContributionList():
                                 self._packSubContrib(subcontrib, dirName, "", materialTypes,days,mainResource,fromDate,fileHandler)
-                        elif isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.SessionSlot) \
-                            and (entry.getOwner().getSession().getId() in sessions or len(sessions) == 0):
-                            self._packSessionSlot(entry.getOwner(), dirName, materialTypes, days, mainResource, fromDate, fileHandler)
+                    elif isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.SessionSlot) \
+                        and (entry.getOwner().getSession().getId() in sessions):
+                        self._packSessionSlot(entry.getOwner(), dirName, materialTypes, days, mainResource, fromDate, fileHandler)
             di+=timedelta(days=1)
 
         self._addMaterials(self._conf, "", "", "", "", materialTypes, mainResource, fromDate, fileHandler)

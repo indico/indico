@@ -61,6 +61,7 @@ from MaKaC.badgeDesignConf import BadgeDesignConfiguration
 from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
+from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 import MaKaC.common.info as info
 from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
@@ -7075,23 +7076,11 @@ class WFullMaterialPackage(wcomponents.WTemplated):
         for session in self._conf.getSessionList():
             vars["sessionList"] += i18nformat("""
                  <input name="sessionList" type="checkbox" value="%s" checked="checked">%s _("(last modified: %s)")<br>""") % (session.getId(),session.getTitle(), format_datetime(session.getModificationDate(), format='d MMMM yyyy H:mm'))
-        vars["materialType"] = i18nformat("""
-                                <tr>
-            <td>
-                <input name="materialType" type="checkbox" value="paper" checked="checked"> _("Papers")
-                <br>
-                <input name="materialType" type="checkbox" value="slides" checked="checked"> _("Slides")
-                <br>
-                <input name="materialType" type="checkbox" value="video" checked="checked"> _("Videos")
-                <br>
-                <input name="materialType" type="checkbox" value="poster" checked="checked"> _("Posters")
-                <br>
-                <input name="materialType" type="checkbox" value="minutes" checked="checked"> _("Minutes")
-                <br>
-                <input name="materialType" type="checkbox" value="other" checked="checked"> _("Other types")
-            </td>
-        </tr>
-        """)
+            materialTypeList = '<tr><td>'
+            for materialTypeName in MaterialFactoryRegistry.getAllowed(self._conf):
+                materialTypeList += ("""<input name="materialType" type="checkbox" value="%s" checked="checked">%s<br>""" % (materialTypeName, _(materialTypeName.capitalize())))
+            materialTypeList += i18nformat("""<input name="materialType" type="checkbox" value="other" checked="checked">_("Other types")</td></tr>""")
+        vars["materialType"] = materialTypeList
         return vars
 
 # ------------------ Static web pages ------------------
