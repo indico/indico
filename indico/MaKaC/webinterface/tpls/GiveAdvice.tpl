@@ -203,7 +203,7 @@ var updatePage = function (firstLoad){
             submitButton.dom.disabled = true;
         }
         submitButton.set('Submit');
-        $E('submittedmessage').set('Assessment not submitted yet');
+        $E('submittedmessage').set('Assessment not yet submitted');
         showWidgets(firstLoad);
     }
 }

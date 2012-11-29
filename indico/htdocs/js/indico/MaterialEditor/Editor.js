@@ -1199,7 +1199,7 @@ type("ResourceListWidget", ["ListWidget"], {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
 
                 jsonRpc(Indico.Urls.JsonRpcService,
-                        'material.resources.delete',
+                        self.deleteResourceMethod,
                         resParams,
                         function(response,error) {
                             if (exists(error)) {
@@ -1393,7 +1393,7 @@ type("ResourceListWidget", ["ListWidget"], {
         return resourceNode;
     }
 
-}, function(resources, matParams, materialTitle, materialTypes, showMainResources, canReviewModify) {
+}, function(resources, matParams, materialTitle, materialTypes, showMainResources, canReviewModify, deleteResourceMethod) {
     this.matParams = matParams;
     this.resources = resources;
     this.materialName = materialTitle;
@@ -1401,6 +1401,7 @@ type("ResourceListWidget", ["ListWidget"], {
     this.ListWidget("materialListResource");
     this.showMainResources = showMainResources || false;
     this.canReviewModify = canReviewModify || false;
+    this.deleteResourceMethod = deleteResourceMethod;
 
     var self = this;
 
@@ -1483,7 +1484,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         );
 
         args.materialProtection = material.get('protection');
-        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types, self.showMainResources, self.canReviewModify);
+        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types, self.showMainResources, self.canReviewModify, self.deleteResourceMethod);
 
         // check whenever a material gets empty (no resources) and delete it
         material.get('resources').observe(
@@ -1640,7 +1641,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
     }
 },
 
-     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify, addMaterialMode) {
+     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify, addMaterialMode, deleteResourceMethod) {
          var self = this;
          this.width = width;
          this.height = height;
@@ -1651,6 +1652,8 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          if (!exists(listMethod)) {
              listMethod = 'material.list';
          }
+         this.deleteResourceMethod = any(deleteResourceMethod, "material.resources.delete");
+
          this.canReviewModify = any(canReviewModify, false);
          this.addMaterialMode = addMaterialMode;
          this.RemoteWidget(listMethod, args);
@@ -1696,7 +1699,7 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
 },
      function(args, types, uploadAction, width, height, canReviewModify, sendToReviewButton, textHasMaterials) {
          var self = this;
-         this.MaterialListWidget(args, types, uploadAction, width, height, false, 'material.reviewing.list', canReviewModify);
+         this.MaterialListWidget(args, types, uploadAction, width, height, false, 'material.reviewing.list', canReviewModify, false, 'material.reviewing.resources.delete');
          this.canReviewModify = canReviewModify;
          this.sendToReviewButton = sendToReviewButton;
          this.textHasMaterials = textHasMaterials;

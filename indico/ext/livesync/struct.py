@@ -244,6 +244,11 @@ class MultiPointerTrack(Persistent):
 
         return self._pointerIterator(pid, lambda x: x, till=till)
 
+    def is_empty(self):
+        for __, ___ in self._container.iteritems():
+            return False
+        return True
+
     def movePointer(self, pid, pos):
         """
         Moves a given pointer (id) to a given timestamp
@@ -252,7 +257,7 @@ class MultiPointerTrack(Persistent):
             raise KeyError("Pointer '%s' doesn't seem to exist!" % pid)
 
         # check that the tree has something
-        if len(self._container) == 0:
+        if self.is_empty():
             raise EmptyTrackException()
 
         self._pointers[pid] = pos

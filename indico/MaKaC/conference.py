@@ -3571,13 +3571,14 @@ class Conference(CommonObjectBase, Locatable):
         """
         return [c for c in self.contributions.values() if not c.getSession()]
 
-    def getContributionListSortedById(self, includeWithdrawn=True):
-        """Returns a list of the conference contribution objects, sorted by their id
+
+    def getContributionListSorted(self, includeWithdrawn=True, key="id"):
+        """Returns a list of the conference contribution objects, sorted by key provided
         """
         contributions = self.contributions.values()
         if not includeWithdrawn:
             contributions = filter(lambda c: not isinstance(c.getCurrentStatus(), ContribStatusWithdrawn), contributions)
-        contributions.sort(key = lambda c: c.getId())
+        contributions.sort(key = lambda c: getattr(c, key))
         return contributions
 
     def getNumberOfContributions(self, only_scheduled=False):
@@ -7345,6 +7346,9 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         if self.getSession() is not None:
             res=self.getSession().getTextColor()
         return res
+
+    def getAllMaterialList(self):
+        return self.getSession().getAllMaterialList()
 
 
 class ContributionParticipation(Persistent, Fossilizable):

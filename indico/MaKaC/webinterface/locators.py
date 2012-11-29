@@ -316,7 +316,9 @@ class WebLocator:
             obj = CrossLocationQueries.getRooms( roomID = self.__roomID, location = self.__location )
             return obj
         if self.__categId:
-            obj = conference.CategoryManager().getById( self.__categId )
+            if not conference.CategoryManager().hasKey(self.__categId):
+                raise errors.NoReportError(_("There is no category with id '%s', or it has been deleted") % self.__categId)
+            obj = conference.CategoryManager().getById(self.__categId)
             if self.__materialId:
                 obj=obj.getMaterialById(self.__materialId)
             if self.__resId:

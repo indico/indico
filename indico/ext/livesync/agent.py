@@ -122,8 +122,7 @@ class SyncAgent(Fossilizable, Persistent):
         track = self._manager.getTrack()
 
         try:
-            track.movePointer(self._id, ts / \
-                              self._manager.getGranularity() - 1)
+            track.movePointer(self._id, ts)
         except EmptyTrackException:
             # if the track is empty, don't bother doing this
             pass
@@ -140,8 +139,7 @@ class SyncAgent(Fossilizable, Persistent):
 
     def getLastDT(self):
         ts = self.getLastTS()
-        return datetime.datetime.utcfromtimestamp(ts * \
-                    self._manager.getGranularity()) if ts else None
+        return datetime.datetime.utcfromtimestamp(ts) if ts else None
 
     def getName(self):
         return self._name

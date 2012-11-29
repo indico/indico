@@ -403,8 +403,41 @@ class TimeSchedule(Schedule, Persistent):
     def moveDownEntry(self,entry,tz=None):
         pass
 
-    def rescheduleTimes(self, type, diff, tz, day=None):
-        pass
+    def rescheduleTimes(self, type, diff, day, doFit):
+        """
+        recalculate and reschedule the entries of the event with a time "diff" of separation.
+        """
+
+        from MaKaC.conference import SessionSlot
+        entries = self.getEntriesOnDay(day)
+        if type == "duration":
+            i = 0
+            while i < len(entries):
+                entry = entries[i]
+                if doFit:
+                    if isinstance(entry.getOwner(), SessionSlot):
+                        entry.getOwner().fit()
+                if i + 1 == len(entries):
+                    dur = entry.getDuration()
+                else:
+                    nextentry = entries[i + 1]
+                    dur = nextentry.getStartDate() - entry.getStartDate() - diff
+                if dur < timedelta(0):
+                    raise EntryTimingError( _("""With the time between entries you've chosen, the entry "%s" will have a duration less than zero minutes. Please, choose another time""") % entry.getTitle())
+                entry.setDuration(dur=dur, check=2)
+                i += 1
+        elif type == "startingTime":
+            st = day.replace(hour=self.getAdjustedStartDate().hour, minute=self.getAdjustedStartDate().minute).astimezone(timezone('UTC'))
+            for entry in entries:
+                if doFit:
+                    if isinstance(entry.getOwner(), SessionSlot):
+                        entry.getOwner().fit()
+                entry.setStartDate(st, check=2, moveEntries=1)
+                st = entry.getEndDate() + diff
+        elif type == "noAction" and doFit:
+            for entry in entries:
+                if isinstance(entry.getOwner(), SessionSlot):
+                    entry.getOwner().fit()
 
     def clear(self):
         while len(self._entries)>0:
@@ -620,40 +653,6 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
         self.reSchedule()
         self._p_changed = 1
 
-    def rescheduleTimes( self, type, diff, day, doFit):
-        """
-        recalculate and reschedule the entries of the conference slot with a time "diff" of separation.
-        """
-        from MaKaC.conference import SessionSlot
-        entries = self.getEntriesOnDay(day)
-        if type=="duration":
-            i=0
-            while i<len(entries):
-                entry=entries[i]
-                if doFit:
-                    if isinstance( entry.getOwner(), SessionSlot ) :
-                        entry.getOwner().fit()
-                if i+1 == len(entries):
-                    dur=entry.getDuration()
-                else:
-                    nextentry=entries[i+1]
-                    dur=nextentry.getStartDate()-entry.getStartDate()-diff
-                if dur<timedelta(0):
-                    raise EntryTimingError( _("""With the time between entries you've chosen, the entry "%s" will have a duration less than zero minutes. Please, choose another time""")%entry.getTitle())
-                entry.setDuration(dur=dur, check=2)
-                i+=1
-        elif type=="startingTime":
-            st = day.replace(hour=self.getAdjustedStartDate().hour, minute=self.getAdjustedStartDate().minute).astimezone(timezone('UTC'))
-            for entry in entries:
-                if doFit:
-                    if isinstance( entry.getOwner(), SessionSlot ) :
-                        entry.getOwner().fit()
-                entry.setStartDate(st, check=2, moveEntries=1)
-                st=entry.getEndDate()+diff
-        elif type=="noAction" and doFit:
-            for entry in entries:
-                if isinstance( entry.getOwner(), SessionSlot ) :
-                    entry.getOwner().fit()
 
 class SessionSchedule(TimeSchedule):
     """
@@ -690,6 +689,7 @@ class SessionSchedule(TimeSchedule):
         if diff is not None:
             for entry in entriesList:
                 entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
+
 
 class SlotSchedule(TimeSchedule):
     """
@@ -808,7 +808,11 @@ class SlotSchedule(TimeSchedule):
            entriesList: list of entries for applying the diff"""
         if diff is not None:
             for entry in entriesList:
-                entry.setStartDate(entry.getStartDate()+diff, check=2, moveEntries=1)
+                entry.setStartDate(entry.getStartDate() + diff, check=2, moveEntries=1)
+
+    def rescheduleTimes(self, type, diff, day, doFit):
+        pass
+
 
 class PosterSlotSchedule(SlotSchedule):
 

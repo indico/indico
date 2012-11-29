@@ -147,6 +147,32 @@ class ConferencePacker:
     def _normalisePathItem(self,name):
         return str(name).translate(string.maketrans("",""),"\\/")
 
+    def _addMaterials(self, element, spkList, dayDirName="", parentDirName="", elementDirName="", materialTypes=[], mainResource=False, fromDate="", fileHandler=None):
+        if element.getAllMaterialList() is not None:
+            for mat in element.getAllMaterialList():
+                # either "other" was selected, or this type is in the list of desired ones
+                if "other" in materialTypes or mat.getTitle().lower() in materialTypes:
+                    if mainResource:
+                        resources = [mat.getMainResource()]
+                    else:
+                        resources = mat.getResourceList()
+                else:
+                    resources = []
+
+                for resource in resources:
+                    # URLs cannot be packed, only local files
+                    if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
+                        if fromDate == "" or resource.getCreationDate().strftime("%Y-%m-%d") >= fromDate.strftime("%Y-%m-%d"):
+                            self._items += 1
+                            fileHandler.add("%s-%s%s" % (os.path.join(self._confDirName,
+                                                                     dayDirName,
+                                                                     parentDirName,
+                                                                     elementDirName,
+                                                                     self._normalisePathItem(mat.getTitle())),
+                                                                     "%s-"%spkList if spkList else "",
+                                                                     self._normalisePathItem(resource.getFileName())),
+                                            resource.getFilePath())
+
     def pack(self,materialTypes=[],days=[], mainResource=False, fromDate="", fileHandler=None, sessions=[]):
         if fromDate != "":
             [ day, month, year] = fromDate.split(" ")
@@ -163,62 +189,20 @@ class ConferencePacker:
                     for entry in self._conf.getSchedule().getEntriesOnDay(di):
                         if isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.Contribution):
                             contrib=entry.getOwner()
-                            self._packContrib(contrib, "", dirName, materialTypes,days,mainResource,fromDate,fileHandler)
+                            self._packContrib(contrib, dirName, "", materialTypes,days,mainResource,fromDate,fileHandler)
                             for subcontrib in contrib.getSubContributionList():
-                                self._packContrib(subcontrib, "", dirName, materialTypes,days,mainResource,fromDate,fileHandler)
+                                self._packSubContrib(subcontrib, dirName, "", materialTypes,days,mainResource,fromDate,fileHandler)
+                        elif isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.SessionSlot) \
+                            and (entry.getOwner().getSession().getId() in sessions or len(sessions) == 0):
+                            self._packSessionSlot(entry.getOwner(), dirName, materialTypes, days, mainResource, fromDate, fileHandler)
             di+=timedelta(days=1)
-        for session in self._conf.getSessionList():
-            if len(sessions) == 0 or session.getId() in sessions:
-                di=session.getSchedule().getAdjustedStartDate()
-                sesED=session.getSchedule().getAdjustedEndDate()
-                ed = sesED.replace(hour=23,minute=59,second=59)
-                sessionDirName="%s"%self._normalisePathItem(session.getTitle().strip())
-                while di<=ed:
-                    if days == [] or days is None or di.strftime("%d%B%Y") in days:
-                        for entry in session.getSchedule().getEntriesOnDay(di):
-                            if isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                                    isinstance(entry.getOwner(),conference.SessionSlot):
-                                slot=entry.getOwner()
-                                slotDirName="%s"%di.strftime("%Y%m%d_%A")
-                                if slot.getTitle()!="":
-                                    slotDirName="%s-%s"%(slotDirName,self._normalisePathItem(slot.getTitle().strip()))
-                                #fileHandler.addDir("%s/%s/%s"%(self._confDirName,sessionDirName,slotDirName))
-                                for entry in slot.getSchedule().getEntries():
-                                    if isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.Contribution):
-                                        contrib=entry.getOwner()
-                                        self._packContrib(contrib, sessionDirName, slotDirName, materialTypes,days,mainResource,fromDate,fileHandler)
-                                        for subcontrib in contrib.getSubContributionList():
-                                            self._packContrib(subcontrib, sessionDirName, slotDirName, materialTypes,days,mainResource,fromDate,fileHandler)
-                    di+=timedelta(days=1)
 
-        # add "root" materials as well
-        # (totally hacky... a general method for adding
-        # materials should be added... check copy below)
-
-        for mat in self._conf.getAllMaterialList():
-
-            if "other" in materialTypes or mat.getTitle().lower() in materialTypes:
-                if mainResource:
-                    resources = [mat.getMainResource()]
-                else:
-                    resources = mat.getResourceList()
-            else:
-                resources = []
-
-            for resource in resources:
-                # URLs cannot be packed, only local files
-                if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
-                    if fromDate == "" or resource.getCreationDate().strftime("%Y-%m-%d") >= fromDate.strftime("%Y-%m-%d"):
-                        self._items += 1
-                        fileHandler.add("%s-%s" % (os.path.join(self._confDirName,
-                                                           mat.getTitle()),
-                                                           self._normalisePathItem(resource.getFileName())),
-                                        resource.getFilePath())
+        self._addMaterials(self._conf, "", "", "", "", materialTypes, mainResource, fromDate, fileHandler)
 
         fileHandler.close()
         return fileHandler.getPath()
 
-    def _packContrib(self, contrib, sessionDirName="", slotDirName="", materialTypes=[],days=[], mainResource=False, fromDate="", fileHandler=None):
+    def _packContrib(self, contrib, dayDirName ,slotDirName="", materialTypes=[],days=[], mainResource=False, fromDate="", fileHandler=None):
 
         # speakers should be added to filename, if they exist
         if len(contrib.getSpeakerList()) > 0:
@@ -226,32 +210,39 @@ class ConferencePacker:
         else:
             spk = ""
 
-        if contrib.getAllMaterialList() is not None:
-            for mat in contrib.getAllMaterialList():
+        dirName = "%s_%s"%(contrib.getAdjustedStartDate().strftime("%H%M"), contrib.getTitle())
+        self._addMaterials(contrib, spk, dayDirName, slotDirName, dirName, materialTypes, mainResource, fromDate, fileHandler)
 
-                # either "other" was selected, or this type is in the list of desired ones
-                if "other" in materialTypes or mat.getTitle().lower() in materialTypes:
-                    if mainResource:
-                        resources = [mat.getMainResource()]
-                    else:
-                        resources = mat.getResourceList()
-                else:
-                    resources = []
+    def _packSubContrib(self, subContrib, dayDirName ,slotDirName="", materialTypes=[],days=[], mainResource=False, fromDate="", fileHandler=None):
 
-                for resource in resources:
-                    # URLs cannot be packed, only local files
-                    if isinstance(resource, conference.LocalFile) and resource.canAccess(self._aw):
-                        if fromDate == "" or resource.getCreationDate().strftime("%Y-%m-%d") >= fromDate.strftime("%Y-%m-%d"):
-                            self._items += 1
-                            fileHandler.add("%s-%s%s-%s" % (os.path.join(self._confDirName,
-                                                                     sessionDirName,
-                                                                     slotDirName,
-                                                                     self._normalisePathItem(contrib.getId())),
-                                                                     mat.getTitle(),
-                                                                     spk,
-                                                                     self._normalisePathItem(resource.getFileName())),
-                                            resource.getFilePath())
+        # speakers should be added to filename, if they exist
+        if len(subContrib.getSpeakerList()) > 0:
+            spk = "-%s" % self._normalisePathItem(subContrib.getSpeakerList()[0].getFamilyName().lower())
+        else:
+            spk = ""
 
+        contrib = subContrib.getContribution()
+        dirName = "%s_%s"%(contrib.getAdjustedStartDate().strftime("%H%M"), contrib.getTitle())
+        self._addMaterials(subContrib, spk, dayDirName, slotDirName, os.path.join(dirName, subContrib.getTitle()), materialTypes, mainResource, fromDate, fileHandler)
+
+    def _packSessionSlot(self, sessionSlot, dayDirName, materialTypes=[],days=[], mainResource=False, fromDate="", fileHandler=None):
+
+        # speakers should be added to filename, if they exist
+        if len(sessionSlot.getConvenerList()) > 0:
+            spk = "-%s" % self._normalisePathItem(sessionSlot.getConvenerList()[0].getFamilyName().lower())
+        else:
+            spk = ""
+
+        dirName = "%s_%s"%(sessionSlot.getAdjustedStartDate().strftime("%H%M"), sessionSlot.getSession().getTitle())
+
+        self._addMaterials(sessionSlot, spk, dayDirName, "", dirName ,materialTypes, mainResource, fromDate, fileHandler)
+
+        for entry in sessionSlot.getSchedule().getEntries():
+            if isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.Contribution):
+                contrib=entry.getOwner()
+                self._packContrib(contrib, dayDirName, dirName, materialTypes,days,mainResource,fromDate,fileHandler)
+                for subcontrib in contrib.getSubContributionList():
+                    self._packSubContrib(subcontrib, dayDirName, dirName, materialTypes,days,mainResource,fromDate,fileHandler)
 
 class PDFPagesCounter:
 

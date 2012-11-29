@@ -61,7 +61,7 @@
   }
 
   function activateAgent(agentId) {
-      new ConfirmPopup([$T('Activate '), Html.strong({}, agentId)],
+      new ConfirmPopup(format($T("Activate '{0}'"), agentId),
           Html.div({style: {width: '350px'}},
                    $T('Are you sure you want to activate this agent? ' +
                       'Please make sure that the export process finished successfully')),

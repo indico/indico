@@ -55,9 +55,6 @@ def removeAssignReferee(req, **params):
 def finalJudge( req, **params ):
     return contribReviewingModif.RHFinalJudge( req ).process( params )
 
-def submitForReviewing( req, **params ):
-    return contribReviewingModif.RHSubmitForReviewing( req ).process( params )
-
 def reviewingHistory( req, **params ):
     return contribReviewingModif.RHReviewingHistory( req ).process( params )
 

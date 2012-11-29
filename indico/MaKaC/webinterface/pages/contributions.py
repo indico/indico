@@ -242,10 +242,10 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
                 if self._contrib.getReviewManager().isReferee(self._rh._getUser()) and not (paperReviewChoice == 3 or paperReviewChoice == 1):
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "referee", _("Referee Assesment"), \
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "referee", _("Referee Assessment"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
                 else:
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Assesments", _("Assesments"), \
+                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Assessments", _("Assessments"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
 
             if (paperReviewChoice == 3 or paperReviewChoice == 4) and \

@@ -1573,12 +1573,15 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                     if (self.isTopLevelTimetable) {
                         // We are in a top level management timetable
 
+                        var postParams = {confId: self.tt.eventInfo.id};
+                        if (exists(self.tt.contextInfo.timetableSession)) {
+                            postParams['sessionId'] = self.tt.contextInfo.timetableSession.id;
+                        }
+
                         IndicoUI.Dialogs.Util.progress($T("Rescheduling day ") + self.__getCurrentDayText() + "...");
 
                         Util.postRequest(Indico.Urls.Reschedule,
-                                {
-                                    confId: self.tt.eventInfo.id
-                                },
+                                postParams,
                                 {
                                     OK: "ok",
                                     action: self.rescheduleAction,

@@ -425,26 +425,34 @@ class GetResourceAllowedUsers(ResourceModifBase):
 
 class DeleteResourceBase(ResourceModifBase):
 
-    def _getAnswer(self):
-        resourceId = self._resource.getId()
-
+    def _deleteResource(self):
         # remove the resource
         self._material.removeResource(self._resource)
-        event = self._material.getOwner()
+        self._event = self._material.getOwner()
 
         # if there are no resources left inside the material,
         # just delete it
         if len(self._material.getResourceList()) == 0:
-            event.removeMaterial(self._material)
+            self._event.removeMaterial(self._material)
 
-        newMaterialTypes = event.getMaterialRegistry().getMaterialList(event)
 
+class DeleteResource(DeleteResourceBase):
+
+    def _getAnswer(self):
+        self._deleteResource()
         return {
-            'deletedResourceId': resourceId,
-            'newMaterialTypes': newMaterialTypes
+            'deletedResourceId': self._resource.getId(),
+            'newMaterialTypes': self._event.getMaterialRegistry().getMaterialList(self._event)
             }
 
+class DeleteResourceReviewing(DeleteResourceBase):
 
+    def _getAnswer(self):
+        self._deleteResource()
+        return {
+            'deletedResourceId': self._resource.getId(),
+            'newMaterialTypes': [["reviewing", "Reviewing"]]
+            }
 
 methodMap = {
 
@@ -464,6 +472,7 @@ methodMap = {
     "resources.listAllowedUsers": GetResourceAllowedUsers,
     "resources.list": GetResourcesBase,
     "resources.edit": EditResourceBase,
-    "resources.delete": DeleteResourceBase
+    "resources.delete": DeleteResource,
+    "reviewing.resources.delete": DeleteResourceReviewing
     }
 

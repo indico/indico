@@ -8436,14 +8436,6 @@ div.sdlw-complete {
     color: #666666;
 }
 
-.optionsBlock {
-    float:right;
-    width:500px;
-    background:#F0F0F0;
-    padding:10px;
-    border-radius: 5px;
-}
-
 .redWarningPopup {
     background-color: #F2DEDE;
     border-color: #EED3D7;
@@ -8532,4 +8524,11 @@ ul.material_list ul li {
     height: 0;
     margin: 0;
     border: 0;
+}
+
+.quotation {
+    padding-left: 10px;
+    white-space: pre;
+    color: #aaa;
+    border-left: 4px solid #999;
 }

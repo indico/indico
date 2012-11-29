@@ -347,7 +347,8 @@ class CSBooking(CSBookingBase):
         if isinstance(result, VidyoError):
             if result.getErrorType() == 'unknownRoom':
                 self.setBookingNotPresent()
-            raise automute_result
+            raise result
+        return result
 
     def _setAutomute(self):
         return self._automute_op('set')
@@ -355,6 +356,13 @@ class CSBooking(CSBookingBase):
     def _getAutomute(self):
         return self._automute_op('get')
 
+    def _setModeratorPIN(self):
+        result = ExternalOperationsManager.execute(self, "setModeratorPIN", VidyoOperations.setModeratorPIN, self)
+
+        if isinstance(result, VidyoError):
+            if result.getErrorType() == 'unknownRoom':
+                self.setBookingNotPresent()
+            raise result
     def _create(self):
         """ Creates the Vidyo public room that will be associated to this CSBooking,
             based on the booking params.
@@ -396,6 +404,7 @@ class CSBooking(CSBookingBase):
                 self._sendNotificationToOldNewOwner(oldBookingParams["owner"])
 
             self._setAutomute()
+            self._setModeratorPIN()
 
     def _notifyOnView(self):
         """ Will get called when manager sees list of bookings in management interface,

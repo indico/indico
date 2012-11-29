@@ -247,6 +247,22 @@ class VidyoOperations(object):
             else:
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getAutomute operation got WebFault: %s""" %
                             (confId, bookingId, e.fault.faultstring))
+    @classmethod
+    def setModeratorPIN(cls, booking):
+        confId = booking.getConference().getId()
+        bookingId = booking.getId()
+        roomId = booking.getRoomId()
+        moderatorPIN = booking.getModeratorPin()
+
+        try:
+            AdminApi.setModeratorPIN(roomId, moderatorPIN, confId, bookingId)
+        except WebFault, e:
+            faultString = e.fault.faultstring
+            if faultString.startswith('Room not found for roomID'):
+                return VidyoError("unknownRoom", "setModeratorPIN")
+            else:
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's setModeratorPIN operation got WebFault: %s""" %
+                            (confId, bookingId, e.fault.faultstring))
 
     @classmethod
     def queryRoom(cls, booking, roomId):

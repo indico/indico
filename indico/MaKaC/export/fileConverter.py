@@ -261,7 +261,7 @@ class CDSConvFileConverter(FileConverter):
                 fileName = params["filename"]
                 for resource in mat.getResourceList():
                     # if the pdf name is the same as any of the resources, and the material does not have a PDF yet:
-                    if os.path.splitext(resource.fileName)[0] == os.path.splitext(fileName)[0] and not mat.hasFile(fileName):
+                    if isinstance(resource, conference.LocalFile) and os.path.splitext(resource.fileName)[0] == os.path.splitext(fileName)[0] and not mat.hasFile(fileName):
                         resource.setPDFConversionRequestDate(None)
                         f = conference.LocalFile()
                         f.setName(fileName)

@@ -126,6 +126,7 @@ td.itemLeftAlign{
 }
 
 td.itemRightAlign{
+    max-width: 200px;
     text-align: right;
 }
 

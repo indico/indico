@@ -48,7 +48,7 @@ from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, 
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from MaKaC.common import Config
 from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
-    ConferenceClosedError, NoReportError
+    ConferenceClosedError, NoReportError, NotFoundError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
 from MaKaC.webinterface import locators
@@ -2502,8 +2502,6 @@ class RHConfModifDisplayRemoveLink( RHConferenceModifBase ):
             link = menu.getLinkById(self._linkId)
             self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
         elif self._confirm:
-            #create the link
-
             menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
             link = menu.getLinkById(self._linkId)
             if isinstance(link, displayMgr.SystemLink):
@@ -2517,6 +2515,8 @@ class RHConfModifDisplayRemoveLink( RHConferenceModifBase ):
         else:
             menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
             link = menu.getLinkById(self._linkId)
+            if link is None:
+                raise NotFoundError( _("The link you are trying to delete no longer exists"))
             if isinstance(link, displayMgr.SystemLink):
                 raise MaKaCError( _("You cannot remove a system link"))
             p = conferences.WPConfModifDisplayRemoveLink(self, self._target, link )
@@ -4191,6 +4191,7 @@ class RHReschedule(RHConferenceModifBase):
         self._action=params.get("action","duration")
         self._fit= params.get("fit","noFit") == "doFit"
         self._targetDay=params.get("targetDay",None) #comes in format YYYYMMDD, ex: 20100317
+        self._sessionId = params.get("sessionId", "")
         if self._targetDay is None:
             raise MaKaCError( _("Error while rescheduling timetable: not target day"))
         else:
@@ -4209,12 +4210,17 @@ class RHReschedule(RHConferenceModifBase):
     def _process(self):
         if not self._cancel:
             if not self._ok:
-                p=conferences.WPConfModifReschedule(self,self._conf, self._targetDay)
+                p = conferences.WPConfModifReschedule(self, self._conf, self._targetDay)
                 return p.display()
             else:
-                t=timedelta(hours=int(self._hour), minutes=int(self._minute))
-                self._conf.getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
-        self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
+                t = timedelta(hours=int(self._hour), minutes=int(self._minute))
+        if self._sessionId:
+            self._conf.getSessionById(self._sessionId).getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
+            self._redirect("%s#%s" % (urlHandlers.UHSessionModifSchedule.getURL(self._conf.getSessionById(self._sessionId)), self._targetDay))
+        else :
+            self._conf.getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
+            self._redirect("%s#%s" % (urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
+
 
 class RHRelocate(RHConferenceModifBase):
 

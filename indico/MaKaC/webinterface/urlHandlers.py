@@ -1537,11 +1537,12 @@ class UHConfUser( URLHandler ):
 
     def getURL( cls, conference, av=None ):
         url = cls._getURL()
-        loc = conference.getLocator().copy()
-        if av:
-            for i in av.getLocator().keys():
-                loc[i] = av.getLocator()[i]
-        url.setParams( loc )
+        if conference is not None:
+            loc = conference.getLocator().copy()
+            if av:
+                for i in av.getLocator().keys():
+                    loc[i] = av.getLocator()[i]
+            url.setParams( loc )
         return url
     getURL = classmethod( getURL )
 

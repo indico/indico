@@ -21,7 +21,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC import registration
-from MaKaC.errors import FormValuesError,MaKaCError, AccessError
+from MaKaC.errors import FormValuesError,MaKaCError, AccessError, NotFoundError
 from MaKaC.common import Config
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
@@ -189,33 +189,36 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
         else:
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
-class RHRegistrationFormCreationDone( RHRegistrationFormDisplayBase ):
 
+class RHRegistrationFormRegistrantBase( RHRegistrationFormDisplayBase ):
     def _checkParams(self, params):
         RHRegistrationFormDisplayBase._checkParams(self, params)
         self._registrant=None
         regId=params.get("registrantId",None)
+        if regId is None:
+            raise MaKaCError(_("registrant id not set"))
+        self._registrant=self._conf.getRegistrantById(regId)
+        if self._registrant is None:
+            raise NotFoundError(_("The registrant with id %s does not exist or has been deleted")%regId)
+
+class RHRegistrationFormCreationDone( RHRegistrationFormRegistrantBase ):
+
+    def _checkParams(self, params):
+        RHRegistrationFormRegistrantBase._checkParams(self, params)
         self._authkey=params.get("authkey","")
-        if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)
-            if self._registrant.getRandomId() != self._authkey or self._authkey == "":
-                raise AccessError("You are not authorized to access this web page")
+        if self._registrant.getRandomId() != self._authkey or self._authkey == "":
+            raise AccessError("You are not authorized to access this web page")
 
     def _processIfActive( self ):
         if self._registrant is not None:
             p = registrationForm.WPRegistrationFormCreationDone(self, self._conf, self._registrant)
             return p.display()
 
-class RHRegistrationFormconfirmBooking( RHRegistrationFormDisplayBase ):
+class RHRegistrationFormconfirmBooking( RHRegistrationFormRegistrantBase ):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
     def _checkParams( self, params ):
-        RHBaseRegistrationForm._checkParams(self, params)
-
-        self._registrant=None
-        regId=params.get("registrantId",None)
-        if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)
+        RHRegistrationFormRegistrantBase._checkParams(self, params)
         self._regForm = self._conf.getRegistrationForm()
         if self._conf.getModPay().hasPaymentConditions() and params.get("conditions","false") != "on":
             raise MaKaCError("You cannot pay without accepting the conditions")
@@ -230,14 +233,10 @@ class RHRegistrationFormconfirmBooking( RHRegistrationFormDisplayBase ):
             url.addParam("registrantId",self._registrant.getId())
             self._redirect(url)
 
-class RHRegistrationFormconfirmBookingDone( RHRegistrationFormDisplayBase ):
+class RHRegistrationFormconfirmBookingDone( RHRegistrationFormRegistrantBase ):
 
     def _checkParams(self, params):
-        RHRegistrationFormDisplayBase._checkParams(self, params)
-        self._registrant=None
-        regId=params.get("registrantId",None)
-        if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)
+        RHRegistrationFormRegistrantBase._checkParams(self, params)
         cond=self._getSession().getVar("conditionsAccepted")
         if cond is None:
             raise MaKaCError("You cannot pay without accepting the conditions")

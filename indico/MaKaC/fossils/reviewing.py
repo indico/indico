@@ -48,6 +48,9 @@ class IReviewFossil(IFossil):
     def getReviewingStatus(self):
         pass
 
+    def isAuthorSubmitted(self):
+        pass
+
 class IReviewManagerFossil(IFossil):
     """
     Fossil for review manager

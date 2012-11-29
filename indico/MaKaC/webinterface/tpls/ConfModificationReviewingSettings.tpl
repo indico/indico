@@ -761,13 +761,13 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
 $E('editorSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorSubmittedRefereeNotif',
         {conference: '${ ConfReview.getConference().getId() }',
         AutoEmailsToChange: 'Referee'},
-        $T('a layout reviewer submits an assesment'),
+        $T('a layout reviewer submits an assessment'),
         'message14'
 ));
 $E('reviewerSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerSubmittedRefereeNotif',
         {conference: '${ ConfReview.getConference().getId() }',
     AutoEmailsToChange: 'Referee'},
-    $T('a content reviewer submits an assesment'),
+    $T('a content reviewer submits an assessment'),
     'message15'
 ));
 

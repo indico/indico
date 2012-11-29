@@ -54,58 +54,46 @@
                 </tr>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Your last proposition") }</span></td>
-                    <td bgcolor="white" valign="top">
-                        % if lastJudgement:
-                            ${ lastJudgement }
-                        % else:
-                            ${ _("No proposition yet") }
-                        % endif
+                    <td>
+                        <span>${lastJudgement if lastJudgement else _("No proposition yet")}</span>
+                        <p class="quotation">${lastJudgementComment if lastJudgementComment else ""}</p>
+                    </td>
+                    <td rowspan="3">
+                        <table>
+                            <tr>
+                                <form action=${ proposeToAccURL } method="POST">
+                                <td>
+                                        ${ proposeToAcceptButton }
+                                </td>
+                                </form>
+                            </tr>
+                            <tr>
+                                <form action=${ proposeToRejURL } method="POST">
+                                <td>
+                                        ${ proposeToRejectButton }
+                                </td>
+                                </form>
+                            </tr>
+                            <tr>
+                                <form action=${ proposeForOtherTracksURL } method="POST">
+                                <td>
+                                        ${ proposeForOtherTracksButton }
+                                </td>
+                                </form>
+                            </tr>
+                            <tr>
+                                <form action=${ duplicatedURL } method="POST">
+                                <td>
+                                        ${ duplicatedButton }
+                                </td>
+                                </form>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Status")}</span></td>
-                    <td colspan="2" valign="top" bgcolor="${ statusColor }">
-                        <table width="100%">
-                            <tr>
-                                <td width="100%">${ statusDetails }</td>
-                                <td align="right" valign="bottom">
-                                    <table align="right">
-                                        <tr>
-                                            <form action=${ proposeToAccURL } method="POST">
-                                            <td align="right">
-                                                    ${ proposeToAcceptButton }
-                                            </td>
-                                            </form>
-                                        </tr>
-                                        <tr>
-                                            <form action=${ proposeToRejURL } method="POST">
-                                            <td align="right">
-                                                    ${ proposeToRejectButton }
-                                            </td>
-                                            </form>
-                                        </tr>
-                                        <tr>
-                                            <form action=${ proposeForOtherTracksURL } method="POST">
-                                            <td align="right">
-                                                    ${ proposeForOtherTracksButton }
-                                            </td>
-                                            </form>
-                                        </tr>
-                                        <tr>
-                                            <form action=${ duplicatedURL } method="POST">
-                                            <td align="right">
-                                                    ${ duplicatedButton }
-                                            </td>
-                                            </form>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">${ statusComment }</td>
-                            </tr>
-                        </table>
-                    </td>
+                    <td width="100%" valign="top">${ statusDetails } <br> ${ statusComment }</td>
                 </tr>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Your rating for this abstract") }</span></td>

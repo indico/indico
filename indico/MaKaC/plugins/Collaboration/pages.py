@@ -129,6 +129,8 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
+
+        agreement_name = CollaborationTools.getOptionValue("RecordingRequest", "AgreementName")
         manager = self._conf.getCSBookingManager()
 
         for sw in manager.getSpeakerWrapperList():
@@ -149,8 +151,11 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
                 if self.spkWrapper.getStatus() == SpeakerStatusEnum.SIGNED:
                     dtagree = self.spkWrapper.getDateAgreementSigned()
                     vars['outcomeText'] = _("You have already submitted your electronic agreement, it appears that you accepted it on <strong>%s</strong>.") % format_datetime(dtagree)
-                else:
+                elif self.spkWrapper.getStatus() == SpeakerStatusEnum.REFUSED:
                     vars['outcomeText'] = _("You have already submitted your electronic agreement, it appears that you refused it.")
+                else:
+                    vars['outcomeText'] = _("The organizer has already uploaded a scanned copy of {0}. No electronic signature is needed.").format(
+                        CollaborationTools.getOptionValue("RecordingRequest", "AgreementName"))
 
             else:
                 vars['error'] = None
@@ -167,7 +172,6 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
                     cont = self._conf.getContributionById(self.spkWrapper.getContId())
 
                 vars['cont'] = cont
-
                 vars['showContributionInfo'] = self.authKey
 
                 location = cont.getLocation()
@@ -188,7 +192,7 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
                 vars['contDate'] = "%s (%s)"%(formatTwoDates(cont.getStartDate(), cont.getEndDate(), tz = tz, showWeek = True), tz)
 
                 vars['linkToEvent'] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-                vars['agreementName'] = CollaborationTools.getOptionValue("RecordingRequest", "AgreementName")
+                vars['agreementName'] = agreement_name
         else:
             vars['error'] = 'Error'
 

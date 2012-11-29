@@ -8,11 +8,12 @@
 
 <table class="Revtab" width="90%" cellspacing="0" cellpadding="10px" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
-        <td nowrap class="groupTitle" colspan=4>${ _("Give advice on content of the paper")}</td>
+        <td nowrap class="groupTitle" colspan=5>${ _("Give advice on content of the paper")}</td>
     </tr>
     <tr>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;">${ _("Id")}</td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;">${ _("Title")}</td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;">${ _("Review #")}</td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;">${ _("State")}</td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;">${ _("Deadline")}</td>
     </tr>
@@ -39,6 +40,9 @@
                        </td>
                    % endif
             <td style="padding-right:5px;padding-left:5px;">
+                ${_("Review {0}").format(len(c.getReviewManager().getVersioning()))}
+            </td>
+            <td style="padding-right:5px;padding-left:5px;">
                 % if c.getReviewManager().getLastReview().hasGivenAdvice(User):
                     <% advice = c.getReviewManager().getLastReview().getAdviceFrom(User).getJudgement() %>
                     <%
@@ -49,16 +53,23 @@
                         else:
                             advice_color = 'orange'
                     %>
-                    <span>${ _("Advice given")}:</span><span style="color:${advice_color}"> ${ advice }</span>
+                    <span style="color:${advice_color}">${ _("Advice  given: ") + advice }</span>
                 % elif not c.getReviewManager().getLastReview().isAuthorSubmitted():
                     % if len(c.getReviewManager().getVersioning()) > 1:
-                        <span>${ _("Author has yet to re-submit paper") }</span>
+                        <span style="color:orange;">${ _("Author has yet to re-submit paper") }</span>
                     % else:
-                        <span>${ _("Paper not submitted yet")}</span>
+                        <span>${ _("Paper not yet submitted")}</span>
                     % endif
                 % else:
+                    % if len(c.getReviewManager().getVersioning()) > 1:
+                        <span style="color:#D18700;">
+                            ${ _("Author has re-submitted paper")}
+                        </span><br/>
+                    % endif
                     <% referee_did = c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() %>
-                    <span ${ "style='font-weight: bold;'" if not referee_did else "" }>${ _("Advice not given yet")}</span>
+                    <span ${ "style='font-weight: bold;'" if not referee_did else "" }>
+                    ${ _("Advice not yet given")}
+                    </span>
                     % if referee_did:
                     <span style="color:#3F4C6B;">${ _("but Referee already assessed contribution")}</span>
                     % endif
@@ -79,5 +90,5 @@
 </table>
 % endif
 % if not ConfReview.getReviewedContributions(User):
-<p style="padding-left: 25px;"><font color="gray">${ _("There are no contributions assigned to you to assess yet.")}</font></p>
+<p style="padding-left: 25px;"><font color="gray">${ _("No contributions have so far been assigned to you for judgement.")}</font></p>
 % endif

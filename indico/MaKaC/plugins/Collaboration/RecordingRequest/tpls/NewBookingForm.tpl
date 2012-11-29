@@ -8,7 +8,7 @@
             <td>
                 <span class="RRNoteText">
                     ${_("In order to send a Recording request, you need to select a room capable of recording. ")}
-                    <span class='fakeLink' onclick='toggleRecordingCapableRooms();' id="recordingRoomsText">${_("See list of recordable rooms")}</span>
+                    <span class='fakeLink' id="recordingRoomsText">${_("See list of recordable rooms")}</span>
                 </span>
             </td>
         </tr>
@@ -101,7 +101,7 @@
                         % endif
                     </td>
                 </tr>
-                % if RecordingCapable:
+                % if RecordingCapable and (NRecordingCapableContributions < NTalks):
                 <tr>
                     <td></td>
                     <td class="warning">

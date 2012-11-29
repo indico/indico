@@ -733,11 +733,28 @@ type("AuthorsPopup", ["ExclusivePopup"], {
 
 type("SubmitPopup", ["ExclusivePopupWithButtons"], {
 
+    _save: function() {
+        var self = this;
+        var killProgress = IndicoUI.Dialogs.Util.progress($T('Submitting paper for reviewing...'));
+
+        indicoRequest('reviewing.contribution.submitPaper',
+                self.args,
+                function(response,error) {
+                    if (exists(error)) {
+                        self.postDraw();
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    } else {
+                        killProgress();
+                        window.location.reload(true);
+                    }
+                }
+               );
+    },
+
     draw: function() {
         var contentDiv = $("<div/>");
         var materialList = $("<div/>", {id: "reviewingMaterialListPlace1"});
-        this.form = $("<form/>", {action: this.action, method: "POST"});
-        contentDiv.append(materialList);
         var warningDiv =  $("<div/>", {id: "submitWarningText"}).addClass("collaborationWarning");
         warningDiv.css("padding-bottom", "3px");
         warningDiv.css("padding-left", "3px");
@@ -749,9 +766,8 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
             tooltip: $T('First you should add the materials and then by clicking on this button you will submit them for reviewing. They will be locked until the end of the process.'),
             disabled: true
         });
-        this.form.append(warningDiv);
         contentDiv.append(materialList);
-        contentDiv.append(this.form);
+        contentDiv.append(warningDiv);
         return this.ExclusivePopup.prototype.draw.call(this, contentDiv);
 
     },
@@ -770,7 +786,7 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
                 var confirm = new ConfirmPopup("Submit", $T('Do you want to send the paper for reviewing? After sending it, you will not be able to submit another file until it is reviewed.'),
                             function(action){
                     if(action){
-                        self.form.submit();
+                        self._save();
                     }
                 });
                 confirm.open();
@@ -796,17 +812,23 @@ type("UploadedPaperPopup", ["ExclusivePopup"], {
 
     draw: function() {
         var self = this;
-        var container = $("<ul/>").css("list-style", "none").css("padding", "0px");
-        each(this.resourceList, function(resource) {
-            var resourceElem = $("<li/>");
-            var details = $("<ul/>").css("list-style", "none").css("padding-left", "25px");
-            resourceElem.append($("<a/>").attr("href", resource.url).text(resource.name));
-            details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File name")+": ")).append($("<span/>").text(resource.file.fileName)));
-            details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File size")+": ")).append($("<span/>").text(Math.floor(resource.file.fileSize/1024)+ "KB")));
-            details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File creation date")+": ")).append($("<span/>").text(resource.file.creationDate)));
-            resourceElem.append(details);
-            container.append(resourceElem);
-        });
+        var container = $("<div/>");
+        if(this.resourceList.length.get() > 0){
+            var paperList = $("<ul/>").css("list-style", "none").css("padding", "0px");
+            each(this.resourceList, function(resource) {
+                var resourceElem = $("<li/>");
+                var details = $("<ul/>").css("list-style", "none").css("padding-left", "25px");
+                resourceElem.append($("<a/>").attr("href", resource.url).text(resource.name));
+                details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File name")+": ")).append($("<span/>").text(resource.file.fileName)));
+                details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File size")+": ")).append($("<span/>").text(Math.floor(resource.file.fileSize/1024)+ "KB")));
+                details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File creation date")+": ")).append($("<span/>").text(resource.file.creationDate)));
+                resourceElem.append(details);
+                paperList.append(resourceElem);
+            });
+            container.append(paperList);
+        } else{
+            container.append($("<div/>").css({textAlign:"center", padding: pixels(5)}).append($T("No paper uploaded")));
+        }
         return this.ExclusivePopup.prototype.draw.call(this, container);
     },
     postDraw: function(){
@@ -902,7 +924,8 @@ type("ContributionsPopup", ["ExclusivePopup"], {
             table.append(Html.tr({}, Html.td({style:{verticalAlign: 'top'}}, time), Html.td({}, title, infoDiv)));
         });
         this.innerHTML = Html.table({style: {marginBottom: pixels(10)}}, table).dom.innerHTML;
-        return this.ExclusivePopup.prototype.draw.call(this, Html.table({style: {marginBottom: pixels(10)}}, table));
+        return this.ExclusivePopup.prototype.draw.call(this, Html.table({style: {marginBottom: pixels(10)}}, table),
+                                                       {maxHeight: Math.min($(window).height() - 50, 700)});
     },
     postDraw: function(){
         this.ExclusivePopup.prototype.postDraw.call(this);

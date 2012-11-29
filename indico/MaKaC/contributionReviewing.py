@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
+
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import urlHandlers
@@ -34,6 +36,7 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.paperReviewing import Answer
 from MaKaC.common.Counter import Counter
 from MaKaC.webinterface.urlHandlers import UHContributionDisplay, UHContributionReviewingJudgements
+from indico.util.i18n import ngettext # unicode ngettext
 ###############################################
 # Contribution reviewing classes
 ###############################################
@@ -492,7 +495,10 @@ class RefereeJudgement(Judgement):
 
         # 2 --> to be corrected, > 3 has the same behaviour as 'to be corrected'
         if int(self._judgement.getId()) == 2 or int(self._judgement.getId()) > 3:
-            self.getReviewManager().newReview()
+            rm = self.getReviewManager()
+            rm.newReview()
+            # remove reviewing materials from the contribution
+            rm.getContribution().removeMaterial(matReviewing)
 
 
     def getAnswers(self):
@@ -525,7 +531,10 @@ class EditorJudgement(Judgement):
         if self.getReviewManager().getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING and (self._judgement.getId() == "2" or int(self._judgement.getId()) > 3):
             matReviewing = self.getReviewManager().getContribution().getReviewing()
             self.getReview().copyMaterials(matReviewing)
-            self.getReviewManager().newReview()
+            rm = self.getReviewManager()
+            rm.newReview()
+            # remove reviewing materials from the contribution
+            rm.getContribution().removeMaterial(matReviewing)
 
     def purgeAnswers(self):
         """ Remove the answers of the questions that were sent but we don't need anymory because
@@ -637,6 +646,19 @@ class Review(Persistent, Fossilizable):
     def getReviewerJudgement(self, reviewer):
         return self._reviewerJudgements[reviewer]
 
+    def _getReviewerStatus(self, status):
+        if self.anyReviewerHasGivenAdvice():
+            advices = defaultdict(int)
+            for reviewer in self._reviewManager.getReviewersList():
+                judgement = self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()
+                if judgement != None:
+                    advices[judgement] += 1
+            resume = "(%s)" % ", ".join("%s %s" % (v, k.lower()) for k, v in advices.iteritems())
+            status.append(_("Content assessed by %s %s %s") % (
+                    sum(advices.values()), ngettext("reviewer", "reviewers", sum(advices.values())), resume))
+        else:
+            status.append(_("No content reviewers have decided yet"))
+
     def getReviewingStatus(self, forAuthor = False):
         """ Returns a list of strings with a description of the current status of the review.
         """
@@ -659,26 +681,11 @@ class Review(Persistent, Fossilizable):
                             status.append(_("Layout assessed by ") + str(self._reviewManager.getEditor().getFullName())+ _(" as: ") + str(self._editorJudgement.getJudgement()))
                         else:
                             status.append(_("Pending layout reviewer decision"))
-
-                        if self.anyReviewerHasGivenAdvice():
-                            for reviewer in self._reviewManager.getReviewersList():
-                                if (self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement() != None):
-                                    status.append(_("Content assessed by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
-                            if not self.allReviewersHaveGivenAdvice():
-                                status.append(_("Some content reviewers have not decided yet"))
-                        else:
-                            status.append(_("No content reviewers have decided yet"))
+                        self._getReviewerStatus(status)
                     if self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING:
-                        if self.anyReviewerHasGivenAdvice():
-                            for reviewer in self._reviewManager.getReviewersList():
-                                if (self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement() != None):
-                                    status.append(_("Content assessed by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
-                            if not self.allReviewersHaveGivenAdvice():
-                                status.append(_("Some content reviewers have not decided yet"))
-                        else:
-                            status.append(_("No content reviewers have decided yet"))
+                        self._getReviewerStatus(status)
         else:
-            status.append(_("Materials not submitted yet"))
+            status.append(_("Materials not yet submitted"))
         return status
 
     def isAuthorSubmitted(self):

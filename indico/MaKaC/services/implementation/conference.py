@@ -280,6 +280,8 @@ class ConferenceShortURLModification( ConferenceTextModificationBase ):
     """
     def _handleSet(self):
         mapper = ShortURLMapper()
+        if self._value and mapper.hasKey(self._value):
+            raise NoReportError(_("Short URL tag already used: '%s'. Please select another one.")%self._value)
         mapper.remove(self._target)
         self._target.setUrlTag(self._value)
         if self._value:

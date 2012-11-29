@@ -106,6 +106,14 @@ class TestMultiPointerTrack(unittest.TestCase):
         del self._mpt[1]
         self.assertEqual(len(self._mpt), 1)
 
+    def test_track_empty(self):
+        """
+        checking that track is empty
+        """
+        self.assertEqual(self._mpt.is_empty(), True)
+        self._addSome()
+        self.assertEqual(self._mpt.is_empty(), False)
+
     def testMovePointer(self):
         """
         moving the pointer

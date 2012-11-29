@@ -23,8 +23,6 @@ import MaKaC.user as user
 from MaKaC.errors import FormValuesError
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh.contribMod import RHContribModifBase, RHContribModifBaseReviewingStaffRights
-from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-from MaKaC.webinterface.rh.contribDisplay import RHContributionMaterialSubmissionRightsBase
 from MaKaC.webinterface.rh.contribMod import RCContributionReferee
 from MaKaC.webinterface.rh.contribMod import RCContributionEditor
 from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
@@ -405,22 +403,6 @@ class RHGiveAdvice(RHReviewerBase):
             reviewerJudgement.sendNotificationEmail()
 
             self._redirect( urlHandlers.UHContributionGiveAdvice.getURL( self._target ))
-
-#Classes for the author
-class RHReviewingAuthorBase(RHContributionMaterialSubmissionRightsBase):
-
-    def _checkProtection(self):
-        if self._target.getConference().hasEnabledSection("paperReviewing"):
-            RHContributionMaterialSubmissionRightsBase._checkProtection(self)
-        else:
-            raise MaKaCError(_("Paper Reviewing is not active for this conference"))
-
-class RHSubmitForReviewing(RHReviewingAuthorBase):
-    _uh = urlHandlers.UHContributionDisplay
-
-    def _process (self):
-        self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
-        self._redirect(urlHandlers.UHContributionDisplay.getURL(self._target))
 
 #class to show reviewing history
 class RHReviewingHistory(RHContribModifBaseReviewingStaffRights):
