@@ -35,6 +35,19 @@ class VidyoOperations(object):
     """
 
     @classmethod
+    def roomWithSameOwner(cls, owner, roomName):
+        # we retrieve the just created room; we need to do this because Vidyo will have
+        # added extra data like the room id, the url
+        searchFilter = SOAPObjectFactory.createFilter('admin', roomName)
+        answer = AdminApi.getRooms(searchFilter, None, None)
+        createdRooms = answer.room
+
+        for room in createdRooms:
+            if str(room.name) == roomName and str(room.ownerName) == owner:
+                return room
+        return None
+
+    @classmethod
     def createRoom(cls, booking):
         """ Attempts to create a public room in Vidyo.
             Returns None on success. Will also set booking.setAccountName() if success, with the Indico & Vidyo login used successfully.
@@ -91,7 +104,10 @@ class VidyoOperations(object):
                 faultString = e.fault.faultstring
 
                 if faultString.startswith('Room exist for name'):
-                    return VidyoError("duplicated", "create")
+                    if VidyoOperations.roomWithSameOwner(possibleLogins[loginToUse], roomNameForVidyo):
+                        return VidyoError("duplicatedWithOwner", "create")
+                    else:
+                        return VidyoError("duplicated", "create")
 
                 elif faultString.startswith('Member not found for ownerName'):
                     loginToUse = loginToUse + 1
@@ -117,8 +133,27 @@ class VidyoOperations(object):
         for room in createdRooms:
             if str(room.extension) == extension:
                 return room
-
         return None
+
+    @classmethod
+    def attachRoom(cls, booking):
+        owner = booking.getOwnerObject()
+        possibleLogins = VidyoTools.getAvatarLoginList(owner)
+        if not possibleLogins:
+            return VidyoError("userHasNoAccounts", "attach")
+        roomName = booking.getBookingParamByName("roomName")
+        searchFilter = SOAPObjectFactory.createFilter('admin', roomName)
+        answer = AdminApi.getRooms(searchFilter, booking.getConference().getId(), booking.getId())
+        createdRooms = answer.room
+
+        for room in createdRooms:
+            loginToUse = 0
+            while loginToUse < len(possibleLogins):
+                if str(room.name) == roomName and str(room.ownerName) == possibleLogins[loginToUse]:
+                    return room
+                loginToUse = loginToUse + 1
+        else:
+            return  VidyoError("notValidRoom", "attach")
 
     @classmethod
     def modifyRoom(cls, booking, oldBookingParams):

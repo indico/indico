@@ -262,16 +262,8 @@ class CSBookingManager(Persistent, Observer):
 
         self.addVideoService(booking.getLinkId(), booking)
 
-    def createBooking(self, bookingType, bookingParams = {}):
-        """ Adds a new booking to the list of bookings.
-            The id of the new booking is auto-generated incrementally.
-            After generating the booking, its "performBooking" method will be called.
 
-            bookingType: a String with the booking's plugin. Example: "DummyPlugin", "EVO"
-            bookingParams: a dictionary with the parameters necessary to create the booking.
-                           "create the booking" usually means Indico deciding if the booking can take place.
-                           if "startDate" and "endDate" are among the keys, they will be taken out of the dictionary.
-        """
+    def _createBooking(self, bookingType, bookingParams = {}, operation = "_create"):
         if self.canCreateBooking(bookingType):
 
             uniqueId = self.checkVideoLink(bookingParams)
@@ -292,7 +284,7 @@ class CSBookingManager(Persistent, Observer):
             else:
                 newId = self._getNewBookingId()
                 newBooking.setId(newId)
-                createResult = newBooking._create()
+                createResult = getattr(newBooking, operation)()
                 if isinstance(createResult, CSErrorBase):
                     return createResult
                 else:
@@ -316,6 +308,28 @@ class CSBookingManager(Persistent, Observer):
         else:
             #we raise an exception because the web interface should take care of this never actually happening
             raise CollaborationServiceException(bookingType + " only allows to create 1 booking per event")
+
+    def createBooking(self, bookingType, bookingParams = {}):
+        """ Adds a new booking to the list of bookings.
+            The id of the new booking is auto-generated incrementally.
+            After generating the booking, its "performBooking" method will be called.
+
+            bookingType: a String with the booking's plugin. Example: "DummyPlugin", "EVO"
+            bookingParams: a dictionary with the parameters necessary to create the booking.
+                           "create the booking" usually means Indico deciding if the booking can take place.
+                           if "startDate" and "endDate" are among the keys, they will be taken out of the dictionary.
+        """
+        return self._createBooking(bookingType, bookingParams)
+
+    def attachBooking(self, bookingType, bookingParams = {}):
+        """ Attach an existing booking to the list of bookings.
+             The checking and the params are the same as create the booking
+        """
+        for booking in self.getBookingList(sorted, bookingType):
+            result = booking.checkAttachParams(bookingParams)
+            if isinstance(result, CSErrorBase):
+                return result
+        return self._createBooking(bookingType, bookingParams, "_attach")
 
     def _indexBooking(self, booking, index_names=None):
         indexes = self._getIndexList(booking)
@@ -2011,6 +2025,15 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         raise CollaborationException("Method _create was not overriden for the plugin type " + str(self._type))
 
+    def _attach(self):
+        """ To be overriden by inheriting classes.
+            This method is called when a booking is attached, after setting the booking parameters.
+            The plugin should decide if the booking is accepted or not.
+            Often this will involve communication with another entity, like an MCU for the multi-point H.323 plugin,
+            or a EVO HTTP server in the EVO case.
+        """
+        raise CollaborationException("Method _attach was not overriden for the plugin type " + str(self._type))
+
     def _modify(self, oldBookingParams):
         """ To be overriden by inheriting classes.
             This method is called when a booking is modifying, after setting the booking parameters.
@@ -2190,6 +2213,9 @@ class CSBookingBase(Persistent, Fossilizable):
 
     def __cmp__(self, booking):
         return cmp(self.getUniqueId(), booking.getUniqueId()) if booking else 1
+
+    def checkAttachParams(self, bookingParams):
+        return None
 
 class WCSTemplateBase(wcomponents.WTemplated):
     """ Base class for Collaboration templates.

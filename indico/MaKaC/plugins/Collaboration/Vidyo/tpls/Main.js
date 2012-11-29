@@ -55,7 +55,7 @@
         };
     },
 
-    errorHandler: function(event, error, booking) {
+    errorHandler: function(event, error, booking, popup) {
         if (event === 'create' || event === 'edit') {
             if (error.errorType === 'invalidName') {
                 var message = $T("That room name is not valid. Please write a new name that starts " +
@@ -80,7 +80,16 @@
                 IndicoUtil.markInvalidField($E('roomName'), message);
 
             }
-
+            if (error.errorType === 'duplicatedWithOwner') {
+                var conferenceId = this.vidyoComponents.params.conference;
+                var handler = function(confirm) {
+                    if (confirm) {
+                        attachBooking(booking, "Vidyo", conferenceId);
+                        popup.close();
+                    }
+                };
+                new ConfirmPopup($T('Attach room'), Html.div({style: {width: pixels(500)}}, error.userMessage), handler, $T("Attach room")).open();
+            }
             if (error.errorType === 'badOwner') {
                 CSErrorPopup($T("Invalid owner"), [$T("The user ") + this.vidyoComponents["ownerField"].get().name + $T(" does not have a Vidyo account.")]);
             }
@@ -97,32 +106,27 @@
 
         }
 
-        if (event === 'edit' && error.errorType === 'unknownRoom') {
-            vidyoMarkBookingNotPresent(booking);
-            CSErrorPopup($T("Public room removed in Vidyo"),
-                    [$T("This public room seems to have been deleted in Vidyo."),
-                     $T("Please delete it and try to create it again.")]);
+        if (event === 'attach' && error.errorType === 'notValidRoom') {
+            CSErrorPopup($T("Public room duplicated name"), [error.userMessage]);
         }
 
-        if (event === 'checkStatus' && error.errorType === 'unknownRoom') {
+        if (event === 'attach' && error.errorType === 'duplicated') {
+            CSErrorPopup($T("Public room duplicated name"),
+                    [$T("There is already a Vidyo Public Room linked to this event with the same name."),
+                     $T("Please give a different name to the room.")]);
+        }
+
+        if ((event === 'edit' || event === 'checkStatus' || event === 'connect') && error.errorType === 'unknownRoom') {
             vidyoMarkBookingNotPresent(booking);
             CSErrorPopup($T("Public room removed in Vidyo"),
                     [$T("This public room seems to have been deleted in Vidyo."),
                      $T("Please delete it and try to create it again.")]);
-
         }
 
         if (event === 'connect' && error.errorType === 'noValidConferenceRoom') {
             CSErrorPopup($T("Not valid conference room"),
                     [$T("The conference room is not a valid Vidyo capable room."),
                      $T("Please select one that is Vidyo capable.")]);
-
-        }
-
-        if (event === 'connect' && error.errorType === 'unknownRoom') {
-            CSErrorPopup($T("Public room removed from Vidyo"),
-                    [$T("This public room seems to have been deleted from Vidyo."),
-                     $T("Please delete it and try to create it again.")]);
         }
 
         if (event === 'connect' && error.errorType === 'noExistsRoom') {

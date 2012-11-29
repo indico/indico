@@ -360,6 +360,7 @@ class CSBooking(CSBookingBase):
             if result.getErrorType() == 'unknownRoom':
                 self.setBookingNotPresent()
             raise result
+
     def _create(self):
         """ Creates the Vidyo public room that will be associated to this CSBooking,
             based on the booking params.
@@ -383,6 +384,35 @@ class CSBooking(CSBookingBase):
 
             self._setAutomute()
 
+    def checkAttachParams(self, bookingParams):
+        if bookingParams["roomName"] == self.getBookingParamByName("roomName") and bookingParams.get("videoLinkType") == self.getBookingParamByName("videoLinkType"):
+            return VidyoError("duplicated", "attach")
+
+    def _attach(self):
+        """ Creates the Vidyo public room that will be associated to this CSBooking,
+            based on the booking params.
+            Returns None if success.
+            Returns a VidyoError if there is a problem.
+        """
+        result = ExternalOperationsManager.execute(self, "attachRoom", VidyoOperations.attachRoom, self)
+        if isinstance(result, VidyoError):
+            return result
+
+        else:
+            self._roomId = str(result.roomID)
+            self._extension = str(result.extension)
+            self._url = str(result.RoomMode.roomURL)
+            self.setOwnerAccount(str(result.ownerName), updateAvatar = True)
+            recoveredDescription = VidyoTools.recoverVidyoDescription(result.description)
+            if recoveredDescription:
+                self._bookingParams["roomDescription"] = recoveredDescription
+            else:
+                self._warning = "invalidDescription"
+            self._bookingParams["autoMute"] = self._getAutomute()
+            self.setBookingOK()
+            VidyoTools.getEventEndDateIndex().indexBooking(self)
+            VidyoTools.getIndexByVidyoRoom().indexBooking(self)
+
     def _modify(self, oldBookingParams):
         """ Modifies the Vidyo public room in the remote system
         """
@@ -402,6 +432,7 @@ class CSBooking(CSBookingBase):
 
             self._setAutomute()
             self._setModeratorPIN()
+            self._updateRelatedBookings()
 
     def _notifyOnView(self):
         """ Will get called when manager sees list of bookings in management interface,

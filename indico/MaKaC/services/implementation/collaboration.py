@@ -128,9 +128,7 @@ class CollaborationBookingModif(CollaborationBookingModifBase):
         if not RCVideoServicesUser.hasRights(self, None, self._bookingType):
             raise CollaborationException(_("You dot have access to modify a %s booking")%self._bookingType)
 
-class CollaborationCreateCSBooking(CollaborationBase, CollaborationBookingModif):
-    """ Adds a new booking
-    """
+class CollaborationCreateCSBookingBase(CollaborationBase, CollaborationBookingModif):
     def _checkParams(self):
         CollaborationBase._checkParams(self)
 
@@ -148,8 +146,20 @@ class CollaborationCreateCSBooking(CollaborationBase, CollaborationBookingModif)
     def _checkProtection(self):
         CollaborationBookingModif._checkProtection(self)
 
+class CollaborationCreateCSBooking(CollaborationCreateCSBookingBase):
+    """ Adds a new booking
+    """
+
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.createBooking(self._bookingType, bookingParams = self._bookingParams),
+                         None, tz = self._conf.getTimezone())
+
+class CollaborationAttachCSBooking(CollaborationCreateCSBookingBase):
+    """ Attach an new booking
+    """
+
+    def _getAnswer(self):
+        return fossilize(self._CSBookingManager.attachBooking(self._bookingType, bookingParams = self._bookingParams),
                          None, tz = self._conf.getTimezone())
 
 class CollaborationRemoveCSBooking(CollaborationBookingModif):
@@ -460,6 +470,7 @@ class CollaborationMakeMeModeratorCSBooking(CollaborationBookingModifBase):
 
 methodMap = {
     "createCSBooking": CollaborationCreateCSBooking,
+    "attachCSBooking": CollaborationAttachCSBooking,
     "removeCSBooking": CollaborationRemoveCSBooking,
     "editCSBooking": CollaborationEditCSBooking,
     "startCSBooking": CollaborationStartCSBooking,

@@ -1109,21 +1109,11 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
                                         if (result._type === 'CSSanitizationError') {
                                             sanitizationError(result.invalidFields);
                                         } else {
-                                            codes[self.bookingType].errorHandler('create', result);
+                                            codes[self.bookingType].errorHandler('create', result, self.values, self);
                                         }
                                     } else {
-                                        hideAllInfoRows(false);
-                                        showInfo[result.id] = true; // we initialize the show info boolean for this booking
-                                        bookings.append(result);
-                                        showAllInfoRows(false);
-                                        addIFrame(result);
-                                        refreshStartAllStopAllButtons();
-                                        refreshTableHead();
-                                        if (pluginHasFunction(self.bookingType, 'postCreate')) {
-                                            codes[self.bookingType].postCreate(result);
-                                        }
+                                        createSuccess(result, self.bookingType);
                                         killProgress();
-                                        hightlightBookingM(result);
                                         self.close();
 
                                     }
@@ -1259,6 +1249,55 @@ var createBooking = function(pluginName, conferenceId) {
 
     return true;
 }
+
+/**
+ * Function that will be called when the user presses the "Attach" button when tried to create.
+ * @param {bookingParams} the parameters of the booking
+ * @param {bookingType} pluginName a string with the type of booking being created ('Vidyo', 'EVO', ...)
+ * @param {string} conferenceId the conferenceId of the current event
+ */
+
+var attachBooking = function(bookingParams, bookingType, conferenceId) {
+    var killProgress = IndicoUI.Dialogs.Util.progress("Attaching the room to the event...");
+    indicoRequest(
+            'collaboration.attachCSBooking',
+            {
+                conference: conferenceId,
+                type: bookingType,
+                bookingParams: bookingParams
+            },
+            function(result,error) {
+                if (!error) {
+                    // If the server found no problems, a booking object is returned in the result.
+                    // We add it to the watchlist and create an iframe.
+                    if (result.error) {
+                        killProgress();
+                        codes[bookingType].errorHandler('attach', result, bookingParams);
+                    } else {
+                        createSuccess(result, bookingType);
+                        killProgress();
+                    }
+                } else {
+                    killProgress();
+                    IndicoUtil.errorReport(error);
+                }
+            }
+        );
+};
+
+var createSuccess = function(result, bookingType) {
+    hideAllInfoRows(false);
+    showInfo[result.id] = true; // we initialize the show info boolean for this booking
+    bookings.append(result);
+    showAllInfoRows(false);
+    addIFrame(result);
+    refreshStartAllStopAllButtons();
+    refreshTableHead();
+    if (pluginHasFunction(bookingType, 'postCreate')) {
+        codes[bookingType].postCreate(result);
+    }
+    hightlightBookingM(result);
+};
 
 /**
  * Function that will be called when the user presses the "Edit" button of a booking.

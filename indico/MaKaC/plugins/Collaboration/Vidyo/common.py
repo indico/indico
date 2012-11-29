@@ -262,6 +262,10 @@ class VidyoError(CSErrorBase):
             if self._errorType == "duplicated":
                 return _("This Public room could not be created or changed because Vidyo considers the resulting public room name as duplicated.")
 
+            elif self._errorType == "duplicatedWithOwner":
+                return _("""This Public room could not be created or changed because Vidyo considers the resulting public room name as duplicated.
+                However, you are the moderator of the room and you can attach to this event.""")
+
             elif self._errorType == "badOwner":
                 return _("This Public room could not be created or changed because the specified moderator does not have a Vidyo account.")
 
@@ -288,6 +292,9 @@ class VidyoError(CSErrorBase):
 
             elif self._errorType == "userHasNoAccounts":
                 return _("The user selected as owner has no login information")
+
+            elif self._errorType == "notValidRoom" and self._operation == "attach":
+                return _("The room with that name does not exist or you are not the owner. Please select another one.")
 
             else:
                 return self._errorType
