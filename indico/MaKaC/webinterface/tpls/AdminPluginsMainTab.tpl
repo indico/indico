@@ -48,7 +48,7 @@
                 % for pluginType in PluginsHolder.getPluginTypes(includeNonVisible = False):
                 <tr>
                     <td>
-                        <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}" class="togglePluginType">
+                        <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}" data-confirm='${"This will reload all the plugins too. Do you want to continue?"}' data-title='${"Toggle Plugin Type"}'>
                         % if not pluginType.isUsable():
                             <img class="imglink" alt="${ _("Not in usable state")}" src="${Config.getInstance().getSystemIconURL( 'greyedOutSection' )}"/>
                         % elif pluginType.isActive():
@@ -63,7 +63,7 @@
                                 (${ pluginType.getNotUsableReason() })
                             </small>
                         % else:
-                            <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}" class="togglePluginType">
+                            <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}" data-confirm='${"This will reload all the plugins too. Do you want to continue?"}' data-title='${"Toggle Plugin Type"}'>
                                 ${ pluginType.getName() }
                             </a>
                         % endif
@@ -82,15 +82,3 @@
 % else:
     ${ _("No plugin types in the system (or non marked as visible)") }
 % endif
-
-<script type="text/javascript">
-$(".togglePluginType").click(function(){
-    var self = this;
-    new ConfirmPopup($T("Toggle Plugin Type"), $T("This will reload all the plugins too. Do you want to continue?"), function(confirmed){
-        if (confirmed) {
-            window.location = self.getAttribute("href");
-        }
-    }).open();
-    return false;
-});
-</script>

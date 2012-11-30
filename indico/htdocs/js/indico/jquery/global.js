@@ -44,4 +44,13 @@ $(document).ready(function() {
 
     // Enable colorbox for links with rel="lightbox"
     $('a[rel="lightbox"]').colorbox();
+    $(".body").on("click", "[data-confirm]", function(event){
+        var self = this;
+        new ConfirmPopup($(this).data("title"), $(this).data("confirm"), function(confirmed){
+            if(confirmed){
+                window.location = self.getAttribute("href");
+            }
+        }).open();
+        return false;
+    });
 });
