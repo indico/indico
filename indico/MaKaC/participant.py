@@ -165,8 +165,13 @@ class Participation(Persistent):
         currentUser = ContextManager.get('currentUser')
         self._notifyMgrNewParticipant = value
         logData = {}
-        logData["subject"] = "Sending email after application has been %s"%("activated" if value else "deactivated")
-        self._conference.getLogHandler().logAction(logData,"participants",currentUser)
+
+        if value:
+            logData["subject"] = _("Manager notification of participant application has been enabled")
+        else:
+            logData["subject"] = _("Manager notification of participant application has been disabled")
+
+        self._conference.getLogHandler().logAction(logData, "participants", currentUser)
         self.notifyModification()
 
     def isFull(self):
@@ -288,7 +293,7 @@ class Participation(Persistent):
             """)
 
         data["fromAddr"] = eventManager.getEmail()
-        data["subject"] = "Invitation to %s"%self._conference.getTitle()
+        data["subject"] = "Invitation to '%s'" % self._conference.getTitle()
         data["body"] = """
         Dear %s %s,
 
@@ -298,11 +303,11 @@ class Participation(Persistent):
         Looking forward to meeting you at %s
         Your Indico
         on behalf of %s %s
-        """%(title, familyName, \
-             self._conference.getTitle(), \
-             eventURL, refuse, \
-             self._conference.getTitle(), \
-             eventManager.getFirstName(), eventManager.getFamilyName())
+        """ % (title, familyName,
+               self._conference.getTitle(),
+               eventURL, refuse,
+               self._conference.getTitle(),
+               eventManager.getFirstName(), eventManager.getFamilyName())
 
         return data
 
@@ -581,7 +586,7 @@ on behalf of %s %s
 
         toList = []
         for userId in participantsIdList :
-            participant = self._participantList.get(userId,None)
+            participant = self._participantList.get(userId, None)
             if participant is not None :
                 toList.append(participant.getEmail())
         data["toList"] = toList

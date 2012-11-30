@@ -883,7 +883,7 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
                     if participation.isNotifyMgrNewParticipant():
                         # to notify the manager of new participant addition
                         data = self.preparedNewParticipantMessage(pending)
-                        GenericMailer.sendAndLog(GenericNotification(data),self._conf)
+                        GenericMailer.sendAndLog(GenericNotification(data), self._conf)
                 else:
                     result["msg"] = _("The participant identified by email '%s' has been added to the list of pending participants"
                                     % pending.getEmail())
@@ -905,7 +905,7 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
         data = {}
         data["toList"] = toList
         data["fromAddr"] = Config.getInstance().getSupportEmail()
-        data["subject"] = "New participant joined %s"%self._conf.getTitle()
+        data["subject"] = "New participant joined '%s'" % self._conf.getTitle()
 
         data["body"] = """
         Dear Event Manager,

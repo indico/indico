@@ -55,7 +55,7 @@ function reloadOptions(response, error) {
         } else {
             if(!$('#notifyMgrNewParticipant').is(':visible')) {
                 $("#notifyMgrNewParticipant").show();
-                $("#notifyMgrNewParticipant").effect("highlight",{},3000);
+                $("#notifyMgrNewParticipant").effect("highlight", {}, 3000);
             }
         }
     }
@@ -76,6 +76,6 @@ IndicoUI.executeOnLoad(function(){
             {confId:${confId}}, ${ jsonEncode(numMaxParticipants) }, false, null, function(value){return IndicoUtil.isInteger(value);}, '${_("The value set is not a positive number")}', '${_("Please insert a positive number or 0 for unlimited")}',
             null).draw().dom);
 
-    $(reloadOptions(${"true" if autoAccept else "false"}));
+    reloadOptions(${autoAccept | n,j});
    });
 </script>
