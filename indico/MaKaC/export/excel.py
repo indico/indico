@@ -24,7 +24,7 @@ from datetime import datetime
 from MaKaC.conference import Link
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import LocalFile
-import csv
+import csv, codecs
 
 class ExcelGenerator:
     """It helps to create an Excel CSV file. The way to work with this class
@@ -77,13 +77,12 @@ class ExcelGenerator:
     def getExcelContent(self):
         if self._currentLine != []:
             self.newLine()
-        return ''.join(self._lines)
+        return codecs.BOM_UTF8 + ''.join(self._lines)
 
     def excelFormatting(text):
         if text is None:
             text = ""
         if text.strip() != "":
-            text = utils.utf8Tolatin1(text)
             text = text.replace('\x0d', '')
         return text
     excelFormatting=staticmethod(excelFormatting)
