@@ -6282,6 +6282,7 @@ class Session(CommonObjectBase, Locatable):
             return
         if contrib.isScheduled():
             # unschedule the contribution
+            contrib._notify("contributionUnscheduled")
             sch=contrib.getSchEntry().getSchedule()
             sch.removeEntry(contrib.getSchEntry())
         del self.contributions[contrib.getId()]
