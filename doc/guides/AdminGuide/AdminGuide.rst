@@ -266,6 +266,25 @@ You will be asked to confirm the deletion of temporary files and
 websessions as well as packing of the database.
 
 
+Administration scripts
+====================
+
+
+Recover Administration Account
+----------------------------------
+
+*indico_admin* script allows you to recover administrator account.
+It can:
+
+* grant administrator privileges to any existing user (by user id)
+* revoke administrator privileges from any existing user (by user id)
+* create a new user with administrator privileges
+
+For more information type in console:
+::
+    indico_admin --help
+
+
 .. |image0| image:: AdminGuidePics/logo.png
 .. |image1| image:: AdminGuidePics/start1.png
 .. |image2| image:: AdminGuidePics/start2.png
