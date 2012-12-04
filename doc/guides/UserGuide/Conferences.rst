@@ -1007,6 +1007,18 @@ Here are the different tabs:
 
 * **Tools**: From here, you can delete the abstract
 
+Back to submitted
+'''''''''''''''''
+When the abstract has been accepted or rejected it exists the possibility of undo the action and come back to the status
+*Submitted*.
+
+It will be shown the button *back to submitted* in order to make the action.
+
+|image156|
+
+In case of the status *Accepted*, a popup will open in order to confirm the action because the associated contribution will be deleted.
+
+|image157|
 
 --------------
 
@@ -2027,3 +2039,5 @@ session. You may also make a PDF of the session.
 .. |image153| image:: UserGuidePics/tt_contribintosession.png
 .. |image154| image:: UserGuidePics/tt_undo.png
 .. |image155| image:: UserGuidePics/confd152.png
+.. |image156| image:: UserGuidePics/abstractBackToSubmitted.png
+.. |image157| image:: UserGuidePics/abstractBackToSubmittedConfirm.png
