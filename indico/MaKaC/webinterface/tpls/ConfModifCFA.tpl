@@ -88,8 +88,15 @@
             % else:
                 <br/><img src="${ iconDisabled }" border="0"> <span id="makePresenterMandatory" style="color:#777"> ${makeMandSpk}</span>
             % endif
-            <br/><a href="${ showAttachedFilesUrl }" ${"""data-confirm="%s" data-title="%s" """%(_("Please, note that if you enable this option the files (attached to the abstracts) will be public and accessible by everybody. Are you sure to continue?"), _("Show attached files")) if not showAttachedFilesContribList else ""}>
-                <img src="${ iconEnabled if showAttachedFilesContribList else iconDisabled }" border="0"> ${ _("Show files attached to abstracts in the contribution list") }
+            <br/>
+            <a href="${ showAttachedFilesUrl }"
+               % if not showAttachedFilesContribList:
+                 data-confirm="${_("Please, note that if you enable this option the files (attached to the abstracts) will be public and accessible by everybody. Are you sure to continue?")}"
+                 data-title="${_("Show attached files")}"
+               % endif
+               >
+               <img src="${ iconEnabled if showAttachedFilesContribList else iconDisabled }" border="0" />
+               ${ _("Show files attached to abstracts in the contribution list")}
             </a>
         </td>
     </tr>

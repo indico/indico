@@ -71,7 +71,9 @@
                         % if al.getEndedOn():
                             <span class="alarmSentDelete">${_("Delete")}</span>
                         % elif al.getId():
-                            <a href="${deleteAlarmURL}?${al.getLocator().getURLForm()}" data-confirm='${"Are you sure to delete this alarm"}' data-title='${"Delete alarm"}'>${_("Delete")}</a>
+                            <a href="${deleteAlarmURL}?${al.getLocator().getURLForm()}"
+                               data-confirm='${_("Are you sure you want to delete this alarm?")}'
+                               data-title='${_("Delete alarm")}'>${_("Delete")}</a>
                         % else:
                             <span class="notScheduled">${_("Delete")}</span>
                         % endif:

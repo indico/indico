@@ -13,7 +13,9 @@
         }
         function submit_delete()
         {
-            new ConfirmPopup($T("Delete room"),$T("THIS ACTION IS IRREVERSIBLE. Please note that all archival BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?"), function(confirmed) {
+            new ConfirmPopup($T("Delete room"),
+                             $T("THIS ACTION IS IRREVERSIBLE. Please note that all archival BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?"),
+                             function(confirmed) {
                 if(confirmed) {
                     $("#submits").attr("action", "${ deleteRoomUH.getURL( room ) }");
                     $("#submits").submit();
