@@ -106,7 +106,11 @@
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Status")}</span></td>
                     <td bgcolor="white" valign="top">${ status }</td>
-                    <td bgcolor="white" valign="bottom" align="right" colspan="2">${'<input type="submit" onclick="showWarning();" class="btn" value="'+ _("back to submitted")+'">' if showBackToSubmitted else ""}</td>
+                    <td bgcolor="white" valign="bottom" align="right" colspan="2">
+                        % if showBackToSubmitted:
+                            <input type="submit" id="backToSubmitted" class="btn" value="${_("back to submitted")}">
+                        % endif
+                    </td>
                 </tr>
                 <tr>
                     <td class="dataCaptionTD" nowrap><span class="dataCaptionFormat">${ inlineContextHelp(_('Average of all the answers given by the reviewers for this abstract.')) }${ _("Average rating") }</span></td>
@@ -125,7 +129,7 @@
                             <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ title }">${ submitterFullName } (${ submitterAffiliation })</a>
                         </div>
                     </td>
-                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" onclick="changeSubmitter();" ${"disabled" if abstractAccepted else ""}></td>
+                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" id="changeSubmitter" ${"disabled" if abstractAccepted else ""}></td>
                 </tr>
                 <tr>
                     <td colspan="4" class="horizontalLine">&nbsp;</td>
@@ -219,31 +223,23 @@
 
 var status = '${ statusName }';
 
-function showWarning() {
+$("#backToSubmitted").click(function(){
     if (status=="ACCEPTED") {
-        var content = Html.div({}, Html.table({}, Html.tbody({},
-                Html.tr({}, Html.td({style:{textAlign:'center'}},
-                        Html.span({},"The contribution associated with this abstract will be "),
-                        Html.span({style:{fontWeight:'bold'}}, "deleted."))),
-                Html.tr({}, Html.td({style:{textAlign:'center'}},
-                        Html.span({style:{fontWeight:'bold'}}, "All"),
-                        Html.span({}, " the existing sub-contributions within the above contribution will also be "),
-                        Html.span({style:{fontWeight:'bold'}}, "deleted."))),
-                Html.tr({}, Html.td({style:{textAlign:'center'}},
-                        Html.span({},"The abstract status will be "),
-                        Html.span({style:{fontWeight:'bold'}}, "Submitted."))),
-                Html.tr({}, Html.td({style:{textAlign:'center'}}, "Do you want to continue?")))));
-        var popup = new ConfirmPopup("Back to submitted status", content,
+        var content = $("<div/>").css("width", "380px");
+        content.append($("<div/>").css("margin-bottom", "10px").append($T("The contribution associated with this abstract and all the existing sub-contributions within it will be ")).append($("<span/>").css("font-weight", "bold").append($T("deleted."))));
+        content.append($("<div/>").css("margin-bottom", "10px").append($T("The abstract will remain and its status will change to ")).append($("<span/>").css("font-weight", "bold").append($T("submitted."))));
+        content.append($T("Do you want to continue?"));
+        var popup = new ConfirmPopup($T("Back to submitted status"), content,
                 function(action) {
                     if (action) {
                         window.location = ${ backToSubmittedURL };
                     }
-                }, "Confirm");
+                }, $T("Confirm"));
         popup.open();
     } else {
         window.location = ${ backToSubmittedURL };
     }
-}
+});
 
 var changeSubmitterHandler = function(user) {
 	indicoRequest(
@@ -266,12 +262,12 @@ var changeSubmitterHandler = function(user) {
     );
 };
 
-function changeSubmitter() {
+$("#changeSubmitter").click(function(){
     // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
     //         showToggleFavouriteButtons, chooseProcess)
     var chooseUsersPopup = new ChooseUsersPopup($T("Change submitter"), true, '${ confId }', false,
             true, true, true, true, changeSubmitterHandler);
     chooseUsersPopup.execute();
-}
+});
 
 </script>

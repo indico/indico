@@ -486,7 +486,7 @@ class RHBackToSubmitted(RHAbstractModifBase):
 
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
-        if self._abstract.getCurrentStatus().__class__ in [review.AbstractStatusWithdrawn, review.AbstractStatusRejected]:
+        if isinstance(self._abstract.getCurrentStatus(), (review.AbstractStatusWithdrawn, review.AbstractStatusRejected)):
             self._abstract.setCurrentStatus(review.AbstractStatusSubmitted(self._abstract))
         elif isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusAccepted):
             # remove the associated contribution
