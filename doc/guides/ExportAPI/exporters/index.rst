@@ -9,4 +9,5 @@ Exportable Elements
    ./file.rst
    ./room.rst
    ./reservation.rst
+   ./room_booking.rst
    ./videoservices.rst
