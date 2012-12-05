@@ -139,7 +139,7 @@ class SyncAgent(Fossilizable, Persistent):
 
     def getLastDT(self):
         ts = self.getLastTS()
-        return datetime.datetime.utcfromtimestamp(ts) if ts else None
+        return datetime.datetime.utcfromtimestamp(ts * self._manager.getGranularity()) if ts else None
 
     def getName(self):
         return self._name

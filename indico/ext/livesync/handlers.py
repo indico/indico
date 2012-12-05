@@ -113,7 +113,7 @@ class DeleteAgent(AgentOperationBase):
 class PreActivateAgent(AgentOperationBase):
 
     def _getAnswer(self):
-        self._agent.preActivate(int_timestamp(nowutc()))
+        self._agent.preActivate(int_timestamp(nowutc()) / self._sm.getGranularity())
         return True
 
 
