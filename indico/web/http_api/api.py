@@ -28,8 +28,6 @@ import pytz
 import re
 import types
 import urllib
-import time as time2
-from email.Utils import formatdate
 from ZODB.POSException import ConflictError
 from datetime import datetime, timedelta, time
 
@@ -64,7 +62,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.rb_tools import Period, datespan
 
 from indico.web.http_api.util import get_query_parameter
-from MaKaC.conference import Link, LocalFile
+from MaKaC.conference import LocalFile
 from MaKaC.errors import NoReportError
 
 utc = pytz.timezone('UTC')
@@ -625,23 +623,23 @@ class ContributionFetcher(SessionContribFetcher):
 @HTTPAPIHook.register
 class FileHook(HTTPAPIHook, RHFileCommon):
     """
-    Example: /export/file/conference/1/contribution/2/session/3/subContribution/4/material/Slides/resource/5.file?ak=00000000-0000-0000-0000-000000000000
+    Example: /export/file/conference/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin?ak=00000000-0000-0000-0000-000000000000
     """
-    DEFAULT_DETAIL = 'file'
-    VALID_FORMATS = ('file')
+    DEFAULT_DETAIL = 'bin'
+    VALID_FORMATS = ('bin')
     GUEST_ALLOWED = False
-    RE = r'(?P<event>[\w\s]+)(/contrib/(?P<contrib>[\w\s]+))?(/session/(?P<session>[\w\s]+))?(/subcontrib/(?P<subcontrib>[\w\s]+))?/material/(?P<material>[^/]+)/res/(?P<res>[\w\s]+)'
+    RE = r'(?P<event>[\w\s]+)(/session/(?P<session>[\w\s]+))?(/contrib/(?P<contrib>[\w\s]+))?(/subcontrib/(?P<subcontrib>[\w\s]+))?/material/(?P<material>[^/]+)/(?P<res>[\w\s]+)'
 
     def _getParams(self):
         super(FileHook, self)._getParams()
         self._type = 'file'
         self._event = self._pathParams['event']
-        self._contrib = self._pathParams['contrib']
         self._session = self._pathParams['session']
+        self._contrib = self._pathParams['contrib']
         self._subcontrib = self._pathParams['subcontrib']
         self._material = self._pathParams['material']
         self._res = self._pathParams['res']
-        params = {'confId': self._event, 'contribId': self._contrib, 'sessionId': self._session, 'subContId': self._subcontrib, 'materialId': self._material, 'resId': self._res}
+        params = {'confId': self._event, 'sessionId': self._session, 'contribId': self._contrib, 'subContId': self._subcontrib, 'materialId': self._material, 'resId': self._res}
         try:
             import MaKaC.webinterface.locators as locators
             l = locators.WebLocator()
@@ -670,7 +668,7 @@ class FileHook(HTTPAPIHook, RHFileCommon):
 class FileFetcher(DataFetcher):
 
     DETAIL_INTERFACES = {
-        'file': '',
+        'bin': '',
     }
 
     def file(self, data):
@@ -681,4 +679,4 @@ Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)
 Serializer.register('ics', ICalSerializer)
 Serializer.register('atom', AtomSerializer)
-Serializer.register('file', FileSerializer)
+Serializer.register('bin', FileSerializer)
