@@ -218,34 +218,29 @@ type("DisplayTimeTable", ["TimeTable"], {
         var self = this;
 
         self.timetableDrawer.setPrintableVersion(true);
-        var bodyPadding = $E(document.body).dom.style.padding;
-        var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
-        var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
+        var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return value;});
 
-        var goBackLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Go back'));
-        var printLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Print'));
+        var goBackLink = $('<a>', {href: window.location.hash, text: $T('Go back')}).css('fontSize', '17px');
+        var separator = $('<a>', { text: ' | '}).css('fontSize', '17px');
+        var printLink = $('<a>', {href: window.location.hash, text: $T('Print')}).css('fontSize', '17px');
 
-        var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
+        var links = $('<span>', {html: goBackLink.add(separator).add(printLink)}).css('float', 'right');
 
-        var headerStyle = {padding: '0px 5px 5px 5px',
-            borderBottom: '1px solid black',
-            textAlign: 'center',
-            width: pixels(self.timetableDrawer.width)};
-        var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
-            Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+        var header = $('<div>', {class: 'timetableHeader clearfix', html: links}).css({padding : '0px 5px 5px 5px', borderBottom : '1px solid black', textAlign: 'center', width: self.timetableDrawer.width});
+        header.append($('<span>', {html: self._titleTemplate(self.timetableDrawer.day)}).css('float', 'left'));
 
-        goBackLink.observeClick(function(e) {
-            $E(document.body).setStyle('padding', bodyPadding);
-            $E(document.body).set(elements);
-            self.timetableDrawer.setPrintableVersion(false);
+        goBackLink.click(function() {
+            location.reload();
         });
-        printLink.observeClick(function(e) {
+
+        printLink.click(function() {
             window.print();
         });
-        var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
-        $E(document.body).set(header, timetableDiv);
 
-        $E(document.body).setStyle('padding', pixels(30));
+        var timetableDiv = $('<div>', {html: timetableElements}).css({paddingTop : '20px', position : 'relative'});
+
+        $("body").html(header.add(timetableDiv));
+        $("body").css("padding", "30px");
     },
 
     pdf: function() {
@@ -258,16 +253,16 @@ type("DisplayTimeTable", ["TimeTable"], {
         IndicoUI.Dialogs.Util.progress($T("Switching to full screen mode..."));
         // This timeout is needed in order to give time to the progress indicator to be rendered
         setTimeout(function(){
-            self.timetableDrawer.width = $E(document.body).dom.clientWidth - 50; // 50 is a width offset.
+            self.timetableDrawer.width = $(window).width() - 50; // 50 is a width offset.
 
-            var headerStyle = {width: pixels(self.timetableDrawer.width)};
-            var header = Html.div({className: 'timetableFullScreenHeader clearfix', style: headerStyle}, Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+            var header = $('<div>', {class: 'timetableFullScreenHeader clearfix'}).css('width', self.timetableDrawer.width);
+            header.append($('<span>', {html: self._titleTemplate(self.timetableDrawer.day)}).css('float', 'left'));
 
             self.timetableDrawer.redraw(self.currentDay);
             var timetableCanvas = $('#timetable_canvas');
             $('#timetable_canvas').width('width', self.timetableDrawer.width);
-            $E(document.body).set(header);
-            $E(document.body).setStyle('padding', pixels(30));
+            $("body").html(header);
+            $("body").css("padding", "30px");
             $(".timetableFullScreenHeader").before(self._getExtraButtons());
             $(".timetableFullScreenHeader").before(self.legend);
             $(".timetableFullScreenHeader").after(timetableCanvas);
