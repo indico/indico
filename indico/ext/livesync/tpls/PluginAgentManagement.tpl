@@ -47,7 +47,6 @@
                      agentRequest('livesync.deleteAgent', agentId)
                   }
               }).open();
-      }
   }
 
   function addAgent() {

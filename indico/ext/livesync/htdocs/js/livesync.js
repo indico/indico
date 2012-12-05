@@ -74,7 +74,7 @@ type("AgentModificationDialog", ["ExclusivePopupWithButtons"],
              var idField = new RealtimeTextBox();
 
              if (!this.fullyEditable) {
-                 selectType.disable();
+                 $(selectType.dom).attr('disabled', 'disabled');
                  idField.disable();
              } else {
                  this.parameterManager.add(selectType, 'text', false);
