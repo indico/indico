@@ -180,7 +180,7 @@ class RHSendLogin( base.RH ):
             av = AvatarHolder().getById(self._userId)
         elif self._email:
             try:
-                av = AvatarHolder().match({"email":self._email})[0]
+                av = AvatarHolder().match({"email":self._email}, exact=1)[0]
             except:
                 pass
         if av:
