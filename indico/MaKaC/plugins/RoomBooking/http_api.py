@@ -34,9 +34,13 @@ from MaKaC.rb_tools import Period
 from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
 from MaKaC.user import Group, Avatar
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
+from indico.web.http_api.responses import HTTPAPIError
+from indico.web.wsgi import webinterface_handler_config as apache
+from MaKaC.rb_location import Location, CrossLocationFactory, CrossLocationQueries
+from MaKaC.rb_tools import doesPeriodsOverlap
+from MaKaC.authentication import AuthenticatorMgr
 
-
-globalHTTPAPIHooks = ['RoomHook', 'ReservationHook']
+globalHTTPAPIHooks = ['RoomHook', 'ReservationHook', 'BookRoomHook']
 MAX_DATETIME = datetime(2099, 12, 31, 23, 59, 00)
 MIN_DATETIME = datetime(2000, 1, 1, 00, 00, 00)
 
@@ -123,6 +127,78 @@ class ReservationHook(RoomBookingHook):
         expInt = ReservationFetcher(aw, self)
         return expInt.reservation(self._locList)
 
+
+class BookRoomHook(HTTPAPIHook):
+    PREFIX = 'api'
+    TYPES = ('roomBooking',)
+    RE = r'bookRoom'
+    GUEST_ALLOWED = False
+    VALID_FORMATS = ('json', 'xml')
+    COMMIT = True
+    HTTP_POST = True
+
+    def _getParams(self):
+        super(BookRoomHook, self)._getParams()
+        self._params = {}
+        self._params['roomID'] = get_query_parameter(self._queryParams, ['roomid'])
+        self._params['roomLocation'] = get_query_parameter(self._queryParams, ['location'])
+        self._params['userName'] = get_query_parameter(self._queryParams, ['username'])
+        self._params['reason'] = get_query_parameter(self._queryParams, ['reason'])
+        self._params['userBookedFor'] = AuthenticatorMgr().getAvatarByLogin(self._params['userName']).values()
+        if not self._params['userBookedFor']:
+            raise HTTPAPIError('Username does not exists.')
+        self._params['userBookedFor'] = self._params['userBookedFor'][0]
+        if not all(self._params.values() + [self._fromDT, self._toDT]):
+            raise HTTPAPIError('A required argument is missing.', apache.HTTP_BAD_REQUEST)
+
+    def _hasAccess(self, aw):
+        """Check if the impersonated user may book a room
+
+        Admins can always access; otherwise the authorized list must be empty or
+        the user must be present in that list or manager list (or member of a group in that list).
+        """
+        self._user = aw.getUser()
+        self._room = CrossLocationQueries.getRooms(location=self._params['roomLocation'], roomID=int(self._params['roomID']))
+        if self._user.isAdmin():
+            return True
+        authorizedList = PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue()
+        managersList = PluginsHolder().getPluginType("RoomBooking").getOption("Managers").getValue()
+        if not authorizedList:
+            return True
+        for entity in authorizedList + managersList:
+            if ((isinstance(entity, Group) and entity.containsUser(user)) or
+               (isinstance(entity, Avatar) and entity == user)):
+                return True
+        if not self._room.canBook(self._user):
+            if self._room.canPrebook(self._user):
+                raise HTTPAPIError('It is not possible to pre-book rooms through the API.')
+        return False
+
+    def api_roomBooking(self, aw):
+        resv = CrossLocationFactory.newReservation(location=self._params['roomLocation'])
+        resv.room = self._room
+        resv.startDT = self._fromDT.replace(tzinfo=None)
+        resv.endDT = self._toDT.replace(tzinfo=None)
+        for nbd in resv.room.getNonBookableDates():
+            if (doesPeriodsOverlap(nbd.getStartDate(), nbd.getEndDate(), resv.startDT, resv.endDT)):
+                raise HTTPAPIError('Failed to create the booking. You cannot book this room because it is unavailable during this time period.')
+        roomBlocked = resv.room.getBlockedDay(resv.startDT)
+        if roomBlocked and not roomBlocked.block.canOverride(self._user):
+            raise HTTPAPIError('Failed to create the booking. You cannot book this room because it is blocked during this time period.')
+        resv.repeatability = None
+        resv.reason = self._params['reason']
+        resv.createdDT = datetime.now()
+        resv.createdBy = str(self._user.getId())
+        resv.bookedForName = self._params['userBookedFor'].getFullName()
+        resv.contactEmail = self._params['userBookedFor'].getEmail()
+        resv.contactPhone = self._params['userBookedFor'].getTelephone()
+        resv.isRejected = False
+        resv.isCancelled = False
+        resv.isConfirmed = True
+        if resv.getCollisions():
+            raise HTTPAPIError('Failed to create the booking. There is a collision with another booking.')
+        resv.insert()
+        return {'reservationID': resv.id}
 
 class IRoomMetadataFossil(IFossil):
 
