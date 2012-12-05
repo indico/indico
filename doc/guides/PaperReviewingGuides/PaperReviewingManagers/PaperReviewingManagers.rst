@@ -83,6 +83,10 @@ Options for content and layout reviewing mode
 
         |image11|
 
+  When saving the default due dates, one can choose to apply them to the current assigned contributions, or only to the new ones that will be added in the future.
+
+        |image28|
+
 - The system sends automatic e-mails in order to notify the reviewing
   team or the authors of the papers in several situations. You can enable
   or disable the e-mails by clicking on the check boxes.

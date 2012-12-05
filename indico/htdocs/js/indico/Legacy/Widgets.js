@@ -988,21 +988,6 @@ IndicoUI.Widgets = {
             return elem;
         },
 
-        dateEditor: function(elem, method, attributes, cachedValue){
-
-            IndicoUI.Effect.mouseOver(elem.dom);
-
-            var context = new WidgetEditableContext();
-
-            var editable = new WidgetEditable(WidgetEditable.getClickableView(WidgetEditable.getTemplatedTextView(getBlankTemplate(Html.span({
-                style: {
-                    fontStyle: 'italic'
-                }
-            }, "None")))), WidgetEditable.getFieldEditor(curry(IndicoUI.Widgets.Generic.dateField, true)));
-
-            $B(elem, [editable(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, method, attributes, cachedValue), context), Widget.text(" "), IndicoUI.Aux.defaultEditMenu(context)]);
-        },
-
         dateStartEndTimeField: function(defaultStartTime, defaultEndTime, additional) {
 
             var obj = new WatchObject();

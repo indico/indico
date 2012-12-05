@@ -114,19 +114,6 @@
         </span></td>
         <td style="color: #000000;">
             <span id="inPlaceEditDefaultRefereeDueDate">
-                <% date = ConfReview.getAdjustedDefaultRefereeDueDate() %>
-                % if date is None:
-                    ${ _("Date has not been set yet.")}
-                % else:
-                    ${ formatDateTime(date) }
-                % endif
-            </span>
-        </td>
-        <td>
-            <input id="applyRefereeDeadline" type="button" class="btn" name="applyRefereeDeadline" value="${ _("Apply to all papers")}" onclick="applyDeadlineToAll('Referee')">
-        </td>
-        <td>
-            <span id="messageApplyReferee"></span>
         </td>
     </tr>
     % if ConfReview.hasPaperEditing():
@@ -140,19 +127,7 @@
         </span></td>
         <td  style="color: #000000;">
             <span id="inPlaceEditDefaultEditorDueDate">
-                <% date = ConfReview.getAdjustedDefaultEditorDueDate() %>
-                % if date is None:
-                    ${ _("Date has not been set yet.")}
-                % else:
-                    ${ formatDateTime(date) }
-                % endif
             </span>
-        </td>
-        <td>
-            <input id="applyEditorDeadline" type="button" class="btn" name="applyEditorDeadline" value="${ _("Apply to all papers")}" onclick="applyDeadlineToAll('Editor')">
-        </td>
-        <td>
-            <span id="messageApplyEditor"></span>
         </td>
         % if not ConfReview.hasPaperReviewing():
             <% display = 'table-row' %>
@@ -171,19 +146,7 @@
         </span></td>
         <td style="color: #000000;">
             <span id="inPlaceEditDefaultReviewerDueDate">
-                <% date = ConfReview.getAdjustedDefaultReviewerDueDate() %>
-                % if date is None:
-                    ${ _("Date has not been set yet.")}
-                % else:
-                    ${ formatDateTime(date) }
-                % endif
             </span>
-        </td>
-        <td>
-            <input id="applyReviewerDeadline" type="button" class="btn" name="applyReviewerDeadline" value="${ _("Apply to all papers")}" onclick="applyDeadlineToAll('Reviewer')">
-        </td>
-        <td>
-            <span id="messageApplyReviewer"></span>
         </td>
     </tr>
 </table>
@@ -609,27 +572,21 @@ var showEditingCriteria = function() {
 
 
 var showDefaultRefereeDate = function() {
-    new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultRefereeDueDate'),
-                       'reviewing.conference.changeDefaultDueDate',
-                       {conference: '${ ConfReview.getConference().getId() }',
-                        dueDateToChange: 'Referee'},
-                       null, true);
+    $('#inPlaceEditDefaultRefereeDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
+            {conference: '${ ConfReview.getConference().getId() }',
+             dueDateToChange: 'Referee'}, ${ConfReview.getAdjustedDefaultRefereeDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
 }
 
 var showDefaultEditorDate = function() {
-    new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultEditorDueDate'),
-                       'reviewing.conference.changeDefaultDueDate',
-                       {conference: '${ ConfReview.getConference().getId() }',
-                        dueDateToChange: 'Editor'},
-                       null, true);
+    $('#inPlaceEditDefaultEditorDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
+            {conference: '${ ConfReview.getConference().getId() }',
+             dueDateToChange: 'Editor'}, ${ConfReview.getAdjustedDefaultEditorDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
 }
 
 var showDefaultReviewerDate = function() {
-    new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultReviewerDueDate'),
-                       'reviewing.conference.changeDefaultDueDate',
-                       {conference: '${ ConfReview.getConference().getId() }',
-                        dueDateToChange: 'Reviewer'},
-                       null, true);
+    $('#inPlaceEditDefaultReviewerDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
+        {conference: '${ ConfReview.getConference().getId() }',
+    dueDateToChange: 'Reviewer'}, ${ConfReview.getAdjustedDefaultReviewerDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
 }
 
 
@@ -870,57 +827,5 @@ $E('reviewerSubmittedRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
     showEditingCriteria();
     showDefaultEditorDate();
 % endif
-
-// Apply deadline function
-function applyDeadlineToAll(rol) {
-    if (rol == 'Referee' || rol == 'Editor' || rol == 'Reviewer') {
-        indicoRequest('reviewing.conference.changeDefaultDueDate',
-                      {conference: '${ ConfReview.getConference().getId() }',
-                       dueDateToChange: rol},
-                function(result, error){
-                    if (!error) {
-                        if (result == 'Date has not been set yet.') {
-                            var popup = new AlertPopup($T("Applying a date to all papers"), Html.span({},$T("Please, save a date before applying it.")));
-                            popup.open();
-                        } else {
-                            if (rol == 'Referee') {
-                                var newDeadlineMsg = Html.tr({}, Html.td({}, $T("Date ") + result + $T(" will be applied as referee deadline for the existing papers.")));
-                            } else if (rol == 'Editor') {
-                                var newDeadlineMsg = Html.tr({}, Html.td({}, $T("Date ") + result + $T(" will be applied as layout reviewer deadline for the existing papers.")));
-                            } else if (rol == 'Reviewer') {
-                                var newDeadlineMsg = Html.tr({}, Html.td({}, $T("Date ") + result + $T(" will be applied as content reviewer deadline for the existing papers.")));
-                            }
-
-                            var content = Html.table({style:{textAlign:'center'}}, Html.tbody({},
-                                    Html.tr({}, Html.td({}, $T("Applying this deadline to all the papers you will lose the previous deadlines for each one (if they already existed)."))),
-                                    newDeadlineMsg,
-                                    Html.tr({}, Html.td({}, $T(" Do you want to continue?")))));
-                            var popup = new ConfirmPopup($T("Applying a date to all papers"), content,
-                                             function(action) {
-                                                 if (action) {
-                                                     indicoRequest('reviewing.conference.applyDefaultDueDate',
-                                                             {conference: '${ ConfReview.getConference().getId() }',
-                                                              dueDateToChange: rol, value: result},
-                                                              function(result, error) {
-                                                                  var elemId = 'messageApply' + rol;
-                                                                  if(!error) {
-                                                                      $E(elemId).set($T('Saved'));
-                                                                      $E(elemId).dom.style.color = 'green';
-                                                                      var to = setTimeout("$E(\"" + elemId + "\").set(\'\u00A0\')", 2000);
-                                                                  } else {
-                                                                      $E(elemId).set($T('Error'));
-                                                                      $E(elemId).dom.style.color = 'red';
-                                                                      var to = setTimeout("$E(\"" + elemId + "\").set(\'\u00A0\')", 2000);
-                                                                  }
-                                                              }
-                                                     );
-                                                 }
-                                            });
-                            popup.open();
-                        }
-                    }
-                });
-    }
-}
 
 </script>

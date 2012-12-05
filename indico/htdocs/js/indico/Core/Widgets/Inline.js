@@ -1317,6 +1317,16 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              this._error(error);
          },
 
+         /* By default, any check before save is accepted */
+         _handleSave: function() {
+             this._save();
+         },
+
+         _save: function() {
+             this._savedValue = this._getNewValue();
+             this.source.set(this._savedValue);
+         },
+
          _handleContentEdit: function() {
 
              var self = this;
@@ -1324,8 +1334,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              this.saveButton = Widget.button(command(function() {
                      if (self._verifyInput()){
                          // save it, in case we need to come back to edit mode;
-                         self._savedValue = self._getNewValue();
-                         self.source.set(self._savedValue);
+                         self._handleSave();
                      }
              }, 'Save'));
 

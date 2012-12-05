@@ -362,30 +362,27 @@
 
 % if CanEditDueDates:
     % if ContributionReviewManager.hasReferee():
-        new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditRefereeDueDate'),
-                           'reviewing.contribution.changeDueDate',
-                           {conference: '${ Conference.getId() }',
-                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
-                            dueDateToChange: 'Referee'},
-                           null, true);
+        $('#inPlaceEditRefereeDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
+                {conference: '${ Conference.getId() }',
+                 contribution: '${ ContributionReviewManager.getContribution().getId() }',
+                 dueDateToChange: 'Referee'},
+                 ${formatDateTime(ContributionReviewManager.getLastReview().getAdjustedRefereeDueDate()) | h,j}).draw().dom);
     % endif
 
     % if ContributionReviewManager.hasEditor():
-        new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditEditorDueDate'),
-                           'reviewing.contribution.changeDueDate',
-                           {conference: '${ Conference.getId() }',
-                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
-                            dueDateToChange: 'Editor'},
-                           null, true);
+        $('#inPlaceEditEditorDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
+                {conference: '${ Conference.getId() }',
+                 contribution: '${ ContributionReviewManager.getContribution().getId() }',
+                 dueDateToChange: 'Editor'},
+                 ${formatDateTime(ContributionReviewManager.getLastReview().getAdjustedEditorDueDate()) | h,j}).draw().dom);
     % endif
 
     % if ContributionReviewManager.hasReviewers():
-        new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditReviewerDueDate'),
-                           'reviewing.contribution.changeDueDate',
-                           {conference: '${ Conference.getId() }',
-                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
-                            dueDateToChange: 'Reviewer'},
-                           null, true);
+        $('#inPlaceEditReviewerDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
+                {conference: '${ Conference.getId() }',
+                 contribution: '${ ContributionReviewManager.getContribution().getId() }',
+                 dueDateToChange: 'Reviewer'},
+                 ${formatDateTime(ContributionReviewManager.getLastReview().getAdjustedReviewerDueDate()) | h,j}).draw().dom);
     % endif
 
 % endif
