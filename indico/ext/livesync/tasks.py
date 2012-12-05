@@ -63,7 +63,7 @@ class LiveSyncUpdateTask(PeriodicTask):
                 logger.info("'Acknowledge' not done - no records?")
             logger.info("Agent '%s' finished" % agtName)
 
-    def setOnRunningListSince(self, sometime):
+    def setOnRunningListSince(self, dt):
         dbi = DBMgr.getInstance()
-        self.onRunningListSince = sometime
+        self.onRunningListSince = dt
         dbi.commit()

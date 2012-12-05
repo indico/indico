@@ -55,7 +55,7 @@ class InvenioRecordUploader(RecordUploader):
     A worker that uploads data using HTTP
     """
 
-    def __init__(self, logger, agent, server, task):
+    def __init__(self, logger, agent, server, task=None):
         super(InvenioRecordUploader, self).__init__(logger, agent)
         self._server = server
         self._task = task

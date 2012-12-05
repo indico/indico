@@ -69,7 +69,7 @@ class CERNSearchRecordUploader(RecordUploader):
     A worker that uploads data using HTTP
     """
 
-    def __init__(self, logger, agent, url, username, password, task):
+    def __init__(self, logger, agent, url, username, password, task=None):
         super(CERNSearchRecordUploader, self).__init__(logger, agent)
         self._url = url
         self._username = username
