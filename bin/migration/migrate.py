@@ -36,7 +36,7 @@ from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayInd
 from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
-from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom, SupportInfo
+from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
@@ -48,6 +48,7 @@ from MaKaC.user import AvatarHolder
 from MaKaC.rb_location import CrossLocationQueries
 
 from indico.core.index import Catalog
+from indico.core.db.event import SupportInfo
 from indico.ext import livesync
 from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
@@ -574,7 +575,7 @@ def ip_based_acl(dbi, withRBDB, prevVersion):
 @since('1.0')
 def supportInfo(dbi, withRBDB, prevVersion):
     """
-    Moving support info fields from conference to an own class
+    Moving support info fields from conference to a dedicated class
     """
     ch = ConferenceHolder()
     i = 0
@@ -589,16 +590,13 @@ def supportInfo(dbi, withRBDB, prevVersion):
         if hasattr(conf, "_supportEmail"):
             email = conf._supportEmail
             del conf._supportEmail
-        if hasattr(conf, "_supportTelephone"):
-            telephone = conf._supportTelephone
-            del conf._supportTelephone
 
         supportInfo = SupportInfo(conf, caption, email, telephone)
         conf.setSupportInfo(supportInfo)
 
-        if i%1000 == 999:
+        if i % 1000 == 999:
             dbi.commit()
-        i+=1
+        i += 1
     dbi.commit()
 
 

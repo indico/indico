@@ -334,9 +334,9 @@ class ConferenceSupportModification( ConferenceTextModificationBase ):
     """
     def _handleSet(self):
         self._supportInfo = self._target.getSupportInfo()
-        caption = self._value.get("caption","")
-        email = self._value.get("email","")
-        phone = self._value.get("telephone","")
+        caption = self._value.get("caption", "")
+        email = self._value.get("email", "")
+        phone = self._value.get("telephone", "")
 
         if caption == "":
             raise ServiceError("ERR-E2", "The caption cannot be empty")

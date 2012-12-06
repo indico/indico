@@ -34,7 +34,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
     IResourceMinimalFossil, ILinkMinimalFossil, ILocalFileMinimalFossil,\
     IResourceFossil, ILinkFossil, ILocalFileFossil,\
     ILocalFileExtendedFossil, IConferenceParticipationMinimalFossil,\
-    ICategoryFossil, ILocalFileAbstractMaterialFossil, ISupportInfoFossil
+    ICategoryFossil, ILocalFileAbstractMaterialFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
@@ -94,12 +94,13 @@ from MaKaC.webinterface import urlHandlers
 
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.webinterface.common.tools import escape_html
 import zope.interface
 
 from indico.modules.scheduler import Client, tasks
 from indico.util.date_time import utc_timestamp
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
-from MaKaC.webinterface.common.tools import escape_html
+from indico.core.db.event import SupportInfo
 
 
 class CoreObject(Persistent):
@@ -1993,61 +1994,6 @@ class ReportNumberHolder(Persistent):
         if self.getOwner() != None:
             self.getOwner().notifyModification()
 
-class SupportInfo(Persistent):
-    fossilizes(ISupportInfoFossil)
-    def __init__(self, owner, caption="", email="", telephone=""):
-        self._owner = owner
-        self._caption = caption
-        self._email = email
-        self._telephone = telephone
-
-    def getOwner(self):
-        return self._owner
-
-    def getCaption(self):
-        return self._caption
-
-    def setCaption(self, caption):
-        self._caption = caption
-
-    def getEmail(self, returnNoReply=False, caption=False):
-        """
-        Returns the support email address associated with the conference
-        :param returnNoReply: Return no-reply address in case there's no support e-mail (default True)
-        :type returnNoReply: bool
-
-        """
-        if self._caption.strip() == "" and returnNoReply:
-            # In case there's no conference support e-mail, return the no-reply
-            # address, and the 'global' support e-mail if there isn't one
-            return Config.getInstance().getNoReplyEmail()
-        else:
-            if caption and self._caption:
-                return '"%s" <%s>' % (self._caption, self._email)
-            else:
-                return self._caption
-
-    def setEmail( self, email ):
-        self._email = email.strip()
-
-    def hasEmail( self ):
-        return self._email != "" and self._email != None
-
-    def getTelephone(self):
-        return self._telephone
-
-    def setTelephone( self, telephone ):
-        self._telephone = telephone.strip()
-
-    def hasTelephone( self ):
-        return self._telephone != "" and self._telephone != None
-
-    def clone(self, owner):
-        supportInfo = SupportInfo(owner)
-        supportInfo.setCaption(self.getCaption())
-        supportInfo.setEmail(self.getEmail())
-        supportInfo.setTelephone(self.getTelephone())
-        return supportInfo
 
 class Conference(CommonObjectBase, Locatable):
     """This class represents the real world conferences themselves. Objects of

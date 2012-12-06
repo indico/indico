@@ -21,6 +21,9 @@ from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 
+from indico.core.db.fossils import ISupportInfoFossil
+
+
 class ICategoryFossil(IFossil):
 
     def getId(self):
@@ -36,17 +39,6 @@ class IConferenceMinimalFossil(IFossil):
 
     def getTitle(self):
         """Conference title"""
-
-class ISupportInfoFossil(IFossil):
-
-    def getCaption(self):
-        """ Support Caption """
-
-    def getEmail(self):
-        """ Support Email """
-
-    def getTelephone(self):
-        """ Support Telephone """
 
 class IConferenceFossil(IConferenceMinimalFossil):
 
