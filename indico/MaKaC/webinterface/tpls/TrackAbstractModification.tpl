@@ -116,6 +116,7 @@
                     </form>
                 </td>
             </tr>
+            % if showDuplicated:
             <tr>
                 <td>
                     <form action=${ duplicatedURL } method="POST">
@@ -127,6 +128,7 @@
                     </form>
                 </td>
             </tr>
+            % endif
         </table>
     </td>
 </tr>

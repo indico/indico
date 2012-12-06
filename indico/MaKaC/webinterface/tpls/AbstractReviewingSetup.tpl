@@ -47,20 +47,17 @@
 <table>
   <tr>
     <td style="padding-left:25px;">
-        <span id="allowAccept" class="fakeLink">
-            <img id="allowImg" src="${ allowAccept }" border="0" style="padding: 2px 5px 0 0">
-            ${ _("Allow reviewers to accept/reject abstracts") }
-        </span>
+        <div id="inPlaceAllowAccept"></div>
     </td>
   </tr>
 </table>
 
 <script type="text/javascript">
 // Component for the review questions
-$E('inPlaceEditQuestions').set(new ManageListOfElements({'get':'abstractReviewing.questions.getQuestions',
+$('#inPlaceEditQuestions').html(new ManageListOfElements({'get':'abstractReviewing.questions.getQuestions',
         'add':'abstractReviewing.questions.addQuestion', 'remove':'abstractReviewing.questions.removeQuestion',
         'edit': 'abstractReviewing.questions.editQuestion'},
-        {conference: '${ abstractReview.getConference().getId() }'},'question', 'abstractReviewingQuestions', true).draw());
+        {conference: '${ abstractReview.getConference().getId() }'},'question', 'abstractReviewingQuestions', true).draw().dom);
 
 
 //get the first question or a default one
@@ -72,28 +69,15 @@ var previewQuestion =  new ExampleQuestionWidget('abstractReviewing.questions.up
 previewQuestion.draw();
 
 // Components to change the number of answers and the scale
-$E('inPlaceEditNumberOfAnswers').set(new NumberAnswersEditWidget('abstractReviewing.questions.changeNumberofAnswers',
-       {conference: '${ abstractReview.getConference().getId() }'},'${ abstractReview.getNumberOfAnswers() }').draw());
+$('#inPlaceEditNumberOfAnswers').html(new NumberAnswersEditWidget('abstractReviewing.questions.changeNumberofAnswers',
+       {conference: '${ abstractReview.getConference().getId() }'},'${ abstractReview.getNumberOfAnswers() }').draw().dom);
 
-$E('inPlaceEditScale').set(new ScaleEditWidget('abstractReviewing.questions.changeScale',
+$('#inPlaceEditScale').html(new ScaleEditWidget('abstractReviewing.questions.changeScale',
        {conference: '${ abstractReview.getConference().getId() }'},
-       {'min':'${ abstractReview.getScaleLower() }', 'max':'${ abstractReview.getScaleHigher() }'}).draw());
+       {'min':'${ abstractReview.getScaleLower() }', 'max':'${ abstractReview.getScaleHigher() }'}).draw().dom);
 
-$E('allowAccept').observeClick(function() {
-    indicoRequest('abstractReviewing.settings.changeReviewerRights',
-                  {conference: '${ abstractReview.getConference().getId() }'},
-                  function(result, error) {
-                      if (!error) {
-                          if (result) {
-                    	      $E('allowImg').dom.src = '${ str(Config.getInstance().getSystemIconURL("enabledSection")) }';
-                          } else {
-                        	  $E('allowImg').dom.src = '${ str(Config.getInstance().getSystemIconURL("disabledSection")) }';
-                          }
-                      } else {
-                    	  IndicoUtil.errorReport(error);
-                          return;
-                      }
-                  });
-});
+
+
+$('#inPlaceAllowAccept').html(new SwitchOptionButton('abstractReviewing.settings.changeReviewerRights', {conference: '${ abstractReview.getConference().getId() }'}, $T("Allow reviewers to accept/reject abstracts"), "aaaa", $T("Saved")).draw().dom);
 
 </script>

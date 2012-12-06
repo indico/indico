@@ -848,15 +848,15 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
 
     def _getLastJudgement(self):
         jud = self._abstract.getLastJudgementPerReviewer(self._rh.getAW().getUser(), self._track)
-        if jud.__class__ == review.AbstractAcceptance:
+        if isinstance(jud, review.AbstractAcceptance):
             return "Proposed to be accepted"
-        elif jud.__class__ == review.AbstractRejection:
+        elif isinstance(jud, review.AbstractRejection):
             return "Proposed to be rejected"
-        elif jud.__class__ == review.AbstractReallocation:
+        elif isinstance(jud, review.AbstractReallocation):
             return "Proposed to for other tracks"
-        elif jud.__class__ == review.AbstractMarkedAsDuplicated:
+        elif isinstance(jud, review.AbstractMarkedAsDuplicated):
             return "Marked as duplicated"
-        elif jud.__class__ == review.AbstractUnMarkedAsDuplicated:
+        elif isinstance(jud, review.AbstractUnMarkedAsDuplicated):
             return "Unmarked as duplicated"
         return None
 
@@ -866,10 +866,10 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
 
     def _getStatusCommentsHTML( self, status ):
         comment = ""
-        if status._id in ["accepted", "accepted_other", "rejected",
+        if status.getId() in ["accepted", "accepted_other", "rejected",
                           "withdrawn", "duplicated"]:
             comment = self.htmlText( status.getComment() )
-        elif status._id == 'pa':
+        elif status.getId() == 'pa':
             conflicts = status.getConflicts()
             if conflicts:
                 if comment != "":
@@ -944,33 +944,25 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         aStatus = AbstractStatusTrackViewFactory().getStatus( self._track, self._abstract )
         vars["statusDetails"] = self._getStatusDetailsHTML( aStatus )
         vars["statusComment"] = self._getStatusCommentsHTML( aStatus )
-        vars["modifyStatusURL"],vars["modifyStatusBtn"] = quoteattr(""),""
-        vars["PA_defaults"] = ""
 
-        if isinstance(aStatus,_ASTrackViewPA):
-            vars["PA_defaults"] = """
-                <input type="hidden" name="comment" value=%s>
-                <input type="hidden" name="contribType" value=%s>
-                                """%(quoteattr(str(aStatus.getComment())),\
-                                    quoteattr(str(aStatus.getContribType())))
-            vars["modifyStatusBtn"] = i18nformat("""<input type="submit" class="btn" value="_("modify proposition")">""")
-            vars["modifyStatusURL"] = quoteattr(str(urlHandlers.UHTrackAbstractPropToAcc.getURL(self._track,self._abstract)))
         vars["proposeToAccURL"] = quoteattr(str(urlHandlers.UHTrackAbstractPropToAcc.getURL(self._track,self._abstract)))
         vars["proposeToRejURL"] = quoteattr(str(urlHandlers.UHTrackAbstractPropToRej.getURL(self._track,self._abstract)))
         vars["proposeForOtherTracksURL"] = quoteattr( str( urlHandlers.UHTrackAbstractPropForOtherTrack.getURL( self._track, self._abstract) ) )
         vars["comments"] = self._abstract.getComments()
         vars["abstractId"] = self._abstract.getId()
 
-        vars["duplicatedURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModMarkAsDup.getURL(self._track,self._abstract)))
-        if aStatus.__class__ in [_ASTrackViewPA,_ASTrackViewPR,_ASTrackViewSubmitted,_ASTrackViewPFOT]:
+        vars["showDuplicated"] = False
+        if aStatus.getId() in ["pa","pr","submitted","pfot"]:
+            vars["duplicatedURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModMarkAsDup.getURL(self._track,self._abstract)))
             vars["isDuplicated"] = False
-        elif aStatus.__class__ == _ASTrackViewDuplicated:
-            vars["isDuplicated"] = True
+            vars["showDuplicated"] = True
+        elif aStatus.getId() == "duplicated":
+            vars["showDuplicated"] = vars["isDuplicated"] = True
             vars["duplicatedURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModUnMarkAsDup.getURL(self._track,self._abstract)))
         vars["contribution"] = self._getContribHTML()
 
         vars["buttonsStatus"] = "enabled"
-        if aStatus.__class__ in [_ASTrackViewAccepted, _ASTrackViewRejected, _ASTrackViewAcceptedForOther]:
+        if aStatus.getId() in ["accepted", "rejected", "accepted_other"]:
             vars["buttonsStatus"] = "disabled"
         rating = self._abstract.getRatingPerReviewer(self._rh.getAW().getUser(), self._track)
         if (rating == None):
@@ -982,7 +974,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
         vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
-        vars["showAcceptButton"] = self._abstract.getConference().getConfAbstractReview().getCanReviewerAccept()
+        vars["showAcceptButton"] = self._abstract.getConference().getConfAbstractReview().canReviewerAccept()
         vars["acceptURL"] = quoteattr(str(urlHandlers.UHTrackAbstractAccept.getURL(self._track, self._abstract)))
         vars["rejectURL"] = quoteattr(str(urlHandlers.UHTrackAbstractReject.getURL(self._track, self._abstract)))
 

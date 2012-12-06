@@ -798,12 +798,21 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
             items.append("""<option value="%s">%s</option>"""%(session.getId(), session.getTitle()))
         return items
 
+    def _checkNotificationTpl(self):
+        for notificationTpl in self._abstract.getOwner().getNotificationTplList():
+            for condition in notificationTpl.getConditionList():
+                if isinstance(condition, review.NotifTplCondAccepted):
+                    return True
+        return False
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["abstractName"] = self._abstract.getTitle()
         vars["tracks"] = "".join( self._getTrackItemsHTML() )
         vars["sessions"] = "".join( self._getSessionItemsHTML() )
         vars["types"] = "".join( self._getTypeItemsHTML() )
+        vars["showNotifyCheckbox"] = self._checkNotificationTpl()
+
         if self._track == None:
             vars["acceptURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentAccept.getURL(self._abstract)))
             vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
@@ -922,9 +931,17 @@ class WAbstractManagmentReject( wcomponents.WTemplated ):
         self._aw = aw
         self._conf = abstract.getOwner().getOwner()
 
+    def _checkNotificationTpl(self):
+        for notificationTpl in self._abstract.getOwner().getNotificationTplList():
+            for condition in notificationTpl.getConditionList():
+                if isinstance(condition, review.NotifTplCondRejected):
+                    return True
+        return False
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["abstractName"] = self._abstract.getTitle()
+        vars["showNotifyCheckbox"] = self._checkNotificationTpl()
         if self._track == None:
             vars["rejectURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentReject.getURL(self._abstract)))
             vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))

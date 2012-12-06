@@ -66,6 +66,8 @@ If you click on an abstract's name you will be taken to the
 Abstract's Management area. From here you can view the abstract's
 details and propose whether you want to accept, reject, mark as
 duplicated, or suggest the abstract for another track.
+Depending on the setup of the Abstract Module, a track coordinator can be able
+to directly accept or reject the abstract.
 
 ------------
 
@@ -76,7 +78,8 @@ This is where you can modify the main details of the abstract, and also
 see some information as for instance submitter, status, etc.
 It is also from here where a track coordinator can propose the abstract to
 be accepted, rejected, for another track and mark as duplicated (see next
-image).
+image). Depending on the setup of the Abstract Module, a track coordinator can also
+accept or reject the abstract directly.
 
 |image5|
 

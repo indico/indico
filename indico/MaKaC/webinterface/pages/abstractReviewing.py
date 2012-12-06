@@ -47,12 +47,6 @@ class WAbstractReviewingSetup(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["abstractReview"] = self._conf.getConfAbstractReview()
-        iconDisabled = str(Config.getInstance().getSystemIconURL("disabledSection"))
-        iconEnabled = str(Config.getInstance().getSystemIconURL("enabledSection"))
-        if self._conf.getConfAbstractReview().getCanReviewerAccept():
-            vars["allowAccept"] = iconEnabled
-        else:
-            vars["allowAccept"] = iconDisabled
         return vars
 
 

@@ -106,18 +106,13 @@ class ConferenceAbstractReview(Persistent):
         """ Returns the number of possible answers """
         return self._numberOfAnswers
 
-    def getCanReviewerAccept(self):
-        try:
-            return self._canReviewerAccept
-        except AttributeError:
+    def canReviewerAccept(self):
+        if not hasattr(self, "_canReviewerAccept"):
             self._canReviewerAccept = False
         return self._canReviewerAccept
 
-    def changeCanReviewerAccept(self):
-        if self._canReviewerAccept:
-            self._canReviewerAccept = False
-        else:
-            self._canReviewerAccept = True
+    def setCanReviewerAccept(self, canReviewerAccept):
+        self._canReviewerAccept = canReviewerAccept
 
     def recalculateRBLabelsAndTitles(self):
         """ Recalculate the labels for the radio buttons """

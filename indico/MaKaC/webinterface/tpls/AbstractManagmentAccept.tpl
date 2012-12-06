@@ -25,7 +25,6 @@
                         % endif
                     </td>
                 </tr>
-                % if not trackTitle:
                 <tr>
                     <td nowrap class="titleCellTD" style="padding-top: 5px; padding-bottom: 5px"><span class="titleCellFormat">${ _("Destination session")}</span></td>
                     <td>
@@ -34,7 +33,6 @@
                         </select>
                     </td>
                 </tr>
-                % endif
                 <tr>
                     <td nowrap class="titleCellTD" style="padding-top: 5px; padding-bottom: 5px"><span class="titleCellFormat">${ _("Type of contribution")}</span></td>
                     <td>
@@ -48,11 +46,11 @@
                     <td nowrap class="titleCellTD" style="padding-top: 5px; padding-bottom: 5px"><span class="titleCellFormat">${ _("Comments")}</span></td>
                     <td style="padding-top: 5px; padding-bottom: 5px"><textarea name="comments" rows="6" cols="50"></textarea></td>
                 </tr>
-                % if not trackTitle:
+                % if showNotifyCheckbox:
                 <tr>
                     <td nowrap class="titleCellTD" style="padding-top: 5px; padding-bottom: 5px"><span class="titleCellFormat">${ _("Email Notification")}</span></td>
                     <td>
-                        <input type="checkbox" name="notify" value="true" checked>${ _(" Automatic Email Notification")}
+                        <input type="checkbox" name="notify" value="true" checked>${ _("Send the automatic notification of acceptance using the Email Template created by the manager")}
                     </td>
                 </tr>
                 % endif

@@ -23,7 +23,6 @@ from BTrees.OOBTree import OOBTree
 import MaKaC.webinterface.pages.tracks as tracks
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.user as user
 import MaKaC.webinterface.common.abstractFilters as abstractFilters
 import MaKaC.review as review
 from MaKaC.webinterface.rh.conferenceBase import RHTrackBase
@@ -41,7 +40,6 @@ from MaKaC.abstractReviewing import ConferenceAbstractReview
 from MaKaC.paperReviewing import Answer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
-import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 
 
@@ -380,18 +378,26 @@ class RHTrackAbstractSetStatusBase(RHTrackAbstractBase):
 
     def _checkProtection(self):
         RHTrackAbstractBase._checkProtection(self)
-        if  not self._abstract.getConference().getConfAbstractReview().getCanReviewerAccept():
-            raise MaKaCError("The acceptance or rejection of abstracts is not allowed. Only the managers of the conference can perform this action.")
+        if  not self._abstract.getConference().getConfAbstractReview().canReviewerAccept():
+            raise MaKaCError(_("The acceptance or rejection of abstracts is not allowed. Only the managers of the conference can perform this action."))
 
     def _checkParams(self, params):
         RHTrackAbstractBase._checkParams(self, params)
         self._action = params.get("accept", None)
         if self._action:
             self._typeId = params.get("type", "")
+            self._session=self._conf.getSessionById(params.get("session", ""))
         else:
             self._action = params.get("reject", None)
         self._comments = params.get("comments", "")
+        self._doNotify = params.has_key("notify")
 
+    def _notifyStatus(self, status):
+        wrapper = _AbstractWrapper(status)
+        tpl = self._abstract.getOwner().getNotifTplForAbstract(wrapper)
+        if self._doNotify and tpl:
+            n = EmailNotificator()
+            self._abstract.notify(n, self._getUser())
 
 
 class RHTrackAbstractAccept(RHTrackAbstractSetStatusBase):
@@ -399,14 +405,9 @@ class RHTrackAbstractAccept(RHTrackAbstractSetStatusBase):
     def _process(self):
         if self._action:
             cType = self._abstract.getConference().getContribTypeById(self._typeId)
-            self._abstract.accept(self._getUser(), self._track, cType, self._comments)
-            st = review.AbstractStatusAccepted(self._abstract, None, self._track, cType)
-            wrapper = _AbstractWrapper(st)
-            tpl = self._abstract.getOwner().getNotifTplForAbstract(wrapper)
-            if tpl:
-                n = EmailNotificator()
-                self._abstract.notify(n, self._getUser())
-                self._redirect(urlHandlers.UHTrackModifAbstracts.getURL(self._track))
+            self._abstract.accept(self._getUser(), self._track, cType, self._comments, self._session)
+            self._notifyStatus(review.AbstractStatusAccepted(self._abstract, None, self._track, cType))
+            self._redirect(urlHandlers.UHTrackAbstractModif.getURL( self._track, self._abstract ))
         else:
             p = tracks.WPTrackAbstractAccept(self, self._track, self._abstract)
             return p.display(**self._getRequestParams())
@@ -417,13 +418,8 @@ class RHTrackAbstractReject(RHTrackAbstractSetStatusBase):
     def _process(self):
         if self._action:
             self._abstract.reject(self._getUser(), self._comments)
-            st = review.AbstractStatusRejected(self._abstract, None, None)
-            wrapper = _AbstractWrapper(st)
-            tpl = self._abstract.getOwner().getNotifTplForAbstract(wrapper)
-            if tpl:
-                n = EmailNotificator()
-                self._abstract.notify(n, self._getUser())
-                self._redirect(urlHandlers.UHTrackModifAbstracts.getURL(self._track))
+            self._notifyStatus(review.AbstractStatusRejected(self._abstract, None, None))
+            self._redirect(urlHandlers.UHTrackAbstractModif.getURL( self._track, self._abstract ))
         else:
             p = tracks.WPTrackAbstractReject(self, self._track, self._abstract)
             return p.display(**self._getRequestParams())

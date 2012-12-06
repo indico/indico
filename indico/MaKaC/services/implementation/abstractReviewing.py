@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.base import ParameterManager
+from MaKaC.services.implementation.base import ParameterManager, TextModificationBase
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.common.fossilize import fossilize
 import MaKaC.user as user
@@ -187,11 +187,13 @@ class AbstractReviewingRemoveReviewer(AbstractReviewingBase):
         return fossilize(self._conf.getTrackById(self._trackId).getCoordinatorList())
 
 
-class AbstractReviewingChangeReviewerRights(AbstractReviewingBase):
+class AbstractReviewingChangeReviewerRights(TextModificationBase, AbstractReviewingBase):
 
-    def _getAnswer(self):
-        self._confAbstractReview.changeCanReviewerAccept()
-        return self._confAbstractReview.getCanReviewerAccept()
+    def _handleSet(self):
+        self._confAbstractReview.setCanReviewerAccept(self._value)
+
+    def _handleGet(self):
+        return self._confAbstractReview.canReviewerAccept()
 
 
 methodMap = {

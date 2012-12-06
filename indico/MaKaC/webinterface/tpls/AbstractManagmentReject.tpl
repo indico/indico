@@ -17,11 +17,11 @@
     <tr>
         <td>&nbsp;</td>
     </tr>
-    % if not trackTitle:
+    % if showNotifyCheckbox:
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Email Notification")}</span></td>
         <td>
-            <input type="checkbox" name="notify" value="true" checked> ${ _("Automatic Email Notification")}
+            <input type="checkbox" name="notify" value="true" checked> ${ _("Send the automatic notification of acceptance using the Email Template created by the manager")}
         </td>
     </tr>
     <tr><td>&nbsp;</td></tr>
