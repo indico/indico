@@ -1685,18 +1685,13 @@ class _AbstractTrackSF( filters.SortingField ):
         trackList2 = a2.getTrackList()
         # check if there is track assignement for the abstract and get the list of ids if needed
         if len(trackList1) == 0:
-            a = [-1.0]
+            a = [-1]
         else:
-            a = []
-            for track in trackList1:
-                a.append(track.getId())
+            a = [track.getId() for track in trackList1]
         if len(trackList2) == 0:
-            b = [-1.0]
+            b = [-1]
         else:
-            b = []
-            for track in trackList2:
-                b.append(track.getId())
-
+            b = [track.getId() for track in trackList2]
         return cmp( a, b )
 
 class AbstractSortingCriteria( filters.SortingCriteria ):
