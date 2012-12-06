@@ -502,7 +502,7 @@ class RoomBase( object ):
         """
         return True
 
-    def canBook( self, user ):
+    def canBook(self, user):
         """
         FINAL (not intented to be overriden)
         Reservable rooms which does not require pre-booking can be booked by anyone.
@@ -514,9 +514,9 @@ class RoomBase( object ):
             return False
 
         if self.isActive and self.isReservable and not self.resvsNeedConfirmation:
-            simbaList = self.customAtts.get( 'Simba List' )
+            simbaList = self.customAtts.get('Simba List')
             if simbaList and simbaList != "Error: unknown mailing list" and simbaList != "":
-                if user.isMemberOfSimbaList( simbaList ):
+                if user.isMemberOfSimbaList(simbaList):
                     return True
             else:
                 return True
@@ -524,11 +524,11 @@ class RoomBase( object ):
             return False
 
         if (self.isOwnedBy( user ) and self.isActive) \
-               or user.isRBAdmin():
+                or user.isRBAdmin():
             return True
         return False
 
-    def canPrebook( self, user ):
+    def canPrebook(self, user):
         """
         FINAL (not intented to be overriden)
         Reservable rooms can be pre-booked by anyone.
@@ -540,16 +540,16 @@ class RoomBase( object ):
             return False
 
         if self.isActive and self.isReservable:
-            simbaList = self.customAtts.get( 'Simba List' )
+            simbaList = self.customAtts.get('Simba List')
             if simbaList and simbaList != "Error: unknown mailing list" and simbaList != "":
-                    if user.isMemberOfSimbaList( simbaList ):
+                    if user.isMemberOfSimbaList(simbaList):
                         return True
             else:
                 return True
         if user == None:
             return False
         if (self.isOwnedBy( user ) and self.isActive) \
-               or user.isRBAdmin():
+                or user.isRBAdmin():
             return True
         return False
 
