@@ -2044,14 +2044,8 @@ class UHContribModifMaterials( URLHandler ):
 class UHContribModifSchedule( URLHandler ):
     _relativeURL = "contributionModification.py/schedule"
 
-
-class UHContributionMove( URLHandler ):
-    _relativeURL = "contributionModification.py/move"
-
-
 class UHContributionPerformMove( URLHandler ):
     _relativeURL = "contributionModification.py/performMove"
-
 
 class UHSubContribModification( URLHandler ):
     _relativeURL = "subContributionModification.py"

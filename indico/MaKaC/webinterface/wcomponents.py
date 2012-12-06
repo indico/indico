@@ -1232,9 +1232,7 @@ class WContribModifTool(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["deleteIconURL"] = Configuration.Config.getInstance().getSystemIconURL("delete")
-        vars["moveIconURL"] = Configuration.Config.getInstance().getSystemIconURL("move")
         return vars
-
 
 
 class WContributionDeletion(object):

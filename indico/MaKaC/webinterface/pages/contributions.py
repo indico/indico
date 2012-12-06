@@ -306,22 +306,23 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
 
-class WPContribModifMain( WPContributionModifBase ):
 
-    def _setActiveTab( self ):
+class WPContribModifMain(WPContributionModifBase):
+
+    def _setActiveTab(self):
         self._tabMain.setActive()
 
-class WPContributionModifTools( WPContributionModifBase ):
 
-    def _setActiveTab( self ):
+class WPContributionModifTools(WPContributionModifBase):
+
+    def _setActiveTab(self):
         self._tabTools.setActive()
 
-    def _getTabContent( self, params ):
-        wc = wcomponents.WContribModifTool( self._target )
-        pars = { \
-"deleteContributionURL": urlHandlers.UHContributionDelete.getURL( self._target ), \
-"MoveContributionURL": urlHandlers.UHContributionMove.getURL( self._target ) }
-        return wc.getHTML( pars )
+    def _getTabContent(self, params):
+        wc = wcomponents.WContribModifTool(self._target)
+        pars = {"deleteContributionURL": urlHandlers.UHContributionDelete.getURL(self._target)}
+        return wc.getHTML(pars)
+
 
 class WPContributionModifMaterials( WPContributionModifBase ):
 
@@ -914,35 +915,6 @@ class WPContributionDeletion( WPContributionModifTools ):
     def _getTabContent( self, params ):
         wc = wcomponents.WContributionDeletion( [self._target] )
         return wc.getHTML( urlHandlers.UHContributionDelete.getURL( self._target ) )
-
-
-class WContributionMove(wcomponents.WTemplated):
-
-    def __init__(self, contrib, conf ):
-        self._contrib = contrib
-        self._conf = conf
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        sesList = ""
-        if self._contrib.getOwner() != self._conf:
-            sesList = i18nformat("""<option value=\"CONF\" > _("Conference") : %s</option>\n""")%self._conf.getTitle()
-        for ses in self._conf.getSessionListSorted():
-            if self._contrib.getOwner() != ses:
-                sesList = sesList + i18nformat("""<option value=\"%s\" > _("Session") : %s</option>\n""")%(ses.getId(), ses.getTitle())
-        vars["sessionList"] = sesList
-        vars["confId"] = self._conf.getId()
-        vars["contribId"] = self._contrib.getId()
-        return vars
-
-
-class WPcontribMove( WPContributionModifTools ):
-
-    def _getTabContent( self, params ):
-        wc = WContributionMove( self._target, self._target.getConference() )
-        params["cancelURL"] = urlHandlers.UHContribModifTools.getURL( self._target )
-        params["moveURL"] = urlHandlers.UHContributionPerformMove.getURL()
-        return wc.getHTML( params )
 
 
 class WPContributionDisplayRemoveMaterialsConfirm( WPContributionDefaultDisplayBase ):

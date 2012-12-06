@@ -37,34 +37,23 @@ def materialsAdd(req, **params):
 def removeMaterials( req, **params ):
     return contribMod.RHContributionRemoveMaterials( req ).process( params )
 
-
-def move( req, **params ):
-    return contribMod.RHContributionMove( req ).process( params )
-
-
 def performMove( req, **params ):
     return contribMod.RHContributionPerformMove( req ).process( params )
-
 
 def data( req, **params ):
     return contribMod.RHContributionData( req ).process( params )
 
-
 def xml( req, **params ):
     return contribMod.RHContributionToXML( req ).process( params )
-
 
 def pdf( req, **params ):
     return contribMod.RHContributionToPDF( req ).process( params )
 
-
 def modifData( req, **params ):
     return contribMod.RHContributionModifData( req ).process( params )
 
-
 def setTrack( req, **params ):
     return contribMod.RHSetTrack( req ).process( params )
-
 
 def setSession( req, **params ):
     return contribMod.RHSetSession( req ).process( params )

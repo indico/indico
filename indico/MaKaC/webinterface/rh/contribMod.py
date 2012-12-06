@@ -662,14 +662,6 @@ class RHContributionDeletion(RHContribModifBaseSpecialSesCoordRights):
             return p.display()
 
 
-class RHContributionMove(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionMove
-
-    def _process(self):
-        p = contributions.WPcontribMove(self, self._target)
-        return p.display(**self._getRequestParams())
-
-
 class RHContributionPerformMove(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionPerformMove
 
