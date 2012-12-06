@@ -4304,8 +4304,7 @@ from MaKaC.rb_location import ReservationGUID, RoomGUID, Location
 
 # 0. Base Classes
 
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSearch4Rooms,\
-    RHRoomBookingCloneBooking
+from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSearch4Rooms, RHRoomBookingCloneBooking, RHRoomBookingProtected
 from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomList
 from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingList
 from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomDetails
@@ -4315,11 +4314,12 @@ from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSaveBooking
 
 # 0. RHConfModifRoomBookingChooseEvent
 
-class RHConferenceModifRoomBookingBase( RoomBookingDBMixin, RHConferenceModifBase ):
+class RHConferenceModifRoomBookingBase( RoomBookingDBMixin, RHConferenceModifBase, RHRoomBookingProtected):
 
     def _checkProtection( self ):
         self._checkSessionUser()
         RHConferenceModifBase._checkProtection(self)
+        RHRoomBookingProtected._checkSessionUser(self)
 
 class RHConfModifRoomBookingChooseEvent( RHConferenceModifRoomBookingBase, RHRoomBookingSearch4Rooms ):
     _uh = urlHandlers.UHConfModifRoomBookingChooseEvent
