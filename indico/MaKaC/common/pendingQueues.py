@@ -120,7 +120,7 @@ class _PendingNotification(object):
 
     def getFromAddr(self):
         # TODO: There will be on "from address" from a conference, but what if there are more different conferences
-        supEmail=self._psList[0].getConference().getSupportInfo().getEmail(returnNoReply=True)
+        supEmail = self._psList[0].getConference().getSupportInfo().getEmail(returnNoReply=True)
         if self._forceIndicoFromAddress or supEmail.strip()=="":
             info = HelperMaKaCInfo.getMaKaCInfoInstance()
             return "%s <%s>"%(info.getTitle(), Config.getInstance().getSupportEmail())

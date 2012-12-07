@@ -207,6 +207,7 @@ def register_all_js(env):
 
 def register_all_css(env, main_css_file):
     env.register('base_css', Bundle(main_css_file,
+                                    'icons.css',
                                     'calendar-blue.css',
                                     'jquery-ui.css',
                                     'jquery.qtip.css',

@@ -158,8 +158,7 @@
     Styles for the menu box
 */
 #outer {
-    background: #f5eedb;
-    border: 1px solid #64615a;
+    border: 1px solid #ccc;
 }
 
 /*
@@ -174,30 +173,30 @@
     The menu item when doing mouseover
 */
 #outer li a:hover {
-    background: #989486;
-    color: white;
+    background: #e0e0e0;
 }  
 
 /*
     A non selected menu item
 */    
 .menuConfTitle {
-    text-align:left;
-    color:#0200C6;
+    text-align: left;
 }
+
 .menuConfTitle a {
-    color: #4e4c46;
+    color: #275C86;
     padding: 7px 12px;
 }
 
 /*
     A selected menu item
 */
-.menuConfSelected {
-    font-weight: bold;
-}
-.menuConfSelected a {
-    color: #4e4c46;
+
+.menuConfTitle.selected > a, .menuConfMiddleCell.selected > a {
+    color: #BD891A;
+    background: #dadada;
+    border-bottom: 1px solid #d0d0d0;
+    border-top: 1px solid #d0d0d0;
 }
 
 /*
@@ -207,16 +206,20 @@ li ul.inner li a {
     padding: 3px 12px 3px 30px;
     background: transparent url(../../images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
 }
-.subMenuConfSelected {
-}
-.subMenuConfSelected a {
-}
+
 
 /*
-    Support link
+    Support box
 */
-.confSupportEmailBox{
-    margin: 20px 0;
+
+.support_box {
+    background: #f6f6f6;
+    border: 1px solid #ccc;
+}
+
+.support_box > h3 {
+    color: #f3f3f3;
+    background: #1a64a0;
 }
 
 

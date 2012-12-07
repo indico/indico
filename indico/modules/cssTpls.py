@@ -33,10 +33,7 @@ class CssTplsModule(Module):
 
     def __init__(self):
         self._cssTpls = {"template0.css": CSSItem("template0.css"), \
-                         "template1.css": CSSItem("template1.css"), \
-                         "template2.css": CSSItem("template2.css"),
                          "right_menu.css": CSSItem("right_menu.css"),
-                         "top_menu.css": CSSItem("top_menu.css"),
                          "orange.css": CSSItem("orange.css"),
                          "brown.css": CSSItem("brown.css"),
 

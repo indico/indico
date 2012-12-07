@@ -1,0 +1,36 @@
+@font-face {
+	font-family: 'icomoon-ultimate';
+	src:url('../fonts/icomoon-ultimate.eot');
+	src:url('../fonts/icomoon-ultimate.eot?#iefix') format('embedded-opentype'),
+		url('../fonts/icomoon-ultimate.svg#icomoon-ultimate') format('svg'),
+		url('../fonts/icomoon-ultimate.woff') format('woff'),
+		url('../fonts/icomoon-ultimate.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+/* Use the following CSS code if you want to use data attributes for inserting your icons */
+[data-icon]:before {
+	font-family: 'icomoon-ultimate';
+	content: attr(data-icon);
+	speak: none;
+	font-weight: normal;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Use the following CSS code if you want to have a class per icon */
+[class^="icon-"]:before, [class*=" icon-"]:before {
+	font-family: 'icomoon-ultimate';
+	font-style: normal;
+	speak: none;
+	font-weight: normal;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+.icon-phone:before {
+	content: "\70";
+}
+.icon-mail:before {
+	content: "\6d";
+}

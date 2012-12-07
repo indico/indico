@@ -355,8 +355,10 @@ class outputGenerator(Observable):
             self._userToXML(chair, out)
         out.closeTag("announcer")
 
-        if conf.getSupportInfo().getEmail() != '':
-            out.writeTag("supportEmail", conf.getSupportInfo().getEmail(), [["caption", conf.getSupportInfo().getCaption()]])
+        sinfo = conf.getSupportInfo()
+
+        if sinfo.getEmail() != '':
+            out.writeTag("supportEmail", sinfo.getEmail(), [["caption", sinfo.getCaption()]])
 
         keywords = conf.getKeywords()
         keywords = keywords.replace("\r\n", "\n")

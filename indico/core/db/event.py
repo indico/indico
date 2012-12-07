@@ -87,6 +87,9 @@ class SupportInfo(Persistent):
     def hasTelephone( self ):
         return self._telephone != "" and self._telephone != None
 
+    def isEmpty(self):
+        return not self._email and not self._telephone
+
     def clone(self, owner):
         supportInfo = SupportInfo(owner)
         supportInfo.setCaption(self.getCaption())

@@ -53,6 +53,7 @@ from indico.ext import livesync
 from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
      CategoryStatisticsUpdaterTask
+from indico.modules import ModuleHolder
 
 
 from indico.modules.scheduler import Client
@@ -599,6 +600,21 @@ def supportInfo(dbi, withRBDB, prevVersion):
         i += 1
     dbi.commit()
 
+
+@since('1.0')
+def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
+    """
+    Removing old CSS Templates from events
+    """
+
+    mod = ModuleHolder().getById('cssTpls')
+
+    del mod._cssTpls['template1.css']
+    del mod._cssTpls['template2.css']
+    del mod._cssTpls['top_menu.css']
+
+    mod._p_changed = 1
+    dbi.commit()
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[]):

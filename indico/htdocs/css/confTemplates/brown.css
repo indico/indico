@@ -1,12 +1,12 @@
 
 .confTitleBox {
-	border-top: 3px solid #300018;
+    border-top: 3px solid #300018;
     border-bottom: 1px solid #300018;
-    background: #fa6900 url("../../images/conf/sprites_brown.png") repeat-x 0 -24px;
+    background: #5a3d31 url("../../images/conf/sprites_brown.png") repeat-x 0 -24px;
 }
 
 .confSubTitleBox {
-    background: #e0e4cc url("../../images/conf/sprites_brown.png") repeat-x 0 -213px;
+    background: #e0e4cc;
     border-bottom: 1px solid #837b47;
     border-top: 1px solid #837b47;
 }
@@ -31,6 +31,15 @@
 #outer {
     background: #dfe7e7;
     border: 1px solid #7e8383;
+}
+
+.support_box {
+    background: #dfe7e7;
+    border: 1px solid #7e8383;
+}
+
+.support_box > h3 {
+    background: #5a3d31;
 }
 
 #outer li a:hover {

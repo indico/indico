@@ -78,7 +78,7 @@
 
 .confSubTitleBox {
     min-height: 45px;
-    background: #f5faff url("../images/conf/sprites_blue.png") repeat-x 0 -213px;
+    background: #f5faff;
     border-bottom: 1px solid #d5e4f1;
     border-top: 1px solid #d5e4f1;
 }
@@ -137,19 +137,19 @@ div.datePlace > div.timezone {
 /* Styles for all menu Items */
 
 #outer {
-    width:100%;
+    width: 100%;
     position:relative;
-    margin-top: 10px;
-    padding: 10px 0;
-    background: #f5eedb;
-    border: 1px solid #64615a;
-    -moz-border-radius: 5px;
-    -webkit-border-radius:5px;
-    behavior: url(border-radius.htc);
+    background: #f6f6f6;
+
+    border: 1px solid #ccc;
 
     list-style-image: none;
     list-style-position: outside;
     list-style-type: none;
+}
+
+#outer > li.menuConfTitle {
+    display: block;
 }
 
 #outer li a {
@@ -162,8 +162,7 @@ div.datePlace > div.timezone {
 }
 
 #outer li a:hover {
-    background: #989486;
-    color: white;
+    background: #e0e0e0;
 }
 
 .conf_leftMenu {
@@ -175,11 +174,10 @@ div.datePlace > div.timezone {
 
 .menuConfTitle {
 	text-align:left;
-	color:#0200C6;
 }
 
-.menuConfTitle a {
-    color: #4e4c46;
+.menuConfTitle > a {
+    color: #275C86;
     padding: 7px 12px;
 }
 
@@ -196,30 +194,18 @@ li.menuConfMiddleCell {
 }
 
 li.menuConfMiddleCell a {
+    color: #777;
     padding: 0px 0px 0px 30px;
 }
 
 	/* selected menu item */
 
-.menuConfSelected {
-    font-weight: bold;
+.menuConfTitle.selected > a, .menuConfMiddleCell.selected > a {
+    color: #BD891A;
+    background: #dadada;
+    border-bottom: 1px solid #d0d0d0;
+    border-top: 1px solid #d0d0d0;
 }
-
-.subMenuConfSelected {
-    font-weight: bold;
-}
-
-.menuConfSelected a {
-    padding: 7px 12px;
-    color: #4e4c46;
-}
-
-
-.subMenuConfSelected a {
-    font-weight: bold;
-}
-
-	/* last menu item */
 
 .menuConfBottomCell {
 	border-bottom:0px;
@@ -229,13 +215,6 @@ li.menuConfMiddleCell a {
 }
 
 	/* Support link */
-
-.confSupportEmailBox{
-	margin: 20px 0;
-}
-
-a.confSupportEmail:link {
-}
 
 	/*For dynamic menu*/
 
@@ -255,12 +234,7 @@ a.confSupportEmail:link {
 .conf_leftMenu ul {
 	list-style:none;
 	margin: 0px;
-	margin-bottom: 5px;
 	padding: 0px;
-}
-
-.conf_leftMenu li {
-	border-top:none;
 }
 
 
@@ -412,4 +386,48 @@ ul.chair_list {
     padding: 0px;
     margin: 0px;
     list-style-type: none;
+}
+
+.conf_leftMenu .spacer {
+    height: 1em;
+}
+
+.support_box {
+    margin-top: 10px !important;
+    width: 100%;
+    color: #aaa;
+    background: #f6f6f6;
+    border: 1px solid #ccc;
+}
+
+.support_box > h3 {
+    margin: 10px;
+    color: #f3f3f3;
+    background: #1a64a0;
+    margin: 0 0 5px 0;
+    padding: 5px;
+    font-weight: normal;
+}
+
+.support_box > li {
+    white-space: nowrap;
+    margin: 0 5px 5px 10px;
+    vertical-align: middle;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.support_box > li .icon {
+    color: #777;
+    font-size: 1.5em;
+    vertical-align: middle;
+}
+
+.support_box > li > a {
+    margin-left: 5px;
+    line-height: 1.5em;
+    vertical-align: middle;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

@@ -488,21 +488,17 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["body"] = self._body
         vars["supportEmail"] = ""
         vars["supportTelephone"] = ""
-        if self._conf.getSupportInfo().hasEmail():
-            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportInfo().getEmail(), urllib.quote( self._conf.getTitle() ) ))
-            vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>"""%(mailto,
-                                                Config.getInstance().getSystemIconURL("smallEmail"),
-                                                self._conf.getSupportInfo().getCaption())
 
-        if self._conf.getSupportInfo().hasTelephone():
-            vars["supportTelephone"] = "Phone: %s"%self._conf.getSupportInfo().getTelephone()
+        sinfo = self._conf.getSupportInfo()
+
 
         p={"closeMenuURL": vars["closeMenuURL"], \
             "menuStatus": vars["menuStatus"], \
-            "supportEmail": vars["supportEmail"], \
-            "supportTelephone": vars["supportTelephone"]  \
-            }
-        vars["menu"] = ConfDisplayMenu( self._menu ).getHTML(p)
+            "menu": self._menu,
+            "support_info": sinfo,
+            "event": self._conf
+           }
+        vars["menu"] = WConfDisplayMenu(self._menu).getHTML(p)
 
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
         format = dm.getFormat()
@@ -515,86 +511,13 @@ class WConfDisplayFrame(wcomponents.WTemplated):
             vars["searchBox"] = ""
         return vars
 
-class ConfDisplayMenu:
+
+class WConfDisplayMenu(wcomponents.WTemplated):
 
     def __init__(self, menu):
+        wcomponents.WTemplated.__init__(self)
         self._menu = menu
 
-    def getHTML(self, params):
-        html = []
-        if params["menuStatus"] == "open" and self._menu:
-            html = ["""<!--Left menu-->
-                            <div class="conf_leftMenu">
-                                        <ul id="outer" class="clearfix">"""]
-            html.append("""
-                                <li class="menuConfTopCell">
-                                    <a href=%s><img alt="Hide menu" src="%s" class="imglink"></a>
-                                </li>
-                          """%(quoteattr(str(params["closeMenuURL"])),Config.getInstance().getSystemIconURL("closeMenuIcon")))
-            for link in self._menu.getEnabledLinkList():
-                if link.isVisible():
-                    html.append(self._getLinkHTML(link))
-            html.append("""<li class="menuConfBottomCell">&nbsp;</li>""")
-            html.append("""     </ul>
-                                <div class="confSupportEmailBox">%s<br/>%s</div>
-                        </div>"""%(params["supportEmail"], params["supportTelephone"]))
-        return "".join(html)
-
-    def _getLinkHTML(self, link, indent=""):
-        if not link.isVisible():
-            return ""
-
-        if link.getType() == "spacer":
-            html = """<tr><td><br></td></tr>\n"""
-            try:
-                index = link.getParent().getLinkList().index(link)-1
-                type = link.getParent().getLinkList()[index].getType()
-                if (type == "system" or type == "extern") and index!= -1:
-                    html = """<li class="menuConfMiddleCell"><br><li>\n"""
-            except Exception:
-                pass
-
-        else:
-            target = ""
-            sublinkList=[]
-            for sublink in link.getEnabledLinkList():
-                if sublink.isVisible():
-                    sublinkList.append(sublink)
-            if (link.getDisplayTarget()):
-                target=""" target="%s" """%link.getDisplayTarget()
-            #Commented because 'menuicon' variable is not used
-            #if sublinkList:
-            #    menuicon=Config.getInstance().getSystemIconURL("arrowBottomMenuConf")
-            #else:
-            #    menuicon=Config.getInstance().getSystemIconURL("arrowRightMenuConf")
-            if self._menu.isCurrentItem(link):
-                html = ["""<li id="menuLink_%s" class="menuConfSelected" nowrap><a href="%s"%s>%s</a>\n"""%
-                            (link.getName(), link.getURL(), target, _(link.getCaption()))]
-            else:
-                html = ["""<li id="menuLink_%s" class="menuConfTitle" nowrap><a class="confSection" href="%s"%s>%s</a>\n"""%
-                            (link.getName(), link.getURL(), target, _(link.getCaption()))]
-
-            if len(sublinkList) > 0:
-                html += """<ul class="inner">"""
-
-            for sublink in sublinkList:
-                target = ""
-                if isinstance(sublink, displayMgr.ExternLink):
-                    target=""" target="%s" """%sublink.getDisplayTarget()
-                if self._menu.isCurrentItem(sublink):
-                    html.append("""<li id="menuLink_%s" class="subMenuConfSelected" nowrap><a href="%s"%s>\
-                            %s</a></li>\n"""\
-                            %(sublink.getName(), sublink.getURL(), target, _(sublink.getCaption())))
-                else:
-                    html.append( """<li id="menuLink_%s" class="menuConfMiddleCell" nowrap><a class="confSubSection" href="%s"%s>\
-                            %s</a></li>"""%(sublink.getName(), sublink.getURL(), target,\
-                             _(sublink.getCaption())) )
-
-            if len(sublinkList) > 0:
-                html += "</ul>"
-            html += "</li>"
-
-        return "".join(html)
 
 class WPConfSignIn( WPConferenceDefaultDisplayBase ):
 
