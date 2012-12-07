@@ -95,16 +95,16 @@ class RoomBookingAvailabilitySearchRooms( ServiceBase, RoomBookingAvailabilityPa
 
         return [room.id for room in rooms]
 
-class RoomBookingFullNameListRooms( RoomBookingListRooms):
+class RoomBookingFullNameListRooms(RoomBookingListRooms):
 
-    def _getAnswer( self ):
+    def _getAnswer(self):
 
         res = []
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
-            if Location.parse( self._location ):
-                for room in CrossLocationQueries.getRooms( location = self._location ):
-                    res.append((room.name, room.getFullName()))
+            if Location.parse(self._location):
+                for room in CrossLocationQueries.getRooms(location=self._location, allFast=True):
+                        res.append((room.name, room.getFullName()))
         return res
 
 class RoomBookingListLocationsAndRooms( ServiceBase ):
