@@ -205,14 +205,30 @@ var SortCriteria = {
         return e1 == e2?0:(e1 < e2?-1:1);
     },
     Integer: function(e1, e2) {
-
         if (isNaN(parseInt(e1,10)) ||
             isNaN(parseInt(e2,10))) {
             return SortCriteria.Default(e1, e2);
         } else {
             return parseInt(e1,10) == parseInt(e2,10)?0:(parseInt(e1,10) < parseInt(e2,10)?-1:1);
         }
-    }
+    },
+    DashSeparated: function(e1, e2) {
+        // sorting format: int-string-string-...
+        // for example 41-R2-020
+        var e1Array = e1.split('-');
+        var e2Array = e2.split('-');
+        for (var i = 0; i < e1Array.length; i++) {
+          if (i == 0) {
+              var result = SortCriteria.Integer(e1Array[i], e2Array[i]);
+          }
+          else {
+              var result = SortCriteria.Default(e1Array[i], e2Array[i]);
+          }
+          if (result != 0)
+              return result;
+        };
+        return 0;
+    },
 };
 
 function partition(list, start, end, index, cmp) {

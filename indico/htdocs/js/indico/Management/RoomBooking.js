@@ -44,7 +44,7 @@ type("RoomBookingWidget", ["IWidget"],
                         this.eventFavorites.indexOf(e2) !== null) {
                  return 1;
              } else {
-                 return SortCriteria.Integer(e1, e2);
+                 return SortCriteria.DashSeparated(e1, e2);
              }
          },
 
