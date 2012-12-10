@@ -35,7 +35,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.plugins.Collaboration.Vidyo.pages import ServiceInformation
-from MaKaC.conference import Contribution, Session
+from MaKaC.conference import Contribution, SessionSlot
 from indico.core.index import Catalog
 from MaKaC.plugins.Collaboration.Vidyo.indexes import IIndexableByVidyoRoom
 
@@ -330,7 +330,7 @@ class CSBooking(CSBookingBase):
             if self.isLinkedToContribution() and isinstance(linkObject, Contribution):
                 title = linkObject.getTitle()
                 linkVideoText = title + " (" + self._linkVideoType + ")"
-            elif self.isLinkedToSession() and isinstance(linkObject, Session):
+            elif self.isLinkedToSession() and isinstance(linkObject, SessionSlot):
                 title = linkObject.getSession().getTitle() + (" - " + linkObject.getTitle() if linkObject.getTitle() else "")
                 linkVideoText = title + " (" + self._linkVideoType + ")"
             else:
