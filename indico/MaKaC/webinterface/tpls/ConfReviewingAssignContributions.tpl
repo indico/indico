@@ -8,7 +8,7 @@
 % if not ConfReview.hasReviewing():
 <p style="padding-left: 25px; color:gray;">${ _("Type of reviewing has not yet been chosen. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></p>
 % else:
-% if len(Conference.getContributionListSortedById()) == 0:
+% if len(Conference.getContributionListSorted()) == 0:
 <p style="padding-left: 25px;"><font color="gray">${ _("There are no papers to assign.")}</font></p>
 %else:
 <table style="margin-left:20px;">
@@ -28,7 +28,7 @@
            </div>
         </td>
         <td align="bottom" style="padding-top:27px;">
-            <div id="totalContributions" style="display:none;"><span>${_("  ( Total:  ")}</span><span style="font-size:15px; font-weight: bold;">${ len(Conference.getContributionListSortedById()) }</span>
+            <div id="totalContributions" style="display:none;"><span>${_("  ( Total:  ")}</span><span style="font-size:15px; font-weight: bold;">${ len(Conference.getContributionListSorted()) }</span>
             <span>${_(" )")}</span>
             </div>
         </td>
