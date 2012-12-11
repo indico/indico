@@ -215,19 +215,10 @@ class Participation(Persistent, Observable):
         participants.sort(utils.sortUsersByName)
         return participants
 
-    def getParticipantListText(self):
-        text = []
-        for p in self.getParticipantList():
-            part = p.getName()
-            if not p.isPresent() and nowutc() > self._conference.getEndDate():
-                part += " (absent)"
-            text.append(part)
-        return "; ".join(text)
-
     def getPresentParticipantListText(self):
         text = []
         for p in self.getParticipantList():
-            if p.isPresent() or nowutc() < self._conference.getEndDate():
+            if p.isConfirmed():
                 part = p.getName()
                 text.append(part)
         return "; ".join(text)
@@ -705,14 +696,14 @@ on behalf of %s %s
     def getPresentNumber(self):
         counter = 0
         for p in self._participantList.values() :
-            if p.isPresent() :
+            if p.isPresent() and p.isConfirmed():
                 counter += 1
         return counter
 
     def getAbsentNumber(self):
         counter = 0
         for p in self._participantList.values() :
-            if not p.isPresent() :
+            if not p.isPresent() and p.isConfirmed():
                 counter += 1
         return counter
 
@@ -855,7 +846,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
             self._email = ""
 
             self._status = None
-            self._present = None
+            self._present = True
             self._participation = None
             if conference is not None:
                 self._participation = conference.getParticipation()
@@ -966,15 +957,6 @@ class Participant (Persistent, Negotiator, Fossilizable):
     def isPresent(self):
         return self._present
 
-    def getPresenceText(self):
-        presence = "n/a"
-        if nowutc() > self.getConference().getStartDate():
-            if self.isPresent():
-                presence = "present"
-            else:
-                presence = "absent"
-        return presence
-
     def setPresent(self):
         self._present = True
 
@@ -989,6 +971,9 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
     def getStatus(self):
         return self._status
+
+    def isConfirmed(self):
+        return self._status in ["accepted", "added"]
 
     def setStatusAdded(self, responsibleUser=None):
         self._status = "added"

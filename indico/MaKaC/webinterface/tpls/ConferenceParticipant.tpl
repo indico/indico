@@ -13,7 +13,7 @@
     <td class="CRLabstractDataCell" valign="top" id="phoneParticipant${participant.getId()}">${participant.getTelephone()}</td>
     <td class="CRLabstractDataCell" valign="top" id="faxParticipant${participant.getId()}">${participant.getFax()}</td>
     <td class="CRLabstractDataCell" valign="top" id="statusParticipant${participant.getId()}">${participant.getStatus()}</td>
-    <td class="CRLabstractDataCell" valign="top" id="presence${participant.getId()}">${(_("present") if participant.isPresent() else _("absent")) if nowutc() > conference.getStartDate() else "n/a"}</td>
+    <td class="CRLabstractDataCell" valign="top" id="presence${participant.getId()}">${(_("present") if participant.isPresent() else _("absent")) if nowutc() > conference.getStartDate() and participant.isConfirmed() else "n/a"}</td>
 </tr>
 <script type="text/javascript">
     $('#participantEdit${participant.getId()}').click(function(){

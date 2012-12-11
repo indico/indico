@@ -34,6 +34,3 @@ class IParticipantMinimalFossil(IFossil):
     def getStatus(self):
         pass
 
-    def getPresenceText(self):
-        pass
-

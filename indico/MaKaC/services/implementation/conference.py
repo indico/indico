@@ -764,6 +764,11 @@ class ConferenceParticipantListBase(ConferenceModifBase):
             return _("""The participants identified by email %s
                         are already in the %s participants' list.""")%(typeList ,", ".join(list))
 
+    def _checkParticipantConfirmed(slef, participant):
+        if not participant.isConfirmed():
+            raise NoReportError(_("Selected participant(s) did not confirm invitation. Until then you can not change presence status"))
+
+
 class ConferenceParticipantsDisplay(ConferenceModifBase):
 
     def _getAnswer( self ):
@@ -1085,6 +1090,7 @@ class ConferenceMarkPresenceParticipants(ConferenceParticipantListBase):
             raise NoReportError(_("No participants were selected to be marked as presents."))
         for id in self._userList:
             participant = self._conf.getParticipation().getParticipantById(id)
+            self._checkParticipantConfirmed(participant)
             participant.setPresent()
         return True
 
@@ -1095,6 +1101,7 @@ class ConferenceMarkAbsentParticipants(ConferenceParticipantListBase):
             raise NoReportError(_("No participants were selected to be marked as absents."))
         for id in self._userList:
             participant = self._conf.getParticipation().getParticipantById(id)
+            self._checkParticipantConfirmed(participant)
             participant.setAbsent()
         return True
 
