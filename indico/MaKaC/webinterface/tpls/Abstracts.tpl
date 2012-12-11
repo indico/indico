@@ -1,163 +1,3 @@
-<script type="text/javascript">
-<!--
-
-var newAbst = false;
-
-function selectAllTracks()
-{
-document.filterOptionForm.trackShowNoValue.checked=true
-if (!document.filterOptionForm.track.length)
-        {
-            document.filterOptionForm.track.checked=true
-        }else{
-for (i = 0; i < document.filterOptionForm.track.length; i++)
-    {
-    document.filterOptionForm.track[i].checked=true
-    }
-}
-}
-
-function unselectAllTracks()
-{
-document.filterOptionForm.trackShowNoValue.checked=false
-if (!document.filterOptionForm.track.length)
-        {
-            document.filterOptionForm.track.checked=false
-        }else{
-    for (i = 0; i < document.filterOptionForm.track.length; i++)
-        {
-        document.filterOptionForm.track[i].checked=false
-        }
-    }
-}
-
-function selectAllTypes()
-{
-document.filterOptionForm.typeShowNoValue.checked=true
-if (!document.filterOptionForm.type.length)
-        {
-            document.filterOptionForm.type.checked=true
-        }else{
-for (i = 0; i < document.filterOptionForm.type.length; i++)
-    {
-    document.filterOptionForm.type[i].checked=true
-    }
-}
-}
-
-function unselectAllTypes()
-{
-document.filterOptionForm.typeShowNoValue.checked=false
-if (!document.filterOptionForm.type.length)
-        {
-            document.filterOptionForm.type.checked=false
-        }else{
-for (i = 0; i < document.filterOptionForm.type.length; i++)
-    {
-    document.filterOptionForm.type[i].checked=false
-    }
-}
-}
-
-function selectAllStatus()
-{
-for (i = 0; i < document.filterOptionForm.status.length; i++)
-    {
-    document.filterOptionForm.status[i].checked=true
-    }
-}
-
-function unselectAllStatus()
-{
-for (i = 0; i < document.filterOptionForm.status.length; i++)
-    {
-    document.filterOptionForm.status[i].checked=false
-    }
-}
-
-function selectAllAccTracks()
-{
-document.filterOptionForm.accTrackShowNoValue.checked=true
-if (!document.filterOptionForm.acc_track.length)
-        {
-            document.filterOptionForm.acc_track.checked=true
-        }else{
-for (i = 0; i < document.filterOptionForm.acc_track.length; i++)
-    {
-    document.filterOptionForm.acc_track[i].checked=true
-    }
-}
-}
-
-function unselectAllAccTracks()
-{
-document.filterOptionForm.accTrackShowNoValue.checked=false
-if (!document.filterOptionForm.acc_track.length)
-        {
-            document.filterOptionForm.acc_track.checked=false
-        }else{
-for (i = 0; i < document.filterOptionForm.acc_track.length; i++)
-    {
-    document.filterOptionForm.acc_track[i].checked=false
-    }
-}
-}
-
-function selectAllAccTypes()
-{
-document.filterOptionForm.accTypeShowNoValue.checked=true
-if (!document.filterOptionForm.acc_type.length)
-        {
-            document.filterOptionForm.acc_type.checked=true
-        }else{
-for (i = 0; i < document.filterOptionForm.acc_type.length; i++)
-    {
-    document.filterOptionForm.acc_type[i].checked=true
-    }
-}
-}
-
-function unselectAllAccTypes()
-{
-document.filterOptionForm.accTypeShowNoValue.checked=false
-if (!document.filterOptionForm.acc_type.length)
-        {
-            document.filterOptionForm.acc_type.checked=false
-        }else{
-for (i = 0; i < document.filterOptionForm.acc_type.length; i++)
-    {
-    document.filterOptionForm.acc_type[i].checked=false
-    }
-}
-}
-
-function selectAllFields()
-{
-document.filterOptionForm.showID.checked=true
-document.filterOptionForm.showPrimaryAuthor.checked=true
-document.filterOptionForm.showTracks.checked=true
-document.filterOptionForm.showType.checked=true
-document.filterOptionForm.showStatus.checked=true
-document.filterOptionForm.showRating.checked=true
-document.filterOptionForm.showAccTrack.checked=true
-document.filterOptionForm.showAccType.checked=true
-document.filterOptionForm.showSubmissionDate.checked=true
-}
-
-function unselectAllFields()
-{
-document.filterOptionForm.showID.checked=false
-document.filterOptionForm.showPrimaryAuthor.checked=false
-document.filterOptionForm.showTracks.checked=false
-document.filterOptionForm.showType.checked=false
-document.filterOptionForm.showStatus.checked=false
-document.filterOptionForm.showRating.checked=false
-document.filterOptionForm.showAccTrack.checked=false
-document.filterOptionForm.showAccType.checked=false
-document.filterOptionForm.showSubmissionDate.checked=false
-}
-//-->
-</script>
 <a href="" name="results"></a>
 <table width="100%" valign="top" align="left" cellspacing="0">
     <tr>
@@ -204,10 +44,42 @@ document.filterOptionForm.showSubmissionDate.checked=false
         <td colspan="11" align="left" width="100%">
           <form action=${ filterPostURL } method="post" name="displayOptionForm">
             <input type="hidden" name="operationType" value="display" />
-            ${ displayMenu }
-            ${ sortingOptions }
+            <div class="CRLDiv" style="display: none;" id="displayMenu">
+                <table width="95%%" align="center" border="0">
+                    <tr>
+                        <td>
+                            <table width="100%%">
+                                <tr>
+                                    <td>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <table align="center" cellspacing="0" width="100%%">
+                                            <tr>
+                                                <td style="border-bottom:1px solid lightgrey;" valign="top" align="left"><span style="color:black"><b>Columns to display:</b></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" class="titleCellFormat" style="padding-top:5px;" nowrap> <a id="selectDisplay">${_("Select all")}</a> | <a id="unselectDisplay">${_("Unselect all")}</a> </td>
+                                            </tr>
+                                            <tr>
+                                                <td valign="top">${disp}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center"><input type="submit" class="btn" name="OK" value=  ${_("Apply")}></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
           </form>
-          <form action=${ filterPostURL } method="post" name="filterOptionForm">
+          ${ sortingOptions }
+          <form action=${ filterPostURL } method="post" name="filterOptionForm" id="filterOptionForm">
             <input type="hidden" name="operationType" value="filter" />
             ${ filterMenu }
             ${ sortingOptions }
@@ -216,19 +88,50 @@ document.filterOptionForm.showSubmissionDate.checked=false
     </tr>
     <tr>
         <td colspan="11" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
+        <form action=${abstractSelectionAction} method="post" name="abstractsForm" id="abstractsForm" onSubmit="return atLeastOneSelected()">
             <table>
-                <form action=${ abstractSelectionAction } method="post" name="abstractsForm" onSubmit="return atLeastOneSelected()">
                 <tr>
-                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="${ _("Add new")}"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="${ _("Accept") }">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="${ _("Reject") }">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="${ _("Merge")}"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="${ _("Author list")}"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="PKGA" value="${ _("Download attachments")}"></td>
-                    <td valign="bottom" align="left">Export to:</td>
-                    <td valign="bottom" align="left"><input type="image" name="excel" src=${ excelIconURL} border="0"></td>
-                    <td valign="bottom" align="left"><input type="image" name="pdf" src=${ pdfIconURL} border="0"></td>
-                    <td valign="bottom" align="left"><input type="image" name="xml" src=${ xmlIconURL} border="0"></td>
+                  <td colspan="10">
+                      ${ displayOptions }
+                  </td>
+                </tr>
+                <tr id="headPanel" class="follow-scroll" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);">
+                    <td valign="bottom" width="100%" align="left" colspan="1000">
+                        <table style="margin-left: -8px" >
+                            <tr >
+                                <td valign="bottom" align="left">
+                                    <ul id="button-menu" class="ui-list-menu">
+                                      <li class="left" id="addRegistrant">
+                                        <a href="#" id="add_new_abstract">${_("Add new")}</a>
+                                      </li>
+                                      <li class="middle">
+                                        <a href="#" id="accept_abstracts">${_("Accept")}</a>
+                                      </li>
+                                      <li class="middle">
+                                        <a href="#" id="reject_abstracts">${_("Reject")}</a>
+                                      </li>
+                                      <li class="middle">
+                                        <a href="#" id="merge_abstracts">${_("Merge")}</a>
+                                      </li>
+                                      <li class="middle">
+                                        <a href="#" id="author_list">${_("Author list")}</a>
+                                      </li>
+                                      <li class="right">
+                                        <a href="#" id="download_attachments">${_("Download attachments")}</a>
+                                      </li>
+                                    </ul>
+                                </td>
+                                <td>
+                                  Export to:
+                                </td>
+                                <td>
+                                    <input type="image" name="pdf" src=${ pdfIconURL} border="0">
+                                    <input type="image" name="excel" src=${ excelIconURL } border="0">
+                                    <input type="image" name="xml" src=${ xmlIconURL} border="0">
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </table>
         </td>
@@ -241,7 +144,43 @@ document.filterOptionForm.showSubmissionDate.checked=false
         <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts with the filters criteria selected")}</span></td>
     % else:
         <tr>
-            ${ abstractTitleBar }
+            <td colspan=4 style='padding: 5px 0px 10px;' nowrap>
+            Select: <a style='color: #0B63A5;' id='selectAll'> All</a>, <a style='color: #0B63A5;' id='deselectAll'>None</a>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+        % if "ID" in displayColumns:
+           <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href=${numberSortingURL}> ${_("ID")}</a>${numberImg}</td>
+        % endif
+        <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Title")}</td>
+        % if "PrimaryAuthor" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Primary Author(s)")}</td>
+        % endif
+        % if "Tracks" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Tracks")}</td>
+        % endif
+        % if "Type" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${typeSortingURL}> ${_("Type")}</a>${typeImg}</td>
+        % endif
+        % if "Status" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${statusSortingURL}> ${_("Status")}</a>${statusImg}</td>
+        % endif
+        % if "Rating" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${ratingSortingURL}> ${_("Rating")}</a>${ratingImg}</td>
+        % endif
+        % if "AccTrack" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Acc. Track")}</td>
+        % endif
+        % if "AccType" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Acc. Type")}</td>
+        % endif
+        % if "SubmissionDate" in displayColumns:
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${dateSortingURL}> ${_("Submission date")}</a>${dateImg}</td>
+        % endif
         </tr>
     % endif
     <tr><td>
@@ -249,48 +188,51 @@ document.filterOptionForm.showSubmissionDate.checked=false
             ${ abstracts }
         </tbody>
     </td></tr>
-    <tr>
-        <td colspan="11" style="border-top: 2px solid #777777; padding-top: 3px;" valign="bottom" align="left">
-            <table>
-                <tr>
-                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="${ _("Add new")}"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="${ _("Accept") }">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="${ _("Reject") }">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="${ _("Merge")}"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="${ _("Author list")}"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="PKGA" value="${ _("Download attachments")}"></td>
-                    <td valign="bottom" align="left">${ _("Export to:") }</td>
-                    <td valign="bottom" align="left"><input type="image" name="excel" src=${ excelIconURL} border="0"></td>
-                    <td valign="bottom" align="left"><input type="image" name="pdf" src=${ pdfIconURL} border="0"></td>
-                    <td valign="bottom" align="left"><input type="image" name="xml" src=${ xmlIconURL} border="0"></td>
-            </tr>
-            </form>
-            </table>
-        </td>
-    </tr>
 </table>
+</form>
 
 <script type="text/javascript">
-    function onMouseOver(element) {
-        if ($E(element).dom.style.backgroundColor ==='transparent') {
-           $E(element).dom.style.backgroundColor='rgb(255, 246, 223)';
-        }
+    var newAbst = false;
+
+    function selectAllTracks() {
+        $("#filterOptionForm #Tracks input:checkbox").attr("checked", true)
     }
 
-    function onMouseOut(element) {
-        var inputNodes = IndicoUtil.findFormFields($E(element))
-        for (i = 0; i < inputNodes.length; i++) {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                if(node.checked !== true) {
-                    $E(node.name+node.value).dom.style.backgroundColor='transparent';
-                } else {
-                    $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
-                }
-            }
-        }
+    function unselectAllTracks() {
+        $("#filterOptionForm #Tracks input:checkbox").attr("checked", false)
     }
 
+    function selectAllTypes() {
+        $("#filterOptionForm #Types input:checkbox").attr("checked", true)
+    }
+
+    function unselectAllTypes() {
+        $("#filterOptionForm #Types input:checkbox").attr("checked", false)
+    }
+
+    function selectAllStatus() {
+        $("#filterOptionForm #Status input:checkbox").attr("checked", true)
+    };
+
+    function unselectAllStatus() {
+        $("#filterOptionForm #Status input:checkbox").attr("checked", false)
+    }
+
+    function selectAllAccTracks() {
+        $("#filterOptionForm #AccTracks input:checkbox").attr("checked", true)
+    }
+
+    function unselectAllAccTracks() {
+        $("#filterOptionForm #AccTracks input:checkbox").attr("checked", false)
+    }
+
+    function selectAllAccTypes() {
+        $("#filterOptionForm #AccTypes input:checkbox").attr("checked", true)
+    }
+
+    function unselectAllAccTypes() {
+        $("#filterOptionForm #AccTypes input:checkbox").attr("checked", false)
+    }
 
     function atLeastOneSelected() {
         if(!newAbst) {
@@ -304,7 +246,6 @@ document.filterOptionForm.showSubmissionDate.checked=false
                     }
                 }
             }
-
             var dialog = new WarningPopup($T("Warning"), $T("No abstract selected! Please select at least one."));
             dialog.open();
 
@@ -314,46 +255,37 @@ document.filterOptionForm.showSubmissionDate.checked=false
         }
     }
 
-    function isSelected(element) {
-        var inputNodes = IndicoUtil.findFormFields($E(element))
-        for (i = 0; i < inputNodes.length; i++) {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                if(node.checked == true) {
-                    $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
-                } else {
-                    $E(node.name+node.value).dom.style.backgroundColor='transparent';
-                }
+    function actionAbstractsRows() {
+        $("tr[id^=abstracts] input:checkbox").click(function(){
+            if(this.checked){
+                $(this).parents('tr[id^=abstracts]').css('background-color',"#CDEB8B");
+            }else{
+                $(this).parents('tr[id^=abstracts]').css('background-color',"transparent");
             }
-        }
+        });
+
+        $("tr[id^=abstracts]").hover(function () {
+            if($(this).find('input:checkbox:checked').size() == 0){
+                $(this).css({'background-color' : 'rgb(255, 246, 223)'});
+            }}
+            , function () {
+              if($(this).find('input:checkbox:checked').size() > 0){
+                  $(this).css('background-color',"#CDEB8B");
+              }else{
+                  $(this).css('background-color',"transparent");
+              }
+        });
+        $('tr[id^=abstracts] input:checkbox:checked').parents('tr[id^=abstracts]').css('background-color',"#CDEB8B");
     }
 
-    function selectAll()
-    {
-        if (!document.abstractsForm.abstracts.length)
-        {
-            document.abstractsForm.abstracts.checked=true
-        }else{
-            for (i = 0; i < document.abstractsForm.abstracts.length; i++)
-            {
-                document.abstractsForm.abstracts[i].checked=true;
-            }
-        }
-        isSelected("abstractsItems")
+    function selectAll() {
+        $('tr[id^=abstracts] input:checkbox').attr('checked', true);
+        $('tr[id^=abstracts]').css('background-color',"#CDEB8B");
     }
 
-    function deselectAll()
-    {
-        if (!document.abstractsForm.abstracts.length)
-        {
-            document.abstractsForm.abstracts.checked=false
-        }else{
-            for (i = 0; i < document.abstractsForm.abstracts.length; i++)
-            {
-                document.abstractsForm.abstracts[i].checked=false;
-            }
-        }
-        isSelected("abstractsItems")
+    function deselectAll() {
+        $('tr[id^=abstracts] input:checkbox').attr('checked', false);
+        $('tr[id^=abstracts]').css('background-color',"transparent");
     }
 
     function showFilters() {
@@ -379,11 +311,11 @@ document.filterOptionForm.showSubmissionDate.checked=false
 
     function showDisplay() {
         if ($E("filterMenu").dom.style.display == "") { // Check if the other menu (filters) is shown and hide if needed
-% if filterUsed:
+            % if filterUsed:
             $E("index_filter").set('${ _("Show filters")}')
-% else:
+            % else:
             $E("index_filter").set('${ _("Apply filters")}');
-% endif
+            % endif
             $E('index_filter').dom.className = "CRLIndexUnselected";
             $E("filterMenu").dom.style.display = "none";
         }
@@ -398,23 +330,6 @@ document.filterOptionForm.showSubmissionDate.checked=false
         }
     }
 
-    function selectDisplay()
-    {
-        for (i = 0; i < document.displayOptionForm.disp.length; i++)
-        {
-            document.displayOptionForm.disp[i].checked=true
-        }
-    }
-
-    function unselectDisplay()
-    {
-        for (i = 0; i < document.displayOptionForm.disp.length; i++)
-        {
-            document.displayOptionForm.disp[i].checked=false
-        }
-    }
-</script>
-<script>
 function showQuestionDetails(questions, answers) {
     // Create the table and the headers
     var content = Html.div();
@@ -445,4 +360,67 @@ function showQuestionDetails(questions, answers) {
     popup = new AlertPopup('Average per question',content);
     popup.open();
 }
+
+IndicoUI.executeOnLoad(function(){
+
+    actionAbstractsRows();
+    $('#button-menu').dropdown();
+
+    $(window).scroll(function(){
+        IndicoUI.Effect.followScroll();
+    });
+
+
+    // Insert hidden field to the form
+    var InsertHiddenField = function (name, value, cleanup){
+        if (cleanup) {
+            $("#abstractsForm input[type=hidden]").remove(); // clean previous actions
+        }
+        $('#abstractsForm').append($("<input>").attr("type", "hidden").attr("name", name).val(value));
+    }
+
+    $("#accept_abstracts").bind('menu_select',function(event) {
+         InsertHiddenField("acceptMultiple", $T("Accept"), false);
+         $('#abstractsForm').submit();
+     });
+
+    $("#reject_abstracts").bind('menu_select',function(event) {
+        InsertHiddenField("rejectMultiple", $T("Reject"), false);
+        $('#abstractsForm').submit();
+     });
+
+    $("#merge_abstracts").bind('menu_select',function(event) {
+        InsertHiddenField("merge", $T("Merge"), false);
+        $('#abstractsForm').submit();
+     });
+
+    $("#author_list").bind('menu_select',function(event) {
+        InsertHiddenField("auth", $T("Author List"), false);
+        $('#abstractsForm').submit();
+     });
+
+    $("#download_attachments").bind('menu_select',function(){
+        InsertHiddenField("PKGA", $T("Download attachments"), false);
+        $('#abstractsForm').submit();
+    });
+
+    $("#add_new_abstract").bind('menu_select',function(){
+        newAbst = true;
+        InsertHiddenField("newAbstract", $T("Add"), false);
+        $('#abstractsForm').submit();
+    });
+
+    $("#selectDisplay").click(function(){
+        $("#displayMenu input[type=checkbox]").attr("checked",true);
+    });
+
+    $("#unselectDisplay").click(function(){
+        $("#displayMenu input[type=checkbox]").attr("checked",false);
+    });
+
+    $("#selectAll").click(function(){selectAll();});
+    $("#deselectAll").click(function(){deselectAll();});
+
+});
+
 </script>

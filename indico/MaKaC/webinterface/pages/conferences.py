@@ -3847,30 +3847,6 @@ class WAbstracts( wcomponents.WTemplated ):
                 i18nformat("""<input type="checkbox" name="comment"%s> _("only with comments")""")%checkedShowComments]
         return l
 
-    def _getAbstractTitleBar(self):
-        l = ["<td></td>"]
-        if "ID" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href=%(numberSortingURL)s> _("ID")</a> %(numberImg)s</td>"""))
-        l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Title")</td>"""))
-        if "PrimaryAuthor" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Primary Author(s)")</td>"""))
-        if "Tracks" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Tracks")</td>"""))
-        if "Type" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(typeSortingURL)s> _("Type")</a> %(typeImg)s</td>"""))
-        if "Status" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(statusSortingURL)s> _("Status")</a><b> %(statusImg)s</td>"""))
-        if "Rating" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(ratingSortingURL)s> _("Rating")</a><b> %(ratingImg)s</td>"""))
-        if "AccTrack" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Track")</td>"""))
-        if "AccType" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Type")</td>"""))
-        if "SubmissionDate" in self._getDisplay():
-            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(dateSortingURL)s> _("Submission date")</a> %(dateImg)s</td>"""))
-
-        return "<tr><td colspan=4 style='padding: 5px 0px 10px;' nowrap>Select: <a style='color: #0B63A5;' alt='Select all' onclick='javascript:selectAll()'> All</a>, <a style='color: #0B63A5;' alt='Unselect all' onclick='javascript:deselectAll()'>None</a></td></tr><tr><td></td></tr><tr>%s</tr>"%("\n".join(l))
-
     def _getFilterMenu(self):
 
         options = [
@@ -3942,44 +3918,11 @@ class WAbstracts( wcomponents.WTemplated ):
         res.append("""</table>""")
         return "".join(res)
 
-    def _getDisplayMenu(self):
-        menu =  _("""<div class="CRLDiv" style="display: none;" id="displayMenu"><table width="95%%" align="center" border="0">
-        <tr>
-            <td>
-                <table width="100%%">
-                    <tr>
-                        <td>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <table align="center" cellspacing="0" width="100%%">
-                                <tr>
-                                    <td style="border-bottom:1px solid lightgrey;" valign="top" align="left"><span style="color:black"><b>Columns to display:</b></span></td>
-                                </tr>
-                                <tr>
-                                    <td align="left" class="titleCellFormat" style="padding-top:5px;" nowrap> <a onclick="selectDisplay()">_("Select all")</a> | <a onclick="unselectDisplay()">_("Unselect all")</a> </td>
-                                </tr>
-                                <tr>
-                                    <td valign="top">%(disp)s</td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center"><input type="submit" class="btn" name="OK" value=  _("apply filter")></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table></div>""")
-        return menu
-
     def _getDisplayOptionsHTML(self):
         html = []
         if self._display == []:
             html.append("""<input type="hidden" name="disp" value="ID">""")
+            html.append("""<input type="hidden" name="disp" value="Title">""")
             html.append("""<input type="hidden" name="disp" value="PrimaryAuthor">""")
             html.append("""<input type="hidden" name="disp" value="Tracks">""")
             html.append("""<input type="hidden" name="disp" value="Type">""")
@@ -3991,6 +3934,7 @@ class WAbstracts( wcomponents.WTemplated ):
         else:
             for d in self._display:
                 html.append("""<input type="hidden" name="disp" value="%s">"""%(d))
+            html.append("""<input type="hidden" name="disp" value="Title">""")
         html.append("""<input type="hidden" name="sortBy" value="%s">"""%(self._sortingCrit.getField().getId()))
         return "".join(html)
 
@@ -4099,7 +4043,7 @@ class WAbstracts( wcomponents.WTemplated ):
                 detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, ["%.2f" % i for i in answers])
 
 
-            m = ["""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('abstracts%s')" type="checkbox" name="abstracts" value="%s"></td>"""%(abstract.getId(), abstract.getId())]
+            m = ["""<td valign="top" align="right" width="3%%"><input type="checkbox" name="abstracts" value="%s"></td>"""%(abstract.getId())]
             if "ID" in self._getDisplay():
                 m.append("""<td class="CRLabstractLeftDataCell" nowrap>%s%s</td>"""%(abstract.getId(), comments))
             m.append("""<td class="CRLabstractDataCell">
@@ -4144,9 +4088,9 @@ class WAbstracts( wcomponents.WTemplated ):
                 m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%format_date(abstract.getSubmissionDate(), format='long'))
             if len(m) == 1:
                 m = ["<td></td>"]
-            l.append("""<tr id="abstracts%s" style="background-color: transparent;" onmouseout="javascript:onMouseOut('abstracts%s')" onmouseover="javascript:onMouseOver('abstracts%s')">
+            l.append("""<tr id="abstracts%s" style="background-color: transparent;">
                          %s
-                        </tr>"""%(abstract.getId(),abstract.getId(),abstract.getId(),"\n".join(m)))
+                        </tr>"""%(abstract.getId(),"\n".join(m)))
         if self._order =="up":
             l.reverse()
         vars["abstracts"] = "".join( l )
@@ -4159,14 +4103,12 @@ class WAbstracts( wcomponents.WTemplated ):
         url = urlHandlers.UHConfAbstractManagment.getURL(self._conf)
         url.setSegment( "results" )
         vars["filterPostURL"] = quoteattr(str(url))
-        vars["abstractTitleBar"] = self._getAbstractTitleBar()%vars
-
         vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
         vars["pdfIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["xmlIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("xml")))
         vars["disp"] = self._getDispHTML()
-        vars["displayMenu"] = self._getDisplayMenu()%vars
         vars["displayOptions"] = self._getDisplayOptionsHTML()
+        vars["displayColumns"] = self._getDisplay()
 
         return vars
 

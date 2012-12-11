@@ -2244,6 +2244,7 @@ class RHAbstractsListToExcel(RHConfModifCFABase):
     def _checkParams( self, params ):
         RHConfModifCFABase._checkParams( self, params )
         self._abstracts = normaliseListParam( params.get("abstracts", []) )
+        self._display = self._normaliseListParam(params.get("disp",[]))
 
     def _process( self ):
         filename = "AbstractList.csv"
@@ -2252,7 +2253,7 @@ class RHAbstractsListToExcel(RHConfModifCFABase):
         for id in self._abstracts :
            abstractList.append(self._conf.getAbstractMgr().getAbstractById(id))
 
-        generator = AbstractListToExcel(self._conf,abstractList)
+        generator = AbstractListToExcel(self._conf,abstractList, self._display)
         data = generator.getExcelFile()
 
         self._req.headers_out["Content-Length"] = "%s"%len(data)
