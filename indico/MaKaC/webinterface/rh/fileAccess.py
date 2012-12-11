@@ -29,7 +29,7 @@ from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from copy import copy
 
-class RHFileAccess( RHFileCommon, RHFileBase, RHDisplayBaseProtected ):
+class RHFileAccess(RHFileCommon, RHFileBase, RHDisplayBaseProtected):
     _uh  = urlHandlers.UHFileAccess
 
     def _checkParams( self, params ):

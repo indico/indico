@@ -122,6 +122,7 @@ def buildAW(ak, req, onlyPublic=False):
         aw.setUser(ak.getUser())
     return aw
 
+
 def handler(req, **params):
     ContextManager.destroy()
     logger = Logger.get('httpapi')

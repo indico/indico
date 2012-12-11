@@ -78,7 +78,6 @@ class RoomHook(RoomBookingHook):
     """
     Example: /room/CERN/23.xml
     """
-    TYPES = ('room', )
     RE = r'(?P<location>[\w\s]+)/(?P<idlist>\w+(?:-[\w\s]+)*)'
     DEFAULT_DETAIL = 'rooms'
     MAX_RECORDS = {

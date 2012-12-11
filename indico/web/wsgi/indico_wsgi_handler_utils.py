@@ -74,6 +74,9 @@ class table(Headers):
         else:
             return str(ret)
 
+    def update(self, data):
+        for k, v in data.iteritems():
+            self[k] = v
 
 ## Some functions made public
 exists_config_define = lambda dummy: True

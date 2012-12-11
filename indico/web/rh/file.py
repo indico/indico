@@ -21,21 +21,28 @@ import time
 from MaKaC.common import Config
 from email.Utils import formatdate
 
-class RHFileCommon():
+
+class RHFileCommon:
 
     def _process(self):
-        self._req.headers_out["Content-Length"] = "%s" % self._file.getSize()
-        self._req.headers_out["Last-Modified"] = "%s" % formatdate(time.mktime(self._file.getCreationDate().timetuple()))
+
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType(self._file.getFileType())
-        self._req.content_type = """%s""" % (mimetype)
-        dispos = "inline"
-        try:
-            if self._req.headers_in['User-Agent'].find('Android') != -1:
-                dispos = "attachment"
-        except KeyError:
-            pass
-        self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self._file.getFileName())
+
+        self._req.content_type = str(mimetype)
+
+        if 'User-Agent' in self._req.headers_in and \
+                self._req.headers_in['User-Agent'].find('Android') != -1:
+            dispos = "attachment"
+        else:
+            dispos = "inline"
+
+        self._req.headers_out.update({
+                "Content-Length": str(self._file.getSize()),
+                "Last-Modified": formatdate(time.mktime(self._file.getCreationDate().timetuple())),
+                "Content-Disposition": '{0}; filename="{1}"'.format(dispos, self._file.getFileName())
+                })
+
         if cfg.getUseXSendFile() and self._req.headers_in['User-Agent'].find('Android') == -1:
             # X-Send-File support makes it easier, just let the web server
             # do all the heavy lifting

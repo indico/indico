@@ -40,8 +40,6 @@ from indico.web.http_api.html import HTML4Serializer
 from indico.web.http_api.jsonp import JSONPSerializer
 from indico.web.http_api.ical import ICalSerializer
 from indico.web.http_api.atom import AtomSerializer
-from indico.web.http_api.file import FileSerializer
-from indico.web.rh.file import RHFileCommon
 from indico.web.http_api.fossils import IConferenceMetadataFossil,\
     IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil,\
     IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil,\
@@ -49,25 +47,23 @@ from indico.web.http_api.fossils import IConferenceMetadataFossil,\
     ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil,\
     IContributionMetadataWithSubContribsFossil
 from indico.web.http_api.responses import HTTPAPIError
+from indico.web.http_api.util import get_query_parameter
 from indico.web.wsgi import webinterface_handler_config as apache
 
 # indico legacy imports
 from MaKaC.common.db import DBMgr
-from MaKaC.common import Config
 from MaKaC.conference import CategoryManager
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.rb_tools import Period, datespan
-
-from indico.web.http_api.util import get_query_parameter
-from MaKaC.conference import LocalFile
 from MaKaC.errors import NoReportError
 
 utc = pytz.timezone('UTC')
 MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
 MIN_DATETIME = utc.localize(datetime(2000, 1, 1))
+
 
 class ArgumentParseError(Exception):
     pass
@@ -204,9 +200,9 @@ class HTTPAPIHook(object):
         self._getParams()
         req = self._req
         if not self.GUEST_ALLOWED and not aw.getUser():
-            raise HTTPAPIError('Guest access to this hook is forbidden.', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('Guest access to this resource is forbidden.', apache.HTTP_FORBIDDEN)
         if not self._hasAccess(aw):
-            raise HTTPAPIError('Access to this hook is restricted.', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('Access to this resource is restricted.', apache.HTTP_FORBIDDEN)
 
         func = getattr(self, self.PREFIX + '_' + self._type, None)
         if not func:
@@ -620,63 +616,8 @@ class ContributionFetcher(SessionContribFetcher):
         return self._process(_iterate_objs(idlist))
 
 
-@HTTPAPIHook.register
-class FileHook(HTTPAPIHook, RHFileCommon):
-    """
-    Example: /export/file/conference/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin?ak=00000000-0000-0000-0000-000000000000
-    """
-    DEFAULT_DETAIL = 'bin'
-    VALID_FORMATS = ('bin')
-    GUEST_ALLOWED = False
-    RE = r'(?P<event>[\w\s]+)(/session/(?P<session>[\w\s]+))?(/contrib/(?P<contrib>[\w\s]+))?(/subcontrib/(?P<subcontrib>[\w\s]+))?/material/(?P<material>[^/]+)/(?P<res>[\w\s]+)'
-
-    def _getParams(self):
-        super(FileHook, self)._getParams()
-        self._type = 'file'
-        self._event = self._pathParams['event']
-        self._session = self._pathParams['session']
-        self._contrib = self._pathParams['contrib']
-        self._subcontrib = self._pathParams['subcontrib']
-        self._material = self._pathParams['material']
-        self._res = self._pathParams['res']
-        params = {'confId': self._event, 'sessionId': self._session, 'contribId': self._contrib, 'subContId': self._subcontrib, 'materialId': self._material, 'resId': self._res}
-        try:
-            import MaKaC.webinterface.locators as locators
-            l = locators.WebLocator()
-            l.setResource(params)
-            self._file = l.getObject()
-        except (NoReportError, KeyError, AttributeError):
-            raise HTTPAPIError("File not found", apache.HTTP_NOT_FOUND)
-        if not isinstance(self._file, LocalFile):
-            raise HTTPAPIError("Resource is not a file", apache.HTTP_NOT_FOUND)
-        self._binaryData = RHFileCommon._process(self)
-
-    def _hasAccess(self, aw):
-        return self._file.canAccess(aw)
-
-    @classmethod
-    def _matchPath(cls, path):
-        if not hasattr(cls, '_RE'):
-            cls._RE = re.compile(r'/' + cls.PREFIX + '/event/' + cls.RE + r'\.(\w+)$')
-        return cls._RE.match(path)
-
-    def export_file(self, aw):
-        expInt = FileFetcher(aw, self)
-        return expInt.file([Config.getInstance().getFileTypeMimeType(self._file.getFileType()), self._binaryData])
-
-
-class FileFetcher(DataFetcher):
-
-    DETAIL_INTERFACES = {
-        'bin': '',
-    }
-
-    def file(self, data):
-        return self._process(data)
-
-
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)
 Serializer.register('ics', ICalSerializer)
 Serializer.register('atom', AtomSerializer)
-Serializer.register('bin', FileSerializer)
+
