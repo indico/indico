@@ -844,6 +844,8 @@ submitted to the conference:
 
 * **Apply filters**: Clicking on this link will open a box with many filters. Enabling or disabling any of them will have an impact on the abstracts shown in the list below. For example, you can choose to display only the abstracts belonging to a particular track or session.
 
+* **Columns to display**: Clicking on this link will open a box with the columns to display for each abstract.
+
 * **Add New**:  Submit a new abstract. When you click on this, a window will open:
 
 |image150|
