@@ -272,7 +272,7 @@ class EventCollaborationListener(Component):
         if obj.__class__ == Conference:
             obj = obj.getCSBookingManager()
             obj.notifyDeletion()
-        elif obj.__class__ == Contribution:
+        elif obj.__class__ == Contribution and obj.getStartDate() is not None:
             csBookingManager = obj.getCSBookingManager()
             for booking in csBookingManager.getBookingList():
                 booking.unindex_talk(obj)
