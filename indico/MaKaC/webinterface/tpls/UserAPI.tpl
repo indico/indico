@@ -135,12 +135,12 @@
                         }
                         else{
                             $('#enablePersistentSignatures').attr('value', (result == true ? $T('Disable') : $T('Enable')) + $T(' persistent signatures') )
-                            $('#enablePersistentSignatures')[0].dataset.enabled = result == true ? "1" : "0";
+                            $('#enablePersistentSignatures').data("enabled", result == true ? "1" : "0");
                         }
                     });
             }
         }
-        new ConfirmPopup($T("Persistent signatures"), Html.div({style: {width: '350px'}},this.dataset.enabled == "1" ? disableText : enableText), confirmHandler).open();
+        new ConfirmPopup($T("Persistent signatures"), Html.div({style: {width: '350px'}},$(this).data("enabled") == "1" ? disableText : enableText), confirmHandler).open();
     });
 % if not apiKey or not apiKey.isBlocked():
     % if not apiKey:
