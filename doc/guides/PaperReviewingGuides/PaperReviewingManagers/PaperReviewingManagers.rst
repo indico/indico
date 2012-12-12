@@ -79,7 +79,7 @@ Options for content and layout reviewing mode
 
 - You can set due dates for the reviewing team to give their
   judgments. They will not be able to judge the papers after the
-  deadline. These default dates apply only for a new contribution.
+  deadline.
 
         |image11|
 
@@ -264,3 +264,4 @@ Reviewing history for a contribution
 .. |image25| image:: PaperReviewingManagersPics/confmanagers20.png
 .. |image26| image:: PaperReviewingManagersPics/confmanagers21.png
 .. |image27| image:: PaperReviewingManagersPics/confmanagers22.png
+.. |image28| image:: PaperReviewingManagersPics/confmanagers23.png
