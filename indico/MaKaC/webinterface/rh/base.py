@@ -57,10 +57,8 @@ from MaKaC.common.contextManager import ContextManager
 from indico.util.i18n import _, availableLocales
 
 from MaKaC.plugins import PluginsHolder
-from MaKaC.user import Group, Avatar
-from MaKaC.accessControl import AdminList
-
 from MaKaC.plugins.base import OldObservable
+from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 
 from indico.util.network import _get_remote_ip
 
@@ -816,7 +814,7 @@ class RoomBookingDBMixin:     # It's _not_ RH
             CrossLocationDB.rollback()
 
 
-class RHProtected( RH ):
+class RHProtected(RH):
 
     def _getLoginURL( self ):
         return urlHandlers.UHSignIn.getURL(self.getRequestURL())
@@ -833,7 +831,7 @@ class RHProtected( RH ):
         self._checkSessionUser()
 
 
-class RHRoomBookingProtected( RHProtected ):
+class RHRoomBookingProtected(RHProtected):
 
     def _checkSessionUser( self ):
         user = self._getUser()
@@ -843,19 +841,13 @@ class RHRoomBookingProtected( RHProtected ):
         else:
             try:
                 if PluginsHolder().getPluginType("RoomBooking").isActive():
-                    if not AdminList.getInstance().isAdmin(user) and PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue() != []:
-                        authenticatedUser = False
-                        for entity in PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue():
-                            if isinstance(entity, Group) and entity.containsUser(user) or \
-                               isinstance(entity, Avatar) and entity == user:
-                                    authenticatedUser = True
-                                    break
-                        if not authenticatedUser:
-                            raise AccessError()
+                    if not rb_check_user_access(user):
+                        raise AccessError()
             except KeyError:
                 pass
 
-class RHDisplayBaseProtected( RHProtected ):
+
+class RHDisplayBaseProtected(RHProtected):
 
     def _checkProtection( self ):
         if not self._target.canAccess( self.getAW() ):
@@ -873,7 +865,7 @@ class RHDisplayBaseProtected( RHProtected ):
                 raise AccessError()
 
 
-class RHModificationBaseProtected( RHProtected ):
+class RHModificationBaseProtected(RHProtected):
 
     _allowClosed = False
 

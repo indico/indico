@@ -17,15 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from pytz import timezone
+# stdlib imports
 import fnmatch
 import itertools
-from dateutil import rrule
 from datetime import datetime, timedelta
-from indico.web.http_api.api import IteratedDataFetcher, HTTPAPIHook
-from indico.web.http_api.util import get_query_parameter
-from indico.util.fossilize import fossilize, IFossil
-from indico.util.fossilize.conversion import Conversion
+
+# 3rd party imports
+from pytz import timezone
+from dateutil import rrule
+
+# legacy imports
 from MaKaC.common.timezoneUtils import utc2server
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.plugins.base import PluginsHolder
@@ -34,11 +35,19 @@ from MaKaC.rb_tools import Period
 from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
 from MaKaC.user import Group, Avatar
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
-from indico.web.http_api.responses import HTTPAPIError
-from indico.web.wsgi import webinterface_handler_config as apache
 from MaKaC.rb_location import Location, CrossLocationFactory, CrossLocationQueries
 from MaKaC.rb_tools import doesPeriodsOverlap
 from MaKaC.authentication import AuthenticatorMgr
+from MaKaC.plugins.RoomBooking.common import rb_check_user_access
+
+# indico imports
+from indico.web.wsgi import webinterface_handler_config as apache
+from indico.web.http_api.responses import HTTPAPIError
+from indico.web.http_api.api import IteratedDataFetcher, HTTPAPIHook
+from indico.web.http_api.util import get_query_parameter
+from indico.util.fossilize import fossilize, IFossil
+from indico.util.fossilize.conversion import Conversion
+
 
 globalHTTPAPIHooks = ['RoomHook', 'ReservationHook', 'BookRoomHook']
 MAX_DATETIME = datetime(2099, 12, 31, 23, 59, 00)
@@ -62,22 +71,11 @@ class RoomBookingHook(HTTPAPIHook):
         self._resvFilter = getResvStateFilter(self._queryParams)
 
     def _hasAccess(self, aw):
-        """Check if the impersonated user may access the RB module
-
-        Admins can always access it; otherwise the authorized list must be empty or
-        the user must be present in that list (or member of a group in that list).
         """
-        user = aw.getUser()
-        if user.isAdmin():
-            return True
-        authorizedList = PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue()
-        if not authorizedList:
-            return True
-        for entity in authorizedList:
-            if ((isinstance(entity, Group) and entity.containsUser(user)) or
-               (isinstance(entity, Avatar) and entity == user)):
-                return True
-        return False
+        Check if the user may access the RB module
+        """
+        return rb_check_user_access(aw.getUser())
+
 
 class RoomHook(RoomBookingHook):
     """
@@ -139,52 +137,60 @@ class BookRoomHook(HTTPAPIHook):
 
     def _getParams(self):
         super(BookRoomHook, self)._getParams()
-        self._params = {}
-        self._params['roomID'] = get_query_parameter(self._queryParams, ['roomid'])
-        self._params['roomLocation'] = get_query_parameter(self._queryParams, ['location'])
-        self._params['userName'] = get_query_parameter(self._queryParams, ['username'])
-        self._params['reason'] = get_query_parameter(self._queryParams, ['reason'])
-        self._params['userBookedFor'] = AuthenticatorMgr().getAvatarByLogin(self._params['userName']).values()
-        if not self._params['userBookedFor']:
-            raise HTTPAPIError('Username does not exists.')
-        self._params['userBookedFor'] = self._params['userBookedFor'][0]
-        if not all(self._params.values() + [self._fromDT, self._toDT]):
-            raise HTTPAPIError('A required argument is missing.', apache.HTTP_BAD_REQUEST)
+
+        username = get_query_parameter(self._queryParams, ['username'])
+        booked_for = AuthenticatorMgr().getAvatarByLogin(username).values()
+
+        if not booked_for:
+            raise HTTPAPIError('Username does not exist.')
+
+        self._params = {
+            'roomid': get_query_parameter(self._queryParams, ['roomid']),
+            'location': get_query_parameter(self._queryParams, ['location']),
+            'username': username,
+            'reason': get_query_parameter(self._queryParams, ['reason']),
+            'userBookedFor': booked_for[0],
+            'from': self._fromDT,
+            'to': self._toDT
+            }
+
+        # calculate missing arguments
+        missing = list(name for (name, value) in (self._params.iteritems()) if not value)
+
+        if missing:
+            raise HTTPAPIError('Argument(s) missing: {0}'.format(', '.join(missing)), apache.HTTP_BAD_REQUEST)
+
+        self._room = CrossLocationQueries.getRooms(location=self._params['location'], roomID=int(self._params['roomid']))
 
     def _hasAccess(self, aw):
-        """Check if the impersonated user may book a room
-
-        Admins can always access; otherwise the authorized list must be empty or
-        the user must be present in that list or manager list (or member of a group in that list).
+        """
+        Check if the API user may book a room
         """
         self._user = aw.getUser()
-        self._room = CrossLocationQueries.getRooms(location=self._params['roomLocation'], roomID=int(self._params['roomID']))
-        if self._user.isAdmin():
-            return True
-        authorizedList = PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue()
-        managersList = PluginsHolder().getPluginType("RoomBooking").getOption("Managers").getValue()
-        if not authorizedList:
-            return True
-        for entity in authorizedList + managersList:
-            if ((isinstance(entity, Group) and entity.containsUser(user)) or
-               (isinstance(entity, Avatar) and entity == user)):
-                return True
-        if not self._room.canBook(self._user):
-            if self._room.canPrebook(self._user):
-                raise HTTPAPIError('It is not possible to pre-book rooms through the API.')
-        return False
+
+        if self._room.resvsNeedConfirmation:
+            raise HTTPAPIError('This room does not accept direct bookings and it '
+                               'is not possible to pre-book rooms through the API.')
+
+        return self._room.canBook(self._user)
 
     def api_roomBooking(self, aw):
-        resv = CrossLocationFactory.newReservation(location=self._params['roomLocation'])
+        resv = CrossLocationFactory.newReservation(location=self._params['location'])
         resv.room = self._room
         resv.startDT = self._fromDT.replace(tzinfo=None)
         resv.endDT = self._toDT.replace(tzinfo=None)
+
+        # checking room availability
         for nbd in resv.room.getNonBookableDates():
             if (doesPeriodsOverlap(nbd.getStartDate(), nbd.getEndDate(), resv.startDT, resv.endDT)):
                 raise HTTPAPIError('Failed to create the booking. You cannot book this room because it is unavailable during this time period.')
+
         roomBlocked = resv.room.getBlockedDay(resv.startDT)
+
+        # checking room blocking
         if roomBlocked and not roomBlocked.block.canOverride(self._user):
             raise HTTPAPIError('Failed to create the booking. You cannot book this room because it is blocked during this time period.')
+
         resv.repeatability = None
         resv.reason = self._params['reason']
         resv.createdDT = datetime.now()
@@ -195,10 +201,14 @@ class BookRoomHook(HTTPAPIHook):
         resv.isRejected = False
         resv.isCancelled = False
         resv.isConfirmed = True
+
         if resv.getCollisions():
             raise HTTPAPIError('Failed to create the booking. There is a collision with another booking.')
+
         resv.insert()
+
         return {'reservationID': resv.id}
+
 
 class IRoomMetadataFossil(IFossil):
 

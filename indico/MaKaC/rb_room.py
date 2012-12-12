@@ -22,6 +22,7 @@ from MaKaC.conference import ConferenceHolder
 Part of Room Booking Module (rb_)
 """
 
+from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 from MaKaC.rb_tools import Impersistant, checkPresence, iterdays
 from MaKaC.rb_location import Location, RoomGUID, CrossLocationQueries
 from MaKaC.user import Avatar, AvatarHolder
@@ -507,6 +508,11 @@ class RoomBase( object ):
         Reservable rooms which does not require pre-booking can be booked by anyone.
         Other rooms - only by their responsibles.
         """
+
+        # if the user has no access to the RB module, let's end it here
+        if not rb_check_user_access(user):
+            return False
+
         if self.isActive and self.isReservable and not self.resvsNeedConfirmation:
             simbaList = self.customAtts.get( 'Booking Simba List' )
             if simbaList and simbaList != "Error: unknown mailing list" and simbaList != "":
@@ -528,6 +534,11 @@ class RoomBase( object ):
         Reservable rooms can be pre-booked by anyone.
         Other rooms - only by their responsibles.
         """
+
+        # if the user has no access to the RB module, let's end it here
+        if not rb_check_user_access(user):
+            return False
+
         if self.isActive and self.isReservable:
             simbaList = self.customAtts.get( 'Booking Simba List' )
             if simbaList and simbaList != "Error: unknown mailing list" and simbaList != "":

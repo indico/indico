@@ -16,7 +16,36 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
+# legacy imports
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.accessControl import AdminList
+from MaKaC.plugins import PluginsHolder
+from MaKaC import user as user_mod
+
 
 def getRoomBookingOption(opt):
     return PluginsHolder().getPluginType('RoomBooking').getOption(opt).getValue()
+
+
+def rb_check_user_access(user):
+    """
+    Check if user should have access to RB module in general
+    """
+
+    authorized = PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue()
+
+    if AdminList.getInstance().isAdmin(user):
+        # user is admin
+        return True
+    elif len(authorized) == 0:
+        # the authorization list is empty (it's disabled)
+        return True
+    else:
+        # there is something in the authorization list
+        for entity in authorized:
+            if isinstance(entity, user_mod.Group) and entity.containsUser(user) or \
+                    isinstance(entity, user_mod.Avatar) and entity == user:
+                return True
+
+    return False

@@ -143,8 +143,6 @@ def handler(req, **params):
     if minfo.getRoomBookingModuleActive():
         Factory.getDALManager().connect()
 
-    mode = path.split('/')[1]
-
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     signature = get_query_parameter(queryParams, ['signature'])
     timestamp = get_query_parameter(queryParams, ['timestamp'], 0, integer=True)
@@ -157,8 +155,8 @@ def handler(req, **params):
     if hook is None or dformat is None:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
-    # Disable caching if we are not exporting
-    if mode != 'export' or hook.NO_CACHE:
+    # Disable caching if we are not just retrieving data (or the hook requires it)
+    if req.method == 'POST' or hook.NO_CACHE:
         no_cache = True
 
     ak = error = result = None
