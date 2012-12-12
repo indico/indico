@@ -16,7 +16,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-
 """
 Asynchronous request handlers for category-related services.
 """
@@ -40,6 +39,7 @@ import MaKaC.common.info as info
 from MaKaC import domain
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
+from MaKaC.webinterface.urlHandlers import UHCategModifAC
 
 class CategoryBase(object):
     """
@@ -288,20 +288,21 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
     def _sendMail(self, currentList, newManager):
         text = _("""Dear managers,
 
-        %s has been added as manager to the category '%s'.
+%s has been added as manager for the category '%s':
 
-        Best regards,
+%s
 
-        Indico Team
-        """) % (newManager.getStraightFullName(), self._categ.getName())
-        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(), "toList": [manager.getEmail() for manager in currentList], "subject": "New category manager", "body": text }
+Best regards,
+Indico Team
+        """) % (newManager.getStraightFullName(), self._categ.getName(), UHCategModifAC.getURL(self._categ))
+        maildata = { "fromAddr": "%s" % Config.getInstance().getNoReplyEmail(), "toList": [manager.getEmail() for manager in currentList], "subject": "New category manager", "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
 
     def _getAnswer(self):
         ph = PrincipalHolder()
         if self._kindOfList == "modification":
-            currentList = self._categ.getManagerList()
+            currentList = self._categ.getManagerList()[:]
             for user in self._userList:
                 newManager = ph.getById(user["id"])
                 self._categ.grantModification(newManager)

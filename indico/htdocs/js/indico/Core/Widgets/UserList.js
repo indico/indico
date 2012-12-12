@@ -603,15 +603,11 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
 type("ListOfUsersManagerProtection", ["ListOfUsersManager"], {
 
     addExistingUser: function(){
-        this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true);
-    },
-
-    addExistingUser: function(){
         if(this.showEmailCheckbox){
             var sendEmailDiv = Html.div({className:"informationUserList", style:{marginTop: pixels(10)}});
             var checkbox = Html.checkbox({style:{verticalAlign:"middle"}}, true);
             checkbox.dom.id = "send-email-managers";
-            sendEmailDiv.append(Html.span({},checkbox, "Send email notification to the current category managers"));
+            sendEmailDiv.append(Html.span({},checkbox, $T("Send email notification to the current category managers")));
             this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true,{"sendEmailManagers": function(){return $("#send-email-managers")[0].checked;}}, sendEmailDiv);
         }else {
             this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true);
