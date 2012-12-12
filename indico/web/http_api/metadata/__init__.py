@@ -17,26 +17,5 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-json-based fossil serializer
-"""
-# indico imports
-from indico.util import json
 
-# module imports
-from indico.util.metadata.serializer import Serializer
-
-
-class JSONSerializer(Serializer):
-
-    """
-    Does basically direct translation from the fossi
-    """
-
-    _mime = 'application/json'
-
-    def __call__(self, fossil):
-        return json.dumps(fossil, pretty=self.pretty)
-
-
-Serializer.register('json', JSONSerializer)
+from indico.web.http_api.metadata.serializer import Serializer

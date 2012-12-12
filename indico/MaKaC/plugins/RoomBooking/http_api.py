@@ -22,7 +22,7 @@ import fnmatch
 import itertools
 from dateutil import rrule
 from datetime import datetime, timedelta
-from indico.web.http_api import DataFetcher, HTTPAPIHook
+from indico.web.http_api.api import IteratedDataFetcher, HTTPAPIHook
 from indico.web.http_api.util import get_query_parameter
 from indico.util.fossilize import fossilize, IFossil
 from indico.util.fossilize.conversion import Conversion
@@ -44,6 +44,7 @@ MIN_DATETIME = datetime(2000, 1, 1, 00, 00, 00)
 def utcdate(datet):
     d = datet.astimezone(timezone('UTC'))
     return utc2server(d)
+
 
 class RoomBookingHook(HTTPAPIHook):
     GUEST_ALLOWED = False
@@ -78,6 +79,7 @@ class RoomHook(RoomBookingHook):
     """
     Example: /room/CERN/23.xml
     """
+    TYPES = ('room', )
     RE = r'(?P<location>[\w\s]+)/(?P<idlist>\w+(?:-[\w\s]+)*)'
     DEFAULT_DETAIL = 'rooms'
     MAX_RECORDS = {
@@ -232,7 +234,7 @@ class IReservationMetadataFossil(IReservationMetadataFossilBase):
     room.result = IMinimalRoomMetadataFossil
 
 
-class RoomBookingFetcher(DataFetcher):
+class RoomBookingFetcher(IteratedDataFetcher):
     """
     Base export interface for RB related stuff
     """

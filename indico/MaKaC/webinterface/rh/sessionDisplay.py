@@ -26,7 +26,7 @@ from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from MaKaC.common import Config
 from indico.web.http_api.api import SessionHook
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 

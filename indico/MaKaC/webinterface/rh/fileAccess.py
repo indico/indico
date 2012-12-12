@@ -19,7 +19,6 @@
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
-from indico.web.rh.file import RHFileCommon
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.pages import files
 from MaKaC.common import Config
@@ -29,7 +28,10 @@ from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from copy import copy
 
-class RHFileAccess(RHFileCommon, RHFileBase, RHDisplayBaseProtected):
+from indico.web.rh.file import set_file_headers, send_file
+
+
+class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
     _uh  = urlHandlers.UHFileAccess
 
     def _checkParams( self, params ):
@@ -57,7 +59,14 @@ class RHFileAccess(RHFileCommon, RHFileBase, RHDisplayBaseProtected):
             p = files.WPMinutesDisplay(self, self._file )
             return p.display()
         else:
-            return RHFileCommon._process(self)
+            set_file_headers(self._req,
+                             fname=self._file.getFileName(),
+                             last_modified=self._file.getCreationDate(),
+                             size=self._file.getSize(),
+                             data=self._file.readBin(),
+                             ftype=self._file.getFileType(),
+                             fpath=self._file.getFilePath())
+            return send_file(self._file)
 
 
 class RHFileAccessStoreAccessKey( RHFileBase ):

@@ -48,7 +48,7 @@ from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.web.http_api.api import CategoryEventFetcher
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.api import CategoryEventHook
 
 class RHConfSignIn( conferenceBase.RHConferenceBase ):

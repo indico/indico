@@ -33,7 +33,7 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
 from indico.web.http_api.api import ContributionHook
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 

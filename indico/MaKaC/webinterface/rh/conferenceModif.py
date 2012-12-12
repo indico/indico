@@ -78,7 +78,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.modules.scheduler import tasks, Client
 from indico.util import json
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
 

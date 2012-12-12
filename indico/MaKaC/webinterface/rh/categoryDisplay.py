@@ -49,7 +49,7 @@ from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 from indico.web.http_api.api import CategoryEventHook
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.wsgi import webinterface_handler_config as apache
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 

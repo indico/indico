@@ -22,30 +22,35 @@ from MaKaC.common import Config
 from email.Utils import formatdate
 
 
-class RHFileCommon:
+def set_file_headers(req, fname, fpath, last_modified, ftype, data, size):
+    cfg = Config.getInstance()
 
-    def _process(self):
+    mimetype = cfg.getFileTypeMimeType(ftype)
+    req.content_type = str(mimetype)
 
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType(self._file.getFileType())
+    if 'User-Agent' in req.headers_in and \
+            req.headers_in['User-Agent'].find('Android') != -1:
+        dispos = "attachment"
+    else:
+        dispos = "inline"
 
-        self._req.content_type = str(mimetype)
+    req.headers_out.update({
+            "Content-Length": str(size),
+            "Last-Modified": formatdate(time.mktime(last_modified.timetuple())),
+            "Content-Disposition": '{0}; filename="{1}"'.format(dispos, fname)
+            })
 
-        if 'User-Agent' in self._req.headers_in and \
-                self._req.headers_in['User-Agent'].find('Android') != -1:
-            dispos = "attachment"
-        else:
-            dispos = "inline"
+    if cfg.getUseXSendFile() and req.headers_in['User-Agent'].find('Android') == -1:
+        # X-Send-File support makes it easier, just let the web server
+        # do all the heavy lifting
 
-        self._req.headers_out.update({
-                "Content-Length": str(self._file.getSize()),
-                "Last-Modified": formatdate(time.mktime(self._file.getCreationDate().timetuple())),
-                "Content-Disposition": '{0}; filename="{1}"'.format(dispos, self._file.getFileName())
-                })
+        # send_x_file only sets headers
+        req.send_x_file(fpath)
 
-        if cfg.getUseXSendFile() and self._req.headers_in['User-Agent'].find('Android') == -1:
-            # X-Send-File support makes it easier, just let the web server
-            # do all the heavy lifting
-            return self._req.send_x_file(self._file.getFilePath())
-        else:
-            return self._file.readBin()
+
+def send_file(fdata):
+    cfg = Config.getInstance()
+    if cfg.getUseXSendFile() and req.headers_in['User-Agent'].find('Android') == -1:
+        return ""
+    else:
+        return fdata.readBin()

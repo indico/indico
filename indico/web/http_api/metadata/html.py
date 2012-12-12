@@ -18,35 +18,35 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # python stdlib imports
-from pyatom import AtomFeed
-
-# indico imports
-from indico.util.string import unicodeOrNone
+import os
+from collections import defaultdict
+from operator import itemgetter
 
 # module imports
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
+
+# legacy indico imports
+from MaKaC.common.TemplateExec import render
 
 
-class AtomSerializer(Serializer):
+class HTML4Serializer(Serializer):
 
     schemaless = False
-    _mime = 'application/atom+xml'
+    _mime = 'text/html'
 
-    def __call__(self, fossils):
+    def _execute(self, fossils):
         results = fossils['results']
         if type(results) != list:
             results = [results]
 
-        feed = AtomFeed(
-            title='Indico Feed',
-            feed_url=fossils['url']
-        )
-
+        unorderedFossils = defaultdict(list)
         for fossil in results:
-            feed.add(
-                title=unicodeOrNone(fossil['title']),
-                summary=unicodeOrNone(fossil['description']),
-                url=fossil['url'],
-                updated=fossil['startDate']  # ugh, but that's better than creationDate
-                )
-        return feed.to_string()
+            unorderedFossils[fossil['startDate'].date()].append(fossil)
+
+        # Sort top level (by date)
+        orderedFossils = sorted(unorderedFossils.items(), key=itemgetter(0))
+        # Sort day level (by date/time, actually only time because it's only a single day)
+        for day, events in orderedFossils:
+            events.sort(key=itemgetter('startDate'))
+        return render(os.path.join(os.path.dirname(__file__), 'html4.tpl'),
+                      {'fossils': orderedFossils, 'ts': fossils['ts']})

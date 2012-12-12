@@ -23,7 +23,7 @@ import icalendar as ical
 from lxml import html
 
 # indico imports
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 
 # legacy indico imports
 from MaKaC.rb_reservation import RepeatabilityEnum
@@ -149,7 +149,7 @@ class ICalSerializer(Serializer):
     def register_mapper(cls, fossil, func):
         cls._mappers[fossil] = func
 
-    def __call__(self, fossils):
+    def _execute(self, fossils):
         results = fossils['results']
         if type(results) != list:
             results = [results]

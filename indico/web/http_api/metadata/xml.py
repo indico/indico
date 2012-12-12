@@ -22,7 +22,7 @@ from lxml import etree
 from datetime import datetime
 
 # module imports
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.common.logger import Logger
 
 
@@ -90,7 +90,7 @@ class XMLSerializer(Serializer):
 
         return felement
 
-    def __call__(self, fossil, xml_declaration=True):
+    def _execute(self, fossil, xml_declaration=True):
         if type(fossil) == list:
             # collection of fossils
             doc = etree.ElementTree(etree.Element("collection"))

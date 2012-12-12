@@ -18,9 +18,12 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
+
 class Serializer(object):
 
     schemaless = True
+    encapsulate = True
+
     registry = {}
 
     def __init__(self, pretty=False, **kwargs):
@@ -52,6 +55,15 @@ class Serializer(object):
     def getMIMEType(self):
         return self._mime
 
+    def set_headers(self, req):
+        req.headers_out['Content-Length'] = str(len(self._data))
+        req.headers_out['Content-Type'] = self.getMIMEType()
 
-from indico.util.metadata.json import JSONSerializer
-from indico.util.metadata.xml import XMLSerializer
+    def __call__(self, obj, *args, **kwargs):
+        self._obj = obj
+        self._data = self._execute(obj, *args, **kwargs)
+        return self._data
+
+
+from indico.web.http_api.metadata.json import JSONSerializer
+from indico.web.http_api.metadata.xml import XMLSerializer

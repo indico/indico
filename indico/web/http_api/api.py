@@ -35,11 +35,11 @@ from datetime import datetime, timedelta, time
 from indico.util.date_time import nowutc
 from indico.util.fossilize import fossilize
 
-from indico.util.metadata import Serializer
-from indico.web.http_api.html import HTML4Serializer
-from indico.web.http_api.jsonp import JSONPSerializer
-from indico.web.http_api.ical import ICalSerializer
-from indico.web.http_api.atom import AtomSerializer
+from indico.web.http_api.metadata import Serializer
+from indico.web.http_api.metadata.html import HTML4Serializer
+from indico.web.http_api.metadata.jsonp import JSONPSerializer
+from indico.web.http_api.metadata.ical import ICalSerializer
+from indico.web.http_api.metadata.atom import AtomSerializer
 from indico.web.http_api.fossils import IConferenceMetadataFossil,\
     IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil,\
     IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil,\
@@ -93,6 +93,7 @@ class HTTPAPIHook(object):
     GUEST_ALLOWED = True # When False, it forces authentication
     COMMIT = False # commit database changes
     HTTP_POST = False # require (and allow) HTTP POST
+    NO_CACHE = False
 
     @classmethod
     def parseRequest(cls, path, queryParams):
@@ -232,7 +233,6 @@ class HTTPAPIHook(object):
 
 
 class DataFetcher(object):
-    DETAIL_INTERFACES = {}
 
     _deltas =  {'yesterday': timedelta(-1),
                 'tomorrow': timedelta(1)}
@@ -244,22 +244,11 @@ class DataFetcher(object):
 
     def __init__(self, aw, hook):
         self._aw = aw
-        self._tz = hook._tz
-        self._serverTZ = hook._serverTZ
-        self._offset = hook._offset
-        self._limit = hook._limit
-        self._detail = hook._detail
-        self._orderBy = hook._orderBy
-        self._descending = hook._descending
-        self._fromDT = hook._fromDT
-        self._toDT = hook._toDT
+        self._hook = hook
 
     @classmethod
     def getAllowedFormats(cls):
         return Serializer.getAllFormats()
-
-    def _userAccessFilter(self, obj):
-        return obj.canAccess(self._aw)
 
     @classmethod
     def _parseDateTime(cls, dateTime, allowNegativeOffset):
@@ -321,6 +310,25 @@ class DataFetcher(object):
             return tz.localize(value.combine(value.date(), time(0, 0, 0)))
         else:
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
+
+
+class IteratedDataFetcher(DataFetcher):
+    DETAIL_INTERFACES = {}
+
+    def __init__(self, aw, hook):
+        super(IteratedDataFetcher, self).__init__(aw, hook)
+        self._tz = hook._tz
+        self._serverTZ = hook._serverTZ
+        self._offset = hook._offset
+        self._limit = hook._limit
+        self._detail = hook._detail
+        self._orderBy = hook._orderBy
+        self._descending = hook._descending
+        self._fromDT = hook._fromDT
+        self._toDT = hook._toDT
+
+    def _userAccessFilter(self, obj):
+        return obj.canAccess(self._aw)
 
     def _limitIterator(self, iterator, limit):
         counter = 0
@@ -427,7 +435,7 @@ class CategoryEventHook(HTTPAPIHook):
         return expInt.event(self._idList)
 
 
-class CategoryEventFetcher(DataFetcher):
+class CategoryEventFetcher(IteratedDataFetcher):
     DETAIL_INTERFACES = {
         'events': IConferenceMetadataFossil,
         'contributions': IConferenceMetadataWithContribsFossil,
@@ -557,7 +565,7 @@ class SessionContribHook(HTTPAPIHook):
         expInt = ContributionFetcher(aw, self)
         return expInt.contribution(self._idList)
 
-class SessionContribFetcher(DataFetcher):
+class SessionContribFetcher(IteratedDataFetcher):
 
     def __init__(self, aw, hook):
         super(SessionContribFetcher, self).__init__(aw, hook)
@@ -620,4 +628,3 @@ Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)
 Serializer.register('ics', ICalSerializer)
 Serializer.register('atom', AtomSerializer)
-

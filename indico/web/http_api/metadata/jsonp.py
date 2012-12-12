@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.metadata.json import JSONSerializer
+from indico.web.http_api.metadata.json import JSONSerializer
 
 
 class JSONPSerializer(JSONSerializer):
@@ -31,7 +31,7 @@ class JSONPSerializer(JSONSerializer):
         super(JSONPSerializer, self).__init__(**kwargs)
         self._prefix = jsonp
 
-    def __call__(self, results):
+    def _execute(self, results):
         return "// fetched from Indico\n%s(%s);" % \
                (self._prefix,
-                super(JSONPSerializer, self).__call__(results))
+                super(JSONPSerializer, self)._execute(results))

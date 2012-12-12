@@ -33,12 +33,12 @@ from ZODB.POSException import ConflictError
 # indico imports
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.auth import APIKeyHolder
-from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
 from indico.web.http_api.util import remove_lists, get_query_parameter
 from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.wsgi import webinterface_handler_config as apache
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 from indico.util.network import _get_remote_ip
 from indico.util.contextManager import ContextManager
 
@@ -152,14 +152,14 @@ def handler(req, **params):
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
 
-    # Disable caching if we are not exporting
-    if mode != 'export':
-        no_cache = True
-
     # Get our handler function and its argument and response type
-    func, dformat = HTTPAPIHook.parseRequest(path, queryParams)
-    if func is None or dformat is None:
+    hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
+    if hook is None or dformat is None:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+
+    # Disable caching if we are not exporting
+    if mode != 'export' or hook.NO_CACHE:
+        no_cache = True
 
     ak = error = result = None
     ts = int(time.time())
@@ -181,7 +181,7 @@ def handler(req, **params):
                 cache_key = 'signed_' + cache_key
 
         obj = None
-        addToCache = True
+        addToCache = not hook.NO_CACHE
         cache = GenericCache('HTTPAPI')
         cache_key = RE_REMOVE_EXTENSION.sub('', cache_key)
         if not no_cache:
@@ -191,7 +191,7 @@ def handler(req, **params):
                 addToCache = False
         if result is None:
             # Perform the actual exporting
-            res = func(aw, req)
+            res = hook(aw, req)
             if isinstance(res, tuple) and len(res) == 4:
                 result, extra, complete, typeMap = res
             else:
@@ -240,25 +240,22 @@ def handler(req, **params):
 
         serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
                                        **remove_lists(queryParams))
-
         if error:
-            resultFossil = fossilize(error)
-        else:
-            iface = None
-            if mode == 'export':
-                iface = IHTTPAPIExportResultFossil
-            resultFossil = fossilize(HTTPAPIResult(result, path, query, ts, complete, extra), iface)
-
-        del resultFossil['_fossil']
-
-        try:
-            if error and not serializer.schemaless:
+            if not serializer.schemaless:
                 # if our serializer has a specific schema (HTML, ICAL, etc...)
                 # use JSON, since it is universal
                 serializer = Serializer.create('json')
-            data = serializer(resultFossil)
-            req.headers_out['Content-Length'] = "%s" % len(data)
-            req.headers_out['Content-Type'] = serializer.getMIMEType()
+
+            result = fossilize(error)
+        else:
+            if serializer.encapsulate:
+                result = fossilize(HTTPAPIResult(result, path, query, ts, complete, extra), IHTTPAPIExportResultFossil)
+                del result['_fossil']
+
+        try:
+            data = serializer(result)
+            serializer.set_headers(req)
+
             return data
         except:
             logger.exception('Serialization error in request %s?%s' % (path, query))

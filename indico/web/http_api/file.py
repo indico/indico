@@ -21,11 +21,11 @@
 import re
 
 # indico imports
-from indico.util.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer
 
 from indico.web.http_api.api import HTTPAPIHook, DataFetcher
 from indico.web.http_api.responses import HTTPAPIError
-from indico.web.rh.file import RHFileCommon
+from indico.web.rh.file import set_file_headers
 from indico.web.wsgi import webinterface_handler_config as apache
 
 # legacy imports
@@ -34,7 +34,7 @@ from MaKaC.common import Config
 
 
 @HTTPAPIHook.register
-class FileHook(HTTPAPIHook, RHFileCommon):
+class FileHook(HTTPAPIHook):
     """
     Example: /export/file/conference/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin?ak=00000000-0000-0000-0000-000000000000
     """
@@ -43,6 +43,7 @@ class FileHook(HTTPAPIHook, RHFileCommon):
     VALID_FORMATS = ('bin',)
     GUEST_ALLOWED = True
     RE = r'(?P<event>[\w\s]+)(/session/(?P<session>[\w\s]+))?(/contrib/(?P<contrib>[\w\s]+))?(/subcontrib/(?P<subcontrib>[\w\s]+))?/material/(?P<material>[^/]+)/(?P<res>[\w\s]+)'
+    NO_CACHE = True
 
     def _getParams(self):
         super(FileHook, self)._getParams()
@@ -68,14 +69,19 @@ class FileHook(HTTPAPIHook, RHFileCommon):
 
 
     def export_file(self, aw):
+        cfg = Config.getInstance()
 
         if not isinstance(self._file, LocalFile):
             raise HTTPAPIError("Resource is not a file", apache.HTTP_NOT_FOUND)
 
-        self._binaryData = RHFileCommon._process(self)
-
-        expInt = FileFetcher(aw, self)
-        return expInt.file([Config.getInstance().getFileTypeMimeType(self._file.getFileType()), self._binaryData])
+        return {
+            "fname": self._file.getFileName(),
+            "last_modified": self._file.getCreationDate(),
+            "size": self._file.getSize(),
+            "data": "" if cfg.getUseXSendFile() else self._file.readBin(),
+            "ftype": self._file.getFileType(),
+            "fpath": self._file.getFilePath()
+            }
 
     def _hasAccess(self, aw):
         return self._file.canAccess(aw)
@@ -87,23 +93,24 @@ class FileHook(HTTPAPIHook, RHFileCommon):
         return cls._RE.match(path)
 
 
-class FileFetcher(DataFetcher):
-
-    DETAIL_INTERFACES = {
-        'bin': '',
-    }
-
-    def file(self, data):
-        return self._process(data)
-
-
 class FileSerializer(Serializer):
 
+    encapsulate = False
     schemaless = False
 
-    def __call__(self, fossils):
-        self._mime = fossils['results'][0]
-        return fossils['results'][1]
+    def _execute(self, fdata):
+        cfg = Config.getInstance()
+
+        self._mime = cfg.getFileTypeMimeType(fdata['ftype'])
+
+        if cfg.getUseXSendFile():
+            return ""
+        else:
+            return fdata['data']
+
+    def set_headers(self, req):
+        super(FileSerializer, self).set_headers(req)
+        set_file_headers(req, **self._obj)
 
 
 Serializer.register('bin', FileSerializer)

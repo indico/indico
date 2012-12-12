@@ -21,7 +21,7 @@ import icalendar as ical
 from datetime import timedelta
 
 from indico.core.index import Catalog
-from indico.web.http_api import HTTPAPIHook, DataFetcher
+from indico.web.http_api.api import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.ical import ICalSerializer
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
@@ -221,7 +221,7 @@ class VideoEventHook(HTTPAPIHook):
         return expInt.video(self._idList, self._alarms, self._categ_id)
 
 
-class VideoEventFetcher(DataFetcher):
+class VideoEventFetcher(IteratedDataFetcher):
     DETAIL_INTERFACES = {
         'all' : ICollaborationMetadataFossil
     }
@@ -246,6 +246,9 @@ class VideoEventFetcher(DataFetcher):
 
     def iter_bookings(self, idList, categ_id=None):
         for vsid in idList:
+            if vsid not in self.ID_TO_IDX:
+                continue
+
             if vsid in ['webcast', 'recording']:
                 idx = Catalog.getIdx('cs_booking_instance')[self.ID_TO_IDX[vsid]]
                 for __, bkw in idx.iter_bookings(self._fromDT, self._toDT):
