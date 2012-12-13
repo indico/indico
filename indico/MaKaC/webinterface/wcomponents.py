@@ -5878,7 +5878,7 @@ class WRoomBookingAdminLocation( WTemplated ):
 
         # Rooms
         rooms = self._location.factory.newRoom().getRooms(location = self._location.friendlyName)
-        rooms.sort(key = lambda r: r.getFullName())
+        rooms.sort()
 
         vars["Rooms"] = rooms
 
