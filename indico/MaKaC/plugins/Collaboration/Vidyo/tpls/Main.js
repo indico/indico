@@ -107,7 +107,7 @@
         }
 
         if (event === 'attach' && error.errorType === 'notValidRoom') {
-            CSErrorPopup($T("Public room duplicated name"), [error.userMessage]);
+            CSErrorPopup($T("Duplicate room name"), [error.userMessage]);
         }
 
         if (event === 'attach' && error.errorType === 'duplicated') {
