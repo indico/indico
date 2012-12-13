@@ -2192,7 +2192,7 @@ class WHTMLDomainList:
             url = self._vars["domainDetailsURLGen"]( dom )
             ul.append("""<tr>
                             <td bgcolor="%s"><a href="%s">%s</a></td>
-                        </tr>"""%(color, url, dom.getName() ) )
+                        </tr>"""%(color, url, dom.getName() or _("no name") ) )
         if ul:
             text += "".join( ul )
         else:

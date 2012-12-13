@@ -121,9 +121,9 @@ class _DomainFilterCriteria(filters.FilterCriteria):
 class DomainHolder(ObjectHolder):
     idxName = "domains"
     counterName = "DOMAINS"
-    
+
     def match( self, criteria):
-        """ 
+        """
         """
         crit={}
         for f,v in criteria.items():
@@ -143,7 +143,7 @@ class DomainHolder(ObjectHolder):
         letters = []
         for domain in self.getList():
             name = domain.getName()
-            if not name[0].lower() in letters:
+            if name and not name[0].lower() in letters:
                 letters.append(name[0].lower())
         letters.sort()
         return letters
@@ -152,6 +152,6 @@ class DomainHolder(ObjectHolder):
         list = []
         for domain in self.getList():
             name = domain.getName()
-            if name[0].lower() == letter.lower():
+            if name and name[0].lower() == letter.lower():
                 list.append(domain)
         return list
