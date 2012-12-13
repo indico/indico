@@ -240,6 +240,8 @@ class Room( Persistent, RoomBase, Fossilizable ):
                     continue
                 elif blockState == 'pending' and pendingBlockings:
                     continue
+                if roomEx.isReservable and hasattr(room, "customAtts") and room.customAtts.get('Booking Simba List'):
+                    continue
             if ownedBy != None:
                 if not room.isOwnedBy( ownedBy ):
                     continue
@@ -468,7 +470,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
         infos = []
         if self.capacity:
             infos.append("%s %s" % (self.capacity , _("people")))
-        if self.isReservable:
+        if self.isReservable and not self.customAtts.get('Booking Simba List'):
             infos.append(_("public"))
         else:
             infos.append(_("private"))

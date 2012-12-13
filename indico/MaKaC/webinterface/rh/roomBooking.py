@@ -213,7 +213,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         session.setVar( "longitude", c.longitude )
 
         session.setVar( "isActive", c.isActive )
-        session.setVar( "isReservable", c.isReservable and not c.customAtts.get('Simba List'))
+        session.setVar( "isReservable", c.isReservable )
         session.setVar( "resvsNeedConfirmation", c.resvsNeedConfirmation )
         session.setVar( "resvStartNotification", c.resvStartNotification )
         session.setVar( "resvStartNotificationBefore", c.resvStartNotificationBefore )
@@ -321,7 +321,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.longitude = session.getVar( "longitude" )
 
         candRoom.isActive = bool( session.getVar( "isActive" ) )
-        candRoom.isReservable = bool( session.getVar( "isReservable") and not session.getVar( "cattr_Simba List" ) )
+        candRoom.isReservable = bool( session.getVar( "isReservable") )
         candRoom.resvsNeedConfirmation = bool( session.getVar( "resvsNeedConfirmation" ) )
         candRoom.resvStartNotification = session.getVar("resvStartNotification")
         candRoom.resvStartNotificationBefore = session.getVar("resvStartNotificationBefore")
@@ -361,7 +361,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.longitude = params.get( "longitude" )
 
         candRoom.isActive = bool( params.get( "isActive" ) ) # Safe
-        candRoom.isReservable = bool( params.get( "isReservable" ) and not params.get( "cattr_Simba List" ) ) # Safe
+        candRoom.isReservable = bool( params.get( "isReservable" ) ) # Safe
         candRoom.resvsNeedConfirmation = bool( params.get( "resvsNeedConfirmation" ) ) # Safe
         candRoom.resvStartNotification = bool( params.get( "resvStartNotification" ) )
         tmp = params.get("resvStartNotificationBefore")

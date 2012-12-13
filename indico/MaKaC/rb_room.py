@@ -514,7 +514,7 @@ class RoomBase( object ):
             return False
 
         if self.isActive and self.isReservable and not self.resvsNeedConfirmation:
-            simbaList = self.customAtts.get('Simba List')
+            simbaList = self.customAtts.get('Booking Simba List')
             if simbaList and simbaList != "Error: unknown mailing list" and simbaList != "":
                 if user.isMemberOfSimbaList(simbaList):
                     return True
@@ -540,7 +540,7 @@ class RoomBase( object ):
             return False
 
         if self.isActive and self.isReservable:
-            simbaList = self.customAtts.get('Simba List')
+            simbaList = self.customAtts.get('Booking Simba List')
             if simbaList and simbaList != "Error: unknown mailing list" and simbaList != "":
                     if user.isMemberOfSimbaList(simbaList):
                         return True
