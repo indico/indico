@@ -1,3 +1,14 @@
+<%def name="includeOrderImg(column='')">
+   % if sortingField == column:
+        % if order == "down":
+            <img src="${downArrow}" alt="down">
+        % elif order == "up":
+            <img src="${upArrow}" alt="up">
+        % endif
+   % endif
+</%def>
+
+
 <a href="" name="results"></a>
 <table width="100%" valign="top" align="left" cellspacing="0">
     <tr>
@@ -64,7 +75,19 @@
                                                 <td align="left" class="titleCellFormat" style="padding-top:5px;" nowrap> <a id="selectDisplay">${_("Select all")}</a> | <a id="unselectDisplay">${_("Unselect all")}</a> </td>
                                             </tr>
                                             <tr>
-                                                <td valign="top">${disp}</td>
+                                                <td valign="top">
+                                                    <table width="100%%" cellpadding="0" cellspacing="0" valign="top">
+                                                        % for column in columns:
+                                                            <tr>
+                                                                <td align="left" valign="top">
+                                                                    <input type="checkbox" name="disp" value="${column}" ${"checked" if column in displayColumns else ""}>
+                                                                </td>
+                                                                <td width="100%%" align="left" valign="top">${columnsDict[column]}
+                                                                </td>
+                                                            </tr>
+                                                        %endfor
+                                                    </table>
+                                                </td>
                                             </tr>
                                         </table>
                                     </td>
@@ -77,12 +100,14 @@
                     </tr>
                 </table>
             </div>
+            <input type="hidden" name="sortBy" value="${sortingField}">
+            <input type="hidden" name="order" value="${order}">
           </form>
-          ${ sortingOptions }
           <form action=${ filterPostURL } method="post" name="filterOptionForm" id="filterOptionForm">
             <input type="hidden" name="operationType" value="filter" />
             ${ filterMenu }
-            ${ sortingOptions }
+            <input type="hidden" name="sortBy" value="${sortingField}">
+            <input type="hidden" name="order" value="${order}">
           </form>
         </td>
     </tr>
@@ -92,7 +117,11 @@
             <table>
                 <tr>
                   <td colspan="10">
-                      ${ displayOptions }
+                    % for option in displayColumns:
+                        <input type="hidden" name="disp" value="${option}">
+                    % endfor
+                    <input type="hidden" name="disp" value="Title">
+                    <input type="hidden" name="order" value="${order}">
                   </td>
                 </tr>
                 <tr id="headPanel" class="follow-scroll" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);">
@@ -154,23 +183,33 @@
         <tr>
             <td></td>
         % if "ID" in displayColumns:
-           <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href=${numberSortingURL}> ${_("ID")}</a>${numberImg}</td>
+           <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href="${getSortingURL('number')}"> ${_("ID")}</a>
+                ${includeOrderImg("number")}
+           </td>
         % endif
         <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Title")}</td>
         % if "PrimaryAuthor" in displayColumns:
             <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Primary Author(s)")}</td>
         % endif
         % if "Tracks" in displayColumns:
-            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${trackSortingURL}> ${_("Tracks")}</a>${trackImg}</td>
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${getSortingURL('track')}"> ${_("Tracks")}</a>
+                ${includeOrderImg("track")}
+           </td>
         % endif
         % if "Type" in displayColumns:
-            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${typeSortingURL}> ${_("Type")}</a>${typeImg}</td>
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${getSortingURL('type')}"> ${_("Type")}</a>
+                ${includeOrderImg("type")}
+           </td>
         % endif
         % if "Status" in displayColumns:
-            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${statusSortingURL}> ${_("Status")}</a>${statusImg}</td>
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${getSortingURL('status')}"> ${_("Status")}</a>
+                ${includeOrderImg("status")}
+           </td>
         % endif
         % if "Rating" in displayColumns:
-            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${ratingSortingURL}> ${_("Rating")}</a>${ratingImg}</td>
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${getSortingURL('rating')}"> ${_("Rating")}</a>
+                ${includeOrderImg("rating")}
+           </td>
         % endif
         % if "AccTrack" in displayColumns:
             <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Acc. Track")}</td>
@@ -179,16 +218,22 @@
             <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Acc. Type")}</td>
         % endif
         % if "SubmissionDate" in displayColumns:
-            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${dateSortingURL}> ${_("Submission date")}</a>${dateImg}</td>
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${getSortingURL('date')}"> ${_("Submission date")}</a>
+                ${includeOrderImg("date")}
+           </td>
         % endif
         % if "ModificationDate" in displayColumns:
-            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${modifDateSortingURL}> ${_("Modification date")}</a>${modifDateImg}</td>
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href="${getSortingURL('modifDate')}"> ${_("Modification date")}</a>
+                ${includeOrderImg("modifDate")}
+           </td>
         % endif
         </tr>
     % endif
     <tr><td>
         <tbody id="abstractsItems">
-            ${ abstracts }
+            % for abstract in abstracts:
+                  <%include file="Abstract.tpl" args="abstract=abstract,display=displayColumns"/>
+            % endfor
         </tbody>
     </td></tr>
 </table>

@@ -3764,8 +3764,14 @@ class WAbstracts( wcomponents.WTemplated ):
         self._display = display
         self._filterUsed = filterUsed
 
-    def _getURL( self ):
+    def _getURL( self, sortingField, column ):
         url = urlHandlers.UHConfAbstractManagment.getURL(self._conf)
+        url.addParam("sortBy", column)
+        if sortingField and sortingField.getId() == column:
+            if self._order == "down":
+                url.addParam("order","up")
+            elif self._order == "up":
+                url.addParam("order","down")
         return url
 
 
@@ -3884,10 +3890,7 @@ class WAbstracts( wcomponents.WTemplated ):
             Dictionary with the translation from "ids" to "name to display" for each of the options you can choose for the display.
             This method complements the method "_setDispOpts" in which we get a dictonary with "ids".
         """
-        try:
-            if self._columns:
-                pass
-        except AttributeError:
+        if not hasattr(self, "_columns"):
             self._columns = {"ID":"ID", "PrimaryAuthor":"Primary Author", "Tracks": "Tracks", "Type":"Type", "Status":"Status", \
                       "Rating":"Rating", "AccTrack":"Acc. Track", "AccType":"Acc. Type", "SubmissionDate":"Submission Date", "ModificationDate":"Modification Date"}
         return self._columns
@@ -3902,42 +3905,20 @@ class WAbstracts( wcomponents.WTemplated ):
             display = self.COLUMNS
         return display
 
-    def _getDispHTML(self):
-        """
-        Filtering criteria: table with all the options for the columns we need to display.
-        """
-        res = ["""<table width="100%%" cellpadding="0" cellspacing="0" valign="top">"""]
-        columns = self._getColumnTitlesDict()
-        display = self._getDisplay()
+    def _getDisplayOptions(self):
+        return self._getDisplay () + ["Title"]
 
-        for column in self.COLUMNS:
-            checked = ""
-            if column in display:
-                checked = " checked"
-            res.append("""<tr><td align="left" valign="top"><input type="checkbox" name="disp" value="%s"%s></td><td width="100%%" align="left" valign="top">%s</td></tr>"""%(column,checked,columns[column]))
-        res.append("""</table>""")
-        return "".join(res)
+    def _getAccType(self, abstract):
+        status = abstract.getCurrentStatus()
+        if isinstance(status,(review.AbstractStatusAccepted, review.AbstractStatusProposedToAccept)) and status.getType() is not None:
+            return self.htmlText(status.getType().getName())
+        return ""
 
-    def _getDisplayOptionsHTML(self):
-        html = []
-        if self._display == []:
-            html.append("""<input type="hidden" name="disp" value="ID">""")
-            html.append("""<input type="hidden" name="disp" value="Title">""")
-            html.append("""<input type="hidden" name="disp" value="PrimaryAuthor">""")
-            html.append("""<input type="hidden" name="disp" value="Tracks">""")
-            html.append("""<input type="hidden" name="disp" value="Type">""")
-            html.append("""<input type="hidden" name="disp" value="Status">""")
-            html.append("""<input type="hidden" name="disp" value="Rating">""")
-            html.append("""<input type="hidden" name="disp" value="AccTrack">""")
-            html.append("""<input type="hidden" name="disp" value="AccType">""")
-            html.append("""<input type="hidden" name="disp" value="SubmissionDate">""")
-            html.append("""<input type="hidden" name="disp" value="ModificationDate">""")
-        else:
-            for d in self._display:
-                html.append("""<input type="hidden" name="disp" value="%s">"""%(d))
-            html.append("""<input type="hidden" name="disp" value="Title">""")
-        html.append("""<input type="hidden" name="sortBy" value="%s">"""%(self._sortingCrit.getField().getId()))
-        return "".join(html)
+    def _getAccTrack(self, abstract):
+        status = abstract.getCurrentStatus()
+        if isinstance(status,(review.AbstractStatusAccepted, review.AbstractStatusProposedToAccept)) and status.getTrack() is not None:
+            return self.htmlText(status.getTrack().getCode())
+        return ""
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
@@ -3951,179 +3932,19 @@ class WAbstracts( wcomponents.WTemplated ):
         if self._sortingCrit is not None:
             sortingField=self._sortingCrit.getField()
 
-        vars["sortingOptions"]="""<input type="hidden" name="sortBy" value="%s">
-                          <input type="hidden" name="order" value="%s">"""%(sortingField.getId(), self._order)
+        vars["sortingField"] = sortingField.getId()
+        vars["order"] = self._order
+        vars["downArrow"] = Config.getInstance().getSystemIconURL("downArrow")
+        vars["upArrow"] = Config.getInstance().getSystemIconURL("upArrow")
+        vars["getSortingURL"] = lambda column: self._getURL(sortingField, column)
+        vars["getAccType"] = lambda abstract: self._getAccType(abstract)
+        vars["getAccTrack"] = lambda abstract: self._getAccTrack(abstract)
 
-        url = self._getURL()
-        url.addParam("sortBy", "type")
-        vars["typeImg"] = ""
-        if sortingField and sortingField.getId() == "type":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="type">"""
-            if self._order == "down":
-                vars["typeImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["typeImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["typeSortingURL"] = quoteattr( str( url ) )
-
-        url = self._getURL()
-        url.addParam("sortBy", "status")
-        vars["statusImg"] = ""
-        if sortingField and sortingField.getId() == "status":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="status">"""
-            if self._order == "down":
-                vars["statusImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["statusImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["statusSortingURL"] = quoteattr( str( url ) )
-
-        # sort by rating
-        url = self._getURL()
-        url.addParam("sortBy", "rating")
-        vars["ratingImg"] = ""
-        if sortingField and sortingField.getId() == "rating":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="rating">"""
-            if self._order == "down":
-                vars["ratingImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["ratingImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["ratingSortingURL"] = quoteattr( str( url ) )
-
-        # sort by track
-        url = self._getURL()
-        url.addParam("sortBy", "track")
-        vars["trackImg"] = ""
-        if sortingField and sortingField.getId() == "track":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="track">"""
-            if self._order == "down":
-                vars["trackImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["trackImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["trackSortingURL"] = quoteattr(str(url))
-
-        url=self._getURL()
-        url.addParam("sortBy","number")
-        vars["numberImg"]=""
-        if sortingField and sortingField.getId() == "number":
-                vars["currentSorting"] = """<input type="hidden" name="sortBy" value="number">"""
-                if self._order == "down":
-                    vars["numberImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                    url.addParam("order","up")
-                elif self._order == "up":
-                    vars["numberImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                    url.addParam("order","down")
-        vars["numberSortingURL"]=quoteattr(str(url))
-
-        url = self._getURL()
-        url.addParam("sortBy", "date")
-        vars["dateImg"] = ""
-        if sortingField and sortingField.getId() == "date":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="date">"""
-            if self._order == "down":
-                vars["dateImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["dateImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["dateSortingURL"] = quoteattr( str( url ) )
-
-        url = self._getURL()
-        url.addParam("sortBy", "modifDate")
-        vars["modifDateImg"] = ""
-        if sortingField and sortingField.getId() == "modifDate":
-            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="modifDate">"""
-            if self._order == "down":
-                vars["modifDateImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
-            elif self._order == "up":
-                vars["modifDateImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        vars["modifDateSortingURL"] = quoteattr( str( url ) )
-
-        l = []
         f = filters.SimpleFilter( self._filterCrit, self._sortingCrit )
         abstractList=f.apply(self._conf.getAbstractMgr().getAbstractsMatchingAuth(self._authSearch))
-        for abstract in abstractList:
-            s=abstract.getCurrentStatus()
-            comments = ""
-            if abstract.getComments():
-                comments = i18nformat(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
-            accTrack,accType="&nbsp;","&nbsp;"
-            urlGen=urlHandlers.UHCFAAbstractManagment.getURL
-
-            # check if the abstract has a review with questions
-            if abstract.getRating() == None:
-                rating = "-"
-                detailsImg = ""
-            else:
-                # Get the list of questions and the answers values
-                questionNames = abstract.getQuestionsAverage().keys()
-                answers = abstract.getQuestionsAverage().values()
-                rating = "%.2f" % abstract.getRating()
-                imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")
-                detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, ["%.2f" % i for i in answers])
-
-
-            m = ["""<td valign="top" align="right" width="3%%"><input type="checkbox" name="abstracts" value="%s"></td>"""%(abstract.getId())]
-            if "ID" in self._getDisplay():
-                m.append("""<td class="CRLabstractLeftDataCell" nowrap>%s%s</td>"""%(abstract.getId(), comments))
-            m.append("""<td class="CRLabstractDataCell">
-                        <a href=%s>%s</a></td>"""%(quoteattr(str(urlGen(abstract))), self.htmlText(abstract.getTitle())))
-            if "PrimaryAuthor" in self._getDisplay():
-                authList = [ auth.getFullName() for auth in abstract.getPrimaryAuthorList() if auth.getFullName()]
-                PAuthors = "<br>".join(authList)
-                m.append("""<td class="CRLabstractDataCell">%s</td>"""%PAuthors)
-            if "Tracks" in self._getDisplay():
-                tracks = [ self.htmlText(track.getCode() or track.getId()) for track in abstract.getTrackListSorted()]
-                m.append("""<td class="CRLabstractDataCell">%s</td>"""%("<br>".join(tracks) or "&nbsp;"))
-            if "Type" in self._getDisplay():
-                contribType = abstract.getContribType()
-                contribTypeName = _("None")
-                if contribType:
-                    contribTypeName = contribType.getName()
-                m.append("""<td class="CRLabstractDataCell">%s</td>"""%self.htmlText(contribTypeName))
-            if "Status" in self._getDisplay():
-                status=AbstractStatusList.getInstance().getCode(s.__class__ )
-                statusIconURL=AbstractStatusList.getInstance().getIconURL(s.__class__)
-                statusIconHTML = """<img src=%s border="0" alt="">"""%quoteattr(str(statusIconURL))
-                m.append("""<td class="CRLabstractDataCell" nowrap>%s %s</td>"""%(statusIconHTML,status))
-            if "Rating" in self._getDisplay():
-                m.append("""<td class="CRLabstractDataCell">%s&nbsp;%s</td>"""%(rating,detailsImg))
-            if "AccTrack" in self._getDisplay():
-                if isinstance(s,review.AbstractStatusAccepted):
-                    if s.getTrack() is not None:
-                        accTrack=self.htmlText(s.getTrack().getCode())
-                elif isinstance(s,review.AbstractStatusProposedToAccept):
-                    if s.getTrack() is not None:
-                        accTrack=self.htmlText(s.getTrack().getCode())
-                m.append("""<td class="CRLabstractDataCell">%s</td>"""%accTrack)
-            if "AccType" in self._getDisplay():
-                if isinstance(s,review.AbstractStatusAccepted):
-                    if s.getType() is not None:
-                        accType=self.htmlText(s.getType().getName())
-                elif isinstance(s,review.AbstractStatusProposedToAccept):
-                    if s.getType() is not None:
-                        accType=self.htmlText(s.getType().getName())
-                m.append("""<td class="CRLabstractDataCell">%s</td>"""%accType)
-            if "SubmissionDate" in self._getDisplay():
-                m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%format_date(abstract.getSubmissionDate(), format='long'))
-            if "ModificationDate" in self._getDisplay():
-                m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%format_date(abstract.getModificationDate(), format='long'))
-            if len(m) == 1:
-                m = ["<td></td>"]
-            l.append("""<tr id="abstracts%s" style="background-color: transparent;">
-                         %s
-                        </tr>"""%(abstract.getId(),"\n".join(m)))
         if self._order =="up":
-            l.reverse()
-        vars["abstracts"] = "".join( l )
+            abstractList.reverse()
+        vars["abstracts"] = abstractList
 
         vars["totalNumberAbstracts"] = str(len(self._conf.getAbstractMgr().getAbstractList()))
         vars["filteredNumberAbstracts"] = str(len(abstractList))
@@ -4136,9 +3957,9 @@ class WAbstracts( wcomponents.WTemplated ):
         vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
         vars["pdfIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["xmlIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("xml")))
-        vars["disp"] = self._getDispHTML()
-        vars["displayOptions"] = self._getDisplayOptionsHTML()
         vars["displayColumns"] = self._getDisplay()
+        vars["columnsDict"] = self._getColumnTitlesDict()
+        vars["columns"] = self.COLUMNS
 
         return vars
 
