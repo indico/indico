@@ -26,7 +26,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\
     datetimeToUnixTimeInt
-from MaKaC.webinterface import wcomponents, urlHandlers
+from MaKaC.webinterface import wcomponents
 from MaKaC.plugins import PluginsHolder
 from MaKaC.errors import MaKaCError, NoReportError
 from MaKaC.services.interface.rpc.common import ServiceError
@@ -35,16 +35,15 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools,\
     MailTools
+from MaKaC.plugins.Collaboration.urlHandlers import UHConfModifCollaboration
 from MaKaC.conference import Observer
 from MaKaC.webinterface.common.tools import hasTags
 from MaKaC.plugins.Collaboration import mail
 from MaKaC.common.mail import GenericMailer
 import os, inspect
-import MaKaC.plugins.Collaboration as Collaboration
 from indico.modules.scheduler.client import Client
 from indico.modules.scheduler.tasks import HTTPTask
 from indico.util import json
-from indico.util.i18n import gettext_lazy
 from indico.util.date_time import now_utc
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
@@ -731,7 +730,7 @@ class CSBookingManager(Persistent, Observer):
                 ContextManager.get('dateChangeNotificationProblems')['Collaboration'] = [
                     'Some Video Services bookings could not be moved:',
                     problems,
-                    'Go to [[' + str(urlHandlers.UHConfModifCollaboration.getURL(self.getOwner(), secure = ContextManager.get('currentRH').use_https())) + ' the Video Services section]] to modify them yourself.'
+                    'Go to [[' + str(UHConfModifCollaboration.getURL(self.getOwner(), secure = ContextManager.get('currentRH').use_https())) + ' the Video Services section]] to modify them yourself.'
                 ]
 
 
@@ -1979,7 +1978,7 @@ class CSBookingBase(Persistent, Fossilizable):
         return
 
     def getModificationURL(self):
-        return urlHandlers.UHConfModifCollaboration.getURL(self.getConference(),
+        return UHConfModifCollaboration.getURL(self.getConference(),
                                                            secure = ContextManager.get('currentRH').use_https(),
                                                            tab = CollaborationTools.getPluginTab(self.getPlugin()))
 

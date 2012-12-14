@@ -21,7 +21,7 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
 from MaKaC.i18n import _
 from MaKaC.fossils.user import IAvatarFossil
-from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
+from MaKaC.plugins.Collaboration.pages import WAdvancedTabBase
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools,\
     getVidyoOptionValue
 from datetime import timedelta

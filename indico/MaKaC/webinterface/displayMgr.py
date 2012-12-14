@@ -952,11 +952,7 @@ class SystemLinkData(Observable):
             "viewMyEvaluation": { \
                 "caption": "Modify my evaluation", \
                 "URL": 'UHConfEvaluationDisplayModif', \
-                "parent": "evaluation"},
-            "collaboration": { \
-                "caption": "Video Services", \
-                "URL": 'UHCollaborationDisplay', \
-                "parent": ""} \
+                "parent": "evaluation"}
             }
             self._notify('confDisplaySMFillDict', {'dict': self._linkData, 'conf': conf})
         #this ordered list allow us to keep the order we want for the menu
@@ -990,8 +986,7 @@ class SystemLinkData(Observable):
                                         "registrants",
                                         "evaluation",
                                         "newEvaluation",
-                                        "viewMyEvaluation",
-                                        "collaboration"]
+                                        "viewMyEvaluation"]
             self._notify('confDisplaySMFillOrderedKeys', self._linkDataOrderedKeys)
 
 

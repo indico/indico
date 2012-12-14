@@ -28,7 +28,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
 from MaKaC.common import info
 from MaKaC.i18n import _
-from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
+from MaKaC.plugins.Collaboration.pages import WAdvancedTabBase
 from datetime import timedelta
 
 class WNewBookingForm(WCSPageTemplateBase):

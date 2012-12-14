@@ -21,7 +21,67 @@
 URL handlers for Collaboration plugins
 """
 
+import os
+
+from indico.web.rh import RHHtdocs
+
 from MaKaC.webinterface.urlHandlers import SecureURLHandler, URLHandler
+from MaKaC.plugins import Collaboration
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+
+class RHCollaborationHtdocs(RHHtdocs):
+    """
+    Static file handler for Collaboration plugin
+    """
+
+    _url = r"^/Collaboration/(?:(?P<plugin>[^\s/]+)/)?(?P<filepath>[^\s/]+)$"
+
+    @classmethod
+    def calculatePath(cls, plugin, filepath):
+        if plugin:
+            module = CollaborationTools.getModule(plugin)
+            if module:
+                local_path = module.__path__[0]
+            elif os.path.exists(os.path.join(Collaboration.__path__[0], 'htdocs', plugin)):
+                return super(RHCollaborationHtdocs, cls).calculatePath(filepath, local_path=os.path.join(Collaboration.__path__[0], 'htdocs', plugin))
+            else:
+                return None
+        else:
+            local_path = Collaboration.__path__[0]
+
+        return super(RHCollaborationHtdocs, cls).calculatePath(
+            filepath,
+            local_path=os.path.join(local_path, 'htdocs'))
+
+class UHCollaborationHtdocs(URLHandler):
+    """
+    URL handler for epayment status
+    """
+    _relativeURL = "Collaboration"
+
+class UHAdminCollaboration(URLHandler):
+    """
+    URL handler for Admin Collaboration
+    """
+    _relativeURL = "Collaboration/admin"
+
+class UHConfModifCollaboration(URLHandler):
+    """
+    URL handler for Admin Collaboration
+    """
+    _relativeURL = "Collaboration/bookingModif"
+
+class UHConfModifCollaborationManagers(URLHandler):
+    """
+    URL handler for Admin Collaboration
+    """
+    _relativeURL = "Collaboration/managers"
+
+class UHCollaborationDisplay(URLHandler):
+    """
+    URL handler for Admin Collaboration
+    """
+    _relativeURL = "Collaboration/display"
 
 class UHCollaborationElectronicAgreement(URLHandler):
     """

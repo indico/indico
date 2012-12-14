@@ -31,7 +31,6 @@ from MaKaC.conference import CategoryManager, ConferenceHolder
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
-from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient
 
 pluginActions = [
     ("deleteOldRooms", {"buttonText": "Delete old Vidyo rooms",

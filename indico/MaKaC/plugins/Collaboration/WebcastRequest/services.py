@@ -17,19 +17,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
+from MaKaC.plugins.Collaboration.services import CollaborationPluginServiceBase
 from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInformation
 from MaKaC.conference import Contribution
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 
 class WebcastAbleTalksService(CollaborationPluginServiceBase):
-    
+
     def _getAnswer(self):
         talkInfo = getCommonTalkInformation(self._conf)
         webcastAbleTalks = talkInfo[3]
         webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
-        
+
         return fossilize(webcastAbleTalks, IContributionWithSpeakersFossil,
                          tz = self._conf.getTimezone(),
                          units = '(hours)_minutes',

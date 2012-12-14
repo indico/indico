@@ -22,7 +22,7 @@ from indico.util.fossilize import fossilize
 
 # legacy MaKaC imports
 from MaKaC.services.implementation.base import ServiceError
-from MaKaC.services.implementation.collaboration import CollaborationBookingModifBase
+from MaKaC.plugins.Collaboration.services import CollaborationBookingModifBase
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 
 

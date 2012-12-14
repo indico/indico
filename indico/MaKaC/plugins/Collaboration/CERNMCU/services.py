@@ -17,8 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase,\
-    CollaborationPluginServiceBookingModifBase
+from MaKaC.plugins.Collaboration.services import CollaborationPluginServiceBase, CollaborationPluginServiceBookingModifBase
 from MaKaC.plugins.Collaboration.CERNMCU.common import CERNMCUException, CERNMCUError
 from MaKaC.i18n import _
 from MaKaC.common.fossilize import fossilize

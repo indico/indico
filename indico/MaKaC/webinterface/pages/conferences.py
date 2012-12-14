@@ -1466,8 +1466,9 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._generalSection.addItem( self._reviewingMenuItem)
 
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed(self._rh.getAW().getUser()):
+            from MaKaC.plugins.Collaboration.urlHandlers import UHConfModifCollaboration
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
-                urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = self._rh.use_https()))
+                UHConfModifCollaboration.getURL(self._conf, secure = self._rh.use_https()))
             self._generalSection.addItem( self._videoServicesMenuItem)
         else:
             self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"), None)
@@ -1519,7 +1520,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
 
         #we decide which side menu item appear and which don't
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReviewingStaff
-        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager, RCCollaborationAdmin, RCCollaborationPluginAdmin
+        from MaKaC.plugins.Collaboration.handlers import RCVideoServicesManager, RCCollaborationAdmin, RCCollaborationPluginAdmin
 
         canModify = self._conf.canModify(self._rh.getAW())
         isReviewingStaff = RCReviewingStaff.hasRights(self._rh)

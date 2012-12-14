@@ -24,13 +24,12 @@ from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree, OOSet
 from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.common.Configuration import Config
-from MaKaC.common.timezoneUtils import nowutc, date2utctimestamp, datetimeToUnixTime
+from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
 from pytz import timezone
 from MaKaC.common.logger import Logger
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.base import extension_point
 from zope.index.text import textindex
 import pytz
 import itertools
@@ -1295,13 +1294,8 @@ class IndexesHolder( ObjectHolder ):
                 Idx[str(id)] = PendingManagersIndex()
             elif id=="pendingCoordinatorsTasks":
                 Idx[str(id)] = PendingManagersTasksIndex()
-            elif id=="collaboration":
-                if PluginsHolder().hasPluginType("Collaboration", mustBeActive=False):
-                    from MaKaC.plugins.Collaboration.indexes import CollaborationIndex
-                    Idx[str(id)] = CollaborationIndex()
-                else:
-                    raise MaKaCError(_("Tried to retrieve collaboration index, but Collaboration plugins are not present"))
-
+            else:
+                extension_point("indexHolderProvider", Idx, id)
             return Idx[str(id)]
 
 

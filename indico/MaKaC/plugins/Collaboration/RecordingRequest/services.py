@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
+from MaKaC.plugins.Collaboration.services import CollaborationPluginServiceBase
 from MaKaC.plugins.Collaboration.RecordingRequest.common import getTalks
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil

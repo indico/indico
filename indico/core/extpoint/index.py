@@ -26,3 +26,9 @@ class ICatalogIndexProvider(IContributor):
         """
         Should provide a (name, class) tuple
         """
+
+class IIndexHolderProvider(IContributor):
+    def indexHolderProvider(self, obj, dictIdx, typeIdx):
+        """
+        Update the dictIdx with an IndexHolder
+        """

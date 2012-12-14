@@ -1273,18 +1273,6 @@ class UHConfGrantModificationToAllConveners( URLHandler ):
 class UHConfModifCoordinatorRights(URLHandler):
     _relativeURL = "confModifAC.py/modifySessionCoordRights"
 
-class UHAdminCollaboration(URLHandler):
-    _relativeURL = "adminCollaboration.py"
-
-class UHConfModifCollaboration(OptionallySecureURLHandler):
-    _relativeURL = "confModifCollaboration.py"
-
-class UHConfModifCollaborationManagers(URLHandler):
-    _relativeURL = "confModifCollaboration.py/managers"
-
-class UHCollaborationDisplay(URLHandler):
-    _relativeURL = "collaborationDisplay.py"
-
 class UHConfModifTools( URLHandler ):
     _relativeURL = "confModifTools.py"
 

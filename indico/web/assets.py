@@ -123,9 +123,6 @@ indico_timetable = Bundle(
                'Management.js'),
    filters='rjsmin', output='js/indico_timetable_%(version)s.min.js')
 
-indico_collaboration = Bundle('js/indico/Collaboration/Collaboration.js',
-                              filters='rjsmin', output='js/indico_collaboration_%(version)s.min.js')
-
 indico_legacy = Bundle(
     *namespace('js/indico/Legacy',
 
@@ -280,7 +277,6 @@ def register_all_js(env):
     env.register('indico_timetable', indico_timetable)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
-    env.register('indico_collaboration', indico_collaboration)
     env.register('indico_materialeditor', indico_materialeditor)
     env.register('indico_display', indico_display)
     env.register('indico_jquery', indico_jquery)

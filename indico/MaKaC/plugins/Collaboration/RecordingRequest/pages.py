@@ -29,7 +29,7 @@ from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IContributionRRFossil
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
 from MaKaC.plugins.Collaboration.RecordingRequest.common import getCommonTalkInformation
-from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
 
 
 class WNewBookingForm(WCSPageTemplateBase):

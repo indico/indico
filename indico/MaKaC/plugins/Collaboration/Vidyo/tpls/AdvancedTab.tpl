@@ -24,5 +24,5 @@
     <div class="collaborationAdvancedTabTitle">Other options</div>
 </div>
 <div style="margin-top:10px">
-<%include file="${TPLS}/ConfModifCollaborationDefaultAdvancedTab.tpl"/>
+<%include file="/Collaboration/ConfModifCollaborationDefaultAdvancedTab.tpl"/>
 </div>

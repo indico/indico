@@ -29,7 +29,7 @@ from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.fossilize import fossilize, IFossil
 from indico.util.fossilize.conversion import Conversion
 
-from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools

@@ -17,16 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import os
 import shutil
-from copy import copy
 import tempfile, types
 from persistent.list import PersistentList
 from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
-import MaKaC.webinterface.common.timezones as convertTime
 import MaKaC.common.timezoneUtils as timezoneUtils
 from BTrees.OOBTree import OOBTree
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
@@ -37,10 +34,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.sessions as sessions
-import MaKaC.user as user
 import MaKaC.conference as conference
-import MaKaC.schedule as schedule
-import MaKaC.domain as domain
 from MaKaC.webinterface.general import *
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected, RoomBookingDBMixin
 from MaKaC.webinterface.rh.base import RH   # Strange conflict was here: this line vs nothing
@@ -59,25 +53,23 @@ import MaKaC.webinterface.common.registrantNotificator as registrantNotificator
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
-from MaKaC.webinterface.common.slotDataWrapper import Slot
 from MaKaC.common.contribPacker import ZIPFileHandler,AbstractPacker, ContribPacker,ConferencePacker, ProceedingsPacker
 from MaKaC.common.dvdCreation import DVDCreation
-from MaKaC.conference import ContributionParticipation, Contribution, CustomRoom
+from MaKaC.conference import CustomRoom
 from MaKaC.common import pendingQueues
-import httplib
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.plugins.base import Observable
 from MaKaC.common.timezoneUtils import nowutc
-
+from MaKaC.plugins.Collaboration.urlHandlers import UHConfModifCollaboration
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.rb_tools import FormMode
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.modules.scheduler import tasks, Client
+from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
 
@@ -205,9 +197,9 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
     def _checkParams(self, params):
         RHConferenceModifKey._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
-        from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager
-        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
-        from MaKaC.webinterface.rh.collaboration import RCCollaborationPluginAdmin
+        from MaKaC.plugins.Collaboration.handlers import RCVideoServicesManager
+        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
+        from MaKaC.plugins.Collaboration.handlers import RCCollaborationPluginAdmin
         self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
@@ -234,7 +226,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
         elif self._isVideoServicesManagerOrAdmin:
-            url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = self.use_https())
+            url = UHConfModifCollaboration.getURL(self._conf, secure = self.use_https())
 
         else:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )

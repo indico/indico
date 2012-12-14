@@ -22,24 +22,21 @@
 
 import zope.interface
 
-from MaKaC.common.utils import *
+from MaKaC.common.utils import daysBetween
 from MaKaC.conference import Conference, Contribution
-from MaKaC.rb_location import IIndexableByManagerIds
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper
+from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay
 from MaKaC.common.logger import Logger
 from MaKaC.common.indexes import IndexesHolder
 
-
-from indico.util.event import uid_to_obj
 from indico.core.index import OOIndex, Index
 from indico.core.index.adapter import IIndexableByStartDateTime
-from indico.core.extpoint import Component, IListener
-from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, \
-     IMetadataChangeListener, INavigationContributor
+from indico.core.extpoint import Component
+from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, IMetadataChangeListener, INavigationContributor
+from indico.core.extpoint.plugins import IPluginSettingsContributor
 from indico.core.extpoint.location import ILocationActionListener
-from indico.core.extpoint.index import ICatalogIndexProvider
-from indico.core.index import Catalog
+from indico.core.extpoint.index import ICatalogIndexProvider, IIndexHolderProvider
 
 
 class CSBookingInstanceIndexCatalog(Index):
@@ -308,3 +305,32 @@ class EventCollaborationListener(Component):
             for plugin, managers in confToClone.getCSBookingManager().getManagers().iteritems():
                 for manager in managers:
                     conf.getCSBookingManager().addPluginManager(plugin, manager)
+
+# INavigationContributor
+
+    @classmethod
+    def confDisplaySMFillDict(cls, obj, params):
+        sideMenuItemsDict = params['dict']
+        conf = params['conf']
+
+        sideMenuItemsDict["collaboration"] =  {
+                "caption": "Video Services",
+                "URL": UHCollaborationDisplay,
+                "staticURL": "",
+                "parent": ""}
+    @classmethod
+    def confDisplaySMFillOrderedKeys(cls, obj, list):
+        list.append("collaboration")
+
+class PluginSettingsContributor(Component):
+    """
+    Plugs to the IPluginSettingsContributor extension point, providing a "plugin
+    settings" web interface
+    """
+
+    zope.interface.implements(IPluginSettingsContributor, IIndexHolderProvider)
+
+    def indexHolderProvider(self, obj, dictIdx, typeIdx):
+        from MaKaC.plugins.Collaboration.indexes import CollaborationIndex
+        if typeIdx == "collaboration":
+            dictIdx[typeIdx] = CollaborationIndex()

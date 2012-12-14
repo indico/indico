@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.collaboration import CollaborationPluginServiceBase
+from MaKaC.plugins.Collaboration.services import CollaborationPluginServiceBase
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink, createCDSRecord, submitMicalaMetadata
 from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunication

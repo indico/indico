@@ -234,7 +234,7 @@ class CollaborationTools(object):
         """
         csbm = conference.getCSBookingManager()
 
-        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
         isAdminUser = RCCollaborationAdmin.hasRights(user = user)
 
         isAdminOnlyPlugin = cls.isAdminOnlyPlugin(plugin)

@@ -21,14 +21,11 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
 from MaKaC.common.utils import formatDateTime
 from datetime import timedelta
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
-from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate, getMaxEndDate,\
-    getEVOOptionValueByName
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate, getMaxEndDate
+from MaKaC.plugins.Collaboration.EVO.common import getMinStartDate, getMaxEndDate, getEVOOptionValueByName
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
+from MaKaC.plugins.Collaboration.pages import WAdvancedTabBase
 
 class WNewBookingForm(WCSPageTemplateBase):
 

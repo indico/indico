@@ -56,7 +56,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
     def _checkProtection( self ):
-        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
         if not RCCollaborationAdmin.hasRights(self, None) and \
             not RCCollaborationPluginAdmin.hasRights(self, plugins = "any"):
             base.RHDisplayBaseProtected._checkProtection( self )
