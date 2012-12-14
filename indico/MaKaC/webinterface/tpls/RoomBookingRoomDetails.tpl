@@ -182,7 +182,7 @@
                                         <tr>
                                             <td align="right" valign="top"><small>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                                % if not room.isReservable or attrs.get('Booking Simba List'):
+                                                % if not room.isReservable:
                                                     <span class="privateRoom"> ${ _("This room is not publicly bookable")}</span>
                                                 % elif room.isReservable and room.resvsNeedConfirmation:
                                                     <span class="moderatedRoom"> ${ _("Pre-bookings for this room require confirmation")}</span>
@@ -190,7 +190,7 @@
                                                     <span class="publicRoom"> ${ _("Bookings for this room are automatically accepted")}</span>
                                                 % endif
                                                 % if attrs.get('Booking Simba List') :
-                                                    <br><span class="privateRoom">Bookings for this room are restricted to members of the ${ attrs.get('Booking Simba List') } listbox</span>
+                                                    <br><span class="privateRoom">${_("Bookings for this room are restricted to members of the <strong>{0}</strong> listbox").format(attrs.get('Booking Simba List'))}</span>
                                                 % endif
                                             </td>
                                         </tr>

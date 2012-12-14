@@ -495,6 +495,9 @@ class RoomBase( object ):
         """
         return True
 
+    def hasBookingACL(self):
+        return (self.customAtts.get('Booking Simba List') or "").strip() != ""
+
     def canView( self, accessWrapper ):
         """
         FINAL (not intented to be overriden)

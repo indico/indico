@@ -206,6 +206,9 @@ class Room( Persistent, RoomBase, Fossilizable ):
 #        responsibleID = kwargs.get( 'responsibleID' )
         pendingBlockings = kwargs.get( 'pendingBlockings' )
 
+        # onlyPublic - there are no restrictions to booking (no ACL)
+        onlyPublic = kwargs.get('onlyPublic')
+
         ret_lst = []
         counter = 0
         if roomID != None:
@@ -221,6 +224,8 @@ class Room( Persistent, RoomBase, Fossilizable ):
             # Apply all conditions =========
             if location != None:
                 if room.locationName != location:
+                    continue
+            if onlyPublic and hasattr(room, "customAtts") and room.hasBookingACL():
                     continue
             if roomEx != None:
                 if not qbeMatch( roomEx, room, Room.__attrSpecialEqual, minCapacity = minCapacity ):
@@ -239,8 +244,6 @@ class Room( Persistent, RoomBase, Fossilizable ):
                 if blockState == 'active':
                     continue
                 elif blockState == 'pending' and pendingBlockings:
-                    continue
-                if roomEx.isReservable and hasattr(room, "customAtts") and room.customAtts.get('Booking Simba List'):
                     continue
             if ownedBy != None:
                 if not room.isOwnedBy( ownedBy ):
@@ -470,7 +473,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
         infos = []
         if self.capacity:
             infos.append("%s %s" % (self.capacity , _("people")))
-        if self.isReservable and not self.customAtts.get('Booking Simba List'):
+        if self.isReservable and not self.hasBookingACL():
             infos.append(_("public"))
         else:
             infos.append(_("private"))

@@ -321,7 +321,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.longitude = session.getVar( "longitude" )
 
         candRoom.isActive = bool( session.getVar( "isActive" ) )
-        candRoom.isReservable = bool( session.getVar( "isReservable") )
+        candRoom.isReservable = bool(session.getVar("isReservable"))
         candRoom.resvsNeedConfirmation = bool( session.getVar( "resvsNeedConfirmation" ) )
         candRoom.resvStartNotification = session.getVar("resvStartNotification")
         candRoom.resvStartNotificationBefore = session.getVar("resvStartNotificationBefore")
@@ -712,7 +712,7 @@ class RHRoomBookingSearch4Rooms( RHRoomBookingBase ):
             self._forNewBooking = params.get( 'forNewBooking' ) == 'True'
 
     def _businessLogic( self ):
-        self._rooms = CrossLocationQueries.getRooms( allFast = True )
+        self._rooms = CrossLocationQueries.getRooms(allFast = True)
         self._rooms.sort()
         self._equipment = CrossLocationQueries.getPossibleEquipment()
 
@@ -882,7 +882,6 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
         r.capacity = self._capacity
         r.isActive = self._isActive
         #r.responsibleId = self._responsibleId
-        r.isReservable = self._isReservable
         if self._isAutoConfirmed:
             r.resvsNeedConfirmation = False
         for eq in self._equipment:
@@ -891,10 +890,21 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
         if self._onlyMy:
             rooms = self._ownedBy.getRooms()
         elif self._availability == "Don't care":
-            rooms = CrossLocationQueries.getRooms( location = self._roomLocation, freeText = self._freeSearch, ownedBy = self._ownedBy, roomExample = r, pendingBlockings = self._includePendingBlockings )
+            rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
+                                                  freeText=self._freeSearch,
+                                                  ownedBy=self._ownedBy,
+                                                  roomExample=r,
+                                                  pendingBlockings=self._includePendingBlockings,
+                                                  onlyPublic=self._isReservable)
             # Special care for capacity (20% => greater than)
-            if len ( rooms ) == 0:
-                rooms = CrossLocationQueries.getRooms( location = self._roomLocation, freeText = self._freeSearch, ownedBy = self._ownedBy, roomExample = r, minCapacity = True, pendingBlockings = self._includePendingBlockings )
+            if len (rooms) == 0:
+                rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
+                                                      freeText=self._freeSearch,
+                                                      ownedBy=self._ownedBy,
+                                                      roomExample=r,
+                                                      minCapacity=True,
+                                                      pendingBlockings=self._includePendingBlockings,
+                                                      onlyPublic=self._isReservable)
         else:
             # Period specification
             p = ReservationBase()

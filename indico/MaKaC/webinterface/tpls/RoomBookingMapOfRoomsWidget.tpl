@@ -137,6 +137,10 @@ function floorFilter(mapView, room) {
     return roomFloor == inputFloor;
 }
 
+function isPublicFilter(mapView, room) {
+    return !room.hasBookingACL && room.isReservable;
+}
+
 function buildingFilterActiveIf(mapView) {
     // the building number filter is active only if the 'around the building' filter is not checked
     return !mapView.filterInput(1);
@@ -171,7 +175,7 @@ var filters = [
     {label: "${ _("Video conference") }", filterType: "room", inputType: "boolean", defaultValue: false, property: "needsAVCSetup", optional: true, defaultValue: false},
     {label: "${ _("Webcast/Recording") }", filterType: "room", inputType: "boolean", defaultValue: false, property: "hasWebcastRecording", optional: true, defaultValue: false},
 % endif
-    {label: "${ _("Only public rooms") }", filterType: "room", inputType: "boolean", property: "isReservable", optional: true, defaultValue:false},
+    {label: "${ _("Only public rooms") }", filterType: "room", inputType: "boolean", filterFunction: isPublicFilter, optional: true, defaultValue:false},
     {label: "${ _("Auto confirm") }", filterType: "room", inputType: "boolean", property: "isAutoConfirm", optional: true, defaultValue:false},
     {label: "${ _("Only mine") }", filterType: "room", inputType: "boolean", property: "responsibleId", optional: true, defaultValue:false, checkedValue: ${ user.id }},
     {label: "${ _("Is active") }", filterType: "room", inputType: "boolean", property: "isActive", optional: true, defaultValue:true}

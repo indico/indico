@@ -65,7 +65,11 @@ class IRoomMapFossil(IRoomFossil):
 
     def isReservable(self):
         """ Is the room public? """
-    isReservable.produce = lambda s: bool(s.isReservable and not s.customAtts.get('Booking Simba List'))
+
+    def hasBookingACL(self):
+        """
+        Is there a list of users who can book it?
+        """
 
     def getIsAutoConfirm(self):
         """ Has the room auto-confirmation of schedule? """

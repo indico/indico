@@ -148,7 +148,7 @@ def quoteattr(s):
 
 
 def roomClass(room):
-    if not room.isReservable or room.customAtts.get('Booking Simba List'):
+    if not room.isReservable or room.hasBookingACL():
         roomCls = "privateRoom"
     elif room.isReservable and room.resvsNeedConfirmation:
         roomCls = "moderatedRoom"
