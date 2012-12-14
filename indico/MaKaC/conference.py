@@ -1330,7 +1330,9 @@ class Category(CommonObjectBase):
     def canIPAccess( self, ip ):
         if not self.__ac.canIPAccess( ip ):
             return False
-        if self.getOwner():
+
+        # if category is inheriting, check protection above
+        if self.getAccessProtectionLevel() == 0 and self.getOwner():
             return self.getOwner().canIPAccess(ip)
         return True
 
@@ -3709,9 +3711,13 @@ class Conference(CommonObjectBase, Locatable):
     def canIPAccess( self, ip ):
         if not self.__ac.canIPAccess( ip ):
             return False
-        for owner in self.getOwnerList():
-            if not owner.canIPAccess(ip):
-                return False
+
+        # if event is inheriting, check IP protection above
+        if self.getAccessProtectionLevel() == 0:
+            for owner in self.getOwnerList():
+                if not owner.canIPAccess(ip):
+                    return False
+
         return True
 
     def requireDomain( self, dom ):
