@@ -36,7 +36,7 @@
                     <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                     <span style="padding: 0px 6px 0px 6px">|</span>
                 % endif
-                <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
+                <a id="index_filter" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
                   % if filterUsed:
                     ${ _("Show filters")}
                   % else:
@@ -44,7 +44,7 @@
                   % endif
                 </a>
                 <span style="padding: 0px 6px 0px 6px">|</span>
-                <a id="index_display" onclick="showDisplay()" class="CAIndexUnselected" font-size="16">
+                <a id="index_display" class="CAIndexUnselected" font-size="16">
                     ${ _("Columns to display")}
                 </a>
             </div>
@@ -113,7 +113,7 @@
     </tr>
     <tr>
         <td colspan="12" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
-        <form action=${abstractSelectionAction} method="post" name="abstractsForm" id="abstractsForm" onSubmit="return atLeastOneSelected()">
+        <form action=${abstractSelectionAction} method="post" name="abstractsForm" id="abstractsForm">
             <table>
                 <tr>
                   <td colspan="10">
@@ -336,47 +336,50 @@
         $('tr[id^=abstracts]').css('background-color',"transparent");
     }
 
-    function showFilters() {
-        if ($E("displayMenu").dom.style.display == "") { // Check if the other menu (columns) is shown and hide if needed
-            $E("index_display").set('${ _("Select columns to display")}');
-            $E('index_display').dom.className = "CRLIndexUnselected";
-            $E("displayMenu").dom.style.display = "none";
-        }
-        if ($E("filterMenu").dom.style.display == "") { // the menu is shown, so hide it
-% if filterUsed:
-            $E("index_filter").set('${ _("Show filters")}');
-% else:
-            $E("index_filter").set('${ _("Apply filters")}');
-% endif
-            $E('index_filter').dom.className = "CRLIndexUnselected";
-            $E("filterMenu").dom.style.display = "none";
-        }else { // the menu is hiden so, show it
-            $E("index_filter").set('${ _("Hide filters")}');
-            $E('index_filter').dom.className = "CRLIndexSelected";
-            $E("filterMenu").dom.style.display = "";
-        }
-    }
 
-    function showDisplay() {
-        if ($E("filterMenu").dom.style.display == "") { // Check if the other menu (filters) is shown and hide if needed
-            % if filterUsed:
-            $E("index_filter").set('${ _("Show filters")}')
-            % else:
-            $E("index_filter").set('${ _("Apply filters")}');
-            % endif
-            $E('index_filter').dom.className = "CRLIndexUnselected";
-            $E("filterMenu").dom.style.display = "none";
+    $('#index_filter').click(
+      function() {
+        if ($("#displayMenu").is(":visible")) {
+            $("#index_display").html($T("Select columns to display"));
+            $('#index_display').addClass("CRLIndexUnselected").removeClass("CRLIndexSelected");
+            $("#displayMenu").hide();
         }
-        if ($E("displayMenu").dom.style.display == "") { // the menu is shown, so hide it
-            $E("index_display").set('${ _("Select columns to display")}');
-            $E('index_display').dom.className = "CRLIndexUnselected";
-            $E("displayMenu").dom.style.display = "none";
+        if ($("#filterMenu").is(":visible")) {
+% if filterUsed:
+            $("#index_filter").html($T("Show filters"));
+% else:
+            $("#index_filter").html($T("Apply filters"));
+% endif
+            $('#index_filter').addClass("CRLIndexUnselected").removeClass("CRLIndexSelected");
+            $("#filterMenu").hide();
         }else { // the menu is hiden so, show it
-            $E("index_display").set('${ _("Close selection")}');
-            $E('index_display').dom.className = "CRLIndexSelected";
-            $E("displayMenu").dom.style.display = "";
+            $("#index_filter").html($T("Hide filters"));
+            $('#index_filter').removeClass("CRLIndexUnselected").addClass("CRLIndexSelected");
+            $("#filterMenu").show();
         }
-    }
+      });
+
+    $('#index_display').click(
+      function(){
+        if ($("#filterMenu").is(":visible")) {
+            % if filterUsed:
+            $("#index_filter").html($T("Show filters"));
+            % else:
+            $("#index_filter").html($T("Apply filters"));
+            % endif
+            $('#index_filter').addClass("CRLIndexUnselected").removeClass("CRLIndexSelected");
+            $("#filterMenu").hide();
+        }
+        if ($("#displayMenu").is(":visible")) {
+            $("#index_display").html($T("Select columns to display"));
+            $('#index_display').addClass("CRLIndexUnselected").removeClass("CRLIndexSelected");
+            $("#displayMenu").hide();
+        } else { // the menu is hiden so, show it
+            $("#index_display").html($T("Close selection"));
+            $('#index_display').removeClass("CRLIndexUnselected").addClass("CRLIndexSelected");
+            $("#displayMenu").show();
+        }
+    });
 
 function showQuestionDetails(questions, answers) {
     // Create the table and the headers
@@ -409,8 +412,7 @@ function showQuestionDetails(questions, answers) {
     popup.open();
 }
 
-IndicoUI.executeOnLoad(function(){
-
+$(function(){
     actionAbstractsRows();
     $('#button-menu').dropdown();
 
@@ -418,57 +420,49 @@ IndicoUI.executeOnLoad(function(){
         IndicoUI.Effect.followScroll();
     });
 
-
     // Insert hidden field to the form
     var InsertHiddenField = function (name, value, cleanup){
-        if (cleanup) {
-            $("#abstractsForm input[type=hidden]").remove(); // clean previous actions
-        }
-        $('#abstractsForm').append($("<input>").attr("type", "hidden").attr("name", name).val(value));
+      if (cleanup) {
+        $("#abstractsForm input[type=hidden]").remove(); // clean previous actions
+      }
+      $('#abstractsForm').append($("<input>").attr("type", "hidden").attr("name", name).val(value));
     }
 
-    $("#accept_abstracts").bind('menu_select',function(event) {
-         InsertHiddenField("acceptMultiple", $T("Accept"), false);
-         $('#abstractsForm').submit();
-     });
-
-    $("#reject_abstracts").bind('menu_select',function(event) {
-        InsertHiddenField("rejectMultiple", $T("Reject"), false);
-        $('#abstractsForm').submit();
-     });
-
-    $("#merge_abstracts").bind('menu_select',function(event) {
-        InsertHiddenField("merge", $T("Merge"), false);
-        $('#abstractsForm').submit();
-     });
-
-    $("#author_list").bind('menu_select',function(event) {
-        InsertHiddenField("auth", $T("Author List"), false);
-        $('#abstractsForm').submit();
-     });
-
-    $("#download_attachments").bind('menu_select',function(){
-        InsertHiddenField("PKGA", $T("Download attachments"), false);
-        $('#abstractsForm').submit();
+    _({
+      "#accept_abstracts": ["acceptMultiple", $T("Accept")],
+      "#reject_abstracts": ["rejectMultiple", $T("Reject")],
+      "#merge_abstracts": ["merge", $T("Merge")],
+      "#author_list": ["auth", $T("Author List")],
+      "#download_attachments": ["PKGA", $T("Download attachments")]
+    }).each(function(vals, key) {
+      $(key).bind('menu_select',function(){
+        if (atLeastOneSelected()) {
+            InsertHiddenField(vals[0], vals[1], false);
+            $('#abstractsForm').submit();
+        }
+      });
     });
 
     $("#add_new_abstract").bind('menu_select',function(){
-        newAbst = true;
-        InsertHiddenField("newAbstract", $T("Add"), false);
-        $('#abstractsForm').submit();
+      InsertHiddenField("newAbstract", $T("Add"), false);
+      $('#abstractsForm').submit();
     });
 
     $("#selectDisplay").click(function(){
-        $("#displayMenu input[type=checkbox]").attr("checked",true);
+      $("#displayMenu input[type=checkbox]").attr("checked",true);
     });
 
     $("#unselectDisplay").click(function(){
-        $("#displayMenu input[type=checkbox]").attr("checked",false);
+      $("#displayMenu input[type=checkbox]").attr("checked",false);
     });
 
-    $("#selectAll").click(function(){selectAll();});
-    $("#deselectAll").click(function(){deselectAll();});
+    $("#selectAll").click(function(){
+      selectAll();
+    });
 
+    $("#deselectAll").click(function(){
+      deselectAll();
+    });
 });
 
 </script>
