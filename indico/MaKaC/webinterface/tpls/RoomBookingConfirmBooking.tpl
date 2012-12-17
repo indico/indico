@@ -57,7 +57,7 @@
                                     <input type="hidden" name="roomID" id="roomID" value="${candResv.room.id}" />
                                     <input type="hidden" name="roomLocation" id="roomLocation" value="${candResv.room.locationName}" />
 
-                                    <input type="hidden" name="conf" value="${ conf }" />
+                                    <input type="hidden" name="conf" value="${conf.getId() if conf else ""}"/>
 
                                     <input type="hidden" name="forceAddition" value="True" />
 
