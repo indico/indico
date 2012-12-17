@@ -301,8 +301,6 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
 "cloneOptions": i18nformat("""
     <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" >
         _("Participants")</li>
-    <li><input type="checkbox" name="cloneAddedInfo" id="cloneAddedInfo" value="1" >
-                          _("send email to the participants of the created event")</li>
     <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" >
         _("Evaluation")</li>
            """) }

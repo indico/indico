@@ -658,7 +658,6 @@ class WPMConfClone(conferences.WPConfClone):
 "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                      <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" checked="checked" />_("Participants")</li>
-                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneAddedInfo" id="cloneAddedInfo" value="1" />_("send email to the participants of the created event")</li></ul></li>
                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>
                """) }
         #let the plugins add their own elements
