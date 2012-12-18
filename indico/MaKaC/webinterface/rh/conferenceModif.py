@@ -24,6 +24,7 @@ from copy import copy
 import tempfile, types
 from persistent.list import PersistentList
 from datetime import datetime,timedelta
+from dateutil.relativedelta import relativedelta
 from pytz import timezone
 import MaKaC.webinterface.common.timezones as convertTime
 import MaKaC.common.timezoneUtils as timezoneUtils
@@ -2015,11 +2016,11 @@ class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase, Observabl
                 if params["order"] == "last":
                     rd = self._getLastDay(date, int(params["day"]))
                     if rd < date:
-                        date = datetime(int(date.year),int(date.month)+1, 1, int(date.hour), int(date.minute))
+                        date = (date + relativedelta(months=1)).replace(day=1)
                 else:
                     rd = self._getFirstDay(date, int(params["day"])) + timedelta((int(params["order"])-1)*7)
                     if rd < date:
-                        date = datetime(int(date.year),int(date.month)+1, 1, int(date.hour), int(date.minute))
+                        date = (date + relativedelta(months=1)).replace(day=1)
             while date <= endDate:
                 if params["day"] == "OpenDay":
                     od=self._getOpenDay(date,params["order"])
@@ -2054,11 +2055,11 @@ class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase, Observabl
                 if params["order"] == "last":
                     rd = self._getLastDay(date, int(params["day"]))
                     if rd < date:
-                        date = datetime(int(date.year),int(date.month)+1, 1, int(date.hour), int(date.minute))
+                        date = (date + relativedelta(months=1)).replace(day=1)
                 else:
                     rd = self._getFirstDay(date, int(params["day"])) + timedelta((int(params["order"])-1)*7)
                     if rd < date:
-                        date = datetime(int(date.year),int(date.month)+1, 1, int(date.hour), int(date.minute))
+                        date = (date + relativedelta(months=1)).replace(day=1)
 
             i=0
             stop = int(params["numd"])
