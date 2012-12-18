@@ -9,15 +9,6 @@
         </tr>
 
         <tr>
-            <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> ${ _("Status")}</span></td>
-            <td bgcolor="white" width="65%" class="blacktext">
-                <form action=${ simpleTextURL } method="POST">
-                    <b>${ status }</b>
-                    <input type="submit"  id="toggleSimpleTextButton" class="btn" value="${ statusBtn }">
-                </form>
-            </td>
-        </tr>
-        <tr>
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat">${ _("Text announcement")}</span></td>
             <td bgcolor="white" width="65%" class="blacktext">
                 <form action=${ tickertapeURL } method="POST" style="margin:0;">
@@ -29,6 +20,15 @@
             </td>
         </tr>
 
+        <tr>
+            <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> ${ _("Status")}</span></td>
+            <td bgcolor="white" width="65%" class="blacktext">
+                <form action=${ simpleTextURL } method="POST">
+                    <b>${ status }</b>
+                    <input type="submit"  id="toggleSimpleTextButton" class="btn" value="${ statusBtn }">
+                </form>
+            </td>
+        </tr>
         <tr>
             <td colspan="2">
                 <a name="headerFeatures"></a>

@@ -1189,6 +1189,7 @@ class TickerTape(Persistent):
         return self._enabledSimpleText and self._active
 
     def setSimpleTextEnabled(self, v):
+        self._active = True
         self._enabledSimpleText=v
 
 class ImageWrapper(Persistent):
