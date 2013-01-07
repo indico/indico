@@ -371,7 +371,7 @@ class BaseEPayMod(Persistent):
         """ Saves the values coming in a dict (data) in the corresping class variables. (e.g. title, url, business, etc) """
         raise Exception("This method must be overloaded")
 
-    def getPluginSectionHTML(self, conf, user, urlStatus, urlModif, img, text):
+    def getPluginSectionHTML(self, conf, aw, urlStatus, urlModif, img, text):
         selbox = ""
         return """
                 <tr>

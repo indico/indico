@@ -43,14 +43,14 @@ class WPConfModifEPaymentBase( registrationForm.WPConfModifRegFormBase ):
 class WPConfModifEPayment( WPConfModifEPaymentBase ):
 
     def _getTabContent( self, params ):
-        wc = WConfModifEPayment(self._conf, self._getAW().getUser())
+        wc = WConfModifEPayment(self._conf, self._getAW())
         return wc.getHTML()
 
 class WConfModifEPayment( wcomponents.WTemplated ):
 
-    def __init__( self, conference, user ):
+    def __init__( self, conference, aw ):
         self._conf = conference
-        self._user = user
+        self._aw = aw
 
     def _getSectionsHTML(self):
         modPay=self._conf.getModPay()
@@ -71,7 +71,7 @@ class WConfModifEPayment( wcomponents.WTemplated ):
                 img = notEnabledBulb
                 text = disabledText
 
-            pluginHTML = gs.getPluginSectionHTML(self._conf, self._user, urlStatus, urlModif, img, text)
+            pluginHTML = gs.getPluginSectionHTML(self._conf, self._aw, urlStatus, urlModif, img, text)
             html.append(pluginHTML)
 
         html.insert(0, """<a href="" name="sections"></a><input type="hidden" name="oldpos"><table align="left">""")
