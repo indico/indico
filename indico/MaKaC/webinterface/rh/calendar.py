@@ -53,30 +53,31 @@ class RHCalendar(base.RHProtected):
             self._target = categNoAccess
             raise AccessError()
 
-    def _checkParams( self, params ):
-        categIdList = self._normaliseListParam( params.get("selCateg", []) )
+    def _checkParams(self, params):
+        categIdList = self._normaliseListParam(params.get("selCateg", []))
         self._categList = []
         cm = conference.CategoryManager()
         for id in categIdList:
             try:
-                self._categList.append( cm.getById(id) )
+                self._categList.append(cm.getById(id))
             except KeyError:
                 continue
         self._target = self._categList
         if not self._categList:
             cm = conference.CategoryManager()
-            self._categList.append( cm.getRoot() )
+            self._categList.append(cm.getRoot())
         tz = DisplayTZ(self._aw).getDisplayTZ()
         months = params.get("months", 3)
-        columns = params.get("columns",3)
-        month = int( params.get("month", (nowutc()-relativedelta(months=1)).astimezone(timezone(tz)).month) )
-        year = int( params.get("year", nowutc().astimezone(timezone(tz)).year) )
-        sdate = timezone(tz).localize(datetime( year, month, 1 ))
-        self._cal = wcalendar.MonthCalendar( self._aw, \
-                                                sdate, \
-                                                months, \
-                                                columns, \
-                                                self._categList )
+        columns = params.get("columns", 3)
+        startDate = nowutc() - relativedelta(months=1)
+        month = int(params.get("month", startDate.astimezone(timezone(tz)).month))
+        year = int(params.get("year", startDate.astimezone(timezone(tz)).year))
+        sdate = timezone(tz).localize(datetime(year, month, 1))
+        self._cal = wcalendar.MonthCalendar(self._aw,
+                                            sdate,
+                                            months,
+                                            columns,
+                                            self._categList)
         self._categ = self._categList[0]
 
     def _process( self ):

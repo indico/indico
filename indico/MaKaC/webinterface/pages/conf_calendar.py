@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime,date
+from datetime import datetime, date
 import calendar
 import time
 import random
@@ -253,26 +253,27 @@ class WCalendar(wcomponents.WTemplated):
         return vars
 
 
-class WPCalendar( WPCalendarBase ):
+class WPCalendar(WPCalendarBase):
 
-    def _getBody( self, params ):
-        wc = WCalendar( self._getAW(), self._cal )
+    def _getBody(self, params):
+        wc = WCalendar(self._getAW(), self._cal)
         cat = self._categ
-        catman=conference.CategoryManager()
-        catList=[]
+        catman = conference.CategoryManager()
+        catList = []
         for cat in self._cal.getCategoryList():
-            while cat.getId()!="0":
+            while cat.getId() != "0":
                 cat = cat.getOwner()
                 catList.append(cat.getId())
-        params = { "changeMonthsURL": urlHandlers.UHCalendar.getURL(), \
-                   "categDisplayURL": urlHandlers.UHCategoryDisplay.getURL(self._categ), \
-                   "selCategsURL": str(urlHandlers.UHCalendarSelectCategories.getURL()), \
-                   "categoryTitle": self._categ.getTitle() \
-                 }
-        params["selCategsURL"] += "?xs="+catman.getRoot().getId()
+        params = {"changeMonthsURL": urlHandlers.UHCalendar.getURL(),
+                  "categDisplayURL": urlHandlers.UHCategoryDisplay.getURL(self._categ),
+                  "selCategsURL": str(urlHandlers.UHCalendarSelectCategories.getURL()),
+                  "categoryTitle": self._categ.getTitle(),
+                  "currentYear": datetime.now().year,
+                  }
+        params["selCategsURL"] += "?xs=" + catman.getRoot().getId()
         for id in catList:
-            params["selCategsURL"] += "&xs="+id
-        return wc.getHTML( params )
+            params["selCategsURL"] += "&xs=" + id
+        return wc.getHTML(params)
 
     def _getNavigationDrawer(self):
         #link = [{"url": urlHandlers.UHCalendar.getURL([self._categ]), "title": _("Calendar overview")}]
