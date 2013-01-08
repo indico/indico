@@ -1459,7 +1459,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             urlHandlers.UHConfModifRegForm.getURL( self._conf ))
         self._generalSection.addItem( self._regFormMenuItem)
 
-        self._abstractMenuItem = wcomponents.SideMenuItem(_("Call for Abstracts"),
+        self._abstractMenuItem = wcomponents.SideMenuItem(_("Abstracts"),
             urlHandlers.UHConfModifCFA.getURL( self._conf ))
         self._generalSection.addItem( self._abstractMenuItem)
 

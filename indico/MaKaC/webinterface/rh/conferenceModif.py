@@ -1567,15 +1567,15 @@ class RHCFAPerformDataModification( RHConfModifCFABase ):
                                         int( params["sMonth"] ), \
                                         int( params["sDay"] ) )
             except ValueError,e:
-                raise FormValuesError("The start date you have entered is not correct: %s"%e, "Call for Abstracts")
+                raise FormValuesError("The start date you have entered is not correct: %s"%e, "Abstracts")
             try:
                 eDate = datetime( int( params["eYear"] ), \
                                         int( params["eMonth"] ), \
                                         int( params["eDay"] ) )
             except ValueError,e:
-                raise FormValuesError("The end date you have entered is not correct: %s"%e, "Call for Abstracts")
+                raise FormValuesError("The end date you have entered is not correct: %s"%e, "Abstracts")
             if eDate < sDate :
-                raise FormValuesError("End date can't be before start date!", "Call for Abstracts")
+                raise FormValuesError("End date can't be before start date!", "Abstracts")
             try:
                 mDate = None
                 if params["mYear"] or params["mMonth"] or params["mDay"]:
@@ -1583,9 +1583,9 @@ class RHCFAPerformDataModification( RHConfModifCFABase ):
                                   int( params["mMonth"] ), \
                                   int( params["mDay"] ) )
             except ValueError,e:
-                raise FormValuesError("The modification end date you have entered is not correct: %s"%e, "Call for Abstracts")
+                raise FormValuesError("The modification end date you have entered is not correct: %s"%e, "Abstracts")
             if mDate is not None and (mDate < sDate or mDate < eDate):
-                raise FormValuesError("End date must be after end date!", "Call for Abstracts")
+                raise FormValuesError("End date must be after end date!", "Abstracts")
 
             abMgr.setAnnouncement(params["announcement"])
             abMgr.setModificationDeadline( self._modifDL )
