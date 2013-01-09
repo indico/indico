@@ -25,6 +25,8 @@ import tempfile
 import string, sys, os
 from datetime import timedelta,datetime
 
+from indico.util.date_time import format_date
+
 from MaKaC.common.utils import utf8rep
 from MaKaC.errors import MaKaCError
 from MaKaC import conference
@@ -182,7 +184,7 @@ class ConferencePacker:
                 dirName = "%s" % di.strftime("%Y%m%d_%A")
                 for entry in entries:
                     if isinstance(entry, schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(), conference.Contribution):
-                        if di.strftime("%d%B%Y") in days:
+                        if format_date(di, format='dMMMMyyyy') in days:
                             contrib = entry.getOwner()
                             self._packContrib(contrib, dirName, "", materialTypes, days, mainResource, fromDate, fileHandler)
                             for subcontrib in contrib.getSubContributionList():
