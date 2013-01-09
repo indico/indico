@@ -3928,7 +3928,8 @@ class SessionsForm(BaseForm):
                 if type(sess) != list:
                     sess=[sess]
                 for ses in sess:
-                    sessions.append(self.getSessionById(ses))
+                    if self.hasSession(ses):
+                        sessions.append(self.getSessionById(ses))
         return [RegistrantSession(ses) for ses in sessions]
 
     def getSessionList(self, doSort=False):
