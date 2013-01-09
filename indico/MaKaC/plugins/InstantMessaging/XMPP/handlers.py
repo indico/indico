@@ -30,7 +30,7 @@ from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.plugins import Observable
 from MaKaC.plugins.util import PluginFieldsWrapper
-from MaKaC.plugins.helpers import DBHelpers, MailHelper
+from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.InstantMessaging.XMPP.helpers import DeleteLogLinkGenerator, LogLinkGenerator, generateCustomLinks, generateLogLink, XMPPLogsActivated
 from MaKaC.i18n import _
 
@@ -171,7 +171,6 @@ class CreateChatroom( XMPPChatroomService ):
         if self._room.getCreatedInLocalServer():
             self.roomExistsXMPP(self._botJID, self._botPass, self._room)
         try:
-            ContextManager.setdefault('mailHelper', MailHelper())
             self._notify('createChatroom', {'room': self._room,
                                             'conference': conference})
         except ServiceError, e:
@@ -191,7 +190,6 @@ class CreateChatroom( XMPPChatroomService ):
 
         tz = DisplayTZ(self._aw, conference).getDisplayTZ()
 
-        ContextManager.get('mailHelper').sendMails()
         fossilizedRoom = self._room.fossilize(tz=tz)
 
         # add links to join the room
@@ -242,7 +240,6 @@ class EditChatroom( XMPPChatroomService ):
                 self.roomExistsXMPP(self._botJID, self._botPass, self._room)
 
             #edit the chat room in indico
-            ContextManager.setdefault('mailHelper', MailHelper())
             self._notify('editChatroom', {'oldTitle': oldRoom.getTitle(),
                                           'newRoom': self._room,
                                           'userId': self._user.getId()})
@@ -281,7 +278,6 @@ class EditChatroom( XMPPChatroomService ):
         if modified:
             Logger.get('ext.im').info("The room %s has been modified by the user %s at %s hours" %(self._title, self._user.getName(), self._room.getModificationDate()))
 
-        ContextManager.get('mailHelper').sendMails()
         return self._room.fossilizeMultiConference(values['conference'])
 
 
@@ -299,7 +295,6 @@ class DeleteChatroom( XMPPChatroomService ):
         message = _("%s has requested to delete this room. Please address this person for further information" %self._user.getName())
         #delete room from Indico
         try:
-            ContextManager.setdefault('mailHelper', MailHelper())
             self._notify('deleteChatroom', {'room': self._room})
         except ServiceError, e:
             Logger.get('ext.im').exception(_('Problem deleting indexes in the database for chat room %s' % self._room.getTitle()))
@@ -317,7 +312,6 @@ class DeleteChatroom( XMPPChatroomService ):
             document = urllib2.urlopen(req)
             Logger.get('ext.im').info("The room %s has been deleted by the user %s at %s hours" %(self._title, self._user.getName(), nowutc()))
 
-        ContextManager.get('mailHelper').sendMails()
         return True
 
 
@@ -381,7 +375,6 @@ class AddConference2Room( ServiceBase, Observable ):
 
     def _getAnswer( self ):
         rooms=[]
-        ContextManager.setdefault('mailHelper', MailHelper())
         try:
             for roomID in self._rooms:
                 try:
@@ -400,8 +393,6 @@ class AddConference2Room( ServiceBase, Observable ):
         except NoReportError, e:
             Logger.get('ext.im').exception("Error adding chat rooms. User: %s. Chat room: %s" %(self._aw.getUser().getFullName(), roomID))
             raise ServiceError(message = _('There was an error trying to add the chat rooms. Please refresh your browser and try again'))
-
-        ContextManager.get('mailHelper').sendMails()
         return rooms
 
 

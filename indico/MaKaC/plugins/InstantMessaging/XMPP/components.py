@@ -21,7 +21,7 @@ from MaKaC.plugins.InstantMessaging.notificationComponents import IInstantMessag
 from MaKaC.plugins.base import Observable, PluginsHolder
 from MaKaC.plugins.util import PluginsWrapper, PluginFieldsWrapper
 from MaKaC.plugins.InstantMessaging.XMPP.helpers import GeneralLinkGenerator
-from MaKaC.plugins.helpers import DBHelpers, MailHelper
+from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.InstantMessaging.indexes import IndexByConf, IndexByCRName, IndexByID, IndexByUser
 from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.i18n import _
@@ -143,17 +143,14 @@ class ChatSMContributor(Component, Observable):
         conf = params['conf']
         user = params['user']
         options = params['options']
-        ContextManager.setdefault('mailHelper', MailHelper())
 
         if options.get("chatrooms", True):
             crList = DBHelpers().getChatroomList(confToClone)
             ownersList = [cr.getOwner() for cr in crList]
             if PluginsWrapper('InstantMessaging', 'XMPP').isActive():
-                 for cr in crList:
-                     if user is cr.getOwner():
-                         cls()._notify('addConference2Room', {'room':cr, 'conf':conf.getId()})
-
-        ContextManager.get('mailHelper').sendMails()
+                for cr in crList:
+                    if user is cr.getOwner():
+                        cls()._notify('addConference2Room', {'room':cr, 'conf':conf.getId(), 'clone': True})
 
 
 class ChatroomStorage(Component):
@@ -241,7 +238,7 @@ class ChatroomStorage(Component):
             don't know it, we have to check the parameters accordingly"""
         room = params['room']
         confId = params['conf']
-
+        room.setConference(ConferenceHolder().getById(confId))
         confIndex = IndexByConf()
         confIndex.index(confId, room)
 
@@ -274,10 +271,11 @@ class ChatroomMailer(Component):
 
     @classmethod
     def addConference2Room(cls, obj, params):
-        room = params['room']
-        conf = ConferenceHolder().getById(params['conf'])
-        #without the number added it would only send 1 mail, because for every new chat room it'd think that there has been a retry
-        ExternalOperationsManager.execute(cls, "add_"+str(cls.__class__)+str(room.getId()), cls.performOperation, 'create', conf, room, room, conf)
+        if not params.get("clone", False):
+            room = params['room']
+            conf = ConferenceHolder().getById(params['conf'])
+            #without the number added it would only send 1 mail, because for every new chat room it'd think that there has been a retry
+            ExternalOperationsManager.execute(cls, "add_"+str(cls.__class__)+str(room.getId()), cls.performOperation, 'create', conf, room, room, conf)
 
     @classmethod
     def performOperation(cls, operation, conf, room, *args):
@@ -292,7 +290,7 @@ class ChatroomMailer(Component):
         if not len(userList) is 0:
             try:
                 cn = ChatroomsNotification(room, userList)
-                ContextManager.get('mailHelper').newMail(GenericMailer.sendAndLog, getattr(cn, operation)(*args), \
+                GenericMailer.sendAndLog(getattr(cn, operation)(*args), \
                                          conf, \
                                          "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
                                          room.getOwner())

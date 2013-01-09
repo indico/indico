@@ -26,19 +26,6 @@ from MaKaC.i18n import _
 
 import string
 
-class MailHelper:
-    def __init__(self):
-        self.__mails = []
-
-    def newMail(self, function, *args):
-        self.__mails.append({'function': function, 'args': args})
-        return self.__mails
-
-    def sendMails(self):
-        for mail in self.__mails:
-            mail['function'](*mail['args'])
-        return True
-
 class DBHelpers:
 
     @classmethod
