@@ -1282,7 +1282,7 @@ class IndexesHolder( ObjectHolder ):
             elif id=="pendingCoordinatorsTasks":
                 Idx[str(id)] = PendingManagersTasksIndex()
             elif id=="collaboration":
-                if PluginsHolder().hasPluginType("Collaboration"):
+                if PluginsHolder().hasPluginType("Collaboration", mustBeActive=False):
                     from MaKaC.plugins.Collaboration.indexes import CollaborationIndex
                     Idx[str(id)] = CollaborationIndex()
                 else:
