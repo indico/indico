@@ -558,29 +558,20 @@ class DailyNonBookablePeriod(Persistent):
         return self._startTime
 
     def setStartTime(self, startTime):
-        if startTime is None:
-            self._startTime = None
-        else:
-            self._startTime = startTime
+        self._startTime = startTime
 
     def getEndTime(self):
         return self._endTime
 
     def setEndTime(self, endTime):
-        if endTime is None:
-            self._endTime = None
-        else:
-            self._endTime = endTime
+        self._endTime = endTime
 
     def doesPeriodOverlap(self, startTime, endTime):
         periodStart = datetime.datetime.strptime(self.getStartTime(), "%H:%M").time()
         periodEnd = datetime.datetime.strptime(self.getEndTime(), "%H:%M").time()
-        try:
-            return (startTime <= periodStart and endTime >= periodStart) or \
-                (startTime <= periodEnd and endTime >= periodEnd) or \
-                (startTime >= periodStart and endTime <= periodEnd)
-        except ValueError:
-            return None
+        return (startTime <= periodStart and endTime > periodStart) or \
+            (startTime < periodEnd and endTime >= periodEnd) or \
+            (startTime >= periodStart and endTime <= periodEnd)
 
 # ============================================================================
 # ================================== TEST ====================================

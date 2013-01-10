@@ -1442,7 +1442,7 @@ class ReservationBase( Fossilizable ):
         # 3. Lasts longer than one month AND
         # 4. Takes more than x hours monthly
 
-        if not self.room.isReservable or room.hasBookingACL():
+        if not self.room.isReservable or self.room.hasBookingACL():
             return False
         if self.repeatability == None:
             return False

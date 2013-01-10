@@ -403,7 +403,12 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
 
         for periodNumber in range(int(params.get("dailyNonBookablePeriodCounter"))):
             if params.get("startTimeDailyNonBookablePeriod" + str(periodNumber)):
-                candRoom.addDailyNonBookablePeriod(params.get("startTimeDailyNonBookablePeriod" + str(periodNumber)), params.get("endTimeDailyNonBookablePeriod" + str(periodNumber)))
+                try:
+                    cStartTime = datetime.strptime(params.get("startTimeDailyNonBookablePeriod" + str(periodNumber)), "%H:%M")
+                    cEndTime = datetime.strptime(params.get("endTimeDailyNonBookablePeriod" + str(periodNumber)), "%H:%M")
+                    candRoom.addDailyNonBookablePeriod(cStartTime.strftime("%H:%M"), cEndTime.strftime("%H:%M"))
+                except ValueError:
+                    continue
 
         eqList = []
         vcList = []
