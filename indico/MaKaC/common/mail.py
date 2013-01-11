@@ -18,6 +18,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import smtplib
+from email.utils import formatdate
+
 from MaKaC.common import Config
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
@@ -79,8 +81,8 @@ class GenericMailer:
             ct = "text/plain"
         subject=notification.getSubject()
         body=notification.getBody()
-        msg="""Content-Type: %s; charset=\"utf-8\"\r\nFrom: %s\r\nTo: %s\r\n%sSubject: %s\r\n\r\n%s"""%(ct, fromAddr,\
-                to,cc,subject,body)
+        msg="""Content-Type: %s; charset=\"utf-8\"\r\nFrom: %s\r\nTo: %s\r\n%sSubject: %s\r\nDate: %s\r\n\r\n%s"""%(ct, fromAddr,\
+                to,cc,subject,formatdate(localtime=True),body)
         toList = notification.getToList()
         ccList = notification.getCCList()
         if hasattr(notification, 'getBCCList'):
