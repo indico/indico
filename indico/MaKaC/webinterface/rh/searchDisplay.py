@@ -150,7 +150,7 @@ class RHSearchBase:
                     fResults.append(r)
                 record += 1
 
-            if record > numHits or numHits <= number or len(results) <= number:
+            if record > numHits or numHits <= number or len(results) <= number or (numHits <= numRequest and len(fResults) <= number):
                 shortResult = True
                 break
 
