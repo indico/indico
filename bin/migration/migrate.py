@@ -564,7 +564,7 @@ def timedLinkedEventListRemoval(dbi, withRBDB, prevVersion):
 @since('1.0')
 def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
     """
-    Change Vidyo Room Names
+    Changing Vidyo Room Names
     """
     ph = PluginsHolder()
     collaboration_pt = ph.getPluginType("Collaboration")
@@ -573,8 +573,8 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
     i = 0
     for booking in VidyoTools.getIndexByVidyoRoom().itervalues():
         if hasattr(booking, '_originalConferenceId'):
-            roomName = booking["roomName"] + '_indico_' + booking._originalConferenceId
-            booking["roomName"] = roomName.decode("utf-8")
+            roomName = booking.getBookingParamByName("roomName") + '_indico_' + booking._originalConferenceId
+            booking._bookingParams["roomName"] = roomName.decode("utf-8")
             del booking._originalConferenceId
         i += 1
         if i % 100 == 0:
@@ -583,7 +583,7 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
 @since('1.0')
 def reindexVidyoEventEndDateIndex(dbi, withRBDB, prevVersion):
     """
-    Reindexing of the VidyoEventEndDateIndex used for delete old rooms
+    Reindexing VidyoEventEndDateIndex
     """
     ph = PluginsHolder()
     collaboration_pt = ph.getPluginType("Collaboration")

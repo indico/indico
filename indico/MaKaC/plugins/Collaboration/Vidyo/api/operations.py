@@ -147,11 +147,9 @@ class VidyoOperations(object):
         createdRooms = answer.room
 
         for room in createdRooms:
-            loginToUse = 0
-            while loginToUse < len(possibleLogins):
-                if str(room.name) == roomName and str(room.ownerName) == possibleLogins[loginToUse]:
+            for login in possibleLogins:
+                if str(room.name) == roomName and str(room.ownerName) == login:
                     return room
-                loginToUse = loginToUse + 1
         else:
             return  VidyoError("notValidRoom", "attach")
 

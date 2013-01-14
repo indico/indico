@@ -155,8 +155,8 @@ class ComponentsManager(Persistent):
 
         for subscriber in subscribers:
 
-            f = getattr(subscriber,event)
             try:
+                f = getattr(subscriber,event)
                 results.append(f(obj, *params))
             except Exception, e:
                 Logger.get('ext.notification').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
