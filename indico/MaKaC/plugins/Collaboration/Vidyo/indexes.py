@@ -136,7 +136,7 @@ class EventEndDateIndex(Persistent):
         for conf in ConferenceHolder().getList():
             csbm = conf.getCSBookingManager()
             for booking in csbm.getBookingList():
-                if booking.getType() == "Vidyo":
+                if booking.getType() == "Vidyo" and booking.isCreated():
                     self.indexBooking(booking)
             i += 1
             if dbi and i % 100 == 0:
@@ -194,7 +194,7 @@ class BookingsByVidyoRoomIndex(SIndex):
         for conf in ConferenceHolder().getList():
             csbm = conf.getCSBookingManager()
             for booking in csbm.getBookingList():
-                if booking.getType() == "Vidyo":
+                if booking.getType() == "Vidyo"and booking.isCreated():
                     self.indexBooking(booking)
             i += 1
             if dbi and i % 100 == 0:
