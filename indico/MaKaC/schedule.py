@@ -1542,14 +1542,16 @@ class ScheduleToJson:
     @staticmethod
     def process(schedule, tz, aw, days = None, mgmtMode = False, useAttrCache = False, hideWeekends = False):
 
-        scheduleDict={}
+        scheduleDict = {}
 
         if not days and schedule.getOwner().isFullyPublic() and not mgmtMode:
             scheduleDict = ScheduleToJson._cache.get(schedule.getOwner().getUniqueId())
 
         if not scheduleDict:
             scheduleDict={}
-            if not days:
+            fullTT = False # This flag is used to indicate that we must save the general cache (not entries). When
+            if not days:   # asking only one day, we don't need to cache (it can generate issues)
+                fullTT = True
                 days = daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
 
             dates = [d.strftime("%Y%m%d") for d in days]
@@ -1567,8 +1569,8 @@ class ScheduleToJson:
                     if day in dates:
                         genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
                         scheduleDict[day][genId] = resultData
-            if not days and schedule.getConference().isFullyPublic() and not mgmtMode:
-                ScheduleToJson._cache.set(schedule.getConference().getUniqueId(), scheduleDict, timedelta(minutes=5))
+            if fullTT and schedule.getOwner().isFullyPublic() and not mgmtMode:
+                ScheduleToJson._cache.set(schedule.getOwner().getUniqueId(), scheduleDict, timedelta(minutes=5))
 
         if hideWeekends:
             for entry in scheduleDict.keys():
@@ -1593,6 +1595,9 @@ class ScheduleToJson:
     def cleanCache(obj, cleanConferenceCache = True):
         ScheduleToJson._cacheEntries.delete(obj.getUniqueId())
         if cleanConferenceCache:
-            ScheduleToJson._cache.delete(obj.getOwner().getConference().getUniqueId())
+            ScheduleToJson.cleanConferenceCache(obj.getOwner().getConference())
 
+    @staticmethod
+    def cleanConferenceCache(obj):
+        ScheduleToJson._cache.delete(obj.getUniqueId())
 

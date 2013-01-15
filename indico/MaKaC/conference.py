@@ -1476,10 +1476,11 @@ class Category(CommonObjectBase):
             self._statistics = {}
         return self._statistics
 
-    def notifyModification( self ):
+    def notifyModification(self, raiseEvent = True):
         """Method called to notify the current category has been modified.
         """
-        self._notify('infoChanged')
+        if raiseEvent:
+            self._notify('infoChanged')
         self.cleanCache()
         self._p_changed=1
 
@@ -2190,6 +2191,10 @@ class Conference(CommonObjectBase, Locatable):
             cache.cleanCache()
             cache = EventCache({"id":self.getId(), "type": "static"})
             cache.cleanCache()
+
+        if not ContextManager.get('clean%s'%self.getUniqueId(), False):
+            ScheduleToJson.cleanConferenceCache(self)
+            ContextManager.set('clean%s'%self.getUniqueId(), True)
 
     def cleanCategoryCache( self ):
         if len(self.getOwnerList()) > 0:
@@ -10233,11 +10238,12 @@ class SubContribution(CommonObjectBase, Locatable):
         sCont.notifyModification()
         return sCont
 
-    def notifyModification( self ):
+    def notifyModification(self, raiseEvent = True):
         parent = self.getParent()
         if parent:
             parent.setModificationDate()
-        self._notify('infoChanged')
+        if raiseEvent:
+            self._notify('infoChanged')
         self._p_changed = 1
 
     def getCategoriesPath(self):
@@ -10804,7 +10810,7 @@ class Material(CommonObjectBase):
     def notifyModification( self ):
         parent = self.getOwner()
         if parent:
-            parent.setModificationDate()
+            parent.notifyModification(raiseEvent = False)
         self._p_changed = 1
 
     def getLocator( self ):
