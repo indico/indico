@@ -5424,20 +5424,20 @@ class Session(CommonObjectBase, Locatable):
     def setFullyPublic( self ):
         if self.isProtected():
             self._fullyPublic = False
-            self._p_changed = 1
+            self.notifyModification()
             return
         for res in self.getAllMaterialList():
             if not res.isFullyPublic():
                 self._fullyPublic = False
-                self._p_changed = 1
+                self.notifyModification()
                 return
         for res in self.getContributionList():
             if not res.isFullyPublic():
                 self._fullyPublic = False
-                self._p_changed = 1
+                self.notifyModification()
                 return
         self._fullyPublic = True
-        self._p_changed = 1
+        self.notifyModification()
 
     def updateFullyPublic( self ):
         self.setFullyPublic()
@@ -6954,17 +6954,17 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
             self._contributionDuration = None
         return self._contributionDuration
 
-    def notifyModification( self, cleanCache = True, cleanEntries = False):
+    def notifyModification( self, cleanCache = True, cleanCacheEntries = False):
         self.getSession().notifyModification(cleanCache = False)
         if cleanCache:
-            self.cleanCache(cleanEntries)
+            self.cleanCache(cleanCacheEntries)
         self._p_changed = 1
 
-    def cleanCache(self, cleanEntries = False):
+    def cleanCache(self, cleanCacheEntries = False):
         if not ContextManager.get('clean%s'%self.getUniqueId(), False):
             ScheduleToJson.cleanCache(self)
             ContextManager.set('clean%s'%self.getUniqueId(), True)
-            if cleanEntries:
+            if cleanCacheEntries:
                 for entry in self.getSchedule().getEntries():
                     entry.getOwner().cleanCache(cleanConference = False)
 
@@ -7871,12 +7871,12 @@ class Contribution(CommonObjectBase, Locatable):
     def removeField( self, field ):
         if self.getFields().has_key(field):
             del self.getFields()[field]
-            self.notifyModification(cleanCache = False)
+            self.notifyModification()
 
     def setField( self, field, value ):
         try:
             self.getFields()[field] = value
-            self.notifyModification(cleanCache = False)
+            self.notifyModification()
         except:
             pass
 

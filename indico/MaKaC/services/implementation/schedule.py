@@ -1401,7 +1401,7 @@ methodMap = {
     "session.editSlotById": SessionScheduleEditSessionSlotById,
     "session.deleteSlot": SessionScheduleDeleteSessionSlot,
     "session.changeColors": SessionScheduleChangeSessionColors,
-   "session.modifyStartEndDate": SessionScheduleModifyStartEndDate,
+    "session.modifyStartEndDate": SessionScheduleModifyStartEndDate,
 
 
     "session.getUnscheduledContributions": SessionGetUnscheduledContributions,
