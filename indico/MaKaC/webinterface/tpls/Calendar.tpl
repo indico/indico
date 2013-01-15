@@ -141,7 +141,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                                 <option>12</option>
                             </select>
                             <select name="year" style="min-width: 50px;">
-                                % for year in reversed(range(1996, currentYear + 1)):
+                                % for year in reversed(range(currentYear - 10, currentYear + 1)):
                                     <option>${year}</option>
                                 % endfor
                             </select>
