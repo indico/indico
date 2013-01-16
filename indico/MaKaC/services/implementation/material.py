@@ -129,7 +129,8 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
                 # Submitters have access
                 return
             # status = 3 means the paper is under review (submitted but not reviewed)
-            elif isinstance(owner, conference.Contribution) and RCContributionPaperReviewingStaff.hasRights(self, contribution = owner, includingContentReviewer=False) and reviewingState == 3:
+            # status = 2 means that the author has not yet submitted the material
+            elif isinstance(owner, conference.Contribution) and RCContributionPaperReviewingStaff.hasRights(self, contribution = owner, includingContentReviewer=False) and reviewingState in [2, 3]:
                 return
             elif owner.getSession() and \
                      owner.getSession().canCoordinate(self._aw, "modifContribs"):

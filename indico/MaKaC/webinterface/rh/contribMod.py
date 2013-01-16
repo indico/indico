@@ -610,10 +610,19 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRigh
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
             self._loggedIn = True
-        elif not (RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False) and self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
+        # status = 3 means the paper is under review (submitted but not reviewed)
+        # status = 2 means that the author has not yet submitted the material
+        elif not (RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False) and  self._target.getReviewing().getReviewingState() in [2, 3]):
             RHSubmitMaterialBase._checkProtection(self)
         else:
             self._loggedIn = True
+
+    def _process(self):
+        result = RHSubmitMaterialBase._process(self)
+        # if a Paper Reviewer uploads a paper, when the status is 'To be corrected', we must change the status to 'Submitted' again.
+        if self._target.getReviewing() and self._target.getReviewing().getReviewingState() == 2 and RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False):
+            self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
+        return result
 
 
 class RHContributionSetVisibility(RHContribModifBaseSpecialSesCoordRights):

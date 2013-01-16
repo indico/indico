@@ -353,8 +353,8 @@
         self.observeRadioButtons(vidyoComponents);
 
         if(bookingPopup.booking !== undefined){
-            if(bookingPopup.booking.isRoomInMultipleBookings) $(".redWarningPopup").show();
-            else $(".redWarningPopup").hide();
+            if(bookingPopup.booking.isRoomInMultipleBookings) $(".redWarningMessage").show();
+            else $(".redWarningMessage").hide();
         }
         return vidyoComponents;
     },
