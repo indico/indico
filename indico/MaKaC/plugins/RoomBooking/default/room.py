@@ -59,24 +59,24 @@ class Room( Persistent, RoomBase, Fossilizable ):
         self.customAtts = PersistentMapping()
         self.avaibleVC = []
         self._nonBookableDates = []
-        self._dailyNonBookablePeriods = []
+        self._dailyBookablePeriods = []
 
-    def getDailyNonBookablePeriods(self):
+    def getDailyBookablePeriods(self):
         try:
-            if self._dailyNonBookablePeriods:
+            if self._dailyBookablePeriods:
                 pass
         except AttributeError:
-            self._dailyNonBookablePeriods = []
+            self._dailyBookablePeriods = []
             self._p_changed = 1
-        return self._dailyNonBookablePeriods
+        return self._dailyBookablePeriods
 
-    def addDailyNonBookablePeriod(self, startTime, endTime):
-        nbp = DailyNonBookablePeriod(startTime, endTime)
-        self._dailyNonBookablePeriods.append(nbp)
+    def addDailyBookablePeriod(self, startTime, endTime):
+        nbp = DailyBookablePeriod(startTime, endTime)
+        self._dailyBookablePeriods.append(nbp)
         self._p_changed = 1
 
-    def clearDailyNonBookablePeriods(self):
-        self._dailyNonBookablePeriods = []
+    def clearDailyBookablePeriods(self):
+        self._dailyBookablePeriods = []
         self._p_changed = 1
 
     def getNonBookableDates(self):
@@ -540,7 +540,7 @@ class NonBookableDate(Persistent):
         else:
             self._endDate = endDate
 
-class DailyNonBookablePeriod(Persistent):
+class DailyBookablePeriod(Persistent):
 
     def __init__(self, startTime, endTime):
         self.setStartTime(startTime)
@@ -566,12 +566,10 @@ class DailyNonBookablePeriod(Persistent):
     def setEndTime(self, endTime):
         self._endTime = endTime
 
-    def doesPeriodOverlap(self, startTime, endTime):
+    def doesPeriodFit(self, startTime, endTime):#
         periodStart = datetime.datetime.strptime(self.getStartTime(), "%H:%M").time()
         periodEnd = datetime.datetime.strptime(self.getEndTime(), "%H:%M").time()
-        return (startTime <= periodStart and endTime > periodStart) or \
-            (startTime < periodEnd and endTime >= periodEnd) or \
-            (startTime >= periodStart and endTime <= periodEnd)
+        return startTime >= periodStart and endTime <= periodEnd
 
 # ============================================================================
 # ================================== TEST ====================================

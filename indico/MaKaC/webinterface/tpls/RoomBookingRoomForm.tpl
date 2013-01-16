@@ -76,7 +76,7 @@
                 <li> ${ _("Large photo may be of any size.")}</li>
             </ul>
         </div>
-        <div id="dailyNonBookablePeriodsCH" class="tip">
+        <div id="dailyBookablePeriodsCH" class="tip">
             ${ _("Time format: 'HH:MM'")}
         </div>
     </div>
@@ -277,25 +277,25 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Daily unavailability periods")}&nbsp;&nbsp;</small></td>
+                                            <td align="right" valign="top"><small> ${ _("Daily availability periods")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                                <table id="dailyNonBookablePeriodsTable">
-                                                    % for i in range(len(dailyNonBookablePeriods)):
+                                                <table id="dailyBookablePeriodsTable">
+                                                    % for i in range(len(dailyBookablePeriods)):
                                                         <tr class="startEndDate">
                                                             <td class="startEndDateEntry">${ _("from") }:</td>
-                                                            <td><span id="startTimeDailyNonBookablePeriod${i}"></span></td>
+                                                            <td><span id="startTimeDailyBookablePeriod${i}"></span></td>
                                                             <td class="startEndDateEntry">${ _("to") }:</td>
-                                                            <td><span id="endTimeDailyNonBookablePeriod${i}"></span>
+                                                            <td><span id="endTimeDailyBookablePeriod${i}"></span>
                                                             % if i is 0:
-                                                                ${contextHelp('dailyNonBookablePeriodsCH')}</td>
-                                                                <td><span onclick="addDailyNonBookablePeriod()"><a class="fakeLink">${_("add period")}</a></span></td>
+                                                                ${contextHelp('dailyBookablePeriodsCH')}</td>
+                                                                <td><span onclick="addDailyBookablePeriod()"><a class="fakeLink">${_("add period")}</a></span></td>
                                                             % else:
                                                                 </td>
                                                             % endif
                                                         </tr>
                                                     % endfor
                                                 </table>
-                                                <input type="hidden" id="dailyNonBookablePeriodCounter" name="dailyNonBookablePeriodCounter" value="0" />
+                                                <input type="hidden" id="dailyBookablePeriodCounter" name="dailyBookablePeriodCounter" value="0" />
                                             </td>
                                         </tr>
                                         <tr>
@@ -372,8 +372,8 @@
     var nonBookablePeriodCounter = ${len(nonBookableDates)};
     $('#nonBookablePeriodCounter').val(nonBookablePeriodCounter);
 
-    var dailyNonBookablePeriodCounter = ${len(dailyNonBookablePeriods)};
-    $('#dailyNonBookablePeriodCounter').val(dailyNonBookablePeriodCounter);
+    var dailyBookablePeriodCounter = ${len(dailyBookablePeriods)};
+    $('#dailyBookablePeriodCounter').val(dailyBookablePeriodCounter);
 
     IndicoUI.executeOnLoad(function(){
     % for i in range(len(nonBookableDates)):
@@ -387,14 +387,14 @@
         endDateField.set('${nonBookableDates[i].getEndDate().strftime("%d/%m/%Y %H:%M") if nonBookableDates[i].getEndDate() else ""}')
     % endfor
 
-    % for i in range(len(dailyNonBookablePeriods)):
+    % for i in range(len(dailyBookablePeriods)):
         var dateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
-            "${dailyNonBookablePeriods[i].getStartTime() if dailyNonBookablePeriods[i].getStartTime() else ""}",
-            "${dailyNonBookablePeriods[i].getEndTime() if dailyNonBookablePeriods[i].getEndTime() else ""}",
-            {id:'startTimeDailyNonBookablePeriod${i}', name:'startTimeDailyNonBookablePeriod${i}', style: {width: '50px'}},
-            {id:'endTimeDailyNonBookablePeriod${i}', name:'endTimeDailyNonBookablePeriod${i}', style: {width: '50px'}});
-        $E('startTimeDailyNonBookablePeriod${i}').set(dateStartEndTimeField.startTimeField);
-        $E('endTimeDailyNonBookablePeriod${i}').set(dateStartEndTimeField.endTimeField);
+            "${dailyBookablePeriods[i].getStartTime() if dailyBookablePeriods[i].getStartTime() else ""}",
+            "${dailyBookablePeriods[i].getEndTime() if dailyBookablePeriods[i].getEndTime() else ""}",
+            {id:'startTimeDailyBookablePeriod${i}', name:'startTimeDailyBookablePeriod${i}', style: {width: '50px'}},
+            {id:'endTimeDailyBookablePeriod${i}', name:'endTimeDailyBookablePeriod${i}', style: {width: '50px'}});
+        $E('startTimeDailyBookablePeriod${i}').set(dateStartEndTimeField.startTimeField);
+        $E('endTimeDailyBookablePeriod${i}').set(dateStartEndTimeField.endTimeField);
     % endfor
     });
 
@@ -409,19 +409,19 @@
 
     }
 
-    function addDailyNonBookablePeriod(){
-        $("#dailyNonBookablePeriodsTable tr:last").after('<tr class="startEndDate"><td class="startEndDateEntry">${ _("from") }:</td><td><span id="startTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter + '"></span></td><td class="startEndDateEntry">${ _("to") }:</td><td><span id="endTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter +'"></span></td></tr>');
+    function addDailyBookablePeriod(){
+        $("#dailyBookablePeriodsTable tr:last").after('<tr class="startEndDate"><td class="startEndDateEntry">${ _("from") }:</td><td><span id="startTimeDailyBookablePeriod' + dailyBookablePeriodCounter + '"></span></td><td class="startEndDateEntry">${ _("to") }:</td><td><span id="endTimeDailyBookablePeriod' + dailyBookablePeriodCounter +'"></span></td></tr>');
 
         newDateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField("","",
-            {id:'startTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter, name:'startTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter, style: {width: '50px'}}, 
-            {id:'endTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter, name:'endTimeDailyNonBookablePeriod' + 
-                dailyNonBookablePeriodCounter, style: {width: '50px'}});
+            {id:'startTimeDailyBookablePeriod' + dailyBookablePeriodCounter, name:'startTimeDailyBookablePeriod' + dailyBookablePeriodCounter, style: {width: '50px'}},
+            {id:'endTimeDailyBookablePeriod' + dailyBookablePeriodCounter, name:'endTimeDailyBookablePeriod' +
+                dailyBookablePeriodCounter, style: {width: '50px'}});
 
-        $E('startTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter).set(newDateStartEndTimeField.startTimeField);
-        $E('endTimeDailyNonBookablePeriod' + dailyNonBookablePeriodCounter).set(newDateStartEndTimeField.endTimeField);
+        $E('startTimeDailyBookablePeriod' + dailyBookablePeriodCounter).set(newDateStartEndTimeField.startTimeField);
+        $E('endTimeDailyBookablePeriod' + dailyBookablePeriodCounter).set(newDateStartEndTimeField.endTimeField);
 
-        dailyNonBookablePeriodCounter = dailyNonBookablePeriodCounter + 1;
-        $("#dailyNonBookablePeriodCounter").val(dailyNonBookablePeriodCounter);
+        dailyBookablePeriodCounter = dailyBookablePeriodCounter + 1;
+        $("#dailyBookablePeriodCounter").val(dailyBookablePeriodCounter);
     }
 
     function searchForUsers(){

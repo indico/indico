@@ -1,4 +1,4 @@
-<%page args="repeatability=None, form=None, unavailableDates=None, unavailableDayPeriods=None, maxAdvanceDays=None"/>
+<%page args="repeatability=None, form=None, unavailableDates=None, availableDayPeriods=None, maxAdvanceDays=None"/>
 <script type="text/javascript">
 
     // Comments the repeatition for user, to make it clear
@@ -63,11 +63,11 @@
                                             </td>
                                         </tr>
                                         % endif
-                                        % if unavailableDayPeriods:
+                                        % if availableDayPeriods:
                                         <tr id="sdatesTR" >
-                                            <td class="subFieldWidth" align="right" valign="top" ><small>${ _("Unavailable day periods") }</small></td>
+                                            <td class="subFieldWidth" align="right" valign="top" ><small>${ _("Available day periods") }</small></td>
                                             <td class="blacktext">
-                                            <span style="color:#881122">${ _("This room cannot be booked during the following time periods") }:<ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), unavailableDayPeriods )) }</li></ul></span>
+                                            <span style="color:#881122">${ _("This room can only be booked during the following time periods") }:<ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), availableDayPeriods )) }</li></ul></span>
                                             </td>
                                         </tr>
                                         % endif

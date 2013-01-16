@@ -176,10 +176,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="right" valign="top"><small> ${ _("Daily unavailability periods")}&nbsp;&nbsp;</small></td>
+                                            <td align="right" valign="top"><small> ${ _("Daily availability periods")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                            % if room.getDailyNonBookablePeriods():
-                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), room.getDailyNonBookablePeriods() )) }</li></ul>
+                                            % if room.getDailyBookablePeriods():
+                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), room.getDailyBookablePeriods() )) }</li></ul>
                                             % else:
                                                 ${_("Not set")}
                                             % endif

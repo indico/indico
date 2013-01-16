@@ -262,12 +262,12 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             errors.append("Latitude must be a number")
 
         try:
-            for dailyNonBookablePeriod in c.getDailyNonBookablePeriods():
-                if datetime.strptime(dailyNonBookablePeriod.getStartTime(), "%H:%M").time() > datetime.strptime(dailyNonBookablePeriod.getEndTime(), "%H:%M").time():
-                    errors.append("period start time should be before end time in daily unavailability period field")
+            for dailyBookablePeriod in c.getDailyBookablePeriods():
+                if datetime.strptime(dailyBookablePeriod.getStartTime(), "%H:%M").time() > datetime.strptime(dailyBookablePeriod.getEndTime(), "%H:%M").time():
+                    errors.append("period start time should be before end time in daily availability period field")
                     break
         except ValueError:
-            errors.append("Daily unavailability periods must be in correct time format 'HH:MM'")
+            errors.append("Daily availability periods must be in correct time format 'HH:MM'")
 
         params = self._params
         if ( params['largePhotoPath'] != '' ) ^ ( params['smallPhotoPath'] != '' ):
@@ -390,7 +390,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.comments = params.get( "comments" )
         candRoom.maxAdvanceDays = intd(params.get( "maxAdvanceDays" ))
         candRoom.clearNonBookableDates()
-        candRoom.clearDailyNonBookablePeriods()
+        candRoom.clearDailyBookablePeriods()
 
         for periodNumber in range(int(params.get("nonBookablePeriodCounter"))):
             if params.get("startDateNonBookablePeriod" + str(periodNumber)):
@@ -401,12 +401,12 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
                 except ValueError:
                     continue
 
-        for periodNumber in range(int(params.get("dailyNonBookablePeriodCounter"))):
-            if params.get("startTimeDailyNonBookablePeriod" + str(periodNumber)):
+        for periodNumber in range(int(params.get("dailyBookablePeriodCounter"))):
+            if params.get("startTimeDailyBookablePeriod" + str(periodNumber)):
                 try:
-                    cStartTime = datetime.strptime(params.get("startTimeDailyNonBookablePeriod" + str(periodNumber)), "%H:%M")
-                    cEndTime = datetime.strptime(params.get("endTimeDailyNonBookablePeriod" + str(periodNumber)), "%H:%M")
-                    candRoom.addDailyNonBookablePeriod(cStartTime.strftime("%H:%M"), cEndTime.strftime("%H:%M"))
+                    cStartTime = datetime.strptime(params.get("startTimeDailyBookablePeriod" + str(periodNumber)), "%H:%M")
+                    cEndTime = datetime.strptime(params.get("endTimeDailyBookablePeriod" + str(periodNumber)), "%H:%M")
+                    candRoom.addDailyBookablePeriod(cStartTime.strftime("%H:%M"), cEndTime.strftime("%H:%M"))
                 except ValueError:
                     continue
 
@@ -1478,9 +1478,11 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
         for nbd in self._candResv.room.getNonBookableDates():
             if doesPeriodsOverlap(nbd.getStartDate(), nbd.getEndDate(), self._candResv.startDT, self._candResv.endDT):
                 raise FormValuesError("You cannot book this room during the following periods: %s"%("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
-        for nbp in self._candResv.room.getDailyNonBookablePeriods():
-            if nbp.doesPeriodOverlap(self._candResv.startDT.time(), self._candResv.endDT.time()):
-                raise FormValuesError("You cannot book this room during the following time periods: %s" % (", ".join(map(lambda x: "from %s to %s" % (x.getStartTime(), x.getEndTime()), self._candResv.room.getDailyNonBookablePeriods()))))
+        for nbp in self._candResv.room.getDailyBookablePeriods():
+            if nbp.doesPeriodFit(self._candResv.startDT.time(), self._candResv.endDT.time()):
+                break
+        else:
+            raise FormValuesError("You must book this room in one of the following time periods: %s" % (", ".join(map(lambda x: "from %s to %s" % (x.getStartTime(), x.getEndTime()), self._candResv.room.getDailyBookablePeriods()))))
 
         user = self._getUser()
         days = self._candResv.room.maxAdvanceDays

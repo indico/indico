@@ -169,7 +169,7 @@
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("When")}</span></td>
                                 <td>
                                     <table width="100%">
-                                        <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(), unavailableDayPeriods = candResv.room.getDailyNonBookablePeriods(), maxAdvanceDays = candResv.room.maxAdvanceDays"/>
+                                        <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(), availableDayPeriods = candResv.room.getDailyBookablePeriods(), maxAdvanceDays = candResv.room.maxAdvanceDays"/>
                                     </table>
                                 </td>
                             </tr>
