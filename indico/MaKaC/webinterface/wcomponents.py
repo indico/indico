@@ -1925,11 +1925,11 @@ class WAccessControlFrameBase(WTemplated):
 
     def _getChildURL(self, child):
         if isinstance(child, conference.Session):
-            return urlHandlers.UHSessionModification.getURL(child)
+            return urlHandlers.UHSessionModifAC.getURL(child)
         if isinstance(child, conference.Material):
             return urlHandlers.UHMaterialModification.getURL(child)
         if isinstance(child, conference.Contribution):
-            return urlHandlers.UHContributionModification.getURL(child)
+            return urlHandlers.UHContribModifAC.getURL(child)
         if isinstance(child, conference.SubContribution):
             return urlHandlers.UHSubContributionModification.getURL(child)
 

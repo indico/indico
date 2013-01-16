@@ -12,27 +12,11 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Current status")}</span></td>
     <td bgcolor="white" width="100%" valign="top" class="blacktext">
         <div class="ACStatusDiv">
-            ${ _("Your " + termsDict[type]['name'] + " is currently") } <span class="ACStatus" style="color: ${statusColor};">${ _(privacy) }</span>
+            ${ _("Your " + termsDict[type]['name'] + " is currently") } <span class="ACStatus" id="privacy_status" style="color: ${statusColor};">${ _(privacy) }</span>
             % if privacy == 'INHERITING' :
                 ${ _("from a")} <span style="color: ${parentStatusColor};">${ _(parentPrivacy)}</span> ${ _(termsDict[type]['parentName'])}
             % endif
-            % if not isFullyPublic and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
-                ${ _(", but be aware that some parts of your " + termsDict[type]['name'] + " are")} <span style="color: #B02B2C;">${ _("protected") }</span>. <span class="fakeLink" id="childrenProtectedText">${_("See protected elements")}</span>
-                <div id="childrenProtected" style="display:none">
-                % for childType in childrenProtected:
-                    %if childrenProtected[childType]:
-                        <div style="font-size:13px; font-weight: bold; color:#444; margin: 5px 0px">${childType}</div>
-                        <ul style="list-style: none inside none; margin: 5px 0 0; padding: 0px 10px;">
-                        % for child in childrenProtected[childType]:
-                            <li><a href="${getChildURL(child)}">${child.getTitle()}</a></li>
-                        % endfor
-                        </ul>
-                    % endif
-                % endfor
-                </div>
-            % endif
-            .
-        </div>
+            </div>
         <div class="ACStatusDescDiv">
             % if privacy == 'PUBLIC' :
                 ${ _("This means that it can be viewed by all the users, regardless of the access protection of its parent " + termsDict[type]['parentName']) } '${ parentName }'.
@@ -44,17 +28,40 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
                 % if parentPrivacy == 'PRIVATE' :
                 <br/>
                 ${ _("You can specify users allowed to access your " + termsDict[type]['name'])} <strong>${ _("in addition")}</strong>
-                ${ _(" of the ones already allowed to access the parent " + termsDict[type]['parentName'])} '${ parentName }'
+                ${ _(" to the ones already allowed to access the parent " + termsDict[type]['parentName'])} '${ parentName }'
                 ${ _("by adding them to the list below. This won't change the access protection of the parent " + termsDict[type]['parentName'] + ".")}
                 % endif
             % endif
         </div>
-        % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
-        <div class="ACUserListDiv">
-            <div class="ACUserListWrapper" id="ACUserListWrapper">
-            </div>
-        </div>
+
+        % if isFullyPublic == False and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
+                <div id="protected_children_warning">
+                  <i class="icon-shield"></i>
+                  <span>
+                    ${_('Some parts of it are, however, protected. <a href="#" id="see_protected">Which ones?</a>')}
+                  </span>
+                </div>
+
+                <div id="childrenProtected" style="display:none">
+                % for childType in childrenProtected:
+                    %if childrenProtected[childType]:
+                        <h3>${childType}</h3>
+                        <ul>
+                        % for child in childrenProtected[childType]:
+                            <li><a href="${getChildURL(child)}">${child.getTitle()}</a></li>
+                        % endfor
+                        </ul>
+                    % endif
+                % endfor
+                </div>
         % endif
+
+       % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
+       <div class="ACUserListDiv">
+           <div class="ACUserListWrapper" id="ACUserListWrapper">
+           </div>
+       </div>
+       % endif
     </td>
 </tr>
 % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
@@ -93,10 +100,13 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
     </td>
 </tr>
 <script type="text/javascript">
+
 % if not isFullyPublic and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
-    $("#childrenProtectedText").qtip({
+  $(function() {
+
+    $("#see_protected").qtip({
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+            classes: 'see_protected_tip ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
         },
         show: {
             event: 'click',
@@ -119,6 +129,9 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
             text: $("#childrenProtected")
         }
     });
+
+  });
+
 % endif
 
 % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :

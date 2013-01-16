@@ -3708,6 +3708,7 @@ div.ACModifDiv {
 div.ACStatusDiv {
     font-size: 15px;
     padding-bottom: 9px;
+    color: #444;
 }
 
 span.ACStatus {
@@ -3715,11 +3716,10 @@ span.ACStatus {
 }
 
 div.ACStatusDescDiv {
-    color: #777777;
-    padding-left: 20px;
-    padding-bottom: 20px;
-    font-style: italic;
-    width: 600px;
+    font-size: 0.9em;
+    color: #999;
+    margin-bottom: 10px;
+    max-width: 450px;
 }
 
 div.ACModifButtonsDiv {
@@ -3732,8 +3732,7 @@ div.ACModifButtonEntry {
 }
 
 div.ACUserListDiv {
-    padding-bottom: 20px;
-    padding-left: 35px;
+    margin-bottom: 20px;
 }
 
 div.ACUserListDiv ul.UIPeopleList {
@@ -8546,4 +8545,43 @@ div.informationUserList {
     border-radius: 4px 4px 4px 4px;
     margin-bottom: 18px;
     padding: 8px 35px 8px 14px;
+}
+
+#protected_children_warning {
+    color: #777;
+    font-size: 0.9em;
+    margin: 10px 0 10px 0;
+    padding: 10px;
+    max-width: 450px;
+    background-color: #eee;
+}
+
+#protected_children_warning i.icon-shield {
+    vertical-align: middle;
+    font-size: 1.4em;
+    color: #991111;
+    margin-right: 7px;
+}
+
+#privacy_status {
+    border-bottom: 1px dotted #999;
+}
+
+#see_protected {
+    font-size: 0.9em;
+}
+
+.see_protected_tip {
+    padding: 5px !important;
+    min-width: 200px !important;
+}
+
+.see_protected_tip ul {
+    list-style: none inside none;
+    margin: 5px 0 0;
+    padding: 0px 10px;
+}
+
+.see_protected_tip ul li {
+    margin-bottom: 5px;
 }
