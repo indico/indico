@@ -562,9 +562,9 @@ def timedLinkedEventListRemoval(dbi, withRBDB, prevVersion):
 
 
 @since('1.0')
-def reindexVidyoIndex(dbi, withRBDB, prevVersion):
+def reindexVidyoBookings(dbi, withRBDB, prevVersion):
     """
-    Reindexing VidyoEventEndDateIndex
+    Reindexing Vidyo bookings
     """
     ph = PluginsHolder()
     collaboration_pt = ph.getPluginType("Collaboration")
