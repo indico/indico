@@ -1,65 +1,70 @@
     <script type="text/javascript">
         function submit_cancel()
         {
-            if ( !confirm(  "${ _('Are you sure you want to CANCEL your booking?')}" ) )
-                return;
-            var frm = document.forms['submits'];
-            frm.action = '${ urlHandlers.UHRoomBookingCancelBooking.getURL( reservation ) }';
-            frm.submit();
+            new ConfirmPopup($T("Cancel booking"),$T("Are you sure you want to CANCEL your booking?"), function(confirmed) {
+                if(confirmed) {
+                    $("#submits").attr("action", "${ urlHandlers.UHRoomBookingCancelBooking.getURL(reservation)}");
+                    $("#submits").submit();
+                }
+            }, $T("Yes"), $T("No")).open();
         }
         function submit_accept()
         {
-            if ( !confirm(  "${ _('Are you sure you want to ACCEPT this booking?')}" ) )
-                return;
-            var frm = document.forms['submits'];
-            frm.action = '${ urlHandlers.UHRoomBookingAcceptBooking.getURL( reservation ) }';
-            frm.submit();
+            new ConfirmPopup($T("Accept booking"),$T("Are you sure you want to ACCEPT your booking?"), function(confirmed) {
+                if(confirmed) {
+                    $("#submits").attr("action", "${ urlHandlers.UHRoomBookingAcceptBooking.getURL(reservation)}");
+                    $("#submits").submit();
+                }
+            }, $T("Yes"), $T("No")).open();
         }
         function submit_reject()
         {
-            reason = prompt(  "${ _('Are you sure you want to REJECT THE _WHOLE_ BOOKING? If so, please give a reason:')}", '' );
-            if ( !reason )
-                return;
-            var frm = document.forms['submits'];
-            frm.action = '${ urlHandlers.UHRoomBookingRejectBooking.getURL( reservation ) }' + '&reason=' + encodeURI( reason );
-            frm.submit();
+            new ConfirmPopupWithReason($T("Reject booking"),$T("Are you sure you want to REJECT THE _WHOLE_ BOOKING? If so, please give a reason"), function(confirmed) {
+                if(confirmed) {
+                    var reason = this.reason.get();
+                    $("#submits").attr("action", "${ urlHandlers.UHRoomBookingRejectBooking.getURL(reservation)}"+ '&reason=' + encodeURI( reason ));
+                    $("#submits").submit();
+                }
+            }, $T("Yes"), $T("No")).open();
+
         }
         function submit_reject_occurrence( action )
         {
-            reason = prompt(  "${ _('Are you sure you want to REJECT the booking for the selected date? If so, please give a reason:')}", '' );
-            if ( !reason )
-                return;
-            var frm = document.forms['submits'];
-            frm.action = action + '&reason=' + encodeURI( reason );
-            frm.submit();
+            new ConfirmPopupWithReason($T("Reject occurrence"),$T("Are you sure you want to REJECT the booking for the selected date? If so, please give a reason:"), function(confirmed) {
+                if(confirmed) {
+                    var reason = this.reason.get();
+                    $("#submits").attr("action", action + '&reason=' + encodeURI( reason ));
+                    $("#submits").submit();
+                }
+            }, $T("Yes"), $T("No")).open();
         }
         function submit_cancel_occurrence( action )
         {
-            if (confirm("${ _('Are you sure you want to cancel the selected date from the booking?')}")) {
-              var frm = document.forms['submits'];
-              frm.action = action;
-              frm.submit();
-            }
+            new ConfirmPopup($T("Cancel ocurrence"),$T("Are you sure you want to CANCEL the selected date from the booking?"), function(confirmed) {
+                if(confirmed) {
+                    $("#submits").attr("action", action);
+                    $("#submits").submit();
+                }
+            }, $T("Yes"), $T("No")).open();
         }
         function submit_modify()
         {
-            var frm = document.forms['submits'];
-            frm.action = '${ modifyBookingUH.getURL( reservation ) }';
-            frm.submit();
+            $("#submits").attr("action", "${ modifyBookingUH.getURL(reservation)}");
+            $("#submits").submit();
         }
         function submit_delete()
         {
-            if ( !confirm( "${ _('THIS ACTION IS IRREVERSIBLE. Are you sure you want to DELETE the booking?')}" ) )
-                return;
-            var frm = document.forms['submits'];
-            frm.action = '${ urlHandlers.UHRoomBookingDeleteBooking.getURL( reservation ) }';
-            frm.submit();
+            new ConfirmPopup($T("Delete booking"),$T("THIS ACTION IS IRREVERSIBLE. Are you sure you want to DELETE the booking?"), function(confirmed) {
+                if(confirmed) {
+                    $("#submits").attr("action", '${ urlHandlers.UHRoomBookingDeleteBooking.getURL( reservation ) }');
+                    $("#submits").submit();
+                }
+            }, $T("Yes"), $T("No")).open();
         }
         function submit_clone()
         {
-            var frm = document.forms['submits'];
-            frm.action = '${ cloneURL }';
-            frm.submit();
+            $("#submits").attr("action", "${cloneURL}");
+            $("#submits").submit();
         }
     </script>
 
@@ -257,7 +262,7 @@
                             <tr>
                                 <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> ${ _("Actions")}</span></td>
                                 <td>
-                                    <form name="submits" action="" method="post">
+                                    <form name="submits" id="submits" action="" method="post">
                                         &nbsp;
                                         % if canCancel  and  not reservation.isCancelled and not reservation.isRejected:
                                             <input type="button" class="btn" value="${ _("Cancel Booking")}" onclick="submit_cancel();return false;"/>

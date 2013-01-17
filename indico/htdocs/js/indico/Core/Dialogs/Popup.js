@@ -507,6 +507,17 @@ type("ConfirmPopupWithPM", ["ConfirmPopup"],
     }
 );
 
+type('ConfirmPopupWithReason', ['ConfirmPopupWithPM'], {
+
+}, function(title, content, handler, buttonTitle, cancelButtonTitle) {
+
+    this.reason = Html.textarea({style:{width:'100%'}});
+
+    this.ConfirmPopupWithPM(title, Html.div({}, content, Html.div({style: {marginTop:pixels(10)}},Html.div({style:{fontWeight:"bold"}}, $T("Reason: ")),this.reason)), handler, buttonTitle, cancelButtonTitle);
+    this.parameterManager.add(this.reason, 'text', false);
+});
+
+
 /**
  * Utility function to display a three buttons popup.
  * The difference with ConfirmButton is the existence of a third button.
