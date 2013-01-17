@@ -573,6 +573,7 @@ def reindexVidyoBookings(dbi, withRBDB, prevVersion):
     VidyoTools.getEventEndDateIndex().initialize(dbi)
     VidyoTools.getIndexByVidyoRoom().initialize(dbi)
 
+
 @since('1.0')
 def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
     """
@@ -591,6 +592,7 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
         i += 1
         if i % 100 == 0:
             dbi.commit()
+
 
 @since('1.0')
 def ip_based_acl(dbi, withRBDB, prevVersion):
@@ -647,6 +649,7 @@ def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
 
     mod._p_changed = 1
     dbi.commit()
+
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[]):
