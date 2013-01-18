@@ -76,10 +76,9 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
         desc_text = fossil.get('description', '').strip()
         if not desc_text:
             desc_text = '<p/>'
-        description += "Description: " + html.fromstring(desc_text.decode('utf-8')).text_content() \
-                    + '\nURL: ' + fossil['url']
+        description += html.fromstring(desc_text.decode('utf-8')).text_content() + '\n\n'+ fossil['url']
     else:
-        description += "URL: " + fossil['url']
+        description += fossil['url']
     event.set('description', description)
     cal.add_component(event)
 
@@ -108,7 +107,7 @@ def serialize_reservation(cal, fossil, now):
     event.set('url', fossil['bookingUrl'])
     event.set('summary', fossil['reason'])
     event.set('location', fossil['location'].decode('utf-8') + ': ' + fossil['room']['fullName'].decode('utf-8'))
-    event.set('description', fossil['reason'].decode('utf-8') + '\n' + fossil['bookingUrl'])
+    event.set('description', fossil['reason'].decode('utf-8') + '\n\n' + fossil['bookingUrl'])
     rrule = None
     if fossil['repeatability'] is not None:
         rrule = serialize_repeatability(fossil['startDT'], fossil['endDT'], RepeatabilityEnum.shortname2rep[fossil['repeatability']])

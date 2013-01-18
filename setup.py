@@ -47,8 +47,7 @@ except ImportError:
     BABEL_PRESENT = False
 
 
-DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras",
-                   "https://github.com/collective/icalendar/tarball/6f899869d462a23d0ebd3f54fb237e8670242bc4#egg=icalendar-3.0"]
+DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
 
 DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor']
 
@@ -122,7 +121,7 @@ def _getInstallRequires():
 
     base =  ['ZODB3>=3.8', 'pytz', 'zope.index', 'zope.interface',
              'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil<2.0',
-             'pypdf', 'mako>=0.4.1', 'babel', 'icalendar>=3.0', 'pyatom',
+             'pypdf', 'mako>=0.4.1', 'babel', 'icalendar>=3.2', 'pyatom',
              'simplejson', 'python-cjson', 'cssmin', 'webassets',
              'pojson>=0.4', 'requests']
 

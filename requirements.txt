@@ -6,7 +6,7 @@ ZODB3==3.10.5
 argparse==1.2.1
 cds-indico-extras==0.2
 cssmin==0.1.4
-icalendar==3.0.1b2
+icalendar==3.2
 lxml==2.3.4
 pojson==0.4
 polib==1.0.0
