@@ -74,15 +74,15 @@ class XMPPChatroomService( ChatroomServiceBase ):
 
         self._user = self._getUser()
 
-    def proccessAnswer(self, answer):
+    def processAnswer(self, answer):
         # controlled error
         if hasattr(answer, '_error') and answer._error['error']:
             # we need to make a distinction in this case to show the widget in the client
             if answer._error['reason'] is 'roomExists':
-                Logger.get('InstantMessaging (XMPP-XMPP server)').error("User %s tried to create the room %s, but it exists already" %(self._room.getOwner(), self._room.getTitle()))
+                Logger.get('InstantMessaging (XMPP-XMPP server)').error("User %s tried to create the room %s, but it exists already" % (self._room.getOwner(), self._room.getTitle()))
                 raise NoReportError(self.messages['sameName'], explanation='roomExists')
             else:
-                Logger.get('InstantMessaging (XMPP-XMPP server)').error("User %s executed an XMPP operation that provoked an error: %s" %(self._room.getOwner(), answer._error['reason']))
+                Logger.get('InstantMessaging (XMPP-XMPP server)').error("User %s executed an XMPP operation that provoked an error: %s" % (self._room.getOwner(), answer._error['reason']))
                 raise ServiceError(message = answer._error['reason'])
         # this should never happen! When an error happens, it should ALWAYS be set in the
         # _error variable in bot.py
@@ -100,7 +100,7 @@ class XMPPChatroomService( ChatroomServiceBase ):
         except Exception, e:
             Logger.get('InstantMessaging (XMPP-XMPP server)').exception("Exception while checking if room existed")
             raise ServiceError(message = self.messages['default'])
-        return self.proccessAnswer(self._bot)
+        return self.processAnswer(self._bot)
 
     def roomPreferencesXMPP(self, jid, password, room):
         """ Creates the room in the XMPP server """
@@ -111,7 +111,7 @@ class XMPPChatroomService( ChatroomServiceBase ):
         except Exception, e:
             Logger.get('InstantMessaging (XMPP-XMPP server)').error("Exception while checking if room existed: %s" %e)
             raise ServiceError(message = self.messages['default'])
-        return self.proccessAnswer(self._bot)
+        return self.processAnswer(self._bot)
 
     def createRoomXMPP(self, jid, password, room):
         """ Creates the room in the XMPP server """
@@ -122,7 +122,7 @@ class XMPPChatroomService( ChatroomServiceBase ):
         except Exception, e:
             Logger.get('InstantMessaging (XMPP-XMPP server)').error("Exception while creating: %s" %e)
             raise ServiceError(message = self.messages['creating'])
-        return self.proccessAnswer(self._bot)
+        return self.processAnswer(self._bot)
 
     def editRoomXMPP(self, jid, password, room, checkRoomExists = True):
         """ Edits the room in the XMPP server. If checkRoomExists is set to true
@@ -136,7 +136,7 @@ class XMPPChatroomService( ChatroomServiceBase ):
         except Exception, e:
             Logger.get('InstantMessaging (XMPP-XMPP server)').error("Exception while editing: %s" %e)
             raise ServiceError(message = self.messages['editing'])
-        return self.proccessAnswer(self._bot)
+        return self.processAnswer(self._bot)
 
     def deleteRoomXMPP(self, jid, password, room, message):
         """ Deletes the room in the XMPP server """
@@ -147,7 +147,7 @@ class XMPPChatroomService( ChatroomServiceBase ):
         except Exception, e:
             Logger.get('InstantMessaging (XMPP-XMPP server)').error("Exception while deleting: %s" %e)
             raise ServiceError(message = self.messages['deleting'])
-        return self.proccessAnswer(self._bot)
+        return self.processAnswer(self._bot)
 
 class CreateChatroom( XMPPChatroomService ):
 

@@ -57,13 +57,11 @@ class IndicoXMPPBotBase(object):
 
     def treatError(self, error, msg=''):
         """ Gets the response from the XMPP driver and, in case of error, returns the appropiate message"""
-        return {'error':error, 'reason':msg if msg!= '' else _('There was a problem while connecting our XMPP server. Please try again later')}
+        return {'error': error,
+                'reason': msg if msg!= '' else _('There was a problem while connecting our XMPP server. Please try again later')}
 
     def run(self):
-        try:
-            self.xmpp.process(threaded=False)
-        except Exception, e:
-            raise Exception(e)
+        self.xmpp.process(threaded=False)
 
 
 class IndicoXMPPBotRoomExists(IndicoXMPPBotBase):
@@ -77,6 +75,7 @@ class IndicoXMPPBotRoomExists(IndicoXMPPBotBase):
         try:
             connected = self.xmpp.connect()
         except Exception, e:
+            Logger.get('xmpp').exception('Connection problem')
             self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
 
@@ -84,16 +83,18 @@ class IndicoXMPPBotRoomExists(IndicoXMPPBotBase):
         #mod_discovery, service discovery related
         disco = self.xmpp.plugin['xep_0030']
         try:
-            roomExists=disco.getInfo(self._jid)
-        except Exception, e:
-            self._error = self.treatError(True, str(e))
-            self.xmpp.disconnect()
-        if roomExists.get('type') != 'error':
-            #if the type returned is not error it means that it found a chat room with the name we want, therefore that name is not usable
+            disco.getInfo(self._jid)
             self._error = self.treatError(True, 'roomExists')
-        else:
-            self._error = self.treatError(False)
-        self.xmpp.disconnect()
+        except sleekxmpp.exceptions.IqError, e:
+            if e.condition == 'item-not-found':
+                self._error = self.treatError(False)
+            else:
+                self._error = self.treatError(True, str(e))
+        except Exception, e:
+            Logger.get('xmpp').exception('Error connecting')
+            self._error = self.treatError(True, str(e))
+        finally:
+            self.xmpp.disconnect()
 
 
 
