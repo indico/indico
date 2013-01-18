@@ -7347,6 +7347,9 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     def getAllMaterialList(self):
         return self.getSession().getAllMaterialList()
 
+    def isFullyPublic(self):
+        return self.getSession().isFullyPublic()
+
 
 class ContributionParticipation(Persistent, Fossilizable):
 
@@ -9202,6 +9205,12 @@ class Contribution(CommonObjectBase, Locatable):
             l.append( self.getMinutes() )
         l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
+
+    def getAllViewableMaterialList( self, aw=None ):
+        if not aw:
+            aw = ContextManager.get("currentRH").getAW()
+        return [mat for mat in self.getAllMaterialList() if mat.canView(aw)]
+
 
     def newSubContribution(self):
         newSub = SubContribution()

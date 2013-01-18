@@ -1456,7 +1456,9 @@ class ScheduleToJson:
     @staticmethod
     def obtainFossil(entry, tz, fossilInterface = None, mgmtMode = False, useAttrCache = False):
 
-        if mgmtMode:
+        if mgmtMode or (not isinstance(entry, BreakTimeSchEntry) and not entry.getOwner().isFullyPublic()):
+        # We check if it is fully public because it could be some material protected
+        # that would create a security hole if we cache it
             result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
         else:
             cache_key = entry.getUniqueId()

@@ -23,6 +23,7 @@ from MaKaC.fossils.conference import IMaterialMinimalFossil,\
         IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
 from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
     IContributionParticipationTTMgmtFossil
+from MaKaC.common.contextManager import ContextManager
 
 class ISchEntryFossil(IFossil):
 
@@ -172,7 +173,7 @@ class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
 
     def getMaterial(self):
         """ Entry Material """
-    getMaterial.produce = lambda s: s.getOwner().getAllMaterialList()
+    getMaterial.produce = lambda s: s.getOwner().getAllViewableMaterialList()
     getMaterial.result = IMaterialMinimalFossil
 
     def getPresenters(self):

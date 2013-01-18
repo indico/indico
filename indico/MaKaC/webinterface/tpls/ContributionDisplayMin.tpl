@@ -84,8 +84,9 @@
                 </ul>
             </div>
         % endif
-            <% canEditFiles = (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn %>
-            % if Contribution.getAllMaterialList() or canEditFiles:
+        <% canEditFiles = (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn %>
+        <% materialList = Contribution.getAllViewableMaterialList() %>
+        % if materialList or canEditFiles:
             <div class="contributionRightPanelSection">
                 <h2 class="contributionSectionTitle">${_("Files")}</h2>
                 % if canEditFiles:
@@ -94,10 +95,7 @@
                 </div>
                 % endif
                 <ul>
-                % for material in Contribution.getAllMaterialList():
-                    <% if not material.canView(self_._aw):
-                           continue
-                     %>
+                % for material in materialList:
 
                     <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink" title="${material.getDescription()}">
                         ${material.getTitle()}
@@ -114,7 +112,7 @@
                 % endfor
                 </ul>
             </div>
-            % endif
+        % endif
     </div>
 </div>
 <script type="text/javascript">
