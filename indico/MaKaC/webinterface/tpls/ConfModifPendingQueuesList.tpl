@@ -28,21 +28,30 @@
                 <span class="name">${pList[0].getFullName()}</span>
             % endif
         <ul class="contributions">
-            % for cp in sorted(pList, self_._cmpByContribName):
+            % if pType == _("Submitters"):
+              <% pList.sort(self_._cmpByContribName) %>
+            % elif pType == _("ConfSubmitters"):
+              <% pList.sort(self_._cmpByConfName) %>
+            % endif
+            % for cp in sorted(pList):
                 <li>
+				% if pType == _("Submitters"):
                     <% contrib = cp.getContribution() %>
                     <a href="${str(urlHandlers.UHContributionModification.getURL(contrib))}">
                         ${contrib.getTitle()}
                     </a>
-                    % if pType == _("Submitters"):
-                        % if contrib.isPrimaryAuthor(cp):
-                            ${_("Primary Author")}
-                        % elif contrib.isCoAuthor(cp):
-                            ${_("Co-Author")}
-                        % elif contrib.isSpeaker(cp):
-                            ${_("Speaker")}
-                        % endif
+                    % if contrib.isPrimaryAuthor(cp):
+                        ${_("Primary Author")}
+                    % elif contrib.isCoAuthor(cp):
+                        ${_("Co-Author")}
+                    % elif contrib.isSpeaker(cp):
+                        ${_("Speaker")}
                     % endif
+				% elif pType == _("ConfSubmitters"):
+					<a href="${ str(urlHandlers.UHConferenceModification.getURL(cp.getConference())) }">
+						${cp.getConference().getTitle())}
+					</a>
+				% endif
                 </li>
             % endfor
         </ul>

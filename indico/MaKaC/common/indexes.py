@@ -1105,6 +1105,14 @@ class PendingSubmittersIndex( PendingQueuesUsersIndex ):
     _name = "pendingSubmitters"
     pass
 
+class PendingConfSubmittersIndex( PendingQueuesUsersIndex ):
+    _name = "pendingConfSubmitters"
+    pass
+
+class PendingConfSubmittersTasksIndex( PendinQueuesTasksIndex ):
+    _name = "pendingConfSubmittersTasks"
+    pass
+
 class PendingSubmittersTasksIndex( PendinQueuesTasksIndex ):
     _name = "pendingSubmittersTasks"
     pass
@@ -1228,10 +1236,11 @@ class IndexesHolder( ObjectHolder ):
     __allowedIdxs = [ "email", "name", "surName", "organisation", "group",
                     "status", "calendar", "category", "categoryDate",
                     "categoryDateAll", "categoryName",
-                    "pendingSubmitters",
-                    "pendingSubmittersTasks", "pendingManagers",
-                    "pendingManagersTasks", "pendingCoordinators",
-                    "pendingCoordinatorsTasks", "webcasts", "collaboration"]
+                    "pendingSubmitters", "pendingConfSubmitters",
+                    "pendingConfSubmittersTasks", "pendingSubmittersTasks",
+                    "pendingManagers", "pendingManagersTasks",
+                    "pendingCoordinators", "pendingCoordinatorsTasks",
+                    "webcasts", "collaboration"]
 
     def getIndex( self, name ):
         return self.getById(name)
@@ -1271,8 +1280,12 @@ class IndexesHolder( ObjectHolder ):
                 Idx[str(id)] = TextIndex()
             elif id=="pendingSubmitters":
                 Idx[str(id)] = PendingSubmittersIndex()
+            elif id=="pendingConfSubmitters":
+                Idx[str(id)] = PendingConfSubmittersIndex()
             elif id=="pendingSubmittersTasks":
                 Idx[str(id)] = PendingSubmittersTasksIndex()
+            elif id=="pendingConfSubmittersTasks":
+                Idx[str(id)] = PendingConfSubmittersTasksIndex()
             elif id=="pendingManagers":
                 Idx[str(id)] = PendingManagersIndex()
             elif id=="pendingManagersTasks":

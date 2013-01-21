@@ -7254,27 +7254,31 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
     def __init__(self, conf, aw, activeTab="submitters"):
         self._conf = conf
         self._aw = aw
-        self._activeTab = activeTab
-        self._pendingSubmitters = self._conf.getPendingQueuesMgr().getPendingSubmitters()
-        self._pendingManagers = self._conf.getPendingQueuesMgr().getPendingManagers()
-        self._pendingCoordinators = self._conf.getPendingQueuesMgr().getPendingCoordinators()
+        self._activeTab=activeTab
+        self._pendingConfSubmitters=self._conf.getPendingQueuesMgr().getPendingConfSubmitters()
+        self._pendingSubmitters=self._conf.getPendingQueuesMgr().getPendingSubmitters()
+        self._pendingManagers=self._conf.getPendingQueuesMgr().getPendingManagers()
+        self._pendingCoordinators=self._conf.getPendingQueuesMgr().getPendingCoordinators()
 
-    def _createTabCtrl(self):
-        self._tabCtrl = wcomponents.TabControl()
-        url = urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
-        url.addParam("tab", "submitters")
-        self._tabSubmitters = self._tabCtrl.newTab("submitters", \
-                                                _("Pending Submitters"), str(url))
-        url.addParam("tab", "managers")
-        self._tabManagers = self._tabCtrl.newTab("managers", \
-                                                _("Pending Managers"), str(url))
-        url.addParam("tab", "coordinators")
-        self._tabCoordinators = self._tabCtrl.newTab("coordinators", \
-                                                _("Pending Coordinators"), str(url))
+    def _createTabCtrl( self ):
+        self._tabCtrl=wcomponents.TabControl()
+        url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab","conf_submitters")
+        self._tabConfSubmitters=self._tabCtrl.newTab("conf_submitters", \
+                                                _("Pending Conference Submitters"),str(url))
+        url.addParam("tab","submitters")
+        self._tabSubmitters=self._tabCtrl.newTab("submitters", \
+                                                _("Pending Contribution Submitters"),str(url))
+        url.addParam("tab","managers")
+        self._tabManagers=self._tabCtrl.newTab("managers", \
+                                                _("Pending Managers"),str(url))
+        url.addParam("tab","coordinators")
+        self._tabCoordinators=self._tabCtrl.newTab("coordinators", \
+                                                _("Pending Coordinators"),str(url))
         self._tabSubmitters.setEnabled(True)
         tab = self._tabCtrl.getTabById(self._activeTab)
         if tab is None:
-            tab = self._tabCtrl.getTabById("submitters")
+            tab=self._tabCtrl.getTabById("conf_submitters")
         tab.setActive()
 
     def getVars(self):

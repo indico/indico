@@ -188,9 +188,101 @@ class PendingReminder(OneShotTask):
 
 #---SUBMITTERS----
 
+class PendingConfSubmittersHolder(PendingHolder):
+
+    """ This is an index that holds all the requests to add Chairpersons or Speakers in the
+        list of avatars with rights to submit material.
+        Those participants are not Avatars yet (do not have Indico account) and that's why
+        they are in this pending queue. So once they become Indico users they will be removed
+        from the index"""
+
+    def __init__(self):
+        """Index by email of all the request to add Chairpersons or Speakers"""
+        self._id="Submitters"
+        self._idx = indexes.IndexesHolder().getById("pendingConfSubmitters") # All the Conference Chairpersons/Speakers
+        self._tasksIdx=indexes.IndexesHolder().getById("pendingConfSubmittersTasks") # Tasks which send reminder emails periodically asking for the creation of one indico account
+        self._reminder=PendingConfSubmitterReminder
+
+    def grantRights(self, av):
+        l = self.getPendingByEmail(av.getEmail())
+        for e in l:
+            # We must grant the new avatar with submission rights
+            conf = e.getConference()
+            conf.getAccessController().grantSubmission(av)
+
+            # the Conference method "removePendingConfSubmitter" will remove the Submitter
+            # objects from the conference pending submitter
+            # list and from the this index (PendingConfSubmitterHolder).
+            e.getConference().getPendingQueuesMgr().removePendingConfSubmitter(e)
+
+    def _sendReminderEmail(self, sb):
+        from MaKaC.conference import ContributionParticipation
+        DBMgr.getInstance().commit()
+        if type(sb)==list:
+            notif = _PendingConfSubmitterNotification( sb )
+            mail.GenericMailer.send( notif )
+        else:
+            psList=self.getPendingByEmail(sb.getEmail())
+            if psList != [] and psList is not None:
+                notif = _PendingConfSubmitterNotification( psList )
+                mail.GenericMailer.send( notif )
+
+class _PendingConfSubmitterNotification(_PendingNotification):
+
+    def getBody( self ):
+        url = urlHandlers.UHUserCreation.getURL()
+        url.addParam("cpEmail",self._psList[0].getEmail())
+        return _("""
+    You have been added as chairperson/speaker of the following event:%s
+    and material submission rights have been granted to you.
+    Please create an account in Indico in order to use these rights. You can create your account at the following URL:
+
+    <%s>
+
+    *Note that you must use this email address %s when creating the account*
+
+    Best Regards.
+
+    --
+    Indico project <http://indico-software.org/>
+                """)%( self._getParticipations(), url, self._psList[0].getEmail() )
+
+    def _getParticipations(self):
+        participations = "\n\n"
+        for conf in self._participationsByConf.keys():
+            participations += i18nformat("""\t\t\t- _("Event") \"%s\":\n""") % conf.getTitle()
+            accessURL = urlHandlers.UHConferenceDisplay.getURL(conf)
+            participations += "\t\t\t\t - Access: %s\n" % accessURL
+        return participations
+
+
+class PendingConfSubmitterReminder(PendingReminder):
+
+    def run(self):
+        hasAccount=PendingReminder.run(self)
+        if not hasAccount:
+            psh=PendingConfSubmittersHolder()
+            psl=psh.getPendingByEmail(self._email)
+            if psl != [] and psl is not None:
+                notif = _PendingConfSubmitterNotification( psl )
+                mail.GenericMailer.send( notif )
+
+    def tearDown(self):
+        psh=PendingConfSubmittersHolder()
+        psl=psh.getPendingByEmail(self._email)
+        for e in psl:
+            e.getConference().getPendingQueuesMgr().removePendingConfSubmitter(e)
+
+    def getPendings(self):
+        psh=PendingConfSubmittersHolder()
+        try:
+            return psh.getPendingByEmail(self._email)
+        except:
+            return None
+
 class PendingSubmittersHolder(PendingHolder):
 
-    """ This is an index that holds all the requests to add Authors, Speakers and Chairpersons in the
+    """ This is an index that holds all the requests to add Authors or Speakers in the
         list of avatars with rights to submit material.
         Those participants are not Avatars yet (do not have Indico account) and that's why
         they are in this pending queue. So once they become Indico users they will be removed
@@ -207,12 +299,8 @@ class PendingSubmittersHolder(PendingHolder):
         l = self.getPendingByEmail(av.getEmail())
         for e in l:
             # We must grant the new avatar with submission rights
-            if hasattr(e, "getContribution"):
-                contrib = e.getContribution()
-                contrib.grantSubmission(av)
-            elif hasattr(e, "getConference"):
-                conf = e.getConference()
-                conf.getAccessController().grantSubmission(av)
+            contrib = e.getContribution()
+            contrib.grantSubmission(av)
 
             # the Conference method "removePendingSubmitter" will remove the Submitter
             # (type-ContributionParticipation) objects from the conference pending submitter
@@ -234,6 +322,7 @@ class PendingSubmittersHolder(PendingHolder):
             if psList != [] and psList is not None:
                 notif = _PendingSubmitterNotification( psList )
                 mail.GenericMailer.send( notif )
+
 
 class _PendingSubmitterNotification(_PendingNotification):
 
@@ -271,34 +360,6 @@ class _PendingSubmitterNotification(_PendingNotification):
                 participations+=i18nformat("""\t\t\t\t - _("Contribution") \"%s\" (%s)\n""")%(contrib.getTitle(), typeAuthor)
                 accessURL = urlHandlers.UHContributionDisplay.getURL(contrib)
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
-        return participations
-
-class _PendingConfSubmitterNotification(_PendingNotification):
-
-    def getBody( self ):
-        url = urlHandlers.UHUserCreation.getURL()
-        url.addParam("cpEmail",self._psList[0].getEmail())
-        return _("""
-    You have been added as chairperson/speaker of the following event:%s
-    and material submission rights have been granted to you.
-    Please create an account in Indico in order to use these rights. You can create your account at the following URL:
-
-    <%s>
-
-    *Note that you must use this email address %s when creating the account*
-
-    Best Regards.
-
-    --
-    Indico project <http://indico-software.org/>
-                """)%( self._getParticipations(), url, self._psList[0].getEmail() )
-
-    def _getParticipations(self):
-        participations = "\n\n"
-        for conf in self._participationsByConf.keys():
-            participations += i18nformat("""\t\t\t- _("Event") \"%s\":\n""") % conf.getTitle()
-            accessURL = urlHandlers.UHConferenceDisplay.getURL(conf)
-            participations += "\t\t\t\t - Access: %s\n" % accessURL
         return participations
 
 class PendingSubmitterReminder(PendingReminder):
@@ -620,7 +681,8 @@ class PendingCoordinatorReminder(PendingReminder):
 #--GENERAL---
 class PendingQueuesHolder(object):
 
-    _pendingQueues=[PendingSubmittersHolder, \
+    _pendingQueues=[PendingConfSubmittersHolder, \
+                    PendingSubmittersHolder, \
                     PendingManagersHolder, \
                     PendingCoordinatorsHolder]
 
@@ -647,12 +709,21 @@ class ConfPendingQueuesMgr(Persistent):
 
     def __init__(self, conf):
         self._conf=conf
+        self._pendingConfSubmitters={}
         self._pendingSubmitters={}
         self._pendingManagers={}
         self._pendingCoordinators={}
 
     def getConference(self):
         return self._conf
+
+    def getPendingConfSubmitters(self):
+        try:
+            if self._pendingConfSubmitters:
+                pass
+        except AttributeError:
+            self._pendingConfSubmitters={}
+        return self._pendingConfSubmitters
 
     def getPendingSubmitters(self):
         return self._pendingSubmitters
@@ -673,7 +744,64 @@ class ConfPendingQueuesMgr(Persistent):
             self._pendingCoordinators={}
         return self._pendingCoordinators
 
-    #----Pending queue for submitters-----
+    #----Pending queue for conference submitters-----
+
+    def getPendingConfSubmittersKeys(self, sort=False):
+        if sort:
+            # from MaKaC.conference import ContributionParticipation
+            # return keys of contribution participants sorted by name
+            keys=[]
+            vl=[]
+            # flatten the list of lists
+            for v in self.getPendingConfSubmitters().values()[:]:
+                vl.extend(v)
+            # sort
+            # vl.sort(ContributionParticipation._cmpFamilyName)
+            for v in vl:
+                email=v.getEmail().lower().strip()
+                if email not in keys:
+                    keys.append(email)
+            return keys
+        else:
+            keys=self.getPendingConfSubmitters().keys()
+        return keys
+
+    def addPendingConfSubmitter(self, ps, sendEmail=True, sendPeriodicEmail=False):
+        email=ps.getEmail().lower().strip()
+        if self.getPendingConfSubmitters().has_key(email):
+            if not ps in self._pendingConfSubmitters[email]:
+                self._pendingConfSubmitters[email].append(ps)
+        else:
+            self._pendingConfSubmitters[email] = [ps]
+        pendings=PendingConfSubmittersHolder()
+        pendings.addPending(ps, sendEmail, sendPeriodicEmail)
+        self.notifyModification()
+
+    def removePendingConfSubmitter(self, ps):
+        email=ps.getEmail().lower().strip()
+        if self.getPendingConfSubmitters().has_key(email):
+            if ps in self._pendingConfSubmitters[email]:
+                self._pendingConfSubmitters[email].remove(ps)
+                pendings=PendingConfSubmittersHolder()
+                pendings.removePending(ps)
+            if self._pendingConfSubmitters[email] == []:
+                del self._pendingConfSubmitters[email]
+            self.notifyModification()
+
+    def getPendingConfSubmittersByEmail(self, email):
+        email=email.lower().strip()
+        if self.getPendingConfSubmitters().has_key(email):
+            return self._pendingConfSubmitters[email]
+        return []
+
+    def isPendingConfSubmitter(self, cp):
+        email=cp.getEmail().lower().strip()
+        return cp in self.getPendingConfSubmittersByEmail(email)
+
+    #---End conference submitters-----
+
+
+    #----Pending queue for contribution submitters-----
 
     def getPendingSubmittersKeys(self, sort=False):
         if sort:
@@ -695,17 +823,6 @@ class ConfPendingQueuesMgr(Persistent):
             keys=self.getPendingSubmitters().keys()
         return keys
 
-    def addPendingSubmitter(self, ps, sendEmail=True, sendPeriodicEmail=False):
-        email=ps.getEmail().lower().strip()
-        if self.getPendingSubmitters().has_key(email):
-            if not ps in self._pendingSubmitters[email]:
-                self._pendingSubmitters[email].append(ps)
-        else:
-            self._pendingSubmitters[email] = [ps]
-        pendings=PendingSubmittersHolder()
-        pendings.addPending(ps, sendEmail, sendPeriodicEmail)
-        self.notifyModification()
-
     def removePendingSubmitter(self, ps):
         email=ps.getEmail().lower().strip()
         if self.getPendingSubmitters().has_key(email):
@@ -716,6 +833,17 @@ class ConfPendingQueuesMgr(Persistent):
             if self._pendingSubmitters[email] == []:
                 del self._pendingSubmitters[email]
             self.notifyModification()
+
+    def addPendingSubmitter(self, ps, sendEmail=True, sendPeriodicEmail=False):
+        email=ps.getEmail().lower().strip()
+        if self.getPendingSubmitters().has_key(email):
+            if not ps in self._pendingSubmitters[email]:
+                self._pendingSubmitters[email].append(ps)
+        else:
+            self._pendingSubmitters[email] = [ps]
+        pendings=PendingSubmittersHolder()
+        pendings.addPending(ps, sendEmail, sendPeriodicEmail)
+        self.notifyModification()
 
     def getPendingSubmittersByEmail(self, email):
         email=email.lower().strip()

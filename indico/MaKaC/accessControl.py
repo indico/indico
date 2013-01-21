@@ -396,7 +396,7 @@ class AccessController( Persistent, Observable ):
         if av is not None and av.isActivated():
             self._grantSubmission(av)
         elif sb.getEmail() != "":
-            self.getOwner().getPendingQueuesMgr().addPendingSubmitter(sb, False)
+            self.getOwner().getPendingQueuesMgr().addPendingConfSubmitter(sb, False)
             submissionEmailGranted = self._grantSubmissionEmail(sb.getEmail())
             if submissionEmailGranted:
                 from MaKaC.common import pendingQueues

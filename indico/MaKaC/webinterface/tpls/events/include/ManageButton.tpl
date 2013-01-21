@@ -1,5 +1,4 @@
 <%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False"/>
-
 <%
     info = extractInfoForButton(item)
     menuName = 'menu%(confId)s%(sessId)s%(slotId)s%(contId)s%(subContId)s' % info

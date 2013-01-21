@@ -81,6 +81,7 @@ from indico.modules.scheduler import tasks, Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
 
+
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
 
     def _checkParams( self, params ):
@@ -3815,12 +3816,81 @@ class RHConfModifPendingQueues( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifPendingQueues
 
     def _process( self ):
-        p = conferences.WPConfModifPendingQueues( self, self._target, self._getRequestParams().get("tab","submitters") )
+        p = conferences.WPConfModifPendingQueues( self, self._target, self._getRequestParams().get("tab","conf_submitters") )
         return p.display()
+
+class RHConfModifPendingQueuesActionConfSubm:
+    """
+    class to select the action to do with the selected pending conference submitters
+    """
+
+    _uh = urlHandlers.UHConfModifPendingQueuesActionConfSubm
+
+    def __init__(self, req):
+        self._req = req
+
+    def process(self, params):
+        if params.has_key("remove"):
+            return RHConfModifPendingQueuesRemoveConfSubm(self._req).process(params)
+        elif params.has_key("reminder"):
+            return RHConfModifPendingQueuesReminderConfSubm(self._req).process(params)
+        return "no action to do"
+
+class RHConfModifPendingQueuesRemoveConfSubm( RHConferenceModifBase ):
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingSubmitters", []) )
+        self._pendingConfSubms = []
+        for id in self._pendingConfSubmIds:
+            self._pendingConfSubms.extend(self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(id))
+        self._remove=params.has_key("confirm")
+        self._confirmed=params.has_key("confirm") or params.has_key("cancel")
+
+    def _process( self ):
+        url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab","conf_submitters")
+        if self._pendingConfSubms == []:
+            self._redirect(url)
+        if self._confirmed:
+            if self._remove:
+                for ps in self._pendingConfSubms:
+                    self._conf.getPendingQueuesMgr().removePendingConfSubmitter(ps)
+            self._redirect(url)
+        else:
+            wp = conferences.WPConfModifPendingQueuesRemoveConfSubmConfirm(self, self._conf, self._pendingConfSubmIds)
+            return wp.display()
+
+class RHConfModifPendingQueuesReminderConfSubm( RHConferenceModifBase ):
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingSubmitters", []) )
+        self._pendingConfSubms = []
+        for email in self._pendingConfSubmIds:
+            self._pendingConfSubms.append(self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(email))
+        self._send=params.has_key("confirm")
+        self._confirmed=params.has_key("confirm") or params.has_key("cancel")
+
+
+    def _process( self ):
+        url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab","conf_submitters")
+        if self._pendingConfSubms == []:
+            self._redirect(url)
+        if self._confirmed:
+            if self._send:
+                pendings=pendingQueues.PendingConfSubmittersHolder()
+                for pss in self._pendingConfSubms:
+                    pendings._sendReminderEmail(pss)
+            self._redirect(url)
+        else:
+            wp = conferences.WPConfModifPendingQueuesReminderConfSubmConfirm(self, self._conf, self._pendingConfSubmIds)
+            return wp.display()
 
 class RHConfModifPendingQueuesActionSubm:
     """
-    class to select the action to do with the selected pending submitters
+    class to select the action to do with the selected pending contribution submitters
     """
 
     _uh = urlHandlers.UHConfModifPendingQueuesActionSubm

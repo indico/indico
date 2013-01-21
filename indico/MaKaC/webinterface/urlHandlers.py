@@ -3135,6 +3135,9 @@ class UHConfModifRegistrantReasonPartPeformModify( URLHandler ):
 class UHConfModifPendingQueues( URLHandler ):
     _relativeURL = "confModifPendingQueues.py"
 
+class UHConfModifPendingQueuesActionConfSubm( URLHandler ):
+    _relativeURL = "confModifPendingQueues.py/actionConfSubmitters"
+
 class UHConfModifPendingQueuesActionSubm( URLHandler ):
     _relativeURL = "confModifPendingQueues.py/actionSubmitters"
 

@@ -22,6 +22,9 @@ from MaKaC.webinterface.rh import conferenceModif
 def index( req, **params ):
     return conferenceModif.RHConfModifPendingQueues( req ).process( params )
 
+def actionConfSubmitters( req, **params ):
+    return conferenceModif.RHConfModifPendingQueuesActionConfSubm( req ).process( params )
+
 def actionSubmitters( req, **params ):
     return conferenceModif.RHConfModifPendingQueuesActionSubm( req ).process( params )
 
