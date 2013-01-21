@@ -421,15 +421,15 @@ type("RoomBookingVerticalReservationWidget", ["RoomBookingReservationWidget"],
                               this.parentInfo.get('location') + ")")):'';
                     return Html.div(
                             'roomWidget',
-                                 Html.div({style:{paddingTop:'5px'}},
-                                     Html.div('roomVerticalWidgetTitle', $T("Room")),
-                                     Html.div({style: {cssFloat:'left'}},
-                                                         rbActive ?
-                                                         this.roomChooser.draw() :
-                                                         this.roomChooser)),
                                  Html.div({style:{paddingTop:'5px', clear:'left'}},
                                     Html.div('roomVerticalWidgetTitle', $T("Location")),
                                     Html.div({style: {cssFloat:'left'}}, this.locationChooser.draw())),
+                                    Html.div({style:{paddingTop:'5px'}},
+                                        Html.div('roomVerticalWidgetTitle', $T("Room")),
+                                        Html.div({style: {cssFloat:'left'}},
+                                                            rbActive ?
+                                                            this.roomChooser.draw() :
+                                                            this.roomChooser)),
                                 Html.div({style:{paddingTop:'5px', clear:'left'}},
                                          this.parentInfo?this.inheritCheckbox:'', this.inheritText)
                                 );

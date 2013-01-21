@@ -1286,16 +1286,6 @@ class SessionEditRoomLocation(EditRoomLocationBase, sessionServices.SessionModif
                 self._schEntry = self._slot._confSchEntry
         self._entry = self._slot
 
-    def _performOperation(self):
-        result = EditRoomLocationBase._performOperation(self)
-
-        pickledDataSlotSchEntry = fossilize(self._slot.getConfSchEntry(), tz=self._conf.getTimezone())
-        pickledDataSession = fossilize(self._session, tz=self._conf.getTimezone())
-        result.update({'slotEntry': pickledDataSlotSchEntry,
-                       'session': pickledDataSession})
-
-        return result
-
 class SessionSlotEditRoomLocation(EditRoomLocationBase, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):

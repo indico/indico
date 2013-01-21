@@ -747,15 +747,17 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         if(self.eventData.conveners &&
            self.eventData.conveners.length > 0)
         {
+            var convenersDiv = Html.div({className: 'timeLocationDiv'});
             //Using plural if there are multiple conveners
-            infoContentDiv.append(
+            convenersDiv.append(
                 Html.div('roomPopupTitle',
                             (self.eventData.conveners.length > 1)?
                             $T('Conveners'):
                             $T('Convener'), ': '));
 
-            infoContentDiv.append(self._formatConveners(this.eventData.conveners));
-            infoContentDiv.append(Html.br());
+            convenersDiv.append(self._formatConveners(this.eventData.conveners));
+            convenersDiv.append(Html.br());
+            infoContentDiv.append(convenersDiv);
         }
 
         // If it's a contribtion add speaker information
@@ -1228,9 +1230,9 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             this._setInfo();
             this._setParentInfo();
 
-            roomLocationDiv = Html.div({},Html.div('roomPopupTitle', 'Room: '),
-                    self.eventData.room, Html.br(), Html.div('roomPopupTitle', 'Location: '),
-                    self.eventData.location, Html.img({src: imageSrc("edit_16.png")}));
+            roomLocationDiv = Html.div({},Html.div('roomPopupTitle', 'Location: '),
+                    self.eventData.location, Html.br(), Html.div('roomPopupTitle', 'Room: '),
+                    self.eventData.room, Html.img({src: imageSrc("edit_16.png")}), Html.br());
 
             this.editRoomLocationFunction = function(e){
                 roomLocationDiv.dom.style.display = 'none';
