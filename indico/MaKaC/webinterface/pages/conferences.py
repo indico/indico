@@ -698,8 +698,9 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["moreInfo_html"] = isStringHTML(info)
         vars["moreInfo"] = info
         vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
-
-        return vars
+		vars["isSubmitter"] = self._conf.getAccessController().canUserSubmit(self._aw.getUser())
+        
+return vars
 
 
 class WConfDetailsFull(WConfDetailsBase):
@@ -1666,6 +1667,12 @@ class WConfModifMainData(wcomponents.WTemplated):
             av = AvatarHolder().match({"email": chair['email']},
                                   forceWithoutExtAuth=True, exact=True)
             chair['showManagerCB'] = True
+            chair['showSubmitterCB'] = True
+            if not av:
+                if chair['email'] in self._conf.getAccessController().getSubmitterEmailList():
+                    chair['showSubmitterCB'] = False
+            elif (av[0] in self._conf.getAccessController().getSubmitterList()):
+                chair['showSubmitterCB'] = False
             if (av and self._conf.getAccessController().canModify(av[0])) or chair['email'] in self._conf.getAccessController().getModificationEmail():
                 chair['showManagerCB'] = False
         return result
@@ -2158,7 +2165,6 @@ class WPConfModifAC(WPConferenceModifBase):
             "setVisibilityURL": urlHandlers.UHConfSetVisibility.getURL()
             }
         return wc.getHTML(p)
-
 
 class WConfModifTools(wcomponents.WTemplated):
 

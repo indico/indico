@@ -4,7 +4,7 @@
     info = extractInfoForButton(item)
     menuName = 'menu%(confId)s%(sessId)s%(slotId)s%(contId)s%(subContId)s' % info
 %>
-% if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink']):
+% if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink', 'submitter']):
 
     % if manageLink:
         <div class="manageLink" style="background: ${bgColor};">
@@ -66,7 +66,7 @@
                     return false;}, display: $T('Delete minutes')};
             % endif
 
-            % if getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture":
+            % if getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture" and 'submitter' not in info:
                 menuOptions['compileMinutes'] = {action: function(m) {
                     var popupHandler = function(action){
                         if(action){

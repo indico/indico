@@ -54,7 +54,7 @@ class AccessController( Persistent, Observable ):
         and have a common policy.
        Objects of this class provide 2 list of users (one contains the users
         who can access the related object and another one the users which can
-        modify it) along wiht methods for managing them (granting or revoking
+        modify it) along with methods for managing them (granting or revoking
         privileges).
        Conference objects can delegate the access control to one of this
         objects so they don't need to implement again the AC mechanism.
@@ -62,10 +62,11 @@ class AccessController( Persistent, Observable ):
         __accessProtection -- (int) Flag which indicates whether the resource
             the current access controller is related to is protected (on) or
             not (off).
-        managers -- (PList) List of recognised users or groups (Principal)
+        managers -- (PList) List of recognized users or groups (Principal)
             allowed to modify the related resource
-        allowed -- (PList) List of recognised users or groups (Principal)
+        allowed -- (PList) List of recognized users or groups (Principal)
             allowed to access the related resource
+        submitters -- (PList) List of recognized chairpersons/speakers allowed to manage event materials
     """
 
     def __init__( self, owner ):
@@ -80,7 +81,8 @@ class AccessController( Persistent, Observable ):
         self.accessKey = ""
         self.owner = owner
         self.contactInfo = ""
-        self.nonInheritingChildren = set()
+        self.submitters = []
+        self.submittersEmail = []
 
     def getOwner(self):
         return self.owner
@@ -370,7 +372,100 @@ class AccessController( Persistent, Observable ):
     def setContactInfo(self, info):
         self.contactInfo = info
 
-    def addNonInheritingChildren(self, obj):
+    def _initSubmissionPrivileges(self):
+        """Initializes submission privileges list.
+            This is a temporary function used for creating the attribute in the
+            case it does not exist into the DB
+        """
+        try:
+            if self.submitters:
+                pass
+        except AttributeError:
+            self.submitters = []  # create the attribute
+
+    def _grantSubmission(self, av):
+        if av not in self.submitters:
+            self.submitters.append(av)
+            self._p_changed = 1
+
+    def grantSubmission(self, sb):
+        """Grants submission privileges for the specified user
+        """
+        self._initSubmissionPrivileges()
+        av = self._getAvatarByEmail(sb.getEmail())
+        if av is not None and av.isActivated():
+            self._grantSubmission(av)
+        elif sb.getEmail() != "":
+            self.getOwner().getPendingQueuesMgr().addPendingSubmitter(sb, False)
+            submissionEmailGranted = self._grantSubmissionEmail(sb.getEmail())
+            if submissionEmailGranted:
+                from MaKaC.common import pendingQueues
+                notif = pendingQueues._PendingConfSubmitterNotification([sb])
+                from MaKaC.common import mail
+                mail.GenericMailer.sendAndLog(notif, self.getOwner())
+                if self.getOwner() is not None:
+                    self.getOwner()._getSubmitterIdx().indexEmail(sb.getEmail(), self)
+
+    def _revokeSubmission(self, av):
+        if av in self.submitters:
+            self.submitters.remove(av)
+            self._p_changed = 1
+
+    def revokeSubmission(self, sb):
+        """Removes submission privileges for the specified user
+        """
+        self._initSubmissionPrivileges()
+        av = self._getAvatarByEmail(sb.getEmail())
+        self._revokeSubmissionEmail(sb.getEmail())
+        self._revokeSubmission(av)
+
+    def _getAvatarByEmail(self, email):
+        from MaKaC.user import AvatarHolder
+        ah = AvatarHolder()
+        avatars = ah.match({"email": email}, exact=1, forceWithoutExtAuth=True)
+        if not avatars:
+            avatars = ah.match({"email": email}, exact=1)
+        for av in avatars:
+            if av.hasEmail(email):
+                return av
+        return None
+
+    def getSubmitterList(self):
+        """Gives the list of users with submission privileges
+        """
+        self._initSubmissionPrivileges()
+        return self.submitters
+
+    def canUserSubmit(self, user):
+        """Tells whether a user can submit material
+        """
+        if user is None:
+            return False
+        self._initSubmissionPrivileges()
+        return user in self.submitters
+
+    def _grantSubmissionEmail(self, email):
+        """Returns True if submission email was granted. False if email was already in the list.
+        """
+        if not email.lower() in map(lambda x: x.lower(), self.getSubmitterEmailList()):
+            self.getSubmitterEmailList().append(email)
+            self._p_changed = 1
+            return True
+        return False
+
+    def _revokeSubmissionEmail(self, email):
+        if email in self.getSubmitterEmailList():
+            self.getSubmitterEmailList().remove(email)
+            self._p_changed = 1
+
+    def getSubmitterEmailList(self):
+        try:
+            return self.submittersEmail
+        except:
+            self.submittersEmail = []
+        return self.submittersEmail
+
+ def addNonInheritingChildren(self, obj):
         self.nonInheritingChildren.add(obj)
         self._p_changed = 1
 

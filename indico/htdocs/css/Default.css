@@ -7775,6 +7775,12 @@ ul.UIAuthorList li .authorMove {
     cursor: move;
 }
 
+ul.UIAuthorList li .author {
+    padding: 0px 0px 4px 20px;
+    z-index: 1;
+    cursor: default;
+}
+
 ul.UIAuthorList li.UIAuthorMove {
     background: white url("../images/drag.png") left top no-repeat;
 }

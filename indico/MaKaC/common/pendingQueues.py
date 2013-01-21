@@ -190,7 +190,7 @@ class PendingReminder(OneShotTask):
 
 class PendingSubmittersHolder(PendingHolder):
 
-    """ This is an index that holds all the requests to add Authors and Speakers in the
+    """ This is an index that holds all the requests to add Authors, Speakers and Chairpersons in the
         list of avatars with rights to submit material.
         Those participants are not Avatars yet (do not have Indico account) and that's why
         they are in this pending queue. So once they become Indico users they will be removed
@@ -204,11 +204,16 @@ class PendingSubmittersHolder(PendingHolder):
         self._reminder=PendingSubmitterReminder
 
     def grantRights(self, av):
-        l=self.getPendingByEmail(av.getEmail())
+        l = self.getPendingByEmail(av.getEmail())
         for e in l:
             # We must grant the new avatar with submission rights
-            contrib=e.getContribution()
-            contrib.grantSubmission(av)
+            if hasattr(e, "getContribution"):
+                contrib = e.getContribution()
+                contrib.grantSubmission(av)
+            elif hasattr(e, "getConference"):
+                conf = e.getConference()
+                conf.getAccessController().grantSubmission(av)
+
             # the Conference method "removePendingSubmitter" will remove the Submitter
             # (type-ContributionParticipation) objects from the conference pending submitter
             # list and from the this index (PendingSubmitterHolder).
@@ -266,6 +271,34 @@ class _PendingSubmitterNotification(_PendingNotification):
                 participations+=i18nformat("""\t\t\t\t - _("Contribution") \"%s\" (%s)\n""")%(contrib.getTitle(), typeAuthor)
                 accessURL = urlHandlers.UHContributionDisplay.getURL(contrib)
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
+        return participations
+
+class _PendingConfSubmitterNotification(_PendingNotification):
+
+    def getBody( self ):
+        url = urlHandlers.UHUserCreation.getURL()
+        url.addParam("cpEmail",self._psList[0].getEmail())
+        return _("""
+    You have been added as chairperson/speaker of the following event:%s
+    and material submission rights have been granted to you.
+    Please create an account in Indico in order to use these rights. You can create your account at the following URL:
+
+    <%s>
+
+    *Note that you must use this email address %s when creating the account*
+
+    Best Regards.
+
+    --
+    Indico project <http://indico-software.org/>
+                """)%( self._getParticipations(), url, self._psList[0].getEmail() )
+
+    def _getParticipations(self):
+        participations = "\n\n"
+        for conf in self._participationsByConf.keys():
+            participations += i18nformat("""\t\t\t- _("Event") \"%s\":\n""") % conf.getTitle()
+            accessURL = urlHandlers.UHConferenceDisplay.getURL(conf)
+            participations += "\t\t\t\t - Access: %s\n" % accessURL
         return participations
 
 class PendingSubmitterReminder(PendingReminder):

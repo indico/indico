@@ -28,9 +28,13 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                     if (!error) {
                         if (self.eventType == "conference") {
                             // Update all lists of the page
-                            primaryAuthorManager.drawUserList(result[0]);
-                            coAuthorManager.drawUserList(result[1]);
-                            speakerManager.drawUserList(result[2]);
+                            if (self.kindOfUser == "chairperson") {
+                                chairPersonsManager.drawUserList(result);
+                            } else {
+                                primaryAuthorManager.drawUserList(result[0]);
+                                coAuthorManager.drawUserList(result[1]);
+                                speakerManager.drawUserList(result[2]);
+                            }
                         } else {
                             speakerManager.drawUserList(result);
                         }
@@ -75,6 +79,9 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                 }
             });
             var spanClass = 'authorMove';
+            if (self.kindOfUser == "chairperson") {
+                spanClass = 'author';
+            }
             row.append($('<span class=' + spanClass + ' />').append(
                 self._personName(user)));
             row.data('user', user);
@@ -160,6 +167,7 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
     },
 
     _sendEmail: function(userId) {
+        var self = this;
         // request necessary data
         indicoRequest(this.methods["sendEmail"], this._getParamsSendEmail(userId),
                function(result, error) {
@@ -169,7 +177,11 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                             popup.open();
                         } else {
                             // send the email
-                            window.location = 'mailto:'+result["email"]+'?subject=['+result["confTitle"]+'] Contribution '+result["contribId"]+': '+result["contribTitle"];
+                            if (result["contribId"] == undefined) {
+                                window.location = 'mailto:'+result["email"]+'?subject=['+result["confTitle"]+']';
+                            } else {
+                                window.location = 'mailto:'+result["email"]+'?subject=['+result["confTitle"]+'] Contribution '+result["contribId"]+': '+result["contribTitle"];
+                            }
                         }
                     } else {
                         IndicoUtil.errorReport(error);
@@ -184,20 +196,18 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
 
 },
 
-    function(confId, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList) {
+    function(confId, methods, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList) {
         this.kindOfUser = kindOfUser;
 	    this.eventType = eventType;
-
-        this.methods = {'addNew': 'contribution.participants.addNewParticipant',
-                        'addExisting': 'contribution.participants.addExistingParticipant',
-                        'remove': 'contribution.participants.removeParticipant',
-                        'edit': 'contribution.participants.editParticipantData',
-                        'sendEmail': 'contribution.participants.sendEmailData',
-                        'changeSubmission': 'contribution.participants.changeSubmissionRights'};
-
-        this.ListOfUsersManager(confId, this.methods, params, inPlaceListElem, userCaption, elementClass, false,
-                {submission: true, management: false, coordination: false},
-                {title: false, affiliation: true, email:false},
+        this.rightsToShow = {submission: true, management: false, coordination: false};
+        this.nameOptions = {title: false, affiliation: true, email:false};
+        if (kindOfUser == "chairperson") {
+            this.rightsToShow = {submission: true, management: false, coordination: false};
+            this.nameOptions = {title: true, affiliation: false, email:false};
+        }
+        this.ListOfUsersManager(confId, methods, params, inPlaceListElem, userCaption, elementClass, false,
+                this.rightsToShow,
+                this.nameOptions,
                 {remove: true, edit: true, favorite: false, arrows: false, menu: true}, initialList, true, false, inPlaceMenu);
     }
 );

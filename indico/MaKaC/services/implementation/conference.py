@@ -1323,6 +1323,12 @@ class ConferenceChairPersonBase(ConferenceModifBase):
             av = AvatarHolder().match({"email": chair['email']},
                                   forceWithoutExtAuth=True, exact=True)
             chair['showManagerCB'] = True
+            chair['showSubmitterCB'] = True
+            if not av:
+                if chair['email'] in self._conf.getAccessController().getSubmitterEmailList():
+                    chair['showSubmitterCB'] = False
+            elif (av[0] in self._conf.getAccessController().getSubmitterList()):
+                chair['showSubmitterCB'] = False
             if (av and self._conf.getAccessController().canModify(av[0])) or chair['email'] in self._conf.getAccessController().getModificationEmail():
                 chair['showManagerCB'] = False
         return result
@@ -1339,6 +1345,7 @@ class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
         ConferenceChairPersonBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        self._submissionRights = pm.extract("presenter-grant-submission", pType=bool, allowEmpty=False)
         # Check if there is already a user with the same email
         for person in self._userList:
             if self._isEmailAlreadyUsed(person["email"]):
@@ -1355,6 +1362,8 @@ class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
         chair.setPhone(av.getTelephone())
         chair.setFax(av.getFax())
         self._conf.addChair(chair)
+        if self._submissionRights:
+            self._conf.getAccessController().grantSubmission(chair)
 
     def _getAnswer(self):
         for person in self._userList:
@@ -1396,6 +1405,11 @@ class ConferenceAddNewChairPerson(ConferenceChairPersonBase):
             else:
                 #Apart from granting the chairman, we add it as an Indico user
                 self._conf.grantModification(chair)
+        #If the chairperson needs to be given submission rights
+        if self._userData.get("submission", False):
+            if self._userData.get("email", "") == "":
+                raise ServiceAccessError(_("It is necessary to enter the email of the user if you want to add him as submitter."))
+            self._conf.getAccessController().grantSubmission(chair)
 
     def _getAnswer(self):
         self._newChair()
@@ -1412,6 +1426,7 @@ class ConferenceRemoveChairPerson(ConferenceChairPersonBase):
     def _getAnswer(self):
         chair = self._conf.getChairById(self._chairId)
         self._conf.removeChair(chair)
+        self._conf.getAccessController().revokeSubmission(chair)
         return self._getChairPersonsList()
 
 
@@ -1451,10 +1466,45 @@ class ConferenceEditChairPerson(ConferenceChairPersonBase):
             else:
                 #Apart from granting the chairman, we add it as an Indico user
                 self._conf.grantModification(chair)
+        #If the chairperson needs to be given submission rights because the checkbox is selected
+        if self._userData.get("submission", False):
+            if self._userData.get("email", "") == "":
+                raise ServiceAccessError(_("It is necessary to enter the email of the user if you want to add him as submitter."))
+            self._conf.getAccessController().grantSubmission(chair)
 
     def _getAnswer(self):
         chair = self._conf.getChairById(self._chairId)
         self._editChair(chair)
+        return self._getChairPersonsList()
+
+
+class ConferenceSendEmailData(ConferenceChairPersonBase):
+        def _getAnswer(self):
+            pm = ParameterManager(self._params)
+            self._chairperson = self._conf.getChairById(pm.extract("userId", pType=str, allowEmpty=False))
+            return {"confTitle": self._conf.getTitle(),
+                    "email": self._chairperson.getEmail()
+                    }
+
+
+class ConferenceChangeSubmissionRights(ConferenceChairPersonBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._chairperson = self._conf.getChairById(pm.extract("userId", pType=str, allowEmpty=False))
+        if self._chairperson == None:
+            raise ServiceAccessError(_("The user that you are trying to delete does not exist."))
+        if self._chairperson.getEmail() == "":
+            raise ServiceAccessError(_("It is not possible to grant submission rights to a participant without an email address. Please set an email address."))
+        self._action = pm.extract("action", pType=str, allowEmpty=False)
+        self._eventType = pm.extract("eventType", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        if self._action == "grant":
+            self._conf.getAccessController().grantSubmission(self._chairperson)
+        elif self._action == "remove":
+            self._conf.getAccessController().revokeSubmission(self._chairperson)
         return self._getChairPersonsList()
 
 class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase ):
@@ -1627,6 +1677,8 @@ methodMap = {
     "main.addNewChairPerson": ConferenceAddNewChairPerson,
     "main.removeChairPerson": ConferenceRemoveChairPerson,
     "main.editChairPerson": ConferenceEditChairPerson,
+    "main.sendEmailData": ConferenceSendEmailData,
+    "main.changeSubmissionRights": ConferenceChangeSubmissionRights,
     "program.changeDescription": ConferenceProgramDescriptionModification,
     "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributionsReview,

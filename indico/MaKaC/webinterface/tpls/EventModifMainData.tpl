@@ -185,12 +185,12 @@ additionalInfo = confObj.getContactInfo()
     <td colspan="2">
         <table width="100%">
             <tr>
-                <td class="blacktext" style="width: 100%">
-                    <ul id="chairPersonsList" class="UIPeopleList"></ul>
+                <td class="blacktext" style="width: 79%">
+                    <ul id="chairPersonsList" class="UIAuthorList"></ul>
                 </td>
-                <td nowrap valign="top">
+                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                     <span id="addNewChairSpan" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                        <a id="addNewChairLink" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Add chairperson") if eventType == "conference" or eventType == "meeting" else  _("Add speaker")}</a>
+                        <a id="addNewChairLink" class="dropDownMenu fakeLink">${ _("Add chairperson") if eventType == "conference" or eventType == "meeting" else  _("Add speaker")}</a>
                     </span>
                 </td>
             </tr>
@@ -293,15 +293,13 @@ $E('inPlaceEditLocation').set([
 
 // Search chairpersons/speakers
 
-var chairPersonsManager = new ListOfUsersManager(confFossile["id"],
+var chairPersonsManager = new ParticipantsListManager(confFossile["id"],
         {'addNew': 'event.main.addNewChairPerson',
          'addExisting': 'event.main.addExistingChairPerson',
          'remove': 'event.main.removeChairPerson',
-         'edit': 'event.main.editChairPerson'}, {confId: confFossile["id"]}, $E('chairPersonsList'),
-        "chairperson", "UIPerson", false,
-        {submission: false, management: true, coordination: false},
-        {title: true, affiliation: false, email:false},
-        {remove: true, edit: true, favorite: false, arrows: false, menu: false}, ${chairpersons | n,j},
-        true, false, $E('addNewChairSpan'));
-
+         'edit': 'event.main.editChairPerson',
+         'sendEmail': 'event.main.sendEmailData',
+         'changeSubmission': 'event.main.changeSubmissionRights'},
+        {confId: confFossile["id"], kindOfList: "chairperson"}, $E('chairPersonsList'), $E('addNewChairSpan'),
+         "chairperson", "chairperson", "conference", "UIAuthorMove",  ${chairpersons | n,j});
 </script>

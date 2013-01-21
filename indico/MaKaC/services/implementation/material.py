@@ -114,6 +114,10 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
     def _checkProtection(self):
         owner = self._material.getOwner()
 
+        # Conference submitters have access
+        if isinstance(owner, conference.Conference) and owner.getAccessController().canUserSubmit(self._aw.getUser()):
+            return
+
         # There are two exceptions to the normal permission scheme:
         # (sub-)contribution submitters and session coordinators
 

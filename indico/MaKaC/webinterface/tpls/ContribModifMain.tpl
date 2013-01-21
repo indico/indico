@@ -225,20 +225,26 @@
 
 <script>
 var confId = '${ self_._rh._target.getConference().getId() }';
+var methods = {'addNew': 'contribution.participants.addNewParticipant',
+               'addExisting': 'contribution.participants.addExistingParticipant',
+               'remove': 'contribution.participants.removeParticipant',
+               'edit': 'contribution.participants.editParticipantData',
+               'sendEmail': 'contribution.participants.sendEmailData',
+               'changeSubmission': 'contribution.participants.changeSubmissionRights'};
 % if eventType == "conference":
     //(confId, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList)
-    var primaryAuthorManager = new ParticipantsListManager(confId,
+    var primaryAuthorManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "prAuthor"}, $E('inPlacePrimaryAuthors'), $E('inPlacePrimaryAuthorsMenu'),
         "prAuthor", "primary author", "conference", "UIAuthorMove", ${primaryAuthors | n,j});
     $('#inPlacePrimaryAuthors').data('manager', primaryAuthorManager);
 
-    var coAuthorManager = new ParticipantsListManager(confId,
+    var coAuthorManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "coAuthor"}, $E('inPlaceCoAuthors'), $E('inPlaceCoAuthorsMenu'),
         "coAuthor", "co-author", "conference", "UIAuthorMove", ${coAuthors | n,j});
     $('#inPlaceCoAuthors').data('manager', coAuthorManager);
 
 % endif:
-    var speakerManager = new ParticipantsListManager(confId,
+    var speakerManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "speaker"}, $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'),
         "speaker", "speaker", "${eventType}", "UIAuthorMove", ${speakers | n,j});
     $('#inPlaceSpeakers').data('manager', speakerManager);

@@ -47,6 +47,10 @@
   </div>
   % endif
 
+  % if isSubmitter:
+  	<div id="manageMaterials"><a class="fakeLink" >${_("Add materials")}</a></div>
+  % endif
+
   % if material:
   <div class="info_line material">
       <span  title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
