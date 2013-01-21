@@ -1450,8 +1450,8 @@ class ContribSchEntry(LinkedTimeSchEntry):
 
 class ScheduleToJson:
 
-    _cacheEntries = GenericCache("ConferenceTimetableEntries")
-    _cache = GenericCache("ConferenceTimetable")
+    _cacheEntries = GenericCache("ConfTTEntries")
+    _cache = GenericCache("ConfTT")
 
     @staticmethod
     def obtainFossil(entry, tz, fossilInterface = None, mgmtMode = False, useAttrCache = False):
