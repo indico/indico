@@ -23,6 +23,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
 from MaKaC.common.contextManager import ContextManager
+from indico.util.fs import silentremove
 
 import hashlib, os, shutil, datetime, time
 import cPickle as pickle
@@ -435,7 +436,7 @@ class FileCacheClient(CacheClient):
     def delete(self, key):
         path = self._getFilePath(key, False)
         if os.path.exists(path):
-            os.remove(path)
+            silentremove(path)
         return 1
 
 
