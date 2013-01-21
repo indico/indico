@@ -253,7 +253,7 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
             c.getAccessController().setProtection(-1)
 
         avatars, newUsers, allowedAvatars = self._getPersons()
-        UtilPersons.addToConf(avatars, newUsers, allowedAvatars, c, self._params.has_key('grant-manager'))
+        UtilPersons.addToConf(avatars, newUsers, allowedAvatars, c, self._params.has_key('grant-manager'), self._params.has_key('presenter-grant-submission'))
         if params.get("sessionSlots",None) is not None :
             if params["sessionSlots"] == "enabled" :
                 c.enableSessionSlots()
@@ -340,7 +340,7 @@ _Access%s_
 class UtilPersons:
 
     @staticmethod
-    def addToConf( avatars, newUsers, accessingAvatars, conf, grantManager):
+    def addToConf( avatars, newUsers, accessingAvatars, conf, grantManager, grantSubmission):
 
         if newUsers :
             for newUser in newUsers:
@@ -355,7 +355,7 @@ class UtilPersons:
                 person.setFax(newUser.get("fax",""))
                 if not UtilPersons._alreadyDefined(person) :
                     #TODO: add to conf
-                    UtilPersons._addChair(conf, person, grantManager)
+                    UtilPersons._addChair(conf, person, grantManager, grantSubmission)
                 else :
                     #self._errorList.append("%s has been already defined as %s of this conference"%(person.getFullName(),self._typeName))
                     pass
@@ -368,7 +368,7 @@ class UtilPersons:
                     person.setDataFromAvatar(selected)
                     if not UtilPersons._alreadyDefined(person):
                         #TODO: add to conf
-                        UtilPersons._addChair(conf, person, grantManager)
+                        UtilPersons._addChair(conf, person, grantManager, grantSubmission)
                     else :
                         #self._errorList.append("%s has been already defined as %s of this conference"%(person.getFullName(),self._typeName))
                         pass
@@ -400,10 +400,12 @@ class UtilPersons:
         return False
 
     @staticmethod
-    def _addChair(conf, chair, grant):
+    def _addChair(conf, chair, grantManager, grantSubmission):
         conf.addChair(chair)
-        if grant:
+        if grantManager:
             conf.grantModification(chair)
+        if grantSubmission:
+            conf.getAccessController().grantSubmission(chair)
 
 class UtilsConference:
 
