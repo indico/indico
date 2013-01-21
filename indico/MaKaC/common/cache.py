@@ -332,7 +332,45 @@ class MultiLevelCache(object):
         return '%s_%s' % (entry.getId(), version)
 
 
-class FileCacheClient(object):
+class CacheClient(object):
+
+    def set_multi(self, mapping, ttl=0):
+        notstored = []
+        for key, val in mapping.iteritems():
+            if self.set(key, val, ttl) == 0:
+                notstored.append(key)
+        return notstored
+
+    def get_multi(self, keys):
+        values = {}
+        for key in keys:
+            val = self.get(key)
+            if val is not None:
+                values[key] = val
+        return values
+
+    def delete_multi(self, keys):
+        for key in keys:
+            self.delete(key)
+        return 1
+
+
+class NullCacheClient(CacheClient):
+    """
+    Does nothing
+    """
+
+    def set(self, key, val, ttl=0):
+        return 1
+
+    def get(self, key):
+        return None
+
+    def delete(self, key):
+        return
+
+
+class FileCacheClient(CacheClient):
     """File-based cache with a memcached-like API.
 
     Contains only features needed by GenericCache.
@@ -365,13 +403,6 @@ class FileCacheClient(object):
             f.close()
         return 1
 
-    def set_multi(self, mapping, ttl=0):
-        notstored = []
-        for key, val in mapping.iteritems():
-            if self.set(key, val, ttl) == 0:
-                notstored.append(key)
-        return notstored
-
     def get(self, key):
         path = self._getFilePath(key)
         if not os.path.exists(path):
@@ -388,23 +419,10 @@ class FileCacheClient(object):
             return None
         return val
 
-    def get_multi(self, keys):
-        values = {}
-        for key in keys:
-            val = self.get(key)
-            if val is not None:
-                values[key] = val
-        return values
-
     def delete(self, key):
         path = self._getFilePath(key, False)
         if os.path.exists(path):
             os.remove(path)
-        return 1
-
-    def delete_multi(self, keys):
-        for key in keys:
-            self.delete(key)
         return 1
 
 
@@ -422,15 +440,19 @@ class GenericCache(object):
             return
         # If not, we might have one from another instance
         self._client = ContextManager.get('GenericCacheClient', None)
+
         if self._client is not None:
             return
+
         # If not, create a new one
         backend = Config.getInstance().getCacheBackend()
         if backend == 'memcached':
             import memcache
             self._client = memcache.Client(Config.getInstance().getMemcachedServers())
-        else:
+        elif backend == 'files':
             self._client = FileCacheClient(Config.getInstance().getXMLCacheDir())
+        else:
+            self._client = NullCacheClient()
 
         ContextManager.set('GenericCacheClient', self._client)
 
