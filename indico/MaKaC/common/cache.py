@@ -392,31 +392,44 @@ class FileCacheClient(CacheClient):
         return os.path.join(dir, filename)
 
     def set(self, key, val, ttl=0):
-        f = open(self._getFilePath(key), 'wb')
-        OSSpecific.lockFile(f, 'LOCK_EX')
         try:
-            expiry = int(time.time()) + ttl if ttl else None
-            data = (expiry, val)
-            pickle.dump(data, f)
-        finally:
-            OSSpecific.lockFile(f, 'LOCK_UN')
-            f.close()
+            f = open(self._getFilePath(key), 'wb')
+            OSSpecific.lockFile(f, 'LOCK_EX')
+            try:
+                expiry = int(time.time()) + ttl if ttl else None
+                data = (expiry, val)
+                pickle.dump(data, f)
+            finally:
+                OSSpecific.lockFile(f, 'LOCK_UN')
+                f.close()
+        except (IOError, OSError):
+            Logger.get('FileCache').exception('Error setting value in cache')
+            return 0
         return 1
 
     def get(self, key):
-        path = self._getFilePath(key)
-        if not os.path.exists(path):
-            return None
-        f = open(path, 'rb')
-        OSSpecific.lockFile(f, 'LOCK_SH')
-        expiry = val = None
         try:
-            expiry, val = pickle.load(f)
-        finally:
-            OSSpecific.lockFile(f, 'LOCK_UN')
-            f.close()
-        if expiry and time.time() > expiry:
+            path = self._getFilePath(key)
+            if not os.path.exists(path):
+                return None
+
+            f = open(path, 'rb')
+            OSSpecific.lockFile(f, 'LOCK_SH')
+            expiry = val = None
+            try:
+                expiry, val = pickle.load(f)
+            finally:
+                OSSpecific.lockFile(f, 'LOCK_UN')
+                f.close()
+            if expiry and time.time() > expiry:
+                return None
+        except (IOError, OSError):
+            Logger.get('FileCache').exception('Error getting cached value')
             return None
+        except (EOFError, pickle.UnpicklingError):
+            Logger.get('FileCache').exception('Cached information seems corrupted. Overwriting it.')
+            return None
+
         return val
 
     def delete(self, key):
