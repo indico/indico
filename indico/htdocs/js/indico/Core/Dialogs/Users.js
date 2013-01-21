@@ -1043,7 +1043,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             var grantCoordination = [];
             var warning = [];
             if (this.grantSubmission) {
-                grantSubmission = [$T('Grant submission rights'), $B(Html.checkbox({}), userData.accessor('submission'))];
+                grantSubmission = [$T('Grant submission rights'), $B(Html.checkbox({id: 'submissionCheckbox'}), userData.accessor('submission'))];
                 warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
                         $T('he or she will be sent an email asking to register as a user.'), Html.br(),
                         $T(' After the registration the user will automatically be given'), Html.br(),
@@ -1076,7 +1076,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                [$T('First Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('firstName'))],
                [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],
-               [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'email', this.allowEmptyEmail), userData.accessor('email'))],
+               [$T('Email'),  $B(self.parameterManager.add(Html.edit({id: "email",  style: {width: '300px'}}), 'email', this.allowEmptyEmail), userData.accessor('email'))],
                [$T('Address'), $B(Html.textarea({style:{width:'300px'}}), userData.accessor('address'))],
                [$T('Telephone'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('phone'))],
                [$T('Fax'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('fax'))],
@@ -1085,20 +1085,24 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
          },
 
-         _getButtons: function() {
-             var self = this;
-             return [
-                 [$T('Save'), function() {
-                     self.action(self.userData, function() {
-                         self.close();
-                     });
-                 }],
-                 [$T('Cancel'), function() {
-                     self.close();
-                 }]
-             ];
-         }
-
+        _getButtons: function() {
+            var self = this;
+            return [
+                [$T('Save'), function() {
+                    if ($('#submissionCheckbox').is(':checked') && $('#email').val() == 0) {
+                        var popup = new WarningPopup($T('Warning'), $T("It is not possible to grant submission rights to a participant without an email address. Please set an email address."));
+                        popup.open();
+                        return;
+                    }
+                    self.action(self.userData, function() {
+                    self.close();
+                    });
+                }],
+                [$T('Cancel'), function() {
+                    self.close();
+                }]
+            ];
+        }
      },
      function(title, userData, action, grantSubmission, grantManagement, grantCoordination, allowEmptyEmail) {
          this.userData = userData;
