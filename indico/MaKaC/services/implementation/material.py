@@ -21,7 +21,7 @@
 Schedule-related services
 """
 
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError,NoReportError
 from MaKaC.services.implementation.base import \
      ParameterManager, ProtectedModificationService, ProtectedDisplayService
 
@@ -94,7 +94,10 @@ class MaterialBase:
 
 
         except Exception, e:
-            raise ServiceError("ERR-M0", str(e))
+            if self._target is None:
+                raise NoReportError(_("The material with does not exist anymore. Please refresh the page."))
+            else:
+                raise ServiceError("ERR-M0", str(e))
 
 class MaterialDisplayBase(ProtectedDisplayService, MaterialBase):
 
@@ -181,7 +184,11 @@ class ResourceBase:
                 self._categ=self._target.getCategory()
 
         except Exception, e:
-            raise ServiceError("ERR-M0", str(e))
+            if self._target is None:
+                raise NoReportError(_("The resource with does not exist anymore. Please refresh the page."))
+
+            else:
+                raise ServiceError("ERR-M0", str(e))
 
 
 class ResourceDisplayBase(ProtectedDisplayService, ResourceBase):

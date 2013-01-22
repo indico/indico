@@ -492,10 +492,12 @@ class CategoryEventFetcher(IteratedDataFetcher):
         """
         sched = conf.getSchedule()
         for day in datespan(conf.getStartDate(), conf.getEndDate()):
-            startDT = sched.calculateDayStartDate(day)
-            endDT = sched.calculateDayEndDate(day)
-            if startDT != endDT:
-                yield Period(startDT, endDT)
+            # ignore days that have no occurrences
+            if sched.getEntriesOnDay(day):
+                startDT = sched.calculateDayStartDate(day)
+                endDT = sched.calculateDayEndDate(day)
+                if startDT != endDT:
+                    yield Period(startDT, endDT)
 
     def _addOccurrences(self, fossil, obj, startDT, endDT):
         if self._occurrences:

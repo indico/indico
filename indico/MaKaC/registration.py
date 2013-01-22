@@ -435,7 +435,7 @@ class RegistrationForm(Persistent):
                         val = "0"
 
                 fakeParams = {f.getInput().getHTMLName(): val}
-                f.getInput().setResponseValue(mg.getResponseItemById(f.getId()), fakeParams, registrant, mg, override=True)
+                f.getInput().setResponseValue(mg.getResponseItemById(f.getId()), fakeParams, registrant, mg, override=True, validate=False)
         self.personalData = pd
 
     def getPersonalData(self):
@@ -1095,7 +1095,7 @@ class FieldInputType(Persistent):
         """
         return ""
 
-    def setResponseValue(self, item, params, registrant, mg=None, override=False):
+    def setResponseValue(self, item, params, registrant, mg=None, override=False, validate=True):
         """
         This method shouldn't be called from the classes inheriting from this one (FieldInputType).
         This method fills the attribute "item" (MiscellaneousInfoSimpleItem) with the value the user wrote
@@ -1108,7 +1108,7 @@ class FieldInputType(Persistent):
         else:
             self._beforeValueChange(item, False)
 
-        self._setResponseValue(item, params, registrant, override=override)
+        self._setResponseValue(item, params, registrant, override=override, validate=validate)
         self._afterValueChange(item)
 
     def _beforeValueChange(self, item, newItem):
@@ -1121,7 +1121,7 @@ class FieldInputType(Persistent):
         if item.getQuantity():
             self.getParent().increaseNoPlaces()
 
-    def _setResponseValue(self, item, registrant, params, override=False):
+    def _setResponseValue(self, item, registrant, params, override=False, validate=True):
         """
         Method that should be overwritten by the classes inheriting from this one in order to get the value written in the form.
         """
@@ -1204,7 +1204,7 @@ class TextInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed() ):
             #if ( item is not None and item.isBillable()):
             #######################
@@ -1299,13 +1299,13 @@ class TelephoneInput(FieldInputType):
             tmp = """%s</tr><tr><td>%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         v = params.get(self.getHTMLName(), "")
 
         if not override and self.getParent().isMandatory() and v.strip() == "":
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
 
-        if v.strip() != '' and not TelephoneInput._PATTERN.match(v):
+        if validate and v.strip() != '' and not TelephoneInput._PATTERN.match(v):
             raise FormValuesError(_("The field \"%s\" is in wrong format. Please fill it in the correct format: (+) 999 99 99 99") % self.getParent().getCaption())
 
         v = re.sub(r'\s+|\-+', '', v)
@@ -1400,7 +1400,7 @@ class TextareaInput(FieldInputType):
 
         return tmp
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed() ):
             #if ( item is not None and item.isBillable()):
             #######################
@@ -1526,7 +1526,7 @@ class NumberInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         v=params.get(self.getHTMLName(),"")
         quantity = 0
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed()):
@@ -1655,7 +1655,7 @@ class LabelInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         if ( registrant is not None and self._parent.isBillable() and registrant.getPayed()):
             #if ( item is not None and item.isBillable()):
             #######################
@@ -1720,7 +1720,7 @@ class CheckboxInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         if (registrant is not None and self._parent.isBillable() and registrant.getPayed()):
             #if ( item is not None and item.isBillable()):
             #######################
@@ -1804,7 +1804,7 @@ class YesNoInput(FieldInputType):
 
 
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         if (registrant is not None and self._parent.isBillable() and registrant.getPayed()):
             #if ( item is not None and item.isBillable()):
             #    return
@@ -1853,7 +1853,7 @@ class FileInput(FieldInputType):
         wc = WFileInputField(self, item, default)
         return wc.getHTML()
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         v=params.get(self.getHTMLName(),"")
         newValueEmpty = v.strip() == "" if isinstance(v, str) else v.filename==""
         if not override and self.getParent().isMandatory() and newValueEmpty:
@@ -2302,7 +2302,7 @@ class RadioGroupInput(FieldInputType):
         else:
             return self._getDropDownModifHTML(item, registrant, default)
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         v=params.get(self.getHTMLName(),"")
         billable=False
         for val in self._items.values():
@@ -2462,7 +2462,7 @@ class CountryInput(FieldInputType):
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         v = params.get(self.getHTMLName(), "")
         if not override and self.getParent().isMandatory() and v.strip() == "":
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
@@ -2536,7 +2536,7 @@ class DateInput(FieldInputType):
             tmp = """%s</tr><tr><td>%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
-    def _setResponseValue(self, item, params, registrant, override=False):
+    def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         day = params.get('%sDay' % self.getHTMLName(), 1) or 1
         month = params.get('%sMonth' % self.getHTMLName(), 1) or 1
         year = params.get('%sYear' % self.getHTMLName())

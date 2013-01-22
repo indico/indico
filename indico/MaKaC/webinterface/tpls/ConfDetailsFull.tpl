@@ -11,11 +11,14 @@
     <td align="right" valign="top" class="displayField"><b> ${ _("Timezone")}:</b></td>
     <td>${ timezone }</td>
   </tr>
+  % if location:
   <tr>
     <td align="right" valign="top" class="displayField"><b> ${ _("Location")}:</b></td>
     <td>${ location }</td>
   </tr>
+  % endif
 
+  % if chairs:
   <tr>
     <td align="right" valign="top" class="displayField"><strong>${_("Chairs:")}</strong></td>
     <td>
@@ -36,6 +39,7 @@
       </ul>
     </td>
   </tr>
+  % endif
 
   ${ material }
   ${ moreInfo }

@@ -353,7 +353,7 @@ def getOrphans():
                 AND LS.idStatus = S.idStatus
                 AND S.idMachine = M.idMachine
                 AND M.idVenue = V.idVenue
-                AND (NOT L.IndicoID OR L.IndicoID IS NULL)
+                AND L.IndicoID IS NULL
                 ORDER BY L.LOID""",
                 (idTaskRecording,))
             connection.commit()

@@ -47,8 +47,7 @@ except ImportError:
     BABEL_PRESENT = False
 
 
-DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras",
-                   "https://github.com/collective/icalendar/tarball/6f899869d462a23d0ebd3f54fb237e8670242bc4#egg=icalendar-3.0"]
+DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
 
 DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor']
 
@@ -122,8 +121,9 @@ def _getInstallRequires():
 
     base =  ['ZODB3>=3.8', 'pytz', 'zope.index', 'zope.interface',
              'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil<2.0',
-             'pypdf', 'mako>=0.4.1', 'babel', 'icalendar>=3.0', 'pyatom',
-             'cssmin', 'webassets', 'pojson>=0.4', 'requests']
+             'pypdf', 'mako>=0.4.1', 'babel', 'icalendar>=3.2', 'pyatom',
+             'cssmin', 'webassets',
+             'pojson>=0.4', 'requests']
 
     #for Python older than 2.7
     if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
@@ -478,10 +478,10 @@ if __name__ == '__main__':
           author = "Indico Team",
           author_email = "indico-team@cern.ch",
           url = "http://indico-software.org",
-          download_url = "http://indico-software.org/wiki/Releases/Indico0.98-rc1",
+          download_url = "http://indico-software.org/wiki/Releases/Indico0.99",
           platforms = ["any"],
           long_description = "Indico allows you to schedule conferences, from single talks to complex meetings with sessions and contributions. It also includes an advanced user delegation mechanism, allows paper reviewing, archival of conference information and electronic proceedings",
-          license = "http://www.gnu.org/licenses/gpl-2.0.txt",
+          license = "http://www.gnu.org/licenses/gpl-3.0.txt",
           entry_points = """
             [console_scripts]
 

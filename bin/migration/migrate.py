@@ -519,6 +519,12 @@ def chatroomIndexMigration(dbi, withRBDB, prevVersion):
 
     from MaKaC.plugins.InstantMessaging.indexes import IndexByUser, IndexByConf, IndexByCRName, IndexByID
 
+    im_plugin = PluginsHolder().getPluginType('InstantMessaging')
+
+    if not im_plugin.isUsable():
+        print console.colored('  IM plugin not usable - jumping task', 'yellow')
+        return
+
     try:
         for idx in [IndexByUser(), IndexByConf(), IndexByCRName()]:
             tmp_idx = defaultdict(list)

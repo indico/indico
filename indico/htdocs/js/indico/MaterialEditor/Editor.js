@@ -332,10 +332,10 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                 // visibility and access key
                 if (self.creationMode == 'material') {
                     self.visibility.enable();
-                    self.password.enable();
+                    self.password.dom.disabled = false;
                 } else {
                     self.visibility.disable();
-                    self.password.disable();
+                    self.password.dom.disabled = true;
                 }
 
                 // draw a little notification saying that
