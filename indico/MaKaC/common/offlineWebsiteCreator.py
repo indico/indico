@@ -18,19 +18,29 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import string
-import shutil, os
+import shutil
+import os
 import re
 import MaKaC.common.TemplateExec as templateEngine
+from MaKaC import conference
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import displayMgr
-from MaKaC.webinterface.pages import conferences, registrants, contributions, sessions,\
-    authors
+from MaKaC.webinterface.pages.static import WPTPLStaticConferenceDisplay, WPStaticConferenceDisplay, WPStaticConferenceTimeTable, WPStaticConferenceProgram, WPStaticContributionList, WPStaticInternalPageDisplay, WPStaticAuthorIndex, WPStaticSpeakerIndex, WPStaticSessionDisplay, WPStaticContributionDisplay, WPStaticConfRegistrantsList, WPStaticMaterialConfDisplayBase, WPStaticSubContributionDisplay, WPStaticAuthorDisplay
 from MaKaC.common.Configuration import Config
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.common.logger import Logger
 from MaKaC.common import timezoneUtils
+from MaKaC.conference import LocalFile
+from MaKaC.fileRepository import LocalRepository
+
+from MaKaC.PDFinterface.conference import ProgrammeToPDF
+from MaKaC.PDFinterface.conference import TimeTablePlain
+from MaKaC.PDFinterface.conference import AbstractBook
+from MaKaC.PDFinterface.conference import ContribToPDF
+from MaKaC.PDFinterface.conference import TimeTablePlain
+from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
 
 class OfflineEvent:
 
@@ -47,41 +57,46 @@ class OfflineEvent:
             websiteCreator = ConferenceOfflineCreator(self._rh, self._conf, self._html)
         return websiteCreator.create()
 
+
 class OfflineEventCreator:
 
     def __init__(self, rh, conf, html):
         self._rh = rh
         self._conf = conf
         self._html = html
-        self._outputFileName = ""
+        self._outputFile = ""
         self._fileHandler = None
         self._mainPath = ""
         self._staticPath = ""
-        #self._toUser = ContextManager.get('currentUser')
+        # self._toUser = ContextManager.get('currentUser')
 
     def create(self):
-        try:
-            self._fileHandler = ZIPFileHandler()
-            # Create main and static folders
-            self._mainPath = "OfflineWebsite-%s" % self._normalisePath(self._conf.getTitle())
-            self._fileHandler.addDir(self._mainPath)
-            self._staticPath = os.path.join(self._mainPath, "static")
-            self._fileHandler.addDir(self._staticPath)
+        config = Config.getInstance()
+        self._fileHandler = ZIPFileHandler()
+        
+        # Create main and static folders
+        self._mainPath = "OfflineWebsite-%s" % self._normalisePath(self._conf.getTitle())
+        self._fileHandler.addDir(self._mainPath)
+        self._staticPath = os.path.join(self._mainPath, "static")
+        self._fileHandler.addDir(self._staticPath)
 
-            # Getting all materials, static files (css, images, js and vars.js.tpl)
-            self._getAllMaterial()
-            self._html = self._getStaticFiles(self._html)
-            # Specific changes
-            self._create()
+        # Getting all materials, static files (css, images, js and vars.js.tpl)
+        self._getAllMaterial()
+        self._html = self._getStaticFiles(self._html)
+        
+        # Specific changes
+        self._create()
 
-            fname = os.path.join(self._mainPath, urlHandlers.UHConferenceDisplay.getStaticURL())
-            self._fileHandler.addNewFile(fname, self._html)
-            self._fileHandler.close()
-            self._outputFileName = self._generateZipFile(self._fileHandler.getPath())
-        except Exception, e:
-            Logger.get('offline-website').error(str(e))
-        self._fileHandler = None
-        return self._outputFileName
+        # Creating ConferenceDisplay.html file
+        conferenceDisplayPath = os.path.join(self._mainPath, urlHandlers.UHConferenceDisplay.getStaticURL()) 
+        self._fileHandler.addNewFile(conferenceDisplayPath, self._html)
+        
+        # Creating index.html file
+        self._fileHandler.addNewFile("index.html", """<meta HTTP-EQUIV="REFRESH" content="0; url=%s">""" % conferenceDisplayPath)
+        
+        self._fileHandler.close()
+        self._outputFile = self._generateZipFile(self._fileHandler.getPath())
+        return self._outputFile
 
     def _getStaticFiles(self, html):
         config = Config.getInstance()
@@ -106,21 +121,23 @@ class OfflineEventCreator:
         return path
 
     def _getAllMaterial(self):
-        self._addMaterialFrom(self._conf, "events/%s-conference" % self._conf.getId())
+        self._addMaterialFrom(self._conf, "events/conference")
         for contrib in self._conf.getContributionList():
             self._addMaterialFrom(contrib, "agenda/%s-contribution" % contrib.getId())
-            if (contrib.getSubContributionList() is not None):
+            if contrib.getSubContributionList():
                 for sc in contrib.getSubContributionList():
                     self._addMaterialFrom(sc, "agenda/%s-subcontribution" % sc.getId())
         for session in self._conf.getSessionList():
             self._addMaterialFrom(session, "agenda/%s-session" % session.getId())
 
     def _addMaterialFrom(self, target, categoryPath):
-        if target.getAllMaterialList() is not None:
+        if target.getAllMaterialList():
             for mat in target.getAllMaterialList():
                 for res in mat.getResourceList():
-                    dstPath = os.path.join(self._mainPath, "files", categoryPath, mat.getId(), res.getId() + "-" + res.getName())
-                    self._addFileFromSrc(dstPath, res.getFilePath())
+                    if isinstance(res, conference.LocalFile):
+                        dstPath = os.path.join(
+                            self._mainPath, "files", categoryPath, mat.getId(), res.getId() + "-" + res.getName())
+                        self._addFileFromSrc(dstPath, res.getFilePath())
 
     def _downloadFiles(self, html, baseURL, srcPath, dstNamePath):
         dstPath = os.path.join(self._staticPath, dstNamePath)
@@ -145,13 +162,19 @@ class OfflineEventCreator:
         config = Config.getInstance()
         if os.path.isfile(cssFilename):
             imgPath = os.path.join(self._staticPath, "images")
+            fontPath = os.path.join(self._staticPath, "fonts")
             cssFile = open(cssFilename, "rb")
             for line in cssFile.readlines():
                 images = re.findall(r'images/(.+?\.\w*)', line)
+                fonts = re.findall(r'fonts/(.+?\.\w*)', line)
                 for imgFilename in images:
                     imgSrcFile = os.path.join(config.getImagesDir(), imgFilename)
                     imgDstFile = os.path.join(imgPath, imgFilename)
                     self._addFileFromSrc(imgDstFile, imgSrcFile)
+                for fontFilename in fonts:
+                    fontSrcFile = os.path.join(config.getFontsDir(), fontFilename)
+                    fontDstFile = os.path.join(fontPath, fontFilename)
+                    self._addFileFromSrc(fontDstFile, fontSrcFile)
 
     def _addVarsJSTpl(self):
         config = Config.getInstance()
@@ -164,136 +187,136 @@ class OfflineEventCreator:
             varsData = templateEngine.render(tplFile, varsDict)
             self._fileHandler.addNewFile(varsPath, varsData)
 
-    def _generateZipFile(self, path):
-        filename = os.path.basename(path)
-        if self._fileHandler is not None and \
-                isinstance(self._fileHandler, ZIPFileHandler) and \
-                not filename.lower().endswith(".zip"):
-            filename = "%s.zip" % filename
-        try:
-            print "ZIPFilename: %s" % filename
-            shutil.copyfile(path, filename)
-        except:
-            # TODO: If using Scheduler, the Error to raise should be different
-            raise MaKaCError(_("It is not possible to copy the offline website's zip file in the folder \"results\" to publish the file. \
-                    Please contact with the system administrator"))
-        return filename
+    def _generateZipFile(self, srcPath):
+        repo = LocalRepository()
+        filename = os.path.basename(srcPath) + ".zip"
+        file = LocalFile()
+        file.setFilePath(srcPath)
+        file.setFileName(filename)
+        repo.storeFile(file, self._conf.getId())
+        return file
+
 
 class ConferenceOfflineCreator(OfflineEventCreator):
 
-    # Menu itens allowed to be shown in offline mode
-    _menu_offline_itens = {"overview" : None, \
-                           "programme" : None, \
-                           "timetable" : None, \
-                           "authorIndex" : None, \
-                           "speakerIndex" : None, \
-                           "contributionList" : None, \
-                           "registrants" : None,
-                           "abstractsBook" : None}
+    # Menu items allowed to be shown in offline mode
+    _menu_offline_items = {"overview": None,
+                           "programme": None,
+                           "timetable": None,
+                           "authorIndex": None,
+                           "speakerIndex": None,
+                           "contributionList": None,
+                           "registrants": None,
+                           "abstractsBook": None}
 
     def _create(self):
         self._initializeMenuItensComponents()
         # Getting conference logo
         self._addLogo()
-        # Getting all menu itens
-        self._getMenuItens()
+        # Getting all menu items
+        self._getMenuItems()
+        # Getting conference timetable in PDF
+        self._addPdf(self._conf, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, **{'conf': self._conf, 'aw': self._rh._aw})
+        # Generate contributions in PDF
+        self._addPdf(self._conf, urlHandlers.UHContributionListToPDF, ConfManagerContribsToPDF, **{'conf': self._conf, 'contribList': self._conf.getContributionList()})
+
         # Getting specific pages for contributions
         for cont in self._conf.getContributionList():
             self._getContrib(cont)
+            # Getting specific pages for subcontributions
+            for subCont in cont.getSubContributionList():
+                self._getSubContrib(subCont)
 
         for session in self._conf.getSessionList():
             self._getSession(session)
 
+        # Getting material pages for conference
+        self._addConferenceMaterialDisplayPages()
+
+    def _addConferenceMaterialDisplayPages(self):
+        for mat in self._conf.getAllMaterialList():
+            if len(mat.getResourceList()) != 1:
+                html = WPStaticMaterialConfDisplayBase(self._rh, mat).display()
+                self._addPage(html, urlHandlers.UHMaterialDisplay, target=mat)
+
     def _initializeMenuItensComponents(self):
-        self._menu_offline_itens["programme"] = conferences.WPStaticConferenceProgram(self._rh, self._conf)
-        self._menu_offline_itens["timetable"] = conferences.WPStaticConferenceTimeTable(self._rh, self._conf)
-        self._menu_offline_itens["authorIndex"] = conferences.WPStaticAuthorIndex(self._rh, self._conf)
-        self._menu_offline_itens["speakerIndex"] = conferences.WPStaticSpeakerIndex(self._rh, self._conf)
-        self._menu_offline_itens["contributionList"] = conferences.WPStaticContributionList(self._rh, self._conf)
-        self._menu_offline_itens["registrants"] = registrants.WPStaticConfRegistrantsList(self._rh, self._conf)
+        self._menu_offline_items["programme"] = WPStaticConferenceProgram(self._rh, self._conf)
+        self._menu_offline_items["timetable"] = WPStaticConferenceTimeTable(self._rh, self._conf)
+        self._menu_offline_items["authorIndex"] = WPStaticAuthorIndex(self._rh, self._conf)
+        self._menu_offline_items["speakerIndex"] = WPStaticSpeakerIndex(self._rh, self._conf)
+        self._menu_offline_items["contributionList"] = WPStaticContributionList(self._rh, self._conf)
+        self._menu_offline_items["registrants"] = WPStaticConfRegistrantsList(self._rh, self._conf)
 
     def _addLogo(self):
-        if self._conf.getLogo() is not None:
-            logoDstPath = os.path.join(self._mainPath, Config.getInstance().getImagesBaseURL(), "logo", str(self._conf.getLogo()))
+        if self._conf.getLogo():
+            logoDstPath = os.path.join(
+                self._mainPath, Config.getInstance().getImagesBaseURL(), "logo", str(self._conf.getLogo()))
             self._fileHandler.addNewFile(logoDstPath, self._conf.getLogo().readBin())
 
-    def _getMenuItens(self):
+    def _getMenuItems(self):
         menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
         for link in menu.getEnabledLinkList():
             if link.isVisible():
                 if isinstance(link, displayMgr.PageLink):
                     self._getInternalPage(link)
                 elif not isinstance(link, displayMgr.Spacer):
-                        self._getMenuSystemItem(link)
+                    self._getMenuSystemItem(link)
 
     def _getMenuSystemItem(self, link):
-        if link.getName() in self._menu_offline_itens.keys():
-            if self._menu_offline_itens[link.getName()] is not None:
-                # TODO: remove this if clause when change the author and speaker filtering to use JavaScript
-                if link.getName in ("authorIndex", "speakerIndex"):
-                    html = self._menu_offline_itens[link.getName()].display(viewMode="full", selLetter="a")
-                else:
-                    html = self._menu_offline_itens[link.getName()].display()
+        if link.getName() in self._menu_offline_items.keys():
+            if self._menu_offline_items[link.getName()]:
+                html = self._menu_offline_items[link.getName()].display()
                 handler = getattr(urlHandlers, link.getURLHandler())
-                self._addPage(html, handler)
+                self._addPage(html, handler, target=None)
         if (link.getName() == "abstractsBook"):
-            self._addAbstractBookPDF()
+            self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, **{'conf': self._conf, 'aw': self._rh._aw})
         if (link.getName() == "programme"):
-            self._addConferenceProgrammePDF()
+            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, **{'conf': self._conf})
 
     def _getInternalPage(self, link):
         page = link.getPage()
-        html = conferences.WPStaticInternalPageDisplay(self._rh, self._conf, page).display()
-        self._addPage(html, urlHandlers.UHInternalPageDisplay, page)
+        html = WPStaticInternalPageDisplay(self._rh, self._conf, page).display()
+        self._addPage(html, urlHandlers.UHInternalPageDisplay, target=page)
 
-    def _addPage(self, html, rh, target=None):
-        fname = os.path.join(self._mainPath, rh.getStaticURL(target))
+    def _addPage(self, html, rh, target, **params):
+        fname = os.path.join(self._mainPath, str(rh.getStaticURL(target, **params)))
         html = self._getStaticFiles(html)
         self._fileHandler.addNewFile(fname, html)
 
     def _getContrib(self, contrib):
-        html = contributions.WPStaticContributionDisplay( self._rh, contrib, 0 ).display()
-        self._addPage(html, urlHandlers.UHContributionDisplay, contrib)
-        self._addContribPDF(contrib)
+        html = WPStaticContributionDisplay(self._rh, contrib, 0).display()
+        self._addPage(html, urlHandlers.UHContributionDisplay, target=contrib)
+        self._addPdf(contrib, urlHandlers.UHContribToPDF, ContribToPDF, **{'conf': self._conf, 'contrib': contrib})
 
         for author in contrib.getAuthorList():
             self._getAuthor(contrib, author)
         for author in contrib.getCoAuthorList():
             self._getAuthor(contrib, author)
 
+    def _getSubContrib(self, subContrib):
+        html = WPStaticSubContributionDisplay(self._rh, subContrib).display()
+        self._addPage(html, urlHandlers.UHSubContributionDisplay, target=subContrib)
+
     def _getAuthor(self, contrib, author):
-        html = authors.WPStaticAuthorDisplay(self._rh, contrib, author.getId()).display()
-        self._addPage(html, urlHandlers.UHContribAuthorDisplay, author)
+        try:
+            html = WPStaticAuthorDisplay(self._rh, contrib, author.getId()).display()
+            self._addPage(html, urlHandlers.UHContribAuthorDisplay, target=contrib, authorId=author.getId())
+        except MaKaCError:
+            pass
 
     def _getSession(self, session):
-        html = sessions.WPStaticSessionDisplay(self._rh, session).display(activeTab="")
-        self._addPage(html, urlHandlers.UHSessionDisplay, session);
+        html = WPStaticSessionDisplay(self._rh, session).display(activeTab="")
+        self._addPage(html, urlHandlers.UHSessionDisplay, target=session)
 
-        # FIX: contribs tab static link
-        htmlContrib = sessions.WPStaticSessionDisplay(self._rh, session).display(activeTab="contribs")
-        sessionContribfile = os.path.join(self._mainPath, urlHandlers.UHSessionDisplay.getStaticURL(session)+"contribs")
+        htmlContrib = WPStaticSessionDisplay(self._rh, session).display(activeTab="contribs")
+        sessionContribfile = os.path.join(self._mainPath, "contribs-" + urlHandlers.UHSessionDisplay.getStaticURL(session))
         htmlContrib = self._getStaticFiles(htmlContrib)
         self._fileHandler.addNewFile(sessionContribfile, htmlContrib)
+        self._addPdf(session, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, **{'conf': self._conf, 'aw':
+                     self._rh._aw, 'showSessions': [session.getId()]})
 
-    # --------------- PDF Files ------------
-    def _addConferenceProgrammePDF(self):
-        from MaKaC.PDFinterface.conference import ProgrammeToPDF
+    def _addPdf(self, event, pdfUrlHandler, generatorClass, **generatorParams):
         tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()
-        filename = os.path.join(self._mainPath, urlHandlers.UHConferenceProgramPDF.getStaticURL(self._conf))
-        pdf = ProgrammeToPDF(self._conf, tz=tz)
+        filename = os.path.join(self._mainPath, pdfUrlHandler.getStaticURL(event))
+        pdf = generatorClass(tz=tz, **generatorParams)
         self._fileHandler.addNewFile(filename, pdf.getPDFBin())
-
-    def _addAbstractBookPDF(self):
-        from MaKaC.PDFinterface.conference import AbstractBook
-        tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()
-        filename = os.path.join(self._mainPath, urlHandlers.UHConfAbstractBook.getStaticURL(self._conf))
-        pdf = AbstractBook(self._conf, self._rh._aw, tz=tz)
-        self._fileHandler.addNewFile(filename, pdf.getPDFBin())
-
-    def _addContribPDF(self, contrib):
-        from MaKaC.PDFinterface.conference import ContribToPDF
-        tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()
-        filename = os.path.join(self._mainPath, urlHandlers.UHContribToPDF.getStaticURL(contrib))
-        pdf = ContribToPDF(self._conf, contrib, tz=tz)
-        self._fileHandler.addNewFile(filename, pdf.getPDFBin())
-

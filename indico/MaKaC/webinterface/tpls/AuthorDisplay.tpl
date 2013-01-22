@@ -34,7 +34,7 @@
         <div class="contribItem" style="clear: both; padding-bottom: 7px; padding-left: 20px;">
             <a href="${contrib['url']}">${contrib['title']}</a>
             % if contrib['materials']:
-                <img class="material_icon" title="${_('materials')}" src="${Config.getInstance().getBaseURL()}/images/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
+                <img class="material_icon" title="${_('materials')}" src="${Config.getInstance().getImagesBaseURL()}/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
                 <%include file="MaterialListPopup.tpl" args="materials=contrib['materials']"/>
             % endif
         </div>

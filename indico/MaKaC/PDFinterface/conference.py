@@ -1140,7 +1140,7 @@ def sortEntries(x,y):
 class TimeTablePlain(PDFWithTOC):
 
     def __init__(self,conf,aw,showSessions=[],showDays=[],sortingCrit=None, ttPDFFormat=None,
-                 pagesize='A4', fontsize = 'normal', firstPageNumber = '1', showSpeakerAffiliation=False, tz=None):
+                 pagesize='A4', fontsize = 'normal', firstPageNumber = 1, showSpeakerAffiliation=False, tz=None):
         self._conf=conf
         if not tz:
             self._tz = self._conf.getTimezone()

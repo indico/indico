@@ -49,12 +49,15 @@ class ModuleHolder( ObjectHolder ):
         import indico.modules.cssTpls as cssTpls
         import indico.modules.upcoming as upcoming
         import indico.modules.scheduler as scheduler
+        import indico.modules.offlineEvents as offlineEvents
+
 
         ModuleHolder._availableModules = {
-            news.NewsModule.id               : news.NewsModule,
-            cssTpls.CssTplsModule.id         : cssTpls.CssTplsModule,
-            upcoming.UpcomingEventsModule.id : upcoming.UpcomingEventsModule,
-            scheduler.SchedulerModule.id             : scheduler.SchedulerModule
+            news.NewsModule.id                    : news.NewsModule,
+            cssTpls.CssTplsModule.id              : cssTpls.CssTplsModule,
+            upcoming.UpcomingEventsModule.id      : upcoming.UpcomingEventsModule,
+            scheduler.SchedulerModule.id          : scheduler.SchedulerModule,
+            offlineEvents.OfflineEventsModule.id  : offlineEvents.OfflineEventsModule
         }
 
     def _newId( self ):

@@ -141,6 +141,11 @@ class IContributionParticipationMinimalFossil(IFossil):
 
 class IContributionParticipationFossil(IContributionParticipationMinimalFossil):
 
+    def getURL(self):
+        """ Author Display URL """
+    getURL.produce = lambda s: str(urlHandlers.UHContribAuthorDisplay.getURL(s))
+    getURL.name = "url"
+
     def getTitle(self):
         pass
 

@@ -7886,6 +7886,7 @@ ul.conveners ul.names .affiliation {
     padding-bottom:5px;
 }
 
+
 .contributionReviewingStatus, .abstractStatus {
     border-radius: 5px;
     margin-top: 5px;
@@ -7894,6 +7895,30 @@ ul.conveners ul.names .affiliation {
     display: inline-block;
     color: white;
     font-weight: bold;
+}
+
+.offlineTasksGenerated{
+    text-align: center;
+    width: 65px;
+    background: none repeat scroll 0 0 #9AC33A;
+}
+
+.offlineTasksQueued {
+    text-align: center;
+    width: 65px;
+    background: none repeat scroll 0 0 #A4CCC9;
+}
+
+.offlineTasksFailed {
+    text-align: center;
+    width: 65px;
+    background: none repeat scroll 0 0 #B93725;
+}
+
+.offlineTask {
+    width: 1px;
+    white-space: nowrap;
+    padding: 1px 20px 3px 0px;
 }
 
 .contributionReviewingStatusRejected, .abstractStatusRejected, .abstractStatusDuplicated, .abstractStatusWithdrawn {

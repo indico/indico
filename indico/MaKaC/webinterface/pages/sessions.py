@@ -27,7 +27,7 @@ import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.linking as linking
-from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase, WContributionCreation, WPModScheduleNewContribBase, WPConferenceModifBase, WPStaticEventBase
+from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase, WPConferenceModifBase
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.common import Config, info
 import MaKaC.webinterface.timetable as timetable
@@ -49,7 +49,7 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.user import Avatar
-
+from MaKaC.common.contextManager import ContextManager
 
 class WPSessionBase(WPConferenceBase):
 
@@ -1283,8 +1283,3 @@ class WSessionICalExport(WICalExportBase):
         vars.update(self._getIcalExportParams(self._user, '/export/event/%s/session/%s.ics' % \
                                               (self._session.getConference().getId(), self._session.getId())))
         return vars
-
-class WPStaticSessionDisplay(WPStaticEventBase, WPSessionDisplay):
-
-    def getJSFiles(self):
-        return WPStaticEventBase.getJSFiles(self) + self._includeJSPackage('Timetable')

@@ -413,7 +413,7 @@ class AccessController( Persistent, Observable ):
                 return av
         return None
 
-    def getSubmitterList(self):
+    def getSubmitterList(self, no_groups=False):
         """Gives the list of users with submission privileges
         """
         try:

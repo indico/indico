@@ -82,8 +82,6 @@ class WebFactory(WebFactory):
     def customiseToolsTabCtrl( tabCtrl ):
         tabCtrl.getTabById("clone").enable()
         tabCtrl.getTabById("matPackage").enable()
-        tabCtrl.getTabById("offlineSite").enable()
-        tabCtrl.getTabById("close").enable()
         tabCtrl.getTabById("delete").enable()
         tabCtrl.getTabById("badges").disable()
         tabCtrl.getTabById("alarms").enable()

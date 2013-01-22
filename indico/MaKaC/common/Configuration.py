@@ -541,6 +541,7 @@ class Config:
             'WorkerName'                : socket.getfqdn(),
             'StylesheetsDir'            : os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'stylesheets'),
             'ImagesDir'                 : os.path.join(self.getHtdocsDir(), 'images'),
+            'FontsDir'                  : os.path.join(self.getHtdocsDir(), 'fonts'),
             'JSDir'                     : os.path.join(self.getHtdocsDir(), 'js'),
             'PublicURL'                 : "%s/%s" % (self.getBaseURL(), self.getPublicFolder()),
             'SystemIcons'               : self.__systemIcons,
@@ -878,3 +879,9 @@ class Config:
             return "static/css"
         else:
             return "%s/css" % self.getBaseURL()
+
+    def getFontsBaseURL(self):
+        if ContextManager.get('offlineMode', False):
+            return "static/fonts"
+        else:
+            return "%s/fonts" % self.getBaseURL()

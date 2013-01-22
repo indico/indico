@@ -91,3 +91,6 @@ def posterSaveBackground (req, **params):
 
 def posterGetBackground (req, **params):
     return conferenceModif.RHConfPosterGetBackground(req).process(params)
+
+def offline (req, **params):
+    return conferenceModif.RHConfOffline(req).process(params)

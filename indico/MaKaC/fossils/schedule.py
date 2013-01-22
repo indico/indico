@@ -19,6 +19,7 @@
 
 from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
+from MaKaC.webinterface import urlHandlers
 from MaKaC.fossils.conference import IMaterialMinimalFossil,\
         IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
 from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
@@ -170,6 +171,16 @@ class IContribSchEntryFossil(ISchEntryFossil):
 
 
 class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
+
+    def getURL(self):
+        """ Entry Display URL """
+    getURL.produce = lambda s: str(urlHandlers.UHContributionDisplay.getURL(s.getOwner()))
+    getURL.name = "url"
+
+    def getPDF(self):
+        """ Entry PDF URL """
+    getPDF.produce = lambda s: str(urlHandlers.UHConfTimeTablePDF.getURL(s.getOwner()))
+    getPDF.name = "pdf"
 
     def getMaterial(self):
         """ Entry Material """
@@ -326,6 +337,16 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
     getUniqueId.produce = lambda s: s.getOwner().getSession().getUniqueId()
 
 class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
+
+    def getURL(self):
+        """ Entry Display URL """
+    getURL.produce = lambda s: str(urlHandlers.UHSessionDisplay.getURL(s.getOwner()))
+    getURL.name = "url"
+
+    def getPDF(self):
+        """ Entry PDF URL """
+    getPDF.produce = lambda s: str(urlHandlers.UHConfTimeTablePDF.getURL(s.getOwner()))
+    getPDF.name = "pdf"
 
     def getEntries(self):
         """ Entries contained inside the session """

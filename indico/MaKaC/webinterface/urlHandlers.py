@@ -74,7 +74,7 @@ class URLHandler(object):
         return cls._relativeURL
 
     @classmethod
-    def getStaticURL(cls, target=None):
+    def getStaticURL(cls, target=None, **params):
         url = cls._relativeURL.replace("py", "html")
         return url
 
@@ -325,7 +325,7 @@ class UHConferenceEmail(URLHandler):
     _endpoint = 'event.EMail'
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(cls, target, **params):
         if target is not None:
             return "mailto:%s" % str(target.getEmail())
         return cls.getURL(target)
@@ -355,9 +355,8 @@ class UHConferenceLogo(URLHandler):
     _endpoint = 'event.conferenceDisplay-getLogo'
 
     @classmethod
-    def getStaticURL(cls, target):
-        url = os.path.join(Config.getInstance().getImagesBaseURL(), "logo", str(target.getLogo()))
-        return url
+    def getStaticURL(cls, target, **params):
+        return os.path.join(Config.getInstance().getImagesBaseURL(), "logo", str(target.getLogo()))
 
 
 class UHConferenceCSS(URLHandler):
@@ -1010,9 +1009,17 @@ class UHContribToXMLConfManager(URLHandler):
 class UHContribToXML(URLHandler):
     _endpoint = 'event.contributionDisplay-xml'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return ""
+
 
 class UHContribToiCal(URLHandler):
     _endpoint = 'event.contributionDisplay-ical'
+
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return ""
 
 
 class UHContribToPDFConfManager(URLHandler):
@@ -1112,7 +1119,7 @@ class UHInternalPageDisplay(URLHandler):
     _endpoint = 'event.internalPage'
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(cls, target, **params):
         params = target.getLocator()
         url = os.path.join("internalPage-%s.html" % params["pageId"])
         return url
@@ -1896,6 +1903,17 @@ class UHSubContribModifMaterials(URLHandler):
 class UHMaterialDisplay(URLHandler):
     _endpoint = 'files.materialDisplay'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            params = target.getLocator()
+            resources = target.getOwner().getMaterialById(params["materialId"]).getResourceList()
+            if len(resources) == 1:
+                return os.path.join("files/events/conference", params["materialId"],
+                                    resources[0].getId() + "-" + resources[0].getName())
+            return "materialDisplay-%s.html" % params["materialId"]
+        return cls._getURL()
+
 
 class UHConferenceProgram(URLHandler):
     _endpoint = 'event.conferenceProgram'
@@ -1905,7 +1923,7 @@ class UHConferenceProgramPDF(URLHandler):
     _endpoint = 'event.conferenceProgram-pdf'
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(cls, target, **params):
         return "files/generatedPdf/Programme.pdf"
 
 
@@ -1916,6 +1934,19 @@ class UHConferenceTimeTable(URLHandler):
 class UHConfTimeTablePDF(URLHandler):
     _endpoint = 'event.conferenceTimeTable-pdf'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            params = target.getLocator()
+            from MaKaC import conference
+            if isinstance(target, conference.Conference):
+                return "files/generatedPdf/Conference.pdf"
+            if isinstance(target, conference.Contribution):
+                return "files/generatedPdf/%s-Contribution.pdf" % (params["contribId"])
+            elif isinstance(target, conference.Session) or isinstance(target, conference.SessionSlot):
+                return "files/generatedPdf/%s-Session.pdf" % (params["sessionId"])
+        return cls._getURL()
+
 
 class UHConferenceCFA(URLHandler):
     _endpoint = 'event.conferenceCFA'
@@ -1925,7 +1956,7 @@ class UHSessionDisplay(URLHandler):
     _endpoint = 'event.sessionDisplay'
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(cls, target, **params):
         if target is not None:
             params = target.getLocator()
             return "%s-session.html" % (params["sessionId"])
@@ -1940,7 +1971,7 @@ class UHContributionDisplay(URLHandler):
     _endpoint = 'event.contributionDisplay'
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(cls, target, **params):
         if target is not None:
             params = target.getLocator()
             return "%s-contrib.html" % (params["contribId"])
@@ -1949,6 +1980,13 @@ class UHContributionDisplay(URLHandler):
 
 class UHSubContributionDisplay(URLHandler):
     _endpoint = 'event.subContributionDisplay'
+
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            params = target.getLocator()
+            return "%s-subcontrib.html" % (params["subContId"])
+        return cls._getURL()
 
 
 class UHSubContributionModification(URLHandler):
@@ -1966,7 +2004,7 @@ class UHFileAccess(URLHandler):
         owner = target.getOwner().getOwner()
 
         if isinstance(owner, conference.Conference):
-            path = "events/%s-conference" % owner.getId()
+            path = "events/conference"
         elif isinstance(owner, conference.Session):
             path = "agenda/%s-session" % owner.getId()
         elif isinstance(owner, conference.Contribution):
@@ -1979,8 +2017,12 @@ class UHFileAccess(URLHandler):
         return url
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(cls, target, **params):
         return cls.generateFileStaticLink(target)
+
+
+class UHOfflineEventAccess(URLHandler):
+    _relativeURL = "getFile.py/offlineEvent"
 
 
 class UHVideoWmvAccess(URLHandler):
@@ -2163,6 +2205,10 @@ class UHContributionList(URLHandler):
 class UHContributionListToPDF(URLHandler):
     _endpoint = 'event.contributionListDisplay-contributionsToPDF'
 
+    @classmethod
+    def getStaticURL(self, target, **params):
+            return "files/generatedPdf/Contributions.pdf"
+
 
 class UHConfModAbstractPropToAcc(URLHandler):
     _endpoint = 'event_mgmt.abstractManagment-propToAcc'
@@ -2276,7 +2322,7 @@ class UHConfAbstractBook(URLHandler):
     _endpoint = 'event.conferenceDisplay-abstractBook'
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(self, target, **params):
         return "files/generatedPdf/BookOfAbstracts.pdf"
 
 
@@ -2794,14 +2840,18 @@ class UHContribAuthorDisplay(URLHandler):
     _endpoint = 'event.contribAuthorDisplay'
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(cls, target, **params):
         if target is not None:
-            return "%s-authorDisplay.html" % target.getId()
+            return "contribs-%s-authorDisplay-%s.html" % (target.getId(), params.get("authorId", ""))
         return cls._getURL()
 
 
 class UHConfTimeTableCustomizePDF(URLHandler):
     _endpoint = 'event.conferenceTimeTable-customizePdf'
+
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return "files/generatedPdf/Conference.pdf"
 
 
 class UHConfRegistrationForm(URLHandler):
@@ -3127,7 +3177,7 @@ class UHConfRegistrantsList(URLHandler):
     _endpoint = 'event.confRegistrantsDisplay-list'
 
     @classmethod
-    def getStaticURL(cls, target):
+    def getStaticURL(cls, target, **params):
         return "confRegistrantsDisplay.html"
 
 
@@ -3443,6 +3493,10 @@ class UHConfModifPosterPrintingPDF(URLHandler):
 class UHJsonRpcService(OptionallySecureURLHandler):
     _endpoint = 'api.jsonrpc'
 
+    @classmethod
+    def getStaticURL(self, target, **params):
+        return ""
+
 
 class UHAPIExport(OptionallySecureURLHandler):
     _endpoint = 'api.httpapi'
@@ -3707,3 +3761,7 @@ class UHHelper(object):
     @classmethod
     def getDisplayUH(cls, klazz, type=""):
         return cls.displayUHs.get("%s%s" % (klazz.__name__, type), None)
+
+
+class UHConfOffline (URLHandler):
+    _relativeURL = "confModifTools.py/offline"

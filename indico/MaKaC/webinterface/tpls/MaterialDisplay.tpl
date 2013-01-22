@@ -2,7 +2,7 @@
 <% from MaKaC.conference import Link %>
 <% from MaKaC.webinterface.general import strfFileSize %>
 <div id="buttonBar" class="materialButtonBar">
-% if material.canModify(accessWrapper) or canSubmitResource:
+% if (material.canModify(accessWrapper) or canSubmitResource):
     <span id="manageMaterial" class="fakeLink" style="font-weight: bold">${_("Edit")}</span>
 % endif
 </div>

@@ -34,6 +34,7 @@ from BTrees import OOBTree
 from MaKaC.common.Counter import Counter
 
 from MaKaC.common.logger import Logger
+from MaKaC.common.Configuration import Config
 from MaKaC.review import Abstract
 from MaKaC.registration import Registrant
 
@@ -269,7 +270,6 @@ class MaterialLocalRepository(Persistent):
         del self.__files[ file.getRepositoryId() ]
 
 
-# The following class seems to be not used at all (26.02.2007)
 class LocalRepository(Persistent):
     """File repositroy keeping the files under a certain path in the local
         filesystem (machine where the system is installed).
@@ -279,47 +279,21 @@ class LocalRepository(Persistent):
         self.__idGen = Counter()
 
     def __getNewFileId( self ):
-        #due to concurrency problems it will be mandatory to check that the
-        #   directory does not exist, otherwise we'll generate a new id till
-        #   it does not exist
-        #concurrency problems could be avoided if we used the file system as
-        #   concurrency control system (creating a dir is an atomic operation)
-        #   but this would imply searching for the last id which could be
-        #   very very low in case of having a big directory list
-        while 1:
-            id = str(self.__idGen.newCount())
-            destPath = os.path.join( self.__getRepositoryPath(), id )
-            if not os.access( destPath, os.F_OK ):
-                return id
+        return str(self.__idGen.newCount())
 
     def __getRepositoryPath( self ):
-        from MaKaC.common.Configuration import Config
-        cfg = Config.getInstance()
-        return cfg.getArchiveDir()
+        return os.path.join(Config.getInstance().getUploadedFilesSharedTempDir(), 'offline/')
 
     def getFilePath( self, id ):
-        # this os.path.split is to be removed, just to keep compatibility with
-        #   old filerepository where the full path was stored
-        return os.path.join( self.__getRepositoryPath(), id, os.path.split(self.__files[id])[1] )
+        return os.path.join( self.__getRepositoryPath(), self.__files[id])
 
-
-    def storeFile( self, newFile, forcedFileId=None ):
-        #this id generation can cause concurrency problems as it is not writen
-        #   till the transaction is comited which could make that if the copying
-        #   of the file to the archive is long two or more clients have the
-        #   same id. This will still cause concurrency errors as the two clients
-        #   will have modify the counter so the DB will raise a read conflict
-        #   for the one who commits later, but at least it will prevent from
-        #   having 2 files with the same id
-        if forcedFileId:
-            id = forcedFileId
-        else:
-            id = self.__getNewFileId()
-        destPath = os.path.join( self.__getRepositoryPath(), id )
-        #if not os.access( destPath, os.F_OK ):
-        os.makedirs( destPath )
+    def storeFile( self, newFile, confId):
+        id = self.__getNewFileId()
+        destPath = os.path.join( self.__getRepositoryPath(), confId )
+        if not os.access( destPath, os.F_OK ):
+            os.makedirs( destPath )
         destPath = os.path.join( destPath, newFile.getFileName() )
-        relativePath = os.path.join( id, newFile.getFileName())
+        relativePath = os.path.join( confId, newFile.getFileName())
         try:
             shutil.copyfile( newFile.getFilePath(), destPath )
             self.__files[id] = relativePath

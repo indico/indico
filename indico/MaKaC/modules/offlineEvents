@@ -17,8 +17,4 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
-
-
-def index(req, **params):
-    return conferenceDisplay.RHStaticEventDisplay( req ).process( params )
+from indico.modules.offlineEvents import *

@@ -9,7 +9,7 @@
 % for track in program:
     <li>
       % if 'url' in track:
-      <a class="right" href='${track['url']}'>edit</a>
+        <a class="right" href='${track['url']}'>edit</a>
       % endif
       <span class="title">${track['title']}</span>
       <div class="description">

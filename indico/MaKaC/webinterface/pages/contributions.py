@@ -28,7 +28,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.webinterface.pages.metadata import WICalExportBase
-from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase, WPStaticEventBase
+from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common import Config
 from MaKaC.common.utils import isStringHTML, formatDateTime
@@ -73,12 +73,7 @@ class WContributionDisplayBase(WICalExportBase):
         self._hideFull = hideFull
 
     def _getAuthorURL(self, author):
-        if ContextManager.get('offlineMode', False):
-            authURL=urlHandlers.UHContribAuthorDisplay.getStaticURL(author)
-        else:
-            authURL=urlHandlers.UHContribAuthorDisplay.getURL(self._contrib)
-            authURL.addParam("authorId", author.getId())
-        return authURL
+        return urlHandlers.UHContribAuthorDisplay.getURL(self._contrib, authorId=author.getId())
 
     def _getResourceName(self, resource):
         if isinstance(resource, conference.Link):
@@ -151,7 +146,6 @@ class WContributionDisplayBase(WICalExportBase):
             vars["statusText"] = _("Paper not yet submitted")
             vars["statusClass"] = "contributionReviewingStatusNotSubmitted"
         vars["prefixUpload"] = "Re-" if  statusReviewing not in ["Accept", "Reject", None] else ""
-        vars["offlineMode"] = ContextManager.get('offlineMode', False)
         vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
         return vars
@@ -941,7 +935,3 @@ class WContributionICalExport(WICalExportBase):
                                               (self._contrib.getConference().getId(), self._contrib.getId())))
 
         return vars
-
-
-class WPStaticContributionDisplay(WPStaticEventBase, WPContributionDisplay):
-    pass

@@ -41,9 +41,9 @@ class ZIPFileHandler:
         (fh,name)=tempfile.mkstemp(prefix="Indico",dir=Config.getInstance().getTempDir())
         os.fdopen(fh).close()
         try:
-            self._file=zipfile.ZipFile(name,"w",zipfile.ZIP_DEFLATED)
+            self._file=zipfile.ZipFile(name,"w", zipfile.ZIP_DEFLATED, allowZip64=True)
         except:
-            self._file=zipfile.ZipFile(name,"w")
+            self._file=zipfile.ZipFile(name,"w", allowZip64=True)
         self._name=name
 
     def _normalisePath(self,path):

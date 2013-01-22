@@ -2147,10 +2147,8 @@ class WPConfModifToolsBase(WPConferenceModifBase):
                 urlHandlers.UHConfDeletion.getURL(self._conf))
         self._tabMatPackage = self._tabCtrl.newTab("matPackage", _("Material Package"), \
                 urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf))
-        self._tabOfflineSite = self._tabCtrl.newTab("offlineSite", _("Offline Site"), \
-                urlHandlers.UHConfDVDCreation.getURL(self._conf))
-
-        self._tabOfflineSite.setHidden(True)
+        self._tabOffline = self._tabCtrl.newTab("offline", _("Offline version"), \
+                urlHandlers.UHConfOffline.getURL(self._conf))
 
         self._setActiveTab()
 
@@ -2660,6 +2658,30 @@ class WPConfClone( WPConfModifToolsBase, OldObservable ):
         #let the plugins add their own elements
         self._notify('addCheckBox2CloneConf', pars)
         return p.getHTML(pars)
+
+#---------------------------------------------------------------------------------------
+
+class WPConfOffline(WPConfModifToolsBase):
+
+    def _setActiveTab(self):
+        self._tabOffline.setActive()
+
+    def _getTabContent(self, params):
+        p = WConfOffline(self._conf)
+        return p.getHTML(params)
+
+
+class WConfOffline(wcomponents.WTemplated):
+
+    def __init__(self, conf):
+        self._conf = conf
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["confId"] = self._conf.getId()
+        vars["avatarId"] = self._rh._aw.getUser().getId()
+        vars["offlineTasks"] = ModuleHolder().getById("offlineEvents").getOfflineEventByConfId(self._conf.getId())
+        return vars
 
 #---------------------------------------------------------------------------------------
 

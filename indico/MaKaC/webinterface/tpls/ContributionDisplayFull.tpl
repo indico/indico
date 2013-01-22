@@ -41,7 +41,7 @@
 </%block>
 
 <%block name="detail">
-    % if not self_._rh._target.getConference().getAbstractMgr().isActive() or not self_._rh._target.getConference().hasEnabledSection("cfa") or not self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
+    % if not Contribution.getConference().getAbstractMgr().isActive() or not Contribution.getConference().hasEnabledSection("cfa") or not Contribution.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
         % if Contribution.getDescription().strip()!="":
         <div class="contributionSection">
             <h2 class="contributionSectionTitle">Description</h2>

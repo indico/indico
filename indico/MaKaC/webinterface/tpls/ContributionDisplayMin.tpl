@@ -3,13 +3,13 @@
 
 <div id="buttonBar" class="contributionButtonBar">
     % if Contribution.canModify(accessWrapper):
-    <a href="${str(urlHandlers.UHContributionModification.getURL(Contribution))}" style="font-weight: bold" >${_("Edit")}</a> |
+        <a href="${str(urlHandlers.UHContributionModification.getURL(Contribution))}" style="font-weight: bold" >${_("Edit")}</a> |
     % endif
-    <a href="${str(urlHandlers.UHContribToPDF.getURL(Contribution))}" target="_blank">${_("PDF")}</a> |
-    <a href="${str(urlHandlers.UHContribToXML.getURL(Contribution))}"" target="_blank">${_("XML")}</a>
+    <a href="${str(urlHandlers.UHContribToPDF.getURL(Contribution))}" target="_blank">${_("PDF")}</a>
+    | <a href="${str(urlHandlers.UHContribToXML.getURL(Contribution))}" target="_blank">${_("XML")}</a>
     % if Contribution.isScheduled():
-    |
-    <a id="exportIcal${Contribution.getUniqueId()}" class="fakeLink exportIcal" data-id="${Contribution.getUniqueId()}">${_("iCal")}</a>
+        |
+        <a id="exportIcal${Contribution.getUniqueId()}" class="fakeLink exportIcal" data-id="${Contribution.getUniqueId()}">${_("iCal")}</a>
     % endif
     <%include file="ContributionICalExport.tpl" args="item=Contribution"/>
 </div>
@@ -68,10 +68,8 @@
         </div>
     </div>
     <div class="contributionRightPanel">
-        % if not offlineMode:
-            <%block name="paperReview">
-            </%block>
-        % endif
+        <%block name="paperReview">
+        </%block>
         <%block name="place">
         </%block>
         <%block name="authors">

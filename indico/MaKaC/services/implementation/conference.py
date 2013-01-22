@@ -60,10 +60,12 @@ from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 
 
 # indico imports
-from indico.modules.scheduler import tasks
+from indico.modules import ModuleHolder
+from indico.modules.offlineEvents import OfflineEventItem
+from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGeneratorTask
+from indico.modules.scheduler import tasks, Client
 from indico.util.i18n import i18nformat
 from indico.web.http_api.util import generate_public_auth_request
-
 
 class ConferenceBase:
     """
@@ -777,6 +779,7 @@ class ConferenceParticipantsDisplay(ConferenceModifBase):
         else:
             self._conf.getParticipation().participantListDisplay()
         return True
+
 
 class ConferenceParticipantsAddedInfo(ConferenceModifBase):
 
@@ -1658,6 +1661,21 @@ class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
         result["authRequestDetailedURL"] =  urls["authRequestURL"]
         return result
 
+class ConferenceOfflineAddTask(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._avatar = AvatarHolder().getById(pm.extract("avatarId", pType=str, allowEmpty=False))
+
+    def _getAnswer(self):
+        offlineEventsModule = ModuleHolder().getById("offlineEvents")
+        offlineEvent = OfflineEventItem(self._conf, self._avatar, "Queued")
+        offlineEventsModule.addOfflineEvent(offlineEvent)
+        client = Client()
+        client.enqueue(OfflineEventGeneratorTask(offlineEvent))
+        return True
+
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupport": ConferenceSupportModification,
@@ -1725,5 +1743,6 @@ methodMap = {
     "protection.removeRegistrar": ConferenceProtectionRemoveRegistrar,
     "protection.getProtectedChildren": ConferenceGetChildrenProtected,
     "protection.getPublicChildren": ConferenceGetChildrenPublic,
-    "api.getExportURLs": ConferenceExportURLs
+    "api.getExportURLs": ConferenceExportURLs,
+    "offline.addTask": ConferenceOfflineAddTask
     }

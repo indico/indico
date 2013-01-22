@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+<% baseUrl = baseurl if baseurl else "static" %>
+
 <html xmlns:fb="http://ogp.me/ns/fb#" xmlns:og="http://opengraph.org/schema/">
     <head>
         <title>${ page._getTitle() }${ area }</title>
@@ -17,8 +20,8 @@
 % endif
 
         <script type="text/javascript">
-                var TextRoot = "${ baseurl }/js/indico/i18n/";
-                var ScriptRoot = "${ baseurl }/js/";
+                var TextRoot = "${ baseUrl }/js/indico/i18n/";
+                var ScriptRoot = "${ baseUrl }/js/";
         </script>
 
         <!-- Indico specific -->
@@ -26,7 +29,7 @@
 
         <!-- Page Specific JS files-->
         % for JSFile in extraJSFiles:
-            ${ page._getJavaScriptInclude(JSFile) }
+            ${ page._getJavaScriptInclude(baseUrl + JSFile) }
         % endfor
 
         <!--[if (gte IE 6)&(lte IE 8)]>
@@ -41,12 +44,12 @@
     </script>
 
         <!-- Calendar Widget -->
-        ${ page._getJavaScriptInclude(baseurl + "/js/calendar/calendar.js") }
-        ${ page._getJavaScriptInclude(baseurl + "/js/calendar/calendar-setup.js") }
+        ${ page._getJavaScriptInclude(baseUrl + "/js/calendar/calendar.js") }
+        ${ page._getJavaScriptInclude(baseUrl + "/js/calendar/calendar-setup.js") }
 
         <!-- Page Specific CSS files-->
         % for cssFile in extraCSS:
-            <link rel="stylesheet" type="text/css" href="${cssFile}">
+            <link rel="stylesheet" type="text/css" href="${baseUrl}/${cssFile.lstrip('/')}">
         % endfor
 
         <!-- Page Specific, directly inserted Javascript -->

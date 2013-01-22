@@ -38,3 +38,6 @@ def wmv(req, **params):
 
 def flash(req, **params):
     return fileAccess.RHVideoFlashAccess( req ).process( params )
+
+def offlineEvent(req, **params):
+    return fileAccess.RHOfflineEventAccess( req ).process( params )

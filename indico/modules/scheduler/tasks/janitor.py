@@ -18,9 +18,28 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common import DBMgr
+from indico.modules import ModuleHolder
 from indico.modules.scheduler.tasks import PeriodicTask
+from datetime import datetime, timedelta
+
+
+MAX_OFFLINE_WEBPAGE_LIFE = 30 * 24 * 3600
+
+
+def delete_offline_events(dbi, logger):
+    logger.info("Checking which offline events should be deleted")
+    offlineEventsModule = ModuleHolder().getById("offlineEvents")
+    events = offlineEventsModule.getOfflineEventList()
+    for confEvents in events.values():
+        for event in confEvents:
+            if event.status != "queued" and datetime.now() - event.creationTime.replace(tzinfo=None) > timedelta(seconds=MAX_OFFLINE_WEBPAGE_LIFE):
+                logger.info("Deleting offline event {0}".format(event.id))
+                offlineEventsModule.removeOfflineEvent(event)
+                dbi.commit()
+                logger.info("Deleted offline event {0}".format(event.id))
 
 
 class JanitorTask(PeriodicTask):
     def run(self):
         dbi = DBMgr.getInstance()
+        delete_offline_events(dbi, self.getLogger())

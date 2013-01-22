@@ -7386,7 +7386,7 @@ class ContributionParticipation(Persistent, Fossilizable):
         if self.getContribution() is None:
             return None
         loc=self.getContribution().getLocator()
-        loc["authId"]=self.getId()
+        loc["authorId"]=self.getId()
         return loc
 
     def _unindex(self):

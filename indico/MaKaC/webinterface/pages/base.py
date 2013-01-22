@@ -87,9 +87,7 @@ class WPBase(OldObservable):
         self._extraJS = []
 
     def _getBaseURL(self):
-        if ContextManager.get('relativeURL', False):
-            return ''
-        elif request.is_secure and Config.getInstance().getBaseSecureURL():
+        if request.is_secure and Config.getInstance().getBaseSecureURL():
             return Config.getInstance().getBaseSecureURL()
         else:
             return Config.getInstance().getBaseURL()

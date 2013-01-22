@@ -20,7 +20,7 @@ from flask import request
 
 from xml.sax.saxutils import quoteattr
 
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPStaticEventBase
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface import wcomponents, navigation, urlHandlers
 from MaKaC.errors import MaKaCError
 from MaKaC.common import Config
@@ -97,7 +97,3 @@ class WPAuthorDisplay(WPConferenceDefaultDisplayBase):
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
-
-
-class WPStaticAuthorDisplay(WPStaticEventBase, WPAuthorDisplay):
-    pass

@@ -724,13 +724,6 @@ class Link(Persistent):
         return str
 
     def isVisible(self):
-        from MaKaC.common.offlineWebsiteCreator import ConferenceOfflineCreator
-        if ContextManager.get('offlineMode', False):
-            if self.getName() in ConferenceOfflineCreator._menu_offline_itens.keys() or \
-            isinstance(self, PageLink) or isinstance(self, ExternLink):
-                return True
-            else:
-                return False
         try:
             if self._v_visible:
                 pass

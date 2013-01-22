@@ -11,7 +11,7 @@
     % endif
     <% pdfUrl = urlHandlers.UHConfTimeTablePDF.getURL(session.getConference()) %>
     <% pdfUrl.addParam("showSessions", session.getId()) %>
-    <a href="${str(pdfUrl)}" target="_blank">${_("PDF")}</a> |
+    <a href="${str(pdfUrl)}" target="_blank">${_("PDF")}</a>| 
     <a href="#" id="exportIcal${session.getUniqueId()}" class="fakeLink exportIcal" data-id="${session.getUniqueId()}">${_("iCal")}</a>
     <%include file="SessionICalExport.tpl" args="item=session"/>
 </div>

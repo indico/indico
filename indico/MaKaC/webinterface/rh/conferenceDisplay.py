@@ -408,47 +408,6 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
 
         return warningText + p.display(**params)
 
-# Generate Static pages
-class RHStaticEventDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
-    _uh = urlHandlers.UHConferenceDisplay
-
-    def _process( self ):
-
-        ContextManager.set('offlineMode', True)
-
-        # get event type
-        wf = self.getWebFactory()
-        if wf != None:
-            eventType = self.getWebFactory().getId()
-        else:
-            eventType = "conference"
-
-        if eventType == "conference":
-            p = conferences.WPStaticConferenceDisplay( self, self._target )
-            html = p.display()
-        else:
-            # get default/selected view
-            styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
-            # if no default view was attributed, then get the configuration default
-            if view == "" or not styleMgr.existsStyle(view):
-                view=styleMgr.getDefaultStyleForEventType( eventType )
-
-            if view in styleMgr.getXSLStyles():
-                return "Sorry! Not allowed for XSL Style"
-            else:
-                p = conferences.WPTPLStaticConferenceDisplay( self, self._target, view, eventType, self._reqParams )
-                html = p.display(**self._getRequestParams())
-
-        print "Loading offline website..."
-
-        from MaKaC.common.offlineWebsiteCreator import OfflineEvent
-        websiteZipFile=OfflineEvent(self, self._conf, eventType, html).create()
-
-        if websiteZipFile == None:
-            return "Offline website creation had caused an error."
-        return "Offline website created! File: %s"%websiteZipFile
-
 
 class RHRelativeEvent(RHConferenceBaseDisplay):
     def _checkParams(self, params):
@@ -841,7 +800,7 @@ class RHAuthorIndex(RHConferenceBaseDisplay):
         return p.display()
 
 class RHSpeakerIndex(RHConferenceBaseDisplay):
-    _uh=urlHandlers.UHConfAuthorIndex
+    _uh=urlHandlers.UHConfSpeakerIndex
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )

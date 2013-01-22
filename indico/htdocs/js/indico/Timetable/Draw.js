@@ -790,7 +790,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
     _getExportPopup: function(method, params){
         var self = this;
         var killProgress = IndicoUI.Dialogs.Util.progress();
-        jsonRpc(Indico.Urls.JsonRpcService, method,
+           jsonRpc(Indico.Urls.JsonRpcService, method,
                 params,
                 function(result, error){
                     killProgress();
@@ -807,7 +807,9 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                         };
                         popup.open();
                     }
-                });
+            });
+        // Ensure that progress popup is closed for offline conference generation
+        killProgress();
     },
 
     _getMenuBar: function() {
@@ -819,19 +821,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         }
 
         var bar = Html.div({});
-
-        var url = "#";
-        if (self.eventData.entryType == 'Contribution') {
-            url = build_url(Indico.Urls.ContributionDisplay, {
-                contribId: self.eventData.contributionId,
-                confId: self.eventData.conferenceId
-            });
-        } else if (self.eventData.entryType == 'Session') {
-            url = build_url(Indico.Urls.SessionDisplay, {
-                sessionId: self.eventData.sessionId,
-                confId: self.eventData.conferenceId
-            }, self.timetable.currentDay);
-        }
+        var url = self.eventData.url;
         var viewLink = Html.a({'href': url}, "View details");
         bar.append(viewLink);
 
@@ -857,22 +847,28 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     contribId: self.eventData.contributionId,
                     confId: self.eventData.conferenceId
                 };
-                menuItems["PDF"] = {action: build_url(Indico.Urls.ContribToPDF, urlParams), display: $T('PDF')};
-                menuItems["Calendar"+ self.eventData.uniqueId] = {action: function(){
-                    self._getExportPopup("schedule.api.getContribExportPopup",{ confId: self.eventData.conferenceId,
-                        contribId: self.eventData.contributionId });
-                    }, display: $T('Calendar')};
+                menuItems["PDF"] = {action: self.eventData.pdf, display: $T('PDF')};
+                menuItems["Calendar" + self.eventData.uniqueId] = {
+                    action: function() {
+                        self._getExportPopup("schedule.api.getContribExportPopup", {
+                            confId: self.eventData.conferenceId,
+                            contribId: self.eventData.contributionId
+                        });
+                    },
+                    display: $T('Calendar')
+                };
                 menuItems["XML"] = {action: build_url(Indico.Urls.ContribToXML, urlParams), display: $T('XML')};
             } else if (self.eventData.entryType == 'Session') {
-                urlParams = {
-                    showSessions: self.eventData.sessionId,
-                    confId: self.eventData.conferenceId
+                menuItems["PDFtimetable"] = {action: self.eventData.pdf, display: $T('PDF timetable')};
+                menuItems["Calendar" + self.eventData.uniqueId] = {
+                    action: function() {
+                        self._getExportPopup("schedule.api.getSessionExportPopup", {
+                            confId: self.eventData.conferenceId,
+                            sessionId: self.eventData.sessionId
+                        });
+                    },
+                    display: $T('Calendar')
                 };
-                menuItems["PDFtimetable"] = {action: build_url(Indico.Urls.ConfTimeTablePDF, urlParams), display:$T('PDF timetable')};
-                menuItems["Calendar"+ self.eventData.uniqueId] = {action: function(){
-                    self._getExportPopup("schedule.api.getSessionExportPopup",{ confId: self.eventData.conferenceId,
-                        sessionId: self.eventData.sessionId });
-                    }, display: $T('Calendar')};
             }
 
             this.exportMenu = new PopupMenu(menuItems, [exportLink], null, true, true);
@@ -957,7 +953,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         each(contribs, function(value) {
             if (++i <= maxNumContribs) {
                 var element = links ? Html.a({
-                    href: Indico.Urls.ContributionDisplay + '?sessionId=' + value.sessionId + '&contribId=' + value.contributionId + '&confId=' + value.conferenceId,
+                    href: value.url,
                     style: {fontWeight: 'normal'}},
                     value.title) :
                     Html.span({}, value.title);

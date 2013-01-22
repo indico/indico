@@ -20,15 +20,16 @@ from flask import session
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
+from MaKaC.webinterface.rh.base import RH, RHDisplayBaseProtected
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.pages import files
 from MaKaC.errors import NotFoundError, AccessError
-
 from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from copy import copy
 
 from indico.web.flask.util import send_file
+from indico.modules import ModuleHolder
 
 
 class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
@@ -113,3 +114,23 @@ class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
     def _process( self ):
         p = files.WPVideoFlash(self, self._link )
         return p.display()
+
+
+class RHOfflineEventAccess(RHConferenceModifBase):
+    _uh = urlHandlers.UHOfflineEventAccess
+
+    def _checkParams(self, params):
+        if not "confId" in params:
+            raise NotFoundError("Missing 'confId' argument.")
+        if not "fileId" in params:
+            raise NotFoundError("Missing 'fileId' argument.")
+        self._offlineEvent = ModuleHolder().getById("offlineEvents").getOfflineEventByFileId(params["confId"],
+                                                                                             params["fileId"])
+        if not self._offlineEvent or not self._offlineEvent.file:
+            raise NotFoundError("The file you try to access does not exist.")
+        self._target = self._offlineEvent.conference
+
+    def _process(self):
+        f = self._offlineEvent.file
+        return send_file(f.getFileName(), f.getFilePath(), f.getFileType(),
+                         last_modified=self._offlineEvent.creationTime, inline=False)

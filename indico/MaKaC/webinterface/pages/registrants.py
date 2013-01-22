@@ -24,7 +24,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.common.filters as filters
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase, WPStaticEventBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.common import Config
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
@@ -2078,15 +2078,4 @@ class WPRegistrantModifPrintBadges( WPConfModifRegistrantListBase ):
 
     def _getTabContent( self, params ):
         wc = WRegistrantModifPrintBadges( self._conf, selectedRegistrants = self._selectedRegistrants )
-        return wc.getHTML()
-
-class WPStaticConfRegistrantsList(WPStaticEventBase, WPConfRegistrantsList):
-
-    def _getBody( self, params ):
-        from MaKaC.webinterface.rh.registrantsDisplay import RHRegistrantsList
-        import MaKaC.webinterface.common.regFilters as regFilters
-
-        sortingCrit=regFilters.SortingCriteria( [params.get( "sortBy", "Name" ).strip()] )
-        filterCrit=RHRegistrantsList.create_filter(self._conf, params)
-        wc = WConfRegistrantsList( self._conf, filterCrit, sortingCrit, None, "session")
         return wc.getHTML()

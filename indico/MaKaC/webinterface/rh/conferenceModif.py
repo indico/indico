@@ -4752,3 +4752,9 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
                 key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
                 filePath = os.path.join(tempPath, session[key][int(self.__backgroundId)][0])
                 return self.__fileBin(filePath)
+
+
+class RHConfOffline(RHConferenceModifBase):
+
+    def _process(self):
+        return conferences.WPConfOffline(self, self._conf).display()
