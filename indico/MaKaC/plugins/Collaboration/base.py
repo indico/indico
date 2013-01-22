@@ -446,7 +446,7 @@ class CSBookingManager(Persistent, Observer):
                 index.changeModificationDate(booking, oldModificationDate, newModificationDate)
 
     def _changeConfStartDateInIndex(self, booking, oldConfStartDate, newConfStartDate):
-        if booking.shouldBeIndexed():
+        if booking.shouldBeIndexed() and oldConfStartDate is not None and newConfStartDate is not None:
             indexes = self._getIndexList(booking)
             for index in indexes:
                 index.changeConfStartDate(booking, oldConfStartDate, newConfStartDate)
