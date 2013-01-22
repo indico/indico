@@ -72,10 +72,12 @@
 
 </div>
 
-
-
-
 ${ actions }
+
+% if isSubmitter:
+    <div id="manageMaterials" style="padding-top: 20px;"></div>
+% endif
+
 
 <script type="text/javascript">
       $('.chair_list .nomail').qtip({
@@ -83,4 +85,19 @@ ${ actions }
                  text: $T("Login to see email address"),
              },
          });
+
+% if isSubmitter:
+    <% from MaKaC.common.fossilize import fossilize %>
+    <% from MaKaC.conference import IMaterialFossil %>
+    var args = {
+        conference: '${conf.getId()}',
+        confId: '${conf.getId()}',
+        parentProtected: ${jsBoolean(conf.isProtected())}
+    };
+    var matList = ${fossilize(conf.getMaterialRegistry().getMaterialList(conf), IMaterialFossil)};
+    var mlist = new MaterialListWidget(args, matList, Indico.Urls.UploadAction.conference, null, null, true);
+    $E('manageMaterials').set(mlist.draw());
+
+% endif
+
 </script>

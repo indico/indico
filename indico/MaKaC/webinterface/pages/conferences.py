@@ -693,7 +693,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
 
         vars["chairs"] = self._conf.getChairList()
         vars["material"] = self._getMaterialHTML()
-
+		vars["conf"] = self._conf
         info = self._conf.getContactInfo()
         vars["moreInfo_html"] = isStringHTML(info)
         vars["moreInfo"] = info
@@ -1060,6 +1060,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                 info["minutesLink"] = True
                 info["materialLink"] = True
                 info["cloneLink"] = urlHandlers.UHConfClone.getURL(item)
+            if item.getAccessController().canUserSubmit(self._rh._aw.getUser()):
+                info["submitter"] = True
 
         elif itemType == 'Session':
             session = item.getSession()
