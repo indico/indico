@@ -22,7 +22,7 @@ from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.conference import IMaterialMinimalFossil,\
         IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
 from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
-    IContributionParticipationTTMgmtFossil
+    IContributionParticipationTTMgmtFossil, IContributionParticipationFossil
 from MaKaC.common.contextManager import ContextManager
 
 class ISchEntryFossil(IFossil):
@@ -187,7 +187,7 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
     def getPresenters(self):
         """ Entry Presenters """
     getPresenters.produce = lambda x: x.getOwner().getSpeakerList()
-    getPresenters.result = IConferenceParticipationFossil
+    getPresenters.result = IContributionParticipationFossil
 
     def getAuthors(self):
         """ Entry Primary authors """

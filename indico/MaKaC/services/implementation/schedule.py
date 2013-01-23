@@ -311,7 +311,7 @@ class ConferenceScheduleEditContribution(ScheduleEditContributionBase, conferenc
     def _schedule(self, contribution):
         pass
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return None
 
 
@@ -328,7 +328,7 @@ class SessionSlotScheduleEditContribution(ScheduleEditContributionBase, sessionS
     def _schedule(self, contribution):
         pass
 
-    def _getSlotEntry(self):
+    def _getSlotEntryFossil(self):
         return self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
                                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
@@ -1060,8 +1060,7 @@ class ScheduleContributions(ScheduleOperation):
                                     timezone = self._target.getTimezone())
 
         self._ids = pManager.extract("ids", pType=list, allowEmpty=False)
-        date = pManager.extract("date", pType=datetime.date,
-                                            allowEmpty=False)
+        date = pManager.extract("date", pType=datetime.date, allowEmpty=False)
 
         # convert date to datetime
         self._date = pytz.timezone(self._target.getTimezone()).localize(datetime.datetime(*(date.timetuple()[:6]+(0,))))

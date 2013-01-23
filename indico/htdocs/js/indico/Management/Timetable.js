@@ -150,7 +150,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                  var self = this;
                  var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
                  var source = indicoSource(
-                     self.args.session?'schedule.session.getUnscheduledContributions':
+                     self.args.get('session')?'schedule.session.getUnscheduledContributions':
                          'schedule.event.getUnscheduledContributions',
                      self.args.get("args"));
                  source.state.observe(function(state) {
@@ -214,7 +214,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              args.date = date;
 
 
-             indicoRequest(self.args.session?'schedule.slot.scheduleContributions':
+             indicoRequest(self.args.get('session')?'schedule.slot.scheduleContributions':
                            'schedule.event.scheduleContributions', args, function(result, error){
                                killProgress();
                                if (error) {
@@ -401,12 +401,13 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             // to make the request for the session timetable or the top level timetable
 
             if(self.previousDate.substr(0,10) != self.dateArgs.get('selectedDay')){
-                /* if we chose a different day, it doesn't matter
-                    if we are inside a session */
+                /* if the date changes, the contribution will be always attached to the conference. Even
+                 * if we are inside a session, the contribution will be moved out.
+                 * In principle, this should never happen because it is disabled from the add/edit popup */
                      self.timeStartMethod = self.timetable.managementActions.methods.Event.dayEndDate;
              } else {
                  if(exists(self.timetable.parentTimetable)) {
-                         self.timeStartMethod = self.timetable.managementActions.methods[self.originalArgs.parentType].dayEndDate;
+                     self.timeStartMethod = self.timetable.managementActions.methods[self.originalArgs.parentType].dayEndDate;
                  }
              }
 
@@ -469,10 +470,6 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         $B(info.accessor('presenters'), presListWidget.getUsers());
         info.set('privileges', presListWidget.getPrivileges());
 
-        var reportNumbersEditor = new ReportNumberEditorForForm(self.info.get("reportNumbers"), self.reportNumberSystems, {});
-        $B(info.accessor('reportNumbers'), reportNumbersEditor.getReportNumbers());
-
-
         var startTimeLine, daySelect, datecomponent;
 
         // in case of poster sessions
@@ -524,8 +521,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
                 daySelect,
                 startTimeLine,
-                [$T('Presenter(s)'), presListWidget.draw()],
-                [$T('Report numbers'), reportNumbersEditor.draw()]
+                [$T('Presenter(s)'), presListWidget.draw()]
             ]);
     },
 
@@ -574,6 +570,9 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             );
             fields.push([$T('Type'), $B(typeSelect,
                                         info.accessor('contributionType'))]);
+            var reportNumbersEditor = new ReportNumberEditorForForm(self.info.get("reportNumbers"), self.reportNumberSystems, {});
+            $B(info.accessor('reportNumbers'), reportNumbersEditor.getReportNumbers());
+            fields.push([$T('Report numbers'), reportNumbersEditor.draw()]);
         }
 
         return IndicoUtil.createFormFromMap(fields);
@@ -586,14 +585,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var authorListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
             self.info.get("authors"), true, null,
-            true, false, this.args.conference, {"author-grant-submission": [$T("submission rights"), true]},
+            true, false, this.args.get('conference'), {"author-grant-submission": [$T("submission rights"), true]},
             true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         var coauthorListWidget = new UserListField(
                 'VeryShortPeopleListDiv', 'PeopleList',
                 self.info.get("coauthors"), true, null,
-                true, false, this.args.conference, {"coauthor-grant-submission": [$T("submission rights"), true]},
+                true, false, this.args.get('conference'), {"coauthor-grant-submission": [$T("submission rights"), true]},
                 true, true, true,
                 userListNothing, userListNothing, userListNothing);
 
@@ -622,7 +621,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                         self.method = self.timetable.managementActions.methods.Contribution.add;
                     }
                     else{
-                        if(exists(self.timetable.parentTimetable)) {
+                        if(self.timetable && exists(self.timetable.parentTimetable)) {
                             self.method = self.timetable.managementActions.methods.SessionContribution.add;
                         }
                     }

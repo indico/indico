@@ -115,7 +115,7 @@ else:
             <table>
                 <tbody>
                         <td>
-                           <input type="button" onclick="addContribution()" class="btn" name="" value="${ _("Add new")}">
+                           <input type="button" onclick="addContribution();" class="btn" name="" value="${ _("Add new")}">
                         </td>
                         <form action=${ contribSelectionAction } method="post" name="contribsForm" id="contribsForm">
                         <td>
@@ -255,7 +255,7 @@ var addContribution = function() {
                           window.location.reload();
                        },
                        ${ jsBoolean(self_._conf.getAbstractMgr().isActive()) },
-                       ${ bookings },
+                       ${ bookings |n,j },
                        false);
 
     dialog.execute();

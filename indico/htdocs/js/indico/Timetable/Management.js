@@ -401,6 +401,7 @@ type("TimetableManagementActions", [], {
 
         return params;
     },
+
     addContribution: function() {
         var self = this;
 
@@ -420,6 +421,7 @@ type("TimetableManagementActions", [], {
             this.methods[params.parentType].dayEndDate,
             $O(params),
             $O(params.roomInfo),
+            params.startDate,
             params.selectedDay,
             this.eventInfo.isConference,
             this.eventInfo.favoriteRooms,

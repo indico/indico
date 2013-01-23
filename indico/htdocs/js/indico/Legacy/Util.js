@@ -219,7 +219,7 @@ var IndicoUtil = {
                                   Html.td(labelStyle, Html.label("popUpLabel",item[0])),
                                   Html.td(fieldStyle, Html.div('popUpTdContent', item[1]))));
             } else {
-                if(item[0].jquery) item[0] = $E(item[0].get(0));
+                if(item[0]!== undefined && item[0].jquery) item[0] = $E(item[0].get(0));
                 list.push(Html.tr({style:{marginTop:'10px'}},
                                   Html.td(),
                                   Html.td(fieldStyle, item[0])));
