@@ -13,14 +13,13 @@
         <td class="blacktext spaceLeft"><div id="displayTimezone" class="userPrefOption"></div><div id="displayTimezoneStatus" class="userPrefOptionStatus"></div></td>
     </tr>
     <tr>
-        <td class="titleCellTD"><span class="titleCellFormat">${ _("Show past events by default")}</span></td>
+        <td class="titleCellTD" nowrap><span class="titleCellFormat">${ _("Show past events by default")}</span></td>
         <td class="blacktext spaceLeft" nowrap><div id="tabShowPastEvents"></div></td>
     </tr>
+    % if pluginUserPreferences:
+        ${pluginUserPreferences}
+    % endif
 </table>
-% if pluginUserPreferences:
-    <h2 class="formTitle">${ _("Plugins Preferences")}</h2>
-    <table style="margin-left: 100px;">${pluginUserPreferences}</table>
-% endif
 
 <script type="text/javascript">
 

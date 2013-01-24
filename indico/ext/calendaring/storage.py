@@ -22,7 +22,7 @@ from BTrees.OOBTree import OOBTree
 from MaKaC.user import Avatar
 from MaKaC.common import DBMgr
 from persistent.list import PersistentList
-from MaKaC.conference import Conference, ConferenceHolder
+from MaKaC.conference import Conference
 
 
 """
@@ -41,16 +41,12 @@ def getUserDisablePluginStorage():
 def enablePluginForUser(userId):
     storage = getUserDisablePluginStorage()
     if userId in storage:
-        dbi = DBMgr.getInstance()
         del storage[userId]
-        dbi.commit()
 
 
 def disablePluginForUser(userId):
     storage = getUserDisablePluginStorage()
-    dbi = DBMgr.getInstance()
     storage[userId] = False
-    dbi.commit()
 
 
 def isUserPluginEnabled(userId):
@@ -65,26 +61,14 @@ def getAvatarConferenceStorage():
     return storage['avatar_conference']
 
 
-def clearAvatarConferenceStorage(keysToDelete):
-    dbi = DBMgr.getInstance()
-    storage = getAvatarConferenceStorage()
-    for i, key in enumerate(keysToDelete):
-        del storage[key]
-        if i % 1000 == 999:
-            dbi.commit()
-    dbi.commit()
-
-
 def addAvatarConference(avatar, conference, eventType):
     avatar = getAvatar(avatar)
     if avatar and isUserPluginEnabled(avatar.getId()):
-        dbi = DBMgr.getInstance()
         storage = getAvatarConferenceStorage()
         key = avatar.getId() + "_" + conference.getId()
         if not storage.get(key):
             storage[key] = PersistentList()
         storage[key].append(dict(avatar=avatar, conference=conference, eventType=eventType))
-        dbi.commit()
 
 
 def updateConference(obj):
@@ -102,6 +86,6 @@ def updateConference(obj):
 def getAvatar(avatar):
     if isinstance(avatar, Avatar):
         return avatar
-    if hasattr(avatar, 'getAvatar'):
+    if hasattr(avatar, 'getAvatar'): # Participant, Registrant, etc.
         return avatar.getAvatar()
     return None

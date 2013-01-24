@@ -22,6 +22,6 @@ The Calendaring plug-in provides calendaring notifications for users registered 
 """
 
 __metadata__ = {
-    'name': "calendaring",
-    'description': "Enables calendaring notifications for users registered for a Conference or new participant of the Meeting"
+    'name': "Calendaring",
+    'description': "Enables calendaring notifications when a user registers in a conference or participates in a meeting or lecture."
     }

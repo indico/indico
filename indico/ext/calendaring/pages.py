@@ -18,18 +18,17 @@
 
 import zope.interface
 from indico.core.extpoint.base import Component
-from indico.core.extpoint.events import IManagementArea
+from indico.core.extpoint.events import IUserAreaContributor
 from MaKaC.webinterface import wcomponents
 from indico.ext import calendaring
 from indico.ext.calendaring.storage import getUserDisablePluginStorage, isUserPluginEnabled
 
 
-class IManagementAreaComponent(Component):
+class IUserAreaComponent(Component):
 
-    zope.interface.implements(IManagementArea)
+    zope.interface.implements(IUserAreaContributor)
 
-    def pluginUserPreferences(self, obj, userId):
-        storage = getUserDisablePluginStorage()
+    def userPreferences(self, obj, userId):
         vars = {}
         vars['userId'] = userId
         vars['outlookPluginEnabled'] = isUserPluginEnabled(userId)

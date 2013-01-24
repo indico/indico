@@ -236,11 +236,11 @@ class IEventDisplayContributor(IContributor):
         Returns the info that the plugins want to add into the footer.
         """
 
-class IManagementArea(IContributor):
+class IUserAreaContributor(IContributor):
     """
-    Aggregates extension points that relate to management area pages
+    Aggregates extension points that relate to the user area pages
     """
-    def pluginUserPreferences(self, obj, userId):
+    def userPreferences(self, obj, userId):
         """
         Returns the preferences that the plugins want to add in user profile preferences
         """

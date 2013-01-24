@@ -20,9 +20,11 @@
 import requests
 from MaKaC.plugins import PluginsHolder
 from indico.modules.scheduler import PeriodicTask
-from indico.ext.calendaring.storage import getAvatarConferenceStorage, clearAvatarConferenceStorage, isUserPluginEnabled
+from indico.ext.calendaring.storage import getAvatarConferenceStorage, isUserPluginEnabled
 from indico.util.date_time import format_datetime
 from webassets.filter.cssrewrite import urlpath
+from MaKaC.common.db import DBMgr
+from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 
 class OutlookUpdateCalendarNotificationTask(PeriodicTask):
@@ -32,57 +34,58 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
 
     def run(self):
         logger = self.getLogger()
-        plugin = PluginsHolder().getPluginType('calendaring').getPlugin('outlook')
         storage = getAvatarConferenceStorage()
         keysToDelete = []
+
+        # Send the requests
         for key, eventList in storage.iteritems():
             success = True
             for event in eventList:
                 logger.info("processing: %s:%s" % (key, event))
-                if self._sendEventRequest(key, event['eventType'], event['avatar'], event['conference'], plugin) is 200:
-                    logger.info("processing successful")
-                    event['eventType'] = "toDelete"
-                else:
-                    success = False
-                    logger.info("processing failed")
+                if not event.get('request_sent', False): # only the ones that are not already sent
+                    result = ExternalOperationsManager.execute(self, 'sendEventRequest', self._sendEventRequest, key, event['eventType'], event['avatar'], event['conference'])
+                    if result and result.status_code == 200:
+                        logger.info("processing successful")
+                        event['request_sent'] = True
+                    else:
+                        success = False
+                        logger.error("POST failed: [%s] %s" % (result.status_code, result.text))
             if success:
                 keysToDelete.append(key)
-        clearAvatarConferenceStorage(keysToDelete)
 
-    def _sendEventRequest(self, key, eventType, avatar, conference, plugin):
+        self._clearAvatarConferenceStorage(keysToDelete)
+
+    def _clearAvatarConferenceStorage(self, keysToDelete):
+        dbi = DBMgr.getInstance()
+        dbi.commit() # Ensure that the status 'request_sent' is kept and requests are not sent twice
+        storage = getAvatarConferenceStorage()
+        for i, key in enumerate(keysToDelete):
+            del storage[key]
+            if i % 1000 == 999:
+                dbi.commit()
+        dbi.commit()
+
+    def _sendEventRequest(self, key, eventType, avatar, conference):
         try:
             logger = self.getLogger()
+            plugin = PluginsHolder().getPluginType('calendaring').getPlugin('outlook')
             if not isUserPluginEnabled(avatar.getId()):
                 logger.info("outlook plugin disabled for user: %s" % avatar.getId())
                 return 200
-            if eventType == 'added':
-                logger.debug("adding new calendar entry for: %s" % avatar.getId())
+            if eventType in ['added', 'updated']:
+                logger.debug("performing '%s' for: %s" % (eventType, avatar.getId()))
                 payload = {'userEmail': avatar.getEmail(),
                            'uniqueID': plugin.getOption('prefix').getValue() + key,
                            'subject': conference.getTitle(),
-                           'location': conference.getRoom().getFullName(),
+                           'location': conference.getRoom().getName() if conference.getRoom() else '',
                            'body': conference.getDescription(),
                            'status': plugin.getOption('status').getValue(),
-                           'startDate': format_datetime(conference.getStartDate(), format=plugin.getOption('timeFormat').getValue()),
-                           'endDate': format_datetime(conference.getEndDate(), format=plugin.getOption('timeFormat').getValue()),
+                           'startDate': format_datetime(conference.getStartDate(), format=plugin.getOption('datetimeFormat').getValue()),
+                           'endDate': format_datetime(conference.getEndDate(), format=plugin.getOption('datetimeFormat').getValue()),
                            'isThereReminder': plugin.getOption('reminder').getValue(),
                            'reminderTimeInMinutes': plugin.getOption('reminder_minutes').getValue(),
                            }
-                operation = plugin.getOption('addToCalendarOperationName').getValue()
-            elif eventType == 'updated':
-                logger.debug("updating calendar entry for: %s" % avatar.getId())
-                payload = {'userEmail': avatar.getEmail(),
-                           'uniqueID': plugin.getOption('prefix').getValue() + key,
-                           'subject': conference.getTitle(),
-                           'location': conference.getRoom().getFullName(),
-                           'body': conference.getDescription(),
-                           'status': plugin.getOption('status').getValue(),
-                           'startDate': format_datetime(conference.getStartDate(), format=plugin.getOption('timeFormat').getValue()),
-                           'endDate': format_datetime(conference.getEndDate(), format=plugin.getOption('timeFormat').getValue()),
-                           'isThereReminder': plugin.getOption('reminder').getValue(),
-                           'reminderTimeInMinutes': plugin.getOption('reminder_minutes').getValue(),
-                           }
-                operation = plugin.getOption('updateCalendarOperationName').getValue()
+                operation = plugin.getOption('addToCalendarOperationName').getValue() if eventType == 'added' else plugin.getOption('updateCalendarOperationName').getValue()
             elif eventType == 'removed':
                 logger.debug("removing calendar entry for: %s" % avatar.getId())
                 payload = {'userEmail': avatar.getEmail(),
@@ -95,11 +98,25 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
             r = requests.post(urlpath.tslash(plugin.getOption('url').getValue()) + operation,
                               auth=(plugin.getOption('login').getValue(), plugin.getOption('password').getValue()),
                               data=payload, headers=headers, timeout=plugin.getOption('timeout').getValue())
-            return r.status_code
+            return r
         except requests.exceptions.Timeout:
-            logger.exception('RequestException: Timeout')
+            logger.exception('Timeout ')
         except requests.exceptions.RequestException:
             logger.exception('RequestException: Connection problem')
         except Exception, e:
-            logger.exception('SendEventException: %s' % e)
+            logger.exception('Outlook EventException: %s' % e)
         return None
+
+class OutlookTaskRegistry(object):
+
+    @staticmethod
+    def register():
+        from MaKaC.common.timezoneUtils import nowutc
+        from indico.modules.scheduler import Client
+        from dateutil.rrule import MINUTELY
+        from MaKaC.common import DBMgr
+        DBMgr.getInstance().startRequest()
+        task = OutlookUpdateCalendarNotificationTask(MINUTELY, dtstart = nowutc())
+        client = Client()
+        client.enqueue(task)
+        DBMgr.getInstance().endRequest()

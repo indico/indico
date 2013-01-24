@@ -61,7 +61,7 @@ class IRegistrantListener(IListener):
         """
         Sent when a event endDate was modified
         """
-    def placeChanged(cls, obj):
+    def placeChanged(self, obj):
         """
         Sent when a event place was modified
         """

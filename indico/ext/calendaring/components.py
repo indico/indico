@@ -62,5 +62,5 @@ class RegistrantListener(Component, Observable):
     def endDateChanged(self, obj, params={}):
         updateConference(obj)
 
-    def placeChanged(cls, obj):
+    def placeChanged(self, obj):
         updateConference(obj)

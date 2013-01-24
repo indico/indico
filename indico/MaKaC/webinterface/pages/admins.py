@@ -1403,7 +1403,7 @@ class WUserPreferences(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["showPastEvents"] = self._avatar.getPersonalInfo().getShowPastEvents()
-        vars["pluginUserPreferences"] = "".join(self._notify('pluginUserPreferences', self._avatar.getId()))
+        vars["pluginUserPreferences"] = "".join(self._notify('userPreferences', self._avatar.getId()))
         vars["userId"] = self._avatar.getId()
         return vars
 
