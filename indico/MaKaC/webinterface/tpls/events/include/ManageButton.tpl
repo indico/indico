@@ -89,7 +89,7 @@
                 m.close();
                 return false;}, display: $T('Add material')},
             % if getItemType(item) == 'Conference' and item.getConference().getAllMaterialList() or \
-            getItemType(item) == 'SubContribution' and item.getContribution().getAllMaterialList() or \
+            getItemType(item) == 'SubContribution' and item.getAllMaterialList() or \
             getItemType(item) == 'Contribution' and item.getContribution().getAllMaterialList() or \
             getItemType(item) == 'Session' and item.getSession().getAllMaterialList():
                 'editMaterial': {action: function(m) {
