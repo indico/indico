@@ -39,7 +39,7 @@ class SudsCache(Cache):
         self._cache.get(key)
 
     def put(self, key, val):
-        self._cache.set(id, val, self._duration)
+        self._cache.set(key, val, self._duration)
 
     def purge(self, key):
-        self._cache.delete(id)
+        self._cache.delete(key)
