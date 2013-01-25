@@ -945,3 +945,32 @@ type("ContributionsPopup", ["ExclusivePopup"], {
          this.ExclusivePopup(title, closeHandler, true, true);
      }
     );
+
+type("ChildrenProtectionPopup", ["ExclusivePopup"], {
+
+    draw: function() {
+        var self = this;
+        var container = $("<table/>").attr("cellspacing", 0);
+        each(this.elementList, function(element) {
+            var className = (self.elementList.length.get() != self.elementList.indexOf(element) + 1)?"CRLabstractDataCell":"CRLLastDataCell";
+            var row = $("<tr/>").css("color","#444444");
+            var link = $('<a/>').attr('href', element.protectionURL).html($T("Edit protection"))
+            row.append($("<td/>").addClass(className).css({"font-weight": "bold", "width": "15%"}).html(element._type));
+            row.append($("<td/>").addClass(className).css("width","50%").html(_.contains(["Link", "LocalFile"], element._type)?element.name:element.title));
+            row.append($("<td/>").attr("nowrap", "nowrap").addClass(className).append(link));
+            container.append(row);
+        });
+        return this.ExclusivePopup.prototype.draw.call(this, container, {margin: pixels(5), minWidth: pixels(300), maxWidth: pixels(this.width)});
+    },
+    postDraw: function(){
+        this.ExclusivePopup.prototype.postDraw.call(this);
+    }
+    },
+     function(title, elementList) {
+
+         this.elementList = $L(elementList);
+         this.title = title;
+         this.width = 450;
+         this.ExclusivePopup(this.title, null, true, true);
+     }
+    );

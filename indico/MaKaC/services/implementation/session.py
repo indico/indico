@@ -355,7 +355,15 @@ class SessionProtectionToggleDomains(SessionModifBase):
         elif not self._add:
             self._target.freeDomain(d)
 
+class SessionGetChildrenProtected(SessionModifBase):
 
+    def _getAnswer(self):
+        return fossilize(self._session.getAccessController().getChildrenProtected())
+
+class SessionGetChildrenPublic(SessionModifBase):
+
+    def _getAnswer(self):
+        return fossilize(self._session.getAccessController().getChildrenPublic())
 
 methodMap = {
     "getBooking": SessionGetBooking,
@@ -369,4 +377,6 @@ methodMap = {
     "protection.addExistingCoordinator": SessionAddExistingChair,
     "protection.removeCoordinator": SessionRemoveChair,
     "protection.toggleDomains": SessionProtectionToggleDomains,
+    "protection.getChildrenProtected": SessionGetChildrenProtected,
+    "protection.getChildrenPublic": SessionGetChildrenPublic
 }

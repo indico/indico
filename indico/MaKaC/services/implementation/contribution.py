@@ -226,6 +226,15 @@ class ContributionProtectionRemoveUser(ContributionModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._contribution.revokeAccess(userToRemove)
 
+class ContributionGetChildrenProtected(ContributionModifBase):
+
+    def _getAnswer(self):
+        return fossilize(self._contribution.getAccessController().getChildrenProtected())
+
+class ContributionGetChildrenPublic(ContributionModifBase):
+
+    def _getAnswer(self):
+        return fossilize(self._contribution.getAccessController().getChildrenPublic())
 
 class ContributionParticipantsBase(ContributionModifBase):
 
@@ -893,6 +902,8 @@ methodMap = {
     "protection.getAllowedUsersList": ContributionProtectionUserList,
     "protection.addAllowedUsers": ContributionProtectionAddUsers,
     "protection.removeAllowedUser": ContributionProtectionRemoveUser,
+    "protection.getChildrenProtected": ContributionGetChildrenProtected,
+    "protection.getChildrenPublic": ContributionGetChildrenPublic,
 
     "participants.addNewParticipant": ContributionAddNewParticipant,
     "participants.addExistingParticipant": ContributionAddExistingParticipant,

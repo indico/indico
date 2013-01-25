@@ -886,7 +886,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             tz = DisplayTZ(self._getAW(),self._conf).getDisplayTZ()
             useCache = minfo.isCacheActive() and self._params.get("detailLevel", "") in [ "", "contribution" ] and self._view == self._conf.getDefaultStyle() and self._params.get("showSession","all") == "all" and self._params.get("showDate","all") == "all" and tz == self._conf.getTimezone()
-            useNormalCache = useCache and self._conf.isFullyPublic() and not self._conf.canModify(self._getAW()) and self._getAW().getUser() == None
+            useNormalCache = useCache and self._conf.getAccessController().isFullyPublic() and not self._conf.canModify(self._getAW()) and self._getAW().getUser() == None
             useManagerCache = useCache and self._conf.canModify( self._getAW())
             body = ""
             if useManagerCache:

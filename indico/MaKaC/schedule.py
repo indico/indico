@@ -1464,7 +1464,7 @@ class ScheduleToJson:
     @staticmethod
     def obtainFossil(entry, tz, fossilInterface = None, mgmtMode = False, useAttrCache = False):
 
-        if mgmtMode or (not isinstance(entry, BreakTimeSchEntry) and not entry.getOwner().isFullyPublic()):
+        if mgmtMode or (not isinstance(entry, BreakTimeSchEntry) and not entry.getOwner().getAccessController().isFullyPublic()):
         # We check if it is fully public because it could be some material protected
         # that would create a security hole if we cache it
             result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
@@ -1554,7 +1554,7 @@ class ScheduleToJson:
 
         scheduleDict = {}
 
-        if not days and schedule.getOwner().isFullyPublic() and not mgmtMode:
+        if not days and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
             scheduleDict = ScheduleToJson._cache.get(schedule.getOwner().getUniqueId())
 
         if not scheduleDict:
@@ -1579,7 +1579,7 @@ class ScheduleToJson:
                     if day in dates:
                         genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
                         scheduleDict[day][genId] = resultData
-            if fullTT and schedule.getOwner().isFullyPublic() and not mgmtMode:
+            if fullTT and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
                 ScheduleToJson._cache.set(schedule.getOwner().getUniqueId(), scheduleDict, timedelta(minutes=5))
 
         if hideWeekends:

@@ -1,4 +1,4 @@
-<%page args="parentName=None, privacy=None, parentPrivacy=None, statusColor=None, parentStatusColor=None, locator=None, isFullyPublic=None, childrenProtected=None"/>
+<%page args="parentName=None, privacy=None, parentPrivacy=None, statusColor=None, parentStatusColor=None, locator=None"/>
 <%
 termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName':'category'},
             'Event':    {'name':'event', 'paramsKey': 'confId', 'parentName':'category'},
@@ -34,26 +34,28 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
             % endif
         </div>
 
-        % if isFullyPublic == False and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
-                <div id="protected_children_warning">
+        % if not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
+                <div class="noninherited_children_danger">
                   <i class="icon-shield"></i>
                   <span>
-                    ${_('Some parts of it are, however, protected. <a href="#" id="see_protected">Which ones?</a>')}
+                    ${_('Some parts of it are accesible only for authorized people. <a href="#" class="see_children" data-url="{0}.protection.getChildrenProtected" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
                   </span>
                 </div>
-
-                <div id="childrenProtected" style="display:none">
-                % for childType in childrenProtected:
-                    %if childrenProtected[childType]:
-                        <h3>${childType}</h3>
-                        <ul>
-                        % for child in childrenProtected[childType]:
-                            <li><a href="${getChildURL(child)}">${child.getTitle()}</a></li>
-                        % endfor
-                        </ul>
-                    % endif
-                % endfor
+        % elif not target.getAccessController().isFullyPrivate() and (privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE')):
+                <div class="noninherited_children_danger">
+                  <i class="icon-shield"></i>
+                  <span>
+                    ${_('Some parts of it are accesible for everybody. <a href="#" class="see_children" data-url="{0}.protection.getChildrenPublic" data-type="Public">Which ones?</a>').format(termsDict[type]['name'])}
+                  </span>
                 </div>
+                % if len(target.getAccessController().getChildrenProtected()) > 0:
+                <div class="noninherited_children_warning">
+                  <i class="icon-shield"></i>
+                  <span>
+                    ${_('Some other parts are still protected but their protection has been redefined. <a href="#" class="see_children" data-url="{0}.protection.getChildrenProtected" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
+                  </span>
+                </div>
+                %endif
         % endif
 
        % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
@@ -101,37 +103,27 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
 </tr>
 <script type="text/javascript">
 
-% if not isFullyPublic and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
-  $(function() {
-
-    $("#see_protected").qtip({
-        style: {
-            classes: 'see_protected_tip ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
-        },
-        show: {
-            event: 'click',
-            effect: function() {
-                $(this).fadeIn(300);
-            }
-        },
-        position: {
-            my: 'top center',
-            at: 'bottom center',
-        },
-        hide: {
-            event: 'unfocus click',
-            fixed: true,
-            effect: function() {
-                $(this).fadeOut(300);
-            }
-        },
-        content: {
-            text: $("#childrenProtected")
-        }
-    });
-
-  });
-
+% if not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) \
+    or not target.getAccessController().isFullyPrivate() and (privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE')):
+    $(".see_children").click(function(){
+        var self = this;
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Getting children protected elements..."));
+        jsonRpc(Indico.Urls.JsonRpcService, $(self).data("url") ,
+                {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
+                % if type != 'Event':
+                    'confId' : '${ target.getConference().getId() }',
+                % endif
+                },
+                function(result, error){
+                    if (exists(error)) {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    } else {
+                        killProgress();
+                        new ChildrenProtectionPopup($(self).data("type") + $T(" children list"), result).open();
+                    }
+                });
+        });
 % endif
 
 % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :

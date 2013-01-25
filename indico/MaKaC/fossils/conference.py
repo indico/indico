@@ -130,6 +130,10 @@ class IResourceMinimalFossil(IFossil):
     def getDescription(self):
         """ Resource Description """
 
+    def getProtectionURL(self):
+        """ Resource protection URL """
+    getProtectionURL.produce = lambda s: s.getOwner().getProtectionURL()
+
 class ILinkMinimalFossil(IResourceMinimalFossil):
 
     def getURL(self):
@@ -218,6 +222,12 @@ class IMaterialMinimalFossil(IFossil):
     getResourceList.result = {"MaKaC.conference.Link": ILinkMinimalFossil, "MaKaC.conference.LocalFile": ILocalFileMinimalFossil}
     getResourceList.name = "resources"
 
+    def getType(self):
+        """ The type of material"""
+
+    def getProtectionURL(self):
+        pass
+
 class IMaterialFossil(IMaterialMinimalFossil):
 
     def getReviewingState(self):
@@ -248,9 +258,6 @@ class IMaterialFossil(IMaterialMinimalFossil):
     def getMainResource(self):
         """ The main resource"""
     getMainResource.result = {"MaKaC.conference.Link": ILinkFossil, "MaKaC.conference.LocalFile": ILocalFileExtendedFossil}
-
-    def getType(self):
-        """ The type of material"""
 
     def isBuiltin(self):
         """ The material is a default one (builtin) """
@@ -319,6 +326,9 @@ class ISessionFossil(IFossil):
         pass
     getLocator.convert = Conversion.url(urlHandlers.UHSessionDisplay)
     getLocator.name = 'url'
+
+    def getProtectionURL(self):
+        pass
 
 class ISessionSlotFossil(IFossil):
 

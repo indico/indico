@@ -77,6 +77,9 @@ class IContributionFossil(IFossil):
         pass
     getType.convert = lambda t: t and t.getName()
 
+    def getProtectionURL(self):
+        pass
+
 class IContributionParticipationTTDisplayFossil(IFossil):
     """
     Minimal Fossil for Contribution Participation to be

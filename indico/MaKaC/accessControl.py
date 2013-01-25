@@ -19,6 +19,7 @@
 
 import ZODB
 from persistent import Persistent
+from functools import wraps
 
 from MaKaC.common import DBMgr
 from MaKaC.common import info
@@ -26,6 +27,25 @@ import MaKaC
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins import Observable
 from MaKaC.common.logger import Logger
+
+def isFullyAccess(level):
+    def wrap(func):
+        @wraps(func)
+        def decorator(*args):
+            for child in args[0].getNonInheritedChildren():
+                if child.getAccessController().getAccessProtectionLevel() == level:
+                    return False
+            return True
+        return decorator
+    return wrap
+
+def getChildren(level):
+    def wrap(func):
+        @wraps(func)
+        def decorator(*args):
+            return [child for child in args[0].getNonInheritedChildren() if child.getAccessController().getAccessProtectionLevel() == level]
+        return decorator
+    return wrap
 
 class AccessController( Persistent, Observable ):
     """This class keeps access control information both for accessing and
@@ -60,6 +80,7 @@ class AccessController( Persistent, Observable ):
         self.accessKey = ""
         self.owner = owner
         self.contactInfo = ""
+        self.nonInheritedChildren = set()
 
     def getOwner(self):
         return self.owner
@@ -348,6 +369,41 @@ class AccessController( Persistent, Observable ):
 
     def setContactInfo(self, info):
         self.contactInfo = info
+
+    def addNonInheritedChild(self, obj):
+        self.nonInheritedChildren.add(obj)
+        self._p_changed = 1
+
+    def removeNonInheritedChild(self, obj):
+        self.nonInheritedChildren.discard(obj)
+        self._p_changed = 1
+
+    def getNonInheritedChildren(self):
+        return self.nonInheritedChildren
+
+    def updateNonInheritedChildren(self, elem, delete=False):
+        if delete or elem.getAccessController().getAccessProtectionLevel() == 0:
+            self.removeNonInheritedChild(elem)
+        else:
+            self.addNonInheritedChild(elem)
+        self._p_changed = 1
+
+    @isFullyAccess(1)
+    def isFullyPublic(self):
+        pass
+
+    @isFullyAccess(-1)
+    def isFullyPrivate(self):
+        pass
+
+    @getChildren(1)
+    def getChildrenProtected(self):
+        pass
+
+    @getChildren(-1)
+    def getChildrenPublic(self):
+        pass
+
 
 class CategoryAC(AccessController):
 

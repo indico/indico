@@ -4681,6 +4681,11 @@ div.actionButton {
     font-weight: bold;
  }
 
+.CRLLastDataCell{
+    padding:5px;
+    vertical-align: top;
+}
+
 .btnRemove {
     color: red;
     background-color: transparent;
@@ -8547,20 +8552,25 @@ div.informationUserList {
     padding: 8px 35px 8px 14px;
 }
 
-#protected_children_warning {
+.noninherited_children_danger, .noninherited_children_warning {
     color: #777;
     font-size: 0.9em;
-    margin: 10px 0 10px 0;
+    margin: 5px 0 5px 0;
     padding: 10px;
-    max-width: 450px;
+    max-width: 560px;
     background-color: #eee;
 }
 
-#protected_children_warning i.icon-shield {
+.noninherited_children_danger i.icon-shield {
     vertical-align: middle;
-    font-size: 1.4em;
+    font-size: 2em;
     color: #991111;
-    margin-right: 7px;
+}
+
+.noninherited_children_warning i.icon-shield {
+    vertical-align: middle;
+    font-size: 2em;
+    color: #ccbc00;
 }
 
 #privacy_status {

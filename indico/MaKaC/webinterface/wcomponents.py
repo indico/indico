@@ -1923,17 +1923,6 @@ class WMaterialTable( WTemplated ):
 
 class WAccessControlFrameBase(WTemplated):
 
-    def _getChildURL(self, child):
-        if isinstance(child, conference.Session):
-            return urlHandlers.UHSessionModifAC.getURL(child)
-        if isinstance(child, conference.Material):
-            return urlHandlers.UHMaterialModification.getURL(child)
-        if isinstance(child, conference.Contribution):
-            return urlHandlers.UHContribModifAC.getURL(child)
-        if isinstance(child, conference.SubContribution):
-            return urlHandlers.UHSubContributionModification.getURL(child)
-
-
     def _getAccessControlFrametParams( self ):
         vars = {}
         if self._target.getAccessProtectionLevel() == -1:
@@ -1945,13 +1934,6 @@ class WAccessControlFrameBase(WTemplated):
         else :
             vars["privacy"] = "INHERITING"
             vars["statusColor"] = "#444444"
-
-        vars["isFullyPublic"] = None
-        vars["childrenProtected"] = None
-
-        if not isinstance(self._target, Category) :
-            vars["isFullyPublic"] = self._target.isFullyPublic()
-            vars["childrenProtected"] = self._target.getChildrenProtected()
 
         if isinstance(self._target, Category) and self._target.isRoot():
             vars["parentName"] = vars["parentPrivacy"] = vars["parentStatusColor"] = ''
@@ -1968,7 +1950,6 @@ class WAccessControlFrameBase(WTemplated):
                     vars["parentStatusColor"] = "#128F33"
 
         vars["locator"] = self._target.getLocator().getWebForm()
-        vars["getChildURL"] = lambda child: self._getChildURL(child)
         return vars
 
 class WAccessControlFrame(WAccessControlFrameBase):

@@ -366,9 +366,6 @@ class Category(CommonObjectBase):
     def getAccessController(self):
         return self.__ac
 
-    def updateFullyPublic( self ):
-        pass
-
     def getNotifyCreationList( self ):
         """ self._notifyCreationList is a string containing the list of
         email addresses to send an email to when a new event is created"""
@@ -2208,59 +2205,8 @@ class Conference(CommonObjectBase, Locatable):
         if len(self.getOwnerList()) > 0:
             self.getOwnerList()[0].cleanCache()
 
-    def isFullyPublic( self ):
-        """ determines whether an event (or any part of it) is private or not"""
-        if hasattr(self, "_fullyPublic"):
-            return self._fullyPublic
-        else:
-            self.setFullyPublic()
-            return self._fullyPublic
-
-    def setFullyPublic( self ):
-        """ This function calculates the self._fullyPublic attribute"""
-        if self.isProtected():
-            self._fullyPublic = False
-            self._p_changed=1
-            return
-        for mat in self.getAllMaterialList():
-            if not mat.isFullyPublic():
-                self._fullyPublic = False
-                self._p_changed=1
-                return
-        for cont in self.getContributionList():
-            if not cont.isFullyPublic():
-                self._fullyPublic = False
-                self._p_changed=1
-                return
-        for ses in self.getSessionList():
-            if not ses.isFullyPublic():
-                self._fullyPublic = False
-                self._p_changed=1
-                return
-        self._fullyPublic = True
-        self._p_changed = 1
-
-    def updateFullyPublic( self ):
-        self.setFullyPublic()
-
-        # Room booking related
-        #self.__roomBookingGuids = []
-
-    def getChildrenProtected(self):
-        children = {"Material": [],
-                    "Contributions" :[],
-                    "Sessions": []}
-        if not self.isProtected():
-            for mat in self.getAllMaterialList():
-                if not mat.isFullyPublic():
-                    children["Material"].append(mat)
-            for contrib in self.getContributionList():
-                if not contrib.isFullyPublic():
-                    children["Contributions"].append(contrib)
-            for session in self.getSessionList():
-                if not session.isFullyPublic():
-                    children["Sessions"].append(session)
-        return children
+    def updateInheritedChild(self, elem, delete=False):
+        self.getAccessController().updateNonInheritedChildren(elem, delete)
 
     def getKeywords(self):
         try:
@@ -3773,8 +3719,7 @@ class Conference(CommonObjectBase, Locatable):
 
         oldValue = 1 if self.isProtected() else -1
 
-        self.__ac.setProtection( private )
-        self.updateFullyPublic()
+        self.getAccessController().setProtection( private )
         self.cleanCategoryCache()
 
         if oldValue != private:
@@ -5450,46 +5395,13 @@ class Session(CommonObjectBase, Locatable):
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
-    def isFullyPublic( self ):
-        if hasattr(self, "_fullyPublic"):
-            return self._fullyPublic
-        else:
-            self.setFullyPublic()
-            return self._fullyPublic
+    def updateInheritedChild(self, elem, delete=False, propagate=True):
+        self.getAccessController().updateNonInheritedChildren(elem, delete)
+        if propagate == True:
+            self.updateInheritedParent(elem, delete)
 
-    def setFullyPublic( self ):
-        if self.isProtected():
-            self._fullyPublic = False
-            self.notifyModification()
-            return
-        for res in self.getAllMaterialList():
-            if not res.isFullyPublic():
-                self._fullyPublic = False
-                self.notifyModification()
-                return
-        for res in self.getContributionList():
-            if not res.isFullyPublic():
-                self._fullyPublic = False
-                self.notifyModification()
-                return
-        self._fullyPublic = True
-        self.notifyModification()
-
-    def updateFullyPublic( self ):
-        self.setFullyPublic()
-        self.getOwner().updateFullyPublic()
-
-    def getChildrenProtected(self):
-        children = {"Material": [],
-                    "Contributions" :[]}
-        if not self.isProtected():
-            for mat in self.getAllMaterialList():
-                if not mat.isFullyPublic():
-                    children["Material"].append(mat)
-            for contrib in self.getContributionList():
-                if not contrib.isFullyPublic():
-                    children["Contributions"].append(contrib)
-        return children
+    def updateInheritedParent(self, elem, delete=False):
+        self.getOwner().updateInheritedChild(elem, delete)
 
     def getKeywords(self):
         try:
@@ -5618,6 +5530,7 @@ class Session(CommonObjectBase, Locatable):
                 self.getRegistrationSession().setRegistrationForm(None)
                 TrashCanManager().add(self.getRegistrationSession())
             self.conference=None
+            self.updateInheritedParent(self, delete=True)
             TrashCanManager().add(self)
 
     def recover(self, isCancelled):
@@ -6298,6 +6211,11 @@ class Session(CommonObjectBase, Locatable):
         self.getConference().addContribution(newContrib,id)
         self.contributions[newContrib.getId()]=newContrib
         newContrib.setSession(self)
+
+        self.updateInheritedChild(newContrib)
+        for child in newContrib.getAccessController().getNonInheritedChildren():
+            self.updateInheritedChild(child)
+
         self.notifyModification()
 
     def hasContribution(self,contrib):
@@ -6315,6 +6233,11 @@ class Session(CommonObjectBase, Locatable):
             sch=contrib.getSchEntry().getSchedule()
             sch.removeEntry(contrib.getSchEntry())
         del self.contributions[contrib.getId()]
+
+        self.updateInheritedChild(contrib, delete=True, propagate=False)
+        for child in contrib.getAccessController().getNonInheritedChildren():
+            self.updateInheritedChild(child, delete=True, propagate=False)
+
         contrib.setSession(None)
 
         self.notifyModification()
@@ -6378,7 +6301,7 @@ class Session(CommonObjectBase, Locatable):
 
     def setProtection( self, private ):
         self.__ac.setProtection( private )
-        self.updateFullyPublic()
+        self.updateInheritedParent(self)
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -6472,6 +6395,9 @@ class Session(CommonObjectBase, Locatable):
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
 
+    def getProtectionURL(self):
+        return str(urlHandlers.UHSessionModifAC.getURL(self))
+
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
         newMat.setOwner( self )
@@ -6480,9 +6406,9 @@ class Session(CommonObjectBase, Locatable):
 
     def removeMaterial( self, mat ):
         if mat.getId() in self.materials.keys():
+            mat.delete()
             self.materials[mat.getId()].setOwner(None)
             del self.materials[ mat.getId() ]
-            mat.delete()
             self.notifyModification()
             return "done: %s"%mat.getId()
         elif mat.getId().lower() == 'minutes':
@@ -7301,6 +7227,9 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     def recover(self):
         TrashCanManager().remove(self)
 
+    def getAccessController( self ):
+        return self.getSession().getAccessController()
+
     def canAccess(self,aw):
         return self.getSession().canAccess(aw)
 
@@ -7390,9 +7319,6 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
 
     def getAllMaterialList(self):
         return self.getSession().getAllMaterialList()
-
-    def isFullyPublic(self):
-        return self.getSession().isFullyPublic()
 
 
 class ContributionParticipation(Persistent, Fossilizable):
@@ -7864,46 +7790,12 @@ class Contribution(CommonObjectBase, Locatable):
             self._reviewManager = ReviewManager(self)
         return self._reviewManager
 
-    def isFullyPublic( self ):
-        if hasattr(self, "_fullyPublic"):
-            return self._fullyPublic
-        else:
-            self.setFullyPublic()
-            return self._fullyPublic
+    def updateInheritedChild(self, elem, delete=False):
+        self.getAccessController().updateNonInheritedChildren(elem, delete)
+        self.updateInheritedParent(elem, delete)
 
-    def setFullyPublic( self ):
-        if self.isProtected():
-            self._fullyPublic = False
-            self.notifyModification(raiseEvent = False)
-            return
-        for res in self.getAllMaterialList():
-            if not res.isFullyPublic():
-                self._fullyPublic = False
-                self.notifyModification(raiseEvent = False)
-                return
-        for res in self.getSubContributionList():
-            if not res.isFullyPublic():
-                self._fullyPublic = False
-                self.notifyModification(raiseEvent = False)
-                return
-        self._fullyPublic = True
-        self.notifyModification(raiseEvent = False)
-
-    def updateFullyPublic( self ):
-        self.setFullyPublic()
-        self.getOwner().updateFullyPublic()
-
-    def getChildrenProtected(self):
-        children = {"Material": [],
-                    "Subcontributions" :[]}
-        if not self.isProtected():
-            for mat in self.getAllMaterialList():
-                if not mat.isFullyPublic():
-                    children["Material"].append(mat)
-            for subContrib in self.getSubContributionList():
-                if not subContrib.isFullyPublic():
-                    children["Subcontributions"].append(subContrib)
-        return children
+    def updateInheritedParent(self, elem, delete=False):
+        self.getOwner().updateInheritedChild(elem, delete)
 
     def getKeywords(self):
         try:
@@ -8261,7 +8153,6 @@ class Contribution(CommonObjectBase, Locatable):
             self._notify('deleted', oldParent)
 
             self.setTrack(None)
-            self.setSession(None)
             for mat in self.getMaterialList():
                 self.removeMaterial(mat)
             self.removePaper()
@@ -8270,6 +8161,10 @@ class Contribution(CommonObjectBase, Locatable):
             self.removePoster()
             self.removeMinutes()
             self.removeReviewing()
+
+            self.updateInheritedParent(self, delete=True)
+
+            self.setSession(None)
 
             while len(self.getSubContributionList()) > 0:
 
@@ -8289,6 +8184,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._setConference( None )
 
             self.setStatus(ContribStatusNone(self))
+
             TrashCanManager().add(self)
 
     def recover(self):
@@ -9104,7 +9000,7 @@ class Contribution(CommonObjectBase, Locatable):
         oldValue = 1 if self.isProtected() else -1
 
         self.__ac.setProtection( private )
-        self.updateFullyPublic()
+        self.updateInheritedParent(self)
 
         if oldValue != private:
             # notify listeners
@@ -9192,6 +9088,9 @@ class Contribution(CommonObjectBase, Locatable):
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
 
+    def getProtectionURL(self):
+        return str(urlHandlers.UHContribModifAC.getURL(self))
+
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
         newMat.setOwner( self )
@@ -9200,9 +9099,9 @@ class Contribution(CommonObjectBase, Locatable):
 
     def removeMaterial( self, mat ):
         if mat.getId() in self.materials.keys():
+            mat.delete()
             self.materials[mat.getId()].setOwner(None)
             del self.materials[ mat.getId() ]
-            mat.delete()
             self.notifyModification()
         elif mat.getId().lower() == 'paper':
             self.removePaper()
@@ -10216,25 +10115,8 @@ class SubContribution(CommonObjectBase, Locatable):
             grandpaId = None
         return "<SubCont %s:%s:%s@%s>" % (grandpaId, parentId, self.getId(), hex(id(self)))
 
-    def isFullyPublic( self ):
-        if hasattr(self, "_fullyPublic"):
-            return self._fullyPublic
-        else:
-            self.setFullyPublic()
-            return self._fullyPublic
-
-    def setFullyPublic( self ):
-        for res in self.getAllMaterialList():
-            if not res.isFullyPublic():
-                self._fullyPublic = False
-                self._p_changed = 1
-                return
-        self._fullyPublic = True
-        self._p_changed = 1
-
-    def updateFullyPublic( self ):
-        self.setFullyPublic()
-        self.getOwner().updateFullyPublic()
+    def updateInheritedChild(self, elem, delete=False):
+        self.getOwner().updateInheritedChild(elem, delete)
 
     def getAccessController(self):
         return self.getOwner().getAccessController()
@@ -10540,9 +10422,9 @@ class SubContribution(CommonObjectBase, Locatable):
 
     def removeMaterial( self, mat):
         if mat.getId() in self.materials.keys():
+            mat.delete()
             self.materials[mat.getId()].setOwner(None)
             del self.materials[ mat.getId() ]
-            mat.delete()
             self.notifyModification()
         elif mat.getId().lower() == 'paper':
             self.removePaper()
@@ -10814,29 +10696,12 @@ class Material(CommonObjectBase):
         self.__ac = AccessController(self)
         self._mainResource = None
 
-    def isFullyPublic( self ):
-        if hasattr(self, "_fullyPublic"):
-            return self._fullyPublic
-        else:
-            self.setFullyPublic()
-            return self._fullyPublic
+    def updateInheritedChild(self, elem, delete=False):
+        self.getAccessController().updateNonInheritedChildren(elem, delete)
+        self.updateInheritedParent(elem, delete)
 
-    def setFullyPublic( self ):
-        if self.isProtected():
-            self._fullyPublic = False
-            self._p_changed = 1
-            return
-        for res in self.getResourceList():
-            if res.isProtected():
-                self._fullyPublic = False
-                self._p_changed = 1
-                return
-        self._fullyPublic = True
-        self._p_changed = 1
-
-    def updateFullyPublic( self ):
-        self.setFullyPublic()
-        self.getOwner().updateFullyPublic()
+    def updateInheritedParent(self, elem, delete=False):
+        self.getOwner().updateInheritedChild(elem, delete)
 
     def setValues( self, params ):
         """Sets all the values of the current material object from a diccionary
@@ -11073,6 +10938,7 @@ class Material(CommonObjectBase):
     def delete( self ):
         for res in self.getResourceList():
             self.removeResource( res )
+        self.updateInheritedParent(self, delete=True)
         TrashCanManager().add(self)
 
     def recover(self):
@@ -11112,7 +10978,7 @@ class Material(CommonObjectBase):
 
     def setProtection( self, private ):
         self.__ac.setProtection( private )
-        self.updateFullyPublic()
+        self.updateInheritedParent(self)
         self._p_changed = 1
 
     def isHidden( self ):
@@ -11250,6 +11116,9 @@ class Material(CommonObjectBase):
 
     def isBuiltin(self):
         return False
+
+    def getProtectionURL(self):
+        return str(urlHandlers.UHMaterialModification.getURL(self))
 
 class BuiltinMaterial(Material):
     """
@@ -11551,6 +11420,7 @@ class Resource(CommonObjectBase):
 
     def delete( self ):
         if self._owner != None:
+            self.updateInheritedParent(delete=True)
             self._owner.removeResource( self )
             self._owner = None
             TrashCanManager().add(self)
@@ -11580,11 +11450,15 @@ class Resource(CommonObjectBase):
             return self.getOwner().isProtected()
         return False
 
+    def updateInheritedParent(self, delete=False):
+        self.getOwner().updateInheritedChild(self, delete)
+
     @Updates (['MaKaC.conference.Link',
                'MaKaC.conference.LocalFile'],'protection', lambda(x): int(x))
+
     def setProtection( self, private ):
         self.__ac.setProtection( private )
-        self.getOwner().updateFullyPublic()
+        self.updateInheritedParent()
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -11710,6 +11584,9 @@ class Resource(CommonObjectBase):
         if self.pdfConversionRequestDate is not None and self.pdfConversionRequestDate + timedelta(seconds=50) > nowutc() :
             return 'converting'
         return None
+
+    def getProtectionURL(self):
+        return str(urlHandlers.UHMaterialModification.getURL(self.getOwner()))
 
 
 class Link(Resource):

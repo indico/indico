@@ -1281,11 +1281,20 @@ type("ResourceListWidget", ["ListWidget"], {
         var editButton;
         var setMain;
         var flag;
+        var protectionIcon;
 
         if (resource.get('reviewingState') < 3 || (resource.get('reviewingState') == 3 && self.canReviewModify)) {
             if(resource.get('reviewingState') == 3){
                 flag = true;
             } else { flag = false;}
+            var protection = Protection.resolveProtection(resource.get('protection'),self.matParams.materialProtection);
+
+            protectionIcon = Html.span({}, protection==1?
+                                           Html.img({src: imageSrc('protected'),
+                                                     style: {verticalAlign: 'middle', paddingLeft:pixels(5)},
+                                                     alt: "protected",
+                                                     title: $T("This resource is protected")})
+                                           :'');
             removeButton = Widget.link(command(deleteResource,IndicoUI.Buttons.removeButton()));
             editButton = Widget.link(command(function() {
                 IndicoUI.Dialogs.Material.editResource(resParams, self.matParams, self.materialName, resource, resourceNode, function(resource) {
@@ -1330,6 +1339,7 @@ type("ResourceListWidget", ["ListWidget"], {
 
 
         var information = [
+            protectionIcon,
             informationTitle,
             resource.get('type') == 'stored' || 'converting' ? "" :[" (",Html.span({style:{fontStyle: 'italic', fontSize: '11px'}}, resource.get('url')),")"],
             removeButton,
