@@ -129,13 +129,7 @@ class RHCFANotifTplNew(RHCFANotifTplBase):
                 self._redirect(urlHandlers.UHAbstractModNotifTplDisplay.getURL(self._notifTpl))
                 return
         p = WPModCFANotifTplNew(self,self._target)
-        return p.display(title = self._title,\
-                        description = self._description,\
-                        subject = self._subject,\
-                        body = self._body,\
-                        fromAddr = self._fromAddr,\
-                        toList = self._toList,\
-                        ccList = self._ccList)
+        return p.display()
 
 
 class RHCFANotifTplRem(RHConfModifCFABase):
