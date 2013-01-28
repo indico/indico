@@ -1434,7 +1434,7 @@ As with Badge / Tablesigns, you are permitted to alter the resultant PDF options
 
 The list of event templates are templates which are only available for this event, you may freely edit, clone or delete these poster templates at will.
 
-|image157|
+|image159|
 
 The Poster design page is very similar to the Badge / Tablesigns design page. The options are broken into two tabs:
 
