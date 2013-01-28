@@ -152,7 +152,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                  var source = indicoSource(
                      self.args.get('session')?'schedule.session.getUnscheduledContributions':
                          'schedule.event.getUnscheduledContributions',
-                     self.args.get("args"));
+                     self.args);
                  source.state.observe(function(state) {
                      if (state == SourceState.Loaded) {
                          killProgress();
@@ -209,9 +209,9 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              var self = this;
              var killProgress = IndicoUI.Dialogs.Util.progress();
 
-             var args = clone(this.args.get("args"));
-             args.ids = contribs;
-             args.date = date;
+             var args = clone(this.args);
+             args.set("ids", contribs);
+             args.set("date", date);
 
 
              indicoRequest(self.args.get('session')?'schedule.slot.scheduleContributions':
@@ -689,13 +689,13 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
      /**
       * @param timeStartMethod rpc_method_name if this parameter is null, the date will not be shown in the form.
       */
-     function(method, timeStartMethod, args, parentRoomData,
+     function(method, timeStartMethod, args, parentRoomData, confStartDate,
               dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
 
          var self = this;
          this.args = clone(args);
          this.dateArgs = clone(args);
-         this.dateArgs.selectedDay = dayStartDate;
+         this.dateArgs.selectedDay = confStartDate;
          this.timeStartMethod = timeStartMethod;
          this.dayStartDate = dayStartDate;
          this.parentRoomData = parentRoomData;

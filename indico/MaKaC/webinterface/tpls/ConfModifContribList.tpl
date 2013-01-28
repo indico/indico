@@ -247,6 +247,7 @@ var addContribution = function() {
                        $O(${ jsonEncode(dict(conference=self_._conf.id, roomInfo=roomInfo(self_._rh._target)))}),
                        parentEventRoomData,
                        '',
+                       '',
                        ${ jsBoolean(self_._conf.getType() != 'meeting') },
                        [],
                        null,

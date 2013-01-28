@@ -365,10 +365,8 @@ type("TimetableManagementActions", [], {
                 room: this.eventInfo.room,
                 address:this.eventInfo.address
             },
-            args: {
-                conference: this.eventInfo.id,
-                sessionTimetable: any(this.isSessionTimetable, false)
-            },
+            conference: this.eventInfo.id,
+            sessionTimetable: any(this.isSessionTimetable, false),
             type: type,
             parentType: 'Event'
         };
@@ -391,9 +389,9 @@ type("TimetableManagementActions", [], {
         // If sessionId exists then use that value, otherwise just use the id
         // This is needed since the session can either be an entry in the timetable
         // or an entry in this.eventInfo.session.
-        params.args.session = exists(session.sessionId) ? session.sessionId : session.id;
+        params.session = exists(session.sessionId) ? session.sessionId : session.id;
         if (type != 'SessionSlot') {
-            params.args.slot = session.sessionSlotId;
+            params.slot = session.sessionSlotId;
             params.type = 'Session' + params.type;
         }
 
@@ -415,7 +413,7 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Contribution');
         }
 
-        params.args.parentType = params.parentType;
+        params.parentType = params.parentType;
         var dialog = new AddContributionDialog(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
@@ -468,12 +466,12 @@ type("TimetableManagementActions", [], {
                                 "room": eventData.inheritRoom?null:eventData.room,
                                 "address": eventData.inheritLoc?'':eventData.address}));
 
-        params.args.parentType = params.parentType;
         var dialog = new AddNewContributionDialog(
             this.methods[params.type].edit,
             this.methods[params.parentType].dayEndDate,
             args,
             $O(params.roomInfo),
+            params.starDate,
             params.selectedDay,
             this.eventInfo.isConference,
             this.eventInfo.favoriteRooms,
