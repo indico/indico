@@ -4794,7 +4794,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         speaker = "<br>".join( l )
         session = ""
         if contrib.getSession() is not None:
-            if contrib.getSession().getCode() != "not assigned":
+            if contrib.getSession().getCode() != "no code":
                 session=self.htmlText(contrib.getSession().getCode())
             else:
                 session=self.htmlText(contrib.getSession().getId())
@@ -5177,7 +5177,8 @@ class WConfModMoveContribsToSession(wcomponents.WTemplated):
         vars["contribs"]=",".join(self._contribIdList)
         s=["""<option value="--none--">--none--</option>"""]
         for session in self._conf.getSessionListSorted():
-            s.append("""<option value=%s>%s</option>"""%(
+            if not session.isClosed():
+                s.append("""<option value=%s>%s</option>"""%(
                 quoteattr(str(session.getId())),
                 self.htmlText(session.getTitle())))
         vars["sessions"]="".join(s)

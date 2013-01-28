@@ -436,7 +436,7 @@ class WContribModifMain(wcomponents.WTemplated):
         if not self._contrib.getSession() is None:
             res=[ i18nformat("""<option value="">--_("none")--</option>""")]
         for session in self._contrib.getConference().getSessionListSorted():
-            if self._contrib.getSession()==session:
+            if self._contrib.getSession()==session or session.isClosed():
                 continue
             from MaKaC.common.TemplateExec import truncateTitle
             res.append("""<option value=%s>%s</option>"""%(quoteattr(str(session.getId())),self.htmlText(truncateTitle(session.getTitle(), 60))))

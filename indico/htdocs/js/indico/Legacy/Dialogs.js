@@ -70,12 +70,12 @@ extend(IndicoUI.Dialogs,
                        killLoadProgress();
 
                        var submitInfo = function() {
-                           each(args, function(value, key) {
-                               info.set(key, value);
+                           each(info, function(value, key) {
+                               args[key] = value;
                            });
                            if (parameterManager.check()) {
                                var killProgress = IndicoUI.Dialogs.Util.progress();
-                               indicoRequest(method, info,
+                               indicoRequest(method, args,
                                              function(result, error){
                                                  killProgress();
                                                  if (error) {
@@ -248,8 +248,8 @@ extend(IndicoUI.Dialogs,
            addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, favoriteRooms, days, successFunc, editOn, bookedRooms, timetable){
                var parameterManager = new IndicoUtil.parameterManager();
                var isEdit = exists(editOn)?editOn:false;
-               var args = isEdit?params:params.args;
-               var dateArgs = clone(args);
+               var args = params;
+               var dateArgs = clone(params);
                dateArgs.selectedDay = dayStartDate;
                var info = new WatchObject();
                var parentRoomData;

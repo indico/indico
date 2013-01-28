@@ -202,6 +202,7 @@ type("TimetableManagementActions", [], {
             if (error) {
                 IndicoUtil.errorReport(error);
                 dfr.reject(error);
+                self.timetable.timetableDrawer.redraw();
                 if (undo) {
                     killProgress();
                 }
@@ -259,6 +260,7 @@ type("TimetableManagementActions", [], {
             if (error) {
                 IndicoUtil.errorReport(error);
                 dfr.reject(error);
+                self.timetable.timetableDrawer.redraw();
             } else {
                 if (undo) {
                     self.timetable.enableUndo(undo, {'eventData': eventData,
@@ -563,7 +565,7 @@ type("TimetableManagementActions", [], {
         IndicoUI.Dialogs.addSession(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
-            params.args,
+            params,
             params.roomInfo,
             $O(params.roomInfo),
             params.selectedDay,

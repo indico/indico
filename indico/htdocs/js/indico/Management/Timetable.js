@@ -463,12 +463,12 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
             self.isEdit?self.info.get("presenters"):null, true, null,
-            true, false, self.info.get("conference"), {"presenter-grant-submission": [$T("submission rights"), true]},
+            true, false, self.info.get("conference"), {"presenter-grant-submission": [$T("submission rights"),  !self.isEdit]},
             true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         $B(info.accessor('presenters'), presListWidget.getUsers());
-        info.set('privileges', presListWidget.getPrivileges());
+        info.set('presenter-privileges', presListWidget.getPrivileges());
 
         var startTimeLine, daySelect, datecomponent;
 
@@ -585,20 +585,21 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var authorListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
             self.info.get("authors"), true, null,
-            true, false, this.args.get('conference'), {"author-grant-submission": [$T("submission rights"), true]},
+            true, false, this.args.get('conference'), {"author-grant-submission": [$T("submission rights"), !self.isEdit]},
             true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         var coauthorListWidget = new UserListField(
                 'VeryShortPeopleListDiv', 'PeopleList',
                 self.info.get("coauthors"), true, null,
-                true, false, this.args.get('conference'), {"coauthor-grant-submission": [$T("submission rights"), true]},
+                true, false, this.args.get('conference'), {"coauthor-grant-submission": [$T("submission rights"), !self.isEdit]},
                 true, true, true,
                 userListNothing, userListNothing, userListNothing);
 
         $B(info.accessor('authors'), authorListWidget.getUsers());
         $B(info.accessor('coauthors'), coauthorListWidget.getUsers());
-
+        info.set('author-privileges', authorListWidget.getPrivileges());
+        info.set('coauthor-privileges', coauthorListWidget.getPrivileges());
         return IndicoUtil.createFormFromMap(
             [
                 [$T('Author(s)'), authorListWidget.draw()],
@@ -1308,7 +1309,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                 }
 
                 // define if contrib is of type Contribution or Break (display purpose)
-                var span1 = Html.span({}, this.entryType == "Contribution"?
+                var span1 = Html.span({}, this.eventData.entryType == "Contribution"?
                                       $T("This contribution currently located at: "):
                                       $T("This break is currently located at: "),
                                       contribLocation);

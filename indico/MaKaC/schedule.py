@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from indico.MaKaC.errors import NoReportError
 
 """
 """
@@ -427,6 +428,9 @@ class TimeSchedule(Schedule, Persistent):
             i = 0
             while i < len(entries):
                 entry = entries[i]
+                if isinstance(entry.getOwner(), SessionSlot) and entry.getOwner().getSession().isClosed():
+                    raise EntryTimingError(_("""The modification of the session "%s" is not allowed because it is closed""") % entry.getOwner().getSession().getTitle())
+
                 if doFit:
                     if isinstance(entry.getOwner(), SessionSlot):
                         entry.getOwner().fit()
@@ -442,6 +446,8 @@ class TimeSchedule(Schedule, Persistent):
         elif type == "startingTime":
             st = day.replace(hour=self.getAdjustedStartDate().hour, minute=self.getAdjustedStartDate().minute).astimezone(timezone('UTC'))
             for entry in entries:
+                if isinstance(entry.getOwner(), SessionSlot) and entry.getOwner().getSession().isClosed():
+                    raise EntryTimingError(_("""The modification of the session "%s" is not allowed because it is closed""") % entry.getOwner().getSession().getTitle())
                 if doFit:
                     if isinstance(entry.getOwner(), SessionSlot):
                         entry.getOwner().fit()
@@ -450,6 +456,8 @@ class TimeSchedule(Schedule, Persistent):
         elif type == "noAction" and doFit:
             for entry in entries:
                 if isinstance(entry.getOwner(), SessionSlot):
+                    if entry.getOwner().getSession().isClosed():
+                        raise EntryTimingError(_("""The modification of the session "%s" is not allowed because it is closed""") % entry.getOwner().getSession().getTitle())
                     entry.getOwner().fit()
 
     def clear(self):

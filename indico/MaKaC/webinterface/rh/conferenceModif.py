@@ -3575,6 +3575,8 @@ class RHMoveContribsToSession(RHConferenceModifBase):
         self._session=self._target.getSessionById(params.get("targetSession",""))
         self._contribIds=self._normaliseListParam(params.get("contributions",[]))
         if params.has_key("OK"):
+            if self._session is not None and self._session.isClosed():
+                raise NoReportError(_("""The modification of the session "%s" is not allowed because it is closed""")%self._session.getTitle())
             self._contribIds=self._normaliseListParam(params.get("contributions","").split(","))
             self._action="MOVE"
         elif params.has_key("CANCEL"):
@@ -3608,6 +3610,8 @@ class RHMoveContribsToSession(RHConferenceModifBase):
                         return p.display(contribIds=self._contribIds,targetSession=self._session)
                     elif self._action=="MOVE_CONFIRMED":
                         continue
+                if contrib.getSession() is not None and contrib.getSession().isClosed():
+                    raise NoReportError(_("""The contribution "%s" cannot be moved because it is inside of the session "%s" that is closed""")%(contrib.getId(), contrib.getSession().getTitle()))
                 contribList.append(contrib)
             for contrib in contribList:
                 contrib.setSession(self._session)

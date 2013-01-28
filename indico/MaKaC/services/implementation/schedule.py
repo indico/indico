@@ -31,7 +31,7 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.schedule import IConferenceScheduleDisplayFossil
 
 from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportError,\
-    NoReportError
+    NoReportError, ServiceAccessError
 
 from MaKaC.services.implementation import conference as conferenceServices
 from MaKaC.services.implementation import base
@@ -147,8 +147,8 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
                 # call the appropriate method
                 addMethod(contribution, element)
                 peopleIds.append(element.getId())
-                if self._privileges is not None:
-                    if self._privileges.get('%s-grant-submission' % elemType, False):
+                if self._privileges[elemType] is not None:
+                    if self._privileges[elemType].get('%s-grant-submission' % elemType, False):
                         contribution.grantSubmission(element)
             else:
                 peopleIds.append(elemValues["id"])
@@ -156,6 +156,9 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
         for person in getListMethod(contribution)[:]:
             if str(person.getId()) not in peopleIds:
                 deleteMethod(contribution, person)
+            elif self._privileges[elemType] is not None:
+                if self._privileges[elemType].get('%s-grant-submission' % elemType, False):
+                    contribution.grantSubmission(person)
 
     def _addReportNumbers(self):
         reportNumbersSet = []
@@ -190,7 +193,11 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
         for field in self._target.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
             self._fields[field.getId()] = self._pManager.extract("field_%s"%field.getId(), pType=str,
                                                      allowEmpty=True, defaultValue='')
-        self._privileges = self._pManager.extract("privileges", pType=dict, allowEmpty=True)
+
+        self._privileges = {}
+        for elemType in ["presenter", "author", "coauthor"]:
+            self._privileges[elemType] = self._pManager.extract("%s-privileges"%elemType, pType=dict, allowEmpty=True)
+
         self._contribTypeId = self._pManager.extract("contributionType", pType=str, allowEmpty=True)
         self._materials = self._pManager.extract("materials", pType=dict, allowEmpty=True)
 
@@ -437,6 +444,9 @@ class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.Conf
         sessionSlot = self._schEntry.getOwner()
         session = sessionSlot.getSession()
 
+        if session.isClosed():
+            raise ServiceAccessError(_("""The modification of the session "%s" is not allowed because it is closed""")%session.getTitle())
+
         logInfo = session.getLogInfo()
         logInfo["subject"] = "Deleted session: %s"%session.getTitle()
         self._conf.getLogHandler().logAction(logInfo,"Timetable/Session",self._getUser())
@@ -664,6 +674,8 @@ class ModifyStartEndDate(ScheduleOperation):
 
         duration = self._endDate - self._startDate
         owner = self._schEntry.getOwner()
+        if isinstance(owner, SessionSlot) and owner.getSession().isClosed():
+            raise ServiceAccessError(_("""The modification of the session "%s" is not allowed because it is closed""")%owner.getSession().getTitle())
         if isinstance(owner, SessionSlot) and owner.getSession().getScheduleType() == "poster":
             # If it is a poster session we must modify the size of all the contributions inside it.
             for entry in owner.getSchedule().getEntries():
@@ -1177,8 +1189,10 @@ class MoveEntryBase(ScheduleOperation):
             if sessionId != "conf":
                 # Moving inside a session
                 session = self._conf.getSessionById(sessionId)
-
                 if session is not None:
+
+                    if session.isClosed():
+                        raise ServiceAccessError(_("""The modification of the session "%s" is not allowed because it is closed""")%session.getTitle())
 
                     if session.getScheduleType() == "poster" and isinstance(self._schEntry, BreakTimeSchEntry):
                         raise NoReportError(_("It is not possible to move a break inside a poster session"))

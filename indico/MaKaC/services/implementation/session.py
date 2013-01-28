@@ -72,6 +72,8 @@ class SessionModifBase(SessionBase, ProtectedModificationService):
                 self._slot = self._schEntry.getOwner()
 
     def _checkProtection(self):
+        if self._session.isClosed():
+            raise ServiceAccessError(_(""""The modification of the session "%s" is not allowed because it is closed""")%self._session.getTitle())
         ProtectedModificationService._checkProtection(self)
 
     def _getCheckFlag(self):
@@ -90,7 +92,7 @@ class SessionModifCoordinationBase(SessionModifBase):
 
     def _checkProtection(self):
         # if the use is authorized to coordinate the session, (s)he won't go through the usual mechanisms
-        if self._session.canCoordinate(self.getAW()):
+        if not self._session.isClosed() and self._session.canCoordinate(self.getAW()):
             return
         SessionModifBase._checkProtection( self )
 
@@ -98,7 +100,7 @@ class SessionModifCoordinationBase(SessionModifBase):
 class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
 
     def _checkProtection(self):
-        if self._session.canCoordinate(self.getAW(), "unrestrictedSessionTT"):
+        if not self._session.isClosed() and self._session.canCoordinate(self.getAW(), "unrestrictedSessionTT"):
             return
         SessionModifBase._checkProtection( self )
 
@@ -106,7 +108,7 @@ class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
 class SessionModifUnrestrictedContribMngCoordBase(SessionModifBase):
 
     def _checkProtection(self):
-        if self._session.canCoordinate(self.getAW(), "modifContribs"):
+        if not self._session.isClosed() and self._session.canCoordinate(self.getAW(), "modifContribs"):
             return
         SessionModifBase._checkProtection( self )
 

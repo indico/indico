@@ -35,23 +35,8 @@ def close( req, **params ):
 def open( req, **params ):
     return sessionModif.RHSessionOpen( req ).process( params )
 
-def addMaterial( req, **params ):
-    return sessionModif.RHSessionAddMaterial( req ).process( params )
-
-def performAddMaterial( req, **params ):
-    return sessionModif.RHSessionPerformAddMaterial( req ).process( params )
-
-def removeMaterials( req, **params ):
-    return sessionModif.RHSessionRemoveMaterials( req ).process( params )
-
 def materialsAdd(req, **params):
     return sessionModif.RHMaterialsAdd(req).process(params)
-
-def importContrib( req, **params ):
-    return sessionModif.RHSessionImportContrib( req ).process( params )
-
-def addContribs( req, **params ):
-    return sessionModif.RHAddContribs( req ).process( params )
 
 def addContribs( req, **params ):
     return sessionModif.RHAddContribs( req ).process( params )

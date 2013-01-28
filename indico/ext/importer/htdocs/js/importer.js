@@ -499,6 +499,11 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
                                     timetable._updateEntry(result, result.id);
                                 }
                             };
+                            var errorCallback = function(error){
+                                if(error){
+                                    IndicoUtil.errorReport(error);
+                                }
+                            };
                             var finalCallback = function(){
                                 if(self.successFunction)
                                     self.successFunction(self.info.get('redirect'));
@@ -507,7 +512,7 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
                                 self.close();
                                 killProgress();
                             };
-                            ImporterUtils.multipleIndicoRequest(args, successCallback , null, finalCallback);
+                            ImporterUtils.multipleIndicoRequest(args, successCallback , errorCallback, finalCallback);
                         }
                         else {
                             new WarningPopup("Warning", "Some contributions will end after 24:00. Please modify start time and duration.").open();

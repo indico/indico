@@ -73,6 +73,8 @@ class RHSessionModifBase( RHSessionBase, RHModificationBaseProtected ):
 class RHSessionModCoordinationBase(RHSessionModifBase):
 
     def _checkProtection(self):
+        if self._target.isClosed():
+            raise NoReportError(_("""The modification of the session "%s" is not allowed because it is closed""")%self._target.getTitle())
         if self._target.canCoordinate(self.getAW()):
             return
         RHSessionModifBase._checkProtection( self )
@@ -80,12 +82,19 @@ class RHSessionModCoordinationBase(RHSessionModifBase):
 class RHSessionModUnrestrictedContribMngCoordBase(RHSessionModifBase):
 
     def _checkProtection(self):
+        if self._target.isClosed():
+            raise NoReportError(_("""The modification of the session "%s" is not allowed because it is closed""")%self._target.getTitle())
         if self._target.canCoordinate(self.getAW(), "modifContribs"):
             return
         RHSessionModifBase._checkProtection( self )
 
-class RHSessionModification(RHSessionModCoordinationBase):
+class RHSessionModification(RHSessionModifBase):
     _uh = urlHandlers.UHSessionModification
+
+    def _checkProtection(self):
+        if self._target.canCoordinate(self.getAW()):
+            return
+        RHSessionModifBase._checkProtection( self )
 
     def _process( self ):
         if self._session.isClosed():
