@@ -320,11 +320,11 @@ IndicoUI.executeOnLoad(function(){
     });
 
     $("#set_present").bind('menu_select', function () {
-        return manageAttendance('event.participation.markPresent', 'presence','present');
+        return manageAttendance('event.participation.markPresent', 'presence',$T('Attended'));
     });
 
     $("#set_absent").bind('menu_select', function () {
-        return manageAttendance('event.participation.markAbsence', 'presence','absent');
+        return manageAttendance('event.participation.markAbsence', 'presence',$T("Didn't attend"));
     });
 
     $("#excuse_absence").bind('menu_select', function () {

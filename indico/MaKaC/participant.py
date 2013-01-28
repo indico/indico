@@ -218,7 +218,7 @@ class Participation(Persistent, Observable):
     def getPresentParticipantListText(self):
         text = []
         for p in self.getParticipantList():
-            if p.isConfirmed():
+            if p.isPresent() and p.isConfirmed():
                 part = p.getName()
                 text.append(part)
         return "; ".join(text)
@@ -1004,7 +1004,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
         return True
 
     def setStatusExcused(self, responsibleUser=None):
-        if self._status != "added" or self._present :
+        if not self.isConfirmed() or self._present:
             return False
         self._status = "excused"
 
