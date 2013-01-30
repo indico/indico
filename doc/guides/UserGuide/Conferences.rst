@@ -1359,6 +1359,13 @@ in order to request access.
 
 |image49|
 
+If the conference is PUBLIC and has some element that is PRIVATE, there will
+show a message 'Some parts of it are, however, protected. Which ones?'. If you
+click in 'Which ones?' it will show a popup with the children protected. The same
+works when the conference is PRIVATE and has PUBLIC elements.
+
+|image158|
+
 Also when private you can also add an Access Key which means anyone
 with this key can access the conference without logging in. Users
 will get a message as the following:
@@ -2043,3 +2050,4 @@ session. You may also make a PDF of the session.
 .. |image155| image:: UserGuidePics/confd152.png
 .. |image156| image:: UserGuidePics/abstractBackToSubmitted.png
 .. |image157| image:: UserGuidePics/abstractBackToSubmittedConfirm.png
+.. |image158| image:: UserGuidePics/childrenProtectedPopup.png
