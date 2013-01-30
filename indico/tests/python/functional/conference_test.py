@@ -39,7 +39,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
 
     def test_contributions(self):
         self.go("/confModifContribList.py?confId=0")
-        self.click(css="td > form > input.btn")
+        self.click(xpath="//input[@value='Add new']")
         self.type(id="addContributionFocusField", text="contribution 1")
         self.click(xpath="//input[@value='Add Indico User']")
         self.type(id="userSearchFocusField", text="fake")
@@ -82,7 +82,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(css="button.ui-button")
         self.click(ltext="Preview")
         self.click(ltext="List of Abstracts")
-        self.click(name="newAbstract")
+        self.click(ltext="Add new")
         self.type(name="title", text="abstract1")
         self.type(id="f_content", text="abstract1")
         self.click(css="#inPlacePrAuthorsMenu a")

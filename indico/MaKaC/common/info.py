@@ -749,7 +749,7 @@ class StyleManager(Persistent):
 
 class IPBasedACLMgr(Persistent):
 
-    def __init(self):
+    def __init__(self):
         self._full_access_acl = set()
 
     def get_full_access_acl(self):

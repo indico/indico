@@ -71,9 +71,9 @@ class MeetingBase(LectureBase):
         self.click(xpath="(//button[@type='button'])[3]")
         self.click(css="div.timetableBlock.timetableSession > div")
         self.click(ltext="Delete")
-        alert = self.get_alert()
+        alert = self.elem(css=".ui-dialog-content")
         self.assertEqual("Are you sure you want to delete this timetable entry?", alert.text)
-        alert.accept()
+        self.click(css="button.ui-button")
 
     def test_general_settings(self):
         super(MeetingBase, self).test_general_settings(lecture=False)

@@ -292,6 +292,6 @@ $("input[name=delete]").click(function(event){
 
 $("#contribsForm").submit(function(event){
     return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));
-};
+});
 
 </script>

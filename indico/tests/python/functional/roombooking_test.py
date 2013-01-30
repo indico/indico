@@ -74,6 +74,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.type(name="reason", text="Test reason")
         self.click(name="needsAssistance")
         self.click(id="saveBooking")
+        self.wait_for_jquery()
         self.click(xpath="//input[@value='Modify']")
         self.click(name="needsAssistance")
         self.click(id="saveBooking")
