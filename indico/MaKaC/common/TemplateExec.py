@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+import pkg_resources
 
 """Template engine."""
 
@@ -43,7 +44,7 @@ FILTER_IMPORTS = ['from indico.util.json import dumps as j',
 
 class IndicoTemplateLookup(TemplateLookup):
 
-    def getPluginTPlDir(self, pTypeName, pluginName=None):
+    def getPluginTPlDir(self, pTypeName, pluginName, tplName):
         pType = PluginsHolder().getPluginType(pTypeName)
         if pType == None:
             raise Exception(_("The plugin type does not exist"))
@@ -51,8 +52,8 @@ class IndicoTemplateLookup(TemplateLookup):
             plugin = pType.getPlugin(pluginName)
             if plugin == None:
                 raise Exception(_("The plugin does not exist"))
-            return os.path.join(plugin.getModule().__path__[0], "tpls")
-        return os.path.join(pType.getModule().__path__[0], "tpls")
+            return posixpath.normpath(pkg_resources.resource_filename(plugin.getModule().__name__, 'tpls/{0}.tpl'.format(tplName)))
+        return posixpath.normpath(pkg_resources.resource_filename(pType.getModule().__name__, 'tpls/{0}.tpl'.format(tplName)))
 
 
     def get_template(self, uri, module=None):
@@ -89,11 +90,11 @@ class IndicoTemplateLookup(TemplateLookup):
             #Case 3: we look into the plugins
                 uri_split = u.split("/")
                 if len(uri_split) == 2:
-                    srcfile = posixpath.normpath(posixpath.join( self.getPluginTPlDir(pTypeName=uri_split[0]), uri_split[1]))
+                    srcfile = self.getPluginTPlDir(uri_split[0],None, uri_split[1])
                     if os.path.isfile(srcfile):
                         return self._load(srcfile, uri)
                 if len(uri_split) == 3:
-                    srcfile = posixpath.normpath(posixpath.join( self.getPluginTPlDir(pTypeName=uri_split[0], pluginName=uri_split[1]), uri_split[2]))
+                    srcfile = self.getPluginTPlDir(*uri_split)
                     if os.path.isfile(srcfile):
                         return self._load(srcfile, uri)
 

@@ -78,6 +78,8 @@ from indico.core.index import Catalog
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.auth import APIKey
 from indico.web.http_api.util import generate_public_auth_request
+import pkgutil
+import pkg_resources
 
 MIN_PRESENT_EVENTS = 6
 OPTIMAL_PRESENT_EVENTS = 10
@@ -99,8 +101,7 @@ class WTemplated(OldObservable):
     @classmethod
     def forModule(cls, module, *args):
         tplobj = cls(*args)
-        # HACK :/
-        tplobj._dir = os.path.join(module.__path__[0], 'tpls')
+        tplobj._for_module = module
         return tplobj
 
     def __init__( self, tpl_name = None):
@@ -118,6 +119,7 @@ class WTemplated(OldObservable):
         else:
             debug = False
 
+        self._for_module = None
         self._dir = cfg.getTPLDir()
         self._asset_env = Environment(os.path.join(cfg.getHtdocsDir(), 'css'), 'css/')
         self._asset_env.debug = debug
@@ -157,24 +159,21 @@ class WTemplated(OldObservable):
         """
         cfg = Configuration.Config.getInstance()
 
-        file = cfg.getTPLFile( self.tplId )
+        #file = cfg.getTPLFile(self.tplId)
 
         # because MANY classes skip the constructor...
-        if hasattr(self, '_dir'):
-            tplDir = self._dir
+        tplDir = cfg.getTPLDir()
+        if hasattr(self, '_for_module') and self._for_module:
+            self.tplFile = pkg_resources.resource_filename(self._for_module.__name__,
+                                                          'tpls/{0}.tpl'.format(self.tplId))
         else:
-            tplDir = cfg.getTPLDir()
-
-        if file == "":
-            file = self._getSpecificTPL(tplDir,self.tplId)
-        self.tplFile = file
+            self.tplFile = self._getSpecificTPL(tplDir, self.tplId)
 
         hfile = self._getSpecificTPL(os.path.join(tplDir,'chelp'),
                                               self.tplId,
                                               extension='wohl')
 
-        self.helpFile = os.path.join('chelp',hfile)
-
+        self.helpFile = os.path.join('chelp', hfile)
 
     def getVars( self ):
         """Returns a dictionary containing the TPL variables that will

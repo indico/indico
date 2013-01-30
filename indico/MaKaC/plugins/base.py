@@ -880,7 +880,6 @@ class PluginType (PluginBase):
     def _updateComponentInfo(self, plugin, module):
         Logger.get('plugins.holder').info("Updating component info for '%s'" % \
                                           plugin.getFullId())
-
         for smodule in self._getAllSubmodules(module):
             for obj in smodule.__dict__.values():
                 if type(obj) == type and Component in obj.mro() and \
