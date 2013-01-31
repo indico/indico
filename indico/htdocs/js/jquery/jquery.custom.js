@@ -110,7 +110,7 @@
         }
     });
 
-    $.widget('cern.disabledElementWithTooltip', {
+    $.widget('indico.disabledElementWithTooltip', {
         // Default options
         options: {
             disabled: null,

@@ -1,5 +1,5 @@
 (function($, undefined) {
-    $.widget('cern.daterange', {
+    $.widget('indico.daterange', {
         // Default options
         options: {
             disabled: false,

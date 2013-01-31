@@ -16,7 +16,7 @@
  */
 
 // Indico-specific settings
-$.extend(true, $.cern.daterange.prototype.options, {
+$.extend(true, $.indico.daterange.prototype.options, {
     pickerOptions: { dateFormat: 'dd/mm/yy' },
     labelAttrs: { 'class': 'label titleCellFormat' },
     labels: [$T('Choose the start date'), $T('Choose the end date')]

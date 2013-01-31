@@ -3,7 +3,7 @@
 * and show a a tooltip while it is disabled.
 */
 (function($, undefined) {
-    $.widget('cern.disabledButtonWithTooltip',  $.extend({}, $.cern.disabledElementWithTooltip, {
+    $.widget('indico.disabledButtonWithTooltip',  $.extend({}, $.indico.disabledElementWithTooltip, {
         // Default options
         options: {
             elementClass: 'ui-dttbutton'
@@ -14,7 +14,7 @@
             if(this.options.disabled === null) {
                 this.options.disabled = this.isUIButton ? this.element.button('option', 'disabled') : false;
             }
-            $.cern.disabledElementWithTooltip.prototype._create.apply(this, arguments);
+            $.indico.disabledElementWithTooltip.prototype._create.apply(this, arguments);
         },
 
         _update: function() {
@@ -28,7 +28,7 @@
         },
 
         destroy: function() {
-            $.cern.disabledElementWithTooltip.prototype.destroy.apply(this, arguments);
+            $.indico.disabledElementWithTooltip.prototype.destroy.apply(this, arguments);
             // restore ui-state-disabled since super's destroy removed it
             if(this.isUIButton) {
                 this.element.button('option', 'disabled', this.options.disabled);
