@@ -1,0 +1,75 @@
+.confirmation-dialog {
+    overflow: auto;
+    display: inline-block;
+}
+
+.confirmation-dialog .buttons {
+}
+
+.confirmation-dialog .body {
+    max-width: 600px;
+    padding: 8px 15px 8px 15px;
+    margin-bottom: 0.5em;
+    background-color: #eee;
+    border: 1px solid;
+    border-color: #dbdbdb #dbdbdb #c0c0c0 #dbdbdb;
+
+    color: #555;
+    float: left;
+    line-height: 1.8em;
+}
+
+.confirmation-dialog .body .target {
+    font-family: Georgia, Times, Serif;
+    padding-left: 10px;
+    color: #777;
+    margin: 1em 0 1em 0;
+    font-size: 1.2em;
+}
+
+.confirmation-dialog .body.element {
+   display: block;
+}
+
+.confirmation-dialog .body.bordered {
+    border-left: 1px solid #CACACA;
+}
+
+.confirmation-dialog .body h3 {
+    width: auto;
+    margin: 0 0 0.3em 0;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.confirmation-dialog .clearer {
+    clear: both;
+}
+
+input.toolbar-search {
+    float: right;
+    height: 22px;
+    margin-top: 3px;
+    border-radius: 5px;
+    width: 220px;
+}
+
+.confirmation-dialog > h3 {
+    margin-bottom: 0.1em;
+    font-size: 1.7em;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+.confirmation-dialog > h3.warning {
+    color: #E99E18;
+}
+
+.confirmation-dialog > h3.danger {
+    color: #AF0000;
+}
+
+.confirmation-dialog > h3.accept {
+    color: #0B8D00;
+}
+

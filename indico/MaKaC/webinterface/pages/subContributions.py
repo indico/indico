@@ -260,19 +260,19 @@ class WSubContributionDeletion(object):
         self._subContribList = subContribList
 
     def getHTML( self, actionURL ):
-        l = []
-        for subContrib in self._subContribList:
-            l.append("""<li><i>%s</i></li>"""%subContrib.getTitle())
-        msg =  _("""
-        <font size="+2">Are you sure that you want to <font color="red"><b>DELETE</b></font> the following sub contributions:<ul>%s</ul>?</font><br>
-              """)%("".join(l))
+        subcontribs = ''.join(list("<li>{0}</li>".format(s.getTitle()) for s in self._subContribList))
+
+        msg = {'challenge': _("Are you sure that you want to delete the following subcontributions?"),
+               'target': "<ul>{0}</ul>".format(subcontribs)
+               }
+
         wc = wcomponents.WConfirmation()
-        subContribIdList = []
-        for subContrib in self._subContribList:
-            subContribIdList.append( subContrib.getId() )
-        return wc.getHTML( msg, actionURL, {"selectedCateg": subContribIdList}, \
-                                            confirmButtonCaption= _("Yes"), \
-                                            cancelButtonCaption= _("No") )
+
+        subContribIdList = list(sc.getId() for sc in self._subContribList)
+
+        return wc.getHTML(msg, actionURL, {"selectedCateg": subContribIdList},
+                          confirmButtonCaption= _("Yes"),
+                          cancelButtonCaption= _("No") )
 
 
 class WPSubContributionDeletion( WPSubContributionModifTools ):

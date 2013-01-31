@@ -717,22 +717,22 @@ class WPConfRemoveAccommodationType(WPConfModifRegFormAccommodationBase):
             self._eventType=self._rh.getWebFactory().getId()
 
         self._accoTypeIds = accoTypeIds
-        self._accommodationTypes = []
-        counter = 0
-        for at in accommodationTypes :
-            self._accommodationTypes.append("<li>%s</li>"%at)
+        self._accommodationTypes = accommodationTypes
 
     def _setActiveTab( self ):
         self._tabMain.setActive()
 
     def _getTabContent( self, params ):
-        msg =  i18nformat("""
-        <font size="+2"> _("Are you sure that you want to DELETE this accomodation")? <br><table><tr><td align="left"><ul>%s</ul></td></tr></table></font><br>
-        ( _("Note that if you delete this accomodation, registrants who applied for it
-        will lose their accomodation info") )
-              """)%("".join(self._accommodationTypes))
+
+        pcoords = ''.join(list("<li>{0}</li>".format(s) for s in self._accommodationTypes))
+
+        msg = {'challenge': _("Are you sure that you want to DELETE these accomodation types?"),
+               'target': "<ul>{0}</ul>".format(pcoords),
+               'subtext': _("Note that if you delete this accomodation, registrants who applied for it will lose their accomodation info")
+               }
+
         wc = wcomponents.WConfirmation()
-        return wc.getHTML( msg, \
+        return wc.getHTML(msg,
                         urlHandlers.UHConfModifRegFormAccommodationTypeRemove.getURL(self._conf),\
                         {"accommodationType":self._accoTypeIds} , \
                         confirmButtonCaption= _("Yes"), cancelButtonCaption=  _("No"))
@@ -1122,21 +1122,22 @@ class WPConfRemoveSocialEvent(WPConfModifRegFormSocialEventBase):
         WPConfModifRegFormSocialEventBase.__init__(self, rh, conf)
         self._eventType="conference"
         self._socialEventIds = socialEventIds
-        self._eventNames = []
-        for n in eventNames :
-            self._eventNames.append("<li>%s</li>"%n)
+        self._eventNames = eventNames
         if self._rh.getWebFactory() is not None:
-            self._eventType=self._rh.getWebFactory().getId()
+            self._eventType = self._rh.getWebFactory().getId()
 
     def _setActiveTab( self ):
         self._tabMain.setActive()
 
     def _getTabContent( self, params ):
-        msg =  i18nformat("""
-        <font size="+2"> _("Are you sure that you want to DELETE this social event")? <br><table><tr><td align="left"><ul>%s</ul></td></tr></table></font><br>
-        ( _("Note that if you delete this social event, registrants who applied for it
-        will lose their social event info") )
-              """)%("".join(self._eventNames))
+
+        social = ''.join(list("<li>{0}</li>".format(s) for s in self._eventNames))
+
+        msg = {'challenge': _("Are you sure that you want to DELETE these social events?"),
+               'target': "<ul>{0}</ul>".format(social),
+               'subtext': _("Note that if you delete a social event, registrants who applied for it will lose their social event info")
+               }
+
         wc = wcomponents.WConfirmation()
         return wc.getHTML( msg, \
                         urlHandlers.UHConfModifRegFormSocialEventRemove.getURL( self._conf ),\
@@ -1147,21 +1148,19 @@ class WPConfModifRegFormStatusesRemConfirm(WPConfModifRegFormBase):
 
     def __init__(self,rh,target, stids):
         WPConfModifRegFormBase.__init__(self, rh, target)
-        self._statusesIds=stids
+        self._statusesIds = stids
 
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
-        ssHTML=["<ul>"]
-        for id in self._statusesIds:
-            s=self._conf.getRegistrationForm().getStatusById(id)
-            ssHTML.append("""
-                                <li>%s</li>
-                                """%(s.getCaption().strip() or  i18nformat("""-- [%s]  _("status with no name") --""")%s.getId()))
-        ssHTML.append("</ul>")
-        msg= i18nformat(""" _("Are you sure you want to delete the following statuses
-        linked to the registration form module")?
-        %s
-        <font color="red">( _("note that current registrants will lose this info") )</font>""")%("".join(ssHTML))
+
+        statuses = ''.join(list("<li>{0}</li>".format(self._conf.getRegistrationForm().getStatusById(s).getCaption() \
+                                                          or _('-- unnamed status --')) for s in self._statusesIds))
+
+        msg = {'challenge': _("Are you sure you want to delete the following registration statuses?"),
+               'target': "<ul>{0}</ul>".format(statuses),
+               'subtext': _("Please note that any existing registrants will lose this information")
+               }
+
         url=urlHandlers.UHConfModifRegFormActionStatuses.getURL(self._conf)
         return wc.getHTML(msg,url,{"statusesIds":self._statusesIds, "removeStatuses":"1"})
 
@@ -1169,23 +1168,22 @@ class WPConfModifRegFormGeneralSectionRemConfirm(WPConfModifRegFormBase):
 
     def __init__(self,rh,target, gss):
         WPConfModifRegFormBase.__init__(self, rh, target)
-        self._generalSections=gss
+        self._generalSections = gss
 
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         ssHTML=["<ul>"]
-        for id in self._generalSections:
-            s=self._conf.getRegistrationForm().getGeneralSectionFormById(id)
-            ssHTML.append("""
-                                <li>%s</li>
-                                """%(s.getTitle()))
-        ssHTML.append("</ul>")
-        msg= i18nformat("""  _("Are you sure you want to delete the following sections
-        of the registration form")?
-        %s
-        <font color="red">( _("note that current registrants will lose this info"))</font>""")%("".join(ssHTML))
+
+        sections = ''.join(list("<li>{0}</li>".format(self._conf.getRegistrationForm().getGeneralSectionFormById(s).getTitle()) \
+                                    for s in self._generalSections))
+
+        msg = {'challenge': _("Are you sure you want to delete the following sections of the registration form?"),
+               'target': "<ul>{0}</ul>".format(sections),
+               'subtext': _("Please note that any existing registrants will lose this information")
+               }
+
         url=urlHandlers.UHConfModifRegFormActionSection.getURL(self._conf)
-        return wc.getHTML(msg,url,{"sectionsIds":self._generalSections, "removeSection":"1"})
+        return wc.getHTML(msg, url, {"sectionsIds":self._generalSections, "removeSection":"1"})
 
 class WPConfModifRegFormGeneralSectionBase(WPConfModifRegFormSectionsBase):
 
@@ -1423,22 +1421,20 @@ class WPConfModifRegFormGeneralSectionFieldRemConfirm(WPConfModifRegFormGeneralS
 
     def __init__(self,rh,gs, fields):
         WPConfModifRegFormGeneralSectionBase.__init__(self, rh, gs)
-        self._fields=fields
+        self._fields = fields
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        fieldsHTML=["<ul>"]
-        for id in self._fields:
-            f=self._generalSectionForm.getFieldById(id)
-            fieldsHTML.append("""
-                                <li>%s</li>
-                                """%(f.getCaption()))
-        fieldsHTML.append("</ul>")
-        msg= i18nformat(""" _("Are you sure you want to delete the following fields
-        of the section '%s'")?
-        %s
-        <font color="red">( _("note that current registrants will lose this info"))</font>""")%(self._generalSectionForm.getTitle(),
-                "".join(fieldsHTML))
+        wc = wcomponents.WConfirmation()
+
+        fields = ''.join(list("<li>{0}</li>".format(self._generalSectionForm.getFieldById(id).getCaption() \
+                                                        for s in self._fields)))
+
+        msg = {'challenge': _("Are you sure you want to delete the following fields of the section '{0}'".format(
+                        self._generalSectionForm.getTitle())),
+               'target': "<ul>{0}</ul>".format(fields),
+               'subtext': _("Please note that any existing registrants will lose this information")
+               }
+
         url=urlHandlers.UHConfModifRegFormGeneralSectionFieldRemove.getURL(self._generalSectionForm)
         return wc.getHTML(msg,url,{"fieldsIds":self._fields})
 

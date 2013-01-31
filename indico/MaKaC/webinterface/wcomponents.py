@@ -1225,50 +1225,7 @@ class WContribModifTool(WTemplated):
         return vars
 
 
-class WContributionDeletion(object):
-
-    def __init__(self, contribList):
-        self._contribList = contribList
-
-    def getHTML(self, actionURL):
-        titles = []
-
-        for contrib in self._contribList:
-            titles.append("""<li><i>%s</i></li>""" % contrib.getTitle())
-
-        body = i18nformat("""
-        <ul>%s</ul>
-            <table>
-                <tr><td>
-                <font color="red"> _("Note that the following changes will result from this deletion"):</font>
-                <ul>
-                    <li> _("If the contribution is linked to an abstract"):</li>
-                        <ul>
-                            <li> _("The link between the abstract and the contribution will be deleted")</li>
-                            <li> _("The status of the abstract will change to 'submitted'")</li>
-                            <li> _("You'll lose the information about when and who accepted the abstract")</li>
-                        </ul>
-                    </li>
-                </ul>
-                </td></tr>
-            </table>
-              """) % ("".join(titles))
-
-        msg = {'challenge': _("Are you sure that you want to delete the following contributions?"),
-               'target': body,
-               'important': True,
-               'subtext': _("All the existing sub-contributions within the above contribution(s) will also be deleted")
-               }
-
-        wc = WConfirmation()
-        contribIdList = []
-
-        for contrib in self._contribList:
-            contribIdList.append(contrib.getId())
-
-        return wc.getHTML(msg, actionURL, {"selectedCateg": contribIdList}, \
-                                            confirmButtonCaption="Yes", \
-                                            cancelButtonCaption="No")
+class WContributionDeletion(WTemplated):
 
     def delete(self):
         for contrib in self._contribList:
@@ -2485,22 +2442,15 @@ class WSignIn(WTemplated):
 
 class WConfirmation(WTemplated):
 
-    def getHTML(self, message, postURL, passingArgs, loading=False, **opts):
+    def getHTML(self, message, postURL, passingArgs, loading=False, severity="warning", **opts):
         params = {}
         params["message"] = message
         params["postURL"] = postURL
-        pa = []
 
-        for arg in passingArgs.keys():
-            if not type(passingArgs[arg]) == types.ListType:
-                passingArgs[arg] = [passingArgs[arg]]
-
-            for value in passingArgs[arg]:
-                pa.append("""<input type="hidden" name="%s" value="%s">""" % (arg, value))
-
-        params["passingArgs"] = "".join(pa)
+        params["severity"] = severity
+        params["passingArgs"] = passingArgs
         params["loading"] = loading
-        params["confirmButtonCaption"] = opts.get("confirmButtonCaption", _("OK"))
+        params["confirmButtonCaption"] = opts.get("confirmButtonCaption", _("Yes"))
         params["cancelButtonCaption"] = opts.get("cancelButtonCaption", _("Cancel"))
         params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL("warning")
         return WTemplated.getHTML(self, params)

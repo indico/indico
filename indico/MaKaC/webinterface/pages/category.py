@@ -1672,7 +1672,7 @@ class WConferenceDeletion(object):
         msg = {'challenge': _('Are you sure that you want to delete the following events?'),
                'target': "".join(events),
                'important': True,
-               'subtext': _('Note that ALL the existing sub-categories below will also be deleted')
+               'subtext': _('Note that ALL the content therein will be deleted as well')
                }
 
         wc = wcomponents.WConfirmation()

@@ -910,11 +910,15 @@ class WPEditData(WPContribModifMain):
         "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL() }
         return wc.getHTML( pars )
 
+
 class WPContributionDeletion( WPContributionModifTools ):
 
     def _getTabContent( self, params ):
-        wc = wcomponents.WContributionDeletion( [self._target] )
-        return wc.getHTML( urlHandlers.UHContributionDelete.getURL( self._target ) )
+        wc = wcomponents.WContributionDeletion()
+        return wc.getHTML({
+                'contribList': [self._target],
+                'postURL': urlHandlers.UHContributionDelete.getURL(self._target)
+                })
 
 
 class WPContributionDisplayRemoveMaterialsConfirm( WPContributionDefaultDisplayBase ):

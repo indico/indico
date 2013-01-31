@@ -146,11 +146,11 @@ label.disabled{
     color: gray;
 }
 
-code {
+code, .code {
    font-family: monospace;
 }
 
-pre {
+pre, .pre {
    font-family: arial, serif;
    white-space: pre-wrap;       /* css-3 */
    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
@@ -8478,14 +8478,6 @@ table#currencies td, table#currencies th {
     padding: 5px;
 }
 
-.warning {
-    background-color: #fcf8e3;
-    border: 1px solid #fbeed5;
-    border-radius: 4px;
-    color: #c09853;
-    padding: 5px;
-}
-
 .warning h3 {
     margin-top: 0px;
     color: #c09853;
@@ -8540,10 +8532,11 @@ ul.material_list ul li {
 }
 
 .quotation {
+    margin: 10px;
     padding-left: 10px;
-    white-space: pre;
-    color: #aaa;
+    color: #777;
     border-left: 4px solid #999;
+    font-family: Georgia, Times, Serif;
 }
 
 div.informationUserList {

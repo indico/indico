@@ -1,57 +1,51 @@
-<table align="center" width="100%">
-    <tr>
-        <td>
-            <form id="confirmationForm" action="${postURL}" method="POST">
-                ${passingArgs}
-                <table border="0">
-                    <tr>
-                        <td colspan="2">
-                            <div class="titleWarning">
-                                ${ _("Confirmation Required")}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                                <% new_format = 'challenge' in message %>
-                                % if new_format:
-                                    % if 'important' in message:
-                            <div class="bs-alert alert-warning">
-                                    % else:
-                            <div class="bs-alert alert-toolbar">
-                                    % endif
-                                <div class="toolbar-container">
-                                    <div class="container-title">
-                                        ${message['challenge']}
-                                    </div>
-                                    <div style="font-weight:bold;">
-                                        ${message['target']}
-                                    </div>
-                                    % if message['subtext']:
-                                    <div>
-                                        ${message['subtext']}
-                                    </div>
-                                    % endif
-                                </div>
-                                <div class="toolbar-clearer"></div>
-                                % else:
-                            <div class="bs-alert alert-toolbar">
-                                    ${message}
-                                % endif
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="submit" class="bs-btn bs-btn-right" name="cancel" value="${ cancelButtonCaption }">
-                            <input type="submit" class="bs-btn bs-btn-right" name="confirm" value="${ confirmButtonCaption }">
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </td>
-    </tr>
-</table>
+<%page args="postURL, severity='warning', passingArgs={}, message={}, cancelButtonCaption=_('Cancel'), confirmButtonCaption=_('OK')"/>
+
+<div class="confirmation-dialog">
+  <h3 class="${severity}">
+    ${ _("Confirmation Required")}
+  </h3>
+
+  <form id="confirmationForm" action="${postURL}" method="POST">
+
+    <%block name="args">
+      %for key, val in passingArgs.iteritems():
+        %for value in (val if isinstance(val, list) else [val]):
+          <input type="hidden" name="${key}" value="${value}" />
+        %endfor
+      %endfor
+    </%block>
+
+      <div class="body">
+      % if isinstance(message, dict):
+          <h3>
+            <%block name="challenge">
+              ${message['challenge']}
+            </%block>
+          </h3>
+          <p class="target">
+            <%block name="target">
+              ${message['target']}
+            </%block>
+          </p>
+          % if message.get('subtext'):
+            <div class="subtext">
+              <%block name="subtext">
+                ${message['subtext']}
+              </%block>
+            </div>
+          % endif
+        </div>
+        <div class="clearer"></div>
+      % else:
+       <div>${message}</div>
+       </div>
+      % endif
+      <div class="buttons">
+        <input type="submit" class="bs-btn bs-btn-right" name="cancel" value="${ cancelButtonCaption }"/>
+        <input type="submit" class="bs-btn bs-btn-right ${severity}" name="confirm" value="${ confirmButtonCaption }"/>
+      </div>
+  </form>
+</div>
 
 <script type="text/javascript">
 

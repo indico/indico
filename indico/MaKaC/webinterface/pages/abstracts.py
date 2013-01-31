@@ -1534,8 +1534,8 @@ class WPModRemConfirmation(WPModTools):
         wc = wcomponents.WConfirmation()
         msg = {'challenge': _("Are you sure you want to delete the abstract?"),
                'target': self._abs.getTitle(),
-               'important': True,
                'subtext': None
                }
         url = urlHandlers.UHAbstractDelete.getURL(self._abs)
-        return wc.getHTML(msg, url, {})
+        return wc.getHTML(msg, url, {},
+                          severity="danger")

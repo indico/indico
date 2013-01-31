@@ -2298,14 +2298,17 @@ class WPConfClosing(WPConfModifToolsBase):
     def _getTabContent(self, params):
         msg = {'challenge': _("Are you sure that you want to lock the event?"),
                'target': self._conf.getTitle(),
-               'subtext': _("Note that if you lock the event, you will not be able to change its details any more." + 
-                "Only the creator of the event or an administrator of the system / category can unlock an event.")
+               'subtext': _("Note that if you lock the event, you will not be able to change its details any more. "
+                "Only the creator of the event or an administrator of the system / category can unlock an event."),
                }
 
         wc = wcomponents.WConfirmation()
-        return wc.getHTML(msg, \
-                        urlHandlers.UHConferenceClose.getURL(self._conf), {}, \
-                        confirmButtonCaption=_("Yes"), cancelButtonCaption=_("No"))
+        return wc.getHTML(msg,
+                          urlHandlers.UHConferenceClose.getURL(self._conf),
+                          {},
+                          severity="warning",
+                          confirmButtonCaption=_("Yes, lock this event"),
+                          cancelButtonCaption=_("No"))
 
 
 class WPConfDeletion(WPConfModifToolsBase):
@@ -2316,14 +2319,16 @@ class WPConfDeletion(WPConfModifToolsBase):
     def _getTabContent(self, params):
         msg = {'challenge': _("Are you sure that you want to delete the conference?"),
                'target': self._conf.getTitle(),
-               'important': True,
                'subtext': _("Note that if you delete the conference, all the items below it will also be deleted")
                }
 
         wc = wcomponents.WConfirmation()
-        return wc.getHTML(msg, \
-                        urlHandlers.UHConfDeletion.getURL(self._conf), {}, \
-                        confirmButtonCaption=_("Yes"), cancelButtonCaption=_("No"))
+        return wc.getHTML(msg,
+                          urlHandlers.UHConfDeletion.getURL(self._conf),
+                          {},
+                          severity="danger",
+                          confirmButtonCaption=_("Yes, I am sure"),
+                          cancelButtonCaption=_("No"))
 
 
 class WPConfCloneConfirm(WPConfModifToolsBase):
@@ -2336,9 +2341,9 @@ class WPConfCloneConfirm(WPConfModifToolsBase):
         self._tabCloneEvent.setActive()
 
     def _getTabContent(self, params):
-        msg = i18nformat("""
-        <font size="+1"> _("This action will create %s new events. Are you sure you want to proceed")?</font>
-              """) % self._nbClones
+
+        msg = _("This action will create {0} new events. Are you sure you want to proceed").format(self._nbClones)
+
         wc = wcomponents.WConfirmation()
         url = urlHandlers.UHConfPerformCloning.getURL(self._conf)
         params = self._rh._getRequestParams()
@@ -2587,24 +2592,29 @@ class WPConfModifParticipantsInvitationBase(WPConferenceDisplayBase):
                             "type": WebFactory.getId(),\
                             "dark": True})
 
+    def _getBody(self, params):
+        return '<div style="margin:10px">{0}</div>'.format(self._getContent(params))
+
 
 class WPConfModifParticipantsInvite(WPConfModifParticipantsInvitationBase):
 
-    def _getBody(self, params):
-        msg = i18nformat("""
-         <font size="+2">_("Please indicate whether you want to accept or reject the invitation to '%s'")? </font>
-              """)%(self._conf.getTitle())
+    def _getContent(self, params):
+        msg = _("Please indicate whether you want to accept or reject the invitation to '{0}'").format(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
         url = urlHandlers.UHConfParticipantsInvitation.getURL(self._conf)
         url.addParam("participantId",params["participantId"])
-        return wc.getHTML( msg, url, {}, \
-                        confirmButtonCaption=_("Accept"), cancelButtonCaption=_("Reject") )
+        return wc.getHTML(msg,
+                          url,
+                          {},
+                          confirmButtonCaption=_("Accept"),
+                          cancelButtonCaption=_("Reject"),
+                          severity="accept")
 
 #---------------------------------------------------------------------------
 
 class WPConfModifParticipantsRefuse(WPConfModifParticipantsInvitationBase):
 
-    def _getBody( self, params ):
+    def _getContent( self, params ):
         msg = i18nformat("""
         <font size="+2"> _("Are you sure you want to refuse to attend the '%s'")?</font>
               """)%(self._conf.getTitle())
@@ -4545,6 +4555,7 @@ class WConfModifDisplayModifySystemData(wcomponents.WTemplated):
         vars["value_name"] = quoteattr(self._link.getCaption())
         return vars
 
+
 class WPConfModifDisplayRemoveLink( WPConfModifDisplayBase ):
     def __init__(self, rh, conf, link):
         WPConfModifDisplayBase.__init__(self, rh, conf)
@@ -4554,12 +4565,14 @@ class WPConfModifDisplayRemoveLink( WPConfModifDisplayBase ):
         self._tabDisplayMenu.setActive()
 
     def _getTabContent( self, params ):
-        msg = i18nformat("""<font size=\"+2\"> _("Are you sure that you want to DELETE the link") \"%s\"</font><br>( _("Note that if you delete the link, all the links below it will also be deleted"))""")%self._link.getName()
+
+        msg = {
+            'challenge': _("Are you sure that you want to delete this link?"),
+            'target': self._link.getName()
+            }
+
         postURL = quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link)))
         return wcomponents.WConfirmation().getHTML( msg, postURL, {})
-        #wc = WConfModifDisplayRemoveLink( self._conf, link )
-        #p = {"removeLinkURL": quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link)))}
-        #return wc.getHTML( p )
 
 
 class WPConfParticipantList( WPConfAbstractList ):
@@ -7510,16 +7523,13 @@ class WPConfModifPendingQueuesRemoveSubmConfirm(WPConfModifPendingQueuesBase):
 
     def _getTabContent(self, params):
         wc = wcomponents.WConfirmation()
-        pss = []
+        psubs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingSubms))
 
-        for i in self._pendingSubms:
-           pss.append("""<li>%s</li>""" % i)
+        msg = {'challenge': _("Are you sure you want to delete the following participants pending to become submitters?"),
+               'target': "<ul>{0}</ul>".format(psubs),
+               'subtext': _("Please note that they will still remain as participants"),
+               }
 
-        msg = i18nformat(""" _("Are you sure you want to delete the following participants pending to become submitters")?<br>
-        <ul>
-        %s
-        </ul>
-        <font color="red">( _("note they will not become submitters of their contributions but you will still keep them as participants"))</font><br>""")%"".join(pss)
         url = urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
         return wc.getHTML(msg, url, {"pendingSubmitters": self._pendingSubms, "remove": _("remove")})
 
@@ -7531,17 +7541,22 @@ class WPConfModifPendingQueuesReminderSubmConfirm( WPConfModifPendingQueuesBase 
         self._pendingSubms = pendingSubms
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        pss=[]
-        for i in self._pendingSubms:
-           pss.append("""<li>%s</li>"""%i)
-        msg= i18nformat(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
-        <ul>
-        %s
-        </ul>
-        <br>""")%"".join(pss)
-        url=urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
-        return wc.getHTML(msg,url,{"pendingSubmitters":self._pendingSubms, "reminder": _("reminder")})
+        wc = wcomponents.WConfirmation()
+
+        psubs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingSubms))
+
+        msg = {'challenge': _("Are you sure that you want to send these users an email with a reminder to create an account in Indico?"),
+               'target': "<ul>{0}</ul>".format(psubs)
+               }
+
+        url = urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
+        return wc.getHTML(
+            msg,
+            url, {
+                "pendingSubmitters": self._pendingSubms,
+                "reminder": _("reminder")
+                },
+            severity='accept')
 
 class WPConfModifPendingQueuesRemoveMgrConfirm( WPConfModifPendingQueuesBase ):
 
@@ -7550,16 +7565,16 @@ class WPConfModifPendingQueuesRemoveMgrConfirm( WPConfModifPendingQueuesBase ):
         self._pendingMgrs = pendingMgrs
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        pss=[]
-        for i in self._pendingMgrs:
-           pss.append("""<li>%s</li>"""%i)
-        msg= i18nformat(""" _("Are you sure you want to delete the following conveners pending to become managers")?<br>
-        <ul>
-        %s
-        </ul>
-        <font color="red">( _("note they will not become managers of their sessions but you will still keep them as coveners"))</font><br>""")%"".join(pss)
-        url=urlHandlers.UHConfModifPendingQueuesActionMgr.getURL(self._conf)
+        wc = wcomponents.WConfirmation()
+
+        pmgrs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingMgrs))
+
+        msg = {'challenge': _("Are you sure you want to delete the following conveners pending to become managers?"),
+               'target': "<ul>{0}</ul>".format(pmgrs),
+               'subtext': _("Please note that they will still remain as conveners")
+               }
+
+        url = urlHandlers.UHConfModifPendingQueuesActionMgr.getURL(self._conf)
         return wc.getHTML(msg,url,{"pendingManagers":self._pendingMgrs, "remove": _("remove")})
 
 class WPConfModifPendingQueuesReminderMgrConfirm( WPConfModifPendingQueuesBase ):
@@ -7569,16 +7584,15 @@ class WPConfModifPendingQueuesReminderMgrConfirm( WPConfModifPendingQueuesBase )
         self._pendingMgrs = pendingMgrs
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        pss=[]
-        for i in self._pendingMgrs:
-           pss.append("""<li>%s</li>"""%i)
-        msg= i18nformat(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
-        <ul>
-        %s
-        </ul>
-        <br>""")%"".join(pss)
-        url=urlHandlers.UHConfModifPendingQueuesActionMgr.getURL(self._conf)
+        wc = wcomponents.WConfirmation()
+
+        pmgrs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingMgrs))
+
+        msg = {'challenge': _("Are you sure that you want to send these users an email with a reminder to create an account in Indico?"),
+               'target': "<ul>{0}</ul>".format(pmgrs)
+               }
+
+        url = urlHandlers.UHConfModifPendingQueuesActionMgr.getURL(self._conf)
         return wc.getHTML(msg,url,{"pendingManagers":self._pendingMgrs, "reminder": _("reminder")})
 
 class WPConfModifPendingQueuesRemoveCoordConfirm( WPConfModifPendingQueuesBase ):
@@ -7588,17 +7602,20 @@ class WPConfModifPendingQueuesRemoveCoordConfirm( WPConfModifPendingQueuesBase )
         self._pendingCoords = pendingCoords
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        pss=[]
-        for i in self._pendingCoords:
-           pss.append("""<li>%s</li>"""%i)
-        msg= i18nformat(""" _("Are you sure you want to delete the following conveners pending to become coordinators")?<br>
-        <ul>
-        %s
-        </ul>
-        <font color="red">( _("note they will not become coordinators of their sessions but you will still keep them as coveners"))</font><br>""")%"".join(pss)
-        url=urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
-        return wc.getHTML(msg,url,{"pendingCoordinators":self._pendingCoords, "remove": _("remove")})
+        wc = wcomponents.WConfirmation()
+
+        pcoords = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingMgrs))
+
+        msg = {'challenge': _("Are you sure you want to delete the following conveners pending to become coordinators?"),
+               'target': "<ul>{0}</ul>".format(pcoords),
+               'subtext': _("Please note that they will still remain as conveners")
+               }
+
+        url = urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
+        return wc.getHTML(msg, url,{
+                "pendingCoordinators": self._pendingCoords,
+                "remove": _("remove")
+                })
 
 class WPConfModifPendingQueuesReminderCoordConfirm( WPConfModifPendingQueuesBase ):
 
@@ -7607,17 +7624,20 @@ class WPConfModifPendingQueuesReminderCoordConfirm( WPConfModifPendingQueuesBase
         self._pendingCoords = pendingCoords
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        pss=[]
-        for i in self._pendingCoords:
-           pss.append("""<li>%s</li>"""%i)
-        msg= i18nformat(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
-        <ul>
-        %s
-        </ul>
-        <br>""")%"".join(pss)
-        url=urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
-        return wc.getHTML(msg,url,{"pendingCoordinators":self._pendingCoords, "reminder": _("reminder")})
+        wc = wcomponents.WConfirmation()
+
+        pcoords = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingMgrs))
+
+        msg = {'challenge': _("Are you sure that you want to send these users an email with a reminder to create an account in Indico?"),
+               'target': "<ul>{0}</ul>".format(pcoords)
+               }
+
+        url = urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
+        return wc.getHTML(
+            msg, url, {
+                "pendingCoordinators": self._pendingCoords,
+                "reminder": _("reminder")
+                })
 
 class WAbstractBookCustomise(wcomponents.WTemplated):
 

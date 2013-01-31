@@ -712,6 +712,7 @@ class WEmailToRegistrants(wcomponents.WTemplated):
         vars["vars"]=self._getAvailableTagsHTML()
         return vars
 
+
 class WPRegistrantModifRemoveConfirmation(WPConfModifRegistrantListBase):
 
     def __init__(self,rh, conf, registrantList):
@@ -719,14 +720,23 @@ class WPRegistrantModifRemoveConfirmation(WPConfModifRegistrantListBase):
         self._regList = registrantList
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        regs=[]
-        for reg in self._regList:
-            regs.append("<li><i>%s</i></li>"%self._conf.getRegistrantById(reg).getFullName())
-        msg=  i18nformat("""  _("Are you sure you want to delete the following registrants")?:<br><ul>%s</ul>
-        <font color="red"> _("(note you will permanently lose all the information about the registrants)")</font><br>""")%("".join(regs))
-        url=urlHandlers.UHConfModifRegistrantPerformRemove.getURL(self._conf)
-        return wc.getHTML(msg,url,{"registrants":self._regList})
+        wc = wcomponents.WConfirmation()
+
+        regs = ''.join(list("<li>{0}</li>".format(
+                    self._conf.getRegistrantById(reg).getFullName()) for reg in self._regList))
+
+        msg = {
+            'challenge': _("Are you sure you want to delete the following registrants?"),
+            'target': "<ul>{0}</ul>".format(regs),
+            'subtext': _("Please note you will permanently lose all the information about them")
+            }
+
+        url = urlHandlers.UHConfModifRegistrantPerformRemove.getURL(self._conf)
+        return wc.getHTML(
+            msg, url, {
+                "registrants":self._regList
+                })
+
 
 class WPEMail ( WPConfModifRegistrantListBase ):
     def __init__(self, rh, conf, reglist, fromA, cc, subject, body):

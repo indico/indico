@@ -74,7 +74,7 @@
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Your last proposition") }</span></td>
     <td>
         <span>${lastJudgement if lastJudgement else _("No proposition yet")}</span>
-        <p class="quotation">${lastJudgementComment if lastJudgementComment else ""}</p>
+        <p class="quotation pre">${lastJudgementComment if lastJudgementComment else ""}</p>
     </td>
     <td rowspan="3">
         <table>

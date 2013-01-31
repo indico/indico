@@ -402,8 +402,15 @@ class WPSessionDataModification(WPSessionModification):
 class WPModEditDataConfirmation(WPSessionModification):
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        msg= _("""You have selected to CHANGE THIS SESSION SCHEDULE TYPE from %s to %s, if you continue any contribution scheduled within any slot of the current session will be unscheduled, are you sure you want to continue?""")%(self._session.getScheduleType(),params["tt_type"])
+        wc = wcomponents.WConfirmation()
+
+        msg = {
+            'challenge': _("Are you sure you want to change the schedule of this session from '{0}' to '{1}'?").format(
+                self._session.getScheduleType(), params["tt_type"]),
+            'target': self._session.getTitle(),
+            'subtext': _("Note that if you continue any contribution scheduled within any slot of the current session will be unscheduled")
+            }
+
         url=urlHandlers.UHSessionDataModification.getURL(self._session)
         return wc.getHTML(msg,url,params)
 
@@ -707,15 +714,18 @@ class WPSessionModifTools( WPSessionModifBase ):
 class WPSessionDeletion( WPSessionModifTools ):
 
     def _getTabContent( self, params ):
-        msg = i18nformat("""
-        <font size="+2">_("Are you sure that you want to DELETE the session '%s'")?</font><br>(_("Note that if you delete the
-session, all the items below it will also be deleted"))
-              """)%(self._session.getTitle())
+
+        msg = {
+            'challenge': _("Are you sure that you want to delete this session?"),
+            'target': self._session.getTitle(),
+            'subtext': _("Note that if you delete this session all the items under it will also be deleted")
+            }
+
         wc = wcomponents.WConfirmation()
-        return wc.getHTML( msg, \
-                        urlHandlers.UHSessionDeletion.getURL( self._session ), \
-                        {}, \
-                        confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No") )
+        return wc.getHTML(msg,
+                          urlHandlers.UHSessionDeletion.getURL( self._session ),
+                          {},
+                          confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No"))
 
 class WSessionModContribList(wcomponents.WTemplated):
 

@@ -2444,7 +2444,7 @@ class WPMaintenanceBase(WPAdminsSystemBase):
     def __init__(self, rh):
         WPAdminsBase.__init__(self, rh)
 
-    def _setActiveTab(elf):
+    def _setActiveTab(self):
         self._subTabMaintenance.setActive()
 
 
@@ -2482,9 +2482,9 @@ class WPMaintenanceTmpCleanup(WPMaintenanceBase):
         WPMaintenanceBase.__init__(self, rh)
 
     def _getTabContent(self, params):
-        wc = wcomponents.WConfirmation()
         msg = """Are you sure you want to delete the temporary directory
         (note that all the files in that directory will be deleted)?"""
+        wc = wcomponents.WConfirmation()
         url = urlHandlers.UHMaintenancePerformTmpCleanup.getURL()
         return """
                 <table align="center" width="95%%">
