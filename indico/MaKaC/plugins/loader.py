@@ -252,7 +252,7 @@ class PluginLoader(object):
                             "Is there an __init__.py?" %
                             (pid, pModuleName))
 
-        ppath = pmodule.__path__[0]
+        ppath = pkg_resources.resource_filename(pmodule.__name__, "")
         pmetadata = processPluginMetadata(pmodule)
 
         # If it was a module, we check that the "type" field in the metadata

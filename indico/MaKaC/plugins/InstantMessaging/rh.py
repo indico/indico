@@ -27,9 +27,10 @@ from MaKaC.plugins.InstantMessaging.XMPP.helpers import LogLinkGenerator
 from MaKaC.plugins import InstantMessaging
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from MaKaC.errors import MaKaCError, ModificationError, ConferenceClosedError
+from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
-import urllib2, os
+import urllib2
+import pkg_resources
 
 from indico.web.legacy import wrapUH
 from indico.web.rh import RHHtdocs
@@ -41,7 +42,7 @@ class RHInstantMessagingHtdocs(RHHtdocs):
     """
 
     _url = r"^/InstantMessaging/(?P<filepath>.*)$"
-    _local_path = os.path.join(InstantMessaging.__path__[0], 'htdocs')
+    _local_path = pkg_resources.resource_filename(InstantMessaging.__name__, "htdocs")
     _min_dir = 'InstantMessaging'
 
 

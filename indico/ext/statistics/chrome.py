@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import pkg_resources
 import zope.interface
 
 import indico.ext.statistics
@@ -136,7 +136,7 @@ class RHStatisticsView(RHConferenceModifBase):
 class RHStatisticsHtdocs(RHHtdocs):
 
     _url = r"^/statistics/(?P<filepath>.*)$"
-    _local_path = os.path.join(indico.ext.statistics.__path__[0], 'htdocs')
+    _local_path = pkg_resources.resource_filename(indico.ext.statistics.__name__, "htdocs")
 
 
 class WStatisticsView(wcomponents.WTemplated):

@@ -19,13 +19,14 @@
 
 from MaKaC.webinterface import wcomponents
 import os
+import pkg_resources
 import MaKaC.common.Configuration as Configuration
 from copy import copy
 
 from MaKaC.plugins.EPayment import yellowPay
 
 class WTemplated(wcomponents.WTemplated):
-    
+
     def _setTPLFile(self):
         """Sets the TPL (template) file for the object. It will try to get
             from the configuration if there's a special TPL file for it and
@@ -33,15 +34,15 @@ class WTemplated(wcomponents.WTemplated):
             in the configured TPL directory.
         """
         cfg = Configuration.Config.getInstance()
-        
-        dir = os.path.join(yellowPay.__path__[0], "tpls")
+
+        dir = pkg_resources.resource_filename(yellowPay.__name__, "tpls")
         file = cfg.getTPLFile( self.tplId )
         if file == "":
             file = "%s.tpl"%self.tplId
         self.tplFile = os.path.join(dir, file)
-        
+
         hfile = self._getSpecificTPL(os.path.join(dir,'chelp'),
                                      self.tplId,
                                      extension='wohl')
-    
+
         self.helpFile = os.path.join(dir,'chelp',hfile)

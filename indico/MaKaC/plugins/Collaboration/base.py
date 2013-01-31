@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from indico.util.contextManager import ContextManager
 import time
+import pkg_resources
 from persistent import Persistent
 from hashlib import md5
 from MaKaC.common.Counter import Counter
@@ -2238,7 +2239,7 @@ class WCSTemplateBase(wcomponents.WTemplated):
         setattr(self, "_" + self._pluginId + "Options", self._plugin.getOptions())
 
     def _setTPLFile(self, extension='tpl'):
-        tplDir = os.path.join(self._plugin.getModule().__path__[0], "tpls")
+        tplDir = pkg_resources.resource_filename(self._plugin.getModule().__name__, "tpls")
 
         fname = "%s.%s" % (self.tplId, extension)
         self.tplFile = os.path.join(tplDir, fname)
@@ -2277,7 +2278,7 @@ class WCSCSSBase(WCSTemplateBase):
     """
 
     def _setTPLFile(self):
-        tplDir = self._plugin.getModule().__path__[0]
+        tplDir = pkg_resources.resource_filename(self._plugin.getModule().__name__, "")
         fname = "%s.css" % self.tplId
         self.tplFile = os.path.join(tplDir, fname)
         self.helpFile = ''

@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # stdlib imports
-import os
+import pkg_resources
 
 # legacy imports
 from MaKaC.services.implementation.base import ServiceBase
@@ -36,7 +36,7 @@ class RHImporterHtdocs(RHHtdocs):
     """
 
     _url = r"^/importer/(?P<filepath>.*)$"
-    _local_path = os.path.join(indico.ext.importer.__path__[0], 'htdocs')
+    _local_path = pkg_resources.resource_filename(indico.ext.importer.__name__, "htdocs")
     _min_dir = 'importer'
 
 

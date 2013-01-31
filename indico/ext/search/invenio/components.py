@@ -19,7 +19,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # stdlib imports
-import zope.interface, os
+import zope.interface
+import pkg_resources
 
 # legacy imports
 from MaKaC.plugins.base import Observable
@@ -49,5 +50,5 @@ class PluginImplementationContributor(Component, Observable):
 class RHSearchHtdocsInvenio(RHHtdocs):
 
     _url = r"^/invenio/(?P<filepath>.*)$"
-    _local_path = os.path.join(indico.ext.search.invenio.__path__[0], 'htdocs')
+    _local_path = pkg_resources.resource_filename(indico.ext.search.invenio.__name__, "htdocs")
     _min_dir = 'invenio'

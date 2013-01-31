@@ -23,7 +23,7 @@ Request handlers for Collaboration plugins
 
 # standard lib imports
 import os, tempfile, time
-
+import pkg_resources
 # legacy indico imports
 
 # indico api imports
@@ -189,11 +189,11 @@ class RHCollaborationHtdocs(RHHtdocs):
         if plugin:
             module = CollaborationTools.getModule(plugin)
             if module:
-                local_path = module.__path__[0]
+                local_path = pkg_resources.resource_filename(module.__name__, "")
             else:
                 return None
         else:
-            local_path = Collaboration.__path__[0]
+            local_path = pkg_resources.resource_filename(Collaboration.__name__, "")
 
         return super(RHCollaborationHtdocs, cls).calculatePath(
             filepath,

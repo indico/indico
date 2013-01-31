@@ -22,7 +22,7 @@ Contains definitions for the plugin's web interface
 """
 
 # system lib imports
-import os
+import pkg_resources
 
 # 3rd party lib imports
 import zope.interface
@@ -54,7 +54,7 @@ class RHEPaymentHtdocs(RHHtdocs):
     """
 
     _url = r"^/epayment/(?P<filepath>.*)$"
-    _local_path = os.path.join(MaKaC.plugins.EPayment.__path__[0], 'htdocs')
+    _local_path = pkg_resources.resource_filename(MaKaC.plugins.EPayment.__name__, "htdocs")
 
 
 # Plugin Settings

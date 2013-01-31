@@ -52,8 +52,8 @@ class IndicoTemplateLookup(TemplateLookup):
             plugin = pType.getPlugin(pluginName)
             if plugin == None:
                 raise Exception(_("The plugin does not exist"))
-            return posixpath.normpath(pkg_resources.resource_filename(plugin.getModule().__name__, 'tpls/{0}.tpl'.format(tplName)))
-        return posixpath.normpath(pkg_resources.resource_filename(pType.getModule().__name__, 'tpls/{0}.tpl'.format(tplName)))
+            return posixpath.normpath(pkg_resources.resource_filename(plugin.getModule().__name__, 'tpls/{0}'.format(tplName)))
+        return posixpath.normpath(pkg_resources.resource_filename(pType.getModule().__name__, 'tpls/{0}'.format(tplName)))
 
 
     def get_template(self, uri, module=None):

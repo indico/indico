@@ -23,10 +23,11 @@ Contains definitions for the plugin's web interface
 
 # system lib imports
 import os, datetime
+import pkg_resources
 
 # 3rd party lib imports
 import zope.interface
-from webassets import Bundle, Environment
+from webassets import Bundle
 
 # plugin imports
 from indico.web.assets import PluginEnvironment
@@ -71,7 +72,7 @@ class RHLiveSyncHtdocs(RHHtdocs):
     """
 
     _url = r"^/livesync/(?P<filepath>.*)$"
-    _local_path = os.path.join(indico.ext.livesync.__path__[0], 'htdocs')
+    _local_path = pkg_resources.resource_filename(indico.ext.livesync.__name__, "htdocs")
     _min_dir = 'livesync'
 
 
