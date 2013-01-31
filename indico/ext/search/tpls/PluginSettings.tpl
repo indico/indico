@@ -3,6 +3,8 @@
 
     <td>${ _("Default search engine")}</td>
     <td><div id="defaultSearch"></div></td>
+    <td><div id="status" style="color:green;display:none">${_("Saved!")}</div></td>
+    </tr>
 
 </table>
 <script type="text/javascript">
@@ -11,6 +13,9 @@
         var _checkState = function(state){
             if (state == SourceState.Error) {
                 IndicoUtil.errorReport($T("Error saving"));
+            } else if(state == SourceState.Loaded) {
+                $("#status").show();
+                setTimeout(function(){$("#status").hide();}, 1000);
             }
         };
     return _checkState;
