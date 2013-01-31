@@ -381,12 +381,16 @@ class AccessController( Persistent, Observable ):
     def getNonInheritedChildren(self):
         return self.nonInheritedChildren
 
+    def setNonInheritedChildren(self, nonInheritedChildren):
+        self.nonInheritedChildren = nonInheritedChildren
+
     def updateNonInheritedChildren(self, elem, delete=False):
         if delete or elem.getAccessController().getAccessProtectionLevel() == 0:
             self.removeNonInheritedChild(elem)
         else:
             self.addNonInheritedChild(elem)
         self._p_changed = 1
+
 
     @isFullyAccess(1)
     def isFullyPublic(self):

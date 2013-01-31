@@ -656,6 +656,40 @@ def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
     mod._p_changed = 1
     dbi.commit()
 
+@since('1.0')
+def updateNonInheritedChildren(dbi, withRBDB, prevVersion):
+    """
+    Update non inherited children list
+    """
+    def _updateMaterial(obj):
+        for material in obj.getAllMaterialList():
+            material.getAccessController().setNonInheritedChildren(set())
+            material.updateInheritedParent(material)
+            for resource in material.getResourceList():
+                resource.updateInheritedParent()
+
+    ch = ConferenceHolder()
+    i = 0
+
+    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+        conf.getAccessController().setNonInheritedChildren(set())
+        _updateMaterial(conf)
+
+        for session in conf.getSessionList():
+            session.getAccessController().setNonInheritedChildren(set())
+            session.updateInheritedParent(session)
+            _updateMaterial(session)
+        for contrib in conf.getContributionList():
+            contrib.getAccessController().setNonInheritedChildren(set())
+            contrib.updateInheritedParent(contrib)
+            _updateMaterial(contrib)
+            for subContrib in contrib.getSubContributionList():
+                _updateMaterial(subContrib)
+
+        if i % 1000 == 999:
+            dbi.commit()
+        i += 1
+    dbi.commit()
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[]):
