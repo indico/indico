@@ -18,7 +18,7 @@ ImporterUtils = {
      /**
       * Maps importer name into report number system name
       */
-     reportNumberSystems: {"invenio" : "CDS",
+     reportNumberSystems: {"invenio" : "cds",
                            "dummy" : "Dummy"},
 
      /**
@@ -486,7 +486,7 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
                                                      'roomInfo' : {},
                                                      'field_content': entry.summary,
                                                      'reportNumbers': entry.reportNumbers?
-                                                             [[ImporterUtils.reportNumberSystems[self.importer], entry.reportNumbers]]:[],
+                                                             [{'system': ImporterUtils.reportNumberSystems[self.importer], 'number': entry.reportNumbers}]:[],
                                                      'materials': entry.materials}
                                 });
                                 time += duration;

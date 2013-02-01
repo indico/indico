@@ -140,7 +140,7 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
         peopleIds = []
 
         for elemValues in pList:
-            if elemValues["_type"] == "Avatar": #new
+            if elemValues.get("_type","Avatar"): #new
                 element = conference.ContributionParticipation()
                 DictPickler.update(element, elemValues)
 
@@ -164,9 +164,14 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
         reportNumbersSet = []
         if self._reportNumbers:
             for reportNumber in self._reportNumbers:
-                if not self._contribution.getReportNumberHolder().hasReportNumberOnSystem(reportNumber["system"], reportNumber["number"]):
-                    self._contribution.getReportNumberHolder().addReportNumber(reportNumber["system"], reportNumber["number"])
-                reportNumbersSet.append("""s%sr%s"""%(reportNumber["system"], reportNumber["number"]))
+                system = reportNumber["system"]
+                number_list = reportNumber["number"] #sometimes it is a list (e.g. from Importer)
+                if type(number_list) != list:
+                    number_list = [number_list]
+                for number in number_list:
+                    if not self._contribution.getReportNumberHolder().hasReportNumberOnSystem(system, number):
+                        self._contribution.getReportNumberHolder().addReportNumber(system, number)
+                    reportNumbersSet.append("""s%sr%s"""%(system, number))
 
         for system in self._contribution.getReportNumberHolder().getReportNumberKeys():
             for number in self._contribution.getReportNumberHolder().getReportNumbersBySystem(system):
