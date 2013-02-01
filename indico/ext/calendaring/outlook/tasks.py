@@ -25,7 +25,7 @@ from indico.util.date_time import format_datetime
 from webassets.filter.cssrewrite import urlpath
 from MaKaC.common.db import DBMgr
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
-
+from MaKaC.webinterface import urlHandlers
 
 class OutlookUpdateCalendarNotificationTask(PeriodicTask):
     """
@@ -39,18 +39,17 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
 
         # Send the requests
         for key, eventList in storage.iteritems():
-            success = True
             for event in eventList:
                 logger.info("processing: %s:%s" % (key, event))
                 if not event.get('request_sent', False): # only the ones that are not already sent
-                    result = ExternalOperationsManager.execute(self, 'sendEventRequest', self._sendEventRequest, key, event['eventType'], event['avatar'], event['conference'])
-                    if result and result.status_code == 200:
+                    result = ExternalOperationsManager.execute(self, 'sendEventRequest' + key + event['eventType'], self._sendEventRequest, key, event['eventType'], event['avatar'], event['conference'])
+                    if result != 200:
+                        logger.error("POST failed")
+                        break
+                    else:
                         logger.info("processing successful")
                         event['request_sent'] = True
-                    else:
-                        success = False
-                        logger.error("POST failed: [%s] %s" % (result.status_code, result.text))
-            if success:
+            else:
                 keysToDelete.append(key)
 
         self._clearAvatarConferenceStorage(keysToDelete)
@@ -74,11 +73,12 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
                 return 200
             if eventType in ['added', 'updated']:
                 logger.debug("performing '%s' for: %s" % (eventType, avatar.getId()))
+                url = urlHandlers.UHConferenceDisplay.getURL(conference)
                 payload = {'userEmail': avatar.getEmail(),
                            'uniqueID': plugin.getOption('prefix').getValue() + key,
                            'subject': conference.getTitle(),
                            'location': conference.getRoom().getName() if conference.getRoom() else '',
-                           'body': conference.getDescription(),
+                           'body': '<a href="%s">%s</a>' % (url, url) + '<br><br>' + conference.getDescription(),
                            'status': plugin.getOption('status').getValue(),
                            'startDate': format_datetime(conference.getStartDate(), format=plugin.getOption('datetimeFormat').getValue()),
                            'endDate': format_datetime(conference.getEndDate(), format=plugin.getOption('datetimeFormat').getValue()),
@@ -98,9 +98,9 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
             r = requests.post(urlpath.tslash(plugin.getOption('url').getValue()) + operation,
                               auth=(plugin.getOption('login').getValue(), plugin.getOption('password').getValue()),
                               data=payload, headers=headers, timeout=plugin.getOption('timeout').getValue())
-            return r
+            return r.status_code
         except requests.exceptions.Timeout:
-            logger.exception('Timeout ')
+            logger.exception('Timeout')
         except requests.exceptions.RequestException:
             logger.exception('RequestException: Connection problem')
         except Exception, e:
@@ -111,12 +111,11 @@ class OutlookTaskRegistry(object):
 
     @staticmethod
     def register():
-        from MaKaC.common.timezoneUtils import nowutc
         from indico.modules.scheduler import Client
         from dateutil.rrule import MINUTELY
         from MaKaC.common import DBMgr
         DBMgr.getInstance().startRequest()
-        task = OutlookUpdateCalendarNotificationTask(MINUTELY, dtstart = nowutc())
+        task = OutlookUpdateCalendarNotificationTask(MINUTELY)
         client = Client()
         client.enqueue(task)
         DBMgr.getInstance().endRequest()

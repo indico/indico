@@ -82,7 +82,7 @@ class TestTasks(IndicoTestCase):
 
         mockReturn = []
 
-        def mock_sendEventRequest(self, key, eventType, avatar, conference, plugin):
+        def mock_sendEventRequest(self, key, eventType, avatar, conference):
             if avatar.getName() == 'fake-2' and conference.getId() == '0':
                 mockReturn.append(200)
                 return 200
@@ -100,29 +100,20 @@ class TestTasks(IndicoTestCase):
         addAvatarConference(self._avatar1, self._conf1, "added")
         addAvatarConference(self._avatar1, self._conf1, "removed")
         addAvatarConference(self._avatar2, self._conf2, "added")
-        addAvatarConference(self._avatar2, self._conf2, "removed")
         outlookTask.run()
-        self.assertEqual(mockReturn, [None, None, 200, None])
-        self.assertEqual(len(storage), 2)
+        self.assertEqual(mockReturn, [None, 200])
+        self.assertEqual(len(storage), 1)
         self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
-        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf2.getId()]), 2)
         mockReturn = []
 
-        addAvatarConference(self._avatar2, self._conf1, "added")
-        addAvatarConference(self._avatar2, self._conf1, "removed")
-        outlookTask.run()
-        self.assertEqual(mockReturn, [None, None, 200, 200, None, None])
-        self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
-        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf2.getId()]), 2)
-        mockReturn = []
-
-        addAvatarConference(self._avatar1, self._conf1, "added")
+        addAvatarConference(self._avatar1, self._conf2, "added")
         addAvatarConference(self._avatar1, self._conf2, "removed")
         outlookTask.run()
-        self.assertEqual(mockReturn, [None, None, None, None, None, None])
-        self.assertEqual(len(storage), 3)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 3)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf2.getId()]), 1)
-        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf2.getId()]), 2)
+        self.assertEqual(mockReturn, [None])
+        self.assertEqual(len(storage), 2)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf2.getId()]), 2)
         mockReturn = []
+
+        outlookTask._clearAvatarConferenceStorage([self._avatar1.getId() + '_' + self._conf2.getId()])
+        self.assertEqual(len(storage), 1)

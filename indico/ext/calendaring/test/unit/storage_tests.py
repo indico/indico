@@ -26,7 +26,7 @@ from MaKaC import conference as conf
 from indico.tests.python.unit.util import IndicoTestCase, with_context
 
 from MaKaC.plugins import PluginsHolder
-from indico.ext.calendaring.storage import getAvatarConferenceStorage, addAvatarConference, updateConference, clearAvatarConferenceStorage, enablePluginForUser, disablePluginForUser, isUserPluginEnabled
+from indico.ext.calendaring.storage import getAvatarConferenceStorage, addAvatarConference, updateConference
 
 from MaKaC.participant import Participant
 from MaKaC.registration import Registrant
@@ -48,7 +48,7 @@ class TestStorage(IndicoTestCase):
 
         # Create two dummy users
         ah = AvatarHolder()
-        self._avatar1 = ah.getById(0)
+        self._avatar1 = ah.getById('0')
         self._avatar2 = Avatar()
         self._avatar2.setName("fake-2")
         self._avatar2.setSurName("fake")
@@ -78,8 +78,8 @@ class TestStorage(IndicoTestCase):
         self._stopDBReq()
 
     @with_context('database')
-    def testAddRemoveStorageElements(self):
-        """ Tests adding elements to the storage and clearing storage using key value
+    def testAddStorageElements(self):
+        """ Tests adding elements to the storage
         """
         storage = getAvatarConferenceStorage()
         self.assertEqual(len(storage), 0)
@@ -115,26 +115,11 @@ class TestStorage(IndicoTestCase):
         self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf2.getId()]), 2)
         self.assertEqual(storage[self._avatar2.getId() + '_' + self._conf2.getId()][1]["eventType"], "removed")
 
-        clearAvatarConferenceStorage([self._avatar2.getId() + '_' + self._conf1.getId(), self._avatar2.getId() + '_' + self._conf2.getId()])
-        self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf2.getId()]), 1)
-
-        disablePluginForUser(self._avatar1.getId())
         addAvatarConference(self._avatar1, self._conf1, "added")
-        self.assertEqual(isUserPluginEnabled(self._avatar1.getId()), False)
-        self.assertEqual(isUserPluginEnabled(self._avatar2.getId()), True)
-        self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf2.getId()]), 1)
+        addAvatarConference(self._avatar1, self._conf1, "removed")
 
-        enablePluginForUser(self._avatar1.getId())
-        addAvatarConference(self._avatar1, self._conf1, "added")
-        self.assertEqual(isUserPluginEnabled(self._avatar1.getId()), True)
-        self.assertEqual(isUserPluginEnabled(self._avatar2.getId()), True)
-        self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 3)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf2.getId()]), 1)
+        self.assertEqual(len(storage), 4)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
 
     @with_context('database')
     def testUpdateConference(self):
@@ -144,39 +129,28 @@ class TestStorage(IndicoTestCase):
 
         participant1 = Participant(self._conf1, self._avatar1)
         participant2 = Participant(self._conf1, self._avatar2)
+        participant3 = Participant(self._conf2, self._avatar2)
+
         self._conf1.getParticipation().addParticipant(participant1)
         self._conf1.getParticipation().addParticipant(participant2)
+        self._conf2.getParticipation().addParticipant(participant3)
         self._conf1.setTitle('title')
-        self.assertEqual(len(storage), 2)
+        self.assertEqual(len(storage), 3)
         self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
         self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 2)
+        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf2.getId()]), 1)
 
-        updateConference(self._avatar1)
-        self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
-        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 2)
-
-        self._conf2.setDescription('description')
-        self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
-        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 2)
-
-        disablePluginForUser(self._avatar2.getId())
         self._conf1.setDescription('description')
-        self.assertEqual(isUserPluginEnabled(self._avatar1.getId()), True)
-        self.assertEqual(isUserPluginEnabled(self._avatar2.getId()), False)
-        self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 3)
+        self.assertEqual(len(storage), 3)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
         self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 2)
+        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf2.getId()]), 1)
 
-        enablePluginForUser(self._avatar2.getId())
-        participant1.setStatusRefused()
-        updateConference(self._conf1)
-        self.assertEqual(isUserPluginEnabled(self._avatar1.getId()), True)
-        self.assertEqual(isUserPluginEnabled(self._avatar2.getId()), True)
-        self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 4)
-        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 3)
+        self._conf2.setTitle('title')
+        self.assertEqual(len(storage), 3)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
+        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 2)
+        self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf2.getId()]), 2)
 
     @with_context('database')
     def testUpdateParticipantStatus(self):
@@ -192,34 +166,34 @@ class TestStorage(IndicoTestCase):
 
         participant1.setStatusAdded()
         self.assertEqual(len(storage), 1)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
-        self.assertEqual(storage[self._avatar1.getId() + '_' + self._conf1.getId()][1]["eventType"], "added")
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 1)
+        self.assertEqual(storage[self._avatar1.getId() + '_' + self._conf1.getId()][0]["eventType"], "added")
 
         participant1.setStatusRefused()
         self.assertEqual(len(storage), 1)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 3)
-        self.assertEqual(storage[self._avatar1.getId() + '_' + self._conf1.getId()][2]["eventType"], "removed")
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
+        self.assertEqual(storage[self._avatar1.getId() + '_' + self._conf1.getId()][1]["eventType"], "removed")
 
         participant2 = Participant(self._conf1, self._avatar2)
         participant2.setStatusInvited()
         self.assertEqual(len(storage), 1)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 3)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
 
         participant2.setStatusAccepted()
         self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 3)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
         self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 1)
         self.assertEqual(storage[self._avatar2.getId() + '_' + self._conf1.getId()][0]["eventType"], "added")
 
         participant3 = Participant(self._conf2, self._avatar1)
         participant3.setStatusInvited()
         self.assertEqual(len(storage), 2)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 3)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
         self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 1)
 
         participant3.setStatusRejected()
         self.assertEqual(len(storage), 3)
-        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 3)
+        self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf1.getId()]), 2)
         self.assertEqual(len(storage[self._avatar2.getId() + '_' + self._conf1.getId()]), 1)
         self.assertEqual(len(storage[self._avatar1.getId() + '_' + self._conf2.getId()]), 1)
         self.assertEqual(storage[self._avatar1.getId() + '_' + self._conf2.getId()][0]["eventType"], "removed")
