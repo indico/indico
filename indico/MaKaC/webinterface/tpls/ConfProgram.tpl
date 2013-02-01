@@ -1,31 +1,20 @@
-<div class="groupTitle">
-    ${ _("Scientific Programme")}
+<a class="right header-aligned icon-file-pdf toolbar-icon" aria-hidden="true" href="${pdf_url}" title="${_("Download PDF")}" style="margin-top: 0.8em;"></a>
+<h2 class="page_title">${ _("Scientific Programme")}</h2>
+
+<div class="quotation programme">
+  ${ description }
 </div>
-<table width="100%" cellspacing="0">
-    <tr>
-        <td>
-            <font color="black">${ description }</font>
-        </td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-    </tr>
-    <tr>
-        <td>
-            % for track in program:
-                <div class='contributionListContribItem'>
-                    <div class="contributionListContribHeader">
-                    % if 'url' in track:
-                        <a href='${track['url']}'>${track['title']}</a>
-                    % else:
-                        ${track['title']}
-                    % endif
-                    </div>
-                    <div class="contributionListContribDescription">
-                        ${track['description']}
-                    </div>
-                </div>
-            % endfor
-        </td>
-    </tr>
-</table>
+
+<ul class="programme">
+% for track in program:
+    <li>
+      % if 'url' in track:
+      <a class="right" href='${track['url']}'>edit</a>
+      % endif
+      <span class="title">${track['title']}</span>
+      <div class="description">
+        ${track['description']}
+      </div>
+    </li>
+% endfor
+</ul>

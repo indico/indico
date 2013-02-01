@@ -5,9 +5,9 @@
   <a class="title" title="${ escape(eventTitle) }" href="${ urlHandlers.UHConferenceDisplay.getURL(confId=eventId) }">${ escape(eventTitle) }</a>
 
   % if status == 'ongoing':
-    <em>${ _("ongoing till") }&nbsp;${ self_.formatDateTime( dateTime ) }</em>
+    <span class="timing">${ _("ongoing till") }&nbsp;${ self_.formatDateTime( dateTime ) }</span>
   % else:
-    <em>${ _("starts") }&nbsp;${ self_.formatDateTime( dateTime ) }</em>
+    <span class="timing">${ _("starts") }&nbsp;${ self_.formatDateTime( dateTime ) }</span>
   % endif
 
 </li>

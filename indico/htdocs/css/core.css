@@ -1,5 +1,21 @@
 /* Basic elements */
 
+.right {
+    float: right;
+}
+
+.header-aligned {
+    margin-top: 0.8em;
+}
+
+.quotation {
+    margin: 10px;
+    padding-left: 10px;
+    color: #777;
+    border-left: 4px solid #ddd;
+    font-family: Georgia, Times, Serif;
+}
+
 .bs-btn {
     display: inline-block;
     padding: 4px 10px 4px;
@@ -109,4 +125,30 @@
 .bs-btn-right {
     float: right;
     margin-left: 5px;
+}
+
+a.toolbar-icon {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    color: #888;
+    padding: 5px;
+    text-shadow: 1px 1px 1px #fff;
+    transition: color .25s ease-in-out;
+    -webkit-transition: color .25s ease-in-out;
+    -moz-transition: color .25s ease-in-out;
+}
+
+a.toolbar-icon:hover {
+    color: #444;
+}
+
+a.toolbar-icon:active {
+    color: #aaa;
+}
+
+h2.page_title {
+    margin-top: 0.8em;
+    font-family: Georgia, Times, Serif;
+    font-size: 2em;
+    color: #B14300;
 }

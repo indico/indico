@@ -19,13 +19,6 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-@font-face {
-  font-family: 'Special Elite';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Special Elite'), local('SpecialElite-Regular'), url('SpecialElite.ttf');
-}
-
 /*
    A wrapper that wraps around everything except the footer.
    Used to place the footer correctly at the bottom
@@ -305,7 +298,7 @@ a.img:active {
 .categoryTitle {
     border-bottom: 2px solid rgb(170, 170, 170);
     font-size: 34px;
-    font-family: Times New Roman;
+    font-family: Georgia, Times, Times New Roman;
     color: #B14300;
     font-weight: normal;
     margin: 0;
@@ -1021,7 +1014,7 @@ a.confSubSection:hover {
 }
 
 .groupTitle, .groupTitleNoBorder, .groupSubTitle {
-   font-family: "Times New Roman", Verdana, Arial;
+   font-family: Georgia, Times, "Times New Roman";
    font-size: 24px;
    color: #4E4C46;
    letter-spacing: 1px;
@@ -3136,19 +3129,12 @@ div.filterDiv
 }
 
 .smallSideBox {
-    border-radius: 10px;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
+    font-family: Georgia, Times, Times New Roman;
     padding: 15px 15px 10px 15px;
-    background: #efefef;
-    box-shadow: 0px 0px 6px #aaa;
-    -moz-box-shadow: 0px 0px 6px #aaa;
-    -webkit-box-shadow: 0px 0px 6px #aaa;
-    behavior: url('css/border-radius.htc');
+    background: #f8f8f8;
 }
 
 .smallSideBox h1 {
-    font-family: 'Special Elite', arial, serif;
 }
 
 .sideMenu {
@@ -3238,7 +3224,6 @@ div.filterDiv
     padding: 0;
     color: #777;
     font-size: 15px;
-    text-shadow: 1px 1px 0px #FEFEFE;
 }
 
 .sideBar ul {
@@ -3255,6 +3240,8 @@ div.filterDiv
 }
 
 .sideBar ul.items li .title {
+    font-family: Verdana, Arial, Serif;
+    font-size: 1em;
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3297,7 +3284,7 @@ div.filterDiv
     font-size: 14px;
 }
 
-.sideBar em {
+.sideBar .timing {
     font-size: 13px;
     display: block;
     margin-top: 3px;
@@ -8529,14 +8516,6 @@ ul.material_list ul li {
     height: 0;
     margin: 0;
     border: 0;
-}
-
-.quotation {
-    margin: 10px;
-    padding-left: 10px;
-    color: #777;
-    border-left: 4px solid #999;
-    font-family: Georgia, Times, Serif;
 }
 
 div.informationUserList {

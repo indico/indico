@@ -431,3 +431,33 @@ ul.chair_list {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.programme {
+    font-size: 1.2em;
+    font-family: Georgia, Times, Serif;
+}
+
+ul.programme {
+    margin-top: 4em;
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+ul.programme li {
+    color: #444;
+    margin-top: 2em;
+}
+
+ul.programme li .title {
+    display: block;
+    font-size: 1.3em;
+    margin-bottom: 0.6em;
+}
+
+ul.programme li .description {
+    color: #777;
+}
+
+.icon-file-pdf {
+    font-size: 1.5em;
+}

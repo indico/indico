@@ -1280,7 +1280,7 @@ class WConfProgram(wcomponents.WTemplated):
 
         formattedTrack = {
             'title': track.getTitle(),
-            'description': description if description else _('(No description given)')
+            'description': description
         }
 
         if track.getConference().getAbstractMgr().isActive() and \
@@ -1295,11 +1295,12 @@ class WConfProgram(wcomponents.WTemplated):
         return formattedTrack
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars['description'] = self._conf.getProgramDescription()
-        vars['program'] = [self.buildTrackData(t) for t in self._conf.getTrackList()]
+        pvars = wcomponents.WTemplated.getVars(self)
+        pvars['description'] = self._conf.getProgramDescription()
+        pvars['program'] = [self.buildTrackData(t) for t in self._conf.getTrackList()]
+        pvars['pdf_url'] = urlHandlers.UHConferenceProgramPDF.getURL(self._conf)
 
-        return vars
+        return pvars
 
 
 class WPConferenceProgram(WPConferenceDefaultDisplayBase):
@@ -1311,13 +1312,6 @@ class WPConferenceProgram(WPConferenceDefaultDisplayBase):
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._programOpt)
-
-    def _defineToolBar(self):
-        pdf = wcomponents.WTBItem(_("get PDF of the programme"),
-            icon=Config.getInstance().getSystemIconURL("pdf"),
-            actionURL=urlHandlers.UHConferenceProgramPDF.getURL(self._conf))
-        if len(self._conf.getTrackList()) > 0:
-            self._toolBar.addItem(pdf)
 
 
 class WInternalPageDisplay(wcomponents.WTemplated):
