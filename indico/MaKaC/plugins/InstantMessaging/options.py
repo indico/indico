@@ -24,5 +24,6 @@ globalOptions = [
                             "type": 'links',
                             "defaultValue": [{'name': 'your desktop client', 'structure': 'xmpp:[chatroom]@[host]?join'}],
                             "editable": True,
-                            "visible": True})
+                            "visible": True,
+                            "subType": "instantMessaging"})
 ]

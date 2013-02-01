@@ -385,7 +385,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                 return self._drawProtectionPane(value);
             });
 
-        return Html.div({},
+        return $("<div></div>").append(
                         IndicoUtil.createFormFromMap(
                             [
                                 [
@@ -404,7 +404,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                                 ]
 
                             ]),
-                        protectionPane);
+                        $(protectionPane.dom));
 
    },
 
@@ -415,7 +415,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
        var description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
        var displayName = Html.input("text",{'name':'displayName', style:{width:'220px'}});
 
-       return Html.div({},
+       return $("<div></div>").append(
                        IndicoUtil.createFormFromMap(
                            [
                                [
@@ -672,7 +672,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
                                 [$T('Type'), selector],
                                 [$T('File'), file],
                                 [$T('Description'), description]
-                            ]),
+                            ]).get(),
                         uploadType);
 
         $(this.form.dom).ajaxForm({
@@ -805,7 +805,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
 
         return Html.div(
                 {style: {marginTop: pixels(5)}},
-                self.privateInfoDiv);
+                self.privateInfoDiv.get());
 
     },
 
@@ -861,7 +861,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         var protectionDiv = self._drawProtectionDiv();
 
         var infoDiv = Html.div({},
-                self._drawInfoPane(),
+                self._drawInfoPane().get(),
                 this.forReviewing?[]:self._drawProtectionPane() );
         var widget = [[$T("Information"), infoDiv]];
         if(!this.forReviewing) {

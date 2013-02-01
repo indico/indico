@@ -334,7 +334,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             //replace all the invalid characters
             self.crName.set((conferenceName+eventDate).replace(/(\s)|\/|"|'|&|\\|:|<|>|@/g, "_"));
 
-            this.basicTabForm = Html.div({style:{textAlign: 'left'}},
+            this.basicTabForm = $("<div style='text-align: left;'></div>").append(
                 IndicoUtil.createFormFromMap([
                 [$T('Server used'), Html.div({}, Html.tr({}, createCHRadioButton, createCHRadioButtonLabel), Html.tr({}, defineCHRadioButton, defineCHRadioButtonLabel))],
                 [$T('Server'), defineCHText],
@@ -363,12 +363,12 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             showPwd.dom.name = "showPass";
 
             var passwordField = new ShowablePasswordField('roomPass', '', false, 'CHpass').draw();
-            this.advancedTabForm = Html.div({},
+            this.advancedTabForm = $("<div></div>").append(
                 IndicoUtil.createFormFromMap([
                     [$T('Password'), passwordField  ]]),
-                Html.div({className: 'chatAdvancedTabTitleLine', style: {marginTop:pixels(10)}},
-                        Html.div({className: 'chatAdvancedTabTitle'}, $T('Information displayed in the event page'))
-                        ),
+                $("<div class='chatAdvancedTabTitleLine' style='margin-top: 10px;'></div>").append(
+                   $("<div class='chatAdvancedTabTitle' style='margin-top: 10px;'></div>").append($T('Information displayed in the event page'))
+                 ),
                 IndicoUtil.createFormFromMap([
                     [Html.div({className: 'chatAdvancedTabCheckboxDiv', style: {marginTop:pixels(5)}},
                             Html.tr({},
@@ -386,7 +386,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             var width = 600;
             var height = 200
 
-            this.tabControl = new JTabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, height);
+            this.tabControl = new JTabWidget([[$T("Basic"), this.basicTabForm.get()], [$T("Advanced"), this.advancedTabForm]], width, height);
             return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw());
         },
 

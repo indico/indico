@@ -116,7 +116,7 @@ type("AgentModificationDialog", ["ExclusivePopupWithButtons"],
                  });
              }
 
-             return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({}, mainContent, Html.table({}, specificOptions)));
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this, $('<div></div>').append(mainContent, $('<table></table>').append($(specificOptions.dom))));
          },
 
          _getButtons: function() {

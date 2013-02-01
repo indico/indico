@@ -191,7 +191,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
 
        this.foundPeopleListDiv = Html.div("UISearchPeopleListDiv", this.foundPeopleList.draw());
 
-       this.container = Html.div({}, this.searchForm, this.searchButtonDiv, this.foundPeopleListDiv, this.extraDiv);
+       this.container = Html.div({}, this.searchForm.get(), this.searchButtonDiv, this.foundPeopleListDiv, this.extraDiv);
 
        return this.IWidget.prototype.draw.call(this, this.container);
    }

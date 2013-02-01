@@ -5,11 +5,11 @@ type('CurrencyDialog', ['ConfirmPopupWithPM'], {
     this.currency_name = Html.input({}, 'text', old_data ? old_data.name : null);
     this.currency_abbrev = Html.input({}, 'text', old_data ? old_data.abbrev : null);
 
-    var form = Html.div({},
+    var form = $("<div></div>").append(
                         IndicoUtil.createFormFromMap([
                             [$T('Currency name'), this.currency_name],
                             [$T('Currency abbreviation'), this.currency_abbrev]]),
-                        Html.div({style:{color: "orange", fontSize: "smaller"}}, $T('Example: Euro and EUR')));
+                        $("<div style='color: orange; font-size: smaller;'></div>").append($T('Example: Euro and EUR')));
 
     this.ConfirmPopupWithPM(title, form, handler);
     this.parameterManager.add(this.currency_name, 'text', false);

@@ -109,7 +109,7 @@ type("CategoryEventAddDialog", ["ExclusivePopupWithButtons"],
                  ["Weight (float)", $B(Html.edit(), this.info.accessor('weight'))],
                  ["Advertisement time (days)", $B(Html.edit(), this.info.accessor('delta'))]]);
 
-             return this.ExclusivePopupWithButtons.prototype.draw.call(this, Html.div({}, form));
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this, $('<div></div>').append(form));
          },
 
          _getButtons: function() {

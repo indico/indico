@@ -603,8 +603,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         return IndicoUtil.createFormFromMap(
             [
                 [$T('Author(s)'), authorListWidget.draw()],
-                [Html.div({style:{paddingTop:pixels(30)}}, $T('Co-author(s)')),
-                 Html.div({style:{paddingTop:pixels(30)}}, coauthorListWidget.draw())]
+                [$T('Co-author(s)'), coauthorListWidget.draw()]
             ]);
     },
 

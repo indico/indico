@@ -86,10 +86,11 @@
                         var info = '';
                         var example = '';
                         % if option.getSubType() == 'instantMessaging':
-                            info = Html.ul({style: {fontWeight: "bold"}},$T('In the URL field, the following patterns will be changed:'),
-                                    Html.li({style: {fontWeight: "lighter"}},$T('[chatroom] by the chat room name')),
-                                    Html.li({style: {fontWeight: "lighter"}},$T('[host] by the specified host')),
-                                    Html.li({style: {fontWeight: "lighter"}},$T('[nickname] by the nick chosen by the user.')));
+                            info = $("<ul style='font-weight: bold;'></ul>").append(
+                                        $T('In the URL field, the following patterns will be changed:'),
+                                        $("<li style='font-weight: lighter;'></li>").append($T('[chatroom] by the chat room name')),
+                                        $("<li style='font-weight: lighter;'></li>").append($T('[host] by the specified host')),
+                                        $("<li style='font-weight: lighter;'></li>").append($T('[nickname] by the nick chosen by the user.')));
                             example = $T('Example: http://[host]/resource/?x=[chatroom]@conference.[host]?join');
                         % elif option.getSubType() == 'webcastAudiences':
                             addLinkText = $T('Add new audience');
@@ -151,12 +152,11 @@
                             var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
                             var linkName = new AutocheckTextBox({name: 'name', id:"linkname"}, errorLabel);
                             var linkStructure = Html.input("text", {});
-                            var div = Html.div({},IndicoUtil.createFormFromMap([
+                            var div = $("<div></div>").append(IndicoUtil.createFormFromMap([
                                                                     [linkNameLabel, Html.div({}, linkName.draw(), errorLabel)],
                                                                     [$T('URL'), Html.div({}, linkStructure)]]),
-                                                  Html.div({},
-                                    (info)),
-                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
+                                                              $("<div></div>").append(info),
+                                                              $("<div style='color: orange; font-size: smaller;'></div>").append(example));
                             var linksPopup = new ConfirmPopupWithPM(popupTitle,
                                     div,
                                                                         function(value){
@@ -242,21 +242,18 @@
 
                                         var editButton = Widget.link(command(function(){
                                             var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
-                                            var paymentMethodName = Html.div({}, paymentMethod.displayName);
+                                            var paymentMethodName = Html.div({}, paymentMethod.name);
                                             var paymentMethodDisplayName = Html.input("text", {}, paymentMethod.displayName);
                                             var paymentMethodType = Html.input("text", {}, paymentMethod.type);
                                             var paymentMethodExtraFee = Html.input("text", {}, paymentMethod.extraFee);
-
-                                            var div = Html.div({},IndicoUtil.createFormFromMap([
+                                            var div = $("<div></div>").append(IndicoUtil.createFormFromMap([
                                                                                     [paymentMethodNameLabel, Html.div({}, paymentMethodName)],
                                                                                     [$T('Display Name'), Html.div({}, paymentMethodDisplayName)],
                                                                                     [$T('Type'), Html.div({}, paymentMethodType)],
                                                                                     [$T('Extra Fee'), Html.div({}, paymentMethodExtraFee)]]),
-                                                                  Html.div({},
-                                                    (info)),
-                                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
-                                            var paymentMethodsPopup = new ConfirmPopupWithPM(popupTitle,
-                                                    div,
+                                                                              $("<div></div>").append(info),
+                                                                              $("<div style='color: orange; font-size: smaller;'></div>").append(example));
+                                            var paymentMethodsPopup = new ConfirmPopupWithPM(popupTitle, div,
                                                                                         function(value){
                                                                                             if(value){
                                                                                                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Editing payment method..."));
@@ -326,16 +323,14 @@
                             var paymentMethodType = Html.input("text", {});
                             var paymentMethodExtraFee = Html.input("text", {});
 
-                            var div = Html.div({},IndicoUtil.createFormFromMap([
+                            var div = $("<div></div>").append(IndicoUtil.createFormFromMap([
                                                                     [paymentMethodNameLabel, Html.div({}, paymentMethodName.draw(), errorLabel)],
                                                                     [$T('Display Name'), Html.div({}, paymentMethodDisplayName)],
                                                                     [$T('Type'), Html.div({}, paymentMethodType)],
                                                                     [$T('Extra Fee'), Html.div({}, paymentMethodExtraFee)]]),
-                                                  Html.div({},
-                                    (info)),
-                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
-                            var paymentMethodsPopup = new ConfirmPopupWithPM(popupTitle,
-                                    div,
+                                                              $("<div></div>").append(info),
+                                                              $("<div style='color: orange; font-size: smaller'></div>").append(example));
+                            var paymentMethodsPopup = new ConfirmPopupWithPM(popupTitle, div,
                                                                         function(value){
                                                                             if(value){
                                                                                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of payment method..."));

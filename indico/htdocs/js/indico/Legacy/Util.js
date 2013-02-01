@@ -204,32 +204,31 @@ var IndicoUtil = {
     */
     createFormFromMap: function(map, expand) {
         expand = any(expand, false);
-        var labelStyle = {style:{textAlign:'right', verticalAlign: 'top'}};
-        var fieldStyle = {style:{verticalAlign: 'top'}};
+        var labelStyle = "style='text-align: right; vertical-align: top;'";
+        var fieldStyle = "style='vertical-align: top;'";
         if (expand) {
-            labelStyle.style.whiteSpace = "nowrap";
-            fieldStyle.style.width = "100%";
+            labelStyle = "style='white-space:nowrap;'";
+            fieldStyle = "style='width:100%;'";
         }
-        var list = [];
-        $L(map).each(function(item) {
+        var table = $("<table></table");
+        $(map).each(function(key, item) {
             // if the key is an int, do not print the label
             if (item.length == 2) {
-                if(item[1].jquery) item[1] = $E(item[1].get(0));
-                list.push(Html.tr({style:{marginTop:'10px'}},
-                                  Html.td(labelStyle, Html.label("popUpLabel",item[0])),
-                                  Html.td(fieldStyle, Html.div('popUpTdContent', item[1]))));
+                // TO REMOVE: when completed migration to jquery
+                if(!item[1].jquery && item[1].dom) item[1] = $(item[1].dom);
+
+                var row = $("<tr style='margin-top:10px;'></tr>");
+                row.append($("<td " + labelStyle + "><label class='popUpLabel'>" + item[0] +"</label></td>"));
+                row.append($("<td " + fieldStyle + "></td>").append($("<div class='popUpTdContent'></div>").append(item[1])));
+                table.append(row);
             } else {
-                if(item[0]!== undefined && item[0].jquery) item[0] = $E(item[0].get(0));
-                list.push(Html.tr({style:{marginTop:'10px'}},
-                                  Html.td(),
-                                  Html.td(fieldStyle, item[0])));
+                // TO REMOVE: when completed migration to jquery
+                if(item[0]!== undefined && !item[0].jquery && item[0].dom) item[0] = $(item[0].dom);
+
+                table.append($("<tr style='margin-top:10px;'><td></td></tr>").append($("<td " + fieldStyle + "></td>").append(item[0])));
             }
         });
-        var tbody = Html.tbody();
-        each(list, function(row){
-            tbody.append(row);
-        });
-        return Html.table({}, tbody);
+        return table
 
     },
 
