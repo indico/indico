@@ -1472,25 +1472,25 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
             self._resvID = None
 
-
+        user = self._getUser()
         self._candResv = candResv
 
-        for nbd in self._candResv.room.getNonBookableDates():
-            if doesPeriodsOverlap(nbd.getStartDate(), nbd.getEndDate(), self._candResv.startDT, self._candResv.endDT):
-                raise FormValuesError("You cannot book this room during the following periods: %s"%("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
+        if not (user.isAdmin() or user.isRBAdmin()):
+            for nbd in self._candResv.room.getNonBookableDates():
+                if doesPeriodsOverlap(nbd.getStartDate(), nbd.getEndDate(), self._candResv.startDT, self._candResv.endDT):
+                    raise FormValuesError(_("You cannot book this room during the following periods: %s") % ("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
 
-        if self._candResv.room.getDailyBookablePeriods():
-            for nbp in self._candResv.room.getDailyBookablePeriods():
-                if nbp.doesPeriodFit(self._candResv.startDT.time(), self._candResv.endDT.time()):
-                    break
-            else:
-                raise FormValuesError("You must book this room in one of the following time periods: %s" % (", ".join(map(lambda x: "from %s to %s" % (x.getStartTime(), x.getEndTime()), self._candResv.room.getDailyBookablePeriods()))))
+            if self._candResv.room.getDailyBookablePeriods():
+                for nbp in self._candResv.room.getDailyBookablePeriods():
+                    if nbp.doesPeriodFit(self._candResv.startDT.time(), self._candResv.endDT.time()):
+                        break
+                else:
+                    raise FormValuesError(_("You must book this room in one of the following time periods: %s") % (", ".join(map(lambda x: "from %s to %s" % (x.getStartTime(), x.getEndTime()), self._candResv.room.getDailyBookablePeriods()))))
 
-        user = self._getUser()
         days = self._candResv.room.maxAdvanceDays
         if not (user.isRBAdmin() or user.getId() == self._candResv.room.responsibleId) and days > 0:
             if dateAdvanceAllowed(self._candResv.endDT, days):
-                raise FormValuesError(_("You cannot book this room more than %s days in advance.") %  days)
+                raise FormValuesError(_("You cannot book this room more than %s days in advance.") % days)
 
         self._params = params
         self._clearSessionState()
