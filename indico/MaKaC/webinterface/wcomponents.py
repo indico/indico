@@ -848,7 +848,7 @@ class WSimpleNavigationDrawer(WTemplated):
 
 class WBannerModif(WTemplated):
 
-    def __init__( self, path = [], itemType = "", title = "" ):
+    def __init__(self, path = [], itemType = "", title = ""):
         WTemplated.__init__( self, "BannerModif" )
         self._path = path
         self._title = title
@@ -871,16 +871,6 @@ class WTimetableBannerModif(WBannerModif):
         # Iterate till conference is reached
         conf = target.getConference()
         path = self._getOwnerBasePath(target)
-        scheduleModifURL = None
-
-        # if user has access to top-level timetable
-        if conf.canModify(aw):
-            scheduleModifURL = urlHandlers.UHConfModifSchedule.getURL( conf )
-        elif target.getSession():
-            # otherwise, let them access only the session timetable
-            scheduleModifURL = urlHandlers.UHSessionModifSchedule.getURL( target.getSession() )
-        if scheduleModifURL:
-            path.append({"url": scheduleModifURL, "title": _("Timetable")})
         # TITLE AND TYPE
         itemType = type(target).__name__
         title = target.getTitle()
@@ -895,6 +885,9 @@ class WTimetableBannerModif(WBannerModif):
                 path.append({"url": urlHandlers.UHHelper.getModifUH(type(obj)).getURL(obj),
                              "title": truncateTitle(obj.getTitle(), 30),
                              "type": type(obj).__name__})
+                if type(obj) == conference.Session:
+                    path[-1]["sessionTimetableURL"] =  urlHandlers.UHSessionModifSchedule.getURL(obj)
+                    path[-1]["sessionContributionsURL"] =  urlHandlers.UHSessionModContribList.getURL(obj)
             else:
                 break
         return path
@@ -911,21 +904,6 @@ class WListOfPapersToReview(WBannerModif):
             path = [{"url": urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL(conf), "title":_("Contributions list")}]
         if user == "editor":
             path = [{"url": urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL(conf), "title":_("Contributions list")}]
-        # TITLE AND TYPE
-        itemType = type(target).__name__
-        title = target.getTitle()
-        WBannerModif.__init__(self, path, itemType, title)
-
-class WContribListBannerModif(WTimetableBannerModif):
-
-    def __init__(self, target ):
-        ## PATH
-        # Iterate till conference is reached
-        conf = target.getConference()
-        path = self._getOwnerBasePath(target)
-
-        path.append({"url": urlHandlers.UHConfModifContribList.getURL( conf ), "title": _("Contributions list")})
-
         # TITLE AND TYPE
         itemType = type(target).__name__
         title = target.getTitle()

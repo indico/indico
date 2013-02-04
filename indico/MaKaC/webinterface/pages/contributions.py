@@ -289,7 +289,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         self._createTabCtrl()
         banner = ""
         if self._canModify or self._isPRM:
-            banner = wcomponents.WContribListBannerModif(self._target).getHTML()
+            banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
         else:
             if self._conf.getConfPaperReview().isRefereeContribution(self._rh._getUser(), self._contrib):
                 banner = wcomponents.WListOfPapersToReview(self._target, "referee").getHTML()
@@ -297,7 +297,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 banner = wcomponents.WListOfPapersToReview(self._target, "reviewer").getHTML()
             if self._conf.getConfPaperReview().isEditorContribution(self._rh._getUser(), self._contrib):
                 banner = wcomponents.WListOfPapersToReview(self._target, "editor").getHTML()
-        if banner == "" or self._timetableMenuItem._active is True:
+        if banner == "":
             banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
 
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )

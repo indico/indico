@@ -144,4 +144,9 @@
 .icon-close:before {
     content: "\3b";
 }
-
+.icon-grid:before {
+	content: "\67";
+}
+.icon-list:before {
+	content: "\6c";
+}

@@ -241,6 +241,12 @@ a.img:active {
     padding-top: 6px;
 }
 
+.iconContribGoTo {
+  float: left;
+  padding: 0px 5px 0px 5px;
+  cursor: pointer;
+}
+
 .dropDownMenu, .dropDownMenuGrey, .dropUpMenu, .dropDownMenuWhite {
     padding-right: 17px;
     background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center right;
