@@ -107,16 +107,6 @@
     margin-bottom: 5px;
 }
 
-.date {
-    display: inline;
-}
-
-.place {
-    display: inline;
-    font-style: italic;
-    padding-left: 5px;
-}
-
 div.datePlace > div.timezone {
     font-size: 10px;
     color: #777;
@@ -287,8 +277,14 @@ li:hover ul, li.over ul { display: block; } /* For dynamic */
 
 }
 
+.conferenceDetails .description {
+    color: #777;
+    font-family: Georgia, Times, Serif;
+    font-size: 1.2em;
+    margin: 1em 0 2em 0;
+}
+
 table.conferenceDetails td {
-    font-family: Verdana, Arial;
     font-size: 11pt;
     color: #444;
 }
@@ -460,4 +456,74 @@ ul.programme li .description {
 
 .icon-file-pdf {
     font-size: 1.5em;
+}
+
+.conferenceDetails .info_line {
+    color: #777;
+    margin-top: 1em;
+    overflow: auto;
+}
+
+.info_line, info_line:after, info_line:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.grid:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.info_line {
+    width: 50%;
+    float: left;
+    padding: 5px;
+}
+
+.info_line .text {
+    padding-left: 3rem;
+}
+
+.info_line.location .address {
+    margin-top: 0.5em;
+}
+
+.info_line.material ul {
+    margin: 0;
+    padding: 0 3rem 0 3rem;
+    list-style-type: none;
+}
+
+.info_line.location .place {
+    color: #444;
+    font-size: 1.1em;
+}
+
+.info_line.date .timezone {
+    color: #bbb;
+}
+
+.info_line.date {
+    font-size: 1.1em;
+}
+
+.info_line.date .datetime {
+    color: #444;
+}
+
+.info_line.info {
+    padding: 10px;
+    clear: both;
+    width: 100%;
+    font-family: Georgia, Times, Serif;
+    background: #f4f4f4;
+}
+
+.info_line .icon {
+    font-size: 2rem;
+    color: #aaa;
+    float: left;
+    padding-right: 0.5em;
 }

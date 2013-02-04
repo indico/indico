@@ -252,7 +252,7 @@ def validIP(ip):
 
 def isStringHTML(s):
     if type(s) == str:
-        tags = [ "<p>", "<p ", "<br>", "<li>" ]
+        tags = [ "<p>", "<p ", "<br", "<li>" ]
         for tag in tags:
             if s.lower().find(tag) != -1:
                 return True

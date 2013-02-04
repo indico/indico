@@ -34,6 +34,9 @@
 .icon-mail:before {
 	content: "\6d";
 }
+.icon-shield:before {
+	content: "\73";
+}
 .icon-file-pdf:before {
 	content: "\61";
 }
@@ -78,4 +81,19 @@
 }
 .icon-shield:before {
 	content: "\26";
+}
+.icon-time:before {
+	content: "\74";
+}
+.icon-location:before {
+	content: "\6c";
+}
+.icon-chair:before {
+	content: "\63";
+}
+.icon-info:before {
+	content: "\69";
+}
+.icon-material-download:before {
+	content: "\64";
 }

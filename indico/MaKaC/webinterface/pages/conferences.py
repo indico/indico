@@ -643,29 +643,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
                 temp = wcomponents.WMaterialDisplayItem()
                 url = urlHandlers.UHMaterialDisplay.getURL( mat )
                 l.append( temp.getHTML( self._aw, mat, url ) )
-        res = ""
-        if l:
-            res = i18nformat("""
-    <tr>
-        <td align="right" valign="top" class="displayField"><b> _("Material"):</b></td>
-        <td align="left" width="100%%">%s</td>
-    </tr>""")%"<br>".join( l )
-        return res
-
-    def _getMoreInfoHTML( self ):
-        res = ""
-        if isStringHTML(self._conf.getContactInfo()):
-            text = self._conf.getContactInfo()
-        else:
-            text = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._conf.getContactInfo()
-        if self._conf.getContactInfo() != "":
-            res = i18nformat("""
-    <tr>
-        <td align="right" valign="top" class="displayField"><b> _("Additional info"):</b>
-        </td>
-        <td>%s</td>
-    </tr>""")%text
-        return res
+        return l
 
     def _getActionsHTML( self, showActions = False):
         html=[]
@@ -697,32 +675,37 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         vars["timezone"] = tz
-        if isStringHTML(self._conf.getDescription()):
-            vars["description"] = self._conf.getDescription()
-        else:
-            vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._conf.getDescription()
+
+        description = self._conf.getDescription()
+        vars["description_html"] = isStringHTML(description)
+        vars["description"] = description
+
         sdate, edate = self._conf.getAdjustedScreenStartDate(tz), self._conf.getAdjustedScreenEndDate(tz)
-        fsdate, fedate = format_date(sdate, format='long'), format_date(edate, format='long')
+        fsdate, fedate = format_date(sdate, format='medium'), format_date(edate, format='medium')
         fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
 
-        vars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s """)%(fsdate, fstime, \
-                                                        fedate, fetime)
-        if sdate.strftime("%d%B%Y") == edate.strftime("%d%B%Y"):
-            timeInterval = fstime
-            if sdate.strftime("%H%M") != edate.strftime("%H%M"):
-                timeInterval = "%s-%s"%(fstime, fetime)
-            vars["dateInterval"] = "%s (%s)"%( fsdate, timeInterval)
-        vars["location"] = ""
+        vars["dateInterval"] = (fsdate, fstime, fedate, fetime)
+
+        vars["location"] = None
+        vars["address"] = None
+        vars["room"] = None
+
         location = self._conf.getLocation()
         if location:
-            vars["location"] = "<i>%s</i><br><pre>%s</pre>"%( location.getName(), location.getAddress() )
+            vars["location"] = location.getName()
+            vars["address"] = location.getAddress()
+
             room = self._conf.getRoom()
             if room and room.getName():
-                roomLink = linking.RoomLinker().getHTMLLink( room, location )
-                vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
+                roomLink = linking.RoomLinker().getHTMLLink(room, location)
+                vars["room"] = roomLink
+
         vars["chairs"] = self._conf.getChairList()
         vars["material"] = self._getMaterialHTML()
-        vars["moreInfo"] = self._getMoreInfoHTML()
+
+        info = self._conf.getContactInfo()
+        vars["moreInfo_html"] = isStringHTML(info)
+        vars["moreInfo"] = info
         vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
 
         return vars

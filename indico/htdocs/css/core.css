@@ -8,6 +8,14 @@
     margin-top: 0.8em;
 }
 
+.clear {
+    clear: both;
+}
+
+.nohtml {
+    white-space: pre-line;
+}
+
 .quotation {
     margin: 10px;
     padding-left: 10px;

@@ -1,28 +1,35 @@
-<span itemprop="description">${ description }</span>
-<table class="conferenceDetails">
-  <tr>
-    <td colspan="2"><br></td>
-  </tr>
-  <tr>
-    <td align="right" valign="top" class="displayField"><b> ${ _("Dates")}:</b></td>
-    <td>${ dateInterval }</td>
-  </tr>
-  <tr>
-    <td align="right" valign="top" class="displayField"><b> ${ _("Timezone")}:</b></td>
-    <td>${ timezone }</td>
-  </tr>
+<div class="conferenceDetails">
+  <div itemprop="description" class="description ${'nohtml' if not description_html else ''}">${description}</div>
+
+  <div class="grid">
+  <div class="info_line date">
+      <span  title="${_("Date/Time")}" class="icon icon-time toolbar-icon" aria-hidden="true"></span>
+      <div class="text">
+        <div class="date_start">${_('Starts <span class="datetime">{0} {1}</span>').format(dateInterval[0], dateInterval[1])}</div>
+        <div class="date_end">${_('Ends <span class="datetime">{0} {1}</span>').format(dateInterval[2], dateInterval[3])}</div>
+        <div class="timezone">${timezone}</div>
+      </div>
+  </div>
+
   % if location:
-  <tr>
-    <td align="right" valign="top" class="displayField"><b> ${ _("Location")}:</b></td>
-    <td>${ location }</td>
-  </tr>
+    <div class="info_line location">
+        <span title="${_("Location")}" class="icon icon-location toolbar-icon" aria-hidden="true"></span>
+        <div class="place text">
+          ${location}
+        </div>
+      % if room:
+        <div class="room text">${room}</div>
+      % endif
+      % if address:
+        <div class="address text nohtml">${address}</div>
+      % endif
+    </div>
   % endif
 
   % if chairs:
-  <tr>
-    <td align="right" valign="top" class="displayField"><strong>${_("Chairs:")}</strong></td>
-    <td>
-      <ul class="chair_list">
+  <div class="info_line chairs clear">
+      <span  title="${_("Chairpersons")}" class="icon icon-chair toolbar-icon" aria-hidden="true"></span>
+      <ul class="chair_list text">
         % for chair in chairs:
         <li>
           % if chair.getEmail():
@@ -37,14 +44,33 @@
         </li>
         % endfor
       </ul>
-    </td>
-  </tr>
+  </div>
   % endif
 
-  ${ material }
-  ${ moreInfo }
+  % if material:
+  <div class="info_line material">
+      <span  title="${_("Materials")}" class="icon icon-material-download toolbar-icon" aria-hidden="true"></span>
+      <ul class="text">
+        % for mat in material:
+          <li>${mat}</li>
+        % endfor
+      </ul>
+  </div>
+  % endif
 
-</table>
+  % if moreInfo:
+  <div class="info_line info">
+      <span  title="${_("Extra information")}" class="icon icon-info toolbar-icon" aria-hidden="true"></span>
+      <div class="text ${'nohtml' if not moreInfo_html else ''}">${ moreInfo }</div>
+  </div>
+  % endif
+  </div>
+
+</div>
+
+
+
+
 ${ actions }
 
 <script type="text/javascript">
