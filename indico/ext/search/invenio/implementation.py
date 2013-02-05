@@ -52,12 +52,12 @@ class InvenioBaseSEA:
     _id = "invenio"
 
     def __init__(self, **params):
-        self._private = params.get("private", False)
+        self._userLoggedIn = params.get("userLoggedIn", False)
         self._target = params.get("target", None)
         self._page = params.get("page", 1)
         self._noQuery = False
 
-        if self._private:
+        if self._userLoggedIn:
             self._sessionHash = "%s_%s" % (ContextManager.get("currentRH", None)._getSession().getId(), ContextManager.get("currentUser", None).getId())
         else:
             self._sessionHash = 'PUBLIC'
@@ -89,7 +89,7 @@ class InvenioBaseSEA:
     def getRequestAddress(self):
         return self.getVarFromPluginStorage("serverUrl")
 
-    def searchPublic(self):
+    def isSearchTypeOnlyPublic(self):
         return self.getVarFromPluginStorage("type") != "private"
 
     ## Now, we have the actual translation rules
@@ -152,7 +152,7 @@ class InvenioBaseSEA:
 
     @SEA.translate ('collections',[], 'c')
     def translateCollection(self, collection):
-        if self.searchPublic():
+        if self.isSearchTypeOnlyPublic():
             return ""
         else:
             if collection == 'Events':
@@ -160,7 +160,7 @@ class InvenioBaseSEA:
             else:
                 suffix = 'CONTRIBS'
 
-            if self._private:
+            if self._userLoggedIn:
                 prefix = 'INDICOSEARCH'
             else:
                 prefix = 'INDICOSEARCH.PUBLIC'
@@ -169,7 +169,7 @@ class InvenioBaseSEA:
     @SEA.translate ('collections',[], 'p')
     def translateCollectionPublic(self, collection):
 
-        if self.searchPublic():
+        if self.isSearchTypeOnlyPublic():
             if collection == 'Events':
                 return """970__a:"INDICO.*" -970__a:'.*.'"""
             elif collection == 'Contributions':
@@ -192,7 +192,6 @@ class InvenioRedirectSEA(InvenioBaseSEA, SearchEngineRedirectAdapter):
 class InvenioSEA(InvenioBaseSEA, SearchEngineCallAPIAdapter):
     """
         Search engine adapter for CDS Invenio.
-        Currently used at CERN.
     """
     _implementationPackage = indico.ext.search.invenio
 
@@ -315,7 +314,7 @@ class InvenioSEA(InvenioBaseSEA, SearchEngineCallAPIAdapter):
         # if we're searching the private repository,
         # always request twice the number of items per page
         # (in order to account for invisible records)
-        if self._private:
+        if self._userLoggedIn:
             numRequest = number * 2
         else:
             # ask always for an extra one, in order
@@ -418,7 +417,7 @@ class InvenioSEA(InvenioBaseSEA, SearchEngineCallAPIAdapter):
 
         params['targetObj'] = self._target
 
-        params['searchingPublicWarning'] = self.searchPublic() and not self._searchingPrivate
+        params['searchingPublicWarning'] = self.isSearchTypeOnlyPublic() and not self._userLoggedIn
         params['accessWrapper'] = ContextManager().get("currentRH", None).getAW()
 
         return params

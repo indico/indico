@@ -121,7 +121,7 @@ class SearchConfig(object):
         """
         Returns a Logger object for Statistics as a whole or per plugin.
         """
-        logName = 'ext.statistics'
+        logName = 'ext.search'
 
         if extraName:
             logName += '.' + extraName

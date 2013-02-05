@@ -118,7 +118,7 @@ class RHSearchBase(RHCustomizable):
     def _checkParams( self, params ):
         self._params = params
         self._getTarget()
-        self._seAdapter = SearchRegister().getDefaultSearchEngineAgent()(target=self._target, page=int(params.get('page', 1)), private=self.getAW().getUser() != None)
+        self._seAdapter = SearchRegister().getDefaultSearchEngineAgent()(target=self._target, page=int(params.get('page', 1)), userLoggedIn=self.getAW().getUser() != None)
 
     def _filterParams(self, params, seaInstance):
         ret = {}
@@ -219,16 +219,6 @@ class WMiniSearchBox(WBaseSearchBox):
     def __init__(self, confId):
         WBaseSearchBox.__init__(self, targetId = confId)
 
-    def getVars(self):
-        vars = WBaseSearchBox.getVars( self )
-        return vars
-
 class WPluginSettings(WTemplated):
-
-    def getVars(self):
-        """
-        Extend here to add more information to the plugin settings page, hence
-        allowing admin only view.
-        """
-        vars = WTemplated.getVars(self)
+    pass
 
