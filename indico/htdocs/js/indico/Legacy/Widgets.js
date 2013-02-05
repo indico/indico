@@ -322,11 +322,6 @@ IndicoUI.Widgets = {
             return button;
         },
 
-        switchOptionButton: function(method, attributes, caption, messageId) {
-            var button = new SwitchOptionButton(method, attributes, caption, messageId, $T("Saved"));
-            return button.draw();
-        },
-
         sourceSelectionField: function(elem, source, options){
             IndicoUI.Effect.mouseOver(elem.dom);
 

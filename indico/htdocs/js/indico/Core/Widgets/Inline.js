@@ -99,83 +99,60 @@ type("InlineRemoteWidget", ["InlineWidget"],
          this.source = indicoSource(method, attributes, null, !loadOnStartup, callback);
      });
 
-type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
+type("SwitchOptionButton", ["InlineWidget"],
      {
          draw: function() {
              var self = this;
-             var canvas = Html.span({}, 'loading...');
-             canvas.set(self.drawContent());
-             var message = Html.span({style: {marginLeft:'10px'}},'\u00A0');
-             message.dom.id = this.messageId;
+             var checkbox = $("<input/>").attr("type","checkbox").css("vertical-align", "middle");
+             var message = $("<span/>").css({"color":"green", "margin-left":"10px", "vertical-align":"middle", "display": "none"}).append(self.savedMessage);
+             var tbody = $("<tbody/>");
+             tbody.append($("<tr/>").append($("<td/>").append(checkbox).append($("<span/>").css("vertical-align", "middle").append(this.caption))).append($("<td/>").append(message)));
 
-             var table = Html.table();
-             var tbody = Html.tbody();
-             var row1 = Html.tr();
-             var cell2 = Html.td();
+             var request = function(args, showSavedMessage) {
+                 indicoRequest(self.method,
+                         args, function(response, error){
+                       if (exists(error)) {
+                           self._error(error);
+                       }
+                       else {
+                           checkbox.prop("checked", response);
+                           if(showSavedMessage){
+                               message.show();
+                               setTimeout(function(){message.hide();}, 1000);
+                           }
+                       }
+                   });
+             };
 
-             table.dom.style.display = 'inline';
-             table.set(tbody);
 
-             cell2.append(canvas);
-             row1.append(cell2);
+             checkbox.prop('disabled', this.disabled);
 
-             cellMessage = Html.td();
-             cellMessage.dom.style.verticalAlign = "middle";
-             cellMessage.dom.rowSpan = 2;
-             cellMessage.append(message);
-             row1.append(cellMessage);
+             if(this.initState !== null){
+                 checkbox.attr("checked", this.initState);
+             } else{
+                 request(self.attributes, false);
+             }
 
-             tbody.append(row1);
+             if(this.disabled) {
+                 $(tbody).qtip({content: $T("You do not have access to modify the value of this checkbox"), position: {my: 'top middle', at: 'bottom middle'}});
+             }
 
-             this.source.state.observe(function(state) {
-                 var to = 0;
-                 if (state == SourceState.Error) {
-                     self.ready.set(true);
-                     self._error(self.source.error.get());
-                 } else if (state == SourceState.Committing) {
-                     self.ready.set(true);
-                     message.set(self.savedMessage);
-                     message.dom.style.color='green';
-                     to = setTimeout("$E(\""+self.messageId + "\").set(\'\u00A0\')", 2000);
-                 } else if (state == SourceState.Loaded) {
-                     clearTimeout(to);
-                 } else {
-                     message.set(' ');
-                 }
+             checkbox.click(function(){
+                 self.attributes.set('value', checkbox.is(":checked"));
+                 request(self.attributes, true);
              });
 
-             return table;
+             return $("<table/>").css("display","inline").append(tbody).get(0);
          }
 
      },
-     function(method, attributes, savedMessage) {
-         this.savedMessage = savedMessage;
-         this.ready = new WatchValue();
-         this.ready.set(false);
-         this.source = indicoSource(method, attributes);
-     });
-
-type("SwitchOptionButton", ["InlineRemoteWidgetForOptionButton"],
-     {
-         error: function(error) {
-             this.checkbox.set(true);
-             new AlertPopup($T("Error"), error.message).open();
-         },
-
-         drawContent: function() {
-             return Html.div({},
-                             this.checkbox,
-                             this.caption);
-
-         }
-     },
-     function(method, attributes, caption, messageId, showSavedMessage) {
-         this.InlineRemoteWidgetForOptionButton(method, attributes, showSavedMessage);
+     function(method, attributes, caption, savedMessage, initState, disabled) {
+         this.method = method;
+         this.attributes = $O(attributes);
          this.caption = caption;
-         this.checkbox = Html.checkbox({style:{verticalAlign:"middle"}});
-         this.messageId = messageId;
-
-         $B(this.checkbox, this.source);
+         this.savedMessage = savedMessage;
+         this.initState = initState;
+         this.disabled = disabled;
      });
 
 

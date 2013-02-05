@@ -135,7 +135,7 @@
 <script type="text/javascript">
 
 $(function() {
-    $("#inPlaceEditNotifyElectronicAgreement").append($(new SwitchOptionButton("collaboration.toggleNotifyElectronicAgreementAnswer",{confId:${conf.getId()}}, $T("Notify managers when Electronic Agreement is accepted/rejected"), "message", null).draw().dom));
+    $("#inPlaceEditNotifyElectronicAgreement").append($(new SwitchOptionButton("collaboration.toggleNotifyElectronicAgreementAnswer",{confId:${conf.getId()}}, $T("Notify managers when Electronic Agreement is accepted/rejected"),$T("Saved"), ${notifyElectronicAgreementAnswer | n,j} , ${not canModify | n,j}).draw()));
 
     $('.speakerLine input').change(function() {
         if (this.checked) {
@@ -194,7 +194,6 @@ $(function() {
                 '</li></ul>'
         );
     });
-
 });
 
 </script>

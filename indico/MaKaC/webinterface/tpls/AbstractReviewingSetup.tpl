@@ -78,6 +78,6 @@ $('#inPlaceEditScale').html(new ScaleEditWidget('abstractReviewing.questions.cha
 
 
 
-$('#inPlaceAllowAccept').html(new SwitchOptionButton('abstractReviewing.settings.changeReviewerRights', {conference: '${ abstractReview.getConference().getId() }'}, $T("Allow reviewers to accept/reject abstracts"), "aaaa", $T("Saved")).draw().dom);
+$('#inPlaceAllowAccept').html(new SwitchOptionButton('abstractReviewing.settings.changeReviewerRights', {conference: '${ abstractReview.getConference().getId() }'}, $T("Allow reviewers to accept/reject abstracts"), $T("Saved"), null, false).draw());
 
 </script>
