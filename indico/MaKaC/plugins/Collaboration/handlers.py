@@ -31,17 +31,17 @@ from indico.util import json
 from indico.web.rh import RHHtdocs
 from MaKaC.webinterface.rh.collaboration import RHConfModifCSBookings
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.plugins import Collaboration
-from MaKaC.plugins.Collaboration.pages import *
-from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
+from MaKaC.plugins.Collaboration.pages import WPElectronicAgreement, WPElectronicAgreementForm, WPElectronicAgreementFormConference
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.errors import MaKaCError
 from MaKaC.conference import LocalFile
-import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.webinterface.urlHandlers import URLHandler
 from MaKaC.common.logger import Logger
-
+from MaKaC.common import Config
 
 class RHElectronicAgreement(RHConfModifCSBookings):
     _url = r'^/Collaboration/elecAgree/?$'
@@ -52,7 +52,18 @@ class RHElectronicAgreement(RHConfModifCSBookings):
         self.sortCriteria = params.get('sortBy', 'speaker')
         self.order = params.get('order', 'down')
 
-        #If this is an upload
+    def _process(self):
+        if self._cannotViewTab:
+            raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
+        else:
+            p = WPElectronicAgreement(self, self._conf)
+            return p.display(sortCriteria = self.sortCriteria, order = self.order)
+
+class RHUploadElectronicAgreement(RHConferenceModifBase):
+    _url = r'^/Collaboration/uploadElecAgree/?$'
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
         self.spkUniqueId = params.get('spkUniqueId', None)
         self.file = params.get('file', None)
         self.filePath = ''
@@ -100,17 +111,10 @@ class RHElectronicAgreement(RHConfModifCSBookings):
             Logger.get('file_upload').exception("Error uploading file")
             raise MaKaCError("Unexpected error while uploading file")
 
-
     def _process(self):
         if self.spkUniqueId and self.file:
             self.uploadProcess()
             return json.dumps({'status': 'OK'}, textarea=True)
-
-        if self._cannotViewTab:
-            raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
-        else:
-            p = WPElectronicAgreement(self, self._conf)
-            return p.display(sortCriteria = self.sortCriteria, order = self.order)
 
 class RHElectronicAgreementGetFile(RHConfModifCSBookings):
     _url = r'^/Collaboration/getPaperAgree/?$'

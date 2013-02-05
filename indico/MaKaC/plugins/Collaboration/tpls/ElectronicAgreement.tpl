@@ -108,7 +108,7 @@
                 <td>
                     <tbody id="items">
                       % for spkId, spkName, status, contribId, reqType, enabled in contributions:
-                          <%include file="ElectronicAgreementItems.tpl" args="spkId=spkId,spkName=spkName,status=status,contribId=contribId,reqType=reqType,enabled=enabled"/>
+                          <%include file="ElectronicAgreementItems.tpl" args="spkId=spkId, spkName=spkName, status=status, contribId=contribId, reqType=reqType, enabled=enabled, canModify=canModify"/>
                       % endfor
                     </tbody>
                 </td>
@@ -194,6 +194,7 @@ $(function() {
                 '</li></ul>'
         );
     });
+    $('span.noUploadRights').qtip({content: $T("You do not have access to upload the Electronic Agreement"), position: {my: 'top middle', at: 'bottom middle'}});
 });
 
 </script>

@@ -29,6 +29,12 @@ class UHCollaborationElectronicAgreement(URLHandler):
     """
     _relativeURL = "Collaboration/elecAgree"
 
+class UHCollaborationUploadElectronicAgreement(URLHandler):
+    """
+    URL handler for Electronic Agreement to upload the Agreement
+    """
+    _relativeURL = "Collaboration/uploadElecAgree"
+
 class UHCollaborationElectronicAgreementGetFile(URLHandler):
     """
     URL handler for Electronic Agreement Manager to get Paper
