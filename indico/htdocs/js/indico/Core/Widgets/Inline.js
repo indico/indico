@@ -496,6 +496,8 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
                                  function(item) {
                                      if ($.isArray(item)) {
                                          item = new WatchPair(item[0], item[1]);
+                                     } else {
+                                         item = new WatchPair(item, item);
                                      }
                                      return self._drawItem(item);
                                  });
@@ -534,9 +536,12 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
          }
 
      },
-     function(method, args, callback, name, noOptionsText) {
+     function(method, args, callback, name, noOptionsText, defaultSelected) {
          this.select = Html.select({'name':name});
          this.selected = new WatchValue();
+         if(defaultSelected !== undefined){
+             this.set(defaultSelected);
+         }
          this.noOptionsText = any(noOptionsText,$T("No options"));
          // Load data source on startup
          this.InlineRemoteWidget(method, args, true, callback);

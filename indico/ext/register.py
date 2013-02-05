@@ -19,58 +19,44 @@
 
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
-from MaKaC.plugins.base import extension_point
-from indico.ext.register import Register
 
-class SearchRegister(Register):
+class Register(object):
     """
     This register acts as both a wrapper against the legacy PluginsHolder
     and a quick-access object for injecting tracking codes etc into the
     extension points of Indico.
     """
 
-    def _buildRegister(self):
-        """
-        Static mapping attributes for plugin implementations in register.
-        Append lines to add further implementations.
-        """
-        self._registeredImplementations =  dict((key, value) for (key, value) in extension_point("getPluginImplementation"))
+    def __init__(self):
+        self._registeredImplementations = {}
+        self._buildRegister()
 
-    def getAllPlugins(self, activeOnly=False):
-        """
-        Returns a list of all plugin class registered, By default
-        this method only returns active implementations, however all implementations
-        may be returned by setting activeOnly to True.
-        """
-        result = []
-        if activeOnly:
-            result = list(p for p in self._getRegister().values() if p().isActive())
-        else:
-            result = self._getRegister().values()
+    def _getRegister(self):
+        return self._registeredImplementations
 
-        return result
+    def _reInit(self):
+        """
+        Reinitialises the register, removes the saved attributes from the DB
+        instance and reinstantiates based on those defined in _buildRegister()
+        """
+        self.clearAll()
+        self._buildRegister()
 
-    def _getPluginByName(self, plugin):
+    def hasActivePlugins(self):
         """
-        Returns an individual plugin from the register by name of class,
-        returns an instantiated method if instantiate set to True.
+        Returns True only if any implementations are active in the PluginsHolder
         """
-        if plugin in self._getRegister():
-            return self._getRegister()[plugin]
-        else:
-            return None
 
-    def getDefaultSearchEngineAgent(self):
-        """
-        Returns an individual plugin from the register by name of class,
-        """
-        return self._getPluginByName(SearchConfig().getDefaultSearchEngineAgent())
+        activePlugins = list(p for p in self.getAllPlugins(True) if p.isActive())
 
-    def getDefaultSearchEngineAgentName(self):
+        # The resultant activePlugins is only True if there are any plugins.
+        return bool(activePlugins)
+
+    def getAllPluginNames(self):
         """
-        Returns an individual plugin from the register by name of class,
+        Returns a list of all the plugin names (Strings).
         """
-        return SearchConfig().getDefaultSearchEngineAgent()
+        return self._getRegister().keys()
 
 class SearchConfig(object):
     """

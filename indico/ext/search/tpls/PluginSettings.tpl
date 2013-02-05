@@ -28,5 +28,5 @@
             req.state.observe(checkState());
         });
     };
-    var languageSelector = new SelectRemoteWidget("search.getSEAList",{},langCallback);
+    var languageSelector = new SelectRemoteWidget("search.getSEAList",{},langCallback, "searchAgent", $T("No search agents active"), ${defaultSearchEngine | n,j});
 </script>

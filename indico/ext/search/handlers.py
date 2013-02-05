@@ -40,11 +40,7 @@ class SetDefaultSearchEngineAgent(TextModificationBase, AdminService):
 class GetSearchEngineAgentList(AdminService):
 
     def _getAnswer(self):
-        default = SearchConfig().getDefaultSearchEngineAgent()
-        agentList = [agent for agent in SearchConfig().getSearchEngineAgentList() if agent!=default]
-        if default is not None:
-            agentList.insert(0, default)
-        return agentList
+        return SearchConfig().getSearchEngineAgentList()
 
 
 methodMap = {

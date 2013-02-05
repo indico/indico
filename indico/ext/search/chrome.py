@@ -220,5 +220,8 @@ class WMiniSearchBox(WBaseSearchBox):
         WBaseSearchBox.__init__(self, targetId = confId)
 
 class WPluginSettings(WTemplated):
-    pass
+    def getVars(self):
+        vars = WTemplated.getVars( self )
+        vars["defaultSearchEngine"] = SearchRegister().getDefaultSearchEngineAgentName()
+        return vars
 

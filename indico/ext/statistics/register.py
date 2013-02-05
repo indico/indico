@@ -17,22 +17,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
+from indico.ext.register import Register
 
 
-class StatisticsRegister():
+class StatisticsRegister(Register):
     """
     This register acts as both a wrapper against the legacy PluginsHolder
     and a quick-access object for injecting tracking codes etc into the
     extension points of Indico.
     """
-
-    def __init__(self):
-        self._registeredImplementations = {}
-        self._buildRegister()
 
     def _buildRegister(self):
         """
@@ -42,34 +37,6 @@ class StatisticsRegister():
         from indico.ext.statistics.piwik.implementation import PiwikStatisticsImplementation
 
         self._registeredImplementations['Piwik'] = PiwikStatisticsImplementation
-
-    def _getPluginOSPath(self):
-        """
-        Returns the absolute OS path to this plugin, with ending slash included.
-        """
-        import indico.ext.statistics
-        return os.path.join(indico.ext.statistics.__path__)[0] + '/'
-
-    def _getRegister(self):
-        return self._registeredImplementations
-
-    def _reInit(self):
-        """
-        Reinitialises the register, removes the saved attributes from the DB
-        instance and reinstantiates based on those defined in _buildRegister()
-        """
-        self.clearAll()
-        self._buildRegister()
-
-    def hasActivePlugins(self):
-        """
-        Returns True only if any implementations are active in the PluginsHolder
-        """
-
-        activePlugins = list(p for p in self.getAllPlugins(True) if p.isActive())
-
-        # The resultant activePlugins is only True if there are any plugins.
-        return bool(activePlugins)
 
     def getAllPlugins(self, instantiate=True, activeOnly=False):
         """
@@ -95,11 +62,18 @@ class StatisticsRegister():
 
         return result
 
-    def getAllPluginNames(self):
+    def getPluginByName(self, plugin, instantiate=True):
         """
-        Returns a list of all the plugin names (Strings).
+        Returns an individual plugin from the register by name of class,
+        returns an instantiated method if instantiate set to True.
         """
-        return self._getRegister().keys()
+        if plugin in self._getRegister():
+            if not instantiate:
+                return self._getRegister()[plugin]
+            else:
+                return self._getRegister()[plugin]()
+        else:
+            return None
 
     def getAllPluginJSHooks(self, extra=None, includeInactive=False):
         """
@@ -160,20 +134,6 @@ class StatisticsRegister():
         """
         filename = 'StatisticsHookInjection.tpl'
         return "/statistics/" + filename
-
-    def getPluginByName(self, plugin, instantiate=True):
-        """
-        Returns an individual plugin from the register by name of class,
-        returns an instantiated method if instantiate set to True.
-        """
-        if plugin in self._getRegister():
-            if not instantiate:
-                return self._getRegister()[plugin]
-            else:
-                return self._getRegister()[plugin]()
-        else:
-            return None
-
 
 class StatisticsConfig(object):
     """
