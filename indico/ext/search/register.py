@@ -36,35 +36,11 @@ class SearchRegister(Register):
         """
         self._registeredImplementations =  dict((key, value) for (key, value) in extension_point("getPluginImplementation"))
 
-    def getAllPlugins(self, activeOnly=False):
-        """
-        Returns a list of all plugin class registered, By default
-        this method only returns active implementations, however all implementations
-        may be returned by setting activeOnly to True.
-        """
-        result = []
-        if activeOnly:
-            result = list(p for p in self._getRegister().values() if p().isActive())
-        else:
-            result = self._getRegister().values()
-
-        return result
-
-    def _getPluginByName(self, plugin):
-        """
-        Returns an individual plugin from the register by name of class,
-        returns an instantiated method if instantiate set to True.
-        """
-        if plugin in self._getRegister():
-            return self._getRegister()[plugin]
-        else:
-            return None
-
     def getDefaultSearchEngineAgent(self):
         """
         Returns an individual plugin from the register by name of class,
         """
-        return self._getPluginByName(SearchConfig().getDefaultSearchEngineAgent())
+        return self.getPluginByName(SearchConfig().getDefaultSearchEngineAgent(), instantiate=False)
 
     def getDefaultSearchEngineAgentName(self):
         """

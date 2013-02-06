@@ -38,43 +38,6 @@ class StatisticsRegister(Register):
 
         self._registeredImplementations['Piwik'] = PiwikStatisticsImplementation
 
-    def getAllPlugins(self, instantiate=True, activeOnly=False):
-        """
-        Returns a list of all plugin class registered, if instantiate is
-        True, instates all objects before appending to the list. By default
-        this method only returns active implementations, however all implementations
-        may be returned by setting activeOnly to True.
-        """
-        result = []
-
-        if instantiate:
-            for plugin in self._getRegister().values():
-
-                if activeOnly and not plugin().isActive():
-                    continue
-
-                result.append(plugin())
-        else:
-            if activeOnly:
-                result = list(p for p in self._getRegister().values() if p().isActive())
-            else:
-                result = self._getRegister().values()
-
-        return result
-
-    def getPluginByName(self, plugin, instantiate=True):
-        """
-        Returns an individual plugin from the register by name of class,
-        returns an instantiated method if instantiate set to True.
-        """
-        if plugin in self._getRegister():
-            if not instantiate:
-                return self._getRegister()[plugin]
-            else:
-                return self._getRegister()[plugin]()
-        else:
-            return None
-
     def getAllPluginJSHooks(self, extra=None, includeInactive=False):
         """
         Returns a list of JSHook objects which contain the parameters
@@ -84,7 +47,7 @@ class StatisticsRegister(Register):
         """
         hooks = []
 
-        for plugin in self.getAllPlugins(True):
+        for plugin in self.getAllPlugins():
 
             if (not includeInactive and not plugin.isActive()) \
                 or not plugin.hasJSHook():
@@ -106,7 +69,7 @@ class StatisticsRegister(Register):
         """
         listeners = []
 
-        for plugin in self.getAllPlugins(True):
+        for plugin in self.getAllPlugins():
 
             if plugin.hasDownloadListener():
                 listeners.append(plugin)
@@ -120,7 +83,7 @@ class StatisticsRegister(Register):
         """
         paths = []
 
-        for plugin in self.getAllPlugins(True):
+        for plugin in self.getAllPlugins():
 
             if plugin.hasJSHook():
                 paths.append(plugin.getJSHookPath())

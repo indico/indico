@@ -17,9 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common.logger import Logger
-from MaKaC.plugins.base import PluginsHolder
-
 class Register(object):
     """
     This register acts as both a wrapper against the legacy PluginsHolder
@@ -42,56 +39,52 @@ class Register(object):
         self.clearAll()
         self._buildRegister()
 
+    def getAllPlugins(self, instantiate=True, activeOnly=False):
+        """
+        Returns a list of all plugin class registered, if instantiate is
+        True, instates all objects before appending to the list. By default
+        this method only returns active implementations, however all implementations
+        may be returned by setting activeOnly to True.
+        """
+        result = []
+
+        if instantiate:
+            for plugin in self._getRegister().values():
+
+                if activeOnly and not plugin().isActive():
+                    continue
+
+                result.append(plugin())
+        else:
+            if activeOnly:
+                result = list(p for p in self._getRegister().values() if p().isActive())
+            else:
+                result = self._getRegister().values()
+
+        return result
+
+    def getPluginByName(self, plugin, instantiate=True):
+        """
+        Returns an individual plugin from the register by name of class,
+        returns an instantiated method if instantiate set to True.
+        """
+        if plugin in self._getRegister():
+            if not instantiate:
+                return self._getRegister()[plugin]
+            else:
+                return self._getRegister()[plugin]()
+        else:
+            return None
+
     def hasActivePlugins(self):
         """
         Returns True only if any implementations are active in the PluginsHolder
         """
-
-        activePlugins = list(p for p in self.getAllPlugins(True) if p.isActive())
-
         # The resultant activePlugins is only True if there are any plugins.
-        return bool(activePlugins)
+        return bool(self.getAllPlugins(False, True))
 
     def getAllPluginNames(self):
         """
         Returns a list of all the plugin names (Strings).
         """
         return self._getRegister().keys()
-
-class SearchConfig(object):
-    """
-    The current overall configuration of the plugin, wrapper around global
-    options in PluginsHolder / plugin administration.
-    """
-
-    def setDefaultSearchEngineAgent(self, value):
-        """
-        Sets the default Search Engine Agent of the plugin
-        """
-        searchPlugin = PluginsHolder().getPluginType('search')
-        searchPlugin.getOptions()['defaultSearch'].setValue(value)
-
-    def getDefaultSearchEngineAgent(self):
-        """
-        Returns the default Search Engine Agent of the plugin
-        """
-        searchPlugin = PluginsHolder().getPluginType('search')
-        return searchPlugin.getOptions()['defaultSearch'].getValue()
-
-    def getSearchEngineAgentList(self):
-        """
-        Returns the default Search Engine Agent of the plugin
-        """
-        searchPlugin = PluginsHolder().getPluginType('search')
-        return searchPlugin.getPlugins().keys()
-
-    def getLogger(self, extraName=None):
-        """
-        Returns a Logger object for Statistics as a whole or per plugin.
-        """
-        logName = 'ext.search'
-
-        if extraName:
-            logName += '.' + extraName
-
-        return Logger.get(logName)
