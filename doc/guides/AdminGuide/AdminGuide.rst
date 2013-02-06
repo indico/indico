@@ -274,7 +274,7 @@ The plugins area is accessible from the *Plugins* menu.
 From here you are able to:
 
 -
-   Load the plugin types that are installed in the disk. This can be done
+   Load the plugin types that are installed within Indico. This can be done
    manually by clicking in *Reload the plugins manually* button or
    automatically when you enter in the page by activating the checkbox
    *Reload all plugins every time you open*.
@@ -288,15 +288,19 @@ From here you are able to:
 Search plugin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to search content through Indico this plugin has been implemented.
-Here you can activate the different search engine adapters and choose the one to use
-by default if there are more than one active.
+This plugin allows to choose which search engine to use in order to perfom a search action in Indico.
+From here you can activate the different search engine adapters and choose the one to use
+by default, if there are more than one.
 
 Currently, the only search engine plugin is developed for *Invenio*. You need
-to setup the server of the search engine and select the mode, that can be redirect to
-the server or calling to the server API getting private or public content only.
+to setup the Invenio server and select the mode:
 
-You also will need to activate the corresponding Livesync plugin in `Livesync plugin <#livesync-plugin>`_.
+* redirection to the search engine web server
+* fetching, only PUBLIC, results from the search engine server and rendering them using Indico UI
+* fetching, PUBLIC and PRIVATE, results from the search engine server and rendering them using Indico UI
+
+You will also need to activate the corresponding Livesync plugin in `Livesync plugin <#livesync-plugin>`_ in order to
+keep up-to-date the indexes and contents in the Search Engine Server.
 
 |image13|
 
@@ -311,7 +315,7 @@ Administration scripts
 Recover Administration Account
 ----------------------------------
 
-*indico_admin* script allows you to recover administrator account.
+*indico_admin* script allows you to recover any administrator account.
 It can:
 
 * grant administrator privileges to any existing user (by user id)
