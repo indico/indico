@@ -796,7 +796,6 @@ class ReservationBase( Fossilizable ):
                         else:
                             # Collect collisions
                             collisions.append( Collision( overlap( candidatePeriod, colliderPeriod ), resv ) )
-
         return collisions
 
     def getNextRepeating( self, afterDT = None ):

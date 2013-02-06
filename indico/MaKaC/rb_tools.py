@@ -21,6 +21,10 @@
 Small functions and classes widely used in Room Booking Module.
 """
 
+import time
+from datetime import datetime, timedelta
+
+
 class FormMode( object ):
     """
     Used to distinguish between insert and edit mode for the form.
@@ -160,18 +164,9 @@ def doesPeriodsOverlap( *args, **kwargs ):
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
 def __doesPeriodsOverlap( startDT1, endDT1, startDT2, endDT2 ):
-    # Dates must overlap
-    if endDT1.date() < startDT2.date() or endDT2.date() < startDT1.date():
+    if endDT1 <= startDT2 or endDT2 <= startDT1:
         return False
-
-    # Times must overlap
-    if endDT1.time() <= startDT2.time() or endDT2.time() <= startDT1.time():
-        return False
-
     return True
-
-
-from datetime import datetime, timedelta, date
 
 def overlap( *args, **kwargs ):
     """
@@ -271,10 +266,6 @@ def checkPresence( self, errors, attrName, type ):
         errors.append( attrName + ' has invalid type' )
     return None
 
-
-import time
-from datetime import timedelta
-
 def toUTC( localNaiveDT ):
     """
     Converts naive (timezone-less) datetime to UTC.
@@ -304,6 +295,12 @@ def formatDate(date):
 def formatDateTime(date):
     # Convert the date to the Indico "de facto" standard
     return date.strftime("%a %d/%m/%Y %H:%M")
+
+def datespan(startDate, endDate, delta=timedelta(days=1)):
+    currentDate = startDate
+    while currentDate <= endDate:
+        yield currentDate
+        currentDate += delta
 
 def dateAdvanceAllowed(date, days):
     from MaKaC.common.timezoneUtils import nowutc, dayDifference, naive2local
@@ -374,20 +371,6 @@ class Test:
             datetime( 2006, 9, 23, 13 ),
             datetime( 2006, 9, 24, 17 ) )
         print sdt, edt
-
-def formatDate(date):
-    # Convert the date to the Indico "de facto" standard
-    return date.strftime("%a %d/%m/%Y")
-
-def formatDateTime(date):
-    # Convert the date to the Indico "de facto" standard
-    return date.strftime("%a %d/%m/%Y %H:%M")
-
-def datespan(startDate, endDate, delta=timedelta(days=1)):
-    currentDate = startDate
-    while currentDate <= endDate:
-        yield currentDate
-        currentDate += delta
 
 
 if __name__ == "__main__":
