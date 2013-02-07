@@ -531,7 +531,7 @@ class PDFBase:
                     startHeight = startHeight - inch / 2 - height
 
                     # draw horizontally centered, with recalculated width and height
-                    c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height)
+                    c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
                     return startHeight
                 except IOError:
                     if drawTitle:

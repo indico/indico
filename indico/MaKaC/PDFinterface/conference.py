@@ -3097,8 +3097,8 @@ class LectureToPosterPDF:
                 y_1 = posy + (posterHeight - self.__posterTemplate.pixelsToCm(imgHeight))/2.0
 
         self.__canvas.drawImage(file,
-             x_1 * cm, y_1 * cm,
-             width * cm, height * cm)
+                                x_1 * cm, y_1 * cm,
+                                width * cm, height * cm)
 
 
     def __draw_poster(self, posx, posy):
