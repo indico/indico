@@ -1114,17 +1114,13 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
                 var menuItems = {};
 
-                menuItems["blockTimetable"] = { action: function() {
-                    self.managementActions.switchToIntervalTimetable(self.eventData.id);
-                    self.close();
-                }, display: $T('Block timetable')};
                 menuItems["blockProperties"] = { action: function() {
                     self.managementActions.editSessionSlot(self.eventData);
                     self.close();
-                }, display: $T('Block properties')};
+                }, display: $T('Basic edition')};
                 if (!self.managementActions.isSessionTimetable) {
-                    menuItems["sessionProperties"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Session properties')};
-                    menuItems["sessionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Session protection')};
+                    menuItems["sessionProperties"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Full session edition')};
+                    menuItems["sessionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Edit protection')};
                 }
 
                 editLink.observeClick(function() {
