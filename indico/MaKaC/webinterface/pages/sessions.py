@@ -238,17 +238,6 @@ class WPSessionModifBase( WPConferenceModifBase ):
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
 
-
-class WSessionModifClosed(wcomponents.WTemplated):
-
-    def __init__(self):
-        pass
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["closedIconURL"] = Config.getInstance().getSystemIconURL("closed")
-        return vars
-
 class WSessionModifMainType(wcomponents.WTemplated):
 
     def __init__(self):
@@ -351,8 +340,13 @@ class WPSessionModificationClosed( WPSessionModifBase ):
         self._setActiveTab()
 
     def _getTabContent( self, params ):
-        comp=WSessionModifClosed()
-        return comp.getHTML()
+        message = _("The session is currently locked and you cannot modify it in this status. ")
+        if self._session.getConference().canModify(self._rh.getAW()):
+            message += _("If you unlock the session, you will be able to modify its details again.")
+        return wcomponents.WClosed().getHTML({"message": message,
+                                             "postURL": urlHandlers.UHSessionOpen.getURL(self._session),
+                                             "showUnlockButton": self._session.getConference().canModify(self._rh.getAW()),
+                                             "unlockButtonCaption": _("Unlock session")})
 
 #------------------------------------------------------------------------------------
 
@@ -651,17 +645,7 @@ class WPSessionModifAC( WPSessionModifBase ):
         return comp.getHTML()
 
 class WSessionModifTools(wcomponents.WTemplated):
-
-    def __init__( self, session ):
-        self.__session = session
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
-        vars["writeIconURL"] = Config.getInstance().getSystemIconURL("write_minutes")
-        vars["closeIconURL"] = Config.getInstance().getSystemIconURL("closeIcon")
-        vars["closeURL"] = urlHandlers.UHSessionClose.getURL(self.__session)
-        return vars
+    pass
 
 
 class WPSessionModifComm( WPSessionModifBase ):
@@ -696,12 +680,25 @@ class WPSessionModifTools( WPSessionModifBase ):
         self._tabTools.setActive()
 
     def _getTabContent( self, params ):
-        comp = WSessionModifTools( self._session )
-        pars = {
-"deleteSessionURL": urlHandlers.UHSessionDeletion.getURL( self._session ) \
-               }
-        return comp.getHTML( pars )
+        return WSessionModifTools().getHTML( { "deleteSessionURL": urlHandlers.UHSessionDeletion.getURL(self._session),
+                                              "lockSessionURL": urlHandlers.UHSessionClose.getURL(self._session)} )
 
+class WPSessionClosing(WPSessionModifTools):
+
+    def _getTabContent(self, params):
+        msg = {'challenge': _("Are you sure that you want to lock this session?"),
+               'target': self._session.getTitle(),
+               'subtext': _("Note that if you lock this session, you will not be able to change its details any more. "
+                "Only the creator of the event or an administrator of the system / category can unlock a session."),
+               }
+
+        wc = wcomponents.WConfirmation()
+        return wc.getHTML(msg,
+                          urlHandlers.UHSessionClose.getURL(self._session),
+                          {},
+                          severity="warning",
+                          confirmButtonCaption=_("Yes, lock this session"),
+                          cancelButtonCaption=_("No"))
 
 class WPSessionDeletion( WPSessionModifTools ):
 
@@ -717,6 +714,7 @@ class WPSessionDeletion( WPSessionModifTools ):
         return wc.getHTML(msg,
                           urlHandlers.UHSessionDeletion.getURL( self._session ),
                           {},
+                          severity="danger",
                           confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No"))
 
 class WSessionModContribList(wcomponents.WTemplated):

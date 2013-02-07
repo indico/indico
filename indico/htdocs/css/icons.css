@@ -161,3 +161,12 @@
 .icon-settings:before {
 	content: "\33";
 }
+.icon-locked:before {
+    content: "\21";
+}
+.icon-unlocked:before {
+    content: "\23";
+}
+.icon-remove:before {
+    content: "\22";
+}

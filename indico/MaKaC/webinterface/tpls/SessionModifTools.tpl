@@ -1,15 +1,17 @@
-<table align="center" width="100%" class="toolsTab"><tr><td>
-<table align="center">
-    <tr>
-        <td>
-            <a href="${ deleteSessionURL }"><img src="${ deleteIconURL }" alt="
-delete" border="0" align="middle"></a> <b> ${ _("Delete this session")}</b>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href=${ closeURL }><img src=${ closeIconURL } alt="close" border="0" style="vertical-align:middle"></a> <b> ${ _("Close this session")}</b>
-        </td>
-    </tr>
-</table>
-</td></tr></table>
+<div class="toolsContainer">
+    <div>
+        <a href="${deleteSessionURL}" class="bs-btn-icon">
+            <div  class="icon icon-remove icon-medium"></div>
+            <div>${_("Delete")}</div>
+        </a>
+        ${ _("Deleting this session all the items under it will also be deleted")}
+    </div>
+
+    <div style="margin-top:5px;">
+        <a href="${lockSessionURL}" class="bs-btn-icon">
+            <div  class="icon icon-locked icon-medium"></div>
+            <div>${_("Lock")}</div>
+        </a>
+        ${ _("Locking this session you will not be able to change its details any more")}
+    </div>
+</div>

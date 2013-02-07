@@ -1663,19 +1663,6 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
     def _setActiveTab(self):
         pass
 
-class WConfModifClosed(wcomponents.WTemplated):
-
-    def __init__(self):
-        pass
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["closedIconURL"] = Config.getInstance().getSystemIconURL("closed")
-        return vars
-
-
-        return vars
-
 class WConfModifMainData(wcomponents.WTemplated):
 
     def __init__(self,conference,mfRegistry,ct,rh):
@@ -1777,9 +1764,13 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
         WPConferenceModifBase.__init__(self, rh, target)
 
     def _getPageContent( self, params ):
-        wc = WConfModifClosed()
-        pars = { "type": params.get("type","") }
-        return wc.getHTML( pars )
+        message = _("The event is currently locked and you cannot modify it in this status. ")
+        if self._conf.canModify(self._rh.getAW()):
+            message += _("If you unlock the event, you will be able to modify its details again.")
+        return wcomponents.WClosed().getHTML({"message": message,
+                                             "postURL": urlHandlers.UHConferenceOpen.getURL(self._conf),
+                                             "showUnlockButton": self._conf.canModify(self._rh.getAW()),
+                                             "unlockButtonCaption": _("Unlock event")})
 
 
 class WPConferenceModification( WPConferenceModifBase ):

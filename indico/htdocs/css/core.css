@@ -51,3 +51,17 @@ h2.page_title {
     border-left: 4px solid #ddd;
     font-family: Georgia, Times, Serif;
 }
+
+.icon-medium{
+    font-size:3em;
+}
+
+.icon-large{
+    font-size:5em;
+}
+
+.icon-background {
+    font-size: 10em;
+    color: #EEE;
+    float: left;
+}

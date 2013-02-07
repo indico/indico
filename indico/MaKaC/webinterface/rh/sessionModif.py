@@ -348,9 +348,19 @@ class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
 class RHSessionClose( RHSessionModifBase ):
     _uh = urlHandlers.UHSessionClose
 
+    def _checkParams(self, params):
+        RHSessionModifBase._checkParams(self, params)
+        self._confirm = params.has_key("confirm")
+        self._cancel = params.has_key("cancel")
+
     def _process( self ):
-        self._target.setClosed(True)
-        self._redirect(urlHandlers.UHSessionModification.getURL(self._target))
+        if self._cancel:
+            self._redirect(urlHandlers.UHSessionModification.getURL(self._target))
+        elif self._confirm:
+            self._target.setClosed(True)
+            self._redirect(urlHandlers.UHSessionModification.getURL(self._target))
+        else:
+            return sessions.WPSessionClosing(self, self._target).display()
 
 class RHSessionOpen( RHSessionModifBase ):
     _uh = urlHandlers.UHSessionOpen

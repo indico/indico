@@ -1193,15 +1193,7 @@ class WContribModifHeader(WTemplated):
 
 
 class WContribModifTool(WTemplated):
-
-    def __init__( self, contrib ):
-        self._contrib = contrib
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["deleteIconURL"] = Configuration.Config.getInstance().getSystemIconURL("delete")
-        return vars
-
+    pass
 
 class WContributionDeletion(WTemplated):
 
@@ -2329,6 +2321,9 @@ class WDisplayConfirmation(WTemplated):
         params["cancelButtonCaption"] = opts.get("cancelButtonCaption", _("Cancel"))
         params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL("warning")
         return WTemplated.getHTML(self, params)
+
+class WClosed(WTemplated):
+    pass
 
 
 class SideMenu(object):
