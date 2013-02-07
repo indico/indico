@@ -52,6 +52,10 @@ Compatibility of GPLv3 with this library.
 qTip2 - Pretty powerful tooltips based on jQuery. Dual licensed under MIT or GPLv2 licenses.
 <http://craigsworks.com/projects/qtip2/>
 
+jQuery-ColorPicker is a colorpicker plugin for jQuery based in the original  developed by Stefan Petre. Dual
+licensed under MIT and GPLv3.
+<https://github.com/Belelros/jQuery-ColorPicker>
+
 Underscore is a utility-belt library for JavaScript that provides a lot of the functional programming support
 that you would expect in Prototype.js (or Ruby), but without extending any of the built-in JavaScript objects. Underscore is freely distributable under the MIT license.
 http://documentcloud.github.com/underscore/>

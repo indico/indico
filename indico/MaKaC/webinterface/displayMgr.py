@@ -1117,6 +1117,9 @@ class Format(Persistent):
             return color
         return None
 
+    def clearColorCode(self,key):
+        self.setColorCode(key, "")
+
 class TickerTape(Persistent):
 
     def __init__(self):

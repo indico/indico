@@ -363,15 +363,7 @@ class WPSessionDataModification(WPSessionModification):
         p=wcomponents.WSessionModEditData(self._session.getConference(),self._getAW(),title)
         params["postURL"]=urlHandlers.UHSessionDataModification.getURL(self._session)
         params["colorChartIcon"]=Config.getInstance().getSystemIconURL("colorchart")
-        urlbg=urlHandlers.UHSimpleColorChart.getURL()
-        urlbg.addParam("colorCodeTarget", "backgroundColor")
-        urlbg.addParam("colorPreviewTarget", "backgroundColorpreview")
-        params["bgcolorChartURL"]=urlbg
         params["bgcolor"] = self._session.getColor()
-        urltext=urlHandlers.UHSimpleColorChart.getURL()
-        urltext.addParam("colorCodeTarget", "textColor")
-        urltext.addParam("colorPreviewTarget", "textColorpreview")
-        params["textcolorChartURL"]=urltext
         params["textcolor"] = self._session.getTextColor()
         params["textColorToLinks"]=""
         if self._session.isTextColorToLinks():

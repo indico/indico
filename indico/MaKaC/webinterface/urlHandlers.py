@@ -225,9 +225,6 @@ class UHCalendarSelectCategories( URLHandler ):
 class UHSimpleCalendar( URLHandler ):
     _relativeURL = "calendarSelect.py"
 
-class UHSimpleColorChart( URLHandler ):
-    _relativeURL = "colorSelect.py"
-
 class UHConferenceCreation( URLHandler ):
     _relativeURL = "conferenceCreation.py"
     @classmethod

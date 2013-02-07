@@ -504,8 +504,8 @@ class WConfDisplayFrame(wcomponents.WTemplated):
 
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
         format = dm.getFormat()
-        vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
-        vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
+        vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"].replace("#","")
+        vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"].replace("#","")
 
         vars['searchBox']= ""
         vars["confId"] = self._conf.getId()
@@ -4208,17 +4208,10 @@ class WFormatColorOptionModif(wcomponents.WTemplated):
         urlChangeColor = value["url"].getURL(self._conf)
         urlChangeColor.addParam("formatOption",self._formatOption)
 
-        vars["changeColorURL"] = quoteattr(str(urlChangeColor))
+        vars["changeColorURL"] = str(urlChangeColor)
         vars["colorCode"] = value["code"]
         vars["formatOption"] = self._formatOption
-        vars["colorChartIcon"] = Config.getInstance().getSystemIconURL("colorchart")
 
-        url=urlHandlers.UHSimpleColorChart.getURL()
-        url.addParam("colorCodeTarget", "colorCode")
-        url.addParam("colorPreviewTarget", "colorpreview")
-        url.addParam("formId", self._formatOption + "Form")
-
-        vars["colorChartURL"] = url
         return vars
 
 class ConfEditMenu:

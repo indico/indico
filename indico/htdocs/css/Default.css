@@ -5654,6 +5654,12 @@ td.timetablePopupContributionTitle{
     -webkit-box-shadow: 2px 2px 2px #444;
 }
 
+.colorField  {
+    margin-right: 5px;
+    width: 100px;
+    float: left;
+}
+
 .colorPicker .custom {
     margin: 5px;
     margin-bottom: 10px;
@@ -5661,40 +5667,51 @@ td.timetablePopupContributionTitle{
     border-top: 1px dotted #555;
 }
 
-.colorPicker .inputWrapper {
+.colorPicker .inputWrapper, .colorField .inputWrapper {
     position: relative;
+}
+
+.colorPicker .inputWrapper {
     padding-right: 20px;
 }
 
-.colorPicker .inputContainer {
+.colorPicker .inputContainer, .colorField .inputContainer {
     border: 1px solid #777;
     margin: 2px 0 2px 7px;
     position: relativ;
-
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     border-radius: 2px;
 }
 
-.colorPicker .numberSign {
+.colorPicker .numberSign, .colorField .numberSign {
     font-size: 12px;
     max-width: 12px;
     overflow: hidden;
     color: #777;
-    position: absolute;
     left: 10px;
     top: 1px;
     cursor: default;
 }
+.colorPicker .numberSign {
+    position: absolute;
+}
 
-.colorPicker input {
+.colorField .numberSign {
+    padding-left: 2px;
+    display: inline;
+}
+
+.colorPicker input, .colorField input {
     width: 55px;
-    margin-left: 15px;
     border: none;
     font-size: 11px;
     background: transparent;
 }
 
+.colorPicker input {
+    margin-left: 15px;
+}
 .colorPicker button {
     font-size: 11px;
     margin-top: 5px;
@@ -5706,11 +5723,10 @@ td.timetablePopupContributionTitle{
     font-family: Verdana;
 }
 
-.colorPicker .block, .colorPicker .previewBlock {
+.colorPicker .block, .colorPicker .previewBlock, .colorField .previewBlock {
     border: 1px solid #AAA;
     text-align: center;
     overflow: hidden;
-
     -moz-border-radius: 2px;
     -webkit-border-radius:2px;
     border-radius: 2px;
@@ -5722,6 +5738,14 @@ td.timetablePopupContributionTitle{
     right: 0;
     width: 16px;
     height: 16px;
+}
+
+.colorField .previewBlock {
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    float: left;
 }
 
 .colorPicker .block {

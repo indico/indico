@@ -1670,3 +1670,59 @@ type("ErrorAware", [],
      },
      function() {
      });
+
+type("ColorPickerWidget", [],
+        {
+            draw: function(content) {
+                var self = this;
+                var container = $("<div class='inputWrapper'/>");
+                var inputContainer = $("<div class='inputContainer clearfix'/>");
+                var input = $("<input type='text' name='{0}' value='{1}'/>".format(this.inputName, this.initialColor));
+                var preview = $("<div class='previewBlock'/>").css("background-color", "#" + this.initialColor);
+                inputContainer.append(preview);
+                inputContainer.append($("<div class='numberSign'/>").html("#"));
+                inputContainer.append(input);
+                container.append(inputContainer);
+                var updateColorInput = function(color){
+                    $(preview).css('backgroundColor', '#' + color);
+                    self.colorChangedHandler(color);
+                };
+                $(container).ColorPicker({
+                    color: "ffffff",
+                    onSubmit: function(hsb, hex, rgb, el) {
+                            $(el).val(hex);
+                            updateColorInput(hex);
+                            self.colorChangedHandler(hex);
+                            $(el).ColorPickerHide();
+                    },
+                    onBeforeShow: function () {
+                            if($(input).val() != ""){
+                                $(this).ColorPickerSetColor($(input).val());
+                            }
+                    },
+                    onChange: function (hsb, hex, rgb) {
+                            $(input).val(hex);
+                            updateColorInput(hex);
+                    },
+                    onShow: function (colpkr) {
+                        $(colpkr).fadeIn(500);
+                        return false;
+                    },
+                    onHide: function (colpkr) {
+                        $(colpkr).fadeOut(500);
+                        return false;
+                    },
+                });
+
+                $(input).bind('keyup', function(){
+                        $(container).ColorPickerSetColor(this.value);
+                        updateColorInput(this.value);
+                });
+                return container;
+            },
+        },
+        function(inputName, initialColor, colorChangedHandler) {
+            this.inputName = inputName;
+            this.initialColor = initialColor;
+            this.colorChangedHandler = any(colorChangedHandler, function() {return true;});
+        });

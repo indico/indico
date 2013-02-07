@@ -2676,41 +2676,32 @@ class RHConfModifDisplayModifySystemData( RHConferenceModifBase ):
                 return p.display()
         self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
 
-class RHConfModifFormatTitleBgColor( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayUpLink
+class RHConfModifFormatTitleColorBase( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
         self._linkId = params.get("linkId", "")
         self._formatOption = params.get("formatOption", "")
         self._colorCode = params.get("colorCode", "")
+        self._apply =  params.has_key( "apply" )
+        self._remove =  params.has_key( "remove" )
 
     def _process( self ):
         format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
         if self._formatOption:
-            format.setColorCode(self._formatOption, self._colorCode)
+            if self._apply:
+                format.setColorCode(self._formatOption, "#" + self._colorCode)
+            elif self._remove:
+                format.clearColorCode(self._formatOption)
         redirecturl = urlHandlers.UHConfModifDisplayCustomization.getURL(self._conf)
         redirecturl.addParam("formatOption", self._formatOption)
         self._redirect("%s#colors"%redirecturl)
 
+class RHConfModifFormatTitleBgColor( RHConfModifFormatTitleColorBase ):
+    _uh = urlHandlers.UHConfModifFormatTitleBgColor
 
-class RHConfModifFormatTitleTextColor( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifDisplayUpLink
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._linkId = params.get("linkId", "")
-        self._formatOption = params.get("formatOption", "")
-        self._colorCode = params.get("colorCode", "")
-
-    def _process( self ):
-        format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
-        if self._formatOption:
-            format.setColorCode(self._formatOption, self._colorCode)
-        redirecturl = urlHandlers.UHConfModifDisplayCustomization.getURL(self._conf)
-        redirecturl.addParam("formatOption", self._formatOption)
-        self._redirect("%s#colors"%redirecturl)
-
+class RHConfModifFormatTitleTextColor( RHConfModifFormatTitleColorBase ):
+    _uh = urlHandlers.UHConfModifFormatTitleBgColor
 
 class RHConfSaveLogo( RHConferenceModifBase ):
 
