@@ -229,12 +229,12 @@ class ContributionProtectionRemoveUser(ContributionModifBase):
 class ContributionGetChildrenProtected(ContributionModifBase):
 
     def _getAnswer(self):
-        return fossilize(self._contribution.getAccessController().getChildrenProtected())
+        return fossilize(self._contribution.getAccessController().getProtectedChildren())
 
 class ContributionGetChildrenPublic(ContributionModifBase):
 
     def _getAnswer(self):
-        return fossilize(self._contribution.getAccessController().getChildrenPublic())
+        return fossilize(self._contribution.getAccessController().getPublicChildren())
 
 class ContributionParticipantsBase(ContributionModifBase):
 
@@ -902,8 +902,8 @@ methodMap = {
     "protection.getAllowedUsersList": ContributionProtectionUserList,
     "protection.addAllowedUsers": ContributionProtectionAddUsers,
     "protection.removeAllowedUser": ContributionProtectionRemoveUser,
-    "protection.getChildrenProtected": ContributionGetChildrenProtected,
-    "protection.getChildrenPublic": ContributionGetChildrenPublic,
+    "protection.getProtectedChildren": ContributionGetChildrenProtected,
+    "protection.getPublicChildren": ContributionGetChildrenPublic,
 
     "participants.addNewParticipant": ContributionAddNewParticipant,
     "participants.addExistingParticipant": ContributionAddExistingParticipant,

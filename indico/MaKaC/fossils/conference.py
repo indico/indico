@@ -132,7 +132,7 @@ class IResourceMinimalFossil(IFossil):
 
     def getProtectionURL(self):
         """ Resource protection URL """
-    getProtectionURL.produce = lambda s: s.getOwner().getProtectionURL()
+    getProtectionURL.produce = lambda s: str(urlHandlers.UHMaterialModification.getURL(s.getOwner()))
 
 class ILinkMinimalFossil(IResourceMinimalFossil):
 
@@ -226,7 +226,9 @@ class IMaterialMinimalFossil(IFossil):
         """ The type of material"""
 
     def getProtectionURL(self):
-        pass
+        """ Material protection URL """
+    getProtectionURL.produce = lambda s: str(urlHandlers.UHMaterialModification.getURL(s))
+
 
 class IMaterialFossil(IMaterialMinimalFossil):
 
@@ -328,7 +330,8 @@ class ISessionFossil(IFossil):
     getLocator.name = 'url'
 
     def getProtectionURL(self):
-        pass
+        """Session protection URL"""
+    getProtectionURL.produce = lambda s: str(urlHandlers.UHSessionModifAC.getURL(s))
 
 class ISessionSlotFossil(IFossil):
 

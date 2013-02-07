@@ -8552,26 +8552,42 @@ div.informationUserList {
     padding: 8px 35px 8px 14px;
 }
 
-.noninherited_children_danger, .noninherited_children_warning {
+.noninheriting_children_danger, .noninheriting_children_warning {
     color: #777;
     font-size: 0.9em;
     margin: 5px 0 5px 0;
     padding: 10px;
-    max-width: 560px;
+    max-width: 440px;
     background-color: #eee;
+    overflow: auto;
 }
 
-.noninherited_children_danger i.icon-shield {
+.noninheriting_children_danger {
+	background-color: #ECDAD1;
+}
+
+.noninheriting_children_danger .icon-shield {
     vertical-align: middle;
     font-size: 2em;
     color: #991111;
+    float: left;
+    font-size: 1.7em;
+    margin-right: 0.3em;
 }
 
-.noninherited_children_warning i.icon-shield {
+.noninheriting_children_warning .icon-shield {
     vertical-align: middle;
     font-size: 2em;
     color: #ccbc00;
+    float: left;
+    font-size: 1.7em;
+    margin-right: 0.3em;
 }
+
+.noninheriting_children_danger .text, .noninheriting_children_warning .text  {
+    padding-left: 3em;
+}
+
 
 #privacy_status {
     border-bottom: 1px dotted #999;

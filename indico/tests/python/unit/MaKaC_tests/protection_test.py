@@ -120,22 +120,22 @@ class TestProtection(IndicoTestCase):
 
         self.assertEqual(self._session1.getAccessController().isFullyPublic(), False)
         self.assertEqual(self._conf.getAccessController().isFullyPublic(), False)
-        self.assertEqual(self._session1.getAccessController().getChildrenProtected(), [self._contrib2])
-        self.assertEqual(self._contrib1.getAccessController().getChildrenProtected(), [self._resource])
-        self.assertEqual(self._material.getAccessController().getChildrenProtected(), [self._resource])
-        self.assertEqual(set(self._conf.getAccessController().getChildrenProtected()), set([self._contrib2, self._session2, self._resource]))
+        self.assertEqual(self._session1.getAccessController().getProtectedChildren(), [self._contrib2])
+        self.assertEqual(self._contrib1.getAccessController().getProtectedChildren(), [self._resource])
+        self.assertEqual(self._material.getAccessController().getProtectedChildren(), [self._resource])
+        self.assertEqual(set(self._conf.getAccessController().getProtectedChildren()), set([self._contrib2, self._session2, self._resource]))
 
         self._contrib1.removeMaterial(self._material)
 
         self.assertEqual(self._contrib1.getAccessController().isFullyPublic(), True)
-        self.assertEqual(self._material.getAccessController().getChildrenProtected(), [])
-        self.assertEqual(set(self._conf.getAccessController().getChildrenProtected()), set([self._contrib2, self._session2]))
+        self.assertEqual(self._material.getAccessController().getProtectedChildren(), [])
+        self.assertEqual(set(self._conf.getAccessController().getProtectedChildren()), set([self._contrib2, self._session2]))
 
         self._conf.removeContribution(self._contrib2)
 
         self.assertEqual(self._session1.getAccessController().isFullyPublic(), True)
-        self.assertEqual(self._session1.getAccessController().getChildrenProtected(), [])
-        self.assertEqual(self._conf.getAccessController().getChildrenProtected(), [self._session2])
+        self.assertEqual(self._session1.getAccessController().getProtectedChildren(), [])
+        self.assertEqual(self._conf.getAccessController().getProtectedChildren(), [self._session2])
 
     @with_context('database')
     def testPublicInPrivate(self):
@@ -146,21 +146,21 @@ class TestProtection(IndicoTestCase):
 
         self.assertEqual(self._session1.getAccessController().isFullyPrivate(), False)
         self.assertEqual(self._conf.getAccessController().isFullyPrivate(), False)
-        self.assertEqual(self._session1.getAccessController().getChildrenPublic(), [self._contrib2])
-        self.assertEqual(self._contrib1.getAccessController().getChildrenPublic(), [self._resource])
-        self.assertEqual(self._material.getAccessController().getChildrenPublic(), [self._resource])
-        self.assertEqual(set(self._conf.getAccessController().getChildrenPublic()), set([self._contrib2, self._session2, self._resource]))
+        self.assertEqual(self._session1.getAccessController().getPublicChildren(), [self._contrib2])
+        self.assertEqual(self._contrib1.getAccessController().getPublicChildren(), [self._resource])
+        self.assertEqual(self._material.getAccessController().getPublicChildren(), [self._resource])
+        self.assertEqual(set(self._conf.getAccessController().getPublicChildren()), set([self._contrib2, self._session2, self._resource]))
 
         self._contrib1.removeMaterial(self._material)
 
         self.assertEqual(self._contrib1.getAccessController().isFullyPrivate(), True)
-        self.assertEqual(self._material.getAccessController().getChildrenPublic(), [])
-        self.assertEqual(set(self._conf.getAccessController().getChildrenPublic()), set([self._contrib2, self._session2]))
+        self.assertEqual(self._material.getAccessController().getPublicChildren(), [])
+        self.assertEqual(set(self._conf.getAccessController().getPublicChildren()), set([self._contrib2, self._session2]))
 
         self._conf.removeContribution(self._contrib2)
 
         self.assertEqual(self._session1.getAccessController().isFullyPrivate(), True)
-        self.assertEqual(self._session1.getAccessController().getChildrenPublic(), [])
-        self.assertEqual(self._conf.getAccessController().getChildrenPublic(), [self._session2])
+        self.assertEqual(self._session1.getAccessController().getPublicChildren(), [])
+        self.assertEqual(self._conf.getAccessController().getPublicChildren(), [self._session2])
 
 

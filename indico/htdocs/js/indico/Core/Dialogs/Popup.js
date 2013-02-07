@@ -954,9 +954,14 @@ type("ChildrenProtectionPopup", ["ExclusivePopup"], {
         each(this.elementList, function(element) {
             var className = (self.elementList.length.get() != self.elementList.indexOf(element) + 1)?"CRLabstractDataCell":"CRLLastDataCell";
             var row = $("<tr/>").css("color","#444444");
-            var link = $('<a/>').attr('href', element.protectionURL).html($T("Edit protection"))
-            row.append($("<td/>").addClass(className).css({"font-weight": "bold", "width": "15%"}).html(element._type));
-            row.append($("<td/>").addClass(className).css("width","50%").html(_.contains(["Link", "LocalFile"], element._type)?element.name:element.title));
+            var link = $('<a/>').attr('href', element.protectionURL).html($T("Edit protection"));
+
+            // If it is a LocalFile, rename it to File.
+            var type = "LocalFile" == element._type?$T("File"):element._type;
+            type = element.resources?$T("Material"):type;
+
+            row.append($("<td/>").addClass(className).css({"font-weight": "bold", "width": "15%"}).html(type));
+            row.append($("<td/>").addClass(className).css("width","50%").html(_.contains(["Link", "File"], type)?element.name:element.title));
             row.append($("<td/>").attr("nowrap", "nowrap").addClass(className).append(link));
             container.append(row);
         });

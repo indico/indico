@@ -7,6 +7,7 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
             'InSessionContribution': {'name':'contribution', 'paramsKey': 'contribId', 'parentName':'session'},
             'SubContribution': {'name':'contribution', 'paramsKey': 'contribId', 'parentName':'contribution'}
           }
+from MaKaC.conference import Category
 %>
 <tr>
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Current status")}</span></td>
@@ -34,36 +35,41 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
             % endif
         </div>
 
-        % if not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
-                <div class="noninherited_children_danger">
-                  <i class="icon-shield"></i>
-                  <span>
-                    ${_('Some parts of it are accesible only for authorized people. <a href="#" class="see_children" data-url="{0}.protection.getChildrenProtected" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
-                  </span>
-                </div>
-        % elif not target.getAccessController().isFullyPrivate() and (privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE')):
-                <div class="noninherited_children_danger">
-                  <i class="icon-shield"></i>
-                  <span>
-                    ${_('Some parts of it are accesible for everybody. <a href="#" class="see_children" data-url="{0}.protection.getChildrenPublic" data-type="Public">Which ones?</a>').format(termsDict[type]['name'])}
-                  </span>
-                </div>
-                % if len(target.getAccessController().getChildrenProtected()) > 0:
-                <div class="noninherited_children_warning">
-                  <i class="icon-shield"></i>
-                  <span>
-                    ${_('Some other parts are still protected but their protection has been redefined. <a href="#" class="see_children" data-url="{0}.protection.getChildrenProtected" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
-                  </span>
-                </div>
-                %endif
+        % if not isinstance(target, Category):
+            % if (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) and not target.getAccessController().isFullyPublic():
+                    <div class="noninheriting_children_danger">
+                      <span class="icon-shield"></span>
+                      <div class="text">
+                        ${_('Some parts of the event are accessible only by authorized people. <a href="#" class="see_children" data-url="{0}.protection.getProtectedChildren" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
+                      </div>
+                    </div>
+            % elif (privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE')):
+                    % if len(target.getAccessController().getPublicChildren()) > 0:
+                    <div class="noninheriting_children_danger">
+                      <span class="icon-shield"></span>
+                      <div class="text">
+                        ${_('Some parts of the event are accessible by everybody. <a href="#" class="see_children" data-url="{0}.protection.getPublicChildren" data-type="Public">Which ones?</a>').format(termsDict[type]['name'])}
+                      </div>
+                    </div>
+                    %endif
+                    % if len(target.getAccessController().getProtectedChildren()) > 0:
+                    <div class="noninheriting_children_warning">
+                      <span class="icon-shield"></span>
+                      <div class="text">
+                        ${_('Some parts of the event are still protected but their protection has been redefined. <a href="#" class="see_children" data-url="{0}.protection.getProtectedChildren" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
+                      </div>
+                    </div>
+                    %endif
+            % endif
         % endif
 
-       % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
-       <div class="ACUserListDiv">
-           <div class="ACUserListWrapper" id="ACUserListWrapper">
-           </div>
-       </div>
-       % endif
+        % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
+        <h3 style="margin-top: 2em;">${_('Access control List')}</h3>
+        <div class="ACUserListDiv">
+            <div class="ACUserListWrapper" id="ACUserListWrapper">
+            </div>
+        </div>
+        % endif
     </td>
 </tr>
 % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
@@ -103,11 +109,11 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
 </tr>
 <script type="text/javascript">
 
-% if not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) \
-    or not target.getAccessController().isFullyPrivate() and (privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE')):
+% if not isinstance(target, Category) and (not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) \
+    or not target.getAccessController().isFullyPrivate() and (privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE'))):
     $(".see_children").click(function(){
         var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress($T("Getting children protected elements..."));
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching..."));
         jsonRpc(Indico.Urls.JsonRpcService, $(self).data("url") ,
                 {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
                 % if type != 'Event':
@@ -120,7 +126,7 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
                         IndicoUtil.errorReport(error);
                     } else {
                         killProgress();
-                        new ChildrenProtectionPopup($(self).data("type") + $T(" children list"), result).open();
+                        new ChildrenProtectionPopup($(self).data("type") + $T(" elements"), result).open();
                     }
                 });
         });

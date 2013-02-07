@@ -2205,8 +2205,8 @@ class Conference(CommonObjectBase, Locatable):
         if len(self.getOwnerList()) > 0:
             self.getOwnerList()[0].cleanCache()
 
-    def updateInheritedChild(self, elem, delete=False):
-        self.getAccessController().updateNonInheritedChildren(elem, delete)
+    def updateNonInheritingChildren(self, elem, delete=False):
+        self.getAccessController().updateNonInheritingChildren(elem, delete)
 
     def getKeywords(self):
         try:
@@ -5395,13 +5395,15 @@ class Session(CommonObjectBase, Locatable):
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
-    def updateInheritedChild(self, elem, delete=False, propagate=True):
-        self.getAccessController().updateNonInheritedChildren(elem, delete)
+    def updateNonInheritingChildren(self, elem, delete=False, propagate=True):
+        self.getAccessController().updateNonInheritingChildren(elem, delete)
         if propagate == True:
-            self.updateInheritedParent(elem, delete)
+            self.notify_protection_to_owner(elem, delete)
 
-    def updateInheritedParent(self, elem, delete=False):
-        self.getOwner().updateInheritedChild(elem, delete)
+    def notify_protection_to_owner(self, elem, delete=False):
+        """ This methods notifies the owner that the protection has been changed,
+            so it can update its list of non inheriting children """
+        self.getOwner().updateNonInheritingChildren(elem, delete)
 
     def getKeywords(self):
         try:
@@ -5530,7 +5532,7 @@ class Session(CommonObjectBase, Locatable):
                 self.getRegistrationSession().setRegistrationForm(None)
                 TrashCanManager().add(self.getRegistrationSession())
             self.conference=None
-            self.updateInheritedParent(self, delete=True)
+            self.notify_protection_to_owner(self, delete=True)
             TrashCanManager().add(self)
 
     def recover(self, isCancelled):
@@ -6212,9 +6214,9 @@ class Session(CommonObjectBase, Locatable):
         self.contributions[newContrib.getId()]=newContrib
         newContrib.setSession(self)
 
-        self.updateInheritedChild(newContrib)
-        for child in newContrib.getAccessController().getNonInheritedChildren():
-            self.updateInheritedChild(child)
+        self.updateNonInheritingChildren(newContrib)
+        for child in newContrib.getAccessController().getNonInheritingChildren():
+            self.updateNonInheritingChildren(child)
 
         self.notifyModification()
 
@@ -6234,9 +6236,9 @@ class Session(CommonObjectBase, Locatable):
             sch.removeEntry(contrib.getSchEntry())
         del self.contributions[contrib.getId()]
 
-        self.updateInheritedChild(contrib, delete=True, propagate=False)
-        for child in contrib.getAccessController().getNonInheritedChildren():
-            self.updateInheritedChild(child, delete=True, propagate=False)
+        self.updateNonInheritingChildren(contrib, delete=True, propagate=False)
+        for child in contrib.getAccessController().getNonInheritingChildren():
+            self.updateNonInheritingChildren(child, delete=True, propagate=False)
 
         contrib.setSession(None)
 
@@ -6301,7 +6303,7 @@ class Session(CommonObjectBase, Locatable):
 
     def setProtection( self, private ):
         self.__ac.setProtection( private )
-        self.updateInheritedParent(self)
+        self.notify_protection_to_owner(self)
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -6394,9 +6396,6 @@ class Session(CommonObjectBase, Locatable):
 
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
-
-    def getProtectionURL(self):
-        return str(urlHandlers.UHSessionModifAC.getURL(self))
 
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
@@ -7790,12 +7789,12 @@ class Contribution(CommonObjectBase, Locatable):
             self._reviewManager = ReviewManager(self)
         return self._reviewManager
 
-    def updateInheritedChild(self, elem, delete=False):
-        self.getAccessController().updateNonInheritedChildren(elem, delete)
-        self.updateInheritedParent(elem, delete)
+    def updateNonInheritingChildren(self, elem, delete=False):
+        self.getAccessController().updateNonInheritingChildren(elem, delete)
+        self.notify_protection_to_owner(elem, delete)
 
-    def updateInheritedParent(self, elem, delete=False):
-        self.getOwner().updateInheritedChild(elem, delete)
+    def notify_protection_to_owner(self, elem, delete=False):
+        self.getOwner().updateNonInheritingChildren(elem, delete)
 
     def getKeywords(self):
         try:
@@ -8162,7 +8161,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.removeMinutes()
             self.removeReviewing()
 
-            self.updateInheritedParent(self, delete=True)
+            self.notify_protection_to_owner(self, delete=True)
 
             self.setSession(None)
 
@@ -9000,7 +8999,7 @@ class Contribution(CommonObjectBase, Locatable):
         oldValue = 1 if self.isProtected() else -1
 
         self.__ac.setProtection( private )
-        self.updateInheritedParent(self)
+        self.notify_protection_to_owner(self)
 
         if oldValue != private:
             # notify listeners
@@ -9087,9 +9086,6 @@ class Contribution(CommonObjectBase, Locatable):
 
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
-
-    def getProtectionURL(self):
-        return str(urlHandlers.UHContribModifAC.getURL(self))
 
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )
@@ -10115,8 +10111,8 @@ class SubContribution(CommonObjectBase, Locatable):
             grandpaId = None
         return "<SubCont %s:%s:%s@%s>" % (grandpaId, parentId, self.getId(), hex(id(self)))
 
-    def updateInheritedChild(self, elem, delete=False):
-        self.getOwner().updateInheritedChild(elem, delete)
+    def updateNonInheritingChildren(self, elem, delete=False):
+        self.getOwner().updateNonInheritingChildren(elem, delete)
 
     def getAccessController(self):
         return self.getOwner().getAccessController()
@@ -10696,12 +10692,12 @@ class Material(CommonObjectBase):
         self.__ac = AccessController(self)
         self._mainResource = None
 
-    def updateInheritedChild(self, elem, delete=False):
-        self.getAccessController().updateNonInheritedChildren(elem, delete)
-        self.updateInheritedParent(elem, delete)
+    def updateNonInheritingChildren(self, elem, delete=False):
+        self.getAccessController().updateNonInheritingChildren(elem, delete)
+        self.notify_protection_to_owner(elem, delete)
 
-    def updateInheritedParent(self, elem, delete=False):
-        self.getOwner().updateInheritedChild(elem, delete)
+    def notify_protection_to_owner(self, elem, delete=False):
+        self.getOwner().updateNonInheritingChildren(elem, delete)
 
     def setValues( self, params ):
         """Sets all the values of the current material object from a diccionary
@@ -10938,7 +10934,7 @@ class Material(CommonObjectBase):
     def delete( self ):
         for res in self.getResourceList():
             self.removeResource( res )
-        self.updateInheritedParent(self, delete=True)
+        self.notify_protection_to_owner(self, delete=True)
         TrashCanManager().add(self)
 
     def recover(self):
@@ -10978,7 +10974,7 @@ class Material(CommonObjectBase):
 
     def setProtection( self, private ):
         self.__ac.setProtection( private )
-        self.updateInheritedParent(self)
+        self.notify_protection_to_owner(self)
         self._p_changed = 1
 
     def isHidden( self ):
@@ -11116,9 +11112,6 @@ class Material(CommonObjectBase):
 
     def isBuiltin(self):
         return False
-
-    def getProtectionURL(self):
-        return str(urlHandlers.UHMaterialModification.getURL(self))
 
 class BuiltinMaterial(Material):
     """
@@ -11420,7 +11413,7 @@ class Resource(CommonObjectBase):
 
     def delete( self ):
         if self._owner != None:
-            self.updateInheritedParent(delete=True)
+            self.notify_protection_to_owner(delete=True)
             self._owner.removeResource( self )
             self._owner = None
             TrashCanManager().add(self)
@@ -11450,15 +11443,15 @@ class Resource(CommonObjectBase):
             return self.getOwner().isProtected()
         return False
 
-    def updateInheritedParent(self, delete=False):
-        self.getOwner().updateInheritedChild(self, delete)
+    def notify_protection_to_owner(self, delete=False):
+        self.getOwner().updateNonInheritingChildren(self, delete)
 
     @Updates (['MaKaC.conference.Link',
                'MaKaC.conference.LocalFile'],'protection', lambda(x): int(x))
 
     def setProtection( self, private ):
         self.__ac.setProtection( private )
-        self.updateInheritedParent()
+        self.notify_protection_to_owner()
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -11584,10 +11577,6 @@ class Resource(CommonObjectBase):
         if self.pdfConversionRequestDate is not None and self.pdfConversionRequestDate + timedelta(seconds=50) > nowutc() :
             return 'converting'
         return None
-
-    def getProtectionURL(self):
-        return str(urlHandlers.UHMaterialModification.getURL(self.getOwner()))
-
 
 class Link(Resource):
     """Specialises Resource class in order to represent web links. Objects of

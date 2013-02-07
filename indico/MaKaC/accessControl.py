@@ -32,7 +32,7 @@ def isFullyAccess(level):
     def wrap(func):
         @wraps(func)
         def decorator(*args):
-            for child in args[0].getNonInheritedChildren():
+            for child in args[0].getNonInheritingChildren():
                 if child.getAccessController().getAccessProtectionLevel() == level:
                     return False
             return True
@@ -43,7 +43,7 @@ def getChildren(level):
     def wrap(func):
         @wraps(func)
         def decorator(*args):
-            return [child for child in args[0].getNonInheritedChildren() if child.getAccessController().getAccessProtectionLevel() == level]
+            return [child for child in args[0].getNonInheritingChildren() if child.getAccessController().getAccessProtectionLevel() == level]
         return decorator
     return wrap
 
@@ -80,7 +80,7 @@ class AccessController( Persistent, Observable ):
         self.accessKey = ""
         self.owner = owner
         self.contactInfo = ""
-        self.nonInheritedChildren = set()
+        self.nonInheritingChildren = set()
 
     def getOwner(self):
         return self.owner
@@ -370,25 +370,25 @@ class AccessController( Persistent, Observable ):
     def setContactInfo(self, info):
         self.contactInfo = info
 
-    def addNonInheritedChild(self, obj):
-        self.nonInheritedChildren.add(obj)
+    def addNonInheritingChildren(self, obj):
+        self.nonInheritingChildren.add(obj)
         self._p_changed = 1
 
-    def removeNonInheritedChild(self, obj):
-        self.nonInheritedChildren.discard(obj)
+    def removeNonInheritingChildren(self, obj):
+        self.nonInheritingChildren.discard(obj)
         self._p_changed = 1
 
-    def getNonInheritedChildren(self):
-        return self.nonInheritedChildren
+    def getNonInheritingChildren(self):
+        return self.nonInheritingChildren
 
-    def setNonInheritedChildren(self, nonInheritedChildren):
-        self.nonInheritedChildren = nonInheritedChildren
+    def setNonInheritingChildren(self, nonInheritingChildren):
+        self.nonInheritingChildren = nonInheritingChildren
 
-    def updateNonInheritedChildren(self, elem, delete=False):
+    def updateNonInheritingChildren(self, elem, delete=False):
         if delete or elem.getAccessController().getAccessProtectionLevel() == 0:
-            self.removeNonInheritedChild(elem)
+            self.removeNonInheritingChildren(elem)
         else:
-            self.addNonInheritedChild(elem)
+            self.addNonInheritingChildren(elem)
         self._p_changed = 1
 
 
@@ -401,11 +401,11 @@ class AccessController( Persistent, Observable ):
         pass
 
     @getChildren(1)
-    def getChildrenProtected(self):
+    def getProtectedChildren(self):
         pass
 
     @getChildren(-1)
-    def getChildrenPublic(self):
+    def getPublicChildren(self):
         pass
 
 

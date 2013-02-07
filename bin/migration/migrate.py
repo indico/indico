@@ -657,36 +657,36 @@ def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 @since('1.0')
-def updateNonInheritedChildren(dbi, withRBDB, prevVersion):
+def updateNonInheritingChildren(dbi, withRBDB, prevVersion):
     """
     Update non inherited children list
     """
     def _updateMaterial(obj):
         for material in obj.getAllMaterialList():
-            material.getAccessController().setNonInheritedChildren(set())
-            material.updateInheritedParent(material)
+            material.getAccessController().setNonInheritingChildren(set())
+            material.notify_protection_to_owner(material)
             for resource in material.getResourceList():
-                resource.updateInheritedParent()
+                resource.notify_protection_to_owner()
 
     ch = ConferenceHolder()
     i = 0
 
     for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
-        conf.getAccessController().setNonInheritedChildren(set())
+        conf.getAccessController().setNonInheritingChildren(set())
         _updateMaterial(conf)
 
         for session in conf.getSessionList():
-            session.getAccessController().setNonInheritedChildren(set())
-            session.updateInheritedParent(session)
+            session.getAccessController().setNonInheritingChildren(set())
+            session.notify_protection_to_owner(session)
             _updateMaterial(session)
         for contrib in conf.getContributionList():
-            contrib.getAccessController().setNonInheritedChildren(set())
-            contrib.updateInheritedParent(contrib)
+            contrib.getAccessController().setNonInheritingChildren(set())
+            contrib.notify_protection_to_owner(contrib)
             _updateMaterial(contrib)
             for subContrib in contrib.getSubContributionList():
                 _updateMaterial(subContrib)
 
-        if i % 1000 == 999:
+        if i % 10000 == 9999:
             dbi.commit()
         i += 1
     dbi.commit()

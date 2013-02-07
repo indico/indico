@@ -21,6 +21,7 @@ from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.subcontribution import ISubContributionFossil
 from MaKaC.fossils.reviewing import IReviewManagerFossil
+from MaKaC.webinterface import urlHandlers
 
 class IContributionFossil(IFossil):
 
@@ -78,7 +79,8 @@ class IContributionFossil(IFossil):
     getType.convert = lambda t: t and t.getName()
 
     def getProtectionURL(self):
-        pass
+        """Contribution protection URL"""
+    getProtectionURL.produce = lambda s: str(urlHandlers.UHContribModifAC.getURL(s))
 
 class IContributionParticipationTTDisplayFossil(IFossil):
     """
