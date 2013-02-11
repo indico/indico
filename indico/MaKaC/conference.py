@@ -5531,8 +5531,8 @@ class Session(CommonObjectBase, Locatable):
                 self.getConference().getRegistrationForm().getSessionsForm().removeSession(self.getId())
                 self.getRegistrationSession().setRegistrationForm(None)
                 TrashCanManager().add(self.getRegistrationSession())
-            self.conference=None
             self.notify_protection_to_owner(self, delete=True)
+            self.conference=None
             TrashCanManager().add(self)
 
     def recover(self, isCancelled):
