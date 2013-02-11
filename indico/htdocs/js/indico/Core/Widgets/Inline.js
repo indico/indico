@@ -496,7 +496,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
                                  function(item) {
                                      if ($.isArray(item)) {
                                          item = new WatchPair(item[0], item[1]);
-                                     } else {
+                                     } else if(!item.key) {
                                          item = new WatchPair(item, item);
                                      }
                                      return self._drawItem(item);
