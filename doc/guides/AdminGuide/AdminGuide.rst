@@ -304,16 +304,43 @@ keep up-to-date the indexes and contents in the Search Engine Server.
 
 |image13|
 
+
+Outlook calendar notification plugin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This plugin allows to synchronize information about Indico events with the participants personal Microsoft Outlook calendars.
+If a user is added as a registrant/participant of the conference/meeting, a notification about the event is sent to his Outlook calendar.
+The calendar notification is updated every time the event details are changed.
+
+The calendar notification contains the following information about the event:
+
+* title
+* description
+* time
+* location
+* link to event page
+
+This plugin is enabled by default for each user but the user can disable it from the *User Personal Preferences* page.
+The Synchronization is run at a specific interval by the indico-scheduler.
+
+To run the scheduler task for synchronizing events witch the calendar, you have to put following commands in *incidico_shell*:
+
+    from indico.ext.calendaring.outlook.tasks import OutlookTaskRegistry
+    OutlookTaskRegistry.register()
+
+|image14|
+
+
 Livesync plugin
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 Administration scripts
-====================
+========================
 
 
 Recover Administration Account
-----------------------------------
+--------------------------------
 
 *indico_admin* script allows you to recover any administrator account.
 It can:
@@ -322,8 +349,8 @@ It can:
 * revoke administrator privileges from any existing user (by user id)
 * create a new user with administrator privileges
 
-For more information type in console:
-::
+For more information type in console ::
+
     indico_admin --help
 
 
@@ -341,3 +368,4 @@ For more information type in console:
 .. |image11| image:: AdminGuidePics/admin9.png
 .. |image12| image:: AdminGuidePics/admin10.png
 .. |image13| image:: AdminGuidePics/admin11.png
+.. |image14| image:: AdminGuidePics/admin12.png
