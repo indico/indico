@@ -166,7 +166,7 @@ IndicoUI.executeOnLoad(function(){
             $("input:checkbox:checked").each(function() {
                 participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=namePending]").children("[id^=pending]").text();
             });
-            var subject = 'Your application for attendance in \'${conf.getTitle()}\' declined';
+            var subject = 'Your application for attendance in \'{0}\' declined'.format(${conf.getTitle()| n,j});
             var body = 'Dear {name},<br/><br/>' +
                         'your request to attend the \'{confTitle}\' has been declined by the event manager.<br/>';
             var legends = {'confTitle':$T('field containing the conference title.'),
