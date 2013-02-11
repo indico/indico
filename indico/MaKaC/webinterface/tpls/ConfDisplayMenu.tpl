@@ -29,6 +29,7 @@
 
             <ul class="inner">
             % for sublink in link.getEnabledLinkList():
+                %if sublink.isVisible():
               <li id="menuLink_${sublink.getName()}"
                    % if menu.isCurrentItem(sublink):
                      class="menuConfMiddleCell selected"
@@ -42,6 +43,7 @@
                    % endif
                >${_(sublink.getCaption())}</a>
               </li>
+                 % endif
             % endfor
             </ul>
           </li>
