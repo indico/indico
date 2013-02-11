@@ -493,12 +493,13 @@ class BookingConferenceIndex(Persistent):
     def unindexBooking(self, booking, key):
         if key in self._tree:
             try:
-                self._tree[key][1].remove(booking)
+                s = self._tree[key][1]
+                s.remove(booking)
+                self._tree[key] = (self._tree[key][0], s)
                 self._numberOfBookings = self._numberOfBookings - 1
-                if self._tree[key][1]:
-                    self._tree._p_changed = 1
-                else:
+                if not self._tree[key][1]:
                     del self._tree[key]
+                self._tree._p_changed = 1
             except KeyError, e:
                 Logger.get('VideoServ').warning("Tried to unindex booking: (confId=%s, id=%s) with key=%s from BookingConferenceIndex %s, but the booking was not present in the set of bookings with key %s. Exception: %s"%(booking.getConference().getId(), booking.getId(), str(key), self.getName(), str(key), str(e)))
                 self._deepUnindexBooking(booking, key)

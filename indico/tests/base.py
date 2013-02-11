@@ -239,7 +239,6 @@ class BaseTestRunner(IOMixin):
         Goes throught the plugin directories, and adds
         existing unit test dirs
         """
-
         dirs = []
 
         for epoint in pkg_resources.iter_entry_points('indico.ext_types'):
