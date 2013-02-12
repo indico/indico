@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import ZODB
 from persistent import Persistent
 
 from MaKaC.common.ObjectHolders import ObjectHolder
@@ -133,7 +132,7 @@ class DomainHolder(ObjectHolder):
 
     def remove(self, item):
         # METHOD HAS TO BE IMPLEMENTED...
-        ObjectHolders.remove(self, item)
+        ObjectHolder.remove(self, item)
         TrashCanManager().add(item)
 
     def getLength( self ):
