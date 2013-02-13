@@ -22,7 +22,8 @@
                 <div class="contribItem">
                     <a href="${item[i]['url']}">${item[i]['title']}</a>
                     % if item[i]['materials']:
-                        <img id="materialMenuIcon${key}${i}" title="${_('materials')}" src="./images/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
+                        <img class="material_icon" title="${_('materials')}" src="./images/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
+                        <%include file="MaterialListPopup.tpl" args="materials=item[i]['materials']"/>
                     % endif
                 </div>
             % endfor

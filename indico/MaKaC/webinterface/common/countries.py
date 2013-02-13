@@ -96,6 +96,7 @@ class CountryHolder(object):
     _countries['FR'] = "FRANCE"
     _countries['GF'] = "FRENCH GUIANA"
     _countries['PF'] = "FRENCH POLYNESIA"
+    _countries['PS'] = "PALESTINIAN, STATE OF"
     _countries['GA'] = "GABON"
     _countries['GM'] = "GAMBIA"
     _countries['GE'] = "GEORGIA"

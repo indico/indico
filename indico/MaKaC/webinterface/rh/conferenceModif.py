@@ -4190,7 +4190,7 @@ class RHScheduleMoveEntryDown(RHConferenceModifBase):
         else:
             self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf),date.strftime("%Y-%m-%d")))
 
-class RHReschedule(RHConferenceModifBase):
+class RHReschedule(RoomBookingDBMixin, RHConferenceModifBase):
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
