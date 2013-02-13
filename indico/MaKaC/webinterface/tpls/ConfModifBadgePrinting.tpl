@@ -40,7 +40,7 @@
               <tr>
                 <td colspan=3>
                   <div class="bs-alert bs-alert-info">
-                    <input type="submit" value="${('Download Badges PDF')}" class="bs-btn" style="float:right;" id="downloadPDF" />
+                    <input type="submit" value="${('Download Badges PDF')}" class="btn" style="float:right;" id="downloadPDF" />
                   ${_("Select the required template below then you may click the download button to obtain the generated PDF.")}
                   <div class="toolbar-clearer"></div>
                  </div>
@@ -57,9 +57,9 @@
                   ${template['name']}
                 </td>
                 <td align='right'>
-                  <a href="${template['urlEdit']}" class='bs-btn bs-btn-mini'>Edit</a>
-                  <a href="${template['urlCopy']}" class='bs-btn bs-btn-mini'>Clone</a>
-                  <a href="${template['urlDelete']}" class='bs-btn bs-btn-mini'>Delete</a>
+                  <a href="${template['urlEdit']}" class='btn btn-mini'>Edit</a>
+                  <a href="${template['urlCopy']}" class='btn btn-mini'>Clone</a>
+                  <a href="${template['urlDelete']}" class='btn btn-mini'>Delete</a>
                 </td>
               </tr>
               % endfor
@@ -71,7 +71,7 @@
               <tr>
                 <td colspan=3>
                   <div class="bs-alert bs-alert-info alert-toolbar">
-                    <span class="bs-btn bs-btn-info" id="showPDFLayout" style="float:right;">PDF Layout Options</span>
+                    <span class="btn btn-info" id="showPDFLayout" style="float:right;">PDF Layout Options</span>
                   ${_("The page layout and dimensions will be the default for this event, if you would like to review and/or edit these, please click on the PDF Layout button.")}
                   <div class="toolbar-clearer"></div>
                  </div>

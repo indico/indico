@@ -271,7 +271,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         self._tablePDF = params.has_key("pdf.table")
         self._bookPDF = params.has_key("pdf.book")
         self._info = params.has_key("info.x")
-        self._excel = params.has_key("excel.x")
+        self._excel = params.has_key("excel")
         self._reglist = params.get("reglist","").split(",")
         self._display = self._normaliseListParam(params.get("disp",[]))
         self._printBadgesSelected = params.has_key("printBadgesSelected")

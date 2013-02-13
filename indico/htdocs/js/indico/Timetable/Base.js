@@ -887,7 +887,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
     _createAddMenu: function(elem) {
         var self = this;
         var menuItems = {};
-        var ul = $('<ul/>').appendTo(elem);
+        var ul = $('<ul class="dropdown"/>');
 
         if (this._allowCreateHere('Session')) {
             var sessionAdd = $('<a href="#"/>').text($T('Session')).appendTo(ul).wrap("<li/>");
@@ -915,6 +915,8 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
             }).appendTo(ul).wrap("<li/>");
         }
 
+        return ul;
+
     },
 
     _getHeader: function() {
@@ -926,7 +928,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.addMenuLink = this.contextInfo.isPoster ?
             $('<a href="#"/>').text($T('Add poster')).bind('menu_select', function() {
                 self.managementActions.addContribution();
-            }) : $('<a href="#"/>').text($T('Add new'));
+            }) : $('<a href="#" id="add_new" class="arrow" data-toggle="dropdown"/>').text($T('Add new'));
 
 
         this.rescheduleLink = $('<a href="#"/>').text($T('Reschedule')).bind('menu_select', function() {
@@ -960,8 +962,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
 
-        this.menu = $('<ul class="button-menu"/>');
-
+        this.menu = $('<div class="group right"/>');
 
         if (this.isSessionTimetable) {
             this.menu.append(this.addIntervalLink)
@@ -981,25 +982,22 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>', {src: imageSrc(Indico.SystemIcons.tt_time),
                                                                                   title:"Add one hour"}))
-        var tt_status_info = $('<div id="tt_status_info" class="tt_tmp_button"/>');
+        var tt_status_info = $('<div id="tt_status_info" />');
 
-        this.menu.children('a').wrap('<li>');
-        this.menu.children('li').addClass('middle');
-        this.menu.children('li:first-child').removeClass('middle').addClass('left');
-        this.menu.children('li:last-child').removeClass('middle').addClass('right');
+        this.menu.children('a').addClass('btn');
 
         if (!this.contextInfo.isPoster && !this.isSessionTimetable) {
-            this._createAddMenu(this.addMenuLink.parent());
+            this.menu.find('#add_new').after(this._createAddMenu(this.addMenuLink.parent()));
         }
 
         var ret = $('<div/>').append(
-            this.warningArea.dom, $('<div class="clearfix ui-follow-scroll" id="tt_menu"/>').
+            this.warningArea.dom, $('<div class="clearfix ui-follow-scroll toolbar" id="tt_menu"/>').
                 append(this.menu.dropdown({effect_on: 'slideDown'}), tt_status_info, this.infoBox.dom),
             tt_hour_tip);
 
         var extra = this.getTTMenu();
         if (extra) {
-            ret.find('#tt_menu > ul').after(extra);
+            ret.find('#tt_menu .group').after(extra);
         }
 
         return ret;
@@ -1514,8 +1512,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
     getTTMenu: function() {
         var self = this;
-        var goBackLink = $('<a class="go_back tt_tmp_button" href="#"/>').text($T('Up to timetable')).
-            prepend('<span class="arrow_up">▲</span>').
+        var goBackLink = $('<a class="icon-arrow-up btn go_back" href="#"/>').text($T('Up to timetable')).
             click(function() {
                 self.parentTimetable.switchToTopLevel();
                 self._hideWarnings();
@@ -1523,7 +1520,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
                 return false;
             });
 
-        return goBackLink;
+        return $('<div class="group right"/>').append(goBackLink);
     }
 
 },

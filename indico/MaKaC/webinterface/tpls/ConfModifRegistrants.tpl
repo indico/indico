@@ -63,6 +63,7 @@
         <tr>
           <td colspan="40" valign="bottom" align="left">
             <form id="registrantsForm" action=${ actionPostURL } method="post" name="registrantsForm" onsubmit="return atLeastOneRegistrantSelected();">
+            <input id="pdfExportInputHidden" type="hidden" name="pdf">
             <table width="100%" cellspacing="0" align="center" border="0">
                 <tr>
                   <td colspan="10">
@@ -76,37 +77,22 @@
                     <td valign="bottom" width="100%" align="left" colspan="1000">
                         <table style="margin-left: -8px" >
                             <tr >
-                                <td valign="bottom" align="left">
-                                    <ul id="button-menu" class="ui-list-menu">
-                                      <li class="left" id="addRegistrant">
-                                        <a href="#" id="add_new_user">${_("Add new")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="remove_users">${_("Remove")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="send_email">${_("Email")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="print_badges">${_("Print Badges")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="attachments">${_("Attachments")}</a>
-                                      </li>
-                                      <li class="right">
-                                        <a href="#" id="show_stats">${_("Show stats")}</a>
-                                      </li>
-                                    </ul>
-                                </td>
-
-                                <td>
-                                  Export to:
-                                </td>
-                                <td>
-                                    <a href="#" id="exportPDFSelectorLink1" name="pdf" class="iconDropDownMenu"> <img src=${ pdfIconURL} border="0"></a>
-                                    <input id="pdfExportInputHidden" type="hidden" name="pdf">
-                                    <span class="iconSeparator">  | </span>
-                                    <input type="image" style="margin-top:3px;" name="excel" src=${ excelIconURL } border="0">
+                                <td valign="bottom" align="left" id="button-menu" class="toolbar">
+                                    <div class="group">
+                                      <a href="#" class="btn" id="add_new_user">${_("Add new")}</a>
+                                      <a href="#" class="btn" id="remove_users">${_("Remove")}</a>
+                                      <a href="#" class="btn" id="send_email">${_("Email")}</a>
+                                      <a href="#" class="btn" id="print_badges">${_("Print Badges")}</a>
+                                      <a href="#" class="btn" id="attachments">${_("Attachments")}</a>
+                                      <a href="#" class="btn" id="show_stats">${_("Show stats")}</a>
+                                      <a class="button arrow btn" href="#" data-toggle="dropdown">
+                                        ${_("Export")}
+                                      </a>
+                                      <ul class="dropdown">
+                                        <li><a href="#" class="icon-file-pdf" id="export_pdf">${_("PDF")}</a></li>
+                                        <li><a href="#" class="icon-file-excel" id="export_csv">${_("CSV")}</a></li>
+                                      </ul>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
@@ -225,7 +211,7 @@ function deselectAll()
         }
     }
 
-var pdfLink1 = $E('exportPDFSelectorLink1');
+var pdfLink1 = $E('export_pdf');
 var pdfMenu = null;
 
 function createMenu(pdfLink) {
@@ -255,11 +241,6 @@ function submitForm(style) {
     if(form.dom.onsubmit())
         form.dom.submit(); pdfMenu.close();
 }
-
-pdfLink1.observeClick(function(e) {
-    createMenu(pdfLink1);
-    return false;
-});
 
 var atLeastOneRegistrantSelected = function(){
     if (newUser || $("input:checkbox:checked[name^=registrant]").length>0){
@@ -321,6 +302,15 @@ IndicoUI.executeOnLoad(function(){
         InsertHiddenField("newRegistrant", "Add", false);
         $('#registrantsForm').submit();
     });
+
+   $("#export_pdf").on("menu_select", function() {
+      createMenu(pdfLink1);
+      return true;
+   });
+
+   $("#export_csv").on("menu_select", function() {
+      submitForm('excel');
+   });
 
 });
 

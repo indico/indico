@@ -4635,7 +4635,7 @@ div.actionButton {
     display: inline;
     margin-left: 5px;
 }
-
+x
 /* Conference, Registrants List */
 
 .CRLgroupTitleNoBorder {
@@ -4647,7 +4647,7 @@ div.actionButton {
 }
 
 .CRLabstractLeftDataCell {
-    padding-right:5px;
+    padding: 5px 5px 5px 0;
     border-bottom: 1px solid #DDDDDD;
     vertical-align: top;
 }
@@ -6062,18 +6062,6 @@ div.timetableManagementInfoArea ul li{
     background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
 }
 
-#tt_status_info img {
-    margin-top: 2px;
-}
-
-#tt_status_info .icon {
-    margin-right: 5px;
-    font-size: 16px;
-}
-
-#tt_status_info a {
-}
-
 .tt_tmp_button {
     line-height: 30px;
     height: 30px;
@@ -6089,18 +6077,6 @@ div.timetableManagementInfoArea ul li{
     vertical-align: middle;
     padding: 0px 8px;
 }
-
-#tt_status_info {
-    display: none;
-}
-
-#tt_status_info .text {
-    vertical-align: middle;
-    text-align: center;
-    color: #aaa;
-    float: right;
-}
-
 
 #tt_menu.scrolling {
     position: fixed;
@@ -7768,19 +7744,6 @@ ul.UIAuthorList li.UIAuthorMove {
     background: white url("../images/drag.png") left top no-repeat;
 }
 
-.arrow {
-    background: #ECECEC;
-    background-image: url("../images/menu_arrow_black.png") !important;
-    background-image: url("../images/menu_arrow_black.png"), -webkit-gradient(linear, 0% 40%, 0% 70%, from(#F5F5F5), to(#F1F1F1)) !important;
-    background-image: url("../images/menu_arrow_black.png"), -moz-linear-gradient(linear, 0% 40%, 0% 70%, from(#F5F5F5), to(#F1F1F1)) !important;
-    background-repeat: no-repeat !important;
-    background-position: right center !important;
-}
-
-.arrow a {
-    padding-right: 20px !important;
-}
-
 ul.buttonMenuPopupList {
     background-color: #ECECEC;
     border: 0;
@@ -7855,7 +7818,7 @@ ul.buttonMenuPopupList li a:hover {
     background: #eee;
 }
 
-.ui-list-menu > li {
+.ui-list-menu > a {
     min-width: 45px;
 }
 
@@ -7895,24 +7858,6 @@ ul.buttonMenuPopupList li a:hover {
     border-right: none;
 }
 
-.ui-list-menu-level-1 {
-    border: solid 1px #dcdcdc;
-    z-index: 0;
-    min-width: 150px;
-}
-
-.ui-list-menu-level-1 > li {
-    font-weight: normal;
-    float: none;
-    display: block;
-    overflow: auto;
-}
-
-.ui-list-menu-level-1 > li:hover {
-    padding-left: -1px;
-    border: 1px solid #ddd !important;
-    border-width: 0 0 1px 0 !important;
-}
 
 .ui-list-menu-level-2{
     width: 100px;
@@ -7924,40 +7869,11 @@ ul.buttonMenuPopupList li a:hover {
 }
 
 
-.ui-list-menu li.left {
-    -webkit-border-top-right-radius: 0;
-    -moz-border-radius-topright: 0;
-    border-top-right-radius: 0;
-    -webkit-border-bottom-right-radius: 0;
-    -moz-border-radius-bottomright: 0;
-    border-bottom-right-radius: 0;
-    margin: 0;
-}
-
-.ui-list-menu li.middle {
-    border-radius: 0;
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-left: solid 1px #f3f3f3;
-    margin: 0;
-    border-left: solid 1px rgba(255, 255, 255, 0);
-}
 
 .ui-list-menu li.middle:hover, .ui-list-menu li.right:hover {
     border-left: solid 1px #999
 }
 
-.ui-list-menu li.right {
-    -webkit-border-top-left-radius: 0;
-    -moz-border-radius-topleft: 0;
-    border-top-left-radius: 0;
-    -webkit-border-bottom-left-radius: 0;
-    -moz-border-radius-bottomleft: 0;
-    border-bottom-left-radius: 0;
-    border-left: solid 1px #f3f3f3;
-    border-left: solid 1px rgba(255, 255, 255, 0);
-    margin: 0;
-}
 
 #dragTip {
     position: absolute;
@@ -8597,24 +8513,46 @@ div.informationUserList {
 	font-size: 15px;
 }
 
+
 /* Speakers List */
 
-div.speakerEntry {
-  border-bottom: 1px solid #BBB;
-  padding: 5px 0px 5px 0px;
+ul.speaker_list {
+    list-style-type: none;
+    padding: 0.6em 0 0 0;
 }
 
-div.speakerDetails {
-  font-size: 1.4em;
-  border-bottom: 1px solid #CCC;
-  padding-bottom: 3px;
+ul.speaker_list li {
+    margin: 1em 0 0 0;
 }
 
-span.speakerEmail a{
-  padding-left: 10px;
-  font-size: 1em;
+ul.speaker_list a {m
+    font-size: 1em;
 }
 
-div.speakerContributions {
-  line-height: 1.4em;
+ul.speaker_list > li .name {
+    padding: 0 0 1.5em 0;
+    font-size: 1.4em;
+}
+
+ul.speaker_list > li .contributions {
+    color: #777;
+    margin-top: 0.4em;
+    list-style-type: none;
+    padding: 0 0 0 2em;
+}
+
+ul.speaker_list > li .contributions li {
+    margin-top: 0.6em;
+}
+
+#list_options {
+    max-width: 600px;
+}
+
+#list_options #filterSpeakers {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.5em;
+    margin-right: 1em;
+    width: 20em;
 }

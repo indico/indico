@@ -518,8 +518,8 @@
     <div class="bs-alert bs-alert-info alert-toolbar">
       ${_('Once you have finished designing, you may either save or discard your changes here.')}
       <div style="float:right;">
-          <input class="bs-btn bs-btn-small bs-btn-info" name="Save Template Button" value="${ _("Save Template")}" type="button" id="saveButton" />
-          <input class="bs-btn bs-btn-small bs-btn-info" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'" />
+          <input class="btn btn-small btn-info" name="Save Template Button" value="${ _("Save Template")}" type="button" id="saveButton" />
+          <input class="btn btn-small btn-info" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'" />
 
           <form id="saveForm" action="${saveTemplateURL}" method="POST">
               <input name="templateId" value="${templateId}" type="hidden">
@@ -567,7 +567,7 @@
                 ${_('Badge Height')}:<input id="badge_height" name="Badge Height" size="5">
                 <br />
 
-                  <input class="bs-btn bs-btn-small" value="${ _("Update Dimensions")}" type="button" id="changeTemplateSize">
+                  <input class="btn btn-small" value="${ _("Update Dimensions")}" type="button" id="changeTemplateSize">
             </div>
         </div>
         <!-- Tab for element formatting -->
@@ -664,7 +664,7 @@
               <select name="Template Elements List" id="elementList">
                 ${selectOptions}
               </select>
-            <input name="insertButton" id="insertButton" class="bs-btn bs-btn-mini" value="${ _("Insert")}" type="button">
+            <input name="insertButton" id="insertButton" class="btn btn-mini" value="${ _("Insert")}" type="button">
         </div>
         <!-- Modify Selected Element -->
         <div class="toolbar-container element">
@@ -672,7 +672,7 @@
             <div id="currSelected">
                 ${ _("Currently Selected")}: <span id="selection_text"></span>
             </div>
-            <input name="removeButton" id="removeButton" class="bs-btn bs-btn-primary bs-btn-mini bs-btn-fit" value="${ _("Remove Element From Badge")}" type="button" disabled="disabled">
+            <input name="removeButton" id="removeButton" class="btn btn-primary btn-mini btn-fit" value="${ _("Remove Element From Badge")}" type="button" disabled="disabled">
         </div>
 
            ${ _("Position")}:

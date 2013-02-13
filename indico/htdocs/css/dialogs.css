@@ -46,14 +46,6 @@
     clear: both;
 }
 
-input.toolbar-search {
-    float: right;
-    height: 22px;
-    margin-top: 3px;
-    border-radius: 5px;
-    width: 220px;
-}
-
 .confirmation-dialog > h3 {
     margin-bottom: 0.1em;
     font-size: 1.7em;

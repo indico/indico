@@ -28,8 +28,12 @@ $(function() {
         },
 
         _close: function(elem, effect) {
-            this._effect('off', elem.siblings('ul'), effect);
-            elem.siblings('ul').find('ul').hide();
+            var ul = elem.next('ul');
+
+            elem.removeClass('open');
+
+            this._effect('off', ul, effect);
+            ul.find('ul').hide();
             elem.data('on', false);
             elem.parent().removeClass('selected');
             elem.siblings('ul').find('a').data('on', false);
@@ -37,53 +41,36 @@ $(function() {
 
         _close_all: function(effect) {
             var self = this;
-            this.element.children().find('a').each(function() {
+
+            this.element.find('a').each(function() {
                 self._close($(this), effect);
             });
         },
 
         _open: function(elem) {
             var self = this;
-            var sibl = elem.siblings('ul');
+            var sibl = elem.next('ul.dropdown');
+
+            elem.addClass('open');
+
             this._effect('on', sibl);
             elem.data('on', true);
             elem.parent().addClass('selected');
-            sibl.position($.extend({of: elem.parent()}, this.options.positioning[sibl.data('level')] ||
+            sibl.position($.extend({of: elem}, this.options.positioning[sibl.data('level')] ||
                                    {my: 'left top', at: 'left bottom', offset: '0px 0px'}));
-            elem.parent().siblings().find('a').each(function() {
-                self._close($(this));
-            });
-        },
-
-        _set_classes: function(elem, level) {
-            var self = this;
-            level = level || 0;
-            elem.addClass('ui-list-menu-level-' + level);
-            elem.addClass('ui-list-menu-level');
-            elem.data('level', level);
-            elem.children('li').children('ul').each(function() {
-                self._set_classes($(this), level + 1);
+            this.element.find('a').each(function() {
+                if (this != elem.get(0)) {
+                    self._close($(this));
+                }
             });
         },
 
         _menuize: function(elem) {
             var self = this;
 
-            this._set_classes(elem);
-
-            elem.addClass('ui-list-menu');
-            elem.find('li a').each(function() {
-                $this = $(this);
-                if ($this.siblings('ul').length) {
-                    $this.data('expandable', true);
-                    $this.parent().addClass('arrow');
-                }
-                $this.siblings('ul').hide();
-                $this.parent().addClass('');
-            }).click(function(e) {
+            elem.find('.btn').click(function(e) {
                 var $this = $(this);
-
-                if ($this.data('expandable')) {
+                if ($this.data('toggle') == 'dropdown') {
                     if ($this.data('on')) {
                         self._close($this);
                     } else {
@@ -97,6 +84,14 @@ $(function() {
                     }
                     e.preventDefault();
                 }
+            });
+
+            elem.find('ul.dropdown > li > a').click(function(e) {
+                    var result = $(this).triggerHandler('menu_select', self.element);
+                    if(!result) {
+                        self._close_all();
+                    }
+                    e.preventDefault();
             });
         },
 

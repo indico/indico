@@ -19,7 +19,7 @@ type("UndoMixin", [], {
 
     updateUndoDiv: function(tt_status_info) {
         /* A "button" that appears after an action is performed */
-        var undo_contents =  $('<a href="#"/>').text($T('Undo last operation')).
+        var undo_contents =  $('<a href="#" class="btn icon-undo warning"/>').text($T('Undo last operation')).
             click(function() {
                 // "Undo" should be executed over the _current_ timetable, not the original source of
                 // the event. Being so, we call a global event that will then invoke the correct TT
@@ -30,7 +30,7 @@ type("UndoMixin", [], {
             });
         var elem = tt_status_info || $('#tt_status_info');
         if ($(window).data('undo')) {
-            elem.show().html(undo_contents).prepend($('<span class="icon">↺</span>'));
+            elem.show().html($('<div class="group right"/>').append(undo_contents));
         } else {
             elem.hide();
         }

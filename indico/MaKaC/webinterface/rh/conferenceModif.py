@@ -691,30 +691,30 @@ class RHConfModifParticipantsDeclined(RHConferenceModifBase):
         else:
             return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
 
+
 class RHConfModifParticipantsAction(RHConfModifParticipants):
     _uh = urlHandlers.UHConfModifParticipantsAction
 
     def _process( self ):
         params = self._getRequestParams()
-        if params.has_key("excel.x"):
-            selectedList = self._normaliseListParam(self._getRequestParams().get("participants",[]))
-            toList = []
-            if selectedList == []:
-                raise FormValuesError(_("No participant selected! Please select at least one."))
-            else:
-                for id in selectedList :
-                    participant = self._conf.getParticipation().getParticipantById(id)
-                    toList.append(participant)
-            filename = "ParticipantsList.csv"
-            excel = ParticipantsListToExcel(self._conf,list=toList)
-            data = excel.getExcelFile()
-            self._req.set_content_length(len(data))
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( "CSV" )
-            self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = 'inline; filename="%s\"'%filename
-            return data
-        return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
+        selectedList = self._normaliseListParam(self._getRequestParams().get("participants",[]))
+        toList = []
+        if selectedList == []:
+            raise FormValuesError(_("No participant selected! Please select at least one."))
+        else:
+            for id in selectedList :
+                participant = self._conf.getParticipation().getParticipantById(id)
+                toList.append(participant)
+        filename = "ParticipantList.csv"
+        excel = ParticipantsListToExcel(self._conf,list=toList)
+        data = excel.getExcelFile()
+        self._req.set_content_length(len(data))
+        cfg = Config.getInstance()
+        mimetype = cfg.getFileTypeMimeType( "CSV" )
+        self._req.content_type = """%s"""%(mimetype)
+        self._req.headers_out["Content-Disposition"] = 'inline; filename="%s\"'%filename
+        return data
+
 
 class RHConfModifParticipantsStatistics(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifParticipantsStatistics
@@ -1918,11 +1918,11 @@ class RHAbstractsActions:
     def process(self, params):
         if params.has_key("newAbstract"):
             return RHNewAbstract(self._req).process(params)
-        elif params.has_key("pdf.x"):
+        elif params.has_key("pdf"):
             return RHAbstractsToPDF(self._req).process(params)
-        elif params.has_key("excel.x"):
+        elif params.has_key("excel"):
             return RHAbstractsListToExcel(self._req).process(params)
-        elif params.has_key("xml.x"):
+        elif params.has_key("xml"):
             return RHAbstractsToXML(self._req).process(params)
         elif params.has_key("auth"):
             return RHAbstractsParticipantList(self._req).process(params)

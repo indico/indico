@@ -3,7 +3,7 @@
 
   <div class="grid">
   <div class="info_line date">
-      <span  title="${_("Date/Time")}" class="icon icon-time toolbar-icon" aria-hidden="true"></span>
+      <span  title="${_("Date/Time")}" class="icon icon-time" aria-hidden="true"></span>
       <div class="text">
         <div class="date_start">${_('Starts <span class="datetime">{0} {1}</span>').format(dateInterval[0], dateInterval[1])}</div>
         <div class="date_end">${_('Ends <span class="datetime">{0} {1}</span>').format(dateInterval[2], dateInterval[3])}</div>
@@ -13,7 +13,7 @@
 
   % if location:
     <div class="info_line location">
-        <span title="${_("Location")}" class="icon icon-location toolbar-icon" aria-hidden="true"></span>
+        <span title="${_("Location")}" class="icon icon-location" aria-hidden="true"></span>
         <div class="place text">
           ${location}
         </div>
@@ -28,7 +28,7 @@
 
   % if chairs:
   <div class="info_line chairs clear">
-      <span  title="${_("Chairpersons")}" class="icon icon-chair toolbar-icon" aria-hidden="true"></span>
+      <span  title="${_("Chairpersons")}" class="icon icon-chair" aria-hidden="true"></span>
       <ul class="chair_list text">
         % for chair in chairs:
         <li>
@@ -49,7 +49,7 @@
 
   % if material:
   <div class="info_line material">
-      <span  title="${_("Materials")}" class="icon icon-material-download toolbar-icon" aria-hidden="true"></span>
+      <span  title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
       <ul class="text">
         % for mat in material:
           <li>${mat}</li>
@@ -60,7 +60,7 @@
 
   % if moreInfo:
   <div class="info_line info">
-      <span  title="${_("Extra information")}" class="icon icon-info toolbar-icon" aria-hidden="true"></span>
+      <span  title="${_("Extra information")}" class="icon icon-info" aria-hidden="true"></span>
       <div class="text ${'nohtml' if not moreInfo_html else ''}">${ moreInfo }</div>
   </div>
   % endif

@@ -1,4 +1,4 @@
-<a class="right header-aligned icon-file-pdf toolbar-icon" aria-hidden="true" href="${pdf_url}" title="${_("Download PDF")}" style="margin-top: 0.8em;"></a>
+<a class="right header-aligned icon-file-pdf toolbar-icon" aria-hidden="true" href="${pdf_url}" title="${_("Download PDF")}"></a>
 <h2 class="page_title">${ _("Scientific Programme")}</h2>
 
 <div class="quotation programme">

@@ -129,34 +129,26 @@
                         <table style="margin-left: -8px" >
                             <tr >
                                 <td valign="bottom" align="left">
-                                    <ul id="button-menu" class="ui-list-menu">
-                                      <li class="left" id="addRegistrant">
-                                        <a href="#" id="add_new_abstract">${_("Add new")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="accept_abstracts">${_("Accept")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="reject_abstracts">${_("Reject")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="merge_abstracts">${_("Merge")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="author_list">${_("Author list")}</a>
-                                      </li>
-                                      <li class="right">
-                                        <a href="#" id="download_attachments">${_("Download attachments")}</a>
-                                      </li>
-                                    </ul>
-                                </td>
-                                <td>
-                                  Export to:
-                                </td>
-                                <td>
-                                    <input type="image" name="pdf" src=${ pdfIconURL} border="0">
-                                    <input type="image" name="excel" src=${ excelIconURL } border="0">
-                                    <input type="image" name="xml" src=${ xmlIconURL} border="0">
+                                    <div id="button-menu" class="toolbar">
+                                      <div class="group">
+                                        <a href="#" id="add_new_abstract" class="btn">${_("Add new")}</a>
+                                        <a href="#" id="accept_abstracts" class="btn">${_("Accept")}</a>
+                                        <a href="#" id="reject_abstracts" class="btn">${_("Reject")}</a>
+                                        <a href="#" id="merge_abstracts" class="btn">${_("Merge")}</a>
+                                        <a href="#" id="author_list" class="btn">${_("Author list")}</a>
+                                        <a href="#" id="download_attachments" class="btn">${_("Download attachments")}</a>
+
+                                        <a class="button arrow btn" href="#" data-toggle="dropdown">
+                                          ${_("Export")}
+                                        </a>
+                                        <ul class="dropdown">
+                                          <li><a href="#" class="icon-file-pdf" id="export_pdf">${_("PDF")}</a></li>
+                                          <li><a href="#" class="icon-file-excel" id="export_csv">${_("CSV")}</a></li>
+                                          <li><a href="#" class="icon-file-xml" id="export_xml">${_("XML")}</a></li>
+                                        </ul>
+
+                                    </div>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
@@ -433,7 +425,10 @@ $(function(){
       "#reject_abstracts": ["rejectMultiple", $T("Reject")],
       "#merge_abstracts": ["merge", $T("Merge")],
       "#author_list": ["auth", $T("Author List")],
-      "#download_attachments": ["PKGA", $T("Download attachments")]
+      "#download_attachments": ["PKGA", $T("Download attachments")],
+      "#export_pdf": ["pdf", $T("Export PDF")],
+      "#export_csv": ["excel", $T("Export CSV")],
+      "#export_xml": ["xml", $T("Export XML")]
     }).each(function(vals, key) {
       $(key).bind('menu_select',function(){
         if (atLeastOneSelected()) {

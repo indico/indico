@@ -97,3 +97,36 @@
 .icon-material-download:before {
 	content: "\64";
 }
+.icon-wrench:before {
+	content: "\77";
+}
+.icon-checkbox-checked:before {
+	content: "\76";
+}
+.icon-checkbox-unchecked:before {
+	content: "\6f";
+}
+.icon-locked:before {
+	content: "\21";
+}
+.icon-remove:before {
+	content: "\22";
+}
+.icon-unlocked:before {
+	content: "\23";
+}
+.icon-arrow-down:before {
+	content: "\24";
+}
+.icon-file-excel:before {
+	content: "\25";
+}
+.icon-arrow-up:before {
+	content: "\26";
+}
+.icon-undo:before {
+	content: "\27";
+}
+.icon-file-xml:before {
+	content: "\28";
+}

@@ -8,7 +8,7 @@
       <tr>
         <td colspan="2">
             <div class="bs-alert bs-alert-info alert-toolbar">
-              <span class="bs-btn bs-btn-info" id="showPDFLayout" style="float:right;">${_('PDF Layout Options')}</span>
+              <span class="btn btn-info" id="showPDFLayout" style="float:right;">${_('PDF Layout Options')}</span>
             ${_("The page layout and dimensions will be the default for this event, if you would like to review and/or edit these, please click on the PDF Layout button.")}
             <div class="toolbar-clearer"></div>
            </div>
@@ -60,9 +60,9 @@
               % for template in templateList:
               <tr>
                 <td>
-                  <a href="${template['urlEdit']}" class='bs-btn bs-btn-mini'>${_('Edit')}</a>
-                  <a href="${template['urlCopy']}" class='bs-btn bs-btn-mini'>${_('Clone')}</a>
-                  <a href="${template['urlDelete']}" class='bs-btn bs-btn-mini'>${_('Delete')}</a>
+                  <a href="${template['urlEdit']}" class='btn btn-mini'>${_('Edit')}</a>
+                  <a href="${template['urlCopy']}" class='btn btn-mini'>${_('Clone')}</a>
+                  <a href="${template['urlDelete']}" class='btn btn-mini'>${_('Delete')}</a>
                 </td>
                 <td style="padding-left:5px;">
                   <a href="${ NewTemplateURL }&baseTemplate=local${template['id']}" target="_blank">${template['name']}</a>

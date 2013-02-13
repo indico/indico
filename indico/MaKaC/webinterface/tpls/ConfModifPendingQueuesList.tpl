@@ -1,8 +1,8 @@
 % if list:
 <div id="actionsToolbar" class="bs-alert alert-toolbar">
     <form action="${ postURL }" method="post">
-    <input type="submit" class="bs-btn bs-btn-right bs-btn-primary" name="remove" value="${ _("Remove Selected")}" />
-    <input type="submit" class="bs-btn bs-btn-right" name="reminder" value="${ _("Send a Reminder")}" />
+    <input type="submit" class="btn btn-right btn-primary" name="remove" value="${ _("Remove Selected")}" />
+    <input type="submit" class="btn btn-right" name="reminder" value="${ _("Send a Reminder")}" />
     <div>
         ${title}
     </div>

@@ -15,48 +15,61 @@
             <table>
                 <tr >
                     <td valign="bottom" align="left">
-                        <ul id="button-menu" class="ui-list-menu">
-                          <li class="left arrow" id="addParticipant">
-                              <a href="#">${_("Add")}</a>
-                              <ul>
-                                <li><a href="#" id="add_existing_user">${_("Indico User")}</a></li>
-                                <li><a href="#" id="add_new_user">${_("New user")}</a></li>
-                                % if nowutc() < self_._conf.getStartDate() :
-                                    <li><a href="#" id="invite_users">${_("Invite")}</a></li>
-                                % endif
-                              </ul>
-                          </li>
-                          <li class="middle">
-                            <a href="#" id="remove_users">${_("Remove")}</a>
-                          </li>
+                        <div id="button-menu" class="toolbar">
+
+                          <div class="group left">
+                            <a class="icon-checkbox-checked btn arrow" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                            <ul class="dropdown">
+                              <li><a href="#" id="selectAll">All</a></li>
+                              <li><a href="#" id="deselectAll">None</a></li>
+                            </ul>
+                          </div>
+
+                          <div class="group left">
+                          <a class="left arrow btn" id="addParticipant" href="#" data-toggle="dropdown">
+                              ${_("Add")}
+                          </a>
+
+                          <ul class="dropdown">
+                            <li><a href="#" id="add_existing_user">${_("Indico User")}</a></li>
+                            <li><a href="#" id="add_new_user">${_("New user")}</a></li>
+                            % if nowutc() < self_._conf.getStartDate() :
+                              <li><a href="#" id="invite_users">${_("Invite")}</a></li>
+                            % endif
+                          </ul>
+
+                          <a class="btn" id="remove_users" href="#">
+                            ${_("Remove")}
+                          </a>
+
                           % if nowutc() > self_._conf.getStartDate():
-                            <li class="button middle arrow">
-                              <a href="#">${_("Manage attendance")}</a>
-                              <ul>
-                                <li><a href="#" id="set_present">${_("Set as present")}</a></li>
-                                <li><a href="#" id="set_absent">${_("Set as absent")}</a></li>
-                                <li><a href="#" id="excuse_absence">${_("Excuse absence")}</a></li>
-                              </ul>
-
-                            </li>
+                            <a class="button arrow btn" href="#" data-toggle="dropdown">
+                              ${_("Manage attendance")}
+                            </a>
+                            <ul class="dropdown">
+                              <li><a href="#" id="set_present">${_("Set as present")}</a></li>
+                              <li><a href="#" id="set_absent">${_("Set as absent")}</a></li>
+                              <li><a href="#" id="excuse_absence">${_("Excuse absence")}</a></li>
+                            </ul>
                           % endif
-                          <li class="right">
-                            <a href="#" id="send_email">${_("Email")}</a>
-                          </li>
-                        </ul>
 
-                    </td>
-                    <td style="margin-left: 10px;">Export to: </td>
-                    <td>
-                        <input border="0" type="image" src=${excelIconURL} name="excel" style="margin-top:3px;">
+                          <a class="btn" href="#" id="send_email">
+                            ${_("Email")}
+                          </a>
+
+                          <a class="button arrow btn" href="#" data-toggle="dropdown">
+                            ${_("Export")}
+                          </a>
+                          <ul class="dropdown">
+                            <li><a href="#" class="icon-file-excel" id="export_csv">${_("CSV")}</a></li>
+                          </ul>
+
+                          </div>
+
+                        </div>
                     </td>
                 </tr>
             </table>
-        </td>
-    </tr>
-    <tr id="selectBar" style="display:none">
-        <td colspan=10 style="padding: 5px 5px 10px;" nowrap>
-        Select: <a style="color: #0B63A5;" id="selectAll"> All</a>, <a style="color: #0B63A5;" id="deselectAll">None</a>
         </td>
     </tr>
     <tr id="headParticipants"  style="display:none">
@@ -331,8 +344,10 @@ IndicoUI.executeOnLoad(function(){
         return manageAttendance('event.participation.excuseAbsence', 'status','excused');
     });
 
-    $("[name=excel]").click(function(){
-        return atLeastOneParticipantSelected();
+    $("#export_csv").click(function(){
+        if(atLeastOneParticipantSelected()) {
+          $('#participantsForm').submit();
+        }
     });
 
     $(window).scroll(function(){
