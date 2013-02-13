@@ -844,6 +844,8 @@ submitted to the conference:
 
 * **Apply filters**: Clicking on this link will open a box with many filters. Enabling or disabling any of them will have an impact on the abstracts shown in the list below. For example, you can choose to display only the abstracts belonging to a particular track or session.
 
+* **Columns to display**: Clicking on this link will open a box with the columns to display for each abstract.
+
 * **Add New**:  Submit a new abstract. When you click on this, a window will open:
 
 |image150|
@@ -1007,6 +1009,18 @@ Here are the different tabs:
 
 * **Tools**: From here, you can delete the abstract
 
+Back to submitted
+'''''''''''''''''
+When the abstract has been accepted or rejected it exists the possibility of undo the action and come back to the status
+*Submitted*.
+
+It will be shown the button *back to submitted* in order to make the action.
+
+|image156|
+
+In case of the status *Accepted*, a popup will open in order to confirm the action because the associated contribution will be deleted.
+
+|image157|
 
 --------------
 
@@ -1344,6 +1358,13 @@ If the conference is  PRIVATE the event manager will be able to set a
 in order to request access.
 
 |image49|
+
+If the conference is PUBLIC and has some element that is PRIVATE, there will
+show a message 'Some parts of it are, however, protected. Which ones?'. If you
+click in 'Which ones?' it will show a popup with the children protected. The same
+works when the conference is PRIVATE and has PUBLIC elements.
+
+|image158|
 
 Also when private you can also add an Access Key which means anyone
 with this key can access the conference without logging in. Users
@@ -2027,3 +2048,6 @@ session. You may also make a PDF of the session.
 .. |image153| image:: UserGuidePics/tt_contribintosession.png
 .. |image154| image:: UserGuidePics/tt_undo.png
 .. |image155| image:: UserGuidePics/confd152.png
+.. |image156| image:: UserGuidePics/abstractBackToSubmitted.png
+.. |image157| image:: UserGuidePics/abstractBackToSubmittedConfirm.png
+.. |image158| image:: UserGuidePics/childrenProtectedPopup.png

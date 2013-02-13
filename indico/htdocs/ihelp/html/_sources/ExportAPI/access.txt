@@ -18,7 +18,7 @@ where:
 * *LOC* is the location of the element(s) specified by *ID* and only used
   for certain elements, for example, for the room booking (https://indico.server/export/room/CERN/120.json?ak=0...)
 * *ID* is the ID of the element you want to export (can be a *-* separated list). As for example, the 120 in the above URL.
-* *TYPE* is the output format (one of *json*, *jsonp*, *xml*, *html*, *ics*, *atom*)
+* *TYPE* is the output format (one of *json*, *jsonp*, *xml*, *html*, *ics*, *atom*, *bin*)
 * *PARAMS* are various parameters affecting (filtering, sorting, ...) the
   result list
 * *KEY*, *TS*, *SIG* are part of the :ref:`api-authentication`.

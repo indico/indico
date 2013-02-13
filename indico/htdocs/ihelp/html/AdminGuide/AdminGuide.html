@@ -265,6 +265,77 @@ to delete them.</li>
 <p>You will be asked to confirm the deletion of temporary files and
 websessions as well as packing of the database.</p>
 </div>
+<hr class="docutils" />
+<div class="section" id="plugins">
+<h2>2.6. Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h2>
+<p>The plugins area is accessible from the <em>Plugins</em> menu.
+From here you are able to:</p>
+<ul class="simple">
+<li>Load the plugin types that are installed within Indico. This can be done
+manually by clicking in <em>Reload the plugins manually</em> button or
+automatically when you enter in the page by activating the checkbox
+<em>Reload all plugins every time you open</em>.</li>
+<li>Enable and disable the plugin types by clicking in the red/green square.</li>
+</ul>
+<p><img alt="image12" src="../_images/admin10.png" /></p>
+<div class="section" id="search-plugin">
+<h3>2.6.1. Search plugin<a class="headerlink" href="#search-plugin" title="Permalink to this headline">¶</a></h3>
+<p>This plugin allows to choose which search engine to use in order to perfom a search action in Indico.
+From here you can activate the different search engine adapters and choose the one to use
+by default, if there are more than one.</p>
+<p>Currently, the only search engine plugin is developed for <em>Invenio</em>. You need
+to setup the Invenio server and select the mode:</p>
+<ul class="simple">
+<li>redirection to the search engine web server</li>
+<li>fetching, only PUBLIC, results from the search engine server and rendering them using Indico UI</li>
+<li>fetching, PUBLIC and PRIVATE, results from the search engine server and rendering them using Indico UI</li>
+</ul>
+<p>You will also need to activate the corresponding Livesync plugin in <a class="reference external" href="#livesync-plugin">Livesync plugin</a> in order to
+keep up-to-date the indexes and contents in the Search Engine Server.</p>
+<p><img alt="image13" src="../_images/admin11.png" /></p>
+</div>
+<div class="section" id="outlook-calendar-notification-plugin">
+<h3>2.6.2. Outlook calendar notification plugin<a class="headerlink" href="#outlook-calendar-notification-plugin" title="Permalink to this headline">¶</a></h3>
+<p>This plugin allows to synchronize information about Indico events with the participants personal Microsoft Outlook calendars.
+If a user is added as a registrant/participant of the conference/meeting, a notification about the event is sent to his Outlook calendar.
+The calendar notification is updated every time the event details are changed.</p>
+<p>The calendar notification contains the following information about the event:</p>
+<ul class="simple">
+<li>title</li>
+<li>description</li>
+<li>time</li>
+<li>location</li>
+<li>link to event page</li>
+</ul>
+<p>This plugin is enabled by default for each user but the user can disable it from the <em>User Personal Preferences</em> page.
+The Synchronization is run at a specific interval by the indico-scheduler.</p>
+<p>To run the scheduler task for synchronizing events witch the calendar, you have to put following commands in <em>incidico_shell</em>:</p>
+<blockquote>
+<div>from indico.ext.calendaring.outlook.tasks import OutlookTaskRegistry
+OutlookTaskRegistry.register()</div></blockquote>
+<p><img alt="image14" src="../_images/admin12.png" /></p>
+</div>
+<div class="section" id="id2">
+<h3>2.6.3. Livesync plugin<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="section" id="administration-scripts">
+<h1>3. Administration scripts<a class="headerlink" href="#administration-scripts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="recover-administration-account">
+<h2>3.1. Recover Administration Account<a class="headerlink" href="#recover-administration-account" title="Permalink to this headline">¶</a></h2>
+<p><em>indico_admin</em> script allows you to recover any administrator account.
+It can:</p>
+<ul class="simple">
+<li>grant administrator privileges to any existing user (by user id)</li>
+<li>revoke administrator privileges from any existing user (by user id)</li>
+<li>create a new user with administrator privileges</li>
+</ul>
+<p>For more information type in console</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">indico_admin</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -300,6 +371,16 @@ websessions as well as packing of the database.</p>
 <li><a class="reference internal" href="#groups">2.3. Groups</a></li>
 <li><a class="reference internal" href="#ip-domains">2.4. IP Domains</a></li>
 <li><a class="reference internal" href="#maintenance">2.5. Maintenance</a></li>
+<li><a class="reference internal" href="#plugins">2.6. Plugins</a><ul>
+<li><a class="reference internal" href="#search-plugin">2.6.1. Search plugin</a></li>
+<li><a class="reference internal" href="#outlook-calendar-notification-plugin">2.6.2. Outlook calendar notification plugin</a></li>
+<li><a class="reference internal" href="#id2">2.6.3. Livesync plugin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#administration-scripts">3. Administration scripts</a><ul>
+<li><a class="reference internal" href="#recover-administration-account">3.1. Recover Administration Account</a></li>
 </ul>
 </li>
 </ul>

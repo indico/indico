@@ -1,11 +1,11 @@
-Exportable Elements
-===================
+API Resources
+=============
 
 .. toctree::
    :numbered:
 
    ./categ.rst
    ./event.rst
-   ./room.rst
-   ./reservation.rst
+   ./file.rst
+   ./room_booking.rst
    ./videoservices.rst
