@@ -416,7 +416,7 @@ type("ParticipantListField", ["IWidget"],
                         openNewPopup();
                     }
                 }
-                var popup = new ChooseUsersPopup($T("Add Indico User"), true, null, false, true, null, false, true, handler);
+                var popup = new ChooseUsersPopup($T("Add Indico User"), true, null, false, true, null, false, true, false, handler);
                 popup.execute();
             });
 

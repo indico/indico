@@ -193,6 +193,13 @@ type ("SimpleSearchPanel", ["IWidget"], {
 
        this.container = Html.div({}, this.searchForm.get(), this.searchButtonDiv, this.foundPeopleListDiv, this.extraDiv);
 
+        if (this.submissionRights) {
+            var checkbox = Html.checkbox({}, true);
+            $B(this.grantRights.accessor('submission'), checkbox);
+            var submissionDiv = Html.div({style: {marginTop: pixels(5), marginLeft: pixels(-4)}}, checkbox, $T("Grant all selected users submission rights"));
+            this.container.append(submissionDiv);
+        }
+
        return this.IWidget.prototype.draw.call(this, this.container);
    }
 },
@@ -200,7 +207,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
     /**
      * Constructor for SimpleSearchPanel
      */
-    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv) {
+    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv) {
 
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
@@ -216,6 +223,9 @@ type ("SimpleSearchPanel", ["IWidget"], {
         this.searchButtonDiv = null;
         this.foundPeopleListDiv = null;
         this.container = null;
+
+        this.submissionRights = submissionRights;
+        this.grantRights = grantRights;
    }
 );
 
@@ -322,8 +332,8 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
     /**
      * Constructor for UserSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv){
-        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv);
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv){
+        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv);
         if(exists(conferenceId)) {
             this.criteria.set("conferenceId", conferenceId);
         }
@@ -477,7 +487,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
     /**
      * Constructor for UserAndGroupsSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv){
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv){
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
         this.parentSelectionObserver = selectionObserver;
@@ -486,7 +496,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
 
         this.userPanel = new UserSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("users", selectedList);
-        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv);
+        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv);
         this.groupPanel = new GroupSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("groups", selectedList);
         }, showToggleFavouriteButtons);
@@ -621,26 +631,21 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 
     __buildSearchPanel: function(container) {
         var self = this;
-
         if (this.enableGroups) {
             this.searchPanel = new UserAndGroupsSearchPanel(this.onlyOne, function(selectedList){
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            }, self.extraDiv);
-            var returnedDom = this.searchPanel.draw();
-            container.append(returnedDom);
+            }, this.submissionRights, this.grantRights, self.extraDiv);
         } else {
-            this.searchPanel = new UserSearchPanel(this.onlyOne, function(selectedList){
+            this.searchPanel = new UserSearchPanel(this.onlyOne, function(selectedList) {
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            }, self.extraDiv);
-            var returnedDom = this.searchPanel.draw();
-            container.append(returnedDom);
+            }, this.submissionRights, this.grantRights, self.extraDiv);
         }
-
-
+        var returnedDom = this.searchPanel.draw();
+        container.append(returnedDom);
     },
 
     __buildSuggestedUsersPanel: function(container) {
@@ -688,6 +693,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
     },
 
     __save: function() {
+        var self = this;
         var totalSelected = $O({});
         if (this.allowSearch) {
             totalSelected.update(this.searchPanel.getSelectedList().getAll());
@@ -695,9 +701,11 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         if (this.includeFavourites || exists(this.suggestedUsers)) {
             totalSelected.update(this.suggestedUsersPanel.getSelectedList().getAll());
         }
-
         var returnedList = new List();
         each(totalSelected, function(selectedItem) {
+            if (self.submissionRights) {
+                selectedItem.set('isSubmitter', self.grantRights.get('submission'));
+            }
             returnedList.append(selectedItem.getAll());
         });
         this.chooseProcess(returnedList.allItems());
@@ -779,7 +787,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
              conferenceId, enableGroups,
              includeFavourites, suggestedUsers,
              onlyOne, showToggleFavouriteButtons,
-             chooseProcess, extraDiv) {
+             submissionRights, chooseProcess, extraDiv) {
 
         var self = this;
 
@@ -802,6 +810,9 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         this.buttonDiv = null;
         this.cellSearch = null;
         this.cellSuggested = null;
+
+        this.submissionRights = submissionRights;
+        this.grantRights = new WatchObject();
 
         // We build the dialog.
         this.PreLoadHandler(
@@ -943,7 +954,7 @@ type("SingleUserField", ["IWidget"], {
                 var userChoosePopup = new ChooseUsersPopup("Choose user",
                                                            true, self.conferenceId, self.enableGroups,
                                                            self.includeFavourites, self.suggestedUsers,
-                                                           true, true,
+                                                           true, true, false,
                                                            chooseUserHandler);
                 userChoosePopup.execute();
             });
@@ -1153,6 +1164,7 @@ type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
  * can be used on it. For example 'set' can be used to initialize the list.
  * This means that the users are stored with their id's as keys.
  * @param {String} style The class of the ul that will contain the users.
+ * @param {Boolean} allowSetRights. If true, each user will have an edit button to change their rights.
  * @param {Boolean} allowEdit. If true, each user will have an edit button to change their data.
  * @param {Function} editProcess. A function that will be called when a user is edited. The function will
  *                                be passed the new data as a WatchObject.
@@ -1186,7 +1198,44 @@ type("UserListWidget", ["ListWidget"],
                  );
                  editPopup.open();
              }, IndicoUI.Buttons.editButton()));
-
+             var rightsButton =
+                Widget.link(command(function() {},
+                    IndicoUI.Buttons.rightsButton()));
+                    $(rightsButton.dom).children(0).css('color', userData.get('isSubmitter') ? '#cc4646' : '#aaa');
+                    submissionCheckbox = $("<input type='checkbox'>").attr('checked', userData.get('isSubmitter') ? true : false).css('marginRight', '8px').css('verticalAlign', 'middle');
+                    submissionCheckbox.click(function(){
+                        $(rightsButton.dom).children(0).css('color', this.checked ? '#cc4646' : '#aaa');
+                        userData.set('isSubmitter', this.checked);
+                    });
+                    self.rightsTooltip = $("<div></div>");
+                    self.rightsTooltip.append($("<span></span>").text($T("User privileges")).css('fontSize', '13px'));
+                    submissionDiv = $("<div></div>").css('marginTop', '4px');
+                    submissionDiv.append(submissionCheckbox);
+                    submissionDiv.append($("<span></span>").text($T("Submission rights")).css('verticalAlign', 'middle'));
+                    self.rightsTooltip.append(submissionDiv);
+                    $(rightsButton.dom).qtip({
+                        style: {
+                            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+                            tip: {
+                                corner: true,
+                                width: 15,
+                                height: 10
+                            }
+                        },
+                        position: {
+                            my: 'top middle',
+                            at: 'bottom middle'
+                        },
+                        content: {
+                            text: self.rightsTooltip
+                        },
+                        hide: {
+                            event: 'unfocus'
+                        },
+                        show: {
+                            solo: true
+                        }
+                        });
              var removeButton =
                  Widget.link(command(function() {
                              // removeProcess will be passed a WatchObject representing the user.
@@ -1207,10 +1256,12 @@ type("UserListWidget", ["ListWidget"],
              } else {
 
                  var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}});
-
-                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
+                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('id').indexOf("newUser") == -1) {
                      var favouritizeButton = new ToggleFavouriteButton(userData.getAll(), {}, IndicoGlobalVars['userData']['favorite-user-ids'][userData.get('id')]).draw();
                      buttonDiv.append(favouritizeButton);
+                 }
+                 if (this.allowSetRights) {
+                    buttonDiv.append(rightsButton) ;
                  }
                  if (this.allowEdit) {
                     buttonDiv.append(editButton) ;
@@ -1227,9 +1278,10 @@ type("UserListWidget", ["ListWidget"],
          }
      },
 
-     function(style, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons) {
+     function(style, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons) {
 
          this.style = any(style, "UIPeopleList");
+         this.allowSetRights = allowSetRights;
          this.allowEdit = allowEdit;
          this.editProcess = any(editProcess, singleUserNothing);
          this.removeProcess = any(removeProcess, singleUserNothing);
@@ -1246,7 +1298,7 @@ type("UserListWidget", ["ListWidget"],
  * dialog which will enable both to search users/groups and propose a list of suggested users (favourites and others).
  * The 'id' attribute of the users in the list will depend from their origin.
  * - If it was added from the search dialog, the id will be 'existingAvXX' (where XX corresponds to the avatar id).
- * - It it was added from the 'new user' dialog, the id will be 'newUserXX', where XX is auto-increment starting from 0.
+ * - It it was added from the 'new user' dialog, the id will be 'newUserXX', where XX is auto-increment starting from the highest number of newUser on the list increased by 1.
  * - If it was added from the list of suggested users, it will retain the id of the user that was put in the list.
  * - It the user was edited, and the edited user corresponded to an Avatar, the id will be 'editedXX' where XX is the id of the Avatar used initially.
  *
@@ -1292,15 +1344,13 @@ type("UserListField", ["IWidget"], {
                 self.newProcess(peopleList, function(value) {
                     if (value) {
                         each(peopleList, function(person){
-
                             var key;
                             if (person.isGroup || person._fossil === 'group') {
                                 key = person.id;
                             } else {
                                 key = (person._type === "Avatar") ? "existingAv" + person.id : person.id;
                             }
-
-                            if (person._type === "Avatar" && self.userList.get(key)) {
+                            if (person._type === "Avatar" && (self.userList.get(key) || self.userList.get(person.id))) {
                                 // it is an existing avatar, unchanged, and already exists: we do nothing
                             } else {
                                 if (self.userList.get(key)) {
@@ -1308,7 +1358,6 @@ type("UserListField", ["IWidget"], {
                                 }
                                 self.userList.set(key, $O(person));
                             }
-
                             //self._highlightNewUser(id);
                         });
                     }
@@ -1317,7 +1366,7 @@ type("UserListField", ["IWidget"], {
 
             chooseUserButton.observeClick(function() {
                 var chooseUsersPopup = new ChooseUsersPopup(title, self.allowSearch, self.conferenceId, self.enableGroups,
-                        self.includeFavourites, self.suggestedUsers, false, self.showToggleFavouriteButtons, peopleAddedHandler);
+                        self.includeFavourites, self.suggestedUsers, false, self.showToggleFavouriteButtons, self.allowSetRights, peopleAddedHandler);
                 chooseUsersPopup.execute();
             });
 
@@ -1339,7 +1388,7 @@ type("UserListField", ["IWidget"], {
                     newUser,
                     function(newData, suicideHook) {
                         if (newUserPopup.parameterManager.check()) {
-                            newUser.update(newData.getAll());
+                            newUser.set('isSubmitter', newUser.get('submission'));
                             self.newProcess([newUser], function(result) {
                                 if (result) {
                                     self.userList.set(newUserId, newUser);
@@ -1348,7 +1397,7 @@ type("UserListField", ["IWidget"], {
                             });
                             suicideHook();
                         }
-                    }
+                    }, true
                 );
                 newUserPopup.open();
             });
@@ -1390,6 +1439,7 @@ type("UserListField", ["IWidget"], {
      * @param {string} conferenceId for author list search
      * @param {list} privileges dictionary with the privileges that we can set for the users. There is a key and a tuple as vale: (label, default value for checked). E.g. {"grant-manager": ["event modification", false]}
      * @param {Boolean} allowNew If True, a 'New User' button will be present.
+     * @param {Boolean} allowSetRights. If True, rights for each user will be able to be edited.
      * @param {Boolean} allowEdit If True, users in the list will be able to be edited.
      * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
      * @param {Function} newProcess A function that will be called when new users (from new data, or from the search dialog, or from the suggested list) is added to the list.
@@ -1399,14 +1449,18 @@ type("UserListField", ["IWidget"], {
     function(userDivStyle, userListStyle,
              initialUsers, includeFavourites, suggestedUsers,
              allowSearch, enableGroups, conferenceId, privileges,
-             allowNew, allowEdit, showToggleFavouriteButtons,
+             allowNew, allowSetRights, allowEdit, showToggleFavouriteButtons,
              newProcess, editProcess, removeProcess) {
 
         var self = this;
-
-        this.userList = new UserListWidget(userListStyle, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons);
-        this.newUserCounter = 0;
-
+        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons);
+        self.newUserCounter = 0;
+        // find the highest id of newUser and set counter to next value
+        if (initialUsers) {
+            initialUsers.forEach(function(user) {
+                self.newUserCounter = max(parseInt(user.id.replace("newUser", "")), self.newUserCounter) + 1;
+            });
+        }
         this.userDivStyle = any(userDivStyle, "UIPeopleListDiv");
 
         if (exists(initialUsers)) {
@@ -1438,6 +1492,7 @@ type("UserListField", ["IWidget"], {
         this.conferenceId = any(conferenceId, null);
         this.privileges = any(privileges, {});
         this.selectedPrivileges = new WatchObject();
+        this.allowSetRights = allowSetRights;
 
         this.allowNew = any(allowNew, true);
         this.showToggleFavouriteButtons = any(showToggleFavouriteButtons, true);

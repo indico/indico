@@ -137,24 +137,35 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
         pList = pManager.extract("%ss" % elemType, pType=list,
                                  allowEmpty=True)
 
-        peopleIds = []
+        addedIds = []
+        personsIds = [person.getId() for person in getListMethod(contribution)[:]]
 
         for elemValues in pList:
-            if elemValues.get("_type","Avatar"): #new
+            if elemValues["id"] not in personsIds: #new
                 element = conference.ContributionParticipation()
                 DictPickler.update(element, elemValues)
+                element.setId(elemValues["id"])
 
                 # call the appropriate method
                 addMethod(contribution, element)
-                peopleIds.append(element.getId())
+                addedIds.append(element.getId())
+                if self._updateRights:
+                    if elemValues.get("isSubmitter"):
+                        contribution.grantSubmission(element)
                 if self._privileges[elemType] is not None:
                     if self._privileges[elemType].get('%s-grant-submission' % elemType, False):
                         contribution.grantSubmission(element)
-            else:
-                peopleIds.append(elemValues["id"])
+            else: #update
+                if self._updateRights:
+                    personToUpdate = [person for person in getListMethod(contribution)[:] if person.getId() == elemValues["id"]][0]
+                    if elemValues.get("isSubmitter"):
+                        contribution.grantSubmission(personToUpdate)
+                    else:
+                        contribution.revokeSubmission(personToUpdate)
+                addedIds.append(elemValues["id"])
 
-        for person in getListMethod(contribution)[:]:
-            if str(person.getId()) not in peopleIds:
+        for person in getListMethod(contribution)[:]: #delete
+            if str(person.getId()) not in addedIds:
                 deleteMethod(contribution, person)
             elif self._privileges[elemType] is not None:
                 if self._privileges[elemType].get('%s-grant-submission' % elemType, False):
@@ -205,6 +216,7 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
 
         self._contribTypeId = self._pManager.extract("contributionType", pType=str, allowEmpty=True)
         self._materials = self._pManager.extract("materials", pType=dict, allowEmpty=True)
+        self._updateRights = self._params.get("updateRights", False)
 
 
     def _performOperation(self):

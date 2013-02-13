@@ -208,7 +208,7 @@ IndicoUI.executeOnLoad(function(){
 
     var searchUsers = function(title, handler) {
         var chooseUsersPopup = new ChooseUsersPopup(title, true, ${self_._conf.getId()}, false,
-                true, null, false, false, handler);
+                true, null, false, false, false, handler);
         chooseUsersPopup.execute();
         return false;
     };

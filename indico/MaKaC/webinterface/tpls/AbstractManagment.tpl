@@ -266,7 +266,7 @@ $("#changeSubmitter").click(function(){
     // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
     //         showToggleFavouriteButtons, chooseProcess)
     var chooseUsersPopup = new ChooseUsersPopup($T("Change submitter"), true, '${ confId }', false,
-            true, true, true, true, changeSubmitterHandler);
+            true, true, true, true, false, changeSubmitterHandler);
     chooseUsersPopup.execute();
 });
 

@@ -299,7 +299,7 @@ type("AuthorListManager", [], {
         // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
         //          showToggleFavouriteButtons, chooseProcess)
         var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers,
-                                                    onlyOne, showToggleFavouriteButtons,
+                                                    onlyOne, showToggleFavouriteButtons, false,
                     function(userList) {
                         for (var i=0; i<userList.length; i++) {
                             if (!self.isAlreadyInList(userList[i]['email'], true)) {

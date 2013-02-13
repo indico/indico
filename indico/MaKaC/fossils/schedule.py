@@ -192,12 +192,12 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
     def getAuthors(self):
         """ Entry Primary authors """
     getAuthors.produce = lambda x: x.getOwner().getPrimaryAuthorList()
-    getAuthors.result = IConferenceParticipationFossil
+    getAuthors.result = IContributionParticipationFossil
 
     def getCoauthors(self):
         """ Entry Co-Authors """
     getCoauthors.produce = lambda x: x.getOwner().getCoAuthorList()
-    getCoauthors.result = IConferenceParticipationFossil
+    getCoauthors.result = IContributionParticipationFossil
 
     def getId(self):
         """ Default Id """

@@ -85,7 +85,7 @@
                 'userListDiv', 'userList',
                 null, true, null,
                 true, true, null, null,
-                false, false, true,
+                false, false, false, true,
                 userListNothing, userListNothing, userListNothing);
 
         // ---- When the private radio button is selected, display the list of users

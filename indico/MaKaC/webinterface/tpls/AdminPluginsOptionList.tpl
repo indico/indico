@@ -69,7 +69,7 @@
                         var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
                                                    ${ jsonEncode(fossilize(option.getValue(), IAvatarFossil)) }, true, null,
                                                    true, false, null, null,
-                                                   false, false, true,
+                                                   false, false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
                         $E('userList${name}').set(uf.draw())
                     </script>
@@ -473,7 +473,7 @@
                         var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
                                                    ${ jsonEncode(fossilize(option.getValue())) }, true, null,
                                                    true, true, null, null,
-                                                   false, false, true,
+                                                   false, false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
                         $E('userGroupList${name}').set(uf.draw())
                     </script>

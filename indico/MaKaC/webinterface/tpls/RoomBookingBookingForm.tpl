@@ -54,7 +54,7 @@
                                          true,
                                          null, false,
                                          true, null,
-                                         true, true,
+                                         true, true, false,
                                          function(users) {
                                              $E('bookedForName').set(users[0].name);
                                              $E('bookedForId').set(users[0].id);

@@ -47,7 +47,7 @@ type("ListOfUsersManager", [], {
         // params: (title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
         //          showToggleFavouriteButtons, chooseProcess)
         var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers,
-                                                    onlyOne, showToggleFavouriteButtons,
+                                                    onlyOne, showToggleFavouriteButtons, false,
                 function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList, extraParams));}, extraDiv);
         chooseUsersPopup.execute();
     },
@@ -454,7 +454,7 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
         // Create the popup to add new users
         var chooseUsersPopup = new ChooseUsersPopup(
             title, allowSearch, confId, enableGroups, includeFavourites,
-            suggestedUsers, onlyOne, showToggleFavouriteButtons,
+            suggestedUsers, onlyOne, showToggleFavouriteButtons, false,
             function(userList) {
                 for (var i=0; i<userList.length; i++) {
                     if (!self._isAlreadyInList(userList[i]['email'])) {

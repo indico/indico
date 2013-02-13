@@ -87,7 +87,7 @@ var listOfAddHandlers = {};
             ${ jsonEncode(fossilize(coordinatorsByTrack[i])) },
             true,null,
             true, false, null, null,
-            false, false, true,
+            false, false, false, true,
             addReviewerHandler, null, removeReviewerHandler);
 
 

@@ -103,7 +103,7 @@
     var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
             null, true, null,
             true, false, false, {"grant-manager": [${ jsonEncode(_("event modification"))}, false]},
-            true, false, true,
+            true, false, false, true,
             userListNothing, userListNothing, userListNothing);
 
     $E('chairpersonsContainer').set(uf.draw());

@@ -200,7 +200,7 @@ from MaKaC.conference import Category
             'userListDiv', 'userList',
             allowedList, true, null,
             true, true, null, null,
-            false, false, true,
+            false, false, false, true,
             addUsers, null, removeUser);
 
     // ---- On Load

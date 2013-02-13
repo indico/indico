@@ -120,6 +120,10 @@ class IContributionParticipationMinimalFossil(IFossil):
         pass
     getDirectFullName.name = "name"
 
+    def isSubmitter(self):
+        pass
+    isSubmitter.produce = lambda l: l.isSubmitter()
+
 class IContributionParticipationFossil(IContributionParticipationMinimalFossil):
 
     def getTitle(self):

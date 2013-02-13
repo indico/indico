@@ -18,7 +18,7 @@
 function loginAs() {
     var popup = new ChooseUsersPopup(
         $T("Select user to log in as"), true, null, false,
-        true, true, true, true,
+        true, true, true, true, false,
         function(user) {
             indicoRequest(
                 'admin.header.loginAs',

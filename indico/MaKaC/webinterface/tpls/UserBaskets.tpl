@@ -43,7 +43,7 @@
             'FavoritePeopleListDiv', 'PeopleList',
             favouriteList, false, null,
             true, false, null, null,
-            false, false, false,
+            false, false, false, false,
             addUsers, null, removeUser);
 
     $E('basketContainer').set(uf.draw());

@@ -7572,6 +7572,11 @@ class ContributionParticipation(Persistent, Fossilizable):
             res = "%s%s."%(res, self.getFirstName()[0].upper())
         return res
 
+    def isSubmitter(self):
+        if self.getContribution() is None:
+            return False
+        return self.getContribution().canUserSubmit(self)
+
 
     def isPendingSubmitter(self):
         if self.getContribution() is None:
@@ -9506,8 +9511,7 @@ class Contribution(CommonObjectBase, Locatable):
         self.notifyModification(raiseEvent = False)
 
     def _grantSubmissionEmail(self, email):
-        """
-            Returns True if submission email was granted. False if email was already in the list.
+        """Returns True if submission email was granted. False if email was already in the list.
         """
         if not email.lower() in map(lambda x: x.lower(), self.getSubmitterEmailList()):
             self.getSubmitterEmailList().append(email)
@@ -9519,7 +9523,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getSubmitterEmailList().remove(email)
             self._p_changed=1
 
-    def grantSubmission(self,sb, sendEmail=True):
+    def grantSubmission(self, sb, sendEmail=True):
         """Grants a user with submission privileges for the contribution
            - sb: can be an Avatar or an Author (primary author, co-author, speaker)
         """
@@ -9547,23 +9551,39 @@ class Contribution(CommonObjectBase, Locatable):
         else:
             self._grantSubmission(sb)
 
-    def _revokeSubmission(self,av):
+    def _revokeSubmission(self, av):
         if av in self._submitters:
             self._submitters.remove(av)
         if self.getConference() is not None:
-            self.getConference().removeContribSubmitter(self,av)
+            self.getConference().removeContribSubmitter(self, av)
         if isinstance(av, MaKaC.user.Avatar):
             av.unlinkTo(self, "submission")
         self.notifyModification(raiseEvent = False)
 
-    def revokeSubmission(self,av):
+    def revokeSubmission(self, sb):
         """Removes submission privileges for the specified user
+            - sb: can be an Avatar or an Author (primary author, co-author, speaker)
         """
         self._initSubmissionPrivileges()
-        self._revokeSubmission(av)
+        if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
+            ah = AvatarHolder()
+            results = ah.match({"email":sb.getEmail()}, exact=1, forceWithoutExtAuth=True)
+            if not results:
+                results = ah.match({"email":sb.getEmail()}, exact=1)
+            r = None
+            for i in results:
+                if i.hasEmail(sb.getEmail()):
+                    r=i
+                    break
+            if r:
+                self._revokeSubmission(r)
+            else:
+                self.revokeSubmissionEmail(sb.getEmail())
+        else:
+            self._revokeSubmission(sb)
 
     def revokeAllSubmitters(self):
-        self._submitters=[]
+        self._submitters = []
         self.notifyModification(raiseEvent = False)
 
     def getSubmitterList(self):
@@ -9579,24 +9599,26 @@ class Contribution(CommonObjectBase, Locatable):
             self._submittersEmail = []
         return self._submittersEmail
 
-    def canUserSubmit(self,av):
+    def canUserSubmit(self, sb):
         """Tells whether a user can submit material for the current contribution
+            - sb: can be an Avatar or an Author (primary author, co-author, speaker)
         """
-        if av is None:
+        if sb is None:
             return False
         self._initSubmissionPrivileges()
+        if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
+            return any(submitter.getEmail() == sb.getEmail() for submitter in self._submitters) or any(submitterEmail == sb.getEmail() for submitterEmail in self._submittersEmail)
         for principal in self._submitters:
-            if principal != None and principal.containsUser( av ):
+            if principal != None and principal.containsUser(sb):
                 return True
-        ret = False
         #TODO: Remove this and use pending list
-        if isinstance(av, MaKaC.user.Avatar):
-            for email in av.getEmails():
+        if isinstance(sb, MaKaC.user.Avatar):
+            for email in sb.getEmails():
                 if email.lower() in self.getSubmitterEmailList():
-                    self.grantSubmission(av)
+                    self.grantSubmission(sb)
                     self.revokeSubmissionEmail(email)
-                    ret = True
-        return ret
+                    return True
+        return None
 
     def getAccessController(self):
         return self.__ac

@@ -461,14 +461,15 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 this.isEdit?nullRoomInfo(info.get('roomInfo')):true, self.favoriteRooms, null, self.bookedRooms, ttdata, info, undefined, parentName);
 
         var presListWidget = new UserListField(
-            'VeryShortPeopleListDiv', 'PeopleList',
+            'LongPeopleListDiv', 'PeopleList',
             self.isEdit?self.info.get("presenters"):null, true, null,
-            true, false, self.info.get("conference"), {"presenter-grant-submission": [$T("submission rights"),  !self.isEdit]},
-            true, true, true,
+            true, true, self.info.get("conference"), null,
+            true, true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         $B(info.accessor('presenters'), presListWidget.getUsers());
         info.set('presenter-privileges', presListWidget.getPrivileges());
+        info.set('updateRights', true);
 
         var startTimeLine, daySelect, datecomponent;
 
@@ -583,17 +584,17 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var self = this;
 
         var authorListWidget = new UserListField(
-            'VeryShortPeopleListDiv', 'PeopleList',
+            'AuthorPeopleListDiv', 'PeopleList',
             self.info.get("authors"), true, null,
-            true, false, this.args.get('conference'), {"author-grant-submission": [$T("submission rights"), !self.isEdit]},
-            true, true, true,
+            true, false, this.args.get('conference'), null,
+            true, true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         var coauthorListWidget = new UserListField(
-                'VeryShortPeopleListDiv', 'PeopleList',
+                'LongPeopleListDiv', 'PeopleList',
                 self.info.get("coauthors"), true, null,
-                true, false, this.args.get('conference'), {"coauthor-grant-submission": [$T("submission rights"), !self.isEdit]},
-                true, true, true,
+                true, false, this.args.get('conference'), null,
+                true, true, true, true,
                 userListNothing, userListNothing, userListNothing);
 
         $B(info.accessor('authors'), authorListWidget.getUsers());

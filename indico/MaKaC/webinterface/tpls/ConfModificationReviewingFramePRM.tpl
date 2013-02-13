@@ -78,7 +78,7 @@
                                 ${ jsonEncode(fossilize(ConfReview.getPaperReviewManagersList())) },
                                 true,null,
                                 true, false, null, null,
-                                false, false, true,
+                                false, false, false, true,
                                 newPRMHandler, userListNothing, removePRMHandler);
                         $E('PRMList').set(uf.draw());
 </script>

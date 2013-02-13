@@ -117,7 +117,7 @@ extend(IndicoUI.Dialogs,
                                'VeryShortPeopleListDiv', 'PeopleList',
                                null, true, null,
                                true, false, null, null,
-                               true, true, true,
+                               true, false, true, true,
                                userListNothing, userListNothing, userListNothing);
 
                            $B(info.accessor('conveners'), convListWidget.getUsers());
@@ -408,7 +408,7 @@ extend(IndicoUI.Dialogs,
                                'VeryShortPeopleListDiv', 'PeopleList',
                                isEdit?params.conveners:params.sessionConveners, true, null,
                                true, false, null, null,
-                               true, true, true,
+                               true, false, true, true,
                                userListNothing, userListNothing, userListNothing);
 
                            //Create the list of the days in which the conference is being held

@@ -142,7 +142,7 @@
                     'ShortPeopleListDiv', 'PeopleList',
                     ${ fossilize(p.getPrincipal() for p in block.allowed) }, true, null,
                     true, true, null, null,
-                    false, false, true,
+                    false, false, false, true,
                     function(data, func) {
                         userListNothing(data, func);
                         serializeACL();

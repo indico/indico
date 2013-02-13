@@ -549,7 +549,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
             'ShortPeopleListDiv', 'PeopleList',
             null, true, null,
             true, true, null, null,
-            false, false, true,
+            false, false, false, true,
             userListNothing, userListNothing, userListNothing);
 
         // Bind fields to data structure
@@ -792,7 +792,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
                 'ShortPeopleListDiv', 'PeopleList',
                 this.allowedUsers, true, null,
                 true, true, null, null,
-                false, false, true,
+                false, false, false, true,
                 userListNothing, userListNothing, userListNothing);
 
 

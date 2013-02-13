@@ -85,7 +85,7 @@
     var uf = new UserListField('PeopleListDiv', 'PeopleList',
                                ${ jsonEncode(fossilize(CSBM.getPluginManagers(name), IAvatarFossil)) }, true, allManagers,
                                true, false, null, null,
-                               false, false, true,
+                               false, false, false, true,
                                newPersonsHandler, singleUserNothing, removePersonHandler)
     $E('userList_${name}').set(uf.draw())
     % endfor

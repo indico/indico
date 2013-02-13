@@ -429,7 +429,7 @@
                                          true,
                                          null, false,
                                          true, null,
-                                         true, true,
+                                         true, true, false,
                                          function(users) {
                                              $E('responsibleName').set(users[0].name);
                                              $E('responsibleId').set(users[0].id);

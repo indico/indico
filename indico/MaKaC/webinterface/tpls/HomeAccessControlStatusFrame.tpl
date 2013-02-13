@@ -60,7 +60,7 @@
                     'userListDiv', 'userList',
                     allowedList, true, null,
                     true, true, null, null,
-                    false, false, false,
+                    false, false, false, false,
                     addUsers, null, removeUser);
 
             // ---- On Load

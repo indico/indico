@@ -358,6 +358,23 @@ IndicoUI.Buttons = {
         }
 
         return Widget.link(option);
-    }
+    },
 
+    /**
+        * Returns an image with an 'shield' icon
+        */
+    rightsButton: function(){
+        var caption = 'User rights';
+        return Html.span({
+            alt: caption,
+            title: caption,
+            className: "icon-shield-2",
+            ariaHidden: true,
+            style: {
+                'marginLeft': pixels(5),
+                'verticalAlign': 'middle',
+                'fontSize': pixels(15)
+            }
+        });
+    }
 };

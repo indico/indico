@@ -102,7 +102,7 @@
                                 ${ jsonEncode(fossilize(ConfReview.getRefereesList())) },
                                 true,null,
                                 true, false, null, null,
-                                false, false, true,
+                                false, false, false, true,
                                 newRefereeHandler, userListNothing, removeRefereeHandler);
                         $E('RefereeList').set(uf.draw());
 </script>
@@ -174,7 +174,7 @@
                                 ${ jsonEncode(fossilize(ConfReview.getReviewersList())) },
                                 true,null,
                                 true, false, null, null,
-                                false, false, true,
+                                false, false, false, true,
                                 newReviewerHandler, userListNothing, removeReviewerHandler);
                         $E('ReviewerList').set(uf.draw());
 </script>
@@ -246,7 +246,7 @@
                                                    ${ jsonEncode(fossilize(ConfReview.getEditorsList())) },
                                                    true,null,
                                                    true, false, null, null,
-                                                   false, false, true,
+                                                   false, false, false, true,
                                                    newEditorHandler, userListNothing, removeEditorHandler);
                         $E('EditorList').set(uf.draw());
 </script>

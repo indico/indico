@@ -6398,6 +6398,22 @@ div.VeryShortPeopleListDiv {
     overflow: auto;
 }
 
+div.LongPeopleListDiv {
+    margin-bottom: 10px;
+    height: 75px;
+    width: 412px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
+div.AuthorPeopleListDiv {
+    margin-bottom: 10px;
+    height: 130px;
+    width: 412px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
 div.CategoryEventListDiv {
     margin-bottom: 10px;
     height: 150px;
