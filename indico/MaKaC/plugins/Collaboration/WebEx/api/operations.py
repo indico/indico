@@ -29,7 +29,6 @@ on the WebEx server otherwise...)
 import xml.dom.minidom
 from datetime import datetime
 from time import strptime
-from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.WebEx.common import  WebExError,\
     WebExWarning, getWebExOptionValueByName,\
     makeParticipantXML, sendXMLRequest

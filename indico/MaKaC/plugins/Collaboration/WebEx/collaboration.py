@@ -27,7 +27,6 @@ import xml.dom.minidom
 import re
 from time import strptime
 from datetime import timedelta, datetime
-from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, naive2local, getAdjustedDate
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate, getMaxEndDate,\
@@ -36,7 +35,6 @@ from MaKaC.plugins.Collaboration.WebEx.api.operations import WebExOperations
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.common.Counter import Counter
-from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationAdmin, \
     WebExMeetingModifiedNotificationAdmin, WebExMeetingRemovalNotificationAdmin, \
   WebExParticipantNotification
@@ -82,7 +80,7 @@ class CSBooking(CSBookingBase):
             "sendSelfEmail":(bool, False),
             "loggedInEmail":(str, ''),
             "showAccessPassword":(bool,False),
-            "session": (str,""), 
+            "session": (str,""),
             "seeParticipants": (bool, True),
             "enableChat": (bool, True),
             "joinBeforeHost": (bool,True),
@@ -112,6 +110,7 @@ class CSBooking(CSBookingBase):
         self._checksDone = []
         self._bookingChangesHistory = []
         self._latestChanges = []
+        self._webExPass = ""
 
     def getParticipantList(self, sorted = False):
         if sorted:
@@ -147,8 +146,6 @@ class CSBooking(CSBookingBase):
             return self._accessPassword
 
     def getWebExPass(self):
-        if not hasattr(self, "_webExPass"):
-            self._webExPass = ""
         return self._webExPass
 
     def setWebExPass(self, webExPass):
@@ -245,9 +242,6 @@ class CSBooking(CSBookingBase):
         if len(params["meetingTitle"].strip()) == 0:
             return WebExError(errorType = None, userMessage = _("Title cannot be left blank"))
 
-#        if len(params["meetingDescription"].strip()) == 0:
-#            return WebExError(errorType = None, userMessage = _("Description cannot be left blank."))
-
         if len(params["webExUser"].strip()) == 0:
             return WebExError(errorType = None, userMessage = _("WebEx username is empty.  The booking cannot continue without this."))
 
@@ -256,18 +250,6 @@ class CSBooking(CSBookingBase):
 
         if self._startDate >= self._endDate:
             return WebExError(errorType = None, userMessage = _("Start date of booking cannot be after end date."))
-
-#        allowedStartMinutes = self._WebExOptions["allowedPastMinutes"].getValue()
-#        if self.getAdjustedStartDate('UTC')  < (nowutc() - timedelta(minutes = allowedStartMinutes )):
-#            return WebExError(errorType = None, userMessage = "Cannot create booking before the past " + str(allowedStartMinutes) + " minutes.")
-
-#        minStartDate = getMinStartDate(self.getConference())
-#        if self.getStartDate() < minStartDate:
-#            return WebExError(errorType = None, userMessage = _("Cannot create a booking %s minutes before the Indico event's start date."))
-
-#        maxEndDate = getMaxEndDate(self.getConference())
-#        if self.getEndDate() > maxEndDate:
-#            return WebExError(errorType = None, userMessage = _("Cannot create a booking %s minutes after the Indico event's end date."))
 
         return False
 
@@ -441,7 +423,7 @@ class CSBooking(CSBookingBase):
         """
         This function will delete the specified video booking from the WebEx server
         """
-        try: 
+        try:
             result = ExternalOperationsManager.execute(self, "deleteBooking", WebExOperations.deleteBooking, self)
             if isinstance(result, WebExError):
                 return result
@@ -662,7 +644,7 @@ class CSBooking(CSBookingBase):
                 if self._endDate != getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) ):
                     self._endDate = getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )
                     changesFromWebEx.append(_("Updated end time to match WebEx entry"))
-                    latestchanges.append(_("Updated start time to match WebEx entry"))
+                    latestChanges.append(_("Updated start time to match WebEx entry"))
         self.checkCanStart()
         self._bookingChangesHistory = changesFromWebEx
         self._latestChanges = latestChanges

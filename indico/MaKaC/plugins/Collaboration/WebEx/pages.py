@@ -19,17 +19,11 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from datetime import timedelta
-
 from MaKaC.common.utils import formatDateTime
-from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
-
-from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
 from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate, getMaxEndDate
 
 from MaKaC.i18n import _
@@ -64,10 +58,6 @@ class WAdvancedTab(WAdvancedTabBase):
 
     def getVars(self):
         variables = WAdvancedTabBase.getVars(self)
-#        if booking.showAccessPassword():
-#            variables["showAccessPassword"] = "yes"
-#        else:
-#            variables["showAccessPassword"] = "no"
         return variables
 
 class WMain (WJSBase):
@@ -126,7 +116,7 @@ class WStyle(WCSCSSBase):
 class XMLGenerator(object):
     @classmethod
     def getFirstLineInfo(cls, booking, displayTz):
-         return booking._bookingParams["meetingTitle"]
+        return booking._bookingParams["meetingTitle"]
     @classmethod
     def getDisplayName(cls):
         return "WebEx"
@@ -223,11 +213,11 @@ class ServiceInformation(object):
             "title" : _("Auto-join URL:"),
             "linkLines" : [(booking.getUrl(), booking.getUrl())]
         })
-	sections.append({
+        sections.append({
             "title" : _("Call-in toll free number (US/Canada):"),
             "lines" : [booking.getPhoneNum()]
         })
-	sections.append({
+        sections.append({
             "title" : _("Call-in toll number: (US/Canada):"),
             "lines" : [booking.getPhoneNumToll()]
         })

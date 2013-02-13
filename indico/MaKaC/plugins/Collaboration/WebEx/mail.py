@@ -22,8 +22,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 
 from MaKaC.common.Configuration import Config
-from MaKaC.common.utils import formatDateTime
-from MaKaC.plugins.Collaboration.WebEx.common import getWebExOptionValueByName, makeTime
+from MaKaC.plugins.Collaboration.WebEx.common import getWebExOptionValueByName
 import re
 
 class WebExNotificationBase(GenericNotification):
@@ -123,7 +122,7 @@ Request details:<br />
      "end_date":self._booking.getAdjustedEndDate().strftime("%A, %d %B %Y. %I:%M %p"),
      "password":self._booking.getAccessPassword(),
      "url":self._booking.getUrl(),
-     "phone":self._booking.getPhoneNum(), 
+     "phone":self._booking.getPhoneNum(),
      "phoneToll":self._booking.getPhoneNumToll(),
      "phoneAccessCode":re.sub(r'(\d{3})(?=\d)',r'\1 ', str(self._booking.getWebExKey())[::-1])[::-1],
      "timezone":self._booking._conf.getTimezone()
@@ -131,8 +130,8 @@ Request details:<br />
      )
 
     @classmethod
-    def listToStr(cls, list):
-        return "<br />".join([("•" + item) for item in list])
+    def listToStr(cls, li):
+        return "<br />".join([("•" + item) for item in li])
 
 class WebExParticipantNotification(WebExNotificationBase):
     def __init__(self, booking, emailList, typeOfMail, additionalText=""):
@@ -240,7 +239,7 @@ class WebExMeetingModifiedNotificationAdmin(WebExAdminNotificationBase):
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
 
-        body_text = "Dear WebEx Responsible,<br /> There has been a change on %s to the WebEx meeting %s. <br/><br/>	 " % (MailTools.getServerName(), self._conference.getTitle() )
+        body_text = "Dear WebEx Responsible,<br /> There has been a change on %s to the WebEx meeting %s. <br/><br/>" % (MailTools.getServerName(), self._conference.getTitle() )
 #        if len( booking.getLatestChanges() ) > 0:
 #            body_text += "<ul>\n"
 #            for change in booking.getLatestChanges():

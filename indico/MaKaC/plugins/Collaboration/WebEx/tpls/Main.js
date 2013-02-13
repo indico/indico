@@ -12,17 +12,12 @@
     checkParams: function() {
         return {
             'meetingTitle' : ['text', false],
-/*            'meetingDescription' : ['text', false],*/
             'webExPass' : ['text', false],
             'webExUser' : ['text', false],
             'startDate' : ['datetime', false, function(startDateString, values){
                 var errors = [];
                 var startDate = IndicoUtil.parseDateTime(startDateString);
 
-                //check start date is not in the past
-/*                if (beforeNow(startDate)) {
-                    errors.push($T("Start date cannot be before the current time"));
-                }*/
                 var startDatePlusExtraTime = new Date();
                 startDatePlusExtraTime.setTime(startDate.getTime() + ${ AllowedStartMinutes } *60*1000);
                 if (beforeNow(startDatePlusExtraTime)) {
@@ -229,13 +224,13 @@
     },
 
     onCreate: function() {
-        pf = new ParticipantListField();
+        pf = new WebExParticipantListField();
         $E('participantsCell').set(pf.draw());
         WebExDrawContextHelpIcons();
     },
 
     onEdit: function(booking) {
-        pf = new ParticipantListField(booking.bookingParams.participants)
+        pf = new WebExParticipantListField(booking.bookingParams.participants)
         $E('participantsCell').set(pf.draw());
         WebExDrawContextHelpIcons();
     },

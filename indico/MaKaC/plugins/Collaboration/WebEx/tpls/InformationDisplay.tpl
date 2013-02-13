@@ -3,16 +3,16 @@
         % if Booking.getHasAccessPassword():
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span>Protection:</span>
+                <span>${ _("Protection:")}</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                This WebEx meeting is protected by a password.
+                ${ _("This WebEx meeting is protected by a password.")}
             </td>
         </tr>
         % endif
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span>Agenda:</span>
+                <span>${ _("Agenda:")}</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking._bookingParams["meetingDescription"] }
@@ -20,7 +20,7 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span>Toll free call in number:</span>
+                <span>${ _("Toll free call in number:")}</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getPhoneNum() }
@@ -28,7 +28,7 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span>Toll call in number:</span>
+                <span>${ _("Toll call in number:")}</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getPhoneNumToll() }
@@ -36,7 +36,7 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span>Call in access code:</span>
+                <span>${ _("Call in access code:")}</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getPhoneAccessCode() }
@@ -44,7 +44,7 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span>Join URL:</span>
+                <span>${ _("Join URL:")}</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <a href="${ Booking.getUrl() }" target="_blank" >${ Booking.getUrl() }</a>

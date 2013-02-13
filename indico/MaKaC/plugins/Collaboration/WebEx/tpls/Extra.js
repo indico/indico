@@ -175,46 +175,40 @@ var WebExDrawContextHelpIcons = function() {
  * @param {Function} cancelAction (optional) A callback function that will be called if the user presses cancel. The function will be passed
  *                                 a function that must be called to close the popup. If no function is passed the popup will be closed.
  */
-type("PersonDataPopup", ["ExclusivePopup"],
+type("WebExPersonDataPopup", ["ExclusivePopupWithButtons"],
     {
+        _getButtons: function() {
+            var self = this;
+            var closePopup = $.proxy(self.close, self);
+            return [
+                [$T('Save'), function() {
+                    if (self.parameterManager.check()) {
+                        self.action(self.personData, closePopup);
+                    }
+                }],
+                [$T('Cancel'), function() {
+                    if (self.cancelAction) {
+                        self.cancelAction(closePopup);
+                    } else {
+                        closePopup();
+                    }
+                }]
+            ];
+        },
+
         draw: function() {
             var self = this;
-            var personData = self.personData;
-            var closePopup = function(){self.close()}
 
-            var saveButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Save"));
-            saveButton.observeClick(function(){
-                if (self.parameterManager.check()) {
-                    self.action(personData, closePopup);
-                }
-            });
-
-            var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
-            cancelButton.observeClick(function(){
-                if (self.cancelAction) {
-                    self.cancelAction(closePopup)
-                } else {
-                    closePopup();
-                }
-            });
-
-            var buttonDiv = Html.div({style:{textAlign:"center", marginTop:pixels(10)}}, saveButton, cancelButton)
-
-
-            return this.ExclusivePopup.prototype.draw.call(this, Widget.block([
-                IndicoUtil.createFormFromMap([
-                    [$T('Title'), $B(Html.select({}, Html.option({}, ""), Html.option({}, "Mr."), Html.option({}, "Mrs."), Html.option({}, "Ms."), Html.option({}, "Dr."), Html.option({}, "Prof.")), personData.accessor('title'))],
-                    [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), personData.accessor('familyName'))],
-                    [$T('First Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), personData.accessor('firstName'))],
-                    [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), personData.accessor('affiliation'))],
+            return this.ExclusivePopup.prototype.draw.call(this, IndicoUtil.createFormFromMap([
+                    [$T('Title'), $B(Html.select({}, Html.option({}, ""), Html.option({}, "Mr."), Html.option({}, "Mrs."), Html.option({}, "Ms."), Html.option({}, "Dr."), Html.option({}, "Prof.")), self.personData.accessor('title'))],
+                    [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), self.personData.accessor('familyName'))],
+                    [$T('First Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), self.personData.accessor('firstName'))],
+                    [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), self.personData.accessor('affiliation'))],
                     [$T('Email'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false, function()
                     {
-                        if ( !( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test( personData.get("email") )) )
+                        if ( !( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test( self.personData.get("email") )) )
                             return ($T("Invalid email address"));
-                    }), personData.accessor('email'))]
-                ]),
-                buttonDiv
-            ]));
+                    }), self.personData.accessor('email'))]]));
         } // end of draw
     },
 
@@ -223,7 +217,7 @@ type("PersonDataPopup", ["ExclusivePopup"],
         this.action = action;
         this.cancelAction = cancelAction;
         this.parameterManager = new IndicoUtil.parameterManager();
-        this.ExclusivePopup(title, positive);
+        this.ExclusivePopupWithButtons(title, positive);
     }
 );
 
@@ -237,7 +231,7 @@ type("PersonDataPopup", ["ExclusivePopup"],
  * @param {Function} editProcess. A function that will be called when a user is edited. The function will
  *                                be passed the new data as a WatchObject.
  */
-type("ParticipantListWidget", ["ListWidget"],
+type("WebExParticipantListWidget", ["ListWidget"],
     {
         _drawItem: function(participant) {
             var self = this;
@@ -252,7 +246,7 @@ type("ParticipantListWidget", ["ListWidget"],
                         closePopup();
                     }
 
-                    editPopup = new PersonDataPopup(
+                    editPopup = new WebExPersonDataPopup(
                             $T('Change person data'),
                         participantData.clone(),
                         commonHandler
@@ -303,14 +297,14 @@ type("ParticipantListWidget", ["ListWidget"],
 /**
  * Creates a form field with a list of participants (persons or rooms).
  * Participants can be added from a user search dialog, or from a 'new person' dialog, or a 'new room' dialog.
- * The list of participants (a ParticipantListWidget, i.e. a WatchObject) can be retrieved by calling getParticipants().
+ * The list of participants (a WebExParticipantListWidget, i.e. a WatchObject) can be retrieved by calling getParticipants().
  * The 'type' attribute of the participants in the list will be 'person' or 'room'.
  * @param {list} initialParticipants A list of participants that will appear initially.
  */
-type("ParticipantListField", ["IWidget"],
+type("WebExParticipantListField", ["IWidget"],
     {
         _highlightNewParticipant: function(id) {
-            IndicoUI.Effect.highLightBackground(this.participantList.getId() + '_' + id);
+            IndicoUI.Effect.highLightBackground($E(this.participantList.getId() + '_' + id));
         },
 
         _addNewParticipant : function(participant, type) {
@@ -328,14 +322,14 @@ type("ParticipantListField", ["IWidget"],
             var self = this;
 
             var addNewPersonButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add New Participant'));
-            var addExistingPersonButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add Existing User') );
+            var addExistingPersonButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add Indico User') );
 
             addNewPersonButton.observeClick(function(){
                 var handler = function(participant, closePopup) {
                     self._addNewParticipant(participant, 'person');
                     closePopup();
                 }
-                var popup = new PersonDataPopup($T("Add new person"), $O(), handler);
+                var popup = new WebExPersonDataPopup($T("Add new person"), $O(), handler);
                 popup.open();
             });
 
@@ -346,7 +340,7 @@ type("ParticipantListField", ["IWidget"],
                     var openNewPopup = function() {
                         if (i < participantList.length) {
                             title = $T("Please confirm user details");
-                            var popup = new PersonDataPopup(title, $O(participantList[i]), saveHandler, cancelHandler);
+                            var popup = new WebExPersonDataPopup(title, $O(participantList[i]), saveHandler, cancelHandler);
                             popup.open();
                             i++;
                         }
@@ -367,7 +361,7 @@ type("ParticipantListField", ["IWidget"],
                         openNewPopup();
                     }
                 }
-                var popup = new ChooseUsersPopup($T("Add existing person"), true, null, false, false, null, false, true, handler);
+                var popup = new ChooseUsersPopup($T("Add Indico User"), true, null, false, false, null, false, true, handler);
                 popup.open();
             });
 
@@ -382,7 +376,7 @@ type("ParticipantListField", ["IWidget"],
     function(initialParticipants) {
         var self = this;
 
-        this.participantList = new ParticipantListWidget();
+        this.participantList = new WebExParticipantListWidget();
         this.newParticipantCounter = 0;
 
         each(initialParticipants, function(participant){

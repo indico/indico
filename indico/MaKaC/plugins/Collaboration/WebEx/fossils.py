@@ -52,8 +52,7 @@ def removeComplex(bookingParams):
 class ICSBookingIndexingFossil(ICSBookingBaseIndexingFossil):
     def getBookingParams(self):
         """ Remove the booking params that are complex """
-        getBookingParams.convert = lambda bookingParams: removeComplex(bookingParams)
-        pass
+    getBookingParams.convert = lambda bookingParams: removeComplex(bookingParams)
 
 class IParticipantFossil(IFossil):
     def getId(self):

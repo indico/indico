@@ -1,0 +1,37 @@
+span.WebExHiddenPIN {
+    color: #AAAAAA;
+}
+
+.WebExParticipantsDiv {
+    height: 93px;
+    width: 500px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+    margin-bottom: 10px;
+}
+
+ul.WebExParticipantsList
+{
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+}
+
+ul.WebExParticipantsList > li {
+    margin: 0;
+    display: block;
+    margin-bottom: 0px;
+    line-height: 25px;
+    padding-left: 5px;
+    vertical-align: middle;
+}
+
+ul.WebExParticipantsListDisplay {
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+}

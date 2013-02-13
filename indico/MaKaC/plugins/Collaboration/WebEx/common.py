@@ -22,7 +22,7 @@
 
 import httplib
 from persistent import Persistent
-from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
+from MaKaC.plugins.Collaboration.base import CSErrorBase
 from datetime import timedelta, datetime
 from time import strptime
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
@@ -82,7 +82,6 @@ def findDuration(start, finish):
     t1 = makeTime( start )
     t2 = makeTime( finish )
     diff = t2 - t1
-    days = diff.days
     minutes,seconds = divmod(diff.seconds, 60)
     return minutes + diff.days * 1440
 
