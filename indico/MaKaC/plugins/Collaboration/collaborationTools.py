@@ -207,7 +207,6 @@ class CollaborationTools(object):
             If a user is specified, only tabs with plugins that the user can see will be returned:
             -
         """
-
         if tabName:
 
             csbm = conference.getCSBookingManager()

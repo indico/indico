@@ -241,9 +241,9 @@ class WPConfModifCollaboration(WPConfModifCSBase):
         self._buildExtraJS()
 
     def getCSSFiles(self):
-        for plugin in self._tabPlugins:
-            return WPConfModifCSBase.getCSSFiles(self) + \
-                   ['Collaboration/%s/Style.css' % plugin.getId(), 'Collaboration/Style.css']
+
+        return WPConfModifCSBase.getCSSFiles(self) + ['Collaboration/Style.css' ] +\
+                   ['Collaboration/%s/Style.css' % plugin.getId() for plugin in self._tabPlugins]
 
     def getJSFiles(self):
         return WPConfModifCSBase.getJSFiles(self) + \

@@ -1028,13 +1028,13 @@ class WTrackAbstractPropToAcc( wcomponents.WTemplated ):
         if len(l) > 0:
             vars["contribTypes"] =  i18nformat("""
                                     <tr>
-			              <td nowrap class="titleCellTD"><span class="titleCellFormat">
+                          <td nowrap class="titleCellTD"><span class="titleCellFormat">
                                          _("Proposed contribution type"):
-			              </td>
-			              <td>&nbsp;
-				         <select name="contribType">%s</select>
-			              </td>
-		                    </tr>
+                          </td>
+                          <td>&nbsp;
+                         <select name="contribType">%s</select>
+                          </td>
+                            </tr>
                                     """)%("".join(l))
         return vars
 

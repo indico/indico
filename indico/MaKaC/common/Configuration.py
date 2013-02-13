@@ -680,7 +680,7 @@ class Config:
 
     def getTimezoneList(self):
         # Dont move outside, we need to call Config.getInstance() from setup.py and if
-	    # the system has no pytz module then the import will break
+        # the system has no pytz module then the import will break
         from pytz import all_timezones as Timezones
         return Timezones
 

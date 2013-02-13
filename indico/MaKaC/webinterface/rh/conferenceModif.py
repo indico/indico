@@ -1701,7 +1701,7 @@ class AbstractSortingCriteria( filters.SortingCriteria ):
     _availableFields = {
         abstractFilters.ContribTypeSortingField.getId(): \
                                 abstractFilters.ContribTypeSortingField, \
-		_AbstractTrackSF.getId(): _AbstractTrackSF, \
+        _AbstractTrackSF.getId(): _AbstractTrackSF, \
         _AbstractStatusSF.getId(): _AbstractStatusSF, \
         _AbstractIdSF.getId(): _AbstractIdSF, \
         _AbstractRatingSF.getId(): _AbstractRatingSF, \

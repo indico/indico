@@ -112,7 +112,7 @@ class deletedir:
                 # In any case, there's nothing to change in this case
                 pass
 
-	return True
+        return True
 
     def _getDirName(self, logsPath, cr, number):
         if os.path.exists(os.path.join(logsPath,cr+'.'+str(number))):

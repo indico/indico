@@ -33,7 +33,7 @@ def getRHByTag(self, tag):
 
 def preprocessParams(params):
     if not params.has_key("M_EPaymentName") or params.has_key("M_requestTag"):
-    	return False
+        return False
     params["EPaymentName"] = params["M_EPaymentName"]
     params["requestTag"] = params["M_requestTag"]
     return True

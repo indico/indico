@@ -41,7 +41,7 @@ class WPConfModifEPaymentSkipjackBase( registrationForm.WPConfModifRegFormBase )
 
     def _setActiveTab( self ):
         pass
-    
+
     def _setActiveSideMenuItem(self):
         self._regFormMenuItem.setActive(True)
 
@@ -63,7 +63,7 @@ class WPConfModifEPaymentSkipjack( WPConfModifEPaymentSkipjackBase ):
 
 
 class WConfModifEPaymentSkipjack( WTemplated ):
-    
+
     def __init__( self, conference):
         self._conf = conference
 
@@ -88,7 +88,7 @@ class WPConfModifEPaymentSkipjackDataModif( WPConfModifEPaymentSkipjackBase):
         return wc.getHTML(p)
 
 class WConfModifEPaymentSkipjackDataModif( WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -139,10 +139,10 @@ class WPConfirmEPaymentSkipjack( conferences.WPConferenceDefaultDisplayBase ):
     def __init__( self, rh, conf, reg ):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant = reg
-        
+
     def _getBody( self, params ):
         wc = WConfirmEPaymentSkipjack( self._conf, self._registrant)
-        
+
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defindeSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
@@ -162,7 +162,7 @@ class WPEPaymentSkipjackAccepted(conferences.WPConferenceDefaultDisplayBase):
     def __init__(self, rh, conf, reg ):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant = reg
-    
+
     def _getBody( self, params ):
         wc = WconfirmEPaymentSkipjack(self._conf, self._registrant)
         #Uncomment this line and comment above if the redirect method at sj changes.
@@ -173,7 +173,7 @@ class WdisplayPaymentInfo( WTemplated ):
     def __init__( self,configuration, registrant):
         self._registrant = registrant
         self._conf = configuration
-        
+
     def getVars( self ):
         vars = WTemplated.getVars(self)
         vars["message"] = "Thank you, your payment has been accepted by Skipjack."
@@ -185,7 +185,7 @@ class WPEPaymentSkipjackDisplayInfo(conferences.WPConferenceDefaultDisplayBase):
     def __init__(self, rh, conf, reg ):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant = reg
-    
+
     def _getBody( self, params ):
         wc = WdisplayPaymentInfo(self._conf, self._registrant)
         return wc.getHTML()
@@ -195,26 +195,26 @@ class WPEPaymentSkipjackCancelled(conferences.WPConferenceDefaultDisplayBase):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant = reg
         self._denyMsg = denyMsg
-    
+
     def _getBody( self, params ):
         wc = WCancelEPaymentSkipjack(self._conf, self._registrant, self._denyMsg)
         return wc.getHTML()
 
 
-#class WPCancelEPaymentSkipjack( conferences.WPConferenceDefaultDisplayBase ):
-#
-#    def __init__(self, rh, conf, reg):
-#        conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-#        self._registrant=reg
-#        
-#    def _getBody( self, params ):
-#        wc = WCancelEPaymentSkipjack( self._conf,self._registrant )
-#        return wc.getHTML()
-#
-#    def _defineSectionMenu( self ): 
-#        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-#        self._sectionMenu.setCurrentItem(self._regFormOpt)    
-        
+class WPCancelEPaymentSkipjack( conferences.WPConferenceDefaultDisplayBase ):
+
+    def __init__(self, rh, conf, reg):
+        conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
+        self._registrant=reg
+
+    def _getBody( self, params ):
+        wc = WCancelEPaymentSkipjack( self._conf,self._registrant )
+        return wc.getHTML()
+
+    def _defineSectionMenu( self ):
+        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
+        self._sectionMenu.setCurrentItem(self._regFormOpt)
+
 class WCancelEPaymentSkipjack( WTemplated ):
     def __init__( self, conference,reg, denyMsg ):
         self._conf = conference
@@ -225,4 +225,4 @@ class WCancelEPaymentSkipjack( WTemplated ):
         vars = WTemplated.getVars(self)
         vars["message"] = "The payment was denied by Skipjack because \"%s\". Verify the credit card information you entered was correct." % self._denyMsg
         vars["messagedetailPayment"]="Registrant Name:%s %s"%(self._registrant.getFirstName(),self._registrant.getSurName())
-        return vars 
+        return vars

@@ -364,7 +364,7 @@ class Participation(Persistent, Observable):
         if avatar is None :
             # or to encourage him/her to register at Indico
             #self.sendEncouragementToCreateAccount(participant)
-			pass
+            pass
         else:
             # OK, if we have an avatar, let's keep things consistent
             avatar.linkTo(self._conference,"participant")
@@ -398,13 +398,13 @@ class Participation(Persistent, Observable):
     def removeParticipant(self, participant, responsibleUser=None):
         if participant is None:
             return False
-		# If 'participant' is an object from Participant
+        # If 'participant' is an object from Participant
         if isinstance(participant, Participant):
             # remove all entries with participant
             for key, value in self._participantList.items():
                 if value == participant:
                     del self._participantList[key]
-		# If 'participant' is a key
+        # If 'participant' is a key
         else:
             key = participant
             if key not in self._participantList:

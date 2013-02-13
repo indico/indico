@@ -27,6 +27,7 @@ from MaKaC.plugins.EPayment.skipjack.webinterface import urlHandlers as localUrl
 from MaKaC.plugins.EPayment.skipjack import MODULE_ID, epayment as ePayment
 
 from MaKaC.errors import AccessError
+from MaKaC.webinterface.pages import registrationForm
 
 
 ### classes for Skipjack integration
@@ -34,7 +35,7 @@ from MaKaC.errors import AccessError
 # Skipjack information page
 class RHEPaymentmodifSkipjack( RHEPaymentModifBase ):
     _requestTag = "modifSkipjack"
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentSkipjack( self, self._conf)
         return p.display()
@@ -43,7 +44,7 @@ class RHEPaymentmodifSkipjack( RHEPaymentModifBase ):
 # skipjack modification page
 class RHEPaymentmodifSkipjackDataModif( RHEPaymentModifBase ):
     _requestTag = "modifSkipjackData"
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentSkipjackDataModif( self, self._conf)
         return p.display()
@@ -52,7 +53,7 @@ class RHEPaymentmodifSkipjackDataModif( RHEPaymentModifBase ):
 # submission page for configuration modifications
 class RHEPaymentmodifSkipjackPerformDataModif( RHEPaymentModifBase ):
     _requestTag = "modifSkipjackPerformDataModif"
-    
+
     def _checkParams( self, params ):
         RHEPaymentModifBase._checkParams( self, params)
         self._params = params
@@ -183,14 +184,14 @@ class RHEPaymentConfirmSkipjack( RHConferenceBaseDisplay ):
 
 class RHEPaymentCancelSkipjack( RHRegistrationFormDisplayBase ):
     _requestTag = "cancel"
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormDisplayBase._checkParams( self, params )
         self._registrant=None
         regId=params.get("registrantId","")
         if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)                
-        
+            self._registrant=self._conf.getRegistrantById(regId)
+
     def _processIfActive( self ):
         if self._registrant is not None:
             p = ePayments.WPCancelEPaymentSkipjack(self, self._conf ,self._registrant)
@@ -201,9 +202,9 @@ class RHEPaymentDisplayInfoSkipjack( RHConferenceBaseDisplay ):
 
     def _checkProtection( self ):
         if self._getUser() is None or self._registrant is None or (self._registrant.getAvatar().getId() != self._getUser().getId()):
-           raise AccessError("Indico cannot display epayment information without being logged in")
+            raise AccessError("Indico cannot display epayment information without being logged in")
 
-    
+
     def _checkParams( self, params ):
         #
         #skipjack does not allow for the sending of arbitrary variables.  We are
@@ -228,5 +229,5 @@ class RHEPaymentDisplayInfoSkipjack( RHConferenceBaseDisplay ):
             p = registrationForm.WPRegFormInactive( self, self._conf )
             return p.display()
         else:
-	    p = ePayments.WPEPaymentSkipjackDisplayInfo(self, self._conf, self._registrant )
+            p = ePayments.WPEPaymentSkipjackDisplayInfo(self, self._conf, self._registrant )
             return p.display()

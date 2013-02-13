@@ -2492,7 +2492,7 @@ class WPMaintenanceTmpCleanup(WPMaintenanceBase):
                     </tr>
                     <tr>
                         <td>
-		            <br>
+                    <br>
                             %s
                         </td>
                     </tr>
@@ -2515,7 +2515,7 @@ class WPMaintenancePack(WPMaintenanceBase):
                     </tr>
                     <tr>
                         <td>
-		            <br>
+                    <br>
                             %s
                         </td>
                     </tr>
@@ -2538,7 +2538,7 @@ class WPMaintenanceWebsessionCleanup(WPMaintenanceBase):
                     </tr>
                     <tr>
                         <td>
-		            <br>
+                    <br>
                             %s
                         </td>
                     </tr>
