@@ -82,7 +82,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
 
             if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
                 var favouritizeButton = new ToggleFavouriteButton(peopleData.getAll(), null, null, this.favouriteButtonObserver).draw();
-                var favouritizeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingLeft: pixels(5), paddingTop: pixels(5)}}, favouritizeButton);
+                var favouritizeButtonDiv = Html.div({style: {cssFloat: "right"}}, favouritizeButton);
                 return [favouritizeButtonDiv, userName, userEmail];
             } else {
                 return [userName, userEmail];

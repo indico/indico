@@ -2080,6 +2080,7 @@ ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li, ul.UIAuthorLi
     margin-bottom: 0px;
     line-height: 25px;
     padding-left: 5px;
+    padding-right: 5px;
     vertical-align: middle;
 }
 
@@ -2556,7 +2557,7 @@ ul.UIUserEvtList li
 .UIRowButton2
 {
     margin-left: 10px;
-    padding-top: 4px;
+    padding-top: 6px;
 }
 
 .favoriteItem
@@ -3658,6 +3659,7 @@ ul.userList, ul.allowedUserList {
 }
 
 ul.userList li , ul.allowedUserList li {
+    padding-right: 5px;
     display: block;
     line-height: 28px;
     margin: 0 0 0;

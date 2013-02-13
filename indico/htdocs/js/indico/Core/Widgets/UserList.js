@@ -128,7 +128,7 @@ type("ListOfUsersManager", [], {
 
         favorite: function(user) {
             if (user._type == "Avatar") {
-                return $('<span/>').css({padding:'3px', 'float':'right'}).
+                return $('<span/>').css({'float':'right'}).
                     html(new ToggleFavouriteButton(user, {}, IndicoGlobalVars['userData']['favorite-user-ids'][user.id]).draw().dom);
             }
         },
