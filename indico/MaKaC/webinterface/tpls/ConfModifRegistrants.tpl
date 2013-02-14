@@ -78,21 +78,31 @@
                         <table style="margin-left: -8px" >
                             <tr >
                                 <td valign="bottom" align="left" id="button-menu" class="toolbar">
-                                    <div class="group">
-                                      <a href="#" class="btn" id="add_new_user">${_("Add new")}</a>
-                                      <a href="#" class="btn" id="remove_users">${_("Remove")}</a>
-                                      <a href="#" class="btn" id="send_email">${_("Email")}</a>
-                                      <a href="#" class="btn" id="print_badges">${_("Print Badges")}</a>
-                                      <a href="#" class="btn" id="attachments">${_("Attachments")}</a>
-                                      <a href="#" class="btn" id="show_stats">${_("Show stats")}</a>
-                                      <a class="button arrow btn" href="#" data-toggle="dropdown">
-                                        ${_("Export")}
-                                      </a>
-                                      <ul class="dropdown">
-                                        <li><a href="#" class="icon-file-pdf" id="export_pdf">${_("PDF")}</a></li>
-                                        <li><a href="#" class="icon-file-excel" id="export_csv">${_("CSV")}</a></li>
-                                      </ul>
-                                    </div>
+
+                                  <div class="group left">
+                                    <a class="icon-checkbox-checked btn arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                                    <ul class="dropdown">
+                                      <li><a href="#" id="selectAll">All</a></li>
+                                      <li><a href="#" id="selectNone">None</a></li>
+                                    </ul>
+                                  </div>
+
+                                  <div class="group left">
+                                    <a href="#" class="btn" id="add_new_user">${_("Add new")}</a>
+                                    <a href="#" class="btn" id="remove_users">${_("Remove")}</a>
+                                    <a href="#" class="btn" id="send_email">${_("Email")}</a>
+                                    <a href="#" class="btn" id="print_badges">${_("Print Badges")}</a>
+                                    <a href="#" class="btn" id="attachments">${_("Attachments")}</a>
+                                    <a href="#" class="btn" id="show_stats">${_("Show stats")}</a>
+                                    <a class="button arrow btn" href="#" data-toggle="dropdown">
+                                      ${_("Export")}
+                                    </a>
+                                    <ul class="dropdown">
+                                      <li><a href="#" class="icon-file-pdf" id="export_pdf">${_("PDF")}</a></li>
+                                      <li><a href="#" class="icon-file-excel" id="export_csv">${_("CSV")}</a></li>
+                                    </ul>
+                                  </div>
+
                                 </td>
                             </tr>
                         </table>
@@ -110,8 +120,34 @@
             </tr>
             % else:
                 ${ columns }
+
                 <tbody id="registrantsItems">
-                ${ registrants }
+
+                  % for reg, regdict in registrants:
+
+                    <tr id="registrant${reg.getId()}" style="background-color: transparent;" onmouseout="javascript:onMouseOut('registrant${reg.getId()}')"
+                        onmouseover="javascript:onMouseOver('registrant${reg.getId()}')">
+                      <td valign="top"><input onchange="javascript:isSelected('registrant${reg.getId()}')" type="checkbox" name="registrant" value="${reg.getId()}"/></td>
+                      % if "Id" in groups_order["PersonalData"]:
+                        <td valign="top" class="CRLabstractLeftDataCell">${reg.getId()}</td>
+                        <td valign="top" nowrap class="CRLabstractDataCell"><a href="${urlHandlers.UHRegistrantModification.getURL(reg)}">${reg.getFullName()}</a></td>
+                      % endif
+
+                      % for key in groups_order["PersonalData"]:
+                        % if key != "Name" and key != "Id":
+                          <td valign="top"  class="CRLabstractDataCell">${regdict[key]}</td>
+                        % endif
+                      % endfor
+
+                      % for group_key, group_data in groups_order.iteritems():
+                        % if group_key != "PersonalData":
+                          % for key in group_data:
+                            <td valign="top"  class="CRLabstractDataCell">${regdict[key]}</td>
+                          % endfor
+                        % endif
+                      % endfor
+                    </tr>
+                  % endfor
                 </tbody>
             % endif
         </tr>
@@ -155,7 +191,7 @@ function selectAll()
     isSelected("registrantsItems");
 }
 
-function deselectAll()
+function selectNone()
 {
     if (!document.registrantsForm.registrant.length)
     {
@@ -312,6 +348,13 @@ IndicoUI.executeOnLoad(function(){
       submitForm('excel');
    });
 
+    $('#selectAll').click(function() {
+        $('#registrantsItems input:visible').prop('checked', true);
+    });
+
+    $('#selectNone').click(function() {
+        $('#registrantsItems input:visible').prop('checked', false);
+    });
 });
 
 </script>

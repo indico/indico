@@ -158,6 +158,7 @@
 
 .ui-tabs .ui-tabs-nav {
     margin: 0;
+    height: 27px;
 }
 
 .ui-tabs .ui-tabs-nav li a {

@@ -347,29 +347,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         fields.append("""
                         </tr>
                         """)
-        return "<tr><td colspan=4 style='padding: 5px 0px 10px;' nowrap>Select: <a style='color: #0B63A5;' alt='Select all' onclick='javascript:selectAll()'> All</a>, <a style='color: #0B63A5;' alt='Unselect all' onclick='javascript:deselectAll()'>None</a></td></tr>%s"%("\r\n".join(fields))
-
-
-    def _getRegistrantsHTML( self, reg ):
-        url = urlHandlers.UHRegistrantModification.getURL(reg)
-        fullName = reg.getFullName()
-        regdict = registration.RegistrantMapping(reg)
-        res = ("""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('registrant%s')" type="checkbox" name="registrant" value="%s"></td>
-                    """%(reg.getId(),self.htmlText(reg.getId())))
-        if "Id" in self._groupsorder["PersonalData"]:
-            res += ("""<td valign="top" nowrap class="CRLabstractLeftDataCell">%s</td>
-                       """%reg.getId())
-        res += ("""<td valign="top" nowrap class="CRLabstractDataCell"><a href=%s>%s</a></td>
-                   """%(quoteattr(str(url)), self.htmlText(fullName)))
-        # Fisrtly the "PersonalData"
-        res += "".join(["""<td valign="top"  class="CRLabstractDataCell">%s</td>"""%regdict[key] for key in self._groupsorder["PersonalData"] if key != "Name" and key != "Id"])
-        res += "".join(["""<td valign="top"  class="CRLabstractDataCell">%s</td>"""%regdict[key] for groupkey in self._groupsorder.keys() if groupkey != "PersonalData" for key in self._groupsorder[groupkey] ])
-        html = """
-            <tr id="registrant%s" style="background-color: transparent;" onmouseout="javascript:onMouseOut('registrant%s')" onmouseover="javascript:onMouseOver('registrant%s')">
-                %s
-            </tr>
-                """%(reg.getId(),reg.getId(),reg.getId(), res)
-        return html
+        return "\r\n".join(fields)
 
     def _getDisplayOptionsHTML(self):
         html=[]
@@ -468,23 +446,22 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["eve"]=""
         vars["columns"]=self._getRegColumnHTML(sortingField)
         filtered = f.apply(cl)
-        l = [self._getRegistrantsHTML(reg) for reg in filtered]
+
         regl = [reg.getId() for reg in filtered]
         if self._order =="up":
-            l.reverse()
+            filtered.reverse()
             regl.reverse()
-        vars["registrants"] = "".join(l)
-        vars["filteredNumberRegistrants"]=str(len(l))
+
+        vars["registrants"] = zip(filtered, (registration.RegistrantMapping(reg) for reg in filtered))
+
+        vars["filteredNumberRegistrants"]=str(len(filtered))
         vars["totalNumberRegistrants"]=str(len(cl))
         vars["filterUsed"] = self._filterUsed
 
 
         vars["actionPostURL"]=quoteattr(str(urlHandlers.UHConfModifRegistrantListAction.getURL(self._conf)))
+        vars ["reglist"] = ",".join(regl)
 
-        if l == []:
-            vars ["reglist"]=""
-        else:
-            vars ["reglist"]=",".join(regl)
         vars["emailIconURL"]="""<input type="image" name="email" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("envelope")))
         vars["infoIconURL"]="""<input type="image" name="info" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("info")))
         vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
@@ -522,6 +499,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars["uncheckDisplay"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectDisplay()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
         vars["displayMenu"] = self._getDisplayMenu()%vars
         vars["filterMenu"] = self._getFilterMenu()
+        vars["groups_order"] = self._groupsorder
 
         return vars
 

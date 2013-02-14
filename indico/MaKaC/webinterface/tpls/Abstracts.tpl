@@ -112,7 +112,7 @@
         </td>
     </tr>
     <tr>
-        <td colspan="12" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
+        <td colspan="12" style="padding-top:5px" valign="bottom" align="left">
         <form action=${abstractSelectionAction} method="post" name="abstractsForm" id="abstractsForm">
             <table>
                 <tr>
@@ -130,7 +130,16 @@
                             <tr >
                                 <td valign="bottom" align="left">
                                     <div id="button-menu" class="toolbar">
-                                      <div class="group">
+
+                                      <div class="group left">
+                                        <a class="icon-checkbox-checked btn arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                                        <ul class="dropdown">
+                                          <li><a href="#" id="selectAll">All</a></li>
+                                          <li><a href="#" id="selectNone">None</a></li>
+                                        </ul>
+                                      </div>
+
+                                      <div class="group left">
                                         <a href="#" id="add_new_abstract" class="btn">${_("Add new")}</a>
                                         <a href="#" id="accept_abstracts" class="btn">${_("Accept")}</a>
                                         <a href="#" id="reject_abstracts" class="btn">${_("Reject")}</a>
@@ -164,11 +173,6 @@
     % elif (filteredNumberAbstracts == "0"):
         <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts with the filters criteria selected")}</span></td>
     % else:
-        <tr>
-            <td colspan=4 style='padding: 5px 0px 10px;' nowrap>
-            Select: <a style='color: #0B63A5;' id='selectAll'> All</a>, <a style='color: #0B63A5;' id='deselectAll'>None</a>
-            </td>
-        </tr>
         <tr>
             <td></td>
         </tr>
@@ -323,7 +327,7 @@
         $('tr[id^=abstracts]').css('background-color',"#CDEB8B");
     }
 
-    function deselectAll() {
+    function selectNone() {
         $('tr[id^=abstracts] input:checkbox').attr('checked', false);
         $('tr[id^=abstracts]').css('background-color',"transparent");
     }
@@ -455,8 +459,8 @@ $(function(){
       selectAll();
     });
 
-    $("#deselectAll").click(function(){
-      deselectAll();
+    $("#selectNone").click(function(){
+      selectNone();
     });
 });
 

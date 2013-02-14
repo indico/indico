@@ -715,10 +715,8 @@ class WConfDetailsFull(WConfDetailsBase):
     pass
 
 
-class WConfDetailsMin(WConfDetailsBase):
-    pass
-
 #---------------------------------------------------------------------------
+
 
 class WConfDetails:
 
@@ -727,11 +725,7 @@ class WConfDetails:
         self._aw = aw
 
     def getHTML( self, params ):
-        if self._conf.canAccess( self._aw ):
-            return WConfDetailsFull( self._aw, self._conf ).getHTML( params )
-        if self._conf.canView( self._aw ):
-            return WConfDetailsMin( self._aw, self._conf ).getHTML( params )
-        return ""
+        return WConfDetailsFull( self._aw, self._conf ).getHTML( params )
 
 
 class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
