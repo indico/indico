@@ -122,7 +122,6 @@ class IContributionParticipationMinimalFossil(IFossil):
 
     def isSubmitter(self):
         pass
-    isSubmitter.produce = lambda l: l.isSubmitter()
 
 class IContributionParticipationFossil(IContributionParticipationMinimalFossil):
 

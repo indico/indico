@@ -130,46 +130,64 @@ class ScheduleOperation:
 
 class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
 
-    def __addPeople(self, contribution, pManager, elemType, addMethod, deleteMethod, getListMethod):
-        """ Generic method for adding presenters, authors and
-        co-authors. """
+    def __addPeople(self, contribution, pManager, elemType, addMethod, deleteMethod, getListMethod, allParticipantEmails):
+        """ Generic method for adding presenters, authors and co-authors. """
+
+        def __findPerson(personDict, peopleList):
+            for person in peopleList:
+                # TODO: Remove this hack when refactoring Users.js
+                personDict["id"] = personDict["id"].replace('edited','')
+                ##
+                if person.getId() == personDict["id"]:
+                    return person
+            return None
 
         pList = pManager.extract("%ss" % elemType, pType=list,
                                  allowEmpty=True)
 
-        addedIds = []
-        personsIds = [person.getId() for person in getListMethod(contribution)[:]]
+        peopleIds = []
+        currentParticipants = getListMethod(contribution)
+        currentParticipantEmails = [p.getEmail() for p in currentParticipants]
 
         for elemValues in pList:
-            if elemValues["id"] not in personsIds: #new
+            # Already existing participants have a type 'ContributionParticipation', while
+            # added users can be 'Avatar'(search) or no-type (new).
+            if elemValues.get("_type", "Avatar") == "ContributionParticipation": # udpate
+                element = __findPerson(elemValues, currentParticipants)
+                peopleIds.append(elemValues["id"])
+                if element is None: continue # Most probably the part was removed in the meanwhile
+                DictPickler.update(element, elemValues)
+            else: # new
+
+                # Do not add the same participant twice
+                if elemValues["email"] in currentParticipantEmails: # if it is already a participant
+                    continue
+                else: # keep track in case, the user is trying to add 2 times the same participant
+                    currentParticipantEmails.append(elemValues["email"])
+
                 element = conference.ContributionParticipation()
                 DictPickler.update(element, elemValues)
-                element.setId(elemValues["id"])
-
                 # call the appropriate method
                 addMethod(contribution, element)
-                addedIds.append(element.getId())
-                if self._updateRights:
-                    if elemValues.get("isSubmitter"):
-                        contribution.grantSubmission(element)
-                if self._privileges[elemType] is not None:
-                    if self._privileges[elemType].get('%s-grant-submission' % elemType, False):
-                        contribution.grantSubmission(element)
-            else: #update
-                if self._updateRights:
-                    personToUpdate = [person for person in getListMethod(contribution)[:] if person.getId() == elemValues["id"]][0]
-                    if elemValues.get("isSubmitter"):
-                        contribution.grantSubmission(personToUpdate)
-                    else:
-                        contribution.revokeSubmission(personToUpdate)
-                addedIds.append(elemValues["id"])
+                peopleIds.append(element.getId())
+
+            # rights that are set individually per participant
+            if self._updateRights:
+                if elemValues.get("isSubmitter"):
+                    contribution.grantSubmission(element)
+                else:
+                    contribution.revokeSubmission(element)
 
         for person in getListMethod(contribution)[:]: #delete
-            if str(person.getId()) not in addedIds:
+            if str(person.getId()) not in peopleIds:
                 deleteMethod(contribution, person)
+                if person.getEmail() not in allParticipantEmails:
+                    contribution.revokeSubmission(person)
             elif self._privileges[elemType] is not None:
+                # rights that are set to a group of participants
                 if self._privileges[elemType].get('%s-grant-submission' % elemType, False):
                     contribution.grantSubmission(person)
+        allParticipantEmails += currentParticipantEmails
 
     def _addReportNumbers(self):
         reportNumbersSet = []
@@ -250,15 +268,16 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
         for field, value in self._fields.iteritems():
             self._contribution.setField(field, value)
 
+        allParticipantEmails = []
         if (self._target.getConference().getType() == "conference"):
             # for conferences, add authors and coauthors
-            self.__addPeople(self._contribution, self._pManager, "author", conference.Contribution.addPrimaryAuthor, conference.Contribution.removePrimaryAuthor, conference.Contribution.getPrimaryAuthorList)
-            self.__addPeople(self._contribution, self._pManager, "coauthor", conference.Contribution.addCoAuthor, conference.Contribution.removeCoAuthor, conference.Contribution.getCoAuthorList)
+            self.__addPeople(self._contribution, self._pManager, "author", conference.Contribution.addPrimaryAuthor, conference.Contribution.removePrimaryAuthor, conference.Contribution.getPrimaryAuthorList, allParticipantEmails)
+            self.__addPeople(self._contribution, self._pManager, "coauthor", conference.Contribution.addCoAuthor, conference.Contribution.removeCoAuthor, conference.Contribution.getCoAuthorList, allParticipantEmails)
             # set type, if does not exist,
             self._contribution.setType(self._target.getConference().getContribTypeById(self._contribTypeId))
 
 
-        self.__addPeople(self._contribution, self._pManager, "presenter", conference.Contribution.newSpeaker, conference.Contribution.removeSpeaker, conference.Contribution.getSpeakerList)
+        self.__addPeople(self._contribution, self._pManager, "presenter", conference.Contribution.newSpeaker, conference.Contribution.removeSpeaker, conference.Contribution.getSpeakerList, allParticipantEmails)
 
         self._setLocationInfo(self._contribution)
 

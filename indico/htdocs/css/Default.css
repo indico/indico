@@ -6400,14 +6400,6 @@ div.VeryShortPeopleListDiv {
 
 div.LongPeopleListDiv {
     margin-bottom: 10px;
-    height: 75px;
-    width: 412px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
-div.AuthorPeopleListDiv {
-    margin-bottom: 10px;
     height: 130px;
     width: 412px;
     border: 1px solid #CCCCCC;
@@ -8604,7 +8596,6 @@ div.informationUserList {
     padding-left: 3em;
 }
 
-
 #privacy_status {
     border-bottom: 1px dotted #999;
 }
@@ -8626,4 +8617,11 @@ div.informationUserList {
 
 .see_protected_tip ul li {
     margin-bottom: 5px;
+}
+
+.user_list_icon_shield {
+	cursor: pointer;
+	margin-left: 5px;
+	vertical-align: -12%;
+	font-size: 15px;
 }

@@ -1157,6 +1157,104 @@ type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
      }
     );
 
+$(function() {
+    // This widget creates a clickable icon-shield that opens a qtip with the different rights that
+    // can be granted to a user.
+    $.widget("users.shield",{
+
+        options: {
+            userData: null,
+
+            // rights
+            submission: true
+        },
+
+        _qtip: function(rights) {
+
+         // qtip content
+
+            var rightsTooltipText = $("<div></div>")
+                                        .append($("<span></span>").text($T("User privileges")).css('fontSize', '13px'))
+                                        .append($("<div></div>")
+                                                    .css('marginTop', '8px'));
+            $.each(rights, function(index, value) {
+                rightsTooltipText.append(value.checkbox)
+                                 .append($("<span></span>")
+                                         .text(value.text)
+                                         .css('verticalAlign', 'middle'));
+            });
+
+            this.element.qtip({
+                style: {
+                    classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+                    tip: {
+                        corner: true,
+                        width: 15,
+                        height: 10
+                    }
+                },
+                position: {
+                    my: 'top middle',
+                    at: 'bottom middle'
+                },
+                content: {
+                    text: rightsTooltipText
+                },
+                show: {
+                    event: 'click',
+                    solo: true
+                },
+                hide: {
+                    event: 'unfocus'
+                }
+                });
+
+        },
+
+        _create: function() {
+
+            var self = this;
+
+            this.element
+                // add class and attrs
+                .addClass('icon-shield user_list_icon_shield')
+                .attr('ariaHidden', true)
+                .attr('alt', $T('User rights')).attr('title', $T('User rights'))
+                .attr('data-id', 'author_'+this.options.userData.get('email'))
+                //css
+                .css('color', this.options.userData.get('isSubmitter') ? '#cc4646' : '#aaa');
+
+            // Create privelege checkboxes and events
+            var privelegeCheckboxes = [];
+
+            if (this.options.submission) {
+                var submissionCheckbox = $("<input type='checkbox'>")
+                                            .attr('checked', this.options.userData.get('isSubmitter') ? true : false)
+                                            .css('marginRight', '8px').css('verticalAlign', 'middle');
+
+                submissionCheckbox.click(function(){
+                    $('.icon-shield[data-id="author_'+self.options.userData.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: submissionCheckbox.is(':checked')}]);
+                });
+
+                privelegeCheckboxes.push({'checkbox': submissionCheckbox, 'text': $T("Submission rights")});
+            }
+
+            // Listen to protection changes
+            this.element.on('participantProctChange', function(event, args){
+                if (self.options.submission && 'isSubmitter' in args) {
+                    self.element.css('color', args.isSubmitter ? '#cc4646' : '#aaa');
+                    self.options.userData.set('isSubmitter', args.isSubmitter);
+                    submissionCheckbox.prop('checked',args.isSubmitter);
+                }
+            });
+
+            this._qtip(privelegeCheckboxes);
+
+        }
+
+    });
+});
+
 
 /**
  * Creates a list of users. Each user can be edited or removed.
@@ -1172,11 +1270,11 @@ type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
  */
 type("UserListWidget", ["ListWidget"],
      {
-         _drawItem: function(user) {
-             var self = this;
-             var userData = user.get();
+        _drawItem: function(user) {
+            var self = this;
+            var userData = user.get();
 
-             var editButton = Widget.link(command(function() {
+            var editButton = Widget.link(command(function() {
                  editPopup = new UserDataPopup(
                      'Change user data',
                      userData.clone(),
@@ -1197,84 +1295,49 @@ type("UserListWidget", ["ListWidget"],
                      }
                  );
                  editPopup.open();
-             }, IndicoUI.Buttons.editButton()));
-             var rightsButton =
-                Widget.link(command(function() {},
-                    IndicoUI.Buttons.rightsButton()));
-                    $(rightsButton.dom).children(0).css('color', userData.get('isSubmitter') ? '#cc4646' : '#aaa');
-                    submissionCheckbox = $("<input type='checkbox'>").attr('checked', userData.get('isSubmitter') ? true : false).css('marginRight', '8px').css('verticalAlign', 'middle');
-                    submissionCheckbox.click(function(){
-                        $(rightsButton.dom).children(0).css('color', this.checked ? '#cc4646' : '#aaa');
-                        userData.set('isSubmitter', this.checked);
-                    });
-                    self.rightsTooltip = $("<div></div>");
-                    self.rightsTooltip.append($("<span></span>").text($T("User privileges")).css('fontSize', '13px'));
-                    submissionDiv = $("<div></div>").css('marginTop', '4px');
-                    submissionDiv.append(submissionCheckbox);
-                    submissionDiv.append($("<span></span>").text($T("Submission rights")).css('verticalAlign', 'middle'));
-                    self.rightsTooltip.append(submissionDiv);
-                    $(rightsButton.dom).qtip({
-                        style: {
-                            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
-                            tip: {
-                                corner: true,
-                                width: 15,
-                                height: 10
-                            }
-                        },
-                        position: {
-                            my: 'top middle',
-                            at: 'bottom middle'
-                        },
-                        content: {
-                            text: self.rightsTooltip
-                        },
-                        hide: {
-                            event: 'unfocus'
-                        },
-                        show: {
-                            solo: true
-                        }
-                        });
-             var removeButton =
-                 Widget.link(command(function() {
+            }, IndicoUI.Buttons.editButton()));
+
+
+
+
+            var iconShield = $("<span></span>").shield({userData: userData});
+
+
+
+            var removeButton = Widget.link(command(function() {
                              // removeProcess will be passed a WatchObject representing the user.
                              self.removeProcess(userData, function(result) {
                                      if (result) {
                                          self.set(user.key, null);
                                      }
                                  });
+                             }, IndicoUI.Buttons.removeButton()));
 
-             }, IndicoUI.Buttons.removeButton()));
-
-             if (userData.get('isGroup') || userData.get('_fossil') === 'group') {
-
-                 var removeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}}, removeButton);
-                 var groupName = $B(Html.span(), userData.accessor('name'));
-                 return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
-
-             } else {
-
-                 var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}});
-                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('id').indexOf("newUser") == -1) {
-                     var favouritizeButton = new ToggleFavouriteButton(userData.getAll(), {}, IndicoGlobalVars['userData']['favorite-user-ids'][userData.get('id')]).draw();
-                     buttonDiv.append(favouritizeButton);
-                 }
-                 if (this.allowSetRights) {
-                    buttonDiv.append(rightsButton) ;
-                 }
-                 if (this.allowEdit) {
+            if (userData.get('isGroup') || userData.get('_fossil') === 'group') {
+                var removeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}}, removeButton);
+                var groupName = $B(Html.span(), userData.accessor('name'));
+                return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
+            } else {
+                var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10)}});
+                if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
+                    var favouritizeButton = new ToggleFavouriteButton(userData.getAll(), {}, IndicoGlobalVars['userData']['favorite-user-ids'][userData.get('id')]).draw();
+                    buttonDiv.append(favouritizeButton);
+                }
+                if (this.allowSetRights) {
+                    buttonDiv.append(iconShield.get(0));
+                }
+                if (this.allowEdit) {
                     buttonDiv.append(editButton) ;
-                 }
-                 buttonDiv.append(removeButton);
+                }
+                buttonDiv.append(removeButton);
 
-                 var userName = Html.span({},
-                         $B(Html.span(), userData.accessor('familyName'), function(name){return name.toUpperCase();}),
-                         ', ',
-                         $B(Html.span(), userData.accessor('firstName')));
+                var userName = Html.span({},
+                        $B(Html.span(), userData.accessor('familyName'), function(name){return name.toUpperCase();}),
+                        ', ',
+                        $B(Html.span(), userData.accessor('firstName')));
 
-                 return Html.span({}, buttonDiv, userName);
-             }
+                return Html.span({}, buttonDiv, userName);
+            }
          }
      },
 
@@ -1292,13 +1355,15 @@ type("UserListWidget", ["ListWidget"],
     );
 
 
+
+
 /**
  * Creates a form field with a list of users.
  * Users can be added from an initial list of users, from a 'new user' dialog, or from a "choose user"
  * dialog which will enable both to search users/groups and propose a list of suggested users (favourites and others).
  * The 'id' attribute of the users in the list will depend from their origin.
  * - If it was added from the search dialog, the id will be 'existingAvXX' (where XX corresponds to the avatar id).
- * - It it was added from the 'new user' dialog, the id will be 'newUserXX', where XX is auto-increment starting from the highest number of newUser on the list increased by 1.
+ * - It it was added from the 'new user' dialog, the id will be 'newUserXX', where XX is auto-increment starting from 0.
  * - If it was added from the list of suggested users, it will retain the id of the user that was put in the list.
  * - It the user was edited, and the edited user corresponded to an Avatar, the id will be 'editedXX' where XX is the id of the Avatar used initially.
  *
@@ -1350,13 +1415,14 @@ type("UserListField", ["IWidget"], {
                             } else {
                                 key = (person._type === "Avatar") ? "existingAv" + person.id : person.id;
                             }
-                            if (person._type === "Avatar" && (self.userList.get(key) || self.userList.get(person.id))) {
+                            if (person._type === "Avatar" && self.userList.get(key)) {
                                 // it is an existing avatar, unchanged, and already exists: we do nothing
                             } else {
                                 if (self.userList.get(key)) {
                                     self.userList.set(key, null);
                                 }
                                 self.userList.set(key, $O(person));
+                                $('.icon-shield[data-id="author_'+person.email+'"]').trigger('participantProctChange', [{isSubmitter: person.isSubmitter}]);
                             }
                             //self._highlightNewUser(id);
                         });
@@ -1393,11 +1459,12 @@ type("UserListField", ["IWidget"], {
                                 if (result) {
                                     self.userList.set(newUserId, newUser);
                                     //self._highlightNewUser(newUserId);
+                                    $('.icon-shield[data-id="author_'+newUser.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: newUser.get('isSubmitter') || false}]);
                                 }
                             });
                             suicideHook();
                         }
-                    }, true
+                    }, self.allowSetRights
                 );
                 newUserPopup.open();
             });
@@ -1455,12 +1522,6 @@ type("UserListField", ["IWidget"], {
         var self = this;
         this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons);
         self.newUserCounter = 0;
-        // find the highest id of newUser and set counter to next value
-        if (initialUsers) {
-            initialUsers.forEach(function(user) {
-                self.newUserCounter = max(parseInt(user.id.replace("newUser", "")), self.newUserCounter) + 1;
-            });
-        }
         this.userDivStyle = any(userDivStyle, "UIPeopleListDiv");
 
         if (exists(initialUsers)) {

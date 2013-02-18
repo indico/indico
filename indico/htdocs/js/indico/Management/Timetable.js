@@ -584,7 +584,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var self = this;
 
         var authorListWidget = new UserListField(
-            'AuthorPeopleListDiv', 'PeopleList',
+            'LongPeopleListDiv', 'PeopleList',
             self.info.get("authors"), true, null,
             true, false, this.args.get('conference'), null,
             true, true, true, true,

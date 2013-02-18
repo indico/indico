@@ -361,7 +361,7 @@ type("WebExParticipantListField", ["IWidget"],
                         openNewPopup();
                     }
                 }
-                var popup = new ChooseUsersPopup($T("Add Indico User"), true, null, false, false, null, false, true, handler);
+                var popup = new ChooseUsersPopup($T("Add Indico User"), true, null, false, false, null, false, true, false, handler);
                 popup.open();
             });
 

@@ -9568,8 +9568,6 @@ class Contribution(CommonObjectBase, Locatable):
         if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
             ah = AvatarHolder()
             results = ah.match({"email":sb.getEmail()}, exact=1, forceWithoutExtAuth=True)
-            if not results:
-                results = ah.match({"email":sb.getEmail()}, exact=1)
             r = None
             for i in results:
                 if i.hasEmail(sb.getEmail()):
@@ -9605,12 +9603,18 @@ class Contribution(CommonObjectBase, Locatable):
         """
         if sb is None:
             return False
+
         self._initSubmissionPrivileges()
+
         if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
-            return any(submitter.getEmail() == sb.getEmail() for submitter in self._submitters) or any(submitterEmail == sb.getEmail() for submitterEmail in self._submittersEmail)
+            sbEmail = sb.getEmail()
+            return any(submitter.hasEmail(sbEmail) for submitter in self._submitters) or \
+                   any(submitterEmail == sbEmail for submitterEmail in self._submittersEmail)
+
         for principal in self._submitters:
             if principal != None and principal.containsUser(sb):
                 return True
+
         #TODO: Remove this and use pending list
         if isinstance(sb, MaKaC.user.Avatar):
             for email in sb.getEmails():
@@ -9618,7 +9622,7 @@ class Contribution(CommonObjectBase, Locatable):
                     self.grantSubmission(sb)
                     self.revokeSubmissionEmail(email)
                     return True
-        return None
+        return False
 
     def getAccessController(self):
         return self.__ac
