@@ -143,14 +143,17 @@ class RHSearchBase:
             results.extend(r)
 
             # filter
+            allResultsFiltered = False
             for r in results:
                 if len(fResults) == number or len(fResults) == numHits:
                     break
                 if r.isVisible(user):
                     fResults.append(r)
                 record += 1
+            else:
+                allResultsFiltered = True
 
-            if record > numHits or numHits <= number or len(results) <= number or (numHits <= numRequest and len(fResults) <= number):
+            if record > numHits or numHits <= number or len(results) <= number or (allResultsFiltered and len(fResults) <= number):
                 shortResult = True
                 break
 
