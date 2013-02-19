@@ -1297,13 +1297,6 @@ type("UserListWidget", ["ListWidget"],
                  editPopup.open();
             }, IndicoUI.Buttons.editButton()));
 
-
-
-
-            var iconShield = $("<span></span>").shield({userData: userData});
-
-
-
             var removeButton = Widget.link(command(function() {
                              // removeProcess will be passed a WatchObject representing the user.
                              self.removeProcess(userData, function(result) {
@@ -1324,7 +1317,7 @@ type("UserListWidget", ["ListWidget"],
                     buttonDiv.append(favouritizeButton);
                 }
                 if (this.allowSetRights) {
-                    buttonDiv.append(iconShield.get(0));
+                    buttonDiv.append($("<span></span>").shield({userData: userData}).get(0));
                 }
                 if (this.allowEdit) {
                     buttonDiv.append(editButton) ;
