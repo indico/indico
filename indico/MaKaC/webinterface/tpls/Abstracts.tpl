@@ -14,7 +14,7 @@
     <tr>
         <td class="titleCellFormat" nowrap colspan="12">
             <form action=${ accessAbstract } method="post">
-            ${ _("Quick search: Abstract ID")} <input type="text" name="abstractId" size="4"><input type="submit" class="btn" value="${ _("seek it")}"><br>
+            ${ _("Quick search: Abstract ID")} <input type="text" name="abstractId" size="4"><input type="submit" value="${ _("seek it")}"><br>
             </form>
         </td>
     </tr>
@@ -93,7 +93,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="center"><input type="submit" class="btn" name="OK" value=  ${_("Apply")}></td>
+                                    <td align="center"><input type="submit" class="button" name="OK" value=  ${_("Apply")}></td>
                                 </tr>
                             </table>
                         </td>
@@ -132,7 +132,7 @@
                                     <div id="button-menu" class="toolbar">
 
                                       <div class="group left">
-                                        <a class="icon-checkbox-checked btn arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                                        <a class="icon-checkbox-checked button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
                                         <ul class="dropdown">
                                           <li><a href="#" id="selectAll">All</a></li>
                                           <li><a href="#" id="selectNone">None</a></li>
@@ -140,14 +140,14 @@
                                       </div>
 
                                       <div class="group left">
-                                        <a href="#" id="add_new_abstract" class="btn">${_("Add new")}</a>
-                                        <a href="#" id="accept_abstracts" class="btn">${_("Accept")}</a>
-                                        <a href="#" id="reject_abstracts" class="btn">${_("Reject")}</a>
-                                        <a href="#" id="merge_abstracts" class="btn">${_("Merge")}</a>
-                                        <a href="#" id="author_list" class="btn">${_("Author list")}</a>
-                                        <a href="#" id="download_attachments" class="btn">${_("Download attachments")}</a>
+                                        <a href="#" id="add_new_abstract" class="button">${_("Add new")}</a>
+                                        <a href="#" id="accept_abstracts" class="button">${_("Accept")}</a>
+                                        <a href="#" id="reject_abstracts" class="button">${_("Reject")}</a>
+                                        <a href="#" id="merge_abstracts" class="button">${_("Merge")}</a>
+                                        <a href="#" id="author_list" class="button">${_("Author list")}</a>
+                                        <a href="#" id="download_attachments" class="button">${_("Download attachments")}</a>
 
-                                        <a class="button arrow btn" href="#" data-toggle="dropdown">
+                                        <a class="button arrow" href="#" data-toggle="dropdown">
                                           ${_("Export")}
                                         </a>
                                         <ul class="dropdown">

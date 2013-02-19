@@ -8125,9 +8125,14 @@ class WPConfModifBadgePrinting(WPConfModifToolsBase):
 
     def getJSFiles(self):
         files = WPConfModifToolsBase.getJSFiles(self)
-        files += self._includeJSPackage('BadgePosterPrinting')
+        files += self._includeJSPackage('badges_js')
 
         return files
+
+    def getCSSFiles(self):
+        # flatten returned list
+
+        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def _getTabContent(self, params):
         wc = WConfModifBadgePrinting(self._conf)
@@ -8253,6 +8258,11 @@ class WPConfModifBadgeDesign(WPConfModifToolsBase):
             # now, let's pretend nothing happened, and let the code
             # handle the template as if it existed before
             self.__new = False
+
+    def getCSSFiles(self):
+        # flatten returned list
+
+        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def _setActiveTab(self):
         self._tabBadges.setActive()
@@ -8416,7 +8426,7 @@ class WPConfModifPosterPrinting(WPConfModifToolsBase):
 
     def getJSFiles(self):
         files = WPConfModifToolsBase.getJSFiles(self)
-        files += self._includeJSPackage('BadgePosterPrinting')
+        files += self._includeJSPackage('badges_js')
 
         return files
 

@@ -1,5 +1,5 @@
 <a href="" name="results"></a>
-<table width="100%" cellspacing="0" align="center" border="0">
+<table style="margin-top: 1em; border-spacing: 0; border-collapse: collapse; width: 100%;">
         <tr>
            <td nowrap colspan="10">
                 <div class="CRLgroupTitleNoBorder">${ _("Displaying")}<strong> ${ filteredNumberRegistrants } </strong>
@@ -64,7 +64,7 @@
           <td colspan="40" valign="bottom" align="left">
             <form id="registrantsForm" action=${ actionPostURL } method="post" name="registrantsForm" onsubmit="return atLeastOneRegistrantSelected();">
             <input id="pdfExportInputHidden" type="hidden" name="pdf">
-            <table width="100%" cellspacing="0" align="center" border="0">
+            <table>
                 <tr>
                   <td colspan="10">
                     <div>
@@ -75,12 +75,12 @@
                 </tr>
                  <tr id="headPanel" class="follow-scroll" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);">
                     <td valign="bottom" width="100%" align="left" colspan="1000">
-                        <table style="margin-left: -8px" >
+                        <table style="margin-left: -8px;">
                             <tr >
-                                <td valign="bottom" align="left" id="button-menu" class="toolbar">
+                                <td valign="bottom" align="left" id="button-menu" class="toolbar" style="padding-bottom: 1em;">
 
                                   <div class="group left">
-                                    <a class="icon-checkbox-checked btn arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                                    <a class="icon-checkbox-checked button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
                                     <ul class="dropdown">
                                       <li><a href="#" id="selectAll">All</a></li>
                                       <li><a href="#" id="selectNone">None</a></li>
@@ -88,13 +88,13 @@
                                   </div>
 
                                   <div class="group left">
-                                    <a href="#" class="btn" id="add_new_user">${_("Add new")}</a>
-                                    <a href="#" class="btn" id="remove_users">${_("Remove")}</a>
-                                    <a href="#" class="btn" id="send_email">${_("Email")}</a>
-                                    <a href="#" class="btn" id="print_badges">${_("Print Badges")}</a>
-                                    <a href="#" class="btn" id="attachments">${_("Attachments")}</a>
-                                    <a href="#" class="btn" id="show_stats">${_("Show stats")}</a>
-                                    <a class="button arrow btn" href="#" data-toggle="dropdown">
+                                    <a href="#" class="button" id="add_new_user">${_("Add new")}</a>
+                                    <a href="#" class="button" id="remove_users">${_("Remove")}</a>
+                                    <a href="#" class="button" id="send_email">${_("Email")}</a>
+                                    <a href="#" class="button" id="print_badges">${_("Print Badges")}</a>
+                                    <a href="#" class="button" id="attachments">${_("Attachments")}</a>
+                                    <a href="#" class="button" id="show_stats">${_("Show stats")}</a>
+                                    <a class="button arrow button" href="#" data-toggle="dropdown">
                                       ${_("Export")}
                                     </a>
                                     <ul class="dropdown">
@@ -127,22 +127,25 @@
 
                     <tr id="registrant${reg.getId()}" style="background-color: transparent;" onmouseout="javascript:onMouseOut('registrant${reg.getId()}')"
                         onmouseover="javascript:onMouseOver('registrant${reg.getId()}')">
-                      <td valign="top"><input onchange="javascript:isSelected('registrant${reg.getId()}')" type="checkbox" name="registrant" value="${reg.getId()}"/></td>
+                      <td style="width: 1.5em;">
+                        <input onchange="javascript:isSelected('registrant${reg.getId()}')" type="checkbox" name="registrant" value="${reg.getId()}"/>
+                      </td>
                       % if "Id" in groups_order["PersonalData"]:
-                        <td valign="top" class="CRLabstractLeftDataCell">${reg.getId()}</td>
-                        <td valign="top" nowrap class="CRLabstractDataCell"><a href="${urlHandlers.UHRegistrantModification.getURL(reg)}">${reg.getFullName()}</a></td>
+                        <td class="CRLabstractLeftDataCell">${reg.getId()}</td>
                       % endif
+
+                       <td nowrap class="CRLabstractDataCell"><a href="${urlHandlers.UHRegistrantModification.getURL(reg)}">${reg.getFullName()}</a></td>
 
                       % for key in groups_order["PersonalData"]:
                         % if key != "Name" and key != "Id":
-                          <td valign="top"  class="CRLabstractDataCell">${regdict[key]}</td>
+                          <td class="CRLabstractDataCell">${regdict[key]}</td>
                         % endif
                       % endfor
 
                       % for group_key, group_data in groups_order.iteritems():
                         % if group_key != "PersonalData":
                           % for key in group_data:
-                            <td valign="top"  class="CRLabstractDataCell">${regdict[key]}</td>
+                            <td class="CRLabstractDataCell">${regdict[key]}</td>
                           % endfor
                         % endif
                       % endfor

@@ -3,7 +3,7 @@
         <div class="toolbar-container">
           % if ShowKeepValues:
             <div class="element">
-              <input id="keepPDFOptions" type="checkbox" value="keepPDFOptions" name="keepPDFOptions" checked />
+              <input id="keepPDFOptions" type="checkbox" value="keepPDFOptions" name="keepPDFOptions" />
               <label for="keepPDFOptions">${ _("Keep these values for next time")}</label>
               ${inlineContextHelp(_('If you produce badges with these PDF options, they will be kept the next time so that you do not have to input them again.') )}
             </div>

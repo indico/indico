@@ -43,18 +43,34 @@ class WPBase(OldObservable):
 
     def __init__( self, rh ):
         config = Config.getInstance()
+        db_connected = DBMgr.getInstance().isConnected()
+
         self._rh = rh
         self._locTZ = ""
 
-        self._asset_env = Environment(config.getHtdocsDir(), '/')
+        self._asset_env = Environment(config.getHtdocsDir(), '')
+
+        if db_connected:
+            debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
+        else:
+            debug = False
 
         # This is done in order to avoid the problem sending the error report because the DB is not connected.
-        if DBMgr.getInstance().isConnected():
+        if db_connected:
             info = HelperMaKaCInfo.getMaKaCInfoInstance()
             self._asset_env.debug = info.isDebugActive()
 
+        self._dir = config.getTPLDir()
+        self._asset_env.debug = debug
+
+        if db_connected:
+            css_file = config.getCssStylesheetName()
+        else:
+            css_file = 'Default.css'
+
         # register existing assets
         assets.register_all_js(self._asset_env)
+        assets.register_all_css(self._asset_env, css_file)
 
         #store page specific CSS and JS
         self._extraCSS = []
@@ -74,7 +90,7 @@ class WPBase(OldObservable):
         self._title = newTitle.strip()
 
     def getCSSFiles(self):
-        return []
+        return self._asset_env['base_css'].urls()
 
     def _getJavaScriptInclude(self, scriptPath):
         return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'

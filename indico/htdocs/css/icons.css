@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'icomoon-ultimate';
-	src:url('../fonts/icomoon-ultimate.eot');
-	src:url('../fonts/icomoon-ultimate.eot?#iefix') format('embedded-opentype'),
-		url('../fonts/icomoon-ultimate.svg#icomoon-ultimate') format('svg'),
-		url('../fonts/icomoon-ultimate.woff') format('woff'),
-		url('../fonts/icomoon-ultimate.ttf') format('truetype');
+	src:url('../fonts/icomoon.eot');
+	src:url('../fonts/icomoon.eot?#iefix') format('embedded-opentype'),
+		url('../fonts/icomoon.svg#icomoon-ultimate') format('svg'),
+		url('../fonts/icomoon.woff') format('woff'),
+		url('../fonts/icomoon.ttf') format('truetype');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -28,6 +28,7 @@
 	line-height: 1;
 	-webkit-font-smoothing: antialiased;
 }
+
 .icon-phone:before {
 	content: "\70";
 }
@@ -40,19 +41,19 @@
 .icon-file-pdf:before {
 	content: "\61";
 }
-.icon-alarm:before {
+.icon-time:before {
 	content: "\74";
 }
 .icon-location:before {
 	content: "\6c";
 }
-.icon-user:before {
+.icon-chair:before {
 	content: "\63";
 }
 .icon-info:before {
 	content: "\69";
 }
-.icon-box-add:before {
+.icon-material-download:before {
 	content: "\64";
 }
 .icon-wrench:before {
@@ -79,11 +80,8 @@
 .icon-file-excel:before {
 	content: "\25";
 }
-.icon-shield:before {
+.icon-arrow-up:before {
 	content: "\26";
-}
-.icon-time:before {
-	content: "\74";
 }
 .icon-location:before {
 	content: "\6c";
@@ -129,4 +127,43 @@
 }
 .icon-file-xml:before {
 	content: "\28";
+}
+.icon-upload:before {
+	content: "\29";
+}
+.icon-rulers:before {
+	content: "\26";
+}
+.icon-shield:before {
+	content: "\2b";
+}
+.icon-refresh:before {
+	content: "\2c";
+}
+.icon-plus:before {
+	content: "\2d";
+}
+.icon-type:before {
+	content: "\2a";
+}
+.icon-font-size:before {
+	content: "\2f";
+}
+.icon-font-size:before {
+	content: "\2f";
+}
+.icon-pictures:before {
+	content: "\31";
+}
+.icon-copy:before {
+	content: "\30";
+}
+.icon-edit:before {
+	content: "\2e";
+}
+.icon-file-download:before {
+	content: "\32";
+}
+.icon-settings:before {
+	content: "\33";
 }

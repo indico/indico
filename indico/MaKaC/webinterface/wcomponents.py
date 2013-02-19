@@ -106,31 +106,10 @@ class WTemplated(OldObservable):
         return tplobj
 
     def __init__( self, tpl_name = None):
-        db_connected = DBMgr.getInstance().isConnected()
-
         if tpl_name != None:
             self.tplId = tpl_name
 
         self._rh = ContextManager.get('currentRH', None)
-
-        cfg = Configuration.Config.getInstance()
-
-        if db_connected:
-            debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
-        else:
-            debug = False
-
-        self._for_module = None
-        self._dir = cfg.getTPLDir()
-        self._asset_env = Environment(os.path.join(cfg.getHtdocsDir(), 'css'), 'css/')
-        self._asset_env.debug = debug
-
-        if db_connected:
-            css_file = cfg.getCssStylesheetName()
-        else:
-            css_file = 'Default.css'
-
-        assets.register_all_css(self._asset_env, css_file)
 
     def _getSpecificTPL(self, dir, tplId, extension="tpl"):
         """
@@ -277,7 +256,6 @@ class WHTMLHeader(WTemplated):
         tvars["analyticsCode"] = minfo.getAnalyticsCode()
         tvars["analyticsCodeLocation"] = minfo.getAnalyticsCodeLocation()
         tvars['timestamp'] = "%d" % os.stat(__file__).st_mtime
-        tvars['stylesheets'] = self._asset_env['base_css'].urls()
         return tvars
 
 

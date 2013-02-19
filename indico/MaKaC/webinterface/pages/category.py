@@ -1653,9 +1653,10 @@ class WCategoryDeletion(object):
         for categ in self._categList:
             categIdList.append(categ.getId())
 
-        return wc.getHTML(msg, actionURL, {"selectedCateg": categIdList}, \
-                                            confirmButtonCaption=_("Yes"), \
-                                            cancelButtonCaption=_("No"))
+        return wc.getHTML(msg, actionURL, {"selectedCateg": categIdList},
+                          confirmButtonCaption=_("Yes"),
+                          cancelButtonCaption=_("No"),
+                          severity='danger')
 
 
 class WConferenceDeletion(object):

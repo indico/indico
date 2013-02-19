@@ -637,8 +637,8 @@ type("JTabWidget", ["IWidget"], {
             overflow: 'hidden'
         }));
         nav.find('> li').css({
-            'display': 'inline-block',
-            'float': 'none'
+            'display': 'block',
+            'float': 'left'
         });
         // save some space for the scroll buttons
         nav.css({

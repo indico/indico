@@ -126,8 +126,12 @@ indico_jquery = Bundle('js/indico/jquery/defaults.js',
 indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
                                filters='rjsmin', output='indico_jquery_authors_%(version)s.min.js')
 
-indico_badgeposterprinting = Bundle('js/indico/Management/ConfModifBadgePosterPrinting.js',
-                                  filters='jsmin', output='indico_posterdesign_%(version)s.min.js')
+indico_badges_js = Bundle('js/indico/Management/ConfModifBadgePosterPrinting.js',
+                          filters='jsmin', output='indico_badges_%(version)s.min.js')
+
+indico_badges_css = Bundle('css/badges.css',
+                           filters='cssmin', output='indico_badges_%(version)s.min.css')
+
 
 jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.js',
@@ -204,21 +208,22 @@ def register_all_js(env):
     env.register('indico_display', indico_display)
     env.register('indico_jquery', indico_jquery)
     env.register('indico_authors', indico_jquery_authors)
-    env.register('indico_badgeposterprinting', indico_badgeposterprinting)
+    env.register('indico_badges_js', indico_badges_js)
     env.register('base_js', base_js)
 
 
 def register_all_css(env, main_css_file):
-    env.register('base_css', Bundle(main_css_file,
+    env.register('indico_badges_css', indico_badges_css)
+    env.register('base_css', Bundle('css/{0}'.format(main_css_file),
+                                    'css/icons.css',
+                                    'css/core.css',
+                                    'css/buttons.css',
+                                    'css/dialogs.css',
 
-                                    'icons.css',
-                                    'core.css',
-                                    'dialogs.css',
-
-                                    'calendar-blue.css',
-                                    'jquery-ui.css',
-                                    'jquery.qtip.css',
-                                    'jquery.colorbox.css',
-                                    'jquery-ui-custom.css',
+                                    'css/calendar-blue.css',
+                                    'css/jquery-ui.css',
+                                    'css/jquery.qtip.css',
+                                    'css/jquery.colorbox.css',
+                                    'css/jquery-ui-custom.css',
                                     filters=('cssmin'),
                                     output='base_%(version)s.min.css'))

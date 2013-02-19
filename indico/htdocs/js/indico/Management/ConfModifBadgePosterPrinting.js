@@ -12,21 +12,32 @@ $(document).ready(function() {
     resizable: false,
     autoOpen: false,
     maxHeight: '90%',
+    appendTo: '#create_form',
     buttons: {
       Ok: function() {
+        var data = $('#create_form #config_data');
         $(this).dialog('close');
+
+        // set data directly in form
+        data.html('');
+        data.append($('input').clone());
       }
     }
   });
 
   $('#showPDFLayout').click(function() {
     $('#badgePDFOptions').dialog('open');
+    return false;
+  });
+
+  $('#downloadPDF').click(function() {
+    $('#create_form').submit();
+    return false;
   });
 
   var get_radio_buttons = function() {
-    return $(document).find('[name=templateId]');r
+    return $(document).find('[name=templateId]');
   };
-
   var has_template_selected = function() {
     var buttons = get_radio_buttons();
     var has_checked = false;

@@ -8,12 +8,12 @@
   </span>
 
   <div id="actions" class="right group">
-    <a class="icon-checkbox-checked btn arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+    <a class="icon-checkbox-checked button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
     <ul class="dropdown">
       <li><a href="#" id="selectAll">All</a></li>
       <li><a href="#" id="selectNone">None</a></li>
     </ul>
-    <a class="icon-mail btn left icon-only" id="email_people" aria-hidden="true" href="#" title="${_("Email selected people")}"></a>
+    <a class="icon-mail button left icon-only" id="email_people" aria-hidden="true" href="#" title="${_("Email selected people")}"></a>
   </div>
 
 </div>

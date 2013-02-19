@@ -8,7 +8,7 @@
       <tr>
         <td colspan="2">
             <div class="bs-alert bs-alert-info alert-toolbar">
-              <span class="btn btn-info" id="showPDFLayout" style="float:right;">${_('PDF Layout Options')}</span>
+              <span class="button button-info" id="showPDFLayout" style="float:right;">${_('PDF Layout Options')}</span>
             ${_("The page layout and dimensions will be the default for this event, if you would like to review and/or edit these, please click on the PDF Layout button.")}
             <div class="toolbar-clearer"></div>
            </div>
@@ -25,7 +25,7 @@
             <option value="${template['value']}">${template['label']}</option>
           % endfor
           </select>
-          <input class="btn" value="${ _("Create Poster From Template")}" type="submit">
+          <input class="button" value="${ _("Create Poster From Template")}" type="submit">
           <div style="display:none;">
             <div id="badgePDFOptions" title="PDF Options">
               ${ PDFOptions }
@@ -48,7 +48,7 @@
               <option value="${template['value']}">${template['label']}</option>
             % endfor
           </select>
-          <input name="New Template Button" class="btn" value="${ _("New")}" type="submit">
+          <input name="New Template Button" class="button" value="${ _("New")}" type="submit">
           </form>
         </td>
       </tr>
@@ -60,9 +60,9 @@
               % for template in templateList:
               <tr>
                 <td>
-                  <a href="${template['urlEdit']}" class='btn btn-mini'>${_('Edit')}</a>
-                  <a href="${template['urlCopy']}" class='btn btn-mini'>${_('Clone')}</a>
-                  <a href="${template['urlDelete']}" class='btn btn-mini'>${_('Delete')}</a>
+                  <a href="${template['urlEdit']}" class='button button-mini'>${_('Edit')}</a>
+                  <a href="${template['urlCopy']}" class='button button-mini'>${_('Clone')}</a>
+                  <a href="${template['urlDelete']}" class='button button-mini'>${_('Delete')}</a>
                 </td>
                 <td style="padding-left:5px;">
                   <a href="${ NewTemplateURL }&baseTemplate=local${template['id']}" target="_blank">${template['name']}</a>

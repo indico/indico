@@ -4,10 +4,6 @@
         <title>${ page._getTitle() }${ area }</title>
         <link rel="shortcut icon" type="image/x-icon" href="${ systemIcon('addressBarIcon') }">
 
-        % for stylesheet in stylesheets:
-        <link rel="stylesheet" type="text/css" href="${ baseurl + '/' + stylesheet }">
-        % endfor
-
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
 % if social.get('facebook', {}).get('appId', None):
@@ -42,7 +38,7 @@
 
         <!-- Page Specific CSS files-->
         % for cssFile in extraCSS:
-            <link rel="stylesheet" type="text/css" href="${ baseurl + '/' + cssFile }">
+            <link rel="stylesheet" type="text/css" href="${baseurl}/${cssFile.lstrip('/')}">
         % endfor
 
         <!-- Page Specific, directly inserted Javascript -->

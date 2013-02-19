@@ -1,5 +1,5 @@
 
-<table width="100%" cellspacing="0" align="center" border="0">
+<table cellspacing="0" align="center" border="0">
     ${ filterOptions }
     <tr>
         <td>
