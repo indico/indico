@@ -95,3 +95,40 @@ h4 {
     vertical-align: middle;
     margin-left: 0.5em;
 }
+
+.ruler {
+    position: relative;
+}
+
+.ruler#horizontal_ruler {
+    height: 10px;
+    top: -6px;
+}
+
+.ruler#vertical_ruler {
+    width: 10px;
+    left: -6px;
+}
+
+.ruler .marking {
+    box-sizing: border-box;
+    position: absolute;
+    border: 1px solid #aaa;
+    color: #aaa;
+    background: #eee;
+    vertical-align: middle;
+    font-size: 0.7em;
+}
+
+.ruler#vertical_ruler .marking {
+    border-width: 1px 0 0 0;
+    text-align: center;
+    width: 15px;
+}
+
+.ruler#horizontal_ruler .marking {
+    border-width: 0 0 0 1px;
+    padding-left: 5px;
+    line-height: 15px;
+    height: 15px;
+}

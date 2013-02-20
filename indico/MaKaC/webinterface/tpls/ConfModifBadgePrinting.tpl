@@ -40,11 +40,14 @@
 
       <a href="#" id="showPDFLayout" class="button icon-settings right">${_("Layout Settings")}</a>
 
-      <button class="button" id="downloadPDF" style="margin-left: 3em;">
-        <i class="icon-file-download" aria-hidden="true"></i>
-        ${('Download Badges PDF')}
-      </button>
+      <%block name="download_button">
+        <button class="button" id="downloadPDF" style="margin-left: 3em;">
+          <i class="icon-file-download" aria-hidden="true"></i>
+          ${('Download Badges PDF')}
+        </button>
+      </%block>
     </div>
+  </form>
     
 <div id="badgePDFOptions" title="PDF Options">
   ${PDFOptions}

@@ -8201,7 +8201,7 @@ class WConfModifBadgeDesign(wcomponents.WTemplated):
             optgroups.append("".join(optgroup))
 
         vars['selectOptions'] = "\n".join(optgroups)
-
+        vars["backgroundPos"] = "Stretch"
 
         if self.__new:
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, new=True)
@@ -8387,7 +8387,7 @@ class WConfModifPosterPrinting(wcomponents.WTemplated):
         vars["CreatePDFURL"]= str(uh.UHConfModifPosterPrintingPDF.getURL(self.__conf))
         vars["templateList"] = templates
         vars['PDFOptions'] = wcPDFOptions.getHTML()
-        vars['baseTemplateList'] = self._getBaseTemplateListOptions()
+        vars['baseTemplates'] = self._getBaseTemplateListOptions()
         vars['fullTemplateList'] = self._getFullTemplateListOptions()
 
         return vars
@@ -8423,6 +8423,11 @@ class WPConfModifPosterPrinting(WPConfModifToolsBase):
 
     def _setActiveTab(self):
         self._tabPosters.setActive()
+
+    def getCSSFiles(self):
+        # flatten returned list
+
+        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def getJSFiles(self):
         files = WPConfModifToolsBase.getJSFiles(self)
@@ -8548,6 +8553,11 @@ class WPConfModifPosterDesign(WPConfModifToolsBase):
         self.__templateId = templateId
         self.__new = new
         self.__baseTemplate = baseTemplateId
+
+    def getCSSFiles(self):
+        # flatten returned list
+
+        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def _setActiveTab(self):
         self._tabPosters.setActive()

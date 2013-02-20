@@ -15,12 +15,7 @@ $(document).ready(function() {
     appendTo: '#create_form',
     buttons: {
       Ok: function() {
-        var data = $('#create_form #config_data');
         $(this).dialog('close');
-
-        // set data directly in form
-        data.html('');
-        data.append($('input').clone());
       }
     }
   });
@@ -31,6 +26,10 @@ $(document).ready(function() {
   });
 
   $('#downloadPDF').click(function() {
+    var data = $('#create_form #config_data');
+    // set data directly in form
+    data.html('');
+    data.append($('#badgePDFOptions input').clone());
     $('#create_form').submit();
     return false;
   });

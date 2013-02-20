@@ -1,4 +1,14 @@
 <script type="text/javascript">
+
+    <%block name="defaults">
+        TPL_DEFAULT_SIZE = [425, 270];
+
+        // "Zoom factor" - ratio between font
+        // size on screen and on paper
+        var zoom_factor = 1;
+        var numeric_mode = false;
+    </%block>
+
     var snapToGrid = false;
 
     // Dimensions of the template space, in pixels
@@ -8,10 +18,11 @@
     var previousTemplateDimensions;
 
     // Number of pixels per cm
-    var pixelsPerCm = 50;
+    var pixelsPerCm = 50 * zoom_factor;
 
     // Id of the background used
     var backgroundId = -1;
+    var backgroundPos;
 
     // Number of pixels, both horizontal and vertical, that are between the top left corner
     // and the position where items are inserted
@@ -30,7 +41,7 @@
     // Translation dictionary from key to name in current language.
     var translate = ${translateName};
 
-    // List of badge template items
+    // List of template items
     var items = [];
 
     // Pointer for the jQuery-UI tabs later.
@@ -47,7 +58,7 @@
         this.italic = false;
         this.textAlign = "Center";
         this.color = "black";
-        this.fontSize = "medium";
+        this.fontSize = "25pt";
         this.width = 400;
         this.text = $T("Fixed text");
 
@@ -57,7 +68,7 @@
         this.styleIndex = 0;
         this.textAlignIndex = 2; //Center
         this.colorIndex = 0;
-        this.fontSizeIndex = 3; //Medium
+        this.fontSizeIndex = 11; //Medium
     }
 
     Item.prototype.toHTML = function () {
@@ -113,7 +124,7 @@
         return newDiv;
     }
 
-    // This function inserts the selected element in the blank space where badge template designing takes place
+    // This function inserts the selected element in the blank space where template designing takes place
     function insertElement() {
         var newDiv = createDiv();
         // We set the inner html of the div depending on the type of item inserted
@@ -203,28 +214,38 @@
         if (templateDimensions.width > previousTemplateDimensions.width) {
             var hRuler = $('#horizontal_ruler');
             for (var i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i < Math.ceil(templateDimensions.width / pixelsPerCm); i++) {
-                $('<td/>', {
-                    id: 'rulerh' + i
-                }).html('<img src="${ baseURL }/images/ruler/rulerh' + i + '.png" align="center"/>').appendTo(hRuler);
+
+                $('<div class="marking"/>', {
+                     id: 'rulerh' + i
+                }).css({
+                    width: pixelsPerCm + 'px',
+                    left: (i * pixelsPerCm) + 'px',
+                    top: 0
+                }).html(i + 1).appendTo(hRuler);
             }
         }
         else if (templateDimensions.width < previousTemplateDimensions.width) {
             for (var i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i > Math.ceil(templateDimensions.width / pixelsPerCm); i--) {
-                $('#rulerh' + (i - 1)).remove();
+                $('#horizontal_ruler' + (i - 1)).remove();
             }
         }
 
         if (templateDimensions.height > previousTemplateDimensions.height) {
             var vRuler = $('#vertical_ruler');
             for (var i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i < Math.ceil(templateDimensions.height / pixelsPerCm); i++) {
-                $('<tr/>', {
+                $('<div class="marking"/>', {
                     id: 'rulerv' + i
-                }).append('<td><img src="${ baseURL }/images/ruler/rulerv' + i + '.png" align="center"/></td>').appendTo(vRuler);
+                }).css({
+                    'line-height': pixelsPerCm/2.0 + 'px',
+                    height: pixelsPerCm  + 'px',
+                    left: 0,
+                    top: (i * pixelsPerCm) + 'px'
+                }).html(i + 1).appendTo(vRuler);
             }
         }
         else if (templateDimensions.height < previousTemplateDimensions.height) {
             for (i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i > Math.ceil(templateDimensions.height / pixelsPerCm); i--) {
-                $('#rulerv' + (i - 1)).remove();
+                $('#vertical_ruler > #rulerv' + (i - 1)).remove();
             }
         }
     }
@@ -238,6 +259,7 @@
                 left: item.x + 'px',
                 top: item.y + 'px'
             });
+            item.fontSize = zoom_font(zoom_factor, item.fontSize);
             newDiv.html(item.toHTML());
             if (item.selected) {
                 markSelected(newDiv);
@@ -324,7 +346,7 @@
         size: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                item.fontSize = $('#size_selector').val();
+                item.fontSize = zoom_font(zoom_factor, $('#size_selector').val());
                 item.fontSizeIndex = $('#size_selector').prop('selectedIndex');
                 lastSelectedDiv.html(item.toHTML());
             }
@@ -374,6 +396,15 @@
         }
     };
 
+    function zoom_font(zfact, fontSize) {
+        if (numeric_mode) {
+            var pattern = /([0-9.]+)pt/g
+            var ftsize = pattern.exec(fontSize)[1];
+            return (ftsize * zfact) + 'pt';
+        } else {
+            return fontSize;
+        }
+    }
 
     function save() {
         if ($('#template_name').val() == '') {
@@ -385,10 +416,72 @@
         template.push(templateDimensions, pixelsPerCm);
         template.push(backgroundId);
 
+        $.each(items, function(i, item) {
+            if (item != false) {
+                item.fontSize = zoom_font(1/zoom_factor, item.fontSize);
+            }
+        });
+
         template.push(items);
         $('#templateData').val(Json.write(template));
         $('#saveForm').submit();
     }
+
+    function setBackgroundPos(mode) {
+        var background = $('#background');
+        var hiddenField = $('#bgPosition');
+        var bgPosStretch = $('#bgPosStretch');
+        var bgPosCenter = $('#bgPosCenter');
+
+        if (mode == 'Stretch') {
+            background.css({
+                left: 0,
+                top: 0
+            });
+            background.height(templateDimensions.height);
+            background.width(templateDimensions.width);
+            bgPosStretch.prop('checked', true);
+            bgPosCenter.prop('checked', false);
+        }
+        else if (mode == 'Center') {
+            background.height(background.prop('naturalHeight'));
+            background.width(background.prop('naturalWidth'));
+
+            if (background.width() > templateDimensions.width || background.height() > templateDimensions.height) {
+                if (background.width() > templateDimensions.width) {
+                    var ratio = templateDimensions.width / background.width();
+
+                    background.width(templateDimensions.width);
+                    background.height(background.height() * ratio);
+                    background.css({
+                        left: 0,
+                        top: (templateDimensions.height/2.0 - background.height()/2.0) + 'px'
+                    });
+                }
+
+                if (background.height() > templateDimensions.height) {
+                    var ratio = templateDimensions.height / background.height();
+
+                    background.width(background.width() * ratio);
+                    background.height(templateDimensions.height);
+
+                    background.css({
+                        left: (templateDimensions.width/2.0 - background.width()/2.0) + 'px',
+                        top: 0
+                    });
+                }
+            }
+            else {
+                background.css({
+                    left: (templateDimensions.width/2 - background.prop('naturalWidth')/2) + 'px',
+                    top: (templateDimensions.height/2 - background.prop('naturalHeight')/2) + 'px'
+                });
+            }
+
+            bgPosStretch.prop('checked', false);
+            bgPosCenter.prop('checked', true);
+        }
+     }
 
     function displayBackground(backgroundURL) {
         $('<img/>', {
@@ -404,6 +497,7 @@
         }).load(function() {
             $('#loadingIcon').hide();
             $('#removeBackground').removeClass('hidden');
+            setBackgroundPos(backgroundPos);
         }).appendTo('#templateDiv');
     }
 
@@ -469,6 +563,7 @@
                     $('#background').remove();
                 }
                 backgroundId = data.id;
+                backgroundPos = data.pos;
                 displayBackground(data.url);
             },
             beforeSubmit: function() {
@@ -586,6 +681,8 @@
               <i class="icon-pictures left" title="${_("Background")}"></i>
               <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data" class="left">
                 <input name="file" type="file" style="margin-bottom: 1em;" />
+                <%block name="background_options">
+                </%block>
                 <div class="toolbar">
                   <div class="group">
                     <a class="button icon-upload icon-only hidden" id="uploadBackground" title="${_("Upload file")}"></a>
@@ -593,7 +690,7 @@
                       </div>
                 </div>
               </form>
-              <img id="loadingIcon" src=${loadingIconURL} width="20px" height="20px" style="display:none;" />
+              <img id="loadingIcon" src=${loadingIconURL} style="display:none; width: 20px; height: 20px;" />
             </div>
 
         </div>
@@ -637,14 +734,16 @@
                 </select>
                 <!-- Font Size -->
                 <select id='size_selector' name="Template Element Size" class="attrSelect" data-attr="size">
-                  <option value="xx-small"> ${ _("xx-small")}</option>
-                  <option value="x-small"> ${ _("x-small")}</option>
-                  <option value="small"> ${ _("small")}</option>
-                  <option value="medium" SELECTED> ${ _("medium")}</option>
-                  <option value="large"> ${ _("large")}</option>
-                  <option value="x-large"> ${ _("x-large")}</option>
-                  <option value="xx-large"> ${ _("xx-large")}</option>
-                </select>
+                    <%block name="font_sizes">
+                        <option value="xx-small"> ${ _("xx-small")}</option>
+                        <option value="x-small"> ${ _("x-small")}</option>
+                        <option value="small"> ${ _("small")}</option>
+                        <option value="medium" SELECTED> ${ _("medium")}</option>
+                        <option value="large"> ${ _("large")}</option>
+                        <option value="x-large"> ${ _("x-large")}</option>
+                        <option value="xx-large"> ${ _("xx-large")}</option>
+                    </%block>
+            </select>
                 <!-- Font Alignment -->
                 <select id='alignment_selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
                   <!-- Note: the value of the options is used directly in the style attribute of the items -->
@@ -727,21 +826,15 @@
         <td></td>
 
         <td align="left" valign="bottom" height="22px"> <!-- height of the horizontal ruler images -->
-          <table border="0" cellpadding="0" cellspacing="0">
-            <tbody>
-              <tr id="horizontal_ruler">
-              </tr>
-            </tbody>
-          </table>
+            <div id="horizontal_ruler" class="ruler">
+            </div>
         </td>
       </tr>
 
       <tr>
         <td valign="top" align="right" width="22px"> <!-- width of the vertical ruler image -->
-          <table border="0" cellpadding="0" cellspacing="0" align="right">
-            <tbody id="vertical_ruler">
-            </tbody>
-          </table>
+            <div id="vertical_ruler" class="ruler">
+            </div>
         </td>
 
         <td align="left" valign="top">
@@ -773,7 +866,7 @@
         });
         templateDimensions = new Dimensions(template[1].width, template[1].height);
     } else {
-        templateDimensions = new Dimensions(425, 270); //put here the initial dimensions of templateDiv
+        templateDimensions = new Dimensions(TPL_DEFAULT_SIZE[0], TPL_DEFAULT_SIZE[1]);
     }
 
     previousTemplateDimensions = new Dimensions(0,0);
@@ -801,6 +894,7 @@
 
     if (${ editingTemplate } && ${ hasBackground }) {
         backgroundId = ${ backgroundId };
+        backgroundPos = '${ backgroundPos }';
         displayBackground("${ backgroundURL }");
     }
 
