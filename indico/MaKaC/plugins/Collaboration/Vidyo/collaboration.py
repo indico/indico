@@ -201,13 +201,13 @@ class CSBooking(CSBookingBase):
         """ Returns the end date of the link object
         """
         linkObject = self.getLinkObject()
-        return linkObject.getEndDate() if linkObject else ""
+        return linkObject.getEndDate() if linkObject else None
 
     def getStartDate(self):
         """ Returns the start date of the link object
         """
         linkObject = self.getLinkObject()
-        return linkObject.getStartDate() if linkObject else ""
+        return linkObject.getStartDate() if linkObject else None
 
     def getRoomId(self):
         """ The Viydo internal room id for this booking
