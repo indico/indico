@@ -38,8 +38,6 @@ def main(argv):
     meeting = -1
     show = 0
 
-    ContextManager.create()
-
     try:
         opts, args = getopt.getopt(argv, "hm:c:s", ["help","meeting=","category=", "show"])
     except getopt.GetoptError:
@@ -97,7 +95,6 @@ def main(argv):
                 c.setEvaluations([Evaluation(c)])
 
                 # indexes
-                c.indexConf()
                 c._notify('created', cat)
 
                 for contrib in c.getContributionList():

@@ -1,5 +1,6 @@
 <form method="get" action="${searchAction}" id="searchBoxForm" style="margin: 0px;">
 <input type="hidden" id="searchCategId" name="categId" value="0" data-current="${targetId}" data-current-name="${categName}"/>
+<input type="hidden" name="sortOrder" value="d"/>
 <div id="UISearchBox">
     <div id="searchControls">
         <div class="searchButton">
