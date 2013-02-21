@@ -80,9 +80,6 @@
 .icon-file-excel:before {
 	content: "\25";
 }
-.icon-arrow-up:before {
-	content: "\26";
-}
 .icon-location:before {
 	content: "\6c";
 }
@@ -120,7 +117,7 @@
 	content: "\25";
 }
 .icon-arrow-up:before {
-	content: "\26";
+	content: "\34";
 }
 .icon-undo:before {
 	content: "\27";
@@ -145,9 +142,6 @@
 }
 .icon-type:before {
 	content: "\2a";
-}
-.icon-font-size:before {
-	content: "\2f";
 }
 .icon-font-size:before {
 	content: "\2f";

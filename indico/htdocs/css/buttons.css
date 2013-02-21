@@ -196,9 +196,8 @@ button i[class*="icon-"] {
     padding-top: 0.4em;
 }
 
-.toolbar .button[class*="icon-"].icon-only:before {
+.button[class*="icon-"].icon-only:before {
     margin-right: 0;
-    
 }
 
 .button[class*="icon-"]:before {

@@ -696,63 +696,65 @@
         </div>
         <!-- Tab for element formatting -->
         <div id="tabsFormatting" class="tab">
-          <i class="icon-font-size left" title="${_("Font definitions")}"></i>
             <div class="left panel">
+                <i class="icon-font-size left" title="${_("Font definitions")}"></i>
                 <!-- Font Face -->
-                <select id='font_selector' name="Template Element Font" class="attrSelect" data-attr="font">
-                  <optgroup label="${ _('Normal Fonts') }">
-                    <option>Times New Roman</option>
-                    <option>Courier</option>
-                    <option>Sans</option>
-                  </optgroup>
-                  <optgroup label="${ _('Special Character Fonts') }">
-                    <option>LinuxLibertine</option>
-                    <option>Kochi-Mincho</option>
-                    <option>Kochi-Gothic</option>
-                    <option>Uming-CN</option>
-                  </optgroup>
+                <div class="content">
+                    <select id='font_selector' name="Template Element Font" class="attrSelect" data-attr="font">
+                      <optgroup label="${ _('Normal Fonts') }">
+                        <option>Times New Roman</option>
+                        <option>Courier</option>
+                        <option>Sans</option>
+                      </optgroup>
+                      <optgroup label="${ _('Special Character Fonts') }">
+                        <option>LinuxLibertine</option>
+                        <option>Kochi-Mincho</option>
+                        <option>Kochi-Gothic</option>
+                        <option>Uming-CN</option>
+                      </optgroup>
+                    </select>
+                    <!-- Font Colour -->
+                    <select id='color_selector' name="Template Element Color" class="attrSelect" data-attr="color">
+                      <option value="black"> ${ _("black")}</option>
+                      <option value="red"> ${ _("red")}</option>
+                      <option value="blue"> ${ _("blue")}</option>
+                      <option value="green"> ${ _("green")}</option>
+                      <option value="yellow"> ${ _("yellow")}</option>
+                      <option value="brown"> ${ _("brown")}</option>
+                      <option value="gold"> ${ _("gold")}</option>
+                      <option value="pink"> ${ _("pink")}</option>
+                      <option value="gray"> ${ _("gray")}</option>
+                      <option value="white"> ${ _("white")}</option>
+                    </select>
+                    <!-- Font Style -->
+                    <select id='style_selector' name="Template Element Style" class="attrSelect" data-attr="style">
+                      <option value="normal"> ${ _("Normal")}</option>
+                      <option value="bold"> ${ _("Bold")}</option>
+                      <option value="italic"> ${ _("Italic")}</option>
+                      <option value="bold_italic"> ${ _("Bold &amp; Italic")}</option>
+                    </select>
+                    <!-- Font Size -->
+                    <select id='size_selector' name="Template Element Size" class="attrSelect" data-attr="size">
+                        <%block name="font_sizes">
+                            <option value="xx-small"> ${ _("xx-small")}</option>
+                            <option value="x-small"> ${ _("x-small")}</option>
+                            <option value="small"> ${ _("small")}</option>
+                            <option value="medium" SELECTED> ${ _("medium")}</option>
+                            <option value="large"> ${ _("large")}</option>
+                            <option value="x-large"> ${ _("x-large")}</option>
+                            <option value="xx-large"> ${ _("xx-large")}</option>
+                        </%block>
                 </select>
-                <!-- Font Colour -->
-                <select id='color_selector' name="Template Element Color" class="attrSelect" data-attr="color">
-                  <option value="black"> ${ _("black")}</option>
-                  <option value="red"> ${ _("red")}</option>
-                  <option value="blue"> ${ _("blue")}</option>
-                  <option value="green"> ${ _("green")}</option>
-                  <option value="yellow"> ${ _("yellow")}</option>
-                  <option value="brown"> ${ _("brown")}</option>
-                  <option value="gold"> ${ _("gold")}</option>
-                  <option value="pink"> ${ _("pink")}</option>
-                  <option value="gray"> ${ _("gray")}</option>
-                  <option value="white"> ${ _("white")}</option>
-                </select>
-                <!-- Font Style -->
-                <select id='style_selector' name="Template Element Style" class="attrSelect" data-attr="style">
-                  <option value="normal"> ${ _("Normal")}</option>
-                  <option value="bold"> ${ _("Bold")}</option>
-                  <option value="italic"> ${ _("Italic")}</option>
-                  <option value="bold_italic"> ${ _("Bold &amp; Italic")}</option>
-                </select>
-                <!-- Font Size -->
-                <select id='size_selector' name="Template Element Size" class="attrSelect" data-attr="size">
-                    <%block name="font_sizes">
-                        <option value="xx-small"> ${ _("xx-small")}</option>
-                        <option value="x-small"> ${ _("x-small")}</option>
-                        <option value="small"> ${ _("small")}</option>
-                        <option value="medium" SELECTED> ${ _("medium")}</option>
-                        <option value="large"> ${ _("large")}</option>
-                        <option value="x-large"> ${ _("x-large")}</option>
-                        <option value="xx-large"> ${ _("xx-large")}</option>
-                    </%block>
-            </select>
                 <!-- Font Alignment -->
                 <select id='alignment_selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
-                  <!-- Note: the value of the options is used directly in the style attribute of the items -->
-                  <option value="Left"> ${ _("Left")}</option>
-                  <option value="Right"> ${ _("Right")}</option>
-                  <option value="Center"> ${ _("Center")}</option>
-                  <option value="Justified"> ${ _("Justified")}</option>
+                    <!-- Note: the value of the options is used directly in the style attribute of the items -->
+                    <option value="Left"> ${ _("Left")}</option>
+                    <option value="Right"> ${ _("Right")}</option>
+                    <option value="Center"> ${ _("Center")}</option>
+                    <option value="Justified"> ${ _("Justified")}</option>
                 </select>
             </div>
+        </div>
 
             <div class="left panel">
               <i class="icon-rulers left" title="${_("Element dimensions")}"></i>
