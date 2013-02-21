@@ -119,11 +119,11 @@ def _getInstallRequires():
 
     These are the ones needed for runtime.'''
 
-    base =  ['ZODB3>=3.8', 'pytz', 'zope.index', 'zope.interface',
-             'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil<2.0',
+    base =  ['ZODB3==3.10.5', 'zope.index', 'zope.interface',
+             'pytz', 'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil<2.0',
              'pypdf', 'mako>=0.4.1', 'babel', 'icalendar>=3.2', 'pyatom',
-             'cssmin', 'webassets',
-             'pojson>=0.4', 'requests']
+             'cssmin', 'webassets', 'pojson>=0.4', 'requests', 'simplejson==2.6.2',
+             'reportlab']
 
     #for Python older than 2.7
     if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
