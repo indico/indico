@@ -45,6 +45,7 @@ from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 from MaKaC.plugins.RoomBooking.default.room import Room
 from MaKaC.plugins.RoomBooking.tasks import RoomReservationTask
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
+from MaKaC.plugins.Collaboration import urlHandlers
 from MaKaC.webinterface import displayMgr
 from MaKaC.user import AvatarHolder
 from MaKaC.rb_location import CrossLocationQueries
@@ -796,6 +797,27 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
             sys.stdout.flush()
         pipe.execute()
     print '\r  Done   '
+
+@since('1.2')
+def updateVideoServices(dbi, withRBDB, prevVersion):
+    """Video Services migration remove from core"""
+    ch = ConferenceHolder()
+    idx = Catalog.getIdx("cs_bookingmanager_conference")
+    i = 0
+    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+        # Stopre CSBookingManager in the index
+        csbm = getattr(conf, "_CSBookingManager", None)
+        if csbm is None: continue
+        idx.index(conf.getId(), csbm)
+        # Update Menu Links
+        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getMenu()
+        if menu:
+            link = menu.getLinkByName("collaboration")
+            if link:
+                link.setURLHandler(urlHandlers.UHCollaborationDisplay)
+        i += 1
+        if dbi and i % 1000 == 999:
+            dbi.commit()
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),

@@ -23,6 +23,7 @@ from MaKaC.conference import ConferenceHolder
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.indexes import IndexInformation
 from MaKaC.plugins.Collaboration.base import CollaborationException
+from indico.core.index import Catalog
 
 pluginTypeActions = [
     ("indexPluginsPerEventType", {"visible": False,
@@ -107,7 +108,7 @@ class DeleteAllBookingsAction(ActionBase):
     def call(self):
         cf = ConferenceHolder()
         for conf in cf.getValuesToList():
-            csbm = conf.getCSBookingManager()
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
             csbm._bookings = {}
             csbm._bookingsByType = {}
         collaborationIndex = IndexesHolder().getById("collaboration")

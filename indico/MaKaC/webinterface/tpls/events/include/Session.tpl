@@ -18,13 +18,7 @@
             ${session.getTitle()}
         % endif
         </span>
-        % if conf.getCSBookingManager() and conf.getCSBookingManager().hasVideoService(item.getUniqueId()):
-            % for video in conf.getCSBookingManager().getVideoServicesById(item.getUniqueId()):
-                % if video.canBeDisplayed():
-                    <%include file="VideoService.tpl" args="video=video"/>
-                % endif
-            % endfor
-        % endif
+        ${"".join(pluginDetailsSessionContribs.get(item.getUniqueId(),""))}
     </span>
 
     % if session.getDescription():

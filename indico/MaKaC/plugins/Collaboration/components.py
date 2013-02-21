@@ -24,17 +24,25 @@ import zope.interface
 
 from MaKaC.common.utils import daysBetween
 from MaKaC.conference import Conference, Contribution
+from MaKaC.plugins.Collaboration.base import CSBookingManager
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper
-from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay
+from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper, BookingManagerConferenceIndex
+from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay, UHConfModifCollaboration
+from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesManager
+from MaKaC.plugins.Collaboration.output import OutputGenerator
+from MaKaC.plugins.Collaboration.pages import WEventDetailBanner, WVideoService
+
+from MaKaC.plugins import Collaboration
+
 from MaKaC.common.logger import Logger
 from MaKaC.common.indexes import IndexesHolder
+from MaKaC.webinterface import wcomponents
 
-from indico.core.index import OOIndex, Index
+from indico.core.index import OOIndex, Index, Catalog
 from indico.core.index.adapter import IIndexableByStartDateTime
 from indico.core.extpoint import Component
-from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, IMetadataChangeListener, INavigationContributor
-from indico.core.extpoint.plugins import IPluginSettingsContributor
+from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, IMetadataChangeListener, INavigationContributor, IEventDisplayContributor
+from indico.core.extpoint.plugins import IPluginSettingsContributor, IPluginRightsContributor
 from indico.core.extpoint.location import ILocationActionListener
 from indico.core.extpoint.index import ICatalogIndexProvider, IIndexHolderProvider
 
@@ -159,11 +167,39 @@ class CSBookingInstanceIndex(OOIndex):
         self.index_obj(CSBookingInstanceWrapper(bk, talk))
 
 
+class IMEventDisplayComponent(Component):
+
+    zope.interface.implements(IEventDisplayContributor)
+
+    # EventDisplayContributor
+
+    def injectCSSFiles(self, obj):
+        return ['Collaboration/Style.css']
+
+    def injectJSFiles(self, obj):
+        return ['/Collaboration/js/bookings.js', '/Collaboration/js/Collaboration.js']
+
+    def eventDetailBanner(self, obj, conf):
+        vars = OutputGenerator.getCollaborationParams(conf)
+        return WEventDetailBanner.forModule(Collaboration).getHTML(vars)
+
+    def detailSessionContribs(self, obj, conf, params):
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
+        if manager:
+            items = conf.getSessionList() + conf.getContributionList()
+            for item in items:
+                if manager.hasVideoService(item.getUniqueId()):
+                    if not params.has_key(item.getUniqueId()):
+                        params[item.getUniqueId()] = []
+                    for video in manager.getVideoServicesById(item.getUniqueId()):
+                        params[item.getUniqueId()].append(WVideoService.forModule(Collaboration, conf, video).getHTML())
+
 class CatalogIndexProvider(Component):
     zope.interface.implements(ICatalogIndexProvider)
 
     def catalogIndexProvider(self, obj):
-        return [('cs_booking_instance', CSBookingInstanceIndexCatalog)]
+        return [('cs_booking_instance', CSBookingInstanceIndexCatalog),
+                ('cs_bookingmanager_conference', BookingManagerConferenceIndex)]
 
 
 class EventCollaborationListener(Component):
@@ -171,15 +207,14 @@ class EventCollaborationListener(Component):
     zope.interface.implements(IObjectLifeCycleListener,
                               ITimeActionListener,
                               ILocationActionListener,
-                              IMetadataChangeListener,
-                              INavigationContributor)
+                              IMetadataChangeListener)
 
     """In this case, obj is a conference object. Since all we
        need is already programmed in CSBookingManager, we get the
        object of this class and we call the appropiate method"""
     @classmethod
     def dateChanged(cls, obj, params={}):
-        obj = obj.getCSBookingManager()
+        obj = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         try:
             obj.notifyEventDateChanges(params['oldStartDate'], params['newStartDate'], params['oldEndDate'], params['newEndDate'])
         except Exception, e:
@@ -187,7 +222,7 @@ class EventCollaborationListener(Component):
 
     @classmethod
     def startDateChanged(cls, obj, params={}):
-        obj = obj.getCSBookingManager()
+        obj = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         try:
             obj.notifyEventDateChanges(params['oldDate'], params['newDate'], None, None)
         except Exception, e:
@@ -196,18 +231,18 @@ class EventCollaborationListener(Component):
     @classmethod
     def startTimeChanged(self, obj, sdate):
         """ No one is calling this method in the class Conference. Probably this is completely unnecessary"""
-        bookingManager = obj.getCSBookingManager()
+        bookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         bookingManager.notifyEventDateChanges(sdate, obj.startDate, None, None)
 
     @classmethod
     def endTimeChanged(self, obj, edate):
         """ No one is calling this method in the class Conference. Probably this is completely unnecessary"""
-        bookingManager = obj.getCSBookingManager()
+        bookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         bookingManager.notifyEventDateChanges(None, None, edate, obj.endDate)
 
     @classmethod
     def timezoneChanged(self, obj, oldTimezone):
-        bookingManager = obj.getCSBookingManager()
+        bookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         #ATTENTION! At this moment this method notifyTimezoneChange in the class CSBookingManager
         #just returns [], so if you're expecting it to do something just implement whatever you
         #want to do with it
@@ -215,7 +250,7 @@ class EventCollaborationListener(Component):
 
     @classmethod
     def endDateChanged(cls, obj, params={}):
-        obj = obj.getCSBookingManager()
+        obj = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         try:
             obj.notifyEventDateChanges(None, None, params['oldDate'], params['newDate'])
         except Exception, e:
@@ -224,7 +259,7 @@ class EventCollaborationListener(Component):
     @classmethod
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate,
                           newStartDate, newEndDate):
-        obj = obj.getCSBookingManager()
+        obj = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         try:
             obj.notifyEventDateChanges(oldStartDate, newStartDate,
                                        oldEndDate, newEndDate)
@@ -234,20 +269,20 @@ class EventCollaborationListener(Component):
     @classmethod
     def contributionUnscheduled(self, contrib):
         if contrib.getStartDate() is not None:
-            csBookingManager = contrib.getCSBookingManager()
+            csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(contrib.getConference().getId())
             for booking in csBookingManager.getBookingList():
                 booking.unindex_talk(contrib)
 
     @classmethod
     def contributionScheduled(self, contrib):
-        csBookingManager = contrib.getCSBookingManager()
+        csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(contrib.getConference().getId())
         for booking in csBookingManager.getBookingList():
             booking.index_talk(contrib)
 
     @classmethod
     def eventTitleChanged(cls, obj, oldTitle, newTitle):
 
-        obj = obj.getCSBookingManager()
+        obj = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         try:
             obj.notifyTitleChange(oldTitle, newTitle)
         except Exception, e:
@@ -257,40 +292,48 @@ class EventCollaborationListener(Component):
     def infoChanged(cls, obj):
         #Update Speaker Wrapper only if obj is a Conference
         if isinstance(obj, Conference) or isinstance(obj, Contribution):
-            bookingManager = obj.getCSBookingManager()
-
+            bookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
+            if not bookingManager:
+                return
             try:
-                bookingManager.notifyInfoChange()
+                    bookingManager.notifyInfoChange()
             except Exception, e:
                 Logger.get('PluginNotifier').error("Exception while trying to access the info changes " + str(e))
 
+    @classmethod
+    def created(cls, obj, params={}):
+        if obj.__class__ == Conference:
+            csbm = CSBookingManager(obj)
+            Catalog.getIdx("cs_bookingmanager_conference").index(obj.getId(), csbm)
 
     @classmethod
     def deleted(cls, obj, params={}):
         if obj.__class__ == Conference:
-            obj = obj.getCSBookingManager()
+            obj = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
             obj.notifyDeletion()
         elif obj.__class__ == Contribution and obj.getStartDate() is not None:
-            csBookingManager = obj.getCSBookingManager()
+            csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
             for booking in csBookingManager.getBookingList():
                 booking.unindex_talk(obj)
 
     # ILocationActionListener
     @classmethod
     def placeChanged(cls, obj):
-        obj = obj.getCSBookingManager()
+        obj = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
+        if not obj:
+            return
         obj.notifyLocationChange()
 
     @classmethod
     def locationChanged(cls, obj, oldLocation, newLocation):
-        csBookingManager = obj.getCSBookingManager()
+        csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         for booking in csBookingManager.getBookingList():
             booking.unindex_talk(obj)
             booking.index_talk(obj)
 
     @classmethod
     def roomChanged(cls, obj, oldLocation, newLocation):
-        csBookingManager = obj.getCSBookingManager()
+        csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         for booking in csBookingManager.getBookingList():
             booking.unindex_talk(obj)
             booking.index_talk(obj)
@@ -302,11 +345,22 @@ class EventCollaborationListener(Component):
         options = params['options']
 
         if options.get("access", True):
-            for plugin, managers in confToClone.getCSBookingManager().getManagers().iteritems():
+            for plugin, managers in Catalog.getIdx("cs_bookingmanager_conference").get(confToClone.getId()).getManagers().iteritems():
                 for manager in managers:
-                    conf.getCSBookingManager().addPluginManager(plugin, manager)
+                    Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId()).addPluginManager(plugin, manager)
 
-# INavigationContributor
+
+class NavigationContributor(Component):
+    zope.interface.implements(INavigationContributor)
+
+    @classmethod
+    def fillManagementSideMenu(cls, obj, params={}):
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(obj._conf.getConference().getId())
+        if csbm is not None and csbm.isCSAllowed(obj._rh.getAW().getUser()) and \
+        (obj._conf.canModify(obj._rh.getAW()) or RCVideoServicesManager.hasRights(obj._rh, 'any') or
+         RCCollaborationAdmin.hasRights(obj._rh) or RCCollaborationPluginAdmin.hasRights(obj._rh, plugins = 'any')):
+            params['Video Services'] = wcomponents.SideMenuItem(_("Video Services"),
+                                                               UHConfModifCollaboration.getURL(obj._conf, secure = obj._rh.use_https()))
 
     @classmethod
     def confDisplaySMFillDict(cls, obj, params):
@@ -322,6 +376,13 @@ class EventCollaborationListener(Component):
     def confDisplaySMFillOrderedKeys(cls, obj, list):
         list.append("collaboration")
 
+    @classmethod
+    def confDisplaySMShow(cls, obj, params):
+        obj._collaborationOpt = obj._sectionMenu.getLinkByName("collaboration")
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(obj._conf.getConference().getId())
+        if csbm is not None and (not csbm.hasBookings() or not csbm.isCSAllowed()):
+            obj._collaborationOpt.setVisible(False)
+
 class PluginSettingsContributor(Component):
     """
     Plugs to the IPluginSettingsContributor extension point, providing a "plugin
@@ -334,3 +395,13 @@ class PluginSettingsContributor(Component):
         from MaKaC.plugins.Collaboration.indexes import CollaborationIndex
         if typeIdx == "collaboration":
             dictIdx[typeIdx] = CollaborationIndex()
+
+
+class PluginRightsContributor(Component):
+
+    zope.interface.implements(IPluginRightsContributor)
+
+    def isAllowedToAccess(self, obj, params):
+        user = params["user"]
+        return Catalog.getIdx("cs_bookingmanager_conference").get(params["conf"].getId()).isPluginManagerOfAnyPlugin(user) or \
+            RCCollaborationAdmin.hasRights(user=user) or RCCollaborationPluginAdmin.hasRights(user=user, plugins ='any')

@@ -26,6 +26,7 @@ from MaKaC.conference import ConferenceHolder
 from random import Random
 from MaKaC.services.implementation.collaboration import CollaborationRemoveCSBooking, CollaborationBookingIndexQuery, CollaborationCreateTestCSBooking
 from MaKaC.plugins.Collaboration.actions import DeleteAllBookingsAction
+from indico.core.index import Catalog
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.errors import MaKaCError
 from MaKaC.common import Config
@@ -194,7 +195,7 @@ class TestResponsiveness(unittest.TestCase):
                     bookingsForThisConf = max(int(self.random.normalvariate(3, 3)),0)
                     added += bookingsForThisConf
                     while i < bookingsForThisConf:
-                        conf.getCSBookingManager().createTestBooking(bookingParams = {'startDate': self._randomDate(startDate, endDate)})
+                        Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId()).createTestBooking(bookingParams = {'startDate': self._randomDate(startDate, endDate)})
                         i += 1
 
                     populated += 1
@@ -350,7 +351,7 @@ class TestResponsiveness(unittest.TestCase):
         while n == 0:
             counter = 0
             confId = self.random.choice(self.confsWithBookings)
-            testBookings = ConferenceHolder().getById(confId).getCSBookingManager()._bookingsByType.get("DummyPlugin", []) #list of booking ids
+            testBookings = Catalog.getIdx("cs_bookingmanager_conference").get(confId)._bookingsByType.get("DummyPlugin", []) #list of booking ids
             n = len(testBookings)
             if n > 0:
                 bookingId = self.random.choice(testBookings)
@@ -363,7 +364,7 @@ class TestResponsiveness(unittest.TestCase):
 
     def _updateValidIdsAfterRemoveBooking(self, confId):
         self.cdbmgr.startRequest()
-        if len(ConferenceHolder().getById(confId).getCSBookingManager()._bookingsByType.get("DummyPlugin", [])) == 0:
+        if len(Catalog.getIdx("cs_bookingmanager_conference").get(confId)._bookingsByType.get("DummyPlugin", [])) == 0:
             self.confsWithBookings.remove(confId)
         self.cdbmgr.endRequest()
 
@@ -413,7 +414,7 @@ class TestResponsiveness(unittest.TestCase):
 
     def _removeConf(self, confId):
         self.cdbmgr.startRequest()
-        ConferenceHolder().getById(confId).getCSBookingManager().notifyDeletion()
+        Catalog.getIdx("cs_bookingmanager_conference").get(confId).notifyDeletion()
         self.cdbmgr.endRequest()
 
 ######## Index query test ########

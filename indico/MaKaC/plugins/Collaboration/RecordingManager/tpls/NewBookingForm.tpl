@@ -50,7 +50,6 @@
                     </td>
                     <!--  This column shows whether all the speaker of a contribution agreed or not -->
                     <td width="40px" valign="top" style="vertical-align:middle;">
-                        <% manager = Conference.getCSBookingManager() %>
                         % if talk["contId"] != "":
                             % if manager.isContributionReadyToBePublished(talk["contId"]):
                                 <div class="RMcolumnStatusAgreedDone">

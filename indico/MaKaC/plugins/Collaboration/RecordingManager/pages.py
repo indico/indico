@@ -23,6 +23,7 @@ from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrp
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from indico.util.contextManager import ContextManager
 import re
+from indico.core.index import Catalog
 #from MaKaC.common.logger import Logger
 
 class WNewBookingForm(WCSPageTemplateBase):
@@ -54,7 +55,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["LanguageCodeSecondary"] = langSecondary
         vars["LanguageDictionary"]    = langDict
         vars["LanguageCodes"]         = sorted(CollaborationTools.getOptionValue("RecordingManager", "languageDictionary").keys())
-
+        vars["manager"] = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         return vars
 
     def _checkLanguageData(self, langPrimary, langSecondary, langDict):

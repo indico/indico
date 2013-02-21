@@ -24,6 +24,7 @@ from MaKaC.common import log
 from MaKaC.services.implementation.contribution import ContributionDisplayBase
 from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase
 from MaKaC.services.implementation.base import TextModificationBase, ParameterManager, AdminService
+from indico.core.index import Catalog
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationElectronicAgreementForm
 from MaKaC.plugins.Collaboration.mail import ElectronicAgreementNotification, ElectronicAgreementOrganiserNotification
@@ -57,7 +58,7 @@ class CollaborationBase(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self) #sets self._target = self._conf = the Conference object
         self._checkCollaborationEnabled()
-        self._CSBookingManager = self._conf.getCSBookingManager()
+        self._CSBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
 
     def _checkCollaborationEnabled(self):
         """ Checks if the Collaboration plugin system is active
@@ -512,7 +513,7 @@ class GetSpeakerEmailListByCont(ConferenceModifBase):
         self.userId = self._params['userId']
 
     def _getAnswer(self):
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         resultList = []
         for cont in self.contList:
             resultList.extend(manager.getSpeakerEmailListByContribution(cont, self.userId))
@@ -533,7 +534,7 @@ class SendElectronicAgreement(ConferenceModifBase):
         p_cc = self._pm.extract("cc", str, True, "").strip()
         self.cc = setValidEmailSeparators(p_cc).split(',') if p_cc else []
         self.emailToList = []
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         for uniqueId in self.uniqueIdList:
             spk = manager.getSpeakerWrapperByUniqueId(uniqueId)
             if spk.getStatus() not in [SpeakerStatusEnum.SIGNED, SpeakerStatusEnum.FROMFILE]:
@@ -557,7 +558,7 @@ class SendElectronicAgreement(ConferenceModifBase):
         elif self.content.find('{talkTitle}') == -1:
             report = "talkTitle_error"
         else:
-            manager = self._conf.getCSBookingManager()
+            manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
             for uniqueId in self.uniqueIdList:
                 sw = manager.getSpeakerWrapperByUniqueId(uniqueId)
                 if sw.getStatus() not in [SpeakerStatusEnum.SIGNED, SpeakerStatusEnum.FROMFILE]:
@@ -589,7 +590,7 @@ CERN Recording Team"""
 
     def _getAnswer(self):
         spkWrapper = None
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         for sw in manager.getSpeakerWrapperList():
             if sw.getUniqueIdHash() == self.authKey:
                 spkWrapper = sw
@@ -631,7 +632,7 @@ CERN Recording Team"""
 
     def _getAnswer(self):
         spkWrapper = None
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         for sw in manager.getSpeakerWrapperList():
             if sw.getUniqueIdHash() == self.authKey:
                 spkWrapper = sw
@@ -658,7 +659,7 @@ class ToggleNotifyElectronicAgreementAnswer(TextModificationBase, ConferenceModi
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-        self._CSManager = self._conf.getCSBookingManager()
+        self._CSManager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
 
     def _handleSet(self):
         self._CSManager.setNotifyElectronicAgreementAnswer(self._value)

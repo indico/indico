@@ -25,12 +25,11 @@ from MaKaC.conference import Contribution
 from MaKaC.common.timezoneUtils import isSameDay
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
-from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IContributionRRFossil
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
 from MaKaC.plugins.Collaboration.RecordingRequest.common import getCommonTalkInformation
 from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-
+from indico.core.index import Catalog
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -44,7 +43,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["IsLecture"] = isLecture
 
         underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         user = self._rh._getUser()
         isManager = user.isAdmin() or RCCollaborationAdmin.hasRights(user=user) or RCCollaborationPluginAdmin.hasRights(user=user, plugins=['RecordingRequest'])
         booking = manager.getSingleBooking('RecordingRequest')

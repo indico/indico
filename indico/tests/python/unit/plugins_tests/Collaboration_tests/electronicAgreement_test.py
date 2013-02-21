@@ -30,6 +30,7 @@ from MaKaC.plugins.Collaboration.services import SetSpeakerEmailAddress, SendEle
     RejectElectronicAgreement, AcceptElectronicAgreement
 from MaKaC import conference
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
+from indico.core.index import Catalog
 from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase, with_context
 
 class FalseUser:
@@ -161,7 +162,7 @@ class TestElectronicAgreement(IndicoTestCase):
         '''
         Test if the managing rights are respected.
         '''
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
 
         # Test that person3 has not access to webcasted talks
         requestType = CollaborationTools.getRequestTypeUserCanManage(self._conf, self.person3)
@@ -184,7 +185,7 @@ class TestElectronicAgreement(IndicoTestCase):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to NOEMAIL.\n
         '''
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
 
         contributions = manager.getContributionSpeakerByType("both")
 
@@ -227,7 +228,7 @@ class TestElectronicAgreement(IndicoTestCase):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to PENDING.\n
         '''
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         contributions = manager.getContributionSpeakerByType("both")
 
         uniqueIdList = []
@@ -248,7 +249,7 @@ class TestElectronicAgreement(IndicoTestCase):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to SIGNED.\n
         '''
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         contributions = manager.getContributionSpeakerByType("both")
 
         for cont in contributions:
@@ -262,7 +263,7 @@ class TestElectronicAgreement(IndicoTestCase):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to REFUSED.\n
         '''
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         contributions = manager.getContributionSpeakerByType("both")
 
         for cont in contributions:
@@ -274,7 +275,7 @@ class TestElectronicAgreement(IndicoTestCase):
 #==========================================================================
     # Here useful functions called during the tests
     def createAndAcceptBooking(self):
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
 
         # Create a booking - Recording Request
         bookingParams =  {

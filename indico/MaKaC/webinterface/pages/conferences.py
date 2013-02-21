@@ -295,17 +295,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                 if showeditorarea and (self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
                     self._judgeeditorListOpt.setVisible(True)
 
-
-
-        #collaboration related
-        self._collaborationOpt = self._sectionMenu.getLinkByName("collaboration")
-        self._collaborationOpt.setVisible(False)
-        csbm = self._conf.getCSBookingManager()
-        if csbm is not None and csbm.hasBookings() and csbm.isCSAllowed():
-            self._collaborationOpt.setVisible(True)
-
-
-
     def _defineToolBar(self):
         pass
 
@@ -987,7 +976,9 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                 vars['entries'].append(newItem)
 
         vars["pluginDetails"] = "".join(self._notify('eventDetailBanner', self._conf))
-
+        pluginDetailsSessionContribs = {}
+        self._notify('detailSessionContribs', self._conf, pluginDetailsSessionContribs)
+        vars["pluginDetailsSessionContribs"] = pluginDetailsSessionContribs
         vars["daysPerRow"] = self._daysPerRow
         vars["firstDay"] = self._firstDay
         vars["lastDay"] = self._lastDay
@@ -1178,7 +1169,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         modules += self._includeJSPackage('Management')
         modules += self._includeJSPackage('MaterialEditor')
         modules += self._includeJSPackage('Display')
-        modules += self._includeJSPackage('Collaboration')
         modules += sum(self._notify('injectJSFiles'), [])
         return modules
 
@@ -1465,16 +1455,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
         self._generalSection.addItem( self._reviewingMenuItem)
 
-        if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed(self._rh.getAW().getUser()):
-            from MaKaC.plugins.Collaboration.urlHandlers import UHConfModifCollaboration
-            self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"),
-                UHConfModifCollaboration.getURL(self._conf, secure = self._rh.use_https()))
-            self._generalSection.addItem( self._videoServicesMenuItem)
-        else:
-            self._videoServicesMenuItem = wcomponents.SideMenuItem(_("Video Services"), None)
-            self._generalSection.addItem( self._videoServicesMenuItem)
-            self._videoServicesMenuItem.setVisible(False)
-
         self._participantsMenuItem = wcomponents.SideMenuItem(_("Participants"),
             urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
         self._generalSection.addItem( self._participantsMenuItem)
@@ -1520,7 +1500,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
 
         #we decide which side menu item appear and which don't
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReviewingStaff
-        from MaKaC.plugins.Collaboration.handlers import RCVideoServicesManager, RCCollaborationAdmin, RCCollaborationPluginAdmin
 
         canModify = self._conf.canModify(self._rh.getAW())
         isReviewingStaff = RCReviewingStaff.hasRights(self._rh)
@@ -1561,12 +1540,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
                 self._reviewingMenuItem.setVisible(True)
         # For now we don't want the paper reviewing to be displayed
         #self._reviewingMenuItem.setVisible(False)
-
-
-        if not (canModify or
-                RCVideoServicesManager.hasRights(self._rh, 'any') or
-                RCCollaborationAdmin.hasRights(self._rh) or RCCollaborationPluginAdmin.hasRights(self._rh, plugins = 'any')):
-            self._videoServicesMenuItem.setVisible(False)
 
         #we hide the Advanced Options section if it has no items
         if not self._advancedOptionsSection.hasVisibleItems():

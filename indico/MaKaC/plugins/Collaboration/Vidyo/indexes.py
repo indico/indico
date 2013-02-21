@@ -24,6 +24,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.conference import ConferenceHolder
 from zope.interface import Interface
 from indico.core.index import SIndex
+from indico.core.index import Catalog
 
 BOOKINGS_BY_VIDYO_ROOMS_INDEX = "BookingsByVidyoRoomIndex"
 
@@ -134,7 +135,7 @@ class EventEndDateIndex(Persistent):
         i = 0
         self.clear()
         for conf in ConferenceHolder().getList():
-            csbm = conf.getCSBookingManager()
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
             for booking in csbm.getBookingList():
                 if booking.getType() == "Vidyo" and booking.isCreated():
                     self.indexBooking(booking)
@@ -192,7 +193,7 @@ class BookingsByVidyoRoomIndex(SIndex):
         i = 0
         self.clear()
         for conf in ConferenceHolder().getList():
-            csbm = conf.getCSBookingManager()
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
             for booking in csbm.getBookingList():
                 if booking.getType() == "Vidyo"and booking.isCreated():
                     self.indexBooking(booking)

@@ -21,7 +21,7 @@
 
 from MaKaC.common.utils import formatDateTime
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
-from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
+from MaKaC.plugins.Collaboration.pages import WAdvancedTabBase
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase
 from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate, getMaxEndDate

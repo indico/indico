@@ -27,10 +27,8 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.WebcastRequest.common import WebcastRequestError
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
-from MaKaC.i18n import _
-
 from indico.core.index import Catalog
-
+from MaKaC.i18n import _
 
 class CSBooking(CSBookingBase):
 
@@ -126,7 +124,7 @@ class CSBooking(CSBookingBase):
                     """Could not send RequestAcceptedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('accept', e)
 
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         manager.notifyInfoChange()
 
     def _reject(self):
@@ -169,7 +167,7 @@ class CSBooking(CSBookingBase):
                 return WebcastRequestError('remove', e)
 
     def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         manager._changeConfStartDateInIndex(self, oldStartDate, newStartDate)
         if MailTools.needToSendEmails('WebcastRequest'):
             try:

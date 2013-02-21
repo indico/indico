@@ -16,18 +16,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import zope.interface, os
+import os
 from webassets import Bundle
 from indico.web.assets import PluginEnvironment
-from indico.core.extpoint.base import Component
-from indico.core.extpoint.events import IEventDisplayContributor
 from indico.util.date_time import now_utc
 
 from MaKaC.common import Config
 from MaKaC.common.utils import formatTwoDates
+from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.output import OutputGenerator
+from indico.core.index import Catalog
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -60,24 +60,6 @@ STATUS_STRING = {
     SpeakerStatusEnum.PENDING: L_("Pending..."),
     SpeakerStatusEnum.REFUSED: L_("Refused")
 }
-
-
-class IMEventDisplayComponent(Component):
-
-    zope.interface.implements(IEventDisplayContributor)
-
-    # EventDisplayContributor
-
-    def injectCSSFiles(self, obj):
-        return ['Collaboration/Style.css']
-
-    def injectJSFiles(self, obj):
-        return ['/Collaboration/bookings.js']
-
-    def eventDetailBanner(self, obj, conf):
-        vars = OutputGenerator.getCollaborationParams(conf)
-        return WEventDetailBanner.forModule(Collaboration).getHTML(vars)
-
 
 class WEventDetailBanner(wcomponents.WTemplated):
 
@@ -297,7 +279,8 @@ class WPConfModifCSBase (WPConferenceModifBase):
         self._tabs[self._activeTabName].setActive()
 
     def _setActiveSideMenuItem(self):
-        self._videoServicesMenuItem.setActive()
+        if self._pluginsDictMenuItem.has_key('Video Services'):
+            self._pluginsDictMenuItem['Video Services'].setActive(True)
 
 
 class WPConfModifCollaboration(WPConfModifCSBase, WPCollaborationBase):
@@ -349,7 +332,7 @@ class WConfModifCollaboration(wcomponents.WTemplated):
 
         plugins = self._tabPlugins
         singleBookingPlugins, multipleBookingPlugins = CollaborationTools.splitPluginsByAllowMultiple(plugins)
-        csBookingManager = self._conf.getCSBookingManager()
+        csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
 
         bookingsS = {}
 
@@ -467,7 +450,7 @@ class WConfModifCollaborationProtection(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["Conference"] = self._conf
-        csbm = self._conf.getCSBookingManager()
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         vars["CSBM"] = csbm
         allManagers = fossilize(csbm.getAllManagers(), IAvatarFossil)
         vars["AllManagers"] = sorted(allManagers, cmp = UserComparator.cmpUsers)
@@ -508,7 +491,7 @@ class WCollaborationDisplay(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
 
-        csbm = self._conf.getCSBookingManager()
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         pluginNames = csbm.getEventDisplayPlugins()
         bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
         bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
@@ -587,7 +570,7 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
 
         agreement_name = CollaborationTools.getOptionValue("RecordingRequest", "AgreementName")
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
 
         for sw in manager.getSpeakerWrapperList():
             if sw.getUniqueIdHash() == self.authKey:
@@ -695,7 +678,7 @@ class WElectronicAgreement(wcomponents.WTemplated):
         It returns a sorted list of list with only the necessary information:
         [[spkId, spkName, spkStatus, contId], [spkId, spkName, spkStatus, contId], ...]
         '''
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         list = []
 
         sortMap = {'speaker':1, 'status':2, 'cont':3, 'reqType':4}
@@ -718,7 +701,7 @@ class WElectronicAgreement(wcomponents.WTemplated):
 
     def getTableContent(self):
 
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         # Here we check the rights again, and chose what contributions we should show
         requestType = CollaborationTools.getRequestTypeUserCanManage(self._conf, self._user)
 
@@ -780,7 +763,7 @@ class WElectronicAgreement(wcomponents.WTemplated):
         self._fromList.append({"name": "Indico Mailer",
                                "email": Config.getInstance().getNoReplyEmail()})
         vars['fromList'] = self._fromList
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         vars['manager'] = manager
         vars['user'] = self._user
 
@@ -799,4 +782,17 @@ class WElectronicAgreement(wcomponents.WTemplated):
         vars["notifyElectronicAgreementAnswer"] = manager.notifyElectronicAgreementAnswer()
         vars["emailIconURL"]=(str(Config.getInstance().getSystemIconURL("mail_grey")))
         vars["canModify"] = self._conf.canModify( self._rh.getAW() )
+        return vars
+
+class WVideoService(wcomponents.WTemplated):
+
+    def __init__(self, conference, video):
+        self._conf = conference
+        self._video = video
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["conf"] = self._conf
+        vars["video"] = self._video
+        vars["aw"] = ContextManager.get("currentRH").getAW()
         return vars

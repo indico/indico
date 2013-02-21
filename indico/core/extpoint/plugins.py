@@ -33,3 +33,8 @@ class IPluginImplementationContributor(IContributor):
 
     def getPluginImplementation(self, obj):
         pass
+
+class IPluginRightsContributor(IContributor):
+
+    def isAllowedToAccess(self, obj):
+        pass

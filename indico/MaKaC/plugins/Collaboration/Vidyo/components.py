@@ -18,13 +18,12 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
-from MaKaC.common.utils import *
-
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import INavigationContributor
 from MaKaC.plugins.util import PluginsWrapper
 from indico.core.extpoint.index import ICatalogIndexProvider
 from zope.interface import implements
+from indico.core.index import Catalog
 from MaKaC.plugins.Collaboration.Vidyo.indexes import BookingsByVidyoRoomIndex, BOOKINGS_BY_VIDYO_ROOMS_INDEX
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 
@@ -39,7 +38,7 @@ class VidyoContributor(Component):
             * There are vidyo services in the event created by the user who wants to clone
         """
         #list of creators of the chat rooms
-        if PluginsWrapper('Collaboration', 'Vidyo').isActive() and len(obj._conf.getCSBookingManager().getBookingList(filterByType="Vidyo")) !=0:
+        if PluginsWrapper('Collaboration', 'Vidyo').isActive() and len(Catalog.getIdx("cs_bookingmanager_conference").get(obj._conf.getId()).getBookingList(filterByType="Vidyo")) !=0:
             list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneVidyo" id="cloneVidyo" value="1" checked="checked"/>Vidyo</li>""")
 
     @classmethod
@@ -55,12 +54,12 @@ class VidyoContributor(Component):
         options = params['options']
 
         if options.get("vidyo", True):
-            for vs in confToClone.getCSBookingManager().getBookingList(filterByType="Vidyo"):
+            for vs in Catalog.getIdx("cs_bookingmanager_conference").get(confToClone.getId()).getBookingList(filterByType="Vidyo"):
                 # Do not cloning the booking when were are NOT cloning the timetable (optionas has sessions and contribs)
                 # and the booking is linked to a contrib/session
                 if (options.get('sessions', False) and options.get('contributions', False)) or not vs.hasSessionOrContributionLink():
                     newBooking = vs.clone(conf)
-                    conf.getCSBookingManager().addBooking(newBooking)
+                    Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId()).addBooking(newBooking)
                     VidyoTools.getIndexByVidyoRoom().indexBooking(newBooking)
                     VidyoTools.getEventEndDateIndex().indexBooking(newBooking)
 

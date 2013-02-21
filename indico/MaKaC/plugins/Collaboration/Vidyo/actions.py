@@ -28,6 +28,7 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.Vidyo.mail import VidyoCleaningDoneNotification
 from MaKaC.conference import CategoryManager, ConferenceHolder
+from indico.core.index import Catalog
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
@@ -163,7 +164,7 @@ class TestCreateLotsOfBookingsAction(ActionBase):
             c.setTimezone('UTC')
             c.setDates(nowutc() - timedelta(hours = i), nowutc() - timedelta(hours = i - 1))
             for j in xrange(1, 0+1): #number of bookings per event
-                c.getCSBookingManager().createBooking("Vidyo", {"roomName":"room_"+str(i)+"_"+str(j),
+                Catalog.getIdx("cs_bookingmanager_conference").get(c.getId()).createBooking("Vidyo", {"roomName":"room_"+str(i)+"_"+str(j),
                                                                 "roomDescription": "test",
                                                                 "owner":{"_type": "Avatar", "id":"1"}})
 

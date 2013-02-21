@@ -131,7 +131,7 @@ class CSBooking(CSBookingBase):
                     """Could not send RequestAcceptedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return RecordingRequestError('accept', e)
 
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         manager.notifyInfoChange()
 
     def _reject(self):
@@ -169,7 +169,7 @@ class CSBooking(CSBookingBase):
                 return RecordingRequestError('remove', e)
 
     def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         manager._changeConfStartDateInIndex(self, oldStartDate, newStartDate)
         if MailTools.needToSendEmails('RecordingRequest'):
             try:

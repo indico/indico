@@ -19,6 +19,7 @@
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, minDatetime
 from datetime import timedelta
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from indico.core.index import Catalog
 
 class OutputGenerator(object):
 
@@ -30,7 +31,7 @@ class OutputGenerator(object):
 
         #collaboration XML
         out.openTag("collaboration")
-        csbm = conf.getCSBookingManager()
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
 
         out.writeComment("Needed for timezone awareness")
         out.writeTag("todayReference", getAdjustedDate(nowutc(), None, tz).strftime("%Y-%m-%d"))
@@ -88,7 +89,7 @@ class OutputGenerator(object):
     @classmethod
     def getCollaborationParams(cls, conf):
         params = {}
-        csbm = conf.getCSBookingManager()
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
         pluginNames = csbm.getEventDisplayPlugins()
         bookingData = {}
         for pluginName in pluginNames:

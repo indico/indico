@@ -35,6 +35,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from indico.core.index import Catalog
 from MaKaC.plugins import PluginsHolder, Plugin
 from MaKaC.errors import MaKaCError, PluginError
 from MaKaC.webinterface.pages import conferences
@@ -120,7 +121,7 @@ class RCVideoServicesManager(object):
         user = request.getAW().getUser()
 
         if user:
-            csbm = request._conf.getCSBookingManager()
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(request._conf.getId())
             if csbm.isVideoServicesManager(user):
                 return True
 
@@ -316,7 +317,7 @@ class RHUploadElectronicAgreement(RHConferenceModifBase):
             f.setFilePath(self.filePath)
             f.setId(self.spkUniqueId)
             # Update status for speaker wrapper
-            manager = self._conf.getCSBookingManager()
+            manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
             spkWrapper = manager.getSpeakerWrapperByUniqueId(self.spkUniqueId)
             repo = self._conf._getRepository()
 
@@ -343,7 +344,7 @@ class RHElectronicAgreementGetFile(RHConfModifCSBookings):
         self.spkUniqueId = params.get("spkId","")
 
     def _process(self):
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         sw = manager.getSpeakerWrapperByUniqueId(self.spkUniqueId)
         if sw:
             self.file = sw.getLocalFile()

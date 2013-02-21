@@ -257,6 +257,11 @@ class IEventDisplayContributor(IContributor):
         Returns the info that the plugins want to add into the footer.
         """
 
+    def detailSessionContribs(self, obj, conf, params):
+        """
+        Returns the info that the plugins want to add to the Sessions and Contributions
+        """
+
 class IUserAreaContributor(IContributor):
     """
     Aggregates extension points that relate to the user area pages

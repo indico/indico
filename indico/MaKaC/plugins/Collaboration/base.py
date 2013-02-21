@@ -36,6 +36,7 @@ from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools,\
     MailTools
 from MaKaC.plugins.Collaboration.urlHandlers import UHConfModifCollaboration
+from indico.core.index import Catalog
 from MaKaC.conference import Observer
 from MaKaC.webinterface.common.tools import hasTags
 from MaKaC.plugins.Collaboration import mail
@@ -1317,7 +1318,7 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Returns a list of the bookings of the same type as this one (including this one)
             sorted: if true, bookings will be sorted by id
         """
-        return self._conf.getCSBookingManager().getBookingList(sorted, self._type)
+        return Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId()).getBookingList(sorted, self._type)
 
     def getPlugin(self):
         """ Returns the Plugin object associated to this booking.

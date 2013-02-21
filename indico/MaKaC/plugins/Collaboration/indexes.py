@@ -222,7 +222,7 @@ class CollaborationIndex(Persistent):
         i = 0
 
         for cid, conf in ConferenceHolder()._getIdx().iteritems():
-            csbm = conf.getCSBookingManager()
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
             if csbm is None: continue
             #note: probably not the most efficient implementation since _indexBooking is getting the list
             #      of indexes where each booking should be indexed on every iteration
@@ -608,6 +608,31 @@ class BookingConferenceIndex(Persistent):
 
     def dump(self):
         return [(k, [_bookingToDump(b) for b in s[1]]) for k, s in self._tree.iteritems()]
+
+
+class BookingManagerConferenceIndex(Persistent):
+
+    def __init__(self):
+        self._tree = OOBTree()
+        self._name =  "bookingManagerByConf"
+
+    def getName(self):
+        return self._name
+
+    def index(self, conf, csbm):
+        if not self._tree.has_key(conf):
+            self._tree[conf] = csbm
+            self._tree._p_changed = 1
+
+    def unindex(self, conf):
+        del self._tree[conf]
+        self._tree._p_changed = 1
+
+    def get(self, conf):
+        return self._tree.get(conf,None)
+
+    def dump(self):
+        return [(k, s) for k, s in self._tree.iteritems()]
 
 class CategoryChecker(object):
     """ Tries to check if a conference belongs to a category (recursively),

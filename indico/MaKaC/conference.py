@@ -2140,10 +2140,6 @@ class Conference(CommonObjectBase, Locatable):
 
         self._observers = []
 
-        if PluginsHolder().hasPluginType("Collaboration"):
-            from MaKaC.plugins.Collaboration.base import CSBookingManager
-            self._CSBookingManager = CSBookingManager(self)
-
     def __str__(self):
         return "<Conference %s@%s>" % (self.getId(), hex(id(self)))
 
@@ -3822,14 +3818,8 @@ class Conference(CommonObjectBase, Locatable):
         if self.getConfPaperReview().isInReviewingTeam(av):
             return True
 
-        # video services managers are also allowed to access the conference
-        if PluginsHolder().hasPluginType("Collaboration"):
-            if self.getCSBookingManager().isPluginManagerOfAnyPlugin(av):
-                return True
-            from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-            if RCCollaborationAdmin.hasRights(user=av) or \
-                RCCollaborationPluginAdmin.hasRights(user=av, plugins ='any'):
-                return True
+        if True in self._notify("isAllowedToAccess", {"conf": self, "user": av}):
+            return True
 
         return False
 
@@ -3839,6 +3829,7 @@ class Conference(CommonObjectBase, Locatable):
             chair or is granted to access the conference, when the client ip is
             not restricted.
         """
+
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
         if self.__ac.isHarvesterIP(aw.getIP()):
@@ -4992,17 +4983,6 @@ class Conference(CommonObjectBase, Locatable):
 
     def setPosterTemplateManager(self, posterTemplateManager):
         self.__posterTemplateManager = posterTemplateManager
-
-    def getCSBookingManager(self):
-
-        if PluginsHolder().hasPluginType("Collaboration"):
-            if not hasattr(self, "_CSBookingManager"):
-                from MaKaC.plugins.Collaboration.base import CSBookingManager
-                self._CSBookingManager = CSBookingManager(self)
-            return self._CSBookingManager
-        else:
-            return None
-
 
 class DefaultConference(Conference):
     """ 'default' conference, which stores the
@@ -9713,9 +9693,6 @@ class Contribution(CommonObjectBase, Locatable):
         if self.getSession() is not None:
             res=self.getSession().getTextColor()
         return res
-
-    def getCSBookingManager(self):
-        return self.getConference().getCSBookingManager()
 
 class AcceptedContribution( Contribution ):
     """This class represents a contribution which has been created from an

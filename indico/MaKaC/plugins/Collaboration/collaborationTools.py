@@ -30,6 +30,7 @@ from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
     IQueryResultFossil, ICSBookingInstanceIndexingFossil
 from MaKaC.fossils.conference import IConferenceFossil
 from MaKaC.common.contextManager import ContextManager
+from indico.core.index import Catalog
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -159,7 +160,8 @@ class CollaborationTools(object):
             -The user is a Plugin Manager of a plugin in that tab and the plugin is not "admins only"
         """
         tabNamesSet = set()
-        csbm = conference.getCSBookingManager()
+
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conference.getId())
 
         # we get the list of Plugin objects allowed for this kind of event
         allowedForThisEvent = csbm.getAllowedPlugins()
@@ -209,7 +211,7 @@ class CollaborationTools(object):
         """
         if tabName:
 
-            csbm = conference.getCSBookingManager()
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conference.getId())
 
             if conference:
                 allowedPlugins = csbm.getAllowedPlugins()
@@ -232,7 +234,8 @@ class CollaborationTools(object):
             depending on the plugin, the user, and the event where the user tries to see a plugin page
             or change a plugin object
         """
-        csbm = conference.getCSBookingManager()
+
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conference.getId())
 
         from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
         isAdminUser = RCCollaborationAdmin.hasRights(user = user)
@@ -516,7 +519,7 @@ class MailTools(object):
                 -If pluginName is not None, any Video Services Managers for that given system
             The emails in the list are not in any particular order and should be unique.
         """
-        csbm = conf.getCSBookingManager()
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
         managersEmails = []
         managersEmails.append(conf.getCreator().getEmail())
         managersEmails.extend([u.getEmail() for u in conf.getManagerList()])

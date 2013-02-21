@@ -26,8 +26,6 @@ from indico.web.http_api.metadata.ical import ICalSerializer
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
-from indico.util.fossilize import fossilize, IFossil
-from indico.util.fossilize.conversion import Conversion
 
 from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
 from MaKaC.common.indexes import IndexesHolder
@@ -36,7 +34,6 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.fossils import ICollaborationMetadataFossil
-from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper
 from MaKaC.common.timezoneUtils import getAdjustedDate
 
 
@@ -156,7 +153,7 @@ class CollaborationExportHook(HTTPAPIHook):
             raise HTTPAPIError('Conference does not exist.', apache.HTTP_BAD_REQUEST)
 
     def export_eAgreements(self, aw):
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         requestType = CollaborationTools.getRequestTypeUserCanManage(self._conf, aw.getUser())
         contributions = manager.getContributionSpeakerByType(requestType)
         for cont, speakers in contributions.items():
