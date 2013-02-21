@@ -29,6 +29,7 @@ from MaKaC.plugins import PluginsHolder
 from indico.ext.calendaring.storage import getAvatarConferenceStorage, addAvatarConference
 from indico.ext.calendaring.outlook.tasks import OutlookUpdateCalendarNotificationTask
 from dateutil.rrule import MINUTELY
+from indico.util.contextManager import ContextManager
 
 
 class TestTasks(IndicoTestCase):
@@ -42,16 +43,22 @@ class TestTasks(IndicoTestCase):
         self._startDBReq()
 
         PluginsHolder().updateAllPluginInfo()
+        PluginsHolder().getPluginType('calendaring').setActive(True)
+        PluginsHolder().getPluginType('calendaring').getPlugin('outlook').setActive(True)
 
         # Create two dummy users
         ah = AvatarHolder()
-        self._avatar1 = ah.getById(0)
+        self._avatar1 = Avatar()
+        self._avatar1.setName("fake-1")
+        self._avatar1.setSurName("fake1")
+        self._avatar1.setOrganisation("fake1")
+        self._avatar1.setEmail("fake1@fake1.fake")
+        ah.add(self._avatar1)
         self._avatar2 = Avatar()
         self._avatar2.setName("fake-2")
-        self._avatar2.setSurName("fake")
-        self._avatar2.setOrganisation("fake")
-        self._avatar2.setLang("en_GB")
-        self._avatar2.setEmail("fake2@fake.fake")
+        self._avatar2.setSurName("fake2")
+        self._avatar2.setOrganisation("fake2")
+        self._avatar2.setEmail("fake2@fake2.fake")
         ah.add(self._avatar2)
 
         # Create two dummy conferences
@@ -73,6 +80,10 @@ class TestTasks(IndicoTestCase):
         ch.add(self._conf2)
 
         self._stopDBReq()
+
+    def tearDown( self ):
+        super(TestTasks, self).tearDown()
+        ContextManager.destroy()
 
     @with_context('database')
     def testOutlookRunTask(self):
@@ -116,4 +127,5 @@ class TestTasks(IndicoTestCase):
         mockReturn = []
 
         outlookTask._clearAvatarConferenceStorage([self._avatar1.getId() + '_' + self._conf2.getId()])
-        self.assertEqual(len(storage), 1)
+        outlookTask._clearAvatarConferenceStorage([self._avatar1.getId() + '_' + self._conf1.getId()])
+        self.assertEqual(len(storage), 0)

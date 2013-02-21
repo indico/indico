@@ -48,13 +48,17 @@ class TestStorage(IndicoTestCase):
 
         # Create two dummy users
         ah = AvatarHolder()
-        self._avatar1 = ah.getById('0')
+        self._avatar1 = Avatar()
+        self._avatar1.setName("fake-3")
+        self._avatar1.setSurName("fake3")
+        self._avatar1.setOrganisation("fake3")
+        self._avatar1.setEmail("fake3@fake3.fake")
+        ah.add(self._avatar1)
         self._avatar2 = Avatar()
-        self._avatar2.setName("fake-2")
-        self._avatar2.setSurName("fake")
-        self._avatar2.setOrganisation("fake")
-        self._avatar2.setLang("en_GB")
-        self._avatar2.setEmail("fake2@fake.fake")
+        self._avatar2.setName("fake-4")
+        self._avatar2.setSurName("fake4")
+        self._avatar2.setOrganisation("fake4")
+        self._avatar2.setEmail("fake4@fake4.fake")
         ah.add(self._avatar2)
 
         # Create two dummy conferences
