@@ -64,7 +64,7 @@
         return false;
     }
 
-    $(window).load(function() {
+    $(function() {
         var startDate = IndicoUI.Widgets.Generic.dateField_sdate(false, null, ['sDay', 'sMonth', 'sYear']);
         $E('sDatePlace').set(startDate);
 

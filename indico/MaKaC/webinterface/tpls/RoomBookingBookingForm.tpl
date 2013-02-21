@@ -65,7 +65,7 @@
     }
 
 
-    $(window).load(function() {
+    IndicoUI.executeOnLoad(function() {
         % if candResv.room.needsAVCSetup:
             $('.videoConferenceOption, #needsAVCSupport').change(function() {
                 if(this.checked) {

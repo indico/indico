@@ -95,7 +95,7 @@
             });
     }
 
-    $(window).load(function() {
+    IndicoUI.executeOnLoad(function() {
         $('#searchForm').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {

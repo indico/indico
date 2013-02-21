@@ -26,9 +26,9 @@ else:
 
     <%include file="ListJSHelpers.tpl"/>
 
-    window.onload = function(){
+    IndicoUI.executeOnLoad(function() {
         isSelected("contribsItems");
-    }
+    });
 
     function selectAll()
     {

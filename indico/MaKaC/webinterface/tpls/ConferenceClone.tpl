@@ -83,15 +83,13 @@
     }
 
 
-    window.onload = function()
-    {
-
+    IndicoUI.executeOnLoad(function() {
         $E('cloneOncePlace').addContent(dateOnce);
         $E('cloneIntervalPlace_start').addContent(dateInterval_start);
         $E('cloneIntervalPlace_until').addContent(dateInterval_until);
         $E('cloneDaysPlace_start').addContent(dateDays_start);
         $E('cloneDaysPlace_until').addContent(dateDays_until);
-    };
+    });
 </script>
 
 

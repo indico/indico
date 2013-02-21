@@ -140,7 +140,7 @@ var IndicoUI = {
 
 };
 
-window.onload = function() {
+$(function() {
     for (var f in IndicoUI.loadTimeFuncs) {
         IndicoUI.loadTimeFuncs[f]();
     }
@@ -169,7 +169,7 @@ window.onload = function() {
             IndicoUtil.onclickFunctions.removeAt(idx);
         });
     });
-};
+});
 
 window.onunload = function() {
     for (var f in IndicoUI.unloadTimeFuncs) {
