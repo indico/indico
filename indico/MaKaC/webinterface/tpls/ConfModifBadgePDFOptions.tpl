@@ -1,5 +1,5 @@
 <div id="PDFOptionsContainer" style="max-width:550px;margin:10px;">
-    <div class="bs-alert alert-toolbar">
+    <div class="message neutral">
         <div class="toolbar-container">
           % if ShowKeepValues:
             <div class="element">
@@ -95,7 +95,7 @@
       </tbody>
     </table>
 % if ShowTip:
-    <div class="bs-alert bs-alert-info">
+    <div class="message info">
       <div>
         <strong>Tip</strong>${ _(": if your printer does not align the badges correctly, you can tweak the margins.")}
       </div>

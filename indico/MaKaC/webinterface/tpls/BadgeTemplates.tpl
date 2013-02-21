@@ -1,72 +1,47 @@
+<h2>
+  ${ _("Default Badge Templates")}
+  ${inlineContextHelp(_('Templates that will be available for all conferences.') )}
+</h2>
 
-  <table class="groupTable" cellpadding="0">
-    <tbody>
-      <tr>
-        <td class="groupTitle">
-          ${ _("Default Badge Templates")}
-          ${inlineContextHelp(_('Templates that will be available for all conferences.') )}
-        </td>
-      </tr>
+<div>
+  ${_("Click 'Create New Template' to make a new global Badge template for any Indico users to make use of, or you can edit previously saved templates below")}
+</div>
 
-      <tr>
-        <td>
-          <div class="bs-alert bs-alert-info alert-toolbar">
-              <a class="button button-right button-info" href="${ NewDefaultTemplateURL }">${_('Create New Template')}</a>
-              ${_("Click 'Create New Template' to make a new global Badge template for any Indico users to make use of, or you can edit previously saved templates below")}
-            <div class="toolbar-clearer"></div>
-           </div>
-        </td>
-      </tr>
+% if templateList:
 
-      % if templateList:
-      <tr class="trBottomSpacer">
-        <td>
-          <table>
-            <tbody>
-              % for template in templateList:
-              <tr>
-                <td>
-                  <a href="${template['urlEdit']}" class='button button-mini'>${_('Edit')}</a>
-                  <a href="${template['urlDelete']}" class='button button-mini'>${_('Delete')}</a>
-                </td>
-                <td style="padding-left:5px;">
-                  ${template['name']}
-                </td>
-              </tr>
-              % endfor
-          </table>
-        </td>
-      </tr>
+<div class="template_list">
+  <ul>
+    % for template in templateList:
+      <li>
+        <span class="name">${template['name']}</span>
+        <div class="toolbar right thin">
+          <div class="group">
+            <a href="${template['urlEdit']}" class='button icon-edit icon-only' title="${_("Edit template")}"></a>
+            <a href="${template['urlDelete']}" class='button icon-remove icon-only' title="${_("Delete template")}"></a>
+          </div>
+        </div>
+      </li>
+    % endfor
+  </ul>
+</div>
 
-      <tr>
-        <td class="groupTitle">
-          ${ _("Default PDF Options")}
-          ${inlineContextHelp(_('Initial PDF options after a conference is created.') )}
-        </td>
-      </tr>
+<div>
+  <a class="button icon-plus" href="${ NewDefaultTemplateURL }" style="margin-top: 1em;">${_('Create New Template')}</a>
+</div>
+
+
+<h3 class="clear">
+  ${ _("Default PDF Options")}
+  ${inlineContextHelp(_('Initial PDF options after a conference is created.') )}
+</h3>
+
 <form method="post" action="${urlHandlers.UHTemplatesSetDefaultPDFOptions.getURL()}">
-     <tr>
-       <td>
-        <div class="bs-alert bs-alert-info">
-          <input name="savePDFOptions" class="button button-right" value="${ _("Save")}" type="submit">
-        ${_('Once you have modified the default settings, please click save to put the amendments into effect.')}
-        <div class="toolbar-clearer"></div>
-       </div>
-       </td>
-     </tr>
-    <tr>
-      <td>
-        ${PDFOptions}
-        </form>
-      </td>
-    </tr>
-    % else:
-      <tr>
-        <td>
-          ${_('There are currently no templates saved.')}
-        </td>
-      </tr>
-    % endif
+  <div class="bs-alert bs-alert-info">
+    <input name="savePDFOptions" class="button right accept" value="${ _("Save")}" type="submit">
+      ${_('Once you have modified the default settings, please click save to put the amendments into effect.')}
+  </div>
 
-    </tbody>
-  </table>
+  ${PDFOptions}
+% else:
+  ${_('There are currently no templates saved.')}
+% endif

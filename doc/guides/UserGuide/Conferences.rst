@@ -1362,18 +1362,17 @@ in order to request access.
 
 |image49|
 
-If the conference is PUBLIC and has some element that is PRIVATE, there will
-show a message 'Some parts of it are, however, protected. Which ones?'. If you
-click in 'Which ones?' it will show a popup with the children protected. The same
-works when the conference is PRIVATE and has PUBLIC elements.
-
-|image158|
-
-Also when private you can also add an Access Key which means anyone
-with this key can access the conference without logging in. Users
-will get a message as the following:
+Private events can have an Access Key, meaning that anyone
+with this key will be able to access the conference without logging in. Users
+will see a message such as the following:
 
 |image50|
+
+Whenever an event contains elements (sessions, contributions, ...) that have
+different protection statuses (i.e. the even is private but there is a protected
+element within, or conversely) a corresponding warning message will be shown.
+
+|image160|
 
 *Domain Control* This option is only for public events. It allows
 to specify which domain (e.g. CERN) can access the conference.

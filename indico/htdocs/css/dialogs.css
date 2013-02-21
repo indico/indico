@@ -1,3 +1,15 @@
+.message {
+    color: #555;
+    background: #f8f5f4;
+    border: 1px solid #e7e0dd;
+    padding: 1em;
+}
+
+.message.info {
+    background: #ebf2f3;
+    border: 1px solid #cfdee0;
+}
+
 .confirmation-dialog {
     overflow: auto;
     display: inline-block;

@@ -4635,11 +4635,11 @@ div.actionButton {
     display: inline;
     margin-left: 5px;
 }
-x
+
 /* Conference, Registrants List */
 
 .CRLgroupTitleNoBorder {
-   font-family: "Times New Roman", Verdana, Arial;
+    font-family: Georgia, Times, Times New Roman;
    font-size: 19px;
    color: #4E4C46;
    letter-spacing: 1px;

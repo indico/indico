@@ -1,49 +1,33 @@
+<h2>
+  ${ _("Default Poster Templates")}
+</h2>
 
-  <table class="groupTable" cellpadding="0">
-    <tbody>
-      <tr>
-        <td class="groupTitle">
-           ${ _("Default Poster Templates")}
-        </td>
-      </tr>
+<div>
+  ${_("Click 'Create New Template' to make a new global Poster template for any Indico users to make use of, or you can edit previously saved templates below.")}
+</div>
 
-      <tr>
-        <td>
-          <div class="bs-alert bs-alert-info alert-toolbar">
-              <a class="button button-info button-right" href="${ NewDefaultTemplateURL }">${_('Create New Template')}</a>
-              ${_("Click 'Create New Template' to make a new global Poster template for any Indico users to make use of, or you can edit previously saved templates below.")}
-            <div class="toolbar-clearer"></div>
-           </div>
-        </td>
-      </tr>
 
-      % if templateList:
-      <tr class="trBottomSpacer">
-        <td>
-          <table>
-            <tbody>
-              % for template in templateList:
-              <tr>
-                <td>
-                  <a href="${template['urlEdit']}" class="button button-mini">${_('Edit')}</a>
-                  <a href="${template['urlCopy']}" class="button button-mini">${_('Clone')}</a>
-                  <a href="${template['urlDelete']}" class="button button-mini">${_('Delete')}</a>
-                </td>
-                <td style="padding-left:5px;">
-                  ${template['name']}
-                </td>
-              </tr>
-              % endfor
-          </table>
-        </td>
-      </tr>
-      % else:
-      <tr>
-        <td>
-          ${_('There are currently no templates saved.')}
-        </td>
-      </tr>
-      % endif
+% if templateList:
 
-    </tbody>
-  </table>
+<div class="template_list">
+  <ul>
+    % for template in templateList:
+    <li>
+        <span class="name">${template['name']}</span>
+        <div class="toolbar right thin">
+          <div class="group">
+            <a href="${template['urlEdit']}" class='button icon-edit icon-only' title="${_("Edit template")}"></a>
+            <a href="${template['urlCopy']}" class='button icon-copy icon-only' title="${_("Clone template")}"></a>
+            <a href="${template['urlDelete']}" class='button icon-remove icon-only' title="${_("Delete template")}"></a>
+          </div>
+        </div>
+    </li>
+    % endfor
+  </ul>
+</div>
+% else:
+    ${_('There are currently no templates saved.')}
+% endif
+<div>
+  <a class="button icon-plus" href="${ NewDefaultTemplateURL }" style="margin-top: 1em;">${_('Create New Template')}</a>
+</div>
