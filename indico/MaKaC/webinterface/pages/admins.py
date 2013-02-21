@@ -731,6 +731,15 @@ class WPTemplatesCommon( WPAdminsBase ):
             return self._getTabContent( params )
 
 
+class WPBadgeTemplatesBase(WPTemplatesCommon):
+
+    def getCSSFiles(self):
+        return WPTemplatesCommon.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
+
+    def getJSFiles(self):
+        return WPTemplatesCommon.getJSFiles(self) + self._includeJSPackage('badges_js')
+
+
 class WPAdminLayoutGeneral( WPTemplatesCommon ):
 
     def _setActiveTab( self ):
@@ -861,16 +870,11 @@ class WAdminTemplates(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         return vars
 
-class WPBadgeTemplates( WPTemplatesCommon ):
+class WPBadgeTemplates(WPBadgeTemplatesBase):
     pageURL = "badgeTemplates.py"
 
     def __init__(self, rh):
-        WPTemplatesCommon.__init__(self, rh)
-
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPTemplatesCommon.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
+        WPBadgeTemplatesBase.__init__(self, rh)
 
     def _getTabContent( self, params ):
         wp = WBadgeTemplates(conference.CategoryManager().getDefaultConference())
@@ -880,16 +884,11 @@ class WPBadgeTemplates( WPTemplatesCommon ):
         self._subTabBadges.setActive()
 
 
-class WPPosterTemplates( WPTemplatesCommon ):
+class WPPosterTemplates(WPBadgeTemplatesBase):
     pageURL = "posterTemplates.py"
 
     def __init__(self, rh):
-        WPTemplatesCommon.__init__(self, rh)
-
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPTemplatesCommon.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
+        WPBadgeTemplatesBase.__init__(self, rh)
 
     def _getTabContent( self, params ):
         wp = WPosterTemplates(conference.CategoryManager().getDefaultConference())
@@ -899,18 +898,13 @@ class WPPosterTemplates( WPTemplatesCommon ):
         self._subTabPosters.setActive()
 
 
-class WPBadgeTemplateDesign(WPTemplatesCommon):
+class WPBadgeTemplateDesign(WPBadgeTemplatesBase):
 
     def __init__(self, rh, conf, templateId=None, new=False):
-        WPTemplatesCommon.__init__(self, rh)
+        WPBadgeTemplatesBase.__init__(self, rh)
         self._conf = conf
         self.__templateId = templateId
         self.__new = new
-
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPTemplatesCommon.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def _setActiveTab(self):
         self._subTabBadges.setActive()
@@ -920,18 +914,13 @@ class WPBadgeTemplateDesign(WPTemplatesCommon):
         return wc.getHTML()
 
 
-class WPPosterTemplateDesign(WPTemplatesCommon):
+class WPPosterTemplateDesign(WPBadgeTemplatesBase):
 
     def __init__(self, rh, conf, templateId=None, new=False):
-        WPTemplatesCommon.__init__(self, rh)
+        WPBadgeTemplatesBase.__init__(self, rh)
         self._conf = conf
         self.__templateId = templateId
         self.__new = new
-
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPTemplatesCommon.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def _setActiveTab(self):
         self._subTabPosters.setActive()

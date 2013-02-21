@@ -8118,21 +8118,19 @@ class WConfModifBadgePDFOptions(wcomponents.WTemplated):
         return vars
 
 
-class WPConfModifBadgePrinting(WPConfModifToolsBase):
+class WPBadgeBase(WPConfModifToolsBase):
+
+    def getCSSFiles(self):
+        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
+
+    def getJSFiles(self):
+        return WPConfModifToolsBase.getJSFiles(self) + self._includeJSPackage('badges_js')
+
+
+class WPConfModifBadgePrinting(WPBadgeBase):
 
     def _setActiveTab(self):
         self._tabBadges.setActive()
-
-    def getJSFiles(self):
-        files = WPConfModifToolsBase.getJSFiles(self)
-        files += self._includeJSPackage('badges_js')
-
-        return files
-
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def _getTabContent(self, params):
         wc = WConfModifBadgePrinting(self._conf)
@@ -8242,10 +8240,10 @@ class WConfModifBadgeDesign(wcomponents.WTemplated):
         return vars
 
 
-class WPConfModifBadgeDesign(WPConfModifToolsBase):
+class WPConfModifBadgeDesign(WPBadgeBase):
 
     def __init__(self, rh, conf, templateId=None, new=False, baseTemplateId="blank"):
-        WPConferenceModifBase.__init__(self, rh, conf)
+        WPBadgeBase.__init__(self, rh, conf)
         self.__templateId = templateId
         self.__new = new
         self.__baseTemplate = baseTemplateId
@@ -8258,11 +8256,6 @@ class WPConfModifBadgeDesign(WPConfModifToolsBase):
             # now, let's pretend nothing happened, and let the code
             # handle the template as if it existed before
             self.__new = False
-
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def _setActiveTab(self):
         self._tabBadges.setActive()
@@ -8419,21 +8412,10 @@ class WConfModifPosterPDFOptions(wcomponents.WTemplated):
 
         return vars
 
-class WPConfModifPosterPrinting(WPConfModifToolsBase):
+class WPConfModifPosterPrinting(WPBadgeBase):
 
     def _setActiveTab(self):
         self._tabPosters.setActive()
-
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
-
-    def getJSFiles(self):
-        files = WPConfModifToolsBase.getJSFiles(self)
-        files += self._includeJSPackage('badges_js')
-
-        return files
 
     def _getTabContent(self, params):
         wc = WConfModifPosterPrinting(self._conf)
@@ -8546,18 +8528,13 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
         return vars
 
 
-class WPConfModifPosterDesign(WPConfModifToolsBase):
+class WPConfModifPosterDesign(WPBadgeBase):
 
     def __init__(self, rh, conf, templateId=None, new=False, baseTemplateId="blank"):
-        WPConferenceModifBase.__init__(self, rh, conf)
+        WPBadgeBase.__init__(self, rh, conf)
         self.__templateId = templateId
         self.__new = new
         self.__baseTemplate = baseTemplateId
-
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
 
     def _setActiveTab(self):
         self._tabPosters.setActive()
