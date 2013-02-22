@@ -40,7 +40,7 @@ class LectureBase(object):
         ed.clear()
         ed.send_keys("12/07/2011 18:00")
         self.click(css="button")
-        self.wait_for_jquery()
+        self.wait_remove(css="#inPlaceEditStartEndDate > div > span")
 
 
     def test_tools(self):
@@ -86,7 +86,7 @@ class LectureBase(object):
         self.click(css="#inPlaceEditDescription > div > div > span > div > a")
         self.type(css="textarea", text="whatever")
         self.click(css="button")
-        self.click(xpath="//td[@id='inPlaceEditLocation']/span[2]/a")
+        self.click(css="#inPlaceEditLocation > span > a")
         self.type(css="input[type=text]", text="Some Place")
         self.type(name="_roomName", text="Room 1")
         self.type(css="textarea", text="some address")
@@ -129,7 +129,7 @@ class LectureBase(object):
         self.go("/confModifParticipants.py?confId=0")
         self.click(css=".ui-tabs-nav li:nth-child(2)")
         self.click(ltext="Add")
-        self.click(id="add_existing_user")
+        self.click(ltext="Indico User")
         self.type(id="userSearchFocusField", text="fake")
         self.click(css="input[type=\"button\"]")
         self.click(id="_GID1_existingAv0")
@@ -139,7 +139,7 @@ class LectureBase(object):
         self.wait_remove(css='.ui-widget-overlay')
 
         self.click(ltext="Add")
-        self.click(id="add_new_user")
+        self.click(ltext="New user")
         self.type(id="_GID3", text="Ficticio")
         self.type(id="_GID4", text="Joaquim")
         self.type(xpath="(//input[@type='text'])[3]", text="CERN")
@@ -165,11 +165,11 @@ class LectureBase(object):
         self.click(css="button.ui-button")
         self.click(id="checkParticipant1")
         self.click(ltext="Manage attendance")
-        self.click(id="set_absent")
+        self.click(ltext="Set as absent")
         self.wait(css='#checkParticipant1:not(:checked)')
         self.click(id="checkParticipant1")
         self.click(ltext="Manage attendance")
-        self.click(id="excuse_absence")
+        self.click(ltext="Excuse absence")
 
     def test_evaluation(self):
         self.go("/confModifEvaluation.py/setup?confId=0")

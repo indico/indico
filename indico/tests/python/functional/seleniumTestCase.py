@@ -29,6 +29,7 @@ from selenium.common.exceptions import NoSuchElementException, StaleElementRefer
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
 import unittest, time
 
 # Indico
@@ -159,13 +160,7 @@ class SeleniumTestCase(IndicoTestCase):
 
     @classmethod
     def wait_for_jquery(cls, timeout=5):
-        while timeout:
-            active = webd.execute_script('return jQuery.active')
-            if active == 0:
-                return
-            time.sleep(1)
-            timeout -= 1
-        raise Exception('timeout')
+        WebDriverWait(webd, timeout).until(lambda s: s.execute_script("return jQuery.active == 0"))
 
     @classmethod
     @name_or_id_target
@@ -177,14 +172,7 @@ class SeleniumTestCase(IndicoTestCase):
         """
         Wait for a given element to show up
         """
-        while timeout:
-            try:
-                return elem_get(**kwargs)
-            except NoSuchElementException:
-                pass
-            time.sleep(1)
-            timeout -= 1
-        raise Exception('timeout')
+        WebDriverWait(webd, timeout).until(lambda s: elem_get(webd=s, **kwargs) != None)
 
     @classmethod
     def retry(cls, max_retries=2):
