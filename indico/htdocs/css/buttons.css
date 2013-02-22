@@ -19,6 +19,8 @@
     -moz-transition: color .25s ease-out, border-color .25s ease-out;
     vertical-align: middle;
     border: 1px solid #bbb;
+
+    border-radius: 0.2em;
 }
 
 .button:hover {
@@ -51,7 +53,7 @@
 }
 
 .button.danger {
-    color: #f4f4f4 !important;
+    color: #efefef !important;
     background: #af0000;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
 }
@@ -113,6 +115,20 @@
 
 }
 
+.button.big[class*="icon-"]:before {
+    margin-right: 0;
+    margin-bottom: 0.2em;
+    font-size: 2em;
+    display: block;
+    text-align: center;
+}
+
+.button.big {
+    padding: 0.8em;
+    margin-right: 1em;
+    width: 3em;
+}
+
 .button-small {
     padding: 9px;
     font-size: 11px;
@@ -139,9 +155,9 @@ button i[class*="icon-"] {
     font-size: 1.2em;
 }
 
-.button-right {
-    float: right;
+.button.right {
     margin-left: 5px;
+    margin-top: 5px;
 }
 
 .toolbar {
@@ -172,6 +188,17 @@ button i[class*="icon-"] {
 
 .toolbar .group > .button {
     border-left: 1px solid #CCC;
+    border-radius: 0;
+}
+
+.toolbar .group .button:not(.hidden):first-of-type {
+    border-top-left-radius: 0.2em;
+    border-bottom-left-radius: 0.2em;
+}
+
+.toolbar .group .button:not(.hidden):last-of-type {
+    border-top-right-radius: 0.2em;
+    border-bottom-right-radius: 0.2em;
 }
 
 .toolbar .group > .button:not(.hidden) ~ .button:not(.hidden) {

@@ -1,17 +1,20 @@
-<div class="toolsContainer">
+<div class="area overflow" style="max-width: 700px;">
+    <h2>${_("Delete this Session")}</h2>
     <div>
-        <a href="${deleteSessionURL}" class="bs-btn-icon">
-            <div  class="icon icon-remove icon-medium"></div>
-            <div>${_("Delete")}</div>
-        </a>
-        ${ _("Deleting this session all the items under it will also be deleted")}
+        ${ _("By deleting this session you will delete as well all the items contained within.")}
+
+        <a href="${deleteSessionURL}" class="right button danger icon-remove">${_("Delete")}</a>
+    </div>
+</div>
+
+<div class="area overflow" style="max-width: 700px;">
+    <h2>${_("Lock this Session")}</h2>
+    <div>
+        ${ _("After locking this session, no-one will be able to change its details anymore, unless its manager unlocks it.")}
+
+        <a href="${lockSessionURL}" class="right button warning icon-locked">${_("Lock")}</a>
     </div>
 
-    <div style="margin-top:5px;">
-        <a href="${lockSessionURL}" class="bs-btn-icon">
-            <div  class="icon icon-locked icon-medium"></div>
-            <div>${_("Lock")}</div>
-        </a>
-        ${ _("Locking this session you will not be able to change its details any more")}
+    <div>
     </div>
 </div>

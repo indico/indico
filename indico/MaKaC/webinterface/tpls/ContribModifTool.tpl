@@ -1,9 +1,8 @@
-<div class="toolsContainer">
+<div class="area overflow" style="max-width: 700px;">
+    <h2>${_("Delete this Contribution")}</h2>
     <div>
-        <a href="${deleteContributionURL}" class="bs-btn-icon">
-            <div  class="icon icon-remove icon-medium"></div>
-            <div>${_("Delete")}</div>
-        </a>
-        ${ _("Deleting this contribution all the items under it will also be deleted")}
+        ${ _("By deleting this contribution you will delete as well all the items contained within.")}
+
+        <a href="${deleteContributionURL}" class="right button danger icon-remove">${_("Delete")}</a>
     </div>
 </div>

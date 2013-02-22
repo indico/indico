@@ -20,6 +20,11 @@ h2.page_title {
     float: left;
 }
 
+.inline-vcentered {
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .header-aligned {
     margin-top: 0.8em;
 }
@@ -63,5 +68,19 @@ h2.page_title {
 .icon-background {
     font-size: 10em;
     color: #EEE;
-    float: left;
+}
+
+.area {
+    color: #555;
+    margin-top: 1em;
+    padding: 1em;
+    background: #fafafa;
+}
+
+.area h2:first-of-type {
+    margin-top: 0;
+}
+
+.area h2 {
+    color: #aaa;
 }

@@ -41,8 +41,8 @@
        </div>
       % endif
       <div class="buttons">
-        <input type="submit" class="button button-right" name="cancel" value="${ cancelButtonCaption }"/>
-        <input type="submit" class="button button-right ${severity}" name="confirm" value="${ confirmButtonCaption }"/>
+        <input type="submit" class="button right" name="cancel" value="${ cancelButtonCaption }"/>
+        <input type="submit" class="button right ${severity}" name="confirm" value="${ confirmButtonCaption }"/>
       </div>
   </form>
 </div>
