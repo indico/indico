@@ -72,7 +72,7 @@ def setUpModule():
             }
 
         webd = drivers[browser]();
-    webd.implicitly_wait(15)
+    webd.implicitly_wait(25)
 
 
 def elem_get(**kwargs):
@@ -172,7 +172,7 @@ class SeleniumTestCase(IndicoTestCase):
         """
         Wait for a given element to show up
         """
-        WebDriverWait(webd, timeout).until(lambda s: elem_get(webd=s, **kwargs) != None)
+        return WebDriverWait(webd, timeout).until(lambda s: elem_get(webd=s, **kwargs))
 
     @classmethod
     def retry(cls, max_retries=2):
