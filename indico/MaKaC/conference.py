@@ -101,7 +101,7 @@ from indico.modules.scheduler import Client, tasks
 from indico.util.date_time import utc_timestamp
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.core.db.event import SupportInfo
-from indico.MaKaC.schedule import ScheduleToJson
+from MaKaC.schedule import ScheduleToJson
 
 
 class CoreObject(Persistent):
