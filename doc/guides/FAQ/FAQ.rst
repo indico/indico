@@ -63,8 +63,8 @@ How do I restrict the access rights of my event to certain users?
 In order to do that, go to the Managment Area of your event and
 select the 'Protection' entry in the side menu. Once that you are in
 the protection settings, pay attention to the 'Access Control' settings.
-In order to set the access rights, you have to make your event 'Private' first by
-changing its 'Current status' to either 'Private by itself' or 'Private by inheritance'
+In order to set the access rights, you have to make your event 'Restricted' first by
+changing its 'Current status' to either 'Restricted by itself' or 'Restricted by inheritance'
 (if available). Once the event is private, add users to the 'Users allowed to access' list
 by clicking the 'Add user to list' button. A form will be displayed in which you can
 search for users by entering their family name, first name, etc... You can also restrict

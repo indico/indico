@@ -3075,7 +3075,7 @@ msgstr "Pareil que pour le type matériel parent "
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:276
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:787
 msgid ""
-"Private: Can only be viewed by you and users/groups chosen by you from "
+"Restricted: Can only be viewed by you and users/groups chosen by you from "
 "the list of users"
 msgstr ""
 "Privé: Ne peut être visualisé que par vous et d'autres usagers/groupes "

@@ -33,8 +33,8 @@ As we can see, a **File** inherits the protection policy from
 *Session*, *Session* from *Event*, *Event* from *Sub-category* and
 *Sub-category* from *Category.*
 The next picture shows an example of this inheritance system.
-"Category A" is PRIVATE and because of this, "Conference 1" becomes
-PRIVATE too. As User 1 and User 2 are in the access list for
+"Category A" is RESTRICTED and because of this, "Conference 1" becomes
+RESTRICTED too. As User 1 and User 2 are in the access list for
 "Category A" they can also access "Conference 1". The rest of Indico
 users cannot access "Category A" and "Conference 1".
 
@@ -90,7 +90,7 @@ In this graph, only restricted users have access to Category A, but
 everyone can access Conference A, as it is public.
 
 
-**Private**: Making an object private will make it invisible to all
+**Restricted**: Making an object private will make it invisible to all
 users. You will then need to set the users which will have access to it.
 For example, suppose category B is public and conference B is private,
 and you allow users 1 and 2 to access the conference. Then everyone will
@@ -133,7 +133,7 @@ material, file and link) is PUBLIC, we can restrict the access to
 users accessing Indico from some given IPs (these IPs could be like
 127.1 which means that every IP starting like this will be valid).
 
-If the Indico object is PRIVATE, this checking will not be
+If the Indico object is RESTRICTED, this checking will not be
 applied.
 
 If it is INHERITING, it will have the same access protection as its

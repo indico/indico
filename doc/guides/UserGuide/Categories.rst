@@ -38,7 +38,7 @@ access from the menu *Manage*, option *Edit category*. In *General settings*,
 |image1|
 
 Setting the protection for your category is important. You can set it
-to Inheriting, Private or Public, see :ref:`access_control` .
+to Inheriting, Restricted or Public, see :ref:`access_control` .
 
 
 -----------------
@@ -146,12 +146,12 @@ will be able to modify its category without being listed.
 Public: Anyone can view a public category and any user can add events to it.
 However, users will only be able to see the events inside the
 category to which they have access.
-Private: Only those users in the access list or administrators can
+Restricted: Only those users in the access list or administrators can
 access the category and add events. When a Category is made private,
 the option for domain control is omitted and any event or
 category made inside it will also be private. The category will be
 displayed with "(protected)" after its name to show it is private.
-As well, if the category is  PRIVATE the category manager will be able to set a
+As well, if the category access is  RESTRICTED the category manager will be able to set a
 'Contact in case of no access', so users with no access will know who to contact
 in order to request access.
 Inheriting: The category will have the same access protection as its

@@ -9,7 +9,7 @@
     <%include file="AccessControlStatusFrame.tpl" args="parentName=parentName, privacy=privacy,
     parentPrivacy=parentPrivacy, statusColor = statusColor, parentStatusColor=parentStatusColor,
     locator=locator"/>
-    % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE'):
+    % if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED'):
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat">${ _("Access key")}</span></td>
         <td bgcolor="white" width="100%" valign="top" class="blacktext">

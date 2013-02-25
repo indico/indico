@@ -7811,7 +7811,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/AccessControlStatusFrame.tpl:152
 #: indico/MaKaC/webinterface/tpls/HomeAccessControlStatusFrame.tpl:10
 #: indico/MaKaC/webinterface/tpls/HomeAccessControlStatusFrame.tpl:91
-msgid "PRIVATE"
+msgid "RESTRICTED"
 msgstr ""
 
 #: MaKaC/webinterface/pages/collaboration.py:62
@@ -14811,7 +14811,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/EventSetProtection.tpl:10
 #: indico/MaKaC/webinterface/tpls/CategoryCreation.tpl:43
 #: indico/MaKaC/webinterface/tpls/EventSetProtection.tpl:10
-msgid "Private"
+msgid "Restricted"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/CategoryCreation.tpl:43

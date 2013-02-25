@@ -294,7 +294,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
             selector = new RadioFieldWidget([
                 ['inherit', Html.span({className: protection == -1 ? 'strongProtPublic' : 'strongProtPrivate'}, $T("Inherit from parent material type ")+"\""+entry.get('title')+"\" ", inheritanceText)],
-                ['private', Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+                ['private', Html.span({className: 'protPrivate'}, $T("Restricted: Can only be viewed by you and users/groups chosen by you from the list of users"))],
                 ['public', Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
 
@@ -307,7 +307,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
             selector = new RadioFieldWidget([
                 ['inherit', this._parentText(this.args)],
-                ['private', Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+                ['private', Html.span({className: 'protPrivate'}, $T("Restricted: Can only be viewed by you and users/groups chosen by you from the list of users"))],
                 ['public', Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
         }
@@ -819,7 +819,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
 
         self.protectionSelector  = new RadioFieldWidget([
             [0, self._parentText(this.args)],
-            [1, Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+            [1, Html.span({className: 'protPrivate'}, $T("Restricted: Can only be viewed by you and users/groups chosen by you from the list of users"))],
             [-1, Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
 

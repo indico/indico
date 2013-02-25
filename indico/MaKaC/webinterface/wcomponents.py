@@ -1744,7 +1744,7 @@ class WAccessControlFrameBase(WTemplated):
             vars["privacy"] = "PUBLIC"
             vars["statusColor"] = "#128F33"
         elif self._target.isItselfProtected():
-            vars["privacy"] = "PRIVATE"
+            vars["privacy"] = "RESTRICTED"
             vars["statusColor"] = "#B02B2C"
         else :
             vars["privacy"] = "INHERITING"
@@ -1758,7 +1758,7 @@ class WAccessControlFrameBase(WTemplated):
             else:
                 vars["parentName"] = self._target.getOwner().getTitle()
             if self._target.hasProtectedOwner():
-                    vars["parentPrivacy"] = "PRIVATE"
+                    vars["parentPrivacy"] = "RESTRICTED"
                     vars["parentStatusColor"] = "#B02B2C"
             else :
                     vars["parentPrivacy"] = "PUBLIC"

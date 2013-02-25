@@ -21,12 +21,12 @@ from MaKaC.conference import Category
         <div class="ACStatusDescDiv">
             % if privacy == 'PUBLIC' :
                 ${ _("This means that it can be viewed by all the users, regardless of the access protection of its parent " + termsDict[type]['parentName']) } '${ parentName }'.
-            % elif privacy == 'PRIVATE' :
+            % elif privacy == 'RESTRICTED' :
                 ${ _("This means that it can be viewed only by the users you specify in the following list, regardless of the access protection of the parent  " + termsDict[type]['parentName']) } '${ parentName }'.
             % elif privacy == 'INHERITING' :
                 ${ _("This means that it has the same access protection as its parent " + termsDict[type]['parentName']) } '${ parentName }' ${ _("which is currently ")}
                 <span class='ACStatus' style="color: ${parentStatusColor};">${ _(parentPrivacy)}</span> ${ _("(but this may change).")}
-                % if parentPrivacy == 'PRIVATE' :
+                % if parentPrivacy == 'RESTRICTED' :
                 <br/>
                 ${ _("You can specify users allowed to access your " + termsDict[type]['name'])} <strong>${ _("in addition")}</strong>
                 ${ _(" to the ones already allowed to access the parent " + termsDict[type]['parentName'])} '${ parentName }'
@@ -43,7 +43,7 @@ from MaKaC.conference import Category
                         ${_('Some parts of the event are accessible only by authorized people. <a href="#" class="see_children" data-url="{0}.protection.getProtectedChildren" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
                       </div>
                     </div>
-            % elif (privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE')):
+            % elif (privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED')):
                     % if len(target.getAccessController().getPublicChildren()) > 0:
                     <div class="noninheriting_children_danger">
                       <span class="icon-shield"></span>
@@ -63,7 +63,7 @@ from MaKaC.conference import Category
             % endif
         % endif
 
-        % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
+        % if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED') :
         <h3 style="margin-top: 2em;">${_('Access control List')}</h3>
         <div class="ACUserListDiv">
             <div class="ACUserListWrapper" id="ACUserListWrapper">
@@ -72,7 +72,7 @@ from MaKaC.conference import Category
         % endif
     </td>
 </tr>
-% if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
+% if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED') :
 <tr>
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Contact in case of no access")}</span></td>
     <td bgcolor="white" width="100%" valign="top" class="blacktext">
@@ -86,17 +86,17 @@ from MaKaC.conference import Category
         <form action="${ setPrivacyURL }" method="POST">
             ${ locator }
             <div class="ACModifButtonsDiv">
-                % if privacy == 'PRIVATE' or privacy == 'INHERITING':
+                % if privacy == 'RESTRICTED' or privacy == 'INHERITING':
                 <div class="ACModifButtonEntry">
                     ${ _("Make it")} <input type="submit" class="btn" name="changeToPublic" value="${ _("PUBLIC")}"> ${ _("(viewable by all the users, regardless of the access protection of the parent " + termsDict[type]['parentName'])} '${ parentName }').
                 </div>
                 % endif
                 % if privacy == 'PUBLIC' or privacy == 'INHERITING':
                 <div class="ACModifButtonEntry">
-                    ${ _("Make it")} <input type="submit" class="btn" name="changeToPrivate" value="${ _("PRIVATE")}"> ${ _("(viewable only by the users you choose, regardless of the access protection of the parent " + termsDict[type]['parentName'])} '${ parentName }').
+                    ${ _("Make it")} <input type="submit" class="btn" name="changeToPrivate" value="${ _("RESTRICTED")}"> ${ _("(viewable only by the users you choose, regardless of the access protection of the parent " + termsDict[type]['parentName'])} '${ parentName }').
                 </div>
                 % endif
-                % if privacy == 'PUBLIC' or privacy == 'PRIVATE':
+                % if privacy == 'PUBLIC' or privacy == 'RESTRICTED':
                 <div class="ACModifButtonEntry">
                     ${ _("Make it")} <input type="submit" class="btn" name="changeToInheriting" value="${ _("INHERITING")}"> ${ _("the access protection from its parent " + termsDict[type]['parentName'])} '${ parentName }' (<span class=ACStatus style="color: ${parentStatusColor};">${ _(parentPrivacy)}</span> ${ _("for the moment).")}
                 </div>
@@ -110,14 +110,14 @@ from MaKaC.conference import Category
 <script type="text/javascript">
 
 % if not isinstance(target, Category) and (not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) \
-    or not target.getAccessController().isFullyPrivate() and (privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE'))):
+    or not target.getAccessController().isFullyPrivate() and (privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED'))):
     $(".see_children").click(function(){
         var self = this;
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching..."));
         jsonRpc(Indico.Urls.JsonRpcService, $(self).data("url") ,
-                {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
+                {${ termsDict[type]['paramsKey'] }: '${ target.getId() }'
                 % if type != 'Event':
-                    'confId' : '${ target.getConference().getId() }',
+                    , 'confId' : '${ target.getConference().getId() }'
                 % endif
                 },
                 function(result, error){
@@ -132,7 +132,7 @@ from MaKaC.conference import Category
         });
 % endif
 
-% if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
+% if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED') :
     new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[type]['name'] + '.protection.changeContactInfo'}', ${dict([(termsDict[type]['paramsKey'], target.getId())])}, '${contactInfo or _("no contact info defined")}');
     % if type != 'Category' and type!= 'Home' and type != 'Event':
     var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId()), ('confId', target.getConference().getId())])) };

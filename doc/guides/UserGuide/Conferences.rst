@@ -1102,10 +1102,10 @@ From the Protection tab you can:
   to the contributions. By default nobody can submit material, it needs
   to be specified.
 * List the users that can modify the contributions.
-* Make the contribution Public, Private or Inheriting (see :ref:`access_control`):
+* Make the contribution Public, Restricted or Inheriting (see :ref:`access_control`):
 
   - *Public*: Any user can view (not modify) the contribution.
-  - *Private:* Only users listed in the access/modification/submission
+  - *Restricted:* Only users listed in the access/modification/submission
     control can access the contribution.
   - *Inheriting*: It will have the same access protection as its parent
     event. Changing the access protection of the parent event will change
@@ -1356,13 +1356,13 @@ When it is inheriting, it will have the same access protection as its
 parent categoy. Changing the parent's access protection will change
 the conference's access protection accordingly; see :ref:`access_control`.
 
-If the conference is  PRIVATE the event manager will be able to set a
+If the conference access is  RESTRICTED the event manager will be able to set a
 'Contact in case of no access', so users with no access will know who to contact
 in order to request access.
 
 |image49|
 
-Private events can have an Access Key, meaning that anyone
+Restricted events can have an Access Key, meaning that anyone
 with this key will be able to access the conference without logging in. Users
 will see a message such as the following:
 
