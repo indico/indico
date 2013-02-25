@@ -20,7 +20,7 @@
 
 # stdlib imports
 import zope.interface
-import pkg_resources
+import os
 
 # legacy imports
 from MaKaC.plugins.base import Observable
@@ -50,5 +50,5 @@ class PluginImplementationContributor(Component, Observable):
 class RHSearchHtdocsInvenio(RHHtdocs):
 
     _url = r"^/invenio/(?P<filepath>.*)$"
-    _local_path = pkg_resources.resource_filename(indico.ext.search.invenio.__name__, "htdocs")
+    _local_path = os.path.join(os.path.dirname(indico.ext.search.invenio.__file__), "htdocs")
     _min_dir = 'invenio'

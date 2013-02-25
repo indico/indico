@@ -98,7 +98,7 @@ class UHSearch(URLHandler):
 class RHSearchHtdocs(RHHtdocs):
 
     _url = r"^/search/(?P<filepath>.*)$"
-    _local_path = pkg_resources.resource_filename(indico.ext.search.__name__, "htdocs")
+    _local_path = os.path.join(os.path.dirname(indico.ext.search.__file__), "htdocs")
     _min_dir = 'search'
 
 class RHSearchBase(RHCustomizable):
