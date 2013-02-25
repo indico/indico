@@ -602,7 +602,7 @@ def _check_result(req, result):
     @note: that this function actually takes care of writing the result
         to the client.
     """
-    if result is (None or 0):
+    if result is apache.HTTP_OK:
         result = ""
     else:
         if type(result) == unicode:

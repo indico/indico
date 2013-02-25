@@ -211,7 +211,6 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
 
     if possible_handler in module_globals and \
            callable(module_globals[possible_handler]):
-        from indico.web.wsgi.indico_wsgi_handler_utils import _check_result
         ## the req.form must be casted to dict because of Python 2.4 and earlier
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
