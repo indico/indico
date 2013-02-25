@@ -1477,7 +1477,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
         if not (user.isAdmin() or user.isRBAdmin()):
             for nbd in self._candResv.room.getNonBookableDates():
-                if doesPeriodsOverlap(nbd.getStartDate(), nbd.getEndDate(), self._candResv.startDT, self._candResv.endDT):
+                if nbd.doesPeriodsOverlap(self._candResv.startDT, self._candResv.endDT):
                     raise FormValuesError(_("You cannot book this room during the following periods: %s") % ("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
 
             if self._candResv.room.getDailyBookablePeriods():

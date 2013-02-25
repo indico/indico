@@ -164,7 +164,12 @@ def doesPeriodsOverlap( *args, **kwargs ):
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
 def __doesPeriodsOverlap( startDT1, endDT1, startDT2, endDT2 ):
-    if endDT1 <= startDT2 or endDT2 <= startDT1:
+    # Dates must overlap
+    if endDT1.date() < startDT2.date() or endDT2.date() < startDT1.date():
+        return False
+
+    # Times must overlap
+    if endDT1.time() <= startDT2.time() or endDT2.time() <= startDT1.time():
         return False
     return True
 

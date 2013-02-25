@@ -540,6 +540,11 @@ class NonBookableDate(Persistent):
         else:
             self._endDate = endDate
 
+    def doesPeriodOverlap(self, startTime, endTime):
+        if self.getEndTime() <= startTime or endTime <= self.getStartTime():
+            return False
+        return True
+
 class DailyBookablePeriod(Persistent):
 
     def __init__(self, startTime, endTime):
