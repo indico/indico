@@ -151,4 +151,4 @@ def process(req):
 
     req.content_type = "application/json"
     req.write(jsonResponse)
-    return apache.OK
+    return apache.HTTP_OK

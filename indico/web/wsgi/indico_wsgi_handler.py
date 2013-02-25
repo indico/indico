@@ -16,7 +16,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-
 """
 Main wsgi handler
 
@@ -37,7 +36,7 @@ from MaKaC.common import Config
 from wsgiref.util import FileWrapper, guess_scheme
 
 from indico.web.wsgi.webinterface_handler_config import \
-     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
+     HTTP_STATUS_MAP, SERVER_RETURN, HTTP_OK, \
      HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR, \
     REMOTE_HOST, REMOTE_NOLOOKUP
 from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage, \
@@ -122,7 +121,7 @@ def application(environ, start_response):
         #Exception treatment
         except SERVER_RETURN, status:
             status = int(str(status))
-            if status not in (OK, DONE):
+            if status != HTTP_OK:
                 req.status = status
                 req.headers_out['content-type'] = 'text/html'
                 start_response(req.get_wsgi_status(),

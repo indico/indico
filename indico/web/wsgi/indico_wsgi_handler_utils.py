@@ -629,7 +629,7 @@ def _check_result(req, result):
         req.write(result)
         return req.status
 
-    return apache.OK
+    return apache.HTTP_OK
 
 def registerException(errorText=""):
     """

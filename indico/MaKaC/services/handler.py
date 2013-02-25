@@ -39,4 +39,4 @@ def jsonrpc_handler(req):
 
 def test_handler(req):
     req.write("InDiCo")
-    return apache.OK
+    return apache.HTTP_OK

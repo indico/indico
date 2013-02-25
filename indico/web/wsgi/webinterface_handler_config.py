@@ -105,7 +105,6 @@ except ImportError:
 APLOG_NOERRNO = 8
 
 OK = REQ_PROCEED = 0
-DONE = -2
 DECLINED = REQ_NOACTION = -1
 
 _status_values = {
