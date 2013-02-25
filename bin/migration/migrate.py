@@ -612,35 +612,6 @@ def ip_based_acl(dbi, withRBDB, prevVersion):
     ip_acl_mgr._full_access_acl = ip_set
     dbi.commit()
 
-
-@since('1.0')
-def supportInfo(dbi, withRBDB, prevVersion):
-    """
-    Moving support info fields from conference to a dedicated class
-    """
-    ch = ConferenceHolder()
-    i = 0
-
-    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
-        dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf)
-        caption = email = telephone = ""
-
-        if hasattr(dMgr, "_supportEmailCaption"):
-            caption = dMgr._supportEmailCaption
-            del dMgr._supportEmailCaption
-        if hasattr(conf, "_supportEmail"):
-            email = conf._supportEmail
-            del conf._supportEmail
-
-        supportInfo = SupportInfo(conf, caption, email, telephone)
-        conf.setSupportInfo(supportInfo)
-
-        if i % 1000 == 999:
-            dbi.commit()
-        i += 1
-    dbi.commit()
-
-
 @since('1.0')
 def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
     """
@@ -657,36 +628,64 @@ def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 @since('1.0')
-def updateNonInheritingChildren(dbi, withRBDB, prevVersion):
+def conferenceMigration1_0(dbi, withRBDB, prevVersion):
     """
-    Update non inherited children list
+    Tasks: 1. Moving support info fields from conference to a dedicated class
+           2. Update non inherited children list
     """
+
     def _updateMaterial(obj):
         for material in obj.getAllMaterialList():
             material.getAccessController().setNonInheritingChildren(set())
-            material.notify_protection_to_owner(material)
+            if material.getAccessController().getAccessProtectionLevel() != 0:
+                material.notify_protection_to_owner(material)
             for resource in material.getResourceList():
-                resource.notify_protection_to_owner()
+                if resource.getAccessController().getAccessProtectionLevel() != 0:
+                    resource.notify_protection_to_owner()
 
     ch = ConferenceHolder()
     i = 0
 
     for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+
+        #################################################################
+        #Moving support info fields from conference to a dedicated class:
+        #################################################################
+
+        dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf)
+        caption = email = telephone = ""
+
+        if hasattr(dMgr, "_supportEmailCaption"):
+            caption = dMgr._supportEmailCaption
+            del dMgr._supportEmailCaption
+        if hasattr(conf, "_supportEmail"):
+            email = conf._supportEmail
+            del conf._supportEmail
+
+        supportInfo = SupportInfo(conf, caption, email, telephone)
+        conf.setSupportInfo(supportInfo)
+
+        ####################################
+        #Update non inherited children list:
+        ####################################
+
         conf.getAccessController().setNonInheritingChildren(set())
         _updateMaterial(conf)
 
         for session in conf.getSessionList():
             session.getAccessController().setNonInheritingChildren(set())
-            session.notify_protection_to_owner(session)
+            if session.getAccessController().getAccessProtectionLevel() != 0:
+                session.notify_protection_to_owner(session)
             _updateMaterial(session)
         for contrib in conf.getContributionList():
             contrib.getAccessController().setNonInheritingChildren(set())
-            contrib.notify_protection_to_owner(contrib)
+            if contrib.getAccessController().getAccessProtectionLevel() != 0:
+                contrib.notify_protection_to_owner(contrib)
             _updateMaterial(contrib)
             for subContrib in contrib.getSubContributionList():
                 _updateMaterial(subContrib)
 
-        if i % 10000 == 9999:
+        if i % 10000 == 999:
             dbi.commit()
         i += 1
     dbi.commit()
