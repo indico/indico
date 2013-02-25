@@ -490,20 +490,24 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
              var options = this.source.get();
 
              if(_.size(self.source.get()) > 0){
+                 bind.element(this.select,
+                                     this.source,
+                                     function(item) {
+                                         if ($.isArray(item)) {
+                                             item = new WatchPair(item[0], item[1]);
+                                         } else if(!item.key) {
+                                             item = new WatchPair(item, item);
+                                         }
+                                         return self._drawItem(item);
+                                     });
+                 if(self.select.dom.value != self.selected.get()){
+                     var option  = Widget.option(new WatchPair("", ""));
+                     self.select.append(option);
+                     option.accessor('selected').set("selected");
 
-             return bind.element(this.select,
-                                 this.source,
-                                 function(item) {
-                                     if ($.isArray(item)) {
-                                         item = new WatchPair(item[0], item[1]);
-                                     } else if(!item.key) {
-                                         item = new WatchPair(item, item);
-                                     }
-                                     return self._drawItem(item);
-                                 });
-             }
-             else{
-                 self.select = Html.select({'name':name});
+                 }
+                 return self.select;
+             } else{
                  self.select.append(self._drawNoItems());
                  return self.select;
 
