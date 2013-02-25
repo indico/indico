@@ -3,6 +3,6 @@
     <div>
         ${ _("By deleting this contribution you will delete as well all the items contained within.")}
 
-        <a href="${deleteContributionURL}" class="right button danger icon-remove">${_("Delete")}</a>
+        <a href="${deleteContributionURL}" class="right i-button danger icon-remove">${_("Delete")}</a>
     </div>
 </div>

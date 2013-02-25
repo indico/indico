@@ -6,8 +6,8 @@
                <div>${message}</div>
                </div>
               % if showUnlockButton:
-              <div class="buttons">
-                <input type="submit" class="button accept" value="${ unlockButtonCaption }"/>
+              <div class="i-buttons">
+                <input type="submit" class="i-button accept" value="${ unlockButtonCaption }"/>
               </div>
               % endif
            </form>

@@ -1,4 +1,4 @@
-.button {
+.i-button {
     display: inline-block;
     padding: 4px 10px 4px;
     margin: 0;
@@ -23,7 +23,7 @@
     border-radius: 0.2em;
 }
 
-.button:hover {
+.i-button:hover {
     color: #555 !important;
     border-color: #999;
 
@@ -37,28 +37,13 @@
     box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
 }
 
-.button-primary {
-    background-color: #9FCBED;
-    background-image: -ms-linear-gradient(top, #C8E3F7, #9FCBED);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#C8E3F7), to(#9FCBED));
-    background-image: -webkit-linear-gradient(top, #C8E3F7, #9FCBED);
-    background-image: -o-linear-gradient(top, #C8E3F7, #9FCBED);
-    background-image: -moz-linear-gradient(top, #C8E3F7, #9FCBED);
-    background-image: linear-gradient(top, #C8E3F7, #9FCBED);
-    background-repeat: repeat-x;
-    border-color: #05C #05C #003580;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#0088cc', endColorstr='#0055cc', GradientType=0);
-    filter: progid:dximagetransform.microsoft.gradient(enabled=false);
-}
-
-.button.danger {
+.i-button.danger {
     color: #efefef !important;
     background: #af0000;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
 }
 
-.button.danger:hover {
+.i-button.danger:hover {
     color: #f4f4f4 !important;
     text-shadow: 1px 1px 1px #444;
     background-image: -ms-linear-gradient(top, #CF2323, #af0000);
@@ -72,14 +57,14 @@
     filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
 
-.button.warning {
+.i-button.warning {
     color: #efefef !important;
     background: #E99E18;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
     font-weight: normal !important;
 }
 
-.button.warning:hover {
+.i-button.warning:hover {
     color: #fdfdfd !important;
     text-shadow: 1px 1px 1px #888 !important;
     background-image: -ms-linear-gradient(top, #F3BB08, #E99E18);
@@ -93,13 +78,13 @@
     filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
 
-.button.accept {
+.i-button.accept {
     color: #fdfdfd !important;
     background: #0B8D00;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
 }
 
-.button.accept:hover {
+.i-button.accept:hover {
     color: #f4f4f4 important;
     text-shadow: 1px 1px 1px #888;
     background-color: #0b8d00;
@@ -115,7 +100,7 @@
 
 }
 
-.button.big[class*="icon-"]:before {
+.i-button.big[class*="icon-"]:before {
     margin-right: 0;
     margin-bottom: 0.2em;
     font-size: 2em;
@@ -123,39 +108,39 @@
     text-align: center;
 }
 
-.button.big {
+.i-button.big {
     padding: 0.8em;
     margin-right: 1em;
     width: 3em;
 }
 
-.button-small {
+.i-button-small {
     padding: 9px;
     font-size: 11px;
     line-height: 16px;
 }
 
-.button-mini {
+.i-button-mini {
     padding: 2px 6px;
     font-size: 11px;
     line-height: 14px;
 }
 
-.button-fit {
+.i-button-fit {
     width: 100%;
 }
 
-.button:disabled {
+.i-button:disabled {
     color: #ccc !important;
     border: 1px solid #bbb;
     text-shadow: 1px 1px 1px #fff;
 }
 
-button i[class*="icon-"] {
+i-button i[class*="icon-"] {
     font-size: 1.2em;
 }
 
-.button.right {
+.i-button.right {
     margin-left: 5px;
     margin-top: 5px;
 }
@@ -170,7 +155,7 @@ button i[class*="icon-"] {
     height: 1.5em;
 }
 
-.toolbar.thin .button {
+.toolbar.thin .i-button {
     height: 1.5em;
     line-height: 1.5em;
 }
@@ -186,22 +171,22 @@ button i[class*="icon-"] {
     vertical-align: middle;
 }
 
-.toolbar .group > .button {
+.toolbar .group > .i-button {
     border-left: 1px solid #CCC;
     border-radius: 0;
 }
 
-.toolbar .group .button:not(.hidden):first-of-type {
+.toolbar .group .i-button:not(.hidden):first-of-type {
     border-top-left-radius: 0.2em;
     border-bottom-left-radius: 0.2em;
 }
 
-.toolbar .group .button:not(.hidden):last-of-type {
+.toolbar .group .i-button:not(.hidden):last-of-type {
     border-top-right-radius: 0.2em;
     border-bottom-right-radius: 0.2em;
 }
 
-.toolbar .group > .button:not(.hidden) ~ .button:not(.hidden) {
+.toolbar .group > .i-button:not(.hidden) ~ .i-button:not(.hidden) {
     border-left: none;
 }
 
@@ -210,7 +195,7 @@ button i[class*="icon-"] {
     z-index: 1;
 }
 
-.toolbar .button {
+.toolbar .i-button {
     float: left;
     display: block;
     height: 1.8em;
@@ -223,24 +208,24 @@ button i[class*="icon-"] {
     padding-top: 0.4em;
 }
 
-.button[class*="icon-"].icon-only:before {
+.i-button[class*="icon-"].icon-only:before {
     margin-right: 0;
 }
 
-.button[class*="icon-"]:before {
+.i-button[class*="icon-"]:before {
     font-size: 1.2em;
     margin-right: 0.5em;
     vertical-align: -15%;
 }
 
-.toolbar .button.open {
+.toolbar .i-button.open {
     color: #999 !important;
     background: #ddd;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
 }
 
 
-.toolbar .button:active {
+.toolbar .i-button:active {
     color: #555;
 }
 
@@ -288,7 +273,7 @@ button i[class*="icon-"] {
 }
 
 
-.toolbar .button.arrow:after {
+.toolbar .i-button.arrow:after {
     margin-left: 0.2em;
     font-family: 'icomoon-ultimate';
     font-style: normal;

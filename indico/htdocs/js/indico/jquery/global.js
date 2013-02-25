@@ -34,7 +34,7 @@ $(document).ready(function() {
 
     // Use qtip for context help
     $('.contextHelp[title]').qtip();
-    $('.button').qtip();
+    $('.i-button').qtip();
     $('.contextHelp[data-src]').qtip({
         content: {
             text: function() {

@@ -80,7 +80,7 @@
                                 <td valign="bottom" align="left" id="button-menu" class="toolbar" style="padding-bottom: 1em;">
 
                                   <div class="group left">
-                                    <a class="icon-checkbox-checked button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                                    <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
                                     <ul class="dropdown">
                                       <li><a href="#" id="selectAll">All</a></li>
                                       <li><a href="#" id="selectNone">None</a></li>
@@ -88,13 +88,13 @@
                                   </div>
 
                                   <div class="group left">
-                                    <a href="#" class="button" id="add_new_user">${_("Add new")}</a>
-                                    <a href="#" class="button" id="remove_users">${_("Remove")}</a>
-                                    <a href="#" class="button" id="send_email">${_("Email")}</a>
-                                    <a href="#" class="button" id="print_badges">${_("Print Badges")}</a>
-                                    <a href="#" class="button" id="attachments">${_("Attachments")}</a>
-                                    <a href="#" class="button" id="show_stats">${_("Show stats")}</a>
-                                    <a class="button arrow button" href="#" data-toggle="dropdown">
+                                    <a href="#" class="i-button" id="add_new_user">${_("Add new")}</a>
+                                    <a href="#" class="i-button" id="remove_users">${_("Remove")}</a>
+                                    <a href="#" class="i-button" id="send_email">${_("Email")}</a>
+                                    <a href="#" class="i-button" id="print_badges">${_("Print Badges")}</a>
+                                    <a href="#" class="i-button" id="attachments">${_("Attachments")}</a>
+                                    <a href="#" class="i-button" id="show_stats">${_("Show stats")}</a>
+                                    <a class="i-button arrow button" href="#" data-toggle="dropdown">
                                       ${_("Export")}
                                     </a>
                                     <ul class="dropdown">

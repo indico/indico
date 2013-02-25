@@ -93,7 +93,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="center"><input type="submit" class="button" name="OK" value=  ${_("Apply")}></td>
+                                    <td align="center"><input type="submit" class="i-button" name="OK" value=  ${_("Apply")}></td>
                                 </tr>
                             </table>
                         </td>
@@ -132,7 +132,7 @@
                                     <div id="button-menu" class="toolbar">
 
                                       <div class="group left">
-                                        <a class="icon-checkbox-checked button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                                        <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
                                         <ul class="dropdown">
                                           <li><a href="#" id="selectAll">All</a></li>
                                           <li><a href="#" id="selectNone">None</a></li>
@@ -140,14 +140,14 @@
                                       </div>
 
                                       <div class="group left">
-                                        <a href="#" id="add_new_abstract" class="button">${_("Add new")}</a>
-                                        <a href="#" id="accept_abstracts" class="button">${_("Accept")}</a>
-                                        <a href="#" id="reject_abstracts" class="button">${_("Reject")}</a>
-                                        <a href="#" id="merge_abstracts" class="button">${_("Merge")}</a>
-                                        <a href="#" id="author_list" class="button">${_("Author list")}</a>
-                                        <a href="#" id="download_attachments" class="button">${_("Download attachments")}</a>
+                                        <a href="#" id="add_new_abstract" class="i-button">${_("Add new")}</a>
+                                        <a href="#" id="accept_abstracts" class="i-button">${_("Accept")}</a>
+                                        <a href="#" id="reject_abstracts" class="i-button">${_("Reject")}</a>
+                                        <a href="#" id="merge_abstracts" class="i-button">${_("Merge")}</a>
+                                        <a href="#" id="author_list" class="i-button">${_("Author list")}</a>
+                                        <a href="#" id="download_attachments" class="i-button">${_("Download attachments")}</a>
 
-                                        <a class="button arrow" href="#" data-toggle="dropdown">
+                                        <a class="i-button arrow" href="#" data-toggle="dropdown">
                                           ${_("Export")}
                                         </a>
                                         <ul class="dropdown">

@@ -16,9 +16,9 @@
         <span class="name">${template['name']}</span>
         <div class="toolbar right thin">
           <div class="group">
-            <a href="${template['urlEdit']}" class='button icon-edit icon-only' title="${_("Edit template")}"></a>
-            <a href="${template['urlCopy']}" class='button icon-copy icon-only' title="${_("Clone template")}"></a>
-            <a href="${template['urlDelete']}" class='button icon-remove icon-only' title="${_("Delete template")}"></a>
+            <a href="${template['urlEdit']}" class="i-button icon-edit icon-only" title="${_("Edit template")}"></a>
+            <a href="${template['urlCopy']}" class="i-button icon-copy icon-only" title="${_("Clone template")}"></a>
+            <a href="${template['urlDelete']}" class="i-button icon-remove icon-only" title="${_("Delete template")}"></a>
           </div>
         </div>
     </li>
@@ -29,5 +29,5 @@
     ${_('There are currently no templates saved.')}
 % endif
 <div>
-  <a class="button icon-plus" href="${ NewDefaultTemplateURL }" style="margin-top: 1em;">${_('Create New Template')}</a>
+  <a class="i-button icon-plus" href="${ NewDefaultTemplateURL }" style="margin-top: 1em;">${_('Create New Template')}</a>
 </div>

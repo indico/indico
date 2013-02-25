@@ -40,9 +40,9 @@
        <div>${message}</div>
        </div>
       % endif
-      <div class="buttons">
-        <input type="submit" class="button right" name="cancel" value="${ cancelButtonCaption }"/>
-        <input type="submit" class="button right ${severity}" name="confirm" value="${ confirmButtonCaption }"/>
+      <div class="i-buttons">
+        <input type="submit" class="i-button right" name="cancel" value="${ cancelButtonCaption }"/>
+        <input type="submit" class="i-button right ${severity}" name="confirm" value="${ confirmButtonCaption }"/>
       </div>
   </form>
 </div>

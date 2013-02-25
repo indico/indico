@@ -68,7 +68,7 @@ $(function() {
         _menuize: function(elem) {
             var self = this;
 
-            elem.find('.button').click(function(e) {
+            elem.find('.i-button').click(function(e) {
                 var $this = $(this);
                 if ($this.data('toggle') == 'dropdown') {
                     if ($this.data('on')) {

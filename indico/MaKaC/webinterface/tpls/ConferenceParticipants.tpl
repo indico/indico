@@ -18,7 +18,7 @@
                         <div id="button-menu" class="toolbar">
 
                           <div class="group left">
-                            <a class="icon-checkbox-checked button arrow" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                            <a class="icon-checkbox-checked i-button arrow" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
                             <ul class="dropdown">
                               <li><a href="#" id="selectAll">All</a></li>
                               <li><a href="#" id="deselectAll">None</a></li>
@@ -26,7 +26,7 @@
                           </div>
 
                           <div class="group left">
-                          <a class="left arrow button" id="addParticipant" href="#" data-toggle="dropdown">
+                          <a class="left arrow i-button" id="addParticipant" href="#" data-toggle="dropdown">
                               ${_("Add")}
                           </a>
 
@@ -38,12 +38,12 @@
                             % endif
                           </ul>
 
-                          <a class="button" id="remove_users" href="#">
+                          <a class="i-button" id="remove_users" href="#">
                             ${_("Remove")}
                           </a>
 
                           % if nowutc() > self_._conf.getStartDate():
-                            <a class="button arrow button" href="#" data-toggle="dropdown">
+                            <a class="i-button arrow" href="#" data-toggle="dropdown">
                               ${_("Manage attendance")}
                             </a>
                             <ul class="dropdown">
@@ -53,11 +53,11 @@
                             </ul>
                           % endif
 
-                          <a class="button" href="#" id="send_email">
+                          <a class="i-button" href="#" id="send_email">
                             ${_("Email")}
                           </a>
 
-                          <a class="button arrow button" href="#" data-toggle="dropdown">
+                          <a class="i-button arrow button" href="#" data-toggle="dropdown">
                             ${_("Export")}
                           </a>
                           <ul class="dropdown">

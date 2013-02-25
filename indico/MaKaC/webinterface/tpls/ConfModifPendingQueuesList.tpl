@@ -8,13 +8,13 @@
   <input id="action" type="hidden"/>
 
   <div id="actions" class="right group">
-    <a class="icon-checkbox-checked button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+    <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
     <ul class="dropdown">
       <li><a href="#" id="selectAll">All</a></li>
       <li><a href="#" id="selectNone">None</a></li>
     </ul>
-    <a class="icon-mail button left icon-only" id="send_reminder" href="#" title="${_("Send reminder")}"></a>
-    <a class="icon-remove button left icon-only" id="remove_people" href="#" title="${_("Remove selected people")}"></a>
+    <a class="icon-mail i-button left icon-only" id="send_reminder" href="#" title="${_("Send reminder")}"></a>
+    <a class="icon-remove i-button left icon-only" id="remove_people" href="#" title="${_("Remove selected people")}"></a>
   </div>
 </div>
 

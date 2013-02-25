@@ -984,7 +984,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
                                                                                   title:"Add one hour"}))
         var tt_status_info = $('<div id="tt_status_info" />');
 
-        this.menu.children('a').addClass('button');
+        this.menu.children('a').addClass('i-button');
 
         if (!this.contextInfo.isPoster && !this.isSessionTimetable) {
             this.menu.find('#add_new').after(this._createAddMenu(this.addMenuLink.parent()));
@@ -1512,7 +1512,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
     getTTMenu: function() {
         var self = this;
-        var goBackLink = $('<a class="icon-arrow-up button go_back" href="#"/>').text($T('Up to timetable')).
+        var goBackLink = $('<a class="icon-arrow-up i-button go_back" href="#"/>').text($T('Up to timetable')).
             click(function() {
                 self.parentTimetable.switchToTopLevel();
                 self._hideWarnings();

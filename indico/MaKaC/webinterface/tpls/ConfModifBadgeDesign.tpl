@@ -639,8 +639,8 @@
     <div class="overflow">
       ${_('Once you have finished designing, you may either save or discard your changes here.')}
       <div style="float:right;">
-          <input class="button accept" name="Save Template Button" value="${ _("Save Template")}" type="button" id="saveButton" />
-          <input class="button" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'" />
+          <input class="i-button accept" name="Save Template Button" value="${ _("Save Template")}" type="button" id="saveButton" />
+          <input class="i-button" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'" />
 
           <form id="saveForm" action="${saveTemplateURL}" method="POST">
               <input name="templateId" value="${templateId}" type="hidden">
@@ -685,8 +685,8 @@
                 </%block>
                 <div class="toolbar">
                   <div class="group">
-                    <a class="button icon-upload icon-only hidden" id="uploadBackground" title="${_("Upload file")}"></a>
-                    <a class="button icon-remove icon-only hidden" id="removeBackground" title="${_("Remove background")}"></a>
+                    <a class="i-button icon-upload icon-only hidden" id="uploadBackground" title="${_("Upload file")}"></a>
+                    <a class="i-button icon-remove icon-only hidden" id="removeBackground" title="${_("Remove background")}"></a>
                       </div>
                 </div>
               </form>
@@ -812,7 +812,7 @@
               <select name="Template Elements List" id="elementList">
                 ${selectOptions}
               </select>
-            <a id="insertButton" class="button icon-plus right icon-only" title="${ _("Insert")}"></a>
+            <a id="insertButton" class="i-button icon-plus right icon-only" title="${ _("Insert")}"></a>
         </div>
         <!-- Modify Selected Element -->
         <div id="modify_panel" class="panel overflow clear" style="display: none;">
@@ -821,7 +821,7 @@
             <h3>${_('Selected Element')}</h3>
             <div id="selection_text" class="left">
             </div>
-            <a id="removeButton" class="right button icon-remove icon-only" title="${ _("Remove Element")}"></a>
+            <a id="removeButton" class="right i-button icon-remove icon-only" title="${ _("Remove Element")}"></a>
           </div>
         </td>
 
