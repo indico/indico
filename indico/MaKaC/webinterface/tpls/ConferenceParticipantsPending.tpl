@@ -12,23 +12,30 @@
                 <table>
                     <tr>
                         <td valign="bottom" align="left">
-                            <ul style="margin-top:0px;" id="button-menu">
-                              <li class="left"><a href="#" id="accept">${ _("Accept")}</a></li>
-                              <li class="right arrow" id="reject"><a href="#">${ _("Reject")}</a>
-                                <ul>
-                                  <li><a href="#" id="reject_with_mail">${ _("With email notification")}</a></li>
-                                  <li><a href="#" id="reject_no_mail">${ _("No email notification")}</a></li>
-                                </ul>
-                              </li>
+                        <div id="button-menu" class="toolbar">
+                          <div class="group left">
+                            <a class="icon-checkbox-checked i-button arrow" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                            <ul class="dropdown">
+                              <li><a href="#" id="selectAll">All</a></li>
+                              <li><a href="#" id="deselectAll">None</a></li>
                             </ul>
+                          </div>
+                          <div class="group left">
+                              <a class="i-button" id="accept" href="#">
+                                ${_("Accept")}
+                              </a>
+                              <a class="left arrow i-button" id="reject" href="#" data-toggle="dropdown">
+                                  ${_("Reject")}
+                              </a>
+                              <ul class="dropdown">
+                                <li><a href="#" id="reject_with_mail">${_("With email notification")}</a></li>
+                                <li><a href="#" id="reject_no_mail">${_("No email notification")}</a></li>
+                              </ul>
+                          </div>
+                        </div>
                         </td>
                     </tr>
                 </table>
-            </td>
-        </tr>
-        <tr id="selectBar" style="display:none">
-            <td colspan=10 style="padding: 5px 0px 10px;" nowrap>
-            Select: <a style="color: #0B63A5;" id="selectAll"> All</a>, <a style="color: #0B63A5;" id="deselectAll">None</a>
             </td>
         </tr>
     % endif
