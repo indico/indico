@@ -1,6 +1,6 @@
 <%page args="item, parent=None, allMaterial=False, hideTime=True, materialSession=False, order=1, showOrder=True"/>
 
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <% session = item.getSession() %>
 
@@ -8,7 +8,7 @@
 
 <tr>
     <td>
-        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
     </td>
     <td class="itemLeftAlign sessionInfo" colspan="2"><br/>
         <span class="sessionTitle">

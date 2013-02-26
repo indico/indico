@@ -1,5 +1,5 @@
 <%page args="item, parent=None, minutes=False, checkStartTime=False, checkEndTime=False, olist=False, order=0, showDescriptionTitle=False,checkOwnerLocation=True"/>
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <% session = item.getSession() %>
 
@@ -72,7 +72,7 @@
       <td class="headerInfo" >
         % for material in session.getAllMaterialList():
             % if material.canView(accessWrapper):
-                <%include file="${INCLUDE}/Material.tpl" args="material=material"/>
+                <%include file="../../${INCLUDE}/Material.tpl" args="material=material"/>
             % endif
         % endfor
       </td>
@@ -84,7 +84,7 @@
     % endif
   </td>
   <td style="padding-right:4px; width:23px">
-      <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+      <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
   </td>
 </tr>
 </table>

@@ -1,5 +1,5 @@
 <%page/>
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <table width="100%" border="0" bgcolor="white" cellpadding="1" cellspacing="1">
 <tr>
@@ -18,7 +18,7 @@
                     ${conf.getTitle()}
                 </span>
                 <div style="float: right; height: 15px; width: 15px; padding-top: 7px; padding-left: 5px;">
-                    <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True"/>
+                    <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True"/>
                 </div>
             </span>
             % if conf.getReportNumberHolder().listReportNumbers():
@@ -116,7 +116,7 @@
           <td>
             % for material in conf.getAllMaterialList():
                 % if material.canView(accessWrapper):
-                    <%include file="${INCLUDE}/Material.tpl" args="material=material"/>
+                    <%include file="../../${INCLUDE}/Material.tpl" args="material=material"/>
                 % endif
             % endfor
           </td>

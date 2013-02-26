@@ -1,6 +1,6 @@
 <%page args="item, allMaterial=False, minutes=False, order=1, suborder=1"/>
 
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <tr>
 
@@ -69,6 +69,6 @@
     </td>
 
     <td class="itemTopAlign">
-         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+         <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
     </td>
 </tr>

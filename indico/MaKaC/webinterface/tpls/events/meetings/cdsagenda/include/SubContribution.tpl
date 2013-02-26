@@ -1,6 +1,6 @@
 <%page args="item, minutes=True"/>
 
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <tr>
     <td align="left">
@@ -24,7 +24,7 @@
     % if len(item.getAllMaterialList()) > 0:
         % for material in item.getAllMaterialList():
             % if material.canView(accessWrapper):
-            <%include file="${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
+            <%include file="../../${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
             &nbsp;
             % endif
         % endfor
@@ -55,7 +55,7 @@
         % endif
         &nbsp;
         <div style="float:right">
-            <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+            <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
         </div>
     </td>
 

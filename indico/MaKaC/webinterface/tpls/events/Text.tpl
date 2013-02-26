@@ -1,4 +1,4 @@
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="include/Common.tpl"/>
 
 <%def name="printSessionInfo(item)">
     ${item.getSession().getTitle()}<br/>

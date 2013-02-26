@@ -1,6 +1,6 @@
 <%page args="item, parent, hideTime=False, allMaterial=False, minutes=False, order=1, showOrder=True" />
 
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <tr>
     <td colspan="4"></td>
@@ -83,7 +83,7 @@
         </span>
     </td>
     <td class="itemTopAlign">
-        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
     </td>
 </tr>
 % if item.getSubContributionList():

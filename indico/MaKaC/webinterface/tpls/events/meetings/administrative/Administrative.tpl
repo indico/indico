@@ -1,4 +1,4 @@
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../${context['INCLUDE']}/Common.tpl"/>
 <%!
   allMaterial = False
   hideTime = True
@@ -30,7 +30,7 @@
         <br/>&nbsp;<br/>
 
         <div class="eventInfo">
-            <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False"/>
+            <%include file="../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False"/>
             ${conf.getTitle()}<br/>
             <%block name="locationAndTime">
                 % if getLocationInfo(conf) != ('', '', ''):
@@ -84,7 +84,7 @@
                             <td></td>
                         </tr>
                     % endif
-                    <%include file="${INCLUDEADM}/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=self.attr.showOrder"/>
+                    <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=self.attr.showOrder"/>
                     % if getItemType(item) == "Session":
                         <% order += item.getSession().getNumberOfContributions(only_scheduled=True) %>
                     % elif getItemType(item) == "Contribution":
