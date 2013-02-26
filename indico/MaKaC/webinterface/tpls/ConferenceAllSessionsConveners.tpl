@@ -1,4 +1,4 @@
-<form action=${convenerSelectionAction} method="post" id="convenersForm" name="convenersForm" target='_blank'>
+<form action=${convenerSelectionAction} method="post" id="convenersForm" name="convenersForm">
 
 <div id="list_options" class="toolbar" style="line-height: 3em;">
   <input type="text" id="filterSpeakers" value="" placeholder="${_("Search Name, Email &amp; Sessions")}"/>
@@ -54,7 +54,8 @@
 function verifyFilters() {
     $(".speaker_list > li").hide();
     var term = $("#filterSpeakers").attr('value');
-    var items = $("ol.contributions li:contains('"+ term +"'), " +
+    var items = $("ul.contributions li:contains('"+ term +"'), " +
+                  ".speaker_list li input[value*='"+ term +"'], " +
                   ".speaker_list li .name:contains('"+ term +"')").closest('.speaker_list > li');
 
     items.show();

@@ -615,7 +615,6 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
                 indicoRequest('user.favorites.listUsers', {},
                     function(result, error) {
-                        debugger;
                         if (!error) {
                             updateFavList(result);
                             killProgress();

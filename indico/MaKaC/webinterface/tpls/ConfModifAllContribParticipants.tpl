@@ -1,5 +1,5 @@
 
-<form action=${participantSelectionAction} method="post" name="participantsForm">
+<form action=${participantSelectionAction} method="post" name="participantsForm" id="participantsForm">
 
 <div id="list_options" class="toolbar" style="line-height: 3em;">
     <input type="text" id="filterSpeakers" value="" placeholder='${_("Search Name, Email &amp; Contributions")}' />
@@ -44,11 +44,11 @@
 <script type="text/javascript">
 
 function filterEntries() {
-    $(".speakerEntry").hide();
+    $(".speaker_list > li").hide();
     var term = $("#filterSpeakers").attr('value');
-    var items = $(".speakerContributions ol li a:contains('"+ term +"'), " +
-                  ".speakerEmail:contains('"+ term +"'), " +
-                  ".speakerName:contains('"+ term +"')").closest('.speakerEntry');
+    var items = $("ul.contributions li:contains('"+ term +"'), " +
+                  ".speaker_list li input[value*='"+ term +"'], " +
+                  ".speaker_list li .name:contains('"+ term +"')").closest('.speaker_list > li');
     items.show();
 };
 
@@ -64,6 +64,11 @@ $(document).ready(function() {
 
     $("#filterSpeakers").keyup(function() {
         filterEntries();
+    });
+
+    $('#email_people').click(function() {
+        $('#participantsForm').submit();
+        return false;
     });
 });
 
