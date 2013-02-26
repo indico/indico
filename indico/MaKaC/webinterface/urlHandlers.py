@@ -1782,9 +1782,10 @@ class UHMaterialModification( URLHandler ):
         from MaKaC import conference
 
         owner = material.getOwner()
-
         # return handler depending on parent type
-        if isinstance(owner, conference.Conference):
+        if isinstance(owner, conference.Category):
+            handler = UHCategModifFiles
+        elif isinstance(owner, conference.Conference):
             handler = UHConfModifShowMaterials
         elif isinstance(owner, conference.Session):
             handler = UHSessionModifMaterials
