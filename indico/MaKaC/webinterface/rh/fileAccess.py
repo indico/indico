@@ -66,7 +66,7 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
                              data=self._file.readBin(),
                              ftype=self._file.getFileType(),
                              fpath=self._file.getFilePath())
-            return send_file(self._file)
+            return send_file(self._req, self._file)
 
 
 class RHFileAccessStoreAccessKey( RHFileBase ):

@@ -48,7 +48,7 @@ def set_file_headers(req, fname, fpath, last_modified, ftype, data, size):
         req.send_x_file(fpath)
 
 
-def send_file(fdata):
+def send_file(req, fdata):
     cfg = Config.getInstance()
     if cfg.getUseXSendFile() and req.headers_in['User-Agent'].find('Android') == -1:
         return ""
