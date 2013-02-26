@@ -454,7 +454,7 @@ type("ReportNumberList", ["ListWidget"], {
     _drawItem: function(reportNumber){
         var self = this;
         var removeButton = self._createRemoveButton(reportNumber).dom;
-        var removeButtonDiv = $("<div/>").css({float: "right", "padding-right": "10px", "padding-top": "5px"}).html(removeButton);
+        var removeButtonDiv = $("<div/>").css({"float": "right", "padding-right": "10px"}).html(removeButton);
         var reportNumberSpan = $("<span/>");
         reportNumberSpan.append($("<span/>").css("font-weight", "bold").html(reportNumber.get().name + ": "));
         reportNumberSpan.append($("<span/>").html(reportNumber.get().number));
