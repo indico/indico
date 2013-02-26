@@ -90,12 +90,12 @@ Indico's Glossary
      can be associated with Meetings, Sessions, Contributions and
      Subcontributions.
 
-   Private
+   Restricted
      A status in which a resource cannot be accessed by users that do
      not accomplish certain criteria (i.e. being in a list, or coming
      from a specific IP domain...).
 
-   Private by Inheritance
+   Restricted by Inheritance
      A status in which an resource is private just because its parent
      resource was set as private (either by inheritance, or
      explicitly).
@@ -103,7 +103,7 @@ Indico's Glossary
    Public
      A status in which a resource is publicly accessible, with no
      constraints. This status can be overriden, if the parent resource
-     is set as private (see Private by Inheritance).
+     is set as private (see Restricted by Inheritance).
 
    Resource
      In the context of this document, a Resource is a category, event

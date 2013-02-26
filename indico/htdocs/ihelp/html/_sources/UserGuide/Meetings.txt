@@ -297,14 +297,14 @@ of the meeting (see :ref:`access_control`)
 
 |image120|
 
-If the meeting is PUBLIC and has some element that is PRIVATE, there will
+If the meeting is PUBLIC and has some element that is RESTRICTED, there will
 show a message 'Some parts of it are, however, protected. Which ones?'. If you
 click in 'Which ones?' it will show a popup with the children protected. The same
-works when the meeting is PRIVATE and has PUBLIC elements.
+works when the meeting access is RESTRICTED and has PUBLIC elements.
 
 |image165|
 
-If the conference is  PRIVATE the event manager will be able to set a
+If the meeting access is  RESTRICTED the event manager will be able to set a
 'Contact in case of no access', so users with no access will know who to contact
 in order to request access.
 

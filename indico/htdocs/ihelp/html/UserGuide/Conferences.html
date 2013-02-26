@@ -620,6 +620,9 @@ for your conference.</p>
 <li><strong>Print badges</strong>: It will open a new page that will allow you to print the badges of the selected registrants.</li>
 </ul>
 <p><img alt="image103" src="../_images/confreg15.png" /></p>
+<p>You may then select which template you which to use for your PDF by selecting the radio button to the left of it and then clicking &#8216;Download Badges PDF&#8217;. You also have the option to edit, clone and delete the templates you have stored at will.</p>
+<p>Furthermore, clicking the &#8216;PDF Layout Options&#8217; button provides access to further fine-tune your badges before downloading:</p>
+<p><img alt="image158" src="../_images/confreg15pdfopts.png" /></p>
 <ul class="simple">
 <li><strong>Show stats</strong>: It will show the statistics about the registrants.</li>
 </ul>
@@ -965,9 +968,9 @@ priorities.</li>
 to the contributions. By default nobody can submit material, it needs
 to be specified.</li>
 <li>List the users that can modify the contributions.</li>
-<li>Make the contribution Public, Private or Inheriting (see <a class="reference internal" href="Protection.html#access-control"><em>Access Control Policy</em></a>):<ul>
+<li>Make the contribution Public, Restricted or Inheriting (see <a class="reference internal" href="Protection.html#access-control"><em>Access Control Policy</em></a>):<ul>
 <li><em>Public</em>: Any user can view (not modify) the contribution.</li>
-<li><em>Private:</em> Only users listed in the access/modification/submission
+<li><em>Restricted:</em> Only users listed in the access/modification/submission
 control can access the contribution.</li>
 <li><em>Inheriting</em>: It will have the same access protection as its parent
 event. Changing the access protection of the parent event will change
@@ -1114,15 +1117,21 @@ and <a class="reference internal" href="#layout-reviewing"><em>Layout reviewing<
 To enable/disable, click on <em>Show</em>/<em>Hide</em>. For more on the evaluation
 process, see <a class="reference internal" href="Evaluation.html#event-evaluation"><em>Event Evaluation</em></a></p>
 <hr class="docutils" />
+<p id="lists-management">This area gives you access to all the lists of pending users, dependent upon their pending actions. The default view presented is that of all contribution speakers.</p>
 </div>
-<div class="section" id="lists-management">
-<span id="id16"></span><h3>2.4.12. Lists Management<a class="headerlink" href="#lists-management" title="Permalink to this headline">¶</a></h3>
-<p>From this option, you can get the lists of pending people to become Indico
-users, all sessions’ conveners and all contributions’ speakers.</p>
-<p><img alt="image135" src="../_images/conferenceLists.png" /></p>
+<hr class="docutils" />
+<div class="section" id="list-management">
+<h3>2.4.12. List Management<a class="headerlink" href="#list-management" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="list-of-all-contributions-speakers">
+<h4>2.4.12.1. List of all contributions&#8217; speakers<a class="headerlink" href="#list-of-all-contributions-speakers" title="Permalink to this headline">¶</a></h4>
+<p>You are again presented with the corresponding list of users. You can send
+e-mails to selected users.</p>
+<p><img alt="image143" src="../_images/speakersList.png" /></p>
+<p>The same options are available in the three different tabs.</p>
+</div>
 <hr class="docutils" />
 <div class="section" id="pending-people-to-become-indico-users">
-<h4>2.4.12.1. Pending people to become Indico users<a class="headerlink" href="#pending-people-to-become-indico-users" title="Permalink to this headline">¶</a></h4>
+<h4>2.4.12.2. Pending people to become Indico users<a class="headerlink" href="#pending-people-to-become-indico-users" title="Permalink to this headline">¶</a></h4>
 <p>By clicking on this link, you will be presented with 3 tabs: <em>Pending Submitters</em>,
 <em>Pending Managers</em> and <em>Pending Coordinators</em>. In each of them, you will
 find a list of the corresponding users. From these tabs, you can remove
@@ -1131,18 +1140,10 @@ selected users or send reminders.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="list-of-all-sessions-conveners">
-<h4>2.4.12.2. List of all sessions&#8217; conveners<a class="headerlink" href="#list-of-all-sessions-conveners" title="Permalink to this headline">¶</a></h4>
+<h4>2.4.12.3. List of all sessions&#8217; conveners<a class="headerlink" href="#list-of-all-sessions-conveners" title="Permalink to this headline">¶</a></h4>
 <p>You are presented with a corresponding list of users. You can send e-mails
 to selected users.</p>
 <p><img alt="image142" src="../_images/convenersList.png" /></p>
-</div>
-<hr class="docutils" />
-<div class="section" id="list-of-all-contributions-speakers">
-<h4>2.4.12.3. List of all contributions&#8217; speakers<a class="headerlink" href="#list-of-all-contributions-speakers" title="Permalink to this headline">¶</a></h4>
-<p>You are again presented with the corresponding list of users. You can send
-e-mails to selected users.</p>
-<p><img alt="image143" src="../_images/speakersList.png" /></p>
-<p>The same options are available in the three different tabs.</p>
 </div>
 </div>
 <hr class="docutils" />
@@ -1165,19 +1166,18 @@ Conference Managers and Administrators can view the conference.
 When it is inheriting, it will have the same access protection as its
 parent categoy. Changing the parent&#8217;s access protection will change
 the conference&#8217;s access protection accordingly; see <a class="reference internal" href="Protection.html#access-control"><em>Access Control Policy</em></a>.</p>
-<p>If the conference is  PRIVATE the event manager will be able to set a
+<p>If the conference access is  RESTRICTED the event manager will be able to set a
 &#8216;Contact in case of no access&#8217;, so users with no access will know who to contact
 in order to request access.</p>
 <p><img alt="image49" src="../_images/confm29.png" /></p>
-<p>If the conference is PUBLIC and has some element that is PRIVATE, there will
-show a message &#8216;Some parts of it are, however, protected. Which ones?&#8217;. If you
-click in &#8216;Which ones?&#8217; it will show a popup with the children protected. The same
-works when the conference is PRIVATE and has PUBLIC elements.</p>
-<p><img alt="image158" src="../_images/childrenProtectedPopup.png" /></p>
-<p>Also when private you can also add an Access Key which means anyone
-with this key can access the conference without logging in. Users
-will get a message as the following:</p>
+<p>Restricted events can have an Access Key, meaning that anyone
+with this key will be able to access the conference without logging in. Users
+will see a message such as the following:</p>
 <p><img alt="image50" src="../_images/confm30.png" /></p>
+<p>Whenever an event contains elements (sessions, contributions, ...) that have
+different protection statuses (i.e. the even is private but there is a protected
+element within, or conversely) a corresponding warning message will be shown.</p>
+<p><img alt="image160" src="../_images/childrenProtectedPopup.png" /></p>
 <p><em>Domain Control</em> This option is only for public events. It allows
 to specify which domain (e.g. CERN) can access the conference.
 Therefore, only users from inside this domain will be able to access.</p>
@@ -1192,7 +1192,7 @@ coordinators have.</p>
 whole of the conference.</p>
 <hr class="docutils" />
 <div class="section" id="clone-event">
-<span id="id17"></span><h4>2.4.14.1. Clone event<a class="headerlink" href="#clone-event" title="Permalink to this headline">¶</a></h4>
+<span id="id16"></span><h4>2.4.14.1. Clone event<a class="headerlink" href="#clone-event" title="Permalink to this headline">¶</a></h4>
 <p>Clone the conference if you would like to make another conference exactly
 the same. You have the option to clone it once, at fixed intervals, or
 on certain dates. You must clone a conference in two steps:</p>
@@ -1213,8 +1213,16 @@ tick its corresponding box</p>
 <div class="section" id="posters">
 <h4>2.4.14.2. Posters<a class="headerlink" href="#posters" title="Permalink to this headline">¶</a></h4>
 <p>It is possible to create your own posters for the conference in Indico.
-You can either create your own and customize it, or upload a template.</p>
+You can either generate one of the pre-existing templates offered by your installation or generate event specific templates, either using the aforementioned ones as a basis or something entirely new.</p>
 <p><img alt="image127" src="../_images/posters.png" /></p>
+<p>As with Badge / Tablesigns, you are permitted to alter the resultant PDF options by clicking the &#8216;PDF Layout Options&#8217; button and setting the parameters as required beforehand.</p>
+<p>The list of event templates are templates which are only available for this event, you may freely edit, clone or delete these poster templates at will.</p>
+<p><img alt="image159" src="../_images/posterdesign.png" /></p>
+<p>The Poster design page is very similar to the Badge / Tablesigns design page. The options are broken into two tabs:</p>
+<ul class="simple">
+<li>Template settings: Including dimensions, name.</li>
+<li>Element settings: When an element is selected, this pane is auto enabled and permits you to modify font styles and sizes and, if the element is a fixed text item, you can edit its value here. For the latter, double clicking the element directly will prompt you to change its value.</li>
+</ul>
 </div>
 <hr class="docutils" />
 <div class="section" id="badges-tablesigns">
@@ -1318,7 +1326,7 @@ found the picture in your documents, click on <em>Upload</em>.</p>
 </div>
 </div>
 <div class="section" id="logs-management">
-<span id="id19"></span><h3>2.4.16. Logs Management<a class="headerlink" href="#logs-management" title="Permalink to this headline">¶</a></h3>
+<span id="id18"></span><h3>2.4.16. Logs Management<a class="headerlink" href="#logs-management" title="Permalink to this headline">¶</a></h3>
 <p>This shows you a list of all the actions performed on the whole of the
 conference. It shows the date, subject, responsible and module.</p>
 <p><img alt="image134" src="../_images/log.png" /></p>
@@ -1658,10 +1666,10 @@ session. You may also make a PDF of the session.</p>
 <li><a class="reference internal" href="#chat-room">2.4.9. Chat room</a></li>
 <li><a class="reference internal" href="#video-services">2.4.10. Video Services</a></li>
 <li><a class="reference internal" href="#evaluation">2.4.11. Evaluation</a></li>
-<li><a class="reference internal" href="#lists-management">2.4.12. Lists Management</a><ul>
-<li><a class="reference internal" href="#pending-people-to-become-indico-users">2.4.12.1. Pending people to become Indico users</a></li>
-<li><a class="reference internal" href="#list-of-all-sessions-conveners">2.4.12.2. List of all sessions&#8217; conveners</a></li>
-<li><a class="reference internal" href="#list-of-all-contributions-speakers">2.4.12.3. List of all contributions&#8217; speakers</a></li>
+<li><a class="reference internal" href="#list-management">2.4.12. List Management</a><ul>
+<li><a class="reference internal" href="#list-of-all-contributions-speakers">2.4.12.1. List of all contributions&#8217; speakers</a></li>
+<li><a class="reference internal" href="#pending-people-to-become-indico-users">2.4.12.2. Pending people to become Indico users</a></li>
+<li><a class="reference internal" href="#list-of-all-sessions-conveners">2.4.12.3. List of all sessions&#8217; conveners</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#protection-management">2.4.13. Protection Management</a></li>

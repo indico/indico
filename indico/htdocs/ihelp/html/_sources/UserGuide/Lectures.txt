@@ -167,7 +167,7 @@ When it is inheriting, it has the same access protection as its parent
 category. Changing the access protection of its parent category will
 change the access protection of the lecture.
 
-If the conference is  PRIVATE the event manager will be able to set a
+If the lecture access is  PRIVATE the event manager will be able to set a
 'Contact in case of no access', so users with no access will know who to contact
 in order to request access.
 
@@ -176,10 +176,10 @@ with this key can access the lecture without logging in.
 
 |image146|
 
-If the lecture is PUBLIC and has some element that is PRIVATE, there will
+If the lecture is PUBLIC and has some element that is RESTRICTED, there will
 show a message 'Some parts of it are, however, protected. Which ones?'. If you
 click in 'Which ones?' it will show a popup with the children protected. The same
-works when the lecture is PRIVATE and has PUBLIC elements.
+works when the lecture access is RESTRICTED and has PUBLIC elements.
 
 |image167|
 
