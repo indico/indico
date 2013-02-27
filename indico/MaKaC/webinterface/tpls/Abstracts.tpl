@@ -436,7 +436,7 @@ $(function(){
     }).each(function(vals, key) {
       $(key).bind('menu_select',function(){
         if (atLeastOneSelected()) {
-            InsertHiddenField(vals[0], vals[1], false);
+            InsertHiddenField(vals[0], vals[1], true);
             $('#abstractsForm').submit();
         }
       });
