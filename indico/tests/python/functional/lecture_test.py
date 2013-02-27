@@ -149,7 +149,9 @@ class LectureBase(object):
         self.click(xpath="//button[@type='button']")
         self.click(id="checkParticipant2")
         self.click(id="remove_users")
+
         self.wait_remove(css='#checkParticipant2')
+
         self.click(id="checkParticipant1")
         self.click(id="send_email")
         self.type(css="input[type=\"text\"]", text="test")
@@ -169,7 +171,11 @@ class LectureBase(object):
         self.wait(css='#checkParticipant1:not(:checked)')
         self.click(id="checkParticipant1")
         self.click(ltext="Manage attendance")
-        self.click(ltext="Excuse absence")
+
+        time.sleep(0.5)
+
+        button = self.elem(css="#excuse_absence")
+        button.click()
 
     def test_evaluation(self):
         self.go("/confModifEvaluation.py/setup?confId=0")

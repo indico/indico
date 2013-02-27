@@ -66,11 +66,11 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(css="#inPlaceEditDescription > div > div > span > div > a")
         self.type(css="textarea", text="description text")
         self.click(xpath="//button[contains(text(), 'Save')]")
-        self.click(xpath="//input[@value='add track']")
+        self.click(xpath="//input[@value='Add Track']")
         self.type(name="title", text="track 1")
         self.click(xpath="//input[@value='ok']")
         self.click(name="selTracks")
-        self.click(xpath="//input[@value='remove selected']")
+        self.click(xpath="//input[@value='Remove Selected']")
 
     def test_call_for_abstracts(self):
         self.go("/confModifCFA.py?confId=0")
