@@ -603,10 +603,13 @@ class Review(Persistent, Fossilizable):
         self._editorDueDate = None #the Deadline where the editor has to pass his/her judgement
         self._reviewerDueDate = None #the Deadline where all the reviewers have to pass his/her judgement
 
-    def notifyModification(self):
+    def notifyModification(self, **kwargs):
         """ Notifies the DB that a list or dictionary attribute of this object has changed
         """
         self._p_changed = 1
+
+    def updateNonInheritingChildren(self, element, delete=False):
+        pass
 
     def getId(self):
         """ Returns the id of this Review, which is the same as its version number
