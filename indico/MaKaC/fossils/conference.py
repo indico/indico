@@ -122,13 +122,15 @@ class IConferenceParticipationFossil(IConferenceParticipationMinimalFossil):
     def getPhone(self):
         """Conference Participation Phone """
 
-class IResourceMinimalFossil(IFossil):
+class IResourceBasicFossil(IFossil):
 
     def getName(self):
         """ Name of the Resource """
 
     def getDescription(self):
         """ Resource Description """
+
+class IResourceMinimalFossil(IResourceBasicFossil):
 
     def getProtectionURL(self):
         """ Resource protection URL """
@@ -178,7 +180,7 @@ class ILocalFileFossil(IResourceFossil, ILocalFileMinimalFossil):
         """ Type """
     getType.produce = lambda s: 'stored'
 
-class ILocalFileExtendedFossil(ILocalFileFossil):
+class ILocalFileInfoFossil(IFossil):
 
     def getFileName(self):
         """ Local File Filename """
@@ -197,7 +199,11 @@ class ILocalFileExtendedFossil(ILocalFileFossil):
         """ Local File File Size """
     getSize.name = "file.fileSize"
 
-class ILocalFileAbstractMaterialFossil(ILocalFileExtendedFossil):
+class ILocalFileExtendedFossil(ILocalFileFossil, ILocalFileInfoFossil):
+    pass
+
+
+class ILocalFileAbstractMaterialFossil(IResourceBasicFossil, ILocalFileInfoFossil):
 
     def getURL(self):
         """ URL of the Local File """
