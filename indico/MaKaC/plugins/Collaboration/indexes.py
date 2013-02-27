@@ -638,6 +638,9 @@ class CategoryChecker(object):
             return False
         else:
             category = conference.getOwner()
+            if category is None: # event/categ deleted (containing the booking)
+                self._badConfs.add(confId)
+                return False
             categoryId = category.getId()
             isGoodCateg = categoryId in self._goodCategs
             isBadCateg = categoryId in self._badCategs
