@@ -5415,7 +5415,7 @@ class Session(CommonObjectBase, Locatable):
     def setKeywords(self, keywords):
         self._keywords = keywords
 
-    def notifyModification( self, date = None, cleanCache = True ):
+    def notifyModification( self, raiseEvent = True, date = None, cleanCache = True ):
         """Method called to notify the current session has been modified.
         """
         self.setModificationDate(date)
