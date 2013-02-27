@@ -16,7 +16,7 @@ from indico.util.i18n import i18nformat
     <%  questionNames = abstract.getQuestionsAverage().keys() %>
     <%  answers = abstract.getQuestionsAverage().values() %>
     <%  rating = "%.2f" % abstract.getRating() %>
-    <%  imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed") %>
+    <%  imgIcon = Config.getInstance().getSystemIconURL("itemCollapsed") %>
     <%  detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, ["%.2f" % i for i in answers]) %>
 % endif
 
