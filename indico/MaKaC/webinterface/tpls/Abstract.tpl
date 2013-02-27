@@ -33,15 +33,15 @@ from indico.util.i18n import i18nformat
     <td class="CRLabstractDataCell">
         <a href="${str(urlHandlers.UHCFAAbstractManagment.getURL(abstract))}">${self_.htmlText(abstract.getTitle())}</a>
     </td>
-    <td class="CRLabstractDataCell">
     % if "PrimaryAuthor" in display:
+    <td class="CRLabstractDataCell">
       % for auth in abstract.getPrimaryAuthorList():
         % if auth.getFullName():
           ${auth.getFullName()}<br/>
         % endif
       % endfor
-    % endif
     </td>
+    % endif
     % if "Tracks" in display:
         <% tracks = [ self_.htmlText(track.getCode() or track.getId()) for track in abstract.getTrackListSorted()] %>
         <td class="CRLabstractDataCell">${"<br>".join(tracks) or "&nbsp;"}</td>
