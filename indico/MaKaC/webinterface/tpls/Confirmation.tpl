@@ -49,12 +49,12 @@
 
 <script type="text/javascript">
 
-$('#confirmationForm').submit(function(event) {
+$('#confirmationForm > div > input').click(function() {
     if (${"true" if loading else "false"}) {
-        if (event.originalEvent.explicitOriginalTarget.name == "confirm"){
+        if (this.name == "confirm"){
             var killLoadProgress = IndicoUI.Dialogs.Util.progress($T("Performing action..."));
         }
     }
-  });
+})
 
 </script>
