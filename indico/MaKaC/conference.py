@@ -366,6 +366,9 @@ class Category(CommonObjectBase):
     def getAccessController(self):
         return self.__ac
 
+    def updateNonInheritingChildren(self, elem, delete=False):
+        pass
+
     def getNotifyCreationList( self ):
         """ self._notifyCreationList is a string containing the list of
         email addresses to send an email to when a new event is created"""
