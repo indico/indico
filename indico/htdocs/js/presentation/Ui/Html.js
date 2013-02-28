@@ -97,18 +97,7 @@ type("Html", ["XElement", "WatchAccessor", "CanGet"], {
                 return this.isField();
         }
 },
-        Browser.IE
-        ? function(source, attributes) {
-                if (isString(source)) {
-                        if (!empty(attributes.name)) {
-                                // fix for IE
-                                source = '<' + source + ' name="' + attributes.name + '">';
-                                delete attributes.name;
-                        }
-                }
-                this.XElement(source, attributes, $A(arguments, 2));
-        }
-        : function(source, attributes) {
+        function(source, attributes) {
                 this.XElement(source, attributes, $A(arguments, 2));
         }
 );
