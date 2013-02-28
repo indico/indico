@@ -23,7 +23,7 @@ Responsible: Piotr Wlodarek
 """
 
 from datetime import datetime, timedelta, date
-from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodsOverlap, overlap, Period, Impersistant, checkPresence, fromUTC, toUTC, formatDateTime, formatDate,\
+from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodOverlap, overlap, Period, Impersistant, checkPresence, fromUTC, toUTC, formatDateTime, formatDate,\
     datespan
 from MaKaC.rb_room import RoomBase
 from MaKaC.rb_location import ReservationGUID, Location, CrossLocationQueries
@@ -789,7 +789,7 @@ class ReservationBase( Fossilizable ):
             colliderPeriods = r[1]
             for candidatePeriod in candidatePeriods:
                 for colliderPeriod in colliderPeriods:
-                    if doesPeriodsOverlap( candidatePeriod, colliderPeriod ):
+                    if doesPeriodOverlap( candidatePeriod, colliderPeriod ):
                         if boolResult:
                             # There is at least one collision
                             return True
@@ -893,7 +893,7 @@ class ReservationBase( Fossilizable ):
         year, except date1, date2 and date3...).
         """
 
-        theyOverlap = doesPeriodsOverlap( self.startDT, self.endDT, startDT, endDT )
+        theyOverlap = doesPeriodOverlap( self.startDT, self.endDT, startDT, endDT )
         if not theyOverlap:
             return False
 

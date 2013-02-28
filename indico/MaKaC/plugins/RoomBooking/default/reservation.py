@@ -26,7 +26,7 @@ from pytz import timezone
 
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum, WeekDayEnum
-from MaKaC.rb_tools import qbeMatch, doesPeriodsOverlap, iterdays, overlap, weekNumber, containsExactly_OR_containsAny, fromUTC
+from MaKaC.rb_tools import qbeMatch, doesPeriodOverlap, iterdays, overlap, weekNumber, containsExactly_OR_containsAny, fromUTC
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from indico.modules.scheduler import Client, tasks

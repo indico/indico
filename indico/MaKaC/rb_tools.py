@@ -152,18 +152,18 @@ def containsExactly_OR_containsAny( attrValExample, attrValCandidate ):
     return False
 
 
-def doesPeriodsOverlap( *args, **kwargs ):
+def doesPeriodOverlap( *args, **kwargs ):
     """
     Returns true if periods do overlap. This requires both dates and times to overlap.
     Pass it either (period, period) or ( start1, end1, start2, end2 ).
     """
     if len( args ) == 4:
-        return __doesPeriodsOverlap( args[0], args[1], args[2], args[3] )
+        return __doesPeriodOverlap( args[0], args[1], args[2], args[3] )
     if len( args ) == 2:
-        return __doesPeriodsOverlap( args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT )
+        return __doesPeriodOverlap( args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT )
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
-def __doesPeriodsOverlap( startDT1, endDT1, startDT2, endDT2 ):
+def __doesPeriodOverlap( startDT1, endDT1, startDT2, endDT2 ):
     # Dates must overlap
     if endDT1.date() < startDT2.date() or endDT2.date() < startDT1.date():
         return False
@@ -185,7 +185,7 @@ def overlap( *args, **kwargs ):
 
 
 def __overlap( startDT1, endDT1, startDT2, endDT2):
-    if not doesPeriodsOverlap( startDT1, endDT1, startDT2, endDT2):
+    if not doesPeriodOverlap( startDT1, endDT1, startDT2, endDT2):
         # [---]  [----]
         return None
 
@@ -321,17 +321,17 @@ def dateAdvanceAllowed(date, days):
 class Test:
 
     @staticmethod
-    def doesPeriodsOverlap():
+    def doesPeriodOverlap():
 
         # Days overlap, hours not
-        ret = doesPeriodsOverlap(
+        ret = doesPeriodOverlap(
             datetime( 2006, 9, 20, 16 ),
             datetime( 2006, 9, 20, 18 ),
             datetime( 2006, 9, 20, 18, 30 ),
             datetime( 2006, 9, 20, 19 ) )
         assert( not ret )
 
-        ret = doesPeriodsOverlap(
+        ret = doesPeriodOverlap(
             datetime( 2006, 9, 20, 16 ),
             datetime( 2006, 9, 25, 18 ),
             datetime( 2006, 9, 23, 13 ),
@@ -339,7 +339,7 @@ class Test:
         assert( not ret )
 
         # Days does not overlap, hours do
-        ret = doesPeriodsOverlap(
+        ret = doesPeriodOverlap(
             datetime( 2006, 9, 20, 16 ),
             datetime( 2006, 9, 20, 18 ),
             datetime( 2006, 9, 21, 16, 30 ),
@@ -348,10 +348,10 @@ class Test:
 
         p1 = Period( datetime( 2006, 12, 1, 8 ), datetime( 2006, 12, 1, 9 ) )
         p2 = Period( datetime( 2006, 12, 1, 9 ), datetime( 2006, 12, 1, 10 ) )
-        assert( not doesPeriodsOverlap( p1, p2 ) )
+        assert( not doesPeriodOverlap( p1, p2 ) )
 
         # Periods overlap
-        ret = doesPeriodsOverlap(
+        ret = doesPeriodOverlap(
             datetime( 2006, 9, 20, 16 ),
             datetime( 2006, 9, 25, 18 ),
             datetime( 2006, 9, 23, 13 ),
@@ -379,5 +379,5 @@ class Test:
 
 
 if __name__ == "__main__":
-    Test.doesPeriodsOverlap()
+    Test.doesPeriodOverlap()
     Test.overlap()

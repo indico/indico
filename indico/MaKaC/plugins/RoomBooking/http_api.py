@@ -36,7 +36,7 @@ from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
 from MaKaC.user import Group, Avatar
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.rb_location import Location, CrossLocationFactory, CrossLocationQueries
-from MaKaC.rb_tools import doesPeriodsOverlap
+from MaKaC.rb_tools import doesPeriodOverlap
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 
@@ -182,7 +182,7 @@ class BookRoomHook(HTTPAPIHook):
 
         # checking room availability
         for nbd in resv.room.getNonBookableDates():
-            if (doesPeriodsOverlap(nbd.getStartDate(), nbd.getEndDate(), resv.startDT, resv.endDT)):
+            if (doesPeriodOverlap(nbd.getStartDate(), nbd.getEndDate(), resv.startDT, resv.endDT)):
                 raise HTTPAPIError('Failed to create the booking. You cannot book this room because it is unavailable during this time period.')
 
         roomBlocked = resv.room.getBlockedDay(resv.startDT)

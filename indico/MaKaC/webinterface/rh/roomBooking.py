@@ -39,7 +39,7 @@ from MaKaC.rb_room import RoomBase
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
-from MaKaC.rb_tools import intd, FormMode, doesPeriodsOverlap, dateAdvanceAllowed
+from MaKaC.rb_tools import intd, FormMode, doesPeriodOverlap, dateAdvanceAllowed
 from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.plugins import PluginLoader
 from MaKaC import plugins
@@ -1477,7 +1477,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
         if not (user.isAdmin() or user.isRBAdmin()):
             for nbd in self._candResv.room.getNonBookableDates():
-                if nbd.doesPeriodsOverlap(self._candResv.startDT, self._candResv.endDT):
+                if nbd.doesPeriodOverlap(self._candResv.startDT, self._candResv.endDT):
                     raise FormValuesError(_("You cannot book this room during the following periods: %s") % ("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y (%H:%M)"),x.getEndDate().strftime("%d/%m/%Y (%H:%M)")), self._candResv.room.getNonBookableDates()))))
 
             if self._candResv.room.getDailyBookablePeriods():
