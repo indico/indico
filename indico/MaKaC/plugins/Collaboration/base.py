@@ -385,17 +385,16 @@ class CSBookingManager(Persistent, Observer):
                 eventLinkUpdated = False
                 newLinkId = self.checkVideoLink(bookingParams)
 
-                if booking.hasSessionOrContributionLink():
-                    oldLinkData = booking.getLinkIdDict()
-                    oldLinkId = oldLinkData.values()[0]
+                oldLinkData = booking.getLinkIdDict()
+                oldLinkId = oldLinkData.values()[0]
 
-                    # Details changed, we need to remove the association and re-create it
-                    if not (oldLinkData.has_key(bookingParams.get('videoLinkType','')) and oldLinkId == newLinkId):
-                        self.removeVideoSingleService(booking.getLinkId(), booking)
-                        eventLinkUpdated = True
+                # Details changed, we need to remove the association and re-create it
+                if not (oldLinkData.has_key(bookingParams.get('videoLinkType','')) and oldLinkId == newLinkId):
+                    self.removeVideoSingleService(booking.getLinkId(), booking)
+                    eventLinkUpdated = True
 
                 if eventLinkUpdated or (bookingParams.has_key("videoLinkType") and bookingParams.get("videoLinkType","") != "event"):
-                    if self.hasVideoService(booking.getLinkId(), booking):
+                    if self.hasVideoService(newLinkId, booking):
                         pass # No change in the event linking
                     elif newLinkId is not None:
                         if (self.hasVideoService(newLinkId) and bookingParams.has_key("videoLinkType") and bookingParams.get("videoLinkType","") != "event"): # Restriction: 1 video service per session or contribution.
