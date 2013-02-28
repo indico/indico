@@ -1307,7 +1307,7 @@ type("UserListWidget", ["ListWidget"],
                              }, IndicoUI.Buttons.removeButton()));
 
             if (userData.get('isGroup') || userData.get('_fossil') === 'group') {
-                var removeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}}, removeButton);
+                var removeButtonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}}, removeButton);
                 var groupName = $B(Html.span(), userData.accessor('name'));
                 return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
             } else {
