@@ -203,7 +203,7 @@ class WTemplated(OldObservable):
         vars['__rh__'] = self._rh
         vars['self_'] = self
 
-        tempHTML = templateEngine.render(self.tplFile, self, vars)
+        tempHTML = templateEngine.render(self.tplFile, vars, self)
 
         if self._rh and self._rh._req.is_https():
             imagesBaseURL = Config.getInstance().getImagesBaseURL()

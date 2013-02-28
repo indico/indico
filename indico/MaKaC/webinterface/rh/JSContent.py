@@ -100,7 +100,7 @@ class RHTemplateContentJS(base.RH):
             self._dict["__rh__"] = self
             self._dict["user"] = None
 
-            self._htmlData = templateEngine.render(self._tplFile, None, self._dict)
+            self._htmlData = templateEngine.render(self._tplFile, self._dict)
             fh = open(self._htmlPath, "w")
             fh.write(self._htmlData)
             fh.close()
