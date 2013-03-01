@@ -198,17 +198,12 @@ extend(Html, {
          * @return {XElement} element
          */
         checkbox: function(attributes, checked) {
-            if (Browser.IE) {
-                var checkedText = checked?" checked":"";
-                return new Html("<input type=\"checkbox\""+checkedText+">", attributes);
-            } else {
-                var elem = new Html("input", Html.makeAttributes(attributes, {
-                    type: "checkbox"
-                }));
+            var elem = new Html("input", Html.makeAttributes(attributes, {
+                type: "checkbox"
+            }));
 
-                elem.set(checked);
-                return elem;
-            }
+            elem.set(checked);
+            return elem;
 
         },
 
