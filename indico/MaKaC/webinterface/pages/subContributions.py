@@ -155,15 +155,7 @@ class WPSubContribModifMain( WPSubContributionModifBase ):
 
 
 class WSubContribModifTool(wcomponents.WTemplated):
-
-    def __init__( self, subContrib ):
-        self._subContrib = subContrib
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
-        vars["writeIconURL"] = Config.getInstance().getSystemIconURL("write_minutes")
-        return vars
+    pass
 
 
 class WPSubContributionModifTools( WPSubContributionModifBase ):
@@ -172,10 +164,7 @@ class WPSubContributionModifTools( WPSubContributionModifBase ):
         self._tabTools.setActive()
 
     def _getTabContent( self, params ):
-        wc = WSubContribModifTool( self._target )
-        pars = { \
-"deleteSubContributionURL": urlHandlers.UHSubContributionDelete.getURL( self._target )}
-        return wc.getHTML( pars )
+        return WSubContribModifTool().getHTML({"deleteSubContributionURL": urlHandlers.UHSubContributionDelete.getURL( self._target )})
 
 
 class WPSubContributionModifMaterials( WPSubContributionModifBase ):
@@ -281,6 +270,29 @@ class WPSubContributionDeletion( WPSubContributionModifTools ):
         wc = WSubContributionDeletion( [self._target] )
         return wc.getHTML( urlHandlers.UHSubContributionDelete.getURL( self._target ) )
 
+class WPSubContributionModificationClosed( WPSubContribModifMain ):
+
+    def _createTabCtrl( self ):
+        self._tabCtrl = wcomponents.TabControl()
+        self._tabMain = self._tabCtrl.newTab( "main", _("Main"), "")
+
+    def _getTabContent( self, params ):
+        if self._subContrib.getOwner().getSession() != None:
+            message = _("The session is currently locked and you cannot modify it in this status. ")
+            if self._subContrib.getOwner().getConference().canModify(self._rh.getAW()):
+                message += _("If you unlock the session, you will be able to modify its details again.")
+            url = urlHandlers.UHSessionOpen.getURL(self._subContrib.getOwner().getSession())
+            unlockButtonCaption = _("Unlock session")
+        else:
+            message = _("The event is currently locked and you cannot modify it in this status. ")
+            if self._subContrib.getOwner().getConference().canModify(self._rh.getAW()):
+                message += _("If you unlock the event, you will be able to modify its details again.")
+            url = urlHandlers.UHConferenceOpen.getURL(self._subContrib.getOwner().getConference())
+            unlockButtonCaption = _("Unlock event")
+        return wcomponents.WClosed().getHTML({"message": message,
+                                             "postURL":url,
+                                             "showUnlockButton": self._subContrib.getOwner().getConference().canModify(self._rh.getAW()),
+                                             "unlockButtonCaption": unlockButtonCaption})
 
 class WSubContribModifMain(wcomponents.WTemplated):
 
@@ -307,3 +319,4 @@ class WSubContribModifMain(wcomponents.WTemplated):
         vars["authors"] = fossilize(self._subContrib.getContribution().getAllAuthors())
         vars["eventType"] = self._subContrib.getConference().getType()
         return vars
+

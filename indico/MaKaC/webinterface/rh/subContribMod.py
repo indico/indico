@@ -60,27 +60,20 @@ class RHSubContributionModification( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionModification
 
     def _process( self ):
-        p = subContributions.WPSubContributionModification( self, self._target )
+        if self._target.getOwner().getOwner().isClosed():
+            p = subContributions.WPSubContributionModificationClosed(self, self._target)
+        else:
+            p = subContributions.WPSubContributionModification( self, self._target )
         return p.display( **self._getRequestParams() )
-
-
-
-#class RHSubContributionPerformModification( RHSubContribModifBase ):
-#    _uh = urlHandlers.
-#
-#    def _process( self ):
-#        params = self._getRequestParams()
-#        if not ("cancel" in params):
-#            self._target.setName( params.get("name", "") )
-#            self._target.setDescription( params.get("description", "") )
-#        self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
-
 
 class RHSubContributionTools( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContribModifTools
 
     def _process( self ):
-        p = subContributions.WPSubContributionModifTools( self, self._target )
+        if self._target.getOwner().getOwner().isClosed():
+            p = subContributions.WPSubContributionModificationClosed(self, self._target)
+        else:
+            p = subContributions.WPSubContributionModifTools( self, self._target )
         return p.display( **self._getRequestParams() )
 
 
@@ -88,7 +81,10 @@ class RHSubContributionData( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionDataModification
 
     def _process( self ):
-        p = subContributions.WPSubContribData( self, self._target )
+        if self._target.getOwner().getOwner().isClosed():
+            p = subContributions.WPSubContributionModificationClosed(self, self._target)
+        else:
+            p = subContributions.WPSubContribData( self, self._target )
         return p.display( **self._getRequestParams() )
 
 
