@@ -497,7 +497,7 @@ type("RoomListField", ["IWidget"], {
         }
 
         if(this.allowNew) {
-            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, callback);
+            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, callback, null, null, null, false);
             var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
             addRoomButton.observeClick(function(){
                 var selectedValue = roomChooser.select.get();

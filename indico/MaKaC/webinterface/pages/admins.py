@@ -1404,6 +1404,9 @@ class WUserPreferences(wcomponents.WTemplated):
         vars["showPastEvents"] = self._avatar.getPersonalInfo().getShowPastEvents()
         vars["pluginUserPreferences"] = "".join(self._notify('userPreferences', self._avatar.getId()))
         vars["userId"] = self._avatar.getId()
+        vars["defaultLanguage"] =  self._avatar.getLang()
+        vars["defaultTimezone"] = self._avatar.getTimezone()
+        vars["defaultDisplayTimeZone"] =  self._avatar.getDisplayTZMode() or "MyTimezone"
         return vars
 
 class WUserDetails(wcomponents.WTemplated):

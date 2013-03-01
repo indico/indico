@@ -174,7 +174,7 @@
                 $('#roomChooser select > option').detach().sort(function(a, b) {
                     return strnatcmp($(a).text().toLowerCase(), $(b).text().toLowerCase());
                 }).appendTo($('#roomChooser select'));
-            })
+            }, null, null, null, false)
             var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
             addRoomButton.observeClick(function(setResult){
                 var selectedValue = roomChooser.select.get();

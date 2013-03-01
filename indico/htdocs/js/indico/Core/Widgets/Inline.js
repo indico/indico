@@ -500,11 +500,10 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
                                          }
                                          return self._drawItem(item);
                                      });
-                 if(self.select.dom.value != self.selected.get()){
+                 if(self.select.dom.value != self.selected.get() && self.showNoValue){
                      var option  = Widget.option(new WatchPair("", ""));
                      self.select.append(option);
                      option.accessor('selected').set("selected");
-
                  }
                  return self.select;
              } else{
@@ -540,7 +539,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
          }
 
      },
-     function(method, args, callback, name, noOptionsText, defaultSelected) {
+     function(method, args, callback, name, noOptionsText, defaultSelected, showNoValue) {
          this.select = Html.select({'name':name});
          this.selected = new WatchValue();
          if(defaultSelected !== undefined){
@@ -551,6 +550,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
          this.InlineRemoteWidget(method, args, true, callback);
          this.loadOnStartup = false;
          this.name = name;
+         this.showNoValue = any(showNoValue, true);
      });
 
 

@@ -85,14 +85,12 @@ def getAllLocales():
 availableLocales = getAllLocales()
 
 
-def getLocaleDisplayNames(using=None):
+def getLocaleDisplayNames():
     """
     List of (locale_id, locale_name) tuples
     """
 
-    locales = [IndicoLocale.parse(loc) for loc in availableLocales if loc != using]
-    if using:
-        locales.insert(0, IndicoLocale.parse(using))
+    locales = [IndicoLocale.parse(loc) for loc in availableLocales]
     return list((str(loc), loc.languages[loc.language].encode('utf-8')) for loc in locales)
 
 

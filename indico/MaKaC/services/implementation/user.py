@@ -277,8 +277,7 @@ class UserHidePastEvents(UserModifyBase):
 class UserGetLanguages(UserBaseService):
 
     def _getAnswer( self):
-        userLoc = self._target.getLang()
-        return getLocaleDisplayNames(using=userLoc)
+        return getLocaleDisplayNames()
 
 
 class UserSetLanguage(UserModifyBase):
@@ -298,10 +297,7 @@ class UserSetLanguage(UserModifyBase):
 class UserGetTimezones(UserBaseService):
 
     def _getAnswer( self):
-        userTz = self._target.getTimezone()
-        timezones = [tz for tz in TimezoneRegistry.getList() if tz != userTz]
-        timezones.insert(0, userTz)
-        return timezones
+        return TimezoneRegistry.getList()
 
 
 class UserSetTimezone(UserModifyBase):
