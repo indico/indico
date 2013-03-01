@@ -509,6 +509,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
 
         vars['searchBox']= ""
         vars["confId"] = self._conf.getId()
+        vars["dm"] = dm
         extension_point("fillConferenceHeader", vars)
         return vars
 

@@ -59,7 +59,7 @@ class SearchCHContributor(Component):
     def fillConferenceHeader(self, obj, params):
         # Search box, in case search is active
         defaultSearchEngine = SearchRegister().getDefaultSearchEngineAgent()
-        if defaultSearchEngine is not None and defaultSearchEngine.isActive():
+        if params["dm"].getSearchEnabled() and defaultSearchEngine is not None and defaultSearchEngine.isActive():
             params["searchBox"] = WMiniSearchBox.forModule(defaultSearchEngine.getImplementationPackage(), params.get("confId", 0)).getHTML()
 
 
