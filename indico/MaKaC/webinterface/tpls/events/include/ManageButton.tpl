@@ -35,7 +35,8 @@
                 'editSession': {action: function(m){
                     IndicoUI.Dialogs.__addSessionSlot("${info['slotId']}","${item.getSession().getId()}","${conf.getId()}");
                     m.close();
-                    return false; }, display:  $T('Edit session')},
+                    return false; }, display:  $T('Basic session edition')},
+                'editSessionFull': {action: '${info["modifyLink"]}', display:  $T('Full session edition')},
             % else:
                  'editEntry': {action: '${info["modifyLink"]}', display: $T('Edit entry')},
             % endif

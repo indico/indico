@@ -1074,7 +1074,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             session = item.getSession()
             info['parentProtection'] = session.getAccessController().isProtected()
             if session.canModify(self._rh._aw) or session.canCoordinate(self._rh._aw):
-                info['modifyLink'] = True
+                info["modifyLink"] = urlHandlers.UHSessionModification.getURL(item)
             info['slotId'] = session.getSortedSlotList().index(item)
             info['sessId'] = session.getId()
             if session.canModify(self._rh._aw) or session.canCoordinate(self._rh._aw):
