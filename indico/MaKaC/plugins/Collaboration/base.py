@@ -1348,7 +1348,7 @@ class CSBookingBase(Persistent, Fossilizable):
     def getStartDateAsString(self):
         """ Returns the start date as a string, expressed in the meeting's timezone
         """
-        if self._startDate == None:
+        if self.getStartDate() == None:
             return ""
         else:
             return formatDateTime(self.getAdjustedStartDate(), locale='en_US')
@@ -1403,7 +1403,7 @@ class CSBookingBase(Persistent, Fossilizable):
     def getEndDateAsString(self):
         """ Returns the start date as a string, expressed in the meeting's timezone
         """
-        if self._endDate == None:
+        if self.getEndDate() == None:
             return ""
         else:
             return formatDateTime(self.getAdjustedEndDate(), locale='en_US')
