@@ -567,40 +567,6 @@ def timedLinkedEventListRemoval(dbi, withRBDB, prevVersion):
         if i % 100 == 0:
             dbi.commit()
 
-
-@since('1.0')
-def reindexVidyoBookings(dbi, withRBDB, prevVersion):
-    """
-    Reindexing Vidyo bookings
-    """
-    ph = PluginsHolder()
-    collaboration_pt = ph.getPluginType("Collaboration")
-    if not collaboration_pt.isActive() or not collaboration_pt.getPlugin("Vidyo").isActive():
-        return
-    VidyoTools.getEventEndDateIndex().initialize(dbi)
-    VidyoTools.getIndexByVidyoRoom().initialize(dbi)
-
-
-@since('1.0')
-def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
-    """
-    Changing Vidyo Room Names
-    """
-    ph = PluginsHolder()
-    collaboration_pt = ph.getPluginType("Collaboration")
-    if not collaboration_pt.isActive() or not collaboration_pt.getPlugin("Vidyo").isActive():
-        return
-    i = 0
-    for booking in VidyoTools.getIndexByVidyoRoom().itervalues():
-        if hasattr(booking, '_originalConferenceId'):
-            roomName = booking.getBookingParamByName("roomName") + '_indico_' + booking._originalConferenceId
-            booking._bookingParams["roomName"] = roomName.decode("utf-8")
-            del booking._originalConferenceId
-        i += 1
-        if i % 100 == 0:
-            dbi.commit()
-
-
 @since('1.0')
 def ip_based_acl(dbi, withRBDB, prevVersion):
     """
@@ -633,6 +599,7 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
     """
     Tasks: 1. Moving support info fields from conference to a dedicated class
            2. Update non inherited children list
+           3. Update Vidyo indexes
     """
 
     def _updateMaterial(obj):
@@ -644,11 +611,7 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
                 if resource.getAccessController().getAccessProtectionLevel() != 0:
                     resource.notify_protection_to_owner()
 
-    ch = ConferenceHolder()
-    i = 0
-
-    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
-
+    def updateSupport(conf):
         #################################################################
         #Moving support info fields from conference to a dedicated class:
         #################################################################
@@ -666,6 +629,7 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
         supportInfo = SupportInfo(conf, caption, email, telephone)
         conf.setSupportInfo(supportInfo)
 
+    def updateNonInheritedChildren (conf):
         ####################################
         #Update non inherited children list:
         ####################################
@@ -686,10 +650,59 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
             for subContrib in contrib.getSubContributionList():
                 _updateMaterial(subContrib)
 
+    def updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex, pluginActive):
+        ######################
+        #Update Vidyo indexes:
+        ######################
+        if not pluginActive:
+            return
+        csbm = conf.getCSBookingManager()
+        for booking in csbm.getBookingList():
+            if booking.getType() == "Vidyo"and booking.isCreated():
+                endDateIndex.indexBooking(booking)
+                vidyoRoomIndex.indexBooking(booking)
+
+    endDateIndex = VidyoTools.getEventEndDateIndex()
+    vidyoRoomIndex = VidyoTools.getIndexByVidyoRoom()
+    endDateIndex.clear()
+    vidyoRoomIndex.clear()
+    ph = PluginsHolder()
+    collaboration_pt = ph.getPluginType("Collaboration")
+    pluginActive = collaboration_pt.isActive() and collaboration_pt.getPlugin("Vidyo").isActive()
+
+    ch = ConferenceHolder()
+    i = 0
+
+    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+
+        updateSupport(conf)
+        updateNonInheritedChildren(conf)
+        updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex, pluginActive)
+
         if i % 10000 == 999:
             dbi.commit()
         i += 1
     dbi.commit()
+
+
+@since('1.0')
+def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
+    """
+    Changing Vidyo Room Names
+    """
+    ph = PluginsHolder()
+    collaboration_pt = ph.getPluginType("Collaboration")
+    if not collaboration_pt.isActive() or not collaboration_pt.getPlugin("Vidyo").isActive():
+        return
+    i = 0
+    for booking in VidyoTools.getIndexByVidyoRoom().itervalues():
+        if hasattr(booking, '_originalConferenceId'):
+            roomName = booking.getBookingParamByName("roomName") + '_indico_' + booking._originalConferenceId
+            booking._bookingParams["roomName"] = roomName.decode("utf-8")
+            del booking._originalConferenceId
+        i += 1
+        if i % 10000 == 0:
+            dbi.commit()
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[]):
