@@ -258,7 +258,6 @@ type("DisplayTimeTable", ["TimeTable"], {
             var header = $('<div>', {class: 'timetableFullScreenHeader clearfix'}).css('width', self.timetableDrawer.width);
             header.append($('<span>', {html: self._titleTemplate(self.timetableDrawer.day)}).css('float', 'left'));
 
-            self.timetableDrawer.redraw(self.currentDay);
             var timetableCanvas = $('#timetable_canvas');
             $('#timetable_canvas').width('width', self.timetableDrawer.width);
             $("body").html(header);
@@ -266,6 +265,7 @@ type("DisplayTimeTable", ["TimeTable"], {
             $(".timetableFullScreenHeader").before(self._getExtraButtons());
             $(".timetableFullScreenHeader").before(self.legend);
             $(".timetableFullScreenHeader").after(timetableCanvas);
+            self.timetableDrawer.redraw(self.currentDay);
 
             self._filterSetup();
             if (self.timetableDrawer.detail.get() == 'contribution') {
