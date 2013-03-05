@@ -36,6 +36,7 @@ from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayInd
 from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
+from MaKaC.common.Configuration import Config
 from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
@@ -744,15 +745,26 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
     parser.add_argument('--run-only', dest='specified', default='',
                         help='Specify which step(s) to run (comma-separated)')
     parser.add_argument('--prev-version', dest='prevVersion', help='Previous version of Indico (used by DB)', default=__version__)
+    parser.add_argument('--profile', dest='profile', help='Use profiling during the migration', action='store_true')
 
     args = parser.parse_args()
 
     if console.yesno("Are you sure you want to execute the "
                      "migration now?"):
         try:
-            return runMigration(withRBDB=args.useRBDB,
-                                prevVersion=parse_version(args.prevVersion),
-                                specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))))
+            if args.profile:
+                import profile, random, os
+                proffilename = os.path.join(Config.getInstance().getTempDir(), "migration%s.prof" % str(random.random()))
+                result = None
+                profile.runctx("""result=runMigration(withRBDB=args.useRBDB,
+                                  prevVersion=parse_version(args.prevVersion),
+                                  specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))))""",
+                                  globals(), locals(), proffilename)
+                return result
+            else:
+                return runMigration(withRBDB=args.useRBDB,
+                                    prevVersion=parse_version(args.prevVersion),
+                                    specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))))
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])
