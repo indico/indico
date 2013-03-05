@@ -84,12 +84,12 @@
                             <td></td>
                         </tr>
                     % endif
-                    <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=self.attr.showOrder"/>
                     % if getItemType(item) == "Session":
-                        <% order += item.getSession().getNumberOfContributions(only_scheduled=True) %>
-                    % elif getItemType(item) == "Contribution":
-                        <% order +=1 %>
+                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=self.attr.showOrder"/>
+                    % else:
+                        <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=False"/>
                     % endif
+                    <% order +=1 %>
                 % endfor
             </table>
         </%block>
