@@ -125,7 +125,7 @@ def _getInstallRequires():
     base = ['ZODB3==3.10.5', 'zope.index', 'zope.interface',
             'pytz', 'lxml', 'cds-indico-extras', 'zc.queue',
             'python-dateutil<2.0', 'pypdf', 'mako>=0.4.1', 'babel',
-            'icalendar>=3.2', 'pyatom', 'cssmin', 'webassets', 'pojson>=0.4',
+            'icalendar>=3.2', 'pyatom', 'jsmin', 'cssmin', 'webassets', 'pojson>=0.4',
             'requests', 'simplejson>=2.1.0', 'reportlab']
 
     #for Python older than 2.7
