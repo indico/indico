@@ -48,7 +48,6 @@ class Participation(Persistent, Observable):
         self._participantIdGenerator = 0
         self._pendingIdGenerator = 0
         self._declinedIdGenerator = 0
-        self._dateNegotiation = None
         self._displayParticipantList = True
         self._numMaxParticipants = 0
         self._notifyMgrNewParticipant = False
@@ -471,7 +470,7 @@ class Participation(Persistent, Observable):
             data["toList"] = toList
             data["fromAddr"] = Config.getInstance().getSupportEmail()
             data["subject"] = _("New pending participant for %s")%self._conference.getTitle()
-            data["body"] = _("""
+            data["body"] = """
             Dear Event Manager,
 
             a new person is asking for participation in %s.
@@ -479,7 +478,7 @@ class Participation(Persistent, Observable):
             Please take this candidature into consideration and accept or reject it
 
             Your Indico
-            """)%(self._conference.getTitle(), profileURL)
+            """(self._conference.getTitle(), profileURL)
 
             GenericMailer.send(GenericNotification(data))
             self.notifyModification()
@@ -538,7 +537,7 @@ class Participation(Persistent, Observable):
         data["toList"] = toList
         data["fromAddr"] = eventManager.getEmail()
         data["subject"] = _("Please excuse your absence to %s")%self._conference.getTitle()
-        data["body"] = _("""
+        data["body"] = """
 Dear Participant,
 
 you were absent to %s, which was mandatory for you to attend.
@@ -548,7 +547,7 @@ this email.
 
 Your Indico
 on behalf of %s %s
-        """)%(self._conference.getTitle(), \
+        """%(self._conference.getTitle(), \
         eventManager.getFirstName(), eventManager.getFamilyName(), \
         eventManager.getFirstName(), eventManager.getFamilyName())
 
@@ -582,115 +581,6 @@ on behalf of %s %s
                 toList.append(participant.getEmail())
         data["toList"] = toList
         GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants",eventManager)
-        return True
-
-    def sendEncouragementToCreateAccount(self, participant):
-        if participant is None :
-            return False
-        if participant.getEmail() is None or participant.getEmail() == "" :
-            return None
-        data = {}
-        title = participant.getTitle()
-        if title is None or title == "" :
-            title = participant.getFirstName()
-
-        createURL = urlHandlers.UHUserCreation.getURL()
-        data["fromAddr"] = Config.getInstance().getNoReplyEmail()
-        toList = []
-        toList.append(participant.getEmail())
-        data["toList"] = toList
-        data["subject"] = _("Invitation to create an Indico account")
-        data["body"] = _("""
-        Dear %s %s,
-
-        You have been added as a participant to '%s' and you have started to use
-        the Indico system. Most probably you are going to use it in the future,
-        participating in other events supported by Indico.
-        Therefore we strongly recommend that you create your personal Indico Account -
-        storing your personal data it will make your work with Indico easier and
-        allow you access more sophisticated features of the system.
-
-        To proceed in creating your Indico Account simply click on the following
-        link : %s
-        Please use this email address when creating your account: %s
-
-        Your Indico
-        """)%(participant.getFirstName(), participant.getFamilyName(), \
-        self._conference.getTitle(), \
-        createURL, participant.getEmail())
-
-        GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants")
-        return True
-
-    def sendNegotiationInfo(self):
-        if self._dateNgotiation is None :
-            return False
-        if not self._dateNegotiation.isFinished() :
-            return False
-
-        data = {}
-        data["fromAddr"] = Config.getInstance().getNoReplyEmail()
-        if len(self._dateNegotiation.getSolutionList()) == 0:
-
-            """ TODO: Prepate URLs..!! """
-
-            settingURL = ">>must be prepared yet..!!<<"
-            data["subject"] = _("Negotiation algorithm finished - FAILED to find date")
-            toList = []
-            for manager in self._conference.getManagerList() :
-                if isinstance(manager, Avatar) :
-                    toList.append(manager.getEmail())
-            data["toList"] = toList
-            data["body"] = _("""
-            Dear Event Manager,
-
-            negotiation algorithm has finished its work on finding the date for %s,
-            yet it didn't managed to find any solution satisfying all (or almost all)
-            given restrictions.
-            Setting the event's date is now up to you at %s
-
-            Your Indico
-            """)%(self._conference.getTitle(), settingURL)
-
-        elif not self.dateNegotiation.isAutomatic :
-            """ TODO: Prepate URLs..!! """
-
-            choseURL = ">>must be prepared yet..!!<<"
-            data["subject"] = _("Negotiation algorithm finished - SUCCSEEDED")
-            toList = []
-            for manager in self._conference.getManagerList() :
-                if isinstance(manager, Avatar) :
-                    toList.append(manager.getEmail())
-            data["toList"] = toList
-            data["body"] = _("""
-            Dear Event Manager,
-
-            negotiation algorithm has finished its work on finding the date for %s,
-            now you are kindly requested to choose the most siutable date from
-            the list of solution which is avaliable at %s
-
-            Your Indico
-            """)%(self._conference.getTitle(), choseURL)
-
-        else :
-            data["subject"] = _("Date of the %s setteled")%self._conference.getTitle()
-            toList = []
-            for p in self._participantList.valuess() :
-                toList.append(p.getEmail())
-            data["toList"] = toList
-            data["body"] = _("""
-            Dear Participant,
-
-            negotiation algorithm has just set the date of the %s to :
-                start date : %s
-                end date   : %s
-
-            Wishing you a pleasent and interesting time -
-            Your Indico
-            """)%(self._conference.getTitle(), \
-            self._conference.getAdjustedStartDate(), self._conference.getAdjustedEndDate())
-
-        GenericMailer.send(GenericNotification(data))
         return True
 
     def getPresentNumber(self):
