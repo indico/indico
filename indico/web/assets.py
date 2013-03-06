@@ -227,5 +227,5 @@ def register_all_css(env, main_css_file):
                                     'css/jquery.colorbox.css',
                                     'css/jquery-ui-custom.css',
                                     'css/jquery.colorpicker.css',
-                                    filters=('cssmin'),
+                                    filters=('cssmin', 'cssrewrite'),
                                     output='base_%(version)s.min.css'))
