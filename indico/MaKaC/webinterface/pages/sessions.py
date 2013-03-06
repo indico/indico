@@ -118,11 +118,7 @@ class WSessionDisplayBase(WICalExportBase):
         if isinstance(resource, conference.Link):
             return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()
         else:
-            self._tabTimeTable.setEnabled(True)
-            tab = self._tabCtrl.getTabById(self._activeTab)
-            if tab is None:
-                tab = self._tabCtrl.getTabById("time_table")
-            tab.setActive()
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() else resource.getFileName()
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
