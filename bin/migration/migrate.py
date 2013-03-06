@@ -603,11 +603,11 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
     """
 
     def _updateMaterial(obj):
-        for material in obj.getAllMaterialList():
+        for material in obj.getAllMaterialList(sort=False):
             material.getAccessController().setNonInheritingChildren(set())
             if material.getAccessController().getAccessProtectionLevel() != 0:
                 material.notify_protection_to_owner(material)
-            for resource in material.getResourceList():
+            for resource in material.getResourceList(sort=False):
                 if resource.getAccessController().getAccessProtectionLevel() != 0:
                     resource.notify_protection_to_owner()
 
@@ -679,7 +679,7 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
         updateNonInheritedChildren(conf)
         updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex, pluginActive)
 
-        if i % 10000 == 999:
+        if i % 10000 == 9999:
             dbi.commit()
         i += 1
     dbi.commit()

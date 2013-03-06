@@ -624,7 +624,7 @@ class Category(CommonObjectBase):
             self.materials={}
             return self.materials.values()
 
-    def getAllMaterialList( self ):
+    def getAllMaterialList(self):
         l = self.getMaterialList()
         if self.getPaper():
             l.append( self.getPaper() )
@@ -3980,7 +3980,7 @@ class Conference(CommonObjectBase, Locatable):
     def getMaterialList( self ):
         return self.materials.values()
 
-    def getAllMaterialList( self ):
+    def getAllMaterialList(self, sort=True):
         l = self.getMaterialList()
         if self.getPaper():
             l.append( self.getPaper() )
@@ -3992,7 +3992,8 @@ class Conference(CommonObjectBase, Locatable):
             l.append( self.getPoster() )
         if self.getMinutes():
             l.append( self.getMinutes() )
-        l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
+        if sort:
+            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
 
     def _getMaterialFiles(self, material):
@@ -6442,11 +6443,12 @@ class Session(CommonObjectBase, Locatable):
     def getMaterialList( self ):
         return self.materials.values()
 
-    def getAllMaterialList( self ):
+    def getAllMaterialList(self, sort=True):
         l = self.getMaterialList()
         if self.getMinutes():
             l.append( self.getMinutes() )
-        l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
+        if sort:
+            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
 
     def _setSchedule(self):
@@ -7319,8 +7321,8 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
             res=self.getSession().getTextColor()
         return res
 
-    def getAllMaterialList(self):
-        return self.getSession().getAllMaterialList()
+    def getAllMaterialList(self, sort=True):
+        return self.getSession().getAllMaterialList(sort=sort)
 
 
 class ContributionParticipation(Persistent, Fossilizable):
@@ -9150,7 +9152,7 @@ class Contribution(CommonObjectBase, Locatable):
     def getMaterialList( self ):
         return self.materials.values()
 
-    def getAllMaterialList( self ):
+    def getAllMaterialList(self, sort=True):
         l = self.getMaterialList()
         if self.getPaper():
             l.append( self.getPaper() )
@@ -9162,7 +9164,8 @@ class Contribution(CommonObjectBase, Locatable):
             l.append( self.getPoster() )
         if self.getMinutes():
             l.append( self.getMinutes() )
-        l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
+        if sort:
+            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
 
     def getAllViewableMaterialList( self, aw=None ):
@@ -10499,7 +10502,7 @@ class SubContribution(CommonObjectBase, Locatable):
     def getMaterialList( self ):
         return self.materials.values()
 
-    def getAllMaterialList( self ):
+    def getAllMaterialList(self, sort=True):
         l = self.getMaterialList()
         if self.getPaper():
             l.append( self.getPaper() )
@@ -10511,7 +10514,8 @@ class SubContribution(CommonObjectBase, Locatable):
             l.append( self.getMinutes() )
         if self.getPoster():
             l.append( self.getPoster() )
-        l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
+        if sort:
+            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
 
     def setPaper( self, newPaper ):
@@ -10923,9 +10927,10 @@ class Material(CommonObjectBase):
         self.notifyModification()
         Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
 
-    def getResourceList( self ):
+    def getResourceList(self, sort=True):
         list = self.__resources.values()
-        list.sort(utils.sortFilesByName)
+        if sort:
+            list.sort(utils.sortFilesByName)
         return list
 
     def getNbResources(self ):
@@ -11285,8 +11290,8 @@ class Minutes(BuiltinMaterial):
             return ""
         return self.file.readBin()
 
-    def getResourceList( self ):
-        res = Material.getResourceList( self )
+    def getResourceList(self, sort=True):
+        res = Material.getResourceList(self, sort=sort)
         if self.file:
             res.insert(0, self.file)
         return res
