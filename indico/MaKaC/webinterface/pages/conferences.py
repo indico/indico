@@ -5907,7 +5907,7 @@ class ConfStaticDisplayMenu:
                          _(link.getCaption()))]
             else:
                 url="%s%s"%(parentDir, link.getStaticURL())
-                html = ["""<li id="menuLink_%s" class="menuConfTitle" nowrap><a class="confSection" href="%s"%s>%s</a></li>\n"""%(sublink.getName(), url, target, _(link.getCaption()+'aa'))]
+                html = ["""<li id="menuLink_%s" class="menuConfTitle" nowrap><a class="confSection" href="%s"%s>%s</a></li>\n"""%(sublink.getName(), url, target, link.getCaption())]
 
             for sublink in sublinkList:
                 target = ""

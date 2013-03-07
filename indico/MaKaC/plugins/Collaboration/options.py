@@ -58,7 +58,3 @@ globalOptions = [
                          "type": bool,
                          "defaultValue": False})
 ]
-
-
-def foo():
-    return 'aa'
