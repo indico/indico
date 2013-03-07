@@ -201,11 +201,13 @@ class BaseStatisticsImplementation(Component):
             # In case of timeout, log the incident and return the default value.
             logger = self.getLogger()
             logger.exception('Unable to retrieve data, exception: %s' % str(e))
-
             return default
         except:
-            raise Exception('The remote server for %s did not respond.'
+            # For other exceptions, log the incident and return the default value.
+            logger = self.getLogger()
+            logger.exception('The remote server for %s did not respond.'
                             % self.getName())
+            return default
 
         value = response.read()
         response.close()
