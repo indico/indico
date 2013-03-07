@@ -1,31 +1,7 @@
-<table width="100%" class="logsTab"><tr><td>
-<script type="text/javascript">
-<!--
-function selectAll()
-{
-    //document.logListForm.trackShowNoValue.checked=true
-    if (!document.logListForm.logItem.length){
-        document.logListForm.logItem.checked=true
-    } else {
-        for (i = 0; i < document.logListForm.logItem.length; i++) {
-            document.logListForm.logItem[i].checked=true
-        }
-    }
-}
+<% from indico.util.string import truncate %>
+<% from indico.util.date_time import format_datetime %>
 
-function deselectAll()
-{
-    //document.pendingForm.trackShowNoValue.checked=false
-    if (!document.logListForm.logItem.length)    {
-        document.logListForm.logItem.checked=false
-    } else {
-       for (i = 0; i < document.logListForm.logItem.length; i++) {
-           document.logListForm.logItem[i].checked=false
-       }
-    }
-}
-//-->
-</script>
+<table width="100%" class="logsTab"><tr><td>
 <br>
 <table width="100%" align="center" border="0">
     <tr>
@@ -38,9 +14,9 @@ function deselectAll()
             &nbsp;<b> ${ _("Show standard views")}:</b>
         </td>
         <td>
-            &nbsp;<input type="submit" class="btn" name="filter" value="${ _("General Log")}" />
-            &nbsp;<input type="submit" class="btn" name="filter" value="${ _("Email Log")}" />
-            &nbsp;<input type="submit" class="btn" name="filter" value="${ _("Action Log")}" />
+            &nbsp;<input type="submit" class="btn" name="view" value="${ _("General Log")}" />
+            &nbsp;<input type="submit" class="btn" name="view" value="${ _("Email Log")}" />
+            &nbsp;<input type="submit" class="btn" name="view" value="${ _("Action Log")}" />
         </td>
     </tr>
     <tr><td>&nbsp;</td></tr>
@@ -50,7 +26,7 @@ function deselectAll()
         </td>
         <td>
             &nbsp;<input type="text" name="filterKey"  />
-            &nbsp;<input type="submit" class="btn" name="filter" value="${ _("Custom Log")}" />
+            &nbsp;<input type="submit" class="btn" name="view" value="${ _("Custom Log")}" />
         </td>
     </tr>
     <tr><td>&nbsp;</td></tr>
@@ -61,7 +37,6 @@ function deselectAll()
         <table border="0">
             <tr>
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-
                     <a href="${ orderByDate }">${ _("Date")}</a>
                 </td>
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
@@ -75,7 +50,25 @@ function deselectAll()
                 </td>
             </tr>
             <form action=${ logListAction } method="post" name="logListForm">
-            ${ log }
+
+            % for line in log:
+                <% url.addParam("logId",line.getLogId()) %>
+
+                <tr>
+                    <td valign="top" nowrap class="abstractDataCell">
+                        &nbsp;${format_datetime(line.getLogDate())}
+                    </td>
+                    <td valign="top" nowrap class="abstractDataCell">
+                        <a href="${url}">&nbsp;${truncate(line.getLogSubject(), 50)}</a>
+                    </td>
+                    <td valign="top" nowrap class="abstractDataCell">
+                        &nbsp;${line.getResponsibleName()}
+                    </td>
+                    <td valign="top" nowrap class="abstractDataCell">
+                        &nbsp;${line.getModule()}
+                    </td>
+                </tr>
+            % endfor
             </form>
         </table>
         </td>

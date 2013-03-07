@@ -2606,9 +2606,9 @@ class WConferenceLog(wcomponents.WTemplated):
         #default ordering by date
         #default general log list
         order = vars.get("order","date")
-        filter = vars.get("filter","general")
+        view = vars.get("view","general")
         key = vars.get("filterKey","")
-        vars["log"] = self._getLogList(order, filter, key)
+        vars["log"] = self.__conf.getLogHandler().getLogList(view, key, order)
 
         orderByDate = urlHandlers.UHConfModifLog.getURL(self.__conf)
         orderByDate.addParam("order","date")
@@ -2631,42 +2631,10 @@ class WConferenceLog(wcomponents.WTemplated):
         logFilterAction.addParam("order",order)
         vars["logFilterAction"] = logFilterAction
         vars["logListAction"] = ""
-        vars["timezone"] = self._tz
+        vars["timezone"] = timezone(self._tz)
+        vars["url"] = urlHandlers.UHConfModifLogItem.getURL(self.__conf)
 
         return vars
-
-    def _getLogList(self, order="date", filter="general", key=""):
-        html = []
-
-        logList = self.__conf.getLogHandler().getGeneralLogList(order)
-        if filter == "email" :
-            logList = self.__conf.getLogHandler().getEmailLogList(order)
-        elif filter == "action" :
-            logList = self.__conf.getLogHandler().getActionLogList(order)
-        elif filter == "custom" :
-            logList = self.__conf.getLogHandler().getCustomLogList(key, order)
-
-        for li in logList :
-            url = urlHandlers.UHConfModifLogItem.getURL(self.__conf)
-            url.addParam("logId",li.getLogId())
-            if len(li.getLogSubject()) < 50:
-                subject = li.getLogSubject()
-            else:
-                subject = "%s..." % li.getLogSubject()[0:50]
-            text = """
-            <tr>
-                <td valign="top" nowrap class="abstractDataCell">
-                    %s
-                </td>
-                <td valign="top" nowrap class="abstractDataCell"><a href="%s">&nbsp;%s</a></td>
-                <td valign="top" nowrap class="abstractDataCell">&nbsp;%s</td>
-                <td valign="top" nowrap class="abstractDataCell">&nbsp;%s</td>
-            </tr>"""%(li.getLogDate().astimezone(timezone(self._tz)).strftime("%Y-%m-%d %H:%M:%S"),\
-                    url, subject,\
-                    li.getResponsibleName(),\
-                    li.getModule())
-            html.append(text)
-        return "".join(html)
 
 class WPConfModifLog( WPConferenceModifBase ):
 

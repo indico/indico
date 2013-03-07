@@ -741,15 +741,15 @@ class RHConfModifLog (RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams( self, params )
 
-        if params.get("filter",None) is not None :
-            if params["filter"] == "Action Log" :
-                params["filter"] = "action"
-            elif params["filter"] == "Email Log" :
-                params["filter"] = "email"
-            elif params["filter"] == "Custom Log" :
-                params["filter"] = "custom"
-            elif params["filter"] == "General Log" :
-                params["filter"] = "general"
+        if params.get("view",None) is not None :
+            if params["view"] == "Action Log" :
+                params["view"] = "action"
+            elif params["view"] == "Email Log" :
+                params["view"] = "email"
+            elif params["view"] == "Custom Log" :
+                params["view"] = "custom"
+            elif params["view"] == "General Log" :
+                params["view"] = "general"
 
     def  _process(self):
         params = self._getRequestParams()

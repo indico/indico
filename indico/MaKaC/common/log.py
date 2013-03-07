@@ -18,7 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
-from datetime import timedelta, datetime
 from MaKaC.common.timezoneUtils import nowutc
 
 class LogItem(Persistent) :
@@ -49,10 +48,10 @@ class LogItem(Persistent) :
     def getLogId(self):
         return self._logId
 
-    def setLogId(self, id):
+    def setLogId(self, log_id):
         if self._logId is not None :
             return False
-        self._logId = id
+        self._logId = log_id
         return True
 
     def getLogDate(self):
@@ -128,93 +127,46 @@ class LogHandler(Persistent):
 
     def _cmpLogType(logItem1, logItem2):
         return cmp(logItem1.getLogType(), logItem2.getLogType())
-    _cmpLogType= staticmethod(_cmpLogType)
+    _cmpLogType = staticmethod(_cmpLogType)
 
-    def getEmailLogList(self, order="date"):
-        list = self._logLists["emailLog"]
-        if order == "date" :
-            list.sort(LogHandler._cmpLogDate)
-            return list
-        if order == "subject" :
-            list.sort(LogHandler._cmpLogSubject)
-            return list
-        if order == "responsible" :
-            list.sort(LogHandler._cmpLogResponsibleName)
-            return list
-        if order == "module" :
-            list.sort(LogHandler._cmpLogModule)
-            return list
-        if order == "type" :
-            list.sort(LogHandler._cmpLogType)
-            return list
-        return self._logLists["emailLog"]
+    def getLogList(self, log_type="general", key="", order="date"):
+        """ log_type can be 'email', 'action', 'general' or 'custom'
+        """
+        if log_type == "email" :
+            log_list = self._logLists["emailLog"]
+        elif log_type == "action" :
+            log_list = self._logLists["actionLog"]
+        elif log_type == "custom" :
+            log_list = self._getCustomLogList(key)
+        else:
+            log_list = self._logLists["generalLog"].values()
+        return self._sortLogList(log_list, order)
 
-    def getActionLogList(self, order="date"):
-        list = self._logLists["actionLog"]
-        if order == "date" :
-            list.sort(LogHandler._cmpLogDate)
-            return list
-        if order == "subject" :
-            list.sort(LogHandler._cmpLogSubject)
-            return list
-        if order == "responsible" :
-            list.sort(LogHandler._cmpLogResponsibleName)
-            return list
-        if order == "module" :
-            list.sort(LogHandler._cmpLogModule)
-            return list
-        if order == "type" :
-            list.sort(LogHandler._cmpLogType)
-            return list
-        return self._logLists["actionLog"]
-
-    def getGeneralLogList(self, order="date"):
-        list = self._logLists["generalLog"].values()
-        if order == "date" :
-            list.sort(LogHandler._cmpLogDate)
-            return list
-        elif order == "subject" :
-            list.sort(LogHandler._cmpLogSubject)
-            return list
-        elif order == "responsible" :
-            list.sort(LogHandler._cmpLogResponsibleName)
-            return list
-        elif order == "module" :
-            list.sort(LogHandler._cmpLogModule)
-            return list
-        if order == "type" :
-            list.sort(LogHandler._cmpLogType)
-            return list
-        return self._logLists["generalLog"].values()
-
-    def getCustomLogList(self, key, order="date"):
-
-        list = []
+    def _getCustomLogList(self, key):
+        log_list = []
         for li in self._logLists["generalLog"].values() :
             if li.getResponsibleName().lower().find(key.lower()) >= 0 :
-                list.append(li)
+                log_list.append(li)
             else :
                 for v in li.getLogInfo().values() :
-                    value = "%s"%v
+                    value = "%s" % v
                     if value.lower().find(key.lower()) >= 0 :
-                        list.append(li)
+                        log_list.append(li)
                         break
-        if order == "date" :
-            list.sort(LogHandler._cmpLogDate)
-        elif order == "subject" :
-            list.sort(LogHandler._cmpLogSubject)
-            return list
-        elif order == "responsible" :
-            list.sort(LogHandler._cmpLogResponsibleName)
-            return list
-        elif order == "module" :
-            list.sort(LogHandler._cmpLogModule)
-            return list
-        if order == "type" :
-            list.sort(LogHandler._cmpLogType)
-            return list
-        return list
+        return log_list
 
+    def _sortLogList(self, log_list, order="date"):
+        if order == "date" :
+            log_list.sort(LogHandler._cmpLogDate)
+        elif order == "subject" :
+            log_list.sort(LogHandler._cmpLogSubject)
+        elif order == "responsible" :
+            log_list.sort(LogHandler._cmpLogResponsibleName)
+        elif order == "module" :
+            log_list.sort(LogHandler._cmpLogModule)
+        elif order == "type" :
+            log_list.sort(LogHandler._cmpLogType)
+        return log_list
 
     def getLogItemById(self, logId):
         if logId is None :
@@ -246,6 +198,3 @@ class LogHandler(Persistent):
 
     def notifyModification(self):
         self._p_changed=1
-
-
-

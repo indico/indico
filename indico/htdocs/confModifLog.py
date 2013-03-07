@@ -19,8 +19,8 @@
 
 from MaKaC.webinterface.rh import conferenceModif
 
-def index( req, **params ):
-    return conferenceModif.RHConfModifLog( req ).process( params )
+def index(req, **params):
+    return conferenceModif.RHConfModifLog(req).process(params)
 
-def logItem( req, **params ):
-    return conferenceModif.RHConfModifLogItem( req ).process( params )
+def logItem(req, **params):
+    return conferenceModif.RHConfModifLogItem(req).process(params)
