@@ -19,16 +19,12 @@
 
 import urllib
 import os
-import string
 import random
 from indico.util import json
 
-from datetime import timedelta,datetime
+from datetime import timedelta, datetime
 from xml.sax.saxutils import quoteattr, escape
-import lxml.etree
-import lxml.objectify
 
-from MaKaC import user
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.displayMgr as displayMgr
@@ -45,17 +41,14 @@ import MaKaC.review as review
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.materialFactories import ConfMFRegistry,PaperFactory,SlidesFactory,PosterFactory
-from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 from MaKaC.common import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.output import outputGenerator
 from MaKaC.webinterface.general import strfFileSize
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.PDFinterface.base import PDFSizes
 from pytz import timezone
-import MaKaC.webinterface.common.timezones as convertTime
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.badgeDesignConf import BadgeDesignConfiguration
 from MaKaC.posterDesignConf import PosterDesignConfiguration
@@ -78,15 +71,11 @@ from MaKaC.plugins.base import extension_point
 from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
-from MaKaC.conference import Minutes, Session, Contribution, LocalFile
+from MaKaC.conference import Session, Contribution, LocalFile
 from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import formatDateTime
-from MaKaC.plugins.helpers import DBHelpers
-from MaKaC.plugins.base import PluginsHolder
-from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
-from MaKaC.conference import Link
 import collections
 
 def stringToDate( str ):
@@ -2590,66 +2579,62 @@ class WPConfModifParticipantsRefuse(WPConfModifParticipantsInvitationBase):
 class WConferenceLog(wcomponents.WTemplated):
 
     def __init__(self, conference):
+        wcomponents.WTemplated.__init__(self)
         self.__conf = conference
         self._tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         if not self._tz:
             self._tz = 'UTC'
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["confTitle"] = self.__conf.getTitle()
-        vars["confId"] = self.__conf.getId()
+        log_vars = wcomponents.WTemplated.getVars(self)
+        log_vars["confTitle"] = self.__conf.getTitle()
+        log_vars["confId"] = self.__conf.getId()
 
-        vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
-        vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
+        log_vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
+        log_vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
 
-        #default ordering by date
-        #default general log list
-        order = vars.get("order","date")
-        view = vars.get("view","general")
-        key = vars.get("filterKey","")
-        vars["log"] = self.__conf.getLogHandler().getLogList(view, key, order)
+        view = log_vars.get("view","general")
+        key = log_vars.get("filterKey","")
+        order = log_vars.get("order","date")
+        log_vars["log"] = self.__conf.getLogHandler().getLogList(view, key, order)
 
         orderByDate = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderByDate.addParam("order","date")
-        orderByDate.addParam("view",view)
-        #orderByType = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        #orderByType.addParam("order","type")
+        orderByDate.addParam("order", "date")
+        orderByDate.addParam("view", view)
         orderByModule = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderByModule.addParam("order","module")
-        orderByModule.addParam("view",view)
+        orderByModule.addParam("order", "module")
+        orderByModule.addParam("view", view)
         orderByResponsible = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderByResponsible.addParam("order","responsible")
-        orderByResponsible.addParam("view",view)
+        orderByResponsible.addParam("order", "responsible")
+        orderByResponsible.addParam("view", view)
         orderBySubject = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderBySubject.addParam("order","subject")
-        orderBySubject.addParam("view",view)
+        orderBySubject.addParam("order", "subject")
+        orderBySubject.addParam("view", view)
         orderByRecipients = urlHandlers.UHConfModifLog.getURL(self.__conf)
         orderByRecipients.addParam("order", "recipients")
         orderByRecipients.addParam("view", view)
 
-        vars["orderByDate"] = orderByDate
-        #vars["orderByType"] = orderByType
-        vars["orderByModule"] = orderByModule
-        vars["orderByResponsible"] = orderByResponsible
-        vars["orderBySubject"] = orderBySubject
-        vars["orderByRecipients"] = orderByRecipients
+        log_vars["orderByDate"] = orderByDate
+        log_vars["orderByModule"] = orderByModule
+        log_vars["orderByResponsible"] = orderByResponsible
+        log_vars["orderBySubject"] = orderBySubject
+        log_vars["orderByRecipients"] = orderByRecipients
 
         logFilterAction = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        vars["logFilterAction"] = logFilterAction
-        vars["logListAction"] = ""
-        vars["timezone"] = timezone(self._tz)
-        vars["url"] = urlHandlers.UHConfModifLogItem.getURL(self.__conf)
+        log_vars["logFilterAction"] = logFilterAction
+        log_vars["logListAction"] = ""
+        log_vars["timezone"] = timezone(self._tz)
+        log_vars["url"] = urlHandlers.UHConfModifLogItem.getURL(self.__conf)
 
-        return vars
+        return log_vars
 
-class WPConfModifLog( WPConferenceModifBase ):
+class WPConfModifLog(WPConferenceModifBase):
 
-    def _setActiveSideMenuItem( self ):
+    def _setActiveSideMenuItem(self):
         self._logMenuItem.setActive()
 
-    def _getPageContent( self, params ):
-        p = WConferenceLog( self._conf )
+    def _getPageContent(self, params):
+        p = WConferenceLog(self._conf)
         return p.getHTML(params)
 
 #---------------------------------------------------------------------------

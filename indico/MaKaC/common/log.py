@@ -26,24 +26,21 @@ class LogItem(Persistent) :
         self._logId = None
         self._logDate = nowutc()
         self._logType = "generalLog"
-        """
-        user who has performed / authorised the logged action
-        """
+
+        # User who has performed / authorised the logged action
         self._responsibleUser = user
 
-        """
-        Indico module, the logged action comes from
-        """
+        # Indico module, the logged action comes from
         self._module = module
 
-        """
-        DICTIONARY containing infos that have to be logged
-        MUST CONTAIN entry with key : "subject"
-        keys as well as values should be meaningful
-        """
+        # DICTIONARY containing infos that have to be logged
+        # MUST CONTAIN entry with key : "subject"
+        # keys as well as values should be meaningful
         self._logInfo = logInfo
         if self._logInfo.get("subject", None) is None :
-            self._logInfo["subject"] = "%s : %s : %s"%(self._logDate, self._module, self._logType)
+            self._logInfo["subject"] = "%s : %s : %s" % (self._logDate,
+                                                         self._module,
+                                                         self._logType)
 
     def getLogId(self):
         return self._logId
@@ -139,33 +136,8 @@ class LogHandler(Persistent):
     def _cmpLogType(logItem1, logItem2):
         return cmp(logItem1.getLogType(), logItem2.getLogType())
 
-    def getLogList(self, log_type="general", key="", order="date"):
-        """ log_type can be 'email', 'action', 'general' or 'custom'
-        """
-        if log_type == "email" :
-            log_list = self._logLists["emailLog"]
-        elif log_type == "action" :
-            log_list = self._logLists["actionLog"]
-        elif log_type == "custom" :
-            log_list = self._getCustomLogList(key)
-        else:
-            log_list = self._logLists["generalLog"].values()
-        return self._sortLogList(log_list, order)
-
-    def _getCustomLogList(self, key):
-        log_list = []
-        for li in self._logLists["generalLog"].values() :
-            if li.getResponsibleName().lower().find(key.lower()) >= 0 :
-                log_list.append(li)
-            else :
-                for v in li.getLogInfo().values() :
-                    value = "%s" % v
-                    if value.lower().find(key.lower()) >= 0 :
-                        log_list.append(li)
-                        break
-        return log_list
-
-    def _sortLogList(self, log_list, order="date"):
+    @staticmethod
+    def _sortLogList(log_list, order="date"):
         if order == "date" :
             log_list.sort(LogHandler._cmpLogDate)
         elif order == "subject" :
@@ -180,6 +152,33 @@ class LogHandler(Persistent):
             log_list.sort(LogHandler._cmpLogType)
         return log_list
 
+    def getLogList(self, log_type="general", key="", order="date"):
+        """
+        log_type can be 'email', 'action', 'general' or 'custom'
+        """
+        if log_type == "email" :
+            log_list = self._logLists["emailLog"]
+        elif log_type == "action" :
+            log_list = self._logLists["actionLog"]
+        elif log_type == "custom" :
+            log_list = self._getCustomLogList(key)
+        else:
+            log_list = self._logLists["generalLog"].values()
+        return LogHandler._sortLogList(log_list, order)
+
+    def _getCustomLogList(self, key):
+        log_list = []
+        for li in self._logLists["generalLog"].values() :
+            if li.getResponsibleName().lower().find(key.lower()) >= 0 :
+                log_list.append(li)
+            else :
+                for v in li.getLogInfo().values() :
+                    value = "%s" % v
+                    if value.lower().find(key.lower()) >= 0 :
+                        log_list.append(li)
+                        break
+        return log_list
+
     def getLogItemById(self, logId):
         if logId is None :
             return None
@@ -190,7 +189,7 @@ class LogHandler(Persistent):
             return False
         logItem.setLogId(self._newLogId())
         self._logLists[logItem.getLogType()].append(logItem)
-        self._logLists["generalLog"]["%s"%self._lastLogId()] = logItem
+        self._logLists["generalLog"]["%s" % self._lastLogId()] = logItem
         self.notifyModification()
         return True
 
@@ -209,4 +208,4 @@ class LogHandler(Persistent):
         return True
 
     def notifyModification(self):
-        self._p_changed=1
+        self._p_changed = 1
