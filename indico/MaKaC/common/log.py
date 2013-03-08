@@ -87,10 +87,16 @@ class ActionLogItem(LogItem):
 
 
 class EmailLogItem(LogItem):
-
+    """
+    self._logInfo expected keys:
+    - toList
+    """
     def __init__(self, user, logInfo, module):
         LogItem.__init__(self, user, logInfo, module)
         self._logType = "emailLog"
+
+    def getLogRecipients(self):
+        return self._logInfo["toList"]
 
 
 class LogHandler(Persistent):
@@ -109,25 +115,29 @@ class LogHandler(Persistent):
     def _lastLogId(self):
         return self._logIdGenerator
 
+    @staticmethod
     def _cmpLogDate(logItem1, logItem2):
         return cmp(logItem2.getLogDate(), logItem1.getLogDate())
-    _cmpLogDate = staticmethod(_cmpLogDate)
 
+    @staticmethod
     def _cmpLogModule(logItem1, logItem2):
         return cmp(logItem1.getModule(), logItem2.getModule())
-    _cmpLogModule = staticmethod(_cmpLogModule)
 
+    @staticmethod
     def _cmpLogSubject(logItem1, logItem2):
         return cmp(logItem1.getLogSubject(), logItem2.getLogSubject())
-    _cmpLogSubject = staticmethod(_cmpLogSubject)
 
+    @staticmethod
+    def _cmpLogRecipients(logItem1, logItem2):
+        return cmp(logItem1.getLogRecipients(), logItem2.getLogRecipients())
+
+    @staticmethod
     def _cmpLogResponsibleName(logItem1, logItem2):
         return cmp(logItem1.getResponsibleName(), logItem2.getResponsibleName())
-    _cmpLogResponsibleName = staticmethod(_cmpLogResponsibleName)
 
+    @staticmethod
     def _cmpLogType(logItem1, logItem2):
         return cmp(logItem1.getLogType(), logItem2.getLogType())
-    _cmpLogType = staticmethod(_cmpLogType)
 
     def getLogList(self, log_type="general", key="", order="date"):
         """ log_type can be 'email', 'action', 'general' or 'custom'
@@ -160,6 +170,8 @@ class LogHandler(Persistent):
             log_list.sort(LogHandler._cmpLogDate)
         elif order == "subject" :
             log_list.sort(LogHandler._cmpLogSubject)
+        elif order == "recipients" :
+            log_list.sort(LogHandler._cmpLogRecipients)
         elif order == "responsible" :
             log_list.sort(LogHandler._cmpLogResponsibleName)
         elif order == "module" :
@@ -173,7 +185,7 @@ class LogHandler(Persistent):
             return None
         return self._logLists["generalLog"].get(logId, None)
 
-    def addLogItem(self, logItem):
+    def _addLogItem(self, logItem):
         if logItem is None :
             return False
         logItem.setLogId(self._newLogId())
@@ -186,14 +198,14 @@ class LogHandler(Persistent):
         if logInfo is None :
             return False
         logItem = EmailLogItem(user, logInfo, module)
-        self.addLogItem(logItem)
+        self._addLogItem(logItem)
         return True
 
     def logAction(self, logInfo, module, user=None):
         if logInfo is None :
             return False
         logItem = ActionLogItem(user, logInfo, module)
-        self.addLogItem(logItem)
+        self._addLogItem(logItem)
         return True
 
     def notifyModification(self):

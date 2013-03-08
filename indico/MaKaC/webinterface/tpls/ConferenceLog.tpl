@@ -8,7 +8,7 @@
         <td colspan="2" class="groupTitle"> ${ _("Event Log")}</td>
     </tr>
     <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-    <form action=${ logFilterAction } method="post" name="logFilterForm">
+    <form action="${ logFilterAction }" method="post" name="logFilterForm">
     <tr>
         <td width="18%">
             &nbsp;<b> ${ _("Show standard views")}:</b>
@@ -37,13 +37,18 @@
         <table border="0">
             <tr>
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-                    <a href="${ orderByDate }">${ _("Date")}</a>
+                    &nbsp;<a href="${ orderByDate }"> ${_("Date")} </a>
                 </td>
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
                     &nbsp;<a href="${ orderBySubject }"> ${ _("Subject")}</a>
                 </td>
+                % if view == "email" :
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-                    &nbsp;<a href="${ orderByResponsible }"> ${ _("Responsible")}</a>
+                    &nbsp;<a href="${ orderByRecipients }"> ${_("Recipients")} </a>
+                </td>
+                % endif
+                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
+                    &nbsp;<a href="${ orderByResponsible }"> ${ _("Triggered by")}</a>
                 </td>
                 <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
                     &nbsp;<a href="${ orderByModule }"> ${ _("Module")}</a>
@@ -59,8 +64,13 @@
                         &nbsp;${format_datetime(line.getLogDate())}
                     </td>
                     <td valign="top" nowrap class="abstractDataCell">
-                        <a href="${url}">&nbsp;${truncate(line.getLogSubject(), 50)}</a>
+                        &nbsp;<a href="${url}">${truncate(line.getLogSubject(), 50)}</a>
                     </td>
+                    % if view == "email" :
+                    <td valign="top" nowrap class="abstractDataCell">
+                        &nbsp;${truncate(", ".join(line.getLogRecipients()), 50)}
+                    </td>
+                    % endif
                     <td valign="top" nowrap class="abstractDataCell">
                         &nbsp;${line.getResponsibleName()}
                     </td>

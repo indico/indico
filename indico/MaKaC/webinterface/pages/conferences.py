@@ -2612,23 +2612,30 @@ class WConferenceLog(wcomponents.WTemplated):
 
         orderByDate = urlHandlers.UHConfModifLog.getURL(self.__conf)
         orderByDate.addParam("order","date")
+        orderByDate.addParam("view",view)
         #orderByType = urlHandlers.UHConfModifLog.getURL(self.__conf)
         #orderByType.addParam("order","type")
         orderByModule = urlHandlers.UHConfModifLog.getURL(self.__conf)
         orderByModule.addParam("order","module")
+        orderByModule.addParam("view",view)
         orderByResponsible = urlHandlers.UHConfModifLog.getURL(self.__conf)
         orderByResponsible.addParam("order","responsible")
-        orderBySubject= urlHandlers.UHConfModifLog.getURL(self.__conf)
+        orderByResponsible.addParam("view",view)
+        orderBySubject = urlHandlers.UHConfModifLog.getURL(self.__conf)
         orderBySubject.addParam("order","subject")
+        orderBySubject.addParam("view",view)
+        orderByRecipients = urlHandlers.UHConfModifLog.getURL(self.__conf)
+        orderByRecipients.addParam("order", "recipients")
+        orderByRecipients.addParam("view", view)
 
         vars["orderByDate"] = orderByDate
         #vars["orderByType"] = orderByType
         vars["orderByModule"] = orderByModule
         vars["orderByResponsible"] = orderByResponsible
         vars["orderBySubject"] = orderBySubject
+        vars["orderByRecipients"] = orderByRecipients
 
         logFilterAction = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        logFilterAction.addParam("order",order)
         vars["logFilterAction"] = logFilterAction
         vars["logListAction"] = ""
         vars["timezone"] = timezone(self._tz)
