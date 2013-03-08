@@ -182,6 +182,9 @@ class IResourceMetadataFossil(IFossil):
     def getName(self):
         pass
 
+    def getFileName(self):
+        pass
+
 
 class ILocalFileMetadataFossil(IResourceMetadataFossil):
 
