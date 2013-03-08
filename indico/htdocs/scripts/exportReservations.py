@@ -33,7 +33,7 @@ from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.utils import parseDate
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.util.network import get_remote_ip
+from indico.util.network import _get_remote_ip
 
 """
 TODO: This must be refactor to be done with RH???
@@ -48,7 +48,7 @@ def index(req, **params):
 
     # check if it is a machine that belongs to the CERN domain
     cernDomain = DomainHolder().getById(0) # id 0 means CERN
-    if not cernDomain.belongsTo(get_remote_ip(req)):
+    if not cernDomain.belongsTo(_get_remote_ip(req)):
         return "Only CERN users can access to this export resource"
 
     ################### checking params ###################
