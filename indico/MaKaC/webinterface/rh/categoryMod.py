@@ -17,29 +17,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import os,types, tempfile
+import tempfile
 
-import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.Configuration import Config
-import MaKaC.common.indexes as indexes
-from MaKaC.common.utils import sortCategoryByTitle
-import MaKaC.conference as conference
+from MaKaC.common.utils import sortCategoryByTitle, validMail
 import MaKaC.user as user
-import MaKaC.domain as domain
-from MaKaC.common.general import *
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected,\
     RoomBookingDBMixin
 from MaKaC.errors import MaKaCError,NoReportError,FormValuesError
-#import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.conference as conference
-import stat
-import MaKaC.webinterface.materialFactories as materialFactories
-from MaKaC.conference import LocalFile,Material,Link
-from MaKaC.export import fileConverter
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.i18n import _
 
@@ -605,9 +595,14 @@ class RHCategorySetConfControl( RHCategModifBase ):
 class RHCategorySetNotifyCreation( RHCategModifBase ):
     _uh = urlHandlers.UHCategorySetNotifyCreation
 
+    def _checkParams(self, params):
+        RHCategModifBase._checkParams(self, params)
+        self._emailList = params.get("notifyCreationList","")
+        if not validMail(self._emailList):
+            raise FormValuesError(_("The email list contains invalid e-mail addresses or invalid separator"))
+
     def _process( self ):
-        params = self._getRequestParams()
-        self._target.setNotifyCreationList(params.get("notifyCreationList",""))
+        self._target.setNotifyCreationList(self._emailList)
         self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
 
 class RHCategoryDeletion( RoomBookingDBMixin, RHCategModifBase ):
