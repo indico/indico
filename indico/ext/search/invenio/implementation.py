@@ -347,7 +347,7 @@ class InvenioSEA(InvenioBaseSEA, SearchEngineCallAPIAdapter):
                     fResults.append(r)
                 record += 1
             else:
-                allResultsFiltered = True
+                allResultsFiltered = len(fResults) > 0
 
             if record > numHits or numHits <= number or len(results) <= number or (allResultsFiltered and len(fResults) <= number):
                 shortResult = True
