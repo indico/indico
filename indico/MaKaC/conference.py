@@ -9610,14 +9610,12 @@ class Contribution(CommonObjectBase, Locatable):
         if sb is None:
             return False
 
-        self._initSubmissionPrivileges()
-
         if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
             sbEmail = sb.getEmail()
-            return any(submitter.hasEmail(sbEmail) for submitter in self._submitters) or \
-                   any(submitterEmail == sbEmail for submitterEmail in self._submittersEmail)
+            return any(submitter.hasEmail(sbEmail) for submitter in self.getSubmitterList()) or \
+                   any(submitterEmail == sbEmail for submitterEmail in self.getSubmitterEmailList())
 
-        for principal in self._submitters:
+        for principal in self.getSubmitterList():
             if principal != None and principal.containsUser(sb):
                 return True
 
