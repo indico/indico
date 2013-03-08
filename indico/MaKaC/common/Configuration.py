@@ -805,7 +805,13 @@ class Config:
         return "%s/%s"%(self.getImagesBaseURL(), self.__systemIcons[ id ])
 
     def getPluginIconURL( self, pluginName, iconId ):
-        return "%s/%s/images/%s.png"%(self.getBaseURL(), pluginName, iconId)
+        rh = ContextManager.get('currentRH', None)
+
+        if rh and rh._req.is_https() and self.getBaseSecureURL():
+            baseURL = self.getBaseSecureURL()
+        else:
+            baseURL = self.getBaseURL()
+        return "%s/%s/images/%s.png"%(baseURL, pluginName, iconId)
 
     def getSystemIconFileName(self, id):
         if id not in self.__systemIcons:
