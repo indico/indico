@@ -182,9 +182,6 @@ class IResourceMetadataFossil(IFossil):
     def getName(self):
         pass
 
-    def getFileName(self):
-        pass
-
 
 class ILocalFileMetadataFossil(IResourceMetadataFossil):
 
@@ -192,6 +189,9 @@ class ILocalFileMetadataFossil(IResourceMetadataFossil):
         pass
     getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
     getURL.name = 'url'
+
+    def getFileName(self):
+        pass
 
 
 class ILinkMetadataFossil(IResourceMetadataFossil):
