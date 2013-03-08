@@ -160,7 +160,7 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
             else: # new
 
                 # Do not add the same participant twice
-                if elemValues["email"] in currentParticipantEmails: # if it is already a participant
+                if elemValues.get("email") in currentParticipantEmails: # if it is already a participant
                     continue
                 else: # keep track in case, the user is trying to add 2 times the same participant
                     currentParticipantEmails.append(elemValues["email"])
