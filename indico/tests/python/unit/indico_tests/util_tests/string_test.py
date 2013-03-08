@@ -22,7 +22,7 @@ Tests for `indico.util.string` module
 """
 
 import unittest
-from indico.util.string import permissive_format
+from indico.util.string import permissive_format, remove_extra_spaces, remove_tags
 
 class TestPermissiveFormat(unittest.TestCase):
 
@@ -45,3 +45,32 @@ class TestPermissiveFormat(unittest.TestCase):
 
         for text, result in zip(texts, results):
             self.assertEqual(permissive_format(text, params), result)
+
+class TestRemoveTags(unittest.TestCase):
+
+    def testTextRemoveExtraSpaces(self):
+        texts = ["Normal text",
+                 "Text     with   spaces "
+                 ]
+        results = ["Normal text",
+                   "Text with spaces"]
+
+        for text, result in zip(texts, results):
+            self.assertEqual(remove_extra_spaces(text), result)
+
+    def testTextRemoveTags(self):
+        texts = ["There is nothing to remove",
+                 "1 < 2, right?",
+                 "Conference is <b>today</b>",
+                 "Content is <no-valid-tag>valid</no-valid-tag>",
+                 "5>3<a>Multiple</a><b>tags</b>but<c></c>1<2<d>"
+                 ]
+        results = ["There is nothing to remove",
+                   "1 < 2, right?",
+                   "Conference is today",
+                   "Content is valid",
+                   "5>3 Multiple tags but 1<2"
+                   ]
+
+        for text, result in zip(texts, results):
+            self.assertEqual(remove_tags(text), result)
