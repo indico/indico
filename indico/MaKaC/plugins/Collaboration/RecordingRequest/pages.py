@@ -80,6 +80,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or isManager
 
         recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)
+        talks.sort(key = Contribution.contributionStartDateForSort)
 
         fossil_args = dict(tz=self._conf.getTimezone(),
                            units='(hours)_minutes',

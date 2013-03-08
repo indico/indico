@@ -78,6 +78,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["WebcastCapable"] = topLevelWebcastCapable or nWebcastCapable > 0 or isManager
 
         webcastAbleTalks.sort(key = Contribution.contributionStartDateForSort)
+        talks.sort(key = Contribution.contributionStartDateForSort)
 
         fossil_args = dict(tz=self._conf.getTimezone(),
                            units='(hours)_minutes',
