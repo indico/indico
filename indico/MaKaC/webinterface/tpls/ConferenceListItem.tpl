@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
+from indico.util.string import remove_tags
 creatDate = lItem.getCreationDate()
 creatDate = creatDate.replace(hour=0,minute=0,second=0)
 
@@ -22,7 +23,7 @@ elif (startDate.month != endDate.month) or (startDate.day != endDate.day):
 else:
     evtDate = "%s"%startDate.strftime("%d %b")
 
-eventTitle = escape(lItem.getTitle().strip()) or "[no title]"
+eventTitle = escape(remove_tags(lItem.getTitle().strip())) or "[no title]"
 
 if lItem.getType() == "simple_event":
     if len(lItem.getChairList()) > 0:

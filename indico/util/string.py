@@ -21,6 +21,7 @@
 String manipulation functions
 """
 
+import re
 import unicodedata
 
 
@@ -66,3 +67,21 @@ def permissive_format(text, params):
     for k, v in params.iteritems():
         text = text.replace("{" + k + "}", str(v))
     return text
+
+
+def remove_extra_spaces(text):
+    """
+    Removes multiple spaces within text and removes whitespace around the text
+    'Text     with    spaces ' becomes 'Text with spaces'
+    """
+    pattern = re.compile(r"  +")
+    return pattern.sub(' ', text).strip()
+
+
+def remove_tags(text):
+    """
+    Removes html-like tags from given text. Tag names aren't checked,
+    <no-valid-tag></no-valid-tag> pair will be removed.
+    """
+    pattern = re.compile(r"<(\w|\/)[^<\s\"']*?>")
+    return remove_extra_spaces(pattern.sub(' ', text))
