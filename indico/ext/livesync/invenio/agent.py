@@ -80,7 +80,7 @@ class InvenioRecordUploader(RecordUploader):
 
         tupload = time.time() - (tstart + tgen)
 
-        if self.task:
+        if self._task:
             self._task.setOnRunningListSince(nowutc())
 
         self._logger.debug('rec %s result: %s' % (batch, result))
