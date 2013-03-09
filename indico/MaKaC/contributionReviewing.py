@@ -788,6 +788,9 @@ class Review(Persistent, Fossilizable):
     def canIPAccess( self, ip ):
         return self.getOwner().canIPAccess(ip)
 
+    def canUserModify( self, aw ):
+        return self.getOwner().canUserModify(aw)
+
     #Advices methods
     def addReviewerJudgement(self, reviewer):#, questions, adviceJudgement, comments):
         """ Adds an ReviewerJudgement object to the list of ReviewerJudgements objects of the review.
