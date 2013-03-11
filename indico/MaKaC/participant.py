@@ -478,7 +478,7 @@ class Participation(Persistent, Observable):
             Please take this candidature into consideration and accept or reject it
 
             Your Indico
-            """(self._conference.getTitle(), profileURL)
+            """%(self._conference.getTitle(), profileURL)
 
             GenericMailer.send(GenericNotification(data))
             self.notifyModification()
