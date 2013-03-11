@@ -16,7 +16,7 @@
           % else:
             <li id="menuLink_${link.getName()}"
               % if menu.isCurrentItem(link):
-                class="menuConfTitle selected"
+                class="menuConfTitle selected menuConfSelected"
               % else:
                 class="menuConfTitle"
               % endif
