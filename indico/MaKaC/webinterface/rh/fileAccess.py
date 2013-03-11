@@ -55,7 +55,7 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
         self._notify('materialDownloaded', self._file)
         if isinstance(self._file, Link):
             self._redirect(self._file.getURL())
-        elif self._file.getId() is "minutes":
+        elif self._file.getId() == "minutes":
             p = files.WPMinutesDisplay(self, self._file )
             return p.display()
         else:
