@@ -29,10 +29,10 @@
 
             <ul class="inner">
             % for sublink in link.getEnabledLinkList():
-                %if sublink.isVisible():
+                % if sublink.isVisible():
               <li id="menuLink_${sublink.getName()}"
                    % if menu.isCurrentItem(sublink):
-                     class="menuConfMiddleCell selected"
+                     class="sublink selected menuConfSelected menuConfMiddleCell"
                    % else:
                      class="menuConfMiddleCell"
                    % endif

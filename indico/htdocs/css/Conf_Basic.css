@@ -183,14 +183,17 @@ li.menuConfMiddleCell {
     font-weight: normal;
 }
 
+.sublink {
+        color: #777;
+}
+
 li.menuConfMiddleCell a {
-    color: #777;
     padding: 0px 0px 0px 30px;
 }
 
 	/* selected menu item */
 
-.menuConfTitle.selected, .menuConfMiddleCell.selected {
+.menuConfSelected, .menuConfMiddleCellSelected {
     color: #BD891A;
     background: #dadada;
     border-bottom: 1px solid #d0d0d0;
