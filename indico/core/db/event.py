@@ -62,7 +62,7 @@ class SupportInfo(Persistent):
         :type returnNoReply: bool
 
         """
-        if self._caption.strip() == "" and returnNoReply:
+        if self._email.strip() == "" and returnNoReply:
             # In case there's no conference support e-mail, return the no-reply
             # address, and the 'global' support e-mail if there isn't one
             return Config.getInstance().getNoReplyEmail()
