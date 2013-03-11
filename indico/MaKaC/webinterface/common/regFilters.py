@@ -364,7 +364,7 @@ class GeneralFieldSF( RegistrantSortingField ):
                     i2=group2.getResponseItemById(ids[1])
                     if i2 is not None:
                         v2=i2.getValue()
-                return cmp( v1.lower().strip(), v2.lower().strip() )
+                return cmp( str(v1).lower().strip(), str(v2).lower().strip() )
         return 0
 
 class StatusesSF( RegistrantSortingField ):
