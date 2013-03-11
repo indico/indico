@@ -137,18 +137,18 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         sessionCopy = sessionData.copy()
 
         # filtering criteria needs a proper "filter name"
-        del sessionCopy['session']
-        sessionCopy[self._sessionFilterName] = sessionData['session']
+        sessionCopy.pop('session', None)
+        sessionCopy[self._sessionFilterName] = sessionData.get('session')
 
         # Build the filtering criteria
         filterCrit = regFilters.RegFilterCrit(self._conf, sessionCopy)
-
-        filterCrit.getField("accomm").setShowNoValue(
-            sessionCopy.get("accommShowNoValue") )
-        filterCrit.getField(self._sessionFilterName).setShowNoValue(
-            sessionCopy.get("sessionShowNoValue") )
-        filterCrit.getField("event").setShowNoValue(
-            sessionCopy.get("eventShowNoValue") )
+        if sessionData.get('session'):
+            filterCrit.getField("accomm").setShowNoValue(
+                sessionCopy.get("accommShowNoValue") )
+            filterCrit.getField(self._sessionFilterName).setShowNoValue(
+                sessionCopy.get("sessionShowNoValue") )
+            filterCrit.getField("event").setShowNoValue(
+                sessionCopy.get("eventShowNoValue") )
 
         return filterCrit
 
