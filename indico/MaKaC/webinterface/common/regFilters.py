@@ -344,9 +344,9 @@ class RegistrationDateSF( RegistrantSortingField ):
         rd2=r2.getRegistrationDate() or datetime(1995, 1, 1)
         return cmp( rd1, rd2 )
 
+
 class GeneralFieldSF( RegistrantSortingField ):
     _id = "groupID-fieldId"
-
 
     def compare( self, r1, r2 ):
         if self.getSpecialId() != self._id:
@@ -364,8 +364,9 @@ class GeneralFieldSF( RegistrantSortingField ):
                     i2=group2.getResponseItemById(ids[1])
                     if i2 is not None:
                         v2=i2.getValue()
-                return cmp( str(v1).lower().strip(), str(v2).lower().strip() )
+                return cmp(str(v1).lower().strip(), str(v2).lower().strip())
         return 0
+
 
 class StatusesSF( RegistrantSortingField ):
     _id = "s-statusId"
