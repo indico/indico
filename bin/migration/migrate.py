@@ -658,7 +658,7 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
             return
         csbm = conf.getCSBookingManager()
         for booking in csbm.getBookingList():
-            if booking.getType() == "Vidyo"and booking.isCreated():
+            if booking.getType() == "Vidyo" and booking.isCreated():
                 endDateIndex.indexBooking(booking)
                 vidyoRoomIndex.indexBooking(booking)
 
@@ -703,6 +703,7 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
         i += 1
         if i % 10000 == 0:
             dbi.commit()
+    dbi.commit()
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[]):
