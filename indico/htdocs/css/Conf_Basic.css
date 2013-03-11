@@ -56,7 +56,7 @@
 	text-align:left;
 	border-top: 3px solid #234173;
     border-bottom: 1px solid #0f4c80;
-    background: #1a64a0 url("../images/conf/sprites_blue.png") repeat-x scroll 0 -24px;
+    background: #1a64a0;
 }
 
 .confTitle {
@@ -190,7 +190,7 @@ li.menuConfMiddleCell a {
 
 	/* selected menu item */
 
-.menuConfTitle.selected > a, .menuConfMiddleCell.selected > a {
+.menuConfTitle.selected, .menuConfMiddleCell.selected {
     color: #BD891A;
     background: #dadada;
     border-bottom: 1px solid #d0d0d0;
