@@ -110,12 +110,12 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
 class OutlookTaskRegistry(object):
 
     @staticmethod
-    def register():
+    def register(interval=15):
         from indico.modules.scheduler import Client
         from dateutil.rrule import MINUTELY
         from MaKaC.common import DBMgr
         DBMgr.getInstance().startRequest()
-        task = OutlookUpdateCalendarNotificationTask(MINUTELY)
+        task = OutlookUpdateCalendarNotificationTask(MINUTELY, interval=interval)
         client = Client()
         client.enqueue(task)
         DBMgr.getInstance().endRequest()
