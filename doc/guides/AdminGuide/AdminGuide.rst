@@ -323,7 +323,7 @@ The calendar notification contains the following information about the event:
 This plugin is enabled by default for each user but the user can disable it from the *User Personal Preferences* page.
 The Synchronization is run at a specific interval by the indico-scheduler.
 
-To run the scheduler task for synchronizing events witch the calendar, you have to put following commands in *incidico_shell*:
+To run the scheduler task for synchronizing events witch the calendar, you have to put following commands in *incidico_shell*::
 
     from indico.ext.calendaring.outlook.tasks import OutlookTaskRegistry
     OutlookTaskRegistry.register()
