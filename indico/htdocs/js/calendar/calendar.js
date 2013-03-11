@@ -183,9 +183,7 @@ Calendar.stopEvent = function(ev) {
 };
 
 Calendar.addEvent = function(el, evname, func) {
-	if (el.attachEvent) { // IE
-		el.attachEvent("on" + evname, func);
-	} else if (el.addEventListener) { // Gecko / W3C
+    if (el.addEventListener) { // Gecko / W3C
 		el.addEventListener(evname, func, true);
 	} else {
 		el["on" + evname] = func;
@@ -193,9 +191,7 @@ Calendar.addEvent = function(el, evname, func) {
 };
 
 Calendar.removeEvent = function(el, evname, func) {
-	if (el.detachEvent) { // IE
-		el.detachEvent("on" + evname, func);
-	} else if (el.removeEventListener) { // Gecko / W3C
+    if (el.removeEventListener) { // Gecko / W3C
 		el.removeEventListener(evname, func, true);
 	} else {
 		el["on" + evname] = null;
@@ -1527,8 +1523,6 @@ Calendar.prototype.hideShowCovered = function () {
 						getComputedStyle(obj, "").getPropertyValue("visibility");
 				else
 					value = '';
-			} else if (obj.currentStyle) { // IE
-				value = obj.currentStyle.visibility;
 			} else
 				value = '';
 		}
