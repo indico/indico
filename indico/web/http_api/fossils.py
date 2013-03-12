@@ -182,8 +182,10 @@ class IResourceMetadataFossil(IFossil):
     def getName(self):
         pass
 
-
 class ILocalFileMetadataFossil(IResourceMetadataFossil):
+
+    def getId(self):
+        pass
 
     def getURL(self):
         pass
