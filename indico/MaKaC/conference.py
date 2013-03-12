@@ -11477,8 +11477,8 @@ class Resource(CommonObjectBase):
 
     def notify_protection_to_owner(self, delete=False):
         # Resources can be attached to other objects (e.g. Registrant),
-        # but we wish to trigger the notification only when attached to materials
-        if isinstance(self.getOwner(), Material):
+        # but we wish to trigger the notification only when attached to materials (except paper reviewing)
+        if isinstance(self.getOwner(), Material) and not isinstance(self.getOwner(), Reviewing):
             self.getOwner().updateNonInheritingChildren(self, delete)
 
     @Updates (['MaKaC.conference.Link',
