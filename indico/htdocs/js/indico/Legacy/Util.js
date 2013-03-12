@@ -622,7 +622,7 @@ var IndicoUtil = {
                 else if (!allowEmpty && component.get() != null && (!isString(component.get()) || trim(component.get()) === '')) {
                     error = Html.span({}, $T("Field is mandatory"));
                 }
-                if (exists(extraCheckFunction)) {
+                if (error == null && exists(extraCheckFunction)) {
                     error = extraCheckFunction(component.get());
                 }
                 //--------------------------------
