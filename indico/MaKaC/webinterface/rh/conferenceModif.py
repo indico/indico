@@ -2771,6 +2771,8 @@ class RHConfSaveCSS( RHConferenceModifBase ):
                 self._filePath = self._saveFileToTemp( params["file"].file )
                 self._tempFilesToDelete.append(self._filePath)
             self._fileName = params["file"].filename
+        if self._fileName.strip() == "":
+            raise FormValuesError(_("Please, choose the file to upload first"))
 
     def _process( self ):
         f = conference.LocalFile()
