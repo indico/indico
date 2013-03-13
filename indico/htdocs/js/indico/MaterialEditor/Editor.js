@@ -1356,7 +1356,7 @@ type("ResourceListWidget", ["ListWidget"], {
             resourceNode = Html.div({}, Html.img({src:imageSrc("collapsd.png")}), information);
             $(resourceNode.dom).qtip({
                     content: {
-                        text: $T('Indico is currently performing the conversion of the file to PDF. The conversion may take a few seconds.'),
+                        text: $T('Indico is currently performing the conversion of the file to PDF. The conversion may take a few seconds.')
                     },
                     position: {
                         target: 'mouse',
@@ -1837,11 +1837,11 @@ type("MaterialConversionHelper", [], {
         $("img#"+file['id']).parent().qtip({
             content: {
                 text: format($T('Indico is currently performing the conversion to PDF of the file:<br>{fileName}<br>The conversion may take a few seconds.'),
-                        {fileName: file['name']}),
+                        {fileName: file['name']})
             },
             position: {
                 target: 'mouse',
-                adjust: { mouse: true, x: 11, y: 13 },
+                adjust: { mouse: true, x: 11, y: 13 }
             }
         });
     },

@@ -1777,7 +1777,7 @@ type("UploadElectronicAgreementPopup", ["ExclusivePopupWithButtons"],{
 
         draw: function(){
             return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
-        },
+        }
 
     },
     function(confId, spkUniqueId, uploadAction) {

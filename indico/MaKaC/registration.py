@@ -914,7 +914,7 @@ Please use this information for your payment (except for e-payment):\n
                     if v != "":
                         v = ":%s"%v
                     if(quantity>0):
-                         booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%\
+                        booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%\
                                         (quantity,gsf.getTitle(),caption,v,price,price*quantity,currency) )
         for bf in registrant.getBilledForms():
             for item in bf.getBilledItems():
