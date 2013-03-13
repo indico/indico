@@ -1711,7 +1711,7 @@ type("ColorPickerWidget", [],
                     onHide: function (colpkr) {
                         $(colpkr).fadeOut(500);
                         return false;
-                    },
+                    }
                 });
 
                 $(input).bind('keyup', function(){
@@ -1719,7 +1719,7 @@ type("ColorPickerWidget", [],
                         updateColorInput(this.value);
                 });
                 return container;
-            },
+            }
         },
         function(inputName, initialColor, colorChangedHandler) {
             this.inputName = inputName;

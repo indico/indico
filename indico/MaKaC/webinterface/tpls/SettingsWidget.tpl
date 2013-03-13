@@ -50,7 +50,7 @@ $(".userSettings").qtip({
     },
     position: {
         my: 'top center',
-        at: 'bottom center',
+        at: 'bottom center'
     },
     content: function(api){
         return $('#settingsWidget');

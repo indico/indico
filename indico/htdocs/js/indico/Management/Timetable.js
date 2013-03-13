@@ -124,7 +124,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              if (exists(self.selectedObserver)) {
                  self.selectedObserver(self.selectedList);
              }
-         },
+         }
 
 
      }, function(existing, observer) {

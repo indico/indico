@@ -424,7 +424,7 @@ type("DateDeadlineWidget", ["DateWidget"],
                     self.applyToContributions = false;
                     self._save();
                 }
-            },
+            }
         },
         function(method, attributes, initValue, hasContributions) {
             this.applyToContributions = false;

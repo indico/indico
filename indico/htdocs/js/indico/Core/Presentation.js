@@ -228,7 +228,7 @@ var SortCriteria = {
               return result;
         };
         return 0;
-    },
+    }
 };
 
 function partition(list, start, end, index, cmp) {
