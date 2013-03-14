@@ -1959,7 +1959,7 @@ var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
             'collaboration.acceptElectronicAgreement',
             {
                 confId: confId,
-                authKey: authKey,
+                authKey: authKey
             },
             function(result,error) {
                 if (!error) {
@@ -1988,7 +1988,7 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
                     {
                         confId: confId,
                         reason: reason,
-                        authKey: authKey,
+                        authKey: authKey
                     },
                     function(result,error) {
                         killProgress();
