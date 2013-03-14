@@ -44,10 +44,10 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
                 if not event.get('request_sent', False): # only the ones that are not already sent
                     result = ExternalOperationsManager.execute(self, 'sendEventRequest' + key + event['eventType'], self._sendEventRequest, key, event['eventType'], event['avatar'], event['conference'])
                     if result != 200:
-                        logger.error("POST failed")
+                        logger.debug("POST failed")
                         break
                     else:
-                        logger.info("processing successful")
+                        logger.debug("processing successful")
                         event['request_sent'] = True
             else:
                 keysToDelete.append(key)
