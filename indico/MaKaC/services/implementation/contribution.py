@@ -22,7 +22,7 @@ from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.roomBooking import GetBookingBase
 
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
 from MaKaC.common.PickleJar import DictPickler
 
@@ -34,7 +34,6 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
-import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.domain as domain
 
 
@@ -700,6 +699,13 @@ class ContributionSubmittersBase(ContributionModifBase):
         ContributionModifBase._checkParams(self)
         self._pm = ParameterManager(self._params)
 
+    def _removeUserFromSubmitterList(self, submitterId):
+        for submitter in self._contribution.getSubmitterList():
+            if submitter.getId() == submitterId:
+                self._contribution.revokeSubmission(submitter)
+                return True
+        return False
+
     def _getSubmittersList(self):
         result = []
         for submitter in self._contribution.getSubmitterList():
@@ -760,7 +766,7 @@ class ContributionRemoveSubmitter(ContributionSubmittersBase):
                 # remove submitter
                 self._contribution.revokeSubmission(av)
             else:
-                raise ServiceError("ERR-U0", _("User does not exist."))
+                self._removeUserFromSubmitterList(self._submitterId)
         return self._getSubmittersList()
 
 
@@ -792,8 +798,9 @@ class ContributionSumissionControlAddAsAuthor(ContributionSumissionControlModify
             self._contribution.newSpeaker(part)
 
     def _getAnswer(self):
-        ah = AvatarHolder()
-        av = ah.getById(self._submitterId)
+        av = AvatarHolder().getById(self._submitterId)
+        if av is None:
+            raise NoReportError(_("It seems this user has been removed from the database or has been merged into another. Please remove it and add it again."))
         self._newParticipant(av)
         return self._getSubmittersList()
 
@@ -820,16 +827,17 @@ class ContributionSumissionControlRemoveAsAuthor(ContributionSumissionControlMod
 
 
     def _getAnswer(self):
-        ah = AvatarHolder()
-        av = ah.getById(self._submitterId)
+        av = AvatarHolder().getById(self._submitterId)
+        if av is None:
+            raise NoReportError(_("It seems this user has been removed from the database or has been merged into another. Please remove it and add it again."))
         participant = self._getParticipantByEmail(av.getEmail())
-
         if self._kindOfList == "prAuthor":
             self._contribution.removePrimaryAuthor(participant, removeSpeaker=0)
         elif self._kindOfList == "coAuthor":
             self._contribution.removeCoAuthor(participant, removeSpeaker=0)
         elif self._kindOfList == "speaker":
             self._contribution.removeSpeaker(participant)
+
         return self._getSubmittersList()
 
 
