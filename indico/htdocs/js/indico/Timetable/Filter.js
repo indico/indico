@@ -246,7 +246,7 @@ type("TimeTableFilter", ["IWidget"], {
     },
     toggle: function() {
         this.show(!this.state.get())
-    },
+    }
     },
     function(timetableDrawer, closeHandler) {
         var self = this;

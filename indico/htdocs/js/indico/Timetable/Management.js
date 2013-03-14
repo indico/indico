@@ -765,7 +765,7 @@ type("TimetableManagementActions", [], {
             url = Indico.Urls.SessionProtection + '?confId=' + eventData.conferenceId + '&sessionId=' + eventData.sessionId;
         }
         return url;
-    },
+    }
 },
      function(timetable, eventInfo, isSessionTimetable) {
          this.timetable = timetable;

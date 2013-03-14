@@ -477,7 +477,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                      $('.ui-draggable.timetableBlock').die(thisDragSpaceName);
                  }
              });
-       },
+       }
      }, function(timetable) {
          this.TimeDisplacementManager(this.timetable)
          if (this.managementMode) {
@@ -584,7 +584,7 @@ type("DroppableBlockMixin", [],
                      $('.hourLine.ui-droppable').droppable('enable');
 
                      removeBottomMove();
-                 },
+                 }
              });
          }
      });

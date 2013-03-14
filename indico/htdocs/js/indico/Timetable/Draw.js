@@ -121,7 +121,7 @@ type("TimetableBlockBase", [],
                          },
                          position: {
                              my: 'top right',
-                             at: 'bottom left',
+                             at: 'bottom left'
                          },
                          events: {
                              hide: function(event, api) {
@@ -1362,7 +1362,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                id: 'timetable_grid',
                style: {
                    position:'relative',
-                   top: pixels(TimetableDefaults.topMargin),
+                   top: pixels(TimetableDefaults.topMargin)
                }});
 
              last = scale[scale.length-1][0];
