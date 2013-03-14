@@ -65,6 +65,12 @@ def format_number(number, locale=None):
         locale = currentLocale()
     return _format_number(number, locale=locale).encode('utf-8')
 
+def is_same_month(date_1, date_2):
+    """
+    This method ensures that is the same month of the same year
+    """
+    return date_1.month == date_2.month and  date_1.year == date_2.year
+
 ## ATTENTION: Do not use this one for new developments ##
 # It is flawed, as even though the returned value is DST-safe,
 # it is in the _local timezone_, meaning that the number of seconds

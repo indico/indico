@@ -52,7 +52,7 @@ from MaKaC.conference import Conference, Category
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
 import MaKaC.webinterface.common.timezones as convertTime
 from pytz import timezone
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
+from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
 from MaKaC.webinterface.common import contribFilters as contribFilters
 from MaKaC.common import filters, utils
 from MaKaC.common.TemplateExec import escapeHTMLForJS
@@ -73,7 +73,7 @@ from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 
-from indico.util.date_time import utc_timestamp
+from indico.util.date_time import utc_timestamp, is_same_month
 from indico.core.index import Catalog
 
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
@@ -2944,9 +2944,14 @@ class WConferenceList(WTemplated):
         future = []
         present = []
 
+
+        # currentMonth will be used to ensure that when the OPTIMAL_PRESENT_EVENTS is reached
+        # the events of that month are still displayed in the present list
+        currentMonth = utctimestamp2date(previousMonthTS)
         for ts, conf in index.iteritems(previousMonthTS):
-            if ts < nextMonthTS or len(present) < OPTIMAL_PRESENT_EVENTS:
+            if ts < nextMonthTS or len(present) < OPTIMAL_PRESENT_EVENTS or is_same_month(currentMonth, utctimestamp2date(ts)):
                 present.append(conf)
+                currentMonth = utctimestamp2date(ts)
             else:
                 future.append(conf)
 
