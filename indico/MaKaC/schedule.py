@@ -1550,8 +1550,22 @@ class ScheduleToJson:
         return canBeDisplayed
 
     @staticmethod
-    def process(schedule, tz, aw, days = None, mgmtMode = False, useAttrCache = False, hideWeekends = False):
+    def isOnlyWeekend(days):
+        """
+        It checks if the event takes place only during the weekend
+        """
+        # If there are more than 2 days, there is at least one day that is not part of the weekend
+        if len(days) > 2:
+            return False
 
+        for day in days:
+            if (datetime.strptime(day, "%Y%m%d").weekday() not in [5, 6]):
+                return False
+        return True
+
+
+    @staticmethod
+    def process(schedule, tz, aw, days = None, mgmtMode = False, useAttrCache = False, hideWeekends = False):
         scheduleDict = {}
 
         if not days and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
@@ -1582,7 +1596,7 @@ class ScheduleToJson:
             if fullTT and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
                 ScheduleToJson._cache.set(schedule.getOwner().getUniqueId(), scheduleDict, timedelta(minutes=5))
 
-        if hideWeekends:
+        if hideWeekends and not ScheduleToJson.isOnlyWeekend(scheduleDict.keys()):
             for entry in scheduleDict.keys():
                 weekDay = datetime.strptime(entry, "%Y%m%d").weekday()
                 if scheduleDict[entry] == {} and (weekDay == 5 or weekDay == 6):
