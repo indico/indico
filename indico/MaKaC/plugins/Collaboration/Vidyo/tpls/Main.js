@@ -33,6 +33,9 @@
                 if (name.length > maxNameLength) {
                     errors.push($T("The room name cannot be longer than ") + maxNameLength + $T(" characters."));
                 }
+                if (name.length == 0) {
+                    errors.push($T("The room name has not been defined"));
+                }
                 return errors;
             }],
             'roomDescription' : ['text', false],
@@ -40,14 +43,14 @@
             'moderatorPin': ['non_negative_int', true],
             'videoLinkSession': ['text', false, function(option, values){
                 var errors = [];
-                if(self.vidyoComponents["link"].get()=="session" && option == "None"){
+                if(self.vidyoComponents["link"].get()=="session" && ["","None"].indexOf(option)!=-1){
                     errors.push($T("No session has been defined."));
                 }
                 return errors;
             }],
             'videoLinkContribution': ['text', false, function(option, values){
                 var errors = [];
-                if(self.vidyoComponents["link"].get()=="contribution" && option == "None"){
+                if(self.vidyoComponents["link"].get()=="contribution" && ["","None"].indexOf(option)!=-1){
                     errors.push($T("No contribution has been defined."));
                 }
                 return errors;

@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -698,7 +698,7 @@ type("AuthorsPopup", ["ExclusivePopup"], {
         each(this.authorList, function(author) {
             var authorElem = $("<div/>");
             var url = Indico.Urls.AuthorDisplay + '?confId=' + self.confId + '&contribId=' + self.contribId + '&authorId=' + author.id;
-            var link = $("<a/>").attr("href", url).text(author.fullName);
+            var link = $("<a/>").attr("href", url).text(author.name);
             var title = $("<div/>").css("color", "#444444").css("width", self.width + "px").css("font-size", "15px").append(link);
             var emailUrl = Indico.Urls.AuthorEmail + '?confId=' + self.confId + '&sessionId=' + self.sessionId + '&contribId=' + self.contribId + '&authId=' + author.id;
 

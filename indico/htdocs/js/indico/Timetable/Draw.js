@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -121,7 +121,7 @@ type("TimetableBlockBase", [],
                          },
                          position: {
                              my: 'top right',
-                             at: 'bottom left',
+                             at: 'bottom left'
                          },
                          events: {
                              hide: function(event, api) {
@@ -1362,7 +1362,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                id: 'timetable_grid',
                style: {
                    position:'relative',
-                   top: pixels(TimetableDefaults.topMargin),
+                   top: pixels(TimetableDefaults.topMargin)
                }});
 
              last = scale[scale.length-1][0];

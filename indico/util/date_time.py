@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -64,6 +64,12 @@ def format_number(number, locale=None):
     if not locale:
         locale = currentLocale()
     return _format_number(number, locale=locale).encode('utf-8')
+
+def is_same_month(date_1, date_2):
+    """
+    This method ensures that is the same month of the same year
+    """
+    return date_1.month == date_2.month and  date_1.year == date_2.year
 
 ## ATTENTION: Do not use this one for new developments ##
 # It is flawed, as even though the returned value is DST-safe,

@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -1711,7 +1711,7 @@ type("ColorPickerWidget", [],
                     onHide: function (colpkr) {
                         $(colpkr).fadeOut(500);
                         return false;
-                    },
+                    }
                 });
 
                 $(input).bind('keyup', function(){
@@ -1719,7 +1719,7 @@ type("ColorPickerWidget", [],
                         updateColorInput(this.value);
                 });
                 return container;
-            },
+            }
         },
         function(inputName, initialColor, colorChangedHandler) {
             this.inputName = inputName;

@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -162,7 +162,11 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
                 # Do not add the same participant twice
                 if elemValues.get("email") in currentParticipantEmails: # if it is already a participant
                     continue
+<<<<<<< HEAD
                 elif elemValues.has_key("email"): # keep track in case, the user is trying to add 2 times the same participant
+=======
+                elif elemValues.get("email","").strip() != "": # keep track in case, the user is trying to add 2 times the same participant
+>>>>>>> v1.0
                     currentParticipantEmails.append(elemValues["email"])
 
                 element = conference.ContributionParticipation()

@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -2771,6 +2771,8 @@ class RHConfSaveCSS( RHConferenceModifBase ):
                 self._filePath = self._saveFileToTemp( params["file"].file )
                 self._tempFilesToDelete.append(self._filePath)
             self._fileName = params["file"].filename
+        if self._fileName.strip() == "":
+            raise FormValuesError(_("Please, choose the file to upload first"))
 
     def _process( self ):
         f = conference.LocalFile()

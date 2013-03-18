@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -1777,7 +1777,7 @@ type("UploadElectronicAgreementPopup", ["ExclusivePopupWithButtons"],{
 
         draw: function(){
             return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget());
-        },
+        }
 
     },
     function(confId, spkUniqueId, uploadAction) {
@@ -1959,7 +1959,7 @@ var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
             'collaboration.acceptElectronicAgreement',
             {
                 confId: confId,
-                authKey: authKey,
+                authKey: authKey
             },
             function(result,error) {
                 if (!error) {
@@ -1988,7 +1988,7 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
                     {
                         confId: confId,
                         reason: reason,
-                        authKey: authKey,
+                        authKey: authKey
                     },
                     function(result,error) {
                         killProgress();

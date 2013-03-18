@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -163,7 +163,7 @@ type("TimeTable", ["HistoryListener"], {
     //To be overloaded
     redrawLegend: function() {
         return;
-    },
+    }
 
 },
      function(data, width, wrappingElement, detailLevel, managementMode) {
@@ -220,14 +220,17 @@ type("DisplayTimeTable", ["TimeTable"], {
         self.timetableDrawer.setPrintableVersion(true);
         var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return value;});
 
-        var goBackLink = $('<a>', {href: window.location.hash, text: $T('Go back')}).css('fontSize', '17px');
-        var separator = $('<a>', { text: ' | '}).css('fontSize', '17px');
-        var printLink = $('<a>', {href: window.location.hash, text: $T('Print')}).css('fontSize', '17px');
+        var goBackLink = $('<a/>').prop('href', window.location.hash).html($T('Go back')).css('font-size', '17px');
+        var separator = $('<a/>').html(' | ').css('fontSize', '17px');
+        var printLink = $('<a/>').prop('href', window.location.hash).html($T('Print')).css('font-size', '17px');
 
-        var links = $('<span>', {html: goBackLink.add(separator).add(printLink)}).css('float', 'right');
+        var links = $('<span/>').append(goBackLink, separator, printLink).css('float', 'right');
 
-        var header = $('<div>', {class: 'timetableHeader clearfix', html: links}).css({padding : '0px 5px 5px 5px', borderBottom : '1px solid black', textAlign: 'center', width: self.timetableDrawer.width});
-        header.append($('<span>', {html: self._titleTemplate(self.timetableDrawer.day)}).css('float', 'left'));
+        var header = $('<div/>').addClass('timetableHeader clearfix').append(links).css({'padding': '0px 5px 5px 5px',
+                                                                                        'border-bottom': '1px solid black',
+                                                                                        'text-align': 'center',
+                                                                                        'width': self.timetableDrawer.width});
+        header.append($('<span/>').append(self._titleTemplate(self.timetableDrawer.day)).css('float', 'left'));
 
         goBackLink.click(function() {
             location.reload();
@@ -237,7 +240,7 @@ type("DisplayTimeTable", ["TimeTable"], {
             window.print();
         });
 
-        var timetableDiv = $('<div>', {html: timetableElements}).css({paddingTop : '20px', position : 'relative'});
+        var timetableDiv = $('<div/>').append(timetableElements).css({'padding-top': '20px', 'position': 'relative'});
 
         $("body").html(header.add(timetableDiv));
         $("body").css("padding", "30px");
@@ -255,8 +258,8 @@ type("DisplayTimeTable", ["TimeTable"], {
         setTimeout(function(){
             self.timetableDrawer.width = $(window).width() - 50; // 50 is a width offset.
 
-            var header = $('<div>', {class: 'timetableFullScreenHeader clearfix'}).css('width', self.timetableDrawer.width);
-            header.append($('<span>', {html: self._titleTemplate(self.timetableDrawer.day)}).css('float', 'left'));
+            var header = $('<div/>').addClass('timetableFullScreenHeader clearfix').css('width', self.timetableDrawer.width);
+            header.append($('<span/>').append(self._titleTemplate(self.timetableDrawer.day)).css('float', 'left'));
 
             var timetableCanvas = $('#timetable_canvas');
             $('#timetable_canvas').width('width', self.timetableDrawer.width);
@@ -980,8 +983,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         customLinks.appendTo(this.menu);
 
-        var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>', {src: imageSrc(Indico.SystemIcons.tt_time),
-                                                                                  title:"Add one hour"}))
+        var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>').prop('src', imageSrc(Indico.SystemIcons.tt_time)).prop('title', $("Add one hour")));
         var tt_status_info = $('<div id="tt_status_info" />');
 
         this.menu.children('a').addClass('i-button');
@@ -1001,7 +1003,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         }
 
         return ret;
-    },
+    }
 
 },
      function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks) {

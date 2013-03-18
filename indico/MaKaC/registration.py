@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -914,7 +914,7 @@ Please use this information for your payment (except for e-payment):\n
                     if v != "":
                         v = ":%s"%v
                     if(quantity>0):
-                         booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%\
+                        booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%\
                                         (quantity,gsf.getTitle(),caption,v,price,price*quantity,currency) )
         for bf in registrant.getBilledForms():
             for item in bf.getBilledItems():

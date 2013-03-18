@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -182,8 +182,14 @@ class IResourceMetadataFossil(IFossil):
     def getName(self):
         pass
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> v1.0
 class ILocalFileMetadataFossil(IResourceMetadataFossil):
+
+    def getId(self):
+        pass
 
     def getURL(self):
         pass

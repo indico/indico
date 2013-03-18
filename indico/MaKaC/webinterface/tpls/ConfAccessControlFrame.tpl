@@ -20,10 +20,9 @@
 
             <script type="text/javascript">
                 $('#setAccessKey').click(function(e) {
-                    var accessKey = $E('accessKey').dom.value;
-
+                    var accessKey = $('#accessKey').prop("value");
                     new ConfirmPopup($T("Set access key"), $T("Please note that it is more secure to make the event private instead of using an access key."), function(confirmed){
-                        if(confirmed && accessKey){
+                        if(confirmed){
                             indicoRequest('event.protection.setAccessKey', {
                                 confId: ${target.getId()},
                                 accessKey: accessKey
@@ -35,9 +34,9 @@
                                 }
 
                                 var elem = $E('accessKeyChanged');
-                                elem.dom.innerHTML = accessKey ? '${_("Access key saved")}' : '${_("Access key removed")}';
-                                window.setTimeout(function() {
-                                    elem.dom.innerHTML = '';
+                                $("#accessKeyChanged").html(accessKey? $T("Access key saved") : $T("Access key removed"));
+                                setTimeout(function() {
+                                    $("#accessKeyChanged").html('');
                                 }, 3000);
                             }
                         );

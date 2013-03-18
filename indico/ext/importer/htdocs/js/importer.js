@@ -101,7 +101,7 @@ ImporterUtils = {
             });
         else if( finalCallback )
             finalCallback();
-    },
+    }
 };
 
 /**
@@ -181,7 +181,7 @@ type("QueueDict", [],{
                     this.keySequence[idx] = this.keySequence[idx + 1];
                     this.keySequence[idx + 1] = tmp;
                 }
-            },
+            }
         },
         /**
          * Creates an empty dictionary.
