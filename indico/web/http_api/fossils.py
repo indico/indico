@@ -182,10 +182,6 @@ class IResourceMetadataFossil(IFossil):
     def getName(self):
         pass
 
-<<<<<<< HEAD
-
-=======
->>>>>>> v1.0
 class ILocalFileMetadataFossil(IResourceMetadataFossil):
 
     def getId(self):
