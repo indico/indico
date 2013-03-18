@@ -27,9 +27,9 @@
             <div class="warningText">${_("Note: It is more secure to use the manager list instead of a modification key!")}</div>
             <script type="text/javascript">
                 $('#setModifKey').click(function(e) {
-                    var modifKey = $E('modifKey').dom.value;
+                    var modifKey = $('#modifKey').prop("value")
                     new ConfirmPopup($T("Set modification key"), $T("Please note that it is more secure to make the event private instead of using a modification key."), function(confirmed){
-                        if(confirmed && modifKey){
+                        if(confirmed){
                             indicoRequest('event.protection.setModifKey', {
                                 confId: ${target.getId()},
                                 modifKey: modifKey
@@ -40,10 +40,9 @@
                                     return;
                                 }
 
-                                var elem = $E('modifKeyChanged');
-                                elem.dom.innerHTML = modifKey ? '${_("Modification key saved")}' : '${_("Modification key removed")}';
-                                window.setTimeout(function() {
-                                    elem.dom.innerHTML = '';
+                                $("#modifKeyChanged").html(modifKey ? $T("Modification key saved") : $T("Modification key removed"));
+                                setTimeout(function() {
+                                    $("#modifKeyChanged").html('');
                                 }, 3000);
                             }
                         );
