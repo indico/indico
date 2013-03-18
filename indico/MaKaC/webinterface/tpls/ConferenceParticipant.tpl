@@ -35,11 +35,11 @@
         var userData = {};
         userData["id"] = '${participant.getId()}';
         userData["title"] = '${participant.getTitle()}';
-        userData["surName"] = '${participant.getFamilyName()}';
-        userData["name"] = '${participant.getFirstName()}';
-        userData["email"] = '${participant.getEmail()}';
-        userData["address"] = '${participant.getAddress()}';
-        userData["affiliation"] = '${participant.getAffiliation()}';
+        userData["surName"] = ${participant.getFamilyName() | n,j};
+        userData["name"] = ${participant.getFirstName() | n,j};
+        userData["email"] = ${participant.getEmail() | n,j};
+        userData["address"] = ${participant.getAddress() | n,j};
+        userData["affiliation"] = ${participant.getAffiliation() | n,j};
         userData["phone"] = '${participant.getTelephone()}';
         userData["fax"] = '${participant.getFax()}';
         new ApplyForParticipationPopup('${self_._conf.getId()}','event.participation.editParticipant',  $T('Edit participant'), userData, onSuccess, true);
