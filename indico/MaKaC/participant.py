@@ -54,7 +54,7 @@ class Participation(Persistent):
         newParticipation = conference.getParticipation()
         newParticipation._obligatory = self._obligatory
         newParticipation._allowedForApplying = self._allowedForApplying
-        newParticipation._autoAccept = self._autoAccept
+        newParticipation._autoAccept = self.autoAccept()
         newParticipation._displayParticipantList = self._displayParticipantList
         if options.get("addedInfo", False) :
             newParticipation._addedInfo = True
