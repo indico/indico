@@ -259,7 +259,7 @@ class Location( Persistent, object ):
         def __get__( self, obj, cls = None ):
 
             root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
-            return root[_ROOM_BOOKING_LOCATION_LIST]
+            return root.get(_ROOM_BOOKING_LOCATION_LIST, [])
 
     allLocations = GetAllLocations()
 
