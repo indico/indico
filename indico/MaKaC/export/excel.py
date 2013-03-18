@@ -252,7 +252,7 @@ class RegistrantsListToExcel:
 
 class AbstractListToExcel:
 
-    def __init__(self, conf, abstractList=None, display=["ID", "Title", "PrimaryAuthor", "TrackName", "Type", "Rating"], excelSpecific=True):
+    def __init__(self, conf, abstractList=None, display=["ID", "Title", "PrimaryAuthor", "Tracks", "Type", "Rating"], excelSpecific=True):
         self._conf = conf
         self._abstractList = abstractList
         self._displayList = display
@@ -261,7 +261,7 @@ class AbstractListToExcel:
     def getExcelFile(self):
         excelGen = ExcelGenerator()
         for key in self._displayList:
-            if key in ["ID", "Title", "PrimaryAuthor", "TrackName", "Type", "Rating"]:
+            if key in ["ID", "Title", "PrimaryAuthor", "Tracks", "Type", "Rating"]:
                 excelGen.addValue(key)
 
         excelGen.newLine()
@@ -280,7 +280,7 @@ class AbstractListToExcel:
                     for pa in abstract.getPrimaryAuthorList():
                         paList.append(pa.getFullName())
                     excelGen.addValue("; ".join(paList))
-                elif key == "TrackName":
+                elif key == "Tracks":
                     trList = []
                     for tr in abstract.getTrackList():
                         trList.append(tr.getTitle())
