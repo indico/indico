@@ -252,41 +252,42 @@ class RegistrantsListToExcel:
 
 class AbstractListToExcel:
 
-    def __init__(self, conf,list=None, display=["ID","Title","Primary Authors","Track Name","Type", "Rating"], excelSpecific=True):
+    def __init__(self, conf, abstractList=None, display=["ID", "Title", "PrimaryAuthor", "TrackName", "Type", "Rating"], excelSpecific=True):
         self._conf = conf
-        self._abstractList = list
+        self._abstractList = abstractList
         self._displayList = display
         self._excelSpecific = excelSpecific
 
     def getExcelFile(self):
-        excelGen=ExcelGenerator()
+        excelGen = ExcelGenerator()
         for key in self._displayList:
-            excelGen.addValue(key)
+            if key in ["ID", "Title", "PrimaryAuthor", "TrackName", "Type", "Rating"]:
+                excelGen.addValue(key)
 
         excelGen.newLine()
 
         if self._abstractList is None:
             self._abstractList = self._conf.getAbstractMgr().getAbstractList()
 
-        for abstract in self._abstractList :
-            for key in self._displayList :
-                if key == "ID" :
+        for abstract in self._abstractList:
+            for key in self._displayList:
+                if key == "ID":
                     excelGen.addValue(abstract.getId())
-                elif key == "Title" :
+                elif key == "Title":
                     excelGen.addValue(abstract.getTitle())
-                elif key == "Primary Authors" :
+                elif key == "PrimaryAuthor":
                     paList = []
-                    for pa in abstract.getPrimaryAuthorList() :
+                    for pa in abstract.getPrimaryAuthorList():
                         paList.append(pa.getFullName())
                     excelGen.addValue("; ".join(paList))
-                elif key == "Track Name":
+                elif key == "TrackName":
                     trList = []
-                    for tr in abstract.getTrackList() :
+                    for tr in abstract.getTrackList():
                         trList.append(tr.getTitle())
                     excelGen.addValue("; ".join(trList))
                 elif key == "Type":
                     contribType=abstract.getContribType()
-                    ctname=""
+                    ctname = ""
                     if contribType is not None:
                         ctname=contribType.getName()
                     excelGen.addValue(ctname)

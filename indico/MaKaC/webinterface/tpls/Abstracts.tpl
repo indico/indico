@@ -416,34 +416,41 @@ $(function(){
         IndicoUI.Effect.followScroll();
     });
 
+    // Cleanup previous actions
+    var CleanupHiddenFields = function (){
+        $("#abstractsForm input[type=hidden]").remove();
+    }
+
     // Insert hidden field to the form
-    var InsertHiddenField = function (name, value, cleanup){
-      if (cleanup) {
-        $("#abstractsForm input[type=hidden]").remove(); // clean previous actions
-      }
-      $('#abstractsForm').append($("<input>").attr("type", "hidden").attr("name", name).val(value));
+    var InsertHiddenField = function (name, array){
+        for (var index in array){
+            $('#abstractsForm').append($("<input>").attr("type", "hidden").attr("name", name).val(array[index]));
+        }
     }
 
     _({
-      "#accept_abstracts": ["acceptMultiple", $T("Accept")],
-      "#reject_abstracts": ["rejectMultiple", $T("Reject")],
-      "#merge_abstracts": ["merge", $T("Merge")],
-      "#author_list": ["auth", $T("Author List")],
-      "#download_attachments": ["PKGA", $T("Download attachments")],
-      "#export_pdf": ["pdf", $T("Export PDF")],
-      "#export_csv": ["excel", $T("Export CSV")],
-      "#export_xml": ["xml", $T("Export XML")]
+      "#accept_abstracts": {"acceptMultiple": [$T("Accept")]},
+      "#reject_abstracts": {"rejectMultiple": [$T("Reject")]},
+      "#merge_abstracts": {"merge": [$T("Merge")]},
+      "#author_list": {"auth": [$T("Author List")]},
+      "#download_attachments": {"PKGA": [$T("Download attachments")]},
+      "#export_pdf": {"pdf": [$T("Export PDF")]},
+      "#export_csv": {"excel": [$T("Export CSV")], "disp": ${displayColumns}},
+      "#export_xml": {"xml": [$T("Export XML")]}
     }).each(function(vals, key) {
       $(key).bind('menu_select',function(){
         if (atLeastOneSelected()) {
-            InsertHiddenField(vals[0], vals[1], true);
+            CleanupHiddenFields();
+            for (var index in vals) {
+                InsertHiddenField(index, vals[index]);
+            }
             $('#abstractsForm').submit();
         }
       });
     });
 
     $("#add_new_abstract").bind('menu_select',function(){
-      InsertHiddenField("newAbstract", $T("Add"), false);
+      InsertHiddenField("newAbstract", $T("Add"));
       $('#abstractsForm').submit();
     });
 
