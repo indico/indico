@@ -80,7 +80,11 @@
                                                         % for column in columns:
                                                             <tr>
                                                                 <td align="left" valign="top">
-                                                                    <input type="checkbox" name="disp" value="${column}" ${"checked" if column in displayColumns else ""}>
+                                                                    %if column == 'Title':
+                                                                        <input type="hidden" name="disp" value="${column}">
+                                                                    %endif
+                                                                    <input type="checkbox" name="disp" value="${column}" ${"checked" if column in displayColumns or  column == 'Title' else ""}  ${"disabled" if column == 'Title' else ""}>
+
                                                                 </td>
                                                                 <td width="100%%" align="left" valign="top">${columnsDict[column]}
                                                                 </td>

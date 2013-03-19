@@ -2272,8 +2272,8 @@ class RHAbstractsListToExcel(RHConfModifCFABase):
         filename = "AbstractList.csv"
 
         abstractList = []
-        for id in self._abstracts :
-           abstractList.append(self._conf.getAbstractMgr().getAbstractById(id))
+        for abs_id in self._abstracts :
+            abstractList.append(self._conf.getAbstractMgr().getAbstractById(abs_id))
 
         generator = AbstractListToExcel(self._conf,abstractList, self._display)
         data = generator.getExcelFile()
