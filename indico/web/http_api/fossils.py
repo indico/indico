@@ -99,68 +99,6 @@ class IConferenceChairMetadataFossil(IFossil):
     def getAffiliation(self):
         pass
 
-class IConferenceMetadataFossil(IFossil):
-
-    def getId(self):
-        pass
-
-    def getStartDate(self):
-        pass
-    getStartDate.convert = Conversion.datetime
-
-    def getEndDate(self):
-        pass
-    getEndDate.convert = Conversion.datetime
-
-    def getTitle(self):
-        pass
-
-    def getDescription(self):
-        pass
-
-    def getType(self):
-        pass
-
-    def getOwner(self):
-        pass
-    getOwner.convert = lambda x: x.getTitle()
-    getOwner.name = 'category'
-
-    def getCategoryId(self):
-        pass
-    getCategoryId.produce = lambda x: x.getOwner().getId()
-
-    def getTimezone(self):
-        pass
-
-    def getChairList(self):
-        pass
-    getChairList.name = 'chairs'
-    getChairList.result = IConferenceChairMetadataFossil
-
-    def getLocation(self):
-        """ Location (CERN/...) """
-    getLocation.convert = lambda l: l and l.getName()
-
-    def getLocator(self):
-        pass
-    getLocator.convert = Conversion.url(urlHandlers.UHConferenceDisplay)
-    getLocator.name = 'url'
-
-    def getRoom(self):
-        """ Room (inside location) """
-    getRoom.convert = lambda r: r and r.getName()
-
-    def getVisibility(self):
-        pass
-    getVisibility.name = 'visibility'
-    getVisibility.produce = lambda x: Conversion.visibility(x)
-
-    def getRoomMapURL(self):
-        pass
-    getRoomMapURL.produce = lambda x: RoomLinker().getURL(x.getRoom(), x.getLocation())
-
-
 
 class IContributionParticipationMetadataFossil(IFossil):
 
@@ -224,6 +162,68 @@ class _IncludeMaterialFossil(IFossil):
     getAllMaterialList.name = 'material'
     getAllMaterialList.result = IMaterialMetadataFossil
     getAllMaterialList.filterBy = 'access'
+
+
+class IConferenceMetadataFossil(_IncludeMaterialFossil, IFossil):
+
+    def getId(self):
+        pass
+
+    def getStartDate(self):
+        pass
+    getStartDate.convert = Conversion.datetime
+
+    def getEndDate(self):
+        pass
+    getEndDate.convert = Conversion.datetime
+
+    def getTitle(self):
+        pass
+
+    def getDescription(self):
+        pass
+
+    def getType(self):
+        pass
+
+    def getOwner(self):
+        pass
+    getOwner.convert = lambda x: x.getTitle()
+    getOwner.name = 'category'
+
+    def getCategoryId(self):
+        pass
+    getCategoryId.produce = lambda x: x.getOwner().getId()
+
+    def getTimezone(self):
+        pass
+
+    def getChairList(self):
+        pass
+    getChairList.name = 'chairs'
+    getChairList.result = IConferenceChairMetadataFossil
+
+    def getLocation(self):
+        """ Location (CERN/...) """
+    getLocation.convert = lambda l: l and l.getName()
+
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHConferenceDisplay)
+    getLocator.name = 'url'
+
+    def getRoom(self):
+        """ Room (inside location) """
+    getRoom.convert = lambda r: r and r.getName()
+
+    def getVisibility(self):
+        pass
+    getVisibility.name = 'visibility'
+    getVisibility.produce = lambda x: Conversion.visibility(x)
+
+    def getRoomMapURL(self):
+        pass
+    getRoomMapURL.produce = lambda x: RoomLinker().getURL(x.getRoom(), x.getLocation())
 
 
 class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
