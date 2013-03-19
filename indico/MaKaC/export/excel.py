@@ -24,6 +24,9 @@ from datetime import datetime
 from MaKaC.conference import Link
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import LocalFile
+from MaKaC.review import AbstractStatusAccepted, AbstractStatusProposedToAccept
+from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
+from indico.util.date_time import format_date
 import csv, codecs
 
 class ExcelGenerator:
@@ -252,7 +255,7 @@ class RegistrantsListToExcel:
 
 class AbstractListToExcel:
 
-    def __init__(self, conf, abstractList=None, display=["ID", "Title", "PrimaryAuthor", "Tracks", "Type", "Rating"], excelSpecific=True):
+    def __init__(self, conf, abstractList=None, display=["ID", "Title", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate", "ModificationDate"], excelSpecific=True):
         self._conf = conf
         self._abstractList = abstractList
         self._displayList = display
@@ -261,8 +264,7 @@ class AbstractListToExcel:
     def getExcelFile(self):
         excelGen = ExcelGenerator()
         for key in self._displayList:
-            if key in ["ID", "Title", "PrimaryAuthor", "Tracks", "Type", "Rating"]:
-                excelGen.addValue(key)
+            excelGen.addValue(key)
 
         excelGen.newLine()
 
@@ -271,6 +273,8 @@ class AbstractListToExcel:
 
         for abstract in self._abstractList:
             for key in self._displayList:
+                status = abstract.getCurrentStatus()
+                isStatusAccpeted = isinstance(status, (AbstractStatusAccepted, AbstractStatusProposedToAccept))
                 if key == "ID":
                     excelGen.addValue(abstract.getId())
                 elif key == "Title":
@@ -286,16 +290,33 @@ class AbstractListToExcel:
                         trList.append(tr.getTitle())
                     excelGen.addValue("; ".join(trList))
                 elif key == "Type":
-                    contribType=abstract.getContribType()
+                    contribType = abstract.getContribType()
                     ctname = ""
                     if contribType is not None:
-                        ctname=contribType.getName()
+                        ctname = contribType.getName()
                     excelGen.addValue(ctname)
+                elif key == "Status":
+                    excelGen.addValue(AbstractStatusList.getInstance().getCaption(status.__class__))
                 elif key == "Rating":
                     if abstract.getRating():
                         excelGen.addValue("%.2f" % abstract.getRating())
                     else:
                         excelGen.addNumberAsString("-", self._excelSpecific)
+                elif key == "AccTrack":
+                    accTrack = ""
+                    if isStatusAccpeted and status.getTrack():
+                        accTrack = status.getTrack().getCode()
+                    excelGen.addValue(accTrack)
+                elif key == "AccType":
+                    accType = ""
+                    if isStatusAccpeted and status.getType():
+                        accType = status.getType().getName()
+                    excelGen.addValue(accType)
+                elif key == "SubmissionDate":
+                    excelGen.addValue(format_date(abstract.getSubmissionDate(), format="short"))
+                elif key == "ModificationDate":
+                    excelGen.addValue(format_date(abstract.getModificationDate(), format="short"))
+
             excelGen.newLine()
         return excelGen.getExcelContent()
 
