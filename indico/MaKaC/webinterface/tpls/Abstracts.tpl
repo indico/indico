@@ -127,7 +127,7 @@
                     <input type="hidden" name="order" value="${order}">
                   </td>
                 </tr>
-                <tr id="headPanel" class="follow-scroll" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);">
+                <tr id="headPanel" class="follow-scroll">
                     <td valign="bottom" width="100%" align="left" colspan="1000">
                         <table style="margin-left: -8px" >
                             <tr >

@@ -10,7 +10,7 @@
             </div>
         </td>
     </tr>
-    <tr id="headPanel" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);" class="follow-scroll">
+    <tr id="headPanel" class="follow-scroll">
         <td valign="bottom" width="100%" align="left" style="padding-top:5px;" colspan="9">
             <table>
                 <tr >
