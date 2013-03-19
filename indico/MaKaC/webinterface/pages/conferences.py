@@ -3621,7 +3621,7 @@ class WFilterCriterionOptionsAbstracts(wcomponents.WTemplated):
 class WAbstracts( wcomponents.WTemplated ):
 
     # available columns
-    COLUMNS = ["ID", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate", "ModificationDate"]
+    COLUMNS = ["ID", "Title", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate", "ModificationDate"]
 
     def __init__( self, conference, filterCrit, sortingCrit, order, display, filterUsed):
         self._conf = conference
@@ -3758,8 +3758,8 @@ class WAbstracts( wcomponents.WTemplated ):
             This method complements the method "_setDispOpts" in which we get a dictonary with "ids".
         """
         if not hasattr(self, "_columns"):
-            self._columns = {"ID":"ID", "PrimaryAuthor":"Primary Author", "Tracks": "Tracks", "Type":"Type", "Status":"Status", \
-                      "Rating":"Rating", "AccTrack":"Acc. Track", "AccType":"Acc. Type", "SubmissionDate":"Submission Date", "ModificationDate":"Modification Date"}
+            self._columns = {"ID": "ID","Title": "Title", "PrimaryAuthor": "Primary Author", "Tracks": "Tracks", "Type": "Type", "Status":"Status", \
+                      "Rating":" Rating", "AccTrack": "Acc. Track", "AccType": "Acc. Type", "SubmissionDate": "Submission Date", "ModificationDate": "Modification Date"}
         return self._columns
 
     def _getDisplay(self):
@@ -3771,9 +3771,6 @@ class WAbstracts( wcomponents.WTemplated ):
         if display == []:
             display = self.COLUMNS
         return display
-
-    def _getDisplayOptions(self):
-        return self._getDisplay () + ["Title"]
 
     def _getAccType(self, abstract):
         status = abstract.getCurrentStatus()

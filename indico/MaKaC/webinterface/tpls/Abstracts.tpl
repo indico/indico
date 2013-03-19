@@ -120,7 +120,6 @@
                     % for option in displayColumns:
                         <input type="hidden" name="disp" value="${option}">
                     % endfor
-                    <input type="hidden" name="disp" value="Title">
                     <input type="hidden" name="order" value="${order}">
                   </td>
                 </tr>
