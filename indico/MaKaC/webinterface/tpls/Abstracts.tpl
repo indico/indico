@@ -450,7 +450,7 @@ $(function(){
     });
 
     $("#add_new_abstract").bind('menu_select',function(){
-      InsertHiddenField("newAbstract", $T("Add"));
+      InsertHiddenField("newAbstract", [$T("Add")]);
       $('#abstractsForm').submit();
     });
 
