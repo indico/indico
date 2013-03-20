@@ -23,7 +23,7 @@
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Modification key")}</span></td>
         <td class="blacktext">
             <input name=modifKey id="modifKey" type="password" autocomplete="off" size=25 value="${ modifKey }">
-            <input id="setModifKey" type="submit" class="btn" value="${ _("change")}"> <span id="modifKeyChanged" class="successText"></span>
+            <button id="setModifKey" type="button" class="btn">${ _("change")}</button> <span id="modifKeyChanged" class="successText"></span>
             <div class="warningText">${_("Note: It is more secure to use the manager list instead of a modification key!")}</div>
             <script type="text/javascript">
                 $('#setModifKey').click(function(e) {
