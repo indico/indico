@@ -54,6 +54,15 @@ class WebcastManager(Persistent):
             self._managers.remove( av )
             self._p_changed=1
 
+    def removeManagerById( self, managerId ):
+        for av in self.getManagers():
+            if av.getId() == managerId:
+                self._managers.remove( av )
+                self._p_changed=1
+                return True
+        else:
+            return False
+
     def isManager( self, av ):
         if av in self.getManagers():
             return True

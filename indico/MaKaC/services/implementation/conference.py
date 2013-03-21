@@ -993,6 +993,8 @@ class ConferenceAddParticipants(ConferenceParticipantBase, ConferenceParticipant
         for user in self._userList:
             ph = PrincipalHolder()
             selected = ph.getById(user['id'])
+            if selected is None and user["_type"] == "Avatar":
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
             if isinstance(selected, Avatar) :
                 self._addParticipant(self._generateParticipant(selected), participation)
             elif isinstance(selected, Group) :
@@ -1355,6 +1357,8 @@ class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
         for person in self._userList:
             ah = AvatarHolder()
             av = ah.getById(person["id"])
+            if av is None:
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % person["email"])
             self._newChair(av)
 
         return self._getChairPersonsList()
@@ -1520,7 +1524,10 @@ class ConferenceProtectionAddExistingManager(ConferenceManagerListBase):
     def _getAnswer(self):
         ph = PrincipalHolder()
         for user in self._userList:
-            self._conf.grantModification(ph.getById(user["id"]))
+            principal = ph.getById(user["id"])
+            if principal is None and user["_type"] == "Avatar":
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
+            self._conf.grantModification(principal)
         return self._getManagersList()
 
 

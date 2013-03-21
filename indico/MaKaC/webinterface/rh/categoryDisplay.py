@@ -272,6 +272,7 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
         if allowedUsersDict :
             auAvatars, auNewUsers, auEditedAvatars = UserListModificationBase.retrieveUsers({"userList":allowedUsersDict})
         #raise "avt: %s, newusers: %s, edited: %s"%(map(lambda x:x.getFullName(),avatars), newUsers, editedAvatars)
+
         return cpAvatars, cpNewUsers, auAvatars
 
     def alertCreation(self, confs):

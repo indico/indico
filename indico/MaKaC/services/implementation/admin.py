@@ -22,7 +22,7 @@ from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.user import PrincipalHolder, AvatarHolder, GroupHolder
 import MaKaC.webcast as webcast
 import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import MaKaC.common.info as info
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.user import IAvatarAllDetailsFossil
@@ -41,8 +41,10 @@ class AddWebcastAdministrators(AdminService):
         ph = PrincipalHolder()
         for user in self._userList:
             pr = ph.getById(user["id"])
-            if pr != None:
-                self._wm.addManager(pr)
+            if pr is None:
+                raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
+            self._wm.addManager(pr)
+
         return fossilize(self._wm.getManagers())
 
 class RemoveWebcastAdministrator(AdminService):
@@ -52,15 +54,14 @@ class RemoveWebcastAdministrator(AdminService):
         pm = ParameterManager(self._params)
         self._wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         self._userId = pm.extract("userId", pType=str, allowEmpty=False)
-        self._pr = PrincipalHolder().getById(self._userId)
-        if self._pr == None:
-            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
 
     def _getAnswer( self):
         ph = PrincipalHolder()
         pr = ph.getById(self._userId)
         if pr != None:
             self._wm.removeManager(pr)
+        elif not self._wm.removeManagerById(self._userId):
+            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
         return fossilize(self._wm.getManagers())
 
 
@@ -73,7 +74,7 @@ class AdminLoginAs(AdminService):
         self._userId = pm.extract("userId", pType=str, allowEmpty=False)
         self._av = AvatarHolder().getById(self._userId)
         if self._av == None:
-            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
+            raise NoReportError(_("The user that you are trying to login as does not exist anymore in the database"))
 
     def _getAnswer(self):
         tzUtil = timezoneUtils.SessionTZ(self._av)
@@ -96,10 +97,9 @@ class AddAdministrator(AdminService):
         ph = PrincipalHolder()
         for user in self._userList:
             principal = ph.getById(user["id"])
-            if principal != None:
-                adminList.grant(principal)
-            else:
-                raise ServiceError("ER-U0", _("Cannot find user with id %s") % user["id"])
+            if principal is  None:
+                raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
+            adminList.grant(principal)
         return fossilize(minfo.getAdminList())
 
 
@@ -117,7 +117,7 @@ class RemoveAdministrator(AdminService):
         user = ph.getById(self._userId)
         if user != None:
             adminList.revoke(user)
-        else:
+        elif not adminList.revokeById(self._userId):
             raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
         return fossilize(minfo.getAdminList())
 
@@ -144,10 +144,9 @@ class GroupAddExistingMember(GroupMemberBase):
         ph = PrincipalHolder()
         for user in self._userList:
             principal = ph.getById(user["id"])
-            if principal != None:
-                self._group.addMember(principal)
-            else:
-                raise ServiceError("ER-U0", _("Cannot find user with id %s") % user["id"])
+            if principal is None:
+                raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
+            self._group.addMember(principal)
         return fossilize(self._group.getMemberList())
 
 
