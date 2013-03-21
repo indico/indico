@@ -130,7 +130,7 @@ var sendTestAlarm = function ()
         confId: ${conference.getId()},
         fromAddr: $("#fromAddr").val(),
         note: $("#note").val(),
-        includeConf: $("#includeConf:checked").val(),
+        includeConf: $("#includeConf:checked").val()
     },
     function(result, error) {
         if(error) {
