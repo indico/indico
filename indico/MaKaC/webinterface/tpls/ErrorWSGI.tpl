@@ -4,6 +4,7 @@
     <head>
         <title>Indico</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="x-ua-compatible" content="IE=edge" >
         <link href="${ Config.getInstance().getSystemIconURL("addressBarIcon") }" type="image/x-icon" rel="shortcut icon" />
 
         <style type="text/css">
