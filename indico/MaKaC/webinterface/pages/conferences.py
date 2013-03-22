@@ -5719,8 +5719,8 @@ class WPConferenceStaticDefaultDisplayBase( WPConferenceDefaultDisplayBase ):
 <html>
     <head>
         <title>%s</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <meta http-equiv="x-ua-compatible" content="IE=edge" >
         <link rel="shortcut icon" href=%s>
         <link rel="stylesheet" type="text/css"  href="%s/%s">
     </head>
@@ -6529,8 +6529,8 @@ class WPStaticMeetingBase(WPConferenceStaticDefaultDisplayBase):
     <html>
         <head>
             <title>%s</title>
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-            <meta http-equiv="x-ua-compatible" content="IE=edge" >
             <link rel="shortcut icon" href=%s>
             %s
         </head>

@@ -49,7 +49,7 @@ def displayList(res,tz):
 <HTML>
 <HEAD>
    <TITLE>Forthcoming Seminars</TITLE>
-   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </HEAD>
 <BODY LINK="#0000FF" VLINK="#800080">
 

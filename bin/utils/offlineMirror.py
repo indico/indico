@@ -102,6 +102,7 @@ def generateIndex(dest, index, day):
     <head>
 
     <title>Indico offline mirror - %s</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     </head>
 
