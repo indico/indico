@@ -84,7 +84,7 @@ def _setup(args):
     cfg = Config.getInstance()
 
     # logging setup
-    handler = logging.FileHandler(os.path.join(cfg.getLogDir(), 'scheduler.log'), 'a')
+    handler = logging.handlers.TimedRotatingFileHandler(os.path.join(cfg.getLogDir(), 'scheduler.log'), 'midnight')
     handler.setFormatter(
         logging.Formatter(
             "%(asctime)s %(process)s %(name)s: %(levelname)-8s %(message)s"))
