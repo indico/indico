@@ -23,6 +23,7 @@ This script starts an Indico Scheduler instance, forking it off as a background
 process.
 """
 
+import ConfigParser
 import time, sys, os, argparse, logging, cmd, multiprocessing
 from logging.handlers import SMTPHandler
 
@@ -34,6 +35,7 @@ from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 
+
 class SchedulerApp(object):
 
     def __init__(self, args):
@@ -41,9 +43,20 @@ class SchedulerApp(object):
         self.args = args
         config = Config.getInstance()
         worker = config.getWorkerName();
+
+        cp = ConfigParser.ConfigParser()
+        logging_conf_file = os.path.join(config.getConfigurationDir(), "logging.conf")
+        cp.read(logging_conf_file)
+
+        if cp.has_option('handler_smtp', 'args'):
+            # get e-mail from logging config file
+            log_mail = eval(cp.get('handler_smtp', 'args'))[2]
+        else:
+            log_mail = config.getSupportEmail()
+
         self.mailer = SMTPHandler(config.getSmtpServer(),
                                   'scheduler@%s' % worker,
-                                  config.getSupportEmail(),
+                                  log_mail,
                                   "[indico_scheduler] Problem at %s" % worker)
 
         self.mailer.setLevel(logging.ERROR)

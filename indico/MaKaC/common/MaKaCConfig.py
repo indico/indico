@@ -31,8 +31,6 @@ if indico_conf == '': # we may be in development mode or in installation mode
     if not os.path.exists(indico_conf):
         indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf.sample')
 
-print indico_conf
-
 execfile(indico_conf)
 
 FileTypes = {"DOC":  ["Ms Word","application/msword","word_big.png"],
