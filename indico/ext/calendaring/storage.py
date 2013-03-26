@@ -69,7 +69,7 @@ def addAvatarConference(avatar, conference, eventType):
         if not storage.get(key):
             storage[key] = PersistentList()
         # Remove duplicated events to avoid passing two identical pairs: key + eventType to ExternalOperationsManager
-        storage[key] = [event for event in storage[key] if event['eventType'] != eventType]
+        storage[key] = PersistentList([event for event in storage[key] if event['eventType'] != eventType])
         storage[key].append(dict(avatar=avatar, conference=conference, eventType=eventType))
 
 
