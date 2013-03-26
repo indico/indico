@@ -1,0 +1,135 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+.table-title {
+    border-bottom: 1px #E5E5E5 solid;
+    color: #777;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 3px 3px 5px 3px;
+}
+
+.table-title.emphasis {
+    font-style: italic;
+}
+
+.table-title.no-border {
+    border-bottom: none;
+    font-style: italic;
+}
+
+.table-row {
+    border-bottom: 1px #E5E5E5 solid;
+    border-left: 2px solid rgba(56, 126, 229,0);
+}
+
+.table-row ~ .table-row {
+    border-top: none;
+}
+
+.table-cell {
+    display: inline-block;
+    padding: 5px 3px 5px 3px;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.table-cell.empty {
+    color: #999;
+    font-style: italic;
+}
+
+.table-cell[class*="icon-"]:before {
+    color: #555 !important;
+    font-size: 1.2em;
+    margin-right: 0.5em;
+}
+
+.table-cell[class*="icon-"].icon-only:before {
+    margin-right: 0em;
+}
+
+.table-cell.fixed {
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 150px;
+}
+
+/* **************** */
+/* Interactive rows */
+/* **************** */
+.table-row.interactive:hover {
+    border-left-color: rgba(56, 126, 229,1) !important;
+}
+
+.table-row.interactive.active {
+    border-left-color: #E5E5E5;
+}
+
+.table-row.interactive > .inline {
+    cursor: pointer;
+    transition: background-color .25s ease-out;
+    -webkit-transition: background-color .25s ease-out;
+    -moz-transition: background-color .25s ease-out;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    white-space: nowrap;
+}
+
+.table-row.interactive > .inline.active {
+    background-color: #F4F4F4;
+}
+
+.content-row {
+    position: relative;
+}
+
+.content-row > .table-cell.fixed {
+    border-bottom: 1px dashed #E5E5E5;
+    border-right: 1px dashed #E5E5E5;
+    overflow: visible;
+    padding: 5px 5px 5px 0px;
+    text-align: right;
+    width: 176px;
+}
+
+.content-row:last-of-type > .table-cell.fixed {
+    border-bottom: none;
+}
+
+.content-row > .table-cell.fixed.v-growing {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    top: 0;
+}
+
+.content-row > .table-cell:not(.fixed).v-growing {
+    margin-left: 186px;
+    min-height: 1em;
+    white-space: pre-line;
+}

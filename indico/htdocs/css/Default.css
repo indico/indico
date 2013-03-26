@@ -1014,13 +1014,22 @@ a.confSubSection:hover {
 }
 
 .groupTitle, .groupTitleNoBorder, .groupSubTitle {
-   font-family: Georgia, Times, "Times New Roman";
+/*    font-family: Georgia, Times, "Times New Roman"; */
    font-size: 24px;
+   font-weight: bold;
    color: #4E4C46;
    letter-spacing: 1px;
    padding: 3px 3px 5px 3px;
-   border-bottom: 1px solid #777777;
-   margin: 10px 0;
+   border-bottom: 1px solid #AAA;
+   margin-bottom: 10px;
+}
+
+.groupTitle > [class*="icon-"],
+.groupTitleNoBorder > [class*="icon-"],
+.groupSubTitle > [class*="icon-"] {
+    color: #CCC;
+    font-size: 1.2em;
+    vertical-align: middle;
 }
 
 .reviewingsubtitle {
@@ -7800,6 +7809,7 @@ ul.buttonMenuPopupList li a:hover {
     top: 0;
     width:95%;
     background-color:#FFFFFF;
+    z-index: 1000;
 }
 
 .ui-list-menu-level  {

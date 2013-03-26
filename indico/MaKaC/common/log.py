@@ -18,6 +18,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
+
+from indico.util.struct import iterators
 from MaKaC.common.timezoneUtils import nowutc
 
 class LogItem(Persistent) :
@@ -62,9 +64,9 @@ class LogItem(Persistent) :
 
     def getResponsibleName(self):
         if self._responsibleUser is None :
-            return "<system>"
+            return "System"
         else :
-            return self._responsibleUser.getFullName()
+            return self._responsibleUser.getStraightFullName(upper=False)
 
     def getModule(self):
         return self._module
@@ -74,6 +76,19 @@ class LogItem(Persistent) :
 
     def getLogSubject(self):
         return self._logInfo["subject"]
+
+    def getLogInfoList(self):
+        """
+        Return a list of pairs with the caption and the pre-processed
+        information to be shown.
+        """
+        info_list = []
+        for entry in iterators.SortedDictIterator(self._logInfo):
+            if (entry[0] != "subject"):
+                caption = entry[0]
+                value = entry[1]
+                info_list.append((caption, value))
+        return info_list
 
 
 class ActionLogItem(LogItem):
@@ -86,14 +101,33 @@ class ActionLogItem(LogItem):
 class EmailLogItem(LogItem):
     """
     self._logInfo expected keys:
+    - body
+    - ccList
     - toList
     """
     def __init__(self, user, logInfo, module):
         LogItem.__init__(self, user, logInfo, module)
         self._logType = "emailLog"
 
-    def getLogRecipients(self):
-        return self._logInfo["toList"]
+    def getLogBody(self):
+        return self._logInfo.get("body", "No message")
+
+    def getLogCCList(self):
+        return self._logInfo.get("ccList", "No CC receptors")
+
+    def getLogToList(self):
+        return self._logInfo.get("toList", "No receptors")
+
+    def getLogInfoList(self):
+        """
+        Return a list of pairs with the caption and the pre-processed
+        information to be shown.
+        """
+        info_list = []
+        info_list.append(("To", ",".join(self.getLogToList())))
+        info_list.append(("CC", ",".join(self.getLogCCList())))
+        info_list.append(("Body", self.getLogBody()))
+        return info_list
 
 
 class LogHandler(Persistent):

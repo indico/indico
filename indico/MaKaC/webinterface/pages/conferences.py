@@ -17,9 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import urllib
+import collections
 import os
 import random
+import urllib
 from indico.util import json
 
 from datetime import timedelta, datetime
@@ -76,7 +77,7 @@ from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
-import collections
+
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -2587,46 +2588,20 @@ class WConferenceLog(wcomponents.WTemplated):
 
     def getVars(self):
         log_vars = wcomponents.WTemplated.getVars(self)
-        log_vars["confTitle"] = self.__conf.getTitle()
-        log_vars["confId"] = self.__conf.getId()
-
-        log_vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
-        log_vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
-
-        view = log_vars.get("view","general")
-        key = log_vars.get("filterKey","")
-        order = log_vars.get("order","date")
-        log_vars["log"] = self.__conf.getLogHandler().getLogList(view, key, order)
-
-        orderByDate = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderByDate.addParam("order", "date")
-        orderByDate.addParam("view", view)
-        orderByModule = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderByModule.addParam("order", "module")
-        orderByModule.addParam("view", view)
-        orderByResponsible = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderByResponsible.addParam("order", "responsible")
-        orderByResponsible.addParam("view", view)
-        orderBySubject = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderBySubject.addParam("order", "subject")
-        orderBySubject.addParam("view", view)
-        orderByRecipients = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        orderByRecipients.addParam("order", "recipients")
-        orderByRecipients.addParam("view", view)
-
-        log_vars["orderByDate"] = orderByDate
-        log_vars["orderByModule"] = orderByModule
-        log_vars["orderByResponsible"] = orderByResponsible
-        log_vars["orderBySubject"] = orderBySubject
-        log_vars["orderByRecipients"] = orderByRecipients
-
-        logFilterAction = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        log_vars["logFilterAction"] = logFilterAction
-        log_vars["logListAction"] = ""
+        log_vars["log_dict"] = self._getLogDict()
         log_vars["timezone"] = timezone(self._tz)
         log_vars["url"] = urlHandlers.UHConfModifLogItem.getURL(self.__conf)
-
         return log_vars
+
+    def _getLogDict(self):
+        """Return a dictionary of log entries per day."""
+        log = self.__conf.getLogHandler().getLogList()
+        log_dict = collections.defaultdict(list)
+        for line in log:
+            date = line.getLogDate().date()
+            log_dict[date].append(line)
+        return log_dict
+
 
 class WPConfModifLog(WPConferenceModifBase):
 

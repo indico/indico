@@ -37,12 +37,20 @@ h2.page_title {
     display: none !important;
 }
 
+.weak-hidden {
+    display: none;
+}
+
 .overflow {
     overflow: auto;
 }
 
 .nohtml {
     white-space: pre-line;
+}
+
+.bold {
+    font-weight: bold;
 }
 
 .not_important {

@@ -5464,11 +5464,7 @@ class Session(CommonObjectBase, Locatable):
         for sc in self.getConvenerList() :
             data["convener %s"%sc.getId()] = sc.getFullName()
         for co in self.getCoordinatorList() :
-            data["contribution %s"%co.getId()] = co.getFullName()
-        for s in self.getSlotList() :
-            data["contribution %s"%s.getId()] = s.getTitle()
-        for c in self.getContributionList() :
-            data["contribution %s"%c.getId()] = c.getTitle()
+            data["coordinators %s"%co.getId()] = co.getFullName()
 
         return data
 

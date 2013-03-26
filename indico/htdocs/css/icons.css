@@ -11,22 +11,26 @@
 
 /* Use the following CSS code if you want to use data attributes for inserting your icons */
 [data-icon]:before {
-	font-family: 'icomoon-ultimate';
-	content: attr(data-icon);
-	speak: none;
-	font-weight: normal;
-	line-height: 1;
-	-webkit-font-smoothing: antialiased;
+    font-family: 'icomoon-ultimate';
+    content: attr(data-icon);
+    speak: none;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Use the following CSS code if you want to have a class per icon */
 [class^="icon-"]:before, [class*=" icon-"]:before {
 	font-family: 'icomoon-ultimate';
-	font-style: normal;
-	speak: none;
-	font-weight: normal;
-	line-height: 1;
-	-webkit-font-smoothing: antialiased;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
 }
 
 .icon-phone:before {
@@ -169,4 +173,34 @@
 }
 .icon-remove:before {
     content: "\22";
+}
+.icon-cog:before {
+    content: "\33";
+}
+.icon-menu:before {
+    content: "\35";
+}
+.icon-menu-2:before {
+    content: "\36";
+}
+.icon-search:before {
+    content: "\37";
+}
+.icon-arrow-up:before {
+    content: "\34";
+}
+.icon-key-A:before {
+    content: "\38";
+}
+.icon-stack-plus:before {
+    content: "\39";
+}
+.icon-stack-minus:before {
+    content: "\3a";
+}
+.icon-close:before {
+    content: "\3b";
+}
+.icon-clipboard:before {
+    content: "\3c";
 }
