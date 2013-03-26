@@ -460,7 +460,8 @@ class CSBooking(CSBookingBase):
     def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
         """ Moves the booking in the old bookings index
         """
-        VidyoTools.getEventEndDateIndex().moveBooking(self, oldEndDate)
+        if oldEndDate is not None:
+            VidyoTools.getEventEndDateIndex().moveBooking(self, oldEndDate)
 
     def _connect(self, force=False):
         self._checkStatus()

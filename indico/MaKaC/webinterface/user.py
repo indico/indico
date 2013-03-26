@@ -19,7 +19,7 @@
 
 from MaKaC import user
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 
 
 class UserModificationBase ( object ):
@@ -79,6 +79,9 @@ class UserListModificationBase ( object):
             elif id.startswith('edited'):
                 editedAvatars.append((ph.getById(id[6:]), userDict))
             else:
+                principal = ph.getById(id)
+                if principal is None:
+                    raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % userDict["email"])
                 avatars.append(ph.getById(id))
 
         return avatars, newUsers, editedAvatars

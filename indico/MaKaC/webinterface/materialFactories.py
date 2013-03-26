@@ -397,12 +397,21 @@ class MaterialFactoryRegistry:
                   ReviewingFactory._id: ReviewingFactory }
 
     _allowedMaterials = {
-        'simple_event': [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ],
-        'meeting': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
-        'conference' : ["paper", "slides", "poster", "minutes"],
-        'category': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
-        }
+        'simple_event': ["paper", "slides", "poster", "minutes", "agenda", "pictures",
+                         "text", "more information", "document", "list of actions",
+                         "drawings", "proceedings", "live broadcast", "video",
+                         "streaming video", "downloadable video", "notes", "summary"],
 
+        'meeting': ["paper", "slides", "poster", "minutes", "agenda", "video",
+                    "pictures", "text", "more information", "document", "list of actions",
+                    "drawings", "proceedings", "live broadcast", "notes", "summary"],
+
+        'conference': ["paper", "slides", "poster", "minutes", "notes", "summary"],
+
+        'category': ["paper", "slides", "poster", "minutes", "agenda", "video", "pictures",
+                     "text", "more information", "document", "list of actions", "drawings",
+                     "proceedings", "live broadcast"]
+    }
 
     @classmethod
     def getById( cls, matId ):

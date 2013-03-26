@@ -321,6 +321,8 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
             if user["_type"] == "Avatar": # new speaker
                 ah = AvatarHolder()
                 av = ah.getById(user["id"])
+                if av is None:
+                    raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
                 part = self._newParticipant(av)
             elif user["_type"] == "ContributionParticipation": # adding existing author to speaker
                 part = self._contribution.getAuthorById(user["id"])
@@ -744,6 +746,8 @@ class ContributionAddExistingSubmitter(ContributionSubmittersBase):
         ah = PrincipalHolder()
         for user in self._userList:
             av = ah.getById(user["id"])
+            if av is None:
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
             self._contribution.grantSubmission(av)
         return self._getSubmittersList()
 
@@ -863,6 +867,9 @@ class ContributionAddExistingManager(ContributionManagerListBase):
     def _getAnswer(self):
         ph = PrincipalHolder()
         for user in self._userList:
+            principal = ph.getById(user["id"])
+            if principal is None and user["_type"] == "Avatar":
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
             self._contribution.grantModification(ph.getById(user["id"]))
         return self._getManagersList()
 

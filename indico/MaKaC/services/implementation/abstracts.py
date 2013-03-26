@@ -22,7 +22,7 @@ from MaKaC.services.implementation.conference import ConferenceModifBase
 import MaKaC.user as user
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import AvatarHolder
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 
 
 class ChangeAbstractSubmitter(ConferenceModifBase):
@@ -34,6 +34,9 @@ class ChangeAbstractSubmitter(ConferenceModifBase):
         abstractId = pm.extract("abstractId", pType=str, allowEmpty=False)
         self._abstract = self._conf.getAbstractMgr().getAbstractById(abstractId)
         self._submitter = user.AvatarHolder().getById(submitterId)
+        if self._submitter is None:
+            raise NoReportError(_("The user that you are changing does not exist anymore in the database"))
+
 
     def _getAnswer(self):
         self._abstract.setSubmitter(self._submitter)

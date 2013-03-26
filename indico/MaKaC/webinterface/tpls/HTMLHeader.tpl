@@ -2,6 +2,7 @@
 <html xmlns:fb="http://ogp.me/ns/fb#" xmlns:og="http://opengraph.org/schema/">
     <head>
         <title>${ page._getTitle() }${ area }</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <link rel="shortcut icon" type="image/x-icon" href="${ systemIcon('addressBarIcon') }">
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>

@@ -14,7 +14,7 @@
         <td class="titleCellTD"><span class="titleCellFormat">${ _("Access key")}</span></td>
         <td bgcolor="white" width="100%" valign="top" class="blacktext">
             <input name="accessKey" id="accessKey" type="password" autocomplete="off" size=25 value="${ accessKey }">
-            <input id="setAccessKey" type="submit" class="btn" value="${ _("change")}"> <span id="accessKeyChanged" class="successText"></span>
+            <button id="setAccessKey" type="button" class="btn">${ _("change")}</button> <span id="accessKeyChanged" class="successText"></span>
             <div class="warningText">${_("Note: It is more secure to use make the event private instead of using an access key!")}</div>
             </form>
 

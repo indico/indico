@@ -25,7 +25,7 @@ from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.roomBooking import GetBookingBase
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators
 from MaKaC.conference import SessionSlot, SessionChair
@@ -263,10 +263,13 @@ class SessionAddExistingChair(SessionChairListBase):
     def _getAnswer(self):
         ph = PrincipalHolder()
         for user in self._userList:
+            person = ph.getById(user["id"])
+            if person is None:
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
             if self._kindOfList == "manager":
-                self._session.grantModification(ph.getById(user["id"]))
+                self._session.grantModification(person)
             elif self._kindOfList == "coordinator":
-                self._session.addCoordinator(ph.getById(user["id"]))
+                self._session.addCoordinator(person)
         return self._getSessionChairList()
 
 

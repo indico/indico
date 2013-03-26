@@ -380,7 +380,6 @@ class RH(RequestHandlerBase):
         """
         Logger.get('requestHandler').info('Request %s finished with KeyAccessError: "%s"' % (id(self._req), e))
 
-        self._req.status = apache.HTTP_FORBIDDEN
         # We are going to redirect to the page asking for access key
         # and so it must be https if there is a BaseSecureURL. And that's
         # why we set _tohttps to True.

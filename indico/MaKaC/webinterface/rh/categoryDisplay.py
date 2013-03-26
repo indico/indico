@@ -265,13 +265,14 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
     def _getPersons(self):
         cpAvatars, cpNewUsers, auAvatars = [], [], []
         from MaKaC.services.interface.rpc import json
-        chairpersonDict = json.decode(self._params.get("chairperson"))
-        allowedUsersDict = json.decode(self._params.get("allowedUsers"))
+        chairpersonDict = json.decode(self._params.get("chairperson", []))
+        allowedUsersDict = json.decode(self._params.get("allowedUsers", []))
         if chairpersonDict:
             cpAvatars, cpNewUsers, cpEditedAvatars = UserListModificationBase.retrieveUsers({"userList":chairpersonDict})
         if allowedUsersDict :
             auAvatars, auNewUsers, auEditedAvatars = UserListModificationBase.retrieveUsers({"userList":allowedUsersDict})
         #raise "avt: %s, newusers: %s, edited: %s"%(map(lambda x:x.getFullName(),avatars), newUsers, editedAvatars)
+
         return cpAvatars, cpNewUsers, auAvatars
 
     def alertCreation(self, confs):

@@ -80,7 +80,11 @@
                                                         % for column in columns:
                                                             <tr>
                                                                 <td align="left" valign="top">
-                                                                    <input type="checkbox" name="disp" value="${column}" ${"checked" if column in displayColumns else ""}>
+                                                                    %if column == 'Title':
+                                                                        <input type="hidden" name="disp" value="${column}">
+                                                                    %endif
+                                                                    <input type="checkbox" name="disp" value="${column}" ${"checked" if column in displayColumns or  column == 'Title' else ""}  ${"disabled" if column == 'Title' else ""}>
+
                                                                 </td>
                                                                 <td width="100%%" align="left" valign="top">${columnsDict[column]}
                                                                 </td>
@@ -120,11 +124,10 @@
                     % for option in displayColumns:
                         <input type="hidden" name="disp" value="${option}">
                     % endfor
-                    <input type="hidden" name="disp" value="Title">
                     <input type="hidden" name="order" value="${order}">
                   </td>
                 </tr>
-                <tr id="headPanel" class="follow-scroll" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);">
+                <tr id="headPanel" class="follow-scroll">
                     <td valign="bottom" width="100%" align="left" colspan="1000">
                         <table style="margin-left: -8px" >
                             <tr >
@@ -416,34 +419,41 @@ $(function(){
         IndicoUI.Effect.followScroll();
     });
 
+    // Cleanup previous actions
+    var CleanupHiddenFields = function (){
+        $("#abstractsForm input[type=hidden]").remove();
+    }
+
     // Insert hidden field to the form
-    var InsertHiddenField = function (name, value, cleanup){
-      if (cleanup) {
-        $("#abstractsForm input[type=hidden]").remove(); // clean previous actions
-      }
-      $('#abstractsForm').append($("<input>").attr("type", "hidden").attr("name", name).val(value));
+    var InsertHiddenField = function (name, array){
+        for (var index in array){
+            $('#abstractsForm').append($("<input>").attr("type", "hidden").attr("name", name).val(array[index]));
+        }
     }
 
     _({
-      "#accept_abstracts": ["acceptMultiple", $T("Accept")],
-      "#reject_abstracts": ["rejectMultiple", $T("Reject")],
-      "#merge_abstracts": ["merge", $T("Merge")],
-      "#author_list": ["auth", $T("Author List")],
-      "#download_attachments": ["PKGA", $T("Download attachments")],
-      "#export_pdf": ["pdf", $T("Export PDF")],
-      "#export_csv": ["excel", $T("Export CSV")],
-      "#export_xml": ["xml", $T("Export XML")]
+      "#accept_abstracts": {"acceptMultiple": [$T("Accept")]},
+      "#reject_abstracts": {"rejectMultiple": [$T("Reject")]},
+      "#merge_abstracts": {"merge": [$T("Merge")]},
+      "#author_list": {"auth": [$T("Author List")]},
+      "#download_attachments": {"PKGA": [$T("Download attachments")]},
+      "#export_pdf": {"pdf": [$T("Export PDF")]},
+      "#export_csv": {"excel": [$T("Export CSV")], "disp": ${displayColumns}},
+      "#export_xml": {"xml": [$T("Export XML")]}
     }).each(function(vals, key) {
       $(key).bind('menu_select',function(){
         if (atLeastOneSelected()) {
-            InsertHiddenField(vals[0], vals[1], true);
+            CleanupHiddenFields();
+            for (var index in vals) {
+                InsertHiddenField(index, vals[index]);
+            }
             $('#abstractsForm').submit();
         }
       });
     });
 
     $("#add_new_abstract").bind('menu_select',function(){
-      InsertHiddenField("newAbstract", $T("Add"), false);
+      InsertHiddenField("newAbstract", [$T("Add")]);
       $('#abstractsForm').submit();
     });
 

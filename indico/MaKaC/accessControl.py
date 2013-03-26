@@ -439,6 +439,15 @@ class _AdminList(Persistent):
                     self._p_changed=1
                     break
 
+    def revokeById( self, userId ):
+        for u in self.__list:
+            if u.getId() == userId:
+                self.__list.remove(u)
+                self._p_changed=1
+                return True
+        else:
+            return False
+
     def isAdmin( self, user ):
         if user in self.__list:
             return True
