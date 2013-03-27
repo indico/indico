@@ -266,9 +266,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     position: 'absolute',
                     top: pixels(this.topPos),
                     height: pixels(this.height),
-                    'background-color': this.printableVersion ? 'white' : this.eventData.color,
-                    color: this.printableVersion ? 'black' : this.eventData.textColor,
-                    'border-color': this.printableVersion ? 'black' : '',
+                    'background-color': this.eventData.color,
+                    color: this.eventData.textColor,
                     left: pixels(this.leftPos),
                     width: pixels(this.width-3),
                     'border-bottom-style': this.blockData.unfinished?'dashed':''
@@ -506,9 +505,8 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
                 };
 
                 block = Html.div({style: {
-                            backgroundColor: this.printableVersion ? 'white' : this.eventData.color,
-                            color: this.printableVersion ? 'black' : this.eventData.textColor,
-                            borderColor: this.printableVersion ? 'black' : '',
+                            backgroundColor: this.eventData.color,
+                            color: this.eventData.textColor,
                             maxHeight : '30px',
                             margin : '2px 0',
                             overflow : 'hidden'
