@@ -19,6 +19,7 @@
 from zope.interface import implements
 import time
 
+from MaKaC.common import log
 from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.i18n import _
@@ -660,8 +661,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = notifications.VidyoOwnerChosenNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
 
             except Exception, e:
                 Logger.get('Vidyo').error(
@@ -675,8 +675,7 @@ class CSBooking(CSBookingBase):
                 if oldOwnerAvatar:
                     notification = notifications.VidyoOwnerRemovedNotification(self, oldOwnerAvatar)
                     GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                     self.getConference().getCreator())
+                                             self.getPlugin().getName())
 
             except Exception, e:
                 Logger.get('Vidyo').error(
@@ -694,8 +693,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = notifications.NewVidyoPublicRoomNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception, e:
                 Logger.get('Vidyo').error(
                     """Could not send NewVidyoPublicRoomNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
@@ -706,8 +704,7 @@ class CSBooking(CSBookingBase):
                 try:
                     notification = notifications.VidyoOwnerChosenNotification(self)
                     GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                         self.getConference().getCreator())
+                                             self.getPlugin().getName())
 
                 except Exception, e:
                     Logger.get('Vidyo').error(
@@ -730,8 +727,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = notifications.VidyoPublicRoomModifiedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception, e:
                 Logger.get('Vidyo').error(
                     """Could not send VidyoPublicRoomModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
@@ -743,8 +739,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = notifications.VidyoPublicRoomRemovalNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception, e:
                 Logger.get('Vidyo').error(
                     """Could not send VidyoPublicRoomRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
@@ -755,8 +750,7 @@ class CSBooking(CSBookingBase):
                 try:
                     notification = notifications.VidyoRoomDeletedOwnerNotification(self)
                     GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                         self.getConference().getCreator())
+                                             self.getPlugin().getName())
                 except Exception, e:
                     Logger.get('Vidyo').error(
                         """Could not send VidyoRoomDeletedOwnerNotification for booking with id %s of event with id %s, exception: %s""" %

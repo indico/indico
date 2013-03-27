@@ -20,6 +20,7 @@
 Services for Collaboration plugins
 """
 
+from MaKaC.common import log
 from MaKaC.services.implementation.contribution import ContributionDisplayBase
 from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase
 from MaKaC.services.implementation.base import TextModificationBase, ParameterManager
@@ -31,9 +32,9 @@ from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import setValidEmailSeparators
 from indico.util.string import permissive_format
 
-
 from indico.util.i18n import N_
 
+MODULE_NAME = "Video Services"
 
 #TODO: Need to verify if the ContributionDisplayBase is the good parent to inherit from
 class SetSpeakerEmailAddress(ContributionDisplayBase):
@@ -127,8 +128,7 @@ class SendElectronicAgreement(ConferenceModifBase):
                     notification = ElectronicAgreementNotification([sw.getObject().getEmail()], self.cc, self.fromEmail, self.fromName, self.processContent(sw), subject)
 
                     GenericMailer.sendAndLog(notification, self._conf,
-                                             "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                             None)
+                                             MODULE_NAME)
         return report
 
 class RejectElectronicAgreement(ConferenceDisplayBase):
@@ -173,8 +173,7 @@ CERN Recording Team"""
                 notification = ElectronicAgreementOrganiserNotification(emailToList, Config.getInstance().getNoReplyEmail(), content, subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
-                                         "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                         None)
+                                         MODULE_NAME)
 
 class AcceptElectronicAgreement(ConferenceDisplayBase):
 
@@ -214,8 +213,7 @@ CERN Recording Team"""
                 notification = ElectronicAgreementOrganiserNotification(emailToList, Config.getInstance().getNoReplyEmail(), content, subject)
 
                 GenericMailer.sendAndLog(notification, self._conf,
-                                         "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                         None)
+                                         MODULE_NAME)
 
 
 class ToggleNotifyElectronicAgreementAnswer(TextModificationBase, ConferenceModifBase):

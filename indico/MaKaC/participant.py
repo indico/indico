@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.common import log
 from MaKaC.plugins import Observable
 from persistent import Persistent
 from datetime import timedelta, datetime
@@ -29,6 +30,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common import utils
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from MaKaC.common import log
 from MaKaC.common.Configuration import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
@@ -77,13 +79,15 @@ class Participation(Persistent, Observable):
         self._obligatory = True
         logData = {}
         logData["subject"] = "Event set to MANDATORY"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
     def setInobligatory(self, responsibleUser = None):
         self._obligatory = False
         logData = {}
         logData["subject"] = "Event set to NON MANDATORY"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
     def isAddedInfo(self):
         return self._addedInfo
@@ -92,13 +96,15 @@ class Participation(Persistent, Observable):
         self._addedInfo = True
         logData = {}
         logData["subject"] = "Info about adding WILL be sent to participants"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
     def setNoAddedInfo(self, responsibleUser = None):
         self._addedInfo = False
         logData = {}
         logData["subject"] = "Info about adding WON'T be sent to participants"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
     def isAllowedForApplying(self):
         try :
@@ -112,14 +118,16 @@ class Participation(Persistent, Observable):
         self._allowedForApplying = True
         logData = {}
         logData["subject"] = "Applying for participation is ALLOWED"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
     def setNotAllowedForApplying(self, responsibleUser=None):
         self._allowedForApplying = False
         logData = {}
         logData["subject"] = "Applying for participation is NOT ALLOWED"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
     def isAutoAccept(self):
@@ -135,7 +143,8 @@ class Participation(Persistent, Observable):
             "subject": "Auto accept of participation.",
             "value": str(value)
         }
-        self._conference.getLogHandler().logAction(logData, "participants", responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
     def getNumMaxParticipants(self):
@@ -151,7 +160,8 @@ class Participation(Persistent, Observable):
             "subject": "Num max of participants.",
             "value": str(value)
         }
-        self._conference.getLogHandler().logAction(logData, "participants", responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
     def isNotifyMgrNewParticipant(self):
@@ -171,7 +181,8 @@ class Participation(Persistent, Observable):
         else:
             logData["subject"] = _("Manager notification of participant application has been disabled")
 
-        self._conference.getLogHandler().logAction(logData, "participants", currentUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
     def isFull(self):
@@ -316,7 +327,8 @@ class Participation(Persistent, Observable):
         self.getDeclinedParticipantList()["%d"%self._newDeclinedId()] = participant
         logData = participant.getParticipantData()
         logData["subject"] = _("Participant declined : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
 
@@ -346,7 +358,8 @@ class Participation(Persistent, Observable):
 
         logData = participant.getParticipantData()
         logData["subject"] = _("New participant added : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,"participants",eventManager)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
         participant.setStatusAdded()
 
@@ -356,7 +369,9 @@ class Participation(Persistent, Observable):
             if eventManager is None :
                 return False
             data = self.prepareAddedInfo(participant, eventManager)
-            GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants")
+            GenericMailer.sendAndLog(GenericNotification(data),
+                                     self._conference,
+                                     log.ModuleNames.PARTICIPANTS)
 
         avatar = participant.getAvatar()
 
@@ -383,7 +398,8 @@ class Participation(Persistent, Observable):
         self._participantList["%d"%self._lastParticipantId()] = participant
         logData = participant.getParticipantData()
         logData["subject"] = _("New participant invited : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,"participants",eventManager)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         participant.setStatusInvited()
         if participant.getAvatar() is not None:
             if not participant.getAvatar().getEmail():
@@ -413,7 +429,8 @@ class Participation(Persistent, Observable):
 
         logData = participant.getParticipantData()
         logData["subject"] = _("Removed participant %s %s (%s)")%(participant.getFirstName(),participant.getFamilyName(),participant.getEmail())
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
         avatar = participant.getAvatar()
         if avatar:
@@ -452,7 +469,8 @@ class Participation(Persistent, Observable):
 
             logData = participant.getParticipantData()
             logData["subject"] = _("New pending participant : %s")%participant.getWholeName()
-            self._conference.getLogHandler().logAction(logData,"participants")
+            self._conference.getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
             participant.setStatusPending()
 
@@ -501,7 +519,8 @@ class Participation(Persistent, Observable):
 
         logData = participant.getParticipantData()
         logData["subject"] = _("Pending participant removed : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
         self.notifyModification()
         return True
@@ -554,11 +573,12 @@ on behalf of %s %s
         return data
 
     def askForExcuse(self, eventManager, toIdList):
-        data = self.prepareAskForExcuse(eventManager,toIdList)
+        data = self.prepareAskForExcuse(eventManager, toIdList)
         if data is None :
             return False
 
-        GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants",eventManager)
+        GenericMailer.sendAndLog(GenericNotification(data), self._conference,
+                                 log.ModuleNames.PARTICIPANTS)
         return True
 
     def sendSpecialEmail(self, participantsIdList, eventManager, data):
@@ -568,9 +588,9 @@ on behalf of %s %s
             return False
         if len(participantsIdList) == 0:
             return True
-        if data.get("subject",None) is None :
+        if data.get("subject", None) is None :
             return False
-        if data.get("body",None) is None :
+        if data.get("body", None) is None :
             return False
         data["fromAddr"] = eventManager.getEmail()
 
@@ -580,7 +600,8 @@ on behalf of %s %s
             if participant is not None :
                 toList.append(participant.getEmail())
         data["toList"] = toList
-        GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants",eventManager)
+        GenericMailer.sendAndLog(GenericNotification(data), self._conference,
+                                 log.ModuleNames.PARTICIPANTS)
         return True
 
     def getPresentNumber(self):
@@ -877,7 +898,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
         self._participation._notify('participantAdded', self.getConference(), self)
         logData = self.getParticipantData()
         logData["subject"] = "%s : status set to ADDED"%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -889,7 +911,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
         self._participation._notify('participantRemoved', self.getConference(), self)
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REFUSED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -900,7 +923,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to EXCUSED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -911,7 +935,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to INVITED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -923,7 +948,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
         self._participation._notify('participantAdded', self.getConference(), self)
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to ACCEPTED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -935,7 +961,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
         self._participation._notify('participantRemoved', self.getConference(), self)
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REJECTED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -946,7 +973,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to PENDING")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -957,7 +985,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to DECLINED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 

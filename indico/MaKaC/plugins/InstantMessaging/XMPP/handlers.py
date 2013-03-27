@@ -22,6 +22,7 @@ from MaKaC.plugins.InstantMessaging.XMPP.chatroom import XMPPChatroom
 from MaKaC.plugins.InstantMessaging.handlers import ChatroomServiceBase
 from MaKaC.services.implementation.base import ServiceBase, ParameterManager
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.common import log
 from MaKaC.common.Configuration import Config
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.logger import Logger
@@ -475,7 +476,8 @@ class AddLogs2Material( ServiceBase ):
         resource.setDescription("Chat logs for the chat room %s" %self._chatroom.getTitle())
         resource.setName(resource.getFileName())
 
-        self._conf.getLogHandler().logAction({"subject":"Added file %s%s" % (self._file["fileName"],'')},"Files",self._aw.getUser())
+        log_info = {"subject":"Added file %s%s" % (self._file["fileName"],'')}
+        self._conf.getLogHandler().logAction(log_info, log.ModuleNames.MATERIAL)
 
         # forcedFileId - in case there is a conflict, use the file that is
         # already stored

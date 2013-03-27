@@ -21,6 +21,8 @@ import time
 import pkg_resources
 from persistent import Persistent
 from hashlib import md5
+
+from MaKaC.common import log
 from MaKaC.common.Counter import Counter
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\
@@ -2128,8 +2130,7 @@ class CSBookingBase(Persistent, Fossilizable):
             try:
                 notification = mail.NewBookingNotification(self)
                 GenericMailer.sendAndLog(notification, self._conf,
-                                     "MaKaC/plugins/Collaboration/base.py",
-                                     self._conf.getCreator())
+                                         self.getPlugin().getName())
             except Exception, e:
                 Logger.get('VideoServ').error(
                     """Could not send NewBookingNotification for booking with id %s of event with id %s, exception: %s""" %
@@ -2140,8 +2141,7 @@ class CSBookingBase(Persistent, Fossilizable):
             try:
                 notification = mail.BookingModifiedNotification(self)
                 GenericMailer.sendAndLog(notification, self._conf,
-                                     "MaKaC/plugins/Collaboration/base.py",
-                                     self._conf.getCreator())
+                                         self.getPlugin().getName())
             except Exception, e:
                 Logger.get('VideoServ').error(
                     """Could not send BookingModifiedNotification for booking with id %s of event with id %s, exception: %s""" %
@@ -2152,8 +2152,7 @@ class CSBookingBase(Persistent, Fossilizable):
             try:
                 notification = mail.BookingDeletedNotification(self)
                 GenericMailer.sendAndLog(notification, self._conf,
-                                     "MaKaC/plugins/Collaboration/base.py",
-                                     self._conf.getCreator())
+                                         self.getPlugin().getName())
             except Exception, e:
                 Logger.get('VideoServ').error(
                     """Could not send BookingDeletedNotification for booking with id %s of event with id %s, exception: %s""" %

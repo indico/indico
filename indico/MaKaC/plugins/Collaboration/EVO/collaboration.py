@@ -18,6 +18,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import timedelta
+
+from MaKaC.common import log
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase
@@ -424,8 +426,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             try:
                 notification = NewEVOMeetingNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                         self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('EVO').error(
                     """Could not send NewEVOMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
@@ -435,8 +436,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             try:
                 notification = EVOMeetingModifiedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                         self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('EVO').error(
                     """Could not send EVOMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
@@ -446,8 +446,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             try:
                 notification = EVOMeetingRemovalNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                         self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('EVO').error(
                     """Could not send EVOMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %

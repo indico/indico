@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.common import log
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import urlHandlers
@@ -581,7 +582,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingNotification(newReferee, 'Referee', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newReferee)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
 
 
     def removeReferee(self, referee):
@@ -601,7 +603,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(referee, 'Referee', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", referee)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
         else:
             raise MaKaCError("Cannot remove a referee who is not yet referee")
 
@@ -666,7 +669,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingNotification(newEditor, 'Layout Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newEditor)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
 
     def removeEditor(self, editor):
         """ Remove a editor from the conference.
@@ -685,7 +689,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(editor, 'Layout Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", editor)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
         else:
             raise MaKaCError("Cannot remove an editor who is not yet editor")
 
@@ -750,7 +755,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingNotification(newReviewer, 'Content Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newReviewer)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
 
     def removeReviewer(self, reviewer):
         """ Remove a reviewer from the conference.
@@ -769,7 +775,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(reviewer, 'Content Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", reviewer)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
         else:
             raise MaKaCError("Cannot remove a reviewer who is not yet reviewer")
 
@@ -834,7 +841,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
         if self._enablePRMEmailNotif == True:
             notification = ConferenceReviewingNotification(newPaperReviewManager, 'Paper Review Manager', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newPaperReviewManager)
+            GenericMailer.sendAndLog(notification, self._conference,
+                                     log.ModuleNames.PAPER_REVIEWING)
 
     def removePaperReviewManager(self, paperReviewManager):
         """ Remove a paper review manager from the conference.
@@ -853,7 +861,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enablePRMEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(paperReviewManager, 'Paper Review Manager', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", paperReviewManager)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
         else:
             raise MaKaCError("Cannot remove a paper review manager who is not yet paper review manager")
 

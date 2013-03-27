@@ -19,8 +19,20 @@
 
 from persistent import Persistent
 
+from indico.util.contextManager import ContextManager
 from indico.util.struct import iterators
 from MaKaC.common.timezoneUtils import nowutc
+
+class ModuleNames:
+
+    def __init__(self):
+        pass
+
+    MATERIAL = "Material"
+    PAPER_REVIEWING = "Paper Reviewing"
+    PARTICIPANTS = "Participants"
+    REGISTRATION = "Registration"
+    TIMETABLE = "Timetable"
 
 class LogItem(Persistent) :
 
@@ -30,7 +42,7 @@ class LogItem(Persistent) :
         self._logType = "generalLog"
 
         # User who has performed / authorised the logged action
-        self._responsibleUser = user
+        self._responsibleUser = user if user else ContextManager.get("currentUser")
 
         # Indico module, the logged action comes from
         self._module = module

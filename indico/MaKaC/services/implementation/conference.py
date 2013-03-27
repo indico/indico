@@ -33,7 +33,7 @@ from pytz import timezone
 from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
 
-from MaKaC.common import indexes, info, filters, Config, timezoneUtils
+from MaKaC.common import indexes, info, filters, log, Config, timezoneUtils
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
@@ -734,7 +734,8 @@ class ConferenceParticipantBase:
 
             data["body"] = permissive_format(data["body"], mailEnv)
             data["subject"] = permissive_format(data["subject"], mailEnv)
-            GenericMailer.sendAndLog(GenericNotification(data),self._conf,"participants", self._getUser())
+            GenericMailer.sendAndLog(GenericNotification(data), self._conf,
+                                     log.ModuleNames.PARTICIPANTS)
 
 class ConferenceAddEditParticipantBase(ConferenceParticipantBase):
 
@@ -870,7 +871,9 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
                     if participation.isNotifyMgrNewParticipant():
                         # to notify the manager of new participant addition
                         data = self.preparedNewParticipantMessage(pending)
-                        GenericMailer.sendAndLog(GenericNotification(data), self._conf)
+                        GenericMailer.sendAndLog(GenericNotification(data),
+                                                 self._conf,
+                                                 log.ModuleNames.PARTICIPANTS)
                 else:
                     result["msg"] = _("The participant identified by email '%s' has been added to the list of pending participants"
                                     % pending.getEmail())

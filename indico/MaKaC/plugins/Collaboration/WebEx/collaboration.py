@@ -27,6 +27,8 @@ import xml.dom.minidom
 import re
 from time import strptime
 from datetime import timedelta, datetime
+
+from MaKaC.common import log
 from MaKaC.common.timezoneUtils import nowutc, naive2local, getAdjustedDate
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate, getMaxEndDate,\
@@ -38,11 +40,9 @@ from MaKaC.common.Counter import Counter
 from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationAdmin, \
     WebExMeetingModifiedNotificationAdmin, WebExMeetingRemovalNotificationAdmin, \
   WebExParticipantNotification
-
 from MaKaC.plugins.Collaboration.WebEx.fossils import ICSBookingIndexingFossil, ICSBookingConfModifFossil
 from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
-
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 
@@ -686,7 +686,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = NewWebExMeetingNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+                                         log.ModuleNames.VS_WEB_EX,
                                          self.getConference().getCreator())
             except Exception,e:
                 Logger.get('WebEx').error(
@@ -698,8 +698,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = WebExMeetingModifiedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                                         self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('WebEx').error(
                     """Could not send WebExMeetingModifiedNotification for booking with id %s of event with id %s, exception: %s""" %
@@ -710,8 +709,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = WebExMeetingRemovalNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                                         self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('WebEx').error(
                     """Could not send WebExMeetingRemovalNotification for booking with id %s of event with id %s, exception: %s""" %

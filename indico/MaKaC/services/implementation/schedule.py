@@ -26,6 +26,7 @@ from MaKaC.services.implementation.base import ParameterManager
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 
+from MaKaC.common import log
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.schedule import IConferenceScheduleDisplayFossil
@@ -444,8 +445,8 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         self._setLocationInfo(slot)
 
         logInfo = session.getLogInfo()
-        logInfo["subject"] =  _("Create new session: %s")%session.getTitle()
-        self._conf.getLogHandler().logAction(logInfo,"Timetable/Session",self._getUser())
+        logInfo["subject"] =  _("Created new session: %s")%session.getTitle()
+        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
 
         schEntry = slot.getConfSchEntry()
         fossilizedData = schEntry.fossilize(ILinkedTimeSchEntryMgmtFossil, tz=conf.getTimezone())
@@ -485,7 +486,7 @@ class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.Conf
 
         logInfo = session.getLogInfo()
         logInfo["subject"] = "Deleted session: %s"%session.getTitle()
-        self._conf.getLogHandler().logAction(logInfo,"Timetable/Session",self._getUser())
+        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
 
         self._conf.removeSession(session)
 
@@ -503,7 +504,7 @@ class ConferenceScheduleDeleteContribution(ScheduleOperation, conferenceServices
             contrib.delete()
         else:
             logInfo["subject"] =  _("Unscheduled contribution: %s")%contrib.getTitle()
-        self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
+        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
 
 
 class SessionScheduleDeleteSessionSlot(ScheduleOperation, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
@@ -676,7 +677,7 @@ class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.S
         else:
             logInfo["subject"] = "Unscheduled contribution: %s"%contrib.getTitle()
 
-        self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
+        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
 
 
 class ModifyStartEndDate(ScheduleOperation):
@@ -874,8 +875,8 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
         self._addToSchedule()
 
         logInfo = self._slot.getLogInfo()
-        logInfo["subject"] = "Create new slot: %s"%self._slot.getTitle()
-        self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
+        logInfo["subject"] = "Created new session block: %s" % self._slot.getTitle()
+        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
 
         if self._isSessionTimetable:
             schEntry = self._slot.getSessionSchEntry()

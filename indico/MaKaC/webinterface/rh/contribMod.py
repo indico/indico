@@ -26,6 +26,7 @@ import MaKaC.user as user
 import MaKaC.domain as domain
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
+from MaKaC.common import log
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.utils import parseDateTime
 from MaKaC.common import Config
@@ -342,8 +343,9 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
                 sc.newSpeaker(spk)
 
             logInfo = sc.getLogInfo()
-            logInfo["subject"] = "Create new subcontribution: %s"%sc.getTitle()
-            self._target.getConference().getLogHandler().logAction(logInfo, "Timetable/SubContribution", self._getUser())
+            logInfo["subject"] = "Created new subcontribution: %s" %sc.getTitle()
+            self._target.getConference().getLogHandler().logAction(logInfo,
+                                                       log.ModuleNames.TIMETABLE)
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
         else:
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))

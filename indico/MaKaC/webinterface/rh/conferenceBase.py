@@ -23,6 +23,7 @@ import shutil
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.common import log
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.errors import MaKaCError
 from MaKaC.common.Configuration import Config
@@ -354,7 +355,8 @@ class RHSubmitMaterialBase(object):
                         resource.setName(self._displayName)
 
                     if not type(self._target) is Category:
-                        self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (fileEntry["fileName"], text)}, "Files", user)
+                        log_info = {"subject":"Added file %s%s" % (fileEntry["fileName"], text)}
+                        self._target.getConference().getLogHandler().logAction(log_info, log.ModuleNames.MATERIAL)
                     resources.append(resource)
                     # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
 
@@ -370,7 +372,8 @@ class RHSubmitMaterialBase(object):
                         resource.setName(self._displayName)
 
                     if not type(self._target) is Category:
-                        self._target.getConference().getLogHandler().logAction({"subject":"Added link %s%s" % (resource.getURL(), text)}, "Files", user)
+                        log_info = {"subject":"Added link %s%s" % (resource.getURL(), text)}
+                        self._target.getConference().getLogHandler().logAction(log_info, log.ModuleNames.MATERIAL)
                     resources.append(resource)
 
             status = "OK"

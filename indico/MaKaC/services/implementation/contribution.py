@@ -24,6 +24,7 @@ from MaKaC.services.implementation.roomBooking import GetBookingBase
 
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
+from MaKaC.common import log
 from MaKaC.common.PickleJar import DictPickler
 
 import MaKaC.conference as conference
@@ -153,8 +154,9 @@ class ContributionAddSubContribution(ContributionModifBase):
 
         # log the event
         logInfo = sc.getLogInfo()
-        logInfo["subject"] = "Create new subcontribution: %s"%sc.getTitle()
-        self._target.getConference().getLogHandler().logAction(logInfo, "Timetable/SubContribution", self._getUser())
+        logInfo["subject"] = "Created new subcontribution: %s"%sc.getTitle()
+        self._target.getConference().getLogHandler().logAction(logInfo,
+                                                       log.ModuleNames.TIMETABLE)
 
 class ContributionDeleteSubContribution(ContributionModifBase):
 

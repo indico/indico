@@ -17,18 +17,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.common import log
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.RecordingRequest.mail import NewRequestNotification, RequestModifiedNotification, RequestDeletedNotification,\
-    RequestAcceptedNotification, RequestRejectedNotification,\
-    RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin,\
+    RequestAcceptedNotification, RequestRejectedNotification, \
+    RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin, \
     RequestRescheduledNotification, RequestRelocatedNotification
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.mail import GenericMailer
-from MaKaC.plugins.Collaboration.RecordingRequest.common import RecordingRequestException,\
+from MaKaC.plugins.Collaboration.RecordingRequest.common import RecordingRequestException, \
     RecordingRequestError
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
-from MaKaC.i18n import _
 from indico.core.index import Catalog
 
 
@@ -83,8 +83,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = NewRequestNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('RecReq').exception(
                     """Could not send NewRequestNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
@@ -100,8 +99,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = RequestModifiedNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('RecReq').exception(
                     """Could not send RequestModifiedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
@@ -118,8 +116,7 @@ class CSBooking(CSBookingBase):
         try:
             notification = RequestAcceptedNotification(self)
             GenericMailer.sendAndLog(notification, self.getConference(),
-                                 "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                 None)
+                                     self.getPlugin().getName())
         except Exception,e:
             Logger.get('RecReq').exception(
                 """Could not send RequestAcceptedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
@@ -129,8 +126,7 @@ class CSBooking(CSBookingBase):
             try:
                 notificationAdmin = RequestAcceptedNotificationAdmin(self, user)
                 GenericMailer.sendAndLog(notificationAdmin, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                     None)
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('RecReq').exception(
                     """Could not send RequestAcceptedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
@@ -146,8 +142,7 @@ class CSBooking(CSBookingBase):
         try:
             notification = RequestRejectedNotification(self)
             GenericMailer.sendAndLog(notification, self.getConference(),
-                                 "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                 None)
+                                     self.getPlugin().getName())
         except Exception,e:
             Logger.get('RecReq').exception(
                 """Could not send RequestRejectedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
@@ -157,8 +152,7 @@ class CSBooking(CSBookingBase):
             try:
                 notificationAdmin = RequestRejectedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notificationAdmin, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                     None)
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('RecReq').exception(
                     """Could not send RequestRejectedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
@@ -169,8 +163,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = RequestDeletedNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('RecReq').exception(
                     """Could not send RequestDeletedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
@@ -183,8 +176,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = RequestRescheduledNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('RecReq').exception(
                     """Could not send RequestRescheduledNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
@@ -197,8 +189,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = RequestRelocatedNotification(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
-                                     self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('RecReq').exception(
                     """Could not send RequestRelocatedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))

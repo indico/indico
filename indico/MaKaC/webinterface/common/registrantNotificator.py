@@ -19,8 +19,10 @@
 
 """
 """
+
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.review as review
+from MaKaC.common import log
 from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.common.baseNotificator import TplVar, Notification
 
@@ -157,7 +159,9 @@ class EmailNotificator(Notificator):
 
     def notify(self,registrant,params):
         if params.has_key("conf"):
-            GenericMailer.sendAndLog(self.apply(registrant,params),params["conf"])
+            GenericMailer.sendAndLog(self.apply(registrant,params),
+                                     params["conf"],
+                                     log.ModuleNames.REGISTRATION)
         else:
             GenericMailer.send(self.apply(registrant,params))
 
@@ -169,7 +173,8 @@ class EmailNotificator(Notificator):
         cc = params.get("cc",[])
         notification =  Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=cc)
         if params.has_key("conf"):
-            GenericMailer.sendAndLog(notification, params["conf"])
+            GenericMailer.sendAndLog(notification, params["conf"],
+                                     log.ModuleNames.REGISTRATION)
         else:
             GenericMailer.send(notification)
 

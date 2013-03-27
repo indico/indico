@@ -27,6 +27,7 @@ from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, i18nformat
 from MaKaC.conference import ConferenceHolder
+from MaKaC.common import log
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.mail import GenericMailer
@@ -290,10 +291,8 @@ class ChatroomMailer(Component):
         if not len(userList) is 0:
             try:
                 cn = ChatroomsNotification(room, userList)
-                GenericMailer.sendAndLog(getattr(cn, operation)(*args), \
-                                         conf, \
-                                         "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
-                                         room.getOwner())
+                GenericMailer.sendAndLog(getattr(cn, operation)(*args), conf,
+                                         PluginsHolder().getPluginType('InstantMessaging').getPlugin("XMPP").getName())
             except Exception, e:
                 raise ServiceError(message=_('There was an error while contacting the mail server. No notifications were sent: %s'%e))
 
