@@ -43,7 +43,7 @@ type("RichTextEditor", ["IWidget", "Accessor"],
                      self.width,
                      self.height,
                      self.toolbarSet);
-             },50);
+             },5);
              return this.div;
          },
 
@@ -381,7 +381,6 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, to
     try {
 
         CKEDITOR.replace(editorId, {language : userLanguage, width : width, height : height - 75, 'toolbar': toolbarSet});
-
         var cki = CKEDITOR.instances[editorId];
 
         cki.setData(text);
@@ -405,7 +404,7 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, to
     catch (error) {
         setTimeout(function() {
             initializeEditor(wrapper, editorId, text, callbacks, width, height);
-        },50);
+        },5);
     }
 
 }
