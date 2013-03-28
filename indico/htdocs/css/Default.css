@@ -6111,17 +6111,6 @@ div.timetableManagementInfoArea ul li{
     padding: 0px 8px;
 }
 
-#tt_menu.scrolling {
-    position: fixed;
-    padding: 10px 10px 10px 0;
-    top: 0px;
-    z-index: 1;
-    background: #f0f0f0;
-    background: rgba(250, 250, 250, 0.95);
-    box-shadow: 0 0 11px 2px #eee;
-    border-radius: 0 0 10px 10px;
-}
-
 .ui-resizable-handle {
     z-index: 0 !important;
 }
@@ -7802,14 +7791,18 @@ ul.buttonMenuPopupList li a:hover {
     background-color: #ACACAC;
 }
 
-#headPanel.scrolling {
-    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
-    border-radius: 0 0 10px 10px;
+.scrolling {
+    background-color:#FFFFFF;
+    box-shadow: 0 6px 6px -3px rgba(0, 0, 0, 0.2);
     position: fixed;
     top: 0;
-    width:95%;
-    background-color:#FFFFFF;
-    z-index: 1000;
+    z-index: 1;
+}
+
+#sessionBar.scrolling {
+    right: 0;
+    padding: 0 0 5px 5px;
+    z-index:999;
 }
 
 .ui-list-menu-level  {
@@ -8022,14 +8015,6 @@ div#sdlw-actions {
     font-size: 12px;
     padding: 0 5px 5px;
     line-height: 17px;
-}
-
-#sessionBar.scrolling {
-    position: fixed;
-    top: 0;
-    right: 0;
-    padding: 0 0 5px 5px;
-    z-index:999;
 }
 
 div.domain_control .strong {

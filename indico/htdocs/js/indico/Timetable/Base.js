@@ -993,8 +993,10 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         }
 
         var ret = $('<div/>').append(
-            this.warningArea.dom, $('<div class="clearfix ui-follow-scroll toolbar" id="tt_menu"/>').
-                append(this.menu.dropdown({effect_on: 'slideDown'}), tt_status_info, this.infoBox.dom),
+            this.warningArea.dom,
+            $('<div id="headPanel" class="ui-follow-scroll"></div>').append($('<div class="clearfix toolbar" id="tt_menu"/>').
+                append(this.menu.dropdown({effect_on: 'slideDown'}),
+                        tt_status_info, this.infoBox.dom)),
             tt_hour_tip);
 
         var extra = this.getTTMenu();

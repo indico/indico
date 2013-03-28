@@ -374,16 +374,28 @@ IndicoUI.Effect = {
 
     followScroll:function(){
         $.each($('.follow-scroll'),function(){
-            if (!$(this).data('original-offset')){
+            if (!$(this).data('original-offset')) {
                 $(this).data('original-offset', $(this).offset());
             }
 
             var eloffset = $(this).data('original-offset');
             var windowpos = $(window).scrollTop();
             if(windowpos > eloffset.top) {
-                $(this).addClass('scrolling');
+                if (!$(this).hasClass("scrolling")) {
+                    $(this).data({
+                        "original-left": $(this).css("left"),
+                        "original-width": $(this).css("width")
+                    });
+                    $(this).css("width", $(this).width());
+                    $(this).css("left", eloffset.left);
+                    $(this).addClass('scrolling');
+                }
             } else {
-                $(this).removeClass('scrolling');
+                if ($(this).hasClass("scrolling")) {
+                    $(this).css("left", $(this).data("original-left"));
+                    $(this).css("width", $(this).data("original-width"));
+                    $(this).removeClass('scrolling');
+                }
             }
         });
     }
