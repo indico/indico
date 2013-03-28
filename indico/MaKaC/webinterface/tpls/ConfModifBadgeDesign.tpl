@@ -672,7 +672,7 @@
                   <div class="left">${_('Width')} <input id="badge_width" name="Badge Width" size="5" style="margin-left: 0.5em;"></div>
                   <div class="left clear">${_('Height')}<input id="badge_height" name="Badge Height" size="5" style="margin-left: 0.5em;"></div>
                   <div class="clear"></div>
-                  <div class="not_important" style="margin-top: 1em;">${_("Dimensions are in cm, decimals are allowed.")}</div>
+                  <div class="text-not-important" style="margin-top: 1em;">${_("Dimensions are in cm, decimals are allowed.")}</div>
                   <div style="margin-top: 1em;"><input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">${ _("Snap to grid")}</label></div>
                 </div>
             </div>

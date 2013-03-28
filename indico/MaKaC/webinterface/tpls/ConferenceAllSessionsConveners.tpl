@@ -3,7 +3,7 @@
 <div id="list_options" class="toolbar" style="line-height: 3em;">
   <input type="text" id="filterSpeakers" value="" placeholder="${_("Search Name, Email &amp; Sessions")}"/>
 
-  <span class="not_important" style="font-size: 1.2em;">
+  <span class="text-not-important" style="font-size: 1.2em;">
     ${_('{0} conveners').format(convenerNumber)}
   </span>
 

@@ -53,8 +53,28 @@ h2.page_title {
     font-weight: bold;
 }
 
-.not_important {
+.italic {
+    font-style: italic;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-important {
+    color: #111;
+}
+
+.text-normal {
+    color: #444;
+}
+
+.text-not-important {
     color: #777;
+}
+
+.text-superfluous {
+    color: #BBB;
 }
 
 .quotation {

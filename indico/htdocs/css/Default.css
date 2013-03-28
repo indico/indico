@@ -7793,7 +7793,7 @@ ul.buttonMenuPopupList li a:hover {
 
 .scrolling {
     background-color:#FFFFFF;
-    box-shadow: 0 6px 6px -3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 6px -6px rgba(0, 0, 0, 0.2);
     position: fixed;
     top: 0;
     z-index: 1;

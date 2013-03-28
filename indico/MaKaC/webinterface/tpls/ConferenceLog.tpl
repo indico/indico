@@ -78,39 +78,40 @@
 <% key = day_entry[0] %>
 <% value = day_entry[1] %>
 <div id="log-table-${key}">
-    <div class="table-title info">
+    <div class="table-title searchable">
         ${parse_day(key)}
     </div>
     % for line in value:
     <div class="table-row interactive ${line.getLogType()}" aria-hidden="true">
 
         <div class="inline">
-            <span class="table-cell ${get_icon(line.getLogType())}"></span>
-            <span class="table-cell fixed info">${line.getModule()}</span>
-            <span class="table-cell info">${line.getLogSubject()}</span>
-            <span class="table-cell right">
-                ${format_time(line.getLogDate(), "medium")}
-            </span>
+            <span class="table-cell ${get_icon(line.getLogType())}"></span><!--
+            --><span class="table-cell log-module searchable">${line.getModule()}</span><!--
+            --><span class="table-cell log-subject searchable">${line.getLogSubject()}</span><!--
+
+            --><span class="table-cell log-stamp text-superfluous">
             % if line.getResponsibleName() != "System":
-            <span class="table-cell right info">
-                ${_("By ")} ${line.getResponsibleName()} ${_(" at")}
-            </span>
+                ${_("by {user} at {time}").format(user='<span class="text-normal searchable">{0}</span>'.format(line.getResponsibleName()),
+                                                  time='<span class="text-normal">{0}</span>'.format(format_time(line.getLogDate(), "medium")))}
+            % else:
+                <span class="text-normal">${format_time(line.getLogDate(), "medium")}</span>
             % endif
+            </span>
         </div>
 
         <div class="info-wrapper weak-hidden">
         % if len(line.getLogInfo()) == 1 and "subject" in line.getLogInfo():
             <div class="content-row clearfix">
-                <span class="table-cell fixed v-growing"></span>
-                <span class="table-cell empty v-growing">${_("No further information to show.")}</span>
+                <span class="table-cell caption v-growing log-caption"></span>
+                <span class="table-cell empty v-growing log-value">${_("No further information to show.")}</span>
             </div>
         % else:
             % for info in line.getLogInfoList():
                 <% caption = info[0]%>
                 <% value = info[1]%>
                 <div class="content-row clearfix">
-                    <span class="table-cell fixed v-growing">${caption}</span>
-                    <span class="table-cell v-growing info">${value}</span>
+                    <span class="table-cell caption v-growing log-caption">${caption}</span>
+                    <span class="table-cell v-growing log-value searchable">${value}</span>
                 </div>
             % endfor
         % endif
@@ -125,6 +126,10 @@ $(document).ready(function(log_view){
 
     if ($("[id*=log-table-]").length === 0) {
         $("#emptyLog").removeClass("hidden");
+    }
+
+    if ($("#searchInput").attr("value") !== "") {
+        $("#searchInput").attr("value", "");
     }
 
     /* UI animations */
@@ -206,6 +211,12 @@ $(document).ready(function(log_view){
         getSearchFilteredItems().show();
         getCheckboxFilteredItems().hide();
         hideEmptyTables();
+
+        // Needed because $(window).scroll() is not called when hiding elements
+        // causing scrolling elements to be out of place.
+        if ($.browser.msie) {
+            IndicoUI.Effect.followScroll();
+        }
     };
 
     var getCheckboxFilteredItems = function() {
@@ -222,8 +233,8 @@ $(document).ready(function(log_view){
     var getSearchFilteredItems = function() {
         var term = $("#searchInput").attr("value");
         if (resultCache[term] == undefined) {
-            var items = $(".table-title.info:contains('"+ term +"')").siblings(".table-row");
-            items = items.add($(".table-row .info:contains('"+ term +"')").parents(".table-row"));
+            var items = $(".table-title.searchable:contains('"+ term +"')").siblings(".table-row");
+            items = items.add($(".table-row .searchable:contains('"+ term +"')").parents(".table-row"));
             resultCache[term] = items;
         } else {
             var items = resultCache[term];
