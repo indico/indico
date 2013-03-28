@@ -247,7 +247,7 @@
                                             <td align="right">
                                                 <table width="100%" cellspacing="4px">
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>Only Bookings&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>Only Bookings&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="onlyBookings" name="onlyBookings" type="checkbox" />
                                                             ${inlineContextHelp(_("Show only <b>Bookings</b>. If not checked, both pre-bookings and confirmed bookings will be shown.") )}
@@ -255,7 +255,7 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>Only Pre-bookings&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>Only Pre-bookings&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="onlyPrebookings" name="onlyPrebookings" type="checkbox" />
                                                             ${inlineContextHelp(_("Show only <b>PRE-bookings</b>. If not checked, both pre-bookings and confirmed bookings will be shown.") )}
@@ -263,7 +263,7 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>Only mine&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>Only mine&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="onlyMy" name="onlyMy" type="checkbox" />
                                                             ${inlineContextHelp(_('Show only <b>your</b> bookings.'))}
@@ -272,7 +272,7 @@
                                                     </tr>
                                                     % if isResponsibleForRooms:
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>Of my rooms&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>Of my rooms&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
                                                             <input id="ofMyRooms" name="ofMyRooms" type="checkbox" />
                                                             ${inlineContextHelp(_("Only bookings of rooms you are responsible for.") )}
@@ -281,25 +281,25 @@
                                                     </tr>
                                                     % endif
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>${ _("Is rejected") }&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>${ _("Is rejected") }&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="isRejected" name="isRejected" type="checkbox" />
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>${ _("Is cancelled") }&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>${ _("Is cancelled") }&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="isCancelled" name="isCancelled" type="checkbox" />
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>${ _("Is archival") }&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>${ _("Is archival") }&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="isArchival" name="isArchival" type="checkbox" />
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>${ _("Uses video-conf.") }&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>${ _("Uses video-conf.") }&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="usesAVC" name="usesAVC" type="checkbox" />
                                                             ${inlineContextHelp(_('Show only bookings which will use video conferencing systems.'))}
@@ -307,7 +307,7 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top" nowrap><small>${ _("Assistance for video-conf. startup") }&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>${ _("Assistance for video-conf. startup") }&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" />
                                                             ${inlineContextHelp(_('Show only bookings which requested assistance for the startup of the videoconference session.'))}
@@ -315,15 +315,15 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top" nowrap><small>${ _("Assistance for meeting startup") }&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>${ _("Assistance for meeting startup") }&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="needsAssistance" name="needsAssistance" type="checkbox" />
-                                                            ${inlineContextHelp(_('Show only bookings which requested assistance for the startup of your meeting.'))}
+                                                            ${inlineContextHelp(_('Show only bookings which requested assistance for the startup of the meeting.'))}
                                                             <br />
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td width="165px" align="right" valign="top"><small>${ _("Is heavy") }&nbsp;&nbsp;</small></td>
+                                                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap"><small>${ _("Is heavy") }&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="isHeavy" name="isHeavy" type="checkbox" />
                                                             ${inlineContextHelp(_("[v] Show only <b>heavy</b> bookings.") )}
