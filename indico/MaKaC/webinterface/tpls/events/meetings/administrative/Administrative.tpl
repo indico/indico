@@ -1,10 +1,10 @@
+<%page args="showOrder=False"/>
 <%namespace name="common" file="../${context['INCLUDE']}/Common.tpl"/>
 <%!
   allMaterial = False
   hideTime = True
   materialSession = False
   minutes = False
-  showOrder = True
 %>
 <table class="eventWrapper">
     <tr>
@@ -62,7 +62,7 @@
             % endif
         % endif
 
-        <%block name="printSchedule">
+        <%block name="printSchedule" args="showOrder=True">
             <table class="dayList">
                 <% order = 1 %>
                 % for index, item in enumerate(entries):
@@ -85,9 +85,9 @@
                         </tr>
                     % endif
                     % if getItemType(item) == "Session":
-                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=self.attr.showOrder"/>
+                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=True"/>
                     % else:
-                        <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=False"/>
+                        <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=showOrder"/>
                     % endif
                     <% order +=1 %>
                 % endfor
