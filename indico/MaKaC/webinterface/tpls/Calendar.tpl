@@ -86,7 +86,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
             <li><a href="${ categDisplayURL }">${ _("Go back to category page") }</a></li>
         </ul>
         <h1 class="categoryTitle">
-            ${ categoryTitle }&nbsp;
+            ${ categoryTitle | remove_tags }&nbsp;
             <span style="font-style: italic; font-size: 0.8em;">(${ _("calendar overview") })</span>
         </h1>
     </div>

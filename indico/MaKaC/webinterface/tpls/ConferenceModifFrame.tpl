@@ -28,7 +28,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 
     <a href="${ UHConferenceModification.getURL(conf) }">
         <span class="bannerTitle bannerTitle_0">
-            ${ conf.getTitle() } &nbsp;<span style="font-size: 0.8em; font-style: italic;">
+            ${ conf.getTitle() | remove_tags } &nbsp;<span style="font-size: 0.8em; font-style: italic;">
             % if startDate == endDate:
                 ${ startDate }
             % else:

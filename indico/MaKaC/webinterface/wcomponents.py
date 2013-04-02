@@ -808,18 +808,12 @@ class WEventFooter(WFooter):
 
 class WNavigationDrawer(WTemplated):
 
-    def __init__( self, pars, bgColor = None, appendPath = [] , type = None):
+    def __init__( self, pars, bgColor = None, type = None):
         self._target = pars["target"]
         self._isModif = pars.get("isModif", False)
         self._track = pars.get("track", None) #for abstracts viewed inside a track
         self._bgColor = bgColor
         self._actionType = type #type of action
-
-        """
-            The appendPath is an array with dictionaries: {"url": x, "title": x}.
-            Each of these links are added in the end of the breadcrumb
-        """
-        self._appendPath = appendPath
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
@@ -827,7 +821,6 @@ class WNavigationDrawer(WTemplated):
         vars["isModif"]= self._isModif
         vars["track"]= self._track
         vars["bgColor"] = self._bgColor
-        vars["appendPath"] = self._appendPath
         vars["actionType"] = self._actionType
         return vars
 

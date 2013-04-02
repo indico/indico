@@ -28,7 +28,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 % elif isRootCategory:
     ${ _("All events") }
 % else:
-    ${ name }
+    ${ name | remove_tags }
 % endif
 </h1>
 

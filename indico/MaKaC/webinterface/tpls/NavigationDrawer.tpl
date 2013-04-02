@@ -51,17 +51,8 @@ arrowImage = systemIcon( "breadcrumb_arrow.png" )
         % endif
         <% name, url = l[i] %>
         <a href="${ url }" itemscope itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url">
-            <span itemprop="title">${ truncateTitle(name, 40) }</span>
+            <span itemprop="title">${ truncateTitle(name, 40) | remove_tags }</span>
         </a>
     % endfor
-
-    % for i in range(0, len(appendPath)):
-        <% object = appendPath[i] %>
-
-        <img src="${ arrowImage }" />
-
-        <a href="${ object["url"] }">${ object["title"] }</a>
-    % endfor
-
 </span>
 </div>

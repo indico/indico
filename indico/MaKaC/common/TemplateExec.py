@@ -39,7 +39,8 @@ from MaKaC.plugins.base import PluginsHolder
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
 FILTER_IMPORTS = ['from indico.util.json import dumps as j',
-                  'from indico.util.string import html_line_breaks as html_breaks']
+                  'from indico.util.string import html_line_breaks as html_breaks',
+                  'from indico.util.string import remove_tags']
 
 
 class IndicoTemplateLookup(TemplateLookup):
