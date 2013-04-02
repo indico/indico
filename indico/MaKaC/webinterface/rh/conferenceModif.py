@@ -1425,13 +1425,13 @@ class RHProgramTrackDown(RHConferenceModifBase):
 class CFAEnabled(object):
     @staticmethod
     def checkEnabled(request):
-        """ Returns true if call for abstracts has been enabled
+        """ Returns true if abstracts has been enabled
             Otherwise, throws an exception
         """
         if request._conf.hasEnabledSection("cfa"):
             return True
         else:
-            raise MaKaCError( _("You cannot access this option because \"Call for abstracts\" was disabled"))
+            raise MaKaCError( _("You cannot access this option because \"Abstracts\" was disabled"))
 
 class RHConfModifCFABase(RHConferenceModifBase):
 

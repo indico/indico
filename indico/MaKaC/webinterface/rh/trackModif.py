@@ -88,7 +88,7 @@ class RHTrackCoordination( RHTrackModifBase ):
     def _checkProtection(self):
         RHTrackModifBase._checkProtection(self)
         if not self._conf.hasEnabledSection("cfa"):
-            raise MaKaCError( _("You cannot access this option because \"Call for abstracts\" was disabled"))
+            raise MaKaCError( _("You cannot access this option because \"Abstracts\" was disabled"))
 
     def _process( self ):
         p = tracks.WPTrackModifCoordination( self, self._track )
@@ -112,7 +112,7 @@ class RHTrackAbstractsBase( RHTrackModifBase ):
             else:
                 raise TrackCoordinationError("You don't have rights to coordinate this track")
         if checkCFADisabled and not self._conf.hasEnabledSection("cfa"):
-            raise MaKaCError( _("You cannot access this option because \"Call for abstracts\" was disabled"))
+            raise MaKaCError( _("You cannot access this option because \"Abstracts\" was disabled"))
 
 class _TrackAbstractFilterField( filters.FilterField ):
 
