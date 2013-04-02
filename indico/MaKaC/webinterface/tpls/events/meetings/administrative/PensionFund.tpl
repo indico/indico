@@ -1,8 +1,8 @@
 <%inherit file="Administrative.tpl"/>
-
 <%!
   allMaterial = True
   hideTime = True
+  showOrder=True
 %>
 
 <%block name="header">
@@ -39,3 +39,6 @@
     % endif
 </%block>
 
+<%block name="printSchedule" args="showOrder">
+    ${parent.printSchedule(True)}
+</%block>
