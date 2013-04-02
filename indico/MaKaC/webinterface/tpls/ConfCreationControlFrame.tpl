@@ -32,8 +32,8 @@
         <td nowrap class="titleCellTD"><span class="dataCaptionFormat"> ${ _("Notify event creation by email to")}:</span></td>
         <form action="${ setNotifyCreationURL }" method="POST" id ="notifyEventCreation">
         <td class="blacktext">
-        <table><tr><td><input name="notifyCreationList" id="notifyCreationList" size="30" value=${ notifyCreationList }> ( ${ _("email addresses separated by spaces, comas or semi-colons")})</td>
-        <td align="right"><input type="submit" value="${ _("save")}"></td></tr></table>
+        <table><tr><td><input type="text" name="notifyCreationList" id="notifyCreationList" size="30px" value=${ notifyCreationList } /> <br><span style="font-size:10px; color: #999;">( ${ _("email addresses separated by spaces, comas or semi-colons")})</span></td>
+        <td style="vertical-align: top; text-align: right;"><input type="submit" value="${ _("save")}"></td></tr></table>
         </td>
         </form>
     </tr>
@@ -51,7 +51,7 @@ var modificationControlManagerCC = new ListOfUsersManager(null,
         {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ confCreators | n,j});
 
 var pm = new IndicoUtil.parameterManager();
-pm.add($E('notifyCreationList'), 'emaillist');
+pm.add($E('notifyCreationList'), 'emaillist', true);
 $("#notifyEventCreation").submit(function(){
     return pm.check();
 })

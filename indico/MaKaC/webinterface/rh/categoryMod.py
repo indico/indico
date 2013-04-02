@@ -598,7 +598,7 @@ class RHCategorySetNotifyCreation( RHCategModifBase ):
     def _checkParams(self, params):
         RHCategModifBase._checkParams(self, params)
         self._emailList = params.get("notifyCreationList","")
-        if not validMail(self._emailList):
+        if self._emailList.strip() != "" and not validMail(self._emailList):
             raise FormValuesError(_("The email list contains invalid e-mail addresses or invalid separator"))
 
     def _process( self ):
