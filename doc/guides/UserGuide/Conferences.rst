@@ -764,7 +764,7 @@ Abstracts Management
 
 The Abstracts option has 5 tabs:
 
-* **Setup**: Where you can enable/disable the abstracts submission, change the start/end submission dates, set a modification deadline, enable email notifications etc
+* **Setup**: Where you can enable/disable the abstract submission process, change the start/end submission dates, set a modification deadline, enable email notifications etc
 
 * **Preview**: Preview of the submission form, with the content, the author and co-author, but also other options such as track classification etc.
 
@@ -783,9 +783,9 @@ Abstracts
 
 The Abstracts process works in the following way:
 
-1.	The event organizer needs to enable the abstracts submission. You can do in the *Abstracts* option, in the tab *Setup* ; see :ref:`abstracts_setup`
+1.	The event organizer needs to enable the abstract submission process. You can do in the *Abstracts* option, in the tab *Setup* ; see :ref:`abstracts_setup`
 
-2.	All the authors submit their abstract. To do so, they need to go to the event page. If the Abstracts submission has been enabled, under the *Call for Abstracts* option there will be a sub-option *Submit a new abstract*. Click on this link, complete the form and then click on *Submit*. The abstract will need to belong to a track if you want to use the review process
+2.	All the authors submit their abstract. To do so, they need to go to the event page. If the abstract submission process has been enabled, under the *Call for Abstracts* option there will be a sub-option *Submit a new abstract*. Click on this link, complete the form and then click on *Submit*. The abstract will need to belong to a track if you want to use the review process
 
 3.	The abstracts are now reviewed by the track coordinators. Each Track Coordinator has a list of abstracts to review. He will propose to accept, merge or reject each abstract
 
@@ -811,7 +811,7 @@ Setup
 
 The options you can find inside the setup tab are the following:
 
-* **Current status**: From here you can enable and disable the abtracts submission
+* **Current status**: From here you can enable and disable the abstract submission
 
 * **Dates**:  Choose the submission start and end dates
 
@@ -954,7 +954,7 @@ circumstances (when an abstract is accepted, rejected or merged).
 
 In order to create a Notification Template you have to:
 
-* Go to abstracts menu, click on the tab *Reviewing* and then on the option *notification templates* beneath it.
+* Go to *Abstracts* menu, click on the tab *Reviewing* and then on the option *notification templates* beneath it.
 
 * Click on the *add* button and fill the form as following:
 
