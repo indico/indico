@@ -197,6 +197,25 @@ class UHSignOut( URLHandler ):
         return url
     getURL = classmethod( getURL )
 
+
+class UHOAuthRequestToken(URLHandler):
+    _relativeURL = "oauth.py/request_token"
+
+class UHOAuthAuthorization(URLHandler):
+    _relativeURL = "oauth.py/authorize"
+
+class UHOAuthAccessTokenURL(URLHandler):
+    _relativeURL = "oauth.py/access_token"
+
+class UHOAuthResourceURL(URLHandler):
+    _relativeURL = "oauth.py/resource"
+
+class UHOAuthAuthorizeConsumer(URLHandler):
+    _relativeURL = "oauth.py/authorize_consumer"
+
+class UHOAuthDeauthorizeConsumer(URLHandler):
+    _relativeURL = "oauth.py/deauthorize_consumer"
+
 class UHIndicoNews( URLHandler ):
     _relativeURL = "news.py"
 

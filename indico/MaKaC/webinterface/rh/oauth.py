@@ -11,18 +11,9 @@ from MaKaC.webinterface import urlHandlers
 from indico.core.index import Catalog
 from MaKaC.webinterface.urlHandlers import UHThirdPartyAuth
 from indico.web.wsgi import webinterface_handler_config as apache
+from MaKaC.common.Configuration import Config
 
 from indico.modules.oauth.db import Consumer, Token, ConsumerHolder, AccessTokenHolder, RequestTokenHolder, TempRequestTokenHolder
-
-REQUEST_TOKEN_URL = 'http://pcuds43.cern.ch/indico/oauth.py/request_token'
-ACCESS_TOKEN_URL = 'http://pcuds43.cern.ch/indico/oauth.py/access_token'
-AUTHORIZATION_URL = 'http://pcuds43.cern.ch/indico/oauth.py/authorize'
-AUTHORIZE_CONSUMER_URL = 'http://pcuds43.cern.ch/indico/oauth.py/authorize_consumer'
-DEAUTHORIZE_CONSUMER_URL = 'http://pcuds43.cern.ch/indico/oauth.py/deauthorize_consumer'
-CALLBACK_URL = 'http://pcuds43.cern.ch/indico/oauth.py/request_token_ready'
-RESOURCE_URL = 'http://pcuds43.cern.ch/indico/oauth.py/resource'
-REALM = 'http://pcuds43.cern.ch/indico/'
-VERIFIER = 'verifier'
 
 
 #http://nullege.com/codes/show/src%40r%40e%40repoze-oauth-plugin-0.2%40repoze%40who%40plugins%40oauth%40plugin.py/45/oauth2.Server/python
@@ -34,17 +25,17 @@ def gen_random_string(length=40, alphabet=ascii_letters + digits):
 class RHOAuth(base.RH):
 
     def __init__(self, req):
-       base.RH.__init__(self, req)
-       self.oauth_server = oauth.Server()
-       self.oauth_server.add_signature_method(oauth.SignatureMethod_PLAINTEXT())
-       self.oauth_server.add_signature_method(oauth.SignatureMethod_HMAC_SHA1())
+        base.RH.__init__(self, req)
+        self.oauth_server = oauth.Server()
+        self.oauth_server.add_signature_method(oauth.SignatureMethod_PLAINTEXT())
+        self.oauth_server.add_signature_method(oauth.SignatureMethod_HMAC_SHA1())
 
-   # example way to send an oauth error
+    # example way to send an oauth error
     def send_oauth_error(self, err=None):
         # send a 401 error
         self._req.status = apache.HTTP_UNAUTHORIZED
         # return the authenticate header
-        header = oauth.build_authenticate_header(realm=REALM)
+        header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
         for k, v in header.iteritems():
             self._req.headers_out[k] = v
 
@@ -124,7 +115,7 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
                 redirectURL = '%s?user_id=%s&returnURL=%s&callback=%s&third_party_app=%s' %\
                     (UHThirdPartyAuth.getURL(),
                     user_id,
-                    urllib2.quote(AUTHORIZE_CONSUMER_URL),
+                    urllib2.quote(urlHandlers.UHOAuthAuthorizeConsumer.getURL()),
                     urllib2.quote(request_token.getToken().get_callback_url()),
                     urllib2.quote(request_token.getConsumer().getName()))
                 self._redirect(redirectURL)
