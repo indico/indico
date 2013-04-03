@@ -18,60 +18,31 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from pytz import all_timezones
-import httplib
-import urllib
-import base64
 import operator
-from xml.dom.minidom import parseString
-from datetime import datetime, timedelta
-from persistent import Persistent
 from BTrees.OOBTree import OOTreeSet, union
 
-from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
-                            IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
-from MaKaC.common.fossilize import Fossilizable, fossilizes
-from random import random
-from indico.util.i18n import i18nformat
-
-import ZODB
 from persistent import Persistent
 from accessControl import AdminList
-import MaKaC,os
-from MaKaC.common import filters, indexes, logger
-from MaKaC.common.Configuration import Config
+import MaKaC
+from MaKaC.common import filters, indexes
 from MaKaC.common.Locators import Locator
-from MaKaC.common.ObjectHolders import ObjectHolder, IndexHolder
+from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.cache import GenericCache
 from MaKaC.errors import UserError, MaKaCError
-from MaKaC.authentication.LocalAuthentication import LocalIdentity
 from MaKaC.trashCan import TrashCanManager
-from MaKaC.externUsers import ExtUserHolder
-from MaKaC.common.db import DBMgr
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
-from datetime import datetime, timedelta
-
-from MaKaC.common.PickleJar import Updates
 from MaKaC.common.logger import Logger
 from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
                             IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 
-#import ldap
 from pytz import all_timezones
-import httplib
-import urllib
-import base64
-from xml.dom.minidom import parseString
-from copy import deepcopy
 from MaKaC.plugins.base import PluginsHolder
 
-from indico.util.contextManager import ContextManager
 from indico.util.caching import order_dict
-from indico.util.i18n import i18nformat
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
@@ -351,6 +322,7 @@ class Avatar(Persistent, Fossilizable):
     @cached_classproperty
     @classmethod
     def linkedToMap(cls):
+        from MaKaC.common.timerExec import Alarm
         # Hey, when adding new roles don't forget to handle them in AvatarHolder.mergeAvatar, too!
         return {
             'category': {'cls': MaKaC.conference.Category,
@@ -376,7 +348,7 @@ class Avatar(Persistent, Fossilizable):
                       'roles': set(['member'])},
             'evaluation': {'cls': MaKaC.evaluation.Submission,
                            'roles': set(['submitter'])},
-            'alarm': {'cls': MaKaC.common.timerExec.Alarm,
+            'alarm': {'cls': Alarm,
                       'roles': set(['to'])}
         }
 

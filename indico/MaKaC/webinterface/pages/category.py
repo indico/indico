@@ -47,7 +47,7 @@ from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import CERNGroup, Avatar
+from MaKaC.user import Avatar
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
@@ -127,7 +127,7 @@ class WCategoryDisplay(WICalExportBase):
         for mgr in self._target.getManagerList():
             if isinstance(mgr, Avatar):
                 mgrs.append(("avatar", mgr.getAbrName()))
-            elif isinstance(mgr, CERNGroup):
+            elif isinstance(mgr, LDAPGroup):
                 mgrs.append(("group", mgr.getName()))
 
         vars["managers"] = sorted(mgrs)
