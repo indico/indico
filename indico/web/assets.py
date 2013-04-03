@@ -225,7 +225,9 @@ def register_all_css(env, main_css_file):
                                     'css/core.css',
                                     'css/dialogs.css',
                                     'css/icons.css',
+                                    'css/inputs.css',
                                     'css/tables.css',
+                                    'css/toolbars.css',
 
                                     'css/calendar-blue.css',
                                     'css/jquery-ui.css',

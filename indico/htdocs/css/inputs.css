@@ -1,0 +1,133 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+/* ********** */
+/* Text-input */
+/* ********** */
+.text-input {
+    border: 1px solid #BBB;
+    display: inline-block;
+    height: 2.1em;
+    padding: 0em 0.7em 0em 0.7em;
+    transition: color .25s ease-out, border-color .25s ease-out;
+    -webkit-transition: color .25s ease-out, border-color .25s ease-out;
+    -moz-transition: color .25s ease-out, border-color .25s ease-out;
+    vertical-align: middle;
+}
+
+.text-input:hover {
+    border-color: #999 ;
+    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+}
+
+.text-input.active {
+    border-color: #999;
+    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+}
+
+.text-input input[type=text] {
+    background: transparent;
+    border: none;
+    color: #555;
+    font-size: 13px;
+    font-weight: bold;
+    outline: none;
+    height: 1.9em;
+}
+
+.text-input > .reset-input {
+    color: #BBB;
+    visibility: hidden;
+    font-size: 1.2em;
+    vertical-align: -10%;
+}
+
+.text-input > .reset-input:hover {
+    color: #999;
+    cursor: pointer;
+}
+
+.text-input > .reset-input:active {
+    color: #555;
+}
+
+/* ******************* */
+/* Checkboxes & radios */
+/* ******************* */
+.group.selection > input[type=checkbox],
+.group.selection > input[type=radio] {
+    display: none;
+}
+
+.group.selection > label.i-button:hover {
+    background-color: #F7F7F7;
+    background-image: -ms-linear-gradient(top, #E2E2E2, #F7F7F7);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#E2E2E2), to(#F7F7F7));
+    background-image: -webkit-linear-gradient(top, #E2E2E2, #F7F7F7);
+    background-image: -o-linear-gradient(top, #E2E2E2, #F7F7F7);
+    background-image: -moz-linear-gradient(top, #E2E2E2, #F7F7F7);
+    background-image: linear-gradient(bottom, #E2E2E2, #F7F7F7);
+    border-color: #BBB;
+    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+}
+
+.group.selection > label.i-button:active {
+    background-color: #A5C4F3;
+    background-image: -ms-linear-gradient(top, #81ADEF, #A5C4F3);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#81ADEF), to(#A5C4F3));
+    background-image: -webkit-linear-gradient(top, #81ADEF, #A5C4F3);
+    background-image: -o-linear-gradient(top, #81ADEF, #A5C4F3);
+    background-image: -moz-linear-gradient(top, #81ADEF, #A5C4F3);
+    background-image: linear-gradient(bottom, #81ADEF, #A5C4F3);
+}
+
+.group.selection > input[type=checkbox]:checked + label,
+.group.selection > input[type=radio]:checked + label {
+    background-color: #5D95EA;
+    background: -moz-linear-gradient(top, #387EE5, #5D95EA);
+    background: -webkit-linear-gradient(top, #387EE5, #5D95EA);
+    background: -o-linear-gradient(top, #387EE5, #5D95EA);
+    background: -ms-linear-gradient(top, #387EE5, #5D95EA);
+    background: linear-gradient(top, #387EE5, #5D95EA);
+    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+    color: #EEE !important;
+}
+
+.group.selection > input[type=checkbox]:checked + label:hover {
+    box-shadow: none !important;
+    color: #FFF !important;
+}
+
+.group.selection > input[type=radio]:checked + label:hover {
+    cursor: default !important;
+}
+
+.group.selection > input[type=checkbox]:checked + label:active,
+.group.selection > input[type=radio]:checked + label:active {
+    background-color: #A5C4F3;
+    background-image: -ms-linear-gradient(top, #81ADEF, #A5C4F3);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#81ADEF), to(#A5C4F3));
+    background-image: -webkit-linear-gradient(top, #81ADEF, #A5C4F3);
+    background-image: -o-linear-gradient(top, #81ADEF, #A5C4F3);
+    background-image: -moz-linear-gradient(top, #81ADEF, #A5C4F3);
+    background-image: linear-gradient(bottom, #81ADEF, #A5C4F3);
+    color: #555 !important;
+}
