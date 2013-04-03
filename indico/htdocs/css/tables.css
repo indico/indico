@@ -19,38 +19,45 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-.table-title {
-    border-bottom: 1px #E5E5E5 solid;
+table.i-table {
+    border-collapse: collapse;
+    margin-top: 1.6em;
+    table-layout: fixed;
+    width: 100%;
+}
+
+h3.i-table {
     color: #777;
     font-size: 1.2em;
     font-weight: bold;
-    margin-top: 20px;
+    margin-bottom: 0em;
+    margin-top: 1.6em;
     padding: 3px 3px 5px 3px;
 }
 
-.table-title.emphasis {
+h3.i-table.emphasis {
     font-style: italic;
 }
 
-.table-title.no-border {
-    border-bottom: none;
-    font-style: italic;
+h3.i-table.border {
+    border-bottom: 1px solid #E5E5E5;
 }
 
-.table-row {
-    border-bottom: 1px #E5E5E5 solid;
+h3.i-table + table.i-table,
+table.i-table.no-margin {
+    margin-top: 0em;
+}
+
+tr.i-table {
+    border-bottom: 1px solid #E5E5E5;
+    border-top: 1px solid #E5E5E5;
+}
+
+td.i-table {
     border-left: 2px solid rgba(56, 126, 229,0);
-}
-
-.table-row ~ .table-row {
-    border-top: none;
-}
-
-.table-cell {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    display: inline-block;
     overflow: hidden;
     padding: 5px 3px 5px 3px;
     text-overflow: ellipsis;
@@ -58,16 +65,20 @@
     vertical-align: middle;
 }
 
-.table-cell.empty {
+td.i-table ~ td.i-table {
+    border-left: none !important;
+}
+
+td.i-table.empty {
     color: #999;
     font-style: italic;
 }
 
-.table-cell[class*="icon-"] {
-    width: 3%;
+td.i-table[class*="icon-"] {
+     width: 30px;
 }
 
-.table-cell[class*="icon-"]:before {
+td.i-table[class*="icon-"]:before {
     color: #555 !important;
     font-size: 1.2em;
 }
@@ -75,15 +86,7 @@
 /* **************** */
 /* Interactive rows */
 /* **************** */
-.table-row.interactive:hover {
-    border-left-color: rgba(56, 126, 229,1) !important;
-}
-
-.table-row.interactive.active {
-    border-left-color: #E5E5E5;
-}
-
-.table-row.interactive > .inline {
+tr.i-table.interactive > td.i-table {
     cursor: pointer;
     transition: background-color .25s ease-out;
     -webkit-transition: background-color .25s ease-out;
@@ -94,65 +97,72 @@
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    white-space: nowrap;
 }
 
-.table-row.interactive > .inline.active {
+tr.i-table.interactive:hover > td.i-table,
+tr.i-table.interactive:hover + tr.i-table.content-wrapper > td.i-table {
+    border-left-color: rgba(56, 126, 229,1) !important;
+}
+
+tr.i-table.interactive.active > td.i-table {
+    border-left-color: #E5E5E5;
     background-color: #F4F4F4;
 }
 
-.content-row {
-    position: relative;
-    min-height: 2em;
+tr.i-table.content-wrapper {
+    border-top: none;
 }
 
-.content-row > .table-cell.caption {
+tr.i-table.content-wrapper > td.i-table {
+    border-left-color: #E5E5E5;
+    padding: 0px;
+}
+
+tr.i-table.content > td.i-table.caption,
+tr.i-table.content > td.i-table.value {
+    padding: 3px 5px 3px 5px;
+}
+
+tr.i-table.content {
+    border: none;
+}
+
+tr.i-table.content > td.i-table.log-caption {
     border-bottom: 1px dashed #E5E5E5;
     border-right: 1px dashed #E5E5E5;
-    overflow: visible;
-    padding: 5px 5px 5px 0px;
+    font-weight: bold;
     text-align: right;
+    vertical-align: top;
 }
 
-.content-row:last-of-type > .table-cell.caption {
-    border-bottom: none;
-}
-
-.content-row > .table-cell.caption.v-growing {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    top: 0;
-}
-
-.content-row > .table-cell:not(.caption).v-growing {
+tr.i-table.content > td.i-table.value {
+    border-bottom: 1px solid transparent !important;
     white-space: pre-line;
+}
+
+tr.i-table.content:last-of-type > td.i-table.caption,
+tr.i-table.content:last-of-type > td.i-table.value {
+    border-bottom: none !important;
 }
 
 /* ************** */
 /* View specifics */
 /* ************** */
-
-.table-cell.log-module {
+td.i-table.log-module {
     font-weight: bold;
-    width: 15%;
+    width: 150px;
 }
 
-.table-cell.log-subject {
-    width: 57%;
+td.i-table.log-subject {
+    width: auto;
 }
 
-.table-cell.log-stamp {
+td.i-table.log-stamp {
     direction: rtl;
     text-align: right;
-    width: 25%;
+    width: 210px;
 }
 
-.table-cell.log-caption {
-    font-weight: bold;
-    width: 178px;
-}
-
-.table-cell.log-value {
-    margin-left: 181px;
+td.i-table.caption.log-caption {
+    width: 175px;
 }

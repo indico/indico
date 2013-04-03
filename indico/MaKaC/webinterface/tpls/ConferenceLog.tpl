@@ -62,68 +62,67 @@
     </div>
 </div>
 
-<div id="emptyLog" class="hidden">
-    <div class="table-title emphasis">
-         ${_("The log is empty")}
-    </div>
-</div>
+<div id="logs">
+    <h3 id="emptyLog" class="i-table emphasis border hidden">
+        ${_("The log is empty")}
+    </h3>
 
-<div id="nothingToShow" class="hidden">
-    <div class="table-title emphasis">
+    <h3 id="nothingToShow" class="i-table emphasis border hidden">
         ${_("All results hidden")}
-    </div>
-</div>
+    </h3>
 
-% for day_entry in iterators.SortedDictIterator(log_dict, reverse=True):
-<% key = day_entry[0] %>
-<% value = day_entry[1] %>
-<div id="log-table-${key}">
-    <div class="table-title searchable">
-        ${parse_day(key)}
-    </div>
-    % for line in value:
-    <div class="table-row interactive ${line.getLogType()}" aria-hidden="true">
+    % for day_entry in iterators.SortedDictIterator(log_dict, reverse=True):
+    <% key = day_entry[0] %>
+    <% value = day_entry[1] %>
 
-        <div class="inline">
-            <span class="table-cell ${get_icon(line.getLogType())}"></span><!--
-            --><span class="table-cell log-module searchable">${line.getModule()}</span><!--
-            --><span class="table-cell log-subject searchable">${line.getLogSubject()}</span><!--
+    <h3 class="i-table searchable">${parse_day(key)}</h3>
+    <table id="log-table-${key}" class="i-table">
+        % for line in value:
+        <tr class="i-table interactive ${line.getLogType()}" >
+                <td class="i-table ${get_icon(line.getLogType())}" aria-hidden="true"></td>
+                <td class="i-table log-module searchable">${line.getModule()}</td>
+                <td class="i-table log-subject searchable">${line.getLogSubject()}</td>
+                <td class="i-table log-stamp text-superfluous">
+                % if line.getResponsibleName() != "System":
+                    ${_("by {user} at {time}").format(user='<span class="text-normal searchable">{0}</span>'.format(line.getResponsibleName()),
+                                                      time='<span class="text-normal">{0}</span>'.format(format_time(line.getLogDate(), "medium")))}
+                % else:
+                    <span class="text-normal">${format_time(line.getLogDate(), "medium")}</span>
+                % endif
+                </td>
+        </tr>
+        <tr class="i-table content-wrapper weak-hidden">
+            <td class="i-table" colspan="4">
+                <table class="i-table no-margin">
+                        % if len(line.getLogInfo()) == 1 and "subject" in line.getLogInfo():
+                        <tr class="i-table content">
+                            <td class="i-table caption log-caption"></td>
+                            <td class="i-table value empty">${_("No further information to show.")}</td>
+                        </tr>
+                        % else:
+                            % for info in line.getLogInfoList():
+                            <% caption = info[0]%>
+                            <% value = info[1]%>
+                            <tr class="i-table content">
+                                <td class="i-table caption log-caption">${caption}</td>
+                                <td class="i-table value searchable">${value}</td>
+                            </tr>
+                            % endfor
+                        % endif
+                </table>
+            </td>
+        </tr>
 
-            --><span class="table-cell log-stamp text-superfluous">
-            % if line.getResponsibleName() != "System":
-                ${_("by {user} at {time}").format(user='<span class="text-normal searchable">{0}</span>'.format(line.getResponsibleName()),
-                                                  time='<span class="text-normal">{0}</span>'.format(format_time(line.getLogDate(), "medium")))}
-            % else:
-                <span class="text-normal">${format_time(line.getLogDate(), "medium")}</span>
-            % endif
-            </span>
-        </div>
-
-        <div class="info-wrapper weak-hidden">
-        % if len(line.getLogInfo()) == 1 and "subject" in line.getLogInfo():
-            <div class="content-row clearfix">
-                <span class="table-cell caption v-growing log-caption"></span>
-                <span class="table-cell empty v-growing log-value">${_("No further information to show.")}</span>
-            </div>
-        % else:
-            % for info in line.getLogInfoList():
-                <% caption = info[0]%>
-                <% value = info[1]%>
-                <div class="content-row clearfix">
-                    <span class="table-cell caption v-growing log-caption">${caption}</span>
-                    <span class="table-cell v-growing log-value searchable">${value}</span>
-                </div>
-            % endfor
-        % endif
-        </div>
-    </div>
+        % endfor
+    </table>
     % endfor
 </div>
-% endfor
+
 
 <script>
 $(document).ready(function(log_view){
 
+    /* Initializations */
     if ($("[id*=log-table-]").length === 0) {
         $("#emptyLog").removeClass("hidden");
     }
@@ -137,27 +136,49 @@ $(document).ready(function(log_view){
         IndicoUI.Effect.followScroll();
     });
 
-    $(".table-row .inline").click(function() {
-        slideRow($(this));
+    $("tr.i-table.interactive").click(function() {
+        toggleExpandedRow($(this));
     });
 
-    var slideRow = function(row_inline) {
-        row_inline.parent().toggleClass("active");
-        row_inline.toggleClass("active");
-        row_inline.siblings(".info-wrapper").slideToggle();
+    var toggleExpandedRow = function(interactive_row) {
+        if (interactive_row.hasClass("active")) {
+            collapseRow(interactive_row);
+        } else {
+            expandRow(interactive_row);
+        }
     }
 
-    var slideRowDown = function(row_inline) {
-        row_inline.parent().addClass("active");
-        row_inline.addClass("active");
-        row_inline.siblings(".info-wrapper").slideDown();
-    }
+    var expandRow = function(interactive_row) {
+        interactive_row.addClass("active");
+        interactive_row.css("border-bottom", "none");
+        interactive_row.next().removeClass("weak-hidden");
 
-    var slideRowUp = function(row_inline) {
-        row_inline.parent().removeClass("active");
-        row_inline.removeClass("active");
-        row_inline.siblings(".info-wrapper").slideUp();
-    }
+        interactive_row.next()
+        .children("td")
+        .wrapInner('<div style="display: none;" />')
+        .parent()
+        .find("td > div")
+        .slideDown(400, function() {
+            var $set = $(this);
+            $set.replaceWith($set.contents());
+        });
+    };
+
+    var collapseRow = function(interactive_row) {
+        interactive_row.removeClass("active");
+
+        interactive_row.next()
+        .children("td")
+        .wrapInner('<div style="display: block;" />')
+        .parent()
+        .find("td > div")
+        .slideUp(400, function() {
+            var $set = $(this);
+            $set.replaceWith($set.contents());
+            interactive_row.css("border-bottom", "1px #E5E5E5 solid");
+            interactive_row.next().addClass("weak-hidden");
+        });
+    };
 
     /* Event checkbox selector behavior */
     $(".group.selection input[type=checkbox]").change(function() {
@@ -167,15 +188,15 @@ $(document).ready(function(log_view){
     /* Action buttons behavior */
     $("#expandAll").click(function(e) {
         e.preventDefault();
-        $(".table-row .inline").each(function() {
-            slideRowDown($(this));
+        $("tr.i-table.interactive:visible").each(function() {
+            expandRow($(this));
         })
     });
 
     $("#collapseAll").click(function(e) {
         e.preventDefault();
-        $(".table-row .inline").each(function() {
-            slideRowUp($(this));
+        $("tr.i-table.interactive").each(function() {
+            collapseRow($(this));
         })
     });
 
@@ -198,18 +219,24 @@ $(document).ready(function(log_view){
         $("#searchInput").attr("value", "");
         applyFilters();
         updateResetButton();
-    })
+    });
 
     var resultCache = [];
+    var allTableTitles = $("h3.i-table");
     var allTables = $("[id*=log-table-]");
-    var allRows = $(".table-row");
+    var allRows = $("tr.i-table.interactive");
+    var allContentRows = $("tr.i-table.content-wrapper");
 
     var applyFilters = function(){
+        var checkboxes = $(".group.selection input[type=checkbox]:checked");
+        var items = getSearchFilteredItems().filter(getCheckboxFilteredItems(checkboxes));
+
+        allTableTitles.show();
         allTables.show();
         allRows.hide();
+        allContentRows.addClass("weak-hidden");
 
-        getSearchFilteredItems().show();
-        getCheckboxFilteredItems().hide();
+        showRows(items);
         hideEmptyTables();
 
         // Needed because $(window).scroll() is not called when hiding elements
@@ -219,32 +246,50 @@ $(document).ready(function(log_view){
         }
     };
 
-    var getCheckboxFilteredItems = function() {
-        var checkboxes = $(".group.selection input[type=checkbox]:not(:checked)");
-
-        var items = $();
-        checkboxes.each(function(){
-            items = items.add($("div.table-row." + $(this).attr("id") + ":visible"));
-        });
-
-        return items;
-    }
-
     var getSearchFilteredItems = function() {
         var term = $("#searchInput").attr("value");
+
         if (resultCache[term] == undefined) {
-            var items = $(".table-title.searchable:contains('"+ term +"')").siblings(".table-row");
-            items = items.add($(".table-row .searchable:contains('"+ term +"')").parents(".table-row"));
+            var items = $("h3.i-table.searchable:contains('"+ term +"')").next().find("tr.i-table.interactive");
+            items = items.add($("tr.i-table.interactive > td.i-table.searchable:contains('"+ term +"')").parent());
             resultCache[term] = items;
         } else {
             var items = resultCache[term];
         }
 
         return items;
-    }
+    };
+
+    var getCheckboxFilteredItems = function(checkboxes) {
+        return function(i) {
+            var $this = $(this);
+            var flag = false;
+
+            checkboxes.each(function(){
+                if ($this.is("tr.i-table." + $(this).attr("id"))) {
+                    flag = true;
+                }
+            });
+
+            return flag;
+        }
+    };
+
+    var showRows = function(items) {
+        items.show();
+        items.each(function() {
+            if ($(this).hasClass("active") === true) {
+                $(this).next(".content-wrapper").removeClass("weak-hidden");
+            } else {
+                $(this).next(".content-wrapper").addClass("weak-hidden");
+            }
+        });
+    };
 
     var hideEmptyTables = function() {
-        $(".table-row:hidden").parent().not($(".table-row:visible").parent()).hide();
+        $emptyTables = $("tr.i-table.interactive:hidden").parents("table.i-table").not($("tr.i-table.interactive:visible").parents("table.i-table"));
+        $emptyTables.hide();
+        $emptyTables.prev().hide();
 
         if ($("[id*=log-table-]").length > 0 &&
             $("[id*=log-table-]:visible").length === 0) {
@@ -252,7 +297,7 @@ $(document).ready(function(log_view){
         } else {
             $("#nothingToShow").addClass("hidden");
         }
-    }
+    };
 
     var updateResetButton = function() {
         if ($("#searchInput").attr("value") === "") {
@@ -260,7 +305,7 @@ $(document).ready(function(log_view){
         } else {
             $(".reset-input").css('visibility', 'visible');
         }
-    }
+    };
 
-})
+});
 </script>
