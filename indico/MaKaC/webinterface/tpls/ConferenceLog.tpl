@@ -185,6 +185,14 @@ $(document).ready(function(log_view){
         applyFilters();
     });
 
+    // Becasue IE8 does not trigger change event for input elements
+    $('.group.selection input[type=checkbox] + label').click(function () {
+        var $checkbox = $(this).prev();
+        $checkbox.prop("checked", !$checkbox.prop("checked"));
+        $checkbox.trigger("change");
+        return false;
+     });
+
     /* Action buttons behavior */
     $("#expandAll").click(function(e) {
         e.preventDefault();

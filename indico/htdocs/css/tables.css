@@ -54,7 +54,8 @@ tr.i-table {
 }
 
 td.i-table {
-    border-left: 2px solid rgba(56, 126, 229,0);
+/*     border-left: 2px solid rgba(56, 126, 229,0); */
+    border-left: 2px solid transparent;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -86,11 +87,15 @@ td.i-table[class*="icon-"]:before {
 /* **************** */
 /* Interactive rows */
 /* **************** */
-tr.i-table.interactive > td.i-table {
-    cursor: pointer;
+tr.i-table.interactive.active {
+    background-color: #F4F4F4;
     transition: background-color .25s ease-out;
     -webkit-transition: background-color .25s ease-out;
     -moz-transition: background-color .25s ease-out;
+}
+
+tr.i-table.interactive > td.i-table {
+    cursor: pointer;
     user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -99,14 +104,13 @@ tr.i-table.interactive > td.i-table {
     -ms-user-select: none;
 }
 
-tr.i-table.interactive:hover > td.i-table,
-tr.i-table.interactive:hover + tr.i-table.content-wrapper > td.i-table {
-    border-left-color: rgba(56, 126, 229,1) !important;
-}
-
 tr.i-table.interactive.active > td.i-table {
     border-left-color: #E5E5E5;
-    background-color: #F4F4F4;
+}
+
+tr.i-table.interactive:hover > td.i-table,
+tr.i-table.interactive:hover + tr.i-table.content-wrapper > td.i-table {
+    border-left-color: rgb(56, 126, 229) !important;
 }
 
 tr.i-table.content-wrapper {
@@ -160,6 +164,7 @@ td.i-table.log-subject {
 td.i-table.log-stamp {
     direction: rtl;
     text-align: right;
+    text-overflow: clip;
     width: 210px;
 }
 

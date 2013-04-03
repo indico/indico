@@ -147,6 +147,7 @@ jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/date.js',
                 'js/jquery/jquery.multiselect.js',
                 'js/jquery/jquery.colorpicker.js',
+                'js/jquery/jquery-extra-selectors.js',
                 filters='rjsmin', output='jquery_code_%(version)s.min.js')
 
 presentation = Bundle('js/jquery/underscore.js',
@@ -190,9 +191,12 @@ presentation = Bundle('js/jquery/underscore.js',
                       filters='rjsmin', output='presentation_%(version)s.min.js')
 
 
+selectivizr = Bundle('js/selectivizr/selectivizr.js',
+                     filters='rjsmin', output='selectivizr_%(version)s.min.js')
+
+
 base_js = Bundle(jquery, presentation, indico_core,
                  indico_legacy, indico_common, indico_jquery)
-
 
 def register_all_js(env):
     env.register('jquery', jquery)
@@ -211,6 +215,7 @@ def register_all_js(env):
     env.register('indico_authors', indico_jquery_authors)
     env.register('indico_badges_js', indico_badges_js)
     env.register('base_js', base_js)
+    env.register('selectivizr', selectivizr)
 
 
 def register_all_css(env, main_css_file):

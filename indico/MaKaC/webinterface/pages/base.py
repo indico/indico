@@ -165,7 +165,8 @@ class WPBase(OldObservable):
             "extraJSFiles": self.getJSFiles(),
             "extraJS": self._extraJS,
             "language": language,
-            "social": info.getSocialAppConfig()
+            "social": info.getSocialAppConfig(),
+            "assets": self._asset_env
             })
 
     def _getHTMLFooter( self ):

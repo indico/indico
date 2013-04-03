@@ -28,6 +28,13 @@
             ${ page._getJavaScriptInclude(baseurl + JSFile) }
         % endfor
 
+        <!--[if (gte IE 6)&(lte IE 8)]>
+        % for JSFile in assets["selectivizr"].urls():
+            ${'<script src="'+ baseurl + JSFile +'" type="text/javascript"></script>\n'}
+            <noscript><link rel="stylesheet" href="[fallback css]" /></noscript>
+        % endfor
+        <![endif]-->
+
     <script type="text/javascript">
       var currentLanguage = '${ language }';
       loadDictionary(currentLanguage);

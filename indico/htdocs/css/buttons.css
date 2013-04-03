@@ -33,6 +33,7 @@
     line-height: 1em;
     margin: 0;
     padding: 4px 10px 4px;
+    outline: none;
     text-align: center;
     transition: color .25s ease-out, border-color .25s ease-out;
     -webkit-transition: color .25s ease-out, border-color .25s ease-out;
