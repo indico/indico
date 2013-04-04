@@ -1580,8 +1580,18 @@ found the picture in your documents, click on *Upload*.
 Logs Management
 ~~~~~~~~~~~~~~~
 
-This shows you a list of all the actions performed on the whole of the
-conference. It shows the date, subject, responsible and module.
+The Event Log presents a summary of the most relevant actions performed on the
+whole of the conference along with filtering options for easily finding
+specific ones.
+
+The list contains actions grouped by day and each row displays the type of a
+single action (icon), the module in which it was performed, a brief
+description, and the person who triggered it. By clicking a row extended
+information can be displayed.
+
+The toolbar allows to filter by kind of action and the search box to filter by
+match with any of the relevant content. There are also two buttons
+for expanding and collapsing extended information of all rows.
 
 |image134|
 
