@@ -265,3 +265,10 @@ CssStylesheetName    = "Default"
 
 # Categories that you want to limit to certain IPs (RSS, iCal, export.py)
 ExportACL = {}
+
+#------------------------------------------------------------------------------
+# OAUTH PARAMETERS
+#------------------------------------------------------------------------------
+
+# Time to live of the OAuth Tokens
+OAuthAccessTokenTTL = 10000

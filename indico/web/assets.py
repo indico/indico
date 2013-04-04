@@ -235,6 +235,7 @@ def register_all_css(env, main_css_file):
                                     'css/inputs.css',
                                     'css/tables.css',
                                     'css/toolbars.css',
+                                    'css/lists.css',
 
                                     'css/calendar-blue.css',
                                     'css/jquery-ui.css',

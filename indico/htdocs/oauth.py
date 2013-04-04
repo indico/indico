@@ -37,3 +37,9 @@ def authorize_consumer(req, **params):
 
 def deauthorize_consumer(req, **params):
 	return oauth.RHOAuthDeauthorizeConsumer(req).process(params)
+
+def thirdPartyAuth(req, **params):
+	return oauth.RHOAuthThirdPartyAuth(req).process(params)
+
+def userThirdPartyAuth(req, **params):
+	return oauth.RHOAuthUserThirdPartyAuth(req).process(params)

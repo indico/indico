@@ -25,15 +25,12 @@ import MaKaC.common.info as info
 import MaKaC.errors as errors
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.mail as mail
-from MaKaC.common.general import *
-from MaKaC.errors import MaKaCError, ModificationError, NotFoundError
+from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.accessControl import AdminList
 from MaKaC.webinterface.rh.base import RH, RHProtected
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import DBMgr
 from MaKaC.common import pendingQueues
-import MaKaC.common.timezoneUtils as timezoneUtils
-import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import re
 from MaKaC.i18n import _
 
@@ -311,14 +308,6 @@ class RHUserPreferences( RHUserBase ):
         p = adminPages.WPUserPreferences( self, self._avatar )
         return p.display()
 
-class RHUserThirdPartyAuth( base.RHProtected ):
-    _uh = urlHandlers.UHUserThirdPartyAuth
-
-    def _process( self ):
-        p = adminPages.WPUserThirdPartyAuth( self, self._getUser() )
-        return p.display()
-
-
 class RHUserPersBase( base.RHDisplayBaseProtected ):
 
     def _checkParams( self, params ):
@@ -328,14 +317,6 @@ class RHUserPersBase( base.RHDisplayBaseProtected ):
         RHProtected._checkSessionUser( self )
         if not self._aw.getUser():
             raise errors.AccessControlError("user")
-
-class RHUserEvents(RHUserPersBase):
-    _uh = urlHandlers.UHGetUserEventPage
-
-    def _process( self ):
-        p = personalization.WPDisplayUserEvents( self )
-        return p.display()
-
 
 class RHUserActive( RHUserBase ):
 

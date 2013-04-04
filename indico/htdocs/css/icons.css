@@ -150,3 +150,6 @@
 .icon-list:before {
 	content: "\36";
 }
+.icon-trust:before {
+    content: "\35";
+}

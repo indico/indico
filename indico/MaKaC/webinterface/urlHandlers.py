@@ -216,6 +216,12 @@ class UHOAuthAuthorizeConsumer(URLHandler):
 class UHOAuthDeauthorizeConsumer(URLHandler):
     _relativeURL = "oauth.py/deauthorize_consumer"
 
+class UHOAuthThirdPartyAuth( URLHandler ):
+    _relativeURL = "oauth.py/thirdPartyAuth"
+
+class UHOAuthUserThirdPartyAuth( URLHandler ):
+    _relativeURL = "oauth.py/userThirdPartyAuth"
+
 class UHIndicoNews( URLHandler ):
     _relativeURL = "news.py"
 
@@ -1630,12 +1636,6 @@ class UHUserBaskets( URLHandler ):
 class UHUserPreferences( URLHandler ):
     _relativeURL = "userPreferences.py"
 
-class UHUserThirdPartyAuth( URLHandler ):
-    _relativeURL = "userThirdPartyAuth.py"
-
-class UHThirdPartyAuth( URLHandler ):
-    _relativeURL = "thirdPartyAuth.py"
-
 class UHUserAPI( URLHandler ):
     _relativeURL = "userAPI.py"
 
@@ -2611,6 +2611,12 @@ class UHAdminAPIOptionsSet( URLHandler ):
 class UHAdminAPIKeys( URLHandler ):
     _relativeURL = "adminServices.py/apiKeys"
 
+class UHAdminOAuthConsumers( URLHandler ):
+    _relativeURL = "adminServices.py/oauthConsumers"
+
+class UHAdminOAuthAuthorized( URLHandler ):
+    _relativeURL = "adminServices.py/oauthAuthorized"
+
 class UHAnalytics( URLHandler ):
     _relativeURL = "adminServices.py/analytics"
 
@@ -3479,24 +3485,6 @@ class UHConfModifEvaluationResultsOptions( URLHandler ):
 
 class UHConfModifEvaluationResultsSubmittersActions( URLHandler ):
     _relativeURL = "confModifEvaluation.py/resultsSubmittersActions"
-
-############
-# Personalization
-############
-
-# "My Events"
-
-class UHGetUserEventPage( URLHandler ):
-    _relativeURL = "userDetails.py/getEvents"
-
-    @classmethod
-    def getURL( cls, target=None ):
-        url = cls._getURL()
-
-        if (target != None):
-            url.setParams( target.getLocator() )
-
-        return url
 
 class UHResetSession (URLHandler):
     _relativeURL = "resetSessionTZ.py"

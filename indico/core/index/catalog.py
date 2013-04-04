@@ -23,7 +23,7 @@ from indico.core.index.event import CategoryEventStartDateIndex
 
 from MaKaC.common import DBMgr
 from MaKaC.plugins.base import extension_point
-from indico.modules.oauth import UserOAuthRequestTokenIndex, UserOAuthAccessTokenIndex
+from indico.modules.oauth.components import UserOAuthRequestTokenIndex, UserOAuthAccessTokenIndex
 
 
 # TODO: decorator for annoying 'db parameter'

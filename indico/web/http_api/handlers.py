@@ -29,6 +29,7 @@ import time
 import urllib
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
+import oauth2 as oauth
 
 # indico imports
 from MaKaC.webinterface.session import getSessionForReq
@@ -42,8 +43,8 @@ from indico.web.wsgi import webinterface_handler_config as apache
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.util.network import _get_remote_ip
 from indico.util.contextManager import ContextManager
-from indico.modules.oauth import ACCESS_TOKEN_TTL
-from indico.modules.oauth.db import AccessTokenHolder
+from indico.modules.oauth.errors import OAuthError
+from indico.modules.oauth.components import OAuthUtils
 
 # indico legacy imports
 from MaKaC.common import DBMgr, Config
@@ -78,7 +79,6 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     else:
         return path
 
-
 def validateSignature(ak, minfo, signature, timestamp, path, query):
     ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPISignatureTTL()
     if not timestamp and not (ak.isPersistentAllowed() and minfo.isAPIPersistentAllowed()):
@@ -88,18 +88,6 @@ def validateSignature(ak, minfo, signature, timestamp, path, query):
     digest = hmac.new(ak.getSignKey(), normalizeQuery(path, query), hashlib.sha1).hexdigest()
     if signature != digest:
         raise HTTPAPIError('Signature invalid', apache.HTTP_FORBIDDEN)
-
-
-def validateTokenSignature(at, minfo, signature, timestamp, path, query):
-    ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPISignatureTTL()
-    if not timestamp:
-        raise HTTPAPIError('Signature invalid (no timestamp)', apache.HTTP_FORBIDDEN)
-    elif timestamp and abs(timestamp - int(time.time())) > ttl:
-        raise HTTPAPIError('Signature invalid (bad timestamp)', apache.HTTP_FORBIDDEN)
-    digest = hmac.new(at.getToken().secret, normalizeQuery(path, query), hashlib.sha1).hexdigest()
-    if signature != digest:
-        raise HTTPAPIError('Signature invalid', apache.HTTP_FORBIDDEN)
-
 
 def checkAK(apiKey, signature, timestamp, path, query):
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -124,25 +112,6 @@ def checkAK(apiKey, signature, timestamp, path, query):
         onlyPublic = True
     return ak, onlyPublic
 
-def checkAT(atKey, signature, timestamp, path, query):
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    now = time.time()
-    apiMode = minfo.getAPIMode()
-    ath = AccessTokenHolder()
-    if not ath.hasKey(atKey):
-        raise HTTPAPIError('Invalid Access Token Key', apache.HTTP_FORBIDDEN)
-    at = ath.getById(atKey)
-    # Signature validation
-    if now-at.getTimestamp() > ACCESS_TOKEN_TTL:
-        raise HTTPAPIError('Access Token has expired', apache.HTTP_UNAUTHORIZED)
-    onlyPublic = False
-    if signature:
-        validateTokenSignature(at, minfo, signature, timestamp, path, query)
-    else:
-        raise HTTPAPIError('Signature missing', apache.HTTP_FORBIDDEN)
-    return at, onlyPublic
-
-
 def buildAW(ak, req, onlyPublic=False):
     aw = AccessWrapper()
     if ak and not onlyPublic:
@@ -153,19 +122,6 @@ def buildAW(ak, req, onlyPublic=False):
         if not req.is_https() and minfo.isAPIHTTPSRequired() and req.get_user_agent().find("Googlebot") == -1:
             raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
         aw.setUser(ak.getUser())
-    return aw
-
-
-def buildAWFromAccessToken(at, req, onlyPublic=False):
-    aw = AccessWrapper()
-    if at and not onlyPublic:
-        # If we have an authenticated request, require HTTPS
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        # Dirty hack: Google calendar converts HTTP API requests from https to http
-        # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
-        if not req.is_https() and minfo.isAPIHTTPSRequired() and req.get_user_agent().find("Googlebot") == -1:
-            raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
-        aw.setUser(AvatarHolder().getById(at.getUserId()))
     return aw
 
 def handler(req, **params):
@@ -185,18 +141,20 @@ def handler(req, **params):
     dbi = DBMgr.getInstance()
     dbi.startRequest()
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+    if minfo.getRoomBookingModuleActive():
+        Factory.getDALManager().connect()
 
     mode = path.split('/')[1]
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     cookieAuth = get_query_parameter(queryParams, ['ca', 'cookieauth'], 'no') == 'yes'
-    atKey = get_query_parameter(queryParams, ['atk', 'atkey'], None)
     signature = get_query_parameter(queryParams, ['signature'])
     timestamp = get_query_parameter(queryParams, ['timestamp'], 0, integer=True)
     noCache = get_query_parameter(queryParams, ['nc', 'nocache'], 'no') == 'yes'
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
+    oauthToken = queryParams.has_key("oauth_token")
 
     # Get our handler function and its argument and response type
     hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
@@ -217,8 +175,8 @@ def handler(req, **params):
             if not session.getUser():  # ignore guest sessions
                 session = None
 
-        if apiKey or akKey or not session:
-            if atKey == None:
+        if apiKey or oauthToken or not session:
+            if not oauthToken:
                 # Validate the API key (and its signature)
                 ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
                 if enforceOnlyPublic:
@@ -226,8 +184,8 @@ def handler(req, **params):
                 # Create an access wrapper for the API key's user
                 aw = buildAW(ak, req, onlyPublic)
             else: # Access Token (OAuth)
-                at, enforceOnlyPublic = checkAT(atKey, signature, timestamp, path, query)
-                aw = buildAWFromAccessToken(at, req, onlyPublic)
+                at = OAuthUtils.OAuthCheckAccessResource(req, remove_lists(parse_qs(query)))
+                aw = buildAW(at, req, onlyPublic)
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and aw.getUser() is None:
                 cacheKey = normalizeQuery(path, query,
@@ -282,6 +240,10 @@ def handler(req, **params):
             req.status = e.getCode()
             if req.status == apache.HTTP_METHOD_NOT_ALLOWED:
                 req.headers_out['Allow'] = 'GET' if req.method == 'POST' else 'POST'
+    except OAuthError, e:
+        error = e
+        if e.getCode():
+            req.status = e.getCode()
 
     if result is None and error is None:
         # TODO: usage page

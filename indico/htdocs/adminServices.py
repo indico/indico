@@ -19,6 +19,7 @@
 
 import MaKaC.webinterface.rh.services as services
 import MaKaC.webinterface.rh.api as api
+import MaKaC.webinterface.rh.oauth as oauth
 
 def webcast(req, **params):
     return services.RHWebcast(req).process(params)
@@ -100,3 +101,9 @@ def analytics(req, **params):
 
 def saveAnalytics(req, **params):
     return services.RHSaveAnalytics(req).process(params)
+
+def oauthConsumers(req, **params):
+    return oauth.RHAdminOAuthConsumers(req).process(params)
+
+def oauthAuthorized(req, **params):
+    return oauth.RHAdminOAuthAuthorized(req).process(params)

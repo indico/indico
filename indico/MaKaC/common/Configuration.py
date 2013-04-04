@@ -482,6 +482,7 @@ class Config:
         'MaxUploadFilesTotalSize' : '0',
         'MaxUploadFileSize' : '0',
         'ForceConflicts' : 0,
+        'OAuthAccessTokenTTL' : 10000,
         # Authentication
         'LDAPConfig': {'host': 'myldapserver.example.com',
                        'useTLS': True,

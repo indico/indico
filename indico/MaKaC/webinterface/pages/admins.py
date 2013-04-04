@@ -469,6 +469,12 @@ class WPServicesCommon( WPAdminsBase ):
                 urlHandlers.UHAdminAPIOptions.getURL() )
         self._subTabHTTPAPI_Keys = self._subTabHTTPAPI.newSubTab( "api_keys", _("API Keys"), \
                 urlHandlers.UHAdminAPIKeys.getURL() )
+        self._subTabOauth = self._tabCtrl.newTab( "oauth", _("OAuth"), \
+                urlHandlers.UHAdminOAuthConsumers.getURL() )
+        self._subTabOauth_Consumers = self._subTabOauth.newSubTab( "oauth_consumers", _("Consumers"), \
+                urlHandlers.UHAdminOAuthConsumers.getURL() )
+        self._subTabOauth_Authorized = self._subTabOauth.newSubTab( "oauth_authorized", _("Authorized"), \
+                urlHandlers.UHAdminOAuthAuthorized.getURL() )
         self._subTabAnalytics = self._tabCtrl.newTab( "analytics", _("Analytics"), \
                 urlHandlers.UHAnalytics.getURL() )
 
@@ -1412,15 +1418,6 @@ class WUserPreferences(wcomponents.WTemplated):
         return vars
 
 
-class WUserThirdPartyAuth(wcomponents.WTemplated):
-
-    def __init__(self, av):
-        self._avatar = av
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        return vars
-
 class WUserDetails(wcomponents.WTemplated):
 
     def __init__(self, av):
@@ -1521,7 +1518,7 @@ class WPPersonalArea(WPUserBase):
                 urlHandlers.UHUserAPI.getURL(self._avatar) )
 
         self._tabThirdPartyAuth = self._tabCtrl.newTab("auth_control", _("Authorized Apps"),
-                urlHandlers.UHUserThirdPartyAuth.getURL())
+                urlHandlers.UHOAuthUserThirdPartyAuth.getURL(self._avatar))
 
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer(_("User Details"))
@@ -1561,16 +1558,6 @@ class WPUserPreferences( WPPersonalArea ):
 
     def _setActiveTab( self ):
         self._tabPreferences.setActive()
-
-
-class WPUserThirdPartyAuth( WPPersonalArea ):
-
-    def _getTabContent( self, params ):
-        c = WUserThirdPartyAuth( self._avatar )
-        return c.getHTML( params )
-
-    def _setActiveTab( self ):
-        self._tabThirdPartyAuth.setActive()
 
 ### This class is not used anymore. To remove
 class WUserModify(wcomponents.WTemplated):

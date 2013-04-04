@@ -1726,3 +1726,62 @@ type("ColorPickerWidget", [],
             this.initialColor = initialColor;
             this.colorChangedHandler = any(colorChangedHandler, function() {return true;});
         });
+
+
+
+type("AddItemWidget", [],
+        {
+            draw: function(content) {
+                var self = this;
+
+                var toolBar = $("<div class='toolbar'/>");
+                var container = $("<div class='toolbar'/>");
+                var addButton = $("<div class='i-button left'/>").text("Add consumer");
+                var addContainer = $("<div class='left group' style='display:none'/>");
+                var saveButton = $("<div class='i-button accept'/>").text("Add");
+                var cancelButton = $("<div class='i-button'/>").text("Cancel");
+                var inputContainer= $("<div class='text-input left'/>");
+                var input = $("<input type='text' id='consumer_name'/>");
+
+                addButton.click(function(){
+                    addContainer.show();
+                    addButton.hide();
+                });
+                cancelButton.click(function(){
+                    input.val("");
+                    addContainer.hide();
+                    addButton.show();
+                });
+                saveButton.click(function(){
+                    var params = {};
+                    params[self.itemName] =  input.val();
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving..."));
+                    jsonRpc(Indico.Urls.JsonRpcService, self.method ,
+                            params,
+                            function(result, error){
+                                if (exists(error)) {
+                                    killProgress();
+                                    IndicoUtil.errorReport(error);
+                                } else {
+                                    killProgress();
+                                    self.addHandler(result);
+                                    input.val("")
+                                    addContainer.hide();
+                                    addButton.show();
+                                }
+                            });
+                    });
+                inputContainer.append(input);
+                addContainer.append(inputContainer);
+                addContainer.append(saveButton);
+                addContainer.append(cancelButton);
+                container.append(addButton);
+                container.append(addContainer);
+                return container;
+            }
+        },
+        function(itemName, method, addHandler) {
+            this.itemName = itemName;
+            this.method = method;
+            this.addHandler = addHandler;
+        });

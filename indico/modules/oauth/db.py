@@ -1,9 +1,41 @@
-import MaKaC.common.ObjectHolders
-from indico.core.index import IUniqueIdProvider, OOIndex, Catalog
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from zope.interface import implements
-from MaKaC.common.ObjectHolders import ObjectHolder
 from persistent import Persistent
-from indico.modules.oauth import IIndexableByUserId
+import oauth2 as oauth
+from indico.modules.oauth.components import IIndexableByUserId
+from indico.core.index import IUniqueIdProvider, Catalog
+from indico.modules.oauth.fossils import IConsumerFossil
+from MaKaC.common.ObjectHolders import ObjectHolder
+from indico.util.fossilize import fossilizes
+
+class OAuthServer:
+    _instance = None
+
+    @classmethod
+    def getInstance(cls):
+        if cls._instance == None:
+            cls._instance =  oauth.Server()
+            cls._instance.add_signature_method(oauth.SignatureMethod_PLAINTEXT())
+            cls._instance.add_signature_method(oauth.SignatureMethod_HMAC_SHA1())
+        return cls._instance
 
 class ConsumerHolder(ObjectHolder):
     idxName = "consumers"
@@ -54,11 +86,13 @@ class RequestTokenHolder(ObjectHolder):
 
 
 class Consumer(Persistent):
-    def __init__(self, key, secret, name):
+    fossilizes(IConsumerFossil)
+    def __init__(self, key, secret, name, trusted= False, blocked= False):
         self._key = key
         self._secret = secret
         self._name = name
-        self._request_token = None
+        self._trusted = trusted
+        self._blocked = blocked
 
     def getId(self):
         return self._key
@@ -69,17 +103,29 @@ class Consumer(Persistent):
     def getName(self):
         return self._name
 
+    def isTrusted(self):
+        return self._trusted
+
+    def setTrusted(self, trusted):
+        self._trusted = trusted
+
+    def isBlocked(self):
+        return self._blocked
+
+    def setBlocked(self, blocked):
+        self._blocked = blocked
+
 
 class Token(Persistent):
 
     implements(IUniqueIdProvider, IIndexableByUserId)
 
-    def __init__(self, key, token, timestamp, consumer, user_id):
+    def __init__(self, key, token, timestamp, consumer, user):
         self._key = key
         self._token = token
         self._timestamp = timestamp
         self._consumer = consumer
-        self._user_id = user_id
+        self._user = user
 
     def getId(self):
         return self._key
@@ -99,15 +145,15 @@ class Token(Persistent):
     def setTimestamp(self, timestamp):
         self._timestamp = timestamp
 
-    def getUserId(self):
-        return self._user_id
+    def getUser(self):
+        return self._user
 
-    def setUserId(self, user_id):
-        self._user_id = user_id
+    def setUser(self, user):
+        self._user = user
 
     def getConsumer(self):
         return self._consumer
 
     def __conform__(self, proto):
         if proto == IIndexableByUserId:
-            return self.getUserId()
+            return self.getUser().getId()
