@@ -249,9 +249,7 @@ $(document).ready(function(log_view){
 
         // Needed because $(window).scroll() is not called when hiding elements
         // causing scrolling elements to be out of place.
-        if ($.browser.msie) {
-            IndicoUI.Effect.followScroll();
-        }
+        $(window).trigger("scroll");
     };
 
     var getSearchFilteredItems = function() {
