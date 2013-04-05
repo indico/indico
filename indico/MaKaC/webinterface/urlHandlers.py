@@ -1627,6 +1627,9 @@ class UHUserDisable( URLHandler ):
     _relativeURL = "userRegistration.py/disable"
 
 
+class UHUserDashboard(URLHandler):
+    _relativeURL = "userDashboard.py"
+
 class UHUserDetails( URLHandler ):
     _relativeURL = "userDetails.py"
 

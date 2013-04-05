@@ -274,13 +274,19 @@ class RHUserBase( RHProtected ):
             raise errors.AccessControlError("user")
 
 
+class RHUserDashboard(RHUserBase):
+    _uh = urlHandlers.UHUserDashboard
+
+    def _process(self):
+        p = adminPages.WPUserDashboard(self, self._avatar)
+        return p.display()
+
 class RHUserDetails( RHUserBase):
     _uh = urlHandlers.UHUserDetails
 
     def _process( self ):
         p = adminPages.WPUserDetails( self, self._avatar )
         return p.display()
-
 
 class RHUserBaskets( RHUserBase ):
     _uh = urlHandlers.UHUserBaskets

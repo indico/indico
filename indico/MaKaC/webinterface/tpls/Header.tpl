@@ -39,7 +39,7 @@
             % endif
 
             % if currentUser:
-                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHUserDetails.getURL(currentUser) }">${ _("My profile") }</a></li>
+                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a></li>
             % endif
 
             <li id="helpMenu"  onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Help") }</span></li>

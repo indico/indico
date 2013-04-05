@@ -1390,6 +1390,39 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
         vars["accountManagementActive"] = 'Local' in authTagList
         return vars
 
+class WUserDashboard(wcomponents.WTemplated):
+
+    def __init__(self, av):
+        self._avatar = av
+
+    def getHTML(self, currentUser, params):
+        return wcomponents.WTemplated.getHTML(self, params)
+
+    def getVars(self):
+        html_vars = wcomponents.WTemplated.getVars(self)
+        user = self._avatar
+
+        html_vars["categoryManager"] = ""
+        categs = user.getLinkTo("category","manager")
+        for categ in categs:
+            target = CategoryWebLocator({"categId": categ.getId()}).getObject()
+            if target == None:
+                user.unlinkTo(categ,"manager")
+            else:
+                html_vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
+
+        html_vars["eventManager"] = ""
+        ch = ConferenceHolder()
+        events = user.getLinkTo("conference","manager")
+        for event in events:
+            try:
+                ch.getById(event.getId())
+                html_vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
+            except MaKaCError, e:
+                user.unlinkTo(event,"manager")
+
+        return html_vars
+
 
 class WUserBaskets(wcomponents.WTemplated):
 
@@ -1462,24 +1495,6 @@ class WUserDetails(wcomponents.WTemplated):
               self._currentUser in al.getList() or \
               len(self._avatar.getIdentityList())==0:
             vars["identities"] = WUserIdentitiesTable( self._avatar ).getHTML( { "addIdentityURL": vars["addIdentityURL"], "removeIdentityURL": vars["removeIdentityURL"] })
-        vars["categoryManager"] = ""
-        categs = u.getLinkTo("category","manager")
-        for categ in categs:
-            target = CategoryWebLocator({"categId": categ.getId()}).getObject()
-            if target == None:
-                u.unlinkTo(categ,"manager")
-            else:
-                vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
-
-        vars["eventManager"] = ""
-        ch = ConferenceHolder()
-        events = u.getLinkTo("conference","manager")
-        for event in events:
-            try:
-                ch.getById(event.getId())
-                vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
-            except MaKaCError, e:
-                u.unlinkTo(event,"manager")
 
         return vars
 
@@ -1504,6 +1519,10 @@ class WPPersonalArea(WPUserBase):
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
+
+        self._tabRights = self._tabCtrl.newTab("dashboard", _("Dashboard"),
+                               urlHandlers.UHUserDashboard.getURL(self._avatar))
+
         self._tabDetails = self._tabCtrl.newTab( "details", _("Account Details"), \
                 urlHandlers.UHUserDetails.getURL(self._avatar) )
 
@@ -1526,6 +1545,16 @@ class WPPersonalArea(WPUserBase):
 
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer(_("User Details"))
+
+
+class WPUserDashboard(WPPersonalArea):
+
+    def _getTabContent(self, params):
+        c = WUserDashboard(self._avatar)
+        return c.getHTML(self._getAW().getUser(), params)
+
+    def _setActiveTab(self):
+        self._tabRights.setActive()
 
 
 class WPUserDetails( WPPersonalArea ):
