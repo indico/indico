@@ -43,7 +43,7 @@ class ConferenceLocation:
     getArgumentType = classmethod (getArgumentType)
 
     def getValue(cls, conf):
-        return conf.getLocation().getName()
+        return conf.getLocation().getName() if conf.getLocation() else ""
     getValue = classmethod (getValue)
 
 
@@ -54,7 +54,7 @@ class ConferenceAddress:
     getArgumentType = classmethod (getArgumentType)
 
     def getValue(cls, conf):
-        return conf.getLocation().getAddress()
+        return conf.getLocation().getAddress() if conf.getLocation() else ""
     getValue = classmethod (getValue)
 
 class LectureCategory:
