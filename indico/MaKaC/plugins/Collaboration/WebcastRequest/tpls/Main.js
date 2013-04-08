@@ -29,7 +29,7 @@
         var formNodes = IndicoUtil.findFormFields($E('WebcastRequestForm'));
         IndicoUtil.setFormValues(formNodes, {'otherComments':''})
         if (!isLecture) {
-            $E('allTalksRB').dom.checked = true;
+            $('#allTalksRB').trigger('click');
             IndicoUI.Effect.disappear($E('contributionsDiv'));
         }
     },
@@ -37,6 +37,15 @@
     onLoad : function() {
 
         WRUpdateContributionList('contributionList');
+
+        $('input[name=talks]:radio').change(function() {
+            if ($('#allTalksRB').attr('checked')) {
+                $('#not_capable_warning').show();
+            } else {
+                $('#not_capable_warning').hide();
+            }
+        });
+
         IndicoUtil.enableDisableForm($E("WRForm"), WRWebcastCapable);
 
         if (!isLecture) {
@@ -52,7 +61,7 @@
 
     afterLoad : function() {
         if ($("#chooseTalksRB").is(":checked")) {
-            $("#chooseTalksRB").click();
+            $("#chooseTalksRB").trigger('change');
         }
     }
 }
