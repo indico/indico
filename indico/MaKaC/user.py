@@ -27,7 +27,7 @@ from indico.util.i18n import i18nformat
 import ZODB
 from persistent import Persistent
 from accessControl import AdminList
-import MaKaC,os
+import MaKaC
 from MaKaC.common import filters, indexes, logger
 from MaKaC.common.Configuration import Config
 from MaKaC.common.Locators import Locator
