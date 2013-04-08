@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-02-28 16:11+0100\n"
+"POT-Creation-Date: 2013-04-08 08:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -268,6 +268,28 @@ msgstr ""
 msgid "Creating new type of payment method..."
 msgstr ""
 
+#: MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:24
+#: indico/MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:24
+msgid "Set access key"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:24
+#: indico/MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:24
+msgid ""
+"Please note that it is more secure to make the event private instead of using"
+" an access key."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:37
+#: indico/MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:37
+msgid "Access key saved"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:37
+#: indico/MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:37
+msgid "Access key removed"
+msgstr ""
+
 #: MaKaC/webinterface/tpls/ConfContributionListFilters.tpl:223
 #: indico/MaKaC/webinterface/tpls/ConfContributionListFilters.tpl:223
 msgid "No contribution displayed!"
@@ -463,6 +485,28 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/ConfRegistrationFormDisplay.tpl:18
 #: indico/MaKaC/webinterface/tpls/ConfRegistrationFormModify.tpl:18
 msgid "The form contains some errors. Please, correct them and submit again."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:31
+#: indico/MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:31
+msgid "Set modification key"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:31
+#: indico/MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:31
+msgid ""
+"Please note that it is more secure to make the event private instead of using"
+" a modification key."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:43
+#: indico/MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:43
+msgid "Modification key saved"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:43
+#: indico/MaKaC/webinterface/tpls/ConfModificationControlFrame.tpl:43
+msgid "Modification key removed"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModificationReviewingFrame.tpl:93
@@ -1424,8 +1468,8 @@ msgid "No paper uploaded"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Popup.js:957
-#: indico/htdocs/js/indico/Timetable/Draw.js:1123
-#: indico/htdocs/js/indico/Timetable/Draw.js:1148
+#: indico/htdocs/js/indico/Timetable/Draw.js:1121
+#: indico/htdocs/js/indico/Timetable/Draw.js:1146
 msgid "Edit protection"
 msgstr ""
 
@@ -1813,7 +1857,7 @@ msgstr ""
 msgid "You do not have access to modify the value of this checkbox"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/Inline.js:549
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:548
 msgid "No options"
 msgstr ""
 
@@ -1871,28 +1915,28 @@ msgstr ""
 msgid "switch to rich text"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:416
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:415
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:618
 msgid "Saving..."
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:441
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:440
 msgid "here"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:452
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:467
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:451
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:466
 msgid "Warning!"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:453
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:452
 msgid ""
 "Your data contains some potentially harmful , which cannot be stored in the "
 "database. Use the automatic Indico cleaner or clean the text manually (see "
 "the list of forbidden elements that you are using "
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:467
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:466
 msgid "Format of your data is invalid. Please check the syntax."
 msgstr ""
 
@@ -1929,12 +1973,12 @@ msgid "Edit this "
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:175
-#: indico/htdocs/js/indico/Timetable/Draw.js:592
+#: indico/htdocs/js/indico/Timetable/Draw.js:590
 msgid "Move up"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:178
-#: indico/htdocs/js/indico/Timetable/Draw.js:593
+#: indico/htdocs/js/indico/Timetable/Draw.js:591
 msgid "Move down"
 msgstr ""
 
@@ -1958,7 +2002,7 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:317
 #: indico/htdocs/js/indico/Management/Contributions.js:154
-#: indico/htdocs/js/indico/Timetable/Base.js:931
+#: indico/htdocs/js/indico/Timetable/Base.js:934
 msgid "Add new"
 msgstr ""
 
@@ -1986,9 +2030,9 @@ msgid ") is already used by another participant. Please modify email field value
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:530
-#: indico/htdocs/js/indico/Timetable/Draw.js:1114
-#: indico/htdocs/js/indico/Timetable/Draw.js:1141
-#: indico/htdocs/js/indico/Timetable/Draw.js:1161
+#: indico/htdocs/js/indico/Timetable/Draw.js:1112
+#: indico/htdocs/js/indico/Timetable/Draw.js:1139
+#: indico/htdocs/js/indico/Timetable/Draw.js:1159
 msgid "Edit"
 msgstr ""
 
@@ -2036,7 +2080,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:398
 #: indico/htdocs/js/indico/Management/Timetable.js:453
 #: indico/htdocs/js/indico/Management/Timetable.js:909
-#: indico/htdocs/js/indico/Timetable/Draw.js:1256
+#: indico/htdocs/js/indico/Timetable/Draw.js:1254
 msgid "event"
 msgstr ""
 
@@ -2106,7 +2150,7 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:488
 #: indico/htdocs/js/indico/Timetable/Base.js:52
-#: indico/htdocs/js/indico/Timetable/Base.js:893
+#: indico/htdocs/js/indico/Timetable/Base.js:896
 msgid "Session"
 msgstr ""
 
@@ -2579,8 +2623,8 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:455
 #: indico/htdocs/js/indico/Management/Timetable.js:910
 #: indico/htdocs/js/indico/Management/Timetable.js:911
-#: indico/htdocs/js/indico/Timetable/Draw.js:1257
-#: indico/htdocs/js/indico/Timetable/Draw.js:1258
+#: indico/htdocs/js/indico/Timetable/Draw.js:1255
+#: indico/htdocs/js/indico/Timetable/Draw.js:1256
 msgid "contribution"
 msgstr ""
 
@@ -2588,8 +2632,8 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:457
 #: indico/htdocs/js/indico/Management/Timetable.js:912
 #: indico/htdocs/js/indico/Management/Timetable.js:913
-#: indico/htdocs/js/indico/Timetable/Draw.js:1259
-#: indico/htdocs/js/indico/Timetable/Draw.js:1260
+#: indico/htdocs/js/indico/Timetable/Draw.js:1257
+#: indico/htdocs/js/indico/Timetable/Draw.js:1258
 msgid "session"
 msgstr ""
 
@@ -2804,7 +2848,7 @@ msgid " minutes."
 msgstr ""
 
 #: indico/htdocs/js/indico/Management/Timetable.js:1598
-#: indico/htdocs/js/indico/Timetable/Base.js:934
+#: indico/htdocs/js/indico/Timetable/Base.js:937
 msgid "Reschedule"
 msgstr ""
 
@@ -3264,7 +3308,7 @@ msgstr ""
 
 #: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:556
 #: indico/htdocs/js/indico/Timetable/Base.js:190
-#: indico/htdocs/js/indico/Timetable/Base.js:375
+#: indico/htdocs/js/indico/Timetable/Base.js:378
 msgid "Filter"
 msgstr ""
 
@@ -3415,119 +3459,119 @@ msgid "Go back"
 msgstr ""
 
 #: indico/htdocs/js/indico/Timetable/Base.js:225
-#: indico/htdocs/js/indico/Timetable/Base.js:350
+#: indico/htdocs/js/indico/Timetable/Base.js:353
 msgid "Print"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:253
+#: indico/htdocs/js/indico/Timetable/Base.js:256
 msgid "Switching to full screen mode..."
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:282
+#: indico/htdocs/js/indico/Timetable/Base.js:285
 msgid "Exit Full Screen"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:356
-#: indico/htdocs/js/indico/Timetable/Draw.js:857
+#: indico/htdocs/js/indico/Timetable/Base.js:359
+#: indico/htdocs/js/indico/Timetable/Draw.js:855
 msgid "PDF"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:362
+#: indico/htdocs/js/indico/Timetable/Base.js:365
 msgid "Full screen"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:369
+#: indico/htdocs/js/indico/Timetable/Base.js:372
 msgid "Link"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:372
+#: indico/htdocs/js/indico/Timetable/Base.js:375
 msgid "Detailed view"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:427
+#: indico/htdocs/js/indico/Timetable/Base.js:430
 msgid "All days"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:609
+#: indico/htdocs/js/indico/Timetable/Base.js:612
 msgid "You are viewing the contents of the interval:"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:691
+#: indico/htdocs/js/indico/Timetable/Base.js:694
 msgid "Your changes triggered the automatic modification of some settings:"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:701
-#: indico/htdocs/js/indico/Timetable/Base.js:702
+#: indico/htdocs/js/indico/Timetable/Base.js:704
+#: indico/htdocs/js/indico/Timetable/Base.js:705
 msgid "The <strong>starting time</strong> of the session interval <strong>"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:701
-#: indico/htdocs/js/indico/Timetable/Base.js:702
-#: indico/htdocs/js/indico/Timetable/Base.js:706
-#: indico/htdocs/js/indico/Timetable/Base.js:707
+#: indico/htdocs/js/indico/Timetable/Base.js:704
+#: indico/htdocs/js/indico/Timetable/Base.js:705
+#: indico/htdocs/js/indico/Timetable/Base.js:709
+#: indico/htdocs/js/indico/Timetable/Base.js:710
 msgid "</strong> was moved from "
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:703
+#: indico/htdocs/js/indico/Timetable/Base.js:706
 msgid ""
 "The <strong>starting time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:706
-#: indico/htdocs/js/indico/Timetable/Base.js:707
+#: indico/htdocs/js/indico/Timetable/Base.js:709
+#: indico/htdocs/js/indico/Timetable/Base.js:710
 msgid "The <strong>ending time</strong> of the session interval <strong>"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:708
+#: indico/htdocs/js/indico/Timetable/Base.js:711
 msgid "The <strong>ending time</strong> of the <strong>Event</strong> was moved from "
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:711
+#: indico/htdocs/js/indico/Timetable/Base.js:714
 msgid "The contents of the interval <strong>"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:711
+#: indico/htdocs/js/indico/Timetable/Base.js:714
 msgid "</strong> were moved from "
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:717
+#: indico/htdocs/js/indico/Timetable/Base.js:720
 msgid " to "
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:906
+#: indico/htdocs/js/indico/Timetable/Base.js:909
 msgid "Contribution"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:912
+#: indico/htdocs/js/indico/Timetable/Base.js:915
 msgid "Break"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:929
+#: indico/htdocs/js/indico/Timetable/Base.js:932
 msgid "Add poster"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:940
+#: indico/htdocs/js/indico/Timetable/Base.js:943
 msgid "Fit to content"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:946
+#: indico/htdocs/js/indico/Timetable/Base.js:949
 msgid "Add new block"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:1030
+#: indico/htdocs/js/indico/Timetable/Base.js:1032
 msgid "Session legend"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:1064
+#: indico/htdocs/js/indico/Timetable/Base.js:1066
 msgid "see more..."
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:1069
+#: indico/htdocs/js/indico/Timetable/Base.js:1071
 msgid "less..."
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Base.js:1515
+#: indico/htdocs/js/indico/Timetable/Base.js:1517
 msgid "Up to timetable"
 msgstr ""
 
@@ -3549,73 +3593,73 @@ msgstr ""
 msgid " et al."
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:300
+#: indico/htdocs/js/indico/Timetable/Draw.js:299
 msgid "This poster session has "
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:300
+#: indico/htdocs/js/indico/Timetable/Draw.js:299
 msgid " contribution(s)."
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:301
+#: indico/htdocs/js/indico/Timetable/Draw.js:300
 msgid "Please click for more information."
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:699
+#: indico/htdocs/js/indico/Timetable/Draw.js:697
 msgid "inside"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:755
+#: indico/htdocs/js/indico/Timetable/Draw.js:753
 msgid "Conveners"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:756
+#: indico/htdocs/js/indico/Timetable/Draw.js:754
 msgid "Convener"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:806
+#: indico/htdocs/js/indico/Timetable/Draw.js:804
 msgid "Export to Calendar"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:861
-#: indico/htdocs/js/indico/Timetable/Draw.js:869
+#: indico/htdocs/js/indico/Timetable/Draw.js:859
+#: indico/htdocs/js/indico/Timetable/Draw.js:867
 msgid "Calendar"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:862
+#: indico/htdocs/js/indico/Timetable/Draw.js:860
 msgid "XML"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:865
+#: indico/htdocs/js/indico/Timetable/Draw.js:863
 msgid "PDF timetable"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1092
+#: indico/htdocs/js/indico/Timetable/Draw.js:1090
 msgid "Shift later entries"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1120
-#: indico/htdocs/js/indico/Timetable/Draw.js:1146
+#: indico/htdocs/js/indico/Timetable/Draw.js:1118
+#: indico/htdocs/js/indico/Timetable/Draw.js:1144
 msgid "Basic edition"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1122
+#: indico/htdocs/js/indico/Timetable/Draw.js:1120
 msgid "Full session edition"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1132
+#: indico/htdocs/js/indico/Timetable/Draw.js:1130
 msgid "Add block"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1147
+#: indico/htdocs/js/indico/Timetable/Draw.js:1145
 msgid "Full edition"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1176
+#: indico/htdocs/js/indico/Timetable/Draw.js:1174
 msgid "Move"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/Draw.js:1214
+#: indico/htdocs/js/indico/Timetable/Draw.js:1212
 msgid "This session is empty..."
 msgstr ""
 
