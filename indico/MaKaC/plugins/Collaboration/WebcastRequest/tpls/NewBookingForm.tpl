@@ -105,7 +105,7 @@
                 % if WebcastCapable and (NWebcastCapableContributions < NTalks):
                 <tr>
                     <td></td>
-                    <td class="warning">
+                    <td class="warning" id="not_capable_warning">
                         <h3>${_("Note")}</h3>
                         <p>
                             ${_('<a class="uncapable">{1} of {0}</a> talks are not in a room capable of webcasting and thus cannot be webcasted.').format(NTalks, NTalks - NWebcastCapableContributions)}
@@ -230,21 +230,23 @@
         $("#webcastCapableRoomsDiv").hide();
     };
 
-    $("#webcastRoomsText").click(function() {
-        if ($('#webcastCapableRoomsDiv').is(':hidden')) {
-            showRooms();
-        } else {
-            hideRooms();
-        }
-    });
+    $(function() {
+        $("#webcastRoomsText").click(function() {
+            if ($('#webcastCapableRoomsDiv').is(':hidden')) {
+                showRooms();
+            } else {
+                hideRooms();
+            }
+        });
 
-    $(".warning .capable").attr('href', '#').click(function() {
-        new ContributionsPopup($T("Contributions that can be Webcasted"),WR_contributions_able, false, function() {self.popupAllowClose = true; return true;}, true).open();
-        return false;
-    });
-    $(".warning .uncapable").attr('href', '#').click(function() {
-        new ContributionsPopup($T("Contributions that can't be Webcasted"),WR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
-        return false;
+        $(".warning .capable").attr('href', '#').click(function() {
+            new ContributionsPopup($T("Contributions that can be Webcasted"),WR_contributions_able, false, function() {self.popupAllowClose = true; return true;}, true).open();
+            return false;
+        });
+        $(".warning .uncapable").attr('href', '#').click(function() {
+            new ContributionsPopup($T("Contributions that can't be Webcasted"),WR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
+            return false;
+        });
     });
 
 % endif

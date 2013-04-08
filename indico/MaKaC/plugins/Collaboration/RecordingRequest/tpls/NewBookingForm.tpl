@@ -104,7 +104,7 @@
                 % if RecordingCapable and (NRecordingCapableContributions < NTalks):
                 <tr>
                     <td></td>
-                    <td class="warning">
+                    <td class="warning" id="not_capable_warning">
                         <h3>${_("Note")}</h3>
                         <p>
                             ${_('<a class="uncapable">{1} of {0}</a> talks are not in a room capable of recording and thus cannot be recorded.').format(NTalks, NTalks - NRecordingCapableContributions)}
@@ -249,21 +249,24 @@
         $("#recordingCapableRoomsDiv").hide();
     };
 
-    $("#recordingRoomsText").click(function() {
-        if($('#recordingCapableRoomsDiv').is(':hidden')) {
-            showRooms();
-        } else {
-            hideRooms();
-        }
-    });
 
-    $(".warning .capable").attr('href', '#').click(function() {
-        new ContributionsPopup($T("Contributions that can be recorded"), RR_contributions_able, false, function() {self.popupAllowClose = true; return true;}, true).open();
-        return false;
-    });
-    $(".warning .uncapable").attr('href', '#').click(function() {
-        new ContributionsPopup($T("Contributions that can't be recorded"), RR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
-        return false;
+    $(function() {
+        $("#recordingRoomsText").click(function() {
+            if($('#recordingCapableRoomsDiv').is(':hidden')) {
+                showRooms();
+            } else {
+                hideRooms();
+            }
+        });
+
+        $(".warning .capable").attr('href', '#').click(function() {
+            new ContributionsPopup($T("Contributions that can be recorded"), RR_contributions_able, false, function() {self.popupAllowClose = true; return true;}, true).open();
+            return false;
+        });
+        $(".warning .uncapable").attr('href', '#').click(function() {
+            new ContributionsPopup($T("Contributions that can't be recorded"), RR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
+            return false;
+        });
     });
 % endif
 </script>
