@@ -21,6 +21,9 @@ containsCategories = len(categ.getSubCategoryList()) > 0
         % if allowUserModif:
             <li style="font-weight: bold" >|<a id="manageLink" class="dropDownMenu highlight" href="#">${ _("Manage")}</a></li>
         % endif
+        % if isLoggedIn and not isRootCategory:
+            <li id="categFavorite"></li>
+        % endif
 </ul>
 <h1 class="categoryTitle">
 % if isRootCategory and containsCategories:
@@ -141,4 +144,25 @@ manageLink.observeClick(function(e) {
     return false;
 });
 </script>
+% endif
+
+% if isLoggedIn:
+    <script>
+        var favoriteWidget = $('#categFavorite').favoriteButton({
+            toggleFunc: function(favorite, promise) {
+                indicoRequest('category.favorites.' + (favorite ? 'addCategory' : 'delCategory'), {
+                    categId: '${ categ.getId() }'
+                }, function(result, error) {
+                    if(error) {
+                        IndicoUtil.errorReport(error);
+                        promise.reject();
+                        return;
+                    }
+
+                    promise.resolve(favorite);
+                });
+            },
+            favorite: ${ jsonEncode(categ in favoriteCategs) }
+        });
+    </script>
 % endif

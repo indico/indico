@@ -176,6 +176,9 @@ class WCategoryDisplay(WICalExportBase):
         if self._target.conferences:
             vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId(), {'from':"-7d"}))
 
+        vars["isLoggedIn"] = self._aw.getUser() is not None
+        vars["favoriteCategs"] = self._aw.getUser().getLinkTo('category', 'favorite')
+
         return vars
 
 

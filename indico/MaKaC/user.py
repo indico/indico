@@ -500,7 +500,8 @@ class Avatar(Persistent, Fossilizable):
 
     linkedToBase = {"category":{"creator":[],
                                 "manager":[],
-                                "access":[]},
+                                "access":[],
+                                "favorite":[]},
                     "conference":{"creator":[],
                                 "chair":[],
                                 "participant":[],

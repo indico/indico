@@ -26,6 +26,7 @@ from MaKaC.services.implementation.base import ProtectedModificationService, Par
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import ExportToICalBase
+from MaKaC.services.implementation.base import LoggedOnlyService
 
 import MaKaC.conference as conference
 from MaKaC.services.interface.rpc.common import ServiceError
@@ -362,6 +363,29 @@ class CategoryProtectionToggleDomains(CategoryModifBase):
         elif not self._add:
             self._target.freeDomain(d)
 
+
+class CategoryFavoriteAdd(LoggedOnlyService, CategoryDisplayBase):
+
+    def _getAnswer(self):
+        if self._categ is conference.CategoryManager().getRoot():
+            raise ServiceError('ERR-U0', 'Cannot add root category as favorite')
+        self._getUser().linkTo(self._categ, 'favorite')
+
+
+class CategoryFavoriteDel(LoggedOnlyService, CategoryDisplayBase):
+
+    def _getAnswer(self):
+        self._getUser().unlinkTo(self._categ, 'favorite')
+
+
+class CategoryFavoriteList(LoggedOnlyService):
+
+    def _getAnswer(self):
+        return {
+            'favorites': [c.getId() for c in self._getUser().getLinkTo('category', 'favorite')]
+        }
+
+
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -375,5 +399,8 @@ methodMap = {
     "protection.addExistingConfCreator": CategoryAddExistingControlUser,
     "protection.removeConfCreator": CategoryRemoveControlUser,
     "protection.toggleDomains": CategoryProtectionToggleDomains,
-    "api.getExportURLs": CategoryExportURLs
-    }
+    "api.getExportURLs": CategoryExportURLs,
+    "favorites.addCategory": CategoryFavoriteAdd,
+    "favorites.delCategory": CategoryFavoriteDel,
+    "favorites.list": CategoryFavoriteList
+}
