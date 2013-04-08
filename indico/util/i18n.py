@@ -161,7 +161,8 @@ def extract_node(node, keywords, commentTags, options, parents=[None]):
     if isinstance(node, ast.Str) and isinstance(parents[-1], (ast.Assign, ast.Call)):
         matches = RE_TR_FUNCTION.findall(node.s)
         for m in matches:
-            yield (node.lineno, '', m[1].split('\n'), ['old style recursive strings'])
+            line = m[0] or m[1]
+            yield (node.lineno, '', line.split('\n'), ['old style recursive strings'])
     else:
         for cnode in ast.iter_child_nodes(node):
             for rslt in  extract_node(cnode, keywords, commentTags, options, parents=(parents + [node])):
