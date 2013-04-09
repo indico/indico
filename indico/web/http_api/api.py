@@ -413,6 +413,10 @@ class CategoryEventHook(HTTPAPIHook):
     def _getParams(self):
         super(CategoryEventHook, self)._getParams()
         self._idList = self._pathParams['idlist'].split('-')
+        self._wantFavorites = False
+        if 'favorites' in self._idList:
+            self._idList.remove('favorites')
+            self._wantFavorites = True
         self._eventType = get_query_parameter(self._queryParams, ['T', 'type'])
         if self._eventType == 'lecture':
             self._eventType = 'simple_event'
@@ -422,7 +426,10 @@ class CategoryEventHook(HTTPAPIHook):
 
     def export_categ(self, aw):
         expInt = CategoryEventFetcher(aw, self)
-        return expInt.category(self._idList)
+        idList = list(self._idList)
+        if self._wantFavorites and aw.getUser():
+            idList += [c.getId() for c in aw.getUser().getLinkTo('category', 'favorite')]
+        return expInt.category(idList)
 
     def export_categ_extra(self, aw, resultList):
         ids = set((event['categoryId'] for event in resultList))
