@@ -83,6 +83,19 @@ class AbsTrackTplVar(TplVar):
         return i18nformat("""--_("not specified")--""")
     getValue=classmethod(getValue)
 
+class AbsSessionTplVar(TplVar):
+    _name="abstract_session"
+    _description=""
+
+    def getValue(cls,abstract):
+        status=abstract.getCurrentStatus()
+        if isinstance(status,review.AbstractStatusAccepted):
+            session = abstract.getContribution().getSession()
+            if session is not None:
+                return session.getTitle()
+        return i18nformat("""--_("not specified")--""")
+    getValue=classmethod(getValue)
+
 
 class AbsContribTypeTplVar(TplVar):
     _name="contribution_type"
@@ -130,6 +143,17 @@ class AbsURLTplVar(TplVar):
 
     def getValue(cls,abstract):
         return str(urlHandlers.UHAbstractDisplay.getURL(abstract))
+    getValue=classmethod(getValue)
+
+class ContribURLTplVar(TplVar):
+    _name="contribution_URL"
+    _description=""
+
+    def getValue(cls,abstract):
+        status=abstract.getCurrentStatus()
+        if isinstance(status,review.AbstractStatusAccepted):
+            contrib = abstract.getContribution()
+            return str(urlHandlers.UHContributionDisplay.getURL(contrib))
     getValue=classmethod(getValue)
 
 
@@ -201,10 +225,11 @@ class AbsPrimAuthTplVar(TplVar):
     getValue=classmethod(getValue)
 
 class Notificator:
-    _vars=[ConfTitleTplVar,ConfURLTplVar,AbsTitleTplVar,AbsTrackTplVar,
+    _vars=[ConfTitleTplVar,ConfURLTplVar,AbsTitleTplVar,AbsTrackTplVar, AbsSessionTplVar,
             AbsContribTypeTplVar,AbsSubFisrtNameTplVar,
-            AbsSubFamNameTplVar,AbsSubTitleTplVar,AbsURLTplVar,AbsIDTplVar,
-            MergedAbsIDTplVar,MergedAbsTitleTplVar,MergedAbsSubFamNameTplVar, MergedAbsSubFirstNameTplVar, AbsPrimAuthTplVar, AbsReviewCommentsTplVar]
+            AbsSubFamNameTplVar,AbsSubTitleTplVar,AbsURLTplVar, ContribURLTplVar, AbsIDTplVar,
+            MergedAbsIDTplVar,MergedAbsTitleTplVar,MergedAbsSubFamNameTplVar,
+            MergedAbsSubFirstNameTplVar, AbsPrimAuthTplVar, AbsReviewCommentsTplVar]
 
     def getVarList(cls):
         return cls._vars
