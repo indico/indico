@@ -262,6 +262,16 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
     getSpeakerList.name = 'speakers'
     getSpeakerList.result = IContributionParticipationMetadataFossil
 
+    def getPrimaryAuthorList(self):
+        pass
+    getPrimaryAuthorList.name = 'primaryauthors'
+    getPrimaryAuthorList.result = IContributionParticipationMetadataFossil
+
+    def getCoAuthorList(self):
+        pass
+    getCoAuthorList.name = 'coauthors'
+    getCoAuthorList.result = IContributionParticipationMetadataFossil
+
     def getTrack( self ):
         pass
     getTrack.convert = lambda t: t and t.getTitle()
