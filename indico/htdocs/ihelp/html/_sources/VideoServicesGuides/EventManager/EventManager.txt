@@ -1003,7 +1003,7 @@ Figure 47. List of already created bookings after a CERNMCU booking
 was created.
 
 In this case, we created the booking with a start time such that it
-can be started inmediately after creation.
+can be started immediately after creation.
 
 From left to right:
 
