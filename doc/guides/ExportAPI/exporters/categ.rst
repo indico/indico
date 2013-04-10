@@ -6,6 +6,7 @@ URL Format
 */export/categ/ID.TYPE*
 
 The ID can be either a single category ID or a *-* separated list.
+In an authenticated request the special ID *favorites* will be resolved to the user's list of favorites.
 
 
 Parameters
