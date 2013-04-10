@@ -3291,7 +3291,7 @@ class RHNewAbstract(RHConfModifCFABase, AbstractParam):
 
     def _checkParams(self, params):
         RHConfModifCFABase._checkParams(self, params)
-        #if the user is not logged in we return inmediately as this form needs
+        #if the user is not logged in we return immediately as this form needs
         #   the user to be logged in and therefore all the checking below is not
         #   necessary
         if self._getUser() is None:
