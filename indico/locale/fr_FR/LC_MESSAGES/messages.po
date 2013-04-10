@@ -762,7 +762,7 @@ msgid ""
 "Cannot unindex an author of a contribution which does not belong to this "
 "conference"
 msgstr ""
-"Impossible de desindexer l'auteur d'un présentation qui n'appartient pas "
+"Impossible de désindexer l'auteur d'un présentation qui n'appartient pas "
 "à cette conférence"
 
 #: MaKaC/conference.py:8352 indico/MaKaC/conference.py:8352
@@ -853,7 +853,7 @@ msgstr "Le compte rendu (minutes) pour cette présentation existe déjà "
 
 #: MaKaC/conference.py:9374 indico/MaKaC/conference.py:9374
 msgid "The reviewing maretial for this contribution has already been set"
-msgstr "La revue de cette contribution a déjà été telechargee"
+msgstr "La revue de cette contribution a déjà été téléchargée"
 
 #: MaKaC/conference.py:10521 indico/MaKaC/conference.py:10521
 msgid "The paper for this subcontribution has already been set"
@@ -922,7 +922,7 @@ msgstr "Fichier déjà archivé"
 
 #: MaKaC/conference.py:11765 indico/MaKaC/conference.py:11765
 msgid "Destination repository not set"
-msgstr "Dépôt de destiation non spécifié"
+msgstr "Dépôt de destination non spécifié"
 
 #: MaKaC/conference.py:11767 indico/MaKaC/conference.py:11767
 msgid "Nothing to archive"
@@ -990,7 +990,7 @@ msgstr ""
 #: MaKaC/errors.py:58 indico/MaKaC/errors.py:58
 #, python-format
 msgid "you are not authorised to access this %s"
-msgstr "vous n'êtes pas auorisé à accéder à %s"
+msgstr "vous n'êtes pas autorisé à accéder à %s"
 
 #: MaKaC/errors.py:68 indico/MaKaC/errors.py:68
 msgid "the event has been closed"
@@ -1092,7 +1092,7 @@ msgid ""
 "account if you have one."
 msgstr ""
 "Désolé, une inaccessibilité temporaire à NICE nous empêche de vous "
-"identifier. Veuillez réessayer ultérieuement ou utiliser votre compte "
+"identifier. Veuillez réessayer ultérieurement ou utiliser votre compte "
 "local Indico si vous en possédez un."
 
 #: MaKaC/externUsers.py:140 indico/MaKaC/externUsers.py:140
@@ -1150,7 +1150,7 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"            De par la décision des oraganisateurs, la présence à "
+"            De par la décision des organisateurs, la présence à "
 "l'événement \n"
 "            est obligatoire pour tous les participants.\n"
 "            "
@@ -1223,7 +1223,7 @@ msgstr "%s : statut spécifié à REJETÉ"
 #: MaKaC/participant.py:948 indico/MaKaC/participant.py:948
 #, python-format
 msgid "%s : status set to PENDING"
-msgstr "%s : statut spécifé à EN ATTENTE"
+msgstr "%s : statut spécifié à EN ATTENTE"
 
 #: MaKaC/participant.py:959 indico/MaKaC/participant.py:959
 #, python-format
@@ -25959,7 +25959,7 @@ msgid ""
 "Please enter your e-mail address in the field below and your password "
 "will be sent to you"
 msgstr ""
-"Veuillez entrer votre adrelle dans le champ suivant et votre mot de passe"
+"Veuillez entrer votre adresse dans le champ suivant et votre mot de passe"
 " vous sera envoyé."
 
 #: MaKaC/webinterface/tpls/SignIn.tpl:109
