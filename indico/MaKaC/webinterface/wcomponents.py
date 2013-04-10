@@ -1013,16 +1013,6 @@ class WParticipantsBannerModif(WBannerModif):
         title=""
         WBannerModif.__init__(self, path, itemType, title)
 
-
-class WConfLogsBannerModif(WBannerModif):
-
-    def __init__( self, conf ):
-        path=[{"url": urlHandlers.UHConfModifLog.getURL(conf), "title":_("Logs")}]
-
-        itemType="Log item"
-        title=""
-        WBannerModif.__init__(self, path, itemType, title)
-
 class WCategModifHeader(WTemplated):
 
     def __init__(self, targetConf ):

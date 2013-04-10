@@ -756,17 +756,6 @@ class RHConfModifLog (RHConferenceModifBase):
         p = conferences.WPConfModifLog( self, self._target )
         return p.display(**params)
 
-class RHConfModifLogItem (RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifLogItem
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams( self, params )
-
-    def  _process(self):
-        params = self._getRequestParams()
-        p = conferences.WPConfModifLogItem( self, self._target )
-        return p.display(**params)
-
 #######################################################################################
 
 class RHConfClone( RHConferenceModifBase ):

@@ -1267,9 +1267,6 @@ class UHConfModifParticipants( URLHandler ):
 class UHConfModifLog( URLHandler ):
     _relativeURL = "confModifLog.py"
 
-class UHConfModifLogItem( URLHandler ):
-    _relativeURL = "confModifLog.py/logItem"
-
 class UHInternalPageDisplay( URLHandler ):
     _relativeURL = "internalPage.py"
 

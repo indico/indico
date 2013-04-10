@@ -2590,7 +2590,6 @@ class WConferenceLog(wcomponents.WTemplated):
         log_vars = wcomponents.WTemplated.getVars(self)
         log_vars["log_dict"] = self._getLogDict()
         log_vars["timezone"] = timezone(self._tz)
-        log_vars["url"] = urlHandlers.UHConfModifLogItem.getURL(self.__conf)
         return log_vars
 
     def _getLogDict(self):
@@ -2611,60 +2610,6 @@ class WPConfModifLog(WPConferenceModifBase):
     def _getPageContent(self, params):
         p = WConferenceLog(self._conf)
         return p.getHTML(params)
-
-#---------------------------------------------------------------------------
-class WConferenceLogItem(wcomponents.WTemplated):
-
-    def __init__(self, conference):
-        self.__conf = conference
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["confTitle"] = self.__conf.getTitle()
-        vars["confId"] = self.__conf.getId()
-
-        logId = vars.get("logId","")
-        logItem = self.__conf.getLogHandler().getLogItemById(logId)
-        vars["logItem"] = self._getLogItemElements(logItem)
-
-        url = urlHandlers.UHConfModifLog.getURL(self.__conf)
-        vars["logListAction"] = url
-
-        return vars
-
-    def _getLogItemElements(self, logItem):
-        html = []
-
-        text = """
-        <tr>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-                    &nbsp;%s</td>
-                <td>&nbsp;%s</td>
-        </tr>"""%("Subject", logItem.getLogSubject())
-        html.append(text)
-        logInfo = logItem.getLogInfo()
-
-        for key in logInfo.keys():
-            if key != "subject":
-                text = """
-        <tr>
-                <td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-                    &nbsp;%s</td>
-                <td><pre>%s</pre></td>
-        </tr>"""%(key, escape(str(logInfo[key])))
-                html.append(text)
-        return "".join(html)
-
-class WPConfModifLogItem( WPConfModifLog ):
-
-    def _setActiveTab( self ):
-        self._tabLog.setActive()
-
-    def _getPageContent( self, params ):
-        banner = wcomponents.WConfLogsBannerModif(self._conf).getHTML()
-        p = WConferenceLogItem( self._conf )
-        return banner+p.getHTML(params)
-
 
 #---------------------------------------------------------------------------
 
