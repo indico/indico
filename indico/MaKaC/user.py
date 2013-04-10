@@ -711,6 +711,18 @@ class Avatar(Persistent, Fossilizable):
     def setAPIKey(self, apiKey):
         self.apiKey = apiKey
 
+    def getRelatedCategories(self):
+        favorites = set(self.getLinkTo('category', 'favorite'))
+        managed = set(self.getLinkTo('category', 'manager'))
+        res = []
+        for categ in favorites | managed:
+            res.append({
+                'categ': categ,
+                'favorite': categ in favorites,
+                'managed': categ in managed
+            })
+        return res
+
     def resetLinkedTo(self):
         self.linkedTo = deepcopy(self.linkedToBase)
         self._p_changed = 1
