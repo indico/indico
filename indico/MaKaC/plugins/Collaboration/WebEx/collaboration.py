@@ -28,7 +28,6 @@ import re
 from time import strptime
 from datetime import timedelta, datetime
 
-from MaKaC.common import log
 from MaKaC.common.timezoneUtils import nowutc, naive2local, getAdjustedDate
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate, getMaxEndDate,\
@@ -686,7 +685,7 @@ class CSBooking(CSBookingBase):
             try:
                 notification = NewWebExMeetingNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         log.ModuleNames.VS_WEB_EX,
+                                         self.getPlugin().getName(),
                                          self.getConference().getCreator())
             except Exception,e:
                 Logger.get('WebEx').error(

@@ -27,14 +27,12 @@ from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, i18nformat
 from MaKaC.conference import ConferenceHolder
-from MaKaC.common import log
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.mail import GenericMailer
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.services.interface.rpc.common import ServiceError
 import zope.interface
 
 from indico.core.extpoint import Component

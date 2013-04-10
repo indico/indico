@@ -19,7 +19,6 @@
 from zope.interface import implements
 import time
 
-from MaKaC.common import log
 from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.i18n import _

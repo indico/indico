@@ -84,7 +84,7 @@
                 <td class="i-table log-subject searchable">${line.getLogSubject()}</td>
                 <td class="i-table log-stamp text-superfluous">
                 % if line.getResponsibleName() != "System":
-                    ${_("by {user} at {time}").format(user='<span class="text-normal searchable">{0}</span>'.format(line.getResponsibleName()),
+                    ${_("by {user} at {time}").format(user='<span class="text-normal searchable user-name">{0}</span>'.format(line.getResponsibleName()),
                                                       time='<span class="text-normal">{0}</span>'.format(format_time(line.getLogDate(), "medium")))}
                 % else:
                     <span class="text-normal">${format_time(line.getLogDate(), "medium")}</span>
@@ -198,14 +198,14 @@ $(document).ready(function(log_view){
         e.preventDefault();
         $("tr.i-table.interactive:visible").each(function() {
             expandRow($(this));
-        })
+        });
     });
 
     $("#collapseAll").click(function(e) {
         e.preventDefault();
         $("tr.i-table.interactive").each(function() {
             collapseRow($(this));
-        })
+        });
     });
 
     /* Search behavior */

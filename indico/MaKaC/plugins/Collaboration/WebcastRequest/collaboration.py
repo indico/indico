@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import log
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebcastRequest.mail import NewRequestNotification, RequestModifiedNotification, RequestDeletedNotification,\
     RequestRejectedNotification, RequestAcceptedNotification,\
@@ -25,8 +24,7 @@ from MaKaC.plugins.Collaboration.WebcastRequest.mail import NewRequestNotificati
     RequestRescheduledNotification, RequestRelocatedNotification
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.mail import GenericMailer
-from MaKaC.plugins.Collaboration.WebcastRequest.common import WebcastRequestException,\
-    WebcastRequestError
+from MaKaC.plugins.Collaboration.WebcastRequest.common import WebcastRequestError
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.i18n import _

@@ -25,14 +25,15 @@ from MaKaC.common.timezoneUtils import nowutc
 
 class ModuleNames:
 
-    def __init__(self):
-        pass
-
     MATERIAL = "Material"
     PAPER_REVIEWING = "Paper Reviewing"
     PARTICIPANTS = "Participants"
     REGISTRATION = "Registration"
     TIMETABLE = "Timetable"
+
+    def __init__(self):
+        pass
+
 
 class LogItem(Persistent) :
 
@@ -78,7 +79,7 @@ class LogItem(Persistent) :
         if self._responsibleUser is None :
             return "System"
         else :
-            return self._responsibleUser.getStraightFullName(upper=False)
+            return self._responsibleUser.getStraightAbrName()
 
     def getModule(self):
         return self._module

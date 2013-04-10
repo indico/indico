@@ -22,7 +22,6 @@ import pkg_resources
 from persistent import Persistent
 from hashlib import md5
 
-from MaKaC.common import log
 from MaKaC.common.Counter import Counter
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\

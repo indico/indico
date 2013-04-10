@@ -162,12 +162,19 @@ td.i-table.log-subject {
 }
 
 td.i-table.log-stamp {
-    direction: rtl;
     text-align: right;
     text-overflow: clip;
-    width: 210px;
+    width: 230px;
 }
 
 td.i-table.caption.log-caption {
     width: 175px;
+}
+
+span.user-name {
+   display: inline-block;
+   max-width: 120px;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   vertical-align: bottom;
 }

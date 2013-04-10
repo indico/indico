@@ -19,7 +19,6 @@
 
 from datetime import timedelta
 
-from MaKaC.common import log
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase
