@@ -148,6 +148,7 @@ jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.multiselect.js',
                 'js/jquery/jquery.colorpicker.js',
                 'js/jquery/jquery-extra-selectors.js',
+                'js/jquery/jquery.typewatch.js',
                 filters='rjsmin', output='jquery_code_%(version)s.min.js')
 
 presentation = Bundle('js/jquery/underscore.js',

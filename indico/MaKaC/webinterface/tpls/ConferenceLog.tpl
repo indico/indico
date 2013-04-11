@@ -149,35 +149,31 @@ $(document).ready(function(log_view){
     }
 
     var expandRow = function(interactive_row) {
-        interactive_row.addClass("active");
-        interactive_row.css("border-bottom", "none");
-        interactive_row.next().removeClass("weak-hidden");
-
-        interactive_row.next()
-        .children("td")
-        .wrapInner('<div style="display: none;" />')
-        .parent()
-        .find("td > div")
-        .slideDown(400, function() {
-            var $set = $(this);
-            $set.replaceWith($set.contents());
-        });
+        interactive_row.addClass("active border-bottom-none");
+        interactive_row.next().removeClass("weak-hidden")
+                              .children("td")
+                              .wrapInner('<div style="display: none;" />')
+                              .parent()
+                              .find("td > div")
+                              .slideDown(400, function() {
+                                  var $set = $(this);
+                                  $set.replaceWith($set.contents());
+                              });
     };
 
     var collapseRow = function(interactive_row) {
         interactive_row.removeClass("active");
 
-        interactive_row.next()
-        .children("td")
-        .wrapInner('<div style="display: block;" />')
-        .parent()
-        .find("td > div")
-        .slideUp(400, function() {
-            var $set = $(this);
-            $set.replaceWith($set.contents());
-            interactive_row.css("border-bottom", "1px #E5E5E5 solid");
-            interactive_row.next().addClass("weak-hidden");
-        });
+        interactive_row.next().children("td")
+                              .wrapInner('<div style="display: block;" />')
+                              .parent()
+                              .find("td > div")
+                              .slideUp(400, function() {
+                                  var $set = $(this);
+                                  $set.replaceWith($set.contents());
+                                  interactive_row.removeClass("border-bottom-none");
+                                  interactive_row.next().addClass("weak-hidden");
+                              });
     };
 
     /* Event checkbox selector behavior */
@@ -196,16 +192,12 @@ $(document).ready(function(log_view){
     /* Action buttons behavior */
     $("#expandAll").click(function(e) {
         e.preventDefault();
-        $("tr.i-table.interactive:visible").each(function() {
-            expandRow($(this));
-        });
+        $("tr.i-table.interactive:visible").addClass("active border-bottom-none").next().removeClass("weak-hidden");
     });
 
     $("#collapseAll").click(function(e) {
         e.preventDefault();
-        $("tr.i-table.interactive").each(function() {
-            collapseRow($(this));
-        });
+        $("tr.i-table.interactive").removeClass("active border-bottom-none").next().addClass("weak-hidden");
     });
 
     /* Search behavior */
@@ -217,10 +209,15 @@ $(document).ready(function(log_view){
         $("#searchBox .text-input").removeClass("active");
     });
 
-    $("#searchInput").keyup(function() {
-        applyFilters();
-        updateResetButton();
-    });
+    $("#searchInput").typeWatch({
+                            callback: function(){
+                                            applyFilters();
+                                            updateResetButton();
+                                          },
+                            wait: 250,
+                            highlight: true,
+                            captureLength: 0
+                        });
 
     $("#searchBox .reset-input").click(function(e) {
         e.preventDefault();
@@ -257,7 +254,7 @@ $(document).ready(function(log_view){
 
         if (resultCache[term] == undefined) {
             var items = $("h3.i-table.searchable:contains('"+ term +"')").next().find("tr.i-table.interactive");
-            items = items.add($("tr.i-table.interactive > td.i-table.searchable:contains('"+ term +"')").parent());
+            items = items.add($("tr.i-table.interactive .searchable:contains('"+ term +"')").parents("tr.i-table.interactive"));
             resultCache[term] = items;
         } else {
             var items = resultCache[term];

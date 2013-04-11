@@ -94,6 +94,10 @@ tr.i-table.interactive.active {
     -moz-transition: background-color .25s ease-out;
 }
 
+.border-bottom-none {
+	border-bottom: none !important;
+}
+
 tr.i-table.interactive > td.i-table {
     cursor: pointer;
     user-select: none;

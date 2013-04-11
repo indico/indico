@@ -63,4 +63,10 @@ http://documentcloud.github.com/underscore/>
 Prototype is a Javascript framework that aims to ease development of dynamics web applications. It is freely distributable under the terms of an MIT-style license.
 <http://prototypejs.org>
 
+jQuery TypeWatch <github.com/dennyferra/TypeWatch>: Dual licensed under the MIT and GPL licenses.
+
+jQuery Extra Selectors <https://github.com/keithclark/JQuery-Extended-Selectors>: Released under MIT license.
+
+selectivizr (http://selectivizr.com/) is freely distributed under MIT license.
+
 See also the AUTHORS and ChangeLog files.
