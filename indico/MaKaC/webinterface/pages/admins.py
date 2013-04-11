@@ -1389,8 +1389,10 @@ class WUserBaskets(wcomponents.WTemplated):
     def __init__(self, av):
         self._avatar = av
 
-    def getHTML( self, params ):
-        params['user'] = self._avatar;
+    def getHTML(self, params):
+        params['user'] = self._avatar
+        params['favoriteCategs'] = [dict(id=c.getId(), title=c.getTitle()) for c in
+                                    self._avatar.getLinkTo('category', 'favorite')]
         return wcomponents.WTemplated.getHTML( self, params )
 
 

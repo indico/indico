@@ -378,14 +378,6 @@ class CategoryFavoriteDel(LoggedOnlyService, CategoryDisplayBase):
         self._getUser().unlinkTo(self._categ, 'favorite')
 
 
-class CategoryFavoriteList(LoggedOnlyService):
-
-    def _getAnswer(self):
-        return {
-            'favorites': [c.getId() for c in self._getUser().getLinkTo('category', 'favorite')]
-        }
-
-
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -401,6 +393,5 @@ methodMap = {
     "protection.toggleDomains": CategoryProtectionToggleDomains,
     "api.getExportURLs": CategoryExportURLs,
     "favorites.addCategory": CategoryFavoriteAdd,
-    "favorites.delCategory": CategoryFavoriteDel,
-    "favorites.list": CategoryFavoriteList
+    "favorites.delCategory": CategoryFavoriteDel
 }
