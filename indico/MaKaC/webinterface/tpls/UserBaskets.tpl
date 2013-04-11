@@ -1,24 +1,39 @@
 
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-<div class="groupTitle" id="userSection">${ _("Favorite users and categories")}</div>
-<div id="userBasketContainer" style="padding: 10px; float: left;">
-<!-- Filled through DOM manipulation   -->
-</div>
-<div id="favoriteBasketContainer" style="padding: 10px; float: left;">
-    <div class="FavoritePeopleListDiv">
-        <ul class="PeopleList">
-            % for entry in favoriteCategs:
-                <li data-categ-id="${entry['id']}" class="favoriteCateg">
-                    <span class="toggle" style="float: right; clear: both; padding-right: 10px;">
-                        <img src="images/remove.png" alt="del" style="vertical-align: middle;" />
-                    </span>
-                    <span>${entry['title']}</span>
-                </li>
-            % endfor
-        </ul>
-    </div>
-</div>
+<table style="border-spacing:50px 5px;">
+    <thead>
+        <tr>
+            <td class="groupTitle">${ _("Favorite Users")}</td>
+            <td class="groupTitle">${ _("Favorite Categories")}</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <div id="userBasketContainer">
+                <!-- Filled through DOM manipulation   -->
+                </div>
+            </td>
+            <td style="vertical-align: top">
+                <div id="favoriteBasketContainer">
+                    <div class="FavoritePeopleListDiv">
+                        <ul class="PeopleList">
+                            % for entry in favoriteCategs:
+                                <li data-categ-id="${entry['id']}" class="favoriteCateg">
+                                    <span class="toggle" style="float: right; clear: both; padding-right: 10px;">
+                                        <img src="images/remove.png" alt="del" style="vertical-align: middle;" />
+                                    </span>
+                                    <span>${entry['title']}</span>
+                                </li>
+                            % endfor
+                        </ul>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 <script type="text/javascript">
 
