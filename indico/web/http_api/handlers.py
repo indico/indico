@@ -146,7 +146,7 @@ def handler(req, **params):
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     signature = get_query_parameter(queryParams, ['signature'])
     timestamp = get_query_parameter(queryParams, ['timestamp'], 0, integer=True)
-    no_cache = get_query_parameter(queryParams, ['nc', 'nocache'], 'no') == 'yes'
+    noCache = get_query_parameter(queryParams, ['nc', 'nocache'], 'no') == 'yes'
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
 
@@ -157,7 +157,7 @@ def handler(req, **params):
 
     # Disable caching if we are not just retrieving data (or the hook requires it)
     if req.method == 'POST' or hook.NO_CACHE:
-        no_cache = True
+        noCache = True
 
     ak = error = result = None
     ts = int(time.time())
@@ -182,7 +182,7 @@ def handler(req, **params):
         addToCache = not hook.NO_CACHE
         cache = GenericCache('HTTPAPI')
         cache_key = RE_REMOVE_EXTENSION.sub('', cache_key)
-        if not no_cache:
+        if not noCache:
             obj = cache.get(cache_key)
             if obj is not None:
                 result, extra, ts, complete, typeMap = obj
