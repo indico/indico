@@ -47,13 +47,12 @@
   </div>
   % endif
 
-  % if isSubmitter:
-  	<div id="manageMaterials"><a class="fakeLink" >${_("Add materials")}</a></div>
-  % endif
-
   % if material:
   <div class="info_line material">
-      <span  title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
+      <span title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
+      % if isSubmitter:
+        <span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" id="manageMaterials" aria-hidden="true" ></span>
+      % endif
       <ul class="text">
         % for mat in material:
           <li>${mat}</li>
@@ -74,10 +73,6 @@
 
 ${ actions }
 
-% if isSubmitter:
-    <div id="manageMaterials" style="padding-top: 20px;"></div>
-% endif
-
 
 <script type="text/javascript">
       $('.chair_list .nomail').qtip({
@@ -87,16 +82,13 @@ ${ actions }
          });
 
 % if isSubmitter:
-    <% from MaKaC.common.fossilize import fossilize %>
-    <% from MaKaC.conference import IMaterialFossil %>
-    var args = {
-        conference: '${conf.getId()}',
-        confId: '${conf.getId()}',
-        parentProtected: ${jsBoolean(conf.isProtected())}
-    };
-    var matList = ${fossilize(conf.getMaterialRegistry().getMaterialList(conf), IMaterialFossil)};
-    var mlist = new MaterialListWidget(args, matList, Indico.Urls.UploadAction.conference, null, null, true);
-    $E('manageMaterials').set(mlist.draw());
+    $('.info_line.material').css('background-color', '#eee');
+    $("#manageMaterials").click(function(){
+      IndicoUI.Dialogs.Material.editor(${conf.getId() |n,j}, '','','',
+                                       ${conf.getAccessController().isProtected() |n,j},
+                                       ${conf.getMaterialRegistry().getMaterialList(conf) |n,j},
+                                       ${'Indico.Urls.UploadAction.conference'}, true);
+    });
 
 % endif
 

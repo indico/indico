@@ -52,7 +52,7 @@
             % endif
 
             <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>
-            % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText():
+            % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText() and 'submitter' not in info:
                 menuOptions['deleteMinutes'] = {action: function(m) {
                     var popupHandler = function(action){
                         if(action){
@@ -77,7 +77,7 @@
                     return false;}, display: $T('Compile minutes')};
             % endif
 
-            % if 'materialLink' in info:
+            % if 'materialLink' in info or 'submitter' in info:
                 menuOptions['addMaterial'] = {action: function(m) {
                     IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
                         ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, true);

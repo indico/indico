@@ -62,11 +62,11 @@ class AccessController( Persistent, Observable ):
         __accessProtection -- (int) Flag which indicates whether the resource
             the current access controller is related to is protected (on) or
             not (off).
-        managers -- (PList) List of recognized users or groups (Principal)
+        managers -- (PList) List of recognised users or groups (Principal)
             allowed to modify the related resource
-        allowed -- (PList) List of recognized users or groups (Principal)
+        allowed -- (PList) List of recognised users or groups (Principal)
             allowed to access the related resource
-        submitters -- (PList) List of recognized chairpersons/speakers allowed to manage event materials
+        submitters -- (PList) List of recognised chairpersons/speakers allowed to manage event materials
     """
 
     def __init__( self, owner ):
@@ -83,6 +83,7 @@ class AccessController( Persistent, Observable ):
         self.contactInfo = ""
         self.submitters = []
         self.submittersEmail = []
+        self.nonInheritingChildren = set()
 
     def getOwner(self):
         return self.owner
@@ -465,7 +466,7 @@ class AccessController( Persistent, Observable ):
             self.submittersEmail = []
         return self.submittersEmail
 
- def addNonInheritingChildren(self, obj):
+    def addNonInheritingChildren(self, obj):
         self.nonInheritingChildren.add(obj)
         self._p_changed = 1
 

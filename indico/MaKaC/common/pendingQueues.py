@@ -282,7 +282,7 @@ class PendingConfSubmitterReminder(PendingReminder):
 
 class PendingSubmittersHolder(PendingHolder):
 
-    """ This is an index that holds all the requests to add Authors or Speakers in the
+    """ This is an index that holds all the requests to add Authors and Speakers in the
         list of avatars with rights to submit material.
         Those participants are not Avatars yet (do not have Indico account) and that's why
         they are in this pending queue. So once they become Indico users they will be removed
@@ -748,7 +748,6 @@ class ConfPendingQueuesMgr(Persistent):
 
     def getPendingConfSubmittersKeys(self, sort=False):
         if sort:
-            # from MaKaC.conference import ContributionParticipation
             # return keys of contribution participants sorted by name
             keys=[]
             vl=[]
@@ -756,7 +755,6 @@ class ConfPendingQueuesMgr(Persistent):
             for v in self.getPendingConfSubmitters().values()[:]:
                 vl.extend(v)
             # sort
-            # vl.sort(ContributionParticipation._cmpFamilyName)
             for v in vl:
                 email=v.getEmail().lower().strip()
                 if email not in keys:

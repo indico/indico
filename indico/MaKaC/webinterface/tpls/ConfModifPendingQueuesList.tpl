@@ -49,7 +49,7 @@
                     % endif
 				% elif pType == _("ConfSubmitters"):
 					<a href="${ str(urlHandlers.UHConferenceModification.getURL(cp.getConference())) }">
-						${cp.getConference().getTitle())}
+						${cp.getConference().getTitle()}
 					</a>
 				% endif
                 </li>

@@ -167,13 +167,12 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
     },
 
     _sendEmail: function(userId) {
-        var self = this;
         // request necessary data
         indicoRequest(this.methods["sendEmail"], this._getParamsSendEmail(userId),
                function(result, error) {
                     if (!error) {
                         if (result["email"] == "") {
-                            var popup = new AlertPopup($T('Impossible to send an email'), $T('The email of this author is empty, please complete a correct email address before sending the email.'));
+                            var popup = new AlertPopup($T('Impossible to send an email'), $T('The email of this user is empty, please complete a correct email address before sending the email.'));
                             popup.open();
                         } else {
                             // send the email
