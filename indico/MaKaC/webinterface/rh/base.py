@@ -250,12 +250,7 @@ class RH(RequestHandlerBase):
             an invalid session it reset client settings and creates a new one.
        """
         if not self._websession:
-            sm = session.getSessionManager()
-            try:
-                self._websession = sm.get_session( self._req )
-            except session.SessionError:
-                sm.revoke_session_cookie( self._req )
-                self._websession = sm.get_session( self._req )
+            self._websession = session.getSessionForReq(self._req)
 
     def _getSession( self ):
         """Returns the web session associated to the received mod_python

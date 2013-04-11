@@ -20,3 +20,12 @@
 #from MaKaC.webinterface.session import base, sessionManagement
 from base import SessionError
 from sessionManagement import getSessionManager
+
+
+def getSessionForReq(req):
+    sm = getSessionManager()
+    try:
+        return sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie(req)
+        return sm.get_session(req)

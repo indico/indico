@@ -31,6 +31,7 @@ from urlparse import parse_qs
 from ZODB.POSException import ConflictError
 
 # indico imports
+from MaKaC.webinterface.session import getSessionForReq
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
@@ -144,11 +145,13 @@ def handler(req, **params):
         Factory.getDALManager().connect()
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
+    cookieAuth = get_query_parameter(queryParams, ['ca', 'cookieauth'], 'no') == 'yes'
     signature = get_query_parameter(queryParams, ['signature'])
     timestamp = get_query_parameter(queryParams, ['timestamp'], 0, integer=True)
     noCache = get_query_parameter(queryParams, ['nc', 'nocache'], 'no') == 'yes'
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
+    onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
 
     # Get our handler function and its argument and response type
     hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
@@ -163,27 +166,47 @@ def handler(req, **params):
     ts = int(time.time())
     typeMap = {}
     try:
-        # Validate the API key (and its signature)
-        ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
-        if enforceOnlyPublic:
-            onlyPublic = True
-        # Create an access wrapper for the API key's user
-        aw = buildAW(ak, req, onlyPublic)
-        # Get rid of API key in cache key if we did not impersonate a user
-        if ak and aw.getUser() is None:
-            cache_key = normalizeQuery(path, query, remove=('ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache'))
+        sessionUser = getSessionForReq(req).getUser() if cookieAuth else None
+        if apiKey or not sessionUser:
+            # Validate the API key (and its signature)
+            ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
+            if enforceOnlyPublic:
+                onlyPublic = True
+            # Create an access wrapper for the API key's user
+            aw = buildAW(ak, req, onlyPublic)
+            # Get rid of API key in cache key if we did not impersonate a user
+            if ak and aw.getUser() is None:
+                cacheKey = normalizeQuery(path, query,
+                                          remove=('ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache',
+                                                  'oa', 'onlyauthed'))
+            else:
+                cacheKey = normalizeQuery(path, query,
+                                          remove=('signature', 'timestamp', 'nc', 'nocache', 'oa', 'onlyauthed'))
+                if signature:
+                    # in case the request was signed, store the result under a different key
+                    cacheKey = 'signed_' + cacheKey
         else:
-            cache_key = normalizeQuery(path, query, remove=('signature', 'timestamp', 'nc', 'nocache'))
-            if signature:
-                # in case the request was signed, store the result under a different key
-                cache_key = 'signed_' + cache_key
+            # We authenticated using a session cookie.
+            # Reject POST for security reasons (CSRF)
+            if req.method == 'POST':
+                raise HTTPAPIError('Cannot POST when using cookie authentication', apache.HTTP_FORBIDDEN)
+            aw = AccessWrapper()
+            if not onlyPublic:
+                aw.setUser(sessionUser)
+            userPrefix = 'user-' + sessionUser.getId() + '_'
+            cacheKey = userPrefix + normalizeQuery(path, query,
+                                                   remove=('nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed'))
+
+        # Bail out if the user requires authentication but is not authenticated
+        if onlyAuthed and not aw.getUser():
+            raise HTTPAPIError('Not authenticated', apache.HTTP_FORBIDDEN)
 
         obj = None
         addToCache = not hook.NO_CACHE
         cache = GenericCache('HTTPAPI')
-        cache_key = RE_REMOVE_EXTENSION.sub('', cache_key)
+        cacheKey = RE_REMOVE_EXTENSION.sub('', cacheKey)
         if not noCache:
-            obj = cache.get(cache_key)
+            obj = cache.get(cacheKey)
             if obj is not None:
                 result, extra, ts, complete, typeMap = obj
                 addToCache = False
@@ -196,7 +219,7 @@ def handler(req, **params):
                 result, extra, complete, typeMap = res, {}, True, {}
         if result is not None and addToCache:
             ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL()
-            cache.set(cache_key, (result, extra, ts, complete, typeMap), ttl)
+            cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError, e:
         error = e
         if e.getCode():

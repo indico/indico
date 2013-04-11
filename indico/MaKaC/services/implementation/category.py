@@ -368,7 +368,7 @@ class CategoryFavoriteAdd(LoggedOnlyService, CategoryDisplayBase):
 
     def _getAnswer(self):
         if self._categ is conference.CategoryManager().getRoot():
-            raise ServiceError('ERR-U0', 'Cannot add root category as favorite')
+            raise ServiceError('ERR-U0', _('Cannot add root category as favorite'))
         self._getUser().linkTo(self._categ, 'favorite')
 
 
