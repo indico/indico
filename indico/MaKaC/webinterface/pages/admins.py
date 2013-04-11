@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
 
 from pytz import timezone
 from MaKaC.user import CERNGroup
@@ -1402,27 +1403,94 @@ class WUserDashboard(wcomponents.WTemplated):
         html_vars = wcomponents.WTemplated.getVars(self)
         user = self._avatar
 
-        html_vars["categoryManager"] = ""
-        categs = user.getLinkTo("category","manager")
-        for categ in categs:
-            target = CategoryWebLocator({"categId": categ.getId()}).getObject()
-            if target == None:
-                user.unlinkTo(categ,"manager")
-            else:
-                html_vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
+        html_vars["events"] = self._getEvents()
+#        html_vars["attendance"] = self._getAttendanceEvents()
 
-        html_vars["eventManager"] = ""
-        ch = ConferenceHolder()
-        events = user.getLinkTo("conference","manager")
-        for event in events:
-            try:
-                ch.getById(event.getId())
-                html_vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
-            except MaKaCError, e:
-                user.unlinkTo(event,"manager")
+#        html_vars["categoryManager"] = ""
+#        categs = user.getLinkTo("category","manager")
+#        for categ in categs:
+#            target = CategoryWebLocator({"categId": categ.getId()}).getObject()
+#            if target == None:
+#                user.unlinkTo(categ,"manager")
+#            else:
+#                html_vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
+#
+#        html_vars["eventManager"] = ""
+#        ch = ConferenceHolder()
+#        events = user.getLinkTo("conference","manager")
+#        for event in events:
+#            try:
+#                ch.getById(event.getId())
+#                html_vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
+#            except MaKaCError, e:
+#                user.unlinkTo(event,"manager")
 
         return html_vars
 
+    def _getEvents(self):
+        events_dict = OrderedDict()
+
+        self._fetchEventsFromManagement(events_dict)
+        # TODO self._fetchEventsPaperReview(events_dict)
+        # TODO self._fetchEventsAttendance(events_dict)
+
+        return events_dict
+
+    def _fetchEventsFromManagement(self, events_dict):
+        user = self._avatar
+        holder = ConferenceHolder()
+
+        filters = {"conference": ["creator", "chair", "manager", "registrar"],
+                   "session" : ["manager", "coordinator"],
+                   "contribution": ["manager"]}
+
+        for event_kind in filters.keys():
+            for role in filters[event_kind]:
+                for event in user.getLinkTo(event_kind, role):
+                    if event_kind is "conference":
+                        try:
+                            holder.getById(event.getId())
+                            event_id = event.getId()
+                            event_date = event.getStartDate()
+                            event_title = event.getTitle()
+                            event_url = urlHandlers.UHConferenceDisplay.getURL(event)
+                            events_dict[(event_date, event_id)] = {"date": event_date,
+                                                                   "title": event_title,
+                                                                   "url": event_url}
+                            # TODO add rights to dict
+                        except:
+                            pass
+                    elif event_kind is "session":
+                        pass
+                        # TODO get conference
+                        # TODO add rights to dict
+                    elif event_kind is "contribution":
+                        pass
+                        # TODO get conference
+                        # TODO add rights to dict
+
+    def _fetchEventsFromPaperReview(self, events_dict):
+        filters = {"conference": ["paperReviewManager", "referee", "editor",
+                                   "reviewer"],
+                   "contribution": ["referee", "editor", "reviewer"],
+                   "track": ["coordinator"]}
+
+    def _fetchEventsAttendance(self, events_dict):
+        filters = {"conference": ["participant"],
+                   "contribution": ["submission"],
+                   "abstract": ["submitter"],
+                   "registration": ["registrant"],
+                   "evaluation": ["submitter"]}
+#    def _getEventURL(self, event, event_kind):
+#        # TODO not needed anymore
+#        if event_kind is "conference":
+#            url_handler = urlHandlers.UHConferenceDisplay
+#        elif event_kind is "session":
+#            url_handler = urlHandlers.UHSessionDisplay
+#        elif event_kind is "contribution":
+#            url_handler = urlHandlers.UHContributionDisplay
+#
+#        return url_handler.getURL(event)
 
 class WUserBaskets(wcomponents.WTemplated):
 
@@ -1544,7 +1612,7 @@ class WPPersonalArea(WPUserBase):
                 urlHandlers.UHOAuthUserThirdPartyAuth.getURL(self._avatar))
 
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer(_("User Details"))
+        return wcomponents.WSimpleNavigationDrawer(_("My Profile"))
 
 
 class WPUserDashboard(WPPersonalArea):

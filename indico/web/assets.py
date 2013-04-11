@@ -206,6 +206,7 @@ selectivizr = Bundle('js/selectivizr/selectivizr.js',
 base_js = Bundle(jquery, presentation, indico_core,
                  indico_legacy, indico_common, indico_jquery)
 
+
 def register_all_js(env):
     env.register('jquery', jquery)
     env.register('presentation', presentation)
@@ -228,8 +229,9 @@ def register_all_js(env):
 def register_all_css(env, main_css_file):
     env.register('indico_badges_css', indico_badges_css)
     env.register('base_css', Bundle('css/{0}'.format(main_css_file),
-                                    'css/buttons.css',
                                     'css/core.css',
+                                    'css/dashboard.css',
+                                    'css/buttons.css',
                                     'css/dialogs.css',
                                     'css/icons.css',
                                     'css/inputs.css',

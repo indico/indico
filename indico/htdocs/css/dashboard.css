@@ -1,0 +1,101 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+.dashboard-tab {
+    margin-top: 20px;
+}
+
+.quick-access-pane {
+    width: 1000px;
+}
+
+.dashboard-col {
+    display: table-cell;
+    width: 1%;
+}
+
+.dashboard-col:first-child {
+    padding: 0 10px 0 0;
+}
+
+.dashboard-col:last-child {
+    padding: 0 0 0 10px;
+}
+
+.dashboard-box {
+    border: 1px solid #DDD;
+    border-radius: 0.3em;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    margin-bottom: 20px;
+    width: 490px;
+}
+
+.dashboard-box h3 {
+    background: #F7F7F7;
+    border-bottom: 1px solid #DDD;
+    border-top-left-radius: 0.3em;
+    border-top-right-radius: 0.3em;
+    font-size: 14px;
+    line-height: 100%;
+    margin: 0;
+    padding: 10px;
+}
+
+.event-list {
+    list-style: none;
+}
+
+ol.event-list {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.event-list li a {
+    border-bottom: 1px solid #E5E5E5;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+    position: relative;
+}
+
+.event-list li:last-child a {
+    border-bottom: none;
+}
+
+.event-list .event-rights {
+    position: relative;
+    float: right;
+}
+
+.truncate .truncate-target {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-box .truncate-target {
+    max-width: 250px;
+}
