@@ -27031,7 +27031,7 @@ msgstr "Recherche dans"
 
 #: indico/ext/search/tpls/SearchBoxBase.tpl:20
 #: indico/ext/search/tpls/SearchResultBase.tpl:41
-msgid "Any Field"
+msgid "Anywhere"
 msgstr "Tous les champs"
 
 #: indico/ext/search/tpls/SearchBoxBase.tpl:22

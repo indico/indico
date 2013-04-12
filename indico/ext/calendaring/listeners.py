@@ -41,27 +41,3 @@ class IRegistrantListener(IListener):
         """
         Sent when a new meeting participant is removed
         """
-    def eventTitleChanged(self, obj, oldTitle, newTitle):
-        """
-        Sent when a event title was modified
-        """
-    def eventDescriptionChanged(self, obj, oldDesription, newDescription):
-        """
-        Sent when a event description was modified
-        """
-    def dateChanged(self, obj, params={}):
-        """
-        Sent when a event startDate or endDate was modified
-        """
-    def startDateChanged(self, obj, params={}):
-        """
-        Sent when a event startDate was modified
-        """
-    def endDateChanged(self, obj, params={}):
-        """
-        Sent when a event endDate was modified
-        """
-    def placeChanged(self, obj):
-        """
-        Sent when a event place was modified
-        """

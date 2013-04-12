@@ -27,7 +27,7 @@
                 % endif
 
                 <div>
-                  <input style="width: 300px; height:20px; font-size:17px; vertical-align: middle;" type="text" name="p" value="${ p }" />
+                  <input style="width: 300px; height:20px; font-size:17px; vertical-align: middle;" type="text" name="p" value=${ quoteattr(p) } />
                   <input type="submit" value="${ _('Search')}" style="vertical-align: middle;"/>
                 </div>
 
@@ -38,7 +38,7 @@
                         <td>${ _("Search in") }:</td>
                         <td>
                           <select class="UIFieldSpan" name="f">
-                        <option value="" ${"selected" if f=="" else ""}>${ _("Any Field")}</option>
+                        <option value="" ${"selected" if f=="" else ""}>${ _("Anywhere")}</option>
                         <option value="title" ${"selected" if f=="title" else ""}>${ _("Title")}</option>
                         <option value="abstract" ${"selected" if f=="abstract" else ""}>${ _("Talk description/Abstract")}</option>
                         <option value="author" ${"selected" if f=="author" else ""}>${ _("Author/Speaker")}</option>

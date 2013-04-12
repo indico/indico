@@ -24,16 +24,20 @@ Here are included the listeners that are part of the `calendaring` plugin type.
 from zope.interface import implements
 from MaKaC.plugins import Observable
 from indico.core.extpoint import Component
+from indico.core.extpoint.events import ITimeActionListener, IMetadataChangeListener, IObjectLifeCycleListener
+from indico.core.extpoint.location import ILocationActionListener
 from indico.ext.calendaring.listeners import IRegistrantListener
-from indico.ext.calendaring.storage import addAvatarConference, updateConference
+from indico.ext.calendaring.storage import addAvatarConference, updateConference, removeConference
 
 
 class RegistrantListener(Component, Observable):
+
     """
-    Listen for registrant/participant creation or removal
+    Listen for event's that should trigger change in user calendar
     """
 
-    implements(IRegistrantListener)
+    implements(IRegistrantListener, ITimeActionListener,
+               ILocationActionListener, IMetadataChangeListener, IObjectLifeCycleListener)
 
     def registrantAdded(self, conference, avatar):
         addAvatarConference(avatar, conference, 'added')
@@ -64,3 +68,6 @@ class RegistrantListener(Component, Observable):
 
     def placeChanged(self, obj):
         updateConference(obj)
+
+    def deleted(self, obj, oldOwner):
+        removeConference(obj)

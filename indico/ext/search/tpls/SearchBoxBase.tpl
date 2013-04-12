@@ -17,7 +17,7 @@
                 <td style="text-align: right;">${ _("Search in")}</td>
                 <td>
                     <select name="f">
-                  <option value="" selected>${ _("Any Field")}</option>
+                  <option value="" selected>${ _("Anywhere")}</option>
                   <option value="title">${ _("Title")}</option>
                   <option value="abstract">${ _("Talk description/Abstract")}</option>
                   <option value="author">${ _("Author/Speaker")}</option>
