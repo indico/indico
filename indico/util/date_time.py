@@ -17,15 +17,20 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import time, pytz, calendar
+import calendar
+import time
+import pytz
+from datetime import timedelta
 
 from MaKaC.common.timezoneUtils import nowutc
 from indico.util.i18n import currentLocale
+
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
 from babel.dates import format_date as _format_date
 from babel.numbers import format_number as _format_number
 
+now_utc = nowutc
 
 def utc_timestamp(datetimeVal):
     return int(calendar.timegm(datetimeVal.utctimetuple()))
@@ -40,6 +45,7 @@ def format_datetime(dt, format='medium', locale=None, timezone=None):
 
     return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
+
 def format_date(d, format='medium', locale=None):
     """
     Basically a wrapper around Babel's own format_date
@@ -48,6 +54,7 @@ def format_date(d, format='medium', locale=None):
         locale = currentLocale()
 
     return _format_date(d, format=format, locale=locale).encode('utf-8')
+
 
 def format_time(t, format='short', locale=None, timezone=None):
     """
@@ -58,12 +65,33 @@ def format_time(t, format='short', locale=None, timezone=None):
 
     return _format_time(t, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
-now_utc = nowutc
+
+def format_human_date(dt, format='medium', locale=None):
+    """
+    Return the date in a human-like format for yesterday, today and tomorrow.
+    Format the date otherwise.
+    """
+    today = nowutc().date()
+    oneday = timedelta(days=1)
+
+    if not locale:
+        locale = currentLocale()
+
+    if dt == today - oneday:
+        return _("yesterday")
+    elif dt == today:
+        return _("today")
+    elif dt == today + oneday:
+        return _("tomorrow")
+    else:
+        return format_date(dt, format, locale=locale)
+
 
 def format_number(number, locale=None):
     if not locale:
         locale = currentLocale()
     return _format_number(number, locale=locale).encode('utf-8')
+
 
 def is_same_month(date_1, date_2):
     """
@@ -71,16 +99,14 @@ def is_same_month(date_1, date_2):
     """
     return date_1.month == date_2.month and  date_1.year == date_2.year
 
+
 ## ATTENTION: Do not use this one for new developments ##
 # It is flawed, as even though the returned value is DST-safe,
 # it is in the _local timezone_, meaning that the number of seconds
 # returned is the one for the hour with the same "value" for the
 # local timezone.
-
 def int_timestamp(datetimeVal, tz = pytz.timezone('UTC')):
     """
     Returns the number of seconds from the local epoch to the UTC time
     """
     return int(time.mktime(datetimeVal.astimezone(tz).timetuple()))
-
-##

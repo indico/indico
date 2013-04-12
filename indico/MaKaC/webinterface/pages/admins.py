@@ -1451,7 +1451,7 @@ class WUserDashboard(wcomponents.WTemplated):
                         try:
                             holder.getById(event.getId())
                             event_id = event.getId()
-                            event_date = event.getStartDate()
+                            event_date = event.getAdjustedStartDate()
                             event_title = event.getTitle()
                             event_url = urlHandlers.UHConferenceDisplay.getURL(event)
                             events_dict[(event_date, event_id)] = {"date": event_date,

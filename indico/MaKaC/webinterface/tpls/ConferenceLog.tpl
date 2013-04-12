@@ -1,24 +1,8 @@
 <%
-    import datetime
-
+    from indico.util.date_time import format_human_date, format_time
     from indico.util.struct import iterators
-    from indico.util.string import truncate
-    from indico.util.date_time import format_date, format_time
     from MaKaC.common.timezoneUtils import nowutc
-
-    today = nowutc()
-    yesterday = nowutc() - datetime.timedelta(days=1)
 %>
-
-<%def name="parse_day(log_day_date)">
-    % if log_day_date == today.date():
-        ${_("Today")}
-    % elif log_day_date == yesterday.date():
-        ${_("Yesterday")}
-    % else:
-        ${format_date(log_day_date, "long")}
-    % endif
-</%def>
 
 <%def name="get_icon(log_type)">
     % if log_type == "emailLog":
@@ -75,7 +59,7 @@
     <% key = day_entry[0] %>
     <% value = day_entry[1] %>
 
-    <h3 class="i-table searchable">${parse_day(key)}</h3>
+    <h3 class="i-table searchable">${format_human_date(key).title()}</h3>
     <table id="log-table-${key}" class="i-table">
         % for line in value:
         <tr class="i-table interactive ${line.getLogType()}" >

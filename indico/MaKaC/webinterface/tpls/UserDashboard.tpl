@@ -1,11 +1,5 @@
 <%
-    import datetime
-
-    from indico.util.date_time import format_date, format_time
-    from MaKaC.common.timezoneUtils import nowutc
-
-    today = nowutc()
-    yesterday = nowutc() - datetime.timedelta(days=1)
+    from indico.util.date_time import format_human_date
 %>
 
 <div class="dashboard-tab">
@@ -16,7 +10,7 @@
                 <ol class="event-list">
                 % for event in events.values():
                     <li><a href="${event["url"]}" class="truncate">
-                        <span class="date">${format_date(event["date"], "medium")}</span>
+                        <span class="date">${format_human_date(event["date"]).title()}</span>
                         <span class="event-title truncate-target">${event["title"]}</span>
                         <span class="event-rights">
                             <span class="icon-medal"></span>
