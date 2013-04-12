@@ -73,17 +73,19 @@ def addAvatarConference(avatar, conference, eventType):
         storage[key].append(dict(avatar=avatar, conference=conference, eventType=eventType))
 
 
-def updateConference(obj):
+def updateConference(obj, status="updated"):
     if isinstance(obj, Conference):
         for participant in obj.getParticipation().getParticipantList():
             avatar = participant.getAvatar()
             if avatar and isUserPluginEnabled(avatar.getId()) and participant.getStatus() == "added":
-                addAvatarConference(avatar, obj, "updated")
+                addAvatarConference(avatar, obj, status)
         for registrant in obj.getRegistrantsList():
             avatar = registrant.getAvatar()
             if avatar and isUserPluginEnabled(avatar.getId()):
-                addAvatarConference(avatar, obj, "updated")
+                addAvatarConference(avatar, obj, status)
 
+def removeConference(obj):
+    updateConference(obj, status="removed")
 
 def getAvatar(avatar):
     if isinstance(avatar, Avatar):
