@@ -16,10 +16,8 @@
                 <ol class="event-list">
                 % for event in events.values():
                     <li><a href="${event["url"]}" class="truncate">
-                        <span>
-                            <span>${format_date(event["date"], "short")}</span>
-                            <span class="truncate-target">${event["title"]}</span>
-                        </span>
+                        <span class="date">${format_date(event["date"], "medium")}</span>
+                        <span class="event-title truncate-target">${event["title"]}</span>
                         <span class="event-rights">
                             <span class="icon-medal"></span>
                             <span class="icon-reading"></span>
@@ -32,7 +30,7 @@
         </div>
         <div class="dashboard-col">
             <div id="favorites" class="dashboard-box">
-                <h3>${_("Favorites")}</h3>
+                <h3>${_("Your categories")}</h3>
                 <ol class="event-list">
     <%doc>
                 % for event in attendance.values():
@@ -42,7 +40,7 @@
                 </ol>
             </div>
             <div id="recommendations" class="dashboard-box">
-                <h3>${_("Recommendations")}</h3>
+                <h3>${_("Happening in your categories")}</h3>
                 <ol class="event-list">
                 </ol>
             </div>
@@ -71,3 +69,9 @@
     </tr>
 </table>
 </%doc>
+
+<script>
+$(document).ready(function(log_view){
+
+});
+</script>

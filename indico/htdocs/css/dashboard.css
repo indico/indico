@@ -76,6 +76,7 @@ ol.event-list {
     display: block;
     font-size: 14px;
     font-weight: bold;
+    line-height: 18px;
     padding: 10px;
     position: relative;
 }
@@ -84,7 +85,21 @@ ol.event-list {
     border-bottom: none;
 }
 
+.event-list li a:hover .event-title {
+    text-decoration: underline;
+}
+
+.event-list .date {
+    color: #666;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: normal;
+    vertical-align: middle;
+    width: 85px;
+}
+
 .event-list .event-rights {
+    max-width: 150px;
     position: relative;
     float: right;
 }
@@ -97,5 +112,14 @@ ol.event-list {
 }
 
 .dashboard-box .truncate-target {
-    max-width: 250px;
+    max-width: 300px;
+}
+
+.event-rights [class*=icon-] {
+    color: #DDD;
+    font-size: 18px;
+}
+
+.event-rights [class*=icon-].active {
+    color: #777;
 }
