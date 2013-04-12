@@ -21,9 +21,9 @@
                             <span class="truncate-target">${event["title"]}</span>
                         </span>
                         <span class="event-rights">
-                            <span class="icon-edit"></span>
-                            <span class="icon-edit"></span>
-                            <span class="icon-edit"></span>
+                            <span class="icon-medal"></span>
+                            <span class="icon-reading"></span>
+                            <span class="icon-chair"></span>
                         </span>
                     </a></li>
                 % endfor
