@@ -1,3 +1,4 @@
+--find-links http://indico-software.org/wiki/Admin/Installation/IndicoExtras
 Babel==0.9.6
 Mako==0.7.0
 MarkupSafe==0.15
