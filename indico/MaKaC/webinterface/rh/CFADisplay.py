@@ -385,8 +385,6 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename=%s"""%cleanHTMLHeaderFilename(filename)
-        print "vish"
-        print data
         return data
 
 
