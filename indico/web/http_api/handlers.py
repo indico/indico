@@ -166,8 +166,13 @@ def handler(req, **params):
     ts = int(time.time())
     typeMap = {}
     try:
-        sessionUser = getSessionForReq(req).getUser() if cookieAuth else None
-        if apiKey or not sessionUser:
+        session = None
+        if cookieAuth:
+            session = getSessionForReq(req)
+            if not session.getUser():  # ignore guest sessions
+                session = None
+
+        if apiKey or not session:
             # Validate the API key (and its signature)
             ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
             if enforceOnlyPublic:
@@ -187,15 +192,16 @@ def handler(req, **params):
                     cacheKey = 'signed_' + cacheKey
         else:
             # We authenticated using a session cookie.
-            # Reject POST for security reasons (CSRF)
-            if req.method == 'POST':
-                raise HTTPAPIError('Cannot POST when using cookie authentication', apache.HTTP_FORBIDDEN)
+            token = req.headers_in.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
+            if session.csrf_token != token:
+                raise HTTPAPIError('Invalid CSRF token', apache.HTTP_FORBIDDEN)
             aw = AccessWrapper()
             if not onlyPublic:
-                aw.setUser(sessionUser)
-            userPrefix = 'user-' + sessionUser.getId() + '_'
+                aw.setUser(session.getUser())
+            userPrefix = 'user-' + session.getUser().getId() + '_'
             cacheKey = userPrefix + normalizeQuery(path, query,
-                                                   remove=('nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed'))
+                                                   remove=('nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
+                                                           'csrftoken'))
 
         # Bail out if the user requires authentication but is not authenticated
         if onlyAuthed and not aw.getUser():
