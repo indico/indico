@@ -216,7 +216,6 @@ class PendingConfSubmittersHolder(PendingHolder):
             e.getConference().getPendingQueuesMgr().removePendingConfSubmitter(e)
 
     def _sendReminderEmail(self, sb):
-        from MaKaC.conference import ContributionParticipation
         DBMgr.getInstance().commit()
         if type(sb)==list:
             notif = _PendingConfSubmitterNotification( sb )
@@ -232,9 +231,8 @@ class _PendingConfSubmitterNotification(_PendingNotification):
     def getBody( self ):
         url = urlHandlers.UHUserCreation.getURL()
         url.addParam("cpEmail",self._psList[0].getEmail())
-        return _("""
-    You have been added as chairperson/speaker of the following event:%s
-    and material submission rights have been granted to you.
+        return """
+    You have been granted with file submission rights for the following event:%s
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
 
     <%s>
@@ -244,13 +242,12 @@ class _PendingConfSubmitterNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://indico-software.org/>
-                """)%( self._getParticipations(), url, self._psList[0].getEmail() )
+    Indico"""%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):
         participations = "\n\n"
         for conf in self._participationsByConf.keys():
-            participations += i18nformat("""\t\t\t- _("Event") \"%s\":\n""") % conf.getTitle()
+            participations += """\t\t\t- "Event" \"%s\":\n""" % conf.getTitle()
             accessURL = urlHandlers.UHConferenceDisplay.getURL(conf)
             participations += "\t\t\t\t - Access: %s\n" % accessURL
         return participations

@@ -373,26 +373,14 @@ class AccessController( Persistent, Observable ):
     def setContactInfo(self, info):
         self.contactInfo = info
 
-    def _initSubmissionPrivileges(self):
-        """Initializes submission privileges list.
-            This is a temporary function used for creating the attribute in the
-            case it does not exist into the DB
-        """
-        try:
-            if self.submitters:
-                pass
-        except AttributeError:
-            self.submitters = []  # create the attribute
-
     def _grantSubmission(self, av):
-        if av not in self.submitters:
+        if av not in self.getSubmitterList():
             self.submitters.append(av)
             self._p_changed = 1
 
     def grantSubmission(self, sb):
         """Grants submission privileges for the specified user
         """
-        self._initSubmissionPrivileges()
         av = self._getAvatarByEmail(sb.getEmail())
         if av is not None and av.isActivated():
             self._grantSubmission(av)
@@ -405,17 +393,16 @@ class AccessController( Persistent, Observable ):
                 from MaKaC.common import mail
                 mail.GenericMailer.sendAndLog(notif, self.getOwner())
                 if self.getOwner() is not None:
-                    self.getOwner()._getSubmitterIdx().indexEmail(sb.getEmail(), self)
+                    self.getOwner()._getSubmitterIdx().indexEmail(sb.getEmail(), self.getOwner())
 
     def _revokeSubmission(self, av):
-        if av in self.submitters:
+        if av in self.getSubmitterList():
             self.submitters.remove(av)
             self._p_changed = 1
 
     def revokeSubmission(self, sb):
         """Removes submission privileges for the specified user
         """
-        self._initSubmissionPrivileges()
         av = self._getAvatarByEmail(sb.getEmail())
         self._revokeSubmissionEmail(sb.getEmail())
         self._revokeSubmission(av)
@@ -434,16 +421,18 @@ class AccessController( Persistent, Observable ):
     def getSubmitterList(self):
         """Gives the list of users with submission privileges
         """
-        self._initSubmissionPrivileges()
-        return self.submitters
+        try:
+            return self.submitters
+        except AttributeError:
+            self.submitters = []
+            return self.submitters
 
     def canUserSubmit(self, user):
         """Tells whether a user can submit material
         """
         if user is None:
             return False
-        self._initSubmissionPrivileges()
-        return user in self.submitters
+        return user in self.getSubmitterList()
 
     def _grantSubmissionEmail(self, email):
         """Returns True if submission email was granted. False if email was already in the list.

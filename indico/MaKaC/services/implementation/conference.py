@@ -1322,13 +1322,13 @@ class ConferenceChairPersonBase(ConferenceModifBase):
         for chair in result:
             av = AvatarHolder().match({"email": chair['email']},
                                   forceWithoutExtAuth=True, exact=True)
-            chair['showManagerCB'] = True
             chair['showSubmitterCB'] = True
             if not av:
                 if chair['email'] in self._conf.getAccessController().getSubmitterEmailList():
                     chair['showSubmitterCB'] = False
             elif (av[0] in self._conf.getAccessController().getSubmitterList()):
                 chair['showSubmitterCB'] = False
+            chair['showManagerCB'] = True
             if (av and self._conf.getAccessController().canModify(av[0])) or chair['email'] in self._conf.getAccessController().getModificationEmail():
                 chair['showManagerCB'] = False
         return result
@@ -1498,7 +1498,6 @@ class ConferenceChangeSubmissionRights(ConferenceChairPersonBase):
         if self._chairperson.getEmail() == "":
             raise ServiceAccessError(_("It is not possible to grant submission rights to a participant without an email address. Please set an email address."))
         self._action = pm.extract("action", pType=str, allowEmpty=False)
-        self._eventType = pm.extract("eventType", pType=str, allowEmpty=False)
 
     def _getAnswer(self):
         if self._action == "grant":

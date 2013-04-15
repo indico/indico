@@ -7308,7 +7308,7 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
             url.addParam("tab","conf_submitters")
             title = _("Pending chairpersons/speakers to become submitters")
             target = _("Conference")
-            pType = _("ConfSubmitters")
+            pType = "ConfSubmitters"
 
             for key in keys:
                 list.append((key, self._pendingConfSubmitters[key][:]))
@@ -7321,7 +7321,7 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
             url.addParam("tab", "submitters")
             title = _("Pending authors/speakers to become submitters")
             target = _("Contribution")
-            pType = _("Submitters")
+            pType = "Submitters"
 
             for key in keys:
                 list.append((key, self._pendingSubmitters[key][:]))
