@@ -265,6 +265,10 @@ class RH(RequestHandlerBase):
         """
         self._aw.setUser( self._getSession().getUser() )
 
+    @property
+    def csrf_token(self):
+        return self._getSession().csrf_token
+
     def _getRequestParams( self ):
         return self._reqParams
 

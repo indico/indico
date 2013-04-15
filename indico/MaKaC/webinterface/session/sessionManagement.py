@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+import uuid
 
 from MaKaC import *
 import ZODB
@@ -46,6 +47,17 @@ class PSession( base.Session, Persistent ):
         self._lang = minfo.getLang()
         self.datadict["ActiveTimezone"] = "LOCAL"
 
+    @property
+    def csrf_token(self):
+        try:
+            return self._csrf_token
+        except AttributeError:
+            self._csrf_token = str(uuid.uuid4())
+            return self._csrf_token
+
+    def reset_csrf_token(self):
+        del self._csrf_token
+
     def has_info (self):
         """has_info() -> boolean
 
@@ -59,6 +71,7 @@ class PSession( base.Session, Persistent ):
         if newUser:
             self._lang = newUser.getLang()
         self.user = newUser
+        self.reset_csrf_token()
         self._v_modified = True
 
     def getUser( self ):
