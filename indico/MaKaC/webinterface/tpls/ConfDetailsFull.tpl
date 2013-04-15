@@ -48,7 +48,7 @@
   % endif
 
   % if material:
-  <div class="info_line material">
+  <div class="info_line material highlighted_area">
       <span title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
       % if isSubmitter:
         <span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" id="manageMaterials" aria-hidden="true" ></span>
