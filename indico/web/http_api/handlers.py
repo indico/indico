@@ -44,7 +44,7 @@ from indico.util.network import _get_remote_ip
 from indico.util.contextManager import ContextManager
 
 # indico legacy imports
-from MaKaC.common import DBMgr
+from MaKaC.common import DBMgr, Config
 from MaKaC.common.logger import Logger
 from MaKaC.common.fossilize import fossilize
 from MaKaC.accessControl import AccessWrapper
@@ -192,9 +192,10 @@ def handler(req, **params):
                     cacheKey = 'signed_' + cacheKey
         else:
             # We authenticated using a session cookie.
-            token = req.headers_in.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
-            if session.csrf_token != token:
-                raise HTTPAPIError('Invalid CSRF token', apache.HTTP_FORBIDDEN)
+            if Config.getInstance().getCSRFLevel() >= 2:
+                token = req.headers_in.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
+                if session.csrf_token != token:
+                    raise HTTPAPIError('Invalid CSRF token', apache.HTTP_FORBIDDEN)
             aw = AccessWrapper()
             if not onlyPublic:
                 aw.setUser(session.getUser())

@@ -33,6 +33,12 @@ SanitizationLevel    = 2
 # authentication and while logged in.
 AuthenticatedEnforceSecure = "yes"
 
+# Possible values of CSRFLevel:
+#    0: Disable all CSRF checks (DANGEROUS!)
+#    1: Check CSRF token for service requests
+#    2: Check CSRF token for service requests and cookie-based API requests
+CSRFLevel = 2
+
 
 #------------------------------------------------------------------------------
 # URLs
