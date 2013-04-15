@@ -98,6 +98,8 @@ var Indico = {
         ImagesBase: "${ Config.getInstance().getImagesBaseURL() }",
         SecureImagesBase: "${ Config.getInstance().getImagesBaseSecureURL() }",
 
+        APIBase: (window.location.protocol == "https:" ? "${ Config.getInstance().getBaseSecureURL() }" : "${ Config.getInstance().getBaseURL() }") + '/export',
+
         Login: "${ urlHandlers.UHSignIn.getURL() }",
 
         Favourites: "${ urlHandlers.UHUserBaskets.getURL() }",

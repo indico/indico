@@ -309,3 +309,75 @@ if (exists(global.XMLHttpRequest)) {
         );
         };
 }
+
+
+function apiRequest(path, payload, opts) {
+    // We always use cookie authentication and copy the payload object
+    payload = $.extend({
+        cookieauth: true
+    }, payload || {});
+
+    // Additional options
+    opts = $.extend({
+        method: 'GET',
+        silentErrors: false // when true, no error dialog is shown for HTTPAPIErrors
+    }, opts);
+
+    // For convenience we map booleans to yes/no
+    $.each(payload, function(key, val) {
+        if(val === true || val === false) {
+            payload[key] = val ? 'yes' : 'no';
+        }
+    });
+
+    var dfd = $.Deferred();
+    $.ajax({
+        url: Indico.Urls.APIBase + path + '.json',
+        data: payload,
+        type: opts.method,
+        cache: false, // we really don't want caching for AJAX requests!
+        dataType: 'json',
+        headers: {
+            'X-CSRF-Token': $('#csrf-token').attr('content')
+        }
+    }).fail(function(xhr, status, error) {
+        var errorMessage = 'Unknown Error';
+        var resp;
+
+        try {
+            // Maybe we have JSON
+            resp = $.parseJSON(xhr.responseText);
+        }
+        catch(e) {
+            // We got HTML. Probably 404 or something like that.
+            if(~xhr.responseText.indexOf('errorBoxContent')) {
+                errorMessage = $(xhr.responseText).find('#errorBoxContent h1').text();
+            }
+            else {
+                errorMessage = error;
+            }
+            dfd.reject(errorMessage);
+        }
+
+        // Handle JSON error
+        if(resp) {
+            dfd.reject(resp.message);
+            if(resp._type == 'HTTPAPIError' && opts.silentErrors) {
+                return;
+            }
+            if(resp.message) {
+                errorMessage = resp.message;
+            }
+        }
+
+        IndicoUtil.errorReport({
+            title: $T('Error'),
+            message: $T('API request failed:') + ' ' + errorMessage,
+            type: 'noReport'
+        });
+    }).done(function(resp) {
+        dfd.resolve(resp);
+    });
+
+    return dfd.promise();
+}
