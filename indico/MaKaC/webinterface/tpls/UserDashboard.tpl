@@ -8,9 +8,14 @@
             <div id="events" class="dashboard-box">
                 <h3>${_("Events")}</h3>
                 <ol class="event-list">
+                % if len(events) == 0:
+                    <li class="no-event"><a>
+                        <span class="event-title italic text-superfluous">${_("You have no events.")}</span>
+                    </a></li>
+                % else:
                 % for event in events.values():
                     <li><a href="${event["url"]}" class="truncate">
-                        <span class="date">${format_human_date(event["date"]).title()}</span>
+                        <span class="event-date">${format_human_date(event["date"]).title()}</span>
                         <span class="event-title truncate-target">${event["title"]}</span>
                         <span class="event-rights">
                             <span class="icon-medal"></span>
@@ -19,13 +24,20 @@
                         </span>
                     </a></li>
                 % endfor
+                % endif
                 </ol>
             </div>
         </div>
         <div class="dashboard-col">
-            <div id="favorites" class="dashboard-box">
+            <div id="yourCategories" class="dashboard-box">
                 <h3>${_("Your categories")}</h3>
                 <ol class="event-list">
+                % if len(events) != 0:
+                    <li class="no-event"><a>
+                        <span class="event-title italic text-superfluous">${_("You have no categories.")}</span>
+                    </a></li>
+                % else:
+                % endif
     <%doc>
                 % for event in attendance.values():
                     <li><a href="${event["url"] class="truncate"}">${event["title"]}</a></li>
@@ -33,9 +45,15 @@
     </%doc>
                 </ol>
             </div>
-            <div id="recommendations" class="dashboard-box">
+            <div id="happeningCategories" class="dashboard-box">
                 <h3>${_("Happening in your categories")}</h3>
                 <ol class="event-list">
+                % if len(events) != 0:
+                    <li class="no-event"><a>
+                        <span class="event-title italic text-superfluous">${_("You have no categories.")}</span>
+                    </a></li>
+                % else:
+                % endif
                 </ol>
             </div>
         </div>
