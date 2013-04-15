@@ -186,11 +186,11 @@ def handler(req, **params):
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and aw.getUser() is None:
                 cacheKey = normalizeQuery(path, query,
-                                          remove=('ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache',
+                                          remove=('_', 'ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache',
                                                   'oa', 'onlyauthed'))
             else:
                 cacheKey = normalizeQuery(path, query,
-                                          remove=('signature', 'timestamp', 'nc', 'nocache', 'oa', 'onlyauthed'))
+                                          remove=('_', 'signature', 'timestamp', 'nc', 'nocache', 'oa', 'onlyauthed'))
                 if signature:
                     # in case the request was signed, store the result under a different key
                     cacheKey = 'signed_' + cacheKey
@@ -205,7 +205,7 @@ def handler(req, **params):
                 aw.setUser(session.getUser())
             userPrefix = 'user-' + session.getUser().getId() + '_'
             cacheKey = userPrefix + normalizeQuery(path, query,
-                                                   remove=('nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
+                                                   remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
                                                            'csrftoken'))
 
         # Bail out if the user requires authentication but is not authenticated
