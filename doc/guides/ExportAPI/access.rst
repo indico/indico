@@ -56,11 +56,12 @@ public information (instead of everything visible to your Indico user) you
 can add the param *onlypublic=yes* to the query string.
 
 It is also possible to re-use the existing Indico session. This only makes
-sense if your browser accesses the API, e.g. because you want to check if a
-certain API call does what you want or if you are developing on Indico and
-want to access the API via an AJAX request. Additionally this method of
-authentication is restricted to GET requests. To use it, add *cookieauth=yes*
+sense if your browser accesses the API, e.g. because you are developing on
+Indico and want to access the API via an AJAX request. Additionally this method
+of authentication is restricted to GET requests. To use it, add *cookieauth=yes*
 to the query string and do not specify an API key, timestamp or signature.
+To prevent data leakage via CSRF the CSRF token of the current session needs to
+be provided as a GET argument *csrftoken* or a HTTP header *X-CSRF-Token*.
 
 Request Signing
 ~~~~~~~~~~~~~~~
