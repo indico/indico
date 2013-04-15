@@ -238,6 +238,7 @@ function webRequest(url, contentType, body, handler) {
                 transport.open("POST", url, true);
                 transport.setRequestHeader("Accept", "text/javascript, text/html, application/xml, text/xml, application/json, */*");
                 transport.setRequestHeader("Content-Type", contentType);
+                transport.setRequestHeader("X-CSRF-Token", $('#csrf-token').attr('content'));
                 transport.onreadystatechange = function() {
                         if (transport.readyState != ReadyState.Complete) {
                                 return;
