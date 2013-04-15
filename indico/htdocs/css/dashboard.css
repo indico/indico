@@ -46,7 +46,7 @@
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    margin-bottom: 20px;
+    margin-bottom: 44px;
     width: 490px;
 }
 
@@ -61,17 +61,14 @@
     padding: 10px;
 }
 
-.event-list {
+.dashboard-box ol {
     list-style: none;
-}
-
-ol.event-list {
     margin: 0;
     padding: 0;
     border: 0;
 }
 
-.event-list li a {
+.dashboard-box ol li a {
     border-bottom: 1px solid #E5E5E5;
     display: block;
     font-size: 14px;
@@ -87,34 +84,56 @@ ol.event-list {
     -ms-user-select: none;
 }
 
-.event-list li:last-child a {
+.dashboard-box ol li:last-child a {
     border-bottom: none;
 }
 
-.event-list li.no-event a {
+.dashboard-box ol li.no-event a {
     cursor: default;
 }
 
-.event-list li.no-event a .event-title {
+.dashboard-box ol li.no-event a .event-title,
+.dashboard-box ol li.no-event a .category-title {
     text-decoration: none !important;
 }
 
 
-.event-list li a:hover .event-title {
+.dashboard-box ol li a:hover .event-title,
+.dashboard-box ol li a:hover .category-title {
     text-decoration: underline;
 }
 
+.dashboard-box ol .event-title,
+.dashboard-box ol .category-title {
+    vertical-align: middle;
+}
 
-.event-list .event-date {
+.dashboard-box ol .event-date,
+.dashboard-box ol .event-category,
+.dashboard-box ol .category-path {
     color: #666;
     display: inline-block;
-    font-size: 12px;
     font-weight: normal;
     vertical-align: middle;
+}
+
+.dashboard-box ol .event-date {
+    display: inline-block;
+    font-size: 12px;
     width: 85px;
 }
 
-.event-list .event-rights {
+.dashboard-box ol .event-category,
+.dashboard-box ol .category-path {
+    display: block;
+    font-size: 11px;
+}
+
+.dashboard-box ol .event-category{
+    margin-left: 89px;
+}
+
+.dashboard-box ol .item-legend {
     max-width: 150px;
     position: relative;
     float: right;
@@ -127,15 +146,23 @@ ol.event-list {
     white-space: nowrap;
 }
 
-.dashboard-box .truncate-target {
+.dashboard-box .event-title.truncate-target {
     max-width: 300px;
 }
 
-.event-rights [class*=icon-] {
+.dashboard-box .category-title.truncate-target {
+    max-width: 445px;
+}
+
+#happeningCategories .event-title.truncate-target {
+    max-width: 375px;
+}
+
+.item-legend [class*=icon-] {
     color: #DDD;
     font-size: 18px;
 }
 
-.event-rights [class*=icon-].active {
+.item-legend [class*=icon-].active {
     color: #777;
 }

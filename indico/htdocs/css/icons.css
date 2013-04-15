@@ -167,3 +167,9 @@ you can use the generic selector below, but it's slower:
 .icon-medal:before {
     content: "\3e";
 }
+.icon-star:before {
+    content: "\3f";
+}
+.icon-ticket:before {
+    content: "\40";
+}

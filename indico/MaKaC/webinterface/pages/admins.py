@@ -1404,26 +1404,7 @@ class WUserDashboard(wcomponents.WTemplated):
         user = self._avatar
 
         html_vars["events"] = self._getEvents()
-#        html_vars["attendance"] = self._getAttendanceEvents()
-
-#        html_vars["categoryManager"] = ""
-#        categs = user.getLinkTo("category","manager")
-#        for categ in categs:
-#            target = CategoryWebLocator({"categId": categ.getId()}).getObject()
-#            if target == None:
-#                user.unlinkTo(categ,"manager")
-#            else:
-#                html_vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
-#
-#        html_vars["eventManager"] = ""
-#        ch = ConferenceHolder()
-#        events = user.getLinkTo("conference","manager")
-#        for event in events:
-#            try:
-#                ch.getById(event.getId())
-#                html_vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
-#            except MaKaCError, e:
-#                user.unlinkTo(event,"manager")
+        html_vars["categories"] = user.getRelatedCategories()
 
         return html_vars
 
@@ -1438,7 +1419,6 @@ class WUserDashboard(wcomponents.WTemplated):
 
     def _fetchEventsFromManagement(self, events_dict):
         user = self._avatar
-        holder = ConferenceHolder()
 
         filters = {"conference": ["creator", "chair", "manager", "registrar"],
                    "session" : ["manager", "coordinator"],
@@ -1449,7 +1429,6 @@ class WUserDashboard(wcomponents.WTemplated):
                 for event in user.getLinkTo(event_kind, role):
                     if event_kind is "conference":
                         try:
-                            holder.getById(event.getId())
                             event_id = event.getId()
                             event_date = event.getAdjustedStartDate()
                             event_title = event.getTitle()
@@ -1481,16 +1460,6 @@ class WUserDashboard(wcomponents.WTemplated):
                    "abstract": ["submitter"],
                    "registration": ["registrant"],
                    "evaluation": ["submitter"]}
-#    def _getEventURL(self, event, event_kind):
-#        # TODO not needed anymore
-#        if event_kind is "conference":
-#            url_handler = urlHandlers.UHConferenceDisplay
-#        elif event_kind is "session":
-#            url_handler = urlHandlers.UHSessionDisplay
-#        elif event_kind is "contribution":
-#            url_handler = urlHandlers.UHContributionDisplay
-#
-#        return url_handler.getURL(event)
 
 class WUserBaskets(wcomponents.WTemplated):
 

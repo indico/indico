@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
 
 #import ldap
 from pytz import all_timezones
@@ -709,14 +710,16 @@ class Avatar(Persistent, Fossilizable):
     def getRelatedCategories(self):
         favorites = set(self.getLinkTo('category', 'favorite'))
         managed = set(self.getLinkTo('category', 'manager'))
-        res = []
+        res = {}
         for categ in favorites | managed:
-            res.append({
+            res[(categ.getTitle(), categ.getId())] = {
                 'categ': categ,
                 'favorite': categ in favorites,
-                'managed': categ in managed
-            })
-        return res
+                'managed': categ in managed,
+                'path': " >> ".join(categ.getCategoryPathTitles())
+            }
+        categ_dict = OrderedDict(sorted(res.items(), key=lambda t: t[0]))
+        return categ_dict
 
     def resetLinkedTo(self):
         self.linkedTo = deepcopy(self.linkedToBase)
