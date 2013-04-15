@@ -47,7 +47,7 @@ from MaKaC.common.general import *
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError
+from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError, BadRefererError
 from MaKaC.webinterface.mail import GenericMailer
 from xml.sax.saxutils import escape
 
@@ -339,6 +339,23 @@ class RH(RequestHandlerBase):
         """
         pass
 
+    def _checkCSRF(self):
+        # Check referer for POST requests. We do it here so we can properly use indico's error handling
+        if Config.getInstance().getCSRFLevel() < 3 or self._req.method != 'POST':
+            return
+        referer = self._req.headers_in.get('Referer')
+        # allow empty - otherwise we might lock out paranoid users blocking referers
+        if not referer:
+            return
+        # valid http referer
+        if referer.startswith(Config.getInstance().getBaseURL()):
+            return
+        # valid https referer - if https is enabled
+        base_secure = Config.getInstance().getBaseSecureURL()
+        if base_secure and referer.startswith(base_secure):
+            return
+        raise BadRefererError('This operation is not allowed from an external referer.')
+
     def _processGeneralError(self,e):
         """Treats general errors occured during the process of a RH.
         """
@@ -537,6 +554,7 @@ class RH(RequestHandlerBase):
                                 if self._checkHttpsRedirect():
                                     return
 
+                        self._checkCSRF()
                         #if self._getUser() != None and self._getUser().getId() == "893":
                         #    profile = True
                         self._reqParams = copy.copy( params )

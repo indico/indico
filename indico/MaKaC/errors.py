@@ -184,3 +184,7 @@ class HtmlForbiddenTag(MaKaCError):
     """
     """
     pass
+
+
+class BadRefererError(MaKaCError):
+    pass

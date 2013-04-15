@@ -605,8 +605,8 @@ class Config:
         if self.getSanitizationLevel() not in range(4):
             raise MaKaCError("Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel']))
 
-        if self.getCSRFLevel() not in range(3):
-            raise MaKaCError("Invalid CSRFLevel value (%s). Valid values: 0, 1, 2" % (self._configVars['CSRFLevel']))
+        if self.getCSRFLevel() not in range(4):
+            raise MaKaCError("Invalid CSRFLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['CSRFLevel']))
 
     def __getattr__(self, attr):
         """Dynamic finder for values defined in indico.conf

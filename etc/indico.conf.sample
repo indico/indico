@@ -37,6 +37,7 @@ AuthenticatedEnforceSecure = "yes"
 #    0: Disable all CSRF checks (DANGEROUS!)
 #    1: Check CSRF token for service requests
 #    2: Check CSRF token for service requests and cookie-based API requests
+#    3: The above & require an empty or valid referer for normal POST requests
 CSRFLevel = 2
 
 
