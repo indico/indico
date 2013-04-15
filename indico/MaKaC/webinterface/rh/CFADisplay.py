@@ -203,7 +203,10 @@ class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):
         #   necessary
         if self._getUser() == None:
             return
-        headerSize = self._req.headers_in["content-length"]
+        try:
+            headerSize = self._req.headers_in["content-length"]
+        except KeyError:
+            headerSize = -1
         AbstractParam._checkParams(self, params, self._conf, headerSize)
 
 
