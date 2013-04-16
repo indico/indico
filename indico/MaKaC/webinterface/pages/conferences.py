@@ -699,7 +699,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["moreInfo_html"] = isStringHTML(info)
         vars["moreInfo"] = info
         vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
-        vars["isSubmitter"] = self._conf.getAccessController().canUserSubmit(self._aw.getUser())
+        vars["isSubmitter"] = self._conf.getAccessController().canUserSubmit(self._aw.getUser()) or self._conf.canModify(self._aw)
         return vars
 
 
