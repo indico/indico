@@ -242,7 +242,7 @@ class AbstractData(object):
             caption = f.getCaption()
             ml = f.getMaxLength()
             limitation = f.getLimitation()
-            if f.isMandatory() and self._otherFields.get(id,"") == "":
+            if f.isActive() and f.isMandatory() and self._otherFields.get(id,"") == "":
                 errors.append(_("The field '%s' is mandatory") % caption)
             if ml != 0:
                 if limitation == "words" and textUtils.wordsCounter(self._otherFields.get(id,"")) > ml:
